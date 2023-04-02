@@ -2,12 +2,14 @@
   "scripts": {
     "build": "tsc",
     "db:migrate": "run-p db:migrate:*",
-    "db:migrate:dev": "npx prisma migrate dev && npx prisma db seed",
+    "db:migrate:dev": "npx prisma migrate dev",
     "start": "nodemon --exec node --require dotenv/config --experimental-specifier-resolution=node --experimental-modules --no-warnings --loader ts-node/esm ./src/server.ts",
     "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@fastify/cors": "^8.2.1",
+    "@fastify/helmet": "^10.1.0",
     "@prisma/client": "^4.12.0",
     "fastify": "^4.15.0",
     "fastify-plugin": "^4.5.0"

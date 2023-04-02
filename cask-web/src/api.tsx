@@ -1,5 +1,51 @@
 import type { Bottle, Checkin, User } from "./types";
 
+const API_SERVER: string = process.env.API_SERVER || "http://localhost:3100";
+
+type ApiRequestOptions = {
+  method: "GET" | "POST" | "DELETE" | "PUT";
+};
+
+class ApiClient {
+  server: string;
+
+  constructor({ server }: { server: string }) {
+    this.server = server;
+  }
+
+  request(path: string, options: ApiRequestOptions) {
+    fetch(`${this.server}${path}`, options);
+  }
+
+  get(path: string) {
+    return this.request(path, {
+      method: "GET",
+    });
+  }
+
+  post(path: string) {
+    return this.request(path, {
+      method: "POST",
+    });
+  }
+
+  put(path: string) {
+    return this.request(path, {
+      method: "PUT",
+    });
+  }
+
+  delete(path: string) {
+    return this.request(path, {
+      method: "DELETE",
+    });
+  }
+}
+
+const defaultClient = new ApiClient({ server: API_SERVER });
+
+export default defaultClient;
+
 export async function getUser(userId: string): Promise<User> {
   return {
     id: userId,
