@@ -11,13 +11,15 @@ app.register(prismaPlugin);
 // routes
 app.register(bottlesRoute);
 
-await app.listen(3000, "0.0.0.0");
+// await app.listen(3000, "0.0.0.0");
 
-// app.listen({ port: 3000 }, function (err, address) {
-//   if (err) {
-//     app.log.error(err);
-//     process.exit(1);
-//   }
-// });
+const serverPort: number = process.env.PORT
+  ? parseInt(process.env.PORT, 10)
+  : 3000;
 
-// const app = fastify();
+app.listen({ port: serverPort }, function (err, address) {
+  if (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
+});
