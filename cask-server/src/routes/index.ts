@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyPluginCallback } from "fastify";
 import { RouteOptions } from "fastify";
 
 import { listBottles, getBottle } from "./bottles";
+import { googleCallback } from "./auth";
 
 type RouteConfig = Record<string, RouteOptions>;
 
@@ -12,6 +13,11 @@ const routes: RouteConfig = {
     handler: (_, res) => {
       res.status(200).send();
     },
+  },
+  authGoogle: {
+    method: "GET",
+    url: "/auth/google/callback",
+    handler: googleCallback,
   },
   listBottles: {
     method: "GET",

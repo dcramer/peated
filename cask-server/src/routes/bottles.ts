@@ -1,5 +1,4 @@
 import type { RouteHandlerMethod } from "fastify";
-import type { Bottle } from "@prisma/client";
 import { prisma } from "../lib/db";
 
 export const listBottles: RouteHandlerMethod = async (req, res) => {
@@ -10,7 +9,7 @@ export const listBottles: RouteHandlerMethod = async (req, res) => {
 };
 
 export const getBottle: RouteHandlerMethod = async (req, res) => {
-  const bottle = await prisma.bottle.findFirst({
+  const bottle = await prisma.bottle.findUnique({
     where: {
       id: parseInt(req.params.bottleId, 10),
     },

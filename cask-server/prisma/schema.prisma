@@ -14,6 +14,21 @@ model User {
     Checkin     Checkin[]
 }
 
+enum IdentityProvider {
+    google
+}
+
+model Identity {
+    id Int @id @default(autoincrement())
+
+    provider   IdentityProvider
+    externalId String
+
+    userId Int
+
+    @@unique([provider, externalId])
+}
+
 model Producer {
     id      Int      @id @default(autoincrement())
     name    String
@@ -23,10 +38,10 @@ model Producer {
 }
 
 enum Category {
-    Blend
-    BlendedMalt
-    SingleMalt
-    Spirit
+    blend
+    blended_malt
+    single_malt
+    spirit
 }
 
 // e.g. Suntory Whisky

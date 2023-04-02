@@ -1,4 +1,5 @@
 import fastify from "fastify";
+import { OAuth2Namespace } from "@fastify/oauth2";
 
 declare namespace NodeJS {
   export interface ProcessEnv {
@@ -9,6 +10,9 @@ declare namespace NodeJS {
 }
 
 declare module "fastify" {
+  interface FastifyInstance {
+    googleOAuth2: OAuth2Namespace;
+  }
   export interface FastifyRequest {
     user: any;
   }
