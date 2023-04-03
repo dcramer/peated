@@ -3,7 +3,7 @@ import { Box, Fab, Paper } from "@mui/material";
 import type { Checkin } from "../types";
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import { listCheckins } from "../api";
+import { listCheckins } from "../lib/api";
 import CheckinListItem from "../components/checkinListItem";
 
 type LoaderData = {

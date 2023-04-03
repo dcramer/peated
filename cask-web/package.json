@@ -5,6 +5,7 @@
     "@fontsource/roboto": "^4.5.8",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.15",
+    "@react-oauth/google": "^0.9.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",

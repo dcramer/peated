@@ -1,9 +1,11 @@
+import type { RouteObject } from "react-router-dom";
+
 import Root from "./routes/root";
 import ErrorPage from "./error-page";
 import Checkin, { loader as checkinLoader } from "./routes/checkin";
 import Activity, { loader as activityLoader } from "./routes/activity";
 import Search, { loader as searchLoader } from "./routes/search";
-import type { RouteObject } from "react-router-dom";
+import Login from "./routes/login";
 
 export default [
   {
@@ -23,5 +25,9 @@ export default [
         loader: searchLoader,
       },
     ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
   },
 ] as RouteObject[];

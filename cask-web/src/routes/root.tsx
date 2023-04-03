@@ -1,10 +1,18 @@
 import Container from "@mui/material/Container";
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import { AccountBox, Favorite, LocalActivity } from "@mui/icons-material";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Root() {
+  const navigate = useNavigate();
   const location = useLocation();
+
+  const auth = useAuth();
+  if (!auth.user) {
+    navigate("/login");
+    console.log("no user");
+  }
 
   return (
     <Container maxWidth="sm" style={{ position: "relative", height: "100vh" }}>

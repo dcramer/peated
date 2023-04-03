@@ -12,7 +12,7 @@ import {
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 import { getBottleDisplayName } from "../lib";
-import { getBottle } from "../api";
+import { getBottle } from "../lib/api";
 import type { Bottle, User } from "../types";
 import { useState } from "react";
 import { Add as AddIcon } from "@mui/icons-material";

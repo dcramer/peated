@@ -13,7 +13,7 @@ import { getBottleDisplayName } from "../lib";
 
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import { searchBottles } from "../api";
+import { searchBottles } from "../lib/api";
 
 type LoaderData = {
   bottles: Bottle[];
