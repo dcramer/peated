@@ -1,9 +1,10 @@
 import type { Bottle, Checkin, User } from "../types";
 
-const API_SERVER: string = process.env.API_SERVER || "http://localhost:3100";
+const API_SERVER: string = process.env.API_SERVER || "http://localhost:4000";
 
 type ApiRequestOptions = {
   method: "GET" | "POST" | "DELETE" | "PUT";
+  json?: any;
 };
 
 class ApiClient {
@@ -13,8 +14,14 @@ class ApiClient {
     this.server = server;
   }
 
-  request(path: string, options: ApiRequestOptions) {
-    fetch(`${this.server}${path}`, options);
+  async request(path: string, options: ApiRequestOptions) {
+    return await fetch(`${this.server}${path}`, {
+      method: options.method,
+      body: options.json ? JSON.stringify(options.json) : undefined,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 
   get(path: string) {
@@ -23,21 +30,24 @@ class ApiClient {
     });
   }
 
-  post(path: string) {
+  post(path: string, data: any | undefined) {
     return this.request(path, {
       method: "POST",
+      json: data,
     });
   }
 
-  put(path: string) {
+  put(path: string, data: any | undefined) {
     return this.request(path, {
       method: "PUT",
+      json: data,
     });
   }
 
-  delete(path: string) {
+  delete(path: string, data: any | undefined) {
     return this.request(path, {
       method: "DELETE",
+      json: data,
     });
   }
 }

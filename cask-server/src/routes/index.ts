@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyPluginCallback } from "fastify";
 import { RouteOptions } from "fastify";
 
 import { listBottles, getBottle } from "./bottles";
-import { googleCallback } from "./auth";
+import { authGoogle } from "./auth";
 
 type RouteConfig = Record<string, RouteOptions>;
 
@@ -15,9 +15,9 @@ const routes: RouteConfig = {
     },
   },
   authGoogle: {
-    method: "GET",
-    url: "/auth/google/callback",
-    handler: googleCallback,
+    method: "POST",
+    url: "/auth/google",
+    handler: authGoogle,
   },
   listBottles: {
     method: "GET",
@@ -39,7 +39,6 @@ export const router: FastifyPluginCallback = (
   fastify.decorateRequest("user", null);
 
   fastify.addHook("onRequest", (req, res, next) => {
-    console.log("onRequest");
     req.user = null;
     next();
   });

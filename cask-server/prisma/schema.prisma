@@ -8,10 +8,12 @@ generator client {
 }
 
 model User {
-    id          Int       @id @default(autoincrement())
-    email       String    @unique
+    id          Int     @id @default(autoincrement())
+    email       String  @unique
     displayName String?
-    Checkin     Checkin[]
+
+    checkins   Checkin[]
+    identities Identity[]
 }
 
 enum IdentityProvider {
@@ -25,6 +27,7 @@ model Identity {
     externalId String
 
     userId Int
+    User   User @relation(fields: [userId], references: [id])
 
     @@unique([provider, externalId])
 }

@@ -1,6 +1,7 @@
 import { Container, Grid, Typography } from "@mui/material";
 import type { LoaderFunction } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
+import defaultClient from "../lib/api";
 
 type LoaderData = {};
 
@@ -24,7 +25,10 @@ export default function Login() {
         </Grid>
         <Grid item xs={3}>
           <GoogleLogin
-            onSuccess={(credentialResponse) => {
+            onSuccess={async (credentialResponse) => {
+              await defaultClient.post("/auth/google", {
+                token: credentialResponse.credential,
+              });
               console.log(credentialResponse);
             }}
             onError={() => {

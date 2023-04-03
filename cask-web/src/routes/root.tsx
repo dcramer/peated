@@ -3,16 +3,20 @@ import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import { AccountBox, Favorite, LocalActivity } from "@mui/icons-material";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useEffect } from "react";
 
 export default function Root() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const auth = useAuth();
-  if (!auth.user) {
-    navigate("/login");
-    console.log("no user");
-  }
+  useEffect(() => {
+    if (!auth.user) {
+      navigate("/login");
+    }
+  });
+
+  if (!auth.user) return <></>;
 
   return (
     <Container maxWidth="sm" style={{ position: "relative", height: "100vh" }}>
