@@ -10,6 +10,7 @@ import reportWebVitals from "./reportWebVitals";
 import theme from "./theme";
 import routes from "./routes";
 import config from "./config";
+import { AuthProvider } from "./hooks/useAuth";
 
 const router = createBrowserRouter(routes);
 
@@ -19,11 +20,13 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
-      <ThemeProvider theme={theme}>
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        <RouterProvider router={router} />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </ThemeProvider>
+      </AuthProvider>
     </GoogleOAuthProvider>
   </React.StrictMode>
 );

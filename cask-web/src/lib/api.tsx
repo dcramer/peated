@@ -9,18 +9,33 @@ type ApiRequestOptions = {
 
 class ApiClient {
   server: string;
+  accessToken: string | null;
 
-  constructor({ server }: { server: string }) {
+  constructor({
+    server,
+    accessToken = null,
+  }: {
+    server: string;
+    accessToken?: string | null;
+  }) {
     this.server = server;
+    this.accessToken = accessToken;
+  }
+
+  setAccessToken(accessToken: string | null = null) {
+    this.accessToken = accessToken;
   }
 
   async request(path: string, options: ApiRequestOptions) {
+    const headers: { [name: string]: string } = {};
+    if (options.json) headers["Content-Type"] = "application/json";
+    if (this.accessToken)
+      headers["Authorization"] = `Bearer ${this.accessToken}`;
+
     const req = await fetch(`${this.server}${path}`, {
       method: options.method,
       body: options.json ? JSON.stringify(options.json) : undefined,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
     });
     return await req.json();
   }

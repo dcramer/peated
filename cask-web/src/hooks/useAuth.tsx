@@ -1,51 +1,49 @@
-import { createContext, useCallback, useContext, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useContext } from "react";
 import useLocalStorage from "./useLocalStorage";
 import { User } from "../types";
+import defaultClient from "../lib/api";
 
 type Auth = {
-  login: (user: User, accessToken: string) => Promise<void>;
-  logout: () => Promise<void>;
+  login: (user: User, accessToken: string) => void;
+  logout: () => void;
   user: User | null;
 };
 
 const AuthContext = createContext<Auth>({
-  login: async (user, accessToken) => {},
-  logout: async () => {},
+  login: (user, accessToken) => {
+    throw new Error("Missing AuthProvider");
+  },
+  logout: () => {
+    throw new Error("Missing AuthProvider");
+  },
   user: null,
 });
 
-export const AuthProvider = ({ children }: { children: any[] }) => {
+export const AuthProvider = ({ children }: { children: any }) => {
   const [user, setUser] = useLocalStorage<User | null>("user", null);
-  const navigate = useNavigate();
 
   // call this function when you want to authenticate the user
-  const login = useCallback(
-    async (user: User, accessToken: string) => {
-      setUser(user);
-      navigate("/profile");
-    },
-    [navigate, setUser]
-  );
+  const login = (user: User, accessToken: string) => {
+    // kind of gross this exists here, need a better pattern
+    defaultClient.setAccessToken(accessToken);
+    setUser(user);
+  };
 
   // call this function to sign out logged in user
-  const logout = useCallback(async () => {
+  const logout = () => {
+    defaultClient.setAccessToken(null);
     setUser(null);
-    navigate("/", { replace: true });
-  }, [navigate, setUser]);
+  };
 
-  const value = useMemo(
-    () => ({
-      user,
-      login,
-      logout,
-    }),
-    [user, login, logout]
-  );
+  const value = {
+    user,
+    login,
+    logout,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+export default function useAuth() {
   return useContext(AuthContext);
-};
+}

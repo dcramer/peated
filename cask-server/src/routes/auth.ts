@@ -93,6 +93,6 @@ export const authGoogle: RouteHandlerMethod = async function (req, res) {
 
   return res.send({
     user,
-    accessToken: await createAccessToken(user),
+    accessToken: await createAccessToken({ id: user.id }),
   });
 };

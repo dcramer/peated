@@ -1,8 +1,9 @@
-import { Container, Grid, Typography } from "@mui/material";
-import type { LoaderFunction } from "react-router-dom";
+import { Grid, Typography } from "@mui/material";
+import { LoaderFunction, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import defaultClient from "../lib/api";
-import { useAuth } from "../hooks/useAuth";
+import useAuth from "../hooks/useAuth";
+import Layout from "../components/layout";
 
 type LoaderData = {};
 
@@ -13,8 +14,10 @@ export const loader: LoaderFunction = async (): Promise<LoaderData> => {
 export default function Login() {
   const { login } = useAuth();
 
+  const navigate = useNavigate();
+
   return (
-    <Container maxWidth="sm">
+    <Layout>
       <Grid
         container
         spacing={0}
@@ -24,7 +27,7 @@ export default function Login() {
         style={{ minHeight: "100vh" }}
       >
         <Grid item xs={3}>
-          <Typography variant="h1">Casked</Typography>
+          <Typography variant="h1">Cask</Typography>
         </Grid>
         <Grid item xs={3}>
           <GoogleLogin
@@ -36,6 +39,7 @@ export default function Login() {
                 }
               );
               login(user, accessToken);
+              navigate("/");
             }}
             onError={() => {
               console.log("Login Failed");
@@ -43,6 +47,6 @@ export default function Login() {
           />
         </Grid>
       </Grid>
-    </Container>
+    </Layout>
   );
 }

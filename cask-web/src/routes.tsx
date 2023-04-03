@@ -6,6 +6,8 @@ import Checkin, { loader as checkinLoader } from "./routes/checkin";
 import Activity, { loader as activityLoader } from "./routes/activity";
 import Search, { loader as searchLoader } from "./routes/search";
 import Login from "./routes/login";
+import Profile from "./routes/profile";
+import { Favorite } from "@mui/icons-material";
 
 export default [
   {
@@ -23,6 +25,14 @@ export default [
         path: "search",
         element: <Search />,
         loader: searchLoader,
+      },
+      {
+        path: "favorites",
+        element: <Favorite />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
       },
     ],
   },
