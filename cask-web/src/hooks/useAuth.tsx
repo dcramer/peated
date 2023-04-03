@@ -4,13 +4,13 @@ import useLocalStorage from "./useLocalStorage";
 import { User } from "../types";
 
 type Auth = {
-  login: (user: User) => Promise<void>;
+  login: (user: User, accessToken: string) => Promise<void>;
   logout: () => Promise<void>;
   user: User | null;
 };
 
 const AuthContext = createContext<Auth>({
-  login: async (user) => {},
+  login: async (user, accessToken) => {},
   logout: async () => {},
   user: null,
 });
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }: { children: any[] }) => {
 
   // call this function when you want to authenticate the user
   const login = useCallback(
-    async (user: User) => {
+    async (user: User, accessToken: string) => {
       setUser(user);
       navigate("/profile");
     },

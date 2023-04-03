@@ -1,7 +1,7 @@
 import type { RouteHandlerMethod } from "fastify";
 import { prisma } from "../lib/db";
 import { createAccessToken } from "../lib/auth";
-import { Algorithm, decode } from "jsonwebtoken";
+import { decode } from "jsonwebtoken";
 import config from "../config";
 import { verify } from "jsonwebtoken";
 import { JwksClient } from "jwks-rsa";
@@ -45,8 +45,8 @@ export const authGoogle: RouteHandlerMethod = async function (req, res) {
 
   const signingKey = await jwksClient.getSigningKey(header.kid);
 
-  const payload = verify(token, signingKey.publicKey, {
-    algorithms: [header.alg as Algorithm],
+  const payload = verify(token, signingKey.getPublicKey(), {
+    algorithms: ["RS256"],
   }) as GoogleCredential | undefined;
   if (!payload) {
     res.status(400).send({ error: "Invalid token (verify)" });
@@ -66,10 +66,15 @@ export const authGoogle: RouteHandlerMethod = async function (req, res) {
     return;
   }
 
-  let user = await prisma.identity.findFirst({
-    where: { provider: "google", externalId: payload.sub },
+  let user = await prisma.user.findFirst({
+    where: {
+      identities: {
+        some: { provider: "google", externalId: payload.sub },
+      },
+    },
   });
   if (!user) {
+    console.log("Creating new user");
     user = await prisma.user.create({
       data: {
         displayName: payload.given_name,
@@ -87,6 +92,7 @@ export const authGoogle: RouteHandlerMethod = async function (req, res) {
   }
 
   return res.send({
-    data: { user, accessToken: await createAccessToken(user) },
+    user,
+    accessToken: await createAccessToken(user),
   });
 };

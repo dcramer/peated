@@ -15,13 +15,14 @@ class ApiClient {
   }
 
   async request(path: string, options: ApiRequestOptions) {
-    return await fetch(`${this.server}${path}`, {
+    const req = await fetch(`${this.server}${path}`, {
       method: options.method,
       body: options.json ? JSON.stringify(options.json) : undefined,
       headers: {
         "Content-Type": "application/json",
       },
     });
+    return await req.json();
   }
 
   get(path: string) {
