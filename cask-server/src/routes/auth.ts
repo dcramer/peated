@@ -40,8 +40,6 @@ const jwksClient = new JwksClient({
   timeout: 3000,
 });
 
-async function retrieveSigningKey(kid: string) {}
-
 // TODO: verify signing key - not entirely sure if the jwt library exposes this for me?
 // https://www.googleapis.com/oauth2/v2/certs
 export const authGoogle: RouteHandlerMethod = async function (req, res) {
