@@ -6,18 +6,6 @@ import config from "../config";
 import { verify } from "jsonwebtoken";
 import { JwksClient } from "jwks-rsa";
 
-// export const googleCallback: RouteHandlerMethod = async function (req, res) {
-//   const { token } =
-//     await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(req);
-
-//   let user = await prisma.identity.findUnique({
-//     where: { provider: "google", externalId: token },
-//   });
-
-//   return res.send({
-//     data: { user, accessToken: await createAccessToken(data) },
-//   });
-// };
 type GoogleCredential = {
   iss: string;
   nbf: number;
@@ -40,8 +28,6 @@ const jwksClient = new JwksClient({
   timeout: 3000,
 });
 
-// TODO: verify signing key - not entirely sure if the jwt library exposes this for me?
-// https://www.googleapis.com/oauth2/v2/certs
 export const authGoogle: RouteHandlerMethod = async function (req, res) {
   const { token } = req.body;
 
