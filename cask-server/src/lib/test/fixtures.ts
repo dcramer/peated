@@ -18,8 +18,8 @@ export const User = async ({ ...data }: Partial<UserType> = {}) => {
   });
 };
 
-export const Producer = async ({ ...data }: Partial<ProducerType> = {}) => {
-  return await prisma.producer.create({
+export const Brand = async ({ ...data }: Partial<BrandType> = {}) => {
+  return await prisma.brand.create({
     data: {
       name: faker.company.name(),
       country: faker.address.country(),
@@ -28,32 +28,13 @@ export const Producer = async ({ ...data }: Partial<ProducerType> = {}) => {
   });
 };
 
-export const Bottler = async ({ ...data }: Partial<BottlerType> = {}) => {
-  return await prisma.bottler.create({
-    data: {
-      name: faker.company.name(),
-      ...data,
-    },
-  });
-};
-
-export const Brand = async ({ ...data }: Partial<BrandType> = {}) => {
-  return await prisma.brand.create({
-    data: {
-      name: faker.company.name(),
-      ...data,
-    },
-  });
-};
-
 export const Bottle = async ({ ...data }: Partial<BottleType> = {}) => {
-  if (data.producerId === undefined) data.producerId = (await Producer()).id;
-  if (data.bottlerId === undefined) data.bottlerId = (await Bottler()).id;
   if (data.brandId === undefined) data.brandId = (await Brand()).id;
 
   return await prisma.bottle.create({
     data: {
       name: faker.music.songName(),
+      series: faker.music.songName(),
       ...data,
     },
   });

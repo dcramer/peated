@@ -72,18 +72,10 @@ test("creates a new bottle with minimal params", async () => {
     },
   });
   expect(bottle.name).toEqual("Delicious Wood");
-  expect(bottle.producerId).toEqual(producer.id);
-  expect(bottle.bottlerId).toBeNull();
   expect(bottle.brandId).toBeNull();
   expect(bottle.abv).toBeNull();
   expect(bottle.statedAge).toBeNull();
-  expect(bottle.vintageYear).toBeNull();
-  expect(bottle.bottleYear).toBeNull();
   expect(bottle.series).toBeNull();
-  expect(bottle.caskType).toBeNull();
-  expect(bottle.caskNumber).toBeNull();
-  expect(bottle.totalBottles).toBeNull();
-  expect(bottle.mashBill).toBeNull();
 });
 
 test("creates a new bottle with all params", async () => {
@@ -95,18 +87,10 @@ test("creates a new bottle with all params", async () => {
     url: "/bottles",
     payload: {
       name: "Delicious Wood",
-      producer: producer.id,
-      bottler: bottler.id,
       brand: brand.id,
+      series: "Super Delicious",
       abv: 0.45,
       statedAge: 12,
-      vintageYear: 1999,
-      bottleYear: 2000,
-      series: "Super Delicious",
-      caskType: "Port",
-      caskNumber: "6969",
-      totalBottles: 10000,
-      mashBill: { barley: 0.5, corn: 0.2, rye: 0.2, wheat: 0.1 },
     },
   });
 
@@ -116,51 +100,37 @@ test("creates a new bottle with all params", async () => {
 
   const bottle = await prisma.bottle.findUniqueOrThrow({
     where: { id: data.id },
-    include: {
-      mashBill: true,
-    },
   });
   expect(bottle.name).toEqual("Delicious Wood");
-  expect(bottle.producerId).toEqual(producer.id);
-  expect(bottle.bottlerId).toEqual(bottler.id);
   expect(bottle.brandId).toEqual(brand.id);
   expect(bottle.abv).toEqual(0.45);
   expect(bottle.statedAge).toEqual(12);
-  expect(bottle.vintageYear).toEqual(1999);
-  expect(bottle.bottleYear).toEqual(2000);
   expect(bottle.series).toEqual("Super Delicious");
-  expect(bottle.caskType).toEqual("Port");
-  expect(bottle.caskNumber).toEqual("6969");
-  expect(bottle.totalBottles).toEqual(10000);
-  expect(bottle.mashBill.barley).toEqual(0.5);
-  expect(bottle.mashBill.corn).toEqual(0.2);
-  expect(bottle.mashBill.rye).toEqual(0.2);
-  expect(bottle.mashBill.wheat).toEqual(0.1);
 });
 
-test("creates a new bottle with invalid producerId", async () => {
+test("creates a new bottle with invalid brandId", async () => {
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
     payload: {
       name: "Delicious Wood",
-      producer: 5,
+      brand: 5,
     },
   });
 
   expect(response).toRespondWith(400);
 });
 
-test("creates a new bottle with existing producer name", async () => {
-  const producer = await Fixtures.Producer();
+test("creates a new bottle with existing branbd name", async () => {
+  const brand = await Fixtures.Brand();
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
     payload: {
       name: "Delicious Wood",
-      producer: {
-        name: producer.name,
-        country: producer.country,
+      brand: {
+        name: brand.name,
+        country: brand.country,
       },
     },
   });
@@ -173,16 +143,16 @@ test("creates a new bottle with existing producer name", async () => {
     where: { id: data.id },
   });
   expect(bottle.name).toEqual("Delicious Wood");
-  expect(bottle.producerId).toEqual(producer.id);
+  expect(bottle.brandId).toEqual(brand.id);
 });
 
-test("creates a new bottle with new producer name", async () => {
+test("creates a new bottle with new brand name", async () => {
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
     payload: {
       name: "Delicious Wood",
-      producer: {
+      brand: {
         name: "Hard Knox",
         country: "Scotland",
       },
@@ -197,5 +167,5 @@ test("creates a new bottle with new producer name", async () => {
     where: { id: data.id },
   });
   expect(bottle.name).toEqual("Delicious Wood");
-  expect(bottle.producerId).toBeDefined();
+  expect(bottle.brandId).toBeDefined();
 });

@@ -42,10 +42,7 @@ export const listBottles: RouteOptions<
 
     const results = await prisma.bottle.findMany({
       include: {
-        producer: true,
-        bottler: true,
         brand: true,
-        mashBill: true,
       },
       where,
       skip: offset,
@@ -80,10 +77,7 @@ export const getBottle: RouteOptions<
   handler: async (req, res) => {
     const bottle = await prisma.bottle.findUnique({
       include: {
-        producer: true,
         brand: true,
-        bottler: true,
-        mashBill: true,
       },
       where: {
         id: req.params.bottleId,
@@ -104,14 +98,6 @@ export const addBottle: RouteOptions<
   {
     Body: Bottle & {
       brand: number | { name: string };
-      bottler: number | { name: string };
-      producer: number | { name: string; country: string; region?: string };
-      mashBill: {
-        barley: number;
-        corn: number;
-        rye: number;
-        wheat: number;
-      };
     };
   }
 > = {
@@ -124,34 +110,6 @@ export const addBottle: RouteOptions<
       properties: {
         name: { type: "string" },
         brand: {
-          oneOf: [
-            { type: "number" },
-            {
-              type: "object",
-              required: ["name"],
-              properties: {
-                name: {
-                  type: "string",
-                },
-              },
-            },
-          ],
-        },
-        bottler: {
-          oneOf: [
-            { type: "number" },
-            {
-              type: "object",
-              required: ["name"],
-              properties: {
-                name: {
-                  type: "string",
-                },
-              },
-            },
-          ],
-        },
-        producer: {
           oneOf: [
             { type: "number" },
             {
@@ -171,100 +129,21 @@ export const addBottle: RouteOptions<
             },
           ],
         },
+        series: { type: "string" },
         category: {
           type: "string",
           enum: ["blend", "blended_malt", "single_malt", "spirit"],
         },
         abv: { type: "number" },
         stagedAge: { type: "number" },
-        vintageYear: { type: "number" },
-        bottleYear: { type: "number" },
-        series: { type: "string" },
-        caskType: { type: "string" },
-        caskNumber: { type: "string" },
-        totalBottles: { type: "number" },
-        mashBill: {
-          type: "object",
-          properties: {
-            barley: { type: "number" },
-            corn: { type: "number" },
-            rye: { type: "number" },
-            wheat: { type: "number" },
-          },
-        },
       },
     },
   },
   handler: async (req, res) => {
     const body = req.body;
     // gross syntax, whats better?
-    const data: Prisma.BottleUncheckedCreateInput = (({
-      producer,
-      bottler,
-      brand,
-      mashBill,
-      ...d
-    }: any) => d)(body);
-
-    if (body.producer) {
-      let producer: Producer | null;
-
-      if (typeof body.producer === "number") {
-        producer = await prisma.producer.findUnique({
-          where: { id: body.producer },
-        });
-      } else if (body.producer satisfies Partial<Producer>) {
-        producer = await prisma.producer.upsert({
-          where: {
-            // why does this not reflect what the docs say?
-            name_country: {
-              name: body.producer.name,
-              country: body.producer.country,
-            },
-          },
-          update: {
-            region: body.producer.region || null,
-          },
-          create: {
-            name: body.producer.name,
-            country: body.producer.country,
-            region: body.producer.region || null,
-          },
-        });
-      }
-
-      if (!producer) {
-        res.status(400).send({ error: "Invalid producer" });
-      } else {
-        data.producerId = producer.id;
-      }
-    }
-
-    if (body.bottler) {
-      let bottler: Bottler | null;
-
-      if (typeof body.bottler === "number") {
-        bottler = await prisma.bottler.findUnique({
-          where: { id: body.producer },
-        });
-      } else if (body.bottler satisfies Partial<Bottler>) {
-        bottler = await prisma.bottler.upsert({
-          where: {
-            name: body.bottler.name,
-          },
-          create: {
-            name: body.bottler.name,
-          },
-          update: {},
-        });
-      }
-
-      if (!bottler) {
-        res.status(400).send({ error: "Invalid bottler" });
-      } else {
-        data.bottlerId = bottler.id;
-      }
-    }
+    const data: Prisma.BottleUncheckedCreateInput = (({ brand, ...d }: any) =>
+      d)(body);
 
     if (body.brand) {
       let brand: Brand | null;
@@ -281,6 +160,8 @@ export const addBottle: RouteOptions<
           update: {},
           create: {
             name: body.brand.name,
+            country: body.brand.country,
+            region: body.brand.region,
           },
         });
       }
@@ -292,16 +173,11 @@ export const addBottle: RouteOptions<
       }
     }
 
-    if (body.mashBill) {
-      data.mashBill = {
-        create: {
-          ...body.mashBill,
-        },
-      };
-    }
-
     const bottle = await prisma.bottle.create({
       data,
+      include: {
+        brand: true,
+      },
     });
     res.status(201).send(bottle);
   },

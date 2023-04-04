@@ -28,19 +28,9 @@ model Identity {
     externalId String
 
     userId Int
-    User   User @relation(fields: [userId], references: [id])
+    user   User @relation(fields: [userId], references: [id])
 
     @@unique([provider, externalId])
-}
-
-model Producer {
-    id      Int      @id @default(autoincrement())
-    name    String
-    country String
-    region  String?
-    Bottle  Bottle[]
-
-    @@unique([name, country])
 }
 
 enum Category {
@@ -50,62 +40,37 @@ enum Category {
     spirit
 }
 
-// e.g. Suntory Whisky
-model Bottler {
-    id     Int      @id @default(autoincrement())
-    name   String   @unique
-    Bottle Bottle[]
-}
-
-// e.g. Hibiki
+// e.g. Hibiki, Glenlivet
 model Brand {
-    id     Int      @id @default(autoincrement())
-    name   String   @unique
-    Bottle Bottle[]
+    id   Int    @id @default(autoincrement())
+    name String @unique
+
+    country String
+    region  String?
+
+    bottles Bottle[]
 }
 
 // DisplayName is: [Brand] [Name] [Series]
 // if Brand is empty it uses the Producer instead and is considered their base
 // Producer=Hibiki Brand=Hibiki, Name=12, Series=None, DisplayName=Hibiki 12
 // Producer=Macallan, Brand=Blended Malt, Series=Mythic Journey, DisplayName=Macallan Blended Malt Mythic Journey
-// TODO: Whats our unique constraint?
-model Bottle {
-    id         Int       @id @default(autoincrement())
-    name       String
-    brandId    Int?
-    brand      Brand?    @relation(fields: [brandId], references: [id])
-    bottlerId  Int?
-    bottler    Bottler?  @relation(fields: [bottlerId], references: [id])
-    producerId Int?
-    producer   Producer? @relation(fields: [producerId], references: [id])
-    category   Category?
 
+// Bottles are unique to their (name, brand, series), and the rest of the attributes are considered optional facts
+model Bottle {
+    id      Int     @id @default(autoincrement())
+    name    String
+    brandId Int
+    brand   Brand   @relation(fields: [brandId], references: [id])
+    series  String?
+
+    category  Category?
     abv       Float?
     statedAge Int?
 
-    vintageYear Int?
-    bottleYear  Int?
+    checkins Checkin[]
 
-    series String?
-
-    caskType   String?
-    caskNumber String?
-
-    totalBottles Int?
-    mashBill     MashBill?
-    Checkin      Checkin[]
-}
-
-model MashBill {
-    id Int @id @default(autoincrement())
-
-    bottleId Int    @unique
-    bottle   Bottle @relation(fields: [bottleId], references: [id])
-
-    barley Float?
-    corn   Float?
-    rye    Float?
-    wheat  Float?
+    @@unique([name, brandId, series])
 }
 
 model Checkin {

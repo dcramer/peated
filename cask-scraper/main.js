@@ -67,39 +67,39 @@ async function scrapeWhisky(id) {
   const bottle = {};
 
   const headerEl = $("header > h1").first();
-  bottle.brand = {
-    name: headerEl.find("a").first().text(),
-  };
-  bottle.name = headerEl.get()[0]?.lastChild?.data.trim();
-  console.log(
-    `[Whisky ${id}] Identified as ${bottle.brand.name} - ${bottle.name}`
-  );
-
-  bottle.category = mapCategory($("dt:contains('Category') + dd").text());
 
   const maybeRegion = $("ul.breadcrumb > li:nth-child(3)").text();
   const region = maybeRegion !== bottle.brand.name ? maybeRegion : null;
 
-  bottle.producer = {
-    name: $("dt:contains('Distillery') + dd").text(),
+  bottle.brand = {
+    name: headerEl.find("a").first().text(),
     country: $("ul.breadcrumb > li:nth-child(2)").text(),
     region,
   };
+  bottle.name = headerEl.get()[0]?.lastChild?.data.trim();
 
-  bottle.bottler = {
-    name: $("dt:contains('Bottler') + dd").text(),
-  };
+  bottle.category = mapCategory($("dt:contains('Category') + dd").text());
+
+  // bottle.producer = {
+  //   name: $("dt:contains('Distillery') + dd").text(),
+  // };
+
+  // bottle.bottler = {
+  //   name: $("dt:contains('Bottler') + dd").text(),
+  // };
   bottle.series = $("dt:contains('Bottling serie') + dd").text();
 
-  bottle.vintageYear = parseYear($("dt:contains('Vintage') + dd").text());
-  bottle.bottleYear = parseYear($("dt:contains('Bottled') + dd").text());
+  // bottle.vintageYear = parseYear($("dt:contains('Vintage') + dd").text());
+  // bottle.bottleYear = parseYear($("dt:contains('Bottled') + dd").text());
 
-  bottle.caskType = $("dt:contains('Casktype') + dd").text();
-  bottle.caskNumber = $("dt:contains('Casktype') + dd").text();
+  // bottle.caskType = $("dt:contains('Casktype') + dd").text();
+  // bottle.caskNumber = $("dt:contains('Casknumber') + dd").text();
 
   bottle.abv = parseAbv($("dt:contains('Strength') + dd").text());
 
-  console.log(bottle);
+  console.log(
+    `[Whisky ${id}] Identified as ${bottle.brand.name} - ${bottle.name}`
+  );
 
   return bottle;
 }
