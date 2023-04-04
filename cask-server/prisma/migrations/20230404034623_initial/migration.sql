@@ -58,7 +58,7 @@ CREATE TABLE "Bottle" (
     "producerId" INTEGER,
     "category" "Category",
     "abv" DOUBLE PRECISION,
-    "stagedAge" INTEGER,
+    "statedAge" INTEGER,
     "vintageYear" INTEGER,
     "bottleYear" INTEGER,
     "series" TEXT,

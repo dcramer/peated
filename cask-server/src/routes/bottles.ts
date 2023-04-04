@@ -1,6 +1,6 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
-import { Bottle, Bottler, Producer } from "@prisma/client";
+import { Bottle, Bottler, MashBill, Prisma, Producer } from "@prisma/client";
 import { IncomingMessage, Server, ServerResponse } from "http";
 
 export const listBottles: RouteOptions<
@@ -94,6 +94,12 @@ export const addBottle: RouteOptions<
       brand: number | { name: string };
       bottler: number | { name: string };
       producer: number | { name: string; country: string; region?: string };
+      mashBill: {
+        barley: number;
+        corn: number;
+        rye: number;
+        wheat: number;
+      };
     };
   }
 > = {
@@ -180,8 +186,13 @@ export const addBottle: RouteOptions<
   handler: async (req, res) => {
     const body = req.body;
     // gross syntax, whats better?
-    const data: Partial<Bottle> = (({ producer, bottler, brand, ...d }: any) =>
-      d)(body);
+    const data: Prisma.BottleUncheckedCreateInput = (({
+      producer,
+      bottler,
+      brand,
+      mashBill,
+      ...d
+    }: any) => d)(body);
 
     if (body.producer) {
       let producer: Producer | null;
@@ -193,6 +204,7 @@ export const addBottle: RouteOptions<
       } else if (body.producer satisfies Partial<Producer>) {
         producer = await prisma.producer.upsert({
           where: {
+            // why does this not reflect what the docs say?
             name_country: {
               name: body.producer.name,
               country: body.producer.country,
@@ -267,13 +279,13 @@ export const addBottle: RouteOptions<
         data.brandId = brand.id;
       }
     }
-    if (data.brand) {
-      const brand = await prisma.brand.findUnique({
-        where: { id: data.brand },
-      });
-      if (!brand) {
-        res.status(400).send({ error: "Invalid brand" });
-      }
+
+    if (body.mashBill) {
+      data.mashBill = {
+        create: {
+          ...body.mashBill,
+        },
+      };
     }
 
     const bottle = await prisma.bottle.create({

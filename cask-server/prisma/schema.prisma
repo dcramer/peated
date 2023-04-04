@@ -81,7 +81,7 @@ model Bottle {
     category   Category?
 
     abv       Float?
-    stagedAge Int?
+    statedAge Int?
 
     vintageYear Int?
     bottleYear  Int?

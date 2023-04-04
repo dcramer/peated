@@ -21,7 +21,16 @@ const envToLogger: {
   production: {
     level: "warn",
   },
-  test: false,
+  test: {
+    level: "error",
+    transport: {
+      target: "pino-pretty",
+      options: {
+        translateTime: "HH:MM:ss Z",
+        ignore: "pid,hostname,reqId",
+      },
+    },
+  },
 };
 
 export default async function buildFastify(options = {}) {
