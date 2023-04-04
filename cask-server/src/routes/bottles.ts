@@ -67,7 +67,7 @@ export const getBottle: RouteOptions<
   }
 > = {
   method: "GET",
-  url: "/bottle/:bottleId",
+  url: "/bottles/:bottleId",
   schema: {
     params: {
       type: "object",
@@ -79,6 +79,12 @@ export const getBottle: RouteOptions<
   },
   handler: async (req, res) => {
     const bottle = await prisma.bottle.findUnique({
+      include: {
+        producer: true,
+        brand: true,
+        bottler: true,
+        mashBill: true,
+      },
       where: {
         id: req.params.bottleId,
       },

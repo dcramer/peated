@@ -36,6 +36,20 @@ test("lists bottles", async () => {
   expect(data[0].id).toBe(bottle1.id);
 });
 
+test("get bottle", async () => {
+  const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood" });
+  await Fixtures.Bottle({ name: "Something Else" });
+
+  let response = await app.inject({
+    method: "GET",
+    url: `/bottles/${bottle1.id}`,
+  });
+
+  expect(response).toRespondWith(200);
+  let data = JSON.parse(response.payload);
+  expect(data.id).toBe(bottle1.id);
+});
+
 test("creates a new bottle with minimal params", async () => {
   const producer = await Fixtures.Producer();
   const response = await app.inject({

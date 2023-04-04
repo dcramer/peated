@@ -12,7 +12,7 @@ import {
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 import { getBottleDisplayName } from "../lib";
-import { getBottle } from "../lib/api";
+import api from "../lib/api";
 import type { Bottle, User } from "../types";
 import { useState } from "react";
 import { Add as AddIcon } from "@mui/icons-material";
@@ -25,7 +25,9 @@ export const loader: LoaderFunction = async ({
   params: { bottleId },
 }): Promise<LoaderData> => {
   if (!bottleId) throw new Error("Missing bottleId");
-  const bottle = await getBottle(bottleId);
+  const bottle = await api.get(`/bottles/${bottleId}`);
+
+  console.log(bottle);
 
   return { bottle };
 };
