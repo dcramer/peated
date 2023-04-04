@@ -41,6 +41,12 @@ export const listBottles: RouteOptions<
     }
 
     const results = await prisma.bottle.findMany({
+      include: {
+        producer: true,
+        bottler: true,
+        brand: true,
+        mashBill: true,
+      },
       where,
       skip: offset,
       take: limit,
