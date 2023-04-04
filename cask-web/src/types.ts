@@ -17,10 +17,10 @@ export type MashBill = {
 };
 
 export enum Category {
-  Blend,
-  BlendedMalt,
-  SingleMalt,
-  Spirit,
+  blend,
+  blended_malt,
+  single_malt,
+  spirit,
 }
 
 // e.g. Suntory Whisky

@@ -1,12 +1,13 @@
 import { fastify } from "fastify";
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
-const oauthPlugin = require("@fastify/oauth2");
 
 import { router } from "./routes";
 import config from "./config";
 
-const envToLogger = {
+const envToLogger: {
+  [env: string]: any;
+} = {
   development: {
     level: "info",
     transport: {
@@ -23,30 +24,15 @@ const envToLogger = {
   test: false,
 };
 
-const app = fastify({
-  logger: envToLogger[config.ENV] ?? true,
-});
+export default async function buildFastify(options = {}) {
+  const app = fastify({
+    logger: envToLogger[config.ENV] ?? true,
+    ...options,
+  });
 
-app.register(helmet);
-app.register(cors, { credentials: true, origin: config.CORS_HOST });
+  app.register(helmet);
+  app.register(cors, { credentials: true, origin: config.CORS_HOST });
+  app.register(router);
 
-// app.register(oauthPlugin, {
-//   name: "googleOAuth2",
-//   scope: ["profile", "email"],
-//   credentials: {
-//     client: {
-//       id: "<CLIENT_ID>",
-//       secret: "<CLIENT_SECRET>",
-//     },
-//     auth: oauthPlugin.GOOGLE_CONFIGURATION,
-//   },
-//   startRedirectPath: "/auth/google",
-//   callbackUri: `${config.HOST}:${config.PORT}/auth/google/callback`,
-//   callbackUriParams: {
-//     access_type: "offline",
-//   },
-// });
-
-app.register(router);
-
-export default app;
+  return app;
+}

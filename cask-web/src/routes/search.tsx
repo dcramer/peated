@@ -21,6 +21,7 @@ export default function Search() {
 
   const [results, setResults] = useState<Bottle[]>([]);
 
+  // TODO(dcramer): why is this rendering twice
   useEffect(() => {
     const qs = new URLSearchParams(location.search);
 
@@ -41,8 +42,10 @@ export default function Search() {
 
   return (
     <Box>
-      <Box sx={{ display: "flex", alignItems: "flex-end", width: "100%" }}>
-        <form method="GET" onSubmit={onSubmit}>
+      <form method="GET" onSubmit={onSubmit}>
+        <Box
+          sx={{ display: "flex", alignItems: "flex-end", p: 4, width: "100%" }}
+        >
           <AccountCircleIcon sx={{ color: "action.active", mr: 1, my: 0.5 }} />
           <TextField
             label="Search"
@@ -54,8 +57,8 @@ export default function Search() {
               setQuery(e.target.value);
             }}
           />
-        </form>
-      </Box>
+        </Box>
+      </form>
       {results.map((bottle) => {
         return (
           <Card>

@@ -17,3 +17,16 @@ declare module "fastify" {
     user: any;
   }
 }
+
+interface CustomMatchers<R = unknown> {
+  toRespondWith(statusCode: number): R;
+}
+
+declare global {
+  namespace Vi {
+    interface Assertion extends CustomMatchers {}
+    interface AsymmetricMatchersContaining extends CustomMatchers {}
+  }
+
+  var DefaultFixtures;
+}

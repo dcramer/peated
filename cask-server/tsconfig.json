@@ -5,6 +5,7 @@
         "esnext",
         "dom",
       ],
+      "types": ["vitest/globals", "node"],
       "allowJs": true,
       "skipLibCheck": true,
       "esModuleInterop": true,
