@@ -37,8 +37,10 @@ model Producer {
     id      Int      @id @default(autoincrement())
     name    String
     country String
-    Region  String?
+    region  String?
     Bottle  Bottle[]
+
+    @@unique([name, country])
 }
 
 enum Category {
@@ -51,14 +53,14 @@ enum Category {
 // e.g. Suntory Whisky
 model Bottler {
     id     Int      @id @default(autoincrement())
-    name   String
+    name   String   @unique
     Bottle Bottle[]
 }
 
 // e.g. Hibiki
 model Brand {
     id     Int      @id @default(autoincrement())
-    name   String
+    name   String   @unique
     Bottle Bottle[]
 }
 
@@ -66,6 +68,7 @@ model Brand {
 // if Brand is empty it uses the Producer instead and is considered their base
 // Producer=Hibiki Brand=Hibiki, Name=12, Series=None, DisplayName=Hibiki 12
 // Producer=Macallan, Brand=Blended Malt, Series=Mythic Journey, DisplayName=Macallan Blended Malt Mythic Journey
+// TODO: Whats our unique constraint?
 model Bottle {
     id         Int       @id @default(autoincrement())
     name       String
@@ -99,10 +102,10 @@ model MashBill {
     bottleId Int    @unique
     bottle   Bottle @relation(fields: [bottleId], references: [id])
 
-    barley Float
-    corn   Float
-    rye    Float
-    wheat  Float
+    barley Float?
+    corn   Float?
+    rye    Float?
+    wheat  Float?
 }
 
 model Checkin {

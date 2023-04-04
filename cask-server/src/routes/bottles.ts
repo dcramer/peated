@@ -1,6 +1,6 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
-import { Bottle } from "@prisma/client";
+import { Bottle, Bottler, Producer } from "@prisma/client";
 import { IncomingMessage, Server, ServerResponse } from "http";
 
 export const listBottles: RouteOptions<
@@ -85,75 +85,200 @@ export const getBottle: RouteOptions<
   },
 };
 
-export const addBottle: RouteOptions<Server, IncomingMessage, ServerResponse> =
+export const addBottle: RouteOptions<
+  Server,
+  IncomingMessage,
+  ServerResponse,
   {
-    method: "POST",
-    url: "/bottles",
-    schema: {
-      body: {
-        type: "object",
-        required: ["name", "producerId"],
-        properties: {
-          name: { type: "string" },
-          brandId: { type: "number" },
-          bottlerId: { type: "number" },
-          producerId: { type: "number" },
-          category: {
-            type: "string",
-            enum: ["blend", "blended_malt", "single_malt", "spirit"],
-          },
-          abv: { type: "number" },
-          stagedAge: { type: "number" },
-          vintageYear: { type: "number" },
-          bottleYear: { type: "number" },
-          series: { type: "string" },
-          caskType: { type: "string" },
-          caskNumber: { type: "string" },
-          totalBottles: { type: "number" },
-          mashBill: {
-            type: "object",
-            properties: {
-              barley: { type: "number" },
-              corn: { type: "number" },
-              rye: { type: "number" },
-              wheat: { type: "number" },
+    Body: Bottle & {
+      brand: number | { name: string };
+      bottler: number | { name: string };
+      producer: number | { name: string; country: string; region?: string };
+    };
+  }
+> = {
+  method: "POST",
+  url: "/bottles",
+  schema: {
+    body: {
+      type: "object",
+      required: ["name", "producer"],
+      properties: {
+        name: { type: "string" },
+        brand: {
+          oneOf: [
+            { type: "number" },
+            {
+              type: "object",
+              required: ["name"],
+              properties: {
+                name: {
+                  type: "string",
+                },
+              },
             },
+          ],
+        },
+        bottler: {
+          oneOf: [
+            { type: "number" },
+            {
+              type: "object",
+              required: ["name"],
+              properties: {
+                name: {
+                  type: "string",
+                },
+              },
+            },
+          ],
+        },
+        producer: {
+          oneOf: [
+            { type: "number" },
+            {
+              type: "object",
+              required: ["name", "country"],
+              properties: {
+                name: {
+                  type: "string",
+                },
+                country: {
+                  type: "string",
+                },
+                region: {
+                  type: "string",
+                },
+              },
+            },
+          ],
+        },
+        category: {
+          type: "string",
+          enum: ["blend", "blended_malt", "single_malt", "spirit"],
+        },
+        abv: { type: "number" },
+        stagedAge: { type: "number" },
+        vintageYear: { type: "number" },
+        bottleYear: { type: "number" },
+        series: { type: "string" },
+        caskType: { type: "string" },
+        caskNumber: { type: "string" },
+        totalBottles: { type: "number" },
+        mashBill: {
+          type: "object",
+          properties: {
+            barley: { type: "number" },
+            corn: { type: "number" },
+            rye: { type: "number" },
+            wheat: { type: "number" },
           },
         },
       },
     },
-    handler: async (req, res) => {
-      const data = req.body as Bottle;
-      if (data.producerId) {
-        const producer = await prisma.producer.findUnique({
-          where: { id: data.producerId },
+  },
+  handler: async (req, res) => {
+    const body = req.body;
+    // gross syntax, whats better?
+    const data: Partial<Bottle> = (({ producer, bottler, brand, ...d }: any) =>
+      d)(body);
+
+    if (body.producer) {
+      let producer: Producer | null;
+
+      if (typeof body.producer === "number") {
+        producer = await prisma.producer.findUnique({
+          where: { id: body.producer },
         });
-        if (!producer) {
-          res.status(400).send({ error: "Invalid producer" });
-        }
+      } else if (body.producer satisfies Partial<Producer>) {
+        producer = await prisma.producer.upsert({
+          where: {
+            name_country: {
+              name: body.producer.name,
+              country: body.producer.country,
+            },
+          },
+          update: {
+            region: body.producer.region || null,
+          },
+          create: {
+            name: body.producer.name,
+            country: body.producer.country,
+            region: body.producer.region || null,
+          },
+        });
       }
 
-      if (data.bottlerId) {
-        const bottler = await prisma.bottler.findUnique({
-          where: { id: data.bottlerId },
+      if (!producer) {
+        res.status(400).send({ error: "Invalid producer" });
+      } else {
+        data.producerId = producer.id;
+      }
+    }
+
+    if (body.bottler) {
+      let bottler: Bottler | null;
+
+      if (typeof body.bottler === "number") {
+        bottler = await prisma.bottler.findUnique({
+          where: { id: body.producer },
         });
-        if (!bottler) {
-          res.status(400).send({ error: "Invalid bottler" });
-        }
+      } else if (body.bottler satisfies Partial<Bottler>) {
+        bottler = await prisma.bottler.upsert({
+          where: {
+            name: body.bottler.name,
+          },
+          create: {
+            name: body.bottler.name,
+          },
+          update: {},
+        });
       }
 
-      if (data.brandId) {
-        const brand = await prisma.brand.findUnique({
-          where: { id: data.brandId },
+      if (!bottler) {
+        res.status(400).send({ error: "Invalid bottler" });
+      } else {
+        data.bottlerId = bottler.id;
+      }
+    }
+
+    if (body.brand) {
+      let brand: Brand | null;
+
+      if (typeof body.brand === "number") {
+        brand = await prisma.producer.findUnique({
+          where: { id: body.brand },
         });
-        if (!brand) {
-          res.status(400).send({ error: "Invalid brand" });
-        }
+      } else if (body.brand satisfies Partial<Bottler>) {
+        brand = await prisma.brand.upsert({
+          where: {
+            name: body.brand.name,
+          },
+          update: {},
+          create: {
+            name: body.brand.name,
+          },
+        });
       }
 
-      const bottle = await prisma.bottle.create({
-        data,
+      if (!brand) {
+        res.status(400).send({ error: "Invalid brand" });
+      } else {
+        data.brandId = brand.id;
+      }
+    }
+    if (data.brand) {
+      const brand = await prisma.brand.findUnique({
+        where: { id: data.brand },
       });
-      res.status(201).send(bottle);
-    },
-  };
+      if (!brand) {
+        res.status(400).send({ error: "Invalid brand" });
+      }
+    }
+
+    const bottle = await prisma.bottle.create({
+      data,
+    });
+    res.status(201).send(bottle);
+  },
+};

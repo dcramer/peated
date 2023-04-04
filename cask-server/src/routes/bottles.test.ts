@@ -35,14 +35,14 @@ test("lists bottles", async () => {
   expect(data[0].id).toBe(bottle1.id);
 });
 
-test("creates a new bottles", async () => {
+test("creates a new bottle with producerId", async () => {
   const producer = await Fixtures.Producer();
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
     payload: {
       name: "Delicious Wood",
-      producerId: producer.id,
+      producer: producer.id,
     },
   });
 
@@ -51,4 +51,45 @@ test("creates a new bottles", async () => {
   expect(data.id).toBeDefined();
   expect(data.name).toEqual("Delicious Wood");
   expect(data.producerId).toEqual(producer.id);
+});
+
+test("creates a new bottle with existing producer name", async () => {
+  const producer = await Fixtures.Producer();
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood",
+      producer: {
+        name: producer.name,
+        country: producer.country,
+      },
+    },
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+  expect(data.name).toEqual("Delicious Wood");
+  expect(data.producerId).toEqual(producer.id);
+});
+
+test("creates a new bottle with new producer name", async () => {
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood",
+      producer: {
+        name: "Hard Knox",
+        country: "Scotland",
+      },
+    },
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+  expect(data.name).toEqual("Delicious Wood");
+  expect(data.producerId).toBeDefined();
 });

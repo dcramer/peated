@@ -28,7 +28,7 @@ CREATE TABLE "Producer" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "country" TEXT NOT NULL,
-    "Region" TEXT,
+    "region" TEXT,
 
     CONSTRAINT "Producer_pkey" PRIMARY KEY ("id")
 );
@@ -73,10 +73,10 @@ CREATE TABLE "Bottle" (
 CREATE TABLE "MashBill" (
     "id" SERIAL NOT NULL,
     "bottleId" INTEGER NOT NULL,
-    "barley" DOUBLE PRECISION NOT NULL,
-    "corn" DOUBLE PRECISION NOT NULL,
-    "rye" DOUBLE PRECISION NOT NULL,
-    "wheat" DOUBLE PRECISION NOT NULL,
+    "barley" DOUBLE PRECISION,
+    "corn" DOUBLE PRECISION,
+    "rye" DOUBLE PRECISION,
+    "wheat" DOUBLE PRECISION,
 
     CONSTRAINT "MashBill_pkey" PRIMARY KEY ("id")
 );
@@ -98,6 +98,15 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Identity_provider_externalId_key" ON "Identity"("provider", "externalId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Producer_name_country_key" ON "Producer"("name", "country");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Bottler_name_key" ON "Bottler"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Brand_name_key" ON "Brand"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "MashBill_bottleId_key" ON "MashBill"("bottleId");
