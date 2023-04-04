@@ -11,6 +11,8 @@ export enum Category {
   blended_grain,
   blended_malt,
   blended_scotch,
+  bourbon,
+  rye,
   single_grain,
   single_malt,
   spirit,

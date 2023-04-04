@@ -37,7 +37,9 @@ enum Category {
     blend
     blended_grain
     blended_malt
+    bourbon
     blended_scotch
+    rye
     single_grain
     single_malt
     spirit
