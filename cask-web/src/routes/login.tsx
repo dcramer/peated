@@ -35,7 +35,9 @@ export default function Login() {
               const { user, accessToken } = await defaultClient.post(
                 "/auth/google",
                 {
-                  token: credentialResponse.credential,
+                  data: {
+                    token: credentialResponse.credential,
+                  },
                 }
               );
               login(user, accessToken);

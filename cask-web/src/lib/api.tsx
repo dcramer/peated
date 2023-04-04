@@ -4,7 +4,8 @@ const API_SERVER: string = process.env.API_SERVER || "http://localhost:4000";
 
 type ApiRequestOptions = {
   method: "GET" | "POST" | "DELETE" | "PUT";
-  json?: any;
+  data?: any;
+  query?: any;
 };
 
 class ApiClient {
@@ -28,49 +29,53 @@ class ApiClient {
 
   async request(path: string, options: ApiRequestOptions) {
     const headers: { [name: string]: string } = {};
-    if (options.json) headers["Content-Type"] = "application/json";
+    if (options.data) headers["Content-Type"] = "application/json";
     if (this.accessToken)
       headers["Authorization"] = `Bearer ${this.accessToken}`;
 
-    const req = await fetch(`${this.server}${path}`, {
-      method: options.method,
-      body: options.json ? JSON.stringify(options.json) : undefined,
-      headers,
-    });
+    const req = await fetch(
+      `${this.server}${path}?${new URLSearchParams(options.query || {})}`,
+      {
+        body: options.data ? JSON.stringify(options.data) : undefined,
+        headers,
+        ...options,
+      }
+    );
     return await req.json();
   }
 
-  get(path: string) {
+  get(path: string, options: any | undefined = undefined) {
     return this.request(path, {
       method: "GET",
+      ...options,
     });
   }
 
-  post(path: string, data: any | undefined) {
+  post(path: string, options: any | undefined = undefined) {
     return this.request(path, {
       method: "POST",
-      json: data,
+      ...options,
     });
   }
 
-  put(path: string, data: any | undefined) {
+  put(path: string, options: any | undefined = undefined) {
     return this.request(path, {
       method: "PUT",
-      json: data,
+      ...options,
     });
   }
 
-  delete(path: string, data: any | undefined) {
+  delete(path: string, options: any | undefined = undefined) {
     return this.request(path, {
       method: "DELETE",
-      json: data,
+      ...options,
     });
   }
 }
 
 const defaultClient = new ApiClient({ server: API_SERVER });
-
-export default defaultClient;
+const api = defaultClient;
+export default api;
 
 export async function getUser(userId: string): Promise<User> {
   return {

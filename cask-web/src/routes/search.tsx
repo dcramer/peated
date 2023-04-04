@@ -11,30 +11,52 @@ import { red } from "@mui/material/colors";
 import { Bottle } from "../types";
 import { getBottleDisplayName } from "../lib";
 
-import { useLoaderData } from "react-router-dom";
-import type { LoaderFunction } from "react-router-dom";
-import { searchBottles } from "../lib/api";
-
-type LoaderData = {
-  bottles: Bottle[];
-};
-
-export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const bottles = await searchBottles("");
-
-  return { bottles };
-};
+import { useLocation, useNavigate } from "react-router-dom";
+import api from "../lib/api";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function Search() {
-  const { bottles } = useLoaderData() as LoaderData;
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [results, setResults] = useState<Bottle[]>([]);
+
+  useEffect(() => {
+    const qs = new URLSearchParams(location.search);
+
+    api
+      .get("/bottles", {
+        query: { q: qs.get("q") || "" },
+      })
+      .then((r) => setResults(r));
+  }, [location.search]);
+
+  const qs = new URLSearchParams(location.search);
+  const [query, setQuery] = useState<string>(qs.get("q") || "");
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+  };
 
   return (
     <Box>
       <Box sx={{ display: "flex", alignItems: "flex-end", width: "100%" }}>
-        <AccountCircleIcon sx={{ color: "action.active", mr: 1, my: 0.5 }} />
-        <TextField label="Search" variant="standard" sx={{ flex: 1 }} />
+        <form method="GET" onSubmit={onSubmit}>
+          <AccountCircleIcon sx={{ color: "action.active", mr: 1, my: 0.5 }} />
+          <TextField
+            label="Search"
+            variant="standard"
+            name="q"
+            sx={{ flex: 1 }}
+            defaultValue={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+            }}
+          />
+        </form>
       </Box>
-      {bottles.map((bottle) => {
+      {results.map((bottle) => {
         return (
           <Card>
             <CardActionArea href={`/b/${bottle.id}/checkin`}>

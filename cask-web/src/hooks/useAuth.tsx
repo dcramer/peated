@@ -21,18 +21,26 @@ const AuthContext = createContext<Auth>({
 
 export const AuthProvider = ({ children }: { children: any }) => {
   const [user, setUser] = useLocalStorage<User | null>("user", null);
+  const [accessToken, setAccessToken] = useLocalStorage<string | null>(
+    "token",
+    null
+  );
+
+  defaultClient.setAccessToken(accessToken);
 
   // call this function when you want to authenticate the user
   const login = (user: User, accessToken: string) => {
     // kind of gross this exists here, need a better pattern
     defaultClient.setAccessToken(accessToken);
     setUser(user);
+    setAccessToken(accessToken);
   };
 
   // call this function to sign out logged in user
   const logout = () => {
     defaultClient.setAccessToken(null);
     setUser(null);
+    setAccessToken(null);
   };
 
   const value = {

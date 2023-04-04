@@ -9,6 +9,7 @@
     "start:web": "cd cask-web && API_SERVER=http://localhost:4000 dotenv -e ../.env -- npm start",
     "start:server": "cd cask-server && PORT=4000 dotenv -e ../.env -- npm start",
     "db:studio": "cd cask-server && dotenv -e ../.env -- npx prisma studio",
+    "db:migrate": "cd cask-server && dotenv -e ../.env -- npm run db:migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

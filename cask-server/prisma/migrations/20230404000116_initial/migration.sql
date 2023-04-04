@@ -1,5 +1,8 @@
 -- CreateEnum
-CREATE TYPE "Category" AS ENUM ('Blend', 'BlendedMalt', 'SingleMalt', 'Spirit');
+CREATE TYPE "IdentityProvider" AS ENUM ('google');
+
+-- CreateEnum
+CREATE TYPE "Category" AS ENUM ('blend', 'blended_malt', 'single_malt', 'spirit');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -8,6 +11,16 @@ CREATE TABLE "User" (
     "displayName" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Identity" (
+    "id" SERIAL NOT NULL,
+    "provider" "IdentityProvider" NOT NULL,
+    "externalId" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL,
+
+    CONSTRAINT "Identity_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -84,7 +97,13 @@ CREATE TABLE "Checkin" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Identity_provider_externalId_key" ON "Identity"("provider", "externalId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "MashBill_bottleId_key" ON "MashBill"("bottleId");
+
+-- AddForeignKey
+ALTER TABLE "Identity" ADD CONSTRAINT "Identity_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Bottle" ADD CONSTRAINT "Bottle_brandId_fkey" FOREIGN KEY ("brandId") REFERENCES "Brand"("id") ON DELETE SET NULL ON UPDATE CASCADE;
