@@ -10,7 +10,6 @@ import {
   Typography,
 } from "@mui/material";
 import type { Checkin } from "../types";
-import { getBottleDisplayName } from "../lib";
 import { red } from "@mui/material/colors";
 import {
   Comment as CommentIcon,
@@ -40,7 +39,8 @@ export default function CheckinListItem({ value }: { value: Checkin }) {
       <CardMedia height="194" component="img" image={Hibiki12Image}></CardMedia>
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {getBottleDisplayName(value.bottle)}
+          {value.bottle.name}
+          {value.bottle.series && <em>{value.bottle.series}</em>}
         </Typography>
         {!!value.tastingNotes && (
           <Typography variant="body2" color="text.secondary">

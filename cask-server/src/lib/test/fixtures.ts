@@ -2,11 +2,14 @@ import { faker } from "@faker-js/faker";
 import { prisma } from "../db";
 import {
   Bottle as BottleType,
-  Bottler as BottlerType,
   Brand as BrandType,
-  Producer as ProducerType,
+  Distiller as DistillerType,
   User as UserType,
 } from "@prisma/client";
+
+function between(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
 export const User = async ({ ...data }: Partial<UserType> = {}) => {
   return await prisma.user.create({
@@ -28,8 +31,23 @@ export const Brand = async ({ ...data }: Partial<BrandType> = {}) => {
   });
 };
 
+export const Distiller = async ({ ...data }: Partial<DistillerType> = {}) => {
+  return await prisma.distiller.create({
+    data: {
+      name: faker.company.name(),
+      country: faker.address.country(),
+      ...data,
+    },
+  });
+};
+
 export const Bottle = async ({ ...data }: Partial<BottleType> = {}) => {
   if (data.brandId === undefined) data.brandId = (await Brand()).id;
+  if (data.distillerId === undefined) {
+    if (between(0, 1) === 1) {
+      data.distillerId = (await Distiller()).id;
+    }
+  }
 
   return await prisma.bottle.create({
     data: {

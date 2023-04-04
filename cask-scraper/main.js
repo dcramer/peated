@@ -80,9 +80,9 @@ async function scrapeWhisky(id) {
 
   bottle.category = mapCategory($("dt:contains('Category') + dd").text());
 
-  // bottle.producer = {
-  //   name: $("dt:contains('Distillery') + dd").text(),
-  // };
+  bottle.distiller = {
+    name: $("dt:contains('Distillery') + dd").text(),
+  };
 
   // bottle.bottler = {
   //   name: $("dt:contains('Bottler') + dd").text(),

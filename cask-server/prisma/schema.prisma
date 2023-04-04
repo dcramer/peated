@@ -35,7 +35,10 @@ model Identity {
 
 enum Category {
     blend
+    blended_grain
     blended_malt
+    blended_scotch
+    single_grain
     single_malt
     spirit
 }
@@ -51,10 +54,19 @@ model Brand {
     bottles Bottle[]
 }
 
-// DisplayName is: [Brand] [Name] [Series]
-// if Brand is empty it uses the Producer instead and is considered their base
-// Producer=Hibiki Brand=Hibiki, Name=12, Series=None, DisplayName=Hibiki 12
-// Producer=Macallan, Brand=Blended Malt, Series=Mythic Journey, DisplayName=Macallan Blended Malt Mythic Journey
+model Distiller {
+    id   Int    @id @default(autoincrement())
+    name String @unique
+
+    country String
+    region  String?
+
+    bottles Bottle[]
+}
+
+// DisplayName is: [Name] [Series]
+// Distiller=Hibiki Brand=Hibiki, Name=Hibiki 12, Series=None, DisplayName=Hibiki 12
+// Distiller=Macallan, Brand=Blended Malt, Series=Mythic Journey, DisplayName=Macallan Blended Malt Mythic Journey
 
 // Bottles are unique to their (name, brand, series), and the rest of the attributes are considered optional facts
 model Bottle {
@@ -63,6 +75,9 @@ model Bottle {
     brandId Int
     brand   Brand   @relation(fields: [brandId], references: [id])
     series  String?
+
+    distillerId Int?
+    distiller   Distiller? @relation(fields: [distillerId], references: [id])
 
     category  Category?
     abv       Float?

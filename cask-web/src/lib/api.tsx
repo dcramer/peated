@@ -90,9 +90,10 @@ export async function getBottle(bottleId: string): Promise<Bottle> {
     brand: {
       id: "1",
       name: "Hibiki",
+      country: "Japan",
     },
-    name: "12",
-    producer: {
+    name: "Hibiki 12",
+    distiller: {
       id: "1",
       name: "Hibiki",
       country: "Japan",

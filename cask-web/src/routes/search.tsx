@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { Bottle } from "../types";
-import { getBottleDisplayName } from "../lib";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../lib/api";
@@ -60,6 +59,12 @@ export default function Search() {
         </Box>
       </form>
       {results.map((bottle) => {
+        const title = (
+          <>
+            {bottle.name}
+            {bottle.series && <em>{bottle.series}</em>}
+          </>
+        );
         return (
           <Card>
             <CardActionArea href={`/b/${bottle.id}/checkin`}>
@@ -69,8 +74,8 @@ export default function Search() {
                     L
                   </Avatar>
                 }
-                title={getBottleDisplayName(bottle)}
-                subheader={bottle.producer?.name}
+                title={title}
+                subheader={bottle.brand.name}
               />
             </CardActionArea>
           </Card>

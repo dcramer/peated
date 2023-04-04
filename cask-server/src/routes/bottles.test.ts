@@ -51,13 +51,13 @@ test("get bottle", async () => {
 });
 
 test("creates a new bottle with minimal params", async () => {
-  const producer = await Fixtures.Producer();
+  const brand = await Fixtures.Brand();
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
     payload: {
       name: "Delicious Wood",
-      producer: producer.id,
+      brand: brand.id,
     },
   });
 
@@ -67,27 +67,25 @@ test("creates a new bottle with minimal params", async () => {
 
   const bottle = await prisma.bottle.findUniqueOrThrow({
     where: { id: data.id },
-    include: {
-      mashBill: true,
-    },
   });
   expect(bottle.name).toEqual("Delicious Wood");
-  expect(bottle.brandId).toBeNull();
+  expect(bottle.brandId).toBeDefined();
+  expect(bottle.distillerId).toBeNull();
   expect(bottle.abv).toBeNull();
   expect(bottle.statedAge).toBeNull();
   expect(bottle.series).toBeNull();
 });
 
 test("creates a new bottle with all params", async () => {
-  const producer = await Fixtures.Producer();
-  const bottler = await Fixtures.Bottler();
   const brand = await Fixtures.Brand();
+  const distiller = await Fixtures.Distiller();
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
     payload: {
       name: "Delicious Wood",
       brand: brand.id,
+      distiller: distiller.id,
       series: "Super Delicious",
       abv: 0.45,
       statedAge: 12,
@@ -103,6 +101,7 @@ test("creates a new bottle with all params", async () => {
   });
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toEqual(brand.id);
+  expect(bottle.distillerId).toEqual(distiller.id);
   expect(bottle.abv).toEqual(0.45);
   expect(bottle.statedAge).toEqual(12);
   expect(bottle.series).toEqual("Super Delicious");

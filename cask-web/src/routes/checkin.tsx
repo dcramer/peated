@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import { getBottleDisplayName } from "../lib";
 import api from "../lib/api";
 import type { Bottle, User } from "../types";
 import { useState } from "react";
@@ -135,7 +134,8 @@ export default function Checkin() {
       }}
     >
       <Typography variant="h4" component="h4" gutterBottom>
-        {getBottleDisplayName(bottle)}
+        {bottle.name}
+        {bottle.series && <em>{bottle.series}</em>}
       </Typography>
 
       <Box component="form" noValidate sx={{ mt: 3 }}>

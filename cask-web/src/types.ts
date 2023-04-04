@@ -1,5 +1,23 @@
-// the distillery
-export type Producer = {
+// these are %'s, so floating point
+// export type MashBill = {
+//   barley: number;
+//   corn: number;
+//   rye: number;
+//   wheat: number;
+// };
+
+export enum Category {
+  blend,
+  blended_grain,
+  blended_malt,
+  blended_scotch,
+  single_grain,
+  single_malt,
+  spirit,
+}
+
+// e.g. Suntory Whisky
+export type Distiller = {
   id: string;
   name: string;
   // e.g. Scotland
@@ -8,43 +26,24 @@ export type Producer = {
   region?: string;
 };
 
-// these are %'s, so floating point
-export type MashBill = {
-  barley: number;
-  corn: number;
-  rye: number;
-  wheat: number;
-};
-
-export enum Category {
-  blend,
-  blended_malt,
-  single_malt,
-  spirit,
-}
-
-// e.g. Suntory Whisky
-export type Bottler = {
-  id: string;
-  name: string;
-};
-
 // e.g. Hibiki
 export type Brand = {
   id: string;
   name: string;
+  // e.g. Scotland
+  country: string;
+  // e.g. Speyside
+  region?: string;
 };
 
-// DisplayName is: [Brand] [Name] [Series]
-// if Brand is empty it uses the Producer instead and is considered their base
-// Producer=Hibiki Brand=Hibiki, Name=12, Series=None, DisplayName=Hibiki 12
-// Producer=Macallan, Brand=Blended Malt, Series=Mythic Journey, DisplayName=Macallan Blended Malt Mythic Journey
 export type Bottle = {
   id: string;
   name: string;
   brand?: Brand | null;
-  bottler?: Bottler | null;
-  producer: Producer | null;
+  // e.g. the limited release/collection
+  series?: string | null;
+
+  distiller?: Distiller | null;
   category?: Category | null;
 
   // floating point as percentage
@@ -52,22 +51,6 @@ export type Bottle = {
 
   // e.g. 12 [years]
   statedAge?: number | null;
-
-  // TODO: should vintage and bottling be full dates? optional month/day?
-  // the distillation date
-  vintageYear?: number | null;
-  // the bottle date
-  bottleYear?: number | null;
-
-  // e.g. the limited release/collection
-  series?: string | null;
-
-  // e.g. Plum Liqueur Barrels
-  caskType?: string | null;
-  caskNumber?: string | null;
-  // total number of bottles in line
-  totalBottles?: number | null;
-  mashBill?: MashBill | null;
 };
 
 export type User = {

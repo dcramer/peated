@@ -1,6 +1,6 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
-import { Bottle, Bottler, MashBill, Prisma, Producer } from "@prisma/client";
+import { Bottle, Bottler, Brand, Prisma, Distiller } from "@prisma/client";
 import { IncomingMessage, Server, ServerResponse } from "http";
 
 export const listBottles: RouteOptions<
@@ -43,6 +43,7 @@ export const listBottles: RouteOptions<
     const results = await prisma.bottle.findMany({
       include: {
         brand: true,
+        distiller: true,
       },
       where,
       skip: offset,
@@ -78,6 +79,7 @@ export const getBottle: RouteOptions<
     const bottle = await prisma.bottle.findUnique({
       include: {
         brand: true,
+        distiller: true,
       },
       where: {
         id: req.params.bottleId,
@@ -97,7 +99,8 @@ export const addBottle: RouteOptions<
   ServerResponse,
   {
     Body: Bottle & {
-      brand: number | { name: string };
+      brand: number | { name: string; country: string; region?: string };
+      distiller: number | { name: string; country: string; region?: string };
     };
   }
 > = {
@@ -106,7 +109,7 @@ export const addBottle: RouteOptions<
   schema: {
     body: {
       type: "object",
-      required: ["name", "producer"],
+      required: ["name", "brand"],
       properties: {
         name: { type: "string" },
         brand: {
@@ -129,10 +132,38 @@ export const addBottle: RouteOptions<
             },
           ],
         },
+        distiller: {
+          oneOf: [
+            { type: "number" },
+            {
+              type: "object",
+              required: ["name", "country"],
+              properties: {
+                name: {
+                  type: "string",
+                },
+                country: {
+                  type: "string",
+                },
+                region: {
+                  type: "string",
+                },
+              },
+            },
+          ],
+        },
         series: { type: "string" },
         category: {
           type: "string",
-          enum: ["blend", "blended_malt", "single_malt", "spirit"],
+          enum: [
+            "blend",
+            "blended_grain",
+            "blended_malt",
+            "blended_scotch",
+            "single_grain",
+            "single_malt",
+            "spirit",
+          ],
         },
         abv: { type: "number" },
         stagedAge: { type: "number" },
@@ -142,14 +173,17 @@ export const addBottle: RouteOptions<
   handler: async (req, res) => {
     const body = req.body;
     // gross syntax, whats better?
-    const data: Prisma.BottleUncheckedCreateInput = (({ brand, ...d }: any) =>
-      d)(body);
+    const data: Prisma.BottleUncheckedCreateInput = (({
+      brand,
+      distiller,
+      ...d
+    }: any) => d)(body);
 
     if (body.brand) {
       let brand: Brand | null;
 
       if (typeof body.brand === "number") {
-        brand = await prisma.producer.findUnique({
+        brand = await prisma.brand.findUnique({
           where: { id: body.brand },
         });
       } else if (body.brand satisfies Partial<Bottler>) {
@@ -168,8 +202,38 @@ export const addBottle: RouteOptions<
 
       if (!brand) {
         res.status(400).send({ error: "Invalid brand" });
+        return;
       } else {
         data.brandId = brand.id;
+      }
+    }
+
+    if (body.distiller) {
+      let distiller: Distiller | null;
+
+      if (typeof body.distiller === "number") {
+        distiller = await prisma.distiller.findUnique({
+          where: { id: body.distiller },
+        });
+      } else if (body.distiller satisfies Partial<Bottler>) {
+        distiller = await prisma.distiller.upsert({
+          where: {
+            name: body.distiller.name,
+          },
+          update: {},
+          create: {
+            name: body.distiller.name,
+            country: body.distiller.country,
+            region: body.distiller.region,
+          },
+        });
+      }
+
+      if (!distiller) {
+        res.status(400).send({ error: "Invalid distiller" });
+        return;
+      } else {
+        data.distillerId = distiller.id;
       }
     }
 
