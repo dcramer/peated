@@ -1,6 +1,5 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
-import { Checkin } from "@prisma/client";
 import { IncomingMessage, Server, ServerResponse } from "http";
 
 export const listCheckins: RouteOptions<
@@ -9,7 +8,6 @@ export const listCheckins: RouteOptions<
   ServerResponse,
   {
     Querystring: {
-      query?: string;
       page?: number;
     };
   }
@@ -20,31 +18,20 @@ export const listCheckins: RouteOptions<
     querystring: {
       type: "object",
       properties: {
-        query: { type: "string" },
         page: { type: "number" },
       },
     },
   },
   handler: async (req, res) => {
     const page = req.query.page || 1;
-    const query = req.query.query || "";
 
     const limit = 100;
     const offset = (page - 1) * limit;
-
-    const where: { [key: string]: any } = {};
-    if (query) {
-      where.name = {
-        search: query.split(" ").join(" & "),
-        mode: "insensitive",
-      };
-    }
 
     const results = await prisma.checkin.findMany({
       include: {
         bottle: true,
       },
-      where,
       skip: offset,
       take: limit,
       orderBy: { createdAt: "desc" },
