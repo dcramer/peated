@@ -3,6 +3,7 @@ import { prisma } from "../db";
 import {
   Bottle as BottleType,
   Brand as BrandType,
+  Checkin as CheckinType,
   Distiller as DistillerType,
   User as UserType,
 } from "@prisma/client";
@@ -53,6 +54,19 @@ export const Bottle = async ({ ...data }: Partial<BottleType> = {}) => {
     data: {
       name: faker.music.songName(),
       series: faker.music.songName(),
+      ...data,
+    },
+  });
+};
+
+export const Checkin = async ({ ...data }: Partial<CheckinType> = {}) => {
+  if (data.bottleId === undefined) data.bottleId = (await Bottle()).id;
+  if (data.userId === undefined) data.userId = (await User()).id;
+
+  return await prisma.checkin.create({
+    data: {
+      tastingNotes: faker.lorem.sentence(),
+      rating: faker.datatype.float({ min: 1, max: 5 }),
       ...data,
     },
   });

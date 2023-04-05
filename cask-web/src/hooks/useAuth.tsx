@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import useLocalStorage from "./useLocalStorage";
 import { User } from "../types";
-import defaultClient from "../lib/api";
+import api from "../lib/api";
 
 type Auth = {
   login: (user: User, accessToken: string) => void;
@@ -26,19 +26,19 @@ export const AuthProvider = ({ children }: { children: any }) => {
     null
   );
 
-  defaultClient.setAccessToken(accessToken);
+  api.setAccessToken(accessToken);
 
   // call this function when you want to authenticate the user
   const login = (user: User, accessToken: string) => {
     // kind of gross this exists here, need a better pattern
-    defaultClient.setAccessToken(accessToken);
+    api.setAccessToken(accessToken);
     setUser(user);
     setAccessToken(accessToken);
   };
 
   // call this function to sign out logged in user
   const logout = () => {
-    defaultClient.setAccessToken(null);
+    api.setAccessToken(null);
     setUser(null);
     setAccessToken(null);
   };

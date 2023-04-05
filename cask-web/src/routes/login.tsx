@@ -1,7 +1,7 @@
 import { Grid, Typography } from "@mui/material";
 import { LoaderFunction, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
-import defaultClient from "../lib/api";
+import api from "../lib/api";
 import useAuth from "../hooks/useAuth";
 import Layout from "../components/layout";
 
@@ -32,14 +32,11 @@ export default function Login() {
         <Grid item xs={3}>
           <GoogleLogin
             onSuccess={async (credentialResponse) => {
-              const { user, accessToken } = await defaultClient.post(
-                "/auth/google",
-                {
-                  data: {
-                    token: credentialResponse.credential,
-                  },
-                }
-              );
+              const { user, accessToken } = await api.post("/auth/google", {
+                data: {
+                  token: credentialResponse.credential,
+                },
+              });
               login(user, accessToken);
               navigate("/");
             }}

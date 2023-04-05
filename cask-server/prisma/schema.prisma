@@ -102,6 +102,8 @@ model Checkin {
     rating       Float
     userId       Int
     user         User     @relation(fields: [userId], references: [id])
+
+    createdAt DateTime @default(now())
 }
 
 // locations are where you're checking-in from (e.g. a bar, a distillery)

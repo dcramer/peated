@@ -3,7 +3,7 @@ import { Box, Fab, Paper } from "@mui/material";
 import type { Checkin } from "../types";
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import { listCheckins } from "../lib/api";
+import api from "../lib/api";
 import CheckinListItem from "../components/checkinListItem";
 
 type LoaderData = {
@@ -11,7 +11,7 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const checkins = await listCheckins();
+  const checkins = await api.get("/checkins");
 
   return { checkins };
 };
