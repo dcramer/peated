@@ -50,6 +50,19 @@ test("get bottle", async () => {
   expect(data.id).toBe(bottle1.id);
 });
 
+test("requires authentication", async () => {
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood",
+      brand: 1,
+    },
+  });
+
+  expect(response).toRespondWith(401);
+});
+
 test("creates a new bottle with minimal params", async () => {
   const brand = await Fixtures.Brand();
   const response = await app.inject({
@@ -59,6 +72,7 @@ test("creates a new bottle with minimal params", async () => {
       name: "Delicious Wood",
       brand: brand.id,
     },
+    headers: await Fixtures.AuthenticatedHeaders(),
   });
 
   expect(response).toRespondWith(201);
@@ -90,6 +104,7 @@ test("creates a new bottle with all params", async () => {
       abv: 0.45,
       statedAge: 12,
     },
+    headers: await Fixtures.AuthenticatedHeaders(),
   });
 
   expect(response).toRespondWith(201);
@@ -115,6 +130,7 @@ test("creates a new bottle with invalid brandId", async () => {
       name: "Delicious Wood",
       brand: 5,
     },
+    headers: await Fixtures.AuthenticatedHeaders(),
   });
 
   expect(response).toRespondWith(400);
@@ -132,6 +148,7 @@ test("creates a new bottle with existing branbd name", async () => {
         country: brand.country,
       },
     },
+    headers: await Fixtures.AuthenticatedHeaders(),
   });
 
   expect(response).toRespondWith(201);
@@ -156,6 +173,7 @@ test("creates a new bottle with new brand name", async () => {
         country: "Scotland",
       },
     },
+    headers: await Fixtures.AuthenticatedHeaders(),
   });
 
   expect(response).toRespondWith(201);

@@ -1,6 +1,8 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { Checkin, Prisma } from "@prisma/client";
+import { validateRequest } from "../middleware/auth";
 
 export const listCheckins: RouteOptions<
   Server,
@@ -75,5 +77,61 @@ export const getCheckin: RouteOptions<
     } else {
       res.send(checkin);
     }
+  },
+};
+
+export const addCheckin: RouteOptions<
+  Server,
+  IncomingMessage,
+  ServerResponse,
+  {
+    Body: Checkin & {
+      bottle: number;
+    };
+  }
+> = {
+  method: "POST",
+  url: "/checkins",
+  schema: {
+    body: {
+      type: "object",
+      required: ["bottle", "rating"],
+      properties: {
+        bottle: { type: "number" },
+        rating: { type: "number", minimum: 0, maximum: 5 },
+        tastingNotes: { type: "string" },
+        tags: { type: "array", items: { type: "string" } },
+      },
+    },
+  },
+  preHandler: [validateRequest],
+  handler: async (req, res) => {
+    const body = req.body;
+    // gross syntax, whats better?
+    const data: Prisma.CheckinUncheckedCreateInput = (({ bottle, ...d }: any) =>
+      d)(body);
+
+    if (body.bottle) {
+      let bottle = await prisma.bottle.findUnique({
+        where: { id: body.bottle },
+      });
+
+      if (!bottle) {
+        res.status(400).send({ error: "Invalid bottle" });
+        return;
+      } else {
+        data.bottleId = bottle.id;
+      }
+    }
+
+    data.userId = req.user.id;
+
+    const checkin = await prisma.checkin.create({
+      data,
+      include: {
+        bottle: true,
+      },
+    });
+    res.status(201).send(checkin);
   },
 };

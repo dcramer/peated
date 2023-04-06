@@ -2,6 +2,7 @@ import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
 import { Bottle, Bottler, Brand, Prisma, Distiller } from "@prisma/client";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { validateRequest } from "../middleware/auth";
 
 export const listBottles: RouteOptions<
   Server,
@@ -172,6 +173,7 @@ export const addBottle: RouteOptions<
       },
     },
   },
+  preHandler: [validateRequest],
   handler: async (req, res) => {
     const body = req.body;
     // gross syntax, whats better?

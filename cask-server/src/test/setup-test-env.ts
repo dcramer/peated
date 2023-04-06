@@ -1,6 +1,7 @@
 import { prisma } from "../lib/db";
 
 import "../lib/test/expects";
+import { AuthenticatedHeaders } from "../lib/test/fixtures";
 
 global.DefaultFixtures = {};
 
@@ -36,7 +37,6 @@ const clearDatabase = async () => {
 const createDefaultUser = async () => {
   return await prisma.user.create({
     data: {
-      // id: "1",
       email: "fizz.buzz@example.com",
       displayName: "Fizzy Buzz",
     },
@@ -46,9 +46,12 @@ const createDefaultUser = async () => {
 beforeEach(async () => {
   await clearDatabase();
 
-  global.DefaultFixtures = {};
+  const user = await createDefaultUser();
 
-  global.DefaultFixtures.DEFAULT_USER = await createDefaultUser();
+  global.DefaultFixtures = {
+    user,
+    authHeaders: await AuthenticatedHeaders({ user }),
+  };
 });
 
 afterEach(async () => {

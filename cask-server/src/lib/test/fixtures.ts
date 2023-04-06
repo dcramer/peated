@@ -7,6 +7,7 @@ import {
   Distiller as DistillerType,
   User as UserType,
 } from "@prisma/client";
+import { createAccessToken } from "../auth";
 
 function between(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -70,4 +71,22 @@ export const Checkin = async ({ ...data }: Partial<CheckinType> = {}) => {
       ...data,
     },
   });
+};
+
+export const AuthToken = async ({ user }: { user?: UserType | null } = {}) => {
+  if (!user) user = await User();
+
+  return createAccessToken({
+    id: user.id,
+  });
+};
+
+export const AuthenticatedHeaders = async ({
+  user,
+}: {
+  user?: UserType | null;
+} = {}) => {
+  return {
+    Authorization: `Bearer ${await AuthToken({ user })}`,
+  };
 };
