@@ -3,6 +3,7 @@ import {
   Box,
   Chip,
   FormControl,
+  FormHelperText,
   Grid,
   InputAdornment,
   InputLabel,
@@ -19,6 +20,13 @@ import type { Bottle, User } from "../types";
 import { useState } from "react";
 import { Add as AddIcon } from "@mui/icons-material";
 
+function toTitleCase(value: string) {
+  var words = value.toLowerCase().split(" ");
+  for (var i = 0; i < words.length; i++) {
+    words[i] = words[i][0].toUpperCase() + words[i].slice(1);
+  }
+  return words.join(" ");
+}
 export default function AddBottle() {
   const categoryList = [
     "blend",
@@ -32,7 +40,7 @@ export default function AddBottle() {
     "spirit",
   ].map((c) => ({
     id: c,
-    name: c.replace("_", " "),
+    name: toTitleCase(c.replace("_", " ")),
   }));
 
   return (
@@ -58,6 +66,18 @@ export default function AddBottle() {
               placeholder="e.g. Macallan"
               variant="outlined"
               required
+              helperText="The brand whom bottles the spirit."
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Distiller"
+              name="distiller"
+              placeholder="e.g. Macallan"
+              variant="outlined"
+              required
+              helperText="The distiller whom produces the spirit. Sometimes the same as the brand."
             />
           </Grid>
           <Grid item xs={12}>
@@ -68,6 +88,7 @@ export default function AddBottle() {
               placeholder="e.g. Macallan 12"
               variant="outlined"
               required
+              helperText="The full name of the bottle, excluding its series."
             />
           </Grid>
           <Grid item xs={12}>
@@ -77,6 +98,7 @@ export default function AddBottle() {
               name="series"
               placeholder="e.g. The Edition"
               variant="outlined"
+              helperText="If applicable, the series of bottling."
             />
           </Grid>
           <Grid item xs={12}>
@@ -87,11 +109,10 @@ export default function AddBottle() {
               placeholder="e.g. 45"
               name="abv"
               InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">%</InputAdornment>
-                ),
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
               variant="outlined"
+              helperText="The alcohol content by volume."
             />
           </Grid>
           <Grid item xs={12}>
@@ -106,6 +127,7 @@ export default function AddBottle() {
                 ),
               }}
               variant="outlined"
+              helperText="If applicable, the number of years the spirit was aged."
             />
           </Grid>
           <Grid item xs={12}>
@@ -122,6 +144,7 @@ export default function AddBottle() {
                   <MenuItem value={c.id}>{c.name}</MenuItem>
                 ))}
               </Select>
+              <FormHelperText>The kind of spirit.</FormHelperText>
             </FormControl>
           </Grid>
         </Grid>
