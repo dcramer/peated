@@ -1,23 +1,22 @@
-const cheerio = require("cheerio");
-const { existsSync } = require("fs");
-const { open } = require("fs/promises");
+import axios from "axios";
+import { load as cheerio } from "cheerio";
+import { existsSync } from "fs";
+import { open } from "fs/promises";
 
 const MIN_ID = 1;
 const MAX_ID = 250000;
 
 const CACHE = ".cache";
 
-async function downloadAndCacheWhisky(id, filename) {
+async function downloadAndCacheWhisky(id: number, filename: string) {
   const url = `https://www.whiskybase.com/whiskies/whisky/${id}/`;
   let data = "";
   let status = 0;
   try {
-    const req = await fetch(url);
-    status = req.status;
-    data = await req.text();
-  } catch (err) {
-    status = err.response.status;
-    if (code !== 404) {
+    ({ status, data } = await axios.get(url));
+  } catch (err: any) {
+    status = err?.response?.status;
+    if (status !== 404) {
       throw err;
     }
   }
@@ -35,7 +34,7 @@ async function downloadAndCacheWhisky(id, filename) {
 }
 
 // e.g. https://www.whiskybase.com/whiskies/whisky/1/
-async function scrapeWhisky(id) {
+async function scrapeWhisky(id: number) {
   console.log(`Processing Whisky ${id}`);
 
   const filename = `${CACHE}/${id}.html`;
@@ -46,7 +45,7 @@ async function scrapeWhisky(id) {
     ({ data, status } = await downloadAndCacheWhisky(id, filename));
   } else {
     const fs = await open(filename, "r");
-    ({ data, status } = JSON.parse(await fs.readFile()));
+    ({ data, status } = JSON.parse((await fs.readFile()).toString()));
     await fs.close();
   }
 
@@ -62,17 +61,19 @@ async function scrapeWhisky(id) {
   //     14-year-old Roasted Malt
   //   </h1>;
 
-  const $ = cheerio.load(data);
+  const $ = cheerio(data);
 
-  const bottle = {};
+  const bottle: any = {};
 
   const headerEl = $("header > h1").first();
 
+  const brandName = headerEl.find("a").first().text();
+
   const maybeRegion = $("ul.breadcrumb > li:nth-child(3)").text();
-  const region = maybeRegion !== bottle.brand.name ? maybeRegion : null;
+  const region = maybeRegion !== brandName ? maybeRegion : null;
 
   bottle.brand = {
-    name: headerEl.find("a").first().text(),
+    name: brandName,
     country: $("ul.breadcrumb > li:nth-child(2)").text(),
     region,
   };
@@ -104,7 +105,7 @@ async function scrapeWhisky(id) {
   return bottle;
 }
 
-function parseAbv(value) {
+function parseAbv(value: string) {
   if (!value || value === "") return;
   const amt = value.split(" % ")[0];
   const abv = parseInt(amt * 10, 10) / 100;
@@ -115,7 +116,7 @@ function parseAbv(value) {
   return abv;
 }
 
-function parseYear(value) {
+function parseYear(value: string) {
   if (!value || value === "") return;
   const bits = value.split(".");
   const year = bits[bits.length - 1];
@@ -161,13 +162,13 @@ async function scrape() {
   }
 }
 
-function sleep(ms) {
+function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 const API_SERVER = process.env.API_SERVER;
 
-async function submitBottle(bottle) {
+async function submitBottle(bottle: any) {
   const headers = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${process.env.TOKEN}`,
@@ -175,13 +176,11 @@ async function submitBottle(bottle) {
 
   console.log(bottle);
 
-  const resp = await fetch(`${API_SERVER}/bottles`, {
-    method: "POST",
-    body: JSON.stringify(bottle),
+  const resp = await axios.post(`${API_SERVER}/bottles`, bottle, {
     headers,
   });
   if (resp.status !== 201) {
-    const data = await resp.json();
+    const { data } = resp;
     throw new Error(
       `Failed to submit bottle: ${JSON.stringify(data, null, 2)}`
     );

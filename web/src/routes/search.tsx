@@ -1,4 +1,7 @@
-import { AccountCircle as AccountCircleIcon } from "@mui/icons-material";
+import {
+  AccountCircle as AccountCircleIcon,
+  Add as AddIcon,
+} from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -43,7 +46,7 @@ export default function Search() {
     <Box>
       <form method="GET" onSubmit={onSubmit}>
         <Box
-          sx={{ display: "flex", alignItems: "flex-end", p: 4, width: "100%" }}
+          sx={{ display: "flex", alignItems: "flex-end", py: 4, width: "100%" }}
         >
           <AccountCircleIcon sx={{ color: "action.active", mr: 1, my: 0.5 }} />
           <TextField
@@ -66,7 +69,7 @@ export default function Search() {
           </>
         );
         return (
-          <Card>
+          <Card key={bottle.id}>
             <CardActionArea href={`/b/${bottle.id}/checkin`}>
               <CardHeader
                 avatar={
@@ -81,6 +84,22 @@ export default function Search() {
           </Card>
         );
       })}
+      {query && !results.length && (
+        <Card>
+          <CardActionArea href={`/addBottle`}>
+            <CardHeader
+              avatar={<AddIcon />}
+              title="Can't find a bottle?"
+              subheader={
+                <span>
+                  {`Tap here to add `}
+                  <strong>{query}</strong>
+                </span>
+              }
+            />
+          </CardActionArea>
+        </Card>
+      )}
     </Box>
   );
 }

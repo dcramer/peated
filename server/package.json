@@ -3,10 +3,10 @@
   "name": "server",
   "scripts": {
     "build": "tsc",
+    "dev": "nodemon --exec ts-node --require dotenv/config ./src/server.ts",
     "db:migrate": "run-p db:migrate:*",
     "db:migrate:dev": "npx prisma migrate dev",
     "db:migrate:test": "dotenv -e .env.test -- npx prisma db push --accept-data-loss",
-    "start": "nodemon --exec ts-node --require dotenv/config ./src/server.ts",
     "tsc": "tsc",
     "test": "run-s db:migrate:test test:vitest",
     "test:vitest": "dotenv -e .env.test -- vitest --no-threads"

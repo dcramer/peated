@@ -10,9 +10,9 @@
   ],
   "main": "main.js",
   "scripts": {
-    "start": "run-p start:*",
-    "start:web": "cd web && API_SERVER=http://localhost:4000 dotenv -e ../.env -- npm start",
-    "start:server": "cd server && PORT=4000 dotenv -e ../.env -- npm start",
+    "dev": "run-p dev:*",
+    "dev:web": "cd web && API_SERVER=http://localhost:4000 dotenv -e ../.env -- npm run dev",
+    "dev:server": "cd server && CORS_HOST=http://localhost:5173 PORT=4000 dotenv -e ../.env -- npm run dev",
     "db:studio": "cd server && dotenv -e ../.env -- npx prisma studio",
     "db:migrate": "cd server && dotenv -e ../.env -- npm run db:migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,5 +23,9 @@
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.1.0",
     "npm-run-all": "^4.1.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^3.1.0",
+    "vite": "^4.2.1"
   }
 }
