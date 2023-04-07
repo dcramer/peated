@@ -41,7 +41,7 @@ export type Brand = {
 export type Bottle = {
   id: string;
   name: string;
-  brand?: Brand | null;
+  brand: Brand;
   // e.g. the limited release/collection
   series?: string | null;
 

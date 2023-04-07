@@ -1,4 +1,6 @@
 {
+  "private": true,
+  "name": "web",
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",

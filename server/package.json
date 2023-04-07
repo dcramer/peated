@@ -1,4 +1,6 @@
 {
+  "private": true,
+  "name": "server",
   "scripts": {
     "build": "tsc",
     "db:migrate": "run-p db:migrate:*",

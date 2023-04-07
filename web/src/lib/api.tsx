@@ -1,5 +1,3 @@
-import type { Bottle, Checkin, User } from "../types";
-
 const API_SERVER: string = process.env.API_SERVER || "http://localhost:4000";
 
 type ApiRequestOptions = {
