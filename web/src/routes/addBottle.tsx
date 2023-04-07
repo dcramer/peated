@@ -1,24 +1,19 @@
+import { AddBox as AddIcon } from "@mui/icons-material";
 import {
-  Avatar,
   Box,
-  Chip,
+  Button,
   FormControl,
   FormHelperText,
   Grid,
   InputAdornment,
   InputLabel,
   MenuItem,
-  Rating,
   Select,
-  Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { useLoaderData } from "react-router-dom";
-import api from "../lib/api";
-import type { Bottle, User } from "../types";
-import { useState } from "react";
-import { Add as AddIcon } from "@mui/icons-material";
+import { useLocation } from "react-router-dom";
+import BrandSelect from "../components/brandSelect";
 
 function toTitleCase(value: string) {
   var words = value.toLowerCase().split(" ");
@@ -28,6 +23,11 @@ function toTitleCase(value: string) {
   return words.join(" ");
 }
 export default function AddBottle() {
+  const location = useLocation();
+
+  const qs = new URLSearchParams(location.search);
+  const name = qs.get("name") || "";
+
   const categoryList = [
     "blend",
     "blended_grain",
@@ -59,15 +59,7 @@ export default function AddBottle() {
       <Box component="form" noValidate sx={{ mt: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Brand"
-              name="brand"
-              placeholder="e.g. Macallan"
-              variant="outlined"
-              required
-              helperText="The brand whom bottles the spirit."
-            />
+            <BrandSelect />
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -87,6 +79,7 @@ export default function AddBottle() {
               name="name"
               placeholder="e.g. Macallan 12"
               variant="outlined"
+              defaultValue={name}
               required
               helperText="The full name of the bottle, excluding its series."
             />
@@ -108,6 +101,7 @@ export default function AddBottle() {
               required
               placeholder="e.g. 45"
               name="abv"
+              type="number"
               InputProps={{
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
@@ -121,6 +115,7 @@ export default function AddBottle() {
               label="Age"
               placeholder="e.g. 12"
               name="age"
+              type="number"
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">years</InputAdornment>
@@ -141,11 +136,23 @@ export default function AddBottle() {
                 labelId="category-label"
               >
                 {categoryList.map((c) => (
-                  <MenuItem value={c.id}>{c.name}</MenuItem>
+                  <MenuItem key={c.id} value={c.id}>
+                    {c.name}
+                  </MenuItem>
                 ))}
               </Select>
               <FormHelperText>The kind of spirit.</FormHelperText>
             </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              fullWidth
+              variant="contained"
+              endIcon={<AddIcon />}
+              size="large"
+            >
+              Save Bottle
+            </Button>
           </Grid>
         </Grid>
       </Box>

@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 export default function Search() {
   const location = useLocation();
 
-  const [results, setResults] = useState<Bottle[]>([]);
+  const [results, setResults] = useState<readonly Bottle[]>([]);
 
   // TODO(dcramer): why is this rendering twice
   useEffect(() => {
@@ -28,9 +28,9 @@ export default function Search() {
 
     api
       .get("/bottles", {
-        query: { q: qs.get("q") || "" },
+        query: { query: qs.get("q") || "" },
       })
-      .then((r) => setResults(r));
+      .then((r: readonly Bottle[]) => setResults(r));
   }, [location.search]);
 
   const qs = new URLSearchParams(location.search);
