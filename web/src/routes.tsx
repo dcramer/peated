@@ -8,6 +8,7 @@ import Search from "./routes/search";
 import Login from "./routes/login";
 import Profile from "./routes/profile";
 import { Favorite } from "@mui/icons-material";
+import AddBottle from "./routes/addBottle";
 
 export default [
   {
@@ -16,6 +17,10 @@ export default [
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Activity />, loader: activityLoader },
+      {
+        path: "addBottle",
+        element: <AddBottle />,
+      },
       {
         path: "b/:bottleId/checkin",
         element: <Checkin />,

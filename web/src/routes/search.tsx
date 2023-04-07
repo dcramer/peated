@@ -13,13 +13,12 @@ import {
 import { red } from "@mui/material/colors";
 import { Bottle } from "../types";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { Form, useLocation } from "react-router-dom";
 import api from "../lib/api";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Search() {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const [results, setResults] = useState<Bottle[]>([]);
 
@@ -35,16 +34,11 @@ export default function Search() {
   }, [location.search]);
 
   const qs = new URLSearchParams(location.search);
-  const [query, setQuery] = useState<string>(qs.get("q") || "");
-
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    navigate(`/search?q=${encodeURIComponent(query)}`);
-  };
+  const query = qs.get("q") || "";
 
   return (
     <Box>
-      <form method="GET" onSubmit={onSubmit}>
+      <Form method="GET">
         <Box
           sx={{ display: "flex", alignItems: "flex-end", py: 4, width: "100%" }}
         >
@@ -56,11 +50,12 @@ export default function Search() {
             sx={{ flex: 1 }}
             defaultValue={query}
             onChange={(e) => {
-              setQuery(e.target.value);
+              // setQuery(e.target.value);
+              // navigate(`/search?q=${encodeURIComponent(query)}`, {replace: true});
             }}
           />
         </Box>
-      </form>
+      </Form>
       {results.map((bottle) => {
         const title = (
           <>
@@ -86,7 +81,7 @@ export default function Search() {
       })}
       {query && !results.length && (
         <Card>
-          <CardActionArea href={`/addBottle`}>
+          <CardActionArea href={`/addBottle?name=${encodeURIComponent(query)}`}>
             <CardHeader
               avatar={<AddIcon />}
               title="Can't find a bottle?"
