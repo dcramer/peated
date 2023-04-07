@@ -77,12 +77,14 @@ async function scrapeWhisky(id: number) {
     country: $("ul.breadcrumb > li:nth-child(2)").text(),
     region,
   };
-  bottle.name = headerEl.get()[0]?.lastChild?.data.trim();
+  bottle.name = parseName(brandName, headerEl.get()[0]?.lastChild?.data.trim());
 
   bottle.category = mapCategory($("dt:contains('Category') + dd").text());
 
   bottle.distiller = {
     name: $("dt:contains('Distillery') + dd").text(),
+    country: bottle.brand.country,
+    region,
   };
 
   // bottle.bottler = {
@@ -98,11 +100,17 @@ async function scrapeWhisky(id: number) {
 
   bottle.abv = parseAbv($("dt:contains('Strength') + dd").text());
 
-  console.log(
-    `[Whisky ${id}] Identified as ${bottle.brand.name} - ${bottle.name}`
-  );
+  console.log(`[Whisky ${id}] Identified as ${bottle.name} - ${bottle.series}`);
 
   return bottle;
+}
+
+function parseName(brandName: string, bottleName: string) {
+  const bottleNameWithoutAge = bottleName.split("-year-old")[0];
+  if (bottleNameWithoutAge !== bottleName) {
+    bottleName = `${brandName} ${bottleNameWithoutAge}`;
+  }
+  return bottleName;
 }
 
 function parseAbv(value: string) {
@@ -127,7 +135,7 @@ function parseYear(value: string) {
   return year;
 }
 
-function mapCategory(value) {
+function mapCategory(value: string) {
   switch (value.toLowerCase()) {
     case "blend":
     case "blended malt":
@@ -148,12 +156,9 @@ async function scrape() {
     numTasks += 1;
     (async () => {
       const bottle = await scrapeWhisky(currentId);
-      submitBottle(bottle);
+      await submitBottle(bottle);
       numTasks -= 1;
     })();
-
-    // short circuit temp. if you find this in git it shouldnt be there!
-    break;
 
     while (numTasks >= maxTasks - 1) {
       await sleep(100);
@@ -166,7 +171,7 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const API_SERVER = process.env.API_SERVER;
+const API_SERVER = process.env.API_SERVER || "http://localhost:4000";
 
 async function submitBottle(bottle: any) {
   const headers = {
@@ -174,16 +179,13 @@ async function submitBottle(bottle: any) {
     Authorization: `Bearer ${process.env.TOKEN}`,
   };
 
-  console.log(bottle);
-
-  const resp = await axios.post(`${API_SERVER}/bottles`, bottle, {
-    headers,
-  });
-  if (resp.status !== 201) {
-    const { data } = resp;
-    throw new Error(
-      `Failed to submit bottle: ${JSON.stringify(data, null, 2)}`
-    );
+  try {
+    const resp = await axios.post(`${API_SERVER}/bottles`, bottle, {
+      headers,
+    });
+  } catch (err: any) {
+    const data = err?.response?.data;
+    console.error(`Failed to submit bottle: ${JSON.stringify(data, null, 2)}`);
   }
 }
 
