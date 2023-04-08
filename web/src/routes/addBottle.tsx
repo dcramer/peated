@@ -12,11 +12,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BrandSelect from "../components/brandSelect";
 import DistillerSelect from "../components/distillerSelect";
-import { Brand, Category, Distiller } from "../types";
+import { Brand, Distiller } from "../types";
 import { FormEvent, useState } from "react";
+import api from "../lib/api";
 
 function toTitleCase(value: string) {
   var words = value.toLowerCase().split(" ");
@@ -33,11 +34,12 @@ type FormData = {
   distiller?: Distiller;
   abv?: number;
   age?: number;
-  category?: Category;
+  category?: string;
 };
 
 export default function AddBottle() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({});
 
@@ -61,7 +63,11 @@ export default function AddBottle() {
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+
+    (async () => {
+      const bottle = await api.post("/bottles", formData);
+      navigate(`/b/${bottle.id}/checkin`);
+    })();
   };
 
   return (
@@ -161,14 +167,20 @@ export default function AddBottle() {
               <InputLabel id="category-label">Category</InputLabel>
               <Select
                 fullWidth
-                label="Category"
                 name="category"
                 variant="outlined"
                 labelId="category-label"
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value })
                 }
+                renderValue={(value) =>
+                  categoryList.find((v) => value === v.id)?.name || "Unknown"
+                }
+                value={formData.category}
               >
+                <MenuItem key="" value="">
+                  <em>Unknown</em>
+                </MenuItem>
                 {categoryList.map((c) => (
                   <MenuItem key={c.id} value={c.id}>
                     {c.name}

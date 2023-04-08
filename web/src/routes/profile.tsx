@@ -1,4 +1,14 @@
-import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Button,
+  Container,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
@@ -8,10 +18,11 @@ export default function Profile() {
   if (!user) return null;
 
   return (
-    <Box sx={{ position: "relative", height: "100vh" }}>
-      <Stack spacing={2} direction="column">
+    <Box sx={{ pt: 8 }}>
+      <Stack spacing={2} direction="column" alignItems="center">
         <Avatar>{user.displayName.substring(0, 1)}</Avatar>
         <Typography variant="h1">{user.displayName}</Typography>
+
         <Button
           variant="outlined"
           onClick={() => {

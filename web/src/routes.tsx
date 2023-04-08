@@ -7,8 +7,8 @@ import Activity, { loader as activityLoader } from "./routes/activity";
 import Search from "./routes/search";
 import Login from "./routes/login";
 import Profile from "./routes/profile";
-import { Favorite } from "@mui/icons-material";
 import AddBottle from "./routes/addBottle";
+import Favorites from "./routes/favorites";
 
 export default [
   {
@@ -32,7 +32,7 @@ export default [
       },
       {
         path: "favorites",
-        element: <Favorite />,
+        element: <Favorites />,
       },
       {
         path: "profile",

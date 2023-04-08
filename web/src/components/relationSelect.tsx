@@ -50,7 +50,7 @@ export default function RelationSelect({
   };
   const [dialogValue, setDialogValue] = useState<GenericRelation>();
   const handleDialogSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.stopPropagation();
     setValue({
       ...dialogValue,
     });

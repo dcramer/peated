@@ -1,4 +1,9 @@
-import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
+import {
+  BottomNavigation,
+  BottomNavigationAction,
+  Box,
+  Paper,
+} from "@mui/material";
 import { AccountBox, Favorite, LocalActivity } from "@mui/icons-material";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
@@ -20,9 +25,9 @@ export default function Root() {
 
   return (
     <Layout>
-      <Paper sx={{ pb: 8 }}>
+      <Box sx={{ pb: 7, position: "relative", height: "100vh" }}>
         <Outlet />
-      </Paper>
+      </Box>
 
       <Paper
         sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
