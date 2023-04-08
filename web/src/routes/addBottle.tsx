@@ -15,6 +15,8 @@ import {
 import { useLocation } from "react-router-dom";
 import BrandSelect from "../components/brandSelect";
 import DistillerSelect from "../components/distillerSelect";
+import { Brand, Category, Distiller } from "../types";
+import { FormEvent, useState } from "react";
 
 function toTitleCase(value: string) {
   var words = value.toLowerCase().split(" ");
@@ -23,8 +25,21 @@ function toTitleCase(value: string) {
   }
   return words.join(" ");
 }
+
+type FormData = {
+  name?: string;
+  series?: string;
+  brand?: Brand;
+  distiller?: Distiller;
+  abv?: number;
+  age?: number;
+  category?: Category;
+};
+
 export default function AddBottle() {
   const location = useLocation();
+
+  const [formData, setFormData] = useState<FormData>({});
 
   const qs = new URLSearchParams(location.search);
   const name = qs.get("name") || "";
@@ -44,6 +59,11 @@ export default function AddBottle() {
     name: toTitleCase(c.replace("_", " ")),
   }));
 
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(formData);
+  };
+
   return (
     <Box
       sx={{
@@ -57,13 +77,19 @@ export default function AddBottle() {
         Add Bottle
       </Typography>
 
-      <Box component="form" noValidate sx={{ mt: 3 }}>
+      <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={onSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <BrandSelect />
+            <BrandSelect
+              onChange={(value) => setFormData({ ...formData, brand: value })}
+            />
           </Grid>
           <Grid item xs={12}>
-            <DistillerSelect />
+            <DistillerSelect
+              onChange={(value) =>
+                setFormData({ ...formData, distiller: value })
+              }
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -75,6 +101,9 @@ export default function AddBottle() {
               defaultValue={name}
               required
               helperText="The full name of the bottle, excluding its series."
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
             />
           </Grid>
           <Grid item xs={12}>
@@ -85,6 +114,9 @@ export default function AddBottle() {
               placeholder="e.g. The Edition"
               variant="outlined"
               helperText="If applicable, the series of bottling."
+              onChange={(e) =>
+                setFormData({ ...formData, series: e.target.value })
+              }
             />
           </Grid>
           <Grid item xs={12}>
@@ -100,6 +132,9 @@ export default function AddBottle() {
               }}
               variant="outlined"
               helperText="The alcohol content by volume."
+              onChange={(e) =>
+                setFormData({ ...formData, abv: parseInt(e.target.value, 10) })
+              }
             />
           </Grid>
           <Grid item xs={12}>
@@ -116,6 +151,9 @@ export default function AddBottle() {
               }}
               variant="outlined"
               helperText="If applicable, the number of years the spirit was aged."
+              onChange={(e) =>
+                setFormData({ ...formData, age: parseInt(e.target.value, 10) })
+              }
             />
           </Grid>
           <Grid item xs={12}>
@@ -127,6 +165,9 @@ export default function AddBottle() {
                 name="category"
                 variant="outlined"
                 labelId="category-label"
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
               >
                 {categoryList.map((c) => (
                   <MenuItem key={c.id} value={c.id}>
@@ -143,6 +184,7 @@ export default function AddBottle() {
               variant="contained"
               endIcon={<AddIcon />}
               size="large"
+              type="submit"
             >
               Save Bottle
             </Button>

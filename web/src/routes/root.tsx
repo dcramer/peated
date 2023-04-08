@@ -20,7 +20,9 @@ export default function Root() {
 
   return (
     <Layout>
-      <Outlet />
+      <Paper sx={{ pb: 8 }}>
+        <Outlet />
+      </Paper>
 
       <Paper
         sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}

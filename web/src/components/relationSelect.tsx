@@ -29,12 +29,14 @@ export default function RelationSelect({
   label,
   helperText,
   dialogTitle,
+  onChange,
 }: {
   endpoint: string;
   label: string;
   placeholder?: string;
   helperText?: string;
   dialogTitle: string;
+  onChange: (value: any) => void;
 }) {
   const [value, setValue] = useState<InputValue | null>(null);
   const [open, setOpen] = useState(false);
@@ -71,6 +73,10 @@ export default function RelationSelect({
       ),
     []
   );
+
+  useEffect(() => {
+    onChange(value);
+  }, [value]);
 
   useEffect(() => {
     let active = true;
