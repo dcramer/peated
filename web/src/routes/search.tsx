@@ -9,6 +9,7 @@ import {
   CardActionArea,
   CardHeader,
   TextField,
+  debounce,
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { Bottle } from "../types";
@@ -19,22 +20,29 @@ import { useEffect, useState } from "react";
 
 export default function Search() {
   const location = useLocation();
+  const qs = new URLSearchParams(location.search);
 
+  const [query, setQuery] = useState(qs.get("q") || "");
   const [results, setResults] = useState<readonly Bottle[]>([]);
 
-  // TODO(dcramer): why is this rendering twice
+  const fetch = debounce((query: string) => {
+    api
+      .get("/bottles", {
+        query: { query },
+      })
+      .then((r: readonly Bottle[]) => setResults(r));
+  });
+
   useEffect(() => {
     const qs = new URLSearchParams(location.search);
 
-    api
-      .get("/bottles", {
-        query: { query: qs.get("q") || "" },
-      })
-      .then((r: readonly Bottle[]) => setResults(r));
+    setQuery(qs.get("q") || "");
   }, [location.search]);
 
-  const qs = new URLSearchParams(location.search);
-  const query = qs.get("q") || "";
+  // TODO(dcramer): why is this rendering twice
+  useEffect(() => {
+    fetch(query);
+  }, [query]);
 
   return (
     <Box>
@@ -50,8 +58,9 @@ export default function Search() {
             sx={{ flex: 1 }}
             defaultValue={query}
             onChange={(e) => {
-              // setQuery(e.target.value);
-              // navigate(`/search?q=${encodeURIComponent(query)}`, {replace: true});
+              debounce(() => {
+                setQuery(e.target.value);
+              })();
             }}
           />
         </Box>
