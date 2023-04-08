@@ -18,6 +18,8 @@ export const User = async ({ ...data }: Partial<UserType> = {}) => {
     data: {
       displayName: faker.name.firstName(),
       email: faker.internet.email(),
+      admin: false,
+      active: true,
       ...data,
     },
   });
@@ -28,6 +30,7 @@ export const Brand = async ({ ...data }: Partial<BrandType> = {}) => {
     data: {
       name: faker.company.name(),
       country: faker.address.country(),
+      public: true,
       ...data,
     },
   });
@@ -38,6 +41,7 @@ export const Distiller = async ({ ...data }: Partial<DistillerType> = {}) => {
     data: {
       name: faker.company.name(),
       country: faker.address.country(),
+      public: true,
       ...data,
     },
   });
@@ -78,6 +82,7 @@ export const AuthToken = async ({ user }: { user?: UserType | null } = {}) => {
 
   return createAccessToken({
     id: user.id,
+    admin: user.admin,
   });
 };
 

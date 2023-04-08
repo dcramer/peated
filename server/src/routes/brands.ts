@@ -1,6 +1,8 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { Brand, Prisma } from "@prisma/client";
+import { validateRequest } from "../middleware/auth";
 
 export const listBrands: RouteOptions<
   Server,
@@ -37,6 +39,11 @@ export const listBrands: RouteOptions<
         search: query.split(" ").join(" & "),
         mode: "insensitive",
       };
+    }
+
+    where.OR = [{ public: true }];
+    if (req.user) {
+      where.OR.push({ createdById: req.user.id });
     }
 
     const results = await prisma.brand.findMany({
@@ -81,5 +88,42 @@ export const getBrand: RouteOptions<
     } else {
       res.send(checkin);
     }
+  },
+};
+
+export const addBrand: RouteOptions<
+  Server,
+  IncomingMessage,
+  ServerResponse,
+  {
+    Body: Brand;
+  }
+> = {
+  method: "POST",
+  url: "/brands",
+  schema: {
+    body: {
+      type: "object",
+      required: ["name"],
+      properties: {
+        name: { type: "string" },
+        country: { type: "string" },
+        region: { type: "string" },
+      },
+    },
+  },
+  preHandler: [validateRequest],
+  handler: async (req, res) => {
+    const body = req.body;
+    // gross syntax, whats better?
+    const data: Prisma.BrandUncheckedCreateInput = (({ ...d }: any) => d)(body);
+
+    data.createdById = req.user.id;
+    data.public = req.user.admin;
+
+    const brand = await prisma.brand.create({
+      data,
+    });
+    res.status(201).send(brand);
   },
 };

@@ -41,10 +41,14 @@ export default function AddBottle() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState<FormData>({});
-
   const qs = new URLSearchParams(location.search);
   const name = qs.get("name") || "";
+
+  const [formData, setFormData] = useState<FormData>({
+    name,
+    series: "",
+    category: "",
+  });
 
   const categoryList = [
     "blend",
@@ -86,30 +90,18 @@ export default function AddBottle() {
       <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={onSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <BrandSelect
-              onChange={(value) => setFormData({ ...formData, brand: value })}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <DistillerSelect
-              onChange={(value) =>
-                setFormData({ ...formData, distiller: value })
-              }
-            />
-          </Grid>
-          <Grid item xs={12}>
             <TextField
               fullWidth
               label="Bottle"
               name="name"
               placeholder="e.g. Macallan 12"
               variant="outlined"
-              defaultValue={name}
               required
               helperText="The full name of the bottle, excluding its series."
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
+              defaultValue={formData.name}
             />
           </Grid>
           <Grid item xs={12}>
@@ -122,6 +114,21 @@ export default function AddBottle() {
               helperText="If applicable, the series of bottling."
               onChange={(e) =>
                 setFormData({ ...formData, series: e.target.value })
+              }
+              defaultValue={formData.series}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <BrandSelect
+              onChange={(value: any) =>
+                setFormData({ ...formData, brand: value })
+              }
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <DistillerSelect
+              onChange={(value: any) =>
+                setFormData({ ...formData, distiller: value })
               }
             />
           </Grid>
@@ -141,6 +148,7 @@ export default function AddBottle() {
               onChange={(e) =>
                 setFormData({ ...formData, abv: parseInt(e.target.value, 10) })
               }
+              defaultValue={formData.abv}
             />
           </Grid>
           <Grid item xs={12}>

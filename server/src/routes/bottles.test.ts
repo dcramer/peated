@@ -36,6 +36,21 @@ test("lists bottles", async () => {
   expect(data[0].id).toBe(bottle1.id);
 });
 
+test("lists bottles hides private", async () => {
+  const bottle = await Fixtures.Bottle();
+  const bottle2 = await Fixtures.Bottle({ public: false });
+
+  let response = await app.inject({
+    method: "GET",
+    url: "/bottles",
+  });
+
+  expect(response).toRespondWith(200);
+  let data = JSON.parse(response.payload);
+  expect(data.length).toBe(1);
+  expect(data[0].id).toBe(bottle.id);
+});
+
 test("get bottle", async () => {
   const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood" });
   await Fixtures.Bottle({ name: "Something Else" });

@@ -13,8 +13,16 @@ model User {
     email       String  @unique
     displayName String?
 
+    active Boolean @default(true)
+    admin  Boolean @default(false)
+
+    createdAt DateTime @default(now())
+
     checkins   Checkin[]
     identities Identity[]
+    Brand      Brand[]
+    Distiller  Distiller[]
+    Bottle     Bottle[]
 }
 
 enum IdentityProvider {
@@ -53,6 +61,12 @@ model Brand {
     country String?
     region  String?
 
+    public Boolean @default(true)
+
+    createdAt   DateTime @default(now())
+    createdById Int?
+    createdBy   User?    @relation(fields: [createdById], references: [id])
+
     bottles Bottle[]
 }
 
@@ -62,6 +76,12 @@ model Distiller {
 
     country String?
     region  String?
+
+    public Boolean @default(true)
+
+    createdAt   DateTime @default(now())
+    createdById Int?
+    createdBy   User?    @relation(fields: [createdById], references: [id])
 
     bottles Bottle[]
 }
@@ -84,6 +104,12 @@ model Bottle {
     category  Category?
     abv       Float?
     statedAge Int?
+
+    public Boolean @default(true)
+
+    createdAt   DateTime @default(now())
+    createdById Int?
+    createdBy   User?    @relation(fields: [createdById], references: [id])
 
     checkins Checkin[]
 

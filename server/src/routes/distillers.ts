@@ -1,6 +1,8 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { Distiller, Prisma } from "@prisma/client";
+import { validateRequest } from "../middleware/auth";
 
 export const listDistillers: RouteOptions<
   Server,
@@ -37,6 +39,10 @@ export const listDistillers: RouteOptions<
         search: query.split(" ").join(" & "),
         mode: "insensitive",
       };
+    }
+    where.OR = [{ public: true }];
+    if (req.user) {
+      where.OR.push({ createdById: req.user.id });
     }
 
     const results = await prisma.distiller.findMany({
@@ -81,5 +87,44 @@ export const getDistiller: RouteOptions<
     } else {
       res.send(checkin);
     }
+  },
+};
+
+export const addDistiller: RouteOptions<
+  Server,
+  IncomingMessage,
+  ServerResponse,
+  {
+    Body: Distiller;
+  }
+> = {
+  method: "POST",
+  url: "/distillers",
+  schema: {
+    body: {
+      type: "object",
+      required: ["name"],
+      properties: {
+        name: { type: "string" },
+        country: { type: "string" },
+        region: { type: "string" },
+      },
+    },
+  },
+  preHandler: [validateRequest],
+  handler: async (req, res) => {
+    const body = req.body;
+    // gross syntax, whats better?
+    const data: Prisma.DistillerUncheckedCreateInput = (({ ...d }: any) => d)(
+      body
+    );
+
+    data.createdById = req.user.id;
+    data.public = req.user.admin;
+
+    const distiller = await prisma.distiller.create({
+      data,
+    });
+    res.status(201).send(distiller);
   },
 };

@@ -40,6 +40,10 @@ export const listBottles: RouteOptions<
         mode: "insensitive",
       };
     }
+    where.OR = [{ public: true }];
+    if (req.user) {
+      where.OR.push({ createdById: req.user.id });
+    }
 
     const results = await prisma.bottle.findMany({
       include: {
@@ -200,6 +204,8 @@ export const addBottle: RouteOptions<
             name: body.brand.name,
             country: body.brand.country,
             region: body.brand.region,
+            public: req.user.admin,
+            createdById: req.user.id,
           },
         });
       }
@@ -229,6 +235,8 @@ export const addBottle: RouteOptions<
             name: body.distiller.name,
             country: body.distiller.country,
             region: body.distiller.region,
+            public: req.user.admin,
+            createdById: req.user.id,
           },
         });
       }
@@ -240,6 +248,9 @@ export const addBottle: RouteOptions<
         data.distillerId = distiller.id;
       }
     }
+
+    data.createdById = req.user.id;
+    data.public = req.user.admin;
 
     const bottle = await prisma.bottle.create({
       data,
