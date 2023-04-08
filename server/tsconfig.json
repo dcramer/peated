@@ -1,4 +1,7 @@
 {
   "extends": "../common/tsconfig.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"]
+  },
   "include": ["src", "prisma"],
 }

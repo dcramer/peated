@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import BrandSelect from "../components/brandSelect";
+import DistillerSelect from "../components/distillerSelect";
 
 function toTitleCase(value: string) {
   var words = value.toLowerCase().split(" ");
@@ -62,15 +63,7 @@ export default function AddBottle() {
             <BrandSelect />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Distiller"
-              name="distiller"
-              placeholder="e.g. Macallan"
-              variant="outlined"
-              required
-              helperText="The distiller whom produces the spirit. Sometimes the same as the brand."
-            />
+            <DistillerSelect />
           </Grid>
           <Grid item xs={12}>
             <TextField

@@ -23,7 +23,7 @@ export type Distiller = {
   id: string;
   name: string;
   // e.g. Scotland
-  country: string;
+  country?: string;
   // e.g. Speyside
   region?: string;
 };
@@ -33,7 +33,7 @@ export type Brand = {
   id: string;
   name: string;
   // e.g. Scotland
-  country: string;
+  country?: string;
   // e.g. Speyside
   region?: string;
 };

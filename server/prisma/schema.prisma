@@ -50,7 +50,7 @@ model Brand {
     id   Int    @id @default(autoincrement())
     name String @unique
 
-    country String
+    country String?
     region  String?
 
     bottles Bottle[]
@@ -60,7 +60,7 @@ model Distiller {
     id   Int    @id @default(autoincrement())
     name String @unique
 
-    country String
+    country String?
     region  String?
 
     bottles Bottle[]
