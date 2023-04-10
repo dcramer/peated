@@ -122,8 +122,12 @@ export const addDistiller: RouteOptions<
     data.createdById = req.user.id;
     data.public = req.user.admin;
 
-    const distiller = await prisma.distiller.create({
-      data,
+    const distiller = await prisma.distiller.upsert({
+      where: {
+        name: data.name,
+      },
+      update: {},
+      create: data,
     });
     res.status(201).send(distiller);
   },

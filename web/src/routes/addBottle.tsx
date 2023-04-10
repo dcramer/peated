@@ -87,7 +87,7 @@ export default function AddBottle() {
         Add Bottle
       </Typography>
 
-      <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={onSubmit}>
+      <Box component="form" sx={{ mt: 3 }} onSubmit={onSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField

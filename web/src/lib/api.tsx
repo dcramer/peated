@@ -7,6 +7,16 @@ type ApiRequestOptions = {
   query?: any;
 };
 
+class ApiError extends Error {
+  response: Response;
+
+  constructor(message: string, response: Response) {
+    super(message);
+    this.name = this.constructor.name;
+    this.response = response;
+  }
+}
+
 class ApiClient {
   server: string;
   accessToken: string | null;
@@ -32,7 +42,7 @@ class ApiClient {
     if (this.accessToken)
       headers["Authorization"] = `Bearer ${this.accessToken}`;
 
-    const req = await fetch(
+    const resp = await fetch(
       `${this.server}${path}?${new URLSearchParams(options.query || {})}`,
       {
         body: options.data ? JSON.stringify(options.data) : undefined,
@@ -40,7 +50,10 @@ class ApiClient {
         ...options,
       }
     );
-    return await req.json();
+    if (!resp?.ok) {
+      throw new ApiError("Request failed", resp);
+    }
+    return await resp.json();
   }
 
   get(path: string, options: any | undefined = undefined) {

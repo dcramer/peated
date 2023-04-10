@@ -121,8 +121,12 @@ export const addBrand: RouteOptions<
     data.createdById = req.user.id;
     data.public = req.user.admin;
 
-    const brand = await prisma.brand.create({
-      data,
+    const brand = await prisma.brand.upsert({
+      where: {
+        name: data.name,
+      },
+      update: {},
+      create: data,
     });
     res.status(201).send(brand);
   },

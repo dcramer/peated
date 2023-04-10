@@ -1,5 +1,5 @@
 // import { User } from "@prisma/client";
-import { sign, verify, JwtPayload } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 import config from "../config";
 
 interface AccessToken {
@@ -20,7 +20,7 @@ export const createAccessToken = (
 
 export const verifyToken = (
   token: string | undefined
-): Promise<string | JwtPayload | undefined> => {
+): Promise<AccessToken | undefined> => {
   return new Promise((res, rej) => {
     if (!token) {
       rej("invalid token");
@@ -32,7 +32,10 @@ export const verifyToken = (
         rej("invalid token");
         return;
       }
-      res(decoded);
+      if (!decoded || typeof decoded === "string") {
+        rej("invalid token");
+      }
+      res(decoded as AccessToken);
     });
   });
 };

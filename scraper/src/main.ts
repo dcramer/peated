@@ -155,8 +155,14 @@ async function scrape() {
   while (currentId < MAX_ID) {
     numTasks += 1;
     (async () => {
-      const bottle = await scrapeWhisky(currentId);
-      await submitBottle(bottle);
+      try {
+        const bottle = await scrapeWhisky(currentId);
+        await submitBrand(bottle.brand);
+        await submitDistiller(bottle.distiller);
+        // await submitBottle(bottle);
+      } catch (err) {
+        console.error(err);
+      }
       numTasks -= 1;
     })();
 
@@ -173,19 +179,53 @@ function sleep(ms: number) {
 
 const API_SERVER = process.env.API_SERVER || "http://localhost:4000";
 
-async function submitBottle(bottle: any) {
+async function submitBottle(data: any) {
   const headers = {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.TOKEN}`,
+    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
   };
 
   try {
-    const resp = await axios.post(`${API_SERVER}/bottles`, bottle, {
+    await axios.post(`${API_SERVER}/bottles`, data, {
       headers,
     });
   } catch (err: any) {
     const data = err?.response?.data;
     console.error(`Failed to submit bottle: ${JSON.stringify(data, null, 2)}`);
+  }
+}
+
+async function submitBrand(data: any) {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+  };
+
+  try {
+    await axios.post(`${API_SERVER}/brands`, data, {
+      headers,
+    });
+  } catch (err: any) {
+    const data = err?.response?.data;
+    console.error(`Failed to submit brand: ${JSON.stringify(data, null, 2)}`);
+  }
+}
+
+async function submitDistiller(data: any) {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+  };
+
+  try {
+    await axios.post(`${API_SERVER}/distillers`, data, {
+      headers,
+    });
+  } catch (err: any) {
+    const data = err?.response?.data;
+    console.error(
+      `Failed to submit distiller: ${JSON.stringify(data, null, 2)}`
+    );
   }
 }
 

@@ -29,6 +29,7 @@ export default function RelationSelect({
   label,
   helperText,
   dialogTitle,
+  canCreate,
   onChange,
 }: {
   endpoint: string;
@@ -36,6 +37,7 @@ export default function RelationSelect({
   placeholder?: string;
   helperText?: string;
   dialogTitle: string;
+  canCreate?: boolean;
   onChange: (value: any) => void;
 }) {
   const [value, setValue] = useState<InputValue | null>(null);
@@ -103,7 +105,7 @@ export default function RelationSelect({
       <Autocomplete
         open={open}
         onChange={(event, newValue) => {
-          if (typeof newValue === "string") {
+          if (canCreate && typeof newValue === "string") {
             // timeout to avoid instant validation of the dialog's form.
             setTimeout(() => {
               setDialogOpen(true);
@@ -111,7 +113,7 @@ export default function RelationSelect({
                 name: newValue,
               });
             });
-          } else if (newValue && newValue.name) {
+          } else if (canCreate && newValue && newValue.inputValue) {
             setDialogOpen(true);
             setDialogValue({
               name: newValue.inputValue,
@@ -129,11 +131,10 @@ export default function RelationSelect({
         clearOnBlur
         selectOnFocus
         handleHomeEndKeys
-        freeSolo
         filterOptions={(options, params) => {
           const filtered = filter(options, params);
 
-          if (params.inputValue !== "") {
+          if (canCreate && params.inputValue !== "") {
             filtered.push({
               inputValue: params.inputValue,
               name: `Add "${params.inputValue}"`,
@@ -173,35 +174,37 @@ export default function RelationSelect({
           />
         )}
       />
-      <Dialog open={dialogOpen} onClose={handleClose}>
-        <form onSubmit={handleDialogSubmit}>
-          <DialogTitle>{dialogTitle}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>Who are we missing?</DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              name="name"
-              value={dialogValue?.name}
-              onChange={(event) =>
-                setDialogValue({
-                  ...dialogValue,
-                  name: event.target.value,
-                })
-              }
-              label="Name"
-              type="text"
-              placeholder={placeholder}
-              variant="standard"
-              helperText={helperText}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit">Add</Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+      {canCreate && (
+        <Dialog open={dialogOpen} onClose={handleClose}>
+          <form onSubmit={handleDialogSubmit}>
+            <DialogTitle>{dialogTitle}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>Who are we missing?</DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                name="name"
+                value={dialogValue?.name}
+                onChange={(event) =>
+                  setDialogValue({
+                    ...dialogValue,
+                    name: event.target.value,
+                  })
+                }
+                label="Name"
+                type="text"
+                placeholder={placeholder}
+                variant="standard"
+                helperText={helperText}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button type="submit">Add</Button>
+            </DialogActions>
+          </form>
+        </Dialog>
+      )}
     </>
   );
 }
