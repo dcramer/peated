@@ -11,6 +11,7 @@ import theme from "./theme";
 import routes from "./routes";
 import config from "./config";
 import { AuthProvider } from "./hooks/useAuth";
+import Snackbar from "./components/snackbar";
 
 const router = createBrowserRouter(routes);
 
@@ -24,6 +25,7 @@ root.render(
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
+          <Snackbar />
           <RouterProvider router={router} />
         </ThemeProvider>
       </AuthProvider>
