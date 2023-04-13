@@ -1,19 +1,12 @@
 import { Add as AddIcon } from "@mui/icons-material";
-import {
-  AppBar,
-  Box,
-  Container,
-  Fab,
-  Paper,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
+import { Fab, Paper, Tab, Tabs } from "@mui/material";
 import type { Checkin } from "../types";
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 import api from "../lib/api";
 import CheckinListItem from "../components/checkinListItem";
+import Layout from "../components/layout";
+import ScrollView from "../components/scrollView";
 
 type LoaderData = {
   checkins: Checkin[];
@@ -29,28 +22,16 @@ export default function Activity() {
   const { checkins } = useLoaderData() as LoaderData;
 
   return (
-    <Box
-      sx={{
-        position: "relative",
-        height: "100vh",
-        bgcolor: "background.paper",
-      }}
-    >
-      <AppBar component="nav" position="static">
-        <Typography
-          variant="h6"
-          noWrap
-          component="div"
-          sx={{ p: 1, textAlign: "center" }}
-        >
-          Activity
-        </Typography>
+    <Layout
+      title="Activity"
+      appBar={
         <Tabs variant="fullWidth" value={0}>
           <Tab label="Friends" />
           <Tab label="Nearby" />
           <Tab label="Global" />
         </Tabs>
-      </AppBar>
+      }
+    >
       <Fab
         color="primary"
         aria-label="add"
@@ -63,11 +44,11 @@ export default function Activity() {
       >
         <AddIcon />
       </Fab>
-      <Paper>
+      <ScrollView>
         {checkins.map((c) => (
           <CheckinListItem key={c.id} value={c} />
         ))}
-      </Paper>
-    </Box>
+      </ScrollView>
+    </Layout>
   );
 }

@@ -10,15 +10,16 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import BrandSelect from "../components/brandSelect";
+import { FormEvent, useState } from "react";
+
 import DistillerSelect from "../components/distillerSelect";
 import { Brand, Distiller } from "../types";
-import { FormEvent, useState } from "react";
 import api from "../lib/api";
 import { useRequiredAuth } from "../hooks/useAuth";
+import Layout from "../components/layout";
 
 function toTitleCase(value: string) {
   var words = value.toLowerCase().split(" ");
@@ -77,19 +78,8 @@ export default function AddBottle() {
   };
 
   return (
-    <Box
-      sx={{
-        marginTop: 8,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <Typography variant="h4" component="h4" gutterBottom>
-        Add Bottle
-      </Typography>
-
-      <Box component="form" sx={{ mt: 3 }} onSubmit={onSubmit}>
+    <Layout title="Add Bottle">
+      <Box component="form" onSubmit={onSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
@@ -158,7 +148,7 @@ export default function AddBottle() {
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Age"
+              label="Stated Age"
               placeholder="e.g. 12"
               name="statedAge"
               type="number"
@@ -219,6 +209,6 @@ export default function AddBottle() {
           </Grid>
         </Grid>
       </Box>
-    </Box>
+    </Layout>
   );
 }

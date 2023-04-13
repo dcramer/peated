@@ -136,15 +136,7 @@ function parseYear(value: string) {
 }
 
 function mapCategory(value: string) {
-  switch (value.toLowerCase()) {
-    case "blend":
-    case "blended malt":
-    case "single malt":
-    case "spirit":
-      return value.toLowerCase().replace(" ", "_");
-    default:
-      throw new Error(`Unknown category: ${value}`);
-  }
+  return value.toLowerCase().replace(" ", "_");
 }
 
 async function scrape() {

@@ -1,6 +1,8 @@
 import {
+  AppBar,
   Avatar,
   Box,
+  Button,
   Chip,
   FormControl,
   Grid,
@@ -9,12 +11,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 import api from "../lib/api";
 import type { Bottle, User } from "../types";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Add as AddIcon } from "@mui/icons-material";
+import Layout from "../components/layout";
 
 type LoaderData = {
   bottle: Bottle;
@@ -26,12 +29,10 @@ export const loader: LoaderFunction = async ({
   if (!bottleId) throw new Error("Missing bottleId");
   const bottle = await api.get(`/bottles/${bottleId}`);
 
-  console.log(bottle);
-
   return { bottle };
 };
 
-function CheckInTags({
+function CheckinTags({
   value,
   onChange,
 }: {
@@ -72,7 +73,7 @@ function CheckInTags({
   );
 }
 
-function CheckInFriends({ value, onChange }: any) {
+function CheckinFriends({ value, onChange }: any) {
   const friends: User[] = [
     {
       id: "1",
@@ -102,59 +103,80 @@ function CheckInFriends({ value, onChange }: any) {
   );
 }
 
-function CheckInRating() {
+function CheckinRating({ ...props }) {
   return (
     <FormControl fullWidth>
       <Typography variant="h6" gutterBottom>
         Rating
       </Typography>
-      <Rating
-        name="simple-controlled"
-        //   value={value}
-        //   onChange={(event, newValue) => {
-        //     setValue(newValue);
-        //   }}
-      />
+      <Rating precision={0.5} max={5} size="large" {...props} />
     </FormControl>
   );
 }
 
+type FormData = {
+  tastingNotes?: string;
+  rating?: number;
+};
+
 export default function Checkin() {
   const { bottle } = useLoaderData() as LoaderData;
 
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState<FormData>({});
+
   const [tags, setTags] = useState<string[]>([]);
 
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    (async () => {
+      await api.post("/checkins", {
+        data: {
+          ...formData,
+          bottle: bottle.id,
+        },
+      });
+      navigate(`/`);
+    })();
+  };
+
   return (
-    <Box
-      sx={{
-        marginTop: 8,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
+    <Layout appBar="show X/save up here like the instas">
       <Typography variant="h4" component="h4" gutterBottom>
         {bottle.name}
         {bottle.series && <em>{bottle.series}</em>}
       </Typography>
-
-      <Box component="form" noValidate sx={{ mt: 3 }}>
+      <Box component="form" sx={{ mt: 3 }} onSubmit={onSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TextField fullWidth label="Tasting Notes" variant="outlined" />
+            <TextField
+              onChange={(e) => {
+                setFormData({ ...formData, tastingNotes: e.target.value });
+              }}
+              fullWidth
+              label="Tasting Notes"
+              variant="outlined"
+            />
           </Grid>
           <Grid item xs={12}>
-            <CheckInRating />
+            <CheckinRating
+              onChange={(e) => {
+                setFormData({ ...formData, rating: e.target.value });
+              }}
+            />
           </Grid>
           <Grid item xs={12}>
-            <CheckInFriends value={[]} onChange={() => {}} />
+            <CheckinTags value={tags} onChange={setTags} />
           </Grid>
-
           <Grid item xs={12}>
-            <CheckInTags value={tags} onChange={setTags} />
+            <Button fullWidth variant="contained" size="large" type="submit">
+              Save
+            </Button>
           </Grid>
         </Grid>
       </Box>
-    </Box>
+    </Layout>
   );
 }
