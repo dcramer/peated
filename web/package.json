@@ -31,7 +31,7 @@
   },
   "proxy": "http://localhost:4000",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host localhost",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
