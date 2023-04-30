@@ -9,9 +9,10 @@ datasource db {
 }
 
 model User {
-    id          Int     @id @default(autoincrement())
-    email       String  @unique
-    displayName String?
+    id           Int     @id @default(autoincrement())
+    email        String  @unique
+    passwordHash String?
+    displayName  String?
 
     active Boolean @default(true)
     admin  Boolean @default(false)

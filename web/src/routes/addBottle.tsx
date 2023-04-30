@@ -69,7 +69,7 @@ export default function AddBottle() {
     e.preventDefault();
 
     (async () => {
-      const bottle = await api.post("/bottles", formData);
+      const bottle = await api.post("/bottles", { data: { formData } });
       navigate(`/b/${bottle.id}/checkin`);
     })();
   };

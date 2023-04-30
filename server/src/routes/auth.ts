@@ -1,11 +1,12 @@
 import type { RouteOptions } from "fastify";
-import { prisma } from "../lib/db";
-import { createAccessToken } from "../lib/auth";
-import { decode } from "jsonwebtoken";
-import config from "../config";
-import { verify } from "jsonwebtoken";
+import { decode, verify } from "jsonwebtoken";
 import { JwksClient } from "jwks-rsa";
 import { IncomingMessage, Server, ServerResponse } from "http";
+
+import { prisma } from "../lib/db";
+import { createAccessToken } from "../lib/auth";
+import config from "../config";
+import { compareSync } from "bcrypt";
 
 type GoogleCredential = {
   iss: string;
@@ -28,6 +29,59 @@ const jwksClient = new JwksClient({
   jwksUri: "https://www.googleapis.com/oauth2/v2/certs",
   timeout: 3000,
 });
+
+export const authBasic: RouteOptions<
+  Server,
+  IncomingMessage,
+  ServerResponse,
+  {
+    Body: {
+      email: string;
+      password: string;
+    };
+  }
+> = {
+  method: "POST",
+  url: "/auth/basic",
+  schema: {
+    body: {
+      type: "object",
+      required: ["email", "password"],
+      properties: {
+        email: { type: "string" },
+        password: { type: "string" },
+      },
+    },
+  },
+  handler: async function (req, res) {
+    const { email, password } = req.body;
+
+    let user = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      return res.status(401).send({ error: "Invalid credentials" });
+    }
+
+    if (!user.passwordHash) {
+      return res.status(401).send({ error: "Invalid credentials" });
+    }
+
+    if (!compareSync(password, user.passwordHash)) {
+      return res.status(401).send({ error: "Invalid credentials" });
+    }
+
+    return res.send({
+      user,
+      accessToken: await createAccessToken({
+        id: `${user.id}`,
+        admin: user.admin,
+      }),
+    });
+  },
+};
 
 export const authGoogle: RouteOptions<
   Server,

@@ -10,7 +10,7 @@ const main = async (email: string) => {
   });
 
   const token = await createAccessToken({
-    id: user.id,
+    id: `${user.id}`,
     admin: user.admin,
   });
 
