@@ -18,6 +18,7 @@ import DistillerSelect from "../components/distillerSelect";
 import { Brand, Distiller } from "../types";
 import { FormEvent, useState } from "react";
 import api from "../lib/api";
+import { useRequiredAuth } from "../hooks/useAuth";
 
 function toTitleCase(value: string) {
   var words = value.toLowerCase().split(" ");
@@ -40,6 +41,7 @@ type FormData = {
 export default function AddBottle() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useRequiredAuth();
 
   const qs = new URLSearchParams(location.search);
   const name = qs.get("name") || "";
@@ -69,7 +71,7 @@ export default function AddBottle() {
     e.preventDefault();
 
     (async () => {
-      const bottle = await api.post("/bottles", { data: { formData } });
+      const bottle = await api.post("/bottles", { data: formData });
       navigate(`/b/${bottle.id}/checkin`);
     })();
   };
@@ -123,6 +125,7 @@ export default function AddBottle() {
               onChange={(value: any) =>
                 setFormData({ ...formData, brand: value })
               }
+              canCreate={user.admin}
             />
           </Grid>
           <Grid item xs={12}>
@@ -130,6 +133,7 @@ export default function AddBottle() {
               onChange={(value: any) =>
                 setFormData({ ...formData, distiller: value })
               }
+              canCreate={user.admin}
             />
           </Grid>
           <Grid item xs={12}>
@@ -185,6 +189,7 @@ export default function AddBottle() {
                   categoryList.find((v) => value === v.id)?.name || "Unknown"
                 }
                 value={formData.category}
+                required
               >
                 <MenuItem key="" value="">
                   <em>Unknown</em>

@@ -1,11 +1,10 @@
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
-import useAuth from "../hooks/useAuth";
+import { useRequiredAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
-  if (!user) return null;
+  const { logout, user } = useRequiredAuth();
 
   return (
     <Box sx={{ pt: 8 }}>

@@ -52,6 +52,12 @@ export const AuthProvider = ({ children }: { children: any }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+export function useRequiredAuth() {
+  const { user, ...params } = useContext(AuthContext);
+  if (!user) throw new Error("Not authenticated.");
+  return { user, ...params };
+}
+
 export default function useAuth() {
   return useContext(AuthContext);
 }

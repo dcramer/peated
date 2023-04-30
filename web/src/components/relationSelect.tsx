@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import {
   Autocomplete,
   Button,
@@ -6,11 +6,12 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
   createFilterOptions,
   debounce,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import api from "../lib/api";
 
@@ -23,6 +24,10 @@ type InputValue = Omit<GenericRelation, "id"> & { inputValue?: string };
 
 const filter = createFilterOptions<InputValue>();
 
+// type CreateForm = ({
+//   onFieldChange: (value: { [key: string]: any }) => void,
+// }) => ReactNode;
+
 export default function RelationSelect({
   endpoint,
   placeholder,
@@ -31,6 +36,7 @@ export default function RelationSelect({
   dialogTitle,
   canCreate,
   onChange,
+  createForm,
 }: {
   endpoint: string;
   label: string;
@@ -38,6 +44,7 @@ export default function RelationSelect({
   helperText?: string;
   dialogTitle: string;
   canCreate?: boolean;
+  createForm?: (value: any) => ReactNode;
   onChange: (value: any) => void;
 }) {
   const [value, setValue] = useState<InputValue | null>(null);
@@ -45,13 +52,16 @@ export default function RelationSelect({
   const [options, setOptions] = useState<InputValue[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const handleClose = () => {
     setDialogValue({});
     setDialogOpen(false);
   };
   const [dialogValue, setDialogValue] = useState<GenericRelation>();
-  const handleDialogSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleDialogSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     setValue({
       ...dialogValue,
@@ -104,7 +114,7 @@ export default function RelationSelect({
     <>
       <Autocomplete
         open={open}
-        onChange={(event, newValue) => {
+        onChange={(_, newValue) => {
           if (canCreate && typeof newValue === "string") {
             // timeout to avoid instant validation of the dialog's form.
             setTimeout(() => {
@@ -174,35 +184,24 @@ export default function RelationSelect({
           />
         )}
       />
-      {canCreate && (
-        <Dialog open={dialogOpen} onClose={handleClose}>
-          <form onSubmit={handleDialogSubmit}>
-            <DialogTitle>{dialogTitle}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>Who are we missing?</DialogContentText>
-              <TextField
-                autoFocus
-                margin="dense"
-                name="name"
-                value={dialogValue?.name}
-                onChange={(event) =>
-                  setDialogValue({
-                    ...dialogValue,
-                    name: event.target.value,
-                  })
-                }
-                label="Name"
-                type="text"
-                placeholder={placeholder}
-                variant="standard"
-                helperText={helperText}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
-              <Button type="submit">Add</Button>
-            </DialogActions>
-          </form>
+      {canCreate && createForm && (
+        <Dialog open={dialogOpen} onClose={handleClose} fullScreen={fullScreen}>
+          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogContent>
+            {createForm({
+              data: dialogValue || {},
+              onFieldChange: (value: any) => {
+                setDialogValue({
+                  ...dialogValue,
+                  ...value,
+                });
+              },
+            })}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleDialogSubmit}>Add</Button>
+          </DialogActions>
         </Dialog>
       )}
     </>
