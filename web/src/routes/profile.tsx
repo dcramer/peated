@@ -1,14 +1,4 @@
-import {
-  AppBar,
-  Avatar,
-  Box,
-  Button,
-  Container,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
+import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 

@@ -1,10 +1,9 @@
-import { Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { LoaderFunction, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import api from "../lib/api";
 import useAuth from "../hooks/useAuth";
 import Layout from "../components/layout";
-import config from "../config";
 import { FormEvent, useState } from "react";
 
 type LoaderData = {};
@@ -35,24 +34,55 @@ const BasicLogin = () => {
     })();
   };
 
+  const [loginVisible, setLoginVisible] = useState(false);
+
+  if (!loginVisible) {
+    return (
+      <Grid justifyContent="center" display="flex">
+        <Button
+          variant="text"
+          size="small"
+          onClick={() => {
+            setLoginVisible(!loginVisible);
+          }}
+        >
+          Admin Login
+        </Button>
+      </Grid>
+    );
+  }
+
   return (
-    <form onSubmit={onSubmit}>
-      <h2>Debug Login</h2>
-      <input
-        name="email"
-        placeholder="email"
-        required
-        onChange={(e) => setData({ ...data, email: e.target.value })}
-      />
-      <input
-        name="password"
-        type="password"
-        placeholder="password"
-        required
-        onChange={(e) => setData({ ...data, password: e.target.value })}
-      />
-      <input type="submit" style={{ display: "none" }} />
-    </form>
+    <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={onSubmit}>
+      <h2>Login</h2>
+
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TextField
+            name="email"
+            placeholder="email"
+            required
+            fullWidth
+            onChange={(e) => setData({ ...data, email: e.target.value })}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            name="password"
+            type="password"
+            placeholder="password"
+            required
+            fullWidth
+            onChange={(e) => setData({ ...data, password: e.target.value })}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button fullWidth variant="contained" size="large" type="submit">
+            Login
+          </Button>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 
@@ -62,35 +92,39 @@ export default function Login() {
 
   return (
     <Layout>
-      <Grid
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        style={{ minHeight: "100vh" }}
-      >
-        <Grid item xs={3}>
-          <Typography variant="h1">Cask</Typography>
+      <Box sx={{ pb: 7, position: "relative", height: "100vh" }}>
+        <Grid
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          style={{ minHeight: "100vh" }}
+        >
+          <Grid item xs={3}>
+            <Typography variant="h1">Cask</Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                const { user, accessToken } = await api.post("/auth/google", {
+                  data: {
+                    token: credentialResponse.credential,
+                  },
+                });
+                login(user, accessToken);
+                navigate("/");
+              }}
+              onError={() => {
+                console.log("Login Failed");
+              }}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <BasicLogin />
+          </Grid>
         </Grid>
-        <Grid item xs={3}>
-          <GoogleLogin
-            onSuccess={async (credentialResponse) => {
-              const { user, accessToken } = await api.post("/auth/google", {
-                data: {
-                  token: credentialResponse.credential,
-                },
-              });
-              login(user, accessToken);
-              navigate("/");
-            }}
-            onError={() => {
-              console.log("Login Failed");
-            }}
-          />
-          {config.DEBUG && <BasicLogin />}
-        </Grid>
-      </Grid>
+      </Box>
     </Layout>
   );
 }
