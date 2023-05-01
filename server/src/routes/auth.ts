@@ -173,7 +173,10 @@ export const authGoogle: RouteOptions<
 
     return res.send({
       user,
-      accessToken: await createAccessToken({ id: user.id, admin: user.admin }),
+      accessToken: await createAccessToken({
+        id: `${user.id}`,
+        admin: user.admin,
+      }),
     });
   },
 };

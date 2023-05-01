@@ -9,9 +9,10 @@ export const validateRequest: onRequestHookHandler = async (req, res) => {
 
     let { id } = await verifyToken(token);
     req.user = await prisma.user.findUniqueOrThrow({
-      where: { id },
+      where: { id: parseInt(id, 10) },
     });
   } catch (error) {
+    console.error(error);
     return res.status(401).send({ error: "Unauthorized!" });
   }
 };

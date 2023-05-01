@@ -34,7 +34,7 @@ type FormData = {
   brand?: Brand;
   distiller?: Distiller;
   abv?: number;
-  age?: number;
+  statedAge?: number;
   category?: string;
 };
 
@@ -160,7 +160,7 @@ export default function AddBottle() {
               fullWidth
               label="Age"
               placeholder="e.g. 12"
-              name="age"
+              name="statedAge"
               type="number"
               InputProps={{
                 endAdornment: (
@@ -170,12 +170,15 @@ export default function AddBottle() {
               variant="outlined"
               helperText="If applicable, the number of years the spirit was aged."
               onChange={(e) =>
-                setFormData({ ...formData, age: parseInt(e.target.value, 10) })
+                setFormData({
+                  ...formData,
+                  statedAge: parseInt(e.target.value, 10),
+                })
               }
             />
           </Grid>
           <Grid item xs={12}>
-            <FormControl fullWidth>
+            <FormControl fullWidth required>
               <InputLabel id="category-label">Category</InputLabel>
               <Select
                 fullWidth

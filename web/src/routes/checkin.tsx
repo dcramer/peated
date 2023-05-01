@@ -144,7 +144,6 @@ export default function Checkin() {
             <TextField fullWidth label="Tasting Notes" variant="outlined" />
           </Grid>
           <Grid item xs={12}>
-            {" "}
             <CheckInRating />
           </Grid>
           <Grid item xs={12}>
