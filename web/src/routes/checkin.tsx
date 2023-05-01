@@ -1,11 +1,12 @@
 import {
-  AppBar,
+  Alert,
   Avatar,
   Box,
   Button,
   Chip,
   FormControl,
   Grid,
+  IconButton,
   Rating,
   Stack,
   TextField,
@@ -13,10 +14,11 @@ import {
 } from "@mui/material";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import api from "../lib/api";
 import type { Bottle, User } from "../types";
 import { FormEvent, useState } from "react";
-import { Add as AddIcon } from "@mui/icons-material";
+import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
+
+import api, { ApiError } from "../lib/api";
 import Layout from "../components/layout";
 
 type LoaderData = {
@@ -105,7 +107,7 @@ function CheckinFriends({ value, onChange }: any) {
 
 function CheckinRating({ ...props }) {
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth {...props}>
       <Typography variant="h6" gutterBottom>
         Rating
       </Typography>
@@ -127,29 +129,50 @@ export default function Checkin() {
   const [formData, setFormData] = useState<FormData>({});
 
   const [tags, setTags] = useState<string[]>([]);
+  const [error, setError] = useState<string | undefined>();
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
     e.preventDefault();
 
     (async () => {
-      await api.post("/checkins", {
-        data: {
-          ...formData,
-          bottle: bottle.id,
-        },
-      });
-      navigate(`/`);
+      let checkin;
+      try {
+        checkin = await api.post("/checkins", {
+          data: {
+            ...formData,
+            bottle: bottle.id,
+          },
+        });
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setError(await err.errorMessage());
+        } else {
+          console.error(err);
+          setError("Internal error");
+        }
+      }
+      if (checkin) navigate("/");
     })();
   };
 
   return (
-    <Layout appBar="show X/save up here like the instas">
+    <Layout
+      onClose={() => {
+        navigate(-1);
+      }}
+      onSave={onSubmit}
+    >
       <Typography variant="h4" component="h4" gutterBottom>
         {bottle.name}
         {bottle.series && <em>{bottle.series}</em>}
       </Typography>
       <Box component="form" sx={{ mt: 3 }} onSubmit={onSubmit}>
         <Grid container spacing={2}>
+          {error && (
+            <Grid item xs={12}>
+              <Alert severity="error">{error}</Alert>
+            </Grid>
+          )}
           <Grid item xs={12}>
             <TextField
               onChange={(e) => {
@@ -162,6 +185,7 @@ export default function Checkin() {
           </Grid>
           <Grid item xs={12}>
             <CheckinRating
+              required
               onChange={(e) => {
                 setFormData({ ...formData, rating: e.target.value });
               }}
@@ -169,11 +193,6 @@ export default function Checkin() {
           </Grid>
           <Grid item xs={12}>
             <CheckinTags value={tags} onChange={setTags} />
-          </Grid>
-          <Grid item xs={12}>
-            <Button fullWidth variant="contained" size="large" type="submit">
-              Save
-            </Button>
           </Grid>
         </Grid>
       </Box>

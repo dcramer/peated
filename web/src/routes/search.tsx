@@ -17,6 +17,7 @@ import { Bottle } from "../types";
 import { Form, useLocation } from "react-router-dom";
 import api from "../lib/api";
 import { useEffect, useState } from "react";
+import Layout from "../components/layout";
 
 export default function Search() {
   const location = useLocation();
@@ -45,11 +46,9 @@ export default function Search() {
   }, [query]);
 
   return (
-    <Box>
+    <Layout hideAppBar>
       <Form method="GET">
-        <Box
-          sx={{ display: "flex", alignItems: "flex-end", py: 4, width: "100%" }}
-        >
+        <Box sx={{ display: "flex", alignItems: "flex-end", width: "100%" }}>
           <AccountCircleIcon sx={{ color: "action.active", mr: 1, my: 0.5 }} />
           <TextField
             label="Search"
@@ -104,6 +103,6 @@ export default function Search() {
           </CardActionArea>
         </Card>
       )}
-    </Box>
+    </Layout>
   );
 }

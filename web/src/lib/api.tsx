@@ -7,13 +7,17 @@ type ApiRequestOptions = {
   query?: any;
 };
 
-class ApiError extends Error {
+export class ApiError extends Error {
   response: Response;
 
   constructor(message: string, response: Response) {
     super(message);
     this.name = this.constructor.name;
     this.response = response;
+  }
+
+  async errorMessage() {
+    return (await this.response.json()).message;
   }
 }
 

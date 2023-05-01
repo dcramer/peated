@@ -68,7 +68,7 @@ export default function AddBottle() {
     name: toTitleCase(c.replace("_", " ")),
   }));
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
     e.preventDefault();
 
     (async () => {
@@ -78,7 +78,13 @@ export default function AddBottle() {
   };
 
   return (
-    <Layout title="Add Bottle">
+    <Layout
+      title="Add Bottle"
+      onClose={() => {
+        navigate(-1);
+      }}
+      onSave={onSubmit}
+    >
       <Box component="form" onSubmit={onSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -195,17 +201,6 @@ export default function AddBottle() {
               </Select>
               <FormHelperText>The kind of spirit.</FormHelperText>
             </FormControl>
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              fullWidth
-              variant="contained"
-              endIcon={<AddIcon />}
-              size="large"
-              type="submit"
-            >
-              Save Bottle
-            </Button>
           </Grid>
         </Grid>
       </Box>
