@@ -29,7 +29,7 @@ export default function FormHeader({
         </div>
         <div className="justify-end">
           <button onClick={onSave} className="block px-6 h-12 group">
-            <span className="rounded-md bg-peated-dark px-2.5 py-2.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated">
+            <span className="rounded-md bg-peated-dark group-hover:bg-peated-darker px-2.5 py-2.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated">
               Save
             </span>
           </button>

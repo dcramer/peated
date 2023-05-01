@@ -15,6 +15,7 @@ import FormLabel from "../components/formLabel";
 import HelpText from "../components/helpText";
 import FormHeader from "../components/formHeader";
 import Typeahead from "../components/typeahead";
+import BrandSelect from "../components/brandSelect";
 
 type FormData = {
   name?: string;
@@ -91,7 +92,7 @@ export default function AddBottle() {
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
-            defaultValue={formData.name}
+            value={formData.name}
           />
           <HelpText>
             The full name of the bottle, excluding its series.
@@ -108,15 +109,14 @@ export default function AddBottle() {
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
-            defaultValue={formData.series}
+            value={formData.series}
           />
           <HelpText>If applicable, the series of bottling.</HelpText>
         </FormField>
 
         <FormField>
           <FormLabel htmlFor="brand">Brand</FormLabel>
-          <Typeahead
-            type="text"
+          <BrandSelect
             name="brand"
             id="brand"
             placeholder="e.g. Macallan"
@@ -124,7 +124,7 @@ export default function AddBottle() {
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
             canCreate={user.admin}
-            defaultValue={formData.brand}
+            value={formData.brand}
           />
         </FormField>
 
@@ -139,7 +139,7 @@ export default function AddBottle() {
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
-            defaultValue={formData.abv}
+            value={formData.abv}
             suffixLabel="%"
           />
           <HelpText>The alcohol content by volume.</HelpText>
@@ -155,7 +155,7 @@ export default function AddBottle() {
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
-            defaultValue={formData.statedAge}
+            value={formData.statedAge}
             suffixLabel="years"
           />
           <HelpText>

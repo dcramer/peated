@@ -17,7 +17,11 @@ export default function ErrorPage() {
           <p className="mt-6 text-base leading-7 text-gray-600">
             The error we hit was "<i>{error.statusText || error.message}</i>".
           </p>
-          {error.prepareStackTrace && <pre>{error.prepareStackTrace()}</pre>}
+          {error.stack && (
+            <div className="prose mx-auto mt-4">
+              <pre className="text-left">{error.stack}</pre>
+            </div>
+          )}
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Link
               to="/"

@@ -13,9 +13,11 @@ module.exports = {
       white: "#ffffff",
       black: "#000000",
       peated: {
-        light: "#FBBE9D",
-        DEFAULT: "#A94007",
-        dark: "#5C2102",
+        light: "#77c1be",
+        DEFAULT: "#005C58",
+        dark: "#00423F",
+        darker: "#002927",
+        darkest: "#000F0F",
       },
     },
     extend: {
