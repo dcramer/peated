@@ -41,7 +41,7 @@ export default function Search() {
             id="query"
             name="q"
             required
-            className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-peated sm:text-sm sm:leading-6"
             defaultValue={query}
             placeholder="Search for a bottle"
             onChange={(e) => {
@@ -85,7 +85,7 @@ export default function Search() {
                       {bottle.category && formatCategoryName(bottle.category)}
                     </p>
                     <p className="mt-1 text-xs leading-5 text-gray-500">
-                      {bottle.statedAge}
+                      {bottle.statedAge ? `${bottle.statedAge} years` : null}
                     </p>
                   </div>
                   <ChevronRightIcon

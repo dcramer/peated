@@ -1,4 +1,7 @@
-export default ({ className, ...props }) => {
+export default ({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<"label">) => {
   return (
     <label
       {...props}

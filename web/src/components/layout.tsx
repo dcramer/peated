@@ -25,7 +25,7 @@ const AppHeader = ({ excludeMobile }) => {
     <Disclosure
       as="nav"
       className={classNames(
-        "bg-red-600",
+        "bg-peated",
         excludeMobile ? "hidden sm:block" : ""
       )}
     >
@@ -42,9 +42,17 @@ const AppHeader = ({ excludeMobile }) => {
                 <div className="ml-4 flex items-center md:ml-6">
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex max-w-xs items-center rounded-full bg-red-600 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-600">
+                      <Menu.Button className="flex max-w-xs items-center rounded-full bg-peated text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-peated">
                         <span className="sr-only">Open user menu</span>
-                        <UserCircleIcon className="h-8 w-8 rounded-full" />
+                        <span className="inline-block h-8 w-8 overflow-hidden rounded-full bg-gray-100">
+                          <svg
+                            className="h-full w-full text-gray-300"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                          </svg>
+                        </span>{" "}
                       </Menu.Button>
                     </div>
                     <Transition
@@ -74,7 +82,7 @@ const AppHeader = ({ excludeMobile }) => {
                 </div>
               </div>
               <div className="-mr-2 flex md:hidden">
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-red-600 p-2 text-red-200 hover:bg-red-500 hover:bg-opacity-75 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-600">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-peated p-2 text-peated-light hover:bg-peated hover:bg-opacity-75 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-peated">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -88,31 +96,32 @@ const AppHeader = ({ excludeMobile }) => {
 
           {user && (
             <Disclosure.Panel className="md:hidden">
-              <div className="border-red-700 pb-3 pt-4">
+              <div className="border-peated pb-3 pt-4">
                 <div className="flex items-center px-5">
                   <div className="flex-shrink-0">
-                    <UserCircleIcon className="h-10 w-10 rounded-full" />
+                    <span className="inline-block h-10 w-10 overflow-hidden rounded-full bg-gray-100">
+                      <svg
+                        className="h-full w-full text-gray-300"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                    </span>
                   </div>
                   <div className="ml-3">
                     <div className="text-base font-medium text-white">
                       {user.displayName}
                     </div>
-                    <div className="text-sm font-medium text-red-300">
+                    <div className="text-sm font-medium text-peated-light">
                       {user.email}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    className="ml-auto flex-shrink-0 rounded-full border-2 border-transparent bg-red-600 p-1 text-red-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-600"
-                  >
-                    <span className="sr-only">View notifications</span>
-                    <BellIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
                 </div>
                 <div className="mt-3 space-y-1 px-2">
                   <Disclosure.Button
-                    as="a"
-                    className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-red-500 hover:bg-opacity-75"
+                    as="button"
+                    className="w-full text-left block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-peated hover:bg-opacity-75"
                     onClick={() => {
                       logout();
                       navigate("/");
@@ -148,10 +157,10 @@ export default function Layout({
     <>
       <div
         className={`min-h-full ${
-          splash ? "bg-red-600 text-white" : " bg-white"
+          splash ? "bg-peated text-white" : " bg-white"
         }`}
       >
-        {(!noHeader || header) && <AppHeader excludeMobile={noMobileHeader} />}
+        {!noHeader && (header || <AppHeader excludeMobile={noMobileHeader} />)}
         <main className="mx-auto max-w-4xl py-6 sm:px-6 lg:px-8 relative">
           {children}
         </main>

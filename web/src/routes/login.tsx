@@ -40,7 +40,17 @@ const BasicLogin = () => {
   return (
     <div className="sm:mx-auto sm:w-full sm:max-w-sm">
       <Form onSubmit={onSubmit}>
-        <h2 className="text-center mt-4 mb-2">OR</h2>
+        <div className="relative mt-4 mb-2">
+          <div
+            className="absolute inset-0 flex items-center"
+            aria-hidden="true"
+          >
+            <div className="w-full border-t border-peated-light" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-peated px-2 text-sm text-white">Or</span>
+          </div>
+        </div>
         <FormField>
           <TextInput
             id="email"
@@ -70,7 +80,7 @@ const BasicLogin = () => {
         <div>
           <button
             type="submit"
-            className="flex w-full justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+            className="flex w-full justify-center rounded-md bg-peated-dark px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated"
           >
             Sign in
           </button>
@@ -83,13 +93,12 @@ const BasicLogin = () => {
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [loginVisible, setLoginVisible] = useState(false);
 
   return (
     <Layout noHeader splash>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <PeatedLogo />
+          <PeatedLogo color="white" />
         </div>
 
         <div className="mt-8">
@@ -109,20 +118,7 @@ export default function Login() {
               }}
             />
           </div>
-          {!loginVisible ? (
-            <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-sm text-center text-xs text-gray-500">
-              <button
-                className="font-semibold leading-6 text-white"
-                onClick={() => {
-                  setLoginVisible(true);
-                }}
-              >
-                Sign in with email and password
-              </button>
-            </div>
-          ) : (
-            <BasicLogin />
-          )}
+          <BasicLogin />
         </div>
       </div>
     </Layout>

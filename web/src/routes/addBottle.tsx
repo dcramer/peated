@@ -14,6 +14,7 @@ import TextInput from "../components/textInput";
 import FormLabel from "../components/formLabel";
 import HelpText from "../components/helpText";
 import FormHeader from "../components/formHeader";
+import Typeahead from "../components/typeahead";
 
 type FormData = {
   name?: string;
@@ -113,6 +114,21 @@ export default function AddBottle() {
         </FormField>
 
         <FormField>
+          <FormLabel htmlFor="brand">Brand</FormLabel>
+          <Typeahead
+            type="text"
+            name="brand"
+            id="brand"
+            placeholder="e.g. Macallan"
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            canCreate={user.admin}
+            defaultValue={formData.brand}
+          />
+        </FormField>
+
+        <FormField>
           <FormLabel htmlFor="abv">ABV</FormLabel>
           <TextInput
             type="number"
@@ -148,22 +164,6 @@ export default function AddBottle() {
         </FormField>
       </Form>
       {/* 
-          <Grid item xs={12}>
-            <BrandSelect
-              onChange={(value: any) =>
-                setFormData({ ...formData, brand: value })
-              }
-              canCreate={user.admin}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <DistillerSelect
-              onChange={(value: any) =>
-                setFormData({ ...formData, distiller: value })
-              }
-              canCreate={user.admin}
-            />
-          </Grid>
 
           <Grid item xs={12}>
             <FormControl fullWidth required>
