@@ -1,54 +1,50 @@
-import { Add as AddIcon } from "@mui/icons-material";
-import { Fab, Paper, Tab, Tabs } from "@mui/material";
-import type { Checkin } from "../types";
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
+import { PlusIcon } from "@heroicons/react/20/solid";
+import { Link } from "react-router-dom";
+
+import type { Checkin } from "../types";
 import api from "../lib/api";
-import CheckinListItem from "../components/checkinListItem";
 import Layout from "../components/layout";
-import ScrollView from "../components/scrollView";
 
 type LoaderData = {
-  checkins: Checkin[];
+  checkinList: Checkin[];
 };
 
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const checkins = await api.get("/checkins");
+  const checkinList = await api.get("/checkins");
 
-  return { checkins };
+  return { checkinList };
+};
+
+const FloatingCheckinButton = () => {
+  return (
+    <Link
+      type="button"
+      className="rounded-full bg-red-600 p-2 text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 absolute bottom-8 right-8"
+      to="/search"
+    >
+      <PlusIcon className="h-5 w-5" aria-hidden="true" />
+    </Link>
+  );
 };
 
 export default function Activity() {
-  const { checkins } = useLoaderData() as LoaderData;
+  const { checkinList } = useLoaderData() as LoaderData;
 
   return (
-    <Layout
-      title="Activity"
-      appBar={
-        <Tabs variant="fullWidth" value={0}>
-          <Tab label="Friends" />
-          <Tab label="Nearby" />
-          <Tab label="Global" />
-        </Tabs>
-      }
-    >
-      <Fab
-        color="primary"
-        aria-label="add"
-        style={{
-          position: "absolute",
-          bottom: 16 + 56,
-          right: 16,
-        }}
-        href="/search"
-      >
-        <AddIcon />
-      </Fab>
-      <ScrollView>
-        {checkins.map((c) => (
-          <CheckinListItem key={c.id} value={c} />
+    <Layout>
+      <FloatingCheckinButton />
+      <ul role="list" className="space-y-3">
+        {checkinList.map((checkin) => (
+          <li
+            key={checkin.id}
+            className="overflow-hidden bg-white px-4 py-4 shadow sm:rounded-md sm:px-6"
+          >
+            {checkin.bottle.name}
+          </li>
         ))}
-      </ScrollView>
+      </ul>
     </Layout>
   );
 }

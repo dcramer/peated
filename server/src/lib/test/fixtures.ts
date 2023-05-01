@@ -83,6 +83,8 @@ export const AuthToken = async ({ user }: { user?: UserType | null } = {}) => {
   return createAccessToken({
     id: user.id,
     admin: user.admin,
+    displayName: user.displayName,
+    email: user.email,
   });
 };
 

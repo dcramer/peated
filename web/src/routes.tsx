@@ -6,9 +6,7 @@ import Checkin, { loader as checkinLoader } from "./routes/checkin";
 import Activity, { loader as activityLoader } from "./routes/activity";
 import Search from "./routes/search";
 import Login from "./routes/login";
-import Profile from "./routes/profile";
 import AddBottle from "./routes/addBottle";
-import Favorites from "./routes/favorites";
 
 export default [
   {
@@ -29,14 +27,6 @@ export default [
       {
         path: "search",
         element: <Search />,
-      },
-      {
-        path: "favorites",
-        element: <Favorites />,
-      },
-      {
-        path: "profile",
-        element: <Profile />,
       },
     ],
   },

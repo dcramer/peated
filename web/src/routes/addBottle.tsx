@@ -1,33 +1,19 @@
-import { AddBox as AddIcon } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormHelperText,
-  Grid,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
-import BrandSelect from "../components/brandSelect";
+import { Form, useLocation, useNavigate } from "react-router-dom";
+// import BrandSelect from "../components/brandSelect";
 import { FormEvent, useState } from "react";
 
-import DistillerSelect from "../components/distillerSelect";
+// import DistillerSelect from "../components/distillerSelect";
 import { Brand, Distiller } from "../types";
-import api from "../lib/api";
+import api, { ApiError } from "../lib/api";
 import { useRequiredAuth } from "../hooks/useAuth";
 import Layout from "../components/layout";
-
-function toTitleCase(value: string) {
-  var words = value.toLowerCase().split(" ");
-  for (var i = 0; i < words.length; i++) {
-    words[i] = words[i][0].toUpperCase() + words[i].slice(1);
-  }
-  return words.join(" ");
-}
+import { formatCategoryName } from "../lib/strings";
+import FormError from "../components/formError";
+import FormField from "../components/formField";
+import TextInput from "../components/textInput";
+import FormLabel from "../components/formLabel";
+import HelpText from "../components/helpText";
+import FormHeader from "../components/formHeader";
 
 type FormData = {
   name?: string;
@@ -65,57 +51,103 @@ export default function AddBottle() {
     "spirit",
   ].map((c) => ({
     id: c,
-    name: toTitleCase(c.replace("_", " ")),
+    name: formatCategoryName(c),
   }));
+
+  const [error, setError] = useState<string | undefined>();
 
   const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
     e.preventDefault();
 
     (async () => {
-      const bottle = await api.post("/bottles", { data: formData });
-      navigate(`/b/${bottle.id}/checkin`);
+      try {
+        const bottle = await api.post("/bottles", { data: formData });
+        navigate(`/b/${bottle.id}/checkin`);
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setError(await err.errorMessage());
+        } else {
+          console.error(err);
+          setError("Internal error");
+        }
+      }
     })();
   };
 
   return (
-    <Layout
-      title="Add Bottle"
-      onClose={() => {
-        navigate(-1);
-      }}
-      onSave={onSubmit}
-    >
-      <Box component="form" onSubmit={onSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Bottle"
-              name="name"
-              placeholder="e.g. Macallan 12"
-              variant="outlined"
-              required
-              helperText="The full name of the bottle, excluding its series."
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              defaultValue={formData.name}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Series"
-              name="series"
-              placeholder="e.g. The Edition"
-              variant="outlined"
-              helperText="If applicable, the series of bottling."
-              onChange={(e) =>
-                setFormData({ ...formData, series: e.target.value })
-              }
-              defaultValue={formData.series}
-            />
-          </Grid>
+    <Layout header={<FormHeader title="Add Bottle" onSave={onSubmit} />}>
+      <Form onSubmit={onSubmit} className="sm:mx-auto sm:w-full sm:max-w-md">
+        {error && <FormError values={[error]} />}
+
+        <FormField>
+          <FormLabel htmlFor="username">Bottle</FormLabel>
+          <TextInput
+            type="text"
+            name="name"
+            id="name"
+            placeholder="e.g. Macallan 12"
+            required
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            defaultValue={formData.name}
+          />
+          <HelpText>
+            The full name of the bottle, excluding its series.
+          </HelpText>
+        </FormField>
+
+        <FormField>
+          <FormLabel htmlFor="series">Series</FormLabel>
+          <TextInput
+            type="text"
+            name="series"
+            id="series"
+            placeholder="e.g. The Edition"
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            defaultValue={formData.series}
+          />
+          <HelpText>If applicable, the series of bottling.</HelpText>
+        </FormField>
+
+        <FormField>
+          <FormLabel htmlFor="abv">ABV</FormLabel>
+          <TextInput
+            type="number"
+            name="abv"
+            id="abv"
+            placeholder="e.g. 45"
+            required
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            defaultValue={formData.abv}
+            suffixLabel="%"
+          />
+          <HelpText>The alcohol content by volume.</HelpText>
+        </FormField>
+
+        <FormField>
+          <FormLabel htmlFor="stagedAge">Stated Age</FormLabel>
+          <TextInput
+            type="number"
+            name="stagedAge"
+            id="stagedAge"
+            placeholder="e.g. 12"
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            defaultValue={formData.statedAge}
+            suffixLabel="years"
+          />
+          <HelpText>
+            If applicable, the number of years the spirit was aged.
+          </HelpText>
+        </FormField>
+      </Form>
+      {/* 
           <Grid item xs={12}>
             <BrandSelect
               onChange={(value: any) =>
@@ -132,47 +164,7 @@ export default function AddBottle() {
               canCreate={user.admin}
             />
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="ABV"
-              required
-              placeholder="e.g. 45"
-              name="abv"
-              type="number"
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              variant="outlined"
-              helperText="The alcohol content by volume."
-              onChange={(e) =>
-                setFormData({ ...formData, abv: parseInt(e.target.value, 10) })
-              }
-              defaultValue={formData.abv}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Stated Age"
-              placeholder="e.g. 12"
-              name="statedAge"
-              type="number"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">years</InputAdornment>
-                ),
-              }}
-              variant="outlined"
-              helperText="If applicable, the number of years the spirit was aged."
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  statedAge: parseInt(e.target.value, 10),
-                })
-              }
-            />
-          </Grid>
+
           <Grid item xs={12}>
             <FormControl fullWidth required>
               <InputLabel id="category-label">Category</InputLabel>
@@ -202,8 +194,7 @@ export default function AddBottle() {
               <FormHelperText>The kind of spirit.</FormHelperText>
             </FormControl>
           </Grid>
-        </Grid>
-      </Box>
+        </Grid> */}
     </Layout>
   );
 }

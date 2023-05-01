@@ -1,25 +1,16 @@
-import {
-  Alert,
-  Avatar,
-  Box,
-  Button,
-  Chip,
-  FormControl,
-  Grid,
-  IconButton,
-  Rating,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { Form, useLoaderData, useNavigate } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import type { Bottle, User } from "../types";
 import { FormEvent, useState } from "react";
-import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 
+import type { Bottle, User } from "../types";
 import api, { ApiError } from "../lib/api";
 import Layout from "../components/layout";
+import FormError from "../components/formError";
+import FormHeader from "../components/formHeader";
+import FormField from "../components/formField";
+import FormLabel from "../components/formLabel";
+import HelpText from "../components/helpText";
+import TextArea from "../components/textArea";
 
 type LoaderData = {
   bottle: Bottle;
@@ -157,32 +148,28 @@ export default function Checkin() {
 
   return (
     <Layout
-      onClose={() => {
-        navigate(-1);
-      }}
-      onSave={onSubmit}
+      header={
+        <FormHeader
+          title={bottle.name}
+          subtitle={bottle.series}
+          onSave={onSubmit}
+        />
+      }
     >
-      <Typography variant="h4" component="h4" gutterBottom>
-        {bottle.name}
-        {bottle.series && <em>{bottle.series}</em>}
-      </Typography>
-      <Box component="form" sx={{ mt: 3 }} onSubmit={onSubmit}>
-        <Grid container spacing={2}>
-          {error && (
-            <Grid item xs={12}>
-              <Alert severity="error">{error}</Alert>
-            </Grid>
-          )}
-          <Grid item xs={12}>
-            <TextField
-              onChange={(e) => {
-                setFormData({ ...formData, tastingNotes: e.target.value });
-              }}
-              fullWidth
-              label="Tasting Notes"
-              variant="outlined"
-            />
-          </Grid>
+      <Form onSubmit={onSubmit} className="sm:mx-auto sm:w-full sm:max-w-md">
+        {error && <FormError values={[error]} />}
+        <FormField>
+          <FormLabel htmlFor="stagtastingNotesedAge">Tasting Notes</FormLabel>
+          <TextArea
+            name="tastingNotes"
+            id="tastingNotes"
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            defaultValue={formData.tastingNotes}
+          />
+        </FormField>
+        {/*
           <Grid item xs={12}>
             <CheckinRating
               required
@@ -193,9 +180,8 @@ export default function Checkin() {
           </Grid>
           <Grid item xs={12}>
             <CheckinTags value={tags} onChange={setTags} />
-          </Grid>
-        </Grid>
-      </Box>
+          </Grid> */}
+      </Form>
     </Layout>
   );
 }

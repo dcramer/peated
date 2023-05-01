@@ -78,6 +78,8 @@ export const authBasic: RouteOptions<
       accessToken: await createAccessToken({
         id: `${user.id}`,
         admin: user.admin,
+        displayName: user.displayName,
+        email: user.email,
       }),
     });
   },
@@ -176,6 +178,8 @@ export const authGoogle: RouteOptions<
       accessToken: await createAccessToken({
         id: `${user.id}`,
         admin: user.admin,
+        displayName: user.displayName,
+        email: user.email,
       }),
     });
   },

@@ -12,6 +12,8 @@ const main = async (email: string) => {
   const token = await createAccessToken({
     id: `${user.id}`,
     admin: user.admin,
+    displayName: user.displayName,
+    email: user.email,
   });
 
   console.log(`ACCESS_TOKEN=${token}`);

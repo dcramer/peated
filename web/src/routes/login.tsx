@@ -1,10 +1,13 @@
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
-import { LoaderFunction, useNavigate } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { Form, LoaderFunction, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import api from "../lib/api";
 import useAuth from "../hooks/useAuth";
 import Layout from "../components/layout";
-import { FormEvent, useState } from "react";
+
+import PeatedLogo from "../assets/logo.svg";
+import TextInput from "../components/textInput";
+import FormField from "../components/formField";
 
 type LoaderData = {};
 
@@ -34,77 +37,63 @@ const BasicLogin = () => {
     })();
   };
 
-  const [loginVisible, setLoginVisible] = useState(false);
-
-  if (!loginVisible) {
-    return (
-      <Grid justifyContent="center" display="flex">
-        <Button
-          variant="text"
-          size="small"
-          onClick={() => {
-            setLoginVisible(!loginVisible);
-          }}
-        >
-          Admin Login
-        </Button>
-      </Grid>
-    );
-  }
-
   return (
-    <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={onSubmit}>
-      <h2>Login</h2>
-
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField
+    <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+      <Form onSubmit={onSubmit}>
+        <h2 className="text-center mt-4 mb-2">OR</h2>
+        <FormField>
+          <TextInput
+            id="email"
             name="email"
-            placeholder="email"
+            type="email"
+            autoComplete="email"
             required
-            fullWidth
-            onChange={(e) => setData({ ...data, email: e.target.value })}
+            placeholder="you@example.com"
+            onChange={(e) =>
+              setData({ ...data, [e.target.name]: e.target.value })
+            }
           />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
+        </FormField>
+        <FormField>
+          <TextInput
+            id="password"
             name="password"
             type="password"
-            placeholder="password"
+            autoComplete="current-password"
             required
-            fullWidth
-            onChange={(e) => setData({ ...data, password: e.target.value })}
+            placeholder="password"
+            onChange={(e) =>
+              setData({ ...data, [e.target.name]: e.target.value })
+            }
           />
-        </Grid>
-        <Grid item xs={12}>
-          <Button fullWidth variant="contained" size="large" type="submit">
-            Login
-          </Button>
-        </Grid>
-      </Grid>
-    </Box>
+        </FormField>
+        <div>
+          <button
+            type="submit"
+            className="flex w-full justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+          >
+            Sign in
+          </button>
+        </div>{" "}
+      </Form>
+    </div>
   );
 };
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [loginVisible, setLoginVisible] = useState(false);
 
   return (
-    <Layout>
-      <Box sx={{ pb: 7, position: "relative", height: "100vh" }}>
-        <Grid
-          container
-          spacing={0}
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-          style={{ minHeight: "100vh" }}
-        >
-          <Grid item xs={3}>
-            <Typography variant="h1">Cask</Typography>
-          </Grid>
-          <Grid item xs={3}>
+    <Layout noHeader splash>
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <PeatedLogo />
+        </div>
+
+        <div className="mt-8">
+          <div className="max-w-sm mx-auto">
             <GoogleLogin
               onSuccess={async (credentialResponse) => {
                 const { user, accessToken } = await api.post("/auth/google", {
@@ -119,12 +108,23 @@ export default function Login() {
                 console.log("Login Failed");
               }}
             />
-          </Grid>
-          <Grid item xs={3}>
+          </div>
+          {!loginVisible ? (
+            <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-sm text-center text-xs text-gray-500">
+              <button
+                className="font-semibold leading-6 text-white"
+                onClick={() => {
+                  setLoginVisible(true);
+                }}
+              >
+                Sign in with email and password
+              </button>
+            </div>
+          ) : (
             <BasicLogin />
-          </Grid>
-        </Grid>
-      </Box>
+          )}
+        </div>
+      </div>
     </Layout>
   );
 }

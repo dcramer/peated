@@ -5,6 +5,8 @@ import config from "../config";
 interface AccessToken {
   id: string;
   admin: boolean;
+  displayName: string | null;
+  email: string;
 }
 
 export const createAccessToken = (

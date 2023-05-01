@@ -57,7 +57,9 @@ export type Bottle = {
 
 export type User = {
   id: string;
+  admin: boolean;
   displayName: string;
+  email: string;
 };
 
 export type Checkin = {

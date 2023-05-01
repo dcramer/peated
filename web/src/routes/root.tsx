@@ -1,14 +1,6 @@
-import {
-  BottomNavigation,
-  BottomNavigationAction,
-  Box,
-  Paper,
-} from "@mui/material";
-import { AccountBox, Favorite, LocalActivity } from "@mui/icons-material";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import Layout from "../components/layout";
+import useAuth from "../hooks/useAuth";
 import Screen from "../components/screen";
 
 export default function Root() {
