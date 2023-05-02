@@ -8,4 +8,10 @@ export default {
 
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
+  UPLOAD_PATH: process.env.UPLOAD_PATH,
+
+  USE_GCS_STORAGE: !!process.env.USE_GCS_STORAGE,
+  GCS_BUCKET_NAME: process.env.GCS_BUCKET_NAME,
+  GCS_BUCKET_PATH: process.env.GCS_BUCKET_PATH,
 };

@@ -13,6 +13,7 @@ model User {
     email        String  @unique
     passwordHash String?
     displayName  String?
+    imageUrl     String?
 
     active Boolean @default(true)
     admin  Boolean @default(false)
@@ -127,6 +128,7 @@ model Checkin {
     tags         String[]
     // friends      String[]
     rating       Float
+    imageUrl     String?
     userId       Int
     user         User     @relation(fields: [userId], references: [id])
 

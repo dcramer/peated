@@ -8,6 +8,7 @@ import PeatedLogo from "../assets/logo.svg";
 import useAuth from "../hooks/useAuth";
 import { Link } from "react-router-dom";
 import classNames from "../lib/classNames";
+import UserAvatar from "./userAvatar";
 
 const AppHeader = ({ excludeMobile }) => {
   const { user, logout } = useAuth();
@@ -35,14 +36,8 @@ const AppHeader = ({ excludeMobile }) => {
                         <Menu.Button className="flex max-w-xs items-center rounded-full bg-peated text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-peated">
                           <span className="sr-only">Open user menu</span>
                           <span className="inline-block h-8 w-8 overflow-hidden rounded-full bg-gray-100">
-                            <svg
-                              className="h-full w-full text-gray-300"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
-                          </span>{" "}
+                            <UserAvatar user={user} />
+                          </span>
                         </Menu.Button>
                       </div>
                       <Transition
@@ -90,13 +85,7 @@ const AppHeader = ({ excludeMobile }) => {
                   <div className="flex items-center px-5">
                     <div className="flex-shrink-0">
                       <span className="inline-block h-10 w-10 overflow-hidden rounded-full bg-gray-100">
-                        <svg
-                          className="h-full w-full text-gray-300"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
+                        <UserAvatar user={user} />
                       </span>
                     </div>
                     <div className="ml-3">

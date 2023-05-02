@@ -9,12 +9,7 @@ const main = async (email: string) => {
     where: { email },
   });
 
-  const token = await createAccessToken({
-    id: `${user.id}`,
-    admin: user.admin,
-    displayName: user.displayName,
-    email: user.email,
-  });
+  const token = await createAccessToken(user);
 
   console.log(`ACCESS_TOKEN=${token}`);
 };

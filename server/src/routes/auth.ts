@@ -75,12 +75,7 @@ export const authBasic: RouteOptions<
 
     return res.send({
       user,
-      accessToken: await createAccessToken({
-        id: `${user.id}`,
-        admin: user.admin,
-        displayName: user.displayName,
-        email: user.email,
-      }),
+      accessToken: await createAccessToken(user),
     });
   },
 };
@@ -175,12 +170,7 @@ export const authGoogle: RouteOptions<
 
     return res.send({
       user,
-      accessToken: await createAccessToken({
-        id: `${user.id}`,
-        admin: user.admin,
-        displayName: user.displayName,
-        email: user.email,
-      }),
+      accessToken: await createAccessToken(user),
     });
   },
 };

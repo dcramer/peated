@@ -3,6 +3,7 @@ import { prisma } from "../lib/db";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { Checkin, Prisma } from "@prisma/client";
 import { validateRequest } from "../middleware/auth";
+import { storeFile } from "../lib/uploads";
 
 export const listCheckins: RouteOptions<
   Server,
@@ -118,6 +119,8 @@ export const addCheckin: RouteOptions<
   preHandler: [validateRequest],
   handler: async (req, res) => {
     const body = req.body;
+    const user = req.user;
+
     // gross syntax, whats better?
     const data: Prisma.CheckinUncheckedCreateInput = (({ bottle, ...d }: any) =>
       d)(body);
@@ -137,6 +140,16 @@ export const addCheckin: RouteOptions<
 
     data.userId = req.user.id;
 
+    const fileData = await req.file();
+    data.imageUrl = fileData
+      ? await storeFile({
+          data: fileData,
+          namespace: user.id,
+          urlPrefix: "/uploads",
+        })
+      : null;
+
+    // TODO(dcramer): delete file if this fails
     const checkin = await prisma.checkin.create({
       data,
       include: {

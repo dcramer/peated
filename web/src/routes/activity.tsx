@@ -7,6 +7,7 @@ import type { Checkin } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
 import CheckinListItem from "../components/checkinListItem";
+import Glyph from "../assets/glyph.svg";
 
 type LoaderData = {
   checkinList: Checkin[];
@@ -30,17 +31,37 @@ const FloatingCheckinButton = () => {
   );
 };
 
+const EmptyActivity = () => {
+  return (
+    <Link
+      type="button"
+      className="flex flex-col block w-full items-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      to="/search"
+    >
+      <Glyph style={{ width: 48, height: 48 }} />
+
+      <span className="mt-2 block text-sm font-semibold text-gray-900">
+        What are you drinking?
+      </span>
+    </Link>
+  );
+};
+
 export default function Activity() {
   const { checkinList } = useLoaderData() as LoaderData;
 
   return (
     <Layout>
       <FloatingCheckinButton />
-      <ul role="list" className="space-y-3">
-        {checkinList.map((checkin) => (
-          <CheckinListItem key={checkin.id} checkin={checkin} />
-        ))}
-      </ul>
+      {checkinList.length > 0 ? (
+        <ul role="list" className="space-y-3">
+          {checkinList.map((checkin) => (
+            <CheckinListItem key={checkin.id} checkin={checkin} />
+          ))}
+        </ul>
+      ) : (
+        <EmptyActivity />
+      )}
     </Layout>
   );
 }

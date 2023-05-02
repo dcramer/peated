@@ -80,12 +80,7 @@ export const Checkin = async ({ ...data }: Partial<CheckinType> = {}) => {
 export const AuthToken = async ({ user }: { user?: UserType | null } = {}) => {
   if (!user) user = await User();
 
-  return createAccessToken({
-    id: user.id,
-    admin: user.admin,
-    displayName: user.displayName,
-    email: user.email,
-  });
+  return createAccessToken(user);
 };
 
 export const AuthenticatedHeaders = async ({

@@ -1,22 +1,33 @@
 // import { User } from "@prisma/client";
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
+import { User } from "@prisma/client";
 
 interface AccessToken {
   id: string;
   admin: boolean;
   displayName: string | null;
   email: string;
+  imageUrl: string;
 }
 
-export const createAccessToken = (
-  data: AccessToken
-): Promise<string | undefined> => {
+export const createAccessToken = (user: User): Promise<string | undefined> => {
   return new Promise<string | undefined>((res, rej) => {
-    sign(data, config.JWT_SECRET, {}, (err, token) => {
-      if (err) rej(err);
-      res(token);
-    });
+    sign(
+      {
+        id: `${user.id}`,
+        admin: user.admin,
+        displayName: user.displayName,
+        email: user.email,
+        imageUrl: user.imageUrl,
+      },
+      config.JWT_SECRET,
+      {},
+      (err, token) => {
+        if (err) rej(err);
+        res(token);
+      }
+    );
   });
 };
 

@@ -3,7 +3,7 @@ import FormLabel from "./formLabel";
 import TextInput from "./textInput";
 import Typeahead from "./typeahead";
 
-export default (props) => {
+export default ({ ...props }) => {
   return (
     <Typeahead
       {...props}
@@ -24,7 +24,7 @@ export default (props) => {
                 type="text"
                 placeholder="e.g. Macallan"
                 required
-                value={data.name}
+                defaultValue={data.name}
                 onChange={(e) =>
                   onFieldChange({ [e.target.name]: e.target.value })
                 }
@@ -38,7 +38,7 @@ export default (props) => {
                 type="text"
                 placeholder="e.g. Scotland"
                 required
-                value={data.country}
+                defaultValue={data.country}
                 onChange={(e) =>
                   onFieldChange({ [e.target.name]: e.target.value })
                 }
@@ -50,7 +50,7 @@ export default (props) => {
                 name="region"
                 type="text"
                 placeholder="e.g. Islay"
-                value={data.region}
+                defaultValue={data.region}
                 onChange={(e) =>
                   onFieldChange({ [e.target.name]: e.target.value })
                 }

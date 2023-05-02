@@ -1,4 +1,4 @@
-import { Form, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 
 import { Brand, Distiller } from "../types";
@@ -79,7 +79,7 @@ export default function AddBottle() {
 
   return (
     <Layout header={<FormHeader title="Add Bottle" onSave={onSubmit} />}>
-      <Form onSubmit={onSubmit} className="mx-auto max-w-md">
+      <form className="mx-auto max-w-md">
         {error && <FormError values={[error]} />}
 
         <FormField>
@@ -116,18 +116,6 @@ export default function AddBottle() {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="distiller">Distiller</FormLabel>
-          <DistillerSelect
-            name="distiller"
-            id="distiller"
-            placeholder="e.g. Distiller"
-            onChange={(value) => setFormData({ ...formData, distiller: value })}
-            canCreate={user.admin}
-            value={formData.distiller}
-          />
-        </FormField>
-
-        <FormField>
           <FormLabel htmlFor="brand">Brand</FormLabel>
           <BrandSelect
             name="brand"
@@ -138,6 +126,22 @@ export default function AddBottle() {
             value={formData.brand}
             required
           />
+          <HelpText>The brand, or main label of the bottle.</HelpText>
+        </FormField>
+
+        <FormField>
+          <FormLabel htmlFor="distiller">Distiller</FormLabel>
+          <DistillerSelect
+            name="distiller"
+            id="distiller"
+            placeholder="e.g. Distiller"
+            onChange={(value) => setFormData({ ...formData, distiller: value })}
+            canCreate={user.admin}
+            value={formData.distiller}
+          />
+          <HelpText>
+            If applicable, the single distillery which produces this bottle.
+          </HelpText>
         </FormField>
 
         <FormField>
@@ -188,7 +192,7 @@ export default function AddBottle() {
             <option />
             {categoryList.map(({ id, name }) => {
               return (
-                <option key={id} value={id} selected={formData.category === id}>
+                <option key={id} value={id}>
                   {name}
                 </option>
               );
@@ -196,7 +200,7 @@ export default function AddBottle() {
           </Select>
           <HelpText>The kind of spirit.</HelpText>
         </FormField>
-      </Form>
+      </form>
     </Layout>
   );
 }

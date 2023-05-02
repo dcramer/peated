@@ -60,6 +60,7 @@ export type User = {
   admin: boolean;
   displayName: string;
   email: string;
+  imageUrl?: string;
 };
 
 export type Checkin = {
@@ -74,6 +75,7 @@ export type Checkin = {
   friends: string[];
   // 1-5, floating point to make half ratings possible
   rating: number;
+  imageUrl?: string;
   user: User;
   createdAt: string;
 };

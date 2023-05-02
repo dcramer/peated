@@ -1,6 +1,7 @@
 import { fastify } from "fastify";
-import cors from "@fastify/cors";
-import helmet from "@fastify/helmet";
+import FastifyCors from "@fastify/cors";
+import FastifyHelmet from "@fastify/helmet";
+import FastifyMultipart from "@fastify/multipart";
 
 import { router } from "./routes";
 import config from "./config";
@@ -39,8 +40,9 @@ export default async function buildFastify(options = {}) {
     ...options,
   });
 
-  app.register(helmet);
-  app.register(cors, { credentials: true, origin: config.CORS_HOST });
+  app.register(FastifyMultipart);
+  app.register(FastifyHelmet);
+  app.register(FastifyCors, { credentials: true, origin: config.CORS_HOST });
   app.register(router);
 
   return app;

@@ -1,23 +1,29 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import Button from "./button";
 import { toTitleCase } from "../lib/strings";
 import api from "../lib/api";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import classNames from "../lib/classNames";
 
 type Item = {
-  id: string;
-  name: string;
+  id?: string | null;
+  name?: string;
   [key: string]: any;
 };
 
 type Props = React.ComponentPropsWithoutRef<"select"> & {
   endpoint: string;
-  createForm?: any;
+  name?: string;
+  value?: Item | undefined;
+  defaultValue?: Item | undefined;
+  createForm?: ({
+    data,
+    onFieldChange,
+  }: {
+    data: Item;
+    onFieldChange: (arg0: Item) => void;
+  }) => ReactNode;
   canCreate?: boolean;
   onChange: (value: Item | undefined) => void;
 };
@@ -27,9 +33,11 @@ export default ({
   canCreate,
   createForm,
   onChange,
+  required,
+  name,
   ...props
 }: Props) => {
-  const [value, setValue] = useState<Item>();
+  const [value, setValue] = useState<Item | undefined>(props.value);
   const [query, setQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogValue, setDialogValue] = useState({});
@@ -56,13 +64,15 @@ export default ({
         value={value}
         onChange={(value) => {
           // prompt for creation
-          if (value.id === null) {
+          if (value && !value?.id) {
             setDialogValue(value);
             setDialogOpen(true);
           } else {
             setValue(value);
           }
         }}
+        nullable={!required}
+        name={name}
       >
         <div className="relative mt-2">
           <Combobox.Input
@@ -162,17 +172,28 @@ export default ({
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
                 <Dialog.Panel className="relative h-screen transform overflow-hidden bg-white px-4 pb-4 pt-5 text-left transition-all w-full sm:p-6 justify-center items-center flex">
-                  <div className="max-w-md">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+
+                      setValue(dialogValue);
+                      setDialogOpen(false);
+                    }}
+                    className="max-w-md"
+                  >
                     {createForm({
                       data: dialogValue || {},
-                      onFieldChange: (value: any) => {
+                      onFieldChange: (value) => {
                         setDialogValue({
                           ...dialogValue,
                           ...value,
                         });
                       },
                     })}
-                    <div className="mt-5 sm:mt-6 flex gap-x-2">
+                    <div className="mt-5 sm:mt-6 flex gap-x-2 flex-row-reverse flex">
+                      <Button color="primary" type="submit">
+                        Add Brand
+                      </Button>
                       <Button
                         onClick={() => {
                           setDialogOpen(false);
@@ -180,17 +201,8 @@ export default ({
                       >
                         Cancel
                       </Button>
-                      <Button
-                        color="primary"
-                        onClick={() => {
-                          setValue(dialogValue);
-                          setDialogOpen(false);
-                        }}
-                      >
-                        Add Brand
-                      </Button>
                     </div>
-                  </div>
+                  </form>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -199,11 +211,4 @@ export default ({
       )}
     </div>
   );
-  //   return (
-  //       <input
-  //         className={`block w-full py-1.5 ${baseStyles} ${inputStyles}`}
-  //         {...props}
-  //       />
-
-  //   );
 };
