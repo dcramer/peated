@@ -6,8 +6,8 @@ import Typeahead from "./typeahead";
 export default ({ ...props }) => {
   return (
     <Typeahead
-      {...props}
       placeholder="e.g. Macallan"
+      {...props}
       endpoint="/brands"
       createForm={({ data, onFieldChange }) => {
         return (

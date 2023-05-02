@@ -46,15 +46,21 @@ export const StaticRating = ({ value, size, className }: Props) => {
   );
 };
 
-export default ({ ...props }) => {
-  const [value, setValue] = useState(props.value);
+export default ({
+  onChange,
+  ...props
+}: {
+  value?: number | null | undefined;
+  onChange: (value: number) => void;
+}) => {
+  const [value, setValue] = useState<number>(props.value || 0);
 
   return (
     <RadioGroup
       {...props}
       onChange={(value) => {
-        setValue(value);
-        props.onChange(value);
+        setValue(value || 0);
+        onChange(value || 0);
       }}
     >
       <div className="rating">

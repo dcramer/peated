@@ -1,6 +1,5 @@
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import { PlusIcon } from "@heroicons/react/20/solid";
 import { Link } from "react-router-dom";
 
 import type { Bottle, Checkin } from "../types";
@@ -8,6 +7,7 @@ import api from "../lib/api";
 import Layout from "../components/layout";
 import CheckinListItem from "../components/checkinListItem";
 import { formatCategoryName } from "../lib/strings";
+import FloatingCheckinButton from "../components/floatingCheckinButton";
 
 type LoaderData = {
   bottle: Bottle;
@@ -24,18 +24,6 @@ export const loader: LoaderFunction = async ({
   });
 
   return { bottle, checkinList };
-};
-
-const FloatingCheckinButton = ({ to }: { to: string }) => {
-  return (
-    <Link
-      type="button"
-      className="rounded-full bg-peated p-2 text-white shadow-sm hover:bg-peated-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated fixed bottom-8 right-8"
-      to={to}
-    >
-      <PlusIcon className="h-8 w-8" aria-hidden="true" />
-    </Link>
-  );
 };
 
 export default function BottleDetails() {

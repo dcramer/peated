@@ -1,9 +1,35 @@
 import { ReactNode } from "react";
+import FormLabel from "./formLabel";
+import HelpText from "./helpText";
 
-export default ({ children }: { children: ReactNode }) => {
+type Props = {
+  label?: string;
+  htmlFor?: string;
+  helpText?: string;
+  required?: boolean;
+  children?: ReactNode;
+  className?: string;
+};
+
+export default ({
+  className,
+  children,
+  required,
+  label,
+  helpText,
+  htmlFor,
+}: Props) => {
   return (
-    <div className="mb-4 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-      <div className="col-span-full">{children}</div>
+    <div
+      className={`relative px-3 pb-1.5 pt-2.5 focus-within:z-10 focus-within:ring-indigo-600 ${className}`}
+    >
+      {label && (
+        <FormLabel htmlFor={htmlFor} required={required}>
+          {label}
+        </FormLabel>
+      )}
+      {children}
+      {false && helpText && <HelpText>{helpText}</HelpText>}
     </div>
   );
 };

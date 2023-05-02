@@ -8,6 +8,7 @@ import api from "../lib/api";
 import Layout from "../components/layout";
 import CheckinListItem from "../components/checkinListItem";
 import Glyph from "../assets/glyph.svg";
+import FloatingCheckinButton from "../components/floatingCheckinButton";
 
 type LoaderData = {
   checkinList: Checkin[];
@@ -19,24 +20,12 @@ export const loader: LoaderFunction = async (): Promise<LoaderData> => {
   return { checkinList };
 };
 
-const FloatingCheckinButton = () => {
-  return (
-    <Link
-      type="button"
-      className="rounded-full bg-peated p-2 text-white shadow-sm hover:bg-peated-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated fixed bottom-8 right-8"
-      to="/search"
-    >
-      <PlusIcon className="h-8 w-8" aria-hidden="true" />
-    </Link>
-  );
-};
-
 const EmptyActivity = () => {
   return (
     <Link
       type="button"
       className="flex flex-col sm:max-w-xl block m-4 mx-auto items-center rounded-lg border-2 border-dashed border-gray-300 p-12 group hover:border-peated focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      to="/search"
+      to="/search?checkin"
     >
       <Glyph className="text-gray-400 w-16 h-16 group-hover:text-peated" />
 
@@ -55,7 +44,7 @@ export default function Activity() {
 
   return (
     <Layout>
-      <FloatingCheckinButton />
+      <FloatingCheckinButton to="/search?checkin" />
       {checkinList.length > 0 ? (
         <ul role="list" className="space-y-3">
           {checkinList.map((checkin) => (

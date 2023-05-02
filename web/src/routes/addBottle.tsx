@@ -15,6 +15,11 @@ import FormHeader from "../components/formHeader";
 import BrandSelect from "../components/brandSelect";
 import Select from "../components/select";
 import DistillerSelect from "../components/distillerSelect";
+import TextField from "../components/textField";
+import Fieldset from "../components/fieldset";
+import BrandField from "../components/brandField";
+import DistillerField from "../components/distillerField";
+import SelectField from "../components/selectField";
 
 type FormData = {
   name?: string;
@@ -79,78 +84,65 @@ export default function AddBottle() {
 
   return (
     <Layout header={<FormHeader title="Add Bottle" onSave={onSubmit} />}>
-      <form className="mx-auto max-w-md my-4">
+      <form className="sm:my-4 sm:mx-16">
         {error && <FormError values={[error]} />}
 
-        <FormField>
-          <FormLabel htmlFor="username">Bottle</FormLabel>
-          <TextInput
+        <Fieldset>
+          <TextField
             type="text"
+            label="Bottle"
             name="name"
-            id="name"
-            placeholder="e.g. Macallan 12"
             required
+            helpText="The full name of the bottle, excluding its series."
+            placeholder="e.g. Macallan 12"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
             value={formData.name}
           />
-          <HelpText>
-            The full name of the bottle, excluding its series.
-          </HelpText>
-        </FormField>
-
-        <FormField>
-          <FormLabel htmlFor="series">Series</FormLabel>
-          <TextInput
+          <TextField
             type="text"
+            label="Series"
             name="series"
-            id="series"
+            helpText="If applicable, the series of bottling."
             placeholder="e.g. The Edition"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
             value={formData.series}
           />
-          <HelpText>If applicable, the series of bottling.</HelpText>
-        </FormField>
 
-        <FormField>
-          <FormLabel htmlFor="brand">Brand</FormLabel>
-          <BrandSelect
+          <BrandField
+            label="Brand"
             name="brand"
-            id="brand"
+            helpText="The brand, or main label of the bottle."
             placeholder="e.g. Macallan"
-            onChange={(value) => setFormData({ ...formData, brand: value })}
+            onChange={(value: Brand) =>
+              setFormData({ ...formData, brand: value })
+            }
+            required
             canCreate={user.admin}
             value={formData.brand}
-            required
           />
-          <HelpText>The brand, or main label of the bottle.</HelpText>
-        </FormField>
 
-        <FormField>
-          <FormLabel htmlFor="distiller">Distiller</FormLabel>
-          <DistillerSelect
+          <DistillerField
+            label="Distiller"
             name="distiller"
-            id="distiller"
             placeholder="e.g. Distiller"
-            onChange={(value) => setFormData({ ...formData, distiller: value })}
+            helpText="If applicable, the single distillery which produces this bottle."
+            onChange={(value: Distiller) =>
+              setFormData({ ...formData, distiller: value })
+            }
             canCreate={user.admin}
             value={formData.distiller}
           />
-          <HelpText>
-            If applicable, the single distillery which produces this bottle.
-          </HelpText>
-        </FormField>
 
-        <FormField>
-          <FormLabel htmlFor="abv">ABV</FormLabel>
-          <TextInput
+          <TextField
             type="number"
+            label="ABV"
             name="abv"
-            id="abv"
             placeholder="e.g. 45"
+            helpText="The alcohol content by volume."
             required
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -158,48 +150,35 @@ export default function AddBottle() {
             value={formData.abv}
             suffixLabel="%"
           />
-          <HelpText>The alcohol content by volume.</HelpText>
-        </FormField>
 
-        <FormField>
-          <FormLabel htmlFor="statedAge">Stated Age</FormLabel>
-          <TextInput
+          <TextField
             type="number"
+            label="Stated Age"
             name="statedAge"
-            id="statedAge"
             placeholder="e.g. 12"
+            helpText="If applicable, the number of years the spirit was aged."
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
             value={formData.statedAge}
             suffixLabel="years"
           />
-          <HelpText>
-            If applicable, the number of years the spirit was aged.
-          </HelpText>
-        </FormField>
 
-        <FormField>
-          <FormLabel htmlFor="category">Category</FormLabel>
-          <Select
+          <SelectField
+            label="Category"
             name="category"
-            id="category"
+            placeholder="e.g. Single Malt"
+            helpText="The kind of spirit."
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
             value={formData.category}
-          >
-            <option />
-            {categoryList.map(({ id, name }) => {
-              return (
-                <option key={id} value={id}>
-                  {name}
-                </option>
-              );
-            })}
-          </Select>
-          <HelpText>The kind of spirit.</HelpText>
-        </FormField>
+            options={[
+              { id: "", value: <em>Unknown</em> },
+              ...categoryList.map(({ id, name }) => ({ id, value: name })),
+            ]}
+          />
+        </Fieldset>
       </form>
     </Layout>
   );

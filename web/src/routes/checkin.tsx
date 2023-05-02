@@ -1,8 +1,8 @@
-import { Form, useLoaderData, useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 import { FormEvent, useState } from "react";
 
-import type { Bottle, User } from "../types";
+import type { Bottle } from "../types";
 import api, { ApiError } from "../lib/api";
 import Layout from "../components/layout";
 import FormError from "../components/formError";
@@ -12,6 +12,7 @@ import FormLabel from "../components/formLabel";
 import HelpText from "../components/helpText";
 import TextArea from "../components/textArea";
 import Rating from "../components/rating";
+import BottleCard from "../components/bottleCard";
 
 type LoaderData = {
   bottle: Bottle;
@@ -116,20 +117,11 @@ export default function Checkin() {
   };
 
   return (
-    <Layout
-      header={
-        <FormHeader
-          title={bottle.name}
-          subtitle={bottle.series}
-          onSave={onSubmit}
-        />
-      }
-    >
-      <Form
-        onSubmit={onSubmit}
-        className="sm:mx-auto sm:min-w-full sm:max-w-md"
-      >
+    <Layout header={<FormHeader title="Record Tasting" onSave={onSubmit} />}>
+      <form className="mx-auto max-w-md my-4" onSubmit={onSubmit}>
+        <BottleCard bottle={bottle} />
         {error && <FormError values={[error]} />}
+
         <FormField>
           <FormLabel htmlFor="tastingNotes">Tasting Notes</FormLabel>
           <TextArea
@@ -160,7 +152,7 @@ export default function Checkin() {
           <Grid item xs={12}>
             <CheckinTags value={tags} onChange={setTags} />
           </Grid> */}
-      </Form>
+      </form>
     </Layout>
   );
 }

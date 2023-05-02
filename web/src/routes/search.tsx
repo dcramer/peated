@@ -45,9 +45,14 @@ export default function Search() {
           name="q"
           onChange={setQuery}
           onSubmit={(value) => {
-            navigate(`${location.pathname}?q=${encodeURIComponent(value)}`, {
-              replace: true,
-            });
+            navigate(
+              `${location.pathname}?q=${encodeURIComponent(value)}&${
+                directToCheckin ? "checkin" : ""
+              }`,
+              {
+                replace: true,
+              }
+            );
           }}
         />
       }

@@ -1,13 +1,19 @@
 export default ({
   className,
+  required,
   ...props
-}: React.ComponentPropsWithoutRef<"label">) => {
+}: { required?: boolean } & React.ComponentPropsWithoutRef<"label">) => {
   return (
-    <label
-      {...props}
-      className={`block text-sm font-medium leading-6 text-gray-900 ${
-        className || ""
-      }`}
-    />
+    <div className="flex justify-between">
+      <label
+        {...props}
+        className={`block text-sm font-bold leading-6 text-gray-800 ${
+          className || ""
+        }`}
+      />
+      {!required && (
+        <span className="text-xs leading-6 text-gray-400">Optional</span>
+      )}
+    </div>
   );
 };
