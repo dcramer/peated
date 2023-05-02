@@ -1,4 +1,4 @@
-# cask
+# peated
 
 Schema Notes:
 

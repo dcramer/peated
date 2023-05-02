@@ -1,11 +1,11 @@
 {
-  "short_name": "Cask",
-  "name": "Cask",
+  "short_name": "Peated",
+  "name": "Peated",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "glyph.png",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "type": "image/png"
     },
     {
       "src": "logo192.png",

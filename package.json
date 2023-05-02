@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "cask",
+  "name": "peated",
   "version": "0.1.0",
   "description": "",
   "workspaces": [
