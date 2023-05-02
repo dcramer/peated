@@ -20,7 +20,7 @@ export default ({
   return (
     <table className="min-w-full">
       <colgroup>
-        <col className="w-full sm:w-1/2" />
+        <col className="min-w-full sm:w-1/2" />
         <col className="sm:w-1/6" />
         <col className="sm:w-1/6" />
       </colgroup>

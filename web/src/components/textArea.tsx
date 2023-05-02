@@ -6,7 +6,7 @@ export default ({ ...props }: React.ComponentPropsWithoutRef<"textarea">) => {
   return (
     <div className="mt-2">
       <textarea
-        className={`block w-full py-1.5 ${baseStyles} ${inputStyles}`}
+        className={`block min-w-full py-1.5 px-3 ${baseStyles} ${inputStyles}`}
         {...props}
       />
     </div>

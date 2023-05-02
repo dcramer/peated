@@ -1,13 +1,13 @@
 import { User } from "../types";
 
-export default ({ user }: { user: User }) => {
-  if (user.imageUrl) {
-    return <img src={user.imageUrl} className="h-full w-full" />;
+export default ({ user }: { user: User | null }) => {
+  if (user && user.imageUrl) {
+    return <img src={user.imageUrl} className="min-h-full min-w-full" />;
   }
 
   return (
     <svg
-      className="h-full w-full text-gray-300"
+      className="min-h-full min-w-full text-gray-300"
       fill="currentColor"
       viewBox="0 0 24 24"
     >

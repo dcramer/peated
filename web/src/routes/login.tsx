@@ -45,7 +45,7 @@ const BasicLogin = () => {
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
           >
-            <div className="w-full border-t border-peated-light" />
+            <div className="min-w-full border-t border-peated-light" />
           </div>
           <div className="relative flex justify-center">
             <span className="bg-peated px-2 text-sm text-white">Or</span>

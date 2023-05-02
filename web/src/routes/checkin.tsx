@@ -125,7 +125,10 @@ export default function Checkin() {
         />
       }
     >
-      <Form onSubmit={onSubmit} className="sm:mx-auto sm:w-full sm:max-w-md">
+      <Form
+        onSubmit={onSubmit}
+        className="sm:mx-auto sm:min-w-full sm:max-w-md"
+      >
         {error && <FormError values={[error]} />}
         <FormField>
           <FormLabel htmlFor="tastingNotes">Tasting Notes</FormLabel>

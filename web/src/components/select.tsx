@@ -6,7 +6,7 @@ export default ({ ...props }: React.ComponentPropsWithoutRef<"select">) => {
   return (
     <div className="mt-2">
       <select
-        className={`block w-full py-1.5 ${baseStyles} ${inputStyles}`}
+        className={`block min-w-full py-1.5 px-3 ${baseStyles} ${inputStyles}`}
         {...props}
       />
     </div>

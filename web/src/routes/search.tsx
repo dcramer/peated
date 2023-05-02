@@ -1,4 +1,4 @@
-import { Form, useLocation } from "react-router-dom";
+import { Form, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ChevronRightIcon, PlusIcon } from "@heroicons/react/20/solid";
 
@@ -7,9 +7,11 @@ import api from "../lib/api";
 import Layout from "../components/layout";
 import { formatCategoryName, toTitleCase } from "../lib/strings";
 import BottleName from "../components/bottleName";
+import SearchHeader from "../components/searchHeader";
 
 export default function Search() {
   const location = useLocation();
+  const navigate = useNavigate();
   const qs = new URLSearchParams(location.search);
 
   const directToCheckin = !!qs.get("checkin");
@@ -37,28 +39,24 @@ export default function Search() {
   }, [query]);
 
   return (
-    <Layout noMobileHeader>
-      <Form method="GET" className="space-y-6">
-        <div className="mt-2">
-          <input
-            id="query"
-            name="q"
-            required
-            className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-peated sm:text-sm sm:leading-6"
-            defaultValue={query}
-            placeholder="Search for a bottle"
-            onChange={(e) => {
-              // TODO: navigate/replace url
-              setQuery(e.target.value);
-            }}
-          />
-        </div>
-      </Form>
+    <Layout
+      header={
+        <SearchHeader
+          name="q"
+          onChange={setQuery}
+          onSubmit={(value) => {
+            navigate(`${location.pathname}?q=${encodeURIComponent(value)}`, {
+              replace: true,
+            });
+          }}
+        />
+      }
+    >
       <ul role="list" className="divide-y divide-gray-100">
         {results.map((bottle) => {
           const title = <BottleName bottle={bottle} />;
           return (
-            <li key={bottle.id} className="relative py-5 hover:bg-gray-50">
+            <li key={bottle.id} className="relative py-5 hover:bg-gray-100">
               <div className="mx-auto flex max-w-7xl justify-between gap-x-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex gap-x-4">
                   <div className="min-w-0 flex-auto">
@@ -89,7 +87,7 @@ export default function Search() {
                     </p>
                   </div>
                   <ChevronRightIcon
-                    className="h-5 w-5 flex-none text-gray-400"
+                    className="h-5 w-5 flex-none text-gray-500"
                     aria-hidden="true"
                   />
                 </div>
@@ -98,10 +96,10 @@ export default function Search() {
           );
         })}
         {query && query.length >= 3 && (
-          <li className="relative py-5 hover:bg-gray-50">
+          <li className="relative py-5 hover:bg-gray-100">
             <div className="mx-auto flex max-w-7xl justify-between gap-x-6 px-4 sm:px-6 lg:px-8">
               <div className="flex gap-x-4">
-                <PlusIcon className="h-12 w-12 flex-none rounded-full bg-gray-50" />
+                <PlusIcon className="h-12 w-12 flex-none rounded-full bg-gray-100" />
 
                 <div className="min-w-0 flex-auto">
                   <p className="text-sm font-semibold leading-6 text-gray-900">
@@ -126,7 +124,7 @@ export default function Search() {
                   </p>
                 </div> */}
                 <ChevronRightIcon
-                  className="h-5 w-5 flex-none text-gray-400"
+                  className="h-5 w-5 flex-none text-gray-500"
                   aria-hidden="true"
                 />
               </div>

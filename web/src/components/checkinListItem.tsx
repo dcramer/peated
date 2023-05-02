@@ -46,7 +46,7 @@ export default ({
       <div className="flex items-center mb-4 space-x-4">
         <span className="h-10 w-10 overflow-hidden rounded-full bg-gray-100">
           <svg
-            className="h-full w-full text-gray-300"
+            className="min-h-full min-w-full text-gray-300"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
