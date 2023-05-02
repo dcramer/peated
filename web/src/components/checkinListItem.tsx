@@ -7,6 +7,8 @@ import { Checkin } from "../types";
 import { StaticRating } from "./rating";
 import Button from "./button";
 import { formatCategoryName } from "../lib/strings";
+import { Link } from "react-router-dom";
+import BottleName from "./bottleName";
 
 const TimeSince = ({ date }) => {
   return (
@@ -24,16 +26,19 @@ const TimeSince = ({ date }) => {
   );
 };
 
-export default ({ checkin }: { checkin: Checkin }) => {
+export default ({
+  checkin,
+  noBottle,
+}: {
+  checkin: Checkin;
+  noBottle?: boolean;
+}) => {
   const { bottle } = checkin;
 
   const title = (
-    <>
-      {bottle.name}
-      {bottle.series && (
-        <em className="text-peated-darker font-light ml-1">{bottle.series}</em>
-      )}
-    </>
+    <Link to={`/bottles/${bottle.id}`} className="hover:underline">
+      <BottleName bottle={bottle} />
+    </Link>
   );
 
   return (
@@ -49,31 +54,50 @@ export default ({ checkin }: { checkin: Checkin }) => {
           </svg>
         </span>
         <div className="space-y-1 font-medium text-peated flex-1">
-          {checkin.user.displayName}
+          <Link to={`/users/${checkin.user.id}`} className="hover:underline">
+            {checkin.user.displayName}
+          </Link>
           <TimeSince date={checkin.createdAt} />
         </div>
         <StaticRating value={checkin.rating} size="small" />
       </div>
-      <div className="flex items-center mb-4 space-x-4 bg-gray-100 text-peated p-3 rounded-md">
-        <div className="space-y-1 flex-1">
-          <p className="font-semibold leading-6 text-peated">{title}</p>
-          <p className="text-xs font-light text-gray-500">
-            Produced by {bottle.brand.name}
-            {bottle.distiller &&
-              bottle.brand.name !== bottle.distiller.name && (
-                <span> &middot; Distilled at {bottle.distiller.name}</span>
-              )}
-          </p>
+      {!noBottle && (
+        <div className="flex items-center mb-4 space-x-4 bg-gray-100 text-peated p-3 rounded-md">
+          <div className="space-y-1 flex-1">
+            <p className="font-semibold leading-6 text-peated">{title}</p>
+            <p className="text-xs font-light text-gray-500">
+              Produced by{" "}
+              <Link
+                to={`/brands/${bottle.brand.id}`}
+                className="hover:underline"
+              >
+                {bottle.brand.name}
+              </Link>
+              {bottle.distiller &&
+                bottle.brand.name !== bottle.distiller.name && (
+                  <span>
+                    {" "}
+                    &middot; Distilled at{" "}
+                    <Link
+                      to={`/distillers/${bottle.brand.id}`}
+                      className="hover:underline"
+                    >
+                      {bottle.distiller.name}
+                    </Link>
+                  </span>
+                )}
+            </p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm leading-6 text-gray-500">
+              {bottle.category && formatCategoryName(bottle.category)}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-gray-500">
+              {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
+            </p>
+          </div>
         </div>
-        <div className="space-y-1">
-          <p className="text-sm leading-6 text-gray-500">
-            {bottle.category && formatCategoryName(bottle.category)}
-          </p>
-          <p className="mt-1 text-xs leading-5 text-gray-500">
-            {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
-          </p>
-        </div>
-      </div>
+      )}
       {checkin.tastingNotes && (
         <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
           {checkin.tastingNotes}

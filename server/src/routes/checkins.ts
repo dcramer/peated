@@ -11,6 +11,7 @@ export const listCheckins: RouteOptions<
   {
     Querystring: {
       page?: number;
+      bottle?: number;
     };
   }
 > = {
@@ -21,6 +22,7 @@ export const listCheckins: RouteOptions<
       type: "object",
       properties: {
         page: { type: "number" },
+        bottle: { type: "number" },
       },
     },
   },
@@ -30,6 +32,11 @@ export const listCheckins: RouteOptions<
     const limit = 100;
     const offset = (page - 1) * limit;
 
+    const where: Prisma.CheckinWhereInput = {};
+    if (req.query.bottle) {
+      where.bottleId = req.query.bottle;
+    }
+
     const results = await prisma.checkin.findMany({
       include: {
         bottle: {
@@ -37,6 +44,7 @@ export const listCheckins: RouteOptions<
         },
         user: true,
       },
+      where,
       skip: offset,
       take: limit,
       orderBy: { createdAt: "desc" },

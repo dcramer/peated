@@ -63,7 +63,7 @@ export default function AddBottle() {
     (async () => {
       try {
         const bottle = await api.post("/bottles", { data: formData });
-        navigate(`/b/${bottle.id}/checkin`, {
+        navigate(`/bottles/${bottle.id}/checkin`, {
           replace: true,
         });
       } catch (err) {

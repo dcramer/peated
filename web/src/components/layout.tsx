@@ -152,7 +152,7 @@ export default function Layout({
         }`}
       >
         {!noHeader && (header || <AppHeader excludeMobile={noMobileHeader} />)}
-        <main className="mx-auto max-w-4xl h-screen py-6 sm:px-6 lg:px-8 relative">
+        <main className="mx-auto max-w-4xl m-h-screen py-6 sm:px-6 lg:px-8 relative">
           {children}
         </main>
       </div>

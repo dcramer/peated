@@ -7,6 +7,9 @@ import Activity, { loader as activityLoader } from "./routes/activity";
 import Search from "./routes/search";
 import Login from "./routes/login";
 import AddBottle from "./routes/addBottle";
+import BottleDetails, {
+  loader as bottleDetailsLoader,
+} from "./routes/bottleDetails";
 
 export default [
   {
@@ -20,7 +23,12 @@ export default [
         element: <AddBottle />,
       },
       {
-        path: "b/:bottleId/checkin",
+        path: "bottles/:bottleId",
+        element: <BottleDetails />,
+        loader: bottleDetailsLoader,
+      },
+      {
+        path: "bottles/:bottleId/checkin",
         element: <Checkin />,
         loader: checkinLoader,
       },

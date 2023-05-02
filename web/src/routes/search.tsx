@@ -6,6 +6,7 @@ import { Bottle } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
 import { formatCategoryName, toTitleCase } from "../lib/strings";
+import BottleName from "../components/bottleName";
 
 export default function Search() {
   const location = useLocation();
@@ -53,23 +54,14 @@ export default function Search() {
       </Form>
       <ul role="list" className="divide-y divide-gray-100">
         {results.map((bottle) => {
-          const title = (
-            <>
-              {bottle.name}
-              {bottle.series && (
-                <em className="text-gray-500 font-normal ml-1">
-                  {bottle.series}
-                </em>
-              )}
-            </>
-          );
+          const title = <BottleName bottle={bottle} />;
           return (
             <li key={bottle.id} className="relative py-5 hover:bg-gray-50">
               <div className="mx-auto flex max-w-7xl justify-between gap-x-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex gap-x-4">
                   <div className="min-w-0 flex-auto">
                     <p className="text-sm font-semibold leading-6 text-gray-900">
-                      <a href={`/b/${bottle.id}/checkin`}>
+                      <a href={`/bottles/${bottle.id}/checkin`}>
                         <span className="absolute inset-x-0 -top-px bottom-0" />
                         {title}
                       </a>
