@@ -32,7 +32,7 @@ export default function BrandDetails() {
   ];
 
   return (
-    <Layout>
+    <Layout gutter>
       <div className="flex flex-col items-start justify-between gap-x-8 sm:flex-row sm:items-center">
         <div className="space-y-1 flex-1">
           <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">

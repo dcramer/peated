@@ -26,6 +26,24 @@ export const loader: LoaderFunction = async ({
   return { bottle, checkinList };
 };
 
+const EmptyActivity = ({ to }: { to: string }) => {
+  return (
+    <Link
+      type="button"
+      className="flex flex-col block m-4 mx-auto items-center rounded-lg border border-dashed border-gray-300 p-12 group hover:border-peated focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      to={to}
+    >
+      <span className="mt-2 block text-sm font-semibold text-gray-400 group-hover:text-peated">
+        Are you enjoying a dram?
+      </span>
+
+      <span className="mt-2 block text-sm font-light text-gray-400 group-hover:text-peated">
+        Looks like no ones tried out this spirit. Could you be the first?
+      </span>
+    </Link>
+  );
+};
+
 export default function BottleDetails() {
   const { bottle, checkinList } = useLoaderData() as LoaderData;
 
@@ -35,10 +53,10 @@ export default function BottleDetails() {
   ];
 
   return (
-    <Layout>
+    <Layout gutter>
       <FloatingCheckinButton to={`/bottles/${bottle.id}/checkin`} />
 
-      <div className="flex flex-col items-start justify-between gap-x-8 sm:flex-row sm:items-center">
+      <div className="flex flex-row items-start justify-between gap-x-8">
         <div className="space-y-1 flex-1">
           <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">
             {bottle.name}
@@ -73,7 +91,7 @@ export default function BottleDetails() {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid gap-3 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
           <div key={stat.name}>
             <p className="text-base leading-7 text-gray-400">{stat.name}</p>
@@ -86,11 +104,15 @@ export default function BottleDetails() {
       <h2 className="text-lg font-semibold leading-6 mt-12 mb-6 text-gray-900">
         Activity
       </h2>
-      <ul role="list" className="space-y-3">
-        {checkinList.map((checkin) => (
-          <CheckinListItem key={checkin.id} checkin={checkin} noBottle />
-        ))}
-      </ul>
+      {checkinList.length ? (
+        <ul role="list" className="space-y-3 m-4">
+          {checkinList.map((checkin) => (
+            <CheckinListItem key={checkin.id} checkin={checkin} noBottle />
+          ))}
+        </ul>
+      ) : (
+        <EmptyActivity to={`/bottles/${bottle.id}/checkin`} />
+      )}
     </Layout>
   );
 }

@@ -15,8 +15,7 @@ type Props = React.ComponentPropsWithoutRef<typeof Listbox> & {
 export default ({ options, placeholder, ...props }: Props) => {
   const [value, setValue] = useState<Option | undefined>(props.value);
 
-  const baseStyles =
-    "bg-white rounded-md border-0 text-gray-900 placeholder:text-gray-400 focus:ring-0";
+  const baseStyles = "bg-white rounded-md border-0 text-gray-900 focus:ring-0";
   const inputStyles =
     "text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm sm:leading-6";
   return (

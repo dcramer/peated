@@ -1,13 +1,14 @@
 export default ({
   suffixLabel,
   noGutter,
+  className,
   ...props
-}: {
+}: React.ComponentPropsWithoutRef<"input"> & {
   suffixLabel?: string;
   noGutter?: boolean;
-} & React.ComponentPropsWithoutRef<"input">) => {
+}) => {
   const baseStyles =
-    "bg-white rounded-md p-0 border-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm sm:leading-6";
+    "bg-white rounded-md p-0 border-0 text-gray-900 text-sm sm:leading-6";
   const inputStyles =
     "text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm sm:leading-6";
   if (suffixLabel) {
@@ -26,7 +27,7 @@ export default ({
 
   return (
     <input
-      className={`block min-w-full ${baseStyles} ${inputStyles}`}
+      className={`block min-w-full ${baseStyles} ${inputStyles} ${className}`}
       {...props}
     />
   );

@@ -5,6 +5,7 @@ export default function Layout({
   children,
   header,
   splash,
+  gutter,
   noHeader,
   noMobileHeader,
 }: {
@@ -12,6 +13,7 @@ export default function Layout({
   header?: any;
   noHeader?: boolean;
   splash?: boolean;
+  gutter?: boolean;
   noMobileHeader?: boolean;
   onSave?: any;
 }) {
@@ -38,7 +40,12 @@ export default function Layout({
             </div>
           </header>
         )}
-        <main className="mx-auto max-w-4xl m-h-screen relative">
+        <main
+          className={classNames(
+            "mx-auto max-w-4xl m-h-screen relative",
+            gutter && "px-2 sm:px-6 lg:px-8 py-2 sm:py-6 lg:py-8"
+          )}
+        >
           {children}
         </main>
       </div>

@@ -9,7 +9,6 @@ import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
 import FormField from "../components/formField";
 import FormLabel from "../components/formLabel";
-import HelpText from "../components/helpText";
 import TextArea from "../components/textArea";
 import Rating from "../components/rating";
 import BottleCard from "../components/bottleCard";

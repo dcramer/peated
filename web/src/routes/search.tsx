@@ -14,7 +14,7 @@ export default function Search() {
   const navigate = useNavigate();
   const qs = new URLSearchParams(location.search);
 
-  const directToCheckin = !!qs.get("checkin");
+  const directToCheckin = qs.has("checkin");
 
   const [query, setQuery] = useState(qs.get("q") || "");
   const [results, setResults] = useState<readonly Bottle[]>([]);

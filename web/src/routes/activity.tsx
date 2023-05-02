@@ -24,7 +24,7 @@ const EmptyActivity = () => {
   return (
     <Link
       type="button"
-      className="flex flex-col sm:max-w-xl block m-4 mx-auto items-center rounded-lg border-2 border-dashed border-gray-300 p-12 group hover:border-peated focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      className="flex flex-col sm:max-w-xl block mx-auto items-center rounded-lg border-2 border-dashed border-gray-300 p-12 group hover:border-peated focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       to="/search?checkin"
     >
       <Glyph className="text-gray-400 w-16 h-16 group-hover:text-peated" />
@@ -43,7 +43,7 @@ export default function Activity() {
   const { checkinList } = useLoaderData() as LoaderData;
 
   return (
-    <Layout>
+    <Layout gutter>
       <FloatingCheckinButton to="/search?checkin" />
       {checkinList.length > 0 ? (
         <ul role="list" className="space-y-3">
