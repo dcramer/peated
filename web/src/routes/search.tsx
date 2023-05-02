@@ -5,7 +5,7 @@ import { ChevronRightIcon, PlusIcon } from "@heroicons/react/20/solid";
 import { Bottle } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
-import { formatCategoryName } from "../lib/strings";
+import { formatCategoryName, toTitleCase } from "../lib/strings";
 
 export default function Search() {
   const location = useLocation();
@@ -97,7 +97,7 @@ export default function Search() {
             </li>
           );
         })}
-        {query && !results.length && (
+        {query && query.length >= 3 && (
           <li className="relative py-5 hover:bg-gray-50">
             <div className="mx-auto flex max-w-7xl justify-between gap-x-6 px-4 sm:px-6 lg:px-8">
               <div className="flex gap-x-4">
@@ -112,7 +112,7 @@ export default function Search() {
                   </p>
                   <p className="mt-1 flex text-xs leading-5 text-gray-500 gap-x-1">
                     <span>Tap here to add </span>
-                    <strong className="truncate">{query}</strong>
+                    <strong className="truncate">{toTitleCase(query)}</strong>
                   </p>
                 </div>
               </div>

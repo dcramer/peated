@@ -1,21 +1,20 @@
 import { Form, useLocation, useNavigate } from "react-router-dom";
-// import BrandSelect from "../components/brandSelect";
 import { FormEvent, useState } from "react";
 
-// import DistillerSelect from "../components/distillerSelect";
 import { Brand, Distiller } from "../types";
 import api, { ApiError } from "../lib/api";
 import { useRequiredAuth } from "../hooks/useAuth";
 import Layout from "../components/layout";
-import { formatCategoryName } from "../lib/strings";
+import { formatCategoryName, toTitleCase } from "../lib/strings";
 import FormError from "../components/formError";
 import FormField from "../components/formField";
 import TextInput from "../components/textInput";
 import FormLabel from "../components/formLabel";
 import HelpText from "../components/helpText";
 import FormHeader from "../components/formHeader";
-import Typeahead from "../components/typeahead";
 import BrandSelect from "../components/brandSelect";
+import Select from "../components/select";
+import DistillerSelect from "../components/distillerSelect";
 
 type FormData = {
   name?: string;
@@ -33,7 +32,7 @@ export default function AddBottle() {
   const { user } = useRequiredAuth();
 
   const qs = new URLSearchParams(location.search);
-  const name = qs.get("name") || "";
+  const name = toTitleCase(qs.get("name") || "");
 
   const [formData, setFormData] = useState<FormData>({
     name,
@@ -64,7 +63,9 @@ export default function AddBottle() {
     (async () => {
       try {
         const bottle = await api.post("/bottles", { data: formData });
-        navigate(`/b/${bottle.id}/checkin`);
+        navigate(`/b/${bottle.id}/checkin`, {
+          replace: true,
+        });
       } catch (err) {
         if (err instanceof ApiError) {
           setError(await err.errorMessage());
@@ -115,16 +116,28 @@ export default function AddBottle() {
         </FormField>
 
         <FormField>
+          <FormLabel htmlFor="distiller">Distiller</FormLabel>
+          <DistillerSelect
+            name="distiller"
+            id="distiller"
+            placeholder="e.g. Distiller"
+            onChange={(value) => setFormData({ ...formData, distiller: value })}
+            canCreate={user.admin}
+            value={formData.distiller}
+            required
+          />
+        </FormField>
+
+        <FormField>
           <FormLabel htmlFor="brand">Brand</FormLabel>
           <BrandSelect
             name="brand"
             id="brand"
             placeholder="e.g. Macallan"
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
+            onChange={(value) => setFormData({ ...formData, brand: value })}
             canCreate={user.admin}
             value={formData.brand}
+            required
           />
         </FormField>
 
@@ -146,11 +159,11 @@ export default function AddBottle() {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="stagedAge">Stated Age</FormLabel>
+          <FormLabel htmlFor="statedAge">Stated Age</FormLabel>
           <TextInput
             type="number"
-            name="stagedAge"
-            id="stagedAge"
+            name="statedAge"
+            id="statedAge"
             placeholder="e.g. 12"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -162,39 +175,29 @@ export default function AddBottle() {
             If applicable, the number of years the spirit was aged.
           </HelpText>
         </FormField>
-      </Form>
-      {/* 
 
-          <Grid item xs={12}>
-            <FormControl fullWidth required>
-              <InputLabel id="category-label">Category</InputLabel>
-              <Select
-                fullWidth
-                name="category"
-                variant="outlined"
-                labelId="category-label"
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
-                renderValue={(value) =>
-                  categoryList.find((v) => value === v.id)?.name || "Unknown"
-                }
-                value={formData.category}
-                required
-              >
-                <MenuItem key="" value="">
-                  <em>Unknown</em>
-                </MenuItem>
-                {categoryList.map((c) => (
-                  <MenuItem key={c.id} value={c.id}>
-                    {c.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>The kind of spirit.</FormHelperText>
-            </FormControl>
-          </Grid>
-        </Grid> */}
+        <FormField>
+          <FormLabel htmlFor="category">Category</FormLabel>
+          <Select
+            name="category"
+            id="category"
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            value={formData.category}
+          >
+            <option />
+            {categoryList.map(({ id, name }) => {
+              return (
+                <option key={id} value={id} selected={formData.category === id}>
+                  {name}
+                </option>
+              );
+            })}
+          </Select>
+          <HelpText>The kind of spirit.</HelpText>
+        </FormField>
+      </Form>
     </Layout>
   );
 }

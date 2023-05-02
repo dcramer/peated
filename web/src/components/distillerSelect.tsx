@@ -1,65 +1,61 @@
-import { DialogContentText, TextField } from "@mui/material";
-import RelationSelect from "./relationSelect";
+import FormField from "./formField";
+import FormLabel from "./formLabel";
+import TextInput from "./textInput";
+import Typeahead from "./typeahead";
 
 export default (props) => {
   return (
-    <RelationSelect
+    <Typeahead
       {...props}
-      label="Distiller"
+      placeholder="e.g. Macallan"
       endpoint="/distillers"
-      helperText="The distiller whom produces the spirit. Sometimes the same as the brand."
-      dialogTitle="Add Distiller"
       createForm={({ data, onFieldChange }) => {
         return (
           <>
-            <DialogContentText>Who are we missing?</DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              name="name"
-              label="Name"
-              type="text"
-              placeholder="e.g. Macallan"
-              variant="standard"
-              helperText="The distiller whom bottles the spirit."
-              fullWidth
-              required
-              value={data.name}
-              onChange={(e) =>
-                onFieldChange({ [e.target.name]: e.target.value })
-              }
-            />
-            <TextField
-              autoFocus
-              margin="dense"
-              name="country"
-              label="Country"
-              type="text"
-              placeholder="e.g. Scotland"
-              variant="standard"
-              helperText="The country where this distiller is located."
-              fullWidth
-              required
-              value={data.country}
-              onChange={(e) =>
-                onFieldChange({ [e.target.name]: e.target.value })
-              }
-            />
-            <TextField
-              autoFocus
-              margin="dense"
-              name="region"
-              label="Region"
-              type="text"
-              placeholder="e.g. Islay"
-              variant="standard"
-              helperText="If applicable, the region where this distiller is located."
-              fullWidth
-              value={data.region}
-              onChange={(e) =>
-                onFieldChange({ [e.target.name]: e.target.value })
-              }
-            />
+            <p className="text-base mb-4">
+              The distiller is group that makes the spirit.
+            </p>
+            <FormField>
+              <FormLabel htmlFor="name">Name</FormLabel>
+              <TextInput
+                autoFocus
+                id="name"
+                name="name"
+                type="text"
+                placeholder="e.g. Macallan"
+                required
+                value={data.name}
+                onChange={(e) =>
+                  onFieldChange({ [e.target.name]: e.target.value })
+                }
+              />
+            </FormField>
+            <FormField>
+              <FormLabel htmlFor="country">Country</FormLabel>
+              <TextInput
+                autoFocus
+                name="country"
+                type="text"
+                placeholder="e.g. Scotland"
+                required
+                value={data.country}
+                onChange={(e) =>
+                  onFieldChange({ [e.target.name]: e.target.value })
+                }
+              />
+            </FormField>
+            <FormField>
+              <FormLabel htmlFor="region">Region</FormLabel>
+              <TextInput
+                name="region"
+                type="text"
+                placeholder="e.g. Islay"
+                value={data.region}
+                onChange={(e) =>
+                  onFieldChange({ [e.target.name]: e.target.value })
+                }
+              />
+            </FormField>
           </>
         );
       }}

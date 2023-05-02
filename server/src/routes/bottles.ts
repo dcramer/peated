@@ -173,7 +173,7 @@ export const addBottle: RouteOptions<
           ],
         },
         abv: { type: "number" },
-        stagedAge: { type: "number" },
+        statedAge: { type: "number" },
       },
     },
   },
