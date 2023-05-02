@@ -124,7 +124,6 @@ export default function AddBottle() {
             onChange={(value) => setFormData({ ...formData, distiller: value })}
             canCreate={user.admin}
             value={formData.distiller}
-            required
           />
         </FormField>
 
