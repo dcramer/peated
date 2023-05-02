@@ -47,9 +47,13 @@ export const StaticRating = ({ value, size, className }: Props) => {
 };
 
 export default ({
+  name,
+  id,
   onChange,
   ...props
 }: {
+  name?: string;
+  id?: string;
   value?: number | null | undefined;
   onChange: (value: number) => void;
 }) => {
@@ -57,6 +61,7 @@ export default ({
 
   return (
     <RadioGroup
+      id={id}
       {...props}
       onChange={(value) => {
         setValue(value || 0);

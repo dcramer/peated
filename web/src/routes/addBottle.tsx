@@ -83,8 +83,8 @@ export default function AddBottle() {
   };
 
   return (
-    <Layout header={<FormHeader title="Add Bottle" onSave={onSubmit} />}>
-      <form className="sm:my-4 sm:mx-16">
+    <Layout header={<FormHeader title="Add Bottle" onSave={onSubmit} />} gutter>
+      <form className="sm:mx-16">
         {error && <FormError values={[error]} />}
 
         <Fieldset>

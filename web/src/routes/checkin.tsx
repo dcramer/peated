@@ -9,9 +9,11 @@ import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
 import FormField from "../components/formField";
 import FormLabel from "../components/formLabel";
-import TextArea from "../components/textArea";
 import Rating from "../components/rating";
 import BottleCard from "../components/bottleCard";
+import TextAreaField from "../components/textAreaField";
+import RatingField from "../components/ratingField";
+import Fieldset from "../components/fieldset";
 
 type LoaderData = {
   bottle: Bottle;
@@ -67,15 +69,6 @@ function CheckinTags({
   );
 }
 
-function CheckinRating({ ...props }) {
-  return (
-    <FormField {...props}>
-      <FormLabel>Rating</FormLabel>
-      <Rating name="rating" {...props} />
-    </FormField>
-  );
-}
-
 type FormData = {
   tastingNotes?: string;
   rating?: number;
@@ -116,41 +109,33 @@ export default function Checkin() {
   };
 
   return (
-    <Layout header={<FormHeader title="Record Tasting" onSave={onSubmit} />}>
-      <form className="mx-auto max-w-md my-4" onSubmit={onSubmit}>
+    <Layout
+      header={<FormHeader title="Record Tasting" onSave={onSubmit} />}
+      gutter
+    >
+      <form className="mx-auto max-w-md" onSubmit={onSubmit}>
         <BottleCard bottle={bottle} />
         {error && <FormError values={[error]} />}
 
-        <FormField>
-          <FormLabel htmlFor="tastingNotes">Tasting Notes</FormLabel>
-          <TextArea
+        <Fieldset>
+          <RatingField
+            label="How was it?"
+            required
+            onChange={(value) => {
+              setFormData({ ...formData, rating: value });
+            }}
+          />
+
+          <TextAreaField
+            label="Any notes?"
             name="tastingNotes"
-            id="tastingNotes"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
             defaultValue={formData.tastingNotes}
             placeholder="Is it peated?"
           />
-        </FormField>
-        <CheckinRating
-          required
-          onChange={(value) => {
-            setFormData({ ...formData, rating: value });
-          }}
-        />
-        {/*
-          <Grid item xs={12}>
-            <CheckinRating
-              required
-              onChange={(e) => {
-                setFormData({ ...formData, rating: e.target.value });
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <CheckinTags value={tags} onChange={setTags} />
-          </Grid> */}
+        </Fieldset>
       </form>
     </Layout>
   );
