@@ -140,14 +140,16 @@ export const addCheckin: RouteOptions<
 
     data.userId = req.user.id;
 
-    const fileData = await req.file();
-    data.imageUrl = fileData
-      ? await storeFile({
-          data: fileData,
-          namespace: user.id,
-          urlPrefix: "/uploads",
-        })
-      : null;
+    if (req.isMultipart()) {
+      const fileData = await req.file();
+      data.imageUrl = fileData
+        ? await storeFile({
+            data: fileData,
+            namespace: user.id,
+            urlPrefix: "/uploads",
+          })
+        : null;
+    }
 
     // TODO(dcramer): delete file if this fails
     const checkin = await prisma.checkin.create({
