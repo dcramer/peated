@@ -35,7 +35,7 @@ export const StaticRating = ({ value, size, className }: Props) => {
             className={classNames(
               "text-gray-200",
               "rating-half-1",
-              value >= item ? "text-yellow-500" : ""
+              value >= item - 0.5 ? "text-yellow-500" : ""
             )}
           >
             <StarIcon className="h-full" />
@@ -90,7 +90,7 @@ export default ({ ...props }) => {
                   "peer-hover:text-yellow-500",
                   active ? "text-yellow-500" : "",
                   checked ? "text-yellow-500" : "",
-                  value >= item ? "text-yellow-500" : ""
+                  value >= item - 0.5 ? "text-yellow-500" : ""
                 )
               }
             >

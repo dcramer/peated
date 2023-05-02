@@ -38,14 +38,14 @@ export default ({ checkin }: { checkin: Checkin }) => {
     <li className="overflow-hidden bg-white shadow sm:rounded-md">
       <div className="flex items-center mb-4 space-x-4 bg-peated text-white py-2 px-3">
         <div className="space-y-1 font-medium flex-1">
-          <p>
-            <p className="text-sm font-semibold leading-6 text-white">
-              {title}
-            </p>
-            <p className="mt-1 flex text-xs leading-5 text-peated-light truncate">
-              {checkin.bottle.brand.name}
-            </p>
-          </p>
+          <p className="font-semibold leading-6 text-white">{title}</p>
+        </div>
+        <div className="flex gap-x-1 font-sm text-peated-light">
+          <span>{checkin.bottle.brand.name}</span>
+          {checkin.bottle.distiller?.name !== checkin.bottle.brand.name && [
+            <span>/</span>,
+            <span>{checkin.bottle.distiller?.name}</span>,
+          ]}
         </div>
       </div>
       <div className="flex items-center mb-4 space-x-4 px-3">
@@ -67,7 +67,7 @@ export default ({ checkin }: { checkin: Checkin }) => {
         <StaticRating value={checkin.rating} size="small" />
       </div>
       {checkin.tastingNotes && (
-        <p className="mb-2 px-3 text-gray-500 dark:text-gray-400">
+        <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
           {checkin.tastingNotes}
         </p>
       )}
