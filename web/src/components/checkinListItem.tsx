@@ -6,12 +6,13 @@ import {
 import { Checkin } from "../types";
 import { StaticRating } from "./rating";
 import Button from "./button";
+import { formatCategoryName } from "../lib/strings";
 
 const TimeSince = ({ date }) => {
   return (
     <time
       dateTime={date}
-      className="block text-sm text-gray-500 dark:text-gray-400"
+      className="block text-sm font-light text-gray-500 dark:text-gray-400"
     >
       {new Date(date).toLocaleDateString("en-US", {
         weekday: "long",
@@ -24,31 +25,20 @@ const TimeSince = ({ date }) => {
 };
 
 export default ({ checkin }: { checkin: Checkin }) => {
+  const { bottle } = checkin;
+
   const title = (
     <>
-      {checkin.bottle.name}
-      {checkin.bottle.series && (
-        <em className="text-peated-light font-normal ml-1">
-          {checkin.bottle.series}
-        </em>
+      {bottle.name}
+      {bottle.series && (
+        <em className="text-peated-darker font-light ml-1">{bottle.series}</em>
       )}
     </>
   );
+
   return (
-    <li className="overflow-hidden bg-white shadow sm:rounded-md">
-      <div className="flex items-center mb-4 space-x-4 bg-peated text-white py-2 px-3">
-        <div className="space-y-1 font-medium flex-1">
-          <p className="font-semibold leading-6 text-white">{title}</p>
-        </div>
-        <div className="flex gap-x-1 font-sm text-peated-light">
-          <span>{checkin.bottle.brand.name}</span>
-          {checkin.bottle.distiller?.name !== checkin.bottle.brand.name && [
-            <span>/</span>,
-            <span>{checkin.bottle.distiller?.name}</span>,
-          ]}
-        </div>
-      </div>
-      <div className="flex items-center mb-4 space-x-4 px-3">
+    <li className="overflow-hidden bg-white shadow sm:rounded-md p-3">
+      <div className="flex items-center mb-4 space-x-4">
         <span className="h-10 w-10 overflow-hidden rounded-full bg-gray-100">
           <svg
             className="h-full w-full text-gray-300"
@@ -59,19 +49,37 @@ export default ({ checkin }: { checkin: Checkin }) => {
           </svg>
         </span>
         <div className="space-y-1 font-medium text-peated flex-1">
-          <p>
-            {checkin.user.displayName}
-            <TimeSince date={checkin.createdAt} />
-          </p>
+          {checkin.user.displayName}
+          <TimeSince date={checkin.createdAt} />
         </div>
         <StaticRating value={checkin.rating} size="small" />
+      </div>
+      <div className="flex items-center mb-4 space-x-4 bg-gray-100 text-peated p-3 rounded-md">
+        <div className="space-y-1 flex-1">
+          <p className="font-semibold leading-6 text-peated">{title}</p>
+          <p className="text-xs font-light text-gray-500">
+            Produced by {bottle.brand.name}
+            {bottle.distiller &&
+              bottle.brand.name !== bottle.distiller.name && (
+                <span> &middot; Distilled at {bottle.distiller.name}</span>
+              )}
+          </p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm leading-6 text-gray-500">
+            {bottle.category && formatCategoryName(bottle.category)}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-gray-500">
+            {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
+          </p>
+        </div>
       </div>
       {checkin.tastingNotes && (
         <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
           {checkin.tastingNotes}
         </p>
       )}
-      <aside className="px-3 pb-2">
+      <aside>
         <div className="flex items-center mt-3 space-x-3">
           <Button
             type="button"
