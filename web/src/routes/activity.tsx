@@ -35,13 +35,16 @@ const EmptyActivity = () => {
   return (
     <Link
       type="button"
-      className="flex flex-col block w-full items-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      className="flex flex-col block m-4 items-center rounded-lg border-2 border-dashed border-gray-300 p-12 group hover:border-peated focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       to="/search"
     >
-      <Glyph style={{ width: 48, height: 48 }} />
+      <Glyph className="text-gray-400 w-16 h-16 group-hover:text-peated" />
 
-      <span className="mt-2 block text-sm font-semibold text-gray-900">
+      <span className="mt-2 block text-sm font-semibold text-gray-400 group-hover:text-peated">
         What are you drinking?
+      </span>
+      <span className="mt-2 block text-sm font-light text-gray-400 group-hover:text-peated">
+        Get started by recording your first tasting notes.
       </span>
     </Link>
   );
