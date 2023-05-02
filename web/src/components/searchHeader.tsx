@@ -17,21 +17,21 @@ export default function SearchHeader({
   const navigate = useNavigate();
   const [value, setValue] = useState(props.value || "");
 
-  const blockStyles = `px-0 sm:px-6 py-1 sm:py-3`;
+  const blockStyles = `px-0 py-1 sm:py-3`;
 
   return (
     <nav className="flex min-w-full items-center justify-between text-white">
       <div className="flex text-white hover:text-white">
         <button
           onClick={() => navigate(-1)}
-          className={`-m-1.5 p-1.5 ${blockStyles} pr-3`}
+          className={`-m-1.5 p-1.5 ${blockStyles} pr-3 sm:pr-6`}
         >
           <span className="sr-only">Back</span>
           <ChevronLeftIcon className="h-8 w-8" />
         </button>
       </div>
       <form
-        className={`flex-1 px-0 sm:px-6`}
+        className={`flex-1`}
         onSubmit={(e) => {
           e.preventDefault();
 
