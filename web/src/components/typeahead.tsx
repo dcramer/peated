@@ -98,7 +98,7 @@ export default ({
                   value={item}
                   className={({ active }) =>
                     classNames(
-                      "relative cursor-default select-none py-2 pl-3 pr-9 rounded-md",
+                      "relative cursor-default select-none py-2 pl-3 pr-9 rounded-md text-sm",
                       active ? "bg-gray-100 text-peated" : "text-gray-900"
                     )
                   }
@@ -133,7 +133,7 @@ export default ({
                   value={{ id: null, name: toTitleCase(query) }}
                   className={({ active }) =>
                     classNames(
-                      "relative cursor-default select-none py-2 pl-3 pr-9 rounded-md",
+                      "relative cursor-default select-none py-2 pl-3 pr-9 rounded-md text-sm",
                       active ? "bg-gray-100 text-peated" : "text-gray-900"
                     )
                   }

@@ -28,37 +28,37 @@ export default ({ options, placeholder, ...props }: Props) => {
       <div className="relative">
         <Listbox.Button
           placeholder={placeholder}
-          className={`block min-w-full ${baseStyles} ${inputStyles}`}
+          className={`flex min-w-full flex-col ${baseStyles} ${inputStyles}`}
         >
-          <span className="inline-flex w-full truncate">
+          <div className="truncate flex-1">
             {value?.value || (
               <span className="text-gray-400">{placeholder}</span>
             )}
-          </span>
-          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+          </div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
             <ChevronDownIcon
               className="h-4 w-4 text-gray-600"
               aria-hidden="true"
             />
-          </span>
+          </div>
         </Listbox.Button>
+        <Listbox.Options className="absolute z-10 mt-1 max-h-60 min-w-full overflow-auto rounded-md bg-white p-1 text-base shadow-lg ring-1 ring-black ring-opacity-20 focus:outline-none sm:text-sm">
+          {options.map((item) => (
+            <Listbox.Option
+              key={item.id}
+              value={item}
+              className={({ active }) =>
+                classNames(
+                  "relative cursor-default select-none py-2 pl-3 pr-9 rounded-md text-sm",
+                  active ? "bg-gray-100 text-peated" : "text-gray-900"
+                )
+              }
+            >
+              {item.value}
+            </Listbox.Option>
+          ))}
+        </Listbox.Options>
       </div>
-      <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white p-1 text-base shadow-lg ring-1 ring-black ring-opacity-20 focus:outline-none sm:text-sm">
-        {options.map((item) => (
-          <Listbox.Option
-            key={item.id}
-            value={item}
-            className={({ active }) =>
-              classNames(
-                "relative cursor-default select-none py-2 pl-3 pr-9 rounded-md",
-                active ? "bg-gray-100 text-peated" : "text-gray-900"
-              )
-            }
-          >
-            {item.value}
-          </Listbox.Option>
-        ))}
-      </Listbox.Options>
     </Listbox>
   );
 };
