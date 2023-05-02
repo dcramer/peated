@@ -12,6 +12,8 @@ export default function Search() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
 
+  const directToCheckin = !!qs.get("checkin");
+
   const [query, setQuery] = useState(qs.get("q") || "");
   const [results, setResults] = useState<readonly Bottle[]>([]);
 
@@ -61,7 +63,13 @@ export default function Search() {
                 <div className="flex gap-x-4">
                   <div className="min-w-0 flex-auto">
                     <p className="text-sm font-semibold leading-6 text-gray-900">
-                      <a href={`/bottles/${bottle.id}/checkin`}>
+                      <a
+                        href={
+                          directToCheckin
+                            ? `/bottles/${bottle.id}/checkin`
+                            : `/bottles/${bottle.id}`
+                        }
+                      >
                         <span className="absolute inset-x-0 -top-px bottom-0" />
                         {title}
                       </a>

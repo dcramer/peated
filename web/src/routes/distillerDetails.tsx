@@ -4,8 +4,7 @@ import type { LoaderFunction } from "react-router-dom";
 import type { Bottle, Distiller } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
-import { formatCategoryName } from "../lib/strings";
-import { Link } from "react-router-dom";
+import BottleTable from "../components/bottleTable";
 
 type LoaderData = {
   distiller: Distiller;
@@ -60,58 +59,7 @@ export default function DistillerDetails() {
       <h2 className="text-lg font-semibold leading-6 my-6 mt-16 text-gray-900">
         Bottles
       </h2>
-      <table className="min-w-full">
-        <colgroup>
-          <col className="w-full sm:w-1/2" />
-          <col className="sm:w-1/6" />
-          <col className="sm:w-1/6" />
-        </colgroup>
-        <thead className="border-b border-gray-300 text-gray-900">
-          <tr>
-            <th
-              scope="col"
-              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
-            >
-              Bottle
-            </th>
-            <th
-              scope="col"
-              className="hidden px-3 py-3.5 text-right text-sm font-semibold text-gray-900 sm:table-cell"
-            >
-              Category
-            </th>
-            <th
-              scope="col"
-              className="py-3.5 pl-3 pr-4 text-right text-sm font-semibold text-gray-900 sm:pr-0"
-            >
-              Age
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {bottleList.map((bottle, idx) => (
-            <tr key={bottle.id} className="border-b border-gray-200">
-              <td className="max-w-0 py-5 pl-4 pr-3 text-sm sm:pl-0">
-                <Link
-                  to={`/bottles/${bottle.id}`}
-                  className="font-bold text-peated hover:underline"
-                >
-                  {bottle.name}
-                </Link>
-                <div className="mt-1 truncate text-gray-500">
-                  {bottle.series}
-                </div>
-              </td>
-              <td className="hidden px-3 py-5 text-right text-sm text-gray-500 sm:table-cell">
-                {formatCategoryName(bottle.category)}
-              </td>
-              <td className="hidden py-5 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0 sm:table-cell">
-                {bottle.statedAge && `${bottle.statedAge} years`}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <BottleTable bottleList={bottleList} groupBy={(bottle) => bottle.brand} />
     </Layout>
   );
 }
