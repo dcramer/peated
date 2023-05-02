@@ -79,7 +79,7 @@ export default function AddBottle() {
 
   return (
     <Layout header={<FormHeader title="Add Bottle" onSave={onSubmit} />}>
-      <Form onSubmit={onSubmit} className="sm:mx-auto sm:w-full sm:max-w-md">
+      <Form onSubmit={onSubmit} className="mx-auto max-w-md">
         {error && <FormError values={[error]} />}
 
         <FormField>

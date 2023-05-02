@@ -32,7 +32,9 @@ export const listCheckins: RouteOptions<
 
     const results = await prisma.checkin.findMany({
       include: {
-        bottle: true,
+        bottle: {
+          include: { brand: true, distiller: true },
+        },
         user: true,
       },
       skip: offset,

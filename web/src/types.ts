@@ -75,6 +75,7 @@ export type Checkin = {
   // 1-5, floating point to make half ratings possible
   rating: number;
   user: User;
+  createdAt: string;
 };
 
 // locations are where you're checking-in from (e.g. a bar, a distillery)

@@ -11,6 +11,7 @@ import FormField from "../components/formField";
 import FormLabel from "../components/formLabel";
 import HelpText from "../components/helpText";
 import TextArea from "../components/textArea";
+import Rating from "../components/rating";
 
 type LoaderData = {
   bottle: Bottle;
@@ -66,44 +67,12 @@ function CheckinTags({
   );
 }
 
-function CheckinFriends({ value, onChange }: any) {
-  const friends: User[] = [
-    {
-      id: "1",
-      displayName: "Gavin",
-    },
-    {
-      id: "2",
-      displayName: "Rahul",
-    },
-  ];
-
-  return (
-    <FormControl fullWidth>
-      <Typography variant="h6" gutterBottom>
-        Tag Friends
-      </Typography>
-      <Stack direction="row" spacing={1}>
-        {friends.map((f) => (
-          <Chip
-            key={f.id}
-            avatar={<Avatar>{f.displayName.substring(0, 1)}</Avatar>}
-            label={f.displayName}
-          />
-        ))}
-      </Stack>
-    </FormControl>
-  );
-}
-
 function CheckinRating({ ...props }) {
   return (
-    <FormControl fullWidth {...props}>
-      <Typography variant="h6" gutterBottom>
-        Rating
-      </Typography>
-      <Rating precision={0.5} max={5} size="large" {...props} />
-    </FormControl>
+    <FormField {...props}>
+      <FormLabel>Rating</FormLabel>
+      <Rating name="rating" {...props} />
+    </FormField>
   );
 }
 
@@ -159,7 +128,7 @@ export default function Checkin() {
       <Form onSubmit={onSubmit} className="sm:mx-auto sm:w-full sm:max-w-md">
         {error && <FormError values={[error]} />}
         <FormField>
-          <FormLabel htmlFor="stagtastingNotesedAge">Tasting Notes</FormLabel>
+          <FormLabel htmlFor="tastingNotes">Tasting Notes</FormLabel>
           <TextArea
             name="tastingNotes"
             id="tastingNotes"
@@ -167,8 +136,15 @@ export default function Checkin() {
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
             defaultValue={formData.tastingNotes}
+            placeholder="Is it peated?"
           />
         </FormField>
+        <CheckinRating
+          required
+          onChange={(value) => {
+            setFormData({ ...formData, rating: value });
+          }}
+        />
         {/*
           <Grid item xs={12}>
             <CheckinRating
