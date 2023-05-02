@@ -1,9 +1,5 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpDownIcon,
-} from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Fragment, useEffect, useState } from "react";
 import Button from "./button";
 import { toTitleCase } from "../lib/strings";

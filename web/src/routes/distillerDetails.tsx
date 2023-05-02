@@ -1,31 +1,31 @@
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 
-import type { Bottle, Brand } from "../types";
+import type { Bottle, Distiller } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
 import { formatCategoryName } from "../lib/strings";
 import { Link } from "react-router-dom";
 
 type LoaderData = {
-  brand: Brand;
+  distiller: Distiller;
   bottleList: Bottle[];
 };
 
 export const loader: LoaderFunction = async ({
-  params: { brandId },
+  params: { distillerId },
 }): Promise<LoaderData> => {
-  if (!brandId) throw new Error("Missing brandId");
-  const brand = await api.get(`/brands/${brandId}`);
+  if (!distillerId) throw new Error("Missing distillerId");
+  const distiller = await api.get(`/distillers/${distillerId}`);
   const bottleList = await api.get(`/bottles`, {
-    query: { brand: brand.id },
+    query: { distiller: distiller.id },
   });
 
-  return { brand, bottleList };
+  return { distiller, bottleList };
 };
 
-export default function BrandDetails() {
-  const { brand, bottleList } = useLoaderData() as LoaderData;
+export default function DistillerDetails() {
+  const { distiller, bottleList } = useLoaderData() as LoaderData;
 
   const stats = [
     { name: "Bottles", value: "1,234" },
@@ -37,11 +37,11 @@ export default function BrandDetails() {
       <div className="flex flex-col items-start justify-between gap-x-8 sm:flex-row sm:items-center">
         <div className="space-y-1 flex-1">
           <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">
-            {brand.name}
+            {distiller.name}
           </h1>
           <p className="text-xs font-light text-gray-500">
-            Located in {brand.country}
-            {brand.region && <span> &middot; {brand.region}</span>}
+            Located in {distiller.country}
+            {distiller.region && <span> &middot; {distiller.region}</span>}
           </p>
         </div>
       </div>

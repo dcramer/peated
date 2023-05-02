@@ -13,6 +13,9 @@ import BottleDetails, {
 import BrandDetails, {
   loader as brandDetailsLoader,
 } from "./routes/brandDetails";
+import DistillerDetails, {
+  loader as distillerDetailsLoader,
+} from "./routes/distillerDetails";
 
 export default [
   {
@@ -39,6 +42,11 @@ export default [
         path: "brands/:brandId",
         element: <BrandDetails />,
         loader: brandDetailsLoader,
+      },
+      {
+        path: "distillers/:distillerId",
+        element: <DistillerDetails />,
+        loader: distillerDetailsLoader,
       },
       {
         path: "search",
