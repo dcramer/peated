@@ -10,6 +10,9 @@ import AddBottle from "./routes/addBottle";
 import BottleDetails, {
   loader as bottleDetailsLoader,
 } from "./routes/bottleDetails";
+import BrandDetails, {
+  loader as brandDetailsLoader,
+} from "./routes/brandDetails";
 
 export default [
   {
@@ -31,6 +34,11 @@ export default [
         path: "bottles/:bottleId/checkin",
         element: <Checkin />,
         loader: checkinLoader,
+      },
+      {
+        path: "brands/:brandId",
+        element: <BrandDetails />,
+        loader: brandDetailsLoader,
       },
       {
         path: "search",

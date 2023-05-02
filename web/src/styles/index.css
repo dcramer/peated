@@ -1,4 +1,9 @@
 @import "@fontsource/raleway/index.css";
+@import "@fontsource/raleway/100.css";
+@import "@fontsource/raleway/300.css";
+@import "@fontsource/raleway/500.css";
+@import "@fontsource/raleway/700.css";
+@import "@fontsource/raleway/900.css";
 @import "rating.css";
 
 @tailwind base;

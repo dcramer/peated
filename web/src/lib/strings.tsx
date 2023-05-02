@@ -8,6 +8,9 @@ export function toTitleCase(value: string) {
   return words.join(" ");
 }
 
-export function formatCategoryName(value: Category | string) {
+export function formatCategoryName(
+  value: Category | string | undefined | null
+) {
+  if (!value) return "";
   return toTitleCase(`${value}`.replace("_", " "));
 }

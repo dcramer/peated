@@ -12,6 +12,8 @@ export const listBottles: RouteOptions<
     Querystring: {
       query?: string;
       page?: number;
+      brand?: number;
+      distiller?: number;
     };
   }
 > = {
@@ -23,6 +25,8 @@ export const listBottles: RouteOptions<
       properties: {
         query: { type: "string" },
         page: { type: "number" },
+        brand: { type: "number" },
+        distiller: { type: "number" },
       },
     },
   },
@@ -33,13 +37,20 @@ export const listBottles: RouteOptions<
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where: { [key: string]: any } = {};
+    const where: Prisma.BottleWhereInput = {};
     if (query) {
       where.name = {
         search: query.split(" ").join(" & "),
         mode: "insensitive",
       };
     }
+    if (req.query.brand) {
+      where.brandId = req.query.brand;
+    }
+    if (req.query.distiller) {
+      where.distillerId = req.query.distiller;
+    }
+
     where.OR = [{ public: true }];
     if (req.user) {
       where.OR.push({ createdById: req.user.id });
