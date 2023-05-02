@@ -8,12 +8,14 @@ export default function Layout({
   gutter,
   noHeader,
   noMobileHeader,
+  noMobileGutter,
 }: {
   children: any;
   header?: any;
   noHeader?: boolean;
   splash?: boolean;
   gutter?: boolean;
+  noMobileGutter?: boolean;
   noMobileHeader?: boolean;
   onSave?: any;
 }) {
@@ -32,10 +34,8 @@ export default function Layout({
             )}
           >
             <div className="fixed bg-peated left-0 right-0 z-10">
-              <div className="mx-auto max-w-4xl px-2 sm:px-6 lg:px-8">
-                <div className="flex min-w-full max-w-4xl h-10 sm:h-16 items-center justify-between overflow-hidden">
-                  {header || <AppHeader />}
-                </div>
+              <div className="mx-auto max-w-4xl px-2 sm:px-6 lg:px-8 flex min-w-full max-w-4xl items-center justify-between h-10 sm:h-16">
+                {header || <AppHeader />}
               </div>
             </div>
           </header>
@@ -43,7 +43,8 @@ export default function Layout({
         <main
           className={classNames(
             "mx-auto max-w-4xl m-h-screen relative",
-            gutter && "px-2 sm:px-6 lg:px-8 py-2 sm:py-6 lg:py-8"
+            gutter && "sm:px-6 lg:px-8 sm:py-6 lg:py-8",
+            gutter && !noMobileGutter && "px-2 py-2"
           )}
         >
           {children}

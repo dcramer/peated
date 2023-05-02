@@ -38,7 +38,7 @@ const EmptyActivity = ({ to }: { to: string }) => {
       </span>
 
       <span className="mt-2 block text-sm font-light text-gray-400 group-hover:text-peated">
-        Looks like no ones tried out this spirit. Could you be the first?
+        Looks like no ones recorded this spirit. You could be the first!
       </span>
     </Link>
   );

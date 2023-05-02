@@ -28,47 +28,6 @@ export const loader: LoaderFunction = async ({
   return { bottle };
 };
 
-function CheckinTags({
-  value,
-  onChange,
-}: {
-  value: string[];
-  onChange: (newValue: string[]) => void;
-}) {
-  const tags = ["Bold", "Peaty", "Oak"];
-
-  return (
-    <div>
-      <Typography variant="h6" gutterBottom>
-        Flavors
-      </Typography>
-
-      <Stack direction="row" spacing={1}>
-        {tags.map((t) => {
-          const selected = value.indexOf(t) !== -1;
-          return (
-            <Chip
-              key={t}
-              label={t}
-              icon={!selected ? <AddIcon /> : undefined}
-              onClick={() => {
-                if (selected) onChange(value.filter((v) => v !== t));
-                else onChange([t, ...value]);
-              }}
-              variant={!selected ? "outlined" : undefined}
-              onDelete={
-                selected
-                  ? () => onChange(value.filter((v) => v !== t))
-                  : undefined
-              }
-            />
-          );
-        })}
-      </Stack>
-    </div>
-  );
-}
-
 type FormData = {
   tastingNotes?: string;
   rating?: number;
@@ -81,7 +40,6 @@ export default function Checkin() {
 
   const [formData, setFormData] = useState<FormData>({});
 
-  const [tags, setTags] = useState<string[]>([]);
   const [error, setError] = useState<string | undefined>();
 
   const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
@@ -112,8 +70,9 @@ export default function Checkin() {
     <Layout
       header={<FormHeader title="Record Tasting" onSave={onSubmit} />}
       gutter
+      noMobileGutter
     >
-      <form className="mx-auto max-w-md" onSubmit={onSubmit}>
+      <form className="mx-auto max-w-xl" onSubmit={onSubmit}>
         <BottleCard bottle={bottle} />
         {error && <FormError values={[error]} />}
 
