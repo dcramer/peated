@@ -10,6 +10,7 @@ import ImageField from "../components/imageField";
 import { FormEvent, useState } from "react";
 import FormHeader from "../components/formHeader";
 import FormError from "../components/formError";
+import { useRequiredAuth } from "../hooks/useAuth";
 
 type LoaderData = {
   user: User;
@@ -31,6 +32,7 @@ type FormData = {
 
 export default function Settings() {
   const { user } = useLoaderData() as LoaderData;
+  const { updateUser } = useRequiredAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     displayName: user.displayName,
@@ -43,15 +45,22 @@ export default function Settings() {
 
     (async () => {
       try {
-        await api.put("/users/me", {
+        const newUser = await api.put("/users/me", {
           data: {
             displayName: formData.displayName,
           },
         });
-        await api.put("/users/me/avatar", {
-          data: {
-            picture: formData.picture,
-          },
+        const newAvatar =
+          formData.picture !== user.pictureUrl
+            ? await api.put("/users/me/avatar", {
+                data: {
+                  picture: formData.picture,
+                },
+              })
+            : {};
+        updateUser({
+          ...newUser,
+          ...newAvatar,
         });
         navigate(`/users/${user.id}`, {
           replace: true,

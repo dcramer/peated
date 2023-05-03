@@ -6,6 +6,7 @@ import api from "../lib/api";
 type Auth = {
   login: (user: User, accessToken: string) => void;
   logout: () => void;
+  updateUser: (user: User) => void;
   user: User | null;
 };
 
@@ -14,6 +15,9 @@ const AuthContext = createContext<Auth>({
     throw new Error("Missing AuthProvider");
   },
   logout: () => {
+    throw new Error("Missing AuthProvider");
+  },
+  updateUser: (user) => {
     throw new Error("Missing AuthProvider");
   },
   user: null,
@@ -36,6 +40,10 @@ export const AuthProvider = ({ children }: { children: any }) => {
     setAccessToken(accessToken);
   };
 
+  const updateUser = (user: User) => {
+    setUser(user);
+  };
+
   // call this function to sign out logged in user
   const logout = () => {
     api.setAccessToken(null);
@@ -47,6 +55,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
     user,
     login,
     logout,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -250,13 +250,15 @@ export const updateUserAvatar: RouteOptions<
       });
     }
 
-    await prisma.user.update({
+    const newUser = await prisma.user.update({
       where: {
         id: user.id,
       },
       data,
     });
 
-    res.send(serializeUser(user, req.user));
+    res.send({
+      pictureUrl: `${config.URL_PREFIX}${newUser.pictureUrl}`,
+    });
   },
 };
