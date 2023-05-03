@@ -37,7 +37,7 @@ export default function AppHeader() {
             <div>
               <Menu.Button className="flex max-w-xs items-center rounded-full bg-peated text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-peated">
                 <span className="sr-only">Open user menu</span>
-                <span className="inline-block h-6 w-6 sm:h-8 sm:w-8 overflow-hidden rounded-full bg-gray-100">
+                <span className="inline-block h-6 w-6 sm:h-8 sm:w-8 overflow-hidden rounded bg-gray-100">
                   <UserAvatar user={user} />
                 </span>
               </Menu.Button>

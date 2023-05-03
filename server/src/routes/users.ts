@@ -78,7 +78,7 @@ export const getUser: RouteOptions<
   ServerResponse,
   {
     Params: {
-      userId: number;
+      userId: number | "me";
     };
   }
 > = {
@@ -89,15 +89,17 @@ export const getUser: RouteOptions<
       type: "object",
       required: ["userId"],
       properties: {
-        userId: { type: "number" },
+        userId: { oneOf: [{ type: "number" }, { const: "me" }] },
       },
     },
   },
   preHandler: [validateRequest],
   handler: async (req, res) => {
+    const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
+
     const user = await prisma.user.findUnique({
       where: {
-        id: req.params.userId,
+        id: userId,
       },
     });
     if (!user) {

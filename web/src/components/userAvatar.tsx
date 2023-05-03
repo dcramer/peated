@@ -5,7 +5,7 @@ export default ({ user, size }: { user: User | null; size?: number }) => {
     return (
       <img
         src={user.imageUrl}
-        className="min-h-full min-w-full"
+        className="min-h-full min-w-full rounded"
         style={{
           width: size,
           height: size,
@@ -16,7 +16,7 @@ export default ({ user, size }: { user: User | null; size?: number }) => {
 
   return (
     <svg
-      className="min-h-full min-w-full text-gray-300"
+      className="min-h-full min-w-full text-gray-300 rounded"
       fill="currentColor"
       viewBox="0 0 24 24"
       style={{

@@ -82,7 +82,9 @@ export default function UserDetails() {
             </>
           ) : (
             <>
-              <Button color="primary">Edit Profile</Button>
+              <Button to="/settings" color="primary">
+                Edit Profile
+              </Button>
             </>
           )}
         </div>

@@ -1,16 +1,23 @@
 import { ReactNode } from "react";
 import classNames from "../lib/classNames";
+import { Link } from "react-router-dom";
 
 type ButtonColor = "primary" | "default" | undefined;
 
-type Props = React.ComponentPropsWithoutRef<"button"> & {
+type ButtonSize = "small" | "medium";
+
+type Props = Pick<React.ComponentProps<"button">, "onClick" | "onChange"> & {
   color?: ButtonColor;
   icon?: ReactNode;
+  to?: string;
+  size?: ButtonSize;
+  type?: "button" | "submit" | "reset";
+  children?: ReactNode;
 };
 
-export default ({ color, icon, children, ...props }: Props) => {
+export default ({ color, icon, children, type, to, size, ...props }: Props) => {
   const defaultClassName =
-    "inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
+    "inline-flex justify-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
 
   let colorClassName;
   switch (color) {
@@ -22,13 +29,33 @@ export default ({ color, icon, children, ...props }: Props) => {
       colorClassName = "bg-white border-peated text-peated hover:bg-gray-200";
   }
 
+  if (to) {
+    return (
+      <Link
+        className={classNames(
+          defaultClassName,
+          colorClassName,
+          icon ? "inline-flex items-center gap-x-1.5" : "",
+          size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm"
+        )}
+        to={to}
+        {...props}
+      >
+        {icon}
+        {children}
+      </Link>
+    );
+  }
+
   return (
     <button
       className={classNames(
         defaultClassName,
         colorClassName,
-        icon ? "inline-flex items-center gap-x-1.5" : ""
+        icon ? "inline-flex items-center gap-x-1.5" : "",
+        size === "small" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm"
       )}
+      type={type || "button"}
       {...props}
     >
       {icon}

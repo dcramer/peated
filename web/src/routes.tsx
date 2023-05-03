@@ -17,6 +17,7 @@ import DistillerDetails, {
   loader as distillerDetailsLoader,
 } from "./routes/distillerDetails";
 import UserDetails, { loader as userDetailsLoader } from "./routes/userDetails";
+import Settings, { loader as settingsLoader } from "./routes/settings";
 
 export default function createRoutes() {
   return [
@@ -53,6 +54,11 @@ export default function createRoutes() {
         {
           path: "search",
           element: <Search />,
+        },
+        {
+          path: "settings",
+          element: <Settings />,
+          loader: settingsLoader,
         },
         {
           path: "users/:userId",
