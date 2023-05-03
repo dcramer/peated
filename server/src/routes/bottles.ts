@@ -107,13 +107,20 @@ export const getBottle: RouteOptions<
     const totalCheckins = await prisma.checkin.count({
       where: { bottleId: bottle.id },
     });
+    const [{ count: totalPeople }] = await prisma.$queryRaw<
+      { count: number }[]
+    >`SELECT COUNT(DISTINCT "userId") FROM "checkin" WHERE "bottleId" = ${bottle.id}`;
     const [{ avg: avgRating }] = await prisma.$queryRaw<
       { avg: number }[]
     >`SELECT AVG("rating") FROM "checkin" WHERE "bottleId" = ${bottle.id}`;
 
     res.send({
       ...bottle,
-      stats: { checkins: totalCheckins, avgRating: avgRating },
+      stats: {
+        checkins: totalCheckins,
+        avgRating: avgRating,
+        people: totalPeople,
+      },
     });
   },
 };

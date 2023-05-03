@@ -13,6 +13,7 @@ type BottleWithStats = Bottle & {
   stats: {
     checkins: number;
     avgRating: number;
+    people: number;
   };
 };
 
@@ -55,8 +56,9 @@ export default function BottleDetails() {
   const { bottle, checkinList } = useLoaderData() as LoaderData;
 
   const stats = [
-    { name: "Checkins", value: bottle.stats.checkins.toLocaleString() },
     { name: "Avg Rating", value: Math.round(bottle.stats.avgRating, 2) },
+    { name: "Checkins", value: bottle.stats.checkins.toLocaleString() },
+    { name: "People", value: bottle.stats.people.toLocaleString() },
   ];
 
   return (
