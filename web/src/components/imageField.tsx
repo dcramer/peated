@@ -18,11 +18,15 @@ type Props = Omit<React.ComponentProps<typeof TextInput>, "value"> & {
 const fileToDataUrl = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
-      resolve(e.target?.result as string);
+    reader.onload = () => {
+      if (reader.result !== "data:") {
+        resolve(reader.result as string);
+      } else {
+        resolve("");
+      }
     };
-    reader.onerror = (e) => {
-      reject(e);
+    reader.onerror = () => {
+      reject(reader.error);
     };
     reader.readAsDataURL(file);
   });

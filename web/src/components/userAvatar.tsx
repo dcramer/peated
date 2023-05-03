@@ -6,7 +6,7 @@ export default ({ user, size }: { user: User | null; size?: number }) => {
       <img
         src={user.pictureUrl}
         crossOrigin="anonymous"
-        className="h-full w-full rounded"
+        className="h-full w-full rounded object-cover"
         style={{
           width: size,
           height: size,
