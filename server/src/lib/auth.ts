@@ -1,4 +1,3 @@
-// import { User } from "@prisma/client";
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
 import { User } from "@prisma/client";
@@ -20,7 +19,7 @@ export const createAccessToken = (user: User): Promise<string | undefined> => {
         displayName: user.displayName,
         email: user.email,
         imageUrl: user.imageUrl,
-      },
+      } as AccessToken,
       config.JWT_SECRET,
       {},
       (err, token) => {

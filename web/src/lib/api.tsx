@@ -89,6 +89,22 @@ class ApiClient {
   }
 }
 
-const defaultClient = new ApiClient({ server: API_SERVER });
+// TODO(dcramer): we duplicate our token storage method here due to complexity
+// in loaders and when they run
+const createDefaultClient = () => {
+  let accessToken: string | null = null;
+  try {
+    // Get from local storage by key
+    const item = window.localStorage.getItem("token");
+    // Parse stored json or if none return initialValue
+    accessToken = item ? JSON.parse(item) : null;
+  } catch (error) {
+    // If error also return initialValue
+    console.log(error);
+  }
+  return new ApiClient({ server: API_SERVER, accessToken });
+};
+
+const defaultClient = createDefaultClient();
 const api = defaultClient;
 export default api;

@@ -1,6 +1,5 @@
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import { Link } from "react-router-dom";
 
 import type { Checkin, User } from "../types";
 import api from "../lib/api";

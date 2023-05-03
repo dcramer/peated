@@ -5,11 +5,11 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
-import routes from "./routes";
+import createRoutes from "./routes";
 import config from "./config";
 import { AuthProvider } from "./hooks/useAuth";
 
-const router = createBrowserRouter(routes);
+const router = createBrowserRouter(createRoutes());
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

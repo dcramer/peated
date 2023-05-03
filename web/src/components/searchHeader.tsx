@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import TextInput from "./textInput";
 import { useState } from "react";
 
 export default function SearchHeader({
