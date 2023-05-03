@@ -43,11 +43,14 @@ export default async function buildFastify(options = {}) {
       this.log.error(error);
       // Send error response
       reply.status(500).send({
+        ok: false,
         stack: config.ENV !== "production" ? error.stack : undefined,
       });
     } else {
+      console.error(error);
       // fastify will use parent error handler to handle this
       reply.status(error.statusCode || 500).send({
+        ok: false,
         error: "Internal Server Error",
         stack: config.ENV !== "production" ? error.stack : undefined,
       });

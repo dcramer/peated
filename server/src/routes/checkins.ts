@@ -188,7 +188,10 @@ export const addCheckin: RouteOptions<
     const checkin = await prisma.checkin.create({
       data,
       include: {
-        bottle: true,
+        bottle: {
+          include: { brand: true },
+        },
+        user: true,
       },
     });
     res.status(201).send(serializeCheckin(checkin, req.user));

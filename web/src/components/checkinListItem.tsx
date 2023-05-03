@@ -6,13 +6,11 @@ import {
 import { Checkin } from "../types";
 import { StaticRating } from "./rating";
 import Button from "./button";
-import { formatCategoryName } from "../lib/strings";
 import { Link } from "react-router-dom";
-import BottleName from "./bottleName";
 import BottleCard from "./bottleCard";
 import UserAvatar from "./userAvatar";
 
-const TimeSince = ({ date }) => {
+const TimeSince = ({ date }: { date: string }) => {
   return (
     <time
       dateTime={date}

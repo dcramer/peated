@@ -5,7 +5,7 @@ import TextInput from "./textInput";
 import Button from "./button";
 import HelpText from "./helpText";
 
-type Props = React.ComponentProps<typeof TextInput> & {
+type Props = Omit<React.ComponentProps<typeof TextInput>, "value"> & {
   label?: string;
   helpText?: string;
   required?: boolean;

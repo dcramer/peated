@@ -70,7 +70,7 @@ export default function Settings() {
         });
       } catch (err) {
         if (err instanceof ApiError) {
-          setError(await err.errorMessage());
+          setError(err.message);
         } else {
           console.error(err);
           setError("Internal error");
