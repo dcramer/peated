@@ -57,7 +57,7 @@ export default function BottleDetails() {
 
   const stats = [
     { name: "Avg Rating", value: Math.round(bottle.stats.avgRating, 2) },
-    { name: "Checkins", value: bottle.stats.checkins.toLocaleString() },
+    { name: "Tastings", value: bottle.stats.checkins.toLocaleString() },
     { name: "People", value: bottle.stats.people.toLocaleString() },
   ];
 
