@@ -25,12 +25,11 @@ export default function ErrorPage() {
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Link
               to="/"
-              className="rounded-md bg-peated px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-peated-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated"
+              className="rounded bg-peated px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-peated-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated"
             >
               Go back home
             </Link>
             <a
-              type="button"
               className="text-sm font-semibold text-gray-900"
               href="https://github.com/dcramer/cask"
             >

@@ -17,7 +17,7 @@ export default ({ options, placeholder, onChange, ...props }: Props) => {
     options.find((o) => o.id === props.value)
   );
 
-  const baseStyles = "bg-white rounded-md border-0 text-gray-900 focus:ring-0";
+  const baseStyles = "bg-white rounded border-0 text-gray-900 focus:ring-0";
   const inputStyles =
     "text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm sm:leading-6";
   return (
@@ -44,14 +44,14 @@ export default ({ options, placeholder, onChange, ...props }: Props) => {
             />
           </div>
         </Listbox.Button>
-        <Listbox.Options className="absolute z-10 mt-1 max-h-60 min-w-full overflow-auto rounded-md bg-white p-1 text-base shadow-lg ring-1 ring-black ring-opacity-20 focus:outline-none sm:text-sm">
+        <Listbox.Options className="absolute z-10 mt-1 max-h-60 min-w-full overflow-auto rounded bg-white p-1 text-base shadow-lg ring-1 ring-black ring-opacity-20 focus:outline-none sm:text-sm">
           {options.map((item) => (
             <Listbox.Option
               key={item.id}
               value={item}
               className={({ active }) =>
                 classNames(
-                  "relative cursor-default select-none py-2 pl-3 pr-9 rounded-md text-sm",
+                  "relative cursor-default select-none py-2 pl-3 pr-9 rounded text-sm",
                   active ? "bg-gray-100 text-peated" : "text-gray-900"
                 )
               }

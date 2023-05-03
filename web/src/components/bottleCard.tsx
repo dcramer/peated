@@ -5,7 +5,7 @@ import BottleName from "./bottleName";
 
 export default ({ bottle }: { bottle: Bottle }) => {
   return (
-    <div className="flex items-center sm:mb-4 space-x-4 bg-gray-100 text-peated p-3 rounded-md">
+    <div className="flex items-center sm:mb-4 space-x-4 bg-gray-100 text-peated p-3 rounded">
       <div className="space-y-1 flex-1">
         <p className="font-semibold leading-6 text-peated">
           <Link to={`/bottles/${bottle.id}`} className="hover:underline">

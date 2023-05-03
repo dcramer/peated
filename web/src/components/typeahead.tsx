@@ -78,12 +78,12 @@ export default ({
       >
         <div className="relative">
           <Combobox.Input
-            className="min-w-full rounded-md border-0 bg-white p-0 pr-10 placeholder:text-gray-400 text-gray-900 focus:ring-0 text-sm sm:leading-6"
+            className="min-w-full rounded border-0 bg-white p-0 pr-10 placeholder:text-gray-400 text-gray-900 focus:ring-0 text-sm sm:leading-6"
             onChange={(event) => setQuery(event.target.value)}
             displayValue={(item) => item?.name}
             placeholder={placeholder}
           />
-          <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+          <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r px-2 focus:outline-none">
             <ChevronDownIcon
               className="h-4 w-4 text-gray-600"
               aria-hidden="true"
@@ -91,14 +91,14 @@ export default ({
           </Combobox.Button>
 
           {(results.length > 0 || query.length > 0) && (
-            <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white p-1 text-base shadow-lg ring-1 ring-black ring-opacity-20 focus:outline-none sm:text-sm">
+            <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded bg-white p-1 text-base shadow-lg ring-1 ring-black ring-opacity-20 focus:outline-none sm:text-sm">
               {results.map((item) => (
                 <Combobox.Option
                   key={item.id}
                   value={item}
                   className={({ active }) =>
                     classNames(
-                      "relative cursor-default select-none py-2 pl-3 pr-9 rounded-md text-sm",
+                      "relative cursor-default select-none py-2 pl-3 pr-9 rounded text-sm",
                       active ? "bg-gray-100 text-peated" : "text-gray-900"
                     )
                   }
@@ -133,7 +133,7 @@ export default ({
                   value={{ id: null, name: toTitleCase(query) }}
                   className={({ active }) =>
                     classNames(
-                      "relative cursor-default select-none py-2 pl-3 pr-9 rounded-md text-sm",
+                      "relative cursor-default select-none py-2 pl-3 pr-9 rounded text-sm",
                       active ? "bg-gray-100 text-peated" : "text-gray-900"
                     )
                   }

@@ -37,9 +37,9 @@ export default ({
   const { bottle } = checkin;
 
   return (
-    <li className="overflow-hidden bg-white shadow sm:rounded-md p-3">
+    <li className="overflow-hidden bg-white shadow sm:rounded p-3">
       <div className="flex items-center mb-4 space-x-4">
-        <span className="h-10 w-10 overflow-hidden rounded-full bg-gray-100">
+        <span className="h-10 w-10 overflow-hidden rounded bg-gray-100">
           <svg
             className="min-h-full min-w-full text-gray-300"
             fill="currentColor"
