@@ -1,3 +1,5 @@
+import classNames from "../lib/classNames";
+
 export default ({
   suffixLabel,
   noGutter,
@@ -15,7 +17,11 @@ export default ({
     return (
       <div className={`flex ${baseStyles}`}>
         <input
-          className={`block p-0 flex-1 border-0 bg-transparent ${inputStyles} ${className}`}
+          className={classNames(
+            "block flex-1 p-0 border-0 bg-transparent",
+            inputStyles,
+            className || ""
+          )}
           {...props}
         />
         <span className="flex select-none items-center text-gray-500 sm:text-sm">
@@ -27,7 +33,12 @@ export default ({
 
   return (
     <input
-      className={`block min-w-full ${baseStyles} ${inputStyles} ${className}`}
+      className={classNames(
+        "block min-w-full",
+        baseStyles,
+        inputStyles,
+        className || ""
+      )}
       {...props}
     />
   );

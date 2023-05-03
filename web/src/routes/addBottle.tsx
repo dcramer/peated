@@ -108,7 +108,6 @@ export default function AddBottle() {
             type="text"
             label="Series"
             name="series"
-            helpText="If applicable, the series of bottling."
             placeholder="e.g. The Edition"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -133,7 +132,7 @@ export default function AddBottle() {
             label="Distiller"
             name="distiller"
             placeholder="e.g. Distiller"
-            helpText="If applicable, the single distillery which produces this bottle."
+            helpText="The single distillery which produces this bottle."
             onChange={(value: Distiller) =>
               setFormData({ ...formData, distiller: value })
             }
@@ -141,32 +140,37 @@ export default function AddBottle() {
             value={formData.distiller}
           />
 
-          <TextField
-            type="number"
-            label="ABV"
-            name="abv"
-            placeholder="e.g. 45"
-            helpText="The alcohol content by volume."
-            required
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            value={formData.abv}
-            suffixLabel="%"
-          />
-
-          <TextField
-            type="number"
-            label="Stated Age"
-            name="statedAge"
-            placeholder="e.g. 12"
-            helpText="If applicable, the number of years the spirit was aged."
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            value={formData.statedAge}
-            suffixLabel="years"
-          />
+          <div className="flex">
+            <div className="w-1/2 border-r">
+              <TextField
+                type="number"
+                label="ABV"
+                name="abv"
+                placeholder="e.g. 45"
+                helpText="The alcohol content by volume."
+                required
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                value={formData.abv}
+                suffixLabel="%"
+              />
+            </div>
+            <div className="w-1/2">
+              <TextField
+                type="number"
+                label="Stated Age"
+                name="statedAge"
+                placeholder="e.g. 12"
+                helpText="The number of years the spirit was aged."
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                value={formData.statedAge}
+                suffixLabel="years"
+              />
+            </div>
+          </div>
 
           <SelectField
             label="Category"
