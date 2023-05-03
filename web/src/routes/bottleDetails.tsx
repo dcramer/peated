@@ -65,7 +65,7 @@ export default function BottleDetails() {
     <Layout gutter>
       <FloatingCheckinButton to={`/bottles/${bottle.id}/checkin`} />
 
-      <div className="flex flex-row items-start justify-between gap-x-8">
+      <div className="flex flex-row items-start justify-between gap-x-8 px-4">
         <div className="space-y-1 flex-1">
           <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">
             {bottle.name}
@@ -102,7 +102,7 @@ export default function BottleDetails() {
 
       <div className="mt-8 grid gap-3 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
-          <div key={stat.name}>
+          <div key={stat.name} className="px-4">
             <p className="text-base leading-7 text-gray-400">{stat.name}</p>
             <p className="order-first text-3xl font-semibold tracking-tight text-peated sm:text-5xl">
               {stat.value}
@@ -110,11 +110,8 @@ export default function BottleDetails() {
           </div>
         ))}
       </div>
-      <h2 className="text-lg font-semibold leading-6 mt-12 mb-6 text-gray-900">
-        Activity
-      </h2>
       {checkinList.length ? (
-        <ul role="list" className="space-y-3 m-4">
+        <ul role="list" className="space-y-3 mt-8">
           {checkinList.map((checkin) => (
             <CheckinListItem key={checkin.id} checkin={checkin} noBottle />
           ))}
