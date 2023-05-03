@@ -53,10 +53,10 @@ export default function UserDetails() {
   return (
     <Layout gutter>
       <div className="flex flex-wrap mb-8">
-        <div className="w-full sm:w-3/12 pr-4">
+        <div className="w-full sm:w-3/12 flex justify-center">
           <UserAvatar user={user} size={150} />
         </div>
-        <div className="w-full sm:w-6/12 flex flex-col justify-center pr-4">
+        <div className="w-full sm:w-6/12 flex flex-col justify-center px-4">
           <h3 className="text-4xl font-semibold leading-normal mb-2 text-peated self-center sm:self-start">
             {user.displayName}
           </h3>

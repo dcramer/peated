@@ -23,6 +23,7 @@ export const StaticRating = ({ value, size, className }: Props) => {
       {[5, 4, 3, 2, 1].map((item) => {
         return [
           <div
+            key={item}
             className={classNames(
               "text-gray-200",
               "rating-half-2",
@@ -32,6 +33,7 @@ export const StaticRating = ({ value, size, className }: Props) => {
             <StarIcon className="h-full" />
           </div>,
           <div
+            key={item - 0.5}
             className={classNames(
               "text-gray-200",
               "rating-half-1",

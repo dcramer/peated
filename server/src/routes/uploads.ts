@@ -1,9 +1,10 @@
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
-import os from "os";
-import fs from "fs/promises";
+import fs, { open } from "fs/promises";
 
-import path from "path";
+import config from "../config";
+import { format } from "path";
+import { contentType } from "mime-types";
 
 const MAX_AGE = 60 * 60 ** 24;
 
@@ -51,14 +52,17 @@ export const getUpload: RouteOptions<
       const url = `https://storage.googleapis.com/${bucketName}/${bucketPath}${fileParam}`;
       res.redirect(url);
     } else {
-      const filepath = path.format({
-        dir: os.tmpdir(),
+      const filepath = format({
+        dir: config.UPLOAD_PATH,
         base: filename,
       });
-      const fd = await fs.open(filepath, "r");
+      const fd = await open(filepath, "r");
+
       stream = fd.createReadStream();
       res.header("Cache-Control", `max-age=${MAX_AGE}, s-maxage=${MAX_AGE}`);
-      res.send(stream);
+      res.header("Content-Type", contentType(filename));
+
+      await res.send(stream);
     }
   },
 };

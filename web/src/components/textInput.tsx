@@ -11,7 +11,7 @@ export default ({
 }) => {
   const baseStyles = "bg-white p-0 border-0 text-gray-900 text-sm sm:leading-6";
   const inputStyles =
-    "text-gray-900 placeholder:text-gray-400 outline-none text-sm sm:leading-6";
+    "text-gray-900 placeholder:text-gray-400 outline-none focus:ring-0 text-sm sm:leading-6";
   if (suffixLabel) {
     return (
       <div className={`flex ${baseStyles}`}>

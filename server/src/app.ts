@@ -12,11 +12,7 @@ const envToLogger: {
   development: {
     level: "info",
     transport: {
-      target: "pino-pretty",
-      options: {
-        translateTime: "HH:MM:ss Z",
-        ignore: "pid,hostname,reqId",
-      },
+      target: "@fastify/one-line-logger",
     },
   },
   production: {
@@ -25,11 +21,7 @@ const envToLogger: {
   test: {
     level: "error",
     transport: {
-      target: "pino-pretty",
-      options: {
-        translateTime: "HH:MM:ss Z",
-        ignore: "pid,hostname,reqId",
-      },
+      target: "@fastify/one-line-logger",
     },
   },
 };

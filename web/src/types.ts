@@ -60,7 +60,7 @@ export type User = {
   admin: boolean;
   displayName: string;
   email: string;
-  imageUrl?: string;
+  pictureUrl?: string;
 };
 
 export type Checkin = {

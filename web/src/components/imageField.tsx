@@ -23,6 +23,7 @@ export default ({
   buttonLabel,
   className,
   value,
+  onChange,
   ...props
 }: Props) => {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -105,6 +106,7 @@ export default ({
           onChange={(e) => {
             e.preventDefault();
             updatePreview();
+            if (onChange) onChange(e);
           }}
         />
         <div>

@@ -5,7 +5,8 @@ import { authBasic, authGoogle } from "./auth";
 import { addCheckin, getCheckin, listCheckins } from "./checkins";
 import { addBrand, getBrand, listBrands } from "./brands";
 import { addDistiller, getDistiller, listDistillers } from "./distillers";
-import { getUser, listUsers } from "./users";
+import { getUser, listUsers, updateUser, updateUserAvatar } from "./users";
+import { getUpload } from "./uploads";
 
 export const router: FastifyPluginCallback = (
   fastify: FastifyInstance,
@@ -48,6 +49,10 @@ export const router: FastifyPluginCallback = (
 
   fastify.route(listUsers);
   fastify.route(getUser);
+  fastify.route(updateUser);
+  fastify.route(updateUserAvatar);
+
+  fastify.route(getUpload);
 
   next();
 };

@@ -3,7 +3,10 @@ const API_SERVER: string =
 
 type ApiRequestOptions = {
   method: "GET" | "POST" | "DELETE" | "PUT";
-  data?: any;
+  data?: { [name: string]: any } | undefined;
+  files?: {
+    [name: string]: Blob;
+  };
   query?: any;
 };
 
@@ -42,14 +45,29 @@ class ApiClient {
 
   async request(path: string, options: ApiRequestOptions) {
     const headers: { [name: string]: string } = {};
-    if (options.data) headers["Content-Type"] = "application/json";
-    if (this.accessToken)
+    if (this.accessToken) {
       headers["Authorization"] = `Bearer ${this.accessToken}`;
+    }
+
+    const isMultipart = !!Object.keys(options.data || {}).find(
+      (k) => options.data![k] instanceof Blob
+    );
+
+    let body: FormData | string | undefined;
+    if (isMultipart) {
+      body = new FormData();
+      for (let key in options.data) {
+        body.append(key, options.data[key]);
+      }
+    } else if (options.data) {
+      body = options.data ? JSON.stringify(options.data) : undefined;
+      headers["Content-Type"] = "application/json";
+    }
 
     const resp = await fetch(
       `${this.server}${path}?${new URLSearchParams(options.query || {})}`,
       {
-        body: options.data ? JSON.stringify(options.data) : undefined,
+        body,
         headers,
         ...options,
       }

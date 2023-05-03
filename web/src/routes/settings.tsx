@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async (): Promise<LoaderData> => {
 
 type FormData = {
   displayName?: string;
-  image?: string;
+  picture?: string;
 };
 
 export default function Settings() {
@@ -34,7 +34,7 @@ export default function Settings() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     displayName: user.displayName,
-    image: user.imageUrl,
+    picture: user.pictureUrl,
   });
   const [error, setError] = useState<string | undefined>();
 
@@ -43,7 +43,16 @@ export default function Settings() {
 
     (async () => {
       try {
-        await api.post("/users/me", { data: formData });
+        await api.put("/users/me", {
+          data: {
+            displayName: formData.displayName,
+          },
+        });
+        await api.put("/users/me/avatar", {
+          data: {
+            picture: formData.picture,
+          },
+        });
         navigate(`/users/${user.id}`, {
           replace: true,
         });
@@ -78,10 +87,17 @@ export default function Settings() {
             }
           />
           <ImageField
-            name="image"
+            name="picture"
             label="Picture"
-            value={formData.image}
-            onChange={(value) => setFormData({ ...formData, image: value })}
+            value={formData.picture}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                [e.target.name]: e.target.files?.length
+                  ? e.target.files[0]
+                  : undefined,
+              })
+            }
           />
         </Fieldset>
       </form>

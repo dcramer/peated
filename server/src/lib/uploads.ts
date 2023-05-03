@@ -1,12 +1,12 @@
-import fs from "node:fs";
+import { createWriteStream } from "node:fs";
 import { promisify } from "node:util";
 import { pipeline } from "node:stream";
-import cuid from "cuid";
 import { Storage } from "@google-cloud/storage";
 import { extname } from "node:path";
 import type { MultipartFile } from "@fastify/multipart";
 
 import config from "../config";
+import { createId } from "@paralleldrive/cuid2";
 
 const pump = promisify(pipeline);
 
@@ -18,8 +18,8 @@ export const storeFile = async ({
   data: MultipartFile;
   namespace: string;
   urlPrefix: string;
-}): Promise<string> => {
-  const newFilename = `${namespace}-${cuid()}${extname(data.filename)}`;
+}) => {
+  const newFilename = `${namespace}-${createId()}${extname(data.filename)}`;
 
   if (process.env.USE_GCS_STORAGE) {
     const bucketName = process.env.GCS_BUCKET_NAME as string;
@@ -34,14 +34,15 @@ export const storeFile = async ({
     const writeStream = file.createWriteStream();
 
     await pump(data.file, writeStream);
-
-    return `${urlPrefix}/${newFilename}`;
   } else {
     const uploadPath = `${config.UPLOAD_PATH}/${newFilename}`;
-    const writeStream = fs.createWriteStream(uploadPath);
+    const writeStream = createWriteStream(uploadPath);
 
-    await pump(data.file, writeStream);
+    data.file.pipe(writeStream);
+    // await pump(data.file, writeStream);
+
+    console.info(`File written to ${uploadPath}`);
   }
 
-  return "";
+  return `${urlPrefix}/${newFilename}`;
 };

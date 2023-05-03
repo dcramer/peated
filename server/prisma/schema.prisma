@@ -13,7 +13,7 @@ model User {
     email        String  @unique
     passwordHash String?
     displayName  String?
-    imageUrl     String?
+    pictureUrl   String?
 
     active Boolean @default(true)
     admin  Boolean @default(false)

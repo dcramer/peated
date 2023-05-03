@@ -7,7 +7,7 @@ interface AccessToken {
   admin: boolean;
   displayName: string | null;
   email: string;
-  imageUrl: string;
+  pictureUrl: string;
 }
 
 export const createAccessToken = (user: User): Promise<string | undefined> => {
@@ -18,7 +18,7 @@ export const createAccessToken = (user: User): Promise<string | undefined> => {
         admin: user.admin,
         displayName: user.displayName,
         email: user.email,
-        imageUrl: user.imageUrl,
+        pictureUrl: user.pictureUrl,
       } as AccessToken,
       config.JWT_SECRET,
       {},
