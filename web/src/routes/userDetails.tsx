@@ -52,11 +52,11 @@ export default function UserDetails() {
 
   return (
     <Layout gutter>
-      <div className="flex flex-wrap mb-8">
-        <div className="w-full sm:w-3/12 flex justify-center">
+      <div className="min-w-full flex flex-wrap sm:flex-nowrap mb-8">
+        <div className="w-full sm:w-auto flex justify-center sm:justify-start">
           <UserAvatar user={user} size={150} />
         </div>
-        <div className="w-full sm:w-6/12 flex flex-col justify-center px-4">
+        <div className="w-full sm:w-auto sm:flex-1 flex flex-col justify-center px-4">
           <h3 className="text-4xl font-semibold leading-normal mb-2 text-peated self-center sm:self-start">
             {user.displayName}
           </h3>
@@ -75,7 +75,7 @@ export default function UserDetails() {
             </div>
           </div>
         </div>
-        <div className="w-full sm:w-3/12 flex flex-col justify-center items-center sm:items-end">
+        <div className="w-full sm:w-auto flex flex-col justify-center items-center sm:items-end">
           {user.id !== currentUser.id ? (
             <>
               <Button color="primary">Add Friend</Button>
