@@ -16,6 +16,7 @@ import BrandDetails, {
 import DistillerDetails, {
   loader as distillerDetailsLoader,
 } from "./routes/distillerDetails";
+import UserDetails, { loader as userDetailsLoader } from "./routes/userDetails";
 
 export default [
   {
@@ -51,6 +52,11 @@ export default [
       {
         path: "search",
         element: <Search />,
+      },
+      {
+        path: "users/:userId",
+        element: <UserDetails />,
+        loader: userDetailsLoader,
       },
     ],
   },

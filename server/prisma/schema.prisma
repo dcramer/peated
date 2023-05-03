@@ -22,9 +22,9 @@ model User {
 
     checkins   Checkin[]
     identities Identity[]
-    Brand      Brand[]
-    Distiller  Distiller[]
-    Bottle     Bottle[]
+    brands     Brand[]
+    distillers Distiller[]
+    bottles    Bottle[]
 }
 
 enum IdentityProvider {

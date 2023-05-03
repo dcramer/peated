@@ -38,7 +38,7 @@ export default function SearchHeader({
           (onSubmit || onChange)(value);
         }}
       >
-        <TextInput
+        <input
           name={name}
           defaultValue={value}
           placeholder="Search for a bottle"
@@ -46,8 +46,7 @@ export default function SearchHeader({
             setValue(e.target.value);
             onChange(e.target.value);
           }}
-          noGutter
-          className="min-w-full px-2 sm:px-3 py-1 sm:py-3 bg-peated-darker text-white"
+          className="rounded-md focus:outline focus:outline-peated-light min-w-full px-2 sm:px-3 py-1 sm:py-3 bg-peated-darker text-white"
         />
       </form>
     </nav>

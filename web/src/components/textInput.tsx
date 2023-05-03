@@ -15,7 +15,7 @@ export default ({
     return (
       <div className={`flex ${baseStyles}`}>
         <input
-          className={`block p-0 flex-1 border-0 bg-transparent ${inputStyles}`}
+          className={`block p-0 flex-1 border-0 bg-transparent ${inputStyles} ${className}`}
           {...props}
         />
         <span className="flex select-none items-center text-gray-500 sm:text-sm">

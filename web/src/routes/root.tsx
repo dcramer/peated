@@ -11,7 +11,7 @@ export default function Root() {
     if (!auth.user) {
       navigate("/login");
     }
-  });
+  }, [auth]);
 
   if (!auth.user) return null;
 

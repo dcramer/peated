@@ -101,10 +101,10 @@ export default function Search() {
           );
         })}
         {query && query.length >= 3 && (
-          <li className="relative py-5 hover:bg-gray-100">
+          <li className="relative group py-5 hover:bg-gray-100">
             <div className="mx-auto flex max-w-7xl justify-between gap-x-6 px-4 sm:px-6 lg:px-8">
               <div className="flex gap-x-4">
-                <PlusIcon className="h-12 w-12 flex-none rounded-full bg-gray-100" />
+                <PlusIcon className="h-12 w-12 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
 
                 <div className="min-w-0 flex-auto">
                   <p className="text-sm font-semibold leading-6 text-gray-900">
