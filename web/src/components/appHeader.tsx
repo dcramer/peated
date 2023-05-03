@@ -41,7 +41,7 @@ export default function AppHeader() {
         <input
           name={"q"}
           placeholder="Search for a bottle"
-          className="rounded focus:outline focus:outline-peated-light text-xs sm:text-base min-w-full px-2 sm:px-3 py-1 sm:py-3 bg-peated-darker text-white"
+          className="rounded focus:outline focus:outline-peated-light text-xs sm:text-base min-w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-peated-darker text-white"
         />
       </form>
       {user && (
@@ -51,7 +51,7 @@ export default function AppHeader() {
               <div>
                 <Menu.Button className="flex max-w-xs items-center rounded bg-peated text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-peated">
                   <span className="sr-only">Open user menu</span>
-                  <span className="inline-block h-6 w-6 sm:h-8 sm:w-8 overflow-hidden rounded bg-gray-100">
+                  <span className="inline-block h-6 w-6 sm:h-10 sm:w-10 overflow-hidden rounded bg-gray-100">
                     <UserAvatar user={user} />
                   </span>
                 </Menu.Button>
