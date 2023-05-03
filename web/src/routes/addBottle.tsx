@@ -177,9 +177,7 @@ export default function AddBottle() {
             name="category"
             placeholder="e.g. Single Malt"
             helpText="The kind of spirit."
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
+            onChange={(value) => setFormData({ ...formData, category: value })}
             value={formData.category}
             options={[
               { id: "", value: <em>Unknown</em> },

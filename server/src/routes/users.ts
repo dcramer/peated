@@ -106,7 +106,6 @@ export const getUser: RouteOptions<
     const totalCheckins = await prisma.checkin.count({
       where: { userId: user.id },
     });
-
     const [{ count: totalBottles }] = await prisma.$queryRaw<
       { count: number }[]
     >`SELECT COUNT(DISTINCT "bottleId") FROM "checkin" WHERE "userId" = ${user.id}`;

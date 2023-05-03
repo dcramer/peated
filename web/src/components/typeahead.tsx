@@ -78,7 +78,7 @@ export default ({
       >
         <div className="relative">
           <Combobox.Input
-            className="min-w-full rounded-md border-0 bg-white p-0 pr-10 text-gray-900 focus:ring-0 text-sm sm:leading-6"
+            className="min-w-full rounded-md border-0 bg-white p-0 pr-10 placeholder:text-gray-400 text-gray-900 focus:ring-0 text-sm sm:leading-6"
             onChange={(event) => setQuery(event.target.value)}
             displayValue={(item) => item?.name}
             placeholder={placeholder}

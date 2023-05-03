@@ -9,8 +9,15 @@ import CheckinListItem from "../components/checkinListItem";
 import { formatCategoryName } from "../lib/strings";
 import FloatingCheckinButton from "../components/floatingCheckinButton";
 
+type BottleWithStats = Bottle & {
+  stats: {
+    checkins: number;
+    avgRating: number;
+  };
+};
+
 type LoaderData = {
-  bottle: Bottle;
+  bottle: BottleWithStats;
   checkinList: Checkin[];
 };
 
@@ -48,8 +55,8 @@ export default function BottleDetails() {
   const { bottle, checkinList } = useLoaderData() as LoaderData;
 
   const stats = [
-    { name: "Checkins", value: "1,234" },
-    { name: "Rating", value: 4.5 },
+    { name: "Checkins", value: bottle.stats.checkins.toLocaleString() },
+    { name: "Avg Rating", value: Math.round(bottle.stats.avgRating, 2) },
   ];
 
   return (

@@ -1,6 +1,6 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
-import { Bottle, Bottler, Brand, Prisma, Distiller } from "@prisma/client";
+import { Bottle, Brand, Prisma, Distiller } from "@prisma/client";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
 
@@ -102,10 +102,19 @@ export const getBottle: RouteOptions<
       },
     });
     if (!bottle) {
-      res.status(404).send({ error: "Not found" });
-    } else {
-      res.send(bottle);
+      return res.status(404).send({ error: "Not found" });
     }
+    const totalCheckins = await prisma.checkin.count({
+      where: { bottleId: bottle.id },
+    });
+    const [{ avg: avgRating }] = await prisma.$queryRaw<
+      { avg: number }[]
+    >`SELECT AVG("rating") FROM "checkin" WHERE "bottleId" = ${bottle.id}`;
+
+    res.send({
+      ...bottle,
+      stats: { checkins: totalCheckins, avgRating: avgRating },
+    });
   },
 };
 
@@ -199,13 +208,13 @@ export const addBottle: RouteOptions<
     }: any) => d)(body);
 
     if (body.brand) {
-      let brand: Brand | null;
+      let brand: Brand | null = null;
 
       if (typeof body.brand === "number") {
         brand = await prisma.brand.findUnique({
           where: { id: body.brand },
         });
-      } else if (body.brand satisfies Partial<Bottler>) {
+      } else if (body.brand satisfies Partial<Brand>) {
         brand = await prisma.brand.upsert({
           where: {
             name: body.brand.name,
@@ -230,13 +239,13 @@ export const addBottle: RouteOptions<
     }
 
     if (body.distiller) {
-      let distiller: Distiller | null;
+      let distiller: Distiller | null = null;
 
       if (typeof body.distiller === "number") {
         distiller = await prisma.distiller.findUnique({
           where: { id: body.distiller },
         });
-      } else if (body.distiller satisfies Partial<Bottler>) {
+      } else if (body.distiller satisfies Partial<Brand>) {
         distiller = await prisma.distiller.upsert({
           where: {
             name: body.distiller.name,

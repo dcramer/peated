@@ -9,11 +9,13 @@ type Props = React.ComponentPropsWithoutRef<typeof Listbox> & {
   options: Option[];
   placeholder?: string;
   required?: boolean;
-  value: Option;
+  value?: string | undefined;
 };
 
-export default ({ options, placeholder, ...props }: Props) => {
-  const [value, setValue] = useState<Option | undefined>(props.value);
+export default ({ options, placeholder, onChange, ...props }: Props) => {
+  const [value, setValue] = useState<Option | undefined>(
+    options.find((o) => o.id === props.value)
+  );
 
   const baseStyles = "bg-white rounded-md border-0 text-gray-900 focus:ring-0";
   const inputStyles =
@@ -22,6 +24,7 @@ export default ({ options, placeholder, ...props }: Props) => {
     <Listbox
       onChange={(value: Option) => {
         setValue(value);
+        if (onChange) onChange(value.id);
       }}
     >
       <div className="relative">
