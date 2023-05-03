@@ -21,7 +21,7 @@ export default ({
 }: Props) => {
   return (
     <div
-      className={`relative px-3 pb-1.5 pt-2.5 focus-within:z-10 focus-within:ring-indigo-600 ${className}`}
+      className={`relative px-3 pb-1.5 pt-2.5 bg-white focus-within:z-10 focus-within:ring-indigo-600 ${className}`}
     >
       {label && (
         <FormLabel htmlFor={htmlFor} required={required}>

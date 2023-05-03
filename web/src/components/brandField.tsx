@@ -4,7 +4,7 @@ import FormField from "./formField";
 import BrandSelect from "./brandSelect";
 
 type Props = {
-  label: string;
+  label?: string;
   helpText?: string;
   required?: boolean;
   children?: ReactNode;

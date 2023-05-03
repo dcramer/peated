@@ -4,7 +4,7 @@ import FormField from "./formField";
 import Rating from "./rating";
 
 type Props = {
-  label: string;
+  label?: string;
   helpText?: string;
   required?: boolean;
   children?: ReactNode;

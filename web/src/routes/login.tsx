@@ -1,13 +1,12 @@
 import { FormEvent, useState } from "react";
-import { Form, LoaderFunction, useNavigate } from "react-router-dom";
+import { LoaderFunction, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import api from "../lib/api";
 import useAuth from "../hooks/useAuth";
 import Layout from "../components/layout";
 
 import PeatedLogo from "../assets/logo.svg";
-import TextInput from "../components/textInput";
-import FormField from "../components/formField";
+import TextField from "../components/textField";
 
 type LoaderData = {};
 
@@ -39,7 +38,7 @@ const BasicLogin = () => {
 
   return (
     <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-      <Form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit}>
         <div className="relative mt-4 mb-2">
           <div
             className="absolute inset-0 flex items-center"
@@ -51,32 +50,28 @@ const BasicLogin = () => {
             <span className="bg-peated px-2 text-sm text-white">Or</span>
           </div>
         </div>
-        <FormField>
-          <TextInput
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            placeholder="you@example.com"
-            onChange={(e) =>
-              setData({ ...data, [e.target.name]: e.target.value })
-            }
-          />
-        </FormField>
-        <FormField>
-          <TextInput
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            placeholder="password"
-            onChange={(e) =>
-              setData({ ...data, [e.target.name]: e.target.value })
-            }
-          />
-        </FormField>
+        <TextField
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          placeholder="you@example.com"
+          onChange={(e) =>
+            setData({ ...data, [e.target.name]: e.target.value })
+          }
+          className="mb-2 rounded"
+        />
+        <TextField
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          placeholder="password"
+          onChange={(e) =>
+            setData({ ...data, [e.target.name]: e.target.value })
+          }
+          className="mb-2 rounded"
+        />
         <div>
           <button
             type="submit"
@@ -85,7 +80,7 @@ const BasicLogin = () => {
             Sign in
           </button>
         </div>{" "}
-      </Form>
+      </form>
     </div>
   );
 };
