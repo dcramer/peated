@@ -25,6 +25,8 @@ model User {
     brands     Brand[]
     distillers Distiller[]
     bottles    Bottle[]
+
+    @@map("user")
 }
 
 enum IdentityProvider {
@@ -41,6 +43,7 @@ model Identity {
     user   User @relation(fields: [userId], references: [id])
 
     @@unique([provider, externalId])
+    @@map("identity")
 }
 
 enum Category {
@@ -70,6 +73,8 @@ model Brand {
     createdBy   User?    @relation(fields: [createdById], references: [id])
 
     bottles Bottle[]
+
+    @@map("brand")
 }
 
 model Distiller {
@@ -86,6 +91,8 @@ model Distiller {
     createdBy   User?    @relation(fields: [createdById], references: [id])
 
     bottles Bottle[]
+
+    @@map("distiller")
 }
 
 // DisplayName is: [Name] [Series]
@@ -116,6 +123,7 @@ model Bottle {
     checkins Checkin[]
 
     @@unique([name, brandId, series])
+    @@map("bottle")
 }
 
 model Checkin {
@@ -133,10 +141,13 @@ model Checkin {
     user         User     @relation(fields: [userId], references: [id])
 
     createdAt DateTime @default(now())
+
+    @@map("checkin")
 }
 
 // locations are where you're checking-in from (e.g. a bar, a distillery)
 // model Location {
 //     id   Int    @id @default(autoincrement())
 //     name String
+// @@map("location")
 // }

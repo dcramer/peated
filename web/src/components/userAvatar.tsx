@@ -1,8 +1,17 @@
 import { User } from "../types";
 
-export default ({ user }: { user: User | null }) => {
+export default ({ user, size }: { user: User | null; size?: number }) => {
   if (user && user.imageUrl) {
-    return <img src={user.imageUrl} className="min-h-full min-w-full" />;
+    return (
+      <img
+        src={user.imageUrl}
+        className="min-h-full min-w-full"
+        style={{
+          width: size,
+          height: size,
+        }}
+      />
+    );
   }
 
   return (
@@ -10,6 +19,10 @@ export default ({ user }: { user: User | null }) => {
       className="min-h-full min-w-full text-gray-300"
       fill="currentColor"
       viewBox="0 0 24 24"
+      style={{
+        width: size,
+        height: size,
+      }}
     >
       <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
     </svg>

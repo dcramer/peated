@@ -1,10 +1,8 @@
 import { Fragment } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Menu, Transition } from "@headlessui/react";
 
 import useAuth from "../hooks/useAuth";
-import classNames from "../lib/classNames";
 import PeatedLogo from "../assets/logo.svg";
 import PeatedGlyph from "../assets/glyph.svg";
 import UserAvatar from "./userAvatar";
@@ -53,10 +51,18 @@ export default function AppHeader() {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Item>
+                  <Link
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full"
+                    to={`/users/${user.id}`}
+                  >
+                    Profile
+                  </Link>
+                </Menu.Item>
                 <Menu.Item>
                   <button
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full text-left"
                     onClick={() => {
                       logout();
                       navigate("/");

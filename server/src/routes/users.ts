@@ -101,9 +101,18 @@ export const getUser: RouteOptions<
       },
     });
     if (!user) {
-      res.status(404).send({ error: "Not found" });
-    } else {
-      res.send(serializeUser(user, req.user));
+      return res.status(404).send({ error: "Not found" });
     }
+    const totalCheckins = await prisma.checkin.count({
+      where: { userId: user.id },
+    });
+
+    const [{ count: totalBottles }] = await prisma.$queryRaw<
+      { count: number }[]
+    >`SELECT COUNT(DISTINCT "bottleId") FROM "checkin" WHERE "userId" = ${user.id}`;
+
+    const item = serializeUser(user, req.user);
+    item.stats = { checkins: totalCheckins, bottles: totalBottles };
+    res.send(item);
   },
 };
