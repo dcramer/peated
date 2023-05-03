@@ -40,7 +40,7 @@ export const listBottles: RouteOptions<
     const where: Prisma.BottleWhereInput = {};
     if (query) {
       where.name = {
-        search: query.split(" ").join(" & "),
+        contains: query,
         mode: "insensitive",
       };
     }
@@ -60,11 +60,18 @@ export const listBottles: RouteOptions<
       include: {
         brand: true,
         distiller: true,
+        _count: {
+          select: { checkins: true },
+        },
       },
       where,
       skip: offset,
       take: limit,
-      orderBy: { name: "asc" },
+      orderBy: {
+        checkins: {
+          _count: "desc",
+        },
+      },
     });
     res.send(results);
   },

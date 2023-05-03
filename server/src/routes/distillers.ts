@@ -36,7 +36,7 @@ export const listDistillers: RouteOptions<
     const where: { [key: string]: any } = {};
     if (query) {
       where.name = {
-        search: query.split(" ").join(" & "),
+        containers: query,
         mode: "insensitive",
       };
     }
@@ -49,7 +49,11 @@ export const listDistillers: RouteOptions<
       where,
       skip: offset,
       take: limit,
-      orderBy: { name: "asc" },
+      orderBy: {
+        bottles: {
+          _count: "desc",
+        },
+      },
     });
     res.send(results);
   },

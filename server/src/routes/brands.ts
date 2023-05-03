@@ -36,7 +36,7 @@ export const listBrands: RouteOptions<
     const where: { [key: string]: any } = {};
     if (query) {
       where.name = {
-        search: query.split(" ").join(" & "),
+        contains: query,
         mode: "insensitive",
       };
     }
@@ -50,7 +50,12 @@ export const listBrands: RouteOptions<
       where,
       skip: offset,
       take: limit,
-      orderBy: { name: "asc" },
+      // TODO(dcramer): we want to sort by checkins
+      orderBy: {
+        bottles: {
+          _count: "desc",
+        },
+      },
     });
     res.send(results);
   },
