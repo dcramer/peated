@@ -52,11 +52,11 @@ export default function UserDetails() {
 
   return (
     <Layout gutter>
-      <div className="flex flex-wrap sm:gap-x-4 mb-8">
-        <div className="w-full sm:w-3/12">
+      <div className="flex flex-wrap mb-8">
+        <div className="w-full sm:w-3/12 pr-4">
           <UserAvatar user={user} size={150} />
         </div>
-        <div className="w-full flex-1 flex flex-col justify-center">
+        <div className="w-full sm:w-6/12 flex flex-col justify-center pr-4">
           <h3 className="text-4xl font-semibold leading-normal mb-2 text-peated self-center sm:self-start">
             {user.displayName}
           </h3>
@@ -67,7 +67,7 @@ export default function UserDetails() {
               </span>
               <span className="text-sm text-gray-400">Tastings</span>
             </div>
-            <div className="pl-3 text-center">
+            <div className="pl-3 text-center mb-4">
               <span className="text-xl font-bold block uppercase tracking-wide text-peated">
                 {user.stats.bottles.toLocaleString()}
               </span>
@@ -75,14 +75,16 @@ export default function UserDetails() {
             </div>
           </div>
         </div>
-        <div className="w-full flex flex-col justify-center items-end">
-          <div>
-            {user.id !== currentUser.id && (
-              <>
-                <Button color="primary">Add Friend</Button>
-              </>
-            )}
-          </div>
+        <div className="w-full sm:w-3/12 flex flex-col justify-center items-center sm:items-end">
+          {user.id !== currentUser.id ? (
+            <>
+              <Button color="primary">Add Friend</Button>
+            </>
+          ) : (
+            <>
+              <Button color="primary">Edit Profile</Button>
+            </>
+          )}
         </div>
       </div>
 
