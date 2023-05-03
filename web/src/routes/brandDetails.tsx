@@ -45,7 +45,7 @@ export default function BrandDetails() {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8">
         {stats.map((stat) => (
           <div key={stat.name}>
             <p className="text-base leading-7 text-gray-400">{stat.name}</p>
@@ -56,12 +56,10 @@ export default function BrandDetails() {
         ))}
       </div>
 
-      <h2 className="text-lg font-semibold leading-6 my-6 mt-16 text-gray-900">
-        Bottles
-      </h2>
       <BottleTable
         bottleList={bottleList}
         groupBy={(bottle) => bottle.distiller}
+        groupTo={(group) => `/distillers/${group.id}`}
       />
     </Layout>
   );

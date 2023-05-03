@@ -1,20 +1,18 @@
 import { Link } from "react-router-dom";
 
-import { Bottle } from "../types";
+import { Bottle, Brand, Distiller } from "../types";
 import { formatCategoryName } from "../lib/strings";
 
-type Grouper = null | {
-  id: string;
-  name: string;
-  [key: string]: any;
-};
+type Grouper = undefined | null | Brand | Distiller;
 
 export default ({
   bottleList,
   groupBy,
+  groupTo,
 }: {
   bottleList: Bottle[];
   groupBy?: (bottle: Bottle) => Grouper;
+  groupTo?: (group: Grouper) => string;
 }) => {
   let lastGroup: Grouper;
   return (
@@ -59,7 +57,11 @@ export default ({
                   scope="colgroup"
                   className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
                 >
-                  {group.name}
+                  {groupTo ? (
+                    <Link to={groupTo(group)}>{group.name}</Link>
+                  ) : (
+                    group.name
+                  )}
                 </th>
               </tr>
             ) : null,

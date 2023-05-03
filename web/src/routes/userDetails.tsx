@@ -52,44 +52,42 @@ export default function UserDetails() {
 
   return (
     <Layout gutter>
-      <div className="mb-8">
-        <div className="flex flex-wrap sm:gap-x-4">
-          <div className="w-full sm:w-3/12 px-4">
-            <UserAvatar user={user} size={150} />
-          </div>
-          <div className="w-full flex-1 px-4 flex flex-col justify-center">
-            <h3 className="text-4xl font-semibold leading-normal mb-2 text-peated self-center sm:self-start">
-              {user.displayName}
-            </h3>
-            <div className="flex justify-center sm:justify-start">
-              <div className="mr-4 pr-3 text-center">
-                <span className="text-xl font-bold block uppercase tracking-wide text-peated">
-                  {user.stats.checkins.toLocaleString()}
-                </span>
-                <span className="text-sm text-gray-400">Tastings</span>
-              </div>
-              <div className="pl-3 text-center">
-                <span className="text-xl font-bold block uppercase tracking-wide text-peated">
-                  {user.stats.bottles.toLocaleString()}
-                </span>
-                <span className="text-sm text-gray-400">Bottles</span>
-              </div>
+      <div className="flex flex-wrap sm:gap-x-4 mb-8">
+        <div className="w-full sm:w-3/12">
+          <UserAvatar user={user} size={150} />
+        </div>
+        <div className="w-full flex-1 flex flex-col justify-center">
+          <h3 className="text-4xl font-semibold leading-normal mb-2 text-peated self-center sm:self-start">
+            {user.displayName}
+          </h3>
+          <div className="flex justify-center sm:justify-start">
+            <div className="mr-4 pr-3 text-center">
+              <span className="text-xl font-bold block uppercase tracking-wide text-peated">
+                {user.stats.checkins.toLocaleString()}
+              </span>
+              <span className="text-sm text-gray-400">Tastings</span>
+            </div>
+            <div className="pl-3 text-center">
+              <span className="text-xl font-bold block uppercase tracking-wide text-peated">
+                {user.stats.bottles.toLocaleString()}
+              </span>
+              <span className="text-sm text-gray-400">Bottles</span>
             </div>
           </div>
-          <div className="w-full px-4 flex flex-col justify-center items-end">
-            <div>
-              {user.id !== currentUser.id && (
-                <>
-                  <Button color="primary">Add Friend</Button>
-                </>
-              )}
-            </div>
+        </div>
+        <div className="w-full flex flex-col justify-center items-end">
+          <div>
+            {user.id !== currentUser.id && (
+              <>
+                <Button color="primary">Add Friend</Button>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       {checkinList.length ? (
-        <ul role="list" className="space-y-3 m-4">
+        <ul role="list" className="space-y-3">
           {checkinList.map((checkin) => (
             <CheckinListItem key={checkin.id} checkin={checkin} />
           ))}
