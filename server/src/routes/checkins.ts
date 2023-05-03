@@ -4,6 +4,22 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { Checkin, Prisma } from "@prisma/client";
 import { validateRequest } from "../middleware/auth";
 import { storeFile } from "../lib/uploads";
+import config from "../config";
+
+const serializeCheckin = (checkin: Prisma.CheckinSelect, currentUser: User) => {
+  const data: { [key: string]: any } = {
+    id: checkin.id,
+    imageUrl: checkin.imageUrl
+      ? `${config.URL_PREFIX}${checkin.imageUrl}`
+      : null,
+    bottle: checkin.bottle,
+    user: checkin.user,
+    tastingNotes: checkin.tastingNotes,
+    rating: checkin.rating,
+    createdAt: checkin.createdAt,
+  };
+  return data;
+};
 
 export const listCheckins: RouteOptions<
   Server,
@@ -50,7 +66,7 @@ export const listCheckins: RouteOptions<
       take: limit,
       orderBy: { createdAt: "desc" },
     });
-    res.send(results);
+    res.send(results.map((c) => serializeCheckin(c, req.user)));
   },
 };
 
@@ -87,7 +103,7 @@ export const getCheckin: RouteOptions<
     if (!checkin) {
       res.status(404).send({ error: "Not found" });
     } else {
-      res.send(checkin);
+      res.send(serializeCheckin(checkin, req.user));
     }
   },
 };
@@ -158,6 +174,85 @@ export const addCheckin: RouteOptions<
         bottle: true,
       },
     });
-    res.status(201).send(checkin);
+    res.status(201).send(serializeCheckin(checkin, req.user));
+  },
+};
+
+export const updateCheckinImage: RouteOptions<
+  Server,
+  IncomingMessage,
+  ServerResponse,
+  {
+    Params: {
+      checkinId: number;
+    };
+    Body: {
+      image?: File;
+    };
+  }
+> = {
+  method: "POST",
+  url: "/checkins/:checkinId/image",
+  schema: {
+    params: {
+      type: "object",
+      required: ["checkinId"],
+      properties: {
+        checkinId: { type: "number" },
+      },
+    },
+  },
+  preHandler: [validateRequest],
+  handler: async (req, res) => {
+    const checkin = await prisma.checkin.findUnique({
+      where: {
+        id: req.params.checkinId,
+      },
+    });
+    if (!checkin) {
+      return res.status(404).send({ error: "Not found" });
+    }
+
+    if (checkin.userId !== req.user.id && !req.user.admin) {
+      return res.status(403).send({ error: "Forbidden" });
+    }
+
+    if (!req.isMultipart()) {
+      return res.status(400).send({ error: "Bad request" });
+    }
+
+    const fileData = await req.file();
+    if (!fileData) {
+      return res.status(400).send({ error: "Bad request" });
+    }
+
+    const data: Prisma.CheckinUncheckedUpdateInput = {};
+    data.imageUrl = await storeFile({
+      data: fileData,
+      namespace: `checkins`,
+      urlPrefix: "/uploads",
+    });
+
+    if (fileData.file.truncated) {
+      // TODO: delete the file
+      return res.status(413).send({
+        code: "FST_FILES_LIMIT",
+        error: "Payload Too Large",
+        message: "reach files limit",
+      });
+    }
+
+    const newCheckin = await prisma.checkin.update({
+      where: {
+        id: checkin.id,
+      },
+      data,
+    });
+
+    res.send({
+      imageUrl: newCheckin.imageUrl
+        ? `${config.URL_PREFIX}${newCheckin.imageUrl}`
+        : null,
+    });
   },
 };

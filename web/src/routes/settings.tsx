@@ -36,8 +36,11 @@ export default function Settings() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     displayName: user.displayName,
-    picture: user.pictureUrl,
   });
+  const [picture, setPicture] = useState<File | string | undefined>(
+    user.pictureUrl
+  );
+
   const [error, setError] = useState<string | undefined>();
 
   const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
@@ -51,10 +54,10 @@ export default function Settings() {
           },
         });
         const newAvatar =
-          formData.picture !== user.pictureUrl
-            ? await api.put("/users/me/avatar", {
+          picture !== user.pictureUrl
+            ? await api.post("/users/me/avatar", {
                 data: {
-                  picture: formData.picture,
+                  picture,
                 },
               })
             : {};
@@ -100,12 +103,7 @@ export default function Settings() {
             label="Picture"
             value={formData.picture}
             onChange={(e) =>
-              setFormData({
-                ...formData,
-                [e.target.name]: e.target.files?.length
-                  ? e.target.files[0]
-                  : undefined,
-              })
+              setPicture(e.target.files?.length ? e.target.files[0] : undefined)
             }
           />
         </Fieldset>

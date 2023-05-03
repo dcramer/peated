@@ -7,13 +7,11 @@ import api, { ApiError } from "../lib/api";
 import Layout from "../components/layout";
 import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
-import FormField from "../components/formField";
-import FormLabel from "../components/formLabel";
-import Rating from "../components/rating";
 import BottleCard from "../components/bottleCard";
 import TextAreaField from "../components/textAreaField";
 import RatingField from "../components/ratingField";
 import Fieldset from "../components/fieldset";
+import ImageField from "../components/imageField";
 
 type LoaderData = {
   bottle: Bottle;
@@ -38,6 +36,7 @@ export default function Checkin() {
 
   const navigate = useNavigate();
 
+  const [image, setImage] = useState<string | File | undefined>();
   const [formData, setFormData] = useState<FormData>({});
 
   const [error, setError] = useState<string | undefined>();
@@ -61,6 +60,14 @@ export default function Checkin() {
           console.error(err);
           setError("Internal error");
         }
+      }
+      // TODO(dcramer): graceful failure here
+      if (image) {
+        await api.post(`/checkins/${checkin.id}/image`, {
+          data: {
+            image,
+          },
+        });
       }
       if (checkin) navigate("/");
     })();
@@ -93,6 +100,15 @@ export default function Checkin() {
             }
             defaultValue={formData.tastingNotes}
             placeholder="Is it peated?"
+          />
+
+          <ImageField
+            name="image"
+            label="Picture"
+            value={image}
+            onChange={(e) =>
+              setImage(e.target.files?.length ? e.target.files[0] : undefined)
+            }
           />
         </Fieldset>
       </form>

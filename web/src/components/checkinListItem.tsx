@@ -57,11 +57,31 @@ export default ({
         <StaticRating value={checkin.rating} size="small" />
       </div>
       {!noBottle && <BottleCard bottle={bottle} />}
-      {checkin.tastingNotes && (
-        <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
-          {checkin.tastingNotes}
-        </p>
+      {checkin.imageUrl ? (
+        <div className="sm:flex">
+          <div className="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4">
+            <img
+              src={checkin.imageUrl}
+              crossOrigin="anonymous"
+              className="max-w-32 max-h-32"
+            />
+          </div>
+          <div>
+            {checkin.tastingNotes && (
+              <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
+                {checkin.tastingNotes}
+              </p>
+            )}
+          </div>
+        </div>
+      ) : (
+        checkin.tastingNotes && (
+          <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
+            {checkin.tastingNotes}
+          </p>
+        )
       )}
+
       <aside>
         <div className="flex items-center mt-3 space-x-3">
           <Button

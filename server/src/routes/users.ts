@@ -10,11 +10,14 @@ const serializeUser = (user: User, currentUser: User) => {
   const data: { [key: string]: any } = {
     id: user.id,
     displayName: user.displayName,
-    pictureUrl: `${config.URL_PREFIX}${user.pictureUrl}`,
+    pictureUrl: user.pictureUrl
+      ? `${config.URL_PREFIX}${user.pictureUrl}`
+      : null,
   };
   if (currentUser.admin || currentUser.id === user.id) {
     data.email = user.email;
     data.createdAt = user.email;
+    data.admin = user.admin;
   }
   return data;
 };
@@ -192,12 +195,12 @@ export const updateUserAvatar: RouteOptions<
     Params: {
       userId: number | "me";
     };
-    Body: Partial<Pick<User, "displayName">> & {
+    Body: {
       picture?: File;
     };
   }
 > = {
-  method: "PUT",
+  method: "POST",
   url: "/users/:userId/avatar",
   schema: {
     params: {
@@ -221,7 +224,7 @@ export const updateUserAvatar: RouteOptions<
       return res.status(404).send({ error: "Not found" });
     }
 
-    if (user.id !== req.user.id || !user.admin) {
+    if (user.id !== req.user.id && !req.user.admin) {
       return res.status(403).send({ error: "Forbidden" });
     }
 
@@ -237,7 +240,7 @@ export const updateUserAvatar: RouteOptions<
     const data: Prisma.UserUncheckedUpdateInput = {};
     data.pictureUrl = await storeFile({
       data: fileData,
-      namespace: `${user.id}`,
+      namespace: `avatars`,
       urlPrefix: "/uploads",
     });
 
@@ -258,7 +261,9 @@ export const updateUserAvatar: RouteOptions<
     });
 
     res.send({
-      pictureUrl: `${config.URL_PREFIX}${newUser.pictureUrl}`,
+      pictureUrl: newUser.pictureUrl
+        ? `${config.URL_PREFIX}${newUser.pictureUrl}`
+        : null,
     });
   },
 };

@@ -38,6 +38,7 @@ export default function SearchHeader({
         }}
       >
         <input
+          autoFocus
           name={name}
           defaultValue={value}
           placeholder="Search for a bottle"

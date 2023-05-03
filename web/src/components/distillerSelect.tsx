@@ -24,6 +24,7 @@ export default ({ ...props }) => {
                 type="text"
                 placeholder="e.g. Macallan"
                 required
+                autoComplete="off"
                 defaultValue={data.name}
                 onChange={(e) =>
                   onFieldChange({ [e.target.name]: e.target.value })
@@ -38,6 +39,7 @@ export default ({ ...props }) => {
                 type="text"
                 placeholder="e.g. Scotland"
                 required
+                autoComplete="off"
                 defaultValue={data.country}
                 onChange={(e) =>
                   onFieldChange({ [e.target.name]: e.target.value })
@@ -50,6 +52,7 @@ export default ({ ...props }) => {
                 name="region"
                 type="text"
                 placeholder="e.g. Islay"
+                autoComplete="off"
                 defaultValue={data.region}
                 onChange={(e) =>
                   onFieldChange({ [e.target.name]: e.target.value })

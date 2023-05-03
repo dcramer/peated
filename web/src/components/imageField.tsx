@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 import FormField from "./formField";
 import TextInput from "./textInput";
@@ -12,7 +12,20 @@ type Props = React.ComponentProps<typeof TextInput> & {
   children?: ReactNode;
   buttonLabel?: string;
   className?: string;
-  value?: string;
+  value?: string | File | undefined;
+};
+
+const fileToDataUrl = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      resolve(e.target?.result as string);
+    };
+    reader.onerror = (e) => {
+      reject(e);
+    };
+    reader.readAsDataURL(file);
+  });
 };
 
 export default ({
@@ -29,18 +42,27 @@ export default ({
   const fileRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isHover, setHover] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | null>(value || null);
+  const [imageSrc, setImageSrc] = useState<string | null>();
+
+  useEffect(() => {
+    (async () => {
+      if (value instanceof File) {
+        setImageSrc(await fileToDataUrl(value));
+      } else {
+        setImageSrc(value || "");
+      }
+    })();
+  }, [value]);
 
   const updatePreview = () => {
-    const file = Array.from(fileRef.current!.files).find(() => true);
+    const file = Array.from(fileRef.current!.files || []).find(() => true);
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImageSrc(e.target.result);
-      };
-      reader.readAsDataURL(file);
+      (async () => {
+        setImageSrc(await fileToDataUrl(file));
+      })();
     } else {
       imageRef.current!.src = "";
+      setImageSrc("");
     }
   };
 
