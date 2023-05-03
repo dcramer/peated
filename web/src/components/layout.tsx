@@ -34,7 +34,7 @@ export default function Layout({
             )}
           >
             <div className="fixed bg-peated left-0 right-0 z-10">
-              <div className="mx-auto max-w-4xl px-2 sm:px-6 lg:px-8 flex min-w-full max-w-4xl items-center justify-between h-10 sm:h-16">
+              <div className="mx-auto max-w-4xl px-2 sm:px-6 lg:px-8 flex w-full max-w-4xl items-center justify-between h-10 sm:h-16">
                 {header || <AppHeader />}
               </div>
             </div>
