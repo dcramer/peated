@@ -31,9 +31,22 @@ export default function AppHeader() {
   return (
     <>
       <HeaderLogo />
+      <form
+        className={`ml-4 md:ml-9 lg:ml-12 flex-1`}
+        onSubmit={(e) => {
+          e.preventDefault();
+          navigate(`/search`);
+        }}
+      >
+        <input
+          name={"q"}
+          placeholder="Search for a bottle"
+          className="rounded focus:outline focus:outline-peated-light text-xs sm:text-base min-w-full px-2 sm:px-3 py-1 sm:py-3 bg-peated-darker text-white"
+        />
+      </form>
       {user && (
         <div>
-          <div className="ml-4 flex items-center md:ml-6">
+          <div className="ml-4 flex items-center md:ml-9 lg:ml-12">
             <Menu as="div" className="relative ml-3">
               <div>
                 <Menu.Button className="flex max-w-xs items-center rounded bg-peated text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-peated">

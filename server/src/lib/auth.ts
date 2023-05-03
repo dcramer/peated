@@ -18,7 +18,7 @@ export const createAccessToken = (user: User): Promise<string | undefined> => {
         admin: user.admin,
         displayName: user.displayName,
         email: user.email,
-        pictureUrl: user.pictureUrl,
+        pictureUrl: `${config.URL_PREFIX}${user.pictureUrl}`,
       } as AccessToken,
       config.JWT_SECRET,
       {},

@@ -46,7 +46,7 @@ export default function SearchHeader({
             setValue(e.target.value);
             onChange(e.target.value);
           }}
-          className="rounded focus:outline focus:outline-peated-light min-w-full px-2 sm:px-3 py-1 sm:py-3 bg-peated-darker text-white"
+          className="rounded focus:outline focus:outline-peated-light text-xs sm:text-base min-w-full px-2 sm:px-3 py-1 sm:py-3 bg-peated-darker text-white"
         />
       </form>
     </nav>

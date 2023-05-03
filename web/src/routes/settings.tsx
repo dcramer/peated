@@ -101,7 +101,7 @@ export default function Settings() {
           <ImageField
             name="picture"
             label="Picture"
-            value={formData.picture}
+            value={picture}
             onChange={(e) =>
               setPicture(e.target.files?.length ? e.target.files[0] : undefined)
             }
