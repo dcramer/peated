@@ -12,15 +12,15 @@ type ApiRequestOptions = {
 
 export class ApiError extends Error {
   response: Response;
+  data: any;
+  remoteStack: string | undefined;
 
-  constructor(message: string, response: Response) {
-    super(message);
+  constructor(message: string, response: Response, data: any) {
+    super(data.error || message);
     this.name = this.constructor.name;
     this.response = response;
-  }
-
-  async errorMessage() {
-    return (await this.response.json()).message;
+    this.data = data;
+    this.remoteStack = data.stack;
   }
 }
 
@@ -73,7 +73,7 @@ class ApiClient {
       }
     );
     if (!resp?.ok) {
-      throw new ApiError("Request failed", resp);
+      throw new ApiError("Request failed", resp, await resp.json());
     }
     return await resp.json();
   }

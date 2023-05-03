@@ -1,19 +1,36 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
 import { IncomingMessage, Server, ServerResponse } from "http";
-import { Checkin, Prisma } from "@prisma/client";
+import {
+  Bottle,
+  Brand,
+  Checkin,
+  Distiller,
+  Prisma,
+  User,
+} from "@prisma/client";
 import { validateRequest } from "../middleware/auth";
 import { storeFile } from "../lib/uploads";
 import config from "../config";
+import { serializeUser } from "./users";
 
-const serializeCheckin = (checkin: Prisma.CheckinSelect, currentUser: User) => {
+export const serializeCheckin = (
+  checkin: Checkin & {
+    user: User;
+    bottle: Bottle & {
+      brand: Brand;
+      distiller?: Distiller | null;
+    };
+  },
+  currentUser?: User
+) => {
   const data: { [key: string]: any } = {
     id: checkin.id,
     imageUrl: checkin.imageUrl
       ? `${config.URL_PREFIX}${checkin.imageUrl}`
       : null,
     bottle: checkin.bottle,
-    user: checkin.user,
+    user: serializeUser(checkin.user, currentUser),
     tastingNotes: checkin.tastingNotes,
     rating: checkin.rating,
     createdAt: checkin.createdAt,

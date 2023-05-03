@@ -17,8 +17,15 @@ export default function ErrorPage() {
           <p className="mt-6 text-base leading-7 text-gray-600">
             The error we hit was "<i>{error.statusText || error.message}</i>".
           </p>
+          {error.remoteStack && (
+            <div className="prose mx-auto mt-4">
+              <h3>Remote Stack</h3>
+              <pre className="text-left">{error.remoteStack}</pre>
+            </div>
+          )}
           {error.stack && (
             <div className="prose mx-auto mt-4">
+              <h3>Local Stack</h3>
               <pre className="text-left">{error.stack}</pre>
             </div>
           )}

@@ -6,7 +6,7 @@ import { validateRequest } from "../middleware/auth";
 import { storeFile } from "../lib/uploads";
 import config from "../config";
 
-const serializeUser = (user: User, currentUser: User) => {
+export const serializeUser = (user: User, currentUser?: User) => {
   const data: { [key: string]: any } = {
     id: user.id,
     displayName: user.displayName,
@@ -14,7 +14,7 @@ const serializeUser = (user: User, currentUser: User) => {
       ? `${config.URL_PREFIX}${user.pictureUrl}`
       : null,
   };
-  if (currentUser.admin || currentUser.id === user.id) {
+  if (currentUser && (currentUser.admin || currentUser.id === user.id)) {
     data.email = user.email;
     data.createdAt = user.email;
     data.admin = user.admin;

@@ -10,6 +10,7 @@ import { formatCategoryName } from "../lib/strings";
 import { Link } from "react-router-dom";
 import BottleName from "./bottleName";
 import BottleCard from "./bottleCard";
+import UserAvatar from "./userAvatar";
 
 const TimeSince = ({ date }) => {
   return (
@@ -39,14 +40,8 @@ export default ({
   return (
     <li className="overflow-hidden bg-white shadow sm:rounded p-3">
       <div className="flex items-center mb-4 space-x-4">
-        <span className="h-10 w-10 overflow-hidden rounded bg-gray-100">
-          <svg
-            className="min-h-full min-w-full text-gray-300"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
+        <span className="overflow-hidden w-48-px h-48-px rounded bg-gray-100">
+          <UserAvatar size={48} user={checkin.user} />
         </span>
         <div className="space-y-1 font-medium text-peated flex-1">
           <Link to={`/users/${checkin.user.id}`} className="hover:underline">
