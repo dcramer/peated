@@ -48,7 +48,7 @@ export const listBottles: RouteOptions<
       where.brandId = req.query.brand;
     }
     if (req.query.distiller) {
-      where.distillerId = req.query.distiller;
+      where.distillers = { id: req.query.distiller };
     }
 
     where.OR = [{ public: true }];
@@ -59,7 +59,7 @@ export const listBottles: RouteOptions<
     const results = await prisma.bottle.findMany({
       include: {
         brand: true,
-        distiller: true,
+        distillers: true,
         _count: {
           select: { checkins: true },
         },
@@ -102,7 +102,7 @@ export const getBottle: RouteOptions<
     const bottle = await prisma.bottle.findUnique({
       include: {
         brand: true,
-        distiller: true,
+        distillers: true,
       },
       where: {
         id: req.params.bottleId,
@@ -139,7 +139,10 @@ export const addBottle: RouteOptions<
   {
     Body: Bottle & {
       brand: number | { name: string; country: string; region?: string };
-      distiller: number | { name: string; country: string; region?: string };
+      distillers: (
+        | number
+        | { name: string; country: string; region?: string }
+      )[];
     };
   }
 > = {
@@ -171,25 +174,28 @@ export const addBottle: RouteOptions<
             },
           ],
         },
-        distiller: {
-          oneOf: [
-            { type: "number" },
-            {
-              type: "object",
-              required: ["name", "country"],
-              properties: {
-                name: {
-                  type: "string",
-                },
-                country: {
-                  type: "string",
-                },
-                region: {
-                  type: "string",
+        distillers: {
+          type: "array",
+          items: {
+            oneOf: [
+              { type: "number" },
+              {
+                type: "object",
+                required: ["name", "country"],
+                properties: {
+                  name: {
+                    type: "string",
+                  },
+                  country: {
+                    type: "string",
+                  },
+                  region: {
+                    type: "string",
+                  },
                 },
               },
-            },
-          ],
+            ],
+          },
         },
         series: { type: "string" },
         category: {
@@ -217,7 +223,7 @@ export const addBottle: RouteOptions<
     // gross syntax, whats better?
     const data: Prisma.BottleUncheckedCreateInput = (({
       brand,
-      distiller,
+      distillers,
       ...d
     }: any) => d)(body);
 
@@ -252,35 +258,29 @@ export const addBottle: RouteOptions<
       }
     }
 
-    if (body.distiller) {
-      let distiller: Distiller | null = null;
-
-      if (typeof body.distiller === "number") {
-        distiller = await prisma.distiller.findUnique({
-          where: { id: body.distiller },
-        });
-      } else if (body.distiller satisfies Partial<Brand>) {
-        distiller = await prisma.distiller.upsert({
-          where: {
-            name: body.distiller.name,
-          },
-          update: {},
-          create: {
-            name: body.distiller.name,
-            country: body.distiller.country,
-            region: body.distiller.region,
-            public: req.user.admin,
-            createdById: req.user.id,
-          },
-        });
-      }
-
-      if (!distiller) {
-        res.status(400).send({ error: "Invalid distiller" });
-        return;
-      } else {
-        data.distillerId = distiller.id;
-      }
+    if (body.distillers) {
+      data.distillers = {
+        connect: [],
+        connectOrCreate: [],
+      };
+      body.distillers.forEach(async (d) => {
+        if (typeof d === "number") {
+          data.distillers.connect.push({ id: d });
+        } else if (d satisfies Partial<Distiller>) {
+          data.distillers.connectOrCreate.push({
+            where: {
+              name: d.name,
+            },
+            create: {
+              name: d.name,
+              country: d.country,
+              region: d.region,
+              public: req.user.admin,
+              createdById: req.user.id,
+            },
+          });
+        }
+      });
     }
 
     data.createdById = req.user.id;
@@ -290,6 +290,7 @@ export const addBottle: RouteOptions<
       data,
       include: {
         brand: true,
+        distillers: true,
       },
     });
     res.status(201).send(bottle);

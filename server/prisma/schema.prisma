@@ -107,9 +107,6 @@ model Bottle {
     brand   Brand   @relation(fields: [brandId], references: [id])
     series  String?
 
-    distillerId Int?
-    distiller   Distiller? @relation(fields: [distillerId], references: [id])
-
     category  Category?
     abv       Float?
     statedAge Int?
@@ -120,7 +117,8 @@ model Bottle {
     createdById Int?
     createdBy   User?    @relation(fields: [createdById], references: [id])
 
-    checkins Checkin[]
+    distillers Distiller[]
+    checkins   Checkin[]
 
     @@unique([name, brandId, series])
     @@map("bottle")

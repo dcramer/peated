@@ -36,7 +36,7 @@ export const listDistillers: RouteOptions<
     const where: { [key: string]: any } = {};
     if (query) {
       where.name = {
-        containers: query,
+        contains: query,
         mode: "insensitive",
       };
     }

@@ -1,16 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 export default function SearchHeader({
   name,
+  onClose,
   onChange,
   onSubmit,
+  placeholder,
+  closeIcon = <ChevronLeftIcon className="h-8 w-8" />,
   ...props
 }: {
   value?: string;
   name?: string;
-  onChange: (value: string) => void;
+  placeholder?: string;
+  closeIcon?: ReactNode;
+  onClose?: () => void;
+  onChange?: (value: string) => void;
   onSubmit?: (value: string) => void;
 }) {
   const navigate = useNavigate();
@@ -22,11 +28,11 @@ export default function SearchHeader({
     <nav className="flex min-w-full items-center justify-between text-white">
       <div className="flex text-white hover:text-white">
         <button
-          onClick={() => navigate(-1)}
-          className={`-m-1.5 p-1.5 ${blockStyles} pr-3 sm:pr-6`}
+          onClick={() => (onClose ? onClose() : navigate(-1))}
+          className={`-m-1.5 p-1.5 ${blockStyles} pr-3 sm:pr-6 outline-0`}
         >
           <span className="sr-only">Back</span>
-          <ChevronLeftIcon className="h-8 w-8" />
+          <span className="h-8 w-8">{closeIcon}</span>
         </button>
       </div>
       <form
@@ -34,17 +40,18 @@ export default function SearchHeader({
         onSubmit={(e) => {
           e.preventDefault();
 
-          (onSubmit || onChange)(value);
+          if (onSubmit) onSubmit(value);
+          else if (onChange) onChange(value);
         }}
       >
         <input
           autoFocus
           name={name}
           defaultValue={value}
-          placeholder="Search for a bottle"
+          placeholder={placeholder}
           onChange={(e) => {
             setValue(e.target.value);
-            onChange(e.target.value);
+            if (onChange) onChange(e.target.value);
           }}
           className="rounded focus:outline focus:outline-peated-light text-xs sm:text-base min-w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-peated-darker text-white"
         />

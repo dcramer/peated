@@ -4,6 +4,7 @@ import { Bottle } from "../types";
 import BottleName from "./bottleName";
 
 export default ({ bottle }: { bottle: Bottle }) => {
+  const { distillers } = bottle;
   return (
     <div className="flex items-center sm:mb-4 space-x-4 bg-gray-100 text-peated p-3 rounded">
       <div className="space-y-1 flex-1">
@@ -17,18 +18,23 @@ export default ({ bottle }: { bottle: Bottle }) => {
           <Link to={`/brands/${bottle.brand.id}`} className="hover:underline">
             {bottle.brand.name}
           </Link>
-          {bottle.distiller && bottle.brand.name !== bottle.distiller.name && (
-            <span>
-              {" "}
-              &middot; Distilled at{" "}
-              <Link
-                to={`/distillers/${bottle.brand.id}`}
-                className="hover:underline"
-              >
-                {bottle.distiller.name}
-              </Link>
-            </span>
-          )}
+          {distillers.length &&
+            (distillers.length > 1 ||
+              bottle.brand.name !== distillers[0].name) && (
+              <span>
+                {" "}
+                &middot; Distilled at{" "}
+                {distillers.map((d) => (
+                  <Link
+                    key={d.id}
+                    to={`/distillers/${d.id}`}
+                    className="hover:underline"
+                  >
+                    {d.name}
+                  </Link>
+                ))}
+              </span>
+            )}
         </p>
       </div>
       <div className="space-y-1">

@@ -96,10 +96,13 @@ test("creates a new bottle with minimal params", async () => {
 
   const bottle = await prisma.bottle.findUniqueOrThrow({
     where: { id: data.id },
+    include: {
+      distillers: true,
+    },
   });
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toBeDefined();
-  expect(bottle.distillerId).toBeNull();
+  expect(bottle.distillers.length).toBe(0);
   expect(bottle.abv).toBeNull();
   expect(bottle.statedAge).toBeNull();
   expect(bottle.series).toBeNull();
@@ -114,7 +117,7 @@ test("creates a new bottle with all params", async () => {
     payload: {
       name: "Delicious Wood",
       brand: brand.id,
-      distiller: distiller.id,
+      distillers: [distiller.id],
       series: "Super Delicious",
       abv: 0.45,
       statedAge: 12,
@@ -128,10 +131,14 @@ test("creates a new bottle with all params", async () => {
 
   const bottle = await prisma.bottle.findUniqueOrThrow({
     where: { id: data.id },
+    include: {
+      distillers: true,
+    },
   });
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toEqual(brand.id);
-  expect(bottle.distillerId).toEqual(distiller.id);
+  expect(bottle.distillers.length).toBe(1);
+  expect(bottle.distillers[0].id).toEqual(distiller.id);
   expect(bottle.abv).toEqual(0.45);
   expect(bottle.statedAge).toEqual(12);
   expect(bottle.series).toEqual("Super Delicious");
@@ -151,7 +158,7 @@ test("creates a new bottle with invalid brandId", async () => {
   expect(response).toRespondWith(400);
 });
 
-test("creates a new bottle with existing branbd name", async () => {
+test("creates a new bottle with existing brand name", async () => {
   const brand = await Fixtures.Brand();
   const response = await app.inject({
     method: "POST",
@@ -197,7 +204,105 @@ test("creates a new bottle with new brand name", async () => {
 
   const bottle = await prisma.bottle.findUniqueOrThrow({
     where: { id: data.id },
+    include: {
+      brand: true,
+    },
   });
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toBeDefined();
+  expect(bottle.brand.name).toBe("Hard Knox");
+  expect(bottle.brand.country).toBe("Scotland");
+});
+
+test("creates a new bottle with invalid distillerId", async () => {
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood",
+      brand: {
+        name: "Hard Knox",
+        country: "Scotland",
+      },
+      distillers: [5],
+    },
+    headers: await Fixtures.AuthenticatedHeaders(),
+  });
+
+  // TODO: this should return a 400
+  expect(response).toRespondWith(500);
+});
+
+test("creates a new bottle with existing distiller name", async () => {
+  const brand = await Fixtures.Brand();
+  const distiller = await Fixtures.Distiller();
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood",
+      brand: {
+        name: brand.name,
+        country: brand.country,
+      },
+      distillers: [
+        {
+          name: distiller.name,
+          country: distiller.country,
+        },
+      ],
+    },
+    headers: await Fixtures.AuthenticatedHeaders(),
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const bottle = await prisma.bottle.findUniqueOrThrow({
+    where: { id: data.id },
+    include: {
+      distillers: true,
+    },
+  });
+  expect(bottle.name).toEqual("Delicious Wood");
+  expect(bottle.distillers.length).toEqual(1);
+  expect(bottle.distillers[0].id).toEqual(distiller.id);
+});
+
+test("creates a new bottle with new distiller name", async () => {
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood",
+      brand: {
+        name: "Hard Knox",
+        country: "Scotland",
+      },
+      distillers: [
+        {
+          name: "Hard Knox",
+          country: "Scotland",
+        },
+      ],
+    },
+    headers: await Fixtures.AuthenticatedHeaders(),
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const bottle = await prisma.bottle.findUniqueOrThrow({
+    where: { id: data.id },
+    include: {
+      distillers: true,
+    },
+  });
+  expect(bottle.name).toEqual("Delicious Wood");
+  expect(bottle.distillers.length).toEqual(1);
+  expect(bottle.distillers[0].id).toBeDefined();
+  expect(bottle.distillers[0].name).toBe("Hard Knox");
+  expect(bottle.distillers[0].country).toBe("Scotland");
 });

@@ -26,6 +26,24 @@ test("lists distillers", async () => {
   expect(data.length).toBe(2);
 });
 
+test("lists distillers with query", async () => {
+  const distiller = await Fixtures.Distiller({ name: "Macallan" });
+  const distiller2 = await Fixtures.Distiller({ name: "Mars" });
+
+  let response = await app.inject({
+    method: "GET",
+    url: "/distillers",
+    query: {
+      query: "mac",
+    },
+  });
+
+  expect(response).toRespondWith(200);
+  let data = JSON.parse(response.payload);
+  expect(data.length).toBe(1);
+  expect(data[0].id).toBe(distiller.id);
+});
+
 test("lists distillers hides private", async () => {
   const distiller = await Fixtures.Distiller();
   const distiller2 = await Fixtures.Distiller({ public: false });

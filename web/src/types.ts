@@ -41,11 +41,12 @@ export type Brand = {
 export type Bottle = {
   id: string;
   name: string;
-  brand: Brand;
   // e.g. the limited release/collection
   series?: string | null;
 
-  distiller?: Distiller | null;
+  brand: Brand;
+  distillers: Distiller[];
+
   category?: Category | null;
 
   // floating point as percentage

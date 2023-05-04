@@ -24,27 +24,28 @@ export default ({
   labelAction,
 }: Props) => {
   return (
-    <div
-      className={`relative px-3 pb-2.5 pt-2.5 bg-white focus-within:z-10 ${className}`}
+    <label
+      htmlFor={htmlFor}
+      className={classNames(
+        `relative block px-3 pb-2.5 pt-2.5 bg-white focus-within:z-10`,
+        className
+      )}
     >
       {label && (
         <FormLabel
           htmlFor={htmlFor}
           required={required}
-          className={classNames(
-            "flex items-center",
-            labelAction && "cursor-pointer"
-          )}
+          className="flex items-center flex-1 cursor-pointer"
           onClick={labelAction}
         >
           {label}
           {labelAction && (
-            <ChevronRightIcon className="h-6 ml-1 color-peated inline-block" />
+            <ChevronRightIcon className="h-5 ml-1 color-peated font-bold inline-block" />
           )}
         </FormLabel>
       )}
       {children}
       {false && helpText && <HelpText>{helpText}</HelpText>}
-    </div>
+    </label>
   );
 };

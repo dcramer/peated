@@ -7,14 +7,7 @@ import { useRequiredAuth } from "../hooks/useAuth";
 import Layout from "../components/layout";
 import { formatCategoryName, toTitleCase } from "../lib/strings";
 import FormError from "../components/formError";
-import FormField from "../components/formField";
-import TextInput from "../components/textInput";
-import FormLabel from "../components/formLabel";
-import HelpText from "../components/helpText";
 import FormHeader from "../components/formHeader";
-import BrandSelect from "../components/brandSelect";
-import Select from "../components/select";
-import DistillerSelect from "../components/distillerSelect";
 import TextField from "../components/textField";
 import Fieldset from "../components/fieldset";
 import BrandField from "../components/brandField";
@@ -25,7 +18,7 @@ type FormData = {
   name?: string;
   series?: string;
   brand?: Brand;
-  distiller?: Distiller;
+  distillers?: Distiller[];
   abv?: number;
   statedAge?: number;
   category?: string;
@@ -130,14 +123,15 @@ export default function AddBottle() {
 
           <DistillerField
             label="Distiller"
-            name="distiller"
+            name="distillers"
             placeholder="e.g. Distiller"
-            helpText="The single distillery which produces this bottle."
-            onChange={(value: Distiller) =>
-              setFormData({ ...formData, distiller: value })
+            helpText="The distilleries which produces the spirit(s) for this bottle."
+            onChange={(value: Distiller[]) =>
+              setFormData({ ...formData, distillers: value })
             }
             canCreate={user.admin}
-            value={formData.distiller}
+            value={formData.distillers}
+            multiple
           />
 
           <div className="flex">

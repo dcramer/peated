@@ -49,9 +49,9 @@ export const Distiller = async ({ ...data }: Partial<DistillerType> = {}) => {
 
 export const Bottle = async ({ ...data }: Partial<BottleType> = {}) => {
   if (data.brandId === undefined) data.brandId = (await Brand()).id;
-  if (data.distillerId === undefined) {
+  if (data.distillers === undefined) {
     if (between(0, 1) === 1) {
-      data.distillerId = (await Distiller()).id;
+      data.distillers = { connect: [{ id: (await Distiller()).id }] };
     }
   }
 

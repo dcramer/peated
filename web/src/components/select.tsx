@@ -12,7 +12,14 @@ type Props = React.ComponentPropsWithoutRef<typeof Listbox> & {
   value?: string | undefined;
 };
 
-export default ({ options, placeholder, onChange, ...props }: Props) => {
+export default ({
+  options,
+  placeholder,
+  onChange,
+  name,
+  required,
+  ...props
+}: Props) => {
   const [value, setValue] = useState<Option | undefined>(
     options.find((o) => o.id === props.value)
   );
@@ -22,6 +29,7 @@ export default ({ options, placeholder, onChange, ...props }: Props) => {
     "text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm sm:leading-6";
   return (
     <Listbox
+      name={name}
       onChange={(value: Option) => {
         setValue(value);
         if (onChange) onChange(value.id);
@@ -32,9 +40,9 @@ export default ({ options, placeholder, onChange, ...props }: Props) => {
           placeholder={placeholder}
           className={`flex min-w-full flex-col ${baseStyles} ${inputStyles}`}
         >
-          <div className="truncate flex-1">
+          <div className="truncate flex-1 sm:leading-6">
             {value?.value || (
-              <span className="text-gray-400">{placeholder}</span>
+              <span className="text-gray-400 sm:leading-6">{placeholder}</span>
             )}
           </div>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
