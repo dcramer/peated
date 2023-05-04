@@ -64,6 +64,8 @@ export default function BottleDetails() {
     { name: "People", value: bottle.stats.people.toLocaleString() },
   ];
 
+  const { distillers } = bottle;
+
   return (
     <Layout gutter>
       <FloatingCheckinButton to={`/bottles/${bottle.id}/checkin`} />
@@ -78,17 +80,23 @@ export default function BottleDetails() {
             <Link to={`/brands/${bottle.brand.id}`} className="hover:underline">
               {bottle.brand.name}
             </Link>
-            {bottle.distiller &&
-              bottle.brand.name !== bottle.distiller.name && (
+            {distillers.length &&
+              (distillers.length > 1 ||
+                bottle.brand.name !== distillers[0].name) && (
                 <span>
                   {" "}
                   &middot; Distilled at{" "}
-                  <Link
-                    to={`/distillers/${bottle.brand.id}`}
-                    className="hover:underline"
-                  >
-                    {bottle.distiller.name}
-                  </Link>
+                  {distillers
+                    .map<React.ReactNode>((d) => (
+                      <Link
+                        key={d.id}
+                        to={`/distillers/${d.id}`}
+                        className="hover:underline"
+                      >
+                        {d.name}
+                      </Link>
+                    ))
+                    .reduce((prev, curr) => [prev, ", ", curr])}
                 </span>
               )}
           </p>

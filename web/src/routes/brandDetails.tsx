@@ -56,11 +56,7 @@ export default function BrandDetails() {
         ))}
       </div>
 
-      <BottleTable
-        bottleList={bottleList}
-        groupBy={(bottle) => bottle.distiller}
-        groupTo={(group) => `/distillers/${group.id}`}
-      />
+      <BottleTable bottleList={bottleList} />
     </Layout>
   );
 }

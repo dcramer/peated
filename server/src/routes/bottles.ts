@@ -48,7 +48,7 @@ export const listBottles: RouteOptions<
       where.brandId = req.query.brand;
     }
     if (req.query.distiller) {
-      where.distillers = { id: req.query.distiller };
+      where.distillers = { some: { id: req.query.distiller } };
     }
 
     where.OR = [{ public: true }];

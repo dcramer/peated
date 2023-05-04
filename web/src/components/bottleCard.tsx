@@ -24,15 +24,17 @@ export default ({ bottle }: { bottle: Bottle }) => {
               <span>
                 {" "}
                 &middot; Distilled at{" "}
-                {distillers.map((d) => (
-                  <Link
-                    key={d.id}
-                    to={`/distillers/${d.id}`}
-                    className="hover:underline"
-                  >
-                    {d.name}
-                  </Link>
-                ))}
+                {distillers
+                  .map<React.ReactNode>((d) => (
+                    <Link
+                      key={d.id}
+                      to={`/distillers/${d.id}`}
+                      className="hover:underline"
+                    >
+                      {d.name}
+                    </Link>
+                  ))
+                  .reduce((prev, curr) => [prev, ", ", curr])}
               </span>
             )}
         </p>
