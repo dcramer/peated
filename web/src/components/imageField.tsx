@@ -106,7 +106,7 @@ export default ({
         updatePreview();
       }}
     >
-      <div className="col-span-full flex items-center gap-x-4 min-w-full">
+      <div className="col-span-full flex items-center gap-x-4 min-w-full mt-2">
         <div
           className="h-24 w-24 flex-none rounded bg-gray-100 object-cover"
           onClick={(e) => {

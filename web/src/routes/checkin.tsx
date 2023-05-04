@@ -12,6 +12,7 @@ import TextAreaField from "../components/textAreaField";
 import RatingField from "../components/ratingField";
 import Fieldset from "../components/fieldset";
 import ImageField from "../components/imageField";
+import TagsField from "../components/tagsField";
 
 type LoaderData = {
   bottle: Bottle;
@@ -100,6 +101,13 @@ export default function Checkin() {
             }
             defaultValue={formData.tastingNotes}
             placeholder="Is it peated?"
+          />
+
+          <TagsField
+            label="Flavor Profile"
+            name="tags"
+            onChange={(value) => setFormData({ ...formData, tags: value })}
+            defaultValue={formData.tags}
           />
 
           <ImageField
