@@ -63,3 +63,28 @@ test("creates a new checkin with minimal params", async () => {
   expect(checkin.rating).toEqual(3.5);
   expect(checkin.tastingNotes).toBeNull();
 });
+
+test("creates a new checkin with tags", async () => {
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "POST",
+    url: "/checkins",
+    payload: {
+      bottle: bottle.id,
+      rating: 3.5,
+      tags: ["cherry", "PEAT"],
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const checkin = await prisma.checkin.findUniqueOrThrow({
+    where: { id: data.id },
+  });
+  expect(checkin.bottleId).toEqual(bottle.id);
+  expect(checkin.userId).toEqual(DefaultFixtures.user.id);
+  expect(checkin.tags).toEqual(["cherry", "peat"]);
+});

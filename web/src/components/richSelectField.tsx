@@ -5,12 +5,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import Chip from "./chip";
 import SearchHeader from "./searchHeader";
 import Header from "./header";
-import {
-  CheckIcon,
-  CircleStackIcon,
-  PlusIcon,
-  XMarkIcon,
-} from "@heroicons/react/20/solid";
+import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import api from "../lib/api";
 import { toTitleCase } from "../lib/strings";
 import Button from "./button";
@@ -171,6 +166,7 @@ const SelectDialog = ({
   canCreate = false,
   createForm,
   endpoint,
+  options,
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
@@ -179,7 +175,8 @@ const SelectDialog = ({
   searchPlaceholder?: string;
   canCreate?: boolean;
   createForm?: CreateItemForm;
-  endpoint: string;
+  endpoint?: string;
+  options?: Item[];
 }) => {
   const [query, setQuery] = useState("");
   const [itemList, setItemList] = useState<Item[]>([...selectedValues]);
@@ -191,9 +188,13 @@ const SelectDialog = ({
   const [createOpen, setCreateOpen] = useState(false);
 
   const onSearch = async (query: string = "") => {
-    const results = await api.get(endpoint, {
-      query: { query },
-    });
+    const results = endpoint
+      ? await api.get(endpoint, {
+          query: { query },
+        })
+      : options?.filter(
+          (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
+        );
     setResults(results);
   };
 
@@ -253,7 +254,7 @@ const SelectDialog = ({
                             )}
                           />
 
-                          <div className="min-w-0 flex-auto">
+                          <div className="min-w-0 flex-auto flex items-center">
                             <p className="text-sm font-semibold leading-6 text-gray-900">
                               <button
                                 onClick={() => {
@@ -306,7 +307,7 @@ const SelectDialog = ({
                             <p className="text-sm font-semibold leading-6 text-gray-900">
                               <a href={config.GITHUB_REPO} target="_blank">
                                 <span className="absolute inset-x-0 -top-px bottom-0" />
-                                Can't find a distiller?
+                                Can't find what you're looking for?
                               </a>
                             </p>
                             <p className="mt-1 flex text-xs leading-5 text-gray-500 gap-x-1">
@@ -339,20 +340,31 @@ const SelectDialog = ({
 
 type Props = {
   name?: string;
+  value?: Item[];
   label?: string;
   helpText?: string;
   required?: boolean;
-  children?: ReactNode;
-  className?: string;
-  value?: Item[];
-  onChange?: (value: Item | Item[]) => void;
-  targetItems?: number;
   multiple?: boolean;
-  suggestedItems?: Item[];
+  placeholder?: string;
+
+  onChange?: (value: Item | Item[]) => void;
+
+  // maximum number of items to backfill with suggestions
+  // available for quick selection
+  targetItems?: number;
+
   canCreate?: boolean;
   createForm?: CreateItemForm;
-  placeholder?: string;
-  endpoint: string;
+
+  // options are gathered either via dynamic query
+  endpoint?: string;
+  // or fixed value
+  options?: Item[];
+  // static suggestions can also be provided
+  suggestedItems?: Item[];
+
+  children?: ReactNode;
+  className?: string;
 };
 
 export default ({
@@ -362,12 +374,13 @@ export default ({
   required,
   className,
   multiple = false,
-  targetItems = 0,
+  targetItems = 5,
   suggestedItems = [],
   canCreate = false,
   createForm,
   placeholder,
   endpoint,
+  options = [],
   onChange = (value: Item | Item[]) => {},
   ...props
 }: Props) => {
@@ -402,17 +415,13 @@ export default ({
 
   const visibleValues = filterDupes(value, previousValues);
 
-  if (targetItems && value.length < targetItems) {
-    suggestedItems
-      .filter(
-        (item) => !value.find((i) => i.id == item.id && i.name == item.name)
-      )
-      .slice(0, targetItems - value.length)
-      .forEach((item) => {
-        visibleValues.push(item);
+  if (visibleValues.length < targetItems) {
+    filterDupes(visibleValues, suggestedItems)
+      .slice(visibleValues.length, targetItems)
+      .forEach((i) => {
+        visibleValues.push(i);
       });
   }
-
   return (
     <FormField
       label={label}
@@ -424,7 +433,7 @@ export default ({
         setDialogOpen(true);
       }}
     >
-      <div className="flex items-center gap-x-2 sm:leading-6">
+      <div className="flex items-center gap-x-2 sm:leading-6 mt-1">
         {visibleValues.map((item) => (
           <Chip
             key={`${item.id}-${item.name}`}
@@ -452,6 +461,7 @@ export default ({
         selectedValues={value}
         searchPlaceholder="Search for a distiller"
         endpoint={endpoint}
+        options={options}
       />
     </FormField>
   );

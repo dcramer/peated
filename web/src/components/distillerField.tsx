@@ -1,13 +1,17 @@
 import CountryField from "./countryField";
-import RelationField from "./relationField";
+import RichSelectField from "./richSelectField";
 import TextField from "./textField";
 
-type Props = React.ComponentProps<typeof RelationField>;
+type Props = Omit<
+  React.ComponentProps<typeof RichSelectField>,
+  "endpoint" | "options" | "suggestedItems" | "createForm"
+>;
 
 export default (props: Props) => {
   return (
-    <RelationField
+    <RichSelectField
       label="Distiller"
+      {...props}
       endpoint="/distillers"
       createForm={({ data, onFieldChange }) => {
         return (
@@ -50,7 +54,6 @@ export default (props: Props) => {
           </>
         );
       }}
-      {...props}
     />
   );
 };

@@ -32,6 +32,7 @@ export const serializeCheckin = (
     bottle: checkin.bottle,
     user: serializeUser(checkin.user, currentUser),
     tastingNotes: checkin.tastingNotes,
+    tags: checkin.tags,
     rating: checkin.rating,
     createdAt: checkin.createdAt,
   };
@@ -111,7 +112,10 @@ export const getCheckin: RouteOptions<
   handler: async (req, res) => {
     const checkin = await prisma.checkin.findUnique({
       include: {
-        bottle: true,
+        bottle: {
+          include: { brand: true, distillers: true },
+        },
+        user: true,
       },
       where: {
         id: req.params.checkinId,
@@ -157,6 +161,9 @@ export const addCheckin: RouteOptions<
     // gross syntax, whats better?
     const data: Prisma.CheckinUncheckedCreateInput = (({ bottle, ...d }: any) =>
       d)(body);
+
+    if (Array.isArray(data.tags))
+      data.tags = data.tags.map((t) => t.toLowerCase());
 
     if (body.bottle) {
       let bottle = await prisma.bottle.findUnique({

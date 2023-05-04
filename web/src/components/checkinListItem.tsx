@@ -9,6 +9,7 @@ import Button from "./button";
 import { Link } from "react-router-dom";
 import BottleCard from "./bottleCard";
 import UserAvatar from "./userAvatar";
+import Chip from "./chip";
 
 const TimeSince = ({ date }: { date: string }) => {
   return (
@@ -47,7 +48,13 @@ export default ({
           </Link>
           <TimeSince date={checkin.createdAt} />
         </div>
-        <StaticRating value={checkin.rating} size="small" />
+        <div className="flex flex-col items-end gap-y-2">
+          <StaticRating value={checkin.rating} size="small" />
+          <div className="flex gap-x-1">
+            {checkin.tags &&
+              checkin.tags.map((t) => <Chip size="small">{t}</Chip>)}
+          </div>
+        </div>
       </div>
       {!noBottle && <BottleCard bottle={bottle} />}
       {checkin.imageUrl ? (

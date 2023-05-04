@@ -13,6 +13,7 @@ import RatingField from "../components/ratingField";
 import Fieldset from "../components/fieldset";
 import ImageField from "../components/imageField";
 import TagsField from "../components/tagsField";
+import { toTitleCase } from "../lib/strings";
 
 type LoaderData = {
   bottle: Bottle;
@@ -30,6 +31,7 @@ export const loader: LoaderFunction = async ({
 type FormData = {
   tastingNotes?: string;
   rating?: number;
+  tags?: string[];
 };
 
 export default function Checkin() {
@@ -106,8 +108,11 @@ export default function Checkin() {
           <TagsField
             label="Flavor Profile"
             name="tags"
-            onChange={(value) => setFormData({ ...formData, tags: value })}
-            defaultValue={formData.tags}
+            onChange={(value) =>
+              setFormData({ ...formData, tags: value.map((t: any) => t.id) })
+            }
+            value={formData.tags?.map((t) => ({ id: t, name: toTitleCase(t) }))}
+            multiple
           />
 
           <ImageField

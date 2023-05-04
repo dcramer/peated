@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 type ButtonColor = "primary" | "default" | undefined;
 
-type ButtonSize = "small" | "medium";
+type ButtonSize = "small" | "base";
 
 type Props = Pick<React.ComponentProps<"button">, "onClick" | "onChange"> & {
   color?: ButtonColor;
@@ -15,7 +15,15 @@ type Props = Pick<React.ComponentProps<"button">, "onClick" | "onChange"> & {
   children?: ReactNode;
 };
 
-export default ({ color, icon, children, type, to, size, ...props }: Props) => {
+export default ({
+  icon,
+  children,
+  type,
+  to,
+  color = "default",
+  size = "base",
+  ...props
+}: Props) => {
   const defaultClassName =
     "inline-flex justify-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
 
