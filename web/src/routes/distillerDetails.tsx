@@ -6,8 +6,14 @@ import api from "../lib/api";
 import Layout from "../components/layout";
 import BottleTable from "../components/bottleTable";
 
+type DistillerWithStats = Distiller & {
+  stats: {
+    bottles: number;
+  };
+};
+
 type LoaderData = {
-  distiller: Distiller;
+  distiller: DistillerWithStats;
   bottleList: Bottle[];
 };
 
@@ -27,8 +33,7 @@ export default function DistillerDetails() {
   const { distiller, bottleList } = useLoaderData() as LoaderData;
 
   const stats = [
-    { name: "Bottles", value: "1,234" },
-    { name: "Rating", value: 4.5 },
+    { name: "Bottles", value: distiller.stats.bottles.toLocaleString() },
   ];
 
   return (

@@ -83,16 +83,25 @@ export const getBrand: RouteOptions<
     },
   },
   handler: async (req, res) => {
-    const checkin = await prisma.brand.findUnique({
+    const brand = await prisma.brand.findUnique({
       where: {
         id: req.params.brandId,
       },
     });
-    if (!checkin) {
-      res.status(404).send({ error: "Not found" });
-    } else {
-      res.send(checkin);
+    if (!brand) {
+      return res.status(404).send({ error: "Not found" });
     }
+
+    const totalBottles = await prisma.bottle.count({
+      where: { brandId: brand.id },
+    });
+
+    res.send({
+      ...brand,
+      stats: {
+        bottles: totalBottles,
+      },
+    });
   },
 };
 

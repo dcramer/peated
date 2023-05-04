@@ -81,16 +81,25 @@ export const getDistiller: RouteOptions<
     },
   },
   handler: async (req, res) => {
-    const checkin = await prisma.distiller.findUnique({
+    const distiller = await prisma.distiller.findUnique({
       where: {
         id: req.params.distillerId,
       },
     });
-    if (!checkin) {
-      res.status(404).send({ error: "Not found" });
-    } else {
-      res.send(checkin);
+    if (!distiller) {
+      return res.status(404).send({ error: "Not found" });
     }
+
+    const totalBottles = await prisma.bottle.count({
+      where: { distillers: { some: { id: distiller.id } } },
+    });
+
+    res.send({
+      ...distiller,
+      stats: {
+        bottles: totalBottles,
+      },
+    });
   },
 };
 

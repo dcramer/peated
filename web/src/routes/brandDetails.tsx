@@ -6,8 +6,14 @@ import api from "../lib/api";
 import Layout from "../components/layout";
 import BottleTable from "../components/bottleTable";
 
+type BrandWithStats = Brand & {
+  stats: {
+    bottles: number;
+  };
+};
+
 type LoaderData = {
-  brand: Brand;
+  brand: BrandWithStats;
   bottleList: Bottle[];
 };
 
@@ -27,8 +33,7 @@ export default function BrandDetails() {
   const { brand, bottleList } = useLoaderData() as LoaderData;
 
   const stats = [
-    { name: "Bottles", value: "1,234" },
-    { name: "Rating", value: 4.5 },
+    { name: "Bottles", value: brand.stats.bottles.toLocaleString() },
   ];
 
   return (
