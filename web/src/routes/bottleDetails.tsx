@@ -7,7 +7,7 @@ import api from "../lib/api";
 import Layout from "../components/layout";
 import CheckinListItem from "../components/checkinListItem";
 import { formatCategoryName } from "../lib/strings";
-import FloatingCheckinButton from "../components/floatingCheckinButton";
+import Button from "../components/button";
 
 type BottleWithStats = Bottle & {
   stats: {
@@ -65,13 +65,10 @@ export default function BottleDetails() {
   ];
 
   const { distillers } = bottle;
-
   return (
     <Layout gutter>
-      <FloatingCheckinButton to={`/bottles/${bottle.id}/checkin`} />
-
-      <div className="flex flex-row items-start justify-between gap-x-8">
-        <div className="space-y-1 flex-1">
+      <div className="flex flex-wrap flex-row items-start justify-between gap-x-8 gap-y-4 mt-2 sm:mt-0">
+        <div className="space-y-1 flex-1 w-full sm:w-auto flex flex-col items-center sm:items-start">
           <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">
             {bottle.name}
           </h1>
@@ -101,7 +98,7 @@ export default function BottleDetails() {
               )}
           </p>
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1 w-full sm:w-auto flex flex-col items-center sm:items-start">
           <p className="text-sm leading-6 text-gray-500">
             {bottle.category && formatCategoryName(bottle.category)}
           </p>
@@ -111,7 +108,13 @@ export default function BottleDetails() {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-3 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+      <div className="my-8 text-center sm:text-left">
+        <Button to={`/bottles/${bottle.id}/checkin`} color="primary">
+          Record a Tasting
+        </Button>
+      </div>
+
+      <div className="my-8 grid gap-3 grid-cols-3 text-center sm:text-left items-center">
         {stats.map((stat) => (
           <div key={stat.name}>
             <p className="text-base leading-7 text-gray-400">{stat.name}</p>
