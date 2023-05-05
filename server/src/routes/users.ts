@@ -5,22 +5,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
 import { storeFile } from "../lib/uploads";
 import config from "../config";
-
-export const serializeUser = (user: User, currentUser?: User) => {
-  const data: { [key: string]: any } = {
-    id: user.id,
-    displayName: user.displayName,
-    pictureUrl: user.pictureUrl
-      ? `${config.URL_PREFIX}${user.pictureUrl}`
-      : null,
-  };
-  if (currentUser && (currentUser.admin || currentUser.id === user.id)) {
-    data.email = user.email;
-    data.createdAt = user.email;
-    data.admin = user.admin;
-  }
-  return data;
-};
+import { serializeUser } from "../lib/auth";
 
 export const listUsers: RouteOptions<
   Server,

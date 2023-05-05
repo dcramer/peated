@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyPluginCallback } from "fastify";
 
 import { listBottles, getBottle, addBottle } from "./bottles";
-import { authBasic, authGoogle } from "./auth";
+import { authBasic, authDetails, authGoogle } from "./auth";
 import {
   addCheckin,
   getCheckin,
@@ -33,6 +33,7 @@ export const router: FastifyPluginCallback = (
     },
   });
 
+  fastify.route(authDetails);
   fastify.route(authGoogle);
   fastify.route(authBasic);
 

@@ -8,6 +8,8 @@ import Layout from "../components/layout";
 import { formatCategoryName, toTitleCase } from "../lib/strings";
 import BottleName from "../components/bottleName";
 import SearchHeader from "../components/searchHeader";
+import ListItem from "../components/listItem";
+import { Link } from "react-router-dom";
 
 export default function Search() {
   const location = useLocation();
@@ -62,80 +64,71 @@ export default function Search() {
         {results.map((bottle) => {
           const title = <BottleName bottle={bottle} />;
           return (
-            <li key={bottle.id} className="relative py-5 hover:bg-gray-100">
-              <div className="mx-auto flex max-w-7xl justify-between gap-x-6 px-4 sm:px-6 lg:px-8">
-                <div className="flex gap-x-4">
-                  <div className="min-w-0 flex-auto">
-                    <p className="text-sm font-semibold leading-6 text-gray-900">
-                      <a
-                        href={
-                          directToCheckin
-                            ? `/bottles/${bottle.id}/checkin`
-                            : `/bottles/${bottle.id}`
-                        }
-                      >
-                        <span className="absolute inset-x-0 -top-px bottom-0" />
-                        {title}
-                      </a>
-                    </p>
-                    <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate">
-                      {bottle.brand.name}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-x-4">
-                  <div className="hidden sm:flex sm:flex-col sm:items-end">
-                    <p className="text-sm leading-6 text-gray-900">
-                      {bottle.category && formatCategoryName(bottle.category)}
-                    </p>
-                    <p className="mt-1 text-xs leading-5 text-gray-500">
-                      {bottle.statedAge ? `${bottle.statedAge} years` : null}
-                    </p>
-                  </div>
-                  <ChevronRightIcon
-                    className="h-5 w-5 flex-none text-gray-500"
-                    aria-hidden="true"
-                  />
-                </div>
-              </div>
-            </li>
-          );
-        })}
-        {query && query.length >= 3 && (
-          <li className="relative group py-5 hover:bg-gray-100">
-            <div className="mx-auto flex max-w-7xl justify-between gap-x-6 px-4 sm:px-6 lg:px-8">
-              <div className="flex gap-x-4">
-                <PlusIcon className="h-10 w-10 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
-
-                <div className="min-w-0 flex-auto">
-                  <p className="text-sm font-semibold leading-6 text-gray-900">
-                    <a href={`/addBottle?name=${encodeURIComponent(query)}`}>
-                      <span className="absolute inset-x-0 -top-px bottom-0" />
-                      Can't find a bottle?
-                    </a>
-                  </p>
-                  <p className="mt-1 flex text-xs leading-5 text-gray-500 gap-x-1">
-                    <span>Tap here to add </span>
-                    <strong className="truncate">{toTitleCase(query)}</strong>
-                  </p>
-                </div>
+            <ListItem key={bottle.id}>
+              <div className="min-w-0 flex-auto">
+                <p className="text-sm font-semibold leading-6 text-gray-900">
+                  <Link
+                    to={
+                      directToCheckin
+                        ? `/bottles/${bottle.id}/checkin`
+                        : `/bottles/${bottle.id}`
+                    }
+                  >
+                    <span className="absolute inset-x-0 -top-px bottom-0" />
+                    {title}
+                  </Link>
+                </p>
+                <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate">
+                  {bottle.brand.name}
+                </p>
               </div>
               <div className="flex items-center gap-x-4">
-                {/* <div className="hidden sm:flex sm:flex-col sm:items-end">
+                <div className="hidden sm:flex sm:flex-col sm:items-end">
                   <p className="text-sm leading-6 text-gray-900">
-                    {bottle.category}
+                    {bottle.category && formatCategoryName(bottle.category)}
                   </p>
                   <p className="mt-1 text-xs leading-5 text-gray-500">
-                    {bottle.statedAge}
+                    {bottle.statedAge ? `${bottle.statedAge} years` : null}
                   </p>
-                </div> */}
+                </div>
                 <ChevronRightIcon
                   className="h-5 w-5 flex-none text-gray-500"
                   aria-hidden="true"
                 />
               </div>
+            </ListItem>
+          );
+        })}
+        {(results.length === 0 || query !== "") && (
+          <ListItem>
+            <PlusIcon className="h-10 w-10 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
+
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold leading-6 text-gray-900">
+                <Link to={`/addBottle?name=${encodeURIComponent(query)}`}>
+                  <span className="absolute inset-x-0 -top-px bottom-0" />
+                  Can't find a bottle?
+                </Link>
+              </p>
+              <p className="mt-1 flex text-xs leading-5 text-gray-500 gap-x-1">
+                {query !== "" ? (
+                  <span>
+                    Tap here to add{" "}
+                    <strong className="truncate">{toTitleCase(query)}</strong>{" "}
+                    to the database.
+                  </span>
+                ) : (
+                  <span>Tap here to add a new entry to the database.</span>
+                )}
+              </p>
             </div>
-          </li>
+            <div className="flex items-center gap-x-4">
+              <ChevronRightIcon
+                className="h-5 w-5 flex-none text-gray-500"
+                aria-hidden="true"
+              />
+            </div>
+          </ListItem>
         )}
       </ul>
     </Layout>

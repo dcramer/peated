@@ -11,6 +11,7 @@ import { toTitleCase } from "../lib/strings";
 import Button from "./button";
 import config from "../config";
 import classNames from "../lib/classNames";
+import ListItem from "./listItem";
 
 type Item = {
   id?: string | null;
@@ -129,16 +130,6 @@ const CreateItemDialog = ({
         </div>
       </Dialog>
     </Transition.Root>
-  );
-};
-
-const ListItem = ({ children }: { children?: ReactNode }) => {
-  return (
-    <li className="relative py-5 hover:bg-gray-100">
-      <div className="mx-auto flex max-w-7xl justify-between gap-x-6 px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-x-4">{children}</div>
-      </div>
-    </li>
   );
 };
 

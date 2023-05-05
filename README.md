@@ -11,4 +11,23 @@ https://www.whiskybase.com/ is a good example of what the kind of db we need. In
 
 ## Dev
 
-`nf start`
+Bootstrap the environment:
+
+```
+docker-compose up -d
+npm run db:migrate
+```
+
+Note: If you need to tweak default settings, `cp .env.example .env` and go to town.
+
+Create a local user to avoid setting up Google credentials:
+
+```
+npm run create-user -w server
+```
+
+Run the dev server, which spins up both the `web` and the `server` services:
+
+```
+nf start
+```

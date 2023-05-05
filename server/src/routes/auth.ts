@@ -4,9 +4,10 @@ import { JwksClient } from "jwks-rsa";
 import { IncomingMessage, Server, ServerResponse } from "http";
 
 import { prisma } from "../lib/db";
-import { createAccessToken } from "../lib/auth";
+import { createAccessToken, serializeUser } from "../lib/auth";
 import config from "../config";
 import { compareSync } from "bcrypt";
+import { validateRequest } from "../middleware/auth";
 
 type GoogleCredential = {
   iss: string;
@@ -29,6 +30,29 @@ const jwksClient = new JwksClient({
   jwksUri: "https://www.googleapis.com/oauth2/v2/certs",
   timeout: 3000,
 });
+
+export const authDetails: RouteOptions<
+  Server,
+  IncomingMessage,
+  ServerResponse
+> = {
+  method: "GET",
+  url: "/auth",
+  preHandler: [validateRequest],
+  handler: async function (req, res) {
+    // this would be a good palce to add refreshTokens (swap to POST for that)
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.user.id,
+      },
+    });
+    if (!user) {
+      return res.status(401).send({ error: "Unauthorized" });
+    }
+
+    return res.send({ user: serializeUser(user, user) });
+  },
+};
 
 export const authBasic: RouteOptions<
   Server,
@@ -56,7 +80,7 @@ export const authBasic: RouteOptions<
   handler: async function (req, res) {
     const { email, password } = req.body;
 
-    let user = await prisma.user.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         email,
       },
@@ -74,7 +98,7 @@ export const authBasic: RouteOptions<
     }
 
     return res.send({
-      user,
+      user: serializeUser(user, user),
       accessToken: await createAccessToken(user),
     });
   },
@@ -169,7 +193,7 @@ export const authGoogle: RouteOptions<
     }
 
     return res.send({
-      user,
+      user: serializeUser(user, user),
       accessToken: await createAccessToken(user),
     });
   },

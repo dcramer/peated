@@ -14,7 +14,7 @@ export default ({
   children: ReactNode;
   active?: boolean;
   onClick?: () => void;
-  size: ChipSize;
+  size?: ChipSize;
 }) => {
   return (
     <Component

@@ -12,6 +12,7 @@ type ApiRequestOptions = {
 
 export class ApiError extends Error {
   response: Response;
+  statusCode: number;
   data: any;
   remoteStack: string | undefined;
 
@@ -19,6 +20,7 @@ export class ApiError extends Error {
     super(data.error || message);
     this.name = this.constructor.name;
     this.response = response;
+    this.statusCode = response.status;
     this.data = data;
     this.remoteStack = data.stack;
   }

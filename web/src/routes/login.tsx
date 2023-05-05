@@ -1,12 +1,15 @@
 import { FormEvent, useState } from "react";
 import { LoaderFunction, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
-import api from "../lib/api";
+import api, { ApiError } from "../lib/api";
 import useAuth from "../hooks/useAuth";
 import Layout from "../components/layout";
 
 import PeatedLogo from "../assets/logo.svg";
 import TextField from "../components/textField";
+import FormError from "../components/formError";
+import classNames from "../lib/classNames";
+import Alert from "../components/alert";
 
 type LoaderData = {};
 
@@ -23,16 +26,31 @@ const BasicLogin = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState<BasicLoginForm>({});
+  const [error, setError] = useState<string | null>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setLoading(true);
+
     (async () => {
-      const { user, accessToken } = await api.post("/auth/basic", {
-        data,
-      });
-      login(user, accessToken);
-      navigate("/");
+      try {
+        const { user, accessToken } = await api.post("/auth/basic", {
+          data,
+        });
+        login(user, accessToken);
+        navigate("/");
+      } catch (err) {
+        setLoading(false);
+        if (err instanceof ApiError) {
+          if (err.statusCode === 401) {
+            setError("Your login credentials didn't pass the test");
+          }
+        } else {
+          throw err;
+        }
+      }
     })();
   };
 
@@ -50,6 +68,7 @@ const BasicLogin = () => {
             <span className="bg-peated px-2 text-sm text-white">Or</span>
           </div>
         </div>
+        <div className="mb-2">{error && <Alert>{error}</Alert>}</div>
         <TextField
           name="email"
           type="email"
@@ -75,11 +94,15 @@ const BasicLogin = () => {
         <div>
           <button
             type="submit"
-            className="flex w-full justify-center rounded bg-peated-dark px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated"
+            className={classNames(
+              "flex w-full justify-center rounded bg-peated-dark px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated",
+              loading ? "text-peated-light" : "text-white"
+            )}
+            disabled={loading}
           >
             Sign in
           </button>
-        </div>{" "}
+        </div>
       </form>
     </div>
   );
