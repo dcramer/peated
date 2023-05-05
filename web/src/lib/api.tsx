@@ -26,6 +26,8 @@ export class ApiError extends Error {
   }
 }
 
+export class ApiUnavailable extends Error {}
+
 class ApiClient {
   server: string;
   accessToken: string | null;
@@ -66,14 +68,19 @@ class ApiClient {
       headers["Content-Type"] = "application/json";
     }
 
-    const resp = await fetch(
-      `${this.server}${path}?${new URLSearchParams(options.query || {})}`,
-      {
-        body,
-        headers,
-        ...options,
-      }
-    );
+    let resp;
+    try {
+      resp = await fetch(
+        `${this.server}${path}?${new URLSearchParams(options.query || {})}`,
+        {
+          body,
+          headers,
+          ...options,
+        }
+      );
+    } catch (err) {
+      throw new ApiUnavailable("Unable to reach API service.");
+    }
     if (!resp?.ok) {
       throw new ApiError("Request failed", resp, await resp.json());
     }

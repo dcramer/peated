@@ -7,6 +7,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import createRoutes from "./routes";
 import config from "./config";
 import { AuthProvider } from "./hooks/useAuth";
+import { OnlineStatusProvider } from "./hooks/useOnlineStatus";
 
 const router = createBrowserRouter(createRoutes());
 
@@ -16,9 +17,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
+      <OnlineStatusProvider>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </OnlineStatusProvider>
     </GoogleOAuthProvider>
   </React.StrictMode>
 );
