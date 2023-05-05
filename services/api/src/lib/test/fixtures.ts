@@ -48,14 +48,7 @@ export const Distiller = async ({ ...data }: Partial<DistillerType> = {}) => {
   });
 };
 
-export const Bottle = async ({
-  distillerIds = [],
-  ...data
-}: Partial<
-  BottleType & {
-    distillerIds: number[];
-  }
-> = {}) => {
+export const Bottle = async ({ distillerIds = [], ...data }: any = {}) => {
   if (data.brandId === undefined) data.brandId = (await Brand()).id;
 
   const distillers: Prisma.DistillerCreateNestedManyWithoutBottlesInput = {};
@@ -64,7 +57,7 @@ export const Bottle = async ({
       distillers.connect = [{ id: (await Distiller()).id }];
     }
   } else {
-    distillers.connect = distillerIds.map((d) => ({ id: d }));
+    distillers.connect = distillerIds.map((d: string) => ({ id: d }));
   }
 
   return await prisma.bottle.create({
@@ -77,9 +70,9 @@ export const Bottle = async ({
   });
 };
 
-export const Checkin = async ({ ...data }: Partial<CheckinType> = {}) => {
-  if (data.bottleId === undefined) data.bottleId = (await Bottle()).id;
-  if (data.userId === undefined) data.userId = (await User()).id;
+export const Checkin = async ({ ...data }: any = {}) => {
+  if (!data.bottleId) data.bottleId = (await Bottle()).id;
+  if (!data.userId) data.userId = (await User()).id;
 
   return await prisma.checkin.create({
     data: {

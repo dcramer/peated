@@ -4,12 +4,12 @@ import { prisma } from "../lib/db";
 
 export const validateRequest: onRequestHookHandler = async (req, res) => {
   try {
-    let auth = req.headers["authorization"];
-    let token = auth?.replace("Bearer ", "");
+    const auth = req.headers["authorization"];
+    const token = auth?.replace("Bearer ", "");
 
-    let { id } = await verifyToken(token);
+    const { id } = await verifyToken(token);
     req.user = await prisma.user.findUniqueOrThrow({
-      where: { id: parseInt(id, 10) },
+      where: { id },
     });
   } catch (error) {
     console.error(error);

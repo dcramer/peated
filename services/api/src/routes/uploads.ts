@@ -34,8 +34,6 @@ export const getUpload: RouteOptions<
 
     const useGcs = !!process.env.USE_GCS_STORAGE;
 
-    // const filename = path.basename(fileParam);
-
     let stream: any;
     if (useGcs) {
       const bucketName = process.env.GCS_BUCKET_NAME as string;
@@ -49,7 +47,7 @@ export const getUpload: RouteOptions<
       //   .bucket(bucketName)
       //   .file(`${bucketPath}${params.filename}`);
       // stream = file.createReadStream();
-      const url = `https://storage.googleapis.com/${bucketName}/${bucketPath}${fileParam}`;
+      const url = `https://storage.googleapis.com/${bucketName}/${bucketPath}${filename}`;
       res.redirect(url);
     } else {
       const filepath = format({

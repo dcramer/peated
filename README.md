@@ -31,3 +31,9 @@ Run the dev server, which spins up both the `web` and the `api` services:
 ```
 nf start
 ```
+
+NX is used to manage the monorepo, e.g.
+
+```
+npx nx run-many -t build
+```

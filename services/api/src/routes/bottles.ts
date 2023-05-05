@@ -222,9 +222,11 @@ export const addBottle: RouteOptions<
   handler: async (req, res) => {
     const body = req.body;
     // gross syntax, whats better?
-    const data: Partial<Prisma.BottleCreateInput> & {
-      distillers: Prisma.DistillerCreateNestedManyWithoutBottlesInput;
-    } = {
+    // TODO: types
+    // Partial<Prisma.BottleCreateInput> & {
+    //   distillers: Prisma.DistillerCreateNestedManyWithoutBottlesInput;
+    // }
+    const data: any = {
       ...omit(body, "brand"),
       distillers: {
         connect: [],
@@ -300,7 +302,7 @@ export const addBottle: RouteOptions<
         },
       });
 
-      data.distillers.create.forEach(async ({ name }) => {
+      data.distillers.create.forEach(async ({ name }: any) => {
         const distiller = bottle.distillers.find((d2) => d2.name === name);
         if (!distiller)
           throw new Error(`Unable to find connected distiller: ${name}`);

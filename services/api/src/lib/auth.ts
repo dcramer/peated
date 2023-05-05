@@ -44,7 +44,7 @@ export const createAccessToken = (user: User): Promise<string | undefined> => {
 
 export const verifyToken = (
   token: string | undefined
-): Promise<SerializedUser | undefined> => {
+): Promise<SerializedUser> => {
   return new Promise((res, rej) => {
     if (!token) {
       rej("invalid token");
