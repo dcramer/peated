@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "server",
+  "name": "api",
   "scripts": {
     "build": "tsc",
     "dev": "nodemon --exec ts-node --require dotenv/config ./src/server.ts",
@@ -15,6 +15,7 @@
     "test:vitest": "dotenv -e .env.test -- vitest --no-threads"
   },
   "dependencies": {
+    "@peated/shared": "file:../packages/shared",
     "@faker-js/faker": "^7.6.0",
     "@fastify/cors": "^8.2.1",
     "@fastify/helmet": "^10.1.0",
@@ -29,9 +30,7 @@
     "fastify-plugin": "^4.5.0",
     "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^3.0.1",
-    "mime-types": "^2.1.35"
-  },
-  "devDependencies": {
+    "mime-types": "^2.1.35",
     "@swc/core": "^1.3.44",
     "@swc/helpers": "^0.4.14",
     "@types/bcrypt": "^5.0.0",

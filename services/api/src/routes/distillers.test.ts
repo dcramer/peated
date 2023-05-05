@@ -13,8 +13,8 @@ afterAll(async () => {
 });
 
 test("lists distillers", async () => {
-  const distiller = await Fixtures.Distiller();
-  const distiller2 = await Fixtures.Distiller();
+  await Fixtures.Distiller();
+  await Fixtures.Distiller();
 
   let response = await app.inject({
     method: "GET",
@@ -28,7 +28,7 @@ test("lists distillers", async () => {
 
 test("lists distillers with query", async () => {
   const distiller = await Fixtures.Distiller({ name: "Macallan" });
-  const distiller2 = await Fixtures.Distiller({ name: "Mars" });
+  await Fixtures.Distiller({ name: "Mars" });
 
   let response = await app.inject({
     method: "GET",

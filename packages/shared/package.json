@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "name": "@peated/shared",
+  "files": [
+    "tsconfig.json",
+    "tsconfig.node.json"
+],
+  "dependencies": {}
+}

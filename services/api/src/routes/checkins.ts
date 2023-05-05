@@ -12,7 +12,7 @@ import {
 import { validateRequest } from "../middleware/auth";
 import { storeFile } from "../lib/uploads";
 import config from "../config";
-import { serializeUser } from "./users";
+import { serializeUser } from "../lib/auth";
 
 export const serializeCheckin = (
   checkin: Checkin & {
@@ -47,6 +47,7 @@ export const listCheckins: RouteOptions<
     Querystring: {
       page?: number;
       bottle?: number;
+      user?: number;
     };
   }
 > = {
@@ -58,6 +59,7 @@ export const listCheckins: RouteOptions<
       properties: {
         page: { type: "number" },
         bottle: { type: "number" },
+        user: { type: "number" },
       },
     },
   },
@@ -70,6 +72,9 @@ export const listCheckins: RouteOptions<
     const where: Prisma.CheckinWhereInput = {};
     if (req.query.bottle) {
       where.bottleId = req.query.bottle;
+    }
+    if (req.query.user) {
+      where.userId = req.query.user;
     }
 
     const results = await prisma.checkin.findMany({

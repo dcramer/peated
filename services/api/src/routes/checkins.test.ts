@@ -13,8 +13,8 @@ afterAll(async () => {
 });
 
 test("lists checkins", async () => {
-  const checkin = await Fixtures.Checkin();
-  const checkin2 = await Fixtures.Checkin();
+  await Fixtures.Checkin();
+  await Fixtures.Checkin();
 
   let response = await app.inject({
     method: "GET",
@@ -24,6 +24,44 @@ test("lists checkins", async () => {
   expect(response).toRespondWith(200);
   let data = JSON.parse(response.payload);
   expect(data.length).toBe(2);
+});
+
+test("lists checkins with bottle", async () => {
+  const bottle = await Fixtures.Bottle();
+  const checkin = await Fixtures.Checkin({ bottleId: bottle.id });
+  await Fixtures.Checkin();
+
+  let response = await app.inject({
+    method: "GET",
+    url: "/checkins",
+    query: {
+      bottle: `${bottle.id}`,
+    },
+  });
+
+  expect(response).toRespondWith(200);
+  let data = JSON.parse(response.payload);
+  expect(data.length).toBe(1);
+  expect(data[0].id).toBe(checkin.id);
+});
+
+test("lists checkins with bottle", async () => {
+  const bottle = await Fixtures.Bottle();
+  const checkin = await Fixtures.Checkin({ userId: DefaultFixtures.user.id });
+  await Fixtures.Checkin();
+
+  let response = await app.inject({
+    method: "GET",
+    url: "/checkins",
+    query: {
+      user: `${DefaultFixtures.user.id}`,
+    },
+  });
+
+  expect(response).toRespondWith(200);
+  let data = JSON.parse(response.payload);
+  expect(data.length).toBe(1);
+  expect(data[0].id).toBe(checkin.id);
 });
 
 test("get checkin", async () => {

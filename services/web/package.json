@@ -2,6 +2,7 @@
   "private": true,
   "name": "web",
   "dependencies": {
+    "@peated/shared": "file:../packages/shared",
     "@fontsource/raleway": "^4.5.12",
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.17",

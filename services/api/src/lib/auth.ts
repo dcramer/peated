@@ -13,7 +13,7 @@ interface SerializedUser {
 
 export const serializeUser = (
   user: User,
-  currentUser: User
+  currentUser?: User
 ): SerializedUser => {
   const data: SerializedUser = {
     id: user.id,

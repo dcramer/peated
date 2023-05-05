@@ -64,7 +64,7 @@ export default function ErrorPage() {
             </Link>
             <a
               className="text-sm font-semibold text-gray-900"
-              href="https://github.com/dcramer/cask"
+              href={config.GITHUB_REPO}
             >
               Open a GitHub issue
             </a>

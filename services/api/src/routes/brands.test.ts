@@ -13,8 +13,8 @@ afterAll(async () => {
 });
 
 test("lists brands", async () => {
-  const brand = await Fixtures.Brand();
-  const brand2 = await Fixtures.Brand();
+  await Fixtures.Brand();
+  await Fixtures.Brand();
 
   let response = await app.inject({
     method: "GET",
@@ -28,7 +28,7 @@ test("lists brands", async () => {
 
 test("lists brands hides private", async () => {
   const brand = await Fixtures.Brand();
-  const brand2 = await Fixtures.Brand({ public: false });
+  await Fixtures.Brand({ public: false });
 
   let response = await app.inject({
     method: "GET",

@@ -1,5 +1,5 @@
 {
-  "extends": "../common/tsconfig.json",
+  "extends": "@peated/shared/tsconfig.json",
   "compilerOptions": {
     "types": ["vitest/globals"]
   },

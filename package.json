@@ -4,28 +4,31 @@
   "version": "0.1.0",
   "description": "",
   "workspaces": [
-    "web",
-    "scraper",
-    "server"
+    "packages/*",
+    "services/*"
   ],
   "main": "main.js",
   "scripts": {
+    "setup": "npm run setup:deps && npm run setup:db",
+    "setup:deps": "npm install --workspaces --package-lock-only",
+    "setup:db": "npm run db:migrate",
     "dev": "nf start",
-    "dev:web": "API_SERVER=http://localhost:4000 dotenv -e ./.env -- npm run dev -w web",
-    "dev:server": "CORS_HOST=http://localhost:5173 PORT=4000 dotenv -e ./.env -- npm run dev -w server",
-    "db:studio": "dotenv -e ./.env -- npx -w server prisma studio",
-    "db:migrate": "dotenv -e ./.env -- npm run db:migrate -w server",
-    "test:server": "dotenv -e ./.env -- npm run test -w server",
-    "token": "dotenv -e ./.env -- npm run token -w server"
+    "dev:web": "API_SERVER=http://localhost:4000 dotenv -e ./.env -- npm run dev -w services/web",
+    "dev:api": "CORS_HOST=http://localhost:5173 PORT=4000 dotenv -e ./.env -- npm run dev -w services/api",
+    "db:studio": "dotenv -e ./.env -- npx -w packages/api prisma studio",
+    "db:migrate": "dotenv -e ./.env -- npm run db:migrate -w services/api",
+    "test:api": "dotenv -e ./.env -- npm run test -w services/api",
+    "token": "dotenv -e ./.env -- npm run token -w services/api"
   },
-  "author": "",
+  "author": "David Cramer",
   "license": "Apache-2.0",
   "dependencies": {
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.1.0",
+    "foreman": "^3.0.1",
     "npm-run-all": "^4.1.5"
   },
   "devDependencies": {
-    "foreman": "^3.0.1"
+    "nx": "^16.1.0"
   }
 }

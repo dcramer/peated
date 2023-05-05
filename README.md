@@ -7,7 +7,7 @@ Schema Notes:
 - Is CaskType possible to constrain to an enum? Same question for Category.
 - Tags make up a lot of flavor profiles - should things like the way its coal fired be focused on tasting notes more so than bottle or distiller information?
 
-https://www.whiskybase.com/ is a good example of what the kind of db we need. Initial scraper to populate a DB (will need further enriched with other sources) is in `cask-scraper`
+https://www.whiskybase.com/ is a good example of what the kind of db we need. Initial scraper to populate a DB (will need further enriched with other sources) is in `scraper`
 
 ## Dev
 
@@ -15,7 +15,7 @@ Bootstrap the environment:
 
 ```
 docker-compose up -d
-npm run db:migrate
+npm run setup
 ```
 
 Note: If you need to tweak default settings, `cp .env.example .env` and go to town.
@@ -23,10 +23,10 @@ Note: If you need to tweak default settings, `cp .env.example .env` and go to to
 Create a local user to avoid setting up Google credentials:
 
 ```
-npm run create-user -w server
+npm run create-user -w services/api
 ```
 
-Run the dev server, which spins up both the `web` and the `server` services:
+Run the dev server, which spins up both the `web` and the `api` services:
 
 ```
 nf start
