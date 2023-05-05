@@ -1,3 +1,5 @@
+/// <reference types="react/client" />
+/// <reference types="react-router-dom/client" />
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-svgr/client" />
 

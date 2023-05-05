@@ -13,15 +13,13 @@ import config from "../config";
 import classNames from "../lib/classNames";
 import ListItem from "./listItem";
 
-type Item = {
+export type Option = {
   id?: string | null;
   name: string;
   [key: string]: any;
 };
 
-const OverlayTransition = (
-  props: React.ComponentProps<typeof Transition.Child>
-) => {
+const OverlayTransition = ({ children }: { children: ReactNode }) => {
   return (
     <Transition.Child
       as={Fragment}
@@ -31,14 +29,13 @@ const OverlayTransition = (
       leave="ease-in duration-200"
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
-      {...props}
-    />
+    >
+      {children}
+    </Transition.Child>
   );
 };
 
-const PanelTransition = (
-  props: React.ComponentProps<typeof Transition.Child>
-) => {
+const PanelTransition = ({ children }: { children: ReactNode }) => {
   return (
     <Transition.Child
       as={Fragment}
@@ -48,21 +45,22 @@ const PanelTransition = (
       leave="ease-in duration-200"
       leaveFrom="opacity-100 translate-y-0 sm:scale-100"
       leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-      {...props}
-    />
+    >
+      {children}
+    </Transition.Child>
   );
 };
 
-type CreateItemForm = ({
+type CreateOptionForm = ({
   data,
   onFieldChange,
 }: {
-  data: Item;
-  onFieldChange: (arg0: Partial<Item>) => void;
+  data: Option;
+  onFieldChange: (arg0: Partial<Option>) => void;
 }) => ReactNode;
 
 // TODO(dcramer): hitting escape doesnt do what you want here (it does nothing)
-const CreateItemDialog = ({
+const CreateOptionDialog = ({
   open,
   setOpen,
   onSubmit,
@@ -70,10 +68,10 @@ const CreateItemDialog = ({
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
-  onSubmit?: (newItem: Item) => void;
-  render: CreateItemForm;
+  onSubmit?: (newOption: Option) => void;
+  render: CreateOptionForm;
 }) => {
-  const [newItem, setNewItem] = useState<Item>({
+  const [newOption, setNewOption] = useState<Option>({
     id: null,
     name: "",
   });
@@ -97,17 +95,17 @@ const CreateItemDialog = ({
                 onSubmit={(e) => {
                   e.preventDefault();
 
-                  onSubmit && onSubmit({ ...newItem });
+                  onSubmit && onSubmit({ ...newOption });
 
                   setOpen(false);
                 }}
                 className="max-w-md"
               >
                 {render({
-                  data: newItem,
+                  data: newOption,
                   onFieldChange: (value) => {
-                    setNewItem({
-                      ...newItem,
+                    setNewOption({
+                      ...newOption,
                       ...value,
                     });
                   },
@@ -133,12 +131,12 @@ const CreateItemDialog = ({
   );
 };
 
-const filterDupes = (firstList: Item[], ...moreLists: Item[][]) => {
-  const results: Item[] = [...firstList];
+const filterDupes = (firstList: Option[], ...moreLists: Option[][]) => {
+  const results: Option[] = [...firstList];
   const matches = new Set(firstList.map((i) => `${i.id}-${i.name}`));
 
-  moreLists.forEach((items) => {
-    items.forEach((i) => {
+  moreLists.forEach((options) => {
+    options.forEach((i) => {
       if (!matches.has(`${i.id}-${i.name}`)) {
         results.push(i);
         matches.add(`${i.id}-${i.name}`);
@@ -151,7 +149,7 @@ const filterDupes = (firstList: Item[], ...moreLists: Item[][]) => {
 const SelectDialog = ({
   open,
   setOpen,
-  onSelect = (value: any) => {},
+  onSelect = () => {},
   selectedValues = [],
   searchPlaceholder,
   canCreate = false,
@@ -165,14 +163,14 @@ const SelectDialog = ({
   selectedValues?: any[];
   searchPlaceholder?: string;
   canCreate?: boolean;
-  createForm?: CreateItemForm;
+  createForm?: CreateOptionForm;
   endpoint?: string;
-  options?: Item[];
+  options?: Option[];
 }) => {
   const [query, setQuery] = useState("");
-  const [itemList, setItemList] = useState<Item[]>([...selectedValues]);
-  const [results, setResults] = useState<Item[]>([]);
-  const [previousValues, setPreviousValues] = useState<Item[]>([
+  const [optionList, setOptionList] = useState<Option[]>([...selectedValues]);
+  const [results, setResults] = useState<Option[]>([]);
+  const [previousValues, setPreviousValues] = useState<Option[]>([
     ...selectedValues,
   ]);
 
@@ -189,13 +187,13 @@ const SelectDialog = ({
     setResults(results);
   };
 
-  const selectItem = async (item: Item) => {
-    setPreviousValues(filterDupes([item], previousValues));
-    onSelect(item);
+  const selectOption = async (option: Option) => {
+    setPreviousValues(filterDupes([option], previousValues));
+    onSelect(option);
   };
 
   useEffect(() => {
-    setItemList(filterDupes(selectedValues, results, previousValues));
+    setOptionList(filterDupes(selectedValues, results, previousValues));
   }, [
     JSON.stringify(selectedValues),
     JSON.stringify(results),
@@ -233,14 +231,15 @@ const SelectDialog = ({
                 </Header>
                 <main className={"mx-auto max-w-4xl m-h-screen relative"}>
                   <ul role="list" className="divide-y divide-gray-100">
-                    {itemList.map((item) => {
+                    {optionList.map((option) => {
                       return (
-                        <ListItem key={`${item.id}-${item.name}`}>
+                        <ListItem key={`${option.id}-${option.name}`}>
                           <CheckIcon
                             className={classNames(
                               "h-10 w-10 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white",
                               selectedValues.find(
-                                (i) => i.id == item.id && i.name == item.name
+                                (i) =>
+                                  i.id == option.id && i.name == option.name
                               ) && "bg-peated text-white"
                             )}
                           />
@@ -249,11 +248,11 @@ const SelectDialog = ({
                             <p className="text-sm font-semibold leading-6 text-gray-900">
                               <button
                                 onClick={() => {
-                                  selectItem(item);
+                                  selectOption(option);
                                 }}
                               >
                                 <span className="absolute inset-x-0 -top-px bottom-0" />
-                                {item.name}
+                                {option.name}
                               </button>
                             </p>
                             <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate"></p>
@@ -311,12 +310,12 @@ const SelectDialog = ({
                   </ul>
                 </main>
                 {canCreate && createForm && (
-                  <CreateItemDialog
+                  <CreateOptionDialog
                     open={createOpen}
                     setOpen={setCreateOpen}
                     render={createForm}
-                    onSubmit={(newItem) => {
-                      selectItem(newItem);
+                    onSubmit={(newOption) => {
+                      selectOption(newOption);
                     }}
                   />
                 )}
@@ -331,28 +330,28 @@ const SelectDialog = ({
 
 type Props = {
   name?: string;
-  value?: Item[];
+  value?: Option | Option[] | null;
   label?: string;
   helpText?: string;
   required?: boolean;
   multiple?: boolean;
   placeholder?: string;
 
-  onChange?: (value: Item | Item[]) => void;
+  onChange?: (value: Option | Option[]) => void;
 
-  // maximum number of items to backfill with suggestions
+  // maximum number of options to backfill with suggestions
   // available for quick selection
-  targetItems?: number;
+  targetOptions?: number;
 
   canCreate?: boolean;
-  createForm?: CreateItemForm;
+  createForm?: CreateOptionForm;
 
   // options are gathered either via dynamic query
   endpoint?: string;
   // or fixed value
-  options?: Item[];
+  options?: Option[];
   // static suggestions can also be provided
-  suggestedItems?: Item[];
+  suggestedOptions?: Option[];
 
   children?: ReactNode;
   className?: string;
@@ -365,33 +364,37 @@ export default ({
   required,
   className,
   multiple = false,
-  targetItems = 5,
-  suggestedItems = [],
+  targetOptions = 5,
+  suggestedOptions = [],
   canCreate = false,
   createForm,
   placeholder,
   endpoint,
   options = [],
-  onChange = (value: Item | Item[]) => {},
+  onChange = () => {},
   ...props
 }: Props) => {
-  const [value, setValue] = useState<Item[]>(props.value || []);
-  const [previousValues, setPreviousValues] = useState<Item[]>(
-    props.value || []
-  );
+  const initialValue = Array.isArray(props.value)
+    ? props.value
+    : props.value
+    ? [props.value]
+    : [];
+
+  const [value, setValue] = useState<Option[]>(initialValue);
+  const [previousValues, setPreviousValues] = useState<Option[]>(value);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const toggleItem = (item: Item) => {
-    setPreviousValues(filterDupes([item], previousValues));
-    if (value.find((i) => i.id == item.id && i.name == item.name)) {
-      setValue(value.filter((i) => i.id != item.id || i.name != item.name));
+  const toggleOption = (option: Option) => {
+    setPreviousValues(filterDupes([option], previousValues));
+    if (value.find((i) => i.id == option.id && i.name == option.name)) {
+      setValue(value.filter((i) => i.id != option.id || i.name != option.name));
       return false;
     }
 
     if (multiple) {
-      setValue([item, ...value]);
+      setValue([option, ...value]);
     } else {
-      setValue([item]);
+      setValue([option]);
     }
     return true;
   };
@@ -406,9 +409,9 @@ export default ({
 
   const visibleValues = filterDupes(value, previousValues);
 
-  if (visibleValues.length < targetItems) {
-    filterDupes(visibleValues, suggestedItems)
-      .slice(visibleValues.length, targetItems)
+  if (visibleValues.length < targetOptions) {
+    filterDupes(visibleValues, suggestedOptions)
+      .slice(visibleValues.length, targetOptions)
       .forEach((i) => {
         visibleValues.push(i);
       });
@@ -425,13 +428,13 @@ export default ({
       }}
     >
       <div className="flex items-center gap-x-2 sm:leading-6 mt-1">
-        {visibleValues.map((item) => (
+        {visibleValues.map((option) => (
           <Chip
-            key={`${item.id}-${item.name}`}
-            active={value.indexOf(item) !== -1}
-            onClick={() => toggleItem(item)}
+            key={`${option.id}-${option.name}`}
+            active={value.indexOf(option) !== -1}
+            onClick={() => toggleOption(option)}
           >
-            {item.name}
+            {option.name}
           </Chip>
         ))}
         {visibleValues.length === 0 && placeholder && (
@@ -443,8 +446,8 @@ export default ({
       <SelectDialog
         open={dialogOpen}
         setOpen={setDialogOpen}
-        onSelect={(item) => {
-          const active = toggleItem(item);
+        onSelect={(option) => {
+          const active = toggleOption(option);
           if (!multiple && active) setDialogOpen(false);
         }}
         canCreate={canCreate}

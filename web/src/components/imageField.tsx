@@ -7,10 +7,10 @@ import HelpText from "./helpText";
 
 type Props = Omit<React.ComponentProps<typeof TextInput>, "value"> & {
   label?: string;
+  buttonLabel?: string;
   helpText?: string;
   required?: boolean;
   children?: ReactNode;
-  buttonLabel?: string;
   className?: string;
   value?: string | File | undefined;
 };
@@ -34,18 +34,17 @@ const fileToDataUrl = (file: File): Promise<string> => {
 
 export default ({
   name,
-  helpText,
   label,
+  buttonLabel = "Upload Image",
+  helpText,
   required,
-  buttonLabel,
   className,
   value,
   onChange,
-  ...props
 }: Props) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  const [isHover, setHover] = useState(false);
+  const [_isHover, setHover] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>();
 
   useEffect(() => {
@@ -92,10 +91,10 @@ export default ({
         e.preventDefault();
         setHover(false);
       }}
-      onMouseOver={(e) => {
+      onMouseOver={() => {
         setHover(true);
       }}
-      onMouseOut={(e) => {
+      onMouseOut={() => {
         setHover(false);
       }}
       onDrop={(e) => {
@@ -145,7 +144,7 @@ export default ({
               fileRef.current?.click();
             }}
           >
-            Upload Image
+            {buttonLabel}
           </Button>
           <HelpText>JPG, GIF or PNG. 1MB max.</HelpText>
         </div>

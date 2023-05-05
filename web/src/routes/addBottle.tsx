@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 
-import { Brand, Distiller } from "../types";
 import api, { ApiError } from "../lib/api";
 import { useRequiredAuth } from "../hooks/useAuth";
 import Layout from "../components/layout";
@@ -13,15 +12,16 @@ import Fieldset from "../components/fieldset";
 import BrandField from "../components/brandField";
 import DistillerField from "../components/distillerField";
 import SelectField from "../components/selectField";
+import { Option } from "../components/richSelectField";
 
 type FormData = {
   name?: string;
   series?: string;
-  brand?: Brand;
-  distillers?: Distiller[];
+  brand?: Option | undefined;
+  distillers?: Option[] | undefined;
   abv?: number;
   statedAge?: number;
-  category?: string;
+  category?: string | undefined;
 };
 
 export default function AddBottle() {
@@ -113,8 +113,8 @@ export default function AddBottle() {
             name="brand"
             helpText="The brand, or main label of the bottle."
             placeholder="e.g. Macallan"
-            onChange={(value: Brand) =>
-              setFormData({ ...formData, brand: value })
+            onChange={(value) =>
+              setFormData({ ...formData, brand: value as Option })
             }
             required
             canCreate={user.admin}
@@ -126,8 +126,11 @@ export default function AddBottle() {
             name="distillers"
             placeholder="e.g. Distiller"
             helpText="The distilleries which produces the spirit(s) for this bottle."
-            onChange={(value: Distiller[]) =>
-              setFormData({ ...formData, distillers: value })
+            onChange={(value) =>
+              setFormData({
+                ...formData,
+                distillers: value as Option[],
+              })
             }
             canCreate={user.admin}
             value={formData.distillers}
@@ -171,7 +174,9 @@ export default function AddBottle() {
             name="category"
             placeholder="e.g. Single Malt"
             helpText="The kind of spirit."
-            onChange={(value) => setFormData({ ...formData, category: value })}
+            onChange={(value) =>
+              setFormData({ ...formData, category: value as string })
+            }
             value={formData.category}
             options={[
               { id: "", value: <em>Unknown</em> },

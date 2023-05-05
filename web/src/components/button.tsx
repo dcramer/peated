@@ -6,13 +6,14 @@ type ButtonColor = "primary" | "default" | undefined;
 
 type ButtonSize = "small" | "base";
 
-type Props = Pick<React.ComponentProps<"button">, "onClick" | "onChange"> & {
+type Props = {
   color?: ButtonColor;
   icon?: ReactNode;
   to?: string;
   size?: ButtonSize;
   type?: "button" | "submit" | "reset";
   children?: ReactNode;
+  onClick?: (e: any) => void;
 };
 
 export default ({

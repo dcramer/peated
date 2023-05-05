@@ -5,9 +5,8 @@ import api, { ApiError } from "../lib/api";
 import useAuth from "../hooks/useAuth";
 import Layout from "../components/layout";
 
-import PeatedLogo from "../assets/logo.svg";
+import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
 import TextField from "../components/textField";
-import FormError from "../components/formError";
 import classNames from "../lib/classNames";
 import Alert from "../components/alert";
 

@@ -1,13 +1,12 @@
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import { PlusIcon } from "@heroicons/react/20/solid";
 import { Link } from "react-router-dom";
 
 import type { Checkin } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
 import CheckinListItem from "../components/checkinListItem";
-import Glyph from "../assets/glyph.svg";
+import { ReactComponent as Glyph } from "../assets/glyph.svg";
 import FloatingCheckinButton from "../components/floatingCheckinButton";
 
 type LoaderData = {

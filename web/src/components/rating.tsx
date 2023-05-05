@@ -51,13 +51,15 @@ export const StaticRating = ({ value, size, className }: Props) => {
 export default ({
   name,
   id,
-  onChange,
+  onChange = () => {},
+  required = false,
   ...props
 }: {
-  name?: string;
   id?: string;
+  name?: string;
   value?: number | null | undefined;
-  onChange: (value: number) => void;
+  onChange?: (value: number) => void;
+  required?: boolean;
 }) => {
   const [value, setValue] = useState<number>(props.value || 0);
 

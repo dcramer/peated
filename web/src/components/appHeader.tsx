@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu, Transition } from "@headlessui/react";
 
 import useAuth from "../hooks/useAuth";
-import PeatedLogo from "../assets/logo.svg";
-import PeatedGlyph from "../assets/glyph.svg";
+import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
+import { ReactComponent as PeatedGlyph } from "../assets/glyph.svg";
 import UserAvatar from "./userAvatar";
 
 const HeaderLogo = () => {

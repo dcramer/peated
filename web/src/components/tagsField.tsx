@@ -216,7 +216,7 @@ export default (props: Props) => {
       label="Flavors"
       multiple
       {...props}
-      suggestedItems={suggestedTags}
+      suggestedOptions={suggestedTags}
       options={options}
     />
   );

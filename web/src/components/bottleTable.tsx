@@ -12,7 +12,7 @@ export default ({
 }: {
   bottleList: Bottle[];
   groupBy?: (bottle: Bottle) => Grouper;
-  groupTo?: (group: Grouper) => string;
+  groupTo?: (group: Brand | Distiller) => string;
 }) => {
   let lastGroup: Grouper;
   return (
