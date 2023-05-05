@@ -13,6 +13,7 @@ type UserWithStats = User & {
   stats: {
     bottles: number;
     checkins: number;
+    contributions: number;
   };
 };
 
@@ -67,11 +68,17 @@ export default function UserDetails() {
               </span>
               <span className="text-sm text-gray-400">Tastings</span>
             </div>
-            <div className="pl-3 text-center mb-4">
+            <div className="px-3 text-center mb-4">
               <span className="text-xl font-bold block uppercase tracking-wide text-peated">
                 {user.stats.bottles.toLocaleString()}
               </span>
               <span className="text-sm text-gray-400">Bottles</span>
+            </div>
+            <div className="pl-3 text-center mb-4">
+              <span className="text-xl font-bold block uppercase tracking-wide text-peated">
+                {user.stats.contributions.toLocaleString()}
+              </span>
+              <span className="text-sm text-gray-400">Contributions</span>
             </div>
           </div>
         </div>

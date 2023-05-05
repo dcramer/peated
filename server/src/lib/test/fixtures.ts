@@ -5,6 +5,7 @@ import {
   Brand as BrandType,
   Checkin as CheckinType,
   Distiller as DistillerType,
+  Prisma,
   User as UserType,
 } from "@prisma/client";
 import { createAccessToken } from "../auth";
@@ -47,12 +48,23 @@ export const Distiller = async ({ ...data }: Partial<DistillerType> = {}) => {
   });
 };
 
-export const Bottle = async ({ ...data }: Partial<BottleType> = {}) => {
+export const Bottle = async ({
+  distillerIds = [],
+  ...data
+}: Partial<
+  BottleType & {
+    distillerIds: number[];
+  }
+> = {}) => {
   if (data.brandId === undefined) data.brandId = (await Brand()).id;
-  if (data.distillers === undefined) {
+
+  const distillers: Prisma.DistillerCreateNestedManyWithoutBottlesInput = {};
+  if (!distillerIds.length) {
     if (between(0, 1) === 1) {
-      data.distillers = { connect: [{ id: (await Distiller()).id }] };
+      distillers.connect = [{ id: (await Distiller()).id }];
     }
+  } else {
+    distillers.connect = distillerIds.map((d) => ({ id: d }));
   }
 
   return await prisma.bottle.create({
@@ -60,6 +72,7 @@ export const Bottle = async ({ ...data }: Partial<BottleType> = {}) => {
       name: faker.music.songName(),
       series: faker.music.songName(),
       ...data,
+      distillers,
     },
   });
 };

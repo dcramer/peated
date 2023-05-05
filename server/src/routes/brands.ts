@@ -135,13 +135,27 @@ export const addBrand: RouteOptions<
     data.createdById = req.user.id;
     data.public = req.user.admin;
 
-    const brand = await prisma.brand.upsert({
-      where: {
-        name: data.name,
-      },
-      update: {},
-      create: data,
+    const brand = await prisma.$transaction(async (tx) => {
+      const brand = await tx.brand.upsert({
+        where: {
+          name: data.name,
+        },
+        update: {},
+        create: data,
+      });
+
+      await tx.change.create({
+        data: {
+          objectType: "brand",
+          objectId: brand.id,
+          userId: req.user.id,
+          data: JSON.stringify(data),
+        },
+      });
+
+      return brand;
     });
+
     res.status(201).send(brand);
   },
 };

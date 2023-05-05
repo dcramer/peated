@@ -135,13 +135,27 @@ export const addDistiller: RouteOptions<
     data.createdById = req.user.id;
     data.public = req.user.admin;
 
-    const distiller = await prisma.distiller.upsert({
-      where: {
-        name: data.name,
-      },
-      update: {},
-      create: data,
+    const distiller = await prisma.$transaction(async (tx) => {
+      const distiller = await tx.distiller.upsert({
+        where: {
+          name: data.name,
+        },
+        update: {},
+        create: data,
+      });
+
+      await tx.change.create({
+        data: {
+          objectType: "distiller",
+          objectId: distiller.id,
+          userId: req.user.id,
+          data: JSON.stringify(data),
+        },
+      });
+
+      return distiller;
     });
+
     res.status(201).send(distiller);
   },
 };

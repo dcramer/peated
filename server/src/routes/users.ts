@@ -116,10 +116,18 @@ export const getUser: RouteOptions<
     const [{ count: totalBottles }] = await prisma.$queryRaw<
       { count: number }[]
     >`SELECT COUNT(DISTINCT "bottleId") FROM "checkin" WHERE "userId" = ${user.id}`;
+    const totalContributions = await prisma.change.count({
+      where: { userId: user.id },
+    });
 
-    const item = serializeUser(user, req.user);
-    item.stats = { checkins: totalCheckins, bottles: totalBottles };
-    res.send(item);
+    res.send({
+      ...serializeUser(user, req.user),
+      stats: {
+        checkins: totalCheckins,
+        bottles: totalBottles,
+        contributions: totalContributions,
+      },
+    });
   },
 };
 

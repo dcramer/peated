@@ -28,5 +28,10 @@ declare global {
     interface AsymmetricMatchersContaining extends CustomMatchers {}
   }
 
-  var DefaultFixtures;
+  const DefaultFixtures = {
+    user: User,
+    authHeaders: {
+      Authorization: string,
+    },
+  };
 }

@@ -25,6 +25,7 @@ model User {
     brands     Brand[]
     distillers Distiller[]
     bottles    Bottle[]
+    Change     Change[]
 
     @@map("user")
 }
@@ -149,3 +150,15 @@ model Checkin {
 //     name String
 // @@map("location")
 // }
+
+model Change {
+    id     Int  @id @default(autoincrement())
+    userId Int
+    user   User @relation(fields: [userId], references: [id])
+
+    createdAt DateTime @default(now())
+
+    objectType String
+    objectId   Int
+    data       String
+}
