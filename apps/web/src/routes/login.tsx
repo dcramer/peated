@@ -121,6 +121,7 @@ export default function Login() {
             onError={() => {
               console.log("Login Failed");
             }}
+            width="336"
           />
         </div>
         <BasicLogin />
