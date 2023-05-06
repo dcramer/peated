@@ -10,6 +10,12 @@ primary_region = "den"
 CORS_HOST = "https://peated.app"
 URL_PREFIX = "https://api.peated.app"
 
+[build]
+  build-target = "api"
+
+[deploy]
+  release_command = "npm run db:deploy"
+
 [[services]]
   http_checks = []
   internal_port = 4000

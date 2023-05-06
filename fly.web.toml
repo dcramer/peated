@@ -10,8 +10,11 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
 
-[env]
-API_SERVER = "https://api.peated.app"
+[build]
+  build-target = "api"
+  
+  [build.args]
+    API_SERVER = "https://api.peated.app"
 
 [experimental]
   allowed_public_ports = []

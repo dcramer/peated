@@ -4,6 +4,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon --exec ts-node --require dotenv/config ./src/server.ts",
+    "db:deploy": "npx prisma migrate",
     "db:migrate": "run-p db:migrate:*",
     "db:migrate:dev": "npx prisma migrate dev",
     "db:migrate:test": "dotenv -e .env.test -- npx prisma db push --accept-data-loss",

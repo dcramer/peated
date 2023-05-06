@@ -1,7 +1,10 @@
-FROM node:18-alpine as base
+FROM node:18-slim as base
 
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
+
+# Install openssl for Prisma
+RUN apt-get update && apt-get install -y openssl
 
 FROM base as deps
 
@@ -66,6 +69,11 @@ WORKDIR /app
 COPY --from=build-api /app/node_modules ./node_modules
 
 ADD apps/api/ .
+
+ARG VERSION
+ENV VERSION $VERSION
+
+RUN echo $VERSION > VERSION
 
 ENV HOST 0.0.0.0
 ENV PORT 4000
