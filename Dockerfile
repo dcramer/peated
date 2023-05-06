@@ -50,7 +50,7 @@ WORKDIR /app
 
 COPY --from=build-api /app/node_modules ./node_modules
 
-ADD . .
+ADD apps/api/ .
 
 ENV PORT 4000
 
