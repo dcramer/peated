@@ -3,7 +3,7 @@ const config = {
   DEBUG: import.meta.env.DEV,
   GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
   SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN || "",
-  API_SERVER: import.meta.env.VITE_API_HOST || "http://localhost:4000",
+  API_SERVER: import.meta.env.VITE_API_SERVER || "http://localhost:4000",
   GITHUB_REPO: "https://github.com/dcramer/peated",
 };
 
