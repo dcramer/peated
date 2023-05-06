@@ -10,8 +10,8 @@ export default function ErrorPage() {
 
   const isOnline = useOnlineStatus();
 
-  let subtitle: string = "Error";
-  let title: string = "Sorry, an unexpected error has occurred.";
+  let title: string = "Error";
+  let subtitle: string = "Sorry, an unexpected error has occurred.";
   if (error instanceof ApiUnavailable) {
     title = isOnline ? "Server Unreachable" : "Connection Offline";
     subtitle = isOnline
