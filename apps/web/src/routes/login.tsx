@@ -54,56 +54,47 @@ const BasicLogin = () => {
   };
 
   return (
-    <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-      <form onSubmit={onSubmit}>
-        <div className="relative mt-4 mb-2">
-          <div
-            className="absolute inset-0 flex items-center"
-            aria-hidden="true"
-          >
-            <div className="min-w-full border-t border-peated-light" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-peated px-2 text-sm text-white">Or</span>
-          </div>
+    <form onSubmit={onSubmit}>
+      <div className="relative mt-4 mb-2">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="min-w-full border-t border-peated-light" />
         </div>
-        <div className="mb-2">{error && <Alert>{error}</Alert>}</div>
-        <TextField
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          placeholder="you@example.com"
-          onChange={(e) =>
-            setData({ ...data, [e.target.name]: e.target.value })
-          }
-          className="mb-2 rounded"
-        />
-        <TextField
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          placeholder="password"
-          onChange={(e) =>
-            setData({ ...data, [e.target.name]: e.target.value })
-          }
-          className="mb-2 rounded"
-        />
-        <div>
-          <button
-            type="submit"
-            className={classNames(
-              "flex w-full justify-center rounded bg-peated-dark px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated",
-              loading ? "text-peated-light" : "text-white"
-            )}
-            disabled={loading}
-          >
-            Sign in
-          </button>
+        <div className="relative flex justify-center">
+          <span className="bg-peated px-2 text-sm text-white">Or</span>
         </div>
-      </form>
-    </div>
+      </div>
+      <div className="mb-2">{error && <Alert>{error}</Alert>}</div>
+      <TextField
+        name="email"
+        type="email"
+        autoComplete="email"
+        required
+        placeholder="you@example.com"
+        onChange={(e) => setData({ ...data, [e.target.name]: e.target.value })}
+        className="mb-2 rounded"
+      />
+      <TextField
+        name="password"
+        type="password"
+        autoComplete="current-password"
+        required
+        placeholder="password"
+        onChange={(e) => setData({ ...data, [e.target.name]: e.target.value })}
+        className="mb-2 rounded"
+      />
+      <div>
+        <button
+          type="submit"
+          className={classNames(
+            "flex w-full justify-center rounded bg-peated-dark px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated",
+            loading ? "text-peated-light" : "text-white"
+          )}
+          disabled={loading}
+        >
+          Sign in
+        </button>
+      </div>
+    </form>
   );
 };
 
@@ -113,30 +104,26 @@ export default function Login() {
 
   return (
     <Layout noHeader splash>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <PeatedLogo color="white" />
-        </div>
+      <PeatedLogo color="white" />
 
-        <div className="mt-8">
-          <div className="max-w-sm mx-auto">
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                const { user, accessToken } = await api.post("/auth/google", {
-                  data: {
-                    token: credentialResponse.credential,
-                  },
-                });
-                login(user, accessToken);
-                navigate("/");
-              }}
-              onError={() => {
-                console.log("Login Failed");
-              }}
-            />
-          </div>
-          <BasicLogin />
+      <div className="mt-8">
+        <div className="max-w-sm mx-auto">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              const { user, accessToken } = await api.post("/auth/google", {
+                data: {
+                  token: credentialResponse.credential,
+                },
+              });
+              login(user, accessToken);
+              navigate("/");
+            }}
+            onError={() => {
+              console.log("Login Failed");
+            }}
+          />
         </div>
+        <BasicLogin />
       </div>
     </Layout>
   );
