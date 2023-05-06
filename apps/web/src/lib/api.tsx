@@ -1,5 +1,4 @@
-const API_SERVER: string =
-  import.meta.env.API_SERVER || "http://localhost:4000";
+import config from "../config";
 
 type ApiRequestOptions = {
   method: "GET" | "POST" | "DELETE" | "PUT";
@@ -129,7 +128,7 @@ const createDefaultClient = () => {
     // If error also return initialValue
     console.log(error);
   }
-  return new ApiClient({ server: API_SERVER, accessToken });
+  return new ApiClient({ server: config.API_SERVER, accessToken });
 };
 
 const defaultClient = createDefaultClient();
