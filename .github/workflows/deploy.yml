@@ -13,7 +13,7 @@ jobs:
       - run: |
           flyctl deploy -a peated-api \
             --remote-only \
-            --config fly.web.toml \
+            --config fly.api.toml \
             --build-arg VERSION=$(git rev-parse --short HEAD) \
             --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
         env:
