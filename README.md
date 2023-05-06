@@ -23,7 +23,7 @@ Note: If you need to tweak default settings, `cp .env.example .env` and go to to
 Create a local user to avoid setting up Google credentials:
 
 ```
-npm run create-user -w services/api
+npm run create-user -w apps/api
 ```
 
 Run the dev server, which spins up both the `web` and the `api` services:

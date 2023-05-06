@@ -1,31 +1,33 @@
-FROM node:alpine AS base
-RUN apk update && apk add git
-RUN npm i -g turbo
+# base node image
+FROM docker.io/node:lts-alpine as base
 
-# Prune the workspace for the `web` app
-FROM base as pruner
-WORKDIR /app
-COPY . .
-RUN turbo prune --scope=web --docker
- 
-# Add pruned lockfile and package.json's of the pruned subworkspace
-FROM base AS installer
-WORKDIR /app
-COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/package-json.lock ./package-json.lock
-# Install only the deps needed to build the target
-RUN npm install
- 
-# Copy source code of pruned subworkspace and build
-FROM base as builder
-WORKDIR /app
-COPY --from=pruner /app/.git ./.git
-COPY --from=pruner /app/out/full/ .
-COPY --from=installer /app/ .
-RUN turbo run build --scope=web
- 
-# Start the app
-FROM builder as runner
-EXPOSE 3000
-RUN ['npm', '--cwd', 'web', 'start']
+RUN npm install -g npm
 
+# set for base and all layer that inherit from it
+ENV NODE_ENV production
+
+FROM base as deps
+
+WORKDIR /app
+
+ADD . .
+ADD package.json package-lock.json .
+ADD apps/web/package.json apps/web/package.json
+ADD apps/api/package.json apps/api/package.json
+ADD packages/shared/package.json packages/shared/package.json
+RUN npm install --workspaces
+
+ADD . .
+
+FROM base as build-web
+
+WORKDIR /app
+
+COPY --from=deps /app/web/apps/node_modules ./node_modules
+RUN npm run build
+
+FROM pierrezemb/gostatic as final-web
+COPY --from=build-web /app/apps/web/dist /srv/http/
+
+# FROM pierrezemb/gostatic as build-api
+# COPY --from=base /app/apps/web/dist /srv/http/
