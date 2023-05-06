@@ -24,7 +24,6 @@ ADD apps/web/ .
 
 RUN npm run build
 
-# api service
 FROM base as build-api
 
 WORKDIR /app
@@ -40,11 +39,18 @@ ADD apps/api/ .
 RUN npm run build
 
 # web service
-FROM pierrezemb/gostatic as final-web
+FROM pierrezemb/gostatic as web
 
 COPY --from=build-web /app/dist /srv/http/
 
-FROM build-api as final-api
+# api service
+FROM build-api as api
+
+WORKDIR /app
+
+COPY --from=build-api /app/node_modules ./node_modules
+
+ADD . .
 
 ENV PORT 4000
 

@@ -11,6 +11,7 @@
     "create-user": "ts-node --require dotenv/config ./src/bin/create-user.ts",
     "postinstall": "npx prisma generate",
     "tsc": "tsc",
+    "start": "ts-node --require dotenv/config ./src/server.ts",
     "test": "run-s db:migrate:test test:vitest",
     "test:vitest": "dotenv -e .env.test -- vitest --no-threads"
   },
