@@ -32,6 +32,9 @@ ENV SENTRY_PROJECT $SENTRY_PROJECT
 ARG API_SERVER
 ENV API_SERVER $API_SERVER
 
+ARG GOOGLE_CLIENT_ID
+ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
 
