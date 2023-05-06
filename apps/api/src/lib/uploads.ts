@@ -22,12 +22,14 @@ export const storeFile = async ({
   const newFilename = `${namespace}-${createId()}${extname(data.filename)}`;
 
   if (process.env.USE_GCS_STORAGE) {
-    const bucketName = process.env.GCS_BUCKET_NAME as string;
-    const bucketPath = process.env.GCS_BUCKET_PATH
-      ? `${process.env.GCS_BUCKET_PATH}/`
+    const bucketName = config.GCS_BUCKET_NAME as string;
+    const bucketPath = config.GCS_BUCKET_PATH
+      ? `${config.GCS_BUCKET_PATH}/`
       : "";
 
-    const cloudStorage = new Storage();
+    const cloudStorage = new Storage({
+      credentials: config.GCP_CREDENTIALS,
+    });
     const file = cloudStorage
       .bucket(bucketName)
       .file(`${bucketPath}${newFilename}`);
