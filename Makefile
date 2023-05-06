@@ -20,4 +20,4 @@ deploy-web:
 		--build-arg SENTRY_ORG=${SENTRY_ORG} \
 		--build-arg SENTRY_PROJECT=${SENTRY_PROJECT} \
 		--build-arg VERSION=$(shell git rev-parse --short HEAD) \
-		-e VERSION=$(shell git rev-parse --short HEAD)
+		--build-arg API_SERVER=https://api.peated.app

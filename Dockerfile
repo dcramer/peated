@@ -29,6 +29,9 @@ ENV SENTRY_ORG $SENTRY_ORG
 ARG SENTRY_PROJECT
 ENV SENTRY_PROJECT $SENTRY_PROJECT
 
+ARG API_SERVER
+ENV API_SERVER $API_SERVER
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
 
