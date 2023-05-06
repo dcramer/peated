@@ -57,9 +57,17 @@ ADD apps/api/ .
 RUN npm run build
 
 # web service
-FROM pierrezemb/gostatic as web
+FROM nginx:alpine as web
 
-COPY --from=build-web /app/dist /srv/http/
+COPY --from=build-web /app/dist /usr/share/nginx/html
+
+RUN rm /etc/nginx/conf.d/default.conf
+
+COPY nginx/nginx.conf /etc/nginx/conf.d
+
+EXPOSE 8043
+
+CMD ["nginx", "-g", "daemon off;"]
 
 # api service
 FROM build-api as api

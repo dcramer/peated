@@ -11,7 +11,7 @@ kill_timeout = 5
 processes = []
 
 [build]
-  build-target = "api"
+  build-target = "web"
   
   [build.args]
     API_SERVER = "https://api.peated.app"
