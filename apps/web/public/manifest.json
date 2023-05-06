@@ -1,6 +1,7 @@
 {
   "short_name": "Peated",
   "name": "Peated",
+  "description": "Is it Peated?",
   "icons": [
     {
       "src": "glyph.png",
@@ -18,7 +19,9 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#005C58",
   "background_color": "#005C58"
