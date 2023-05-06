@@ -52,6 +52,7 @@ COPY --from=build-api /app/node_modules ./node_modules
 
 ADD apps/api/ .
 
+ENV HOST 0.0.0.0
 ENV PORT 4000
 
 EXPOSE 4000
