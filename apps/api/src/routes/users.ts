@@ -159,8 +159,8 @@ export const updateUser: RouteOptions<
       return res.status(404).send({ error: "Not found" });
     }
 
-    if (user.id !== req.user.id || !user.admin) {
-      return res.status(403).send({ error: "Forbidden " });
+    if (user.id !== req.user.id && !user.admin) {
+      return res.status(403).send({ error: "Forbidden" });
     }
 
     const body = req.body;
