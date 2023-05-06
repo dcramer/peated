@@ -10,6 +10,7 @@ import * as Sentry from "@sentry/node";
 
 Sentry.init({
   dsn: config.SENTRY_DSN,
+  release: config.VERSION,
   integrations: [
     new Sentry.Integrations.Http({ tracing: true }),
     ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),

@@ -7,6 +7,7 @@
     "@heroicons/react": "^2.0.17",
     "@peated/shared": "file:../../packages/shared",
     "@react-oauth/google": "^0.11.0",
+    "@sentry/react": "^7.51.0",
     "@sentry/vite-plugin": "^0.7.2",
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",

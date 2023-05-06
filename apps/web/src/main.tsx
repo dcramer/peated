@@ -2,12 +2,24 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import * as Sentry from "@sentry/react";
 
 // import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import createRoutes from "./routes";
 import config from "./config";
 import { AuthProvider } from "./hooks/useAuth";
 import { OnlineStatusProvider } from "./hooks/useOnlineStatus";
+
+Sentry.init({
+  dsn: config.SENTRY_DSN,
+  release: config.VERSION,
+
+  integrations: [new Sentry.BrowserTracing()],
+
+  // We recommend adjusting this value in production, or using tracesSampler
+  // for finer control
+  tracesSampleRate: 1.0,
+});
 
 const router = createBrowserRouter(createRoutes());
 

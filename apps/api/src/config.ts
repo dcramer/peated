@@ -9,6 +9,8 @@ export default {
   JWT_SECRET: process.env.JWT_SECRET || "",
   URL_PREFIX: process.env.URL_PREFIX || "http://localhost:4000",
 
+  VERSION: process.env.VERSION || "",
+
   SENTRY_DSN: process.env.SENTRY_DSN || "",
 
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,

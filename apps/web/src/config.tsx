@@ -5,7 +5,7 @@ const config = {
   SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN || "",
   API_SERVER: import.meta.env.VITE_API_SERVER || "http://localhost:4000",
 
-  VERSION: import.meta.env.VITE_VERSION || "unknown",
+  VERSION: import.meta.env.VITE_VERSION || "",
   GITHUB_REPO: "https://github.com/dcramer/peated",
 };
 
