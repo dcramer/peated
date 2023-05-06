@@ -17,6 +17,18 @@ FROM base as build-web
 
 WORKDIR /app
 
+ARG VERSION
+ENV VERSION $VERSION
+
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN $SENTRY_AUTH_TOKEN
+
+ARG SENTRY_ORG
+ENV SENTRY_PROJECT $SENTRY_ORG
+
+ARG SENTRY_PROJECT
+ENV SENTRY_PROJECT $SENTRY_PROJECT
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
 

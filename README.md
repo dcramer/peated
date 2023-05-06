@@ -37,3 +37,9 @@ NX is used to manage the monorepo, e.g.
 ```
 npx nx run-many -t build
 ```
+
+## Deploy
+
+```
+make deploy
+```
