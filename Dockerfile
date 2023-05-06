@@ -39,7 +39,7 @@ COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
 ADD apps/web/ .
 
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
-    SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" some_command
+    SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" some_command \
     && npm run build
 
 # build api
