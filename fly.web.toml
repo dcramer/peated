@@ -6,18 +6,19 @@
 app = "peated-web"
 primary_region = "den"
 
-kill_signal = "SIGINT"
-kill_timeout = 5
-processes = []
+[env]
+API_SERVER = "https://api.peated.app"
+SENTRY_ORG = "cramer"
+SENTRY_PROJECT = "peated-web"
+GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
+CORS_HOST = "https://peated.app"
+URL_PREFIX = "https://api.peated.app"
+USE_GCS_STORAGE = "1"
+GCS_BUCKET_NAME = "peated"
+GCS_BUCKET_PATH = "uploads"
 
 [build]
   build-target = "web"
-  
-  [build.args]
-    API_SERVER = "https://api.peated.app"
-    SENTRY_ORG = "cramer"
-    SENTRY_PROJECT = "peated-web"
-    GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
 
 [experimental]
   allowed_public_ports = []
