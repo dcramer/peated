@@ -41,6 +41,8 @@ export default defineConfig(({ command, mode }) => {
         // and need `project:releases` and `org:read` scopes
         authToken: env.SENTRY_AUTH_TOKEN,
 
+        release: env.VERSION,
+
         sourcemaps: {
           // Specify the directory containing build artifacts
           assets: "./dist/**",
