@@ -13,15 +13,13 @@ ADD apps/web/package.json ./apps/web/package.json
 ADD apps/api/package.json ./apps/api/package.json
 RUN npm install --workspaces
 
+# build web
 FROM base as build-web
 
 WORKDIR /app
 
 ARG VERSION
 ENV VERSION $VERSION
-
-ARG SENTRY_AUTH_TOKEN
-ENV SENTRY_AUTH_TOKEN $SENTRY_AUTH_TOKEN
 
 ARG SENTRY_ORG
 ENV SENTRY_ORG $SENTRY_ORG
@@ -40,8 +38,11 @@ COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
 
 ADD apps/web/ .
 
-RUN npm run build
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
+    SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" some_command
+    && npm run build
 
+# build api
 FROM base as build-api
 
 WORKDIR /app
