@@ -6,7 +6,7 @@
     "tsc": "tsc"
   },
   "dependencies": {
-    "@peated/shared": "file:../packages/shared",
+    "@peated/shared": "file:../../packages/shared",
     "@swc/core": "^1.3.46",
     "@types/cheerio": "^0.22.31",
     "axios": "^1.3.5",

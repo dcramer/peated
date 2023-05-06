@@ -1,7 +1,4 @@
-# base node image
-FROM docker.io/node:lts-alpine as base
-
-RUN npm install -g npm
+FROM node:18-alpine as base
 
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
@@ -10,24 +7,47 @@ FROM base as deps
 
 WORKDIR /app
 
-ADD . .
 ADD package.json package-lock.json .
-ADD apps/web/package.json apps/web/package.json
-ADD apps/api/package.json apps/api/package.json
-ADD packages/shared/package.json packages/shared/package.json
+ADD packages ./packages
+ADD apps/web/package.json ./apps/web/package.json
+ADD apps/api/package.json ./apps/api/package.json
 RUN npm install --workspaces
-
-ADD . .
 
 FROM base as build-web
 
 WORKDIR /app
 
-COPY --from=deps /app/web/apps/node_modules ./node_modules
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
+
+ADD apps/web/ .
+
 RUN npm run build
 
-FROM pierrezemb/gostatic as final-web
-COPY --from=build-web /app/apps/web/dist /srv/http/
+# api service
+FROM base as build-api
 
-# FROM pierrezemb/gostatic as build-api
-# COPY --from=base /app/apps/web/dist /srv/http/
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
+
+ADD apps/api/prisma .
+RUN npx prisma generate
+
+ADD apps/api/ .
+
+RUN npm run build
+
+# web service
+FROM pierrezemb/gostatic as final-web
+
+COPY --from=build-web /app/dist /srv/http/
+
+FROM build-api as final-api
+
+ENV PORT 4000
+
+EXPOSE 4000
+
+CMD ["npm", "start"]
