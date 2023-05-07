@@ -8,12 +8,14 @@ import config from "./config";
 
 import * as Sentry from "@sentry/node";
 import FastifySentry from "./sentryPlugin";
+import { prisma } from "./lib/db";
 
 Sentry.init({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
   integrations: [
     new Sentry.Integrations.Http({ tracing: true }),
+    new Sentry.Integrations.Prisma({ client: prisma }),
     ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
   ],
   tracesSampleRate: 1.0,
@@ -52,8 +54,6 @@ export default async function buildFastify(options = {}) {
   app.register(FastifySentry);
 
   app.setErrorHandler(function (error, request, reply) {
-    Sentry.captureException(error);
-
     if (error instanceof fastify.errorCodes.FST_ERR_BAD_STATUS_CODE) {
       // Log error
       this.log.error(error);
