@@ -1,6 +1,4 @@
 import type { RouteOptions } from "fastify";
-import { decode, verify } from "jsonwebtoken";
-import { JwksClient } from "jwks-rsa";
 import { IncomingMessage, Server, ServerResponse } from "http";
 
 import { prisma } from "../lib/db";
@@ -8,28 +6,7 @@ import { createAccessToken, serializeUser } from "../lib/auth";
 import config from "../config";
 import { compareSync } from "bcrypt";
 import { validateRequest } from "../middleware/auth";
-
-type GoogleCredential = {
-  iss: string;
-  nbf: number;
-  aud: string;
-  sub: string;
-  email: string;
-  email_verified: boolean;
-  azp: string;
-  name: string;
-  picture: string;
-  given_name: string;
-  family_name: string;
-  iat: number;
-  exp: number;
-  jti: string;
-};
-
-const jwksClient = new JwksClient({
-  jwksUri: "https://www.googleapis.com/oauth2/v2/certs",
-  timeout: 3000,
-});
+import { OAuth2Client } from "google-auth-library";
 
 export const authDetails: RouteOptions<
   Server,
@@ -110,7 +87,7 @@ export const authGoogle: RouteOptions<
   ServerResponse,
   {
     Body: {
-      token?: string;
+      code: string;
     };
   }
 > = {
@@ -119,52 +96,37 @@ export const authGoogle: RouteOptions<
   schema: {
     body: {
       type: "object",
-      required: ["token"],
+      required: ["code"],
       properties: {
-        token: { type: "string" },
+        code: { type: "string" },
       },
     },
   },
   handler: async function (req, res) {
-    const { token } = req.body;
-    if (!token) {
-      res.status(400).send({ error: "Missing token" });
-      return;
+    const { code } = req.body;
+
+    // https://stackoverflow.com/questions/74132586/authentication-using-node-js-oauthclient-auth-code-flow
+    const client = new OAuth2Client(
+      config.GOOGLE_CLIENT_ID,
+      config.GOOGLE_CLIENT_SECRET,
+      "postmessage"
+    );
+
+    const { tokens } = await client.getToken(code);
+    // client.setCredentials(tokens);
+
+    if (!tokens.id_token) {
+      return res.status(401).send({ error: "Unable to validate credentials" });
     }
 
-    const response = decode(token, { complete: true });
-    if (!response) {
-      res.status(400).send({ error: "Invalid token (invalid)" });
-      return;
-    }
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: config.GOOGLE_CLIENT_ID,
+    });
 
-    const { header } = response;
-    if (!header.kid) {
-      res.status(400).send({ error: "Invalid token (kid)" });
-      return;
-    }
-
-    const signingKey = await jwksClient.getSigningKey(header.kid);
-
-    const payload = verify(token, signingKey.getPublicKey(), {
-      algorithms: ["RS256"],
-    }) as GoogleCredential | undefined;
-    if (!payload) {
-      res.status(400).send({ error: "Invalid token (verify)" });
-      return;
-    }
-
-    if (
-      payload.iss !== "https://accounts.google.com" ||
-      payload.aud !== config.GOOGLE_CLIENT_ID
-    ) {
-      res.status(400).send({ error: "Invalid token (iss)" });
-      return;
-    }
-
-    if (payload.exp < new Date().getTime() / 1000) {
-      res.status(400).send({ error: "Invalid token (expired)" });
-      return;
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(401).send({ error: "Unable to validate credentials" });
     }
 
     let user = await prisma.user.findFirst({

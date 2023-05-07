@@ -2,6 +2,8 @@
 /// <reference types="react-router-dom/client" />
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-svgr/client" />
+/// <reference types="vite-plugin-pwa/react" />
+/// <reference types="vite-plugin-pwa/info" />
 
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_CLIENT_ID: string;

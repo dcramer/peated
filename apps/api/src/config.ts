@@ -22,5 +22,7 @@ export default {
   GCS_BUCKET_NAME: process.env.GCS_BUCKET_NAME,
   GCS_BUCKET_PATH: process.env.GCS_BUCKET_PATH,
 
-  GCP_CREDENTIALS: JSON.parse(process.env.GCP_CREDENTIALS || ""),
+  GCP_CREDENTIALS: process.env.GCP_CREDENTIALS
+    ? JSON.parse(process.env.GCP_CREDENTIALS)
+    : null,
 };

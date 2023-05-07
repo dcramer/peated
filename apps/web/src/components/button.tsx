@@ -14,6 +14,7 @@ type Props = {
   type?: "button" | "submit" | "reset";
   children?: ReactNode;
   onClick?: (e: any) => void;
+  fullWidth?: boolean;
 };
 
 export default ({
@@ -23,10 +24,11 @@ export default ({
   to,
   color = "default",
   size = "base",
+  fullWidth = false,
   ...props
 }: Props) => {
   const defaultClassName =
-    "inline-flex justify-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
+    "inline-flex justify-center items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
 
   let colorClassName;
   switch (color) {
@@ -45,7 +47,8 @@ export default ({
           defaultClassName,
           colorClassName,
           icon ? "inline-flex items-center gap-x-1.5" : "",
-          size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm"
+          size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm",
+          fullWidth ? "w-full" : ""
         )}
         to={to}
         {...props}
@@ -62,7 +65,8 @@ export default ({
         defaultClassName,
         colorClassName,
         icon ? "inline-flex items-center gap-x-1.5" : "",
-        size === "small" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm"
+        size === "small" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm",
+        fullWidth ? "w-full" : ""
       )}
       type={type || "button"}
       {...props}

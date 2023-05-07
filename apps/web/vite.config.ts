@@ -2,6 +2,71 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+import type { ManifestOptions, VitePWAOptions } from "vite-plugin-pwa";
+import replace from "@rollup/plugin-replace";
+import { VitePWA } from "vite-plugin-pwa";
+
+const pwaOptions: Partial<VitePWAOptions> = {
+  registerType: "autoUpdate",
+  base: "/",
+  includeAssets: ["*.png"],
+  manifest: {
+    short_name: "Peated",
+    name: "Peated",
+    description: "Is it Peated?",
+    icons: [
+      {
+        src: "glyph.png",
+        sizes: "64x64 32x32 24x24 16x16",
+        type: "image/png",
+      },
+      {
+        src: "logo192.png",
+        type: "image/png",
+        sizes: "192x192",
+      },
+      {
+        src: "logo512.png",
+        type: "image/png",
+        sizes: "512x512",
+      },
+    ],
+    display: "standalone",
+    theme_color: "#005C58",
+    background_color: "#005C58",
+  },
+  devOptions: {
+    enabled: process.env.NODE_ENV === "development",
+    /* when using generateSW the PWA plugin will switch to classic */
+    type: "module",
+    navigateFallback: "index.html",
+  },
+};
+
+const replaceOptions = { __DATE__: new Date().toISOString() };
+const claims = process.env.CLAIMS === "true";
+const reload = process.env.RELOAD_SW === "true";
+const selfDestroying = process.env.SW_DESTROY === "true";
+
+if (process.env.SW === "true") {
+  pwaOptions.srcDir = "src";
+  pwaOptions.filename = claims
+    ? "service-worker/claims-sw.ts"
+    : "service-worker/prompt-sw.ts";
+  pwaOptions.strategies = "injectManifest";
+  (pwaOptions.manifest as Partial<ManifestOptions>).name =
+    "PWA Inject Manifest";
+  (pwaOptions.manifest as Partial<ManifestOptions>).short_name = "PWA Inject";
+}
+
+if (claims) pwaOptions.registerType = "autoUpdate";
+
+if (reload) {
+  // @ts-expect-error just ignore
+  replaceOptions.__RELOAD_SW__ = "true";
+}
+
+if (selfDestroying) pwaOptions.selfDestroying = selfDestroying;
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -12,6 +77,7 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [
       react(),
+      VitePWA(pwaOptions),
       svgr({
         // Set it to `true` to export React component as default.
         // Notice that it will overrides the default behavior of Vite.
@@ -33,21 +99,23 @@ export default defineConfig(({ command, mode }) => {
         //  A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should ignore. By default no files are ignored.
         exclude: "",
       }),
-      sentryVitePlugin({
-        org: env.SENTRY_ORG,
-        project: env.SENTRY_PROJECT,
+      // https://github.com/getsentry/sentry-javascript/issues/8059
+      // sentryVitePlugin({
+      //   org: env.SENTRY_ORG,
+      //   project: env.SENTRY_PROJECT,
 
-        // Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
-        // and need `project:releases` and `org:read` scopes
-        authToken: env.SENTRY_AUTH_TOKEN,
+      //   // Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
+      //   // and need `project:releases` and `org:read` scopes
+      //   authToken: env.SENTRY_AUTH_TOKEN,
 
-        release: env.VERSION,
+      //   release: env.VERSION,
 
-        sourcemaps: {
-          // Specify the directory containing build artifacts
-          assets: "./dist/**",
-        },
-      }),
+      //   sourcemaps: {
+      //     // Specify the directory containing build artifacts
+      //     assets: "./dist/**",
+      //   },
+      // }),
+      replace(replaceOptions),
     ],
   };
 });
