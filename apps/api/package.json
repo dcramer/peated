@@ -27,6 +27,7 @@
     "@peated/shared": "file:../../packages/shared",
     "@prisma/client": "^4.12.0",
     "@sentry/node": "^7.51.0",
+    "@sentry/utils": "^7.51.0",
     "@swc/core": "^1.3.44",
     "@swc/helpers": "^0.4.14",
     "@types/bcrypt": "^5.0.0",

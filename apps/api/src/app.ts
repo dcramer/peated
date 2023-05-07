@@ -7,6 +7,7 @@ import { router } from "./routes";
 import config from "./config";
 
 import * as Sentry from "@sentry/node";
+import FastifySentry from "./sentryPlugin";
 
 Sentry.init({
   dsn: config.SENTRY_DSN,
@@ -48,6 +49,7 @@ export default async function buildFastify(options = {}) {
   app.register(FastifyHelmet);
   app.register(FastifyCors, { credentials: true, origin: config.CORS_HOST });
   app.register(router);
+  app.register(FastifySentry);
 
   app.setErrorHandler(function (error, request, reply) {
     Sentry.captureException(error);
