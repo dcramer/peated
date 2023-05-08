@@ -4,11 +4,14 @@ import { pipeline } from "node:stream";
 import { Storage } from "@google-cloud/storage";
 import { extname } from "node:path";
 import type { MultipartFile } from "@fastify/multipart";
-
-import config from "../config";
+import opentelemetry from "@opentelemetry/api";
 import { createId } from "@paralleldrive/cuid2";
 
+import config from "../config";
+
 const pump = promisify(pipeline);
+
+const tracer = opentelemetry.trace.getTracer("peated-api");
 
 export const storeFile = async ({
   data,
@@ -30,18 +33,26 @@ export const storeFile = async ({
     const cloudStorage = new Storage({
       credentials: config.GCP_CREDENTIALS,
     });
-    const file = cloudStorage
-      .bucket(bucketName)
-      .file(`${bucketPath}${newFilename}`);
-    const writeStream = file.createWriteStream();
 
-    await pump(data.file, writeStream);
+    tracer.startActiveSpan("gcs.file", () => {
+      const file = cloudStorage
+        .bucket(bucketName)
+        .file(`${bucketPath}${newFilename}`);
+
+      tracer.startActiveSpan("gcs.file.write-stream", async () => {
+        const writeStream = file.createWriteStream();
+        data.file.pipe(writeStream);
+        // await pump(data.file, writeStream);
+      });
+    });
   } else {
     const uploadPath = `${config.UPLOAD_PATH}/${newFilename}`;
-    const writeStream = createWriteStream(uploadPath);
 
-    data.file.pipe(writeStream);
-    // await pump(data.file, writeStream);
+    tracer.startActiveSpan("file.write-stream", () => {
+      const writeStream = createWriteStream(uploadPath);
+      data.file.pipe(writeStream);
+      // await pump(data.file, writeStream);
+    });
 
     console.info(`File written to ${uploadPath}`);
   }
