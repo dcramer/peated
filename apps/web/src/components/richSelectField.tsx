@@ -236,7 +236,7 @@ const SelectDialog = ({
                         <ListItem key={`${option.id}-${option.name}`}>
                           <CheckIcon
                             className={classNames(
-                              "h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white",
+                              "h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:text-white",
                               selectedValues.find(
                                 (i) =>
                                   i.id == option.id && i.name == option.name
