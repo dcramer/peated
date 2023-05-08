@@ -66,7 +66,7 @@ export default function Search() {
           const title = <BottleName bottle={bottle} />;
           return (
             <ListItem key={bottle.id}>
-              <div className="h-12 w-12 p-2 flex-none rounded-full " />
+              <div className="hidden sm:visible h-12 w-12 p-2 flex-none rounded-full " />
 
               <div className="min-w-0 flex-auto">
                 <p className="font-semibold leading-6 text-gray-900">
