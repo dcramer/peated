@@ -34,25 +34,33 @@ export const storeFile = async ({
       credentials: config.GCP_CREDENTIALS,
     });
 
-    await tracer.startActiveSpan("gcs.file", async () => {
-      const file = cloudStorage
-        .bucket(bucketName)
-        .file(`${bucketPath}${newFilename}`);
+    await tracer.startActiveSpan(
+      "gcs.file",
+      { attributes: { bucketName, fileName: newFilename } },
+      async () => {
+        const file = cloudStorage
+          .bucket(bucketName)
+          .file(`${bucketPath}${newFilename}`);
 
-      await tracer.startActiveSpan("gcs.file.write-stream", async () => {
-        const writeStream = file.createWriteStream();
-        data.file.pipe(writeStream);
-        // await pump(data.file, writeStream);
-      });
-    });
+        await tracer.startActiveSpan("gcs.file.write-stream", async () => {
+          const writeStream = file.createWriteStream();
+          data.file.pipe(writeStream);
+          // await pump(data.file, writeStream);
+        });
+      }
+    );
   } else {
     const uploadPath = `${config.UPLOAD_PATH}/${newFilename}`;
 
-    tracer.startActiveSpan("file.write-stream", () => {
-      const writeStream = createWriteStream(uploadPath);
-      data.file.pipe(writeStream);
-      // await pump(data.file, writeStream);
-    });
+    tracer.startActiveSpan(
+      "file.write-stream",
+      { attributes: { fileName: newFilename } },
+      () => {
+        const writeStream = createWriteStream(uploadPath);
+        data.file.pipe(writeStream);
+        // await pump(data.file, writeStream);
+      }
+    );
 
     console.info(`File written to ${uploadPath}`);
   }
