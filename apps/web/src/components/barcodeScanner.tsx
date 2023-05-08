@@ -1,6 +1,6 @@
 import { createRef, useCallback, useLayoutEffect } from "react";
 import Quagga from "@ericblade/quagga2";
-import { captureException } from "@sentry/react";
+import { captureException, trace } from "@sentry/react";
 import { Dialog } from "@headlessui/react";
 
 function getMedian(arr: number[]) {
@@ -129,39 +129,48 @@ export default ({
   };
 
   useLayoutEffect(() => {
-    if (!scannerRef || !scannerRef.current) return;
-    Quagga.init(
+    trace(
       {
-        inputStream: {
-          type: "LiveStream",
-          constraints: {
-            ...constraints,
-            ...(cameraId && { deviceId: cameraId }),
-            ...(!cameraId && { facingMode }),
-          },
-          target: scannerRef.current,
-        },
-        locator,
-        numOfWorkers,
-        decoder: { readers: decoders },
-        locate,
+        name: "quagga.init",
+        op: "quagga.init",
       },
-      (err) => {
-        Quagga.onProcessed(handleProcessed);
+      () => {
+        if (!scannerRef || !scannerRef.current) return;
 
-        if (err) {
-          captureException(err);
-          return console.log("Error starting Quagga:", err);
-        }
-        if (scannerRef && scannerRef.current) {
-          Quagga.start();
-          if (onScannerReady) {
-            onScannerReady();
+        Quagga.init(
+          {
+            inputStream: {
+              type: "LiveStream",
+              constraints: {
+                ...constraints,
+                ...(cameraId && { deviceId: cameraId }),
+                ...(!cameraId && { facingMode }),
+              },
+              target: scannerRef.current,
+            },
+            locator,
+            numOfWorkers,
+            decoder: { readers: decoders },
+            locate,
+          },
+          (err) => {
+            Quagga.onProcessed(handleProcessed);
+
+            if (err) {
+              captureException(err);
+              return console.log("Error starting Quagga:", err);
+            }
+            if (scannerRef && scannerRef.current) {
+              Quagga.start();
+              if (onScannerReady) {
+                onScannerReady();
+              }
+            }
           }
-        }
+        );
+        Quagga.onDetected(errorCheck);
       }
     );
-    Quagga.onDetected(errorCheck);
     return () => {
       Quagga.offDetected(errorCheck);
       Quagga.offProcessed(handleProcessed);
