@@ -24,8 +24,9 @@ export default fastifyPlugin(async (fastify, options) => {
           : request.headers["sentry-trace"]
       );
 
+    const transactionName = request.routerPath;
     const transaction = Sentry.startTransaction({
-      name: request.routerPath,
+      name: transactionName,
       op: "http.server",
       ...traceparentData,
     });
@@ -35,7 +36,9 @@ export default fastifyPlugin(async (fastify, options) => {
     };
 
     Sentry.configureScope((scope) => {
+      // LOVE THAT I HAVE TO CALL TWO CALLS FOR BASICS
       scope.setSpan(transaction);
+      scope.setTransactionName(transactionName);
     });
   });
 
