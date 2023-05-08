@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: |
           flyctl deploy -a peated-api \
@@ -31,4 +33,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@0.3.2
         with:
-          args: "{{ EVENT_PAYLOAD.repository.full_name }} has deployed version ${{ github.sha }}."
+          args: "${{ github.actor }} deployed version [${{ steps.vars.outputs.sha_short }}](https://github.com/dcramer/${{ EVENT_PAYLOAD.repository.full_name }}/${{ github.sha }})."
