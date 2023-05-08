@@ -43,16 +43,10 @@ export default () => {
 
   return (
     <div className="w-0 h-0 p-0 m-0">
-      {(offlineReady || needRefresh) && (
+      {needRefresh && (
         <div className="fixed right-0 bottom-0 m-4 p-3 border border-gray-400 rounded z-10 shadow bg-white">
           <div className="mb-2">
-            {offlineReady ? (
-              <span>App ready to work offline</span>
-            ) : (
-              <span>
-                New content available, click on reload button to update.
-              </span>
-            )}
+            <span>Update Available</span>
           </div>
           {needRefresh && (
             <Button color="primary" onClick={() => updateServiceWorker(true)}>
