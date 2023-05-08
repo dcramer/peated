@@ -36,7 +36,8 @@ export const storeFile = async ({
       {
         op: "gcs.file",
         name: "gcs.file",
-        data: { bucketName, fileName: newFilename },
+        description: newFilename,
+        data: { bucketName },
       },
       async () => {
         const file = cloudStorage
@@ -44,7 +45,11 @@ export const storeFile = async ({
           .file(`${bucketPath}${newFilename}`);
 
         await trace(
-          { op: "gcs.file.write-stream", name: "gcs.file.write-stream" },
+          {
+            op: "gcs.file.write-stream",
+            name: "gcs.file.write-stream",
+            description: newFilename,
+          },
           async () => {
             const writeStream = file.createWriteStream();
             // data.file.pipe(writeStream);
@@ -60,7 +65,7 @@ export const storeFile = async ({
       {
         op: "file.write-stream",
         name: "file.write-stream",
-        data: { fileName: newFilename },
+        description: newFilename,
       },
       () => {
         const writeStream = createWriteStream(uploadPath);
