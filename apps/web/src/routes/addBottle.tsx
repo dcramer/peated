@@ -13,6 +13,7 @@ import BrandField from "../components/brandField";
 import DistillerField from "../components/distillerField";
 import SelectField from "../components/selectField";
 import { Option } from "../components/richSelectField";
+import BarcodeField from "../components/barcodeField";
 
 type FormData = {
   name: string;
@@ -155,6 +156,8 @@ export default function AddBottle() {
               ...categoryList.map(({ id, name }) => ({ id, value: name })),
             ]}
           />
+
+          <BarcodeField name="barcode" />
         </Fieldset>
       </form>
     </Layout>
