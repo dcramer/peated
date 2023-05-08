@@ -3,9 +3,6 @@ import { useRegisterSW } from "virtual:pwa-register/react";
 
 import Button from "./button";
 
-// eslint-disable-next-line no-console
-console.log(pwaInfo);
-
 export default () => {
   // replaced dynamically
   const buildDate = "__DATE__";
