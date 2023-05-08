@@ -37,7 +37,7 @@ export default function ErrorPage() {
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
             {title}
           </h1>
-          <p className="mt-6 text-base leading-7 text-gray-600">{subtitle}</p>
+          <p className="mt-6 leading-7 text-gray-600">{subtitle}</p>
 
           {config.DEBUG && (
             <>
@@ -58,12 +58,12 @@ export default function ErrorPage() {
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Link
               to="/"
-              className="rounded bg-peated px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-peated-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated"
+              className="rounded bg-peated px-3.5 py-2.5 font-semibold text-white shadow-sm hover:bg-peated-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated"
             >
               Go back home
             </Link>
             <a
-              className="text-sm font-semibold text-gray-900"
+              className="font-semibold text-gray-900"
               href={config.GITHUB_REPO}
             >
               Open a GitHub issue

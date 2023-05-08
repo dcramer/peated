@@ -23,8 +23,8 @@ export default ({
         onClick ? "cursor-pointer hover:bg-gray-200" : "",
         active && "bg-peated hover:bg-peated border-peated text-white",
         size === "small"
-          ? "h-[24px] px-[6px] text-xs"
-          : "h-[32px] px-[12px] text-sm"
+          ? "h-[24px] px-[6px] text-sm"
+          : "h-[32px] px-[12px] text-base"
       )}
       onClick={onClick}
     >

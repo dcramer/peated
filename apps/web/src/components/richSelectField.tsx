@@ -236,7 +236,7 @@ const SelectDialog = ({
                         <ListItem key={`${option.id}-${option.name}`}>
                           <CheckIcon
                             className={classNames(
-                              "h-10 w-10 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white",
+                              "h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white",
                               selectedValues.find(
                                 (i) =>
                                   i.id == option.id && i.name == option.name
@@ -245,7 +245,7 @@ const SelectDialog = ({
                           />
 
                           <div className="min-w-0 flex-auto flex items-center">
-                            <p className="text-sm font-semibold leading-6 text-gray-900">
+                            <p className="font-semibold leading-6 text-gray-900">
                               <button
                                 onClick={() => {
                                   selectOption(option);
@@ -263,16 +263,16 @@ const SelectDialog = ({
                     {(results.length === 0 || query !== "") &&
                       (canCreate && createForm ? (
                         <ListItem>
-                          <PlusIcon className="h-10 w-10 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
+                          <PlusIcon className="h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
 
                           <div className="min-w-0 flex-auto">
-                            <p className="text-sm font-semibold leading-6 text-gray-900">
+                            <p className="font-semibold leading-6 text-gray-900">
                               <button onClick={() => setCreateOpen(true)}>
                                 <span className="absolute inset-x-0 -top-px bottom-0" />
                                 Can't find what you're looking for?
                               </button>
                             </p>
-                            <p className="mt-1 flex text-xs leading-5 text-gray-500 gap-x-1">
+                            <p className="mt-1 flex text-sm leading-5 text-gray-500 gap-x-1">
                               {query !== "" ? (
                                 <span>
                                   Tap here to add{" "}
@@ -291,16 +291,16 @@ const SelectDialog = ({
                         </ListItem>
                       ) : (
                         <ListItem>
-                          <PlusIcon className="h-10 w-10 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
+                          <PlusIcon className="h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
 
                           <div className="min-w-0 flex-auto">
-                            <p className="text-sm font-semibold leading-6 text-gray-900">
+                            <p className="font-semibold leading-6 text-gray-900">
                               <a href={config.GITHUB_REPO} target="_blank">
                                 <span className="absolute inset-x-0 -top-px bottom-0" />
                                 Can't find what you're looking for?
                               </a>
                             </p>
-                            <p className="mt-1 flex text-xs leading-5 text-gray-500 gap-x-1">
+                            <p className="mt-1 flex text-sm leading-5 text-gray-500 gap-x-1">
                               Well, that stinks. Maybe a open an issue on
                               GitHub?
                             </p>
@@ -438,9 +438,7 @@ export default ({
           </Chip>
         ))}
         {visibleValues.length === 0 && placeholder && (
-          <div className="text-gray-400 text-sm sm:leading-6">
-            {placeholder}
-          </div>
+          <div className="text-gray-400 sm:leading-6">{placeholder}</div>
         )}
       </div>
       <SelectDialog

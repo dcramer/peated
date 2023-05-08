@@ -16,7 +16,7 @@ export default (props: Props) => {
       createForm={({ data, onFieldChange }) => {
         return (
           <>
-            <p className="text-base mb-4">
+            <p className="mb-4">
               The distiller is the group that makes the spirit.
             </p>
             <TextField

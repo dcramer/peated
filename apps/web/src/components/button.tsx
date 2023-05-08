@@ -28,7 +28,7 @@ export default ({
   ...props
 }: Props) => {
   const defaultClassName =
-    "inline-flex justify-center items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
+    "inline-flex justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
 
   let colorClassName;
   switch (color) {
@@ -37,7 +37,7 @@ export default ({
         "bg-peated border-peated text-white hover:bg-peated-dark";
       break;
     default:
-      colorClassName = "bg-white border-peated text-peated hover:bg-gray-200";
+      colorClassName = "bg-white border-gray-200 text-peated hover:bg-gray-200";
   }
 
   if (to) {

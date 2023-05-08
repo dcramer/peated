@@ -24,8 +24,7 @@ export default ({
   labelAction,
 }: Props) => {
   return (
-    <label
-      htmlFor={htmlFor}
+    <div
       className={classNames(
         `relative block px-3 pb-2.5 pt-2.5 bg-white focus-within:z-10`,
         className
@@ -46,6 +45,6 @@ export default ({
       )}
       {children}
       {false && helpText && <HelpText>{helpText}</HelpText>}
-    </label>
+    </div>
   );
 };

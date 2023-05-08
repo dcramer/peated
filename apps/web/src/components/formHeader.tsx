@@ -23,13 +23,13 @@ export default function FormHeader({
           className={`-m-1.5 p-1.5 ${blockStyles} pr-3 sm:pr-6`}
         >
           <span className="sr-only">Back</span>
-          <ChevronLeftIcon className="h-8 w-8" />
+          <ChevronLeftIcon className="h-10 w-10" />
         </button>
       </div>
       <div
         className={`flex flex-1 flex-row gap-x-2 justify-center ${blockStyles}`}
       >
-        <h1 className="text-md sm:text-lg">{title}</h1>
+        <h1 className="text-lg">{title}</h1>
         {subtitle && (
           <h2 className="hidden sm:block text-sm text-peated-light truncate">
             {subtitle}
@@ -41,7 +41,7 @@ export default function FormHeader({
           onClick={onSave}
           className={`min-h-full group ${blockStyles} pl-3 sm:pl-6`}
         >
-          <span className="rounded bg-peated-dark group-hover:bg-peated-darker px-2.5 p-1 sm:px-2.5 sm:py-2.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated">
+          <span className="rounded bg-peated-dark group-hover:bg-peated-darker p-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated">
             Save
           </span>
         </button>

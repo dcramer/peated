@@ -139,10 +139,12 @@ export const addBottle: RouteOptions<
   ServerResponse,
   {
     Body: Bottle & {
-      brand: number | { name: string; country: string; region?: string };
+      brand:
+        | number
+        | { id?: string; name: string; country: string; region?: string };
       distillers: (
         | number
-        | { name: string; country: string; region?: string }
+        | { id?: string; name: string; country: string; region?: string }
       )[];
     };
   }
@@ -162,6 +164,9 @@ export const addBottle: RouteOptions<
               type: "object",
               required: ["name", "country"],
               properties: {
+                id: {
+                  type: "number",
+                },
                 name: {
                   type: "string",
                 },
@@ -184,6 +189,9 @@ export const addBottle: RouteOptions<
                 type: "object",
                 required: ["name", "country"],
                 properties: {
+                  id: {
+                    type: "number",
+                  },
                   name: {
                     type: "string",
                   },
@@ -202,6 +210,7 @@ export const addBottle: RouteOptions<
         category: {
           type: "string",
           enum: [
+            "",
             "blend",
             "blended_grain",
             "blended_malt",
@@ -262,15 +271,19 @@ export const addBottle: RouteOptions<
       if (typeof body.brand === "number") {
         data.brand = { connect: { id: body.brand } };
       } else if (body.brand satisfies Partial<Brand>) {
-        data.brand = {
-          create: {
-            name: body.brand.name,
-            country: body.brand.country,
-            region: body.brand.region,
-            public: req.user.admin,
-            createdById: req.user.id,
-          },
-        };
+        if (body.brand.id) {
+          data.brand = { connect: { id: body.brand.id } };
+        } else {
+          data.brand = {
+            create: {
+              name: body.brand.name,
+              country: body.brand.country,
+              region: body.brand.region,
+              public: req.user.admin,
+              createdById: req.user.id,
+            },
+          };
+        }
       }
     }
 
@@ -279,16 +292,22 @@ export const addBottle: RouteOptions<
         if (typeof d === "number") {
           data.distillers.connect.push({ id: d });
         } else if (d satisfies Partial<Distiller>) {
-          data.distillers.create.push({
-            name: d.name,
-            country: d.country,
-            region: d.region,
-            public: req.user.admin,
-            createdById: req.user.id,
-          });
+          if (d.id) {
+            data.distillers.connect.push({ id: d.id });
+          } else {
+            data.distillers.create.push({
+              name: d.name,
+              country: d.country,
+              region: d.region,
+              public: req.user.admin,
+              createdById: req.user.id,
+            });
+          }
         }
       }
     }
+
+    if (data.category === "") data.category = null;
 
     data.createdBy = { connect: { id: req.user.id } };
     data.public = req.user.admin;

@@ -43,7 +43,7 @@ export default function DistillerDetails() {
           <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">
             {distiller.name}
           </h1>
-          <p className="text-xs font-light text-gray-500">
+          <p className="text-sm font-light text-gray-500">
             Located in {distiller.country}
             {distiller.region && <span> &middot; {distiller.region}</span>}
           </p>
@@ -53,7 +53,7 @@ export default function DistillerDetails() {
       <div className="my-8 grid gap-3 grid-cols-1 text-center sm:text-left items-center">
         {stats.map((stat) => (
           <div key={stat.name}>
-            <p className="text-base leading-7 text-gray-400">{stat.name}</p>
+            <p className="leading-7 text-gray-400">{stat.name}</p>
             <p className="order-first text-3xl font-semibold tracking-tight text-peated sm:text-5xl">
               {stat.value}
             </p>

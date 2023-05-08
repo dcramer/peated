@@ -40,7 +40,7 @@ export const loader: LoaderFunction = async ({
 const EmptyActivity = () => {
   return (
     <div className="flex flex-col block m-4 mx-auto items-center rounded-lg border border-dashed border-gray-300 p-12">
-      <span className="mt-2 block text-sm font-light text-gray-400">
+      <span className="block font-light text-gray-400">
         Looks like this ones a bit short on tastings.
       </span>
     </div>

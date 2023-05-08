@@ -13,13 +13,13 @@ export default ({ bottle }: { bottle: Bottle }) => {
             <BottleName bottle={bottle} />
           </Link>
         </p>
-        <p className="text-xs font-light text-gray-500">
+        <p className="text-sm font-light text-gray-500">
           Produced by{" "}
           <Link to={`/brands/${bottle.brand.id}`} className="hover:underline">
             {bottle.brand.name}
           </Link>
           {distillers.length &&
-            (distillers.length > 1 ||
+            (distillers.length > 0 ||
               bottle.brand.name !== distillers[0].name) && (
               <span>
                 {" "}
@@ -40,10 +40,10 @@ export default ({ bottle }: { bottle: Bottle }) => {
         </p>
       </div>
       <div className="space-y-1">
-        <p className="text-sm leading-6 text-gray-500">
+        <p className="leading-6 text-gray-500">
           {bottle.category && formatCategoryName(bottle.category)}
         </p>
-        <p className="mt-1 text-xs leading-5 text-gray-500">
+        <p className="mt-1 text-sm leading-5 text-gray-500">
           {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
         </p>
       </div>

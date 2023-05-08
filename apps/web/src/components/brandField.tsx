@@ -14,7 +14,7 @@ export default (props: Props) => {
       createForm={({ data, onFieldChange }) => {
         return (
           <>
-            <p className="text-base mb-4">
+            <p className="mb-4">
               The brand is the group that bottles the spirit. Sometimes this is
               the same as the distiller.
             </p>

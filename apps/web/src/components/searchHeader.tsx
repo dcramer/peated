@@ -32,7 +32,7 @@ export default function SearchHeader({
           className={`-m-1.5 p-1.5 ${blockStyles} pr-3 sm:pr-6 outline-0`}
         >
           <span className="sr-only">Back</span>
-          <span className="h-8 w-8">{closeIcon}</span>
+          <span className="h-10 w-10">{closeIcon}</span>
         </button>
       </div>
       <form
@@ -47,13 +47,13 @@ export default function SearchHeader({
         <input
           autoFocus
           name={name}
-          defaultValue={value}
+          value={value}
           placeholder={placeholder}
           onChange={(e) => {
             setValue(e.target.value);
             if (onChange) onChange(e.target.value);
           }}
-          className="rounded focus:outline focus:outline-peated-light text-xs sm:text-base min-w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-peated-darker text-white"
+          className="rounded focus:outline focus:outline-peated-light min-w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-peated-darker text-white"
         />
       </form>
     </nav>

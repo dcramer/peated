@@ -28,10 +28,10 @@ const EmptyActivity = () => {
     >
       <Glyph className="text-gray-400 w-16 h-16 group-hover:text-peated" />
 
-      <span className="mt-2 block text-sm font-semibold text-gray-400 group-hover:text-peated">
+      <span className="mt-4 block font-semibold text-gray-400 group-hover:text-peated">
         What are you drinking?
       </span>
-      <span className="mt-2 block text-sm font-light text-gray-400 group-hover:text-peated">
+      <span className="mt-2 blockfont-light text-gray-400 group-hover:text-peated">
         Get started by recording your first tasting notes.
       </span>
     </Link>

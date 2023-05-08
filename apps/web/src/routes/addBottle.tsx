@@ -179,7 +179,7 @@ export default function AddBottle() {
             }
             value={formData.category}
             options={[
-              { id: "", value: <em>Unknown</em> },
+              { id: "", value: "n/a" },
               ...categoryList.map(({ id, name }) => ({ id, value: name })),
             ]}
           />

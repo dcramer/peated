@@ -26,7 +26,7 @@ export default ({
 
   const baseStyles = "bg-white rounded border-0 text-gray-900 focus:ring-0";
   const inputStyles =
-    "text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm sm:leading-6";
+    "text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:leading-6";
   return (
     <Listbox
       name={name}
@@ -52,7 +52,7 @@ export default ({
             />
           </div>
         </Listbox.Button>
-        <Listbox.Options className="absolute z-10 mt-1 max-h-60 min-w-full overflow-auto rounded bg-white p-1 text-base shadow-lg ring-1 ring-black ring-opacity-20 focus:outline-none sm:text-sm">
+        <Listbox.Options className="absolute z-10 mt-1 max-h-60 min-w-full overflow-auto rounded bg-white p-1 shadow-lg ring-1 ring-black ring-opacity-20 focus:outline-none sm:text-sm">
           {options.map((item) => (
             <Listbox.Option
               key={item.id}
