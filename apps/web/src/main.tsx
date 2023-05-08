@@ -15,11 +15,19 @@ Sentry.init({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
 
-  integrations: [new Sentry.BrowserTracing()],
+  integrations: [
+    new Sentry.BrowserTracing(),
+    new Sentry.Replay({
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+  ],
 
   // We recommend adjusting this value in production, or using tracesSampler
   // for finer control
   tracesSampleRate: 1.0,
+  replaysSessionSampleRate: 0.01,
+  replaysOnErrorSampleRate: 1.0,
 });
 
 const router = createBrowserRouter(createRoutes());
