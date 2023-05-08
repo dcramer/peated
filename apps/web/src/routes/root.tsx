@@ -2,6 +2,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import Screen from "../components/screen";
+import ReloadPrompt from "../components/reloadPrompt";
 
 export default function Root() {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ export default function Root() {
   return (
     <Screen>
       <Outlet />
+      <ReloadPrompt />
     </Screen>
   );
 }
