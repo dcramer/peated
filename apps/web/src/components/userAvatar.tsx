@@ -5,7 +5,6 @@ export default ({ user, size }: { user: User | null; size?: number }) => {
     return (
       <img
         src={user.pictureUrl}
-        crossOrigin="anonymous"
         className="h-full w-full rounded object-cover"
         style={{
           width: size,
