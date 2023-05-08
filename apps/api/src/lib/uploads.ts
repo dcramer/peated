@@ -34,12 +34,12 @@ export const storeFile = async ({
       credentials: config.GCP_CREDENTIALS,
     });
 
-    tracer.startActiveSpan("gcs.file", () => {
+    await tracer.startActiveSpan("gcs.file", async () => {
       const file = cloudStorage
         .bucket(bucketName)
         .file(`${bucketPath}${newFilename}`);
 
-      tracer.startActiveSpan("gcs.file.write-stream", async () => {
+      await tracer.startActiveSpan("gcs.file.write-stream", async () => {
         const writeStream = file.createWriteStream();
         data.file.pipe(writeStream);
         // await pump(data.file, writeStream);
