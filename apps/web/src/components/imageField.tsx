@@ -116,7 +116,6 @@ export default ({
           {imageSrc && (
             <img
               src={imageSrc}
-              crossOrigin="anonymous"
               ref={imageRef}
               className="h-full w-full rounded object-cover"
             />
