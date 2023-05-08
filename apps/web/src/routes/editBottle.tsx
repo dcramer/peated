@@ -79,6 +79,10 @@ export default function EditBottle() {
       try {
         await api.put(`/bottles/${bottle.id}`, {
           data: formData,
+          brand: formData.brand?.id || formData.brand,
+          distillers: formData.distillers
+            ? formData.distillers.map((d) => d?.id || d)
+            : undefined,
         });
         navigate(`/bottles/${bottle.id}`);
       } catch (err) {
