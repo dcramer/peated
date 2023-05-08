@@ -44,8 +44,8 @@ export const storeFile = async ({
 
         await tracer.startActiveSpan("gcs.file.write-stream", async () => {
           const writeStream = file.createWriteStream();
-          data.file.pipe(writeStream);
-          // await pump(data.file, writeStream);
+          // data.file.pipe(writeStream);
+          await pump(data.file, writeStream);
         });
       }
     );
