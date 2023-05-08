@@ -54,11 +54,13 @@ export default function AddBottle() {
     (async () => {
       try {
         const bottle = await api.post("/bottles", {
-          data: formData,
-          brand: formData.brand?.id || formData.brand,
-          distillers: formData.distillers
-            ? formData.distillers.map((d) => d?.id || d)
-            : undefined,
+          data: {
+            ...formData,
+            brand: formData.brand?.id || formData.brand,
+            distillers: formData.distillers
+              ? formData.distillers.map((d) => d?.id || d)
+              : undefined,
+          },
         });
         navigate(`/bottles/${bottle.id}/checkin`, {
           replace: true,
