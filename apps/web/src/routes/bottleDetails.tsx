@@ -8,6 +8,7 @@ import Layout from "../components/layout";
 import CheckinListItem from "../components/checkinListItem";
 import { formatCategoryName } from "../lib/strings";
 import Button from "../components/button";
+import BottleName from "../components/bottleName";
 
 type BottleWithStats = Bottle & {
   stats: {
@@ -70,7 +71,7 @@ export default function BottleDetails() {
       <div className="min-w-full flex flex-wrap sm:flex-nowrap my-8 gap-y-4">
         <div className="space-y-1 flex-1 w-full sm:w-auto flex flex-col items-center sm:items-start">
           <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">
-            {bottle.name}
+            <BottleName bottle={bottle} />
           </h1>
           <p className="text-sm font-light text-gray-500">
             Produced by{" "}
