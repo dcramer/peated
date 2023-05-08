@@ -41,7 +41,11 @@ export default async function buildFastify(options = {}) {
   });
 
   app.register(FastifyMultipart);
-  app.register(FastifyHelmet);
+  app.register(FastifyHelmet, {
+    crossOriginResourcePolicy: {
+      policy: "same-site",
+    },
+  });
   app.register(FastifyCors, { credentials: true, origin: config.CORS_HOST });
   app.register(router);
   app.register(FastifySentry);
