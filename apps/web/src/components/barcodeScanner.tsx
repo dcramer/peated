@@ -12,10 +12,10 @@ function getMedian(arr: number[]) {
   return (arr[half - 1] + arr[half]) / 2;
 }
 
-function getMedianOfCodeErrors(decodedCodes: any) {
+function getMedianOfCodeErrors(decodedCodes: any[]) {
   const errors = decodedCodes
-    .filter((x) => x.error !== undefined)
-    .map((x) => x.error);
+    .filter((x: any) => x.error !== undefined)
+    .map((x: any) => x.error);
   const medianOfErrors = getMedian(errors);
   return medianOfErrors;
 }
@@ -69,7 +69,7 @@ export default ({
   const scannerRef = createRef<HTMLDivElement>();
 
   const errorCheck = useCallback(
-    (result) => {
+    (result: any) => {
       if (!onDetected) {
         return;
       }

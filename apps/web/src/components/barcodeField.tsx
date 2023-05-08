@@ -21,8 +21,10 @@ export default ({ name, helpText, label, required, className }: Props) => {
   const [hasPermission, setHasPermission] = useState<boolean | null>();
 
   useEffect(() => {
+    // https://github.com/microsoft/TypeScript/issues/33923
+    const permissionName = "camera" as PermissionName;
     navigator.permissions
-      .query({ name: "camera" })
+      .query({ name: permissionName })
       .then((r) => setHasPermission(r.state !== "denied"));
   });
 
