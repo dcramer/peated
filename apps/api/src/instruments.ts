@@ -5,7 +5,6 @@ import { prisma } from "./lib/db";
 
 export const initSentry = ({ ...params }) => {
   Sentry.init({
-    debug: true,
     ...params,
     tracesSampleRate: 1.0,
     profilesSampleRate: 1.0,
