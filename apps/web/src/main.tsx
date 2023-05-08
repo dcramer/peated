@@ -14,6 +14,7 @@ import { register } from "./serviceWorkerRegistration";
 Sentry.init({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
+  debug: config.DEBUG,
 
   integrations: [
     new Sentry.BrowserTracing(),
