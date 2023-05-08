@@ -6,17 +6,13 @@
 //   wheat: number;
 // };
 
-export enum Category {
-  blend,
-  blended_grain,
-  blended_malt,
-  blended_scotch,
-  bourbon,
-  rye,
-  single_grain,
-  single_malt,
-  spirit,
-}
+export type Category =
+  | "blend"
+  | "bourbon"
+  | "rye"
+  | "single_grain"
+  | "single_malt"
+  | "spirit";
 
 // e.g. Suntory Whisky
 export type Distiller = {
@@ -41,19 +37,17 @@ export type Brand = {
 export type Bottle = {
   id: string;
   name: string;
-  // e.g. the limited release/collection
-  series?: string | null;
-
   brand: Brand;
   distillers: Distiller[];
-
   category?: Category | null;
+  statedAge?: number;
+};
 
-  // floating point as percentage
-  abv?: number | null;
-
-  // e.g. 12 [years]
-  statedAge?: number | null;
+export type Edition = {
+  id: string;
+  name: string;
+  bottle: Bottle;
+  barrel?: number;
 };
 
 export type User = {

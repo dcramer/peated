@@ -63,7 +63,6 @@ export const Bottle = async ({ distillerIds = [], ...data }: any = {}) => {
   return await prisma.bottle.create({
     data: {
       name: faker.music.songName(),
-      series: faker.music.songName(),
       ...data,
       distillers,
     },

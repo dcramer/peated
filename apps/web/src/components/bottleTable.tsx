@@ -73,9 +73,6 @@ export default ({
                 >
                   {bottle.name}
                 </Link>
-                <div className="mt-1 truncate text-gray-500">
-                  {bottle.series}
-                </div>
               </td>
               <td className="hidden px-3 py-4 text-right text-sm text-gray-500 sm:table-cell">
                 {formatCategoryName(bottle.category)}

@@ -90,7 +90,7 @@ async function scrapeWhisky(id: number) {
   // bottle.bottler = {
   //   name: $("dt:contains('Bottler') + dd").text(),
   // };
-  bottle.series = $("dt:contains('Bottling serie') + dd").text();
+  // bottle.series = $("dt:contains('Bottling serie') + dd").text();
 
   // bottle.vintageYear = parseYear($("dt:contains('Vintage') + dd").text());
   // bottle.bottleYear = parseYear($("dt:contains('Bottled') + dd").text());

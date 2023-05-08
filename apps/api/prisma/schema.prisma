@@ -25,7 +25,8 @@ model User {
     brands     Brand[]
     distillers Distiller[]
     bottles    Bottle[]
-    Change     Change[]
+    changes    Change[]
+    editions   Edition[]
 
     @@map("user")
 }
@@ -49,10 +50,7 @@ model Identity {
 
 enum Category {
     blend
-    blended_grain
-    blended_malt
     bourbon
-    blended_scotch
     rye
     single_grain
     single_malt
@@ -96,20 +94,13 @@ model Distiller {
     @@map("distiller")
 }
 
-// DisplayName is: [Name] [Series]
-// Distiller=Hibiki Brand=Hibiki, Name=Hibiki 12, Series=None, DisplayName=Hibiki 12
-// Distiller=Macallan, Brand=Blended Malt, Series=Mythic Journey, DisplayName=Macallan Blended Malt Mythic Journey
-
 // Bottles are unique to their (name, brand, series), and the rest of the attributes are considered optional facts
 model Bottle {
-    id      Int     @id @default(autoincrement())
-    name    String
-    brandId Int
-    brand   Brand   @relation(fields: [brandId], references: [id])
-    series  String?
-
+    id        Int       @id @default(autoincrement())
+    name      String
+    brandId   Int
+    brand     Brand     @relation(fields: [brandId], references: [id])
     category  Category?
-    abv       Float?
     statedAge Int?
 
     public Boolean @default(true)
@@ -120,9 +111,28 @@ model Bottle {
 
     distillers Distiller[]
     checkins   Checkin[]
+    editions   Edition[]
 
-    @@unique([name, brandId, series])
+    @@unique([name, brandId])
     @@map("bottle")
+}
+
+// A variation is commonly a single barrel bottle.
+// The name may be something like "Healthy Spirits" (a liquor store collab).
+model Edition {
+    id Int @id @default(autoincrement())
+
+    bottleId Int
+    bottle   Bottle @relation(fields: [bottleId], references: [id])
+    name     String
+    barrel   Int?
+
+    createdAt   DateTime @default(now())
+    createdById Int?
+    createdBy   User?    @relation(fields: [createdById], references: [id])
+
+    @@unique([bottleId, name, barrel])
+    @@map("edition")
 }
 
 model Checkin {

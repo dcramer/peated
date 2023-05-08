@@ -15,12 +15,10 @@ import SelectField from "../components/selectField";
 import { Option } from "../components/richSelectField";
 
 type FormData = {
-  name?: string;
-  series?: string;
-  brand?: Option | undefined;
+  name: string;
+  brand: Option;
   distillers?: Option[] | undefined;
-  abv?: number;
-  statedAge?: number;
+  statedAge?: number | undefined;
   category?: string | undefined;
 };
 
@@ -32,17 +30,12 @@ export default function AddBottle() {
   const qs = new URLSearchParams(location.search);
   const name = toTitleCase(qs.get("name") || "");
 
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<Partial<FormData>>({
     name,
-    series: "",
-    category: "",
   });
 
   const categoryList = [
     "blend",
-    "blended_grain",
-    "blended_malt",
-    "blended_scotch",
     "bourbon",
     "rye",
     "single_grain",
@@ -90,29 +83,19 @@ export default function AddBottle() {
             label="Bottle"
             name="name"
             required
-            helpText="The full name of the bottle, excluding its series."
-            placeholder="e.g. Macallan 12"
+            helpText="The full name of the bottle, excluding its specific cask information."
+            placeholder="e.g. Angel's Envy Private Selection Single Barrel"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
             value={formData.name}
-          />
-          <TextField
-            type="text"
-            label="Series"
-            name="series"
-            placeholder="e.g. The Edition"
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            value={formData.series}
           />
 
           <BrandField
             label="Brand"
             name="brand"
             helpText="The brand, or main label of the bottle."
-            placeholder="e.g. Macallan"
+            placeholder="e.g. Angel's Envy"
             onChange={(value) =>
               setFormData({ ...formData, brand: value as Option })
             }
@@ -124,7 +107,7 @@ export default function AddBottle() {
           <DistillerField
             label="Distiller"
             name="distillers"
-            placeholder="e.g. Distiller"
+            placeholder="e.g. Angel's Envy"
             helpText="The distilleries which produces the spirit(s) for this bottle."
             onChange={(value) =>
               setFormData({
@@ -137,37 +120,18 @@ export default function AddBottle() {
             multiple
           />
 
-          <div className="flex">
-            <div className="w-1/2 border-r">
-              <TextField
-                type="number"
-                label="ABV"
-                name="abv"
-                placeholder="e.g. 45"
-                helpText="The alcohol content by volume."
-                required
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
-                value={formData.abv}
-                suffixLabel="%"
-              />
-            </div>
-            <div className="w-1/2">
-              <TextField
-                type="number"
-                label="Stated Age"
-                name="statedAge"
-                placeholder="e.g. 12"
-                helpText="The number of years the spirit was aged."
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
-                value={formData.statedAge}
-                suffixLabel="years"
-              />
-            </div>
-          </div>
+          <TextField
+            type="number"
+            label="Stated Age"
+            name="statedAge"
+            placeholder="e.g. 12"
+            helpText="The number of years the spirit was aged."
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            value={formData.statedAge}
+            suffixLabel="years"
+          />
 
           <SelectField
             label="Category"
