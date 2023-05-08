@@ -1,10 +1,9 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
-import { Bottle, Brand, Prisma, Distiller } from "@prisma/client";
+import { Bottle, Prisma } from "@prisma/client";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
 import { omit } from "../lib/filter";
-import { Bottle } from "../lib/test/fixtures";
 
 export const listBottles: RouteOptions<
   Server,
