@@ -34,6 +34,7 @@ export const storeFile = async ({
 
     await trace(
       {
+        op: "gcs.file",
         name: "gcs.file",
         data: { bucketName, fileName: newFilename },
       },
@@ -42,18 +43,25 @@ export const storeFile = async ({
           .bucket(bucketName)
           .file(`${bucketPath}${newFilename}`);
 
-        await trace({ name: "gcs.file.write-stream" }, async () => {
-          const writeStream = file.createWriteStream();
-          // data.file.pipe(writeStream);
-          await pump(data.file, writeStream);
-        });
+        await trace(
+          { op: "gcs.file.write-stream", name: "gcs.file.write-stream" },
+          async () => {
+            const writeStream = file.createWriteStream();
+            // data.file.pipe(writeStream);
+            await pump(data.file, writeStream);
+          }
+        );
       }
     );
   } else {
     const uploadPath = `${config.UPLOAD_PATH}/${newFilename}`;
 
     trace(
-      { name: "file.write-stream", data: { fileName: newFilename } },
+      {
+        op: "file.write-stream",
+        name: "file.write-stream",
+        data: { fileName: newFilename },
+      },
       () => {
         const writeStream = createWriteStream(uploadPath);
         data.file.pipe(writeStream);
