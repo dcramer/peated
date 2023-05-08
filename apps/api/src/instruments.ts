@@ -29,6 +29,5 @@ export const initSentry = ({ ...params }) => {
       new ProfilingIntegration(),
       ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
     ],
-    tracesSampleRate: 1.0,
   });
 };
