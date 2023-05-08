@@ -5,6 +5,7 @@ import type { Bottle, Brand } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
 import BottleTable from "../components/bottleTable";
+import Button from "../components/button";
 
 type BrandWithStats = Brand & {
   stats: {
@@ -38,7 +39,7 @@ export default function BrandDetails() {
 
   return (
     <Layout gutter>
-      <div className="flex flex-wrap flex-row items-start justify-between gap-x-8 gap-y-4 mt-2 sm:mt-0">
+      <div className="min-w-full flex flex-wrap sm:flex-nowrap my-8 gap-y-4">
         <div className="space-y-1 flex-1 w-full sm:w-auto flex flex-col items-center sm:items-start">
           <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">
             {brand.name}
@@ -48,6 +49,10 @@ export default function BrandDetails() {
             {brand.region && <span> &middot; {brand.region}</span>}
           </p>
         </div>
+      </div>
+
+      <div className="my-8 justify-center sm:justify-start flex gap-4">
+        <Button to={`/brands/${brand.id}/edit`}>Edit Brand</Button>
       </div>
 
       <div className="my-8 grid gap-3 grid-cols-1 text-center sm:text-left items-center">

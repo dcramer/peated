@@ -67,7 +67,7 @@ export default function BottleDetails() {
   const { distillers } = bottle;
   return (
     <Layout gutter>
-      <div className="flex flex-wrap flex-row items-start justify-between gap-x-8 gap-y-4 mt-2 sm:mt-0">
+      <div className="min-w-full flex flex-wrap sm:flex-nowrap my-8 gap-y-4">
         <div className="space-y-1 flex-1 w-full sm:w-auto flex flex-col items-center sm:items-start">
           <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">
             {bottle.name}
@@ -108,10 +108,11 @@ export default function BottleDetails() {
         </div>
       </div>
 
-      <div className="my-8 text-center sm:text-left">
+      <div className="my-8 justify-center sm:justify-start flex gap-4">
         <Button to={`/bottles/${bottle.id}/checkin`} color="primary">
           Record a Tasting
         </Button>
+        <Button to={`/bottles/${bottle.id}/edit`}>Edit Bottle</Button>
       </div>
 
       <div className="my-8 grid gap-3 grid-cols-3 text-center sm:text-left items-center">

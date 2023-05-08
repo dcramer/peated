@@ -1,5 +1,6 @@
 import buildFastify from "../app";
 import { prisma } from "../lib/db";
+import { omit } from "../lib/filter";
 import * as Fixtures from "../lib/test/fixtures";
 import { FastifyInstance } from "fastify";
 
@@ -403,4 +404,27 @@ test("creates a new bottle with new distiller name", async () => {
     },
   });
   expect(changes.length).toBe(1);
+});
+
+test("edits a new bottle with new name param", async () => {
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      name: "Delicious Wood",
+    },
+    headers: await Fixtures.AuthenticatedHeaders(),
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const bottle2 = await prisma.bottle.findUniqueOrThrow({
+    where: { id: data.id },
+  });
+
+  expect(omit(bottle, "name")).toEqual(omit(bottle2, "name"));
+  expect(bottle2.name).toBe("Delicious Wood");
 });

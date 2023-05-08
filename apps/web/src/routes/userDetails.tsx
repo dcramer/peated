@@ -53,7 +53,7 @@ export default function UserDetails() {
 
   return (
     <Layout gutter>
-      <div className="min-w-full flex flex-wrap sm:flex-nowrap mb-8">
+      <div className="min-w-full flex flex-wrap sm:flex-nowrap my-8 gap-y-4">
         <div className="w-full sm:w-auto flex justify-center sm:justify-start">
           <UserAvatar user={user} size={150} />
         </div>

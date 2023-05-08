@@ -136,6 +136,34 @@ export const authGoogle: RouteOptions<
         },
       },
     });
+
+    // try to associate w/ existing user
+    if (!user) {
+      user = await prisma.user.findFirst({
+        where: {
+          email: payload.email,
+        },
+      });
+      if (user) {
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            identities: {
+              create: [
+                {
+                  provider: "google",
+                  externalId: payload.sub,
+                },
+              ],
+            },
+          },
+        });
+      }
+    }
+
+    // create new account
     if (!user) {
       console.log("Creating new user");
       user = await prisma.user.create({

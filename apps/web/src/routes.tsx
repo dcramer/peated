@@ -18,6 +18,7 @@ import DistillerDetails, {
 } from "./routes/distillerDetails";
 import UserDetails, { loader as userDetailsLoader } from "./routes/userDetails";
 import Settings, { loader as settingsLoader } from "./routes/settings";
+import EditBottle, { loader as editBottleLoader } from "./routes/editBottle";
 
 export default function createRoutes() {
   return [
@@ -40,6 +41,11 @@ export default function createRoutes() {
           path: "bottles/:bottleId/checkin",
           element: <Checkin />,
           loader: checkinLoader,
+        },
+        {
+          path: "bottles/:bottleId/edit",
+          element: <EditBottle />,
+          loader: editBottleLoader,
         },
         {
           path: "brands/:brandId",
