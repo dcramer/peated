@@ -44,7 +44,6 @@ export default fastifyPlugin(async (fastify, options) => {
 
   fastify.addHook("onResponse", async (request, reply) => {
     setImmediate(() => {
-      console.log(request._sentryContext);
       if (request._sentryContext && request._sentryContext.transaction) {
         const transaction = request._sentryContext.transaction;
         // addRequestDataToTransaction(transaction, req);

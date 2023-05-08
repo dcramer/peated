@@ -76,7 +76,6 @@ export const AuthProvider = ({ children }: { children: any }) => {
           });
           setUser(user);
         } catch (err) {
-          console.error("we are here");
           setUser(null);
           setAccessToken(null);
         }

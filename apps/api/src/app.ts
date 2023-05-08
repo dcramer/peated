@@ -6,19 +6,12 @@ import FastifyMultipart from "@fastify/multipart";
 import { router } from "./routes";
 import config from "./config";
 
-import * as Sentry from "@sentry/node";
 import FastifySentry from "./sentryPlugin";
-import { prisma } from "./lib/db";
+import { initSentry } from "./instruments";
 
-Sentry.init({
+initSentry({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
-  integrations: [
-    new Sentry.Integrations.Http({ tracing: true }),
-    new Sentry.Integrations.Prisma({ client: prisma }),
-    ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
-  ],
-  tracesSampleRate: 1.0,
 });
 
 const envToLogger: {
