@@ -26,19 +26,14 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   if (!bottleId) throw new Error("Missing bottleId");
   const bottle = await api.get(`/bottles/${bottleId}`);
-  const checkinList = await api.get(`/checkins`, {
-    query: { bottle: bottle.id },
-  });
 
   return { bottle };
 };
 
 type FormData = {
   name?: string;
-  series?: string;
   brand?: Option | undefined;
   distillers?: Option[] | undefined;
-  abv?: number | undefined;
   statedAge?: number | undefined;
   category?: string | undefined;
 };
@@ -57,19 +52,14 @@ export default function EditBottle() {
 
   const [formData, setFormData] = useState<FormData>({
     name: bottle.name,
-    series: bottle.series || "",
     category: bottle.category ? bottle.category.toString() : "",
     brand: entityToOption(bottle.brand),
     distillers: bottle.distillers.map(entityToOption),
-    abv: bottle.abv || undefined,
     statedAge: bottle.statedAge || undefined,
   });
 
   const categoryList = [
     "blend",
-    "blended_grain",
-    "blended_malt",
-    "blended_scotch",
     "bourbon",
     "rye",
     "single_grain",
@@ -117,22 +107,12 @@ export default function EditBottle() {
             label="Bottle"
             name="name"
             required
-            helpText="The full name of the bottle, excluding its series."
+            helpText="The full name of the bottle, excluding its specific cask information."
             placeholder="e.g. Macallan 12"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
             value={formData.name}
-          />
-          <TextField
-            type="text"
-            label="Series"
-            name="series"
-            placeholder="e.g. The Edition"
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            value={formData.series}
           />
 
           <BrandField
@@ -164,37 +144,18 @@ export default function EditBottle() {
             multiple
           />
 
-          <div className="flex">
-            <div className="w-1/2 border-r">
-              <TextField
-                type="number"
-                label="ABV"
-                name="abv"
-                placeholder="e.g. 45"
-                helpText="The alcohol content by volume."
-                required
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
-                value={formData.abv}
-                suffixLabel="%"
-              />
-            </div>
-            <div className="w-1/2">
-              <TextField
-                type="number"
-                label="Stated Age"
-                name="statedAge"
-                placeholder="e.g. 12"
-                helpText="The number of years the spirit was aged."
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
-                value={formData.statedAge}
-                suffixLabel="years"
-              />
-            </div>
-          </div>
+          <TextField
+            type="number"
+            label="Stated Age"
+            name="statedAge"
+            placeholder="e.g. 12"
+            helpText="The number of years the spirit was aged."
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            value={formData.statedAge}
+            suffixLabel="years"
+          />
 
           <SelectField
             label="Category"

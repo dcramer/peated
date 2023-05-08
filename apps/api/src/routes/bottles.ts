@@ -1,9 +1,75 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
-import { Bottle, Prisma } from "@prisma/client";
+import { Bottle, Category, Prisma } from "@prisma/client";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
 import { omit } from "../lib/filter";
+
+const BottleProperties = {
+  name: { type: "string" },
+  brand: {
+    oneOf: [
+      { type: "number" },
+      {
+        type: "object",
+        required: ["name", "country"],
+        properties: {
+          id: {
+            type: "number",
+          },
+          name: {
+            type: "string",
+          },
+          country: {
+            type: "string",
+          },
+          region: {
+            type: "string",
+          },
+        },
+      },
+    ],
+  },
+  distillers: {
+    type: "array",
+    items: {
+      oneOf: [
+        { type: "number" },
+        {
+          type: "object",
+          required: ["name", "country"],
+          properties: {
+            id: {
+              type: "number",
+            },
+            name: {
+              type: "string",
+            },
+            country: {
+              type: "string",
+            },
+            region: {
+              type: "string",
+            },
+          },
+        },
+      ],
+    },
+  },
+  category: {
+    type: "string",
+    enum: [
+      "",
+      "blend",
+      "bourbon",
+      "rye",
+      "single_grain",
+      "single_malt",
+      "spirit",
+    ],
+  },
+  statedAge: { type: "number" },
+};
 
 export const listBottles: RouteOptions<
   Server,
@@ -133,20 +199,74 @@ export const getBottle: RouteOptions<
   },
 };
 
+type BottleInput = {
+  name: string;
+  category: Category;
+  brand: number | { name: string; country: string; region?: string };
+  distillers: (number | { name: string; country: string; region?: string })[];
+  statedAge?: number;
+};
+
+class InvalidValue extends Error {}
+
+const getBrandParam = async (req: any, value: BottleInput["brand"]) => {
+  if (typeof value === "number") {
+    if (!(await prisma.brand.findUnique({ where: { id: value } }))) {
+      throw new InvalidValue(`${value} is not a valid brand ID`);
+    }
+  }
+
+  if (typeof value === "number") {
+    return { connect: { id: value } };
+  }
+  return {
+    create: {
+      name: value.name,
+      country: value.country,
+      region: value.region,
+      public: req.user.admin,
+      createdById: req.user.id,
+    },
+  };
+};
+
+const getDistillerParam = async (
+  req: any,
+  value: BottleInput["distillers"]
+) => {
+  if (!value) return;
+
+  for (const d of value) {
+    if (typeof d === "number") {
+      if (!(await prisma.distiller.findUnique({ where: { id: d } }))) {
+        throw new InvalidValue(`${value} is not a valid distiller ID`);
+      }
+    }
+  }
+
+  return {
+    connect: value
+      .filter((d) => typeof d === "number")
+      .map((d: any) => ({ id: d })),
+    create: value
+      .filter((d) => typeof d !== "number")
+      // how to type this?
+      .map((d: any) => ({
+        name: d.name,
+        country: d.country,
+        region: d.region,
+        public: req.user.admin,
+        createdById: req.user.id,
+      })),
+  };
+};
+
 export const addBottle: RouteOptions<
   Server,
   IncomingMessage,
   ServerResponse,
   {
-    Body: Omit<Bottle, "id" | "createdById" | "createdAt" | "public"> & {
-      brand:
-        | number
-        | { id?: string; name: string; country: string; region?: string };
-      distillers: (
-        | number
-        | { id?: string; name: string; country: string; region?: string }
-      )[];
-    };
+    Body: BottleInput;
   }
 > = {
   method: "POST",
@@ -155,188 +275,50 @@ export const addBottle: RouteOptions<
     body: {
       type: "object",
       required: ["name", "brand"],
-      properties: {
-        name: { type: "string" },
-        brand: {
-          oneOf: [
-            { type: "number" },
-            {
-              type: "object",
-              required: ["name", "country"],
-              properties: {
-                id: {
-                  type: "number",
-                },
-                name: {
-                  type: "string",
-                },
-                country: {
-                  type: "string",
-                },
-                region: {
-                  type: "string",
-                },
-              },
-            },
-          ],
-        },
-        distillers: {
-          type: "array",
-          items: {
-            oneOf: [
-              { type: "number" },
-              {
-                type: "object",
-                required: ["name", "country"],
-                properties: {
-                  id: {
-                    type: "number",
-                  },
-                  name: {
-                    type: "string",
-                  },
-                  country: {
-                    type: "string",
-                  },
-                  region: {
-                    type: "string",
-                  },
-                },
-              },
-            ],
-          },
-        },
-        series: { type: "string" },
-        category: {
-          type: "string",
-          enum: [
-            "",
-            "blend",
-            "blended_grain",
-            "blended_malt",
-            "blended_scotch",
-            "bourbon",
-            "rye",
-            "single_grain",
-            "single_malt",
-            "spirit",
-          ],
-        },
-        abv: { type: "number" },
-        statedAge: { type: "number" },
-      },
+      properties: BottleProperties,
     },
   },
   preHandler: [validateRequest],
   handler: async (req, res) => {
     const body = req.body;
-    // gross syntax, whats better?
-    // TODO: types
-    // Partial<Prisma.BottleCreateInput> & {
-    //   distillers: Prisma.DistillerCreateNestedManyWithoutBottlesInput;
-    // }
-    const data: any = {
-      ...omit(body, "brand"),
-      distillers: {
-        connect: [],
-        create: [],
-      },
+
+    const bottleData: Prisma.BottleCreateInput = {
+      name: body.name,
+      brand: await getBrandParam(req, body.brand),
+      distillers: await getDistillerParam(req, body.distillers),
+      statedAge: body.statedAge || null,
+      category: body.category || null,
+      public: req.user.admin,
+      createdBy: { connect: { id: req.user.id } },
     };
-
-    // validate params up front
-    if (body.brand && typeof body.brand === "number") {
-      if (!(await prisma.brand.findUnique({ where: { id: body.brand } }))) {
-        return res.status(400).send({
-          ok: false,
-          message: "Invalid brand",
-          brand: body.brand,
-        });
-      }
-    }
-    if (body.distillers) {
-      for (let i = 0, d; (d = body.distillers[i]); i++) {
-        if (typeof d === "number") {
-          if (!(await prisma.distiller.findUnique({ where: { id: d } }))) {
-            return res.status(400).send({
-              ok: false,
-              message: "Invalid distiller",
-              distiller: d,
-            });
-          }
-        }
-      }
-    }
-
-    if (body.brand) {
-      if (typeof body.brand === "number") {
-        data.brand = { connect: { id: body.brand } };
-      } else if (body.brand) {
-        if (body.brand.id) {
-          data.brand = { connect: { id: body.brand.id } };
-        } else {
-          data.brand = {
-            create: {
-              name: body.brand.name,
-              country: body.brand.country,
-              region: body.brand.region,
-              public: req.user.admin,
-              createdById: req.user.id,
-            },
-          };
-        }
-      }
-    }
-
-    if (body.distillers) {
-      for (let i = 0, d; (d = body.distillers[i]); i++) {
-        if (typeof d === "number") {
-          data.distillers.connect.push({ id: d });
-        } else if (d) {
-          if (d.id) {
-            data.distillers.connect.push({ id: d.id });
-          } else {
-            data.distillers.create.push({
-              name: d.name,
-              country: d.country,
-              region: d.region,
-              public: req.user.admin,
-              createdById: req.user.id,
-            });
-          }
-        }
-      }
-    }
-
-    if (data.category === "") data.category = null;
-    if (data.series === "") data.series = null;
-
-    data.createdBy = { connect: { id: req.user.id } };
-    data.public = req.user.admin;
 
     const bottle = await prisma.$transaction(async (tx) => {
       const bottle = await tx.bottle.create({
-        data,
+        data: bottleData,
         include: {
           brand: true,
           distillers: true,
         },
       });
 
-      data.distillers.create.forEach(async ({ name }: any) => {
-        const distiller = bottle.distillers.find((d2) => d2.name === name);
-        if (!distiller)
-          throw new Error(`Unable to find connected distiller: ${name}`);
-        await tx.change.create({
-          data: {
-            objectType: "distiller",
-            objectId: distiller.id,
-            userId: req.user.id,
-            data: JSON.stringify(distiller),
-          },
-        });
-      });
+      if (body.distillers)
+        body.distillers
+          .filter((d) => typeof d !== "number")
+          .forEach(async ({ name }: any) => {
+            const distiller = bottle.distillers.find((d2) => d2.name === name);
+            if (!distiller)
+              throw new Error(`Unable to find connected distiller: ${name}`);
+            await tx.change.create({
+              data: {
+                objectType: "distiller",
+                objectId: distiller.id,
+                userId: req.user.id,
+                data: JSON.stringify(distiller),
+              },
+            });
+          });
 
-      if (data.brand.create) {
+      if (body.brand && typeof body.brand !== "number") {
         await tx.change.create({
           data: {
             objectType: "brand",
@@ -353,7 +335,7 @@ export const addBottle: RouteOptions<
           objectId: bottle.id,
           userId: req.user.id,
           data: JSON.stringify({
-            ...omit(data, "distillers", "brand"),
+            ...omit(bottleData, "distillers", "brand", "createdBy"),
             brandId: bottle.brand.id,
             distillerIds: bottle.distillers.map((d) => d.id),
           }),
@@ -375,17 +357,7 @@ export const editBottle: RouteOptions<
     Params: {
       bottleId: number;
     };
-    Body: Partial<
-      Omit<Bottle, "id" | "createdById" | "createdAt" | "public">
-    > & {
-      brand?:
-        | number
-        | { id?: string; name: string; country: string; region?: string };
-      distillers?: (
-        | number
-        | { id?: string; name: string; country: string; region?: string }
-      )[];
-    };
+    Body: Partial<BottleInput>;
   }
 > = {
   method: "PUT",
@@ -400,86 +372,11 @@ export const editBottle: RouteOptions<
     },
     body: {
       type: "object",
-      properties: {
-        name: { type: "string" },
-        brand: {
-          oneOf: [
-            { type: "number" },
-            {
-              type: "object",
-              required: ["name", "country"],
-              properties: {
-                id: {
-                  type: "number",
-                },
-                name: {
-                  type: "string",
-                },
-                country: {
-                  type: "string",
-                },
-                region: {
-                  type: "string",
-                },
-              },
-            },
-          ],
-        },
-        distillers: {
-          type: "array",
-          items: {
-            oneOf: [
-              { type: "number" },
-              {
-                type: "object",
-                required: ["name", "country"],
-                properties: {
-                  id: {
-                    type: "number",
-                  },
-                  name: {
-                    type: "string",
-                  },
-                  country: {
-                    type: "string",
-                  },
-                  region: {
-                    type: "string",
-                  },
-                },
-              },
-            ],
-          },
-        },
-        series: { type: "string" },
-        category: {
-          type: "string",
-          enum: [
-            "",
-            "blend",
-            "blended_grain",
-            "blended_malt",
-            "blended_scotch",
-            "bourbon",
-            "rye",
-            "single_grain",
-            "single_malt",
-            "spirit",
-          ],
-        },
-        abv: { type: "number" },
-        statedAge: { type: "number" },
-      },
+      properties: BottleProperties,
     },
   },
   preHandler: [validateRequest],
   handler: async (req, res) => {
-    const body = req.body;
-    // gross syntax, whats better?
-    // TODO: types
-    // Partial<Prisma.BottleCreateInput> & {
-    //   distillers: Prisma.DistillerCreateNestedManyWithoutBottlesInput;
-    // }
     const bottle = await prisma.bottle.findUnique({
       include: {
         brand: true,
@@ -493,84 +390,47 @@ export const editBottle: RouteOptions<
       return res.status(404).send({ error: "Not found" });
     }
 
-    const data: any = {
-      ...omit(body, "brand"),
-      distillers: {
-        connect: [],
-        create: [],
-      },
-    };
+    const body = req.body;
+    const bottleData: Partial<Prisma.BottleCreateInput> = {};
 
-    // validate params up front
-    if (body.brand && typeof body.brand === "number") {
-      if (!(await prisma.brand.findUnique({ where: { id: body.brand } }))) {
-        return res.status(400).send({
-          ok: false,
-          message: "Invalid brand",
-          brand: body.brand,
-        });
-      }
+    if (body.name && body.name !== bottle.name) {
+      bottleData.name = body.name;
     }
-    if (body.distillers) {
-      for (let i = 0, d; (d = body.distillers[i]); i++) {
-        if (typeof d === "number") {
-          if (!(await prisma.distiller.findUnique({ where: { id: d } }))) {
-            return res.status(400).send({
-              ok: false,
-              message: "Invalid distiller",
-              distiller: d,
-            });
-          }
-        }
-      }
+
+    if (body.category && body.category !== bottle.category) {
+      bottleData.category = body.category;
     }
 
     if (body.brand) {
       if (typeof body.brand === "number") {
-        data.brand = { connect: { id: body.brand } };
-      } else if (body.brand) {
-        if (body.brand.id) {
-          data.brand = { connect: { id: body.brand.id } };
-        } else {
-          data.brand = {
-            create: {
-              name: body.brand.name,
-              country: body.brand.country,
-              region: body.brand.region,
-              public: req.user.admin,
-              createdById: req.user.id,
-            },
-          };
+        if (body.brand !== bottle.brandId) {
+          bottleData.brand = { connect: { id: body.brand } };
         }
+      } else {
+        bottleData.brand = await getBrandParam(req, body.brand);
       }
     }
 
+    // TODO: only capture changes
     if (body.distillers) {
-      for (let i = 0, d; (d = body.distillers[i]); i++) {
-        if (typeof d === "number") {
-          data.distillers.connect.push({ id: d });
-        } else if (d) {
-          if (d.id) {
-            data.distillers.connect.push({ id: d.id });
-          } else {
-            data.distillers.create.push({
-              name: d.name,
-              country: d.country,
-              region: d.region,
-              public: req.user.admin,
-              createdById: req.user.id,
-            });
-          }
-        }
+      const distillersParam = await getDistillerParam(req, body.distillers);
+      if (distillersParam) {
+        const newDistillersParam = {
+          ...distillersParam,
+          disconnect: bottle.distillers
+            .filter(
+              (d) => !distillersParam.connect.find((d2) => d2.id === d.id)
+            )
+            .map((d) => ({ id: d.id })),
+        };
       }
-    }
 
-    if (data.category === "") data.category = null;
-    if (data.series === "") data.series = null;
+      bottleData.distillers = distillersParam;
+    }
 
     const newBottle = await prisma.$transaction(async (tx) => {
       const newBottle = await tx.bottle.update({
-        data,
+        data: bottleData,
         where: {
           id: bottle.id,
         },
@@ -580,27 +440,30 @@ export const editBottle: RouteOptions<
         },
       });
 
-      data.distillers.create.forEach(async ({ name }: any) => {
-        const distiller = newBottle.distillers.find((d2) => d2.name === name);
-        if (!distiller)
-          throw new Error(`Unable to find connected distiller: ${name}`);
-        await tx.change.create({
-          data: {
-            objectType: "distiller",
-            objectId: distiller.id,
-            userId: req.user.id,
-            data: JSON.stringify(distiller),
-          },
-        });
-      });
+      if (body.distillers)
+        body.distillers
+          .filter((d) => typeof d !== "number")
+          .forEach(async ({ name }: any) => {
+            const distiller = bottle.distillers.find((d2) => d2.name === name);
+            if (!distiller)
+              throw new Error(`Unable to find connected distiller: ${name}`);
+            await tx.change.create({
+              data: {
+                objectType: "distiller",
+                objectId: distiller.id,
+                userId: req.user.id,
+                data: JSON.stringify(distiller),
+              },
+            });
+          });
 
-      if (data.brand && data.brand.create) {
+      if (body.brand && typeof body.brand !== "number") {
         await tx.change.create({
           data: {
             objectType: "brand",
-            objectId: newBottle.brandId,
+            objectId: bottle.brandId,
             userId: req.user.id,
-            data: JSON.stringify(newBottle.brand),
+            data: JSON.stringify(bottle.brand),
           },
         });
       }
@@ -611,7 +474,7 @@ export const editBottle: RouteOptions<
           objectId: newBottle.id,
           userId: req.user.id,
           data: JSON.stringify({
-            ...omit(data, "distillers", "brand"),
+            ...omit(bottleData, "distillers", "brand", "createdBy"),
             brandId: newBottle.brand.id,
             distillerIds: newBottle.distillers.map((d) => d.id),
           }),

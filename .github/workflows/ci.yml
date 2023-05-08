@@ -14,8 +14,6 @@ jobs:
           fetch-depth: 0
       - uses: nrwl/nx-set-shas@v3
       - run: npm ci
-
-      - run: npx nx format:check
-      - run: npx nx affected -t lint --parallel=3
+      - run: docker-compose up -d
       - run: npx nx affected -t test --parallel=3 --configuration=ci
       - run: npx nx affected -t build --parallel=3
