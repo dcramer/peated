@@ -25,6 +25,7 @@ otelSdk.start();
 export const initSentry = ({ ...params }) => {
   Sentry.init({
     ...params,
+    instrumenter: "otel",
     integrations: [
       new Sentry.Integrations.Http({ tracing: true }),
       new Sentry.Integrations.Prisma({ client: prisma }),
