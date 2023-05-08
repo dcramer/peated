@@ -33,7 +33,10 @@ export const storeFile = async ({
     });
 
     await trace(
-      { name: "gcs.file", data: { bucketName, fileName: newFilename } },
+      {
+        name: "gcs.file",
+        data: { bucketName, fileName: newFilename },
+      },
       async () => {
         const file = cloudStorage
           .bucket(bucketName)

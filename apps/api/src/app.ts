@@ -12,7 +12,7 @@ import { initSentry } from "./instruments";
 initSentry({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
-  debug: config.ENV === "development",
+  debug: config.DEBUG,
 });
 
 const envToLogger: {
