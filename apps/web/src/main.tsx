@@ -1,6 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  createRoutesFromChildren,
+  matchRoutes,
+  RouterProvider,
+  useLocation,
+  useNavigationType,
+} from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import * as Sentry from "@sentry/react";
 
@@ -19,6 +26,13 @@ Sentry.init({
   integrations: [
     new Sentry.BrowserTracing({
       tracePropagationTargets: ["localhost", /^\//, "api.peated.app"],
+      routingInstrumentation: Sentry.reactRouterV6Instrumentation(
+        React.useEffect,
+        useLocation,
+        useNavigationType,
+        createRoutesFromChildren,
+        matchRoutes
+      ),
     }),
     new Sentry.Replay({
       maskAllText: true,
@@ -33,7 +47,9 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 });
 
-const router = createBrowserRouter(createRoutes());
+const router = Sentry.wrapCreateBrowserRouter(createBrowserRouter)(
+  createRoutes()
+);
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
