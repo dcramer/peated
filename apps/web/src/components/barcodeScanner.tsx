@@ -49,7 +49,7 @@ export type Props = {
     halfSample: boolean;
   };
   numOfWorkers?: number;
-  decoders?: string[];
+  decoders?: any; // give up on ts
   locate?: boolean;
 };
 
@@ -90,18 +90,17 @@ export default ({
 
     if (result) {
       // console.warn('* quagga onProcessed', result);
-      console.log(result);
 
       if (result.boxes) {
         drawingCtx.clearRect(
           0,
           0,
-          parseInt(drawingCanvas.getAttribute("width")),
-          parseInt(drawingCanvas.getAttribute("height"))
+          parseInt(drawingCanvas.getAttribute("width") || "0"),
+          parseInt(drawingCanvas.getAttribute("height") || "0")
         );
         result.boxes
-          .filter((box) => box !== result.box)
-          .forEach((box) => {
+          .filter((box: any) => box !== result.box)
+          .forEach((box: any) => {
             Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, {
               color: "purple",
               lineWidth: 2,
@@ -130,6 +129,7 @@ export default ({
   };
 
   useLayoutEffect(() => {
+    if (!scannerRef || !scannerRef.current) return;
     Quagga.init(
       {
         inputStream: {
