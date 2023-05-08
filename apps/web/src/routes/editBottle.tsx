@@ -35,12 +35,12 @@ export const loader: LoaderFunction = async ({
 
 type FormData = {
   name?: string;
-  series?: string | null;
+  series?: string;
   brand?: Option | undefined;
   distillers?: Option[] | undefined;
-  abv?: number | null;
-  statedAge?: number | null;
-  category?: string | null | undefined;
+  abv?: number | undefined;
+  statedAge?: number | undefined;
+  category?: string | undefined;
 };
 
 const entityToOption = (entity: any) => {
@@ -57,12 +57,12 @@ export default function EditBottle() {
 
   const [formData, setFormData] = useState<FormData>({
     name: bottle.name,
-    series: bottle.series,
-    category: bottle.category ? bottle.category.toString() : null,
+    series: bottle.series || "",
+    category: bottle.category ? bottle.category.toString() : "",
     brand: entityToOption(bottle.brand),
     distillers: bottle.distillers.map(entityToOption),
-    abv: bottle.abv,
-    statedAge: bottle.statedAge,
+    abv: bottle.abv || undefined,
+    statedAge: bottle.statedAge || undefined,
   });
 
   const categoryList = [
@@ -87,7 +87,7 @@ export default function EditBottle() {
 
     (async () => {
       try {
-        const bottle = await api.put(`/bottles/${bottle.id}`, {
+        await api.put(`/bottles/${bottle.id}`, {
           data: formData,
         });
         navigate(`/bottles/${bottle.id}`);

@@ -308,6 +308,7 @@ export const addBottle: RouteOptions<
     }
 
     if (data.category === "") data.category = null;
+    if (data.series === "") data.series = null;
 
     data.createdBy = { connect: { id: req.user.id } };
     data.public = req.user.admin;
@@ -565,6 +566,7 @@ export const editBottle: RouteOptions<
     }
 
     if (data.category === "") data.category = null;
+    if (data.series === "") data.series = null;
 
     const newBottle = await prisma.$transaction(async (tx) => {
       const newBottle = await tx.bottle.update({
