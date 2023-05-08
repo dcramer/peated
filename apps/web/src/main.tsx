@@ -17,7 +17,9 @@ Sentry.init({
   debug: config.DEBUG,
 
   integrations: [
-    new Sentry.BrowserTracing(),
+    new Sentry.BrowserTracing({
+      tracePropagationTargets: ["localhost", /^\//, "api.peated.app"],
+    }),
     new Sentry.Replay({
       maskAllText: true,
       blockAllMedia: true,
