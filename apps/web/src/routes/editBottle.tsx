@@ -1,12 +1,12 @@
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 
 import api, { ApiError } from "../lib/api";
 import { useRequiredAuth } from "../hooks/useAuth";
 import Layout from "../components/layout";
-import { formatCategoryName, toTitleCase } from "../lib/strings";
+import { formatCategoryName } from "../lib/strings";
 import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
 import TextField from "../components/textField";
