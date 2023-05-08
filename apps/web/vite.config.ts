@@ -75,6 +75,18 @@ export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
 
   return {
+    // TODO(dcramer): for now we're stripping the hash from build files to prevent
+    // issues with rolling out the frontend (aka index.html pointing to an old version that doesnt exist).
+    // Realistically we need push these assets to a CDN.
+    build: {
+      rollupOptions: {
+        output: {
+          entryFileNames: `assets/[name].js`,
+          chunkFileNames: `assets/[name].js`,
+          assetFileNames: `assets/[name].[ext]`,
+        },
+      },
+    },
     plugins: [
       react(),
       VitePWA(pwaOptions),
