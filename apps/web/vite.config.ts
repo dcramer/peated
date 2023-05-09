@@ -68,11 +68,24 @@ if (reload) {
 
 if (selfDestroying) pwaOptions.selfDestroying = selfDestroying;
 
+const ALLOWED_ENV = ["SENTRY_DSN", "GOOGLE_CLIENT_ID", "API_SERVER", "VERSION"];
+
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
   // Load env file based on `mode` in the current working directory.
   // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), "");
+
+  const processEnvValues = {
+    "process.env": Object.entries(env)
+      .filter(([k]) => ALLOWED_ENV.indexOf(k))
+      .reduce((prev, [key, val]) => {
+        return {
+          ...prev,
+          [key]: val,
+        };
+      }, {}),
+  };
 
   return {
     // TODO(dcramer): for now we're stripping the hash from build files to prevent
@@ -87,6 +100,7 @@ export default defineConfig(({ command, mode }) => {
         },
       },
     },
+    define: processEnvValues,
     plugins: [
       react(),
       VitePWA(pwaOptions),
