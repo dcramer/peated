@@ -23,7 +23,7 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   if (!brandId) throw new Error("Missing brandId");
   const brand = await api.get(`/brands/${brandId}`);
-  const bottleList = await api.get(`/bottles`, {
+  const { results: bottleList } = await api.get(`/bottles`, {
     query: { brand: brand.id },
   });
 

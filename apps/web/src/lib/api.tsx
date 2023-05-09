@@ -27,6 +27,12 @@ export class ApiError extends Error {
 
 export class ApiUnavailable extends Error {}
 
+const withoutUndefined = (obj: object) => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([k, v]) => v !== undefined)
+  );
+};
+
 class ApiClient {
   server: string;
   accessToken: string | null;
@@ -70,7 +76,9 @@ class ApiClient {
     let resp;
     try {
       resp = await fetch(
-        `${this.server}${path}?${new URLSearchParams(options.query || {})}`,
+        `${this.server}${path}?${new URLSearchParams(
+          withoutUndefined(options.query || {})
+        )}`,
         {
           body,
           headers,

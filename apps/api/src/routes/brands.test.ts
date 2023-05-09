@@ -22,8 +22,8 @@ test("lists brands", async () => {
   });
 
   expect(response).toRespondWith(200);
-  let data = JSON.parse(response.payload);
-  expect(data.length).toBe(2);
+  let { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(2);
 });
 
 test("lists brands hides private", async () => {
@@ -36,9 +36,9 @@ test("lists brands hides private", async () => {
   });
 
   expect(response).toRespondWith(200);
-  let data = JSON.parse(response.payload);
-  expect(data.length).toBe(1);
-  expect(data[0].id).toBe(brand.id);
+  let { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(brand.id);
 });
 
 test("get brand", async () => {

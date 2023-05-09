@@ -140,7 +140,7 @@ function mapCategory(value: string) {
 }
 
 async function scrape() {
-  const maxTasks = 16;
+  const maxTasks = 8;
 
   let numTasks = 0;
   let currentId = MIN_ID;
@@ -149,9 +149,11 @@ async function scrape() {
     (async () => {
       try {
         const bottle = await scrapeWhisky(currentId);
-        await submitBrand(bottle.brand);
-        await submitDistiller(bottle.distiller);
-        // await submitBottle(bottle);
+        if (bottle) {
+          await submitBrand(bottle.brand);
+          await submitDistiller(bottle.distiller);
+          // await submitBottle(bottle);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -183,7 +185,13 @@ async function submitBottle(data: any) {
     });
   } catch (err: any) {
     const data = err?.response?.data;
-    console.error(`Failed to submit bottle: ${JSON.stringify(data, null, 2)}`);
+    console.error(
+      `Failed to submit bottle: ${err?.response.status} - ${JSON.stringify(
+        data,
+        null,
+        2
+      )}`
+    );
   }
 }
 
@@ -199,7 +207,13 @@ async function submitBrand(data: any) {
     });
   } catch (err: any) {
     const data = err?.response?.data;
-    console.error(`Failed to submit brand: ${JSON.stringify(data, null, 2)}`);
+    console.error(
+      `Failed to submit brand: ${err?.response.status} -${JSON.stringify(
+        data,
+        null,
+        2
+      )}`
+    );
   }
 }
 
@@ -216,7 +230,11 @@ async function submitDistiller(data: any) {
   } catch (err: any) {
     const data = err?.response?.data;
     console.error(
-      `Failed to submit distiller: ${JSON.stringify(data, null, 2)}`
+      `Failed to submit distiller: ${err?.response.status} - ${JSON.stringify(
+        data,
+        null,
+        2
+      )}`
     );
   }
 }

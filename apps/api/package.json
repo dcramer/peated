@@ -12,6 +12,7 @@
     "generate-token": "ts-node --require dotenv/config ./src/bin/generate-token.ts",
     "user:create": "ts-node --require dotenv/config ./src/bin/create-user.ts",
     "user:admin": "ts-node --require dotenv/config ./src/bin/make-admin.ts",
+    "user:generate-token": "ts-node --require dotenv/config ./src/bin/generate-token.ts",
     "postinstall": "npx prisma generate",
     "tsc": "tsc",
     "start": "ts-node --require dotenv/config ./src/server.ts",

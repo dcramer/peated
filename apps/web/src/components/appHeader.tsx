@@ -78,6 +78,30 @@ export default function AppHeader() {
                   </Link>
                 </Menu.Item>
                 <Menu.Item>
+                  <Link
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full"
+                    to={`/bottles`}
+                  >
+                    Bottles
+                  </Link>
+                </Menu.Item>
+                <Menu.Item>
+                  <Link
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full"
+                    to={`/brands`}
+                  >
+                    Brands
+                  </Link>
+                </Menu.Item>
+                <Menu.Item>
+                  <Link
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full"
+                    to={`/distillers`}
+                  >
+                    Distillers
+                  </Link>
+                </Menu.Item>
+                <Menu.Item>
                   <button
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
                     onClick={() => {

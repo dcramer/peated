@@ -180,9 +180,11 @@ const SelectDialog = ({
 
   const onSearch = async (query: string = "") => {
     const results = endpoint
-      ? await api.get(endpoint, {
-          query: { query },
-        })
+      ? (
+          await api.get(endpoint, {
+            query: { query },
+          })
+        ).results
       : options?.filter(
           (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
         );

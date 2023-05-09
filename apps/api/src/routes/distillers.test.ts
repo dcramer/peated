@@ -22,8 +22,8 @@ test("lists distillers", async () => {
   });
 
   expect(response).toRespondWith(200);
-  let data = JSON.parse(response.payload);
-  expect(data.length).toBe(2);
+  let { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(2);
 });
 
 test("lists distillers with query", async () => {
@@ -39,9 +39,9 @@ test("lists distillers with query", async () => {
   });
 
   expect(response).toRespondWith(200);
-  let data = JSON.parse(response.payload);
-  expect(data.length).toBe(1);
-  expect(data[0].id).toBe(distiller.id);
+  let { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(distiller.id);
 });
 
 test("lists distillers hides private", async () => {
@@ -54,9 +54,9 @@ test("lists distillers hides private", async () => {
   });
 
   expect(response).toRespondWith(200);
-  let data = JSON.parse(response.payload);
-  expect(data.length).toBe(1);
-  expect(data[0].id).toBe(distiller.id);
+  let { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(distiller.id);
 });
 
 test("get distiller", async () => {

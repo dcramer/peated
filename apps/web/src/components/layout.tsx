@@ -3,6 +3,8 @@ import classNames from "../lib/classNames";
 import AppHeader from "./appHeader";
 import Header from "./header";
 import { motion, AnimatePresence } from "framer-motion";
+import { Suspense } from "react";
+import Spinner from "./spinner";
 
 export default function Layout({
   children,
@@ -58,7 +60,15 @@ export default function Layout({
                 transition: { duration: 0.5, ease: "easeInOut" },
               }}
             >
-              {children}
+              <Suspense
+                fallback={
+                  <div className="flex justify-center items-center h-screen">
+                    <Spinner />
+                  </div>
+                }
+              >
+                {children}
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </main>

@@ -24,7 +24,7 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   if (!distillerId) throw new Error("Missing distillerId");
   const distiller = await api.get(`/distillers/${distillerId}`);
-  const bottleList = await api.get(`/bottles`, {
+  const { results: bottleList } = await api.get(`/bottles`, {
     query: { distiller: distiller.id },
   });
 

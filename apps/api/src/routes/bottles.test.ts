@@ -23,8 +23,8 @@ test("lists bottles", async () => {
   });
 
   expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.length).toBe(2);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(2);
 });
 
 test("lists bottles hides private", async () => {
@@ -37,9 +37,9 @@ test("lists bottles hides private", async () => {
   });
 
   expect(response).toRespondWith(200);
-  let data = JSON.parse(response.payload);
-  expect(data.length).toBe(1);
-  expect(data[0].id).toBe(bottle.id);
+  let { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle.id);
 });
 
 test("lists bottles with query", async () => {
@@ -55,9 +55,9 @@ test("lists bottles with query", async () => {
   });
 
   expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.length).toBe(1);
-  expect(data[0].id).toBe(bottle1.id);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
 });
 
 test("lists bottles with distiller", async () => {
@@ -77,9 +77,9 @@ test("lists bottles with distiller", async () => {
   });
 
   expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.length).toBe(1);
-  expect(data[0].id).toBe(bottle1.id);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
 });
 
 test("lists bottles with brand", async () => {
@@ -99,9 +99,9 @@ test("lists bottles with brand", async () => {
   });
 
   expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.length).toBe(1);
-  expect(data[0].id).toBe(bottle1.id);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
 });
 
 test("get bottle", async () => {

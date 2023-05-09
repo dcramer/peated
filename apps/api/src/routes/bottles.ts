@@ -1,9 +1,11 @@
 import type { RouteOptions } from "fastify";
 import { prisma } from "../lib/db";
-import { Bottle, Category, Prisma } from "@prisma/client";
+import { Category, Prisma } from "@prisma/client";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
 import { omit } from "../lib/filter";
+import config from "../config";
+import { buildPageLink } from "../lib/paging";
 
 const BottleProperties = {
   name: { type: "string" },
@@ -81,6 +83,7 @@ export const listBottles: RouteOptions<
       page?: number;
       brand?: number;
       distiller?: number;
+      sort?: "name";
     };
   }
 > = {
@@ -92,6 +95,7 @@ export const listBottles: RouteOptions<
       properties: {
         query: { type: "string" },
         page: { type: "number" },
+        sort: { type: "string" },
         brand: { type: "number" },
         distiller: { type: "number" },
       },
@@ -123,6 +127,21 @@ export const listBottles: RouteOptions<
       where.OR.push({ createdById: req.user.id });
     }
 
+    let orderBy: any;
+    switch (req.query.sort) {
+      case "name":
+        orderBy = {
+          name: "asc",
+        };
+        break;
+      default:
+        orderBy = {
+          checkins: {
+            _count: "desc",
+          },
+        };
+    }
+
     const results = await prisma.bottle.findMany({
       include: {
         brand: true,
@@ -133,14 +152,25 @@ export const listBottles: RouteOptions<
       },
       where,
       skip: offset,
-      take: limit,
-      orderBy: {
-        checkins: {
-          _count: "desc",
-        },
+      take: limit + 1,
+      orderBy,
+    });
+
+    res.send({
+      results: results.slice(0, limit),
+      rel: {
+        nextPage: results.length > limit ? page + 1 : null,
+        next:
+          results.length > limit
+            ? buildPageLink(req.routeOptions.url, req.query, page + 1)
+            : null,
+        prevPage: page > 1 ? page - 1 : null,
+        prev:
+          page > 1
+            ? buildPageLink(req.routeOptions.url, req.query, page - 1)
+            : null,
       },
     });
-    res.send(results);
   },
 };
 

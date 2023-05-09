@@ -19,6 +19,11 @@ import DistillerDetails, {
 import UserDetails, { loader as userDetailsLoader } from "./routes/userDetails";
 import Settings, { loader as settingsLoader } from "./routes/settings";
 import EditBottle, { loader as editBottleLoader } from "./routes/editBottle";
+import BottleList, { loader as bottleListLoader } from "./routes/bottles";
+import DistillerList, {
+  loader as distillerListLoader,
+} from "./routes/distillers";
+import BrandList, { loader as brandListLoader } from "./routes/brands";
 
 export default function createRoutes() {
   return [
@@ -43,14 +48,30 @@ export default function createRoutes() {
           loader: checkinLoader,
         },
         {
+          path: "bottles/",
+          element: <BottleList />,
+          loader: bottleListLoader,
+        },
+        {
           path: "bottles/:bottleId/edit",
           element: <EditBottle />,
           loader: editBottleLoader,
         },
         {
+          path: "brands",
+          element: <BrandList />,
+          loader: brandListLoader,
+        },
+
+        {
           path: "brands/:brandId",
           element: <BrandDetails />,
           loader: brandDetailsLoader,
+        },
+        {
+          path: "distillers",
+          element: <DistillerList />,
+          loader: distillerListLoader,
         },
         {
           path: "distillers/:distillerId",

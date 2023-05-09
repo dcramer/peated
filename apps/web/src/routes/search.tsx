@@ -46,8 +46,8 @@ export default function Search() {
       .get("/bottles", {
         query: { query },
       })
-      .then((r: readonly Bottle[]) => {
-        setResults(r);
+      .then(({ results }: { results: readonly Bottle[] }) => {
+        setResults(results);
         setState("ready");
       });
   };

@@ -3,6 +3,7 @@ import { prisma } from "../lib/db";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { Brand, Prisma } from "@prisma/client";
 import { validateRequest } from "../middleware/auth";
+import { buildPageLink } from "../lib/paging";
 
 export const listBrands: RouteOptions<
   Server,
@@ -12,6 +13,7 @@ export const listBrands: RouteOptions<
     Querystring: {
       query?: string;
       page?: number;
+      sort?: "name";
     };
   }
 > = {
@@ -23,6 +25,7 @@ export const listBrands: RouteOptions<
       properties: {
         query: { type: "string" },
         page: { type: "number" },
+        sort: { type: "string" },
       },
     },
   },
@@ -46,18 +49,43 @@ export const listBrands: RouteOptions<
       where.OR.push({ createdById: req.user.id });
     }
 
+    let orderBy: any;
+    switch (req.query.sort) {
+      case "name":
+        orderBy = {
+          name: "asc",
+        };
+        break;
+      default:
+        // TODO(dcramer): we want to sort by checkins
+
+        orderBy = {
+          bottles: {
+            _count: "desc",
+          },
+        };
+    }
+
     const results = await prisma.brand.findMany({
       where,
       skip: offset,
-      take: limit,
-      // TODO(dcramer): we want to sort by checkins
-      orderBy: {
-        bottles: {
-          _count: "desc",
-        },
+      take: limit + 1,
+      orderBy,
+    });
+
+    res.send({
+      results: results.slice(0, limit),
+      rel: {
+        next:
+          results.length > limit
+            ? buildPageLink(req.routeOptions.url, req.query, page + 1)
+            : null,
+        prev:
+          page > 1
+            ? buildPageLink(req.routeOptions.url, req.query, page - 1)
+            : null,
       },
     });
-    res.send(results);
   },
 };
 
