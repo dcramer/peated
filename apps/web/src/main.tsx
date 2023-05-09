@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
@@ -17,6 +17,7 @@ import config from "./config";
 import { AuthProvider } from "./hooks/useAuth";
 import { OnlineStatusProvider } from "./hooks/useOnlineStatus";
 import { register } from "./serviceWorkerRegistration";
+import Spinner from "./components/spinner";
 
 Sentry.init({
   dsn: config.SENTRY_DSN,
@@ -80,7 +81,15 @@ root.render(
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
       <OnlineStatusProvider>
         <AuthProvider>
-          <RouterProvider router={router} />
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center h-screen">
+                <Spinner />
+              </div>
+            }
+          >
+            <RouterProvider router={router} />
+          </Suspense>
         </AuthProvider>
       </OnlineStatusProvider>
     </GoogleOAuthProvider>

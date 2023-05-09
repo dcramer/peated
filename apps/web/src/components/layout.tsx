@@ -1,6 +1,8 @@
+import { useLocation } from "react-router-dom";
 import classNames from "../lib/classNames";
 import AppHeader from "./appHeader";
 import Header from "./header";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Layout({
   children,
@@ -20,6 +22,8 @@ export default function Layout({
   noMobileHeader?: boolean;
   onSave?: any;
 }) {
+  const location = useLocation();
+
   return (
     <>
       <div
@@ -30,6 +34,7 @@ export default function Layout({
         {!noHeader && (
           <Header noMobile={noMobileHeader}>{header || <AppHeader />}</Header>
         )}
+
         <main
           className={classNames(
             "mx-auto max-w-4xl m-h-screen relative",
@@ -38,7 +43,24 @@ export default function Layout({
             splash && "flex-1 self-center sm:max-w-sm px-6 py-12 lg:px-8"
           )}
         >
-          {children}
+          <AnimatePresence>
+            <motion.div
+              key={location.pathname}
+              initial={{ x: 100, opacity: 0 }}
+              animate={{
+                x: 0,
+                opacity: 1,
+                transition: { duration: 0.5, ease: "easeInOut" },
+              }}
+              exit={{
+                x: -100,
+                opacity: 0,
+                transition: { duration: 0.5, ease: "easeInOut" },
+              }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </>

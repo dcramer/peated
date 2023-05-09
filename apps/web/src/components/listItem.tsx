@@ -19,8 +19,6 @@ export default ({
       )}
     >
       <motion.div
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
         className="mx-auto max-w-7xl justify-between gap-x-6 px-4 sm:px-6 lg:px-8"
         layout
       >

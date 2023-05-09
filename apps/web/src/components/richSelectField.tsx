@@ -12,6 +12,7 @@ import Button from "./button";
 import config from "../config";
 import classNames from "../lib/classNames";
 import ListItem from "./listItem";
+import { motion } from "framer-motion";
 
 export type Option = {
   id?: string | null;
@@ -438,7 +439,7 @@ export default ({
         {visibleValues.length > 0 &&
           visibleValues.length < targetOptions &&
           multiple && (
-            <Chip onClick={() => setDialogOpen(true)}>
+            <Chip as={motion.div} onClick={() => setDialogOpen(true)}>
               <PlusIcon className="text-peated w-6 h-6" />
             </Chip>
           )}
