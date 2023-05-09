@@ -1,6 +1,5 @@
 import { Dialog } from "@headlessui/react";
 import { useZxing } from "react-zxing";
-import { useMediaDevices } from "../hooks/useMediaDevices";
 
 export type Props = {
   open: boolean;

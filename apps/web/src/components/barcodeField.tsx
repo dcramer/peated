@@ -4,7 +4,6 @@ import FormField from "./formField";
 import BarcodeScanner from "./barcodeScanner";
 import Button from "./button";
 import Alert from "./alert";
-import { createPortal } from "react-dom";
 
 type Props = {
   name?: string;
@@ -47,7 +46,8 @@ export default ({ name, helpText, label, required, className }: Props) => {
       <BarcodeScanner
         open={scanning}
         setOpen={setScanning}
-        onDetected={(result) => {
+        onError={() => {}}
+        onResult={(result: any) => {
           setResults([...results, result]);
         }}
       />
