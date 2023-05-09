@@ -6,6 +6,7 @@ import {
   Brand,
   Checkin,
   Distiller,
+  Edition,
   Prisma,
   User,
 } from "@prisma/client";
@@ -20,6 +21,7 @@ export const serializeCheckin = (
     bottle: Bottle & {
       brand: Brand;
       distiller?: Distiller | null;
+      edition?: Edition | null;
     };
   },
   currentUser?: User
@@ -34,6 +36,7 @@ export const serializeCheckin = (
     tastingNotes: checkin.tastingNotes,
     tags: checkin.tags,
     rating: checkin.rating,
+    edition: checkin.edition,
     createdAt: checkin.createdAt,
   };
   return data;
@@ -82,6 +85,7 @@ export const listCheckins: RouteOptions<
         bottle: {
           include: { brand: true, distillers: true },
         },
+        edition: true,
         user: true,
       },
       where,
@@ -120,6 +124,7 @@ export const getCheckin: RouteOptions<
         bottle: {
           include: { brand: true, distillers: true },
         },
+        edition: true,
         user: true,
       },
       where: {
@@ -141,6 +146,8 @@ export const addCheckin: RouteOptions<
   {
     Body: Checkin & {
       bottle: number;
+      edition?: string;
+      barrel?: number;
     };
   }
 > = {
@@ -155,6 +162,8 @@ export const addCheckin: RouteOptions<
         rating: { type: "number", minimum: 0, maximum: 5 },
         tastingNotes: { type: "string" },
         tags: { type: "array", items: { type: "string" } },
+        edition: { type: "string" },
+        barrel: { type: "number" },
       },
     },
   },
@@ -164,8 +173,9 @@ export const addCheckin: RouteOptions<
     const user = req.user;
 
     // gross syntax, whats better?
-    const data: Prisma.CheckinUncheckedCreateInput = (({ bottle, ...d }: any) =>
-      d)(body);
+    const data: Prisma.CheckinUncheckedCreateInput & {
+      edition?: Prisma.EditionCreateNestedOneWithoutCheckinsInput;
+    } = (({ bottle, ...d }: any) => d)(body);
 
     if (Array.isArray(data.tags))
       data.tags = data.tags.map((t) => t.toLowerCase());
@@ -183,18 +193,27 @@ export const addCheckin: RouteOptions<
       }
     }
 
-    data.userId = req.user.id;
-
-    if (req.isMultipart()) {
-      const fileData = await req.file();
-      data.imageUrl = fileData
-        ? await storeFile({
-            data: fileData,
-            namespace: user.id,
-            urlPrefix: "/uploads",
-          })
-        : null;
+    if (body.edition) {
+      Í;
+      data.edition = {
+        connectOrCreate: {
+          where: {
+            bottleId_name_barrel: {
+              bottleId: data.bottleId,
+              name: body.edition,
+              barrel: body.barrel,
+            },
+          },
+          create: {
+            bottleId: data.bottleId,
+            name: body.edition,
+            barrel: body.barrel,
+          },
+        },
+      };
     }
+
+    data.userId = user.id;
 
     // TODO(dcramer): delete file if this fails
     const checkin = await prisma.checkin.create({
@@ -203,9 +222,11 @@ export const addCheckin: RouteOptions<
         bottle: {
           include: { brand: true },
         },
+        edition: true,
         user: true,
       },
     });
+
     res.status(201).send(serializeCheckin(checkin, req.user));
   },
 };

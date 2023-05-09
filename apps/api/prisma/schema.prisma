@@ -131,14 +131,18 @@ model Edition {
     createdById Int?
     createdBy   User?    @relation(fields: [createdById], references: [id])
 
+    checkins Checkin[]
+
     @@unique([bottleId, name, barrel])
     @@map("edition")
 }
 
 model Checkin {
-    id       Int    @id @default(autoincrement())
-    bottleId Int
-    bottle   Bottle @relation(fields: [bottleId], references: [id])
+    id        Int      @id @default(autoincrement())
+    bottleId  Int
+    bottle    Bottle   @relation(fields: [bottleId], references: [id])
+    editionId Int?
+    edition   Edition? @relation(fields: [editionId], references: [id])
     // location
 
     tastingNotes String?
