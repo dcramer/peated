@@ -23,7 +23,7 @@ const OverlayTransition = ({ children }: { children: ReactNode }) => {
   return (
     <Transition.Child
       as={Fragment}
-      enter="ease-out duration-300"
+      enter="ease-out duration-200"
       enterFrom="opacity-0"
       enterTo="opacity-100"
       leave="ease-in duration-200"
@@ -39,7 +39,7 @@ const PanelTransition = ({ children }: { children: ReactNode }) => {
   return (
     <Transition.Child
       as={Fragment}
-      enter="ease-out duration-300"
+      enter="ease-out duration-200"
       enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       enterTo="opacity-100 translate-y-0 sm:scale-100"
       leave="ease-in duration-200"
@@ -82,7 +82,6 @@ const CreateOptionDialog = ({
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto min-h-screen"
         onClose={setOpen}
-        unmount={true}
       >
         <div className="min-h-screen text-center">
           <OverlayTransition>
@@ -154,6 +153,7 @@ const SelectDialog = ({
   searchPlaceholder,
   canCreate = false,
   createForm,
+  multiple = false,
   endpoint,
   options,
 }: {
@@ -163,6 +163,7 @@ const SelectDialog = ({
   selectedValues?: any[];
   searchPlaceholder?: string;
   canCreate?: boolean;
+  multiple?: boolean;
   createForm?: CreateOptionForm;
   endpoint?: string;
   options?: Option[];
@@ -225,6 +226,7 @@ const SelectDialog = ({
                     onChange={(value) => {
                       setQuery(value);
                     }}
+                    onDone={multiple ? () => setOpen(false) : undefined}
                     closeIcon={<XMarkIcon className="h-8 w-8" />}
                     placeholder={searchPlaceholder}
                   />
@@ -236,7 +238,7 @@ const SelectDialog = ({
                         <ListItem key={`${option.id}-${option.name}`}>
                           <CheckIcon
                             className={classNames(
-                              "h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:text-white",
+                              "h-12 w-12 p-2 flex-none rounded-full bg-gray-100",
                               selectedValues.find(
                                 (i) =>
                                   i.id == option.id && i.name == option.name
@@ -427,7 +429,7 @@ export default ({
         setDialogOpen(true);
       }}
     >
-      <div className="flex items-center gap-x-2 sm:leading-6 mt-1">
+      <div className="flex flex-wrap gap-2 sm:leading-6 mt-1 overflow-x-auto">
         {visibleValues.map((option) => (
           <Chip
             key={`${option.id}-${option.name}`}
@@ -440,6 +442,13 @@ export default ({
         {visibleValues.length === 0 && placeholder && (
           <div className="text-gray-400 sm:leading-6">{placeholder}</div>
         )}
+        {visibleValues.length > 0 &&
+          visibleValues.length < targetOptions &&
+          multiple && (
+            <Chip onClick={() => setDialogOpen(true)}>
+              <PlusIcon className="text-peated w-6 h-6" />
+            </Chip>
+          )}
       </div>
       <SelectDialog
         open={dialogOpen}
@@ -448,6 +457,7 @@ export default ({
           const active = toggleOption(option);
           if (!multiple && active) setDialogOpen(false);
         }}
+        multiple={multiple}
         canCreate={canCreate}
         createForm={createForm}
         selectedValues={value}

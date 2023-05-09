@@ -7,6 +7,7 @@ export default function SearchHeader({
   onClose,
   onChange,
   onSubmit,
+  onDone,
   placeholder,
   closeIcon = <ChevronLeftIcon className="h-8 w-8" />,
   ...props
@@ -16,6 +17,7 @@ export default function SearchHeader({
   placeholder?: string;
   closeIcon?: ReactNode;
   onClose?: () => void;
+  onDone?: () => void;
   onChange?: (value: string) => void;
   onSubmit?: (value: string) => void;
 }) {
@@ -56,6 +58,18 @@ export default function SearchHeader({
           className="rounded focus:outline focus:outline-peated-light min-w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-peated-darker text-white"
         />
       </form>
+      {onDone && (
+        <div className="flex">
+          <button
+            onClick={onDone}
+            className={`min-h-full group ${blockStyles} pl-3 sm:pl-6`}
+          >
+            <span className="rounded bg-peated-dark group-hover:bg-peated-darker p-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated">
+              Done
+            </span>
+          </button>
+        </div>
+      )}
     </nav>
   );
 }
