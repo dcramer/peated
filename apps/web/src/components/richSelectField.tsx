@@ -441,7 +441,7 @@ export default ({
         {visibleValues.length > 0 &&
           visibleValues.length < targetOptions &&
           multiple && (
-            <Chip as={motion.div} onClick={() => setDialogOpen(true)}>
+            <Chip onClick={() => setDialogOpen(true)}>
               <PlusIcon className="text-peated w-6 h-6" />
             </Chip>
           )}
