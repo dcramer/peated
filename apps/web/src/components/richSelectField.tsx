@@ -207,125 +207,118 @@ const SelectDialog = ({
 
   return (
     <>
-      <Transition.Root show={open} as={Fragment}>
-        <Dialog
-          as="div"
-          className="fixed inset-0 z-10 overflow-y-auto min-h-screen"
-          onClose={setOpen}
-        >
-          <div className="min-h-screen text-center">
-            <OverlayTransition>
-              <Dialog.Overlay className="fixed inset-0" />
-            </OverlayTransition>
+      <Dialog
+        as="div"
+        open={open}
+        className="fixed inset-0 z-10 overflow-y-auto min-h-screen"
+        onClose={setOpen}
+      >
+        <div className="min-h-screen text-center">
+          <Dialog.Overlay className="fixed inset-0" />
 
-            <PanelTransition>
-              <Dialog.Panel className="relative min-h-full h-screen transform overflow-hidden overflow-y-auto bg-white text-left transition-all min-w-full">
-                <Header>
-                  <SearchHeader
-                    onClose={() => setOpen(false)}
-                    onChange={(value) => {
-                      setQuery(value);
-                    }}
-                    onDone={multiple ? () => setOpen(false) : undefined}
-                    closeIcon={<XMarkIcon className="h-8 w-8" />}
-                    placeholder={searchPlaceholder}
-                  />
-                </Header>
-                <main className={"mx-auto max-w-4xl m-h-screen relative"}>
-                  <ul role="list" className="divide-y divide-gray-100">
-                    {optionList.map((option) => {
-                      return (
-                        <ListItem key={`${option.id}-${option.name}`}>
-                          <CheckIcon
-                            className={classNames(
-                              "h-12 w-12 p-2 flex-none rounded-full bg-gray-100",
-                              selectedValues.find(
-                                (i) =>
-                                  i.id == option.id && i.name == option.name
-                              ) && "bg-peated text-white"
-                            )}
-                          />
+          <Dialog.Panel className="relative min-h-full h-screen transform overflow-hidden overflow-y-auto bg-white text-left transition-all min-w-full">
+            <Header>
+              <SearchHeader
+                onClose={() => setOpen(false)}
+                onChange={(value) => {
+                  setQuery(value);
+                }}
+                onDone={multiple ? () => setOpen(false) : undefined}
+                closeIcon={<XMarkIcon className="h-8 w-8" />}
+                placeholder={searchPlaceholder}
+              />
+            </Header>
+            <main className={"mx-auto max-w-4xl m-h-screen relative"}>
+              <ul role="list" className="divide-y divide-gray-100">
+                {optionList.map((option) => {
+                  return (
+                    <ListItem key={`${option.id}-${option.name}`}>
+                      <CheckIcon
+                        className={classNames(
+                          "h-12 w-12 p-2 flex-none rounded-full bg-gray-100",
+                          selectedValues.find(
+                            (i) => i.id == option.id && i.name == option.name
+                          ) && "bg-peated text-white"
+                        )}
+                      />
 
-                          <div className="min-w-0 flex-auto flex items-center">
-                            <p className="font-semibold leading-6 text-gray-900">
-                              <button
-                                onClick={() => {
-                                  selectOption(option);
-                                }}
-                              >
-                                <span className="absolute inset-x-0 -top-px bottom-0" />
-                                {option.name}
-                              </button>
-                            </p>
-                            <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate"></p>
-                          </div>
-                        </ListItem>
-                      );
-                    })}
-                    {(results.length === 0 || query !== "") &&
-                      (canCreate && createForm ? (
-                        <ListItem>
-                          <PlusIcon className="h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
+                      <div className="min-w-0 flex-auto flex items-center">
+                        <p className="font-semibold leading-6 text-gray-900">
+                          <button
+                            onClick={() => {
+                              selectOption(option);
+                            }}
+                          >
+                            <span className="absolute inset-x-0 -top-px bottom-0" />
+                            {option.name}
+                          </button>
+                        </p>
+                        <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate"></p>
+                      </div>
+                    </ListItem>
+                  );
+                })}
+                {(results.length === 0 || query !== "") &&
+                  (canCreate && createForm ? (
+                    <ListItem>
+                      <PlusIcon className="h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
 
-                          <div className="min-w-0 flex-auto">
-                            <p className="font-semibold leading-6 text-gray-900">
-                              <button onClick={() => setCreateOpen(true)}>
-                                <span className="absolute inset-x-0 -top-px bottom-0" />
-                                Can't find what you're looking for?
-                              </button>
-                            </p>
-                            <p className="mt-1 flex text-sm leading-5 text-gray-500 gap-x-1">
-                              {query !== "" ? (
-                                <span>
-                                  Tap here to add{" "}
-                                  <strong className="truncate">
-                                    {toTitleCase(query)}
-                                  </strong>{" "}
-                                  to the database.
-                                </span>
-                              ) : (
-                                <span>
-                                  Tap here to add a new entry to the database.
-                                </span>
-                              )}
-                            </p>
-                          </div>
-                        </ListItem>
-                      ) : (
-                        <ListItem>
-                          <PlusIcon className="h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
+                      <div className="min-w-0 flex-auto">
+                        <p className="font-semibold leading-6 text-gray-900">
+                          <button onClick={() => setCreateOpen(true)}>
+                            <span className="absolute inset-x-0 -top-px bottom-0" />
+                            Can't find what you're looking for?
+                          </button>
+                        </p>
+                        <p className="mt-1 flex text-sm leading-5 text-gray-500 gap-x-1">
+                          {query !== "" ? (
+                            <span>
+                              Tap here to add{" "}
+                              <strong className="truncate">
+                                {toTitleCase(query)}
+                              </strong>{" "}
+                              to the database.
+                            </span>
+                          ) : (
+                            <span>
+                              Tap here to add a new entry to the database.
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </ListItem>
+                  ) : (
+                    <ListItem>
+                      <PlusIcon className="h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
 
-                          <div className="min-w-0 flex-auto">
-                            <p className="font-semibold leading-6 text-gray-900">
-                              <a href={config.GITHUB_REPO} target="_blank">
-                                <span className="absolute inset-x-0 -top-px bottom-0" />
-                                Can't find what you're looking for?
-                              </a>
-                            </p>
-                            <p className="mt-1 flex text-sm leading-5 text-gray-500 gap-x-1">
-                              Well, that stinks. Maybe a open an issue on
-                              GitHub?
-                            </p>
-                          </div>
-                        </ListItem>
-                      ))}
-                  </ul>
-                </main>
-                {canCreate && createForm && (
-                  <CreateOptionDialog
-                    open={createOpen}
-                    setOpen={setCreateOpen}
-                    render={createForm}
-                    onSubmit={(newOption) => {
-                      selectOption(newOption);
-                    }}
-                  />
-                )}
-              </Dialog.Panel>
-            </PanelTransition>
-          </div>
-        </Dialog>
-      </Transition.Root>
+                      <div className="min-w-0 flex-auto">
+                        <p className="font-semibold leading-6 text-gray-900">
+                          <a href={config.GITHUB_REPO} target="_blank">
+                            <span className="absolute inset-x-0 -top-px bottom-0" />
+                            Can't find what you're looking for?
+                          </a>
+                        </p>
+                        <p className="mt-1 flex text-sm leading-5 text-gray-500 gap-x-1">
+                          Well, that stinks. Maybe a open an issue on GitHub?
+                        </p>
+                      </div>
+                    </ListItem>
+                  ))}
+              </ul>
+            </main>
+            {canCreate && createForm && (
+              <CreateOptionDialog
+                open={createOpen}
+                setOpen={setCreateOpen}
+                render={createForm}
+                onSubmit={(newOption) => {
+                  selectOption(newOption);
+                }}
+              />
+            )}
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </>
   );
 };

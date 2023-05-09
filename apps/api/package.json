@@ -4,6 +4,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon --exec ts-node --require dotenv/config ./src/server.ts",
+    "dev:load-mocks": "ts-node --require dotenv/config ./src/bin/load-mocks.ts",
     "db:deploy": "npx prisma migrate deploy",
     "db:migrate": "run-s db:migrate:*",
     "db:migrate:dev": "npx prisma migrate dev",
