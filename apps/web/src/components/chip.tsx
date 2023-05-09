@@ -1,23 +1,23 @@
 import { ElementType, ReactNode } from "react";
 import classNames from "../lib/classNames";
+import { motion } from "framer-motion";
 
 type ChipSize = "small" | "base";
 
 export default ({
-  as: Component = "div",
   children,
   active,
   onClick,
   size = "base",
 }: {
-  as?: ElementType;
   children: ReactNode;
   active?: boolean;
   onClick?: () => void;
   size?: ChipSize;
 }) => {
   return (
-    <Component
+    <motion.div
+      layout
       className={classNames(
         "[word-wrap: break-word] inline-flex items-center justify-between rounded py-0 font-normal normal-case leading-loose shadow-none transition-[opacity] duration-300 ease-linear hover:!shadow-none border-gray-200 border text-peated truncate",
         onClick ? "cursor-pointer hover:bg-gray-200" : "",
@@ -27,6 +27,6 @@ export default ({
       onClick={onClick}
     >
       {children}
-    </Component>
+    </motion.div>
   );
 };
