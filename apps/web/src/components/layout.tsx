@@ -48,14 +48,14 @@ export default function Layout({
           <AnimatePresence>
             <motion.div
               key={location.pathname}
-              initial={{ x: 100, opacity: 0 }}
+              initial={{ y: 100, opacity: 0 }}
               animate={{
-                x: 0,
+                y: 0,
                 opacity: 1,
                 transition: { duration: 0.5, ease: "easeInOut" },
               }}
               exit={{
-                x: -100,
+                y: -100,
                 opacity: 0,
                 transition: { duration: 0.5, ease: "easeInOut" },
               }}
