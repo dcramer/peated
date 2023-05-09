@@ -14,6 +14,8 @@ import Fieldset from "../components/fieldset";
 import ImageField from "../components/imageField";
 import TagsField from "../components/tagsField";
 import { toTitleCase } from "../lib/strings";
+import TextField from "../components/textField";
+import { ArrowDownIcon } from "@heroicons/react/20/solid";
 
 type LoaderData = {
   bottle: Bottle;
@@ -32,6 +34,9 @@ type FormData = {
   tastingNotes?: string;
   rating?: number;
   tags?: string[];
+
+  edition?: string;
+  barrel?: number;
 };
 
 export default function Checkin() {
@@ -123,6 +128,34 @@ export default function Checkin() {
               setImage(e.target.files?.length ? e.target.files[0] : undefined)
             }
           />
+
+          <div className="p-3 bg-gray-100 ">
+            <div className="flex items-center mb-4">
+              <div className="flex-1">
+                <h2 className="font-bold">Bottle Edition</h2>
+                <p>
+                  If this is a specific series or barrel, feel free to note it
+                  below!
+                </p>
+              </div>
+              <ArrowDownIcon className="w-8 h-8" />
+            </div>
+            <Fieldset>
+              <TextField
+                name="edition"
+                label="Edition"
+                value={formData.edition}
+                placeholder="e.g. Healthy Spirits"
+              />
+              <TextField
+                type="number"
+                name="barrel"
+                label="Barrel No."
+                value={formData.barrel}
+                placeholder="e.g. 56"
+              />
+            </Fieldset>
+          </div>
         </Fieldset>
       </form>
     </Layout>

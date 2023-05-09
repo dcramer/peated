@@ -23,13 +23,13 @@ Note: If you need to tweak default settings, `cp .env.example .env` and go to to
 Create a local user to avoid setting up Google credentials:
 
 ```
-npm run create-user -w apps/api
+nx user:create -w apps/api
 ```
 
 Run the dev server, which spins up both the `web` and the `api` services:
 
 ```
-nf start
+npm run dev
 ```
 
 NX is used to manage the monorepo, e.g.
