@@ -1,2 +1,2 @@
-web: npm run dev:web
-api: npm run dev:api
+web: nx dev web
+api: nx dev api
