@@ -3,15 +3,17 @@ FROM node:18-alpine as base
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
 
+RUN npm -i -g pnpm
+
 FROM base as deps
 
 WORKDIR /app
 
-ADD package.json package-lock.json .
+ADD package.json pnpm-lock.yaml .
 ADD packages ./packages
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/api/package.json ./apps/api/package.json
-RUN npm install --workspaces
+RUN pnpm install
 
 # build web
 FROM base as build-web

@@ -1,3 +1,4 @@
+import { db } from "../db";
 import { migrate } from "../db/migrate";
 
 migrate(db, { migrationsFolder: "./migrations" })

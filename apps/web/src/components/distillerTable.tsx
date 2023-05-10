@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 
-import { Distiller } from "../types";
+import { Entity } from "../types";
 import Button from "./button";
 
 export default ({
   distillerList,
   rel,
 }: {
-  distillerList: Distiller[];
+  distillerList: Entity[];
   rel?: {
     next: string | null;
     nextPage: number | null;

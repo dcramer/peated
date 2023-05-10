@@ -55,13 +55,6 @@ export default {
         break;
       default:
         // TODO: materialize // also this query pattern isnt supported yet
-        // select.totalTastings = db
-        //   .select({
-        //     count: sql<number>`COUNT(*)`,
-        //   })
-        //   .from(tastings)
-        //   .where(eq(tastings.bottleId, bottles.id));
-        // orderBy = desc(select.totalTastings);
         orderBy = sql`(SELECT COUNT(*) FROM ${tastings} WHERE ${tastings.bottleId} = ${bottles.id}) DESC`;
     }
 
@@ -69,7 +62,6 @@ export default {
       .select({
         bottle: bottles,
         brand: entities,
-        ...select,
       })
       .from(bottles)
       .innerJoin(entities, eq(entities.id, bottles.brandId))

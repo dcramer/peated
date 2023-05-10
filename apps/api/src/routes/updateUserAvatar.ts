@@ -5,6 +5,7 @@ import { validateRequest } from "../middleware/auth";
 import { storeFile } from "../lib/uploads";
 import config from "../config";
 import { users } from "../db/schema";
+import { eq } from "drizzle-orm";
 
 export default {
   method: "POST",
@@ -56,7 +57,7 @@ export default {
       });
     }
 
-    await db.update(users).set({ pictureUrl });
+    await db.update(users).set({ pictureUrl }).where(eq(users.id, user.id));
 
     res.send({
       pictureUrl: pictureUrl ? `${config.URL_PREFIX}${pictureUrl}` : null,

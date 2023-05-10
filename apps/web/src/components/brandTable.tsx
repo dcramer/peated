@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 
-import { Brand } from "../types";
+import { Entity } from "../types";
 import Button from "./button";
 
 export default ({
   brandList,
   rel,
 }: {
-  brandList: Brand[];
+  brandList: Entity[];
   rel?: {
     next: string | null;
     nextPage: number | null;

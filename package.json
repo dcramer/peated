@@ -3,39 +3,33 @@
   "name": "peated",
   "version": "0.1.0",
   "description": "",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
   "main": "main.js",
   "scripts": {
-    "setup": "npm run setup:deps && npm run setup:db",
-    "setup:deps": "npm install --package-lock-only && npm install --workspaces --package-lock-only",
-    "setup:db": "npm run db:migrate",
+    "build": "pnpm -r --filter='./apps/**' run build",
+    "setup": "pnpm install && npm run db:migrate",
     "dev": "nf start",
     "dev:web": "API_SERVER=http://localhost:4000 dotenv -e .env.local -- npm run dev -w apps/web",
     "dev:api": "CORS_HOST=http://localhost:5173 PORT=4000 dotenv -e .env.local -- npm run dev -w apps/api",
     "db:migrate": "dotenv -e .env.local -- npm run db:migrate -w apps/api",
-    "test:api": "dotenv -e .env.local -- npm run test -w apps/api",
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm -r --stream run test",
+    "test:ci": "CI=true pnpm -r --stream run test",
     "token": "dotenv -e .env.local -- npm run token -w apps/api"
   },
   "author": "David Cramer",
   "license": "Apache-2.0",
   "dependencies": {
-    "@nx/esbuild": "^16.1.1",
-    "@nx/node": "^16.1.1",
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.1.0",
     "foreman": "^3.0.1",
-    "npm-run-all": "^4.1.5"
-  },
-  "devDependencies": {
-    "nx": "^16.1.0"
+    "npm-run-all": "^4.1.5",
+    "pnpm": "^8.5.0"
   },
   "engines": {
     "node": ">=18.0.0 <19.0.0"
   },
   "volta": {
-    "node": "18.16.0"
+    "node": "18.16.0",
+    "pnpm": "8.5.0"
   }
 }
