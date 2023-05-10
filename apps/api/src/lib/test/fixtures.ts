@@ -1,84 +1,95 @@
 import { faker } from "@faker-js/faker";
-import { prisma } from "../db";
-import {
-  Bottle as BottleType,
-  Brand as BrandType,
-  Checkin as CheckinType,
-  Distiller as DistillerType,
-  Prisma,
-  User as UserType,
-} from "@prisma/client";
 import { createAccessToken } from "../auth";
+import {
+  NewBottle,
+  NewEntity,
+  NewTasting,
+  NewUser,
+  User as UserType,
+  bottles,
+  bottlesToDistillers,
+  entities,
+  users,
+} from "../../db/schema";
+import { db } from "../db";
+import { tastings } from "../../db/schema";
 
 function between(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export const User = async ({ ...data }: Partial<UserType> = {}) => {
-  return await prisma.user.create({
-    data: {
-      displayName: faker.name.firstName(),
-      email: faker.internet.email(),
-      admin: false,
-      active: true,
-      ...data,
-    },
-  });
+export const User = async ({ ...data }: Partial<NewUser> = {}) => {
+  return (
+    await db
+      .insert(users)
+      .values({
+        displayName: faker.name.firstName(),
+        email: faker.internet.email(),
+        admin: false,
+        active: true,
+        ...data,
+      })
+      .returning()
+  )[0];
 };
 
-export const Brand = async ({ ...data }: Partial<BrandType> = {}) => {
-  return await prisma.brand.create({
-    data: {
-      name: faker.company.name(),
-      country: faker.address.country(),
-      public: true,
-      ...data,
-    },
-  });
+export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
+  return (
+    await db
+      .insert(entities)
+      .values({
+        name: faker.company.name(),
+        country: faker.address.country(),
+        type: ["brand", "distiller"],
+        ...data,
+        createdById: data.createdById || (await User()).id,
+      })
+      .returning()
+  )[0];
 };
 
-export const Distiller = async ({ ...data }: Partial<DistillerType> = {}) => {
-  return await prisma.distiller.create({
-    data: {
-      name: faker.company.name(),
-      country: faker.address.country(),
-      public: true,
-      ...data,
-    },
-  });
-};
-
-export const Bottle = async ({ distillerIds = [], ...data }: any = {}) => {
-  if (data.brandId === undefined) data.brandId = (await Brand()).id;
-
-  const distillers: Prisma.DistillerCreateNestedManyWithoutBottlesInput = {};
-  if (!distillerIds.length) {
-    if (between(0, 1) === 1) {
-      distillers.connect = [{ id: (await Distiller()).id }];
-    }
-  } else {
-    distillers.connect = distillerIds.map((d: string) => ({ id: d }));
-  }
-
-  return await prisma.bottle.create({
-    data: {
+export const Bottle = async ({
+  distillerIds = [],
+  ...data
+}: Partial<NewBottle> & {
+  distillerIds?: number[];
+} = {}) => {
+  const [bottle] = await db
+    .insert(bottles)
+    .values({
       name: faker.music.songName(),
       ...data,
-      distillers,
-    },
-  });
+      brandId: data.brandId || (await Entity()).id,
+      createdById: data.createdById || (await User()).id,
+    })
+    .returning();
+
+  if (!distillerIds.length) {
+    if (between(0, 1) === 1) {
+      await db.insert(bottlesToDistillers).values({
+        bottleId: bottle.id,
+        distillerId: (await Entity({ type: ["distiller"] })).id,
+      });
+    }
+  } else {
+    for (const d of distillerIds) {
+      await db.insert(bottlesToDistillers).values({
+        bottleId: bottle.id,
+        distillerId: d,
+      });
+    }
+  }
+
+  return bottle;
 };
 
-export const Checkin = async ({ ...data }: any = {}) => {
-  if (!data.bottleId) data.bottleId = (await Bottle()).id;
-  if (!data.userId) data.userId = (await User()).id;
-
-  return await prisma.checkin.create({
-    data: {
-      tastingNotes: faker.lorem.sentence(),
-      rating: faker.datatype.float({ min: 1, max: 5 }),
-      ...data,
-    },
+export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
+  return await db.insert(tastings).values({
+    comments: faker.lorem.sentence(),
+    rating: faker.datatype.float({ min: 1, max: 5 }),
+    ...data,
+    bottleId: data.bottleId || (await Bottle()).id,
+    createdById: data.createdById || (await User()).id,
   });
 };
 

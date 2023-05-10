@@ -1,10 +1,10 @@
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 
-import type { Checkin, User } from "../types";
+import type { Tasting, User } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
-import CheckinListItem from "../components/checkinListItem";
+import TastingListItem from "../components/tastingListItem";
 import UserAvatar from "../components/userAvatar";
 import Button from "../components/button";
 import { useRequiredAuth } from "../hooks/useAuth";
@@ -12,14 +12,14 @@ import { useRequiredAuth } from "../hooks/useAuth";
 type UserWithStats = User & {
   stats: {
     bottles: number;
-    checkins: number;
+    tastings: number;
     contributions: number;
   };
 };
 
 type LoaderData = {
   user: UserWithStats;
-  checkinList: Checkin[];
+  tastingList: Tasting[];
 };
 
 // TODO: when this executes the apiClient has not configured
@@ -30,16 +30,16 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   if (!userId) throw new Error("Missing userId");
   const user = await api.get(`/users/${userId}`);
-  const checkinList = await api.get(`/checkins`, {
+  const tastingList = await api.get(`/tastings`, {
     query: { user: user.id },
   });
 
-  return { user, checkinList };
+  return { user, tastingList };
 };
 
 const EmptyActivity = () => {
   return (
-    <div className="flex flex-col block m-4 mx-auto items-center rounded-lg border border-dashed border-gray-300 p-12">
+    <div className="flex flex-col m-4 mx-auto items-center rounded-lg border border-dashed border-gray-300 p-12">
       <span className="block font-light text-gray-400">
         Looks like this ones a bit short on tastings.
       </span>
@@ -48,7 +48,7 @@ const EmptyActivity = () => {
 };
 
 export default function UserDetails() {
-  const { user, checkinList } = useLoaderData() as LoaderData;
+  const { user, tastingList } = useLoaderData() as LoaderData;
   const { user: currentUser } = useRequiredAuth();
 
   return (
@@ -64,7 +64,7 @@ export default function UserDetails() {
           <div className="flex justify-center sm:justify-start">
             <div className="mr-4 pr-3 text-center">
               <span className="text-xl font-bold block uppercase tracking-wide text-peated">
-                {user.stats.checkins.toLocaleString()}
+                {user.stats.tastings.toLocaleString()}
               </span>
               <span className="text-sm text-gray-400">Tastings</span>
             </div>
@@ -97,10 +97,10 @@ export default function UserDetails() {
         </div>
       </div>
 
-      {checkinList.length ? (
+      {tastingList.length ? (
         <ul role="list" className="space-y-3">
-          {checkinList.map((checkin) => (
-            <CheckinListItem key={checkin.id} checkin={checkin} />
+          {tastingList.map((tasting) => (
+            <TastingListItem key={tasting.id} tasting={tasting} />
           ))}
         </ul>
       ) : (

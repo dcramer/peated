@@ -1,50 +1,131 @@
-import { prisma } from "../lib/db";
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
+import { pgTable, text } from "drizzle-orm/pg-core";
+import { SQL, SQLChunk, StringChunk, eq } from "drizzle-orm";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 
 import "../lib/test/expects";
-import { AuthenticatedHeaders } from "../lib/test/fixtures";
+import { AuthenticatedHeaders, User } from "../lib/test/fixtures";
+import { db, pool } from "../lib/db";
+import { Client } from "pg";
 
 global.DefaultFixtures = {};
 
-const clearDatabase = async () => {
-  const schemaName = "public";
+const pgTables = pgTable("pg_tables", {
+  schemaname: text("schemaname").notNull(),
+  tablename: text("tablename").notNull(),
+});
 
-  // TODO: good idea, but too slow
-  const tnQuery = await prisma.$queryRaw<
-    Array<{ tablename: string }>
-  >`SELECT tablename FROM pg_tables WHERE schemaname=${schemaName};`;
-  const tableNames = tnQuery
-    .filter(({ tablename }) => tablename !== "_prisma_migrations")
-    .map(({ tablename }) => `"${schemaName}"."${tablename}"`)
+const pgClass = pgTable("pg_class", {
+  relname: text("relname").notNull(),
+  relkind: text("relkind").notNull(),
+  relnamespace: text("relnamespace").notNull(),
+});
+
+const pgNamespace = pgTable("pg_namespace", {
+  oid: text("oid").notNull(),
+  nspname: text("nspname").notNull(),
+});
+
+const schemaname = "public";
+
+const SAFE_TABLES = ["__drizzle_migrations"];
+
+const getTableNames = async () => {
+  const tnQuery = await db
+    .select({ tablename: pgTables.tablename })
+    .from(pgTables)
+    .where(eq(pgTables.schemaname, schemaname));
+
+  return tnQuery
+    .filter(({ tablename }) => SAFE_TABLES.indexOf(tablename) === -1)
+    .map(({ tablename }) => `"${schemaname}"."${tablename}"`)
     .join(", ");
+};
+
+const UnsafeSql = (query: string) => {
+  const chunks: SQLChunk[] = [new StringChunk(query)];
+  return new SQL(chunks);
+};
+
+const dropTables = async () => {
+  const tableNames = await getTableNames();
+  if (!tableNames.length) return;
 
   try {
-    await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tableNames} CASCADE;`);
+    // UNSAFE QUERY
+    await db.execute(UnsafeSql(`DROP TABLE ${tableNames} CASCADE;`));
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+const clearTables = async () => {
+  const tableNames = await getTableNames();
+  if (!tableNames.length) return;
+
+  try {
+    // UNSAFE QUERY
+    await db.execute(UnsafeSql(`TRUNCATE TABLE ${tableNames} CASCADE;`));
   } catch (error) {
     console.log({ error });
   }
 
   // reset sequences
-  const snQuery = await prisma.$queryRaw<
-    Array<{ relname: string }>
-  >`SELECT c.relname FROM pg_class AS c JOIN pg_namespace AS n ON c.relnamespace = n.oid WHERE c.relkind='S' AND n.nspname=${schemaName};`;
-  for (const { relname } of snQuery) {
-    await prisma.$executeRawUnsafe(
-      `ALTER SEQUENCE \"${schemaName}\".\"${relname}\" RESTART WITH 1;`
-    );
-  }
+  // const snQuery = await db
+  //   .select({ relname: pgClass.relname })
+  //   .from(pgClass)
+  //   .innerJoin(pgNamespace, eq(pgNamespace.oid, pgClass.relnamespace))
+  //   .where(and(eq(pgClass.relkind, "S"), eq(pgNamespace.nspname, schemaname)));
+  // for (const { relname } of snQuery) {
+  //   await db.execute(
+  //     UnsafeSql(`ALTER SEQUENCE "${schemaname}"."${relname}" RESTART WITH 1;`)
+  //   );
+  // }
 };
 
 const createDefaultUser = async () => {
-  return await prisma.user.create({
-    data: {
-      email: "fizz.buzz@example.com",
-      displayName: "Fizzy Buzz",
-    },
+  return await User({
+    email: "fizz.buzz@example.com",
+    displayName: "Fizzy Buzz",
   });
 };
 
+async function setupDatabase() {
+  const [host, username, password] = ["localhost", "postgres", "postgres"];
+  const client = new Client({ host, user: username, password });
+  await client.connect();
+
+  const applicationDatabaseName = "test_peated";
+
+  const dbQuery = await client.query(
+    `SELECT FROM pg_database WHERE datname = $1`,
+    [applicationDatabaseName]
+  );
+  if (dbQuery.rows.length === 0) {
+    // database does not exist, make it:
+    await client.query(`CREATE DATABASE ${applicationDatabaseName}`);
+  } else {
+    // await dropTables();
+  }
+
+  client.end();
+}
+
+beforeAll(async () => {
+  console.log("Bootstrapping test database");
+  await setupDatabase();
+
+  // this will automatically run needed migrations on the database
+  try {
+    await migrate(db, { migrationsFolder: "./migrations" });
+  } catch (err) {
+    console.error("Unable to run db migrations", err);
+    process.exit(1);
+  }
+});
+
 beforeEach(async () => {
-  await clearDatabase();
+  await clearTables();
 
   const user = await createDefaultUser();
 
@@ -59,5 +140,5 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await prisma.$disconnect();
+  await pool.end();
 });

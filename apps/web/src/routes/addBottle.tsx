@@ -63,7 +63,7 @@ export default function AddBottle() {
               : undefined,
           },
         });
-        navigate(`/bottles/${bottle.id}/checkin`, {
+        navigate(`/bottles/${bottle.id}/tasting`, {
           replace: true,
         });
       } catch (err) {

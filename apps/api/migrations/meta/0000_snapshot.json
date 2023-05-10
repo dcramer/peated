@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "33ffe13b-2b2b-49c4-bdb7-f541f8174202",
+  "id": "a72e59d4-da0e-455f-912c-1f18bca4ddc0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "bottle": {
@@ -42,7 +42,7 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "created_by_id": {
@@ -63,10 +63,10 @@
         }
       },
       "foreignKeys": {
-        "bottle_brand_id_brand_id_fk": {
-          "name": "bottle_brand_id_brand_id_fk",
+        "bottle_brand_id_entity_id_fk": {
+          "name": "bottle_brand_id_entity_id_fk",
           "tableFrom": "bottle",
-          "tableTo": "brand",
+          "tableTo": "entity",
           "columnsFrom": [
             "brand_id"
           ],
@@ -109,16 +109,7 @@
           "notNull": true
         }
       },
-      "indexes": {
-        "bottle_dist_unq": {
-          "name": "bottle_dist_unq",
-          "columns": [
-            "bottle_id",
-            "distiller_id"
-          ],
-          "isUnique": true
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "bottle_distiller_bottle_id_bottle_id_fk": {
           "name": "bottle_distiller_bottle_id_bottle_id_fk",
@@ -133,10 +124,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "bottle_distiller_distiller_id_distiller_id_fk": {
-          "name": "bottle_distiller_distiller_id_distiller_id_fk",
+        "bottle_distiller_distiller_id_entity_id_fk": {
+          "name": "bottle_distiller_distiller_id_entity_id_fk",
           "tableFrom": "bottle_distiller",
-          "tableTo": "distiller",
+          "tableTo": "entity",
           "columnsFrom": [
             "distiller_id"
           ],
@@ -147,75 +138,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {}
-    },
-    "brand": {
-      "name": "brand",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "bigserial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "country": {
-          "name": "country",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "region": {
-          "name": "region",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "created_by_id": {
-          "name": "created_by_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "brand_name_unq": {
-          "name": "brand_name_unq",
+      "compositePrimaryKeys": {
+        "bottle_distiller_bottle_id_distiller_id": {
+          "name": "bottle_distiller_bottle_id_distiller_id",
           "columns": [
-            "name"
-          ],
-          "isUnique": true
+            "bottle_id",
+            "distiller_id"
+          ]
         }
-      },
-      "foreignKeys": {
-        "brand_created_by_id_user_id_fk": {
-          "name": "brand_created_by_id_user_id_fk",
-          "tableFrom": "brand",
-          "tableTo": "user",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {}
+      }
     },
     "change": {
       "name": "change",
@@ -249,7 +180,7 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "created_by_id": {
@@ -264,74 +195,6 @@
         "change_created_by_id_user_id_fk": {
           "name": "change_created_by_id_user_id_fk",
           "tableFrom": "change",
-          "tableTo": "user",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {}
-    },
-    "distiller": {
-      "name": "distiller",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "bigserial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "country": {
-          "name": "country",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "region": {
-          "name": "region",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "created_by_id": {
-          "name": "created_by_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "dist_name_unq": {
-          "name": "dist_name_unq",
-          "columns": [
-            "name"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "distiller_created_by_id_user_id_fk": {
-          "name": "distiller_created_by_id_user_id_fk",
-          "tableFrom": "distiller",
           "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
@@ -377,7 +240,7 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "created_by_id": {
@@ -415,6 +278,80 @@
         "edition_created_by_id_user_id_fk": {
           "name": "edition_created_by_id_user_id_fk",
           "tableFrom": "edition",
+          "tableTo": "user",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {}
+    },
+    "entity": {
+      "name": "entity",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "entity_type[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "entity_name_unq": {
+          "name": "entity_name_unq",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "entity_created_by_id_user_id_fk": {
+          "name": "entity_created_by_id_user_id_fk",
+          "tableFrom": "entity",
           "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
@@ -534,7 +471,7 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "created_by_id": {
@@ -627,13 +564,20 @@
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
+          "default": true
+        },
+        "admin": {
+          "name": "admin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
           "default": false
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -662,6 +606,13 @@
         "spirit": "spirit"
       }
     },
+    "entity_type": {
+      "name": "entity_type",
+      "values": {
+        "brand": "brand",
+        "distiller": "distiller"
+      }
+    },
     "identity_provider": {
       "name": "identity_provider",
       "values": {
@@ -673,8 +624,7 @@
       "values": {
         "bottle": "bottle",
         "edition": "edition",
-        "brand": "brand",
-        "distiller": "distiller"
+        "entity": "entity"
       }
     }
   },

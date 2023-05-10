@@ -31,7 +31,7 @@ export const loader: LoaderFunction = async ({
 };
 
 type FormData = {
-  tastingNotes?: string;
+  comments?: string;
   rating?: number;
   tags?: string[];
 
@@ -39,7 +39,7 @@ type FormData = {
   barrel?: number;
 };
 
-export default function Checkin() {
+export default function AddTasting() {
   const { bottle } = useLoaderData() as LoaderData;
 
   const navigate = useNavigate();
@@ -53,9 +53,9 @@ export default function Checkin() {
     e.preventDefault();
 
     (async () => {
-      let checkin;
+      let tasting;
       try {
-        checkin = await api.post("/checkins", {
+        tasting = await api.post("/tastings", {
           data: {
             ...formData,
             bottle: bottle.id,
@@ -71,13 +71,13 @@ export default function Checkin() {
       }
       // TODO(dcramer): graceful failure here
       if (image) {
-        await api.post(`/checkins/${checkin.id}/image`, {
+        await api.post(`/tastings/${tasting.id}/image`, {
           data: {
             image,
           },
         });
       }
-      if (checkin) navigate("/");
+      if (tasting) navigate("/");
     })();
   };
 
@@ -102,11 +102,11 @@ export default function Checkin() {
 
           <TextAreaField
             label="Any notes?"
-            name="tastingNotes"
+            name="comments"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
-            defaultValue={formData.tastingNotes}
+            defaultValue={formData.comments}
             placeholder="Is it peated?"
           />
 

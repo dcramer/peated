@@ -1,5 +1,4 @@
 import buildFastify from "../app";
-import { prisma } from "../lib/db";
 import { omit } from "../lib/filter";
 import * as Fixtures from "../lib/test/fixtures";
 import { FastifyInstance } from "fastify";

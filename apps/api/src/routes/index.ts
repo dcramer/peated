@@ -1,17 +1,37 @@
 import { FastifyInstance, FastifyPluginCallback } from "fastify";
 
-import { listBottles, getBottle, addBottle, editBottle } from "./bottles";
-import { authBasic, authDetails, authGoogle } from "./auth";
-import {
-  addCheckin,
-  getCheckin,
-  listCheckins,
-  updateCheckinImage,
-} from "./checkins";
-import { addBrand, getBrand, listBrands } from "./brands";
-import { addDistiller, getDistiller, listDistillers } from "./distillers";
-import { getUser, listUsers, updateUser, updateUserAvatar } from "./users";
-import { getUpload } from "./uploads";
+// import {
+//   addCheckin,
+//   getCheckin,
+//   listCheckins,
+//   updateCheckinImage,
+// } from "./checkins";
+// import { getUser, listUsers, updateUser, updateUserAvatar } from "./users";
+// import { getUpload } from "./uploads";
+import authDetails from "./authDetails";
+import authBasic from "./authBasic";
+import authGoogle from "./authGoogle";
+import listBottles from "./listBottles";
+import addBottle from "./addBottle";
+import getBottle from "./getBottle";
+import listEntities from "./listEntities";
+import addEntity from "./addEntity";
+import getEntity from "./getEntity";
+
+const routes = [
+  authDetails,
+  authBasic,
+  authGoogle,
+
+  listBottles,
+  addBottle,
+  getBottle,
+
+  listEntities,
+  addEntity,
+  ,
+  getEntity,
+];
 
 export const router: FastifyPluginCallback = (
   fastify: FastifyInstance,
@@ -33,34 +53,17 @@ export const router: FastifyPluginCallback = (
     },
   });
 
-  fastify.route(authDetails);
-  fastify.route(authGoogle);
-  fastify.route(authBasic);
+  // fastify.route(addCheckin);
+  // fastify.route(listCheckins);
+  // fastify.route(getCheckin);
+  // fastify.route(updateCheckinImage);
 
-  fastify.route(listBottles);
-  fastify.route(addBottle);
-  fastify.route(getBottle);
-  fastify.route(editBottle);
+  // fastify.route(listUsers);
+  // fastify.route(getUser);
+  // fastify.route(updateUser);
+  // fastify.route(updateUserAvatar);
 
-  fastify.route(listBrands);
-  fastify.route(getBrand);
-  fastify.route(addBrand);
-
-  fastify.route(addCheckin);
-  fastify.route(listCheckins);
-  fastify.route(getCheckin);
-  fastify.route(updateCheckinImage);
-
-  fastify.route(listDistillers);
-  fastify.route(getDistiller);
-  fastify.route(addDistiller);
-
-  fastify.route(listUsers);
-  fastify.route(getUser);
-  fastify.route(updateUser);
-  fastify.route(updateUserAvatar);
-
-  fastify.route(getUpload);
+  // fastify.route(getUpload);
 
   next();
 };

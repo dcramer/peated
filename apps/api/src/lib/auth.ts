@@ -1,7 +1,6 @@
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
-import { User } from "@prisma/client";
-
+import { User } from "../db/schema";
 interface SerializedUser {
   id: number;
   displayName: string | null;

@@ -14,31 +14,22 @@ export type Category =
   | "single_malt"
   | "spirit";
 
-// e.g. Suntory Whisky
-export type Distiller = {
-  id: string;
-  name: string;
-  // e.g. Scotland
-  country?: string;
-  // e.g. Speyside
-  region?: string;
-};
-
 // e.g. Hibiki
-export type Brand = {
+export type Entity = {
   id: string;
   name: string;
   // e.g. Scotland
   country?: string;
   // e.g. Speyside
   region?: string;
+  type: ("brand" | "distiller")[];
 };
 
 export type Bottle = {
   id: string;
   name: string;
-  brand: Brand;
-  distillers: Distiller[];
+  brand: Entity;
+  distillers: Entity[];
   category?: Category | null;
   statedAge?: number;
 };
@@ -58,12 +49,12 @@ export type User = {
   pictureUrl?: string;
 };
 
-export type Checkin = {
+export type Tasting = {
   id: string;
   bottle: Bottle;
   // optional location for check-in
   location?: Location | null;
-  tastingNotes?: string | null;
+  comments?: string | null;
   // e.g. "Bold", "Peaty", more or less tags
   tags: string[];
   // people that you're with
@@ -71,11 +62,11 @@ export type Checkin = {
   // 1-5, floating point to make half ratings possible
   rating: number;
   imageUrl?: string;
-  user: User;
+  createdBy: User;
   createdAt: string;
 };
 
-// locations are where you're checking-in from (e.g. a bar, a distillery)
+// locations are where you're tasting from (e.g. a bar, a distillery)
 export type Location = {
   id: string;
   name: string;

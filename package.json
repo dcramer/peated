@@ -10,15 +10,15 @@
   "main": "main.js",
   "scripts": {
     "setup": "npm run setup:deps && npm run setup:db",
-    "setup:deps": "npm install --workspaces --package-lock-only",
+    "setup:deps": "npm install --package-lock-only && npm install --workspaces --package-lock-only",
     "setup:db": "npm run db:migrate",
-    "dev": "nx run-many -t dev api web",
-    "dev:web": "API_SERVER=http://localhost:4000 npm run dev -w apps/web",
-    "dev:api": "CORS_HOST=http://localhost:5173 PORT=4000 npm run dev -w apps/api",
-    "db:studio": "npx -w packages/api prisma studio",
-    "db:migrate": "npm run db:migrate -w apps/api",
-    "test:api": "npm run test -w apps/api",
-    "token": "npm run token -w apps/api"
+    "dev": "nf start",
+    "dev:web": "API_SERVER=http://localhost:4000 dotenv -e .env.local -- npm run dev -w apps/web",
+    "dev:api": "CORS_HOST=http://localhost:5173 PORT=4000 dotenv -e .env.local -- npm run dev -w apps/api",
+    "db:studio": "dotenv -e .env.local -- npx -w packages/api prisma studio",
+    "db:migrate": "dotenv -e .env.local -- npm run db:migrate -w apps/api",
+    "test:api": "dotenv -e .env.local -- npm run test -w apps/api",
+    "token": "dotenv -e .env.local -- npm run token -w apps/api"
   },
   "author": "David Cramer",
   "license": "Apache-2.0",
@@ -26,7 +26,12 @@
     "@nx/esbuild": "^16.1.1",
     "@nx/node": "^16.1.1",
     "dotenv": "^16.0.3",
-    "dotenv-cli": "^7.1.0"
+    "dotenv-cli": "^7.1.0",
+    "foreman": "^3.0.1",
+    "npm-run-all": "^4.1.5"
+  },
+  "devDependencies": {
+    "nx": "^16.1.0"
   },
   "engines": {
     "node": ">=18.0.0 <19.0.0"

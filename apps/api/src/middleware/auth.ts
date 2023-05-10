@@ -1,6 +1,8 @@
 import { onRequestHookHandler } from "fastify";
 import { verifyToken } from "../lib/auth";
-import { prisma } from "../lib/db";
+import { users } from "../db/schema";
+import { eq } from "drizzle-orm";
+import { db } from "../lib/db";
 
 export const validateRequest: onRequestHookHandler = async (req, res) => {
   try {
@@ -8,9 +10,7 @@ export const validateRequest: onRequestHookHandler = async (req, res) => {
     const token = auth?.replace("Bearer ", "");
 
     const { id } = await verifyToken(token);
-    req.user = await prisma.user.findUniqueOrThrow({
-      where: { id },
-    });
+    [req.user] = await db.select().from(users).where(eq(users.id, id));
   } catch (error) {
     console.error(error);
     return res.status(401).send({ error: "Unauthorized!" });

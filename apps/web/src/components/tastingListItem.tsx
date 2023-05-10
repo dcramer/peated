@@ -3,7 +3,7 @@ import {
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
 
-import { Checkin } from "../types";
+import { Tasting } from "../types";
 import { StaticRating } from "./rating";
 import Button from "./button";
 import { Link } from "react-router-dom";
@@ -28,56 +28,59 @@ const TimeSince = ({ date }: { date: string }) => {
 };
 
 export default ({
-  checkin,
+  tasting,
   noBottle,
 }: {
-  checkin: Checkin;
+  tasting: Tasting;
   noBottle?: boolean;
 }) => {
-  const { bottle } = checkin;
+  const { bottle } = tasting;
 
   return (
     <li className="overflow-hidden bg-white shadow sm:rounded p-3">
       <div className="flex items-center mb-4 space-x-4">
         <span className="overflow-hidden w-48-px h-48-px rounded bg-gray-100">
-          <UserAvatar size={48} user={checkin.user} />
+          <UserAvatar size={48} user={tasting.createdBy} />
         </span>
         <div className="space-y-1 font-medium text-peated flex-1">
-          <Link to={`/users/${checkin.user.id}`} className="hover:underline">
-            {checkin.user.displayName}
+          <Link
+            to={`/users/${tasting.createdBy.id}`}
+            className="hover:underline"
+          >
+            {tasting.createdBy.displayName}
           </Link>
-          <TimeSince date={checkin.createdAt} />
+          <TimeSince date={tasting.createdAt} />
         </div>
         <div className="flex flex-col items-end gap-y-2">
-          <StaticRating value={checkin.rating} size="small" />
+          <StaticRating value={tasting.rating} size="small" />
           <div className="flex gap-x-1">
-            {checkin.tags &&
-              checkin.tags.map((t) => <Chip size="small">{t}</Chip>)}
+            {tasting.tags &&
+              tasting.tags.map((t) => <Chip size="small">{t}</Chip>)}
           </div>
         </div>
       </div>
       {!noBottle && <BottleCard bottle={bottle} />}
-      {checkin.imageUrl ? (
+      {tasting.imageUrl ? (
         <div className="sm:flex">
           <div className="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4">
             <img
-              src={checkin.imageUrl}
+              src={tasting.imageUrl}
               crossOrigin="anonymous"
               className="max-w-32 max-h-32"
             />
           </div>
           <div>
-            {checkin.tastingNotes && (
+            {tasting.comments && (
               <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
-                {checkin.tastingNotes}
+                {tasting.comments}
               </p>
             )}
           </div>
         </div>
       ) : (
-        checkin.tastingNotes && (
+        tasting.comments && (
           <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
-            {checkin.tastingNotes}
+            {tasting.comments}
           </p>
         )
       )}

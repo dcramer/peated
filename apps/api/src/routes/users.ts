@@ -95,12 +95,12 @@ export const getUser: RouteOptions<
     if (!user) {
       return res.status(404).send({ error: "Not found" });
     }
-    const totalCheckins = await prisma.checkin.count({
+    const totalTastings = await prisma.tasting.count({
       where: { userId: user.id },
     });
     const [{ count: totalBottles }] = await prisma.$queryRaw<
       { count: number }[]
-    >`SELECT COUNT(DISTINCT "bottleId") FROM "checkin" WHERE "userId" = ${user.id}`;
+    >`SELECT COUNT(DISTINCT "bottleId") FROM "tasting" WHERE "userId" = ${user.id}`;
     const totalContributions = await prisma.change.count({
       where: { userId: user.id },
     });
@@ -108,7 +108,7 @@ export const getUser: RouteOptions<
     res.send({
       ...serializeUser(user, req.user),
       stats: {
-        checkins: totalCheckins,
+        tastings: totalTastings,
         bottles: totalBottles,
         contributions: totalContributions,
       },

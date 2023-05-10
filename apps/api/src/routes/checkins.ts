@@ -1,22 +1,12 @@
 import type { RouteOptions } from "fastify";
-import { prisma } from "../lib/db";
 import { IncomingMessage, Server, ServerResponse } from "http";
-import {
-  Bottle,
-  Brand,
-  Checkin,
-  Distiller,
-  Edition,
-  Prisma,
-  User,
-} from "@prisma/client";
 import { validateRequest } from "../middleware/auth";
 import { storeFile } from "../lib/uploads";
 import config from "../config";
 import { serializeUser } from "../lib/auth";
 
-export const serializeCheckin = (
-  checkin: Checkin & {
+export const serializeTasting = (
+  tasting: Tasting & {
     user: User;
     bottle: Bottle & {
       brand: Brand;
@@ -27,22 +17,22 @@ export const serializeCheckin = (
   currentUser?: User
 ) => {
   const data: { [key: string]: any } = {
-    id: checkin.id,
-    imageUrl: checkin.imageUrl
-      ? `${config.URL_PREFIX}${checkin.imageUrl}`
+    id: tasting.id,
+    imageUrl: tasting.imageUrl
+      ? `${config.URL_PREFIX}${tasting.imageUrl}`
       : null,
-    bottle: checkin.bottle,
-    user: serializeUser(checkin.user, currentUser),
-    tastingNotes: checkin.tastingNotes,
-    tags: checkin.tags,
-    rating: checkin.rating,
-    edition: checkin.edition,
-    createdAt: checkin.createdAt,
+    bottle: tasting.bottle,
+    user: serializeUser(tasting.user, currentUser),
+    tastingNotes: tasting.tastingNotes,
+    tags: tasting.tags,
+    rating: tasting.rating,
+    edition: tasting.edition,
+    createdAt: tasting.createdAt,
   };
   return data;
 };
 
-export const listCheckins: RouteOptions<
+export const listTastings: RouteOptions<
   Server,
   IncomingMessage,
   ServerResponse,
@@ -55,7 +45,7 @@ export const listCheckins: RouteOptions<
   }
 > = {
   method: "GET",
-  url: "/checkins",
+  url: "/tastings",
   schema: {
     querystring: {
       type: "object",
@@ -72,7 +62,7 @@ export const listCheckins: RouteOptions<
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where: Prisma.CheckinWhereInput = {};
+    const where: Prisma.TastingWhereInput = {};
     if (req.query.bottle) {
       where.bottleId = req.query.bottle;
     }
@@ -80,7 +70,7 @@ export const listCheckins: RouteOptions<
       where.userId = req.query.user;
     }
 
-    const results = await prisma.checkin.findMany({
+    const results = await prisma.tasting.findMany({
       include: {
         bottle: {
           include: { brand: true, distillers: true },
@@ -93,33 +83,33 @@ export const listCheckins: RouteOptions<
       take: limit,
       orderBy: { createdAt: "desc" },
     });
-    res.send(results.map((c) => serializeCheckin(c, req.user)));
+    res.send(results.map((c) => serializeTasting(c, req.user)));
   },
 };
 
-export const getCheckin: RouteOptions<
+export const getTasting: RouteOptions<
   Server,
   IncomingMessage,
   ServerResponse,
   {
     Params: {
-      checkinId: number;
+      tastingId: number;
     };
   }
 > = {
   method: "GET",
-  url: "/checkins/:checkinId",
+  url: "/tastings/:tastingId",
   schema: {
     params: {
       type: "object",
-      required: ["checkinId"],
+      required: ["tastingId"],
       properties: {
-        checkinId: { type: "number" },
+        tastingId: { type: "number" },
       },
     },
   },
   handler: async (req, res) => {
-    const checkin = await prisma.checkin.findUnique({
+    const tasting = await prisma.tasting.findUnique({
       include: {
         bottle: {
           include: { brand: true, distillers: true },
@@ -128,23 +118,23 @@ export const getCheckin: RouteOptions<
         user: true,
       },
       where: {
-        id: req.params.checkinId,
+        id: req.params.tastingId,
       },
     });
-    if (!checkin) {
+    if (!tasting) {
       res.status(404).send({ error: "Not found" });
     } else {
-      res.send(serializeCheckin(checkin, req.user));
+      res.send(serializeTasting(tasting, req.user));
     }
   },
 };
 
-export const addCheckin: RouteOptions<
+export const addTasting: RouteOptions<
   Server,
   IncomingMessage,
   ServerResponse,
   {
-    Body: Checkin & {
+    Body: Tasting & {
       bottle: number;
       edition?: string;
       barrel?: number;
@@ -152,7 +142,7 @@ export const addCheckin: RouteOptions<
   }
 > = {
   method: "POST",
-  url: "/checkins",
+  url: "/tastings",
   schema: {
     body: {
       type: "object",
@@ -173,8 +163,8 @@ export const addCheckin: RouteOptions<
     const user = req.user;
 
     // gross syntax, whats better?
-    const data: Prisma.CheckinUncheckedCreateInput & {
-      edition?: Prisma.EditionCreateNestedOneWithoutCheckinsInput;
+    const data: Prisma.TastingUncheckedCreateInput & {
+      edition?: Prisma.EditionCreateNestedOneWithoutTastingsInput;
     } = (({ bottle, ...d }: any) => d)(body);
 
     if (Array.isArray(data.tags))
@@ -216,7 +206,7 @@ export const addCheckin: RouteOptions<
     data.userId = user.id;
 
     // TODO(dcramer): delete file if this fails
-    const checkin = await prisma.checkin.create({
+    const tasting = await prisma.tasting.create({
       data,
       include: {
         bottle: {
@@ -227,17 +217,17 @@ export const addCheckin: RouteOptions<
       },
     });
 
-    res.status(201).send(serializeCheckin(checkin, req.user));
+    res.status(201).send(serializeTasting(tasting, req.user));
   },
 };
 
-export const updateCheckinImage: RouteOptions<
+export const updateTastingImage: RouteOptions<
   Server,
   IncomingMessage,
   ServerResponse,
   {
     Params: {
-      checkinId: number;
+      tastingId: number;
     };
     Body: {
       image?: File;
@@ -245,28 +235,28 @@ export const updateCheckinImage: RouteOptions<
   }
 > = {
   method: "POST",
-  url: "/checkins/:checkinId/image",
+  url: "/tastings/:tastingId/image",
   schema: {
     params: {
       type: "object",
-      required: ["checkinId"],
+      required: ["tastingId"],
       properties: {
-        checkinId: { type: "number" },
+        tastingId: { type: "number" },
       },
     },
   },
   preHandler: [validateRequest],
   handler: async (req, res) => {
-    const checkin = await prisma.checkin.findUnique({
+    const tasting = await prisma.tasting.findUnique({
       where: {
-        id: req.params.checkinId,
+        id: req.params.tastingId,
       },
     });
-    if (!checkin) {
+    if (!tasting) {
       return res.status(404).send({ error: "Not found" });
     }
 
-    if (checkin.userId !== req.user.id && !req.user.admin) {
+    if (tasting.userId !== req.user.id && !req.user.admin) {
       return res.status(403).send({ error: "Forbidden" });
     }
 
@@ -279,10 +269,10 @@ export const updateCheckinImage: RouteOptions<
       return res.status(400).send({ error: "Bad request" });
     }
 
-    const data: Prisma.CheckinUncheckedUpdateInput = {};
+    const data: Prisma.TastingUncheckedUpdateInput = {};
     data.imageUrl = await storeFile({
       data: fileData,
-      namespace: `checkins`,
+      namespace: `tastings`,
       urlPrefix: "/uploads",
     });
 
@@ -295,16 +285,16 @@ export const updateCheckinImage: RouteOptions<
       });
     }
 
-    const newCheckin = await prisma.checkin.update({
+    const newTasting = await prisma.tasting.update({
       where: {
-        id: checkin.id,
+        id: tasting.id,
       },
       data,
     });
 
     res.send({
-      imageUrl: newCheckin.imageUrl
-        ? `${config.URL_PREFIX}${newCheckin.imageUrl}`
+      imageUrl: newTasting.imageUrl
+        ? `${config.URL_PREFIX}${newTasting.imageUrl}`
         : null,
     });
   },

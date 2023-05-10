@@ -1,3 +1,4 @@
+import { InferModel } from "drizzle-orm";
 import {
   pgTable,
   bigserial,
@@ -10,6 +11,7 @@ import {
   bigint,
   smallint,
   doublePrecision,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable(
@@ -22,8 +24,8 @@ export const users = pgTable(
     pictureUrl: text("picture_url"),
 
     active: boolean("active").default(true).notNull(),
-    admin: boolean("active").default(false).notNull(),
-    createdAt: timestamp("created_at").defaultNow(),
+    admin: boolean("admin").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (users) => {
     return {
@@ -31,6 +33,9 @@ export const users = pgTable(
     };
   }
 );
+
+export type User = InferModel<typeof users>;
+export type NewUser = InferModel<typeof users, "insert">;
 
 export const identityProviderEnum = pgEnum("identity_provider", ["google"]);
 
@@ -56,6 +61,33 @@ export const identities = pgTable(
   }
 );
 
+export const entityTypeEnum = pgEnum("entity_type", ["brand", "distiller"]);
+
+export const entities = pgTable(
+  "entity",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+
+    name: text("name").notNull(),
+    country: text("country"),
+    region: text("region"),
+    type: entityTypeEnum("type").array().notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+  },
+  (entities) => {
+    return {
+      nameIndex: uniqueIndex("entity_name_unq").on(entities.name),
+    };
+  }
+);
+
+export type Entity = InferModel<typeof entities>;
+export type NewEntity = InferModel<typeof entities, "insert">;
+
 export const categoryEnum = pgEnum("category", [
   "blend",
   "bourbon",
@@ -65,61 +97,18 @@ export const categoryEnum = pgEnum("category", [
   "spirit",
 ]);
 
-export const brands = pgTable(
-  "brand",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-
-    name: text("name").notNull(),
-    country: text("country"),
-    region: text("region"),
-
-    createdAt: timestamp("created_at").defaultNow(),
-    createdById: bigint("created_by_id", { mode: "number" })
-      .references(() => users.id)
-      .notNull(),
-  },
-  (brands) => {
-    return {
-      nameIndex: uniqueIndex("brand_name_unq").on(brands.name),
-    };
-  }
-);
-
-export const distillers = pgTable(
-  "distiller",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-
-    name: text("name").notNull(),
-    country: text("country"),
-    region: text("region"),
-
-    createdAt: timestamp("created_at").defaultNow(),
-    createdById: bigint("created_by_id", { mode: "number" })
-      .references(() => users.id)
-      .notNull(),
-  },
-  (distillers) => {
-    return {
-      nameIndex: uniqueIndex("dist_name_unq").on(distillers.name),
-    };
-  }
-);
-
 export const bottles = pgTable(
   "bottle",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-
     name: varchar("name", { length: 255 }).notNull(),
     category: categoryEnum("category"),
     brandId: bigint("brand_id", { mode: "number" })
-      .references(() => brands.id)
+      .references(() => entities.id)
       .notNull(),
     statedAge: smallint("stated_age"),
 
-    createdAt: timestamp("created_at").defaultNow(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
@@ -134,6 +123,9 @@ export const bottles = pgTable(
   }
 );
 
+export type Bottle = InferModel<typeof bottles>;
+export type NewBottle = InferModel<typeof bottles, "insert">;
+
 export const bottlesToDistillers = pgTable(
   "bottle_distiller",
   {
@@ -141,12 +133,12 @@ export const bottlesToDistillers = pgTable(
       .references(() => bottles.id)
       .notNull(),
     distillerId: bigint("distiller_id", { mode: "number" })
-      .references(() => distillers.id)
+      .references(() => entities.id)
       .notNull(),
   },
   (bottlesToDistillers) => {
     return {
-      bottleDistillerIndex: uniqueIndex("bottle_dist_unq").on(
+      bottleDistillerId: primaryKey(
         bottlesToDistillers.bottleId,
         bottlesToDistillers.distillerId
       ),
@@ -165,7 +157,7 @@ export const editions = pgTable(
       .references(() => bottles.id)
       .notNull(),
 
-    createdAt: timestamp("created_at").defaultNow(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
@@ -180,6 +172,9 @@ export const editions = pgTable(
     };
   }
 );
+
+export type Edition = InferModel<typeof editions>;
+export type NewEdition = InferModel<typeof editions, "insert">;
 
 export const tastings = pgTable("tasting", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -196,17 +191,19 @@ export const tastings = pgTable("tasting", {
   rating: doublePrecision("rating").notNull(),
   imageUrl: text("image_url"),
 
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
   createdById: bigint("created_by_id", { mode: "number" })
     .references(() => users.id)
     .notNull(),
 });
 
+export type Tasting = InferModel<typeof tastings>;
+export type NewTasting = InferModel<typeof tastings, "insert">;
+
 export const objectTypeEnum = pgEnum("object_type", [
   "bottle",
   "edition",
-  "brand",
-  "distiller",
+  "entity",
 ]);
 
 export const changes = pgTable("change", {
@@ -217,8 +214,11 @@ export const changes = pgTable("change", {
 
   data: text("data").notNull(),
 
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
   createdById: bigint("created_by_id", { mode: "number" })
     .references(() => users.id)
     .notNull(),
 });
+
+export type Change = InferModel<typeof changes>;
+export type NewChange = InferModel<typeof changes, "insert">;

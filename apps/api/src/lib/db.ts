@@ -1,3 +1,4 @@
+import { Table, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
@@ -11,7 +12,7 @@ BigInt.prototype.toJSON = function (): string {
   return this.toString();
 };
 
-const pool = new Pool({
+export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
