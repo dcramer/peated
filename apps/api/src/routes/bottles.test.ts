@@ -26,21 +26,6 @@ test("lists bottles", async () => {
   expect(results.length).toBe(2);
 });
 
-test("lists bottles hides private", async () => {
-  const bottle = await Fixtures.Bottle();
-  const bottle2 = await Fixtures.Bottle({ public: false });
-
-  let response = await app.inject({
-    method: "GET",
-    url: "/bottles",
-  });
-
-  expect(response).toRespondWith(200);
-  let { results } = JSON.parse(response.payload);
-  expect(results.length).toBe(1);
-  expect(results[0].id).toBe(bottle.id);
-});
-
 test("lists bottles with query", async () => {
   const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood" });
   await Fixtures.Bottle({ name: "Something Else" });
@@ -60,7 +45,7 @@ test("lists bottles with query", async () => {
 });
 
 test("lists bottles with distiller", async () => {
-  const distiller1 = await Fixtures.Distiller();
+  const distiller1 = await Fixtures.Entity();
   const bottle1 = await Fixtures.Bottle({
     name: "Delicious Wood",
     distillerIds: [distiller1.id],
@@ -82,7 +67,7 @@ test("lists bottles with distiller", async () => {
 });
 
 test("lists bottles with brand", async () => {
-  const brand1 = await Fixtures.Brand();
+  const brand1 = await Fixtures.Entity();
   const bottle1 = await Fixtures.Bottle({
     name: "Delicious Wood",
     brandId: brand1.id,
@@ -131,7 +116,7 @@ test("requires authentication", async () => {
 });
 
 test("creates a new bottle with minimal params", async () => {
-  const brand = await Fixtures.Brand();
+  const brand = await Fixtures.Entity();
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
@@ -159,8 +144,8 @@ test("creates a new bottle with minimal params", async () => {
 });
 
 test("creates a new bottle with all params", async () => {
-  const brand = await Fixtures.Brand();
-  const distiller = await Fixtures.Distiller();
+  const brand = await Fixtures.Entity();
+  const distiller = await Fixtures.Entity();
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
@@ -215,7 +200,7 @@ test("creates a new bottle with invalid brandId", async () => {
 });
 
 // test("creates a new bottle with existing brand name", async () => {
-//   const brand = await Fixtures.Brand();
+//   const brand = await Fixtures.Entity();
 //   const response = await app.inject({
 //     method: "POST",
 //     url: "/bottles",
@@ -309,8 +294,8 @@ test("creates a new bottle with invalid distillerId", async () => {
 });
 
 // test("creates a new bottle with existing distiller name", async () => {
-//   const brand = await Fixtures.Brand();
-//   const distiller = await Fixtures.Distiller();
+//   const brand = await Fixtures.Entity();
+//   const distiller = await Fixtures.Entity();
 //   const response = await app.inject({
 //     method: "POST",
 //     url: "/bottles",

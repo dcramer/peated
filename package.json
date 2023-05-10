@@ -15,7 +15,6 @@
     "dev": "nf start",
     "dev:web": "API_SERVER=http://localhost:4000 dotenv -e .env.local -- npm run dev -w apps/web",
     "dev:api": "CORS_HOST=http://localhost:5173 PORT=4000 dotenv -e .env.local -- npm run dev -w apps/api",
-    "db:studio": "dotenv -e .env.local -- npx -w packages/api prisma studio",
     "db:migrate": "dotenv -e .env.local -- npm run db:migrate -w apps/api",
     "test:api": "dotenv -e .env.local -- npm run test -w apps/api",
     "token": "dotenv -e .env.local -- npm run token -w apps/api"

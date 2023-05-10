@@ -81,6 +81,7 @@ export default {
   url: "/bottles",
   schema: {
     body: {
+      type: "object",
       $ref: "bottleSchema",
       required: ["name", "brand"],
     },

@@ -53,9 +53,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
 
-ADD apps/api/prisma .
-RUN npx prisma generate
-
 ADD apps/api/ .
 
 RUN npm run build

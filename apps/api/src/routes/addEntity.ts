@@ -6,50 +6,6 @@ import { db } from "../lib/db";
 import { eq, sql } from "drizzle-orm";
 
 export default {
-  method: "GET",
-  url: "/entities/:entityId",
-  schema: {
-    params: {
-      type: "object",
-      required: ["entityId"],
-      properties: {
-        entityId: { type: "number" },
-      },
-    },
-  },
-  handler: async (req, res) => {
-    const [entity] = await db
-      .select()
-      .from(entities)
-      .where(eq(entities.id, req.params.entityId));
-    if (!entity) {
-      return res.status(404).send({ error: "Not found" });
-    }
-
-    const [{ count: totalBottles }] = await db
-      .select({
-        count: sql`COUNT(brandID)`,
-      })
-      .from(bottles)
-      .where(eq(bottles.brandId, entity.id));
-
-    res.send({
-      ...entity,
-      stats: {
-        bottles: totalBottles,
-      },
-    });
-  },
-};
-
-export const addEntity: RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Body: NewEntity;
-  }
-> = {
   method: "POST",
   url: "/brands",
   schema: {
@@ -95,8 +51,6 @@ export const addEntity: RouteOptions<
   IncomingMessage,
   ServerResponse,
   {
-    Params: {
-      entityId: number;
-    };
+    Body: NewEntity;
   }
 >;

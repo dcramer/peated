@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import Screen from "../components/screen";
@@ -8,6 +8,8 @@ import Spinner from "../components/spinner";
 export default function Root() {
   const navigate = useNavigate();
   const { user, state } = useAuth();
+
+  console.log(user, state);
 
   useEffect(() => {
     if (!user && state === "ready") {

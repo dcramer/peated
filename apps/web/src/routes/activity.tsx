@@ -7,7 +7,7 @@ import api from "../lib/api";
 import Layout from "../components/layout";
 import TastingListItem from "../components/tastingListItem";
 import { ReactComponent as Glyph } from "../assets/glyph.svg";
-import FloatingTastingButton from "../components/floatingTastingButton";
+import FloatingButton from "../components/floatingButton";
 
 type LoaderData = {
   tastingList: Tasting[];
@@ -43,7 +43,7 @@ export default function Activity() {
 
   return (
     <Layout gutter>
-      <FloatingTastingButton to="/search?tasting" />
+      <FloatingButton to="/search?tasting" />
       {tastingList.length > 0 ? (
         <ul role="list" className="space-y-3">
           {tastingList.map((tasting) => (
