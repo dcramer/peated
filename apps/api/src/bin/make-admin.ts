@@ -1,4 +1,4 @@
-import { db } from "../lib/db";
+import { db } from "../db";
 import { createInterface } from "readline/promises";
 import { users } from "../db/schema";
 import { eq } from "drizzle-orm";

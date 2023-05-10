@@ -4,7 +4,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { createAccessToken } from "../lib/auth";
 import config from "../config";
 import { OAuth2Client } from "google-auth-library";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { identities, users } from "../db/schema";
 import { and, eq } from "drizzle-orm";
 import { serializeUser } from "../lib/transformers/user";

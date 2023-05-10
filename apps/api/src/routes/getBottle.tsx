@@ -1,7 +1,7 @@
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { bottles, bottlesToDistillers, entities, tastings } from "../db/schema";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { eq, sql } from "drizzle-orm";
 
 export default {

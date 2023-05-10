@@ -8,7 +8,7 @@ import {
   tastings,
   users,
 } from "../db/schema";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { serializeTasting } from "../lib/transformers/tasting";
 

@@ -4,7 +4,7 @@ import { SQL, SQLChunk, StringChunk, eq } from "drizzle-orm";
 
 import "../lib/test/expects";
 import { AuthenticatedHeaders, User } from "../lib/test/fixtures";
-import { db, pool } from "../lib/db";
+import { db, pool } from "../db";
 import { Client } from "pg";
 import { migrate } from "../db/migrate";
 
@@ -112,7 +112,6 @@ async function setupDatabase() {
 }
 
 beforeAll(async () => {
-  console.log("Bootstrapping test database");
   await setupDatabase();
 
   // this will automatically run needed migrations on the database

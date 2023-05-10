@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import buildFastify from "../app";
 import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
-import { db } from "../lib/db";
+import { db } from "../db";
 import * as Fixtures from "../lib/test/fixtures";
 import { FastifyInstance } from "fastify";
 
@@ -259,14 +259,71 @@ test("creates a new bottle with invalid distillerId", async () => {
 // });
 
 test("creates a new bottle with new distiller name", async () => {
+  const brand = await Fixtures.Entity();
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood",
+      brand: brand.id,
+      distillers: [
+        {
+          name: "Hard Knox",
+          country: "Scotland",
+        },
+      ],
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [bottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+  expect(bottle.name).toEqual("Delicious Wood");
+
+  const distillers = await db
+    .select({ distiller: entities })
+    .from(entities)
+    .innerJoin(
+      bottlesToDistillers,
+      eq(bottlesToDistillers.distillerId, entities.id)
+    )
+    .where(eq(bottlesToDistillers.bottleId, bottle.id));
+
+  expect(distillers.length).toEqual(1);
+  const { distiller } = distillers[0];
+  expect(distiller.id).toBeDefined();
+  expect(distiller.name).toBe("Hard Knox");
+  expect(distiller.country).toBe("Scotland");
+  expect(distiller.createdById).toBe(DefaultFixtures.user.id);
+
+  // it should create a change entry for the distiller
+  const changeList = await db
+    .select({ change: changes })
+    .from(changes)
+    .where(
+      and(
+        eq(changes.objectType, "entity"),
+        eq(changes.createdById, DefaultFixtures.user.id)
+      )
+    );
+  expect(changeList.length).toBe(1);
+});
+
+test("creates a new bottle with new distiller name and brand name", async () => {
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
     payload: {
       name: "Delicious Wood",
       brand: {
-        name: "Hard Knox",
-        country: "Scotland",
+        name: "Rip Van",
+        country: "Kentucky",
       },
       distillers: [
         {
@@ -315,4 +372,63 @@ test("creates a new bottle with new distiller name", async () => {
       )
     );
   expect(changeList.length).toBe(2);
+});
+
+test("creates a new bottle with new distiller name which is duplicated as brand name", async () => {
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood",
+      brand: {
+        name: "Hard Knox",
+        country: "Scotland",
+      },
+      distillers: [
+        {
+          name: "Hard Knox",
+          country: "Scotland",
+        },
+      ],
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [bottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+  expect(bottle.name).toEqual("Delicious Wood");
+
+  const distillers = await db
+    .select({ distiller: entities })
+    .from(entities)
+    .innerJoin(
+      bottlesToDistillers,
+      eq(bottlesToDistillers.distillerId, entities.id)
+    )
+    .where(eq(bottlesToDistillers.bottleId, bottle.id));
+
+  expect(distillers.length).toEqual(1);
+  const { distiller } = distillers[0];
+  expect(distiller.id).toEqual(bottle.brandId);
+  expect(distiller.name).toBe("Hard Knox");
+  expect(distiller.country).toBe("Scotland");
+  expect(distiller.createdById).toBe(DefaultFixtures.user.id);
+
+  // it should create a change entry for the brand and distiller
+  const changeList = await db
+    .select({ change: changes })
+    .from(changes)
+    .where(
+      and(
+        eq(changes.objectType, "entity"),
+        eq(changes.createdById, DefaultFixtures.user.id)
+      )
+    );
+  expect(changeList.length).toBe(1);
 });

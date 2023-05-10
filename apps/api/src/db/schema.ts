@@ -104,6 +104,7 @@ export const categoryEnum = pgEnum("category", [
   "single_malt",
   "spirit",
 ]);
+// type MyEnum = InferModel<typeof myTable>["myColWithEnum”]
 
 export const bottles = pgTable(
   "bottle",

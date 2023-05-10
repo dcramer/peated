@@ -3,7 +3,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 
 import { createAccessToken } from "../lib/auth";
 import { compareSync } from "bcrypt";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { serializeUser } from "../lib/transformers/user";

@@ -2,7 +2,7 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
 import { NewEntity, changes, entities } from "../db/schema";
-import { db } from "../lib/db";
+import { db } from "../db";
 
 export default {
   method: "POST",

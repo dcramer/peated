@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { users } from "../db/schema";
 import { createAccessToken } from "../lib/auth";
-import { db } from "../lib/db";
+import { db } from "../db";
 
 const main = async (email: string) => {
   if (!email) {

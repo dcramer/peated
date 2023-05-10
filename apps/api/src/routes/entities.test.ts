@@ -3,7 +3,7 @@ import buildFastify from "../app";
 import { entities } from "../db/schema";
 import * as Fixtures from "../lib/test/fixtures";
 import { FastifyInstance } from "fastify";
-import { db } from "../lib/db";
+import { db } from "../db";
 
 let app: FastifyInstance;
 beforeAll(async () => {

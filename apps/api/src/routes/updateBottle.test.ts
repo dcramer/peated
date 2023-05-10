@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import buildFastify from "../app";
 import { bottles } from "../db/schema";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { omit } from "../lib/filter";
 import * as Fixtures from "../lib/test/fixtures";
 import { FastifyInstance } from "fastify";

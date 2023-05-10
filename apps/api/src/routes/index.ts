@@ -18,6 +18,7 @@ import getTasting from "./getTasting";
 import updateUser from "./updateUser";
 import updateUserAvatar from "./updateUserAvatar";
 import updateTastingImage from "./updateTastingImage";
+import updateBottle from "./updateBottle";
 
 export const router: FastifyPluginCallback = (
   fastify: FastifyInstance,
@@ -46,6 +47,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(listBottles);
   fastify.route(addBottle);
   fastify.route(getBottle);
+  fastify.route(updateBottle);
 
   fastify.route(listEntities);
   fastify.route(addEntity);

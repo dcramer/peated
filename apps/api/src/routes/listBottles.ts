@@ -8,7 +8,7 @@ import {
   entities,
   tastings,
 } from "../db/schema";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { SQL, and, asc, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 
 export default {

@@ -11,7 +11,7 @@ import {
   entities,
   users,
 } from "../../db/schema";
-import { db } from "../db";
+import { db } from "../../db";
 import { tastings } from "../../db/schema";
 
 function between(min: number, max: number): number {

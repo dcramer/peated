@@ -1,6 +1,6 @@
 import { hashSync } from "bcrypt";
 import { createInterface } from "readline/promises";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { users } from "../db/schema";
 
 const readline = createInterface({

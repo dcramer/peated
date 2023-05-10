@@ -2,7 +2,7 @@ import { onRequestHookHandler } from "fastify";
 import { verifyToken } from "../lib/auth";
 import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
-import { db } from "../lib/db";
+import { db } from "../db";
 
 export const validateRequest: onRequestHookHandler = async (req, res) => {
   try {

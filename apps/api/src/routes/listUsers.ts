@@ -1,5 +1,5 @@
 import type { RouteOptions } from "fastify";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
 import { users } from "../db/schema";

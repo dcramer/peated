@@ -8,66 +8,17 @@ import {
   entities,
   Category,
 } from "../db/schema";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { eq } from "drizzle-orm";
-
-type DistillerInput =
-  | number
-  | { name: string; country: string; region?: string };
+import { omit } from "../lib/filter";
+import { EntityInput, upsertEntity } from "../lib/db";
 
 type BottleInput = {
   name: string;
   category: Category;
-  brand: number | { name: string; country: string; region?: string };
-  distillers: DistillerInput[];
+  brand: EntityInput;
+  distillers: EntityInput[];
   statedAge?: number;
-};
-
-const getDistillerId = async (
-  tx: any,
-  distData: DistillerInput,
-  userId: number
-): Promise<number | undefined> => {
-  if (!distData) return undefined;
-
-  if (typeof distData === "number") {
-    let [distiller] = await tx
-      .select()
-      .from(entities)
-      .where(eq(entities.id, distData));
-
-    if (distiller && distiller.type.indexOf("distiller") === -1) {
-      await tx
-        .update(entities)
-        .set({ type: [...distiller.type, "distiller"] })
-        .where(eq(entities.id, distiller.id));
-    }
-
-    return distiller?.id;
-  }
-
-  let [distiller] = await tx
-    .insert(entities)
-    .values({
-      name: distData.name,
-      country: distData.country || null,
-      region: distData.region || null,
-      type: ["distiller"],
-      createdById: userId,
-    })
-    .onConflictDoNothing()
-    .returning();
-
-  if (distiller) {
-    return distiller.id;
-  }
-
-  let [distillerQ] = await tx
-    .select()
-    .from(entities)
-    .where(eq(entities.name, distData.name));
-
-  return distillerQ?.id;
 };
 
 export default {
@@ -99,6 +50,7 @@ export default {
               })
               .onConflictDoNothing()
               .returning();
+
       if (!brand) {
         return res.status(400).send({ error: "Could not identify brand" });
       }
@@ -126,27 +78,23 @@ export default {
       const distillerIds: number[] = [];
       if (body.distillers)
         for (const distData of body.distillers) {
-          let distillerId = await getDistillerId(tx, distData, req.user.id);
-          if (!distillerId) {
+          let distUpsert = await upsertEntity({
+            db: tx,
+            data: distData,
+            userId: req.user.id,
+            type: "distiller",
+          });
+          if (!distUpsert) {
             return res
               .status(400)
               .send({ error: "Could not identify distiller" });
           }
-          if (typeof distData !== "number") {
-            await tx.insert(changes).values({
-              objectType: "entity",
-              objectId: distillerId,
-              createdById: req.user.id,
-              data: JSON.stringify(distData),
-            });
-          }
-
           await tx.insert(bottlesToDistillers).values({
             bottleId: bottle.id,
-            distillerId: distillerId,
+            distillerId: distUpsert.id,
           });
 
-          distillerIds.push(distillerId);
+          distillerIds.push(distUpsert.id);
         }
 
       await tx.insert(changes).values({

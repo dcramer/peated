@@ -2,7 +2,7 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import config from "../config";
 import { tastings } from "../db/schema";
-import { db } from "../lib/db";
+import { db } from "../db";
 import { storeFile } from "../lib/uploads";
 import { validateRequest } from "../middleware/auth";
 import { eq } from "drizzle-orm";
