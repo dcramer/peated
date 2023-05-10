@@ -293,7 +293,7 @@ test("creates a new bottle with new distiller name", async () => {
     .from(entities)
     .innerJoin(
       bottlesToDistillers,
-      eq(bottlesToDistillers.entityId, entities.id)
+      eq(bottlesToDistillers.distillerId, entities.id)
     )
     .where(eq(bottlesToDistillers.bottleId, bottle.id));
 
@@ -304,7 +304,7 @@ test("creates a new bottle with new distiller name", async () => {
   expect(distiller.country).toBe("Scotland");
   expect(distiller.createdById).toBe(DefaultFixtures.user.id);
 
-  // it should create a change entry for the brand
+  // it should create a change entry for the brand and distiller
   const changeList = await db
     .select({ change: changes })
     .from(changes)
@@ -314,5 +314,5 @@ test("creates a new bottle with new distiller name", async () => {
         eq(changes.createdById, DefaultFixtures.user.id)
       )
     );
-  expect(changeList.length).toBe(1);
+  expect(changeList.length).toBe(2);
 });

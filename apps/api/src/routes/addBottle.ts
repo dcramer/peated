@@ -11,27 +11,47 @@ import {
 import { db } from "../lib/db";
 import { eq } from "drizzle-orm";
 
+type DistillerInput =
+  | number
+  | { name: string; country: string; region?: string };
+
 type BottleInput = {
   name: string;
   category: Category;
   brand: number | { name: string; country: string; region?: string };
-  distillers: (number | { name: string; country: string; region?: string })[];
+  distillers: DistillerInput[];
   statedAge?: number;
 };
 
-const getDistillerId = async (tx: any, distData: any, userId: number) => {
-  if (distData === "number") {
+const getDistillerId = async (
+  tx: any,
+  distData: DistillerInput,
+  userId: number
+): Promise<number | undefined> => {
+  if (!distData) return undefined;
+
+  if (typeof distData === "number") {
     let [distiller] = await tx
       .select()
       .from(entities)
       .where(eq(entities.id, distData));
+
+    if (distiller && distiller.type.indexOf("distiller") === -1) {
+      await tx
+        .update(entities)
+        .set({ type: [...distiller.type, "distiller"] })
+        .where(eq(entities.id, distiller.id));
+    }
+
     return distiller?.id;
   }
 
   let [distiller] = await tx
     .insert(entities)
     .values({
-      ...distData,
+      name: distData.name,
+      country: distData.country || null,
+      region: distData.region || null,
       type: ["distiller"],
       createdById: userId,
     })
@@ -47,10 +67,7 @@ const getDistillerId = async (tx: any, distData: any, userId: number) => {
     .from(entities)
     .where(eq(entities.name, distData.name));
 
-  if (!distillerQ) {
-    return null;
-  }
-  return distillerQ.id;
+  return distillerQ?.id;
 };
 
 export default {
@@ -74,7 +91,9 @@ export default {
           : await tx
               .insert(entities)
               .values({
-                ...body.brand,
+                name: body.brand.name,
+                country: body.brand.country || null,
+                region: body.brand.region || null,
                 type: ["brand"],
                 createdById: req.user.id,
               })

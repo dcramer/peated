@@ -34,10 +34,10 @@ export default {
     const offset = (page - 1) * limit;
 
     const where: SQL<unknown>[] = [];
-    if (query) {
-      where.push(ilike(bottles.name, query));
-    }
 
+    if (query) {
+      where.push(ilike(bottles.name, `%${query}%`));
+    }
     if (req.query.brand) {
       where.push(eq(bottles.brandId, req.query.brand));
     }

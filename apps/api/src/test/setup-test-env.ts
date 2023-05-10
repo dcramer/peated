@@ -1,12 +1,12 @@
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { SQL, SQLChunk, StringChunk, eq } from "drizzle-orm";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
 
 import "../lib/test/expects";
 import { AuthenticatedHeaders, User } from "../lib/test/fixtures";
 import { db, pool } from "../lib/db";
 import { Client } from "pg";
+import { migrate } from "../db/migrate";
 
 global.DefaultFixtures = {};
 
@@ -30,14 +30,14 @@ const schemaname = "public";
 
 const SAFE_TABLES = ["__drizzle_migrations"];
 
-const getTableNames = async () => {
+const getTableNames = async (exclude = SAFE_TABLES) => {
   const tnQuery = await db
     .select({ tablename: pgTables.tablename })
     .from(pgTables)
     .where(eq(pgTables.schemaname, schemaname));
 
   return tnQuery
-    .filter(({ tablename }) => SAFE_TABLES.indexOf(tablename) === -1)
+    .filter(({ tablename }) => exclude.indexOf(tablename) === -1)
     .map(({ tablename }) => `"${schemaname}"."${tablename}"`)
     .join(", ");
 };
@@ -48,7 +48,7 @@ const UnsafeSql = (query: string) => {
 };
 
 const dropTables = async () => {
-  const tableNames = await getTableNames();
+  const tableNames = await getTableNames([]);
   if (!tableNames.length) return;
 
   try {

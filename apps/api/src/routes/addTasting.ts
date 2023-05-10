@@ -46,8 +46,8 @@ export default {
     }
 
     const tasting = await db.transaction(async (tx) => {
-      const getEditionId = async () => {
-        if (!body.edition) return null;
+      const getEditionId = async (): Promise<number | undefined> => {
+        if (!body.edition) return;
 
         let [edition] = await tx
           .select()
@@ -91,10 +91,11 @@ export default {
       const [tasting] = await db
         .insert(tastings)
         .values({
-          ...body,
-          editionId: await getEditionId(),
+          comments: body.comments || null,
+          rating: body.rating,
           tags: body.tags ? body.tags.map((t) => t.toLowerCase()) : [],
           bottleId: bottle.id,
+          editionId: await getEditionId(),
           createdById: user.id,
         })
         .returning();
@@ -115,10 +116,6 @@ export default {
       .leftJoin(editions, eq(tastings.editionId, editions.id))
       .where(eq(tastings.id, tasting.id))
       .limit(1);
-
-    if (!tasting) {
-      return res.status(404).send({ error: "Not found" });
-    }
 
     const distillersQuery = await db
       .select({

@@ -28,7 +28,7 @@ export default {
 
     const where: SQL<unknown>[] = [];
     if (query) {
-      where.push(ilike(entities.name, query));
+      where.push(ilike(entities.name, `%${query}%`));
     }
     if (req.query.type) {
       where.push(sql`${req.query.type} = ANY(${entities.type})`);
@@ -41,7 +41,7 @@ export default {
         break;
       default:
         // TODO: materialize
-        orderBy = sql<number>`(SELECT COUNT(*) FROM ${tastings} t JOIN ${bottles} ON ${tastings.bottleId} = ${bottles.id} WHERE ${bottles.brandId} = ${entities.id}) DESC`;
+        orderBy = sql<number>`(SELECT COUNT(*) FROM ${tastings} JOIN ${bottles} ON ${tastings.bottleId} = ${bottles.id} WHERE ${bottles.brandId} = ${entities.id}) DESC`;
     }
 
     const results = await db

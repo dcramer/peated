@@ -28,7 +28,9 @@ export default {
 
     const where: (SQL<unknown> | undefined)[] = [];
     if (query) {
-      where.push(or(ilike(users.displayName, query), eq(users.email, query)));
+      where.push(
+        or(ilike(users.displayName, `%${query}%`), eq(users.email, query))
+      );
     }
 
     const results = await db
