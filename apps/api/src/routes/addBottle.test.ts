@@ -100,7 +100,7 @@ test("creates a new bottle with all params", async () => {
   expect(changeList[0].change.objectId).toBe(bottle.id);
 });
 
-test("creates a new bottle with invalid brandId", async () => {
+test("does not create a new bottle with invalid brandId", async () => {
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
@@ -194,7 +194,7 @@ test("creates a new bottle with new brand name", async () => {
   expect(changeList.length).toBe(1);
 });
 
-test("creates a new bottle with invalid distillerId", async () => {
+test("does not create a new bottle with invalid distillerId", async () => {
   const response = await app.inject({
     method: "POST",
     url: "/bottles",
@@ -204,7 +204,7 @@ test("creates a new bottle with invalid distillerId", async () => {
         name: "Hard Knox",
         country: "Scotland",
       },
-      distillers: [5],
+      distillers: [500000],
     },
     headers: await Fixtures.AuthenticatedHeaders(),
   });
