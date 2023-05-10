@@ -3,13 +3,13 @@ FROM node:18-alpine as base
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
 
-RUN npm -i -g pnpm
+RUN npm install -g pnpm
 
 FROM base as deps
 
 WORKDIR /app
 
-ADD package.json pnpm-lock.yaml .
+ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
 ADD packages ./packages
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/api/package.json ./apps/api/package.json
@@ -39,8 +39,8 @@ ARG GOOGLE_CLIENT_ID
 ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
 
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/web/node_modules ./node_modules
 COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
-
 ADD apps/web/ .
 
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
@@ -53,6 +53,7 @@ FROM base as build-api
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/api/node_modules ./node_modules
 COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
 
 ADD apps/api/ .
