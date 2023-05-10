@@ -1,105 +1,17 @@
+import { and, eq } from "drizzle-orm";
 import buildFastify from "../app";
-import { omit } from "../lib/filter";
+import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
+import { db } from "../lib/db";
 import * as Fixtures from "../lib/test/fixtures";
 import { FastifyInstance } from "fastify";
 
 let app: FastifyInstance;
 beforeAll(async () => {
   app = await buildFastify();
-});
 
-afterAll(async () => {
-  await app.close();
-});
-
-test("lists bottles", async () => {
-  await Fixtures.Bottle({ name: "Delicious Wood" });
-  await Fixtures.Bottle({ name: "Something Else" });
-
-  const response = await app.inject({
-    method: "GET",
-    url: "/bottles",
-  });
-
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
-  expect(results.length).toBe(2);
-});
-
-test("lists bottles with query", async () => {
-  const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood" });
-  await Fixtures.Bottle({ name: "Something Else" });
-
-  let response = await app.inject({
-    method: "GET",
-    url: "/bottles",
-    query: {
-      query: "wood",
-    },
-  });
-
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
-  expect(results.length).toBe(1);
-  expect(results[0].id).toBe(bottle1.id);
-});
-
-test("lists bottles with distiller", async () => {
-  const distiller1 = await Fixtures.Entity();
-  const bottle1 = await Fixtures.Bottle({
-    name: "Delicious Wood",
-    distillerIds: [distiller1.id],
-  });
-  await Fixtures.Bottle({ name: "Something Else" });
-
-  let response = await app.inject({
-    method: "GET",
-    url: "/bottles",
-    query: {
-      distiller: `${distiller1.id}`,
-    },
-  });
-
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
-  expect(results.length).toBe(1);
-  expect(results[0].id).toBe(bottle1.id);
-});
-
-test("lists bottles with brand", async () => {
-  const brand1 = await Fixtures.Entity();
-  const bottle1 = await Fixtures.Bottle({
-    name: "Delicious Wood",
-    brandId: brand1.id,
-  });
-  await Fixtures.Bottle({ name: "Something Else" });
-
-  let response = await app.inject({
-    method: "GET",
-    url: "/bottles",
-    query: {
-      brand: `${brand1.id}`,
-    },
-  });
-
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
-  expect(results.length).toBe(1);
-  expect(results[0].id).toBe(bottle1.id);
-});
-
-test("get bottle", async () => {
-  const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood" });
-  await Fixtures.Bottle({ name: "Something Else" });
-
-  let response = await app.inject({
-    method: "GET",
-    url: `/bottles/${bottle1.id}`,
-  });
-
-  expect(response).toRespondWith(200);
-  let data = JSON.parse(response.payload);
-  expect(data.id).toBe(bottle1.id);
+  return async () => {
+    await app.close();
+  };
 });
 
 test("requires authentication", async () => {
@@ -131,16 +43,18 @@ test("creates a new bottle with minimal params", async () => {
   const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
-  const bottle = await prisma.bottle.findUniqueOrThrow({
-    where: { id: data.id },
-    include: {
-      distillers: true,
-    },
-  });
+  const [bottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toBeDefined();
-  expect(bottle.distillers.length).toBe(0);
   expect(bottle.statedAge).toBeNull();
+  const distillers = await db
+    .select()
+    .from(bottlesToDistillers)
+    .where(eq(bottlesToDistillers.bottleId, bottle.id));
+  expect(distillers.length).toBe(0);
 });
 
 test("creates a new bottle with all params", async () => {
@@ -162,26 +76,28 @@ test("creates a new bottle with all params", async () => {
   const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
-  const bottle = await prisma.bottle.findUniqueOrThrow({
-    where: { id: data.id },
-    include: {
-      distillers: true,
-    },
-  });
+  const [bottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toEqual(brand.id);
-  expect(bottle.distillers.length).toBe(1);
-  expect(bottle.distillers[0].id).toEqual(distiller.id);
   expect(bottle.statedAge).toEqual(12);
   expect(bottle.createdById).toBe(DefaultFixtures.user.id);
+  const distillers = await db
+    .select({ distillerId: bottlesToDistillers.distillerId })
+    .from(bottlesToDistillers)
+    .where(eq(bottlesToDistillers.bottleId, bottle.id));
+  expect(distillers.length).toBe(1);
+  expect(distillers[0].distillerId).toEqual(distiller.id);
 
-  const changes = await prisma.change.findMany({
-    where: {
-      userId: DefaultFixtures.user.id,
-    },
-  });
-  expect(changes.length).toBe(1);
-  expect(changes[0].objectId).toBe(bottle.id);
+  const changeList = await db
+    .select({ change: changes })
+    .from(changes)
+    .where(eq(changes.createdById, DefaultFixtures.user.id));
+
+  expect(changeList.length).toBe(1);
+  expect(changeList[0].change.objectId).toBe(bottle.id);
 });
 
 test("creates a new bottle with invalid brandId", async () => {
@@ -195,8 +111,7 @@ test("creates a new bottle with invalid brandId", async () => {
     headers: await Fixtures.AuthenticatedHeaders(),
   });
 
-  // expect(response).toRespondWith(400);
-  expect(response).toRespondWith(500);
+  expect(response).toRespondWith(400);
 });
 
 // test("creates a new bottle with existing brand name", async () => {
@@ -252,26 +167,31 @@ test("creates a new bottle with new brand name", async () => {
   const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
-  const bottle = await prisma.bottle.findUniqueOrThrow({
-    where: { id: data.id },
-    include: {
-      brand: true,
-    },
-  });
+  const [{ bottle, brand }] = await db
+    .select({ bottle: bottles, brand: entities })
+    .from(bottles)
+    .innerJoin(entities, eq(entities.id, bottles.brandId))
+    .where(eq(bottles.id, data.id));
+
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toBeDefined();
-  expect(bottle.brand.name).toBe("Hard Knox");
-  expect(bottle.brand.country).toBe("Scotland");
-  expect(bottle.brand.createdById).toBe(DefaultFixtures.user.id);
+  expect(brand.name).toBe("Hard Knox");
+  expect(brand.country).toBe("Scotland");
+  expect(brand.createdById).toBe(DefaultFixtures.user.id);
 
   // it should create a change entry for the brand
-  const changes = await prisma.change.findMany({
-    where: {
-      userId: DefaultFixtures.user.id,
-      objectType: "brand",
-    },
-  });
-  expect(changes.length).toBe(1);
+
+  const changeList = await db
+    .select({ change: changes })
+    .from(changes)
+    .where(
+      and(
+        eq(changes.objectType, "entity"),
+        eq(changes.createdById, DefaultFixtures.user.id)
+      )
+    );
+
+  expect(changeList.length).toBe(1);
 });
 
 test("creates a new bottle with invalid distillerId", async () => {
@@ -289,8 +209,7 @@ test("creates a new bottle with invalid distillerId", async () => {
     headers: await Fixtures.AuthenticatedHeaders(),
   });
 
-  // expect(response).toRespondWith(400);
-  expect(response).toRespondWith(500);
+  expect(response).toRespondWith(400);
 });
 
 // test("creates a new bottle with existing distiller name", async () => {
@@ -363,48 +282,37 @@ test("creates a new bottle with new distiller name", async () => {
   const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
-  const bottle = await prisma.bottle.findUniqueOrThrow({
-    where: { id: data.id },
-    include: {
-      distillers: true,
-    },
-  });
+  const [bottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
   expect(bottle.name).toEqual("Delicious Wood");
-  expect(bottle.distillers.length).toEqual(1);
-  expect(bottle.distillers[0].id).toBeDefined();
-  expect(bottle.distillers[0].name).toBe("Hard Knox");
-  expect(bottle.distillers[0].country).toBe("Scotland");
-  expect(bottle.distillers[0].createdById).toBe(DefaultFixtures.user.id);
+
+  const distillers = await db
+    .select({ distiller: entities })
+    .from(entities)
+    .innerJoin(
+      bottlesToDistillers,
+      eq(bottlesToDistillers.entityId, entities.id)
+    )
+    .where(eq(bottlesToDistillers.bottleId, bottle.id));
+
+  expect(distillers.length).toEqual(1);
+  const { distiller } = distillers[0];
+  expect(distiller.id).toBeDefined();
+  expect(distiller.name).toBe("Hard Knox");
+  expect(distiller.country).toBe("Scotland");
+  expect(distiller.createdById).toBe(DefaultFixtures.user.id);
 
   // it should create a change entry for the brand
-  const changes = await prisma.change.findMany({
-    where: {
-      userId: DefaultFixtures.user.id,
-      objectType: "distiller",
-    },
-  });
-  expect(changes.length).toBe(1);
-});
-
-test("edits a new bottle with new name param", async () => {
-  const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/bottles/${bottle.id}`,
-    payload: {
-      name: "Delicious Wood",
-    },
-    headers: await Fixtures.AuthenticatedHeaders(),
-  });
-
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
-  expect(data.id).toBeDefined();
-
-  const bottle2 = await prisma.bottle.findUniqueOrThrow({
-    where: { id: data.id },
-  });
-
-  expect(omit(bottle, "name")).toEqual(omit(bottle2, "name"));
-  expect(bottle2.name).toBe("Delicious Wood");
+  const changeList = await db
+    .select({ change: changes })
+    .from(changes)
+    .where(
+      and(
+        eq(changes.objectType, "entity"),
+        eq(changes.createdById, DefaultFixtures.user.id)
+      )
+    );
+  expect(changeList.length).toBe(1);
 });

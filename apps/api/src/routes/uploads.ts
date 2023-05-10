@@ -1,6 +1,6 @@
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
-import fs, { open } from "fs/promises";
+import { open } from "fs/promises";
 
 import config from "../config";
 import { format } from "path";
@@ -8,16 +8,7 @@ import { contentType } from "mime-types";
 
 const MAX_AGE = 60 * 60 ** 24;
 
-export const getUpload: RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Params: {
-      filename: string;
-    };
-  }
-> = {
+export default {
   method: "GET",
   url: "/uploads/:filename",
   schema: {
@@ -63,4 +54,13 @@ export const getUpload: RouteOptions<
       await res.send(stream);
     }
   },
-};
+} as RouteOptions<
+  Server,
+  IncomingMessage,
+  ServerResponse,
+  {
+    Params: {
+      filename: string;
+    };
+  }
+>;

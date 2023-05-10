@@ -11,11 +11,17 @@ import addEntity from "./addEntity";
 import getEntity from "./getEntity";
 import listUsers from "./listUsers";
 import getUser from "./getUser";
-import { getUpload } from "./uploads";
+import getUpload from "./uploads";
+import listTastings from "./listTastings";
+import addTasting from "./addTasting";
+import getTasting from "./getTasting";
+import updateUser from "./updateUser";
+import updateUserAvatar from "./updateUserAvatar";
+import updateTastingImage from "./updateTastingImage";
 
 export const router: FastifyPluginCallback = (
   fastify: FastifyInstance,
-  opts,
+  _opts,
   next
 ) => {
   fastify.decorateRequest("user", null);
@@ -45,15 +51,15 @@ export const router: FastifyPluginCallback = (
   fastify.route(addEntity);
   fastify.route(getEntity);
 
-  // fastify.route(addCheckin);
-  // fastify.route(listCheckins);
-  // fastify.route(getCheckin);
-  // fastify.route(updateCheckinImage);
+  fastify.route(listTastings);
+  fastify.route(addTasting);
+  fastify.route(getTasting);
+  fastify.route(updateTastingImage);
 
   fastify.route(listUsers);
   fastify.route(getUser);
-  // fastify.route(updateUser);
-  // fastify.route(updateUserAvatar);
+  fastify.route(updateUser);
+  fastify.route(updateUserAvatar);
 
   fastify.route(getUpload);
 

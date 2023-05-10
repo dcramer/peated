@@ -27,7 +27,7 @@ export default {
 
     const [{ count: totalBottles }] = await db
       .select({
-        count: sql`COUNT(brandID)`,
+        count: sql`COUNT(${bottles.brandId})`,
       })
       .from(bottles)
       .where(eq(bottles.brandId, entity.id));

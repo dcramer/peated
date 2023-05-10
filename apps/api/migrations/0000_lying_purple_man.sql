@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS "change" (
 CREATE TABLE IF NOT EXISTS "edition" (
 	"id" bigserial PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL,
-	"barrel" smallint NOT NULL,
+	"barrel" smallint,
 	"bottle_id" bigint NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"created_by_id" bigint NOT NULL

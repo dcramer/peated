@@ -1,7 +1,7 @@
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { buildPageLink } from "../lib/paging";
-import { entities } from "../db/schema";
+import { bottles, entities, tastings } from "../db/schema";
 import { db } from "../lib/db";
 import { SQL, and, asc, desc, eq, ilike, sql } from "drizzle-orm";
 
@@ -31,7 +31,7 @@ export default {
       where.push(ilike(entities.name, query));
     }
     if (req.query.type) {
-      where.push(sql`${entities.type} = ANY(${req.query.type}`);
+      where.push(sql`${req.query.type} = ANY(${entities.type})`);
     }
 
     let orderBy: SQL<unknown>;
@@ -41,9 +41,7 @@ export default {
         break;
       default:
         // TODO: materialize
-        orderBy = desc(
-          sql`SELECT COUNT(*) FROM "tasting" t JOIN "bottle" b ON t.bottleId = b.id WHERE b."brandId" = "entity"."id"`
-        );
+        orderBy = sql<number>`(SELECT COUNT(*) FROM ${tastings} t JOIN ${bottles} ON ${tastings.bottleId} = ${bottles.id} WHERE ${bottles.brandId} = ${entities.id}) DESC`;
     }
 
     const results = await db

@@ -1,12 +1,13 @@
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 
-import { createAccessToken, serializeUser } from "../lib/auth";
+import { createAccessToken } from "../lib/auth";
 import config from "../config";
 import { OAuth2Client } from "google-auth-library";
 import { db } from "../lib/db";
-import { User, identities, users } from "../db/schema";
+import { identities, users } from "../db/schema";
 import { and, eq } from "drizzle-orm";
+import { serializeUser } from "../lib/transformers/user";
 
 export default {
   method: "POST",
@@ -47,9 +48,10 @@ export default {
       return res.status(401).send({ error: "Unable to validate credentials" });
     }
 
-    let user: User;
-    [{ user }] = await db
-      .select()
+    const [result] = await db
+      .select({
+        user: users,
+      })
       .from(users)
       .innerJoin(identities, eq(users.id, identities.userId))
       .where(
@@ -58,43 +60,44 @@ export default {
           eq(identities.externalId, payload.sub)
         )
       );
+    let user = result?.user;
 
     // try to associate w/ existing user
     if (!user) {
-      [user] = await db
+      const [foundUser] = await db
         .select()
         .from(users)
         .where(eq(users.email, payload.email));
-      if (user) {
+      if (foundUser) {
         // TODO: handle race condition
         await db.insert(identities).values({
           provider: "google",
           externalId: payload.sub,
-          userId: user.id,
+          userId: foundUser.id,
+        });
+        user = foundUser;
+
+        // create new account
+      } else {
+        console.log("Creating new user");
+        user = await db.transaction(async (tx) => {
+          let [createdUser] = await tx
+            .insert(users)
+            .values({
+              displayName: payload.given_name,
+              email: payload.email!,
+            })
+            .returning();
+
+          await tx.insert(identities).values({
+            provider: "google",
+            externalId: payload.sub,
+            userId: createdUser.id,
+          });
+
+          return createdUser;
         });
       }
-    }
-
-    // create new account
-    if (!user) {
-      console.log("Creating new user");
-      user = await db.transaction(async (tx) => {
-        let [user] = await tx
-          .insert(users)
-          .values({
-            displayName: payload.given_name,
-            email: payload.email!,
-          })
-          .returning();
-
-        await tx.insert(identities).values({
-          provider: "google",
-          externalId: payload.sub,
-          userId: user.id,
-        });
-
-        return user;
-      });
     }
 
     return res.send({

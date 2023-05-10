@@ -1,13 +1,13 @@
 import type { RouteOptions } from "fastify";
+import { db } from "../lib/db";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
-import { db } from "../lib/db";
-import { changes, tastings, users } from "../db/schema";
-import { eq, sql } from "drizzle-orm";
 import { serializeUser } from "../lib/transformers/user";
+import { User, users } from "../db/schema";
+import { eq } from "drizzle-orm";
 
 export default {
-  method: "GET",
+  method: "PUT",
   url: "/users/:userId",
   schema: {
     params: {
@@ -15,6 +15,12 @@ export default {
       required: ["userId"],
       properties: {
         userId: { oneOf: [{ type: "number" }, { const: "me" }] },
+      },
+    },
+    body: {
+      type: "object",
+      properties: {
+        displayName: { type: "string" },
       },
     },
   },
@@ -28,29 +34,23 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    const [{ totalBottles, totalTastings }] = await db
-      .select({
-        totalBottles: sql`COUNT(DISTINCT ${tastings.bottleId})`,
-        totalTastings: sql`COUNT(${tastings.bottleId})`,
-      })
-      .from(tastings)
-      .where(eq(tastings.createdById, user.id));
+    if (user.id !== req.user.id && !user.admin) {
+      return res.status(403).send({ error: "Forbidden" });
+    }
 
-    const [{ totalContributions }] = await db
-      .select({
-        totalContributions: sql`COUNT(${changes.createdById})`,
-      })
-      .from(changes)
-      .where(eq(changes.createdById, user.id));
+    const body = req.body;
+    const data: { [name: string]: any } = {};
+    if (body.displayName) {
+      data.displayName = body.displayName;
+    }
 
-    res.send({
-      ...serializeUser(user, req.user),
-      stats: {
-        tastings: totalTastings,
-        bottles: totalBottles,
-        contributions: totalContributions,
-      },
-    });
+    const [newUser] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, userId))
+      .returning();
+
+    res.send(serializeUser(newUser, req.user));
   },
 } as RouteOptions<
   Server,
@@ -60,5 +60,6 @@ export default {
     Params: {
       userId: number | "me";
     };
+    Body: Partial<Pick<User, "displayName">>;
   }
 >;

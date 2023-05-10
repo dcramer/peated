@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "a72e59d4-da0e-455f-912c-1f18bca4ddc0",
+  "id": "651c2103-bf17-4fe9-91bc-7a3b83dfbead",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "bottle": {
@@ -228,7 +228,7 @@
           "name": "barrel",
           "type": "smallint",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "bottle_id": {
           "name": "bottle_id",

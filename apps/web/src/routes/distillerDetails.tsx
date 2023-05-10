@@ -1,21 +1,21 @@
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 
-import type { Bottle, Distiller } from "../types";
+import type { Bottle, Entity } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
 import BottleTable from "../components/bottleTable";
 import Button from "../components/button";
 import { useRequiredAuth } from "../hooks/useAuth";
 
-type DistillerWithStats = Distiller & {
+type EntityWithStats = Entity & {
   stats: {
     bottles: number;
   };
 };
 
 type LoaderData = {
-  distiller: DistillerWithStats;
+  distiller: EntityWithStats;
   bottleList: Bottle[];
 };
 
@@ -23,7 +23,7 @@ export const loader: LoaderFunction = async ({
   params: { distillerId },
 }): Promise<LoaderData> => {
   if (!distillerId) throw new Error("Missing distillerId");
-  const distiller = await api.get(`/distillers/${distillerId}`);
+  const distiller = await api.get(`/entities/${distillerId}`);
   const { results: bottleList } = await api.get(`/bottles`, {
     query: { distiller: distiller.id },
   });

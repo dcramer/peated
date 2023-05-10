@@ -6,75 +6,52 @@ import {
   bottlesToDistillers,
   changes,
   entities,
-  categoryEnum,
+  Category,
 } from "../db/schema";
 import { db } from "../lib/db";
 import { eq } from "drizzle-orm";
 
 type BottleInput = {
   name: string;
-  category: categoryEnum;
+  category: Category;
   brand: number | { name: string; country: string; region?: string };
   distillers: (number | { name: string; country: string; region?: string })[];
   statedAge?: number;
 };
 
-class InvalidValue extends Error {}
+const getDistillerId = async (tx: any, distData: any, userId: number) => {
+  if (distData === "number") {
+    let [distiller] = await tx
+      .select()
+      .from(entities)
+      .where(eq(entities.id, distData));
+    return distiller?.id;
+  }
 
-// const getBrandParam = async (req: any, value: BottleInput["brand"]) => {
-//   if (typeof value === "number") {
-//     if (
-//       (await db.select().from(entities).where(eq(entities.id, value)).limit(1))
-//         .length === 0
-//     ) {
-//       throw new InvalidValue(`${value} is not a valid brand ID`);
-//     }
-//   }
+  let [distiller] = await tx
+    .insert(entities)
+    .values({
+      ...distData,
+      type: ["distiller"],
+      createdById: userId,
+    })
+    .onConflictDoNothing()
+    .returning();
 
-//   if (typeof value === "number") {
-//     return { connect: { id: value } };
-//   }
-//   return {
-//     create: {
-//       name: value.name,
-//       country: value.country,
-//       region: value.region,
-//       public: req.user.admin,
-//       createdById: req.user.id,
-//     },
-//   };
-// };
+  if (distiller) {
+    return distiller.id;
+  }
 
-// const getDistillerParam = async (
-//   req: any,
-//   value: BottleInput["distillers"]
-// ) => {
-//   if (!value) return;
+  let [distillerQ] = await tx
+    .select()
+    .from(entities)
+    .where(eq(entities.name, distData.name));
 
-//   for (const d of value) {
-//     if (typeof d === "number") {
-//       if (!(await prisma.distiller.findUnique({ where: { id: d } }))) {
-//         throw new InvalidValue(`${value} is not a valid distiller ID`);
-//       }
-//     }
-//   }
-
-//   return {
-//     connect: value
-//       .filter((d) => typeof d === "number")
-//       .map((d: any) => ({ id: d })),
-//     create: value
-//       .filter((d) => typeof d !== "number")
-//       // how to type this?
-//       .map((d: any) => ({
-//         name: d.name,
-//         country: d.country,
-//         region: d.region,
-//         public: req.user.admin,
-//         createdById: req.user.id,
-//       })),
-//   };
-// };
+  if (!distillerQ) {
+    return null;
+  }
+  return distillerQ.id;
+};
 
 export default {
   method: "POST",
@@ -103,6 +80,9 @@ export default {
               })
               .onConflictDoNothing()
               .returning();
+      if (!brand) {
+        return res.status(400).send({ error: "Could not identify brand" });
+      }
 
       if (typeof body.brand !== "number") {
         await tx.insert(changes).values({
@@ -127,21 +107,12 @@ export default {
       const distillerIds: number[] = [];
       if (body.distillers)
         for (const distData of body.distillers) {
-          let distillerId: number =
-            typeof distData === "number"
-              ? distData
-              : (
-                  await tx
-                    .insert(entities)
-                    .values({
-                      ...distData,
-                      type: ["distiller"],
-                      createdById: req.user.id,
-                    })
-                    .onConflictDoNothing()
-                    .returning()
-                )[0].id;
-
+          let distillerId = await getDistillerId(tx, distData, req.user.id);
+          if (!distillerId) {
+            return res
+              .status(400)
+              .send({ error: "Could not identify distiller" });
+          }
           if (typeof distData !== "number") {
             await tx.insert(changes).values({
               objectType: "entity",
@@ -159,10 +130,10 @@ export default {
           distillerIds.push(distillerId);
         }
 
-      await tx.insert(changes).create({
+      await tx.insert(changes).values({
         objectType: "bottle",
         objectId: bottle.id,
-        userId: req.user.id,
+        createdById: req.user.id,
         data: JSON.stringify({
           ...bottle,
           distillerIds,

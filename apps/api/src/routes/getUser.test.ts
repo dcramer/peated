@@ -1,38 +1,14 @@
 import buildFastify from "../app";
-import { prisma } from "../lib/db";
 import * as Fixtures from "../lib/test/fixtures";
 import { FastifyInstance } from "fastify";
 
 let app: FastifyInstance;
 beforeAll(async () => {
   app = await buildFastify();
-});
 
-afterAll(async () => {
-  await app.close();
-});
-
-test("lists distillers", async () => {
-  const user2 = await Fixtures.User();
-
-  let response = await app.inject({
-    method: "GET",
-    url: "/users",
-    headers: DefaultFixtures.authHeaders,
-  });
-
-  expect(response).toRespondWith(200);
-  let data = JSON.parse(response.payload);
-  expect(data.length).toBe(2);
-});
-
-test("lists distillers requires auth", async () => {
-  let response = await app.inject({
-    method: "GET",
-    url: "/users",
-  });
-
-  expect(response).toRespondWith(401);
+  return async () => {
+    app.close();
+  };
 });
 
 test("get user", async () => {

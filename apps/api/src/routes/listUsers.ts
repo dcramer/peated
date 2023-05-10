@@ -2,9 +2,9 @@ import type { RouteOptions } from "fastify";
 import { db } from "../lib/db";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
-import { serializeUser } from "../lib/auth";
 import { users } from "../db/schema";
 import { SQL, and, asc, eq, ilike, or } from "drizzle-orm";
+import { serializeUser } from "../lib/transformers/user";
 
 export default {
   method: "GET",

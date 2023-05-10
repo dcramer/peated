@@ -1,13 +1,12 @@
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
-import { NewEntity, bottles, changes, entities } from "../db/schema";
+import { NewEntity, changes, entities } from "../db/schema";
 import { db } from "../lib/db";
-import { eq, sql } from "drizzle-orm";
 
 export default {
   method: "POST",
-  url: "/brands",
+  url: "/entities",
   schema: {
     body: {
       type: "object",
@@ -16,6 +15,13 @@ export default {
         name: { type: "string" },
         country: { type: "string" },
         region: { type: "string" },
+        type: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["distiller", "brand"],
+          },
+        },
       },
     },
   },
@@ -24,6 +30,7 @@ export default {
     const body = req.body;
     const data: NewEntity = {
       ...body,
+      type: body.type || [],
       createdById: req.user.id,
     };
 

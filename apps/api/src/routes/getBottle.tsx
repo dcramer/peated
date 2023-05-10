@@ -31,7 +31,9 @@ export default {
     }
 
     const distillers = await db
-      .select()
+      .select({
+        distiller: entities,
+      })
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
@@ -41,15 +43,21 @@ export default {
 
     const [{ count: totalTastings }] = await db
       .select({
-        count: sql`COUNT(${tastings.bottleId})`,
+        count: sql<number>`COUNT(${tastings.bottleId})`,
       })
       .from(tastings)
       .where(eq(tastings.bottleId, bottle.id));
 
-    const [{ count: totalPeople, avgRating }] = await db
+    const [{ count: totalPeople }] = await db
       .select({
-        count: sql`COUNT(DISTINCT ${tastings.createdById})`,
-        avgRating: sql`AVG(${tastings.rating})`,
+        count: sql<number>`COUNT(DISTINCT ${tastings.createdById})`,
+      })
+      .from(tastings)
+      .where(eq(tastings.bottleId, bottle.id));
+
+    const [{ avgRating }] = await db
+      .select({
+        avgRating: sql<number>`AVG(${tastings.rating})`,
       })
       .from(tastings)
       .where(eq(tastings.bottleId, bottle.id));
@@ -57,7 +65,7 @@ export default {
     res.send({
       ...bottle,
       brand,
-      distillers,
+      distillers: distillers.map(({ distiller }) => distiller),
       stats: {
         tastings: totalTastings,
         avgRating: avgRating,

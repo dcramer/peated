@@ -88,6 +88,14 @@ export const entities = pgTable(
 export type Entity = InferModel<typeof entities>;
 export type NewEntity = InferModel<typeof entities, "insert">;
 
+export type Category =
+  | "blend"
+  | "bourbon"
+  | "rye"
+  | "single_grain"
+  | "single_malt"
+  | "spirit";
+
 export const categoryEnum = pgEnum("category", [
   "blend",
   "bourbon",
@@ -152,7 +160,7 @@ export const editions = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
 
     name: varchar("name", { length: 255 }).notNull(),
-    barrel: smallint("barrel").notNull(),
+    barrel: smallint("barrel"),
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),

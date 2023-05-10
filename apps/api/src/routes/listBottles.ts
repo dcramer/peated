@@ -43,26 +43,33 @@ export default {
     }
     if (req.query.distiller) {
       where.push(
-        sql`SELECT 1 FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${req.query.distiller}`
+        sql`EXISTS(SELECT 1 FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${req.query.distiller} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`
       );
     }
 
+    const select: any = {};
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
       case "name":
         orderBy = asc(bottles.name);
         break;
       default:
-        // TODO: materialie
-        orderBy = desc(
-          sql`SELECT COUNT(*) FROM ${tastings} WHERE ${tastings.bottleId} = ${bottles.id}`
-        );
+        // TODO: materialize // also this query pattern isnt supported yet
+        // select.totalTastings = db
+        //   .select({
+        //     count: sql<number>`COUNT(*)`,
+        //   })
+        //   .from(tastings)
+        //   .where(eq(tastings.bottleId, bottles.id));
+        // orderBy = desc(select.totalTastings);
+        orderBy = sql`(SELECT COUNT(*) FROM ${tastings} WHERE ${tastings.bottleId} = ${bottles.id}) DESC`;
     }
 
     const results = await db
       .select({
         bottle: bottles,
         brand: entities,
+        ...select,
       })
       .from(bottles)
       .innerJoin(entities, eq(entities.id, bottles.brandId))
@@ -71,22 +78,24 @@ export default {
       .offset(offset)
       .orderBy(orderBy);
 
-    const distillers = await db
-      .select({
-        bottleId: bottlesToDistillers.bottleId,
-        distiller: entities,
-      })
-      .from(entities)
-      .innerJoin(
-        bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id)
-      )
-      .where(
-        inArray(
-          bottlesToDistillers.bottleId,
-          results.map(({ bottle: b }) => b.id)
-        )
-      );
+    const distillers = results.length
+      ? await db
+          .select({
+            bottleId: bottlesToDistillers.bottleId,
+            distiller: entities,
+          })
+          .from(entities)
+          .innerJoin(
+            bottlesToDistillers,
+            eq(bottlesToDistillers.distillerId, entities.id)
+          )
+          .where(
+            inArray(
+              bottlesToDistillers.bottleId,
+              results.map(({ bottle: b }) => b.id)
+            )
+          )
+      : [];
     const distillersByBottleId: {
       [bottleId: number]: Entity[];
     } = {};

@@ -2,13 +2,13 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { validateRequest } from "../middleware/auth";
 import { omit } from "../lib/filter";
-import { NewBottle, bottles } from "../db/schema";
+import { Category, NewBottle, bottles } from "../db/schema";
 import { db } from "../lib/db";
 import { eq, sql } from "drizzle-orm";
 
 type BottleInput = {
   name: string;
-  category: categoryEnum;
+  category: Category;
   brand: number | { name: string; country: string; region?: string };
   distillers: (number | { name: string; country: string; region?: string })[];
   statedAge?: number;
@@ -71,14 +71,7 @@ class InvalidValue extends Error {}
 //   };
 // };
 
-export const addBottle: RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Body: BottleInput;
-  }
-> = {
+export default {
   method: "POST",
   url: "/bottles",
   schema: {
@@ -287,4 +280,11 @@ export const editBottle: RouteOptions<
 
     res.status(201).send(newBottle);
   },
-};
+} as RouteOptions<
+  Server,
+  IncomingMessage,
+  ServerResponse,
+  {
+    Body: BottleInput;
+  }
+>;

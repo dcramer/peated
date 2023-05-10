@@ -84,13 +84,18 @@ export const Bottle = async ({
 };
 
 export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
-  return await db.insert(tastings).values({
-    comments: faker.lorem.sentence(),
-    rating: faker.datatype.float({ min: 1, max: 5 }),
-    ...data,
-    bottleId: data.bottleId || (await Bottle()).id,
-    createdById: data.createdById || (await User()).id,
-  });
+  return (
+    await db
+      .insert(tastings)
+      .values({
+        comments: faker.lorem.sentence(),
+        rating: faker.datatype.float({ min: 1, max: 5 }),
+        ...data,
+        bottleId: data.bottleId || (await Bottle()).id,
+        createdById: data.createdById || (await User()).id,
+      })
+      .returning()
+  )[0];
 };
 
 export const AuthToken = async ({ user }: { user?: UserType | null } = {}) => {

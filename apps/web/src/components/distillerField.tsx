@@ -12,7 +12,7 @@ export default (props: Props) => {
     <RichSelectField
       label="Distiller"
       {...props}
-      endpoint="/distillers"
+      endpoint="/entities"
       createForm={({ data, onFieldChange }) => {
         return (
           <>
