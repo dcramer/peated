@@ -5,20 +5,16 @@ ENV NODE_ENV production
 
 RUN npm install -g pnpm
 
-FROM base as deps
+FROM base as build
 
 WORKDIR /app
 
-ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
-ADD packages ./packages
-ADD apps/web/package.json ./apps/web/package.json
-ADD apps/api/package.json ./apps/api/package.json
+ADD . .
+# ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
+# ADD packages ./packages
+# ADD apps/web/package.json ./apps/web/package.json
+# ADD apps/api/package.json ./apps/api/package.json
 RUN pnpm install
-
-# build web
-FROM base as build-web
-
-WORKDIR /app
 
 ARG VERSION
 ENV VERSION $VERSION
@@ -38,32 +34,14 @@ ENV API_SERVER $API_SERVER
 ARG GOOGLE_CLIENT_ID
 ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./node_modules
-COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
-ADD apps/web/ .
-
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
-    npm run build
-
-# build api
-FROM base as build-api
-
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/node_modules ./node_modules
-COPY --from=deps /app/packages/shared ./node_modules/@peated/shared
-
-ADD apps/api/ .
-
-RUN npm run build
+    pnpm build
 
 # web service
 FROM nginx:alpine as web
 
-COPY --from=build-web /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 RUN rm /etc/nginx/conf.d/default.conf
 
@@ -74,13 +52,11 @@ EXPOSE 8043
 CMD ["nginx", "-g", "daemon off;"]
 
 # api service
-FROM build-api as api
+FROM build as api
 
 WORKDIR /app
 
-COPY --from=build-api /app/node_modules ./node_modules
-
-ADD apps/api/ .
+COPY --from=build /app/ ./
 
 ARG VERSION
 ENV VERSION $VERSION
@@ -92,4 +68,6 @@ ENV PORT 4000
 
 EXPOSE 4000
 
-CMD ["npm", "start"]
+WORKDIR /app/apps/api
+
+CMD ["pnpm", "start"]

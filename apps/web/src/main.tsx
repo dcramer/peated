@@ -16,7 +16,6 @@ import createRoutes from "./routes";
 import config from "./config";
 import { AuthProvider } from "./hooks/useAuth";
 import { OnlineStatusProvider } from "./hooks/useOnlineStatus";
-import { register } from "./serviceWorkerRegistration";
 import Spinner from "./components/spinner";
 
 Sentry.init({
@@ -95,8 +94,3 @@ root.render(
     </GoogleOAuthProvider>
   </React.StrictMode>
 );
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://cra.link/PWA
-register();

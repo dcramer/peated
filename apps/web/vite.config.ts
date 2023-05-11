@@ -71,13 +71,13 @@ if (selfDestroying) pwaOptions.selfDestroying = selfDestroying;
 const ALLOWED_ENV = ["SENTRY_DSN", "GOOGLE_CLIENT_ID", "API_SERVER", "VERSION"];
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), "");
 
   const processEnvValues = {
-    "process.env": Object.entries(env)
+    "import.meta.env": Object.entries(env)
       .filter(([k]) => ALLOWED_ENV.indexOf(k))
       .reduce((prev, [key, val]) => {
         return {

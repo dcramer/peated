@@ -8,6 +8,8 @@
     "build": "pnpm -r --filter='./apps/**' run build",
     "setup": "pnpm install && npm run db:migrate",
     "dev": "nf start",
+    "dev:web": "API_SERVER=http://localhost:4000 dotenv -e .env.local -- pnpm --filter='./apps/web' dev",
+    "dev:api": "PORT=4000 dotenv -e .env.local -- pnpm --filter='./apps/api' dev",
     "db:migrate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:migrate",
     "typecheck": "tsc --noEmit",
     "test": "pnpm -r --stream run test",
