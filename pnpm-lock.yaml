@@ -91,6 +91,9 @@ importers:
       dotenv:
         specifier: ^16.0.3
         version: 16.0.3
+      dotenv-cli:
+        specifier: ^7.1.0
+        version: 7.1.0
       drizzle-kit:
         specifier: ^0.17.6
         version: 0.17.6
