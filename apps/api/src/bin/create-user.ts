@@ -1,6 +1,7 @@
 import { hashSync } from "bcrypt";
-import { prisma } from "../lib/db";
 import { createInterface } from "readline/promises";
+import { db } from "../db";
+import { users } from "../db/schema";
 
 const readline = createInterface({
   input: process.stdin,
@@ -16,9 +17,15 @@ const main = async () => {
     (await readline.question("Admin [Y/n]? ")).toLowerCase() !== "n";
   readline.close();
 
-  const user = await prisma.user.create({
-    data: { displayName, email, passwordHash: hashSync(password, 8), admin },
-  });
+  const [user] = await db
+    .insert(users)
+    .values({
+      displayName,
+      email,
+      passwordHash: hashSync(password, 8),
+      admin,
+    })
+    .returning();
 
   console.log(`${user.email} created.`);
 };

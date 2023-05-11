@@ -1,10 +1,9 @@
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 
-import type { Brand } from "../types";
+import type { Entity } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
-import FloatingCheckinButton from "../components/floatingCheckinButton";
 import BrandTable from "../components/brandTable";
 
 type PagedResponse<T> = {
@@ -18,7 +17,7 @@ type PagedResponse<T> = {
 };
 
 type LoaderData = {
-  brandListResponse: PagedResponse<Brand>;
+  brandListResponse: PagedResponse<Entity>;
 };
 
 export const loader: LoaderFunction = async ({
@@ -26,9 +25,10 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   const url = new URL(request.url);
 
-  const brandListResponse = await api.get(`/brands`, {
+  const brandListResponse = await api.get(`/entities`, {
     query: {
       sort: "name",
+      type: "brand",
       page: url.searchParams.get("page") || undefined,
     },
   });
@@ -38,7 +38,7 @@ export const loader: LoaderFunction = async ({
 
 const EmptyActivity = () => {
   return (
-    <div className="flex flex-col block m-4 mx-auto items-center rounded-lg border border-dashed border-gray-300 p-12">
+    <div className="flex flex-col m-4 mx-auto items-center rounded-lg border border-dashed border-gray-300 p-12">
       <span className="block font-light text-gray-400">
         Looks like there's no brands in the database yet. Weird.
       </span>
@@ -51,7 +51,6 @@ export default function BrandList() {
 
   return (
     <Layout gutter>
-      <FloatingCheckinButton to="/search?checkin" />
       {brandListResponse.results.length > 0 ? (
         <BrandTable
           brandList={brandListResponse.results}

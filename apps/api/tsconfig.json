@@ -3,6 +3,6 @@
   "compilerOptions": {
     "types": ["vitest/globals"]
   },
-  "include": ["src", "prisma"],
+  "include": ["src"],
   "exclude": ["src/test/setup-test-env.ts"],
 }

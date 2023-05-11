@@ -4,7 +4,6 @@ import type { LoaderFunction } from "react-router-dom";
 import type { Bottle } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
-import FloatingCheckinButton from "../components/floatingCheckinButton";
 import BottleTable from "../components/bottleTable";
 
 type PagedResponse<T> = {
@@ -38,7 +37,7 @@ export const loader: LoaderFunction = async ({
 
 const EmptyActivity = () => {
   return (
-    <div className="flex flex-col block m-4 mx-auto items-center rounded-lg border border-dashed border-gray-300 p-12">
+    <div className="flex flex-col m-4 mx-auto items-center rounded-lg border border-dashed border-gray-300 p-12">
       <span className="block font-light text-gray-400">
         Looks like there's no bottles in the database yet. Weird.
       </span>
@@ -51,7 +50,6 @@ export default function BottleList() {
 
   return (
     <Layout gutter>
-      <FloatingCheckinButton to="/search?checkin" />
       {bottleListResponse.results.length > 0 ? (
         <BottleTable
           bottleList={bottleListResponse.results}

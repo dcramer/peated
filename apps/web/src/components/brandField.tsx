@@ -10,7 +10,7 @@ type Props = Omit<
 export default (props: Props) => {
   return (
     <RichSelectField
-      endpoint="/brands"
+      endpoint="/entities"
       createForm={({ data, onFieldChange }) => {
         return (
           <>

@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 
-import { Bottle, Brand, Distiller } from "../types";
+import { Bottle, Entity } from "../types";
 import { formatCategoryName } from "../lib/strings";
 import Button from "./button";
 
-type Grouper = undefined | null | Brand | Distiller;
+type Grouper = undefined | null | Entity;
 
 export default ({
   bottleList,
@@ -14,7 +14,7 @@ export default ({
 }: {
   bottleList: Bottle[];
   groupBy?: (bottle: Bottle) => Grouper;
-  groupTo?: (group: Brand | Distiller) => string;
+  groupTo?: (group: Entity) => string;
   rel?: {
     next: string | null;
     nextPage: number | null;

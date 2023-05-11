@@ -1,20 +1,20 @@
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 
-import type { Bottle, Brand } from "../types";
+import type { Bottle, Entity } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
 import BottleTable from "../components/bottleTable";
 import Button from "../components/button";
 
-type BrandWithStats = Brand & {
+type EntityWithStats = Entity & {
   stats: {
     bottles: number;
   };
 };
 
 type LoaderData = {
-  brand: BrandWithStats;
+  brand: EntityWithStats;
   bottleList: Bottle[];
 };
 
@@ -22,7 +22,7 @@ export const loader: LoaderFunction = async ({
   params: { brandId },
 }): Promise<LoaderData> => {
   if (!brandId) throw new Error("Missing brandId");
-  const brand = await api.get(`/brands/${brandId}`);
+  const brand = await api.get(`/entities/${brandId}`);
   const { results: bottleList } = await api.get(`/bottles`, {
     query: { brand: brand.id },
   });

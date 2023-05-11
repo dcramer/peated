@@ -1,21 +1,28 @@
 import { FastifyInstance, FastifyPluginCallback } from "fastify";
 
-import { listBottles, getBottle, addBottle, editBottle } from "./bottles";
-import { authBasic, authDetails, authGoogle } from "./auth";
-import {
-  addCheckin,
-  getCheckin,
-  listCheckins,
-  updateCheckinImage,
-} from "./checkins";
-import { addBrand, getBrand, listBrands } from "./brands";
-import { addDistiller, getDistiller, listDistillers } from "./distillers";
-import { getUser, listUsers, updateUser, updateUserAvatar } from "./users";
-import { getUpload } from "./uploads";
+import authDetails from "./authDetails";
+import authBasic from "./authBasic";
+import authGoogle from "./authGoogle";
+import listBottles from "./listBottles";
+import addBottle from "./addBottle";
+import getBottle from "./getBottle";
+import listEntities from "./listEntities";
+import addEntity from "./addEntity";
+import getEntity from "./getEntity";
+import listUsers from "./listUsers";
+import getUser from "./getUser";
+import getUpload from "./uploads";
+import listTastings from "./listTastings";
+import addTasting from "./addTasting";
+import getTasting from "./getTasting";
+import updateUser from "./updateUser";
+import updateUserAvatar from "./updateUserAvatar";
+import updateTastingImage from "./updateTastingImage";
+import updateBottle from "./updateBottle";
 
 export const router: FastifyPluginCallback = (
   fastify: FastifyInstance,
-  opts,
+  _opts,
   next
 ) => {
   fastify.decorateRequest("user", null);
@@ -34,26 +41,22 @@ export const router: FastifyPluginCallback = (
   });
 
   fastify.route(authDetails);
-  fastify.route(authGoogle);
   fastify.route(authBasic);
+  fastify.route(authGoogle);
 
   fastify.route(listBottles);
   fastify.route(addBottle);
   fastify.route(getBottle);
-  fastify.route(editBottle);
+  fastify.route(updateBottle);
 
-  fastify.route(listBrands);
-  fastify.route(getBrand);
-  fastify.route(addBrand);
+  fastify.route(listEntities);
+  fastify.route(addEntity);
+  fastify.route(getEntity);
 
-  fastify.route(addCheckin);
-  fastify.route(listCheckins);
-  fastify.route(getCheckin);
-  fastify.route(updateCheckinImage);
-
-  fastify.route(listDistillers);
-  fastify.route(getDistiller);
-  fastify.route(addDistiller);
+  fastify.route(listTastings);
+  fastify.route(addTasting);
+  fastify.route(getTasting);
+  fastify.route(updateTastingImage);
 
   fastify.route(listUsers);
   fastify.route(getUser);

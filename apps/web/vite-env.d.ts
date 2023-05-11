@@ -6,12 +6,21 @@
 /// <reference types="vite-plugin-pwa/info" />
 
 interface ImportMetaEnv {
-  readonly VITE_GOOGLE_CLIENT_ID: string;
-  readonly VITE_SENTRY_DSN: string;
-  readonly VITE_API_SERVER: string;
-  readonly VITE_API_SERVER: string;
+  readonly GOOGLE_CLIENT_ID: string;
+  readonly SENTRY_DSN: string;
+  readonly API_SERVER: string;
+  readonly VERSION: string;
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
+}
+
+declare namespace NodeJS {
+  export interface ProcessEnv {
+    NODE_ENV: "development" | "production" | "test";
+    SENTRY_DSN?: string;
+    API_SERVER?: string;
+    VERSION?: string;
+  }
 }

@@ -1,19 +1,28 @@
 name: CI
+inputs:
+  node-version:
+    required: false
+    description: Node version for setup-node
+    default: 18.x
 on:
   push:
     branches:
       - main
   pull_request:
-
 jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: nrwl/nx-set-shas@v3
-      - run: npm ci
-      - run: docker-compose up -d
-      - run: npx nx affected -t test --parallel=3 --configuration=ci
-      - run: npx nx affected -t build --parallel=3
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+      - name: Set node version to ${{ inputs.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Run docker images
+        run: docker-compose up -d
+      - name: Run tests
+        run: npm run test:ci

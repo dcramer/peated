@@ -1,37 +1,7 @@
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
-import { User } from "@prisma/client";
-
-interface SerializedUser {
-  id: number;
-  displayName: string | null;
-  pictureUrl: string | null;
-  admin?: boolean;
-  email?: string;
-  createdAt?: string;
-}
-
-export const serializeUser = (
-  user: User,
-  currentUser?: User
-): SerializedUser => {
-  const data: SerializedUser = {
-    id: user.id,
-    displayName: user.displayName,
-    pictureUrl: user.pictureUrl
-      ? `${config.URL_PREFIX}${user.pictureUrl}`
-      : null,
-  };
-  if (currentUser && (currentUser.admin || currentUser.id === user.id)) {
-    return {
-      ...data,
-      email: user.email,
-      createdAt: user.email,
-      admin: user.admin,
-    };
-  }
-  return data;
-};
+import { User } from "../db/schema";
+import { SerializedUser, serializeUser } from "./transformers/user";
 
 export const createAccessToken = (user: User): Promise<string | undefined> => {
   return new Promise<string | undefined>((res, rej) => {

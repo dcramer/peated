@@ -2,7 +2,7 @@ import type { RouteObject } from "react-router-dom";
 
 import Root from "./routes/root";
 import ErrorPage from "./error-page";
-import Checkin, { loader as checkinLoader } from "./routes/checkin";
+import AddTasting, { loader as addTastingLoader } from "./routes/addTasting";
 import Activity, { loader as activityLoader } from "./routes/activity";
 import Search from "./routes/search";
 import Login from "./routes/login";
@@ -43,9 +43,9 @@ export default function createRoutes() {
           loader: bottleDetailsLoader,
         },
         {
-          path: "bottles/:bottleId/checkin",
-          element: <Checkin />,
-          loader: checkinLoader,
+          path: "bottles/:bottleId/addTasting",
+          element: <AddTasting />,
+          loader: addTastingLoader,
         },
         {
           path: "bottles/",

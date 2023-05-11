@@ -2,17 +2,17 @@ import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-import type { Bottle, Checkin } from "../types";
+import type { Bottle, Tasting } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
-import CheckinListItem from "../components/checkinListItem";
+import TastingListItem from "../components/tastingListItem";
 import { formatCategoryName } from "../lib/strings";
 import Button from "../components/button";
 import BottleName from "../components/bottleName";
 
 type BottleWithStats = Bottle & {
   stats: {
-    checkins: number;
+    tastings: number;
     avgRating: number;
     people: number;
   };
@@ -20,7 +20,7 @@ type BottleWithStats = Bottle & {
 
 type LoaderData = {
   bottle: BottleWithStats;
-  checkinList: Checkin[];
+  tastingList: Tasting[];
 };
 
 export const loader: LoaderFunction = async ({
@@ -28,11 +28,11 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   if (!bottleId) throw new Error("Missing bottleId");
   const bottle = await api.get(`/bottles/${bottleId}`);
-  const checkinList = await api.get(`/checkins`, {
+  const tastingList = await api.get(`/tastings`, {
     query: { bottle: bottle.id },
   });
 
-  return { bottle, checkinList };
+  return { bottle, tastingList };
 };
 
 const EmptyActivity = ({ to }: { to: string }) => {
@@ -54,14 +54,14 @@ const EmptyActivity = ({ to }: { to: string }) => {
 };
 
 export default function BottleDetails() {
-  const { bottle, checkinList } = useLoaderData() as LoaderData;
+  const { bottle, tastingList } = useLoaderData() as LoaderData;
 
   const stats = [
     {
       name: "Avg Rating",
       value: Math.round(bottle.stats.avgRating * 100) / 100,
     },
-    { name: "Tastings", value: bottle.stats.checkins.toLocaleString() },
+    { name: "Tastings", value: bottle.stats.tastings.toLocaleString() },
     { name: "People", value: bottle.stats.people.toLocaleString() },
   ];
 
@@ -110,7 +110,7 @@ export default function BottleDetails() {
       </div>
 
       <div className="my-8 justify-center sm:justify-start flex gap-4">
-        <Button to={`/bottles/${bottle.id}/checkin`} color="primary">
+        <Button to={`/bottles/${bottle.id}/tasting`} color="primary">
           Record a Tasting
         </Button>
         <Button to={`/bottles/${bottle.id}/edit`}>Edit Bottle</Button>
@@ -127,14 +127,14 @@ export default function BottleDetails() {
         ))}
       </div>
 
-      {checkinList.length ? (
+      {tastingList.length ? (
         <ul role="list" className="space-y-3">
-          {checkinList.map((checkin) => (
-            <CheckinListItem key={checkin.id} checkin={checkin} noBottle />
+          {tastingList.map((tasting) => (
+            <TastingListItem key={tasting.id} tasting={tasting} noBottle />
           ))}
         </ul>
       ) : (
-        <EmptyActivity to={`/bottles/${bottle.id}/checkin`} />
+        <EmptyActivity to={`/bottles/${bottle.id}/tasting`} />
       )}
     </Layout>
   );

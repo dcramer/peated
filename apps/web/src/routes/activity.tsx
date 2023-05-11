@@ -2,29 +2,29 @@ import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-import type { Checkin } from "../types";
+import type { Tasting } from "../types";
 import api from "../lib/api";
 import Layout from "../components/layout";
-import CheckinListItem from "../components/checkinListItem";
+import TastingListItem from "../components/tastingListItem";
 import { ReactComponent as Glyph } from "../assets/glyph.svg";
-import FloatingCheckinButton from "../components/floatingCheckinButton";
+import FloatingButton from "../components/floatingButton";
 
 type LoaderData = {
-  checkinList: Checkin[];
+  tastingList: Tasting[];
 };
 
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const checkinList = await api.get("/checkins");
+  const tastingList = await api.get("/tastings");
 
-  return { checkinList };
+  return { tastingList };
 };
 
 const EmptyActivity = () => {
   return (
     <Link
       type="button"
-      className="flex flex-col sm:max-w-xl block mx-auto items-center rounded-lg border-2 border-dashed border-gray-300 p-12 group hover:border-peated focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      to="/search?checkin"
+      className="flex flex-col sm:max-w-xl mx-auto items-center rounded-lg border-2 border-dashed border-gray-300 p-12 group hover:border-peated focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      to="/search?tasting"
     >
       <Glyph className="text-gray-400 w-16 h-16 group-hover:text-peated" />
 
@@ -39,15 +39,15 @@ const EmptyActivity = () => {
 };
 
 export default function Activity() {
-  const { checkinList } = useLoaderData() as LoaderData;
+  const { tastingList } = useLoaderData() as LoaderData;
 
   return (
     <Layout gutter>
-      <FloatingCheckinButton to="/search?checkin" />
-      {checkinList.length > 0 ? (
+      <FloatingButton to="/search?tasting" />
+      {tastingList.length > 0 ? (
         <ul role="list" className="space-y-3">
-          {checkinList.map((checkin) => (
-            <CheckinListItem key={checkin.id} checkin={checkin} />
+          {tastingList.map((tasting) => (
+            <TastingListItem key={tasting.id} tasting={tasting} />
           ))}
         </ul>
       ) : (

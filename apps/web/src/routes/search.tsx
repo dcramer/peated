@@ -35,7 +35,7 @@ export default function Search() {
   const navigate = useNavigate();
   const qs = new URLSearchParams(location.search);
 
-  const directToCheckin = qs.has("checkin");
+  const directToTasting = qs.has("tasting");
 
   const [query, setQuery] = useState(qs.get("q") || "");
   const [results, setResults] = useState<readonly Bottle[]>([]);
@@ -74,7 +74,7 @@ export default function Search() {
           onSubmit={(value) => {
             navigate(
               `${location.pathname}?q=${encodeURIComponent(value)}&${
-                directToCheckin ? "checkin" : ""
+                directToTasting ? "tasting" : ""
               }`,
               {
                 replace: true,
@@ -103,8 +103,8 @@ export default function Search() {
                     <p className="font-semibold leading-6 text-gray-900">
                       <Link
                         to={
-                          directToCheckin
-                            ? `/bottles/${bottle.id}/checkin`
+                          directToTasting
+                            ? `/bottles/${bottle.id}/tasting`
                             : `/bottles/${bottle.id}`
                         }
                       >
