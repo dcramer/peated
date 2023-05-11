@@ -12,12 +12,12 @@ const HeaderLogo = () => {
     <>
       <div className="hidden sm:flex">
         <Link to="/">
-          <PeatedLogo className="h-10 text-white" />
+          <PeatedLogo className="h-10 w-auto text-white" />
         </Link>
       </div>
       <div className="flex sm:hidden">
         <Link to="/">
-          <PeatedGlyph className="h-8 text-white" />
+          <PeatedGlyph className="h-8 w-auto text-white" />
         </Link>
       </div>
     </>
