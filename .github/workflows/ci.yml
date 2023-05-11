@@ -20,4 +20,4 @@ jobs:
       - name: Run docker images
         run: docker-compose up -d
       - name: Run tests
-        run: npm run test:ci
+        run: pnpm test:ci

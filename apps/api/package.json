@@ -14,7 +14,7 @@
     "user:generate-token": "ts-node --require dotenv/config ./src/bin/generate-token.ts",
     "tsc": "tsc",
     "start": "ts-node --require dotenv/config ./src/server.ts",
-    "test": "run-s test:vitest",
+    "test": "npm run test:vitest",
     "test:vitest": "dotenv -e .env.test -- vitest --single-thread"
   },
   "dependencies": {
@@ -49,7 +49,6 @@
     "jwks-rsa": "^3.0.1",
     "mime-types": "^2.1.35",
     "nodemon": "^2.0.22",
-    "npm-run-all": "^4.1.5",
     "pg": "^8.10.0",
     "pino-pretty": "^10.0.0",
     "regenerator-runtime": "^0.13.11",
