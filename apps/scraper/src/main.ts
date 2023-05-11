@@ -202,7 +202,7 @@ async function submitBrand(data: any) {
   };
 
   try {
-    await axios.post(`${API_SERVER}/brands`, data, {
+    await axios.post(`${API_SERVER}/entities`, data, {
       headers,
     });
   } catch (err: any) {
@@ -224,7 +224,7 @@ async function submitDistiller(data: any) {
   };
 
   try {
-    await axios.post(`${API_SERVER}/distillers`, data, {
+    await axios.post(`${API_SERVER}/entities`, data, {
       headers,
     });
   } catch (err: any) {
