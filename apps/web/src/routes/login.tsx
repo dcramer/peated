@@ -146,7 +146,7 @@ const GoogleLogin = () => {
 export default function Login() {
   return (
     <Layout noHeader splash>
-      <PeatedLogo color="white" />
+      <PeatedLogo className="max-w-full h-auto text-white" />
 
       <div className="mt-8">
         {config.GOOGLE_CLIENT_ID && (
