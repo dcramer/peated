@@ -1,9 +1,4 @@
 name: CI
-inputs:
-  node-version:
-    required: false
-    description: Node version for setup-node
-    default: 18.x
 on:
   push:
     branches:
@@ -18,10 +13,10 @@ jobs:
           fetch-depth: 0
       - name: Install pnpm
         uses: pnpm/action-setup@v2
-      - name: Set node version to ${{ inputs.node-version }}
+      - name: Set node version to 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ inputs.node-version }}
+          node-version: 18.x
       - name: Run docker images
         run: docker-compose up -d
       - name: Run tests
