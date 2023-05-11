@@ -39,8 +39,11 @@
     "@types/jsonwebtoken": "^9.0.1",
     "@types/mime-types": "^2.1.1",
     "@types/node": "^18.15.11",
+    "@types/pg": "^8.6.6",
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
+    "dotenv-cli": "^7.1.0",
+    "drizzle-kit": "^0.17.6",
     "drizzle-orm": "^0.25.4",
     "fastify": "^4.15.0",
     "fastify-plugin": "^4.5.0",
@@ -55,8 +58,6 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.0.3",
     "vite-tsconfig-paths": "^4.0.8",
-    "vitest": "^0.29.8",
-    "@types/pg": "^8.6.6",
-    "drizzle-kit": "^0.17.6"
+    "vitest": "^0.29.8"
   }
 }
