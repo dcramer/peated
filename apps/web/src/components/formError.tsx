@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import Alert from './alert'
+import { ReactNode } from "react";
+import Alert from "./alert";
 
 export default ({ values }: { values: ReactNode[] }) => {
   return (
@@ -9,11 +9,11 @@ export default ({ values }: { values: ReactNode[] }) => {
       </h3>
       <div className="mt-2 text-sm text-red-700">
         <ul role="list" className="list-disc space-y-1 pl-5">
-          {values.map((v) => (
-            <li>{v}</li>
+          {values.map((v, i) => (
+            <li key={i}>{v}</li>
           ))}
         </ul>
       </div>
     </Alert>
-  )
-}
+  );
+};

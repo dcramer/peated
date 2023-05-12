@@ -1,22 +1,22 @@
-import type { LoaderFunction } from 'react-router-dom'
-import { Link, useLoaderData } from 'react-router-dom'
+import type { LoaderFunction } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
-import { ReactComponent as Glyph } from '../assets/glyph.svg'
-import FloatingButton from '../components/floatingButton'
-import Layout from '../components/layout'
-import TastingListItem from '../components/tastingListItem'
-import api from '../lib/api'
-import type { Tasting } from '../types'
+import { ReactComponent as Glyph } from "../assets/glyph.svg";
+import FloatingButton from "../components/floatingButton";
+import Layout from "../components/layout";
+import TastingListItem from "../components/tastingListItem";
+import api from "../lib/api";
+import type { Tasting } from "../types";
 
 type LoaderData = {
-  tastingList: Tasting[]
-}
+  tastingList: Tasting[];
+};
 
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const tastingList = await api.get('/tastings')
+  const tastingList = await api.get("/tastings");
 
-  return { tastingList }
-}
+  return { tastingList };
+};
 
 const EmptyActivity = () => {
   return (
@@ -34,11 +34,11 @@ const EmptyActivity = () => {
         Get started by recording your first tasting notes.
       </span>
     </Link>
-  )
-}
+  );
+};
 
 export default function Activity() {
-  const { tastingList } = useLoaderData() as LoaderData
+  const { tastingList } = useLoaderData() as LoaderData;
 
   return (
     <Layout gutter>
@@ -53,5 +53,5 @@ export default function Activity() {
         <EmptyActivity />
       )}
     </Layout>
-  )
+  );
 }

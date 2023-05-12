@@ -1,21 +1,21 @@
-import { eq } from 'drizzle-orm'
-import type { RouteOptions } from 'fastify'
-import { IncomingMessage, Server, ServerResponse } from 'http'
-import config from '../config'
-import { db } from '../db'
-import { tastings } from '../db/schema'
-import { storeFile } from '../lib/uploads'
-import { validateRequest } from '../middleware/auth'
+import { eq } from "drizzle-orm";
+import type { RouteOptions } from "fastify";
+import { IncomingMessage, Server, ServerResponse } from "http";
+import config from "../config";
+import { db } from "../db";
+import { tastings } from "../db/schema";
+import { storeFile } from "../lib/uploads";
+import { validateRequest } from "../middleware/auth";
 
 export default {
-  method: 'POST',
-  url: '/tastings/:tastingId/image',
+  method: "POST",
+  url: "/tastings/:tastingId/image",
   schema: {
     params: {
-      type: 'object',
-      required: ['tastingId'],
+      type: "object",
+      required: ["tastingId"],
       properties: {
-        tastingId: { type: 'number' },
+        tastingId: { type: "number" },
       },
     },
   },
@@ -25,37 +25,37 @@ export default {
       .select()
       .from(tastings)
       .where(eq(tastings.id, req.params.tastingId))
-      .limit(1)
+      .limit(1);
     if (!tasting) {
-      return res.status(404).send({ error: 'Not found' })
+      return res.status(404).send({ error: "Not found" });
     }
 
     if (tasting.createdById !== req.user.id && !req.user.admin) {
-      return res.status(403).send({ error: 'Forbidden' })
+      return res.status(403).send({ error: "Forbidden" });
     }
 
     if (!req.isMultipart()) {
-      return res.status(400).send({ error: 'Bad request' })
+      return res.status(400).send({ error: "Bad request" });
     }
 
-    const fileData = await req.file()
+    const fileData = await req.file();
     if (!fileData) {
-      return res.status(400).send({ error: 'Bad request' })
+      return res.status(400).send({ error: "Bad request" });
     }
 
     const imageUrl = await storeFile({
       data: fileData,
       namespace: `tastings`,
-      urlPrefix: '/uploads',
-    })
+      urlPrefix: "/uploads",
+    });
 
     if (fileData.file.truncated) {
       // TODO: delete the file
       return res.status(413).send({
-        code: 'FST_FILES_LIMIT',
-        error: 'Payload Too Large',
-        message: 'reach files limit',
-      })
+        code: "FST_FILES_LIMIT",
+        error: "Payload Too Large",
+        message: "reach files limit",
+      });
     }
 
     await db
@@ -63,11 +63,11 @@ export default {
       .set({
         imageUrl,
       })
-      .where(eq(tastings.id, tasting.id))
+      .where(eq(tastings.id, tasting.id));
 
     res.send({
       imageUrl: imageUrl ? `${config.URL_PREFIX}${imageUrl}` : null,
-    })
+    });
   },
 } as RouteOptions<
   Server,
@@ -75,10 +75,10 @@ export default {
   ServerResponse,
   {
     Params: {
-      tastingId: number
-    }
+      tastingId: number;
+    };
     Body: {
-      image?: File
-    }
+      image?: File;
+    };
   }
->
+>;

@@ -1,16 +1,16 @@
-import config from '../../config'
-import { Bottle, Edition, Entity, Tasting, User } from '../../db/schema'
-import { serializeBottle } from './bottle'
-import { serializeUser } from './user'
+import config from "../../config";
+import { Bottle, Edition, Entity, Tasting, User } from "../../db/schema";
+import { serializeBottle } from "./bottle";
+import { serializeUser } from "./user";
 
 export const serializeTasting = (
   tasting: Tasting & {
-    createdBy: User
-    edition?: Edition | null
+    createdBy: User;
+    edition?: Edition | null;
     bottle: Bottle & {
-      brand: Entity
-      distillers?: Entity[]
-    }
+      brand: Entity;
+      distillers?: Entity[];
+    };
   },
   currentUser?: User,
 ) => {
@@ -26,6 +26,6 @@ export const serializeTasting = (
     rating: tasting.rating,
     edition: tasting.edition,
     createdAt: tasting.createdAt,
-  }
-  return data
-}
+  };
+  return data;
+};

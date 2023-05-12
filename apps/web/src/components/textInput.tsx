@@ -1,25 +1,23 @@
-import classNames from '../lib/classNames'
+import classNames from "../lib/classNames";
 
 export default ({
   suffixLabel,
-  noGutter,
   className,
   ...props
-}: React.ComponentPropsWithoutRef<'input'> & {
-  suffixLabel?: string
-  noGutter?: boolean
+}: React.ComponentPropsWithoutRef<"input"> & {
+  suffixLabel?: string;
 }) => {
-  const baseStyles = 'bg-inherit p-0 border-0 text-gray-900 sm:leading-6'
+  const baseStyles = "bg-inherit p-0 border-0 text-gray-900 sm:leading-6";
   const inputStyles =
-    'text-gray-900 placeholder:text-gray-400 outline-none focus:ring-0  sm:leading-6'
+    "text-gray-900 placeholder:text-gray-400 outline-none focus:ring-0  sm:leading-6";
   if (suffixLabel) {
     return (
       <div className={`flex ${baseStyles}`}>
         <input
           className={classNames(
-            'block flex-1 border-0 bg-transparent p-0',
+            "block flex-1 border-0 bg-transparent p-0",
             inputStyles,
-            className || '',
+            className || "",
           )}
           {...props}
         />
@@ -27,18 +25,18 @@ export default ({
           {suffixLabel}
         </span>
       </div>
-    )
+    );
   }
 
   return (
     <input
       className={classNames(
-        'block min-w-full',
+        "block min-w-full",
         baseStyles,
         inputStyles,
-        className || '',
+        className || "",
       )}
       {...props}
     />
-  )
-}
+  );
+};

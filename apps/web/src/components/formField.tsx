@@ -1,19 +1,19 @@
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
-import { ReactNode } from 'react'
-import classNames from '../lib/classNames'
-import FormLabel from './formLabel'
-import HelpText from './helpText'
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
+import { ReactNode } from "react";
+import classNames from "../lib/classNames";
+import FormLabel from "./formLabel";
+import HelpText from "./helpText";
 
-type Props = React.ComponentPropsWithoutRef<'div'> & {
-  label?: string
-  htmlFor?: string
-  helpText?: string
-  required?: boolean
-  children?: ReactNode
-  className?: string
-  labelAction?: () => void
-  onClick?: () => void
-}
+type Props = React.ComponentPropsWithoutRef<"div"> & {
+  label?: string;
+  htmlFor?: string;
+  helpText?: string;
+  required?: boolean;
+  children?: ReactNode;
+  className?: string;
+  labelAction?: () => void;
+  onClick?: () => void;
+};
 
 export default ({
   className,
@@ -30,7 +30,7 @@ export default ({
       className={classNames(
         `focus:gray-100 relative block bg-white px-3 pb-2.5 pt-2.5 focus-within:z-10 hover:bg-gray-100`,
         className,
-        onClick ? 'cursor-pointer' : '',
+        onClick ? "cursor-pointer" : "",
       )}
       onClick={onClick}
     >
@@ -49,5 +49,5 @@ export default ({
       {children}
       {false && helpText && <HelpText>{helpText}</HelpText>}
     </div>
-  )
-}
+  );
+};

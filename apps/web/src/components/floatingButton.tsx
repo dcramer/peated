@@ -1,5 +1,5 @@
-import { PlusIcon } from '@heroicons/react/20/solid'
-import { Link } from 'react-router-dom'
+import { PlusIcon } from "@heroicons/react/20/solid";
+import { Link } from "react-router-dom";
 
 export default ({ to }: { to: string }) => {
   return (
@@ -10,5 +10,5 @@ export default ({ to }: { to: string }) => {
     >
       <PlusIcon className="h-8 w-8" aria-hidden="true" />
     </Link>
-  )
-}
+  );
+};

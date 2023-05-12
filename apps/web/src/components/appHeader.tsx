@@ -1,11 +1,11 @@
-import { Menu, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-import { ReactComponent as PeatedGlyph } from '../assets/glyph.svg'
-import { ReactComponent as PeatedLogo } from '../assets/logo.svg'
-import useAuth from '../hooks/useAuth'
-import UserAvatar from './userAvatar'
+import { ReactComponent as PeatedGlyph } from "../assets/glyph.svg";
+import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
+import useAuth from "../hooks/useAuth";
+import UserAvatar from "./userAvatar";
 
 const HeaderLogo = () => {
   return (
@@ -21,14 +21,14 @@ const HeaderLogo = () => {
         </Link>
       </div>
     </>
-  )
-}
+  );
+};
 
 export default function AppHeader() {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState("");
 
   return (
     <>
@@ -36,8 +36,8 @@ export default function AppHeader() {
       <form
         className={`ml-4 flex flex-1 justify-end sm:ml-12`}
         onSubmit={(e) => {
-          e.preventDefault()
-          navigate(`/search?q=${encodeURIComponent(query)}`)
+          e.preventDefault();
+          navigate(`/search?q=${encodeURIComponent(query)}`);
         }}
       >
         <input
@@ -105,8 +105,8 @@ export default function AppHeader() {
                   <button
                     className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-200"
                     onClick={() => {
-                      logout()
-                      navigate('/')
+                      logout();
+                      navigate("/");
                     }}
                   >
                     Sign out
@@ -118,5 +118,5 @@ export default function AppHeader() {
         </div>
       )}
     </>
-  )
+  );
 }

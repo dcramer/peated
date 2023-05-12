@@ -1,26 +1,26 @@
-import type { LoaderFunction } from 'react-router-dom'
-import { useLoaderData } from 'react-router-dom'
+import type { LoaderFunction } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 
-import Button from '../components/button'
-import Layout from '../components/layout'
-import TastingListItem from '../components/tastingListItem'
-import UserAvatar from '../components/userAvatar'
-import { useRequiredAuth } from '../hooks/useAuth'
-import api from '../lib/api'
-import type { Tasting, User } from '../types'
+import Button from "../components/button";
+import Layout from "../components/layout";
+import TastingListItem from "../components/tastingListItem";
+import UserAvatar from "../components/userAvatar";
+import { useRequiredAuth } from "../hooks/useAuth";
+import api from "../lib/api";
+import type { Tasting, User } from "../types";
 
 type UserWithStats = User & {
   stats: {
-    bottles: number
-    tastings: number
-    contributions: number
-  }
-}
+    bottles: number;
+    tastings: number;
+    contributions: number;
+  };
+};
 
 type LoaderData = {
-  user: UserWithStats
-  tastingList: Tasting[]
-}
+  user: UserWithStats;
+  tastingList: Tasting[];
+};
 
 // TODO: when this executes the apiClient has not configured
 // its token yet as react-dom (thus context) seemingly has
@@ -28,14 +28,14 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({
   params: { userId },
 }): Promise<LoaderData> => {
-  if (!userId) throw new Error('Missing userId')
-  const user = await api.get(`/users/${userId}`)
+  if (!userId) throw new Error("Missing userId");
+  const user = await api.get(`/users/${userId}`);
   const tastingList = await api.get(`/tastings`, {
     query: { user: user.id },
-  })
+  });
 
-  return { user, tastingList }
-}
+  return { user, tastingList };
+};
 
 const EmptyActivity = () => {
   return (
@@ -44,12 +44,12 @@ const EmptyActivity = () => {
         Looks like this ones a bit short on tastings.
       </span>
     </div>
-  )
-}
+  );
+};
 
 export default function UserDetails() {
-  const { user, tastingList } = useLoaderData() as LoaderData
-  const { user: currentUser } = useRequiredAuth()
+  const { user, tastingList } = useLoaderData() as LoaderData;
+  const { user: currentUser } = useRequiredAuth();
 
   return (
     <Layout gutter>
@@ -107,5 +107,5 @@ export default function UserDetails() {
         <EmptyActivity />
       )}
     </Layout>
-  )
+  );
 }

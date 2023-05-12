@@ -1,38 +1,38 @@
-import type { LoaderFunction } from 'react-router-dom'
-import { Link, useLoaderData } from 'react-router-dom'
+import type { LoaderFunction } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
-import BottleName from '../components/bottleName'
-import Button from '../components/button'
-import Layout from '../components/layout'
-import TastingListItem from '../components/tastingListItem'
-import api from '../lib/api'
-import { formatCategoryName } from '../lib/strings'
-import type { Bottle, Tasting } from '../types'
+import BottleName from "../components/bottleName";
+import Button from "../components/button";
+import Layout from "../components/layout";
+import TastingListItem from "../components/tastingListItem";
+import api from "../lib/api";
+import { formatCategoryName } from "../lib/strings";
+import type { Bottle, Tasting } from "../types";
 
 type BottleWithStats = Bottle & {
   stats: {
-    tastings: number
-    avgRating: number
-    people: number
-  }
-}
+    tastings: number;
+    avgRating: number;
+    people: number;
+  };
+};
 
 type LoaderData = {
-  bottle: BottleWithStats
-  tastingList: Tasting[]
-}
+  bottle: BottleWithStats;
+  tastingList: Tasting[];
+};
 
 export const loader: LoaderFunction = async ({
   params: { bottleId },
 }): Promise<LoaderData> => {
-  if (!bottleId) throw new Error('Missing bottleId')
-  const bottle = await api.get(`/bottles/${bottleId}`)
+  if (!bottleId) throw new Error("Missing bottleId");
+  const bottle = await api.get(`/bottles/${bottleId}`);
   const tastingList = await api.get(`/tastings`, {
     query: { bottle: bottle.id },
-  })
+  });
 
-  return { bottle, tastingList }
-}
+  return { bottle, tastingList };
+};
 
 const EmptyActivity = ({ to }: { to: string }) => {
   return (
@@ -49,22 +49,22 @@ const EmptyActivity = ({ to }: { to: string }) => {
         Looks like no ones recorded this spirit. You could be the first!
       </span>
     </Link>
-  )
-}
+  );
+};
 
 export default function BottleDetails() {
-  const { bottle, tastingList } = useLoaderData() as LoaderData
+  const { bottle, tastingList } = useLoaderData() as LoaderData;
 
   const stats = [
     {
-      name: 'Avg Rating',
+      name: "Avg Rating",
       value: Math.round(bottle.stats.avgRating * 100) / 100,
     },
-    { name: 'Tastings', value: bottle.stats.tastings.toLocaleString() },
-    { name: 'People', value: bottle.stats.people.toLocaleString() },
-  ]
+    { name: "Tastings", value: bottle.stats.tastings.toLocaleString() },
+    { name: "People", value: bottle.stats.people.toLocaleString() },
+  ];
 
-  const { distillers } = bottle
+  const { distillers } = bottle;
   return (
     <Layout gutter>
       <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
@@ -73,7 +73,7 @@ export default function BottleDetails() {
             <BottleName bottle={bottle} />
           </h1>
           <p className="text-sm font-light text-gray-500">
-            Produced by{' '}
+            Produced by{" "}
             <Link to={`/brands/${bottle.brand.id}`} className="hover:underline">
               {bottle.brand.name}
             </Link>
@@ -81,8 +81,8 @@ export default function BottleDetails() {
               (distillers.length > 0 ||
                 bottle.brand.name !== distillers[0].name) && (
                 <span>
-                  {' '}
-                  &middot; Distilled at{' '}
+                  {" "}
+                  &middot; Distilled at{" "}
                   {distillers
                     .map<React.ReactNode>((d) => (
                       <Link
@@ -93,7 +93,7 @@ export default function BottleDetails() {
                         {d.name}
                       </Link>
                     ))
-                    .reduce((prev, curr) => [prev, ', ', curr])}
+                    .reduce((prev, curr) => [prev, ", ", curr])}
                 </span>
               )}
           </p>
@@ -136,5 +136,5 @@ export default function BottleDetails() {
         <EmptyActivity to={`/bottles/${bottle.id}/addTasting`} />
       )}
     </Layout>
-  )
+  );
 }

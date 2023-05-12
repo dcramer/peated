@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom'
-import { formatCategoryName } from '../lib/strings'
-import { Bottle } from '../types'
-import BottleName from './bottleName'
+import { Link } from "react-router-dom";
+import { formatCategoryName } from "../lib/strings";
+import { Bottle } from "../types";
+import BottleName from "./bottleName";
 
 export default ({ bottle }: { bottle: Bottle }) => {
-  const { distillers } = bottle
+  const { distillers } = bottle;
   return (
     <div className="text-peated flex items-center space-x-4 rounded bg-gray-100 p-3 sm:mb-4">
       <div className="flex-1 space-y-1">
@@ -14,7 +14,7 @@ export default ({ bottle }: { bottle: Bottle }) => {
           </Link>
         </p>
         <p className="text-sm font-light text-gray-500">
-          Produced by{' '}
+          Produced by{" "}
           <Link to={`/brands/${bottle.brand.id}`} className="hover:underline">
             {bottle.brand.name}
           </Link>
@@ -23,8 +23,8 @@ export default ({ bottle }: { bottle: Bottle }) => {
             (distillers.length > 0 ||
               bottle.brand.name !== distillers[0].name) && (
               <span>
-                {' '}
-                &middot; Distilled at{' '}
+                {" "}
+                &middot; Distilled at{" "}
                 {distillers
                   .map<React.ReactNode>((d) => (
                     <Link
@@ -35,7 +35,7 @@ export default ({ bottle }: { bottle: Bottle }) => {
                       {d.name}
                     </Link>
                   ))
-                  .reduce((prev, curr) => [prev, ', ', curr])}
+                  .reduce((prev, curr) => [prev, ", ", curr])}
               </span>
             )}
         </p>
@@ -49,5 +49,5 @@ export default ({ bottle }: { bottle: Bottle }) => {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};

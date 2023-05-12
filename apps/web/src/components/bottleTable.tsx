@@ -1,11 +1,11 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
-import { formatCategoryName } from '../lib/strings'
-import { Bottle, Entity } from '../types'
-import BottleName from './bottleName'
-import Button from './button'
+import { formatCategoryName } from "../lib/strings";
+import { Bottle, Entity } from "../types";
+import BottleName from "./bottleName";
+import Button from "./button";
 
-type Grouper = undefined | null | Entity
+type Grouper = undefined | null | Entity;
 
 export default ({
   bottleList,
@@ -13,17 +13,17 @@ export default ({
   groupTo,
   rel,
 }: {
-  bottleList: Bottle[]
-  groupBy?: (bottle: Bottle) => Grouper
-  groupTo?: (group: Entity) => string
+  bottleList: Bottle[];
+  groupBy?: (bottle: Bottle) => Grouper;
+  groupTo?: (group: Entity) => string;
   rel?: {
-    next: string | null
-    nextPage: number | null
-    prev: string | null
-    prevPage: number | null
-  }
+    next: string | null;
+    nextPage: number | null;
+    prev: string | null;
+    prevPage: number | null;
+  };
 }) => {
-  let lastGroup: Grouper
+  let lastGroup: Grouper;
   return (
     <>
       <table className="min-w-full">
@@ -56,9 +56,9 @@ export default ({
         </thead>
         <tbody>
           {bottleList.map((bottle) => {
-            const group = groupBy && groupBy(bottle)
-            const showGroup = group && group.id !== lastGroup?.id
-            if (group) lastGroup = group
+            const group = groupBy && groupBy(bottle);
+            const showGroup = group && group.id !== lastGroup?.id;
+            if (group) lastGroup = group;
             return [
               showGroup ? (
                 <tr key={`g-${group.id}`} className="border-b border-gray-200">
@@ -91,7 +91,7 @@ export default ({
                   {bottle.statedAge && `${bottle.statedAge} years`}
                 </td>
               </tr>,
-            ]
+            ];
           })}
         </tbody>
       </table>
@@ -117,5 +117,5 @@ export default ({
         </nav>
       )}
     </>
-  )
-}
+  );
+};

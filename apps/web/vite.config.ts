@@ -1,71 +1,71 @@
-import replace from '@rollup/plugin-replace'
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
-import type { ManifestOptions, VitePWAOptions } from 'vite-plugin-pwa'
-import { VitePWA } from 'vite-plugin-pwa'
-import svgr from 'vite-plugin-svgr'
+import replace from "@rollup/plugin-replace";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import type { ManifestOptions, VitePWAOptions } from "vite-plugin-pwa";
+import { VitePWA } from "vite-plugin-pwa";
+import svgr from "vite-plugin-svgr";
 
 const pwaOptions: Partial<VitePWAOptions> = {
-  registerType: 'autoUpdate',
-  base: '/',
-  includeAssets: ['*.png'],
+  registerType: "autoUpdate",
+  base: "/",
+  includeAssets: ["*.png"],
   manifest: {
-    short_name: 'Peated',
-    name: 'Peated',
-    description: 'Is it Peated?',
+    short_name: "Peated",
+    name: "Peated",
+    description: "Is it Peated?",
     icons: [
       {
-        src: 'glyph.png',
-        sizes: '64x64 32x32 24x24 16x16',
-        type: 'image/png',
+        src: "glyph.png",
+        sizes: "64x64 32x32 24x24 16x16",
+        type: "image/png",
       },
       {
-        src: 'logo192.png',
-        type: 'image/png',
-        sizes: '192x192',
+        src: "logo192.png",
+        type: "image/png",
+        sizes: "192x192",
       },
       {
-        src: 'logo512.png',
-        type: 'image/png',
-        sizes: '512x512',
+        src: "logo512.png",
+        type: "image/png",
+        sizes: "512x512",
       },
     ],
-    display: 'standalone',
-    theme_color: '#005C58',
-    background_color: '#005C58',
+    display: "standalone",
+    theme_color: "#005C58",
+    background_color: "#005C58",
   },
   devOptions: {
-    enabled: process.env.NODE_ENV === 'development',
+    enabled: process.env.NODE_ENV === "development",
     /* when using generateSW the PWA plugin will switch to classic */
-    type: 'module',
-    navigateFallback: 'index.html',
+    type: "module",
+    navigateFallback: "index.html",
   },
-}
+};
 
-const replaceOptions = { __DATE__: new Date().toISOString() }
-const claims = process.env.CLAIMS === 'true'
-const reload = process.env.RELOAD_SW === 'true'
-const selfDestroying = process.env.SW_DESTROY === 'true'
+const replaceOptions = { __DATE__: new Date().toISOString() };
+const claims = process.env.CLAIMS === "true";
+const reload = process.env.RELOAD_SW === "true";
+const selfDestroying = process.env.SW_DESTROY === "true";
 
-if (process.env.SW === 'true') {
-  pwaOptions.srcDir = 'src'
+if (process.env.SW === "true") {
+  pwaOptions.srcDir = "src";
   pwaOptions.filename = claims
-    ? 'service-worker/claims-sw.ts'
-    : 'service-worker/prompt-sw.ts'
-  pwaOptions.strategies = 'injectManifest'
-  ;(pwaOptions.manifest as Partial<ManifestOptions>).name =
-    'PWA Inject Manifest'
-  ;(pwaOptions.manifest as Partial<ManifestOptions>).short_name = 'PWA Inject'
+    ? "service-worker/claims-sw.ts"
+    : "service-worker/prompt-sw.ts";
+  pwaOptions.strategies = "injectManifest";
+  (pwaOptions.manifest as Partial<ManifestOptions>).name =
+    "PWA Inject Manifest";
+  (pwaOptions.manifest as Partial<ManifestOptions>).short_name = "PWA Inject";
 }
 
-if (claims) pwaOptions.registerType = 'autoUpdate'
+if (claims) pwaOptions.registerType = "autoUpdate";
 
 if (reload) {
   // @ts-expect-error just ignore
-  replaceOptions.__RELOAD_SW__ = 'true'
+  replaceOptions.__RELOAD_SW__ = "true";
 }
 
-if (selfDestroying) pwaOptions.selfDestroying = selfDestroying
+if (selfDestroying) pwaOptions.selfDestroying = selfDestroying;
 
 // https://vitejs.dev/config/
 export default defineConfig(() => {
@@ -101,10 +101,10 @@ export default defineConfig(() => {
         },
 
         //  A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should include. By default all svg files will be included.
-        include: '**/*.svg',
+        include: "**/*.svg",
 
         //  A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should ignore. By default no files are ignored.
-        exclude: '',
+        exclude: "",
       }),
       // https://github.com/getsentry/sentry-javascript/issues/8059
       // sentryVitePlugin({
@@ -124,5 +124,5 @@ export default defineConfig(() => {
       // }),
       replace(replaceOptions),
     ],
-  }
-})
+  };
+});

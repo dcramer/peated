@@ -1,15 +1,15 @@
-import { ReactNode } from 'react'
+import { ReactNode } from "react";
 
-import FormField from './formField'
-import TextInput from './textInput'
+import FormField from "./formField";
+import TextInput from "./textInput";
 
 type Props = {
-  label?: string
-  helpText?: string
-  required?: boolean
-  children?: ReactNode
-  className?: string
-} & React.ComponentProps<typeof TextInput>
+  label?: string;
+  helpText?: string;
+  required?: boolean;
+  children?: ReactNode;
+  className?: string;
+} & React.ComponentProps<typeof TextInput>;
 
 export default ({
   name,
@@ -29,5 +29,5 @@ export default ({
     >
       <TextInput name={name} id={`f-${name}`} required={required} {...props} />
     </FormField>
-  )
-}
+  );
+};

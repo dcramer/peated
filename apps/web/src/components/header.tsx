@@ -1,17 +1,17 @@
-import { ReactNode } from 'react'
-import classNames from '../lib/classNames'
+import { ReactNode } from "react";
+import classNames from "../lib/classNames";
 
 type Props = {
-  noMobile?: boolean
-  children?: ReactNode
-}
+  noMobile?: boolean;
+  children?: ReactNode;
+};
 
 export default ({ noMobile, children }: Props) => {
   return (
     <header
       className={classNames(
-        'h-14 overflow-hidden sm:h-20',
-        noMobile ? 'hidden sm:block' : '',
+        "h-14 overflow-hidden sm:h-20",
+        noMobile ? "hidden sm:block" : "",
       )}
     >
       <div className="bg-peated fixed left-0 right-0 z-10">
@@ -20,5 +20,5 @@ export default ({ noMobile, children }: Props) => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};

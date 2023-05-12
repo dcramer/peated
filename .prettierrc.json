@@ -3,9 +3,9 @@
     "prettier-plugin-organize-imports",
     "prettier-plugin-tailwindcss"
   ],
-  "semi": false,
+  "semi": true,
   "tabWidth": 2,
-  "singleQuote": true,
+  "singleQuote": false,
   "printWidth": 80,
   "trailingComma": "all",
   "overrides": [

@@ -1,22 +1,22 @@
-import { eq } from 'drizzle-orm'
-import { NewEntity, changes, entities } from '../db/schema'
+import { eq } from "drizzle-orm";
+import { NewEntity, changes, entities } from "../db/schema";
 
 export type EntityInput =
   | number
-  | { name: string; country: string; region?: string }
+  | { name: string; country: string; region?: string };
 
 export type UpsertOutcome<T> =
   | {
-      id: number
-      result?: T
-      created: false
+      id: number;
+      result?: T;
+      created: false;
     }
   | {
-      id: number
-      result: T
-      created: true
+      id: number;
+      result: T;
+      created: true;
     }
-  | undefined
+  | undefined;
 
 export const upsertEntity = async ({
   db,
@@ -24,26 +24,29 @@ export const upsertEntity = async ({
   userId,
   type,
 }: {
-  db: any
-  data: EntityInput
-  userId: number
-  type?: 'distiller' | 'brand'
+  db: any;
+  data: EntityInput;
+  userId: number;
+  type?: "distiller" | "brand";
 }): Promise<UpsertOutcome<NewEntity>> => {
-  if (!data) return undefined
+  if (!data) return undefined;
 
-  if (typeof data === 'number') {
-    let [result] = await db.select().from(entities).where(eq(entities.id, data))
+  if (typeof data === "number") {
+    const [result] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, data));
 
     if (result && result.type.indexOf(type) === -1) {
       await db
         .update(entities)
         .set({ type: [...result.type, type] })
-        .where(eq(entities.id, result.id))
+        .where(eq(entities.id, result.id));
     }
-    return result ? { id: result.id, result, created: false } : undefined
+    return result ? { id: result.id, result, created: false } : undefined;
   }
 
-  let [result] = await db
+  const [result] = await db
     .insert(entities)
     .values({
       name: data.name,
@@ -53,25 +56,25 @@ export const upsertEntity = async ({
       createdById: userId,
     })
     .onConflictDoNothing()
-    .returning()
+    .returning();
 
   if (result) {
     await db.insert(changes).values({
-      objectType: 'entity',
+      objectType: "entity",
       objectId: result.id,
       createdById: userId,
       data: JSON.stringify(result),
-    })
+    });
 
-    return { id: result.id, result, created: true }
+    return { id: result.id, result, created: true };
   }
 
-  let [resultConflict] = await db
+  const [resultConflict] = await db
     .select()
     .from(entities)
-    .where(eq(entities.name, data.name))
+    .where(eq(entities.name, data.name));
 
   if (resultConflict)
-    return { id: resultConflict.id, result: resultConflict, created: false }
-  throw new Error('We should never hit this case in upsert')
-}
+    return { id: resultConflict.id, result: resultConflict, created: false };
+  throw new Error("We should never hit this case in upsert");
+};

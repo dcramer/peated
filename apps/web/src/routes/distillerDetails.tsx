@@ -1,37 +1,35 @@
-import type { LoaderFunction } from 'react-router-dom'
-import { useLoaderData } from 'react-router-dom'
+import type { LoaderFunction } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 
-import BottleTable from '../components/bottleTable'
-import Button from '../components/button'
-import Layout from '../components/layout'
-import { useRequiredAuth } from '../hooks/useAuth'
-import api from '../lib/api'
-import type { Bottle, Entity } from '../types'
+import BottleTable from "../components/bottleTable";
+import Button from "../components/button";
+import Layout from "../components/layout";
+import api from "../lib/api";
+import type { Bottle, Entity } from "../types";
 
 type LoaderData = {
-  distiller: Entity
-  bottleList: Bottle[]
-}
+  distiller: Entity;
+  bottleList: Bottle[];
+};
 
 export const loader: LoaderFunction = async ({
   params: { distillerId },
 }): Promise<LoaderData> => {
-  if (!distillerId) throw new Error('Missing distillerId')
-  const distiller = await api.get(`/entities/${distillerId}`)
+  if (!distillerId) throw new Error("Missing distillerId");
+  const distiller = await api.get(`/entities/${distillerId}`);
   const { results: bottleList } = await api.get(`/bottles`, {
     query: { distiller: distiller.id },
-  })
+  });
 
-  return { distiller, bottleList }
-}
+  return { distiller, bottleList };
+};
 
 export default function DistillerDetails() {
-  const { distiller, bottleList } = useLoaderData() as LoaderData
-  const { user: currentUser } = useRequiredAuth()
+  const { distiller, bottleList } = useLoaderData() as LoaderData;
 
   const stats = [
-    { name: 'Bottles', value: distiller.totalBottles.toLocaleString() },
-  ]
+    { name: "Bottles", value: distiller.totalBottles.toLocaleString() },
+  ];
 
   return (
     <Layout gutter>
@@ -70,5 +68,5 @@ export default function DistillerDetails() {
         groupTo={(group) => `/brands/${group.id}`}
       />
     </Layout>
-  )
+  );
 }

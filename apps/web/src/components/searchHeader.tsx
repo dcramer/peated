@@ -1,6 +1,6 @@
-import { ChevronLeftIcon } from '@heroicons/react/20/solid'
-import { ReactNode, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { ChevronLeftIcon } from "@heroicons/react/20/solid";
+import { ReactNode, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchHeader({
   name,
@@ -12,19 +12,19 @@ export default function SearchHeader({
   closeIcon = <ChevronLeftIcon className="h-8 w-8" />,
   ...props
 }: {
-  value?: string
-  name?: string
-  placeholder?: string
-  closeIcon?: ReactNode
-  onClose?: () => void
-  onDone?: () => void
-  onChange?: (value: string) => void
-  onSubmit?: (value: string) => void
+  value?: string;
+  name?: string;
+  placeholder?: string;
+  closeIcon?: ReactNode;
+  onClose?: () => void;
+  onDone?: () => void;
+  onChange?: (value: string) => void;
+  onSubmit?: (value: string) => void;
 }) {
-  const navigate = useNavigate()
-  const [value, setValue] = useState(props.value || '')
+  const navigate = useNavigate();
+  const [value, setValue] = useState(props.value || "");
 
-  const blockStyles = `px-0 py-1 sm:py-3`
+  const blockStyles = `px-0 py-1 sm:py-3`;
 
   return (
     <nav className="flex min-w-full items-center justify-between text-white">
@@ -40,10 +40,10 @@ export default function SearchHeader({
       <form
         className={`flex-1`}
         onSubmit={(e) => {
-          e.preventDefault()
+          e.preventDefault();
 
-          if (onSubmit) onSubmit(value)
-          else if (onChange) onChange(value)
+          if (onSubmit) onSubmit(value);
+          else if (onChange) onChange(value);
         }}
       >
         <input
@@ -52,8 +52,8 @@ export default function SearchHeader({
           value={value}
           placeholder={placeholder}
           onChange={(e) => {
-            setValue(e.target.value)
-            if (onChange) onChange(e.target.value)
+            setValue(e.target.value);
+            if (onChange) onChange(e.target.value);
           }}
           className="focus:outline-peated-light bg-peated-darker min-w-full rounded px-2 py-1.5 text-white focus:outline sm:px-3 sm:py-2"
         />
@@ -71,5 +71,5 @@ export default function SearchHeader({
         </div>
       )}
     </nav>
-  )
+  );
 }

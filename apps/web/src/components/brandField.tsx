@@ -1,11 +1,11 @@
-import CountryField from './countryField'
-import RichSelectField from './richSelectField'
-import TextField from './textField'
+import CountryField from "./countryField";
+import RichSelectField from "./richSelectField";
+import TextField from "./textField";
 
 type Props = Omit<
   React.ComponentProps<typeof RichSelectField>,
-  'endpoint' | 'options' | 'suggestedItems' | 'createForm'
->
+  "endpoint" | "options" | "suggestedItems" | "createForm"
+>;
 
 export default (props: Props) => {
   return (
@@ -51,10 +51,10 @@ export default (props: Props) => {
               }
             />
           </>
-        )
+        );
       }}
       {...props}
       label="Brand"
     />
-  )
-}
+  );
+};

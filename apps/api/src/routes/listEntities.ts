@@ -1,46 +1,46 @@
-import { SQL, and, asc, desc, ilike, sql } from 'drizzle-orm'
-import type { RouteOptions } from 'fastify'
-import { IncomingMessage, Server, ServerResponse } from 'http'
-import { db } from '../db'
-import { entities } from '../db/schema'
-import { buildPageLink } from '../lib/paging'
+import { SQL, and, asc, desc, ilike, sql } from "drizzle-orm";
+import type { RouteOptions } from "fastify";
+import { IncomingMessage, Server, ServerResponse } from "http";
+import { db } from "../db";
+import { entities } from "../db/schema";
+import { buildPageLink } from "../lib/paging";
 
 export default {
-  method: 'GET',
-  url: '/entities',
+  method: "GET",
+  url: "/entities",
   schema: {
     querystring: {
-      type: 'object',
+      type: "object",
       properties: {
-        query: { type: 'string' },
-        page: { type: 'number' },
-        sort: { type: 'string' },
-        type: { type: 'string', enum: ['distiller', 'brand'] },
+        query: { type: "string" },
+        page: { type: "number" },
+        sort: { type: "string" },
+        type: { type: "string", enum: ["distiller", "brand"] },
       },
     },
   },
   handler: async (req, res) => {
-    const page = req.query.page || 1
-    const query = req.query.query || ''
+    const page = req.query.page || 1;
+    const query = req.query.query || "";
 
-    const limit = 100
-    const offset = (page - 1) * limit
+    const limit = 100;
+    const offset = (page - 1) * limit;
 
-    const where: SQL<unknown>[] = []
+    const where: SQL<unknown>[] = [];
     if (query) {
-      where.push(ilike(entities.name, `%${query}%`))
+      where.push(ilike(entities.name, `%${query}%`));
     }
     if (req.query.type) {
-      where.push(sql`${req.query.type} = ANY(${entities.type})`)
+      where.push(sql`${req.query.type} = ANY(${entities.type})`);
     }
 
-    let orderBy: SQL<unknown>
+    let orderBy: SQL<unknown>;
     switch (req.query.sort) {
-      case 'name':
-        orderBy = asc(entities.name)
-        break
+      case "name":
+        orderBy = asc(entities.name);
+        break;
       default:
-        orderBy = desc(entities.totalTastings)
+        orderBy = desc(entities.totalTastings);
     }
 
     const results = await db
@@ -49,7 +49,7 @@ export default {
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(orderBy)
+      .orderBy(orderBy);
 
     res.send({
       results: results.slice(0, limit),
@@ -63,7 +63,7 @@ export default {
             ? buildPageLink(req.routeOptions.url, req.query, page - 1)
             : null,
       },
-    })
+    });
   },
 } as RouteOptions<
   Server,
@@ -71,10 +71,10 @@ export default {
   ServerResponse,
   {
     Querystring: {
-      query?: string
-      page?: number
-      sort?: 'name'
-      type?: 'brand' | 'distiller'
-    }
+      query?: string;
+      page?: number;
+      sort?: "name";
+      type?: "brand" | "distiller";
+    };
   }
->
+>;

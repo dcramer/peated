@@ -1,35 +1,35 @@
-import type { LoaderFunction } from 'react-router-dom'
-import { useLoaderData } from 'react-router-dom'
+import type { LoaderFunction } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 
-import BottleTable from '../components/bottleTable'
-import Button from '../components/button'
-import Layout from '../components/layout'
-import api from '../lib/api'
-import type { Bottle, Entity } from '../types'
+import BottleTable from "../components/bottleTable";
+import Button from "../components/button";
+import Layout from "../components/layout";
+import api from "../lib/api";
+import type { Bottle, Entity } from "../types";
 
 type LoaderData = {
-  brand: Entity
-  bottleList: Bottle[]
-}
+  brand: Entity;
+  bottleList: Bottle[];
+};
 
 export const loader: LoaderFunction = async ({
   params: { brandId },
 }): Promise<LoaderData> => {
-  if (!brandId) throw new Error('Missing brandId')
-  const brand = await api.get(`/entities/${brandId}`)
+  if (!brandId) throw new Error("Missing brandId");
+  const brand = await api.get(`/entities/${brandId}`);
   const { results: bottleList } = await api.get(`/bottles`, {
     query: { brand: brand.id },
-  })
+  });
 
-  return { brand, bottleList }
-}
+  return { brand, bottleList };
+};
 
 export default function BrandDetails() {
-  const { brand, bottleList } = useLoaderData() as LoaderData
+  const { brand, bottleList } = useLoaderData() as LoaderData;
 
   const stats = [
-    { name: 'Bottles', value: brand.totalBottles.toLocaleString() },
-  ]
+    { name: "Bottles", value: brand.totalBottles.toLocaleString() },
+  ];
 
   return (
     <Layout gutter>
@@ -62,5 +62,5 @@ export default function BrandDetails() {
 
       <BottleTable bottleList={bottleList} />
     </Layout>
-  )
+  );
 }

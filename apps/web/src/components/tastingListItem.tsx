@@ -1,15 +1,15 @@
 import {
   ChatBubbleLeftRightIcon,
   HandThumbUpIcon,
-} from '@heroicons/react/24/outline'
+} from "@heroicons/react/24/outline";
 
-import { Link } from 'react-router-dom'
-import { Tasting } from '../types'
-import BottleCard from './bottleCard'
-import Button from './button'
-import Chip from './chip'
-import { StaticRating } from './rating'
-import UserAvatar from './userAvatar'
+import { Link } from "react-router-dom";
+import { Tasting } from "../types";
+import BottleCard from "./bottleCard";
+import Button from "./button";
+import Chip from "./chip";
+import { StaticRating } from "./rating";
+import UserAvatar from "./userAvatar";
 
 const TimeSince = ({ date }: { date: string }) => {
   return (
@@ -17,24 +17,24 @@ const TimeSince = ({ date }: { date: string }) => {
       dateTime={date}
       className="block text-sm font-light text-gray-500 dark:text-gray-400"
     >
-      {new Date(date).toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+      {new Date(date).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       })}
     </time>
-  )
-}
+  );
+};
 
 export default ({
   tasting,
   noBottle,
 }: {
-  tasting: Tasting
-  noBottle?: boolean
+  tasting: Tasting;
+  noBottle?: boolean;
 }) => {
-  const { bottle } = tasting
+  const { bottle } = tasting;
 
   return (
     <li className="overflow-hidden bg-white p-3 shadow sm:rounded">
@@ -55,7 +55,11 @@ export default ({
           <StaticRating value={tasting.rating} size="small" />
           <div className="flex gap-x-1">
             {tasting.tags &&
-              tasting.tags.map((t) => <Chip size="small">{t}</Chip>)}
+              tasting.tags.map((t) => (
+                <Chip key={t} size="small">
+                  {t}
+                </Chip>
+              ))}
           </div>
         </div>
       </div>
@@ -109,5 +113,5 @@ export default ({
         </div>
       </aside>
     </li>
-  )
-}
+  );
+};

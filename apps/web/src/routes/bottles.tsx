@@ -1,39 +1,39 @@
-import type { LoaderFunction } from 'react-router-dom'
-import { useLoaderData } from 'react-router-dom'
+import type { LoaderFunction } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 
-import BottleTable from '../components/bottleTable'
-import Layout from '../components/layout'
-import api from '../lib/api'
-import type { Bottle } from '../types'
+import BottleTable from "../components/bottleTable";
+import Layout from "../components/layout";
+import api from "../lib/api";
+import type { Bottle } from "../types";
 
 type PagedResponse<T> = {
-  results: T[]
+  results: T[];
   rel: {
-    next: string | null
-    nextPage: number | null
-    prev: string | null
-    prevPage: number | null
-  }
-}
+    next: string | null;
+    nextPage: number | null;
+    prev: string | null;
+    prevPage: number | null;
+  };
+};
 
 type LoaderData = {
-  bottleListResponse: PagedResponse<Bottle>
-}
+  bottleListResponse: PagedResponse<Bottle>;
+};
 
 export const loader: LoaderFunction = async ({
   request,
 }): Promise<LoaderData> => {
-  const url = new URL(request.url)
+  const url = new URL(request.url);
 
   const bottleListResponse = await api.get(`/bottles`, {
     query: {
-      sort: 'name',
-      page: url.searchParams.get('page') || undefined,
+      sort: "name",
+      page: url.searchParams.get("page") || undefined,
     },
-  })
+  });
 
-  return { bottleListResponse }
-}
+  return { bottleListResponse };
+};
 
 const EmptyActivity = () => {
   return (
@@ -42,11 +42,11 @@ const EmptyActivity = () => {
         Looks like there's no bottles in the database yet. Weird.
       </span>
     </div>
-  )
-}
+  );
+};
 
 export default function BottleList() {
-  const { bottleListResponse } = useLoaderData() as LoaderData
+  const { bottleListResponse } = useLoaderData() as LoaderData;
 
   return (
     <Layout gutter>
@@ -59,5 +59,5 @@ export default function BottleList() {
         <EmptyActivity />
       )}
     </Layout>
-  )
+  );
 }

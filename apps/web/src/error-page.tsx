@@ -1,33 +1,33 @@
-import { Link, isRouteErrorResponse, useRouteError } from 'react-router-dom'
-import Layout from './components/layout'
-import config from './config'
-import { useOnlineStatus } from './hooks/useOnlineStatus'
-import { ApiUnavailable } from './lib/api'
+import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom";
+import Layout from "./components/layout";
+import config from "./config";
+import { useOnlineStatus } from "./hooks/useOnlineStatus";
+import { ApiUnavailable } from "./lib/api";
 
 export default function ErrorPage() {
-  const error: any = useRouteError()
+  const error: any = useRouteError();
 
-  const isOnline = useOnlineStatus()
+  const isOnline = useOnlineStatus();
 
-  let title: string = 'Error'
-  let subtitle: string = 'Sorry, an unexpected error has occurred.'
+  let title = "Error";
+  let subtitle = "Sorry, an unexpected error has occurred.";
   if (error instanceof ApiUnavailable) {
-    title = isOnline ? 'Server Unreachable' : 'Connection Offline'
+    title = isOnline ? "Server Unreachable" : "Connection Offline";
     subtitle = isOnline
       ? "It looks like Peated's API is unreachable right now. Please try again shortly."
-      : 'It looks like your network is offline.'
+      : "It looks like your network is offline.";
   } else if (isRouteErrorResponse(error)) {
     if (error.status === 404) {
-      title = 'Not Found'
-      subtitle = "We couldn't find the page you were looking for."
-    } else if (error.status === 404) {
-      title = 'Identify Yourself'
+      title = "Not Found";
+      subtitle = "We couldn't find the page you were looking for.";
+    } else if (error.status === 401) {
+      title = "Identify Yourself";
       subtitle =
-        "To get to where you're going we need you to tell us who you are. We don't just let anyone in here."
+        "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
     }
   }
 
-  console.error(error)
+  console.error(error);
 
   return (
     <Layout gutter>
@@ -71,5 +71,5 @@ export default function ErrorPage() {
         </div>
       </main>
     </Layout>
-  )
+  );
 }

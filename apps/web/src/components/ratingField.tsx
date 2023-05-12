@@ -1,15 +1,15 @@
-import { ReactNode } from 'react'
+import { ReactNode } from "react";
 
-import FormField from './formField'
-import Rating from './rating'
+import FormField from "./formField";
+import Rating from "./rating";
 
 type Props = {
-  label?: string
-  helpText?: string
-  required?: boolean
-  children?: ReactNode
-  className?: string
-} & React.ComponentProps<typeof Rating>
+  label?: string;
+  helpText?: string;
+  required?: boolean;
+  children?: ReactNode;
+  className?: string;
+} & React.ComponentProps<typeof Rating>;
 
 export default ({
   name,
@@ -29,5 +29,5 @@ export default ({
     >
       <Rating name={name} id={`f-${name}`} required={required} {...props} />
     </FormField>
-  )
-}
+  );
+};

@@ -1,51 +1,51 @@
 export default {
-  $id: 'bottleSchema',
-  type: 'object',
+  $id: "bottleSchema",
+  type: "object",
   properties: {
-    name: { type: 'string' },
+    name: { type: "string" },
     brand: {
       oneOf: [
-        { type: 'number' },
+        { type: "number" },
         {
-          type: 'object',
-          required: ['name'],
+          type: "object",
+          required: ["name"],
           properties: {
             id: {
-              type: 'number',
+              type: "number",
             },
             name: {
-              type: 'string',
+              type: "string",
             },
             country: {
-              type: 'string',
+              type: "string",
             },
             region: {
-              type: 'string',
+              type: "string",
             },
           },
         },
       ],
     },
     distillers: {
-      type: 'array',
+      type: "array",
       items: {
         oneOf: [
-          { type: 'number' },
+          { type: "number" },
           {
-            type: 'object',
-            required: ['name'],
+            type: "object",
+            required: ["name"],
             properties: {
               id: {
-                type: 'number',
+                type: "number",
               },
               name: {
-                type: 'string',
+                type: "string",
               },
               country: {
-                type: 'string',
+                type: "string",
               },
               region: {
-                type: 'string',
+                type: "string",
               },
             },
           },
@@ -53,17 +53,17 @@ export default {
       },
     },
     category: {
-      type: 'string',
+      type: "string",
       enum: [
-        '',
-        'blend',
-        'bourbon',
-        'rye',
-        'single_grain',
-        'single_malt',
-        'spirit',
+        "",
+        "blend",
+        "bourbon",
+        "rye",
+        "single_grain",
+        "single_malt",
+        "spirit",
       ],
     },
-    statedAge: { type: 'number' },
+    statedAge: { type: "number" },
   },
-}
+};

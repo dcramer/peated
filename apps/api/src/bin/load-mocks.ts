@@ -1,11 +1,11 @@
-import * as Fixtures from '../lib/test/fixtures'
+import * as Fixtures from "../lib/test/fixtures";
 
 const main = async () => {
-  let bottle
+  let bottle;
   for (let i = 0; i < 100; i++) {
-    bottle = await Fixtures.Bottle()
-    console.log(`${bottle.name} created.`)
+    bottle = await Fixtures.Bottle();
+    console.log(`${bottle.name} created.`);
   }
-}
+};
 
-main()
+main();

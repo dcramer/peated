@@ -1,102 +1,102 @@
-import type { RouteObject } from 'react-router-dom'
+import type { RouteObject } from "react-router-dom";
 
-import ErrorPage from './error-page'
-import Activity, { loader as activityLoader } from './routes/activity'
-import AddBottle from './routes/addBottle'
-import AddTasting, { loader as addTastingLoader } from './routes/addTasting'
+import ErrorPage from "./error-page";
+import Activity, { loader as activityLoader } from "./routes/activity";
+import AddBottle from "./routes/addBottle";
+import AddTasting, { loader as addTastingLoader } from "./routes/addTasting";
 import BottleDetails, {
   loader as bottleDetailsLoader,
-} from './routes/bottleDetails'
-import BottleList, { loader as bottleListLoader } from './routes/bottles'
+} from "./routes/bottleDetails";
+import BottleList, { loader as bottleListLoader } from "./routes/bottles";
 import BrandDetails, {
   loader as brandDetailsLoader,
-} from './routes/brandDetails'
-import BrandList, { loader as brandListLoader } from './routes/brands'
+} from "./routes/brandDetails";
+import BrandList, { loader as brandListLoader } from "./routes/brands";
 import DistillerDetails, {
   loader as distillerDetailsLoader,
-} from './routes/distillerDetails'
+} from "./routes/distillerDetails";
 import DistillerList, {
   loader as distillerListLoader,
-} from './routes/distillers'
-import EditBottle, { loader as editBottleLoader } from './routes/editBottle'
-import Login from './routes/login'
-import Root from './routes/root'
-import Search from './routes/search'
-import Settings, { loader as settingsLoader } from './routes/settings'
-import UserDetails, { loader as userDetailsLoader } from './routes/userDetails'
+} from "./routes/distillers";
+import EditBottle, { loader as editBottleLoader } from "./routes/editBottle";
+import Login from "./routes/login";
+import Root from "./routes/root";
+import Search from "./routes/search";
+import Settings, { loader as settingsLoader } from "./routes/settings";
+import UserDetails, { loader as userDetailsLoader } from "./routes/userDetails";
 
 export default function createRoutes() {
   return [
     {
-      path: '/',
+      path: "/",
       element: <Root />,
       errorElement: <ErrorPage />,
       children: [
         { index: true, element: <Activity />, loader: activityLoader },
         {
-          path: 'addBottle',
+          path: "addBottle",
           element: <AddBottle />,
         },
         {
-          path: 'bottles/:bottleId',
+          path: "bottles/:bottleId",
           element: <BottleDetails />,
           loader: bottleDetailsLoader,
         },
         {
-          path: 'bottles/:bottleId/addTasting',
+          path: "bottles/:bottleId/addTasting",
           element: <AddTasting />,
           loader: addTastingLoader,
         },
         {
-          path: 'bottles/',
+          path: "bottles/",
           element: <BottleList />,
           loader: bottleListLoader,
         },
         {
-          path: 'bottles/:bottleId/edit',
+          path: "bottles/:bottleId/edit",
           element: <EditBottle />,
           loader: editBottleLoader,
         },
         {
-          path: 'brands',
+          path: "brands",
           element: <BrandList />,
           loader: brandListLoader,
         },
 
         {
-          path: 'brands/:brandId',
+          path: "brands/:brandId",
           element: <BrandDetails />,
           loader: brandDetailsLoader,
         },
         {
-          path: 'distillers',
+          path: "distillers",
           element: <DistillerList />,
           loader: distillerListLoader,
         },
         {
-          path: 'distillers/:distillerId',
+          path: "distillers/:distillerId",
           element: <DistillerDetails />,
           loader: distillerDetailsLoader,
         },
         {
-          path: 'search',
+          path: "search",
           element: <Search />,
         },
         {
-          path: 'settings',
+          path: "settings",
           element: <Settings />,
           loader: settingsLoader,
         },
         {
-          path: 'users/:userId',
+          path: "users/:userId",
           element: <UserDetails />,
           loader: userDetailsLoader,
         },
       ],
     },
     {
-      path: '/login',
+      path: "/login",
       element: <Login />,
     },
-  ] as RouteObject[]
+  ] as RouteObject[];
 }

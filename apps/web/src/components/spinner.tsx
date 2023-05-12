@@ -18,4 +18,4 @@ export default () => (
       ></path>
     </svg>
   </div>
-)
+);

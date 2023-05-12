@@ -1,54 +1,54 @@
-import { SQL, and, asc, desc, eq, ilike, inArray, sql } from 'drizzle-orm'
-import type { RouteOptions } from 'fastify'
-import { IncomingMessage, Server, ServerResponse } from 'http'
-import { db } from '../db'
-import { Entity, bottles, bottlesToDistillers, entities } from '../db/schema'
-import { buildPageLink } from '../lib/paging'
-import { serializeBottle } from '../lib/transformers/bottle'
+import { SQL, and, asc, desc, eq, ilike, inArray, sql } from "drizzle-orm";
+import type { RouteOptions } from "fastify";
+import { IncomingMessage, Server, ServerResponse } from "http";
+import { db } from "../db";
+import { Entity, bottles, bottlesToDistillers, entities } from "../db/schema";
+import { buildPageLink } from "../lib/paging";
+import { serializeBottle } from "../lib/transformers/bottle";
 
 export default {
-  method: 'GET',
-  url: '/bottles',
+  method: "GET",
+  url: "/bottles",
   schema: {
     querystring: {
-      type: 'object',
+      type: "object",
       properties: {
-        query: { type: 'string' },
-        page: { type: 'number' },
-        sort: { type: 'string' },
-        brand: { type: 'number' },
-        distiller: { type: 'number' },
+        query: { type: "string" },
+        page: { type: "number" },
+        sort: { type: "string" },
+        brand: { type: "number" },
+        distiller: { type: "number" },
       },
     },
   },
   handler: async (req, res) => {
-    const page = req.query.page || 1
-    const query = req.query.query || ''
+    const page = req.query.page || 1;
+    const query = req.query.query || "";
 
-    const limit = 100
-    const offset = (page - 1) * limit
+    const limit = 100;
+    const offset = (page - 1) * limit;
 
-    const where: SQL<unknown>[] = []
+    const where: SQL<unknown>[] = [];
 
     if (query) {
-      where.push(ilike(bottles.name, `%${query}%`))
+      where.push(ilike(bottles.name, `%${query}%`));
     }
     if (req.query.brand) {
-      where.push(eq(bottles.brandId, req.query.brand))
+      where.push(eq(bottles.brandId, req.query.brand));
     }
     if (req.query.distiller) {
       where.push(
         sql`EXISTS(SELECT 1 FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${req.query.distiller} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
-      )
+      );
     }
 
-    let orderBy: SQL<unknown>
+    let orderBy: SQL<unknown>;
     switch (req.query.sort) {
-      case 'name':
-        orderBy = asc(bottles.name)
-        break
+      case "name":
+        orderBy = asc(bottles.name);
+        break;
       default:
-        orderBy = desc(bottles.totalTastings)
+        orderBy = desc(bottles.totalTastings);
     }
 
     const results = await db
@@ -61,7 +61,7 @@ export default {
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(orderBy)
+      .orderBy(orderBy);
 
     const distillers = results.length
       ? await db
@@ -80,15 +80,15 @@ export default {
               results.map(({ bottle: b }) => b.id),
             ),
           )
-      : []
+      : [];
     const distillersByBottleId: {
-      [bottleId: number]: Entity[]
-    } = {}
+      [bottleId: number]: Entity[];
+    } = {};
     distillers.forEach((d) => {
       if (!distillersByBottleId[d.bottleId])
-        distillersByBottleId[d.bottleId] = [d.distiller]
-      else distillersByBottleId[d.bottleId].push(d.distiller)
-    })
+        distillersByBottleId[d.bottleId] = [d.distiller];
+      else distillersByBottleId[d.bottleId].push(d.distiller);
+    });
 
     res.send({
       results: results.slice(0, limit).map(({ bottle, brand }) =>
@@ -113,7 +113,7 @@ export default {
             ? buildPageLink(req.routeOptions.url, req.query, page - 1)
             : null,
       },
-    })
+    });
   },
 } as RouteOptions<
   Server,
@@ -121,11 +121,11 @@ export default {
   ServerResponse,
   {
     Querystring: {
-      query?: string
-      page?: number
-      brand?: number
-      distiller?: number
-      sort?: 'name'
-    }
+      query?: string;
+      page?: number;
+      brand?: number;
+      distiller?: number;
+      sort?: "name";
+    };
   }
->
+>;

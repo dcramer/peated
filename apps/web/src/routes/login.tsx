@@ -1,58 +1,58 @@
-import { useGoogleLogin } from '@react-oauth/google'
-import { FormEvent, useState } from 'react'
-import { LoaderFunction, useNavigate } from 'react-router-dom'
-import Layout from '../components/layout'
-import useAuth from '../hooks/useAuth'
-import api, { ApiError } from '../lib/api'
+import { useGoogleLogin } from "@react-oauth/google";
+import { FormEvent, useState } from "react";
+import { LoaderFunction, useNavigate } from "react-router-dom";
+import Layout from "../components/layout";
+import useAuth from "../hooks/useAuth";
+import api, { ApiError } from "../lib/api";
 
-import { ReactComponent as PeatedLogo } from '../assets/logo.svg'
-import Alert from '../components/alert'
-import Button from '../components/button'
-import TextField from '../components/textField'
-import config from '../config'
-import classNames from '../lib/classNames'
+import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
+import Alert from "../components/alert";
+import Button from "../components/button";
+import TextField from "../components/textField";
+import config from "../config";
+import classNames from "../lib/classNames";
 
-type LoaderData = {}
+type LoaderData = Record<string, never>;
 
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  return {}
-}
+  return {};
+};
 
 type BasicLoginForm = {
-  email?: string
-  password?: string
-}
+  email?: string;
+  password?: string;
+};
 
 const BasicLogin = () => {
-  const { login } = useAuth()
-  const navigate = useNavigate()
-  const [data, setData] = useState<BasicLoginForm>({})
-  const [error, setError] = useState<string | null>()
-  const [loading, setLoading] = useState<boolean>(false)
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [data, setData] = useState<BasicLoginForm>({});
+  const [error, setError] = useState<string | null>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    setLoading(true)
-    ;(async () => {
+    setLoading(true);
+    (async () => {
       try {
-        const { user, accessToken } = await api.post('/auth/basic', {
+        const { user, accessToken } = await api.post("/auth/basic", {
           data,
-        })
-        login(user, accessToken)
-        navigate('/')
+        });
+        login(user, accessToken);
+        navigate("/");
       } catch (err) {
-        setLoading(false)
+        setLoading(false);
         if (err instanceof ApiError) {
           if (err.statusCode === 401) {
-            setError("Your login credentials didn't pass the test.")
+            setError("Your login credentials didn't pass the test.");
           }
         } else {
-          throw err
+          throw err;
         }
       }
-    })()
-  }
+    })();
+  };
 
   return (
     <form onSubmit={onSubmit}>
@@ -79,8 +79,8 @@ const BasicLogin = () => {
         <button
           type="submit"
           className={classNames(
-            'bg-peated-dark focus-visible:outline-peated flex w-full justify-center rounded px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-            loading ? 'text-peated-light' : 'text-white',
+            "bg-peated-dark focus-visible:outline-peated flex w-full justify-center rounded px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+            loading ? "text-peated-light" : "text-white",
           )}
           disabled={loading}
         >
@@ -88,34 +88,34 @@ const BasicLogin = () => {
         </button>
       </div>
     </form>
-  )
-}
+  );
+};
 
 const GoogleLogin = () => {
-  const { login } = useAuth()
-  const navigate = useNavigate()
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const [error, setError] = useState('')
+  const [error, setError] = useState("");
 
   const googleLogin = useGoogleLogin({
-    flow: 'auth-code',
+    flow: "auth-code",
     onSuccess: async (codeResponse) => {
       try {
-        const { user, accessToken } = await api.post('/auth/google', {
+        const { user, accessToken } = await api.post("/auth/google", {
           data: {
             code: codeResponse.code,
           },
-        })
-        login(user, accessToken)
-        navigate('/')
+        });
+        login(user, accessToken);
+        navigate("/");
       } catch (err) {
-        setError('There was an error communicating with the server.')
+        setError("There was an error communicating with the server.");
       }
     },
     onError: () => {
-      console.log('Login Failed')
+      console.log("Login Failed");
     },
-  })
+  });
 
   return (
     <div className="mx-auto max-w-sm">
@@ -139,8 +139,8 @@ const GoogleLogin = () => {
         Sign up with Google
       </Button>
     </div>
-  )
-}
+  );
+};
 
 export default function Login() {
   return (
@@ -150,7 +150,7 @@ export default function Login() {
       <div className="mt-8">
         {config.GOOGLE_CLIENT_ID && (
           <>
-            <GoogleLogin />{' '}
+            <GoogleLogin />
             <div className="relative mb-2 mt-4">
               <div
                 className="absolute inset-0 flex items-center"
@@ -167,5 +167,5 @@ export default function Login() {
         <BasicLogin />
       </div>
     </Layout>
-  )
+  );
 }

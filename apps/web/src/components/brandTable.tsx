@@ -1,19 +1,19 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
-import { Entity } from '../types'
-import Button from './button'
+import { Entity } from "../types";
+import Button from "./button";
 
 export default ({
   brandList,
   rel,
 }: {
-  brandList: Entity[]
+  brandList: Entity[];
   rel?: {
-    next: string | null
-    nextPage: number | null
-    prev: string | null
-    prevPage: number | null
-  }
+    next: string | null;
+    nextPage: number | null;
+    prev: string | null;
+    prevPage: number | null;
+  };
 }) => {
   return (
     <>
@@ -61,10 +61,10 @@ export default ({
                   {brand.country}
                 </td>
                 <td className="hidden py-4 pl-3 pr-4 text-right text-sm text-gray-500 sm:table-cell sm:pr-3">
-                  {brand.region || ''}
+                  {brand.region || ""}
                 </td>
               </tr>
-            )
+            );
           })}
         </tbody>
       </table>
@@ -90,5 +90,5 @@ export default ({
         </nav>
       )}
     </>
-  )
-}
+  );
+};

@@ -1,5 +1,5 @@
-import { XCircleIcon } from '@heroicons/react/20/solid'
-import { ReactNode } from 'react'
+import { XCircleIcon } from "@heroicons/react/20/solid";
+import { ReactNode } from "react";
 
 export default ({ children }: { children: ReactNode }) => {
   return (
@@ -11,5 +11,5 @@ export default ({ children }: { children: ReactNode }) => {
         <div className="ml-3 text-red-800">{children}</div>
       </div>
     </div>
-  )
-}
+  );
+};
