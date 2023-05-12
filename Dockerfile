@@ -41,7 +41,7 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
 # web service
 FROM nginx:alpine as web
 
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/apps/web/dist /usr/share/nginx/html
 
 RUN rm /etc/nginx/conf.d/default.conf
 
