@@ -106,7 +106,7 @@ export default function AddBottle() {
             name="name"
             required
             helpText="The name of the bottle, excluding its specific cask information, and its brand."
-            placeholder="e.g. Angel's Envy Private Selection, 12-year-old"
+            placeholder="e.g. Private Selection, 12-year-old"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
