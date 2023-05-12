@@ -104,7 +104,7 @@ export default function Search() {
                       <Link
                         to={
                           directToTasting
-                            ? `/bottles/${bottle.id}/tasting`
+                            ? `/bottles/${bottle.id}/addTasting`
                             : `/bottles/${bottle.id}`
                         }
                       >

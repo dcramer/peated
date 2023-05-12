@@ -18,7 +18,8 @@ export default ({ bottle }: { bottle: Bottle }) => {
           <Link to={`/brands/${bottle.brand.id}`} className="hover:underline">
             {bottle.brand.name}
           </Link>
-          {distillers.length &&
+          {distillers &&
+            distillers.length > 0 &&
             (distillers.length > 0 ||
               bottle.brand.name !== distillers[0].name) && (
               <span>

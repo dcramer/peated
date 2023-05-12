@@ -1,5 +1,6 @@
 import config from "../../config";
 import { Bottle, Edition, Entity, Tasting, User } from "../../db/schema";
+import { serializeBottle } from "./bottle";
 import { serializeUser } from "./user";
 
 export const serializeTasting = (
@@ -18,7 +19,7 @@ export const serializeTasting = (
     imageUrl: tasting.imageUrl
       ? `${config.URL_PREFIX}${tasting.imageUrl}`
       : null,
-    bottle: tasting.bottle,
+    bottle: serializeBottle(tasting.bottle, currentUser),
     createdBy: serializeUser(tasting.createdBy, currentUser),
     comments: tasting.comments,
     tags: tasting.tags,

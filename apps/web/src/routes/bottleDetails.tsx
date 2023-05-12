@@ -78,7 +78,7 @@ export default function BottleDetails() {
             <Link to={`/brands/${bottle.brand.id}`} className="hover:underline">
               {bottle.brand.name}
             </Link>
-            {distillers.length &&
+            {distillers.length > 0 &&
               (distillers.length > 0 ||
                 bottle.brand.name !== distillers[0].name) && (
                 <span>
@@ -110,7 +110,7 @@ export default function BottleDetails() {
       </div>
 
       <div className="my-8 justify-center sm:justify-start flex gap-4">
-        <Button to={`/bottles/${bottle.id}/tasting`} color="primary">
+        <Button to={`/bottles/${bottle.id}/addTasting`} color="primary">
           Record a Tasting
         </Button>
         <Button to={`/bottles/${bottle.id}/edit`}>Edit Bottle</Button>
@@ -134,7 +134,7 @@ export default function BottleDetails() {
           ))}
         </ul>
       ) : (
-        <EmptyActivity to={`/bottles/${bottle.id}/tasting`} />
+        <EmptyActivity to={`/bottles/${bottle.id}/addTasting`} />
       )}
     </Layout>
   );

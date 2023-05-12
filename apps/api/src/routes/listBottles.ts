@@ -9,7 +9,8 @@ import {
   tastings,
 } from "../db/schema";
 import { db } from "../db";
-import { SQL, and, asc, desc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { SQL, and, asc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { serializeBottle } from "../lib/transformers/bottle";
 
 export default {
   method: "GET",
@@ -98,11 +99,16 @@ export default {
     });
 
     res.send({
-      results: results.slice(0, limit).map(({ bottle, brand }) => ({
-        ...bottle,
-        brand,
-        distillers: distillersByBottleId[bottle.id],
-      })),
+      results: results.slice(0, limit).map(({ bottle, brand }) =>
+        serializeBottle(
+          {
+            ...bottle,
+            brand,
+            distillers: distillersByBottleId[bottle.id],
+          },
+          req.user
+        )
+      ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
         next:

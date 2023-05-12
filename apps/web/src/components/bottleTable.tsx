@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Bottle, Entity } from "../types";
 import { formatCategoryName } from "../lib/strings";
 import Button from "./button";
+import BottleName from "./bottleName";
 
 type Grouper = undefined | null | Entity;
 
@@ -80,7 +81,7 @@ export default ({
                     to={`/bottles/${bottle.id}`}
                     className="font-bold text-peated hover:underline"
                   >
-                    {bottle.name}
+                    <BottleName bottle={bottle} />
                   </Link>
                 </td>
                 <td className="hidden px-3 py-4 text-right text-sm text-gray-500 sm:table-cell">

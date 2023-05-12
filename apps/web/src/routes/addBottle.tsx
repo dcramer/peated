@@ -14,6 +14,8 @@ import DistillerField from "../components/distillerField";
 import SelectField from "../components/selectField";
 import { Option } from "../components/richSelectField";
 import BarcodeField from "../components/barcodeField";
+import FormField from "../components/formField";
+import FormLabel from "../components/formLabel";
 
 type FormData = {
   name: string;
@@ -63,7 +65,7 @@ export default function AddBottle() {
               : undefined,
           },
         });
-        navigate(`/bottles/${bottle.id}/tasting`, {
+        navigate(`/bottles/${bottle.id}/addTasting`, {
           replace: true,
         });
       } catch (err) {
@@ -77,6 +79,11 @@ export default function AddBottle() {
     })();
   };
 
+  const bottleName = (formData) => {
+    if (!formData.name && !formData.brand?.name) return <em>Unknown</em>;
+    return [formData.brand?.name || "", formData.name || ""].join(" ");
+  };
+
   return (
     <Layout
       header={<FormHeader title="Add Bottle" onSave={onSubmit} />}
@@ -87,6 +94,11 @@ export default function AddBottle() {
         {error && <FormError values={[error]} />}
 
         <Fieldset>
+          <FormField>
+            <FormLabel>Display Name</FormLabel>
+            {bottleName(formData)}
+          </FormField>
+
           <BrandField
             label="Brand"
             name="brand"

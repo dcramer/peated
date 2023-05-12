@@ -8,7 +8,7 @@ export default {
         { type: "number" },
         {
           type: "object",
-          required: ["name", "country"],
+          required: ["name"],
           properties: {
             id: {
               type: "number",
@@ -33,7 +33,7 @@ export default {
           { type: "number" },
           {
             type: "object",
-            required: ["name", "country"],
+            required: ["name"],
             properties: {
               id: {
                 type: "number",
