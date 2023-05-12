@@ -1,5 +1,5 @@
 import { toTitleCase } from "../lib/strings";
-import RichSelectField from "./richSelectField";
+import SelectField from "./selectField";
 
 // https://whiskeytrends.com/whiskey-tasting-terminology/
 // https://www.bonigala.com/25-ways-to-describe-whisky
@@ -195,12 +195,7 @@ const aromaDescriptions = [
   "short",
 ];
 
-type Props = Omit<
-  React.ComponentProps<typeof RichSelectField>,
-  "endpoint" | "options" | "suggestedItems"
->;
-
-export default (props: Props) => {
+export default (props: React.ComponentProps<typeof SelectField>) => {
   // pull the most used tags for this 1) bottle, 2) brand, 3) region, 4) country
   const suggestedTags = aromaDescriptions.map((t) => ({
     id: t,
@@ -212,9 +207,8 @@ export default (props: Props) => {
   ].sort((a, b) => compareStrings(a.name, b.name));
 
   return (
-    <RichSelectField
+    <SelectField
       label="Flavors"
-      multiple
       {...props}
       suggestedOptions={suggestedTags}
       options={options}

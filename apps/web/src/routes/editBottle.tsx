@@ -8,8 +8,7 @@ import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
 import Layout from "../components/layout";
-import { Option } from "../components/richSelectField";
-import SelectField from "../components/selectField";
+import SelectField, { Option } from "../components/selectField";
 import TextField from "../components/textField";
 import { useRequiredAuth } from "../hooks/useAuth";
 import api, { ApiError } from "../lib/api";
@@ -34,7 +33,7 @@ type FormData = {
   brand?: Option | undefined;
   distillers?: Option[] | undefined;
   statedAge?: number | undefined;
-  category?: string | undefined;
+  category?: Option | undefined;
 };
 
 const entityToOption = (entity: any) => {
@@ -51,7 +50,12 @@ export default function EditBottle() {
 
   const [formData, setFormData] = useState<FormData>({
     name: bottle.name,
-    category: bottle.category ? bottle.category.toString() : "",
+    category: bottle.category
+      ? {
+          id: bottle.category,
+          name: formatCategoryName(bottle.category),
+        }
+      : undefined,
     brand: entityToOption(bottle.brand),
     distillers: bottle.distillers.map(entityToOption),
     statedAge: bottle.statedAge || undefined,
@@ -79,6 +83,7 @@ export default function EditBottle() {
         await api.put(`/bottles/${bottle.id}`, {
           data: {
             ...formData,
+            category: formData.category?.id || null,
             brand: formData.brand?.id || formData.brand,
             distillers: formData.distillers
               ? formData.distillers.map((d) => d?.id || d)
@@ -167,14 +172,9 @@ export default function EditBottle() {
             name="category"
             placeholder="e.g. Single Malt"
             helpText="The kind of spirit."
-            onChange={(value) =>
-              setFormData({ ...formData, category: value as string })
-            }
-            value={formData.category}
-            options={[
-              { id: "", value: "n/a" },
-              ...categoryList.map(({ id, name }) => ({ id, value: name })),
-            ]}
+            onChange={(value) => setFormData({ ...formData, category: value })}
+            suggestedOptions={categoryList}
+            options={categoryList}
           />
         </Fieldset>
       </form>

@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 
-import FormField from "./formField";
-import Select from "./select";
+import SelectField from "./selectField";
 
 const countryList = [
   "Afghanistan",
@@ -262,7 +261,12 @@ type Props = {
   required?: boolean;
   children?: ReactNode;
   className?: string;
-} & Omit<React.ComponentProps<typeof Select>, "options">;
+  value?: string;
+  onChange?: (value: string) => void;
+} & Omit<
+  React.ComponentProps<typeof SelectField>,
+  "options" | "onChange" | "multiple" | "endpoint"
+>;
 
 export default ({
   name,
@@ -270,27 +274,23 @@ export default ({
   label,
   required,
   className,
-  ...props
+  onChange,
+  value,
 }: Props) => {
   const options = countryList.map((c) => ({
     id: c,
-    value: c,
+    name: c,
   }));
   return (
-    <FormField
+    <SelectField
       label={label}
-      htmlFor={`f-${name}`}
+      name={name}
+      value={value ? { id: value, name: value } : undefined}
       required={required}
       helpText={helpText}
       className={className}
-    >
-      <Select
-        name={name}
-        id={`f-${name}`}
-        required={required}
-        options={options}
-        {...props}
-      />
-    </FormField>
+      options={options}
+      onChange={(value) => onChange && onChange(value.name)}
+    />
   );
 };

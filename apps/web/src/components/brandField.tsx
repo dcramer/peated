@@ -1,15 +1,10 @@
 import CountryField from "./countryField";
-import RichSelectField from "./richSelectField";
+import SelectField from "./selectField";
 import TextField from "./textField";
 
-type Props = Omit<
-  React.ComponentProps<typeof RichSelectField>,
-  "endpoint" | "options" | "suggestedItems" | "createForm"
->;
-
-export default (props: Props) => {
+export default (props: React.ComponentProps<typeof SelectField>) => {
   return (
-    <RichSelectField
+    <SelectField
       endpoint="/entities"
       createForm={({ data, onFieldChange }) => {
         return (
@@ -36,7 +31,7 @@ export default (props: Props) => {
               label="Country"
               placeholder="e.g. Scotland"
               required
-              defaultValue={data.country}
+              value={data.country}
               onChange={(value) => onFieldChange({ country: value })}
             />
             <TextField

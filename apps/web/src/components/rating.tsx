@@ -80,14 +80,14 @@ export default ({
               value={item}
               className={({ active, checked }) =>
                 classNames(
-                  "cursor-pointer text-gray-200",
-                  "hover:text-yellow-600",
+                  "cursor-pointer text-gray-400",
+                  "hover:text-peated-darkest",
                   "rating-half-2",
                   "peer",
-                  "peer-hover:text-yellow-500",
-                  active ? "text-yellow-500" : "",
-                  checked ? "text-yellow-500" : "",
-                  value >= item ? "text-yellow-500" : "",
+                  "peer-hover:text-peated",
+                  active ? "text-peated" : "",
+                  checked ? "text-peated" : "",
+                  value >= item ? "text-peated" : "",
                 )
               }
             >
@@ -98,14 +98,14 @@ export default ({
               value={item - 0.5}
               className={({ active, checked }) =>
                 classNames(
-                  "cursor-pointer text-gray-200",
-                  "hover:text-yellow-600",
+                  "cursor-pointer text-gray-400",
+                  "hover:text-peated-darkest",
                   "rating-half-1",
                   "peer",
-                  "peer-hover:text-yellow-500",
-                  active ? "text-yellow-500" : "",
-                  checked ? "text-yellow-500" : "",
-                  value >= item - 0.5 ? "text-yellow-500" : "",
+                  "peer-hover:text-peated",
+                  active ? "text-peated" : "",
+                  checked ? "text-peated" : "",
+                  value >= item - 0.5 ? "text-peated" : "",
                 )
               }
             >

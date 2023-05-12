@@ -80,6 +80,9 @@ export default ({
       // in order for the 'drop' event to register.
       // See: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Drag_operations#droptargets
       // https://stackoverflow.com/questions/8006715/drag-drop-files-into-standard-html-file-input
+      onClick={(e) => {
+        fileRef.current?.click();
+      }}
       onDragOver={(e) => {
         e.preventDefault();
       }}
@@ -129,7 +132,7 @@ export default ({
           required={required}
           className="hidden"
           onChange={(e) => {
-            e.preventDefault();
+            e.stopPropagation();
             updatePreview();
             if (onChange) onChange(e);
           }}
@@ -139,7 +142,7 @@ export default ({
             type="button"
             color="primary"
             onClick={(e) => {
-              e.preventDefault();
+              e.stopPropagation();
               fileRef.current?.click();
             }}
           >

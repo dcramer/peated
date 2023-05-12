@@ -6,17 +6,27 @@ type ButtonColor = "primary" | "default" | undefined;
 
 type ButtonSize = "small" | "base";
 
-type Props = {
+type BaseProps = {
   color?: ButtonColor;
   icon?: ReactNode;
-  to?: string;
   size?: ButtonSize;
   type?: "button" | "submit" | "reset";
   children?: ReactNode;
-  onClick?: (e: any) => void;
   disabled?: boolean;
   fullWidth?: boolean;
 };
+
+type ConditionalProps =
+  | {
+      to?: string;
+      onClick?: never;
+    }
+  | {
+      to?: never;
+      onClick?: (e: any) => void;
+    };
+
+type Props = BaseProps & ConditionalProps;
 
 export default ({
   icon,

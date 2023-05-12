@@ -1,6 +1,6 @@
 import { load as cheerio } from "cheerio";
 import { open } from "fs/promises";
-import { PageNotFound, getUrl } from "./scraper";
+import { getUrl } from "./scraper";
 
 async function scrapeWhisky(id: number) {
   console.log(`Processing Whisky ${id}`);
@@ -166,67 +166,28 @@ function mapCategory(value: string) {
   return value.toLowerCase().replace(" ", "_");
 }
 
-// async function scrapeBottles() {
-//   const maxTasks = 8;
-
-//   let numTasks = 0;
-//   let currentId = MIN_ID;
-//   while (currentId < MAX_ID) {
-//     numTasks += 1;
-//     (async () => {
-//       try {
-//         const bottle = await scrapeWhisky(currentId);
-//         if (bottle) {
-//           // await submitBrand(bottle.brand);
-//           // await submitDistiller(bottle.distiller);
-//           // await submitBottle(bottle);
-//         }
-//       } catch (err) {
-//         console.error(err);
-//       }
-//       numTasks -= 1;
-//     })();
-
-//     while (numTasks >= maxTasks - 1) {
-//       await sleep(100);
-//     }
-//     currentId += 1;
-//   }
-// }
-
-async function scrape(cb: (id: number) => Promise<void>) {
-  const maxTasks = 8;
-
-  let numTasks = 0;
-  let currentId = 1;
-  let repeatFailures = 0;
-
-  while (repeatFailures < 10000) {
-    numTasks += 1;
-    (async () => {
-      try {
-        await cb(currentId);
-        repeatFailures = 0;
-      } catch (err) {
-        if (err instanceof PageNotFound) {
-          repeatFailures += 1;
-        } else {
-          console.error(err);
-        }
-      }
-      numTasks -= 1;
-    })();
-
-    while (numTasks >= maxTasks) {
-      await sleep(100);
-    }
-    currentId += 1;
+// https://www.whiskybase.com/whiskies/distilleries?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style
+async function scrapeTable(url: string, cb: (url: string) => Promise<void>) {
+  const data = await getUrl(url);
+  const $ = cheerio(data);
+  const results: string[] = [];
+  $("tbody > tr").each(async (_, el) => {
+    const href = $("td:first-child > a", el).attr("href");
+    if (href) results.push(href);
+  });
+  for (const url of results) {
+    await cb(url);
   }
 }
 
 async function scrapeDistillers() {
+  const tableUrl =
+    "https://www.whiskybase.com/whiskies/distilleries?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style";
   const distillerList: any[] = [];
-  await scrape(async (id) => {
+  await scrapeTable(tableUrl, async (url) => {
+    const match = url.match(/\/distillery\/(\d+)\//);
+    if (!match) return;
+    const id = parseInt(match[1], 10);
     const result = await scrapeDistiller(id);
     if (result) distillerList.push(result);
   });
@@ -236,14 +197,19 @@ async function scrapeDistillers() {
 }
 
 async function scrapeBrands() {
-  const brandList: any[] = [];
-  await scrape(async (id) => {
+  const tableUrl =
+    "https://www.whiskybase.com/whiskies/brands?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style";
+  const distillerList: any[] = [];
+  await scrapeTable(tableUrl, async (url) => {
+    const match = url.match(/\/brand\/(\d+)\//);
+    if (!match) return;
+    const id = parseInt(match[1], 10);
     const result = await scrapeBrand(id);
-    if (result) brandList.push(result);
+    if (result) distillerList.push(result);
   });
 
-  console.log(`Found ${brandList.length} brands`);
-  saveResults("brands.json", brandList);
+  console.log(`Found ${distillerList.length} brands`);
+  saveResults("brands.json", distillerList);
 }
 
 async function saveResults(filename: string, results: any) {

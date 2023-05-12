@@ -10,8 +10,8 @@
     "db:migrate": "ts-node --require dotenv/config ./src/bin/db.ts migrate",
     "db:generate": "npx drizzle-kit generate:pg",
     "user": "ts-node --require dotenv/config ./src/bin/user.ts",
-    "tsc": "tsc",
     "start": "ts-node --require dotenv/config ./src/server.ts",
+    "typecheck": "tsc --noEmit",
     "test": "dotenv -e .env.test -- vitest --single-thread"
   },
   "dependencies": {
@@ -54,7 +54,7 @@
     "pino-pretty": "^10.0.0",
     "regenerator-runtime": "^0.13.11",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.3",
+    "typescript": "^5.0.4",
     "vite-tsconfig-paths": "^4.0.8",
     "vitest": "^0.29.8"
   }

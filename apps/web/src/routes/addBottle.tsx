@@ -9,7 +9,7 @@ import FormField from "../components/formField";
 import FormHeader from "../components/formHeader";
 import FormLabel from "../components/formLabel";
 import Layout from "../components/layout";
-import RichSelectField, { Option } from "../components/richSelectField";
+import SelectField, { Option } from "../components/selectField";
 import TextField from "../components/textField";
 import { useRequiredAuth } from "../hooks/useAuth";
 import api, { ApiError } from "../lib/api";
@@ -56,7 +56,7 @@ export default function AddBottle() {
         const bottle = await api.post("/bottles", {
           data: {
             ...formData,
-            category: formData.category.id,
+            category: formData.category ? formData.category.id : null,
             brand: formData.brand?.id || formData.brand,
             distillers: formData.distillers
               ? formData.distillers.map((d) => d?.id || d)
@@ -152,14 +152,12 @@ export default function AddBottle() {
             suffixLabel="years"
           />
 
-          <RichSelectField
+          <SelectField
             label="Category"
             name="category"
             placeholder="e.g. Single Malt"
             helpText="The kind of spirit."
-            onChange={(value) =>
-              setFormData({ ...formData, category: value as Option })
-            }
+            onChange={(value) => setFormData({ ...formData, category: value })}
             suggestedOptions={categoryList}
             options={categoryList}
           />

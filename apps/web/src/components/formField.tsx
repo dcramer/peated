@@ -1,5 +1,5 @@
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
-import { ReactNode } from "react";
+import { MouseEvent, ReactNode } from "react";
 import classNames from "../lib/classNames";
 import FormLabel from "./formLabel";
 import HelpText from "./helpText";
@@ -12,7 +12,7 @@ type Props = React.ComponentPropsWithoutRef<"div"> & {
   children?: ReactNode;
   className?: string;
   labelAction?: () => void;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
 };
 
 export default ({
@@ -28,7 +28,7 @@ export default ({
   return (
     <div
       className={classNames(
-        `focus:gray-100 relative block bg-white px-3 pb-2.5 pt-2.5 focus-within:z-10 hover:bg-gray-100`,
+        `focus:gray-50 relative block bg-white px-3 pb-2.5 pt-2.5 focus-within:z-10 hover:bg-gray-50`,
         className,
         onClick ? "cursor-pointer" : "",
       )}
