@@ -1,18 +1,17 @@
 import { Fragment, ReactNode, useEffect, useState } from "react";
 
-import FormField from "./formField";
 import { Dialog, Transition } from "@headlessui/react";
-import Chip from "./chip";
-import SearchHeader from "./searchHeader";
-import Header from "./header";
 import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import config from "../config";
 import api from "../lib/api";
+import classNames from "../lib/classNames";
 import { toTitleCase } from "../lib/strings";
 import Button from "./button";
-import config from "../config";
-import classNames from "../lib/classNames";
+import Chip from "./chip";
+import FormField from "./formField";
+import Header from "./header";
 import ListItem from "./listItem";
-import { motion } from "framer-motion";
+import SearchHeader from "./searchHeader";
 
 export type Option = {
   id?: string | null;
@@ -81,7 +80,7 @@ const CreateOptionDialog = ({
     <Transition.Root show={open} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 z-10 overflow-y-auto min-h-screen"
+        className="fixed inset-0 z-10 min-h-screen overflow-y-auto"
         onClose={setOpen}
       >
         <div className="min-h-screen text-center">
@@ -90,7 +89,7 @@ const CreateOptionDialog = ({
           </OverlayTransition>
 
           <PanelTransition>
-            <Dialog.Panel className="relative h-screen transform overflow-hidden bg-white px-4 pb-4 pt-5 text-left transition-all min-w-full sm:p-6 justify-center items-center flex">
+            <Dialog.Panel className="relative flex h-screen min-w-full transform items-center justify-center overflow-hidden bg-white px-4 pb-4 pt-5 text-left transition-all sm:p-6">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -110,7 +109,7 @@ const CreateOptionDialog = ({
                     });
                   },
                 })}
-                <div className="mt-5 sm:mt-6 flex gap-x-2 flex-row-reverse flex">
+                <div className="mt-5 flex flex flex-row-reverse gap-x-2 sm:mt-6">
                   <Button color="primary" type="submit">
                     Save Changes
                   </Button>
@@ -213,13 +212,13 @@ const SelectDialog = ({
       <Dialog
         as="div"
         open={open}
-        className="fixed inset-0 z-10 overflow-y-auto min-h-screen"
+        className="fixed inset-0 z-10 min-h-screen overflow-y-auto"
         onClose={setOpen}
       >
         <div className="min-h-screen text-center">
           <Dialog.Overlay className="fixed inset-0" />
 
-          <Dialog.Panel className="relative min-h-full h-screen transform overflow-hidden overflow-y-auto bg-white text-left transition-all min-w-full">
+          <Dialog.Panel className="relative h-screen min-h-full min-w-full transform overflow-hidden overflow-y-auto bg-white text-left transition-all">
             <Header>
               <SearchHeader
                 onClose={() => setOpen(false)}
@@ -231,21 +230,21 @@ const SelectDialog = ({
                 placeholder={searchPlaceholder}
               />
             </Header>
-            <main className={"mx-auto max-w-4xl m-h-screen relative"}>
+            <main className={"m-h-screen relative mx-auto max-w-4xl"}>
               <ul role="list" className="divide-y divide-gray-100">
                 {optionList.map((option) => {
                   return (
                     <ListItem key={`${option.id}-${option.name}`}>
                       <CheckIcon
                         className={classNames(
-                          "h-12 w-12 p-2 flex-none rounded-full bg-gray-100",
+                          "h-12 w-12 flex-none rounded-full bg-gray-100 p-2",
                           selectedValues.find(
                             (i) => i.id == option.id && i.name == option.name
                           ) && "bg-peated text-white"
                         )}
                       />
 
-                      <div className="min-w-0 flex-auto flex items-center">
+                      <div className="flex min-w-0 flex-auto items-center">
                         <p className="font-semibold leading-6 text-gray-900">
                           <button
                             onClick={() => {
@@ -256,7 +255,7 @@ const SelectDialog = ({
                             {option.name}
                           </button>
                         </p>
-                        <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate"></p>
+                        <p className="mt-1 flex truncate text-xs leading-5 text-gray-500"></p>
                       </div>
                     </ListItem>
                   );
@@ -264,7 +263,7 @@ const SelectDialog = ({
                 {(results.length === 0 || query !== "") &&
                   (canCreate && createForm ? (
                     <ListItem>
-                      <PlusIcon className="h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
+                      <PlusIcon className="group-hover:bg-peated h-12 w-12 flex-none rounded-full bg-gray-100 p-2 group-hover:text-white" />
 
                       <div className="min-w-0 flex-auto">
                         <p className="font-semibold leading-6 text-gray-900">
@@ -273,7 +272,7 @@ const SelectDialog = ({
                             Can't find what you're looking for?
                           </button>
                         </p>
-                        <p className="mt-1 flex text-sm leading-5 text-gray-500 gap-x-1">
+                        <p className="mt-1 flex gap-x-1 text-sm leading-5 text-gray-500">
                           {query !== "" ? (
                             <span>
                               Tap here to add{" "}
@@ -292,7 +291,7 @@ const SelectDialog = ({
                     </ListItem>
                   ) : (
                     <ListItem>
-                      <PlusIcon className="h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
+                      <PlusIcon className="group-hover:bg-peated h-12 w-12 flex-none rounded-full bg-gray-100 p-2 group-hover:text-white" />
 
                       <div className="min-w-0 flex-auto">
                         <p className="font-semibold leading-6 text-gray-900">
@@ -301,7 +300,7 @@ const SelectDialog = ({
                             Can't find what you're looking for?
                           </a>
                         </p>
-                        <p className="mt-1 flex text-sm leading-5 text-gray-500 gap-x-1">
+                        <p className="mt-1 flex gap-x-1 text-sm leading-5 text-gray-500">
                           Well, that stinks. Maybe a open an issue on GitHub?
                         </p>
                       </div>
@@ -424,13 +423,17 @@ export default ({
       labelAction={() => {
         setDialogOpen(true);
       }}
+      onClick={() => setDialogOpen(true)}
     >
-      <div className="flex flex-wrap gap-2 sm:leading-6 mt-1 overflow-x-auto">
+      <div className="mt-1 flex flex-wrap gap-2 overflow-x-auto sm:leading-6">
         {visibleValues.map((option) => (
           <Chip
             key={`${option.id}-${option.name}`}
             active={value.indexOf(option) !== -1}
-            onClick={() => toggleOption(option)}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleOption(option);
+            }}
           >
             {option.name}
           </Chip>
@@ -441,8 +444,13 @@ export default ({
         {visibleValues.length > 0 &&
           visibleValues.length < targetOptions &&
           multiple && (
-            <Chip onClick={() => setDialogOpen(true)}>
-              <PlusIcon className="text-peated w-6 h-6" />
+            <Chip
+              onClick={(e) => {
+                e.stopPropagation();
+                setDialogOpen(true);
+              }}
+            >
+              <PlusIcon className="text-peated h-6 w-6" />
             </Chip>
           )}
       </div>

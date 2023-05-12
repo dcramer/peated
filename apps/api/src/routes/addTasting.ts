@@ -1,5 +1,7 @@
+import { eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { db } from "../db";
 import {
   NewTasting,
   bottles,
@@ -10,10 +12,8 @@ import {
   tastings,
   users,
 } from "../db/schema";
-import { db } from "../db";
-import { validateRequest } from "../middleware/auth";
-import { eq, inArray, sql } from "drizzle-orm";
 import { serializeTasting } from "../lib/transformers/tasting";
+import { validateRequest } from "../middleware/auth";
 
 export default {
   method: "POST",

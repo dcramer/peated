@@ -1,28 +1,26 @@
-import { useLocation, useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import api, { ApiError } from "../lib/api";
-import { useRequiredAuth } from "../hooks/useAuth";
-import Layout from "../components/layout";
-import { formatCategoryName, toTitleCase } from "../lib/strings";
-import FormError from "../components/formError";
-import FormHeader from "../components/formHeader";
-import TextField from "../components/textField";
-import Fieldset from "../components/fieldset";
 import BrandField from "../components/brandField";
 import DistillerField from "../components/distillerField";
-import SelectField from "../components/selectField";
-import { Option } from "../components/richSelectField";
-import BarcodeField from "../components/barcodeField";
+import Fieldset from "../components/fieldset";
+import FormError from "../components/formError";
 import FormField from "../components/formField";
+import FormHeader from "../components/formHeader";
 import FormLabel from "../components/formLabel";
+import Layout from "../components/layout";
+import RichSelectField, { Option } from "../components/richSelectField";
+import TextField from "../components/textField";
+import { useRequiredAuth } from "../hooks/useAuth";
+import api, { ApiError } from "../lib/api";
+import { formatCategoryName, toTitleCase } from "../lib/strings";
 
 type FormData = {
   name: string;
   brand: Option;
   distillers?: Option[] | undefined;
   statedAge?: number | undefined;
-  category?: string | undefined;
+  category?: Option;
 };
 
 export default function AddBottle() {
@@ -59,6 +57,7 @@ export default function AddBottle() {
         const bottle = await api.post("/bottles", {
           data: {
             ...formData,
+            category: formData.category.id,
             brand: formData.brand?.id || formData.brand,
             distillers: formData.distillers
               ? formData.distillers.map((d) => d?.id || d)
@@ -154,22 +153,17 @@ export default function AddBottle() {
             suffixLabel="years"
           />
 
-          <SelectField
+          <RichSelectField
             label="Category"
             name="category"
             placeholder="e.g. Single Malt"
             helpText="The kind of spirit."
             onChange={(value) =>
-              setFormData({ ...formData, category: value as string })
+              setFormData({ ...formData, category: value as Option })
             }
-            value={formData.category}
-            options={[
-              { id: "", value: "n/a" },
-              ...categoryList.map(({ id, name }) => ({ id, value: name })),
-            ]}
+            suggestedOptions={categoryList}
+            options={categoryList}
           />
-
-          <BarcodeField name="barcode" />
         </Fieldset>
       </form>
     </Layout>

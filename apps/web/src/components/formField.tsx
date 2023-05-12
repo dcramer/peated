@@ -1,8 +1,8 @@
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { ReactNode } from "react";
+import classNames from "../lib/classNames";
 import FormLabel from "./formLabel";
 import HelpText from "./helpText";
-import { ChevronRightIcon } from "@heroicons/react/20/solid";
-import classNames from "../lib/classNames";
 
 type Props = React.ComponentPropsWithoutRef<"div"> & {
   label?: string;
@@ -12,6 +12,7 @@ type Props = React.ComponentPropsWithoutRef<"div"> & {
   children?: ReactNode;
   className?: string;
   labelAction?: () => void;
+  onClick?: () => void;
 };
 
 export default ({
@@ -22,24 +23,26 @@ export default ({
   helpText,
   htmlFor,
   labelAction,
+  onClick,
 }: Props) => {
   return (
     <div
       className={classNames(
-        `relative block px-3 pb-2.5 pt-2.5 bg-white focus-within:z-10`,
-        className
+        `focus:gray-100 relative block bg-white px-3 pb-2.5 pt-2.5 focus-within:z-10 hover:bg-gray-100`,
+        className,
+        onClick ? "cursor-pointer" : ""
       )}
+      onClick={onClick}
     >
       {label && (
         <FormLabel
           htmlFor={htmlFor}
           required={required}
-          className="flex items-center flex-1 cursor-pointer"
-          onClick={labelAction}
+          className="flex flex-1 cursor-pointer items-center"
         >
           {label}
           {labelAction && (
-            <ChevronRightIcon className="h-5 ml-1 color-peated font-bold inline-block" />
+            <ChevronRightIcon className="color-peated ml-1 inline-block h-5 font-bold" />
           )}
         </FormLabel>
       )}

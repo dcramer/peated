@@ -1,6 +1,6 @@
 import { load as cheerio } from "cheerio";
-import { PageNotFound, getUrl } from "./scraper";
 import { open } from "fs/promises";
+import { PageNotFound, getUrl } from "./scraper";
 
 async function scrapeWhisky(id: number) {
   console.log(`Processing Whisky ${id}`);
@@ -194,14 +194,14 @@ function mapCategory(value: string) {
 //   }
 // }
 
-async function scrape(cb: (id: number) => void) {
+async function scrape(cb: (id: number) => Promise<void>) {
   const maxTasks = 8;
 
   let numTasks = 0;
   let currentId = 1;
   let repeatFailures = 0;
 
-  while (repeatFailures < 50000) {
+  while (repeatFailures < 10000) {
     numTasks += 1;
     (async () => {
       try {

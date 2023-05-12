@@ -1,4 +1,4 @@
-import { ElementType, ReactNode } from "react";
+import { MouseEvent, ReactNode } from "react";
 import classNames from "../lib/classNames";
 import { motion } from "framer-motion";
 
@@ -12,7 +12,7 @@ export default ({
 }: {
   children: ReactNode;
   active?: boolean;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   size?: ChipSize;
 }) => {
   return (

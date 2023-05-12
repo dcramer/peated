@@ -1,7 +1,7 @@
 import { Listbox } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import classNames from "../lib/classNames";
 import { ReactNode, useState } from "react";
+import classNames from "../lib/classNames";
 
 type Option = { id: string; value: string | ReactNode };
 
@@ -24,7 +24,7 @@ export default ({
     options.find((o) => o.id === props.value)
   );
 
-  const baseStyles = "bg-white rounded border-0 text-gray-900 focus:ring-0";
+  const baseStyles = "bg-inherit rounded border-0 text-gray-900 focus:ring-0";
   const inputStyles =
     "text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:leading-6";
   return (
@@ -40,7 +40,7 @@ export default ({
           placeholder={placeholder}
           className={`flex min-w-full flex-col ${baseStyles} ${inputStyles}`}
         >
-          <div className="truncate flex-1 sm:leading-6">
+          <div className="flex-1 truncate sm:leading-6">
             {value?.value || (
               <span className="text-gray-400 sm:leading-6">{placeholder}</span>
             )}
@@ -59,8 +59,8 @@ export default ({
               value={item}
               className={({ active }) =>
                 classNames(
-                  "relative cursor-default select-none py-2 pl-3 pr-9 rounded text-sm",
-                  active ? "bg-gray-100 text-peated" : "text-gray-900"
+                  "relative cursor-default select-none rounded py-2 pl-3 pr-9 text-sm",
+                  active ? "text-peated bg-gray-100" : "text-gray-900"
                 )
               }
             >

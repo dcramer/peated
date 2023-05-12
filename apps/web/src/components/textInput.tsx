@@ -9,7 +9,7 @@ export default ({
   suffixLabel?: string;
   noGutter?: boolean;
 }) => {
-  const baseStyles = "bg-white p-0 border-0 text-gray-900 sm:leading-6";
+  const baseStyles = "bg-inherit p-0 border-0 text-gray-900 sm:leading-6";
   const inputStyles =
     "text-gray-900 placeholder:text-gray-400 outline-none focus:ring-0  sm:leading-6";
   if (suffixLabel) {
@@ -17,7 +17,7 @@ export default ({
       <div className={`flex ${baseStyles}`}>
         <input
           className={classNames(
-            "block flex-1 p-0 border-0 bg-transparent",
+            "block flex-1 border-0 bg-transparent p-0",
             inputStyles,
             className || ""
           )}

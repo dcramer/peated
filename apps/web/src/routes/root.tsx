@@ -9,8 +9,6 @@ export default function Root() {
   const navigate = useNavigate();
   const { user, state } = useAuth();
 
-  console.log(user, state);
-
   useEffect(() => {
     if (!user && state === "ready") {
       navigate("/login");
