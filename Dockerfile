@@ -9,11 +9,10 @@ FROM base as build
 
 WORKDIR /app
 
-ADD . .
-# ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
-# ADD packages ./packages
-# ADD apps/web/package.json ./apps/web/package.json
-# ADD apps/api/package.json ./apps/api/package.json
+ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
+ADD packages ./packages
+ADD apps/web/package.json ./apps/web/package.json
+ADD apps/api/package.json ./apps/api/package.json
 RUN pnpm install
 
 ARG VERSION
@@ -37,6 +36,8 @@ ENV VITE_API_SERVER $API_SERVER
 ARG GOOGLE_CLIENT_ID
 ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
 ENV VITE_GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
+
+ADD . .
 
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
