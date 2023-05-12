@@ -1,16 +1,23 @@
-import { db } from ".";
-import {
-  MigrationConfig,
-  MigrationMeta,
-  readMigrationFiles,
-} from "drizzle-orm/migrator";
+import { readMigrationFiles } from "drizzle-orm/migrator";
 import { sql } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 
-const patchedMigrate = async function (
-  migrations: MigrationMeta[],
-  db: NodePgDatabase
-): Promise<void> {
+export const migrate = async function ({
+  db,
+  fake = false,
+  migrationsFolder = "./migrations",
+}: {
+  db: NodePgDatabase;
+  fake?: boolean;
+  migrationsFolder?: string;
+}) {
+  const migrations = readMigrationFiles({
+    migrationsFolder,
+  });
+  console.log(
+    `Found ${migrations.length} total migrations in ${migrationsFolder}`
+  );
+
   const migrationTableCreate = sql`
     CREATE TABLE IF NOT EXISTS "__drizzle_migrations" (
       id SERIAL PRIMARY KEY,
@@ -30,27 +37,39 @@ const patchedMigrate = async function (
   );
 
   const lastDbMigration = dbMigrations[0];
-  await db.transaction(async (tx) => {
-    for await (const migration of migrations) {
+  const migrationsToApply = migrations.filter(
+    (m) =>
+      !lastDbMigration || Number(lastDbMigration.created_at) < m.folderMillis
+  );
+  if (migrationsToApply.length === 0) {
+    console.log("No migrations need applied.");
+    return;
+  }
+
+  console.log(
+    `Migrating to ${migrationsToApply[migrationsToApply.length - 1].hash} (${
+      migrationsToApply.length
+    } to apply)`
+  );
+
+  for await (const migration of migrationsToApply) {
+    await db.transaction(async (tx) => {
       if (
         !lastDbMigration ||
         Number(lastDbMigration.created_at) < migration.folderMillis
       ) {
-        for (const stmt of migration.sql) {
-          await tx.execute(sql.raw(stmt));
+        if (fake) {
+          console.log(`Faking migration ${migration.hash}`);
+        } else {
+          console.log(`Applying migration ${migration.hash}`);
+          for (const stmt of migration.sql) {
+            await tx.execute(sql.raw(stmt));
+          }
         }
         await tx.execute(
           sql`insert into "__drizzle_migrations" ("hash", "created_at") values(${migration.hash}, ${migration.folderMillis})`
         );
       }
-    }
-  });
+    });
+  }
 };
-
-export async function migrate(
-  db: NodePgDatabase,
-  config: string | MigrationConfig
-) {
-  const migrations = readMigrationFiles(config);
-  await patchedMigrate(migrations, db);
-}
