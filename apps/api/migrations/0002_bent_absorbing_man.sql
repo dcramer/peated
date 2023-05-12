@@ -1,0 +1,1 @@
+ALTER TABLE "entity" ADD COLUMN "total_tastings" bigint DEFAULT 0 NOT NULL;

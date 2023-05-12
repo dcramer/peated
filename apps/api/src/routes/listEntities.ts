@@ -40,8 +40,7 @@ export default {
         orderBy = asc(entities.name);
         break;
       default:
-        // TODO: materialize
-        orderBy = sql<number>`(SELECT COUNT(*) FROM ${tastings} JOIN ${bottles} ON ${tastings.bottleId} = ${bottles.id} WHERE ${bottles.brandId} = ${entities.id}) DESC`;
+        orderBy = desc(entities.totalTastings);
     }
 
     const results = await db

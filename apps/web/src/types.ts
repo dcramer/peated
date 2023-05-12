@@ -23,6 +23,7 @@ export type Entity = {
   // e.g. Speyside
   region?: string;
   type: ("brand" | "distiller")[];
+  totalBottles: number;
 };
 
 export type Bottle = {
@@ -32,6 +33,7 @@ export type Bottle = {
   distillers: Entity[];
   category?: Category | null;
   statedAge?: number;
+  totalTastings: number;
 };
 
 export type Edition = {

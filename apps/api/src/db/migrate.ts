@@ -28,7 +28,9 @@ export const migrate = async function ({
   await db.execute(sql`CREATE SCHEMA IF NOT EXISTS "drizzle"`);
   await db.execute(migrationTableCreate);
 
-  const { rows: dbMigrations } = await db.execute<{
+  const {
+    rows: [lastDbMigration],
+  } = await db.execute<{
     id: number;
     hash: string;
     created_at: string;
@@ -36,7 +38,6 @@ export const migrate = async function ({
     sql`select id, hash, created_at from "__drizzle_migrations" order by created_at desc limit 1`
   );
 
-  const lastDbMigration = dbMigrations[0];
   const migrationsToApply = migrations.filter(
     (m) =>
       !lastDbMigration || Number(lastDbMigration.created_at) < m.folderMillis

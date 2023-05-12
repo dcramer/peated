@@ -9,7 +9,7 @@ import {
   tastings,
 } from "../db/schema";
 import { db } from "../db";
-import { SQL, and, asc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { SQL, and, asc, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { serializeBottle } from "../lib/transformers/bottle";
 
 export default {
@@ -48,15 +48,13 @@ export default {
       );
     }
 
-    const select: any = {};
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
       case "name":
         orderBy = asc(bottles.name);
         break;
       default:
-        // TODO: materialize // also this query pattern isnt supported yet
-        orderBy = sql`(SELECT COUNT(*) FROM ${tastings} WHERE ${tastings.bottleId} = ${bottles.id}) DESC`;
+        orderBy = desc(bottles.totalTastings);
     }
 
     const results = await db

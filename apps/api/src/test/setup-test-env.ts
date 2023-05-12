@@ -119,6 +119,7 @@ beforeAll(async () => {
     await migrate({ db });
   } catch (err) {
     console.error("Unable to run db migrations", err);
+    process.exit(1);
     throw err;
   }
 });

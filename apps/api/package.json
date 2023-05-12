@@ -9,12 +9,10 @@
     "db:deploy": "npm run db:migrate",
     "db:migrate": "ts-node --require dotenv/config ./src/bin/db.ts migrate",
     "db:generate": "npx drizzle-kit generate:pg",
-    "generate-token": "ts-node --require dotenv/config ./src/bin/generate-token.ts",
     "user": "ts-node --require dotenv/config ./src/bin/user.ts",
     "tsc": "tsc",
     "start": "ts-node --require dotenv/config ./src/server.ts",
-    "test": "npm run test:vitest",
-    "test:vitest": "dotenv -e .env.test -- vitest --single-thread"
+    "test": "dotenv -e .env.test -- vitest --single-thread"
   },
   "dependencies": {
     "@faker-js/faker": "^7.6.0",

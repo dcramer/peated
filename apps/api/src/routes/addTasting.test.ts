@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import buildFastify from "../app";
-import { tastings } from "../db/schema";
+import { bottles, entities, tastings } from "../db/schema";
 import { db } from "../db";
 import * as Fixtures from "../lib/test/fixtures";
 import { FastifyInstance } from "fastify";
@@ -15,7 +15,11 @@ afterAll(async () => {
 });
 
 test("creates a new tasting with minimal params", async () => {
-  const bottle = await Fixtures.Bottle();
+  const entity = await Fixtures.Entity({ type: ["brand", "distiller"] });
+  const bottle = await Fixtures.Bottle({
+    brandId: entity.id,
+    distillerIds: [entity.id],
+  });
   const response = await app.inject({
     method: "POST",
     url: "/tastings",
@@ -39,6 +43,18 @@ test("creates a new tasting with minimal params", async () => {
   expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
   expect(tasting.rating).toEqual(3.5);
   expect(tasting.comments).toBeNull();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+  expect(newBottle.totalTastings).toBe(1);
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, entity.id));
+  expect(newEntity.totalTastings).toBe(1);
 });
 
 test("creates a new tasting with tags", async () => {

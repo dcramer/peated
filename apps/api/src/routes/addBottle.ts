@@ -9,7 +9,7 @@ import {
   Category,
 } from "../db/schema";
 import { db } from "../db";
-import { eq } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { EntityInput, upsertEntity } from "../lib/db";
 
 type BottleInput = {
@@ -105,6 +105,13 @@ export default {
           distillerIds,
         }),
       });
+
+      await tx
+        .update(entities)
+        .set({ totalBottles: sql`${entities.totalBottles} + 1` })
+        .where(
+          inArray(entities.id, Array.from(new Set([brand.id, ...distillerIds])))
+        );
 
       return bottle;
     });

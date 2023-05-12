@@ -7,14 +7,8 @@ import Layout from "../components/layout";
 import BottleTable from "../components/bottleTable";
 import Button from "../components/button";
 
-type EntityWithStats = Entity & {
-  stats: {
-    bottles: number;
-  };
-};
-
 type LoaderData = {
-  brand: EntityWithStats;
+  brand: Entity;
   bottleList: Bottle[];
 };
 
@@ -34,7 +28,7 @@ export default function BrandDetails() {
   const { brand, bottleList } = useLoaderData() as LoaderData;
 
   const stats = [
-    { name: "Bottles", value: brand.stats.bottles.toLocaleString() },
+    { name: "Bottles", value: brand.totalBottles.toLocaleString() },
   ];
 
   return (

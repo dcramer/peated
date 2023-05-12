@@ -12,7 +12,7 @@ import {
 } from "../db/schema";
 import { db } from "../db";
 import { validateRequest } from "../middleware/auth";
-import { eq } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { serializeTasting } from "../lib/transformers/tasting";
 
 export default {
@@ -88,7 +88,7 @@ export default {
         )[0].id;
       };
 
-      const [tasting] = await db
+      const [tasting] = await tx
         .insert(tastings)
         .values({
           comments: body.comments || null,
@@ -99,6 +99,28 @@ export default {
           createdById: user.id,
         })
         .returning();
+
+      await tx
+        .update(bottles)
+        .set({ totalTastings: sql`${bottles.totalTastings} + 1` })
+        .where(eq(bottles.id, bottle.id));
+
+      const distillerIds = (
+        await db
+          .select({ id: bottlesToDistillers.distillerId })
+          .from(bottlesToDistillers)
+          .where(eq(bottlesToDistillers.bottleId, bottle.id))
+      ).map((d) => d.id);
+
+      await tx
+        .update(entities)
+        .set({ totalTastings: sql`${entities.totalTastings} + 1` })
+        .where(
+          inArray(
+            entities.id,
+            Array.from(new Set([bottle.brandId, ...distillerIds]))
+          )
+        );
 
       return tasting;
     });

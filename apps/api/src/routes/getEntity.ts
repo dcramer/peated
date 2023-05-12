@@ -1,8 +1,8 @@
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
-import { bottles, entities } from "../db/schema";
+import { entities } from "../db/schema";
 import { db } from "../db";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export default {
   method: "GET",
@@ -25,19 +25,7 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    const [{ count: totalBottles }] = await db
-      .select({
-        count: sql`COUNT(${bottles.brandId})`,
-      })
-      .from(bottles)
-      .where(eq(bottles.brandId, entity.id));
-
-    res.send({
-      ...entity,
-      stats: {
-        bottles: totalBottles,
-      },
-    });
+    res.send(entity);
   },
 } as RouteOptions<
   Server,

@@ -12,6 +12,7 @@
     "dev:api": "PORT=4000 dotenv -e .env.local -- pnpm --filter='./apps/api' dev",
     "db": "dotenv -e .env.local -- pnpm --filter='./apps/api' db",
     "db:migrate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:migrate",
+    "db:generate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:generate",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/api' user",
     "typecheck": "tsc --noEmit",
     "test": "pnpm -r --stream run test",

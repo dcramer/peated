@@ -73,6 +73,13 @@ export const entities = pgTable(
     region: text("region"),
     type: entityTypeEnum("type").array().notNull(),
 
+    totalBottles: bigint("total_bottles", { mode: "number" })
+      .default(0)
+      .notNull(),
+    totalTastings: bigint("total_tastings", { mode: "number" })
+      .default(0)
+      .notNull(),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
@@ -116,6 +123,10 @@ export const bottles = pgTable(
       .references(() => entities.id)
       .notNull(),
     statedAge: smallint("stated_age"),
+
+    totalTastings: bigint("total_tastings", { mode: "number" })
+      .default(0)
+      .notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })

@@ -41,13 +41,6 @@ export default {
       )
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
 
-    const [{ count: totalTastings }] = await db
-      .select({
-        count: sql<number>`COUNT(${tastings.bottleId})`,
-      })
-      .from(tastings)
-      .where(eq(tastings.bottleId, bottle.id));
-
     const [{ count: totalPeople }] = await db
       .select({
         count: sql<number>`COUNT(DISTINCT ${tastings.createdById})`,
@@ -67,7 +60,7 @@ export default {
       brand,
       distillers: distillers.map(({ distiller }) => distiller),
       stats: {
-        tastings: totalTastings,
+        tastings: bottle.totalTastings,
         avgRating: avgRating,
         people: totalPeople,
       },

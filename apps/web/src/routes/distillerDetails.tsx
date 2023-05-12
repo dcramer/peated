@@ -8,14 +8,8 @@ import BottleTable from "../components/bottleTable";
 import Button from "../components/button";
 import { useRequiredAuth } from "../hooks/useAuth";
 
-type EntityWithStats = Entity & {
-  stats: {
-    bottles: number;
-  };
-};
-
 type LoaderData = {
-  distiller: EntityWithStats;
+  distiller: Entity;
   bottleList: Bottle[];
 };
 
@@ -36,7 +30,7 @@ export default function DistillerDetails() {
   const { user: currentUser } = useRequiredAuth();
 
   const stats = [
-    { name: "Bottles", value: distiller.stats.bottles.toLocaleString() },
+    { name: "Bottles", value: distiller.totalBottles.toLocaleString() },
   ];
 
   return (
