@@ -87,24 +87,11 @@ export default function AddBottle() {
         {error && <FormError values={[error]} />}
 
         <Fieldset>
-          <TextField
-            type="text"
-            label="Bottle"
-            name="name"
-            required
-            helpText="The full name of the bottle, excluding its specific cask information."
-            placeholder="e.g. Angel's Envy Private Selection Single Barrel"
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            value={formData.name}
-          />
-
           <BrandField
             label="Brand"
             name="brand"
             helpText="The brand, or main label of the bottle."
-            placeholder="e.g. Angel's Envy"
+            placeholder="e.g. Angel's Envy, Hibiki"
             onChange={(value) =>
               setFormData({ ...formData, brand: value as Option })
             }
@@ -113,10 +100,23 @@ export default function AddBottle() {
             value={formData.brand}
           />
 
+          <TextField
+            type="text"
+            label="Bottle"
+            name="name"
+            required
+            helpText="The name of the bottle, excluding its specific cask information, and its brand."
+            placeholder="e.g. Angel's Envy Private Selection, 12-year-old"
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            value={formData.name}
+          />
+
           <DistillerField
             label="Distiller"
             name="distillers"
-            placeholder="e.g. Angel's Envy"
+            placeholder="e.g. Angel's Envy, Suntory Whisky"
             helpText="The distilleries which produces the spirit(s) for this bottle."
             onChange={(value) =>
               setFormData({

@@ -10,7 +10,6 @@ import {
 } from "../db/schema";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
-import { omit } from "../lib/filter";
 import { EntityInput, upsertEntity } from "../lib/db";
 
 type BottleInput = {
