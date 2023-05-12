@@ -79,7 +79,7 @@ export default function AddBottle() {
     })();
   };
 
-  const bottleName = (formData) => {
+  const bottleName = () => {
     if (!formData.name && !formData.brand?.name) return <em>Unknown</em>;
     return [formData.brand?.name || "", formData.name || ""].join(" ");
   };
@@ -96,7 +96,7 @@ export default function AddBottle() {
         <Fieldset>
           <FormField>
             <FormLabel>Display Name</FormLabel>
-            {bottleName(formData)}
+            {bottleName()}
           </FormField>
 
           <BrandField
