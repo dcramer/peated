@@ -8,10 +8,13 @@ export interface SerializedUser {
   admin?: boolean;
   email?: string;
   createdAt?: string;
+  followStatus?: "none" | "following" | "pending";
 }
 
 export const serializeUser = (
-  user: User,
+  user: User & {
+    followStatus?: "none" | "following" | "pending";
+  },
   currentUser?: User,
 ): SerializedUser => {
   const data: SerializedUser = {
@@ -20,6 +23,7 @@ export const serializeUser = (
     pictureUrl: user.pictureUrl
       ? `${config.URL_PREFIX}${user.pictureUrl}`
       : null,
+    followStatus: user.followStatus,
   };
   if (currentUser && (currentUser.admin || currentUser.id === user.id)) {
     return {

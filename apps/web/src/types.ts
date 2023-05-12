@@ -24,6 +24,9 @@ export type Entity = {
   region?: string;
   type: ("brand" | "distiller")[];
   totalBottles: number;
+  totalTastings: number;
+  createdAt: string;
+  createdBy?: User;
 };
 
 export type Bottle = {
@@ -34,6 +37,8 @@ export type Bottle = {
   category?: Category | null;
   statedAge?: number;
   totalTastings: number;
+  createdAt: string;
+  createdBy?: User;
 };
 
 export type Edition = {
@@ -41,6 +46,18 @@ export type Edition = {
   name: string;
   bottle: Bottle;
   barrel?: number;
+  createdAt: string;
+  createdBy?: User;
+};
+
+export type FollowStatus = "none" | "following" | "pending";
+
+export type FollowRequest = {
+  id: string;
+  status: FollowStatus;
+  createdAt: string;
+  user: User;
+  followsBack: FollowStatus;
 };
 
 export type User = {

@@ -13,7 +13,7 @@ import {
   users,
 } from "../db/schema";
 import { serializeTasting } from "../lib/transformers/tasting";
-import { validateRequest } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "POST",
@@ -32,7 +32,7 @@ export default {
       },
     },
   },
-  preHandler: [validateRequest],
+  preHandler: [requireAuth],
   handler: async (req, res) => {
     const body = req.body;
     const user = req.user;

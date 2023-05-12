@@ -1,14 +1,17 @@
 import { faker } from "@faker-js/faker";
-import { db } from "../../db";
+import { eq } from "drizzle-orm";
+import { db, first } from "../../db";
 import {
   NewBottle,
   NewEntity,
+  NewFollow,
   NewTasting,
   NewUser,
   User as UserType,
   bottles,
   bottlesToDistillers,
   entities,
+  follows,
   tastings,
   users,
 } from "../../db/schema";
@@ -33,19 +36,39 @@ export const User = async ({ ...data }: Partial<NewUser> = {}) => {
   )[0];
 };
 
-export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
+export const Follow = async ({ ...data }: Partial<NewFollow> = {}) => {
   return (
+    await db
+      .insert(follows)
+      .values({
+        fromUserId: data.fromUserId || (await User()).id,
+        toUserId: data.toUserId || (await User()).id,
+        status: "following",
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
+  const name = faker.company.name();
+  const existing = first(
+    await db.select().from(entities).where(eq(entities.name, name)),
+  );
+  if (existing) return existing;
+
+  return first(
     await db
       .insert(entities)
       .values({
-        name: faker.company.name(),
+        name,
         country: faker.address.country(),
         type: ["brand", "distiller"],
         ...data,
         createdById: data.createdById || (await User()).id,
       })
-      .returning()
-  )[0];
+      .returning(),
+  );
 };
 
 export const Bottle = async ({

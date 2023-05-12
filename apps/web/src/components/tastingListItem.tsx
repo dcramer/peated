@@ -9,23 +9,8 @@ import BottleCard from "./bottleCard";
 import Button from "./button";
 import Chip from "./chip";
 import { StaticRating } from "./rating";
+import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
-
-const TimeSince = ({ date }: { date: string }) => {
-  return (
-    <time
-      dateTime={date}
-      className="block text-sm font-light text-gray-500 dark:text-gray-400"
-    >
-      {new Date(date).toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })}
-    </time>
-  );
-};
 
 export default ({
   tasting,
@@ -49,7 +34,10 @@ export default ({
           >
             {tasting.createdBy.displayName}
           </Link>
-          <TimeSince date={tasting.createdAt} />
+          <TimeSince
+            className="block text-sm font-light text-gray-500 dark:text-gray-400"
+            date={tasting.createdAt}
+          />
         </div>
         <div className="flex flex-col items-end gap-y-2">
           <StaticRating value={tasting.rating} size="small" />

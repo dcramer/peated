@@ -13,6 +13,7 @@
     "db": "dotenv -e .env.local -- pnpm --filter='./apps/api' db",
     "db:migrate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:migrate",
     "db:generate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:generate",
+    "load-mocks": "dotenv -e .env.local -- pnpm --filter='./apps/api' load-mocks",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/api' user",
     "typecheck": "pnpm -r --parallel run typecheck",
     "test": "pnpm -r --stream run test",

@@ -23,6 +23,7 @@ test("get user", async () => {
   expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
   expect(data.id).toBe(user.id);
+  expect(data.followStatus).toBe("none");
 });
 
 test("get user:me", async () => {
@@ -44,4 +45,23 @@ test("get user requires auth", async () => {
   });
 
   expect(response).toRespondWith(401);
+});
+
+test("get user w/ followStatus", async () => {
+  const user = await Fixtures.User();
+  await Fixtures.Follow({
+    fromUserId: DefaultFixtures.user.id,
+    toUserId: user.id,
+  });
+
+  const response = await app.inject({
+    method: "GET",
+    url: `/users/${user.id}`,
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(200);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBe(user.id);
+  expect(data.followStatus).toBe("following");
 });

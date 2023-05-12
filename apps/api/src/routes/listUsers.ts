@@ -3,8 +3,9 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { users } from "../db/schema";
+import { buildPageLink } from "../lib/paging";
 import { serializeUser } from "../lib/transformers/user";
-import { validateRequest } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -18,7 +19,7 @@ export default {
       },
     },
   },
-  preHandler: [validateRequest],
+  preHandler: [requireAuth],
   handler: async (req, res) => {
     const page = req.query.page || 1;
     const query = req.query.query || "";
@@ -41,7 +42,19 @@ export default {
       .offset(offset)
       .orderBy(asc(users.displayName));
 
-    res.send(results.map((u) => serializeUser(u, req.user)));
+    res.send({
+      results: results.map((u) => serializeUser(u, req.user)),
+      rel: {
+        next:
+          results.length > limit
+            ? buildPageLink(req.routeOptions.url, req.query, page + 1)
+            : null,
+        prev:
+          page > 1
+            ? buildPageLink(req.routeOptions.url, req.query, page - 1)
+            : null,
+      },
+    });
   },
 } as RouteOptions<
   Server,

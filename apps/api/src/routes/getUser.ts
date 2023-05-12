@@ -1,10 +1,10 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { changes, tastings, users } from "../db/schema";
+import { User, changes, follows, tastings, users } from "../db/schema";
 import { serializeUser } from "../lib/transformers/user";
-import { validateRequest } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -18,7 +18,7 @@ export default {
       },
     },
   },
-  preHandler: [validateRequest],
+  preHandler: [requireAuth],
   handler: async (req, res) => {
     const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
 
@@ -43,8 +43,28 @@ export default {
       .from(changes)
       .where(eq(changes.createdById, user.id));
 
+    const getFollowStatus = async (user: User) => {
+      const [follow] = await db
+        .select()
+        .from(follows)
+        .where(
+          and(
+            eq(follows.fromUserId, req.user.id),
+            eq(follows.toUserId, user.id),
+          ),
+        );
+      if (!follow) return "none";
+      return follow.status;
+    };
+
     res.send({
-      ...serializeUser(user, req.user),
+      ...serializeUser(
+        {
+          ...user,
+          followStatus: await getFollowStatus(user),
+        },
+        req.user,
+      ),
       stats: {
         tastings: totalTastings,
         bottles: totalBottles,

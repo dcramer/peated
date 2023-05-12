@@ -1,13 +1,24 @@
 import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom";
+
 import Layout from "./components/layout";
 import config from "./config";
+import useAuth from "./hooks/useAuth";
 import { useOnlineStatus } from "./hooks/useOnlineStatus";
-import { ApiUnavailable } from "./lib/api";
+import { ApiUnauthorized, ApiUnavailable } from "./lib/api";
 
 export default function ErrorPage() {
   const error: any = useRouteError();
 
   const isOnline = useOnlineStatus();
+
+  const { logout } = useAuth();
+
+  if (error instanceof ApiUnauthorized && error.data.name === "invalid_token") {
+    // need middleware!
+    logout();
+    location.href = "/login";
+    return null;
+  }
 
   let title = "Error";
   let subtitle = "Sorry, an unexpected error has occurred.";
@@ -16,6 +27,10 @@ export default function ErrorPage() {
     subtitle = isOnline
       ? "It looks like Peated's API is unreachable right now. Please try again shortly."
       : "It looks like your network is offline.";
+  } else if (error instanceof ApiUnauthorized) {
+    title = "Identify Yourself";
+    subtitle =
+      "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
   } else if (isRouteErrorResponse(error)) {
     if (error.status === 404) {
       title = "Not Found";

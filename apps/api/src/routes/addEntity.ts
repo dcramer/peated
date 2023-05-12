@@ -2,7 +2,7 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { NewEntity, changes, entities } from "../db/schema";
-import { validateRequest } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "POST",
@@ -25,7 +25,7 @@ export default {
       },
     },
   },
-  preHandler: [validateRequest],
+  preHandler: [requireAuth],
   handler: async (req, res) => {
     const body = req.body;
     const data: NewEntity = {

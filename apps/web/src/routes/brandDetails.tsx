@@ -38,7 +38,7 @@ export default function BrandDetails() {
           <h1 className="text-peated mb-2 flex gap-x-3 text-3xl font-semibold leading-7">
             {brand.name}
           </h1>
-          <p className="text-sm font-light text-gray-500">
+          <p className="prose text-sm font-light text-gray-500">
             Located in {brand.country}
             {brand.region && <span> &middot; {brand.region}</span>}
           </p>

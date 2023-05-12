@@ -1,15 +1,17 @@
 import type { LoaderFunction } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 
+import { useState } from "react";
 import Button from "../components/button";
 import Layout from "../components/layout";
 import TastingListItem from "../components/tastingListItem";
 import UserAvatar from "../components/userAvatar";
 import { useRequiredAuth } from "../hooks/useAuth";
 import api from "../lib/api";
-import type { Tasting, User } from "../types";
+import type { FollowStatus, Tasting, User } from "../types";
 
-type UserWithStats = User & {
+type UserDetails = User & {
+  followStatus?: FollowStatus;
   stats: {
     bottles: number;
     tastings: number;
@@ -18,7 +20,7 @@ type UserWithStats = User & {
 };
 
 type LoaderData = {
-  user: UserWithStats;
+  user: UserDetails;
   tastingList: Tasting[];
 };
 
@@ -50,6 +52,15 @@ const EmptyActivity = () => {
 export default function UserDetails() {
   const { user, tastingList } = useLoaderData() as LoaderData;
   const { user: currentUser } = useRequiredAuth();
+
+  const [followStatus, setFollowStatus] = useState(user.followStatus);
+
+  const followUser = async (follow: boolean) => {
+    const data = await api.post(
+      follow ? `/users/${user.id}/follow` : `/users/${user.id}/unfollow`,
+    );
+    setFollowStatus(data.status);
+  };
 
   return (
     <Layout gutter>
@@ -85,7 +96,16 @@ export default function UserDetails() {
         <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
           {user.id !== currentUser.id ? (
             <>
-              <Button color="primary">Add Friend</Button>
+              <Button
+                color="primary"
+                onClick={() => followUser(followStatus === "none")}
+              >
+                {followStatus === "none"
+                  ? "Add Friend"
+                  : followStatus === "pending"
+                  ? "Request Pending"
+                  : "Remove Friend"}
+              </Button>
             </>
           ) : (
             <>

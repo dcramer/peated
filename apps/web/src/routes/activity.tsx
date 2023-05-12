@@ -13,7 +13,7 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const tastingList = await api.get("/tastings");
+  const { results: tastingList } = await api.get("/tastings");
 
   return { tastingList };
 };

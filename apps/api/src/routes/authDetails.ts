@@ -5,12 +5,12 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { serializeUser } from "../lib/transformers/user";
-import { validateRequest } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
   url: "/auth",
-  preHandler: [validateRequest],
+  preHandler: [requireAuth],
   handler: async function (req, res) {
     // this would be a good palce to add refreshTokens (swap to POST for that)
     const [user] = await db

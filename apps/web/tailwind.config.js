@@ -44,6 +44,20 @@ module.exports = {
           "100%": { opacity: 0, transform: "translate(-20px, 0)" },
         },
       }),
+
+      typography: {
+        DEFAULT: {
+          css: {
+            color: "#000",
+            a: {
+              color: "#005C58",
+              "&:hover": {
+                color: "#005C58",
+              },
+            },
+          },
+        },
+      },
     },
   },
   plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],

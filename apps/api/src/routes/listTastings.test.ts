@@ -5,10 +5,10 @@ import * as Fixtures from "../lib/test/fixtures";
 let app: FastifyInstance;
 beforeAll(async () => {
   app = await buildFastify();
-});
 
-afterAll(async () => {
-  await app.close();
+  return async () => {
+    app.close();
+  };
 });
 
 test("lists tastings", async () => {
@@ -21,8 +21,8 @@ test("lists tastings", async () => {
   });
 
   expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.length).toBe(2);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(2);
 });
 
 test("lists tastings with bottle", async () => {
@@ -39,9 +39,9 @@ test("lists tastings with bottle", async () => {
   });
 
   expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.length).toBe(1);
-  expect(data[0].id).toBe(tasting.id);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(tasting.id);
 });
 
 test("lists tastings with user", async () => {
@@ -59,7 +59,49 @@ test("lists tastings with user", async () => {
   });
 
   expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.length).toBe(1);
-  expect(data[0].id).toBe(tasting.id);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(tasting.id);
+});
+
+test("lists tastings filter friends unauthenticated", async () => {
+  await Fixtures.Tasting();
+  await Fixtures.Tasting();
+
+  const response = await app.inject({
+    method: "GET",
+    url: "/tastings",
+    query: {
+      filter: "friends",
+    },
+  });
+
+  expect(response).toRespondWith(401);
+});
+
+test("lists tastings filter friends", async () => {
+  await Fixtures.Tasting();
+  await Fixtures.Tasting();
+
+  const otherUser = await Fixtures.User();
+  await Fixtures.Follow({
+    fromUserId: DefaultFixtures.user.id,
+    toUserId: otherUser.id,
+    status: "following",
+  });
+  const lastTasting = await Fixtures.Tasting({ createdById: otherUser.id });
+
+  const response = await app.inject({
+    method: "GET",
+    url: "/tastings",
+    query: {
+      filter: "friends",
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(200);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(lastTasting.id);
 });

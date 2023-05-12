@@ -2,7 +2,13 @@ import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { bottles, bottlesToDistillers, entities, tastings } from "../db/schema";
+import {
+  bottles,
+  bottlesToDistillers,
+  entities,
+  tastings,
+  users,
+} from "../db/schema";
 
 export default {
   method: "GET",
@@ -17,13 +23,15 @@ export default {
     },
   },
   handler: async (req, res) => {
-    const [{ bottle, brand }] = await db
+    const [{ bottle, brand, createdBy }] = await db
       .select({
         bottle: bottles,
         brand: entities,
+        createdBy: users,
       })
       .from(bottles)
       .innerJoin(entities, eq(entities.id, bottles.brandId))
+      .innerJoin(users, eq(users.id, bottles.createdById))
       .where(eq(bottles.id, req.params.bottleId));
 
     if (!bottle) {
@@ -57,6 +65,7 @@ export default {
 
     res.send({
       ...bottle,
+      createdBy,
       brand,
       distillers: distillers.map(({ distiller }) => distiller),
       stats: {

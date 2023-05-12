@@ -5,7 +5,7 @@ import config from "../config";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { storeFile } from "../lib/uploads";
-import { validateRequest } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "POST",
@@ -19,7 +19,7 @@ export default {
       },
     },
   },
-  preHandler: [validateRequest],
+  preHandler: [requireAuth],
   handler: async (req, res) => {
     const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
 

@@ -7,29 +7,20 @@ beforeAll(async () => {
   app = await buildFastify();
 
   return async () => {
-    app.close();
+    await app.close();
   };
 });
 
-test("lists users", async () => {
-  const user2 = await Fixtures.User();
+test("lists entities", async () => {
+  await Fixtures.Entity();
+  await Fixtures.Entity();
 
   const response = await app.inject({
     method: "GET",
-    url: "/users",
-    headers: DefaultFixtures.authHeaders,
+    url: "/entities",
   });
 
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(2);
-});
-
-test("lists users requires auth", async () => {
-  const response = await app.inject({
-    method: "GET",
-    url: "/users",
-  });
-
-  expect(response).toRespondWith(401);
 });
