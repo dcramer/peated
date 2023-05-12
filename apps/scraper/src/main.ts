@@ -1,55 +1,14 @@
-import axios from "axios";
 import { load as cheerio } from "cheerio";
-import { existsSync } from "fs";
+import { PageNotFound, getUrl } from "./scraper";
 import { open } from "fs/promises";
 
-const MIN_ID = 1;
-const MAX_ID = 250000;
-
-const CACHE = ".cache";
-
-async function downloadAndCacheWhisky(id: number, filename: string) {
-  const url = `https://www.whiskybase.com/whiskies/whisky/${id}/`;
-  let data = "";
-  let status = 0;
-  try {
-    ({ status, data } = await axios.get(url));
-  } catch (err: any) {
-    status = err?.response?.status;
-    if (status !== 404) {
-      throw err;
-    }
-  }
-
-  const fs = await open(filename, "w");
-  await fs.writeFile(
-    JSON.stringify({
-      status,
-      data,
-    })
-  );
-  await fs.close();
-
-  return { data, status };
-}
-
-// e.g. https://www.whiskybase.com/whiskies/whisky/1/
 async function scrapeWhisky(id: number) {
   console.log(`Processing Whisky ${id}`);
 
-  const filename = `${CACHE}/${id}.html`;
-  let data = "",
-    status = 0;
-  if (!existsSync(filename)) {
-    console.log(`[Whisky ${id}] Cache not found, fetching from internet`);
-    ({ data, status } = await downloadAndCacheWhisky(id, filename));
-  } else {
-    const fs = await open(filename, "r");
-    ({ data, status } = JSON.parse((await fs.readFile()).toString()));
-    await fs.close();
-  }
-
-  if (status === 404) {
+  const data = await getUrl(
+    `https://www.whiskybase.com/whiskies/whisky/${id}/`
+  );
+  if (!data) {
     console.warn(`[Whisky ${id}] Does not exist`);
     return;
   }
@@ -105,6 +64,74 @@ async function scrapeWhisky(id: number) {
   return bottle;
 }
 
+// e.g. https://www.whiskybase.com/whiskies/distillery/2
+async function scrapeDistiller(id: number) {
+  console.log(`Processing Distiller ${id}`);
+
+  const data = await getUrl(
+    `https://www.whiskybase.com/whiskies/distillery/${id}/about`
+  );
+
+  const $ = cheerio(data);
+
+  const result = {
+    name: $("#company-name > h1").text(),
+    country: $("ul.breadcrumb > li:first-child").text(),
+    region: $("ul.breadcrumb > li:last-child").text(),
+  };
+
+  let bottleCount = 0;
+  $(".company-details > ul > li:first-child").each((_, el) => {
+    if ($(".title", el).text() === "Whiskies") {
+      bottleCount = parseInt($(".value", el).text(), 10);
+    }
+  });
+
+  console.log(
+    `[Distiller ${id}] Identified as ${result.name} (${result.country} - ${result.region}) with ${bottleCount} bottles.`
+  );
+  if (bottleCount < 20) {
+    console.warn("Discarding Distillery as low quality risk");
+    return null;
+  }
+
+  return result;
+}
+
+// e.g. https://www.whiskybase.com/whiskies/brand/2
+async function scrapeBrand(id: number) {
+  console.log(`Processing Brand ${id}`);
+
+  const data = await getUrl(
+    `https://www.whiskybase.com/whiskies/brand/${id}/about`
+  );
+
+  const $ = cheerio(data);
+
+  const result = {
+    name: $("#company-name > h1").text(),
+    country: $("ul.breadcrumb > li:first-child").text(),
+    region: $("ul.breadcrumb > li:last-child").text(),
+  };
+
+  let bottleCount = 0;
+  $(".company-details > ul > li:first-child").each((_, el) => {
+    if ($(".title", el).text() === "Whiskies") {
+      bottleCount = parseInt($(".value", el).text(), 10);
+    }
+  });
+
+  console.log(
+    `[Brand ${id}] Identified as ${result.name} (${result.country} - ${result.region}) with ${bottleCount} bottles.`
+  );
+  if (bottleCount < 20) {
+    console.warn("Discarding Brand as low quality risk");
+    return null;
+  }
+
+  return result;
+}
+
 function parseName(brandName: string, bottleName: string) {
   const bottleNameWithoutAge = bottleName.split("-year-old")[0];
   if (bottleNameWithoutAge !== bottleName) {
@@ -139,104 +166,99 @@ function mapCategory(value: string) {
   return value.toLowerCase().replace(" ", "_");
 }
 
-async function scrape() {
+// async function scrapeBottles() {
+//   const maxTasks = 8;
+
+//   let numTasks = 0;
+//   let currentId = MIN_ID;
+//   while (currentId < MAX_ID) {
+//     numTasks += 1;
+//     (async () => {
+//       try {
+//         const bottle = await scrapeWhisky(currentId);
+//         if (bottle) {
+//           // await submitBrand(bottle.brand);
+//           // await submitDistiller(bottle.distiller);
+//           // await submitBottle(bottle);
+//         }
+//       } catch (err) {
+//         console.error(err);
+//       }
+//       numTasks -= 1;
+//     })();
+
+//     while (numTasks >= maxTasks - 1) {
+//       await sleep(100);
+//     }
+//     currentId += 1;
+//   }
+// }
+
+async function scrape(cb: (id: number) => void) {
   const maxTasks = 8;
 
   let numTasks = 0;
-  let currentId = MIN_ID;
-  while (currentId < MAX_ID) {
+  let currentId = 1;
+  let repeatFailures = 0;
+
+  while (repeatFailures < 50000) {
     numTasks += 1;
     (async () => {
       try {
-        const bottle = await scrapeWhisky(currentId);
-        if (bottle) {
-          await submitBrand(bottle.brand);
-          await submitDistiller(bottle.distiller);
-          // await submitBottle(bottle);
-        }
+        await cb(currentId);
+        repeatFailures = 0;
       } catch (err) {
-        console.error(err);
+        if (err instanceof PageNotFound) {
+          repeatFailures += 1;
+        } else {
+          console.error(err);
+        }
       }
       numTasks -= 1;
     })();
 
-    while (numTasks >= maxTasks - 1) {
+    while (numTasks >= maxTasks) {
       await sleep(100);
     }
     currentId += 1;
   }
 }
 
+async function scrapeDistillers() {
+  const distillerList: any[] = [];
+  await scrape(async (id) => {
+    const result = await scrapeDistiller(id);
+    if (result) distillerList.push(result);
+  });
+
+  console.log(`Found ${distillerList.length} distillers`);
+  saveResults("distillers.json", distillerList);
+}
+
+async function scrapeBrands() {
+  const brandList: any[] = [];
+  await scrape(async (id) => {
+    const result = await scrapeBrand(id);
+    if (result) brandList.push(result);
+  });
+
+  console.log(`Found ${brandList.length} brands`);
+  saveResults("brands.json", brandList);
+}
+
+async function saveResults(filename: string, results: any) {
+  const fs = await open(filename, "w");
+  await fs.writeFile(JSON.stringify(results, undefined, 2));
+  await fs.close();
+}
+
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const API_SERVER = process.env.API_SERVER || "http://localhost:4000";
-
-async function submitBottle(data: any) {
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-  };
-
-  try {
-    await axios.post(`${API_SERVER}/bottles`, data, {
-      headers,
-    });
-  } catch (err: any) {
-    const data = err?.response?.data;
-    console.error(
-      `Failed to submit bottle: ${err?.response.status} - ${JSON.stringify(
-        data,
-        null,
-        2
-      )}`
-    );
-  }
+async function main() {
+  await scrapeDistillers();
+  await scrapeBrands();
 }
 
-async function submitBrand(data: any) {
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-  };
-
-  try {
-    await axios.post(`${API_SERVER}/entities`, data, {
-      headers,
-    });
-  } catch (err: any) {
-    const data = err?.response?.data;
-    console.error(
-      `Failed to submit brand: ${err?.response.status} -${JSON.stringify(
-        data,
-        null,
-        2
-      )}`
-    );
-  }
-}
-
-async function submitDistiller(data: any) {
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-  };
-
-  try {
-    await axios.post(`${API_SERVER}/entities`, data, {
-      headers,
-    });
-  } catch (err: any) {
-    const data = err?.response?.data;
-    console.error(
-      `Failed to submit distiller: ${err?.response.status} - ${JSON.stringify(
-        data,
-        null,
-        2
-      )}`
-    );
-  }
-}
-
-scrape();
+main();
