@@ -37,7 +37,11 @@ CREATE TABLE IF NOT EXISTS "bottle_distiller" (
 	"distiller_id" bigint NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "bottle_distiller" ADD CONSTRAINT "bottle_distiller_bottle_id_distiller_id" PRIMARY KEY("bottle_id","distiller_id");
+DO $$ BEGIN
+ ALTER TABLE "bottle_distiller" ADD CONSTRAINT "bottle_distiller_bottle_id_distiller_id" PRIMARY KEY("bottle_id","distiller_id");
+EXCEPTION
+ WHEN syntax_error_or_access_rule_violation THEN null;
+END $$;
 
 CREATE TABLE IF NOT EXISTS "change" (
 	"id" bigserial PRIMARY KEY NOT NULL,
