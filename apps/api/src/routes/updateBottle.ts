@@ -10,7 +10,7 @@ import {
   entities,
 } from "../db/schema";
 import { EntityInput, upsertEntity } from "../lib/db";
-import { validateRequest } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 type BottleInput = {
   name: string;
@@ -36,7 +36,7 @@ export default {
       $ref: "bottleSchema",
     },
   },
-  preHandler: [validateRequest],
+  preHandler: [requireAuth],
   handler: async (req, res) => {
     const [{ bottle, brand }] = await db
       .select({

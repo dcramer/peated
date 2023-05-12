@@ -12,13 +12,17 @@ import getTasting from "./getTasting";
 import getUser from "./getUser";
 import listBottles from "./listBottles";
 import listEntities from "./listEntities";
+import listFollowers from "./listFollowers";
 import listTastings from "./listTastings";
 import listUsers from "./listUsers";
 import updateBottle from "./updateBottle";
+import updateFollower from "./updateFollower";
 import updateTastingImage from "./updateTastingImage";
 import updateUser from "./updateUser";
 import updateUserAvatar from "./updateUserAvatar";
 import getUpload from "./uploads";
+import userFollow from "./userFollow";
+import userUnfollow from "./userUnfollow";
 
 export const router: FastifyPluginCallback = (
   fastify: FastifyInstance,
@@ -62,6 +66,10 @@ export const router: FastifyPluginCallback = (
   fastify.route(getUser);
   fastify.route(updateUser);
   fastify.route(updateUserAvatar);
+  fastify.route(userFollow);
+  fastify.route(userUnfollow);
+  fastify.route(listFollowers);
+  fastify.route(updateFollower);
 
   fastify.route(getUpload);
 

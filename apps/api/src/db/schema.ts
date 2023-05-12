@@ -61,6 +61,34 @@ export const identities = pgTable(
   },
 );
 
+export const followStatusEnum = pgEnum("follow_status", [
+  "none",
+  "pending",
+  "following",
+]);
+
+export const follows = pgTable(
+  "follow",
+  {
+    fromUserId: bigint("from_user_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+    toUserId: bigint("to_user_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+    status: followStatusEnum("status").default("pending").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (follows) => {
+    return {
+      follows: primaryKey(follows.fromUserId, follows.toUserId),
+    };
+  },
+);
+
+export type Follow = InferModel<typeof follows>;
+export type NewFollow = InferModel<typeof follows, "insert">;
+
 export const entityTypeEnum = pgEnum("entity_type", ["brand", "distiller"]);
 
 export const entities = pgTable(

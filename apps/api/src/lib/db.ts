@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { first } from "../db";
 import { NewEntity, changes, entities } from "../db/schema";
 
 export type EntityInput =
@@ -32,10 +33,9 @@ export const upsertEntity = async ({
   if (!data) return undefined;
 
   if (typeof data === "number") {
-    const [result] = await db
-      .select()
-      .from(entities)
-      .where(eq(entities.id, data));
+    const result = first(
+      await db.select().from(entities).where(eq(entities.id, data)),
+    );
 
     if (result && result.type.indexOf(type) === -1) {
       await db
@@ -46,17 +46,19 @@ export const upsertEntity = async ({
     return result ? { id: result.id, result, created: false } : undefined;
   }
 
-  const [result] = await db
-    .insert(entities)
-    .values({
-      name: data.name,
-      country: data.country || null,
-      region: data.region || null,
-      type: [type],
-      createdById: userId,
-    })
-    .onConflictDoNothing()
-    .returning();
+  const result = first(
+    await db
+      .insert(entities)
+      .values({
+        name: data.name,
+        country: data.country || null,
+        region: data.region || null,
+        type: [type],
+        createdById: userId,
+      })
+      .onConflictDoNothing()
+      .returning(),
+  );
 
   if (result) {
     await db.insert(changes).values({
@@ -69,10 +71,9 @@ export const upsertEntity = async ({
     return { id: result.id, result, created: true };
   }
 
-  const [resultConflict] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.name, data.name));
+  const resultConflict = first(
+    await db.select().from(entities).where(eq(entities.name, data.name)),
+  );
 
   if (resultConflict)
     return { id: resultConflict.id, result: resultConflict, created: false };

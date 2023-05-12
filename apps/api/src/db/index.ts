@@ -18,6 +18,11 @@ export const pool = new Pool({
 
 export const db = drizzle(pool, { logger: config.DEBUG });
 
+export const first = (value: any[]) => {
+  const [result] = value;
+  return result;
+};
+
 // export const findFirst = async (
 //   table: AnyPgTable,
 //   query: {

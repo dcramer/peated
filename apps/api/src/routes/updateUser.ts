@@ -4,7 +4,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { User, users } from "../db/schema";
 import { serializeUser } from "../lib/transformers/user";
-import { validateRequest } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "PUT",
@@ -24,7 +24,7 @@ export default {
       },
     },
   },
-  preHandler: [validateRequest],
+  preHandler: [requireAuth],
   handler: async (req, res) => {
     const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
 

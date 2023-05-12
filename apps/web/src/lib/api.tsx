@@ -27,6 +27,8 @@ export class ApiError extends Error {
 
 export class ApiUnavailable extends Error {}
 
+export class ApiUnauthorized extends ApiError {}
+
 const withoutUndefined = (obj: object) => {
   return Object.fromEntries(
     Object.entries(obj).filter(([, v]) => v !== undefined),
@@ -89,6 +91,9 @@ class ApiClient {
       throw new ApiUnavailable("Unable to reach API service.");
     }
     if (!resp?.ok) {
+      if (resp.status === 401) {
+        throw new ApiUnauthorized("Unauthorized", resp, await resp.json());
+      }
       throw new ApiError("Request failed", resp, await resp.json());
     }
     return await resp.json();

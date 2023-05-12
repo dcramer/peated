@@ -19,6 +19,7 @@ import DistillerList, {
   loader as distillerListLoader,
 } from "./routes/distillers";
 import EditBottle, { loader as editBottleLoader } from "./routes/editBottle";
+import Followers, { loader as followersLoader } from "./routes/followers";
 import Login from "./routes/login";
 import Root from "./routes/root";
 import Search from "./routes/search";
@@ -77,6 +78,11 @@ export default function createRoutes() {
           path: "distillers/:distillerId",
           element: <DistillerDetails />,
           loader: distillerDetailsLoader,
+        },
+        {
+          path: "followers",
+          element: <Followers />,
+          loader: followersLoader,
         },
         {
           path: "search",

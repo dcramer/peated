@@ -5,6 +5,7 @@ import BottleName from "../components/bottleName";
 import Button from "../components/button";
 import Layout from "../components/layout";
 import TastingListItem from "../components/tastingListItem";
+import TimeSince from "../components/timeSince";
 import api from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
 import type { Bottle, Tasting } from "../types";
@@ -67,16 +68,14 @@ export default function BottleDetails() {
   const { distillers } = bottle;
   return (
     <Layout gutter>
-      <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
+      <div className="my-4 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap sm:py-0">
         <div className="flex w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
           <h1 className="text-peated mb-2 flex gap-x-3 text-3xl font-semibold leading-7">
             <BottleName bottle={bottle} />
           </h1>
-          <p className="text-sm font-light text-gray-500">
+          <p className="prose text-gray-500">
             Produced by{" "}
-            <Link to={`/brands/${bottle.brand.id}`} className="hover:underline">
-              {bottle.brand.name}
-            </Link>
+            <Link to={`/brands/${bottle.brand.id}`}>{bottle.brand.name}</Link>
             {distillers.length > 0 &&
               (distillers.length > 0 ||
                 bottle.brand.name !== distillers[0].name) && (
@@ -118,7 +117,7 @@ export default function BottleDetails() {
       <div className="my-8 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
         {stats.map((stat) => (
           <div key={stat.name}>
-            <p className="leading-7 text-gray-400">{stat.name}</p>
+            <p className="leading-7 text-gray-500">{stat.name}</p>
             <p className="text-peated order-first text-3xl font-semibold tracking-tight sm:text-5xl">
               {stat.value}
             </p>
@@ -134,6 +133,15 @@ export default function BottleDetails() {
         </ul>
       ) : (
         <EmptyActivity to={`/bottles/${bottle.id}/addTasting`} />
+      )}
+      {bottle.createdBy && (
+        <p className="prose mt-8 text-center text-sm text-gray-500 sm:text-left">
+          This bottle was first added by{" "}
+          <Link to={`/users/${bottle.createdBy.id}`}>
+            {bottle.createdBy.displayName}
+          </Link>{" "}
+          <TimeSince date={bottle.createdAt} />
+        </p>
       )}
     </Layout>
   );

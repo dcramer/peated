@@ -79,7 +79,6 @@ export default function EditBottle() {
     e.preventDefault();
     (async () => {
       try {
-        console.log(formData);
         await api.put(`/bottles/${bottle.id}`, {
           data: {
             ...formData,

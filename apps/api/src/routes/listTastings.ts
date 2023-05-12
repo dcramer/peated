@@ -1,4 +1,4 @@
-import { SQL, and, desc, eq, inArray } from "drizzle-orm";
+import { SQL, and, desc, eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
@@ -8,10 +8,13 @@ import {
   bottlesToDistillers,
   editions,
   entities,
+  follows,
   tastings,
   users,
 } from "../db/schema";
+import { buildPageLink } from "../lib/paging";
 import { serializeTasting } from "../lib/transformers/tasting";
+import { injectAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -27,6 +30,7 @@ export default {
       },
     },
   },
+  preValidation: [injectAuth],
   handler: async (req, res) => {
     const page = req.query.page || 1;
 
@@ -39,6 +43,16 @@ export default {
     }
     if (req.query.user) {
       where.push(eq(tastings.createdById, req.query.user));
+    }
+    if (req.query.filter) {
+      if (req.query.filter === "friends") {
+        if (!req.user) {
+          return res.status(401).send({ error: "Not authenticated" });
+        }
+        where.push(
+          sql`${tastings.createdById} IN (SELECT ${follows.toUserId} FROM ${follows} WHERE ${follows.fromUserId} = ${req.user.id} AND ${follows.status} = 'following')`,
+        );
+      }
     }
 
     const results = await db
@@ -87,23 +101,35 @@ export default {
       else distillersByBottleId[d.bottleId].push(d.distiller);
     });
 
-    res.send(
-      results.map(({ tasting, bottle, brand, createdBy, edition }) =>
-        serializeTasting(
-          {
-            ...tasting,
-            createdBy,
-            edition,
-            bottle: {
-              ...bottle,
-              brand,
-              distillers: distillersByBottleId[bottle.id],
+    res.send({
+      results: results
+        .slice(0, limit)
+        .map(({ tasting, bottle, brand, createdBy, edition }) =>
+          serializeTasting(
+            {
+              ...tasting,
+              createdBy,
+              edition,
+              bottle: {
+                ...bottle,
+                brand,
+                distillers: distillersByBottleId[bottle.id],
+              },
             },
-          },
-          req.user,
+            req.user,
+          ),
         ),
-      ),
-    );
+      rel: {
+        next:
+          results.length > limit
+            ? buildPageLink(req.routeOptions.url, req.query, page + 1)
+            : null,
+        prev:
+          page > 1
+            ? buildPageLink(req.routeOptions.url, req.query, page - 1)
+            : null,
+      },
+    });
   },
 } as RouteOptions<
   Server,
@@ -114,6 +140,7 @@ export default {
       page?: number;
       bottle?: number;
       user?: number;
+      filter?: "global" | "friends" | "local";
     };
   }
 >;
