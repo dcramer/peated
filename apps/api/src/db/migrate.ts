@@ -62,7 +62,9 @@ export const migrate = async function ({
         if (fake) {
           console.log(`Faking migration ${migration.hash}`);
         } else {
-          console.log(`Applying migration ${migration.hash}`);
+          console.log(
+            `Applying migration ${migration.hash} (${migration.sql.length} statement(s))`,
+          );
           for (const stmt of migration.sql) {
             await tx.execute(sql.raw(stmt));
           }
