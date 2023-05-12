@@ -116,7 +116,7 @@ beforeAll(async () => {
 
   // this will automatically run needed migrations on the database
   try {
-    await migrate(db, { migrationsFolder: "./migrations" });
+    await migrate({ db });
   } catch (err) {
     console.error("Unable to run db migrations", err);
     throw err;
