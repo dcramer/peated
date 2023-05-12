@@ -1,11 +1,11 @@
-import { Bottle, Entity, User } from "../../db/schema";
+import { Bottle, Entity, User } from '../../db/schema'
 
 export const serializeBottle = (
   bottle: Bottle & {
-    brand: Entity;
-    distillers?: Entity[];
+    brand: Entity
+    distillers?: Entity[]
   },
-  currentUser?: User
+  currentUser?: User,
 ) => {
   return {
     id: bottle.id,
@@ -14,5 +14,5 @@ export const serializeBottle = (
     category: bottle.category,
     brand: bottle.brand,
     distillers: bottle.distillers || [],
-  };
-};
+  }
+}

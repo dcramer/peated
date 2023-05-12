@@ -1,60 +1,59 @@
-import { FormEvent, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { FormEvent, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
-import BrandField from "../components/brandField";
-import DistillerField from "../components/distillerField";
-import Fieldset from "../components/fieldset";
-import FormError from "../components/formError";
-import FormField from "../components/formField";
-import FormHeader from "../components/formHeader";
-import FormLabel from "../components/formLabel";
-import Layout from "../components/layout";
-import RichSelectField, { Option } from "../components/richSelectField";
-import TextField from "../components/textField";
-import { useRequiredAuth } from "../hooks/useAuth";
-import api, { ApiError } from "../lib/api";
-import { formatCategoryName, toTitleCase } from "../lib/strings";
+import BrandField from '../components/brandField'
+import DistillerField from '../components/distillerField'
+import Fieldset from '../components/fieldset'
+import FormError from '../components/formError'
+import FormField from '../components/formField'
+import FormHeader from '../components/formHeader'
+import FormLabel from '../components/formLabel'
+import Layout from '../components/layout'
+import RichSelectField, { Option } from '../components/richSelectField'
+import TextField from '../components/textField'
+import { useRequiredAuth } from '../hooks/useAuth'
+import api, { ApiError } from '../lib/api'
+import { formatCategoryName, toTitleCase } from '../lib/strings'
 
 type FormData = {
-  name: string;
-  brand: Option;
-  distillers?: Option[] | undefined;
-  statedAge?: number | undefined;
-  category?: Option;
-};
+  name: string
+  brand: Option
+  distillers?: Option[] | undefined
+  statedAge?: number | undefined
+  category?: Option
+}
 
 export default function AddBottle() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user } = useRequiredAuth();
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { user } = useRequiredAuth()
 
-  const qs = new URLSearchParams(location.search);
-  const name = toTitleCase(qs.get("name") || "");
+  const qs = new URLSearchParams(location.search)
+  const name = toTitleCase(qs.get('name') || '')
 
   const [formData, setFormData] = useState<Partial<FormData>>({
     name,
-  });
+  })
 
   const categoryList = [
-    "blend",
-    "bourbon",
-    "rye",
-    "single_grain",
-    "single_malt",
-    "spirit",
+    'blend',
+    'bourbon',
+    'rye',
+    'single_grain',
+    'single_malt',
+    'spirit',
   ].map((c) => ({
     id: c,
     name: formatCategoryName(c),
-  }));
+  }))
 
-  const [error, setError] = useState<string | undefined>();
+  const [error, setError] = useState<string | undefined>()
 
   const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
-    e.preventDefault();
-
-    (async () => {
+    e.preventDefault()
+    ;(async () => {
       try {
-        const bottle = await api.post("/bottles", {
+        const bottle = await api.post('/bottles', {
           data: {
             ...formData,
             category: formData.category.id,
@@ -63,25 +62,25 @@ export default function AddBottle() {
               ? formData.distillers.map((d) => d?.id || d)
               : undefined,
           },
-        });
+        })
         navigate(`/bottles/${bottle.id}/addTasting`, {
           replace: true,
-        });
+        })
       } catch (err) {
         if (err instanceof ApiError) {
-          setError(err.message);
+          setError(err.message)
         } else {
-          console.error(err);
-          setError("Internal error");
+          console.error(err)
+          setError('Internal error')
         }
       }
-    })();
-  };
+    })()
+  }
 
   const bottleName = () => {
-    if (!formData.name && !formData.brand?.name) return <em>Unknown</em>;
-    return [formData.brand?.name || "", formData.name || ""].join(" ");
-  };
+    if (!formData.name && !formData.brand?.name) return <em>Unknown</em>
+    return [formData.brand?.name || '', formData.name || ''].join(' ')
+  }
 
   return (
     <Layout
@@ -167,5 +166,5 @@ export default function AddBottle() {
         </Fieldset>
       </form>
     </Layout>
-  );
+  )
 }

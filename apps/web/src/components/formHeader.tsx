@@ -1,19 +1,19 @@
-import { useNavigate } from "react-router-dom";
-import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { FormEvent } from "react";
+import { ChevronLeftIcon } from '@heroicons/react/20/solid'
+import { FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function FormHeader({
   onSave,
   title,
   subtitle,
 }: {
-  onSave: (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => void;
-  title: string;
-  subtitle?: string | undefined | null;
+  onSave: (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => void
+  title: string
+  subtitle?: string | undefined | null
 }) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const blockStyles = `px-0 py-1 sm:py-3`;
+  const blockStyles = `px-0 py-1 sm:py-3`
 
   return (
     <nav className="flex min-w-full items-center justify-between text-white">
@@ -27,11 +27,11 @@ export default function FormHeader({
         </button>
       </div>
       <div
-        className={`flex flex-1 flex-row gap-x-2 justify-center ${blockStyles}`}
+        className={`flex flex-1 flex-row justify-center gap-x-2 ${blockStyles}`}
       >
         <h1 className="text-lg">{title}</h1>
         {subtitle && (
-          <h2 className="hidden sm:block text-sm text-peated-light truncate">
+          <h2 className="text-peated-light hidden truncate text-sm sm:block">
             {subtitle}
           </h2>
         )}
@@ -39,13 +39,13 @@ export default function FormHeader({
       <div className="flex">
         <button
           onClick={onSave}
-          className={`min-h-full group ${blockStyles} pl-3 sm:pl-6`}
+          className={`group min-h-full ${blockStyles} pl-3 sm:pl-6`}
         >
-          <span className="rounded bg-peated-dark group-hover:bg-peated-darker p-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated">
+          <span className="bg-peated-dark group-hover:bg-peated-darker focus-visible:outline-peated rounded p-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
             Save
           </span>
         </button>
       </div>
     </nav>
-  );
+  )
 }

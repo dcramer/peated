@@ -1,67 +1,67 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { ChevronRightIcon, PlusIcon } from "@heroicons/react/20/solid";
+import { ChevronRightIcon, PlusIcon } from '@heroicons/react/20/solid'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
-import { Bottle } from "../types";
-import api from "../lib/api";
-import Layout from "../components/layout";
-import { formatCategoryName, toTitleCase } from "../lib/strings";
-import BottleName from "../components/bottleName";
-import SearchHeader from "../components/searchHeader";
-import ListItem from "../components/listItem";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
+import BottleName from '../components/bottleName'
+import Layout from '../components/layout'
+import ListItem from '../components/listItem'
+import SearchHeader from '../components/searchHeader'
+import api from '../lib/api'
+import { formatCategoryName, toTitleCase } from '../lib/strings'
+import { Bottle } from '../types'
 
 const SkeletonItem = () => {
   return (
     <ListItem noHover>
       <div className="h-full w-full">
-        <div className="hidden sm:visible h-12 w-12 p-2 flex-none" />
+        <div className="hidden h-12 w-12 flex-none p-2 sm:visible" />
 
         <div className="min-w-0 flex-auto animate-pulse ">
-          <p className="bg-gray-200 font-semibold leading-6 text-gray-900 rounded -indent-96 overflow-hidden">
+          <p className="overflow-hidden rounded bg-gray-200 -indent-96 font-semibold leading-6 text-gray-900">
             Title
           </p>
-          <p className="bg-gray-200 mt-1 flex text-sm leading-5 text-gray-500 truncate rounded -indent-96 overflow-hidden">
+          <p className="mt-1 flex overflow-hidden truncate rounded bg-gray-200 -indent-96 text-sm leading-5 text-gray-500">
             Subtext
           </p>
         </div>
       </div>
     </ListItem>
-  );
-};
+  )
+}
 
 export default function Search() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const qs = new URLSearchParams(location.search);
+  const location = useLocation()
+  const navigate = useNavigate()
+  const qs = new URLSearchParams(location.search)
 
-  const directToTasting = qs.has("tasting");
+  const directToTasting = qs.has('tasting')
 
-  const [query, setQuery] = useState(qs.get("q") || "");
-  const [results, setResults] = useState<readonly Bottle[]>([]);
-  const [state, setState] = useState<"loading" | "ready">("loading");
+  const [query, setQuery] = useState(qs.get('q') || '')
+  const [results, setResults] = useState<readonly Bottle[]>([])
+  const [state, setState] = useState<'loading' | 'ready'>('loading')
 
   const fetch = (query: string) => {
     api
-      .get("/bottles", {
+      .get('/bottles', {
         query: { query },
       })
       .then(({ results }: { results: readonly Bottle[] }) => {
-        setResults(results);
-        setState("ready");
-      });
-  };
+        setResults(results)
+        setState('ready')
+      })
+  }
 
   useEffect(() => {
-    const qs = new URLSearchParams(location.search);
+    const qs = new URLSearchParams(location.search)
 
-    setQuery(qs.get("q") || "");
-  }, [location.search]);
+    setQuery(qs.get('q') || '')
+  }, [location.search])
 
   // TODO(dcramer): why is this rendering twice
   useEffect(() => {
-    fetch(query);
-  }, [query]);
+    fetch(query)
+  }, [query])
 
   return (
     <Layout
@@ -74,18 +74,18 @@ export default function Search() {
           onSubmit={(value) => {
             navigate(
               `${location.pathname}?q=${encodeURIComponent(value)}&${
-                directToTasting ? "tasting" : ""
+                directToTasting ? 'tasting' : ''
               }`,
               {
                 replace: true,
-              }
-            );
+              },
+            )
           }}
         />
       }
     >
       <ul role="list" className="divide-y divide-gray-100">
-        {state === "loading" ? (
+        {state === 'loading' ? (
           <>
             <SkeletonItem />
             <SkeletonItem />
@@ -94,10 +94,10 @@ export default function Search() {
         ) : (
           <>
             {results.map((bottle) => {
-              const title = <BottleName bottle={bottle} />;
+              const title = <BottleName bottle={bottle} />
               return (
                 <ListItem key={bottle.id}>
-                  <div className="hidden sm:visible h-12 w-12 p-2 flex-none" />
+                  <div className="hidden h-12 w-12 flex-none p-2 sm:visible" />
 
                   <div className="min-w-0 flex-auto">
                     <p className="font-semibold leading-6 text-gray-900">
@@ -112,7 +112,7 @@ export default function Search() {
                         {title}
                       </Link>
                     </p>
-                    <p className="mt-1 flex text-sm leading-5 text-gray-500 truncate">
+                    <p className="mt-1 flex truncate text-sm leading-5 text-gray-500">
                       {bottle.brand.name}
                     </p>
                   </div>
@@ -131,11 +131,11 @@ export default function Search() {
                     />
                   </div>
                 </ListItem>
-              );
+              )
             })}
-            {(results.length === 0 || query !== "") && (
+            {(results.length === 0 || query !== '') && (
               <ListItem>
-                <PlusIcon className="h-12 w-12 p-2 flex-none rounded-full bg-gray-100 group-hover:bg-peated group-hover:text-white" />
+                <PlusIcon className="group-hover:bg-peated h-12 w-12 flex-none rounded-full bg-gray-100 p-2 group-hover:text-white" />
 
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold leading-6 text-gray-900">
@@ -144,13 +144,13 @@ export default function Search() {
                       Can't find a bottle?
                     </Link>
                   </p>
-                  <p className="mt-1 flex leading-5 text-gray-500 gap-x-1">
-                    {query !== "" ? (
+                  <p className="mt-1 flex gap-x-1 leading-5 text-gray-500">
+                    {query !== '' ? (
                       <span>
-                        Tap here to add{" "}
+                        Tap here to add{' '}
                         <strong className="truncate">
                           {toTitleCase(query)}
-                        </strong>{" "}
+                        </strong>{' '}
                         to the database.
                       </span>
                     ) : (
@@ -164,5 +164,5 @@ export default function Search() {
         )}
       </ul>
     </Layout>
-  );
+  )
 }

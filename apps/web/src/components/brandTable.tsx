@@ -1,19 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
 
-import { Entity } from "../types";
-import Button from "./button";
+import { Entity } from '../types'
+import Button from './button'
 
 export default ({
   brandList,
   rel,
 }: {
-  brandList: Entity[];
+  brandList: Entity[]
   rel?: {
-    next: string | null;
-    nextPage: number | null;
-    prev: string | null;
-    prevPage: number | null;
-  };
+    next: string | null
+    nextPage: number | null
+    prev: string | null
+    prevPage: number | null
+  }
 }) => {
   return (
     <>
@@ -52,7 +52,7 @@ export default ({
                 <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
                   <Link
                     to={`/brands/${brand.id}`}
-                    className="font-bold text-peated hover:underline"
+                    className="text-peated font-bold hover:underline"
                   >
                     {brand.name}
                   </Link>
@@ -60,11 +60,11 @@ export default ({
                 <td className="hidden px-3 py-4 text-right text-sm text-gray-500 sm:table-cell">
                   {brand.country}
                 </td>
-                <td className="hidden py-4 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-3 sm:table-cell">
-                  {brand.region || ""}
+                <td className="hidden py-4 pl-3 pr-4 text-right text-sm text-gray-500 sm:table-cell sm:pr-3">
+                  {brand.region || ''}
                 </td>
               </tr>
-            );
+            )
           })}
         </tbody>
       </table>
@@ -73,7 +73,7 @@ export default ({
           className="flex items-center justify-between border-t border-gray-200 bg-white py-3"
           aria-label="Pagination"
         >
-          <div className="flex flex-1 justify-between sm:justify-end gap-x-2">
+          <div className="flex flex-1 justify-between gap-x-2 sm:justify-end">
             <Button
               to={rel.prevPage ? `?page=${rel.prevPage}` : undefined}
               disabled={!rel.prevPage}
@@ -90,5 +90,5 @@ export default ({
         </nav>
       )}
     </>
-  );
-};
+  )
+}

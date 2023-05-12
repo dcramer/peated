@@ -1,23 +1,23 @@
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from 'react'
 
-import { Dialog, Transition } from "@headlessui/react";
-import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import config from "../config";
-import api from "../lib/api";
-import classNames from "../lib/classNames";
-import { toTitleCase } from "../lib/strings";
-import Button from "./button";
-import Chip from "./chip";
-import FormField from "./formField";
-import Header from "./header";
-import ListItem from "./listItem";
-import SearchHeader from "./searchHeader";
+import { Dialog, Transition } from '@headlessui/react'
+import { CheckIcon, PlusIcon, XMarkIcon } from '@heroicons/react/20/solid'
+import config from '../config'
+import api from '../lib/api'
+import classNames from '../lib/classNames'
+import { toTitleCase } from '../lib/strings'
+import Button from './button'
+import Chip from './chip'
+import FormField from './formField'
+import Header from './header'
+import ListItem from './listItem'
+import SearchHeader from './searchHeader'
 
 export type Option = {
-  id?: string | null;
-  name: string;
-  [key: string]: any;
-};
+  id?: string | null
+  name: string
+  [key: string]: any
+}
 
 const OverlayTransition = ({ children }: { children: ReactNode }) => {
   return (
@@ -32,8 +32,8 @@ const OverlayTransition = ({ children }: { children: ReactNode }) => {
     >
       {children}
     </Transition.Child>
-  );
-};
+  )
+}
 
 const PanelTransition = ({ children }: { children: ReactNode }) => {
   return (
@@ -48,16 +48,16 @@ const PanelTransition = ({ children }: { children: ReactNode }) => {
     >
       {children}
     </Transition.Child>
-  );
-};
+  )
+}
 
 type CreateOptionForm = ({
   data,
   onFieldChange,
 }: {
-  data: Option;
-  onFieldChange: (arg0: Partial<Option>) => void;
-}) => ReactNode;
+  data: Option
+  onFieldChange: (arg0: Partial<Option>) => void
+}) => ReactNode
 
 // TODO(dcramer): hitting escape doesnt do what you want here (it does nothing)
 const CreateOptionDialog = ({
@@ -66,15 +66,15 @@ const CreateOptionDialog = ({
   onSubmit,
   render,
 }: {
-  open: boolean;
-  setOpen: (value: boolean) => void;
-  onSubmit?: (newOption: Option) => void;
-  render: CreateOptionForm;
+  open: boolean
+  setOpen: (value: boolean) => void
+  onSubmit?: (newOption: Option) => void
+  render: CreateOptionForm
 }) => {
   const [newOption, setNewOption] = useState<Option>({
     id: null,
-    name: "",
-  });
+    name: '',
+  })
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -92,11 +92,11 @@ const CreateOptionDialog = ({
             <Dialog.Panel className="relative flex h-screen min-w-full transform items-center justify-center overflow-hidden bg-white px-4 pb-4 pt-5 text-left transition-all sm:p-6">
               <form
                 onSubmit={(e) => {
-                  e.preventDefault();
+                  e.preventDefault()
 
-                  onSubmit && onSubmit({ ...newOption });
+                  onSubmit && onSubmit({ ...newOption })
 
-                  setOpen(false);
+                  setOpen(false)
                 }}
                 className="max-w-md"
               >
@@ -106,7 +106,7 @@ const CreateOptionDialog = ({
                     setNewOption({
                       ...newOption,
                       ...value,
-                    });
+                    })
                   },
                 })}
                 <div className="mt-5 flex flex flex-row-reverse gap-x-2 sm:mt-6">
@@ -115,7 +115,7 @@ const CreateOptionDialog = ({
                   </Button>
                   <Button
                     onClick={() => {
-                      setOpen(false);
+                      setOpen(false)
                     }}
                   >
                     Cancel
@@ -127,23 +127,23 @@ const CreateOptionDialog = ({
         </div>
       </Dialog>
     </Transition.Root>
-  );
-};
+  )
+}
 
 const filterDupes = (firstList: Option[], ...moreLists: Option[][]) => {
-  const results: Option[] = [...firstList];
-  const matches = new Set(firstList.map((i) => `${i.id}-${i.name}`));
+  const results: Option[] = [...firstList]
+  const matches = new Set(firstList.map((i) => `${i.id}-${i.name}`))
 
   moreLists.forEach((options) => {
     options.forEach((i) => {
       if (!matches.has(`${i.id}-${i.name}`)) {
-        results.push(i);
-        matches.add(`${i.id}-${i.name}`);
+        results.push(i)
+        matches.add(`${i.id}-${i.name}`)
       }
-    });
-  });
-  return results;
-};
+    })
+  })
+  return results
+}
 
 const SelectDialog = ({
   open,
@@ -157,27 +157,27 @@ const SelectDialog = ({
   endpoint,
   options,
 }: {
-  open: boolean;
-  setOpen: (value: boolean) => void;
-  onSelect?: (value: any) => void;
-  selectedValues?: any[];
-  searchPlaceholder?: string;
-  canCreate?: boolean;
-  multiple?: boolean;
-  createForm?: CreateOptionForm;
-  endpoint?: string;
-  options?: Option[];
+  open: boolean
+  setOpen: (value: boolean) => void
+  onSelect?: (value: any) => void
+  selectedValues?: any[]
+  searchPlaceholder?: string
+  canCreate?: boolean
+  multiple?: boolean
+  createForm?: CreateOptionForm
+  endpoint?: string
+  options?: Option[]
 }) => {
-  const [query, setQuery] = useState("");
-  const [optionList, setOptionList] = useState<Option[]>([...selectedValues]);
-  const [results, setResults] = useState<Option[]>([]);
+  const [query, setQuery] = useState('')
+  const [optionList, setOptionList] = useState<Option[]>([...selectedValues])
+  const [results, setResults] = useState<Option[]>([])
   const [previousValues, setPreviousValues] = useState<Option[]>([
     ...selectedValues,
-  ]);
+  ])
 
-  const [createOpen, setCreateOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false)
 
-  const onSearch = async (query: string = "") => {
+  const onSearch = async (query: string = '') => {
     const results = endpoint
       ? (
           await api.get(endpoint, {
@@ -185,27 +185,27 @@ const SelectDialog = ({
           })
         ).results
       : options?.filter(
-          (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
-        );
-    setResults(results);
-  };
+          (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1,
+        )
+    setResults(results)
+  }
 
   const selectOption = async (option: Option) => {
-    setPreviousValues(filterDupes([option], previousValues));
-    onSelect(option);
-  };
+    setPreviousValues(filterDupes([option], previousValues))
+    onSelect(option)
+  }
 
   useEffect(() => {
-    setOptionList(filterDupes(selectedValues, results, previousValues));
+    setOptionList(filterDupes(selectedValues, results, previousValues))
   }, [
     JSON.stringify(selectedValues),
     JSON.stringify(results),
     JSON.stringify(previousValues),
-  ]);
+  ])
 
   useEffect(() => {
-    onSearch(query);
-  }, [query]);
+    onSearch(query)
+  }, [query])
 
   return (
     <>
@@ -223,24 +223,24 @@ const SelectDialog = ({
               <SearchHeader
                 onClose={() => setOpen(false)}
                 onChange={(value) => {
-                  setQuery(value);
+                  setQuery(value)
                 }}
                 onDone={multiple ? () => setOpen(false) : undefined}
                 closeIcon={<XMarkIcon className="h-8 w-8" />}
                 placeholder={searchPlaceholder}
               />
             </Header>
-            <main className={"m-h-screen relative mx-auto max-w-4xl"}>
+            <main className={'m-h-screen relative mx-auto max-w-4xl'}>
               <ul role="list" className="divide-y divide-gray-100">
                 {optionList.map((option) => {
                   return (
                     <ListItem key={`${option.id}-${option.name}`}>
                       <CheckIcon
                         className={classNames(
-                          "h-12 w-12 flex-none rounded-full bg-gray-100 p-2",
+                          'h-12 w-12 flex-none rounded-full bg-gray-100 p-2',
                           selectedValues.find(
-                            (i) => i.id == option.id && i.name == option.name
-                          ) && "bg-peated text-white"
+                            (i) => i.id == option.id && i.name == option.name,
+                          ) && 'bg-peated text-white',
                         )}
                       />
 
@@ -248,7 +248,7 @@ const SelectDialog = ({
                         <p className="font-semibold leading-6 text-gray-900">
                           <button
                             onClick={() => {
-                              selectOption(option);
+                              selectOption(option)
                             }}
                           >
                             <span className="absolute inset-x-0 -top-px bottom-0" />
@@ -258,9 +258,9 @@ const SelectDialog = ({
                         <p className="mt-1 flex truncate text-xs leading-5 text-gray-500"></p>
                       </div>
                     </ListItem>
-                  );
+                  )
                 })}
-                {(results.length === 0 || query !== "") &&
+                {(results.length === 0 || query !== '') &&
                   (canCreate && createForm ? (
                     <ListItem>
                       <PlusIcon className="group-hover:bg-peated h-12 w-12 flex-none rounded-full bg-gray-100 p-2 group-hover:text-white" />
@@ -273,12 +273,12 @@ const SelectDialog = ({
                           </button>
                         </p>
                         <p className="mt-1 flex gap-x-1 text-sm leading-5 text-gray-500">
-                          {query !== "" ? (
+                          {query !== '' ? (
                             <span>
-                              Tap here to add{" "}
+                              Tap here to add{' '}
                               <strong className="truncate">
                                 {toTitleCase(query)}
-                              </strong>{" "}
+                              </strong>{' '}
                               to the database.
                             </span>
                           ) : (
@@ -314,7 +314,7 @@ const SelectDialog = ({
                 setOpen={setCreateOpen}
                 render={createForm}
                 onSubmit={(newOption) => {
-                  selectOption(newOption);
+                  selectOption(newOption)
                 }}
               />
             )}
@@ -322,37 +322,37 @@ const SelectDialog = ({
         </div>
       </Dialog>
     </>
-  );
-};
+  )
+}
 
 type Props = {
-  name?: string;
-  value?: Option | Option[] | null;
-  label?: string;
-  helpText?: string;
-  required?: boolean;
-  multiple?: boolean;
-  placeholder?: string;
+  name?: string
+  value?: Option | Option[] | null
+  label?: string
+  helpText?: string
+  required?: boolean
+  multiple?: boolean
+  placeholder?: string
 
-  onChange?: (value: Option | Option[]) => void;
+  onChange?: (value: Option | Option[]) => void
 
   // maximum number of options to backfill with suggestions
   // available for quick selection
-  targetOptions?: number;
+  targetOptions?: number
 
-  canCreate?: boolean;
-  createForm?: CreateOptionForm;
+  canCreate?: boolean
+  createForm?: CreateOptionForm
 
   // options are gathered either via dynamic query
-  endpoint?: string;
+  endpoint?: string
   // or fixed value
-  options?: Option[];
+  options?: Option[]
   // static suggestions can also be provided
-  suggestedOptions?: Option[];
+  suggestedOptions?: Option[]
 
-  children?: ReactNode;
-  className?: string;
-};
+  children?: ReactNode
+  className?: string
+}
 
 export default ({
   name,
@@ -375,43 +375,43 @@ export default ({
     ? props.value
     : props.value
     ? [props.value]
-    : [];
+    : []
 
-  const [value, setValue] = useState<Option[]>(initialValue);
-  const [previousValues, setPreviousValues] = useState<Option[]>(value);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [value, setValue] = useState<Option[]>(initialValue)
+  const [previousValues, setPreviousValues] = useState<Option[]>(value)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   const toggleOption = (option: Option) => {
-    setPreviousValues(filterDupes([option], previousValues));
+    setPreviousValues(filterDupes([option], previousValues))
     if (value.find((i) => i.id == option.id && i.name == option.name)) {
-      setValue(value.filter((i) => i.id != option.id || i.name != option.name));
-      return false;
+      setValue(value.filter((i) => i.id != option.id || i.name != option.name))
+      return false
     }
 
     if (multiple) {
-      setValue([option, ...value]);
+      setValue([option, ...value])
     } else {
-      setValue([option]);
+      setValue([option])
     }
-    return true;
-  };
+    return true
+  }
 
   useEffect(() => {
     if (multiple) {
-      onChange(value);
+      onChange(value)
     } else {
-      onChange(value[0]);
+      onChange(value[0])
     }
-  }, [JSON.stringify(value)]);
+  }, [JSON.stringify(value)])
 
-  const visibleValues = filterDupes(value, previousValues);
+  const visibleValues = filterDupes(value, previousValues)
 
   if (visibleValues.length < targetOptions) {
     filterDupes(visibleValues, suggestedOptions)
       .slice(visibleValues.length, targetOptions)
       .forEach((i) => {
-        visibleValues.push(i);
-      });
+        visibleValues.push(i)
+      })
   }
   return (
     <FormField
@@ -421,7 +421,7 @@ export default ({
       helpText={helpText}
       className={className}
       labelAction={() => {
-        setDialogOpen(true);
+        setDialogOpen(true)
       }}
       onClick={() => setDialogOpen(true)}
     >
@@ -431,8 +431,8 @@ export default ({
             key={`${option.id}-${option.name}`}
             active={value.indexOf(option) !== -1}
             onClick={(e) => {
-              e.stopPropagation();
-              toggleOption(option);
+              e.stopPropagation()
+              toggleOption(option)
             }}
           >
             {option.name}
@@ -446,8 +446,8 @@ export default ({
           multiple && (
             <Chip
               onClick={(e) => {
-                e.stopPropagation();
-                setDialogOpen(true);
+                e.stopPropagation()
+                setDialogOpen(true)
               }}
             >
               <PlusIcon className="text-peated h-6 w-6" />
@@ -458,8 +458,8 @@ export default ({
         open={dialogOpen}
         setOpen={setDialogOpen}
         onSelect={(option) => {
-          const active = toggleOption(option);
-          if (!multiple && active) setDialogOpen(false);
+          const active = toggleOption(option)
+          if (!multiple && active) setDialogOpen(false)
         }}
         multiple={multiple}
         canCreate={canCreate}
@@ -470,5 +470,5 @@ export default ({
         options={options}
       />
     </FormField>
-  );
-};
+  )
+}

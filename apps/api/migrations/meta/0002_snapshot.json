@@ -62,10 +62,7 @@
       "indexes": {
         "bottle_brand_unq": {
           "name": "bottle_brand_unq",
-          "columns": [
-            "name",
-            "brand_id"
-          ],
+          "columns": ["name", "brand_id"],
           "isUnique": true
         }
       },
@@ -74,12 +71,8 @@
           "name": "bottle_brand_id_entity_id_fk",
           "tableFrom": "bottle",
           "tableTo": "entity",
-          "columnsFrom": [
-            "brand_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["brand_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -87,12 +80,8 @@
           "name": "bottle_created_by_id_user_id_fk",
           "tableFrom": "bottle",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -122,12 +111,8 @@
           "name": "bottle_distiller_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_distiller",
           "tableTo": "bottle",
-          "columnsFrom": [
-            "bottle_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bottle_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -135,12 +120,8 @@
           "name": "bottle_distiller_distiller_id_entity_id_fk",
           "tableFrom": "bottle_distiller",
           "tableTo": "entity",
-          "columnsFrom": [
-            "distiller_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["distiller_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -148,10 +129,7 @@
       "compositePrimaryKeys": {
         "bottle_distiller_bottle_id_distiller_id": {
           "name": "bottle_distiller_bottle_id_distiller_id",
-          "columns": [
-            "bottle_id",
-            "distiller_id"
-          ]
+          "columns": ["bottle_id", "distiller_id"]
         }
       }
     },
@@ -203,12 +181,8 @@
           "name": "change_created_by_id_user_id_fk",
           "tableFrom": "change",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -260,11 +234,7 @@
       "indexes": {
         "edition_unq": {
           "name": "edition_unq",
-          "columns": [
-            "bottle_id",
-            "name",
-            "barrel"
-          ],
+          "columns": ["bottle_id", "name", "barrel"],
           "isUnique": true
         }
       },
@@ -273,12 +243,8 @@
           "name": "edition_bottle_id_bottle_id_fk",
           "tableFrom": "edition",
           "tableTo": "bottle",
-          "columnsFrom": [
-            "bottle_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bottle_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -286,12 +252,8 @@
           "name": "edition_created_by_id_user_id_fk",
           "tableFrom": "edition",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -363,9 +325,7 @@
       "indexes": {
         "entity_name_unq": {
           "name": "entity_name_unq",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "isUnique": true
         }
       },
@@ -374,12 +334,8 @@
           "name": "entity_created_by_id_user_id_fk",
           "tableFrom": "entity",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -418,10 +374,7 @@
       "indexes": {
         "identity_unq": {
           "name": "identity_unq",
-          "columns": [
-            "provider",
-            "external_id"
-          ],
+          "columns": ["provider", "external_id"],
           "isUnique": true
         }
       },
@@ -430,12 +383,8 @@
           "name": "identity_user_id_user_id_fk",
           "tableFrom": "identity",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -508,12 +457,8 @@
           "name": "tasting_bottle_id_bottle_id_fk",
           "tableFrom": "tasting",
           "tableTo": "bottle",
-          "columnsFrom": [
-            "bottle_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bottle_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -521,12 +466,8 @@
           "name": "tasting_edition_id_bottle_id_fk",
           "tableFrom": "tasting",
           "tableTo": "bottle",
-          "columnsFrom": [
-            "edition_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["edition_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -534,12 +475,8 @@
           "name": "tasting_created_by_id_user_id_fk",
           "tableFrom": "tasting",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -605,9 +542,7 @@
       "indexes": {
         "user_email_unq": {
           "name": "user_email_unq",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },

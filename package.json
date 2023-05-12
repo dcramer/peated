@@ -14,10 +14,13 @@
     "db:migrate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:migrate",
     "db:generate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:generate",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/api' user",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "pnpm -r --parallel run typecheck",
     "test": "pnpm -r --stream run test",
     "test:ci": "CI=true pnpm -r --stream run test",
-    "token": "dotenv -e .env.local -- pnpm --filter='./apps/api' token"
+    "token": "dotenv -e .env.local -- pnpm --filter='./apps/api' token",
+    "preinstall": "npx only-allow pnpm",
+    "postinstall": "simple-git-hooks",
+    "format": "prettier --write --cache ."
   },
   "author": "David Cramer",
   "license": "Apache-2.0",
@@ -25,10 +28,12 @@
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.1.0",
     "foreman": "^3.0.1",
+    "lint-staged": "^13.2.2",
     "pnpm": "^8.5.0",
     "prettier": "^2.8.8",
     "prettier-plugin-organize-imports": "^3.2.2",
-    "prettier-plugin-tailwindcss": "^0.2.8"
+    "prettier-plugin-tailwindcss": "^0.2.8",
+    "simple-git-hooks": "^2.8.1"
   },
   "engines": {
     "node": ">=18.0.0 <19.0.0"
@@ -37,5 +42,13 @@
   "volta": {
     "node": "18.16.0",
     "pnpm": "8.5.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged --concurrent false"
+  },
+  "lint-staged": {
+    "*": [
+      "prettier --write --cache --ignore-unknown"
+    ]
   }
 }

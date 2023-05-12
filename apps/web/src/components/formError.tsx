@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import Alert from "./alert";
+import { ReactNode } from 'react'
+import Alert from './alert'
 
 export default ({ values }: { values: ReactNode[] }) => {
   return (
@@ -15,5 +15,5 @@ export default ({ values }: { values: ReactNode[] }) => {
         </ul>
       </div>
     </Alert>
-  );
-};
+  )
+}

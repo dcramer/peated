@@ -1,15 +1,15 @@
 import {
   ChatBubbleLeftRightIcon,
   HandThumbUpIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline'
 
-import { Tasting } from "../types";
-import { StaticRating } from "./rating";
-import Button from "./button";
-import { Link } from "react-router-dom";
-import BottleCard from "./bottleCard";
-import UserAvatar from "./userAvatar";
-import Chip from "./chip";
+import { Link } from 'react-router-dom'
+import { Tasting } from '../types'
+import BottleCard from './bottleCard'
+import Button from './button'
+import Chip from './chip'
+import { StaticRating } from './rating'
+import UserAvatar from './userAvatar'
 
 const TimeSince = ({ date }: { date: string }) => {
   return (
@@ -17,32 +17,32 @@ const TimeSince = ({ date }: { date: string }) => {
       dateTime={date}
       className="block text-sm font-light text-gray-500 dark:text-gray-400"
     >
-      {new Date(date).toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      {new Date(date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       })}
     </time>
-  );
-};
+  )
+}
 
 export default ({
   tasting,
   noBottle,
 }: {
-  tasting: Tasting;
-  noBottle?: boolean;
+  tasting: Tasting
+  noBottle?: boolean
 }) => {
-  const { bottle } = tasting;
+  const { bottle } = tasting
 
   return (
-    <li className="overflow-hidden bg-white shadow sm:rounded p-3">
-      <div className="flex items-center mb-4 space-x-4">
-        <span className="overflow-hidden w-48-px h-48-px rounded bg-gray-100">
+    <li className="overflow-hidden bg-white p-3 shadow sm:rounded">
+      <div className="mb-4 flex items-center space-x-4">
+        <span className="w-48-px h-48-px overflow-hidden rounded bg-gray-100">
           <UserAvatar size={48} user={tasting.createdBy} />
         </span>
-        <div className="space-y-1 font-medium text-peated flex-1">
+        <div className="text-peated flex-1 space-y-1 font-medium">
           <Link
             to={`/users/${tasting.createdBy.id}`}
             className="hover:underline"
@@ -86,7 +86,7 @@ export default ({
       )}
 
       <aside>
-        <div className="flex items-center mt-3 space-x-3">
+        <div className="mt-3 flex items-center space-x-3">
           <Button
             type="button"
             icon={
@@ -109,5 +109,5 @@ export default ({
         </div>
       </aside>
     </li>
-  );
-};
+  )
+}

@@ -1,5 +1,7 @@
-import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import { eq } from 'drizzle-orm'
+import type { RouteOptions } from 'fastify'
+import { IncomingMessage, Server, ServerResponse } from 'http'
+import { db } from '../db'
 import {
   bottles,
   bottlesToDistillers,
@@ -7,20 +9,18 @@ import {
   entities,
   tastings,
   users,
-} from "../db/schema";
-import { db } from "../db";
-import { eq } from "drizzle-orm";
-import { serializeTasting } from "../lib/transformers/tasting";
+} from '../db/schema'
+import { serializeTasting } from '../lib/transformers/tasting'
 
 export default {
-  method: "GET",
-  url: "/tastings/:tastingId",
+  method: 'GET',
+  url: '/tastings/:tastingId',
   schema: {
     params: {
-      type: "object",
-      required: ["tastingId"],
+      type: 'object',
+      required: ['tastingId'],
       properties: {
-        tastingId: { type: "number" },
+        tastingId: { type: 'number' },
       },
     },
   },
@@ -39,10 +39,10 @@ export default {
       .innerJoin(users, eq(tastings.createdById, users.id))
       .leftJoin(editions, eq(tastings.editionId, editions.id))
       .where(eq(tastings.id, req.params.tastingId))
-      .limit(1);
+      .limit(1)
 
     if (!tasting) {
-      return res.status(404).send({ error: "Not found" });
+      return res.status(404).send({ error: 'Not found' })
     }
 
     const distillersQuery = await db
@@ -52,9 +52,9 @@ export default {
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id)
+        eq(bottlesToDistillers.distillerId, entities.id),
       )
-      .where(eq(bottlesToDistillers.bottleId, bottle.id));
+      .where(eq(bottlesToDistillers.bottleId, bottle.id))
 
     res.send(
       serializeTasting(
@@ -68,9 +68,9 @@ export default {
             distillers: distillersQuery.map(({ distiller }) => distiller),
           },
         },
-        req.user
-      )
-    );
+        req.user,
+      ),
+    )
   },
 } as RouteOptions<
   Server,
@@ -78,7 +78,7 @@ export default {
   ServerResponse,
   {
     Params: {
-      tastingId: number;
-    };
+      tastingId: number
+    }
   }
->;
+>

@@ -1,5 +1,5 @@
-import * as Sentry from "@sentry/node";
-import { ProfilingIntegration } from "@sentry/profiling-node";
+import * as Sentry from '@sentry/node'
+import { ProfilingIntegration } from '@sentry/profiling-node'
 
 export const initSentry = ({ ...params }) => {
   Sentry.init({
@@ -11,5 +11,5 @@ export const initSentry = ({ ...params }) => {
       new ProfilingIntegration(),
       ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
     ],
-  });
-};
+  })
+}

@@ -1,25 +1,25 @@
-import fastify from "fastify";
-import { OAuth2Namespace } from "@fastify/oauth2";
+import { OAuth2Namespace } from '@fastify/oauth2'
+import 'fastify'
 
 declare namespace NodeJS {
   export interface ProcessEnv {
-    NODE_ENV: "development" | "production" | "test";
-    PORT?: string;
-    HOST?: string;
+    NODE_ENV: 'development' | 'production' | 'test'
+    PORT?: string
+    HOST?: string
   }
 }
 
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyInstance {
-    googleOAuth2: OAuth2Namespace;
+    googleOAuth2: OAuth2Namespace
   }
   export interface FastifyRequest {
-    user: any;
+    user: any
   }
 }
 
 interface CustomMatchers<R = unknown> {
-  toRespondWith(statusCode: number): R;
+  toRespondWith(statusCode: number): R
 }
 
 declare global {
@@ -33,5 +33,5 @@ declare global {
     authHeaders: {
       Authorization: string,
     },
-  };
+  }
 }

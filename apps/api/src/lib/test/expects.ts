@@ -1,4 +1,4 @@
-import { expect } from "vitest";
+import { expect } from 'vitest'
 
 expect.extend({
   toRespondWith: function (response, statusCode: number) {
@@ -8,11 +8,11 @@ expect.extend({
         pass: false,
         expected: statusCode,
         actual: response.statusCode,
-      };
+      }
     }
     return {
       pass: true,
-      message: () => "",
-    };
+      message: () => '',
+    }
   },
-});
+})

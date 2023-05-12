@@ -1,18 +1,18 @@
-import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { bottles, bottlesToDistillers, entities, tastings } from "../db/schema";
-import { db } from "../db";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql } from 'drizzle-orm'
+import type { RouteOptions } from 'fastify'
+import { IncomingMessage, Server, ServerResponse } from 'http'
+import { db } from '../db'
+import { bottles, bottlesToDistillers, entities, tastings } from '../db/schema'
 
 export default {
-  method: "GET",
-  url: "/bottles/:bottleId",
+  method: 'GET',
+  url: '/bottles/:bottleId',
   schema: {
     params: {
-      type: "object",
-      required: ["bottleId"],
+      type: 'object',
+      required: ['bottleId'],
       properties: {
-        bottleId: { type: "number" },
+        bottleId: { type: 'number' },
       },
     },
   },
@@ -24,10 +24,10 @@ export default {
       })
       .from(bottles)
       .innerJoin(entities, eq(entities.id, bottles.brandId))
-      .where(eq(bottles.id, req.params.bottleId));
+      .where(eq(bottles.id, req.params.bottleId))
 
     if (!bottle) {
-      return res.status(404).send({ error: "Not found" });
+      return res.status(404).send({ error: 'Not found' })
     }
 
     const distillers = await db
@@ -37,23 +37,23 @@ export default {
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id)
+        eq(bottlesToDistillers.distillerId, entities.id),
       )
-      .where(eq(bottlesToDistillers.bottleId, bottle.id));
+      .where(eq(bottlesToDistillers.bottleId, bottle.id))
 
     const [{ count: totalPeople }] = await db
       .select({
         count: sql<number>`COUNT(DISTINCT ${tastings.createdById})`,
       })
       .from(tastings)
-      .where(eq(tastings.bottleId, bottle.id));
+      .where(eq(tastings.bottleId, bottle.id))
 
     const [{ avgRating }] = await db
       .select({
         avgRating: sql<number>`AVG(${tastings.rating})`,
       })
       .from(tastings)
-      .where(eq(tastings.bottleId, bottle.id));
+      .where(eq(tastings.bottleId, bottle.id))
 
     res.send({
       ...bottle,
@@ -64,7 +64,7 @@ export default {
         avgRating: avgRating,
         people: totalPeople,
       },
-    });
+    })
   },
 } as RouteOptions<
   Server,
@@ -72,7 +72,7 @@ export default {
   ServerResponse,
   {
     Params: {
-      bottleId: number;
-    };
+      bottleId: number
+    }
   }
->;
+>

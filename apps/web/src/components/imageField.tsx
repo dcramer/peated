@@ -1,73 +1,73 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from 'react'
 
-import FormField from "./formField";
-import TextInput from "./textInput";
-import Button from "./button";
-import HelpText from "./helpText";
+import Button from './button'
+import FormField from './formField'
+import HelpText from './helpText'
+import TextInput from './textInput'
 
-type Props = Omit<React.ComponentProps<typeof TextInput>, "value"> & {
-  label?: string;
-  buttonLabel?: string;
-  helpText?: string;
-  required?: boolean;
-  children?: ReactNode;
-  className?: string;
-  value?: string | File | undefined;
-};
+type Props = Omit<React.ComponentProps<typeof TextInput>, 'value'> & {
+  label?: string
+  buttonLabel?: string
+  helpText?: string
+  required?: boolean
+  children?: ReactNode
+  className?: string
+  value?: string | File | undefined
+}
 
 const fileToDataUrl = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+    const reader = new FileReader()
     reader.onload = () => {
-      if (reader.result !== "data:") {
-        resolve(reader.result as string);
+      if (reader.result !== 'data:') {
+        resolve(reader.result as string)
       } else {
-        resolve("");
+        resolve('')
       }
-    };
+    }
     reader.onerror = () => {
-      reject(reader.error);
-    };
-    reader.readAsDataURL(file);
-  });
-};
+      reject(reader.error)
+    }
+    reader.readAsDataURL(file)
+  })
+}
 
 export default ({
   name,
   label,
-  buttonLabel = "Upload Image",
+  buttonLabel = 'Upload Image',
   helpText,
   required,
   className,
   value,
   onChange,
 }: Props) => {
-  const fileRef = useRef<HTMLInputElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const [_isHover, setHover] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | null>();
+  const fileRef = useRef<HTMLInputElement>(null)
+  const imageRef = useRef<HTMLImageElement>(null)
+  const [_isHover, setHover] = useState(false)
+  const [imageSrc, setImageSrc] = useState<string | null>()
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       if (value instanceof File) {
-        setImageSrc(await fileToDataUrl(value));
+        setImageSrc(await fileToDataUrl(value))
       } else {
-        setImageSrc(value || "");
+        setImageSrc(value || '')
       }
-    })();
-  }, [value]);
+    })()
+  }, [value])
 
   const updatePreview = () => {
-    const file = Array.from(fileRef.current!.files || []).find(() => true);
+    const file = Array.from(fileRef.current!.files || []).find(() => true)
     if (file) {
-      (async () => {
-        setImageSrc(await fileToDataUrl(file));
-      })();
+      ;(async () => {
+        setImageSrc(await fileToDataUrl(file))
+      })()
     } else {
-      imageRef.current!.src = "";
-      setImageSrc("");
+      imageRef.current!.src = ''
+      setImageSrc('')
     }
-  };
+  }
 
   return (
     <FormField
@@ -81,36 +81,36 @@ export default ({
       // See: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Drag_operations#droptargets
       // https://stackoverflow.com/questions/8006715/drag-drop-files-into-standard-html-file-input
       onDragOver={(e) => {
-        e.preventDefault();
+        e.preventDefault()
       }}
       onDragEnter={(e) => {
-        e.preventDefault();
-        setHover(true);
+        e.preventDefault()
+        setHover(true)
       }}
       onDragExit={(e) => {
-        e.preventDefault();
-        setHover(false);
+        e.preventDefault()
+        setHover(false)
       }}
       onMouseOver={() => {
-        setHover(true);
+        setHover(true)
       }}
       onMouseOut={() => {
-        setHover(false);
+        setHover(false)
       }}
       onDrop={(e) => {
-        e.preventDefault();
-        const dt = new DataTransfer();
-        Array.from(e.dataTransfer.files).forEach((f) => dt.items.add(f));
-        fileRef.current!.files = dt.files;
-        updatePreview();
+        e.preventDefault()
+        const dt = new DataTransfer()
+        Array.from(e.dataTransfer.files).forEach((f) => dt.items.add(f))
+        fileRef.current!.files = dt.files
+        updatePreview()
       }}
     >
-      <div className="col-span-full flex items-center gap-x-4 min-w-full mt-2">
+      <div className="col-span-full mt-2 flex min-w-full items-center gap-x-4">
         <div
           className="h-24 w-24 flex-none rounded bg-gray-100 object-cover"
           onClick={(e) => {
-            e.preventDefault();
-            fileRef.current?.click();
+            e.preventDefault()
+            fileRef.current?.click()
           }}
         >
           {imageSrc && (
@@ -129,9 +129,9 @@ export default ({
           required={required}
           className="hidden"
           onChange={(e) => {
-            e.preventDefault();
-            updatePreview();
-            if (onChange) onChange(e);
+            e.preventDefault()
+            updatePreview()
+            if (onChange) onChange(e)
           }}
         />
         <div>
@@ -139,8 +139,8 @@ export default ({
             type="button"
             color="primary"
             onClick={(e) => {
-              e.preventDefault();
-              fileRef.current?.click();
+              e.preventDefault()
+              fileRef.current?.click()
             }}
           >
             {buttonLabel}
@@ -149,5 +149,5 @@ export default ({
         </div>
       </div>
     </FormField>
-  );
-};
+  )
+}

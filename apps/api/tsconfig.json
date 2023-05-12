@@ -4,5 +4,5 @@
     "types": ["vitest/globals"]
   },
   "include": ["src"],
-  "exclude": ["src/test/setup-test-env.ts"],
+  "exclude": ["src/test/setup-test-env.ts"]
 }

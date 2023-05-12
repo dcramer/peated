@@ -1,5 +1,7 @@
-import React, { Suspense } from "react";
-import ReactDOM from "react-dom/client";
+import { GoogleOAuthProvider } from '@react-oauth/google'
+import * as Sentry from '@sentry/react'
+import React, { Suspense } from 'react'
+import ReactDOM from 'react-dom/client'
 import {
   createBrowserRouter,
   createRoutesFromChildren,
@@ -7,16 +9,14 @@ import {
   RouterProvider,
   useLocation,
   useNavigationType,
-} from "react-router-dom";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import * as Sentry from "@sentry/react";
+} from 'react-router-dom'
 
 // import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
-import createRoutes from "./routes";
-import config from "./config";
-import { AuthProvider } from "./hooks/useAuth";
-import { OnlineStatusProvider } from "./hooks/useOnlineStatus";
-import Spinner from "./components/spinner";
+import Spinner from './components/spinner'
+import config from './config'
+import { AuthProvider } from './hooks/useAuth'
+import { OnlineStatusProvider } from './hooks/useOnlineStatus'
+import createRoutes from './routes'
 
 Sentry.init({
   dsn: config.SENTRY_DSN,
@@ -25,13 +25,13 @@ Sentry.init({
 
   integrations: [
     new Sentry.BrowserTracing({
-      tracePropagationTargets: ["localhost", /^\//, "api.peated.app"],
+      tracePropagationTargets: ['localhost', /^\//, 'api.peated.app'],
       routingInstrumentation: Sentry.reactRouterV6Instrumentation(
         React.useEffect,
         useLocation,
         useNavigationType,
         createRoutesFromChildren,
-        matchRoutes
+        matchRoutes,
       ),
     }),
     new Sentry.Replay({
@@ -45,36 +45,34 @@ Sentry.init({
   tracesSampleRate: 1.0,
   replaysSessionSampleRate: 0.01,
   replaysOnErrorSampleRate: 1.0,
-});
+})
 
 const router = Sentry.wrapCreateBrowserRouter(createBrowserRouter)(
-  createRoutes()
-);
+  createRoutes(),
+)
 
 function initMobileControls() {
-  document.addEventListener("gesturestart", function (e) {
-    e.preventDefault();
+  document.addEventListener('gesturestart', function (e) {
+    e.preventDefault()
     // @ts-ignore-next-line
-    document.body.style.zoom = 0.99;
-  });
+    document.body.style.zoom = 0.99
+  })
 
-  document.addEventListener("gesturechange", function (e) {
-    e.preventDefault();
+  document.addEventListener('gesturechange', function (e) {
+    e.preventDefault()
     // @ts-ignore-next-line
-    document.body.style.zoom = 0.99;
-  });
-  document.addEventListener("gestureend", function (e) {
-    e.preventDefault();
+    document.body.style.zoom = 0.99
+  })
+  document.addEventListener('gestureend', function (e) {
+    e.preventDefault()
     // @ts-ignore-next-line
-    document.body.style.zoom = 1;
-  });
+    document.body.style.zoom = 1
+  })
 }
 
-initMobileControls();
+initMobileControls()
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
@@ -82,7 +80,7 @@ root.render(
         <AuthProvider>
           <Suspense
             fallback={
-              <div className="flex justify-center items-center h-screen">
+              <div className="flex h-screen items-center justify-center">
                 <Spinner />
               </div>
             }
@@ -92,5 +90,5 @@ root.render(
         </AuthProvider>
       </OnlineStatusProvider>
     </GoogleOAuthProvider>
-  </React.StrictMode>
-);
+  </React.StrictMode>,
+)

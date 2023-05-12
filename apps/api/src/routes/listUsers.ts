@@ -1,36 +1,36 @@
-import type { RouteOptions } from "fastify";
-import { db } from "../db";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { validateRequest } from "../middleware/auth";
-import { users } from "../db/schema";
-import { SQL, and, asc, eq, ilike, or } from "drizzle-orm";
-import { serializeUser } from "../lib/transformers/user";
+import { SQL, and, asc, eq, ilike, or } from 'drizzle-orm'
+import type { RouteOptions } from 'fastify'
+import { IncomingMessage, Server, ServerResponse } from 'http'
+import { db } from '../db'
+import { users } from '../db/schema'
+import { serializeUser } from '../lib/transformers/user'
+import { validateRequest } from '../middleware/auth'
 
 export default {
-  method: "GET",
-  url: "/users",
+  method: 'GET',
+  url: '/users',
   schema: {
     querystring: {
-      type: "object",
+      type: 'object',
       properties: {
-        query: { type: "string" },
-        page: { type: "number" },
+        query: { type: 'string' },
+        page: { type: 'number' },
       },
     },
   },
   preHandler: [validateRequest],
   handler: async (req, res) => {
-    const page = req.query.page || 1;
-    const query = req.query.query || "";
+    const page = req.query.page || 1
+    const query = req.query.query || ''
 
-    const limit = 100;
-    const offset = (page - 1) * limit;
+    const limit = 100
+    const offset = (page - 1) * limit
 
-    const where: (SQL<unknown> | undefined)[] = [];
+    const where: (SQL<unknown> | undefined)[] = []
     if (query) {
       where.push(
-        or(ilike(users.displayName, `%${query}%`), eq(users.email, query))
-      );
+        or(ilike(users.displayName, `%${query}%`), eq(users.email, query)),
+      )
     }
 
     const results = await db
@@ -39,9 +39,9 @@ export default {
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(users.displayName));
+      .orderBy(asc(users.displayName))
 
-    res.send(results.map((u) => serializeUser(u, req.user)));
+    res.send(results.map((u) => serializeUser(u, req.user)))
   },
 } as RouteOptions<
   Server,
@@ -49,8 +49,8 @@ export default {
   ServerResponse,
   {
     Querystring: {
-      query?: string;
-      page?: number;
-    };
+      query?: string
+      page?: number
+    }
   }
->;
+>

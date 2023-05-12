@@ -1,26 +1,26 @@
-import { Outlet, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import useAuth from "../hooks/useAuth";
-import Screen from "../components/screen";
-import ReloadPrompt from "../components/reloadPrompt";
-import Spinner from "../components/spinner";
+import { useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+import ReloadPrompt from '../components/reloadPrompt'
+import Screen from '../components/screen'
+import Spinner from '../components/spinner'
+import useAuth from '../hooks/useAuth'
 
 export default function Root() {
-  const navigate = useNavigate();
-  const { user, state } = useAuth();
+  const navigate = useNavigate()
+  const { user, state } = useAuth()
 
   useEffect(() => {
-    if (!user && state === "ready") {
-      navigate("/login");
+    if (!user && state === 'ready') {
+      navigate('/login')
     }
-  }, [JSON.stringify(user), state]);
+  }, [JSON.stringify(user), state])
 
-  if (state === "loading" || !user) {
+  if (state === 'loading' || !user) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex h-screen items-center justify-center">
         <Spinner />
       </div>
-    );
+    )
   }
 
   return (
@@ -28,5 +28,5 @@ export default function Root() {
       <Outlet />
       <ReloadPrompt />
     </Screen>
-  );
+  )
 }

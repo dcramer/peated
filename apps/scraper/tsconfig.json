@@ -1,5 +1,4 @@
 {
-    "extends": "@peated/shared/tsconfig.json",
-    "include": ["src"],
-  }
-  
+  "extends": "@peated/shared/tsconfig.json",
+  "include": ["src"]
+}

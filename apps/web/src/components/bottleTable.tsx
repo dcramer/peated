@@ -1,11 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
 
-import { Bottle, Entity } from "../types";
-import { formatCategoryName } from "../lib/strings";
-import Button from "./button";
-import BottleName from "./bottleName";
+import { formatCategoryName } from '../lib/strings'
+import { Bottle, Entity } from '../types'
+import BottleName from './bottleName'
+import Button from './button'
 
-type Grouper = undefined | null | Entity;
+type Grouper = undefined | null | Entity
 
 export default ({
   bottleList,
@@ -13,17 +13,17 @@ export default ({
   groupTo,
   rel,
 }: {
-  bottleList: Bottle[];
-  groupBy?: (bottle: Bottle) => Grouper;
-  groupTo?: (group: Entity) => string;
+  bottleList: Bottle[]
+  groupBy?: (bottle: Bottle) => Grouper
+  groupTo?: (group: Entity) => string
   rel?: {
-    next: string | null;
-    nextPage: number | null;
-    prev: string | null;
-    prevPage: number | null;
-  };
+    next: string | null
+    nextPage: number | null
+    prev: string | null
+    prevPage: number | null
+  }
 }) => {
-  let lastGroup: Grouper;
+  let lastGroup: Grouper
   return (
     <>
       <table className="min-w-full">
@@ -56,9 +56,9 @@ export default ({
         </thead>
         <tbody>
           {bottleList.map((bottle) => {
-            const group = groupBy && groupBy(bottle);
-            const showGroup = group && group.id !== lastGroup?.id;
-            if (group) lastGroup = group;
+            const group = groupBy && groupBy(bottle)
+            const showGroup = group && group.id !== lastGroup?.id
+            if (group) lastGroup = group
             return [
               showGroup ? (
                 <tr key={`g-${group.id}`} className="border-b border-gray-200">
@@ -79,7 +79,7 @@ export default ({
                 <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
                   <Link
                     to={`/bottles/${bottle.id}`}
-                    className="font-bold text-peated hover:underline"
+                    className="text-peated font-bold hover:underline"
                   >
                     <BottleName bottle={bottle} />
                   </Link>
@@ -87,11 +87,11 @@ export default ({
                 <td className="hidden px-3 py-4 text-right text-sm text-gray-500 sm:table-cell">
                   {formatCategoryName(bottle.category)}
                 </td>
-                <td className="hidden py-4 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-3 sm:table-cell">
+                <td className="hidden py-4 pl-3 pr-4 text-right text-sm text-gray-500 sm:table-cell sm:pr-3">
                   {bottle.statedAge && `${bottle.statedAge} years`}
                 </td>
               </tr>,
-            ];
+            ]
           })}
         </tbody>
       </table>
@@ -100,7 +100,7 @@ export default ({
           className="flex items-center justify-between border-t border-gray-200 bg-white py-3"
           aria-label="Pagination"
         >
-          <div className="flex flex-1 justify-between sm:justify-end gap-x-2">
+          <div className="flex flex-1 justify-between gap-x-2 sm:justify-end">
             <Button
               to={rel.prevPage ? `?page=${rel.prevPage}` : undefined}
               disabled={!rel.prevPage}
@@ -117,5 +117,5 @@ export default ({
         </nav>
       )}
     </>
-  );
-};
+  )
+}

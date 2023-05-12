@@ -1,44 +1,44 @@
-import { useLoaderData } from "react-router-dom";
-import type { LoaderFunction } from "react-router-dom";
+import type { LoaderFunction } from 'react-router-dom'
+import { useLoaderData } from 'react-router-dom'
 
-import type { Bottle, Entity } from "../types";
-import api from "../lib/api";
-import Layout from "../components/layout";
-import BottleTable from "../components/bottleTable";
-import Button from "../components/button";
-import { useRequiredAuth } from "../hooks/useAuth";
+import BottleTable from '../components/bottleTable'
+import Button from '../components/button'
+import Layout from '../components/layout'
+import { useRequiredAuth } from '../hooks/useAuth'
+import api from '../lib/api'
+import type { Bottle, Entity } from '../types'
 
 type LoaderData = {
-  distiller: Entity;
-  bottleList: Bottle[];
-};
+  distiller: Entity
+  bottleList: Bottle[]
+}
 
 export const loader: LoaderFunction = async ({
   params: { distillerId },
 }): Promise<LoaderData> => {
-  if (!distillerId) throw new Error("Missing distillerId");
-  const distiller = await api.get(`/entities/${distillerId}`);
+  if (!distillerId) throw new Error('Missing distillerId')
+  const distiller = await api.get(`/entities/${distillerId}`)
   const { results: bottleList } = await api.get(`/bottles`, {
     query: { distiller: distiller.id },
-  });
+  })
 
-  return { distiller, bottleList };
-};
+  return { distiller, bottleList }
+}
 
 export default function DistillerDetails() {
-  const { distiller, bottleList } = useLoaderData() as LoaderData;
-  const { user: currentUser } = useRequiredAuth();
+  const { distiller, bottleList } = useLoaderData() as LoaderData
+  const { user: currentUser } = useRequiredAuth()
 
   const stats = [
-    { name: "Bottles", value: distiller.totalBottles.toLocaleString() },
-  ];
+    { name: 'Bottles', value: distiller.totalBottles.toLocaleString() },
+  ]
 
   return (
     <Layout gutter>
-      <div className="min-w-full flex flex-wrap sm:flex-nowrap my-8 gap-y-4">
-        <div className="w-full sm:w-auto sm:flex-1 flex flex-col justify-center">
-          <div className="space-y-1 flex-1 w-full sm:w-auto flex flex-col items-center sm:items-start">
-            <h1 className="flex gap-x-3 mb-2 leading-7 font-semibold text-3xl text-peated">
+      <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
+        <div className="flex w-full flex-col justify-center sm:w-auto sm:flex-1">
+          <div className="flex w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
+            <h1 className="text-peated mb-2 flex gap-x-3 text-3xl font-semibold leading-7">
               {distiller.name}
             </h1>
             <p className="text-sm font-light text-gray-500">
@@ -49,15 +49,15 @@ export default function DistillerDetails() {
         </div>
       </div>
 
-      <div className="my-8 justify-center sm:justify-start flex gap-4">
+      <div className="my-8 flex justify-center gap-4 sm:justify-start">
         <Button to={`/distillers/${distiller.id}/edit`}>Edit Distiller</Button>
       </div>
 
-      <div className="my-8 grid gap-3 grid-cols-1 text-center sm:text-left items-center">
+      <div className="my-8 grid grid-cols-1 items-center gap-3 text-center sm:text-left">
         {stats.map((stat) => (
           <div key={stat.name}>
             <p className="leading-7 text-gray-400">{stat.name}</p>
-            <p className="order-first text-3xl font-semibold tracking-tight text-peated sm:text-5xl">
+            <p className="text-peated order-first text-3xl font-semibold tracking-tight sm:text-5xl">
               {stat.value}
             </p>
           </div>
@@ -70,5 +70,5 @@ export default function DistillerDetails() {
         groupTo={(group) => `/brands/${group.id}`}
       />
     </Layout>
-  );
+  )
 }

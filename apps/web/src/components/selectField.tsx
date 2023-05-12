@@ -1,15 +1,15 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
-import FormField from "./formField";
-import Select from "./select";
+import FormField from './formField'
+import Select from './select'
 
 type Props = {
-  label?: string;
-  helpText?: string;
-  required?: boolean;
-  children?: ReactNode;
-  className?: string;
-} & React.ComponentProps<typeof Select>;
+  label?: string
+  helpText?: string
+  required?: boolean
+  children?: ReactNode
+  className?: string
+} & React.ComponentProps<typeof Select>
 
 export default ({
   name,
@@ -29,5 +29,5 @@ export default ({
     >
       <Select name={name} id={`f-${name}`} required={required} {...props} />
     </FormField>
-  );
-};
+  )
+}

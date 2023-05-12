@@ -1,11 +1,11 @@
-import { Fragment, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Menu, Transition } from "@headlessui/react";
+import { Menu, Transition } from '@headlessui/react'
+import { Fragment, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
-import useAuth from "../hooks/useAuth";
-import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
-import { ReactComponent as PeatedGlyph } from "../assets/glyph.svg";
-import UserAvatar from "./userAvatar";
+import { ReactComponent as PeatedGlyph } from '../assets/glyph.svg'
+import { ReactComponent as PeatedLogo } from '../assets/logo.svg'
+import useAuth from '../hooks/useAuth'
+import UserAvatar from './userAvatar'
 
 const HeaderLogo = () => {
   return (
@@ -21,23 +21,23 @@ const HeaderLogo = () => {
         </Link>
       </div>
     </>
-  );
-};
+  )
+}
 
 export default function AppHeader() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
 
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('')
 
   return (
     <>
       <HeaderLogo />
       <form
-        className={`ml-4 sm:ml-12 flex flex-1 justify-end`}
+        className={`ml-4 flex flex-1 justify-end sm:ml-12`}
         onSubmit={(e) => {
-          e.preventDefault();
-          navigate(`/search?q=${encodeURIComponent(query)}`);
+          e.preventDefault()
+          navigate(`/search?q=${encodeURIComponent(query)}`)
         }}
       >
         <input
@@ -45,16 +45,16 @@ export default function AppHeader() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for a bottle"
           autoComplete="off"
-          className="rounded focus:outline focus:outline-peated-light transition-all duration-500 transform w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-peated-darker text-white"
+          className="focus:outline-peated-light bg-peated-darker w-full transform rounded px-2 py-1.5 text-white transition-all duration-500 focus:outline sm:px-3 sm:py-2"
         />
       </form>
       {user && (
-        <div className="ml-4 sm:ml-12 flex items-center">
+        <div className="ml-4 flex items-center sm:ml-12">
           <Menu as="div" className="relative">
             <div>
-              <Menu.Button className="flex max-w-xs items-center rounded bg-peated text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-peated">
+              <Menu.Button className="bg-peated focus:ring-offset-peated flex max-w-xs items-center rounded text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2">
                 <span className="sr-only">Open user menu</span>
-                <span className="inline-block h-8 w-8 sm:h-10 sm:w-10 overflow-hidden rounded bg-gray-100">
+                <span className="inline-block h-8 w-8 overflow-hidden rounded bg-gray-100 sm:h-10 sm:w-10">
                   <UserAvatar user={user} />
                 </span>
               </Menu.Button>
@@ -71,7 +71,7 @@ export default function AppHeader() {
               <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <Menu.Item>
                   <Link
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full"
+                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
                     to={`/users/${user.id}`}
                   >
                     Profile
@@ -79,7 +79,7 @@ export default function AppHeader() {
                 </Menu.Item>
                 <Menu.Item>
                   <Link
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full"
+                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
                     to={`/bottles`}
                   >
                     Bottles
@@ -87,7 +87,7 @@ export default function AppHeader() {
                 </Menu.Item>
                 <Menu.Item>
                   <Link
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full"
+                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
                     to={`/brands`}
                   >
                     Brands
@@ -95,7 +95,7 @@ export default function AppHeader() {
                 </Menu.Item>
                 <Menu.Item>
                   <Link
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full"
+                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
                     to={`/distillers`}
                   >
                     Distillers
@@ -103,10 +103,10 @@ export default function AppHeader() {
                 </Menu.Item>
                 <Menu.Item>
                   <button
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
+                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-200"
                     onClick={() => {
-                      logout();
-                      navigate("/");
+                      logout()
+                      navigate('/')
                     }}
                   >
                     Sign out
@@ -118,5 +118,5 @@ export default function AppHeader() {
         </div>
       )}
     </>
-  );
+  )
 }

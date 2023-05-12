@@ -1,5 +1,7 @@
-import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import { SQL, and, desc, eq, inArray } from 'drizzle-orm'
+import type { RouteOptions } from 'fastify'
+import { IncomingMessage, Server, ServerResponse } from 'http'
+import { db } from '../db'
 import {
   Entity,
   bottles,
@@ -8,37 +10,35 @@ import {
   entities,
   tastings,
   users,
-} from "../db/schema";
-import { db } from "../db";
-import { SQL, and, desc, eq, inArray } from "drizzle-orm";
-import { serializeTasting } from "../lib/transformers/tasting";
+} from '../db/schema'
+import { serializeTasting } from '../lib/transformers/tasting'
 
 export default {
-  method: "GET",
-  url: "/tastings",
+  method: 'GET',
+  url: '/tastings',
   schema: {
     querystring: {
-      type: "object",
+      type: 'object',
       properties: {
-        page: { type: "number" },
-        bottle: { type: "number" },
-        user: { type: "number" },
-        filter: { type: "string", enum: ["global", "friends", "local"] },
+        page: { type: 'number' },
+        bottle: { type: 'number' },
+        user: { type: 'number' },
+        filter: { type: 'string', enum: ['global', 'friends', 'local'] },
       },
     },
   },
   handler: async (req, res) => {
-    const page = req.query.page || 1;
+    const page = req.query.page || 1
 
-    const limit = 100;
-    const offset = (page - 1) * limit;
+    const limit = 100
+    const offset = (page - 1) * limit
 
-    const where: SQL<unknown>[] = [];
+    const where: SQL<unknown>[] = []
     if (req.query.bottle) {
-      where.push(eq(tastings.bottleId, req.query.bottle));
+      where.push(eq(tastings.bottleId, req.query.bottle))
     }
     if (req.query.user) {
-      where.push(eq(tastings.createdById, req.query.user));
+      where.push(eq(tastings.createdById, req.query.user))
     }
 
     const results = await db
@@ -57,7 +57,7 @@ export default {
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(desc(tastings.createdAt));
+      .orderBy(desc(tastings.createdAt))
 
     const distillers = results.length
       ? await db
@@ -68,24 +68,24 @@ export default {
           .from(entities)
           .innerJoin(
             bottlesToDistillers,
-            eq(bottlesToDistillers.distillerId, entities.id)
+            eq(bottlesToDistillers.distillerId, entities.id),
           )
           .where(
             inArray(
               bottlesToDistillers.bottleId,
-              results.map(({ bottle: b }) => b.id)
-            )
+              results.map(({ bottle: b }) => b.id),
+            ),
           )
-      : [];
+      : []
 
     const distillersByBottleId: {
-      [bottleId: number]: Entity[];
-    } = {};
+      [bottleId: number]: Entity[]
+    } = {}
     distillers.forEach((d) => {
       if (!distillersByBottleId[d.bottleId])
-        distillersByBottleId[d.bottleId] = [d.distiller];
-      else distillersByBottleId[d.bottleId].push(d.distiller);
-    });
+        distillersByBottleId[d.bottleId] = [d.distiller]
+      else distillersByBottleId[d.bottleId].push(d.distiller)
+    })
 
     res.send(
       results.map(({ tasting, bottle, brand, createdBy, edition }) =>
@@ -100,10 +100,10 @@ export default {
               distillers: distillersByBottleId[bottle.id],
             },
           },
-          req.user
-        )
-      )
-    );
+          req.user,
+        ),
+      ),
+    )
   },
 } as RouteOptions<
   Server,
@@ -111,9 +111,9 @@ export default {
   ServerResponse,
   {
     Querystring: {
-      page?: number;
-      bottle?: number;
-      user?: number;
-    };
+      page?: number
+      bottle?: number
+      user?: number
+    }
   }
->;
+>

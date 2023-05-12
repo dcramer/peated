@@ -1,13 +1,12 @@
-import { pwaInfo } from "virtual:pwa-info";
-import { useRegisterSW } from "virtual:pwa-register/react";
+import { useRegisterSW } from 'virtual:pwa-register/react'
 
-import Button from "./button";
+import Button from './button'
 
 export default () => {
   // replaced dynamically
-  const buildDate = "__DATE__";
+  const buildDate = '__DATE__'
   // replaced dyanmicaly
-  const reloadSW = "__RELOAD_SW__";
+  const reloadSW = '__RELOAD_SW__'
 
   const {
     offlineReady: [offlineReady, setOfflineReady],
@@ -16,35 +15,35 @@ export default () => {
   } = useRegisterSW({
     onRegisteredSW(swUrl, r) {
       // eslint-disable-next-line no-console
-      console.log(`Service Worker at: ${swUrl}`);
+      console.log(`Service Worker at: ${swUrl}`)
       // @ts-expect-error just ignore
-      if (reloadSW === "true") {
+      if (reloadSW === 'true') {
         r &&
           setInterval(() => {
             // eslint-disable-next-line no-console
-            console.log("Checking for sw update");
-            r.update();
-          }, 20000 /* 20s for testing purposes */);
+            console.log('Checking for sw update')
+            r.update()
+          }, 20000 /* 20s for testing purposes */)
       } else {
         // eslint-disable-next-line prefer-template,no-console
-        console.log("SW Registered: " + r);
+        console.log('SW Registered: ' + r)
       }
     },
     onRegisterError(error) {
       // eslint-disable-next-line no-console
-      console.log("SW registration error", error);
+      console.log('SW registration error', error)
     },
-  });
+  })
 
   const close = () => {
-    setOfflineReady(false);
-    setNeedRefresh(false);
-  };
+    setOfflineReady(false)
+    setNeedRefresh(false)
+  }
 
   return (
-    <div className="w-0 h-0 p-0 m-0">
+    <div className="m-0 h-0 w-0 p-0">
       {needRefresh && (
-        <div className="fixed right-0 bottom-0 m-4 p-3 border border-gray-400 rounded z-10 shadow bg-white">
+        <div className="fixed bottom-0 right-0 z-10 m-4 rounded border border-gray-400 bg-white p-3 shadow">
           <div className="mb-2">
             <span>Update Available</span>
           </div>
@@ -58,5 +57,5 @@ export default () => {
       )}
       <div className="hidden">{buildDate}</div>
     </div>
-  );
-};
+  )
+}

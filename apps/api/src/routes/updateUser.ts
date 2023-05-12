@@ -1,56 +1,56 @@
-import type { RouteOptions } from "fastify";
-import { db } from "../db";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { validateRequest } from "../middleware/auth";
-import { serializeUser } from "../lib/transformers/user";
-import { User, users } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { eq } from 'drizzle-orm'
+import type { RouteOptions } from 'fastify'
+import { IncomingMessage, Server, ServerResponse } from 'http'
+import { db } from '../db'
+import { User, users } from '../db/schema'
+import { serializeUser } from '../lib/transformers/user'
+import { validateRequest } from '../middleware/auth'
 
 export default {
-  method: "PUT",
-  url: "/users/:userId",
+  method: 'PUT',
+  url: '/users/:userId',
   schema: {
     params: {
-      type: "object",
-      required: ["userId"],
+      type: 'object',
+      required: ['userId'],
       properties: {
-        userId: { oneOf: [{ type: "number" }, { const: "me" }] },
+        userId: { oneOf: [{ type: 'number' }, { const: 'me' }] },
       },
     },
     body: {
-      type: "object",
+      type: 'object',
       properties: {
-        displayName: { type: "string" },
+        displayName: { type: 'string' },
       },
     },
   },
   preHandler: [validateRequest],
   handler: async (req, res) => {
-    const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
+    const userId = req.params.userId === 'me' ? req.user.id : req.params.userId
 
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const [user] = await db.select().from(users).where(eq(users.id, userId))
 
     if (!user) {
-      return res.status(404).send({ error: "Not found" });
+      return res.status(404).send({ error: 'Not found' })
     }
 
     if (user.id !== req.user.id && !user.admin) {
-      return res.status(403).send({ error: "Forbidden" });
+      return res.status(403).send({ error: 'Forbidden' })
     }
 
-    const body = req.body;
-    const data: { [name: string]: any } = {};
+    const body = req.body
+    const data: { [name: string]: any } = {}
     if (body.displayName) {
-      data.displayName = body.displayName;
+      data.displayName = body.displayName
     }
 
     const [newUser] = await db
       .update(users)
       .set(data)
       .where(eq(users.id, userId))
-      .returning();
+      .returning()
 
-    res.send(serializeUser(newUser, req.user));
+    res.send(serializeUser(newUser, req.user))
   },
 } as RouteOptions<
   Server,
@@ -58,8 +58,8 @@ export default {
   ServerResponse,
   {
     Params: {
-      userId: number | "me";
-    };
-    Body: Partial<Pick<User, "displayName">>;
+      userId: number | 'me'
+    }
+    Body: Partial<Pick<User, 'displayName'>>
   }
->;
+>

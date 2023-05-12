@@ -1,35 +1,35 @@
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
-import { FastifyInstance } from "fastify";
+import { FastifyInstance } from 'fastify'
+import buildFastify from '../app'
+import * as Fixtures from '../lib/test/fixtures'
 
-let app: FastifyInstance;
+let app: FastifyInstance
 beforeAll(async () => {
-  app = await buildFastify();
+  app = await buildFastify()
 
   return async () => {
-    app.close();
-  };
-});
+    app.close()
+  }
+})
 
-test("lists users", async () => {
-  const user2 = await Fixtures.User();
+test('lists users', async () => {
+  const user2 = await Fixtures.User()
 
   let response = await app.inject({
-    method: "GET",
-    url: "/users",
+    method: 'GET',
+    url: '/users',
     headers: DefaultFixtures.authHeaders,
-  });
+  })
 
-  expect(response).toRespondWith(200);
-  let data = JSON.parse(response.payload);
-  expect(data.length).toBe(2);
-});
+  expect(response).toRespondWith(200)
+  let data = JSON.parse(response.payload)
+  expect(data.length).toBe(2)
+})
 
-test("lists users requires auth", async () => {
+test('lists users requires auth', async () => {
   let response = await app.inject({
-    method: "GET",
-    url: "/users",
-  });
+    method: 'GET',
+    url: '/users',
+  })
 
-  expect(response).toRespondWith(401);
-});
+  expect(response).toRespondWith(401)
+})

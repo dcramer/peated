@@ -1,9 +1,9 @@
 export default () => (
-  <div className="flex justify-center items-center m-8 min-h-full">
+  <div className="m-8 flex min-h-full items-center justify-center">
     <svg
       aria-hidden="true"
       role="status"
-      className="inline w-16 h-16 text-peated-light animate-spin"
+      className="text-peated-light inline h-16 w-16 animate-spin"
       viewBox="0 0 100 101"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -18,4 +18,4 @@ export default () => (
       ></path>
     </svg>
   </div>
-);
+)
