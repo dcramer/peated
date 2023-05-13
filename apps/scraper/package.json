@@ -3,6 +3,7 @@
   "name": "@peated/scraper",
   "scripts": {
     "start": "ts-node --require dotenv/config ./src/main.ts",
+    "import": "ts-node --require dotenv/config ./src/import.ts",
     "tsc": "tsc"
   },
   "dependencies": {
