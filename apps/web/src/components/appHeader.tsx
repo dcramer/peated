@@ -99,7 +99,7 @@ export default function AppHeader() {
                 <Menu.Item>
                   <Link
                     className="flex w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
-                    to={`/followers`}
+                    to={`/friends`}
                   >
                     Friends
                     {followRequestCount > 0 && (

@@ -19,7 +19,7 @@ import DistillerList, {
   loader as distillerListLoader,
 } from "./routes/distillers";
 import EditBottle, { loader as editBottleLoader } from "./routes/editBottle";
-import Followers, { loader as followersLoader } from "./routes/followers";
+import Friends, { loader as friendsLoader } from "./routes/friends";
 import Login from "./routes/login";
 import Root from "./routes/root";
 import Search from "./routes/search";
@@ -80,9 +80,9 @@ export default function createRoutes() {
           loader: distillerDetailsLoader,
         },
         {
-          path: "followers",
-          element: <Followers />,
-          loader: followersLoader,
+          path: "friends",
+          element: <Friends />,
+          loader: friendsLoader,
         },
         {
           path: "search",
