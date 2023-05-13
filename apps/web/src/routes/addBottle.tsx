@@ -158,6 +158,7 @@ export default function AddBottle() {
             placeholder="e.g. Single Malt"
             helpText="The kind of spirit."
             onChange={(value) => setFormData({ ...formData, category: value })}
+            targetOptions={categoryList.length}
             suggestedOptions={categoryList}
             options={categoryList}
           />
