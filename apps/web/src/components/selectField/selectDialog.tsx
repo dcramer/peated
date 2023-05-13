@@ -126,7 +126,7 @@ export default ({
                     <ListItem key={`${option.id}-${option.name}`}>
                       <CheckIcon
                         className={classNames(
-                          "h-12 w-12 flex-none rounded-full bg-gray-100 p-2",
+                          "h-12 w-12 flex-none rounded-full bg-gray-100 p-2 text-gray-100",
                           selectedValues.find(
                             (i) => i.id == option.id && i.name == option.name,
                           ) && "bg-peated text-white",
