@@ -92,8 +92,8 @@ export default function AddBottle() {
         {error && <FormError values={[error]} />}
 
         <Fieldset>
-          <FormField required>
-            <FormLabel>Name (Preview)</FormLabel>
+          <FormField>
+            <FormLabel required>Name (Preview)</FormLabel>
             {bottleName()}
           </FormField>
 
