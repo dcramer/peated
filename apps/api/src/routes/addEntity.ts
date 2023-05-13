@@ -41,6 +41,10 @@ export default {
         .onConflictDoNothing()
         .returning();
 
+      if (!entity) {
+        return null;
+      }
+
       await tx.insert(changes).values({
         objectType: "entity",
         objectId: entity.id,
@@ -50,6 +54,10 @@ export default {
 
       return entity;
     });
+
+    if (!entity) {
+      return res.status(409).send("Unable to create entity");
+    }
 
     res.status(201).send(entity);
   },
