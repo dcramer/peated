@@ -1,9 +1,16 @@
-import { Bottle } from "../types";
-
-export default ({ bottle }: { bottle: Bottle }) => {
+export default ({
+  bottle,
+}: {
+  bottle: {
+    name: string;
+    brand?: {
+      name: string;
+    };
+  };
+}) => {
   return (
     <>
-      {bottle.brand.name} {bottle.name}
+      {bottle.brand?.name || ""} {bottle.name}
     </>
   );
 };

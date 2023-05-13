@@ -1,13 +1,12 @@
 import { FormEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import BottleName from "../components/bottleName";
 import BrandField from "../components/brandField";
 import DistillerField from "../components/distillerField";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
-import FormField from "../components/formField";
 import FormHeader from "../components/formHeader";
-import FormLabel from "../components/formLabel";
 import Layout from "../components/layout";
 import SelectField, { Option } from "../components/selectField";
 import TextField from "../components/textField";
@@ -21,6 +20,54 @@ type FormData = {
   distillers?: Option[] | undefined;
   statedAge?: number | undefined;
   category?: Option;
+};
+
+const PreviewCard = ({
+  data: { distillers, brand, ...bottle },
+}: {
+  data: Partial<FormData>;
+}) => {
+  return (
+    <div className="text-peated flex items-center space-x-4 rounded bg-gray-100 p-3 sm:mb-4">
+      <div className="flex-1 space-y-1">
+        <p className="text-peated font-semibold leading-6">
+          {bottle.name ? (
+            <BottleName
+              bottle={{
+                name: bottle.name,
+                brand: brand
+                  ? {
+                      name: brand.name,
+                    }
+                  : undefined,
+              }}
+            />
+          ) : (
+            "Unknown Bottle"
+          )}
+        </p>
+        <p className="text-sm font-light text-gray-500">
+          Produced by {brand?.name || "Unknown"}
+          {distillers &&
+            distillers.length > 0 &&
+            (distillers.length > 0 || brand?.name !== distillers[0].name) && (
+              <span>
+                {" "}
+                &middot; Distilled at {distillers.map((d) => d.name).join(", ")}
+              </span>
+            )}
+        </p>
+      </div>
+      <div className="space-y-1">
+        <p className="leading-6 text-gray-500">
+          {bottle.category && bottle.category.name}
+        </p>
+        <p className="mt-1 text-sm leading-5 text-gray-500">
+          {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export default function AddBottle() {
@@ -77,11 +124,6 @@ export default function AddBottle() {
     })();
   };
 
-  const bottleName = () => {
-    if (!formData.name && !formData.brand?.name) return <em>Unknown</em>;
-    return [formData.brand?.name || "", formData.name || ""].join(" ");
-  };
-
   return (
     <Layout
       header={<FormHeader title="Add Bottle" onSave={onSubmit} />}
@@ -91,12 +133,9 @@ export default function AddBottle() {
       <form className="sm:mx-16">
         {error && <FormError values={[error]} />}
 
-        <Fieldset>
-          <FormField>
-            <FormLabel required>Name (Preview)</FormLabel>
-            {bottleName()}
-          </FormField>
+        <PreviewCard data={formData} />
 
+        <Fieldset>
           <BrandField
             label="Brand"
             name="brand"
