@@ -35,6 +35,8 @@ export default function Search() {
   const navigate = useNavigate();
   const qs = new URLSearchParams(location.search);
 
+  const maxResults = 50;
+
   const directToTasting = qs.has("tasting");
 
   const [query, setQuery] = useState(qs.get("q") || "");
@@ -44,7 +46,7 @@ export default function Search() {
   const fetch = (query: string) => {
     api
       .get("/bottles", {
-        query: { query },
+        query: { query, limit: maxResults },
       })
       .then(({ results }: { results: readonly Bottle[] }) => {
         setResults(results);
@@ -133,7 +135,7 @@ export default function Search() {
                 </ListItem>
               );
             })}
-            {(results.length === 0 || query !== "") && (
+            {(results.length < maxResults || query !== "") && (
               <ListItem>
                 <PlusIcon className="group-hover:bg-peated h-12 w-12 flex-none rounded-full bg-gray-100 p-2 group-hover:text-white" />
 
