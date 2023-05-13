@@ -16,12 +16,14 @@ const importJson = async (
 
 const importBrands = async () => {
   await importJson("brands.json", async (row) => {
+    console.log(row.name);
     await submitEntity({ ...row, type: ["brand"] });
   });
 };
 
 const importDistillers = async () => {
   await importJson("distillers.json", async (row) => {
+    console.log(row.name);
     await submitEntity({ ...row, type: ["distiller"] });
   });
 };

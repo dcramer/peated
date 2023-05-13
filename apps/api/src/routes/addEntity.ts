@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
@@ -42,6 +43,24 @@ export default {
         .returning();
 
       if (!entity) {
+        // see if we can update an existing entity to add a type
+        const [existing] = await tx
+          .select()
+          .from(entities)
+          .where(eq(entities.name, data.name));
+        const missingTypes = existing.type.filter(
+          (x) => data.type.indexOf(x) === -1,
+        );
+        if (missingTypes) {
+          const [updated] = await tx
+            .update(entities)
+            .set({
+              type: [...existing.type, ...missingTypes],
+            })
+            .where(eq(entities.name, data.name))
+            .returning();
+          return updated;
+        }
         return null;
       }
 

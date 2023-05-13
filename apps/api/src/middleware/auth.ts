@@ -10,7 +10,10 @@ export const requireAuth: onRequestHookHandler = async (req, res) => {
     const token = auth?.replace("Bearer ", "");
 
     const { id } = await verifyToken(token);
-    [req.user] = await db.select().from(users).where(eq(users.id, id));
+    if (!id) throw new Error("Invalid token");
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    if (!user) throw new Error("User not found");
+    req.user = user;
   } catch (error) {
     console.error(error);
     return res
