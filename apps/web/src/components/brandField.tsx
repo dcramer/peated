@@ -29,7 +29,7 @@ export default (props: React.ComponentProps<typeof SelectField>) => {
             <CountryField
               name="country"
               label="Country"
-              placeholder="e.g. Scotland"
+              placeholder="e.g. Scotland, United States of America"
               required
               value={data.country}
               onChange={(value) => onFieldChange({ country: value })}
@@ -38,7 +38,7 @@ export default (props: React.ComponentProps<typeof SelectField>) => {
               name="region"
               label="Region"
               type="text"
-              placeholder="e.g. Islay"
+              placeholder="e.g. Islay, Kentucky"
               autoComplete="off"
               defaultValue={data.region}
               onChange={(e) =>

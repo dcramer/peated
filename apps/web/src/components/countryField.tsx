@@ -290,7 +290,7 @@ export default ({
       helpText={helpText}
       className={className}
       options={options}
-      onChange={(value) => onChange && onChange(value.name)}
+      onChange={(value) => onChange && onChange(value ? value.name : "")}
     />
   );
 };
