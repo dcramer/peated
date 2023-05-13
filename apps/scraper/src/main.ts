@@ -74,10 +74,13 @@ async function scrapeDistiller(id: number) {
 
   const $ = cheerio(data);
 
+  const maybeRegion = $("ul.breadcrumb > li:last-child").text();
+  const country = $("ul.breadcrumb > li:first-child").text();
+
   const result = {
     name: $("#company-name > h1").text(),
-    country: $("ul.breadcrumb > li:first-child").text(),
-    region: $("ul.breadcrumb > li:last-child").text(),
+    country,
+    region: maybeRegion !== country ? maybeRegion : null,
   };
 
   console.log(
@@ -97,10 +100,13 @@ async function scrapeBrand(id: number) {
 
   const $ = cheerio(data);
 
+  const maybeRegion = $("ul.breadcrumb > li:last-child").text();
+  const country = $("ul.breadcrumb > li:first-child").text();
+
   const result = {
     name: $("#company-name > h1").text(),
-    country: $("ul.breadcrumb > li:first-child").text(),
-    region: $("ul.breadcrumb > li:last-child").text(),
+    country,
+    region: maybeRegion !== country ? maybeRegion : null,
   };
 
   console.log(
