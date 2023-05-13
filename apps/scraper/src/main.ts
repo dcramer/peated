@@ -80,20 +80,9 @@ async function scrapeDistiller(id: number) {
     region: $("ul.breadcrumb > li:last-child").text(),
   };
 
-  let bottleCount = 0;
-  $(".company-details > ul > li:first-child").each((_, el) => {
-    if ($(".title", el).text() === "Whiskies") {
-      bottleCount = parseInt($(".value", el).text(), 10);
-    }
-  });
-
   console.log(
-    `[Distiller ${id}] Identified as ${result.name} (${result.country} - ${result.region}) with ${bottleCount} bottles.`,
+    `[Distiller ${id}] Identified as ${result.name} (${result.country} - ${result.region})`,
   );
-  if (bottleCount < 20) {
-    console.warn("Discarding Distillery as low quality risk");
-    return null;
-  }
 
   return result;
 }
@@ -114,21 +103,9 @@ async function scrapeBrand(id: number) {
     region: $("ul.breadcrumb > li:last-child").text(),
   };
 
-  let bottleCount = 0;
-  $(".company-details > ul > li:first-child").each((_, el) => {
-    if ($(".title", el).text() === "Whiskies") {
-      bottleCount = parseInt($(".value", el).text(), 10);
-    }
-  });
-
   console.log(
-    `[Brand ${id}] Identified as ${result.name} (${result.country} - ${result.region}) with ${bottleCount} bottles.`,
+    `[Brand ${id}] Identified as ${result.name} (${result.country} - ${result.region})`,
   );
-  if (bottleCount < 20) {
-    console.warn("Discarding Brand as low quality risk");
-    return null;
-  }
-
   return result;
 }
 
@@ -167,16 +144,20 @@ function mapCategory(value: string) {
 }
 
 // https://www.whiskybase.com/whiskies/distilleries?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style
-async function scrapeTable(url: string, cb: (url: string) => Promise<void>) {
+async function scrapeTable(
+  url: string,
+  cb: (url: string, bottleCount: number) => Promise<void>,
+) {
   const data = await getUrl(url);
   const $ = cheerio(data);
-  const results: string[] = [];
+  const results: [string, number][] = [];
   $("tbody > tr").each(async (_, el) => {
     const href = $("td:first-child > a", el).attr("href");
-    if (href) results.push(href);
+    const bottleCount = parseInt($("td:nth-child(3)", el).text() || "0", 10);
+    if (href) results.push([href, bottleCount]);
   });
-  for (const url of results) {
-    await cb(url);
+  for (const result of results) {
+    await cb(...result);
   }
 }
 
@@ -184,7 +165,11 @@ async function scrapeDistillers() {
   const tableUrl =
     "https://www.whiskybase.com/whiskies/distilleries?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style";
   const distillerList: any[] = [];
-  await scrapeTable(tableUrl, async (url) => {
+  await scrapeTable(tableUrl, async (url, totalBottles) => {
+    if (totalBottles < 20) {
+      console.warn(`Discarding ${url} - too few bottles`);
+      return;
+    }
     const match = url.match(/\/distillery\/(\d+)\//);
     if (!match) return;
     const id = parseInt(match[1], 10);
@@ -200,7 +185,12 @@ async function scrapeBrands() {
   const tableUrl =
     "https://www.whiskybase.com/whiskies/brands?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style";
   const distillerList: any[] = [];
-  await scrapeTable(tableUrl, async (url) => {
+  await scrapeTable(tableUrl, async (url, totalBottles) => {
+    if (totalBottles < 20) {
+      console.warn(`Discarding ${url} - too few bottles`);
+      return;
+    }
+
     const match = url.match(/\/brand\/(\d+)\//);
     if (!match) return;
     const id = parseInt(match[1], 10);
