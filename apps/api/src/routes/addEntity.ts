@@ -48,8 +48,8 @@ export default {
           .select()
           .from(entities)
           .where(eq(entities.name, data.name));
-        const missingTypes = existing.type.filter(
-          (x) => data.type.indexOf(x) === -1,
+        const missingTypes = data.type.filter(
+          (x) => existing.type.indexOf(x) === -1,
         );
         if (missingTypes) {
           const [updated] = await tx
