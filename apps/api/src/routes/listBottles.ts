@@ -103,11 +103,11 @@ export default {
       ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
         next:
           results.length > limit
             ? buildPageLink(req.routeOptions.url, req.query, page + 1)
             : null,
-        prevPage: page > 1 ? page - 1 : null,
         prev:
           page > 1
             ? buildPageLink(req.routeOptions.url, req.query, page - 1)
