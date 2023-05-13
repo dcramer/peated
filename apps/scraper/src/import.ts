@@ -10,7 +10,7 @@ const importJson = async (
   await fs.close();
 
   for (const r of rows) {
-    cb(r);
+    await cb(r);
   }
 };
 

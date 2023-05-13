@@ -14,13 +14,17 @@ export async function submitBottle(data: any) {
     });
   } catch (err: any) {
     const data = err?.response?.data;
-    console.error(
-      `Failed to submit bottle: ${err?.response.status} - ${JSON.stringify(
-        data,
-        null,
-        2,
-      )}`,
-    );
+    if (!data) {
+      console.error(err);
+    } else {
+      console.error(
+        `Failed to submit bottle: ${err?.response.status} - ${JSON.stringify(
+          data,
+          null,
+          2,
+        )}`,
+      );
+    }
   }
 }
 
@@ -36,12 +40,16 @@ export async function submitEntity(data: any) {
     });
   } catch (err: any) {
     const data = err?.response?.data;
-    console.error(
-      `Failed to submit entity: ${err?.response.status} -${JSON.stringify(
-        data,
-        null,
-        2,
-      )}`,
-    );
+    if (!data) {
+      console.error(err.toString());
+    } else {
+      console.error(
+        `Failed to submit entity: ${err?.response.status} -${JSON.stringify(
+          data,
+          null,
+          2,
+        )}`,
+      );
+    }
   }
 }
