@@ -12,6 +12,23 @@ import { StaticRating } from "./rating";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
+const Tags = ({ tags }: { tags: string[] }) => {
+  if (!tags) return null;
+  return (
+    <div className="flex gap-x-1">
+      {tags.slice(0, 3).map((t) => (
+        <Chip key={t} size="small">
+          {t}
+        </Chip>
+      ))}
+      {tags.length > 3 && (
+        <Chip size="small" title={tags.join(", ")}>
+          ⋯
+        </Chip>
+      )}
+    </div>
+  );
+};
 export default ({
   tasting,
   noBottle,
@@ -41,14 +58,7 @@ export default ({
         </div>
         <div className="flex flex-col items-end gap-y-2">
           <StaticRating value={tasting.rating} size="small" />
-          <div className="flex gap-x-1">
-            {tasting.tags &&
-              tasting.tags.map((t) => (
-                <Chip key={t} size="small">
-                  {t}
-                </Chip>
-              ))}
-          </div>
+          <Tags tags={tasting.tags} />
         </div>
       </div>
       {!noBottle && <BottleCard bottle={bottle} />}

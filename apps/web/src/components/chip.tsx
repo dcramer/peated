@@ -9,12 +9,13 @@ export default ({
   active,
   onClick,
   size = "base",
+  ...props
 }: {
   children: ReactNode;
   active?: boolean;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   size?: ChipSize;
-}) => {
+} & React.ComponentPropsWithoutRef<typeof motion.div>) => {
   return (
     <motion.div
       layout
@@ -25,6 +26,7 @@ export default ({
         size === "small" ? "h-[24px] px-[6px] text-sm" : "h-[32px] px-[12px]",
       )}
       onClick={onClick}
+      {...props}
     >
       {children}
     </motion.div>
