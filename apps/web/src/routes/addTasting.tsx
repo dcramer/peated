@@ -70,11 +70,16 @@ export default function AddTasting() {
       }
       // TODO(dcramer): graceful failure here
       if (image) {
-        await api.post(`/tastings/${tasting.id}/image`, {
-          data: {
-            image,
-          },
-        });
+        try {
+          await api.post(`/tastings/${tasting.id}/image`, {
+            data: {
+              image,
+            },
+          });
+        } catch (err) {
+          console.error(err);
+          // TODO show some kind of alert, ask them to reusubmit image
+        }
       }
       if (tasting) navigate("/");
     })();
