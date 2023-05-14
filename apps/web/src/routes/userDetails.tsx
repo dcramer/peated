@@ -8,7 +8,7 @@ import TastingListItem from "../components/tastingListItem";
 import UserAvatar from "../components/userAvatar";
 import { useRequiredAuth } from "../hooks/useAuth";
 import api from "../lib/api";
-import type { FollowStatus, Tasting, User } from "../types";
+import type { FollowStatus, Paginated, Tasting, User } from "../types";
 
 type UserDetails = User & {
   followStatus?: FollowStatus;
@@ -21,7 +21,7 @@ type UserDetails = User & {
 
 type LoaderData = {
   user: UserDetails;
-  tastingList: Tasting[];
+  tastingList: Paginated<Tasting>;
 };
 
 // TODO: when this executes the apiClient has not configured
@@ -117,9 +117,9 @@ export default function UserDetails() {
         </div>
       </div>
 
-      {tastingList.length ? (
+      {tastingList.results.length ? (
         <ul role="list" className="space-y-3">
-          {tastingList.map((tasting) => (
+          {tastingList.results.map((tasting) => (
             <TastingListItem key={tasting.id} tasting={tasting} />
           ))}
         </ul>

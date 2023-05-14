@@ -14,6 +14,8 @@ type BaseProps = {
   children?: ReactNode;
   disabled?: boolean;
   fullWidth?: boolean;
+  fullHeight?: boolean;
+  className?: string;
 };
 
 type ConditionalProps =
@@ -36,6 +38,7 @@ export default ({
   color = "default",
   size = "base",
   fullWidth = false,
+  fullHeight = false,
   disabled = false,
   ...props
 }: Props) => {
@@ -66,6 +69,7 @@ export default ({
           icon ? "inline-flex items-center gap-x-1.5" : "",
           size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm",
           fullWidth ? "w-full" : "",
+          fullHeight ? "h-full" : "",
         )}
         to={to}
         {...props}

@@ -96,7 +96,11 @@ class ApiClient {
       }
       throw new ApiError("Request failed", resp, await resp.json());
     }
-    return await resp.json();
+    if (resp.headers.get("Content-Type") !== "application/json") {
+      const body = await resp.text();
+      if (body) return JSON.parse(body);
+    }
+    return null;
   }
 
   get(path: string, options: any | undefined = undefined) {

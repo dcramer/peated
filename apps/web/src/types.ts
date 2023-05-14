@@ -90,3 +90,30 @@ export type Location = {
   id: string;
   name: string;
 };
+
+type NextPagingRel =
+  | {
+      nextPage: string;
+      next: string;
+    }
+  | {
+      nextPage: null;
+      next: null;
+    };
+
+type PrevPagingRel =
+  | {
+      prevPage: string;
+      prev: string;
+    }
+  | {
+      prevPage: null;
+      prev: null;
+    };
+
+type PagingRel = NextPagingRel & PrevPagingRel;
+
+export type Paginated<T> = {
+  results: T[];
+  rel: PagingRel;
+};

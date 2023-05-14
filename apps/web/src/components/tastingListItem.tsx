@@ -3,11 +3,14 @@ import {
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
 
+import { Menu } from "@headlessui/react";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { Link } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import api from "../lib/api";
 import { Tasting } from "../types";
 import BottleCard from "./bottleCard";
 import Button from "./button";
-import Chip from "./chip";
 import { StaticRating } from "./rating";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
@@ -15,16 +18,15 @@ import UserAvatar from "./userAvatar";
 const Tags = ({ tags }: { tags: string[] }) => {
   if (!tags) return null;
   return (
-    <div className="flex gap-x-1">
-      {tags.slice(0, 3).map((t) => (
-        <Chip key={t} size="small">
-          {t}
-        </Chip>
-      ))}
+    <div className="text-sm">
+      <span>{tags.slice(0, 3).join(", ")}</span>
       {tags.length > 3 && (
-        <Chip size="small" title={tags.join(", ")}>
-          ⋯
-        </Chip>
+        <span>
+          , and{" "}
+          <span className="underline decoration-dotted" title={tags.join(", ")}>
+            {tags.length - 3} more
+          </span>
+        </span>
       )}
     </div>
   );
@@ -37,6 +39,7 @@ export default ({
   noBottle?: boolean;
 }) => {
   const { bottle } = tasting;
+  const { user } = useAuth();
 
   return (
     <li className="overflow-hidden bg-white p-3 shadow sm:rounded">
@@ -59,6 +62,28 @@ export default ({
         <div className="flex flex-col items-end gap-y-2">
           <StaticRating value={tasting.rating} size="small" />
           <Tags tags={tasting.tags} />
+        </div>
+        <div className="flex min-h-full flex-shrink">
+          <Menu as="div" className="relative">
+            <Menu.Button className="text-peated block h-full w-full rounded border-gray-200 bg-white p-3 px-1 hover:bg-gray-200">
+              <EllipsisVerticalIcon className="h-full w-6" />
+            </Menu.Button>
+            <Menu.Items className="absolute right-0 z-10 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-10 focus:outline-none">
+              {(user?.admin || user?.id === tasting.createdBy.id) && (
+                <Menu.Item
+                  as="button"
+                  className="text-peated block w-full px-4 py-2 text-left text-sm hover:bg-gray-200"
+                  onClick={async () => {
+                    await api.delete(`/tastings/${tasting.id}`);
+                    // TODO: propagate
+                    location.reload();
+                  }}
+                >
+                  Delete Tasting
+                </Menu.Item>
+              )}
+            </Menu.Items>
+          </Menu>
         </div>
       </div>
       {!noBottle && <BottleCard bottle={bottle} />}
