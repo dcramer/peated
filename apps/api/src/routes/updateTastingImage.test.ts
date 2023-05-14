@@ -57,12 +57,12 @@ test("tasting image does resize down", async () => {
 
   expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
-  expect(data.pictureUrl).toBeDefined();
+  expect(data.imageUrl).toBeDefined();
 
-  expect(path.extname(data.pictureUrl)).toBe(".webp");
+  expect(path.extname(data.imageUrl)).toBe(".webp");
 
   // grab the file
-  const filepath = `${config.UPLOAD_PATH}/${path.basename(data.pictureUrl)}`;
+  const filepath = `${config.UPLOAD_PATH}/${path.basename(data.imageUrl)}`;
   const metadata = await sharp(filepath).metadata();
   expect(metadata.format).toBe("webp");
   expect(metadata.width).toBe(1000);
