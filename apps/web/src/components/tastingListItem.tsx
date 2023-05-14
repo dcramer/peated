@@ -128,7 +128,7 @@ export default ({
           </div>
           <div>
             {tasting.comments && (
-              <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mb-4 px-3 text-sm text-gray-500 dark:text-gray-400">
                 {tasting.comments}
               </p>
             )}
@@ -136,55 +136,53 @@ export default ({
         </div>
       ) : (
         tasting.comments && (
-          <p className="mb-2 px-3 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mb-4 px-3 text-sm text-gray-500 dark:text-gray-400">
             {tasting.comments}
           </p>
         )
       )}
       {!isTaster && user && (
-        <aside>
-          <div className="mt-3 flex items-center space-x-3">
-            {!hasToasted ? (
-              <Button
-                type="button"
-                icon={
-                  <HandThumbUpIcon
-                    className="-ml-0.5 h-5 w-5"
-                    aria-hidden="true"
-                  />
-                }
-                onClick={async () => {
-                  await api.post(`/tastings/${tasting.id}/toasts`);
-                  setHasToasted(true);
-                  onToast && onToast(tasting);
-                }}
-              >
-                Toast
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                icon={
-                  <SolidHandThumbUpIcon className="text-peated -ml-0.5 h-5 w-5" />
-                }
-                disabled
-              >
-                1
-              </Button>
-            )}
+        <aside className="flex items-center space-x-3">
+          {!hasToasted ? (
             <Button
               type="button"
               icon={
-                <ChatBubbleLeftRightIcon
+                <HandThumbUpIcon
                   className="-ml-0.5 h-5 w-5"
                   aria-hidden="true"
                 />
               }
-              onClick={() => onComment && onComment(tasting)}
+              onClick={async () => {
+                await api.post(`/tastings/${tasting.id}/toasts`);
+                setHasToasted(true);
+                onToast && onToast(tasting);
+              }}
             >
-              Comment
+              Toast
             </Button>
-          </div>
+          ) : (
+            <Button
+              type="button"
+              icon={
+                <SolidHandThumbUpIcon className="text-peated -ml-0.5 h-5 w-5" />
+              }
+              disabled
+            >
+              1
+            </Button>
+          )}
+          <Button
+            type="button"
+            icon={
+              <ChatBubbleLeftRightIcon
+                className="-ml-0.5 h-5 w-5"
+                aria-hidden="true"
+              />
+            }
+            onClick={() => onComment && onComment(tasting)}
+          >
+            Comment
+          </Button>
         </aside>
       )}
     </motion.li>

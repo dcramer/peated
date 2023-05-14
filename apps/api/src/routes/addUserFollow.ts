@@ -3,6 +3,7 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db, first } from "../db";
 import { follows, users } from "../db/schema";
+import { createNotification, objectTypeFromSchema } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -32,43 +33,56 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    const follow =
-      first(
-        await db
-          .insert(follows)
-          .values({
-            fromUserId: req.user.id,
-            toUserId: user.id,
-          })
-          .onConflictDoNothing()
-          .returning(),
-      ) ||
-      first(
-        await db
-          .update(follows)
-          .set({
-            status: "pending",
-          })
-          .where(
-            and(
-              eq(follows.status, "none"),
-              eq(follows.fromUserId, req.user.id),
-              eq(follows.toUserId, user.id),
+    const follow = await db.transaction(async (tx) => {
+      const follow =
+        first(
+          await tx
+            .insert(follows)
+            .values({
+              fromUserId: req.user.id,
+              toUserId: user.id,
+            })
+            .onConflictDoNothing()
+            .returning(),
+        ) ||
+        first(
+          await tx
+            .update(follows)
+            .set({
+              status: "pending",
+            })
+            .where(
+              and(
+                eq(follows.status, "none"),
+                eq(follows.fromUserId, req.user.id),
+                eq(follows.toUserId, user.id),
+              ),
+            )
+            .returning(),
+        ) ||
+        first(
+          await tx
+            .select()
+            .from(follows)
+            .where(
+              and(
+                eq(follows.fromUserId, req.user.id),
+                eq(follows.toUserId, user.id),
+              ),
             ),
-          )
-          .returning(),
-      ) ||
-      first(
-        await db
-          .select()
-          .from(follows)
-          .where(
-            and(
-              eq(follows.fromUserId, req.user.id),
-              eq(follows.toUserId, user.id),
-            ),
-          ),
-      );
+        );
+
+      if (follow)
+        createNotification(tx, {
+          fromUserId: follow.createdById,
+          objectType: objectTypeFromSchema(follows),
+          objectId: follow.fromUserId,
+          createdAt: follow.createdAt,
+          userId: follow.toUserId,
+        });
+
+      return follow;
+    });
 
     res.status(200).send({
       status: follow.status,

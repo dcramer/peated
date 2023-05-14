@@ -86,6 +86,21 @@ export type Tasting = {
   hasToasted: boolean;
 };
 
+export type ObjectType =
+  | "bottle"
+  | "edition"
+  | "entity"
+  | "tasting"
+  | "toast"
+  | "follow";
+
+export type Notification = {
+  objectType: ObjectType;
+  objectId: number;
+  createdAt: string;
+  fromUser?: User;
+};
+
 // locations are where you're tasting from (e.g. a bar, a distillery)
 export type Location = {
   id: string;

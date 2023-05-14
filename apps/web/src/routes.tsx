@@ -21,6 +21,9 @@ import DistillerList, {
 import EditBottle, { loader as editBottleLoader } from "./routes/editBottle";
 import Friends, { loader as friendsLoader } from "./routes/friends";
 import Login from "./routes/login";
+import Notifications, {
+  loader as notificationsLoader,
+} from "./routes/notifications";
 import Root from "./routes/root";
 import Search from "./routes/search";
 import Settings, { loader as settingsLoader } from "./routes/settings";
@@ -83,6 +86,11 @@ export default function createRoutes() {
           path: "friends",
           element: <Friends />,
           loader: friendsLoader,
+        },
+        {
+          path: "notifications",
+          element: <Notifications />,
+          loader: notificationsLoader,
         },
         {
           path: "search",

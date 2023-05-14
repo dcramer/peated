@@ -3,6 +3,7 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db, first } from "../db";
 import { tastings, toasts } from "../db/schema";
+import { createNotification, objectTypeFromSchema } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -34,14 +35,27 @@ export default {
       return res.status(400).send({ error: "Cannot toast yourself" });
     }
 
-    await db
-      .insert(toasts)
-      .values({
-        createdById: req.user.id,
-        tastingId: tasting.id,
-      })
-      .onConflictDoNothing()
-      .returning();
+    await db.transaction(async (tx) => {
+      const toast = first(
+        await tx
+          .insert(toasts)
+          .values({
+            createdById: req.user.id,
+            tastingId: tasting.id,
+          })
+          .onConflictDoNothing()
+          .returning(),
+      );
+
+      if (toast)
+        createNotification(tx, {
+          fromUserId: toast.createdById,
+          objectType: objectTypeFromSchema(toasts),
+          objectId: toast.id,
+          createdAt: toast.createdAt,
+          userId: tasting.createdById,
+        });
+    });
 
     res.status(200).send({});
   },

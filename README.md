@@ -15,25 +15,32 @@ Bootstrap the environment:
 
 ```
 docker-compose up -d
-npm run setup
+pnpm setup
 ```
 
 Note: If you need to tweak default settings, `cp .env.example .env` and go to town.
 
+Setup the database:
+
+```
+make create-db
+pnpm db migrate
+```
+
 Create a local user to avoid setting up Google credentials:
 
 ```
-npm run user:create e -w apps/api
+pnpm user create you@example.com password -a
+```
+
+Load some mock data:
+
+```
+pnpm mocks load-all you@example.com
 ```
 
 Run the dev server, which spins up both the `web` and the `api` services:
 
 ```
 npm run dev
-```
-
-NX is used to manage the monorepo, e.g.
-
-```
-npx nx run-many -t build
 ```

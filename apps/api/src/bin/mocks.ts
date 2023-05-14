@@ -1,9 +1,10 @@
 import { eq, ne, sql } from "drizzle-orm";
 import { db } from "../db";
-import { bottles, users } from "../db/schema";
+import { bottles, follows, users } from "../db/schema";
 import * as Fixtures from "../lib/test/fixtures";
 
 import { program } from "commander";
+import { createNotification, objectTypeFromSchema } from "../lib/notifications";
 
 program.name("mocks").description("CLI for assisting with Drizzle");
 
@@ -50,13 +51,21 @@ program
         .select()
         .from(users)
         .where(ne(users.id, toUserId))
+        .orderBy(sql`RANDOM()`)
         .limit(5);
 
       for (const { id: fromUserId } of userList) {
-        await Fixtures.Follow({
+        const follow = await Fixtures.Follow({
           toUserId,
           fromUserId,
           status: "pending",
+        });
+        await createNotification(db, {
+          fromUserId: follow.fromUserId,
+          objectType: objectTypeFromSchema(follows),
+          objectId: follow.fromUserId,
+          userId: follow.toUserId,
+          createdAt: follow.createdAt,
         });
         console.log(`Created follow request from ${fromUserId} -> ${toUserId}`);
       }

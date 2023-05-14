@@ -3,6 +3,7 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { follows, users } from "../db/schema";
+import { deleteNotification, objectTypeFromSchema } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -32,14 +33,24 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    await db
-      .update(follows)
-      .set({
-        status: "none",
-      })
-      .where(
-        and(eq(follows.fromUserId, req.user.id), eq(follows.toUserId, user.id)),
-      );
+    await db.transaction(async (tx) => {
+      await tx
+        .update(follows)
+        .set({
+          status: "none",
+        })
+        .where(
+          and(
+            eq(follows.fromUserId, req.user.id),
+            eq(follows.toUserId, user.id),
+          ),
+        );
+      deleteNotification(tx, {
+        objectType: objectTypeFromSchema(follows),
+        objectId: req.user.id,
+        userId: user.id,
+      });
+    });
 
     res.status(200).send({
       status: "none",

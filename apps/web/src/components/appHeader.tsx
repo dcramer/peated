@@ -6,6 +6,7 @@ import { ReactComponent as PeatedGlyph } from "../assets/glyph.svg";
 import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
 import useAuth from "../hooks/useAuth";
 import api from "../lib/api";
+import { Notification } from "../types";
 import UserAvatar from "./userAvatar";
 
 const HeaderLogo = () => {
@@ -31,16 +32,20 @@ export default function AppHeader() {
 
   const [query, setQuery] = useState("");
 
+  const [notificationCount, setNotificationCount] = useState(0);
   const [followRequestCount, setFollowRequestCount] = useState(0);
 
   useEffect(() => {
     (async () => {
-      const { results } = await api.get("/users/me/followers", {
+      const { results } = await api.get("/notifications", {
         query: {
-          status: "pending",
+          filter: "unread",
         },
       });
-      setFollowRequestCount(results.length);
+      setNotificationCount(results.length);
+      setFollowRequestCount(
+        results.filter((f: Notification) => f.objectType == "follow").length,
+      );
     })();
   });
 
@@ -71,9 +76,9 @@ export default function AppHeader() {
                 <span className="inline-block h-8 w-8 overflow-hidden rounded bg-gray-100 sm:h-10 sm:w-10">
                   <UserAvatar user={user} />
                 </span>
-                {followRequestCount > 0 && (
+                {notificationCount > 0 && (
                   <div className="absolute -right-2 -top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                    {followRequestCount.toLocaleString()}
+                    {notificationCount.toLocaleString()}
                   </div>
                 )}
               </Menu.Button>
@@ -105,6 +110,19 @@ export default function AppHeader() {
                     {followRequestCount > 0 && (
                       <div className="bg-peated ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full p-1 text-xs font-bold text-white">
                         {followRequestCount}
+                      </div>
+                    )}
+                  </Link>
+                </Menu.Item>
+                <Menu.Item>
+                  <Link
+                    className="flex w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
+                    to={`/notifications`}
+                  >
+                    Notifications
+                    {notificationCount > 0 && (
+                      <div className="bg-peated ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full p-1 text-xs font-bold text-white">
+                        {notificationCount}
                       </div>
                     )}
                   </Link>
