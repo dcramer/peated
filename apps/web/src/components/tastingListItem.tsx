@@ -19,15 +19,25 @@ const Tags = ({ tags }: { tags: string[] }) => {
   if (!tags) return null;
   return (
     <div className="text-sm">
-      <span>{tags.slice(0, 3).join(", ")}</span>
-      {tags.length > 3 && (
-        <span>
-          , and{" "}
-          <span className="underline decoration-dotted" title={tags.join(", ")}>
-            {tags.length - 3} more
+      <div className="hidden sm:block">
+        <span>{tags.slice(0, 5).join(", ")}</span>
+        {tags.length > 4 && (
+          <span>
+            , and{" "}
+            <span
+              className="underline decoration-dotted"
+              title={tags.join(", ")}
+            >
+              {tags.length - 4} more
+            </span>
           </span>
+        )}
+      </div>
+      <div className="sm:hidden">
+        <span className="underline decoration-dotted" title={tags.join(", ")}>
+          {tags.length} flavor note{tags.length !== 1 ? "s" : ""}
         </span>
-      )}
+      </div>
     </div>
   );
 };
