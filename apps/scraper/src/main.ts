@@ -192,7 +192,7 @@ async function scrapeBrands() {
     "https://www.whiskybase.com/whiskies/brands?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style";
   const distillerList: any[] = [];
   await scrapeTable(tableUrl, async (url, totalBottles) => {
-    if (totalBottles < 20) {
+    if (totalBottles < 5) {
       console.warn(`Discarding ${url} - too few bottles`);
       return;
     }
