@@ -4,7 +4,7 @@ import { useLoaderData } from "react-router-dom";
 import { useState } from "react";
 import Button from "../components/button";
 import Layout from "../components/layout";
-import TastingListItem from "../components/tastingListItem";
+import TastingList from "../components/tastingList";
 import UserAvatar from "../components/userAvatar";
 import { useRequiredAuth } from "../hooks/useAuth";
 import api from "../lib/api";
@@ -118,11 +118,7 @@ export default function UserDetails() {
       </div>
 
       {tastingList.results.length ? (
-        <ul role="list" className="space-y-3">
-          {tastingList.results.map((tasting) => (
-            <TastingListItem key={tasting.id} tasting={tasting} />
-          ))}
-        </ul>
+        <TastingList values={tastingList.results} />
       ) : (
         <EmptyActivity />
       )}

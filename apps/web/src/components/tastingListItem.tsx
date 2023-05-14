@@ -1,10 +1,11 @@
+import { Menu } from "@headlessui/react";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import {
   ChatBubbleLeftRightIcon,
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
 
-import { Menu } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import api from "../lib/api";
@@ -44,15 +45,26 @@ const Tags = ({ tags }: { tags: string[] }) => {
 export default ({
   tasting,
   noBottle,
+  onDelete,
+  onToast,
+  onComment,
 }: {
   tasting: Tasting;
   noBottle?: boolean;
+  onDelete?: (tasting: Tasting) => void;
+  onToast?: (tasting: Tasting) => void;
+  onComment?: (tasting: Tasting) => void;
 }) => {
   const { bottle } = tasting;
   const { user } = useAuth();
 
   return (
-    <li className="overflow-hidden bg-white p-3 shadow sm:rounded">
+    <motion.li
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="overflow-hidden bg-white p-3 shadow sm:rounded"
+    >
       <div className="mb-4 flex items-center space-x-4">
         <span className="w-48-px h-48-px overflow-hidden rounded bg-gray-100">
           <UserAvatar size={48} user={tasting.createdBy} />
@@ -85,8 +97,8 @@ export default ({
                   className="text-peated block w-full px-4 py-2 text-left text-sm hover:bg-gray-200"
                   onClick={async () => {
                     await api.delete(`/tastings/${tasting.id}`);
-                    // TODO: propagate
-                    location.reload();
+                    if (onDelete) onDelete(tasting);
+                    else location.reload();
                   }}
                 >
                   Delete Tasting
@@ -129,6 +141,7 @@ export default ({
             icon={
               <HandThumbUpIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
             }
+            onClick={() => onToast && onToast(tasting)}
           >
             Toast
           </Button>
@@ -140,11 +153,12 @@ export default ({
                 aria-hidden="true"
               />
             }
+            onClick={() => onComment && onComment(tasting)}
           >
             Comment
           </Button>
         </div>
       </aside>
-    </li>
+    </motion.li>
   );
 };

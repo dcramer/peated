@@ -4,11 +4,11 @@ import { Link, useLoaderData } from "react-router-dom";
 import BottleName from "../components/bottleName";
 import Button from "../components/button";
 import Layout from "../components/layout";
-import TastingListItem from "../components/tastingListItem";
+import TastingList from "../components/tastingList";
 import TimeSince from "../components/timeSince";
 import api from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
-import type { Bottle, Tasting } from "../types";
+import type { Bottle, Paginated, Tasting } from "../types";
 
 type BottleWithStats = Bottle & {
   stats: {
@@ -20,7 +20,7 @@ type BottleWithStats = Bottle & {
 
 type LoaderData = {
   bottle: BottleWithStats;
-  tastingList: Tasting[];
+  tastingList: Paginated<Tasting>;
 };
 
 export const loader: LoaderFunction = async ({
@@ -125,12 +125,8 @@ export default function BottleDetails() {
         ))}
       </div>
 
-      {tastingList.length ? (
-        <ul role="list" className="space-y-3">
-          {tastingList.map((tasting) => (
-            <TastingListItem key={tasting.id} tasting={tasting} noBottle />
-          ))}
-        </ul>
+      {tastingList.results.length ? (
+        <TastingList values={tastingList.results} />
       ) : (
         <EmptyActivity to={`/bottles/${bottle.id}/addTasting`} />
       )}

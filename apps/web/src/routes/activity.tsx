@@ -4,7 +4,7 @@ import { Link, useLoaderData } from "react-router-dom";
 import { ReactComponent as Glyph } from "../assets/glyph.svg";
 import FloatingButton from "../components/floatingButton";
 import Layout from "../components/layout";
-import TastingListItem from "../components/tastingListItem";
+import TastingList from "../components/tastingList";
 import api from "../lib/api";
 import type { Tasting } from "../types";
 
@@ -44,11 +44,7 @@ export default function Activity() {
     <Layout gutter>
       <FloatingButton to="/search?tasting" />
       {tastingList.length > 0 ? (
-        <ul role="list" className="space-y-3">
-          {tastingList.map((tasting) => (
-            <TastingListItem key={tasting.id} tasting={tasting} />
-          ))}
-        </ul>
+        <TastingList values={tastingList} />
       ) : (
         <EmptyActivity />
       )}
