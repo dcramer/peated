@@ -11,6 +11,7 @@ export const serializeTasting = (
       brand: Entity;
       distillers?: Entity[];
     };
+    hasToasted?: boolean;
   },
   currentUser?: User,
 ) => {
@@ -26,6 +27,7 @@ export const serializeTasting = (
     rating: tasting.rating,
     edition: tasting.edition,
     createdAt: tasting.createdAt,
+    hasToasted: tasting.hasToasted,
   };
   return data;
 };

@@ -4,7 +4,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
-import { serializeUser } from "../lib/transformers/user";
+import { serializeUser } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
 
 export default {

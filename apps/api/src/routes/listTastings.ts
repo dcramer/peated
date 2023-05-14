@@ -10,10 +10,11 @@ import {
   entities,
   follows,
   tastings,
+  toasts,
   users,
 } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
-import { serializeTasting } from "../lib/transformers/tasting";
+import { serializeTasting } from "../lib/serializers/tasting";
 import { injectAuth } from "../middleware/auth";
 
 export default {
@@ -101,6 +102,23 @@ export default {
       else distillersByBottleId[d.bottleId].push(d.distiller);
     });
 
+    const userToastsList: number[] = req.user
+      ? (
+          await db
+            .select({ tastingId: toasts.tastingId })
+            .from(toasts)
+            .where(
+              and(
+                inArray(
+                  toasts.tastingId,
+                  results.map((t) => t.tasting.id),
+                ),
+                eq(toasts.createdById, req.user.id),
+              ),
+            )
+        ).map((t) => t.tastingId)
+      : [];
+
     res.send({
       results: results
         .slice(0, limit)
@@ -115,6 +133,7 @@ export default {
                 brand,
                 distillers: distillersByBottleId[bottle.id],
               },
+              hasToasted: userToastsList.indexOf(tasting.id) !== -1,
             },
             req.user,
           ),

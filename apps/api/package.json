@@ -8,7 +8,7 @@
     "db:deploy": "npm run db:migrate",
     "db:migrate": "ts-node --require dotenv/config ./src/bin/db.ts migrate",
     "db:generate": "npx drizzle-kit generate:pg",
-    "load-mocks": "ts-node --require dotenv/config ./src/bin/load-mocks.ts",
+    "mocks": "ts-node --require dotenv/config ./src/bin/mocks.ts",
     "user": "ts-node --require dotenv/config ./src/bin/user.ts",
     "start": "ts-node --require dotenv/config ./src/server.ts",
     "typecheck": "tsc --noEmit",

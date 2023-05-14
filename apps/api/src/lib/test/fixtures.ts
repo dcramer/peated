@@ -9,6 +9,7 @@ import {
   NewEntity,
   NewFollow,
   NewTasting,
+  NewToast,
   NewUser,
   User as UserType,
   bottles,
@@ -16,6 +17,7 @@ import {
   entities,
   follows,
   tastings,
+  toasts,
   users,
 } from "../../db/schema";
 import { createAccessToken } from "../auth";
@@ -119,6 +121,19 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
         ...data,
         bottleId: data.bottleId || (await Bottle()).id,
         createdById: data.createdById || (await User()).id,
+      })
+      .returning()
+  )[0];
+};
+
+export const Toast = async ({ ...data }: Partial<NewToast> = {}) => {
+  return (
+    await db
+      .insert(toasts)
+      .values({
+        createdById: data.createdById || (await User()).id,
+        tastingId: data.tastingId || (await Tasting()).id,
+        ...data,
       })
       .returning()
   )[0];

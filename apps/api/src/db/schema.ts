@@ -248,6 +248,27 @@ export const tastings = pgTable("tasting", {
 export type Tasting = InferModel<typeof tastings>;
 export type NewTasting = InferModel<typeof tastings, "insert">;
 
+export const toasts = pgTable(
+  "toasts",
+  {
+    tastingId: bigint("tasting_id", { mode: "number" })
+      .references(() => tastings.id)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+  },
+  (toasts) => {
+    return {
+      toastId: primaryKey(toasts.tastingId, toasts.createdById),
+    };
+  },
+);
+
+export type Toast = InferModel<typeof toasts>;
+export type NewToast = InferModel<typeof toasts, "insert">;
+
 export const objectTypeEnum = pgEnum("object_type", [
   "bottle",
   "edition",

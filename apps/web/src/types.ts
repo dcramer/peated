@@ -83,6 +83,7 @@ export type Tasting = {
   imageUrl?: string;
   createdBy: User;
   createdAt: string;
+  hasToasted: boolean;
 };
 
 // locations are where you're tasting from (e.g. a bar, a distillery)

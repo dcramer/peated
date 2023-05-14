@@ -5,7 +5,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { follows, users } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
-import { serializeFollow } from "../lib/transformers/follow";
+import { serializeFollow } from "../lib/serializers/follow";
 import { requireAuth } from "../middleware/auth";
 
 export default {

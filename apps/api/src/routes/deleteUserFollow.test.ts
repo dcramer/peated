@@ -16,8 +16,8 @@ beforeAll(async () => {
 
 test("cannot unfollow self", async () => {
   const response = await app.inject({
-    method: "POST",
-    url: `/users/${DefaultFixtures.user.id}/unfollow`,
+    method: "DELETE",
+    url: `/users/${DefaultFixtures.user.id}/follow`,
     headers: DefaultFixtures.authHeaders,
   });
 
@@ -28,8 +28,8 @@ test("can unfollow new link", async () => {
   const otherUser = await Fixtures.User();
 
   const response = await app.inject({
-    method: "POST",
-    url: `/users/${otherUser.id}/unfollow`,
+    method: "DELETE",
+    url: `/users/${otherUser.id}/follow`,
     headers: DefaultFixtures.authHeaders,
   });
 
@@ -58,8 +58,8 @@ test("can unfollow existing link", async () => {
   });
 
   const response = await app.inject({
-    method: "POST",
-    url: `/users/${otherUser.id}/unfollow`,
+    method: "DELETE",
+    url: `/users/${otherUser.id}/follow`,
     headers: DefaultFixtures.authHeaders,
   });
 

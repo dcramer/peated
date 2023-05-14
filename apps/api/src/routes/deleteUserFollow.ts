@@ -6,8 +6,8 @@ import { follows, users } from "../db/schema";
 import { requireAuth } from "../middleware/auth";
 
 export default {
-  method: "POST",
-  url: "/users/:userId/unfollow",
+  method: "DELETE",
+  url: "/users/:userId/follow",
   schema: {
     params: {
       type: "object",

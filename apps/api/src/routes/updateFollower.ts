@@ -4,7 +4,7 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db, first } from "../db";
 import { follows, users } from "../db/schema";
-import { serializeFollow } from "../lib/transformers/follow";
+import { serializeFollow } from "../lib/serializers/follow";
 import { requireAuth } from "../middleware/auth";
 
 export default {

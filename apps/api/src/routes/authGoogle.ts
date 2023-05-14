@@ -7,7 +7,7 @@ import config from "../config";
 import { db } from "../db";
 import { identities, users } from "../db/schema";
 import { createAccessToken } from "../lib/auth";
-import { serializeUser } from "../lib/transformers/user";
+import { serializeUser } from "../lib/serializers/user";
 
 export default {
   method: "POST",

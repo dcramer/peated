@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { createAccessToken } from "../lib/auth";
-import { serializeUser } from "../lib/transformers/user";
+import { serializeUser } from "../lib/serializers/user";
 
 export default {
   method: "POST",

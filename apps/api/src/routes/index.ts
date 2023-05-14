@@ -3,10 +3,13 @@ import { FastifyInstance, FastifyPluginCallback } from "fastify";
 import addBottle from "./addBottle";
 import addEntity from "./addEntity";
 import addTasting from "./addTasting";
+import addTastingToast from "./addTastingToast";
+import addUserFollow from "./addUserFollow";
 import authBasic from "./authBasic";
 import authDetails from "./authDetails";
 import authGoogle from "./authGoogle";
 import deleteTasting from "./deleteTasting";
+import deleteUserFollow from "./deleteUserFollow";
 import getBottle from "./getBottle";
 import getEntity from "./getEntity";
 import getTasting from "./getTasting";
@@ -22,8 +25,6 @@ import updateTastingImage from "./updateTastingImage";
 import updateUser from "./updateUser";
 import updateUserAvatar from "./updateUserAvatar";
 import getUpload from "./uploads";
-import userFollow from "./userFollow";
-import userUnfollow from "./userUnfollow";
 
 export const router: FastifyPluginCallback = (
   fastify: FastifyInstance,
@@ -63,13 +64,14 @@ export const router: FastifyPluginCallback = (
   fastify.route(getTasting);
   fastify.route(deleteTasting);
   fastify.route(updateTastingImage);
+  fastify.route(addTastingToast);
 
   fastify.route(listUsers);
   fastify.route(getUser);
   fastify.route(updateUser);
   fastify.route(updateUserAvatar);
-  fastify.route(userFollow);
-  fastify.route(userUnfollow);
+  fastify.route(addUserFollow);
+  fastify.route(deleteUserFollow);
   fastify.route(listFollowers);
   fastify.route(updateFollower);
 

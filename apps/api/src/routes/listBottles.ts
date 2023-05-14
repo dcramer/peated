@@ -4,7 +4,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { Entity, bottles, bottlesToDistillers, entities } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
-import { serializeBottle } from "../lib/transformers/bottle";
+import { serializeBottle } from "../lib/serializers/bottle";
 
 export default {
   method: "GET",

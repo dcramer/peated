@@ -56,8 +56,8 @@ export default function UserDetails() {
   const [followStatus, setFollowStatus] = useState(user.followStatus);
 
   const followUser = async (follow: boolean) => {
-    const data = await api.post(
-      follow ? `/users/${user.id}/follow` : `/users/${user.id}/unfollow`,
+    const data = await api[follow ? "post" : "delete"](
+      `/users/${user.id}/follow`,
     );
     setFollowStatus(data.status);
   };

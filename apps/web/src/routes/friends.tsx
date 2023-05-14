@@ -57,8 +57,8 @@ export default function Friends() {
   };
 
   const followUser = async (toUserId: string, follow: boolean) => {
-    const data = await api.post(
-      follow ? `/users/${toUserId}/follow` : `/users/${toUserId}/unfollow`,
+    const data = await api[follow ? "post" : "delete"](
+      `/users/${toUserId}/follow`,
     );
     setMyFollowStatus((state) => ({
       ...state,

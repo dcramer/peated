@@ -10,7 +10,7 @@ import {
   tastings,
   users,
 } from "../db/schema";
-import { serializeTasting } from "../lib/transformers/tasting";
+import { serializeTasting } from "../lib/serializers/tasting";
 
 export default {
   method: "GET",

@@ -1,7 +1,7 @@
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
 import { User } from "../db/schema";
-import { SerializedUser, serializeUser } from "./transformers/user";
+import { SerializedUser, serializeUser } from "./serializers/user";
 
 export const createAccessToken = (user: User): Promise<string | undefined> => {
   return new Promise<string | undefined>((res, rej) => {

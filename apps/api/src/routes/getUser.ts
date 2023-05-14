@@ -3,7 +3,7 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { User, changes, follows, tastings, users } from "../db/schema";
-import { serializeUser } from "../lib/transformers/user";
+import { serializeUser } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
 
 export default {
