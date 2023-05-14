@@ -24,7 +24,7 @@ export const compressAndResizeImage = (
       width: maxWidth,
       height: maxHeight,
       fit: "contain",
-      position: "right top",
+      position: "center",
     })
     .webp({ quality: 80 });
 
