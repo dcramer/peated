@@ -4,7 +4,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import config from "../config";
 import { db } from "../db";
 import { tastings } from "../db/schema";
-import { storeFile } from "../lib/uploads";
+import { compressAndResizeImage, storeFile } from "../lib/uploads";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -47,6 +47,7 @@ export default {
       data: fileData,
       namespace: `tastings`,
       urlPrefix: "/uploads",
+      onProcess: (...args) => compressAndResizeImage(...args, 1000, 1000),
     });
 
     if (fileData.file.truncated) {

@@ -1,5 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { eq } from "drizzle-orm";
+
+import { readFile } from "fs/promises";
+import path from "path";
 import { db, first } from "../../db";
 import {
   NewBottle,
@@ -135,4 +138,12 @@ export const AuthenticatedHeaders = async ({
   return {
     Authorization: `Bearer ${await AuthToken({ user })}`,
   };
+};
+
+export const SampleSquareImage = async () => {
+  return new Blob([await readFile(await SampleSquareImagePath())]);
+};
+
+export const SampleSquareImagePath = async () => {
+  return path.join(__dirname, "assets", "sample-square-image.jpg");
 };

@@ -4,7 +4,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import config from "../config";
 import { db } from "../db";
 import { users } from "../db/schema";
-import { storeFile } from "../lib/uploads";
+import { compressAndResizeImage, storeFile } from "../lib/uploads";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -34,18 +34,25 @@ export default {
     }
 
     if (!req.isMultipart()) {
-      return res.status(400).send({ error: "Bad request" });
+      return res
+        .status(400)
+        .send({ error: "Bad request", code: "invalid_content_type" });
     }
 
+    // TODO: Docs suggest to use this error, but where the hell is the import?
+    // if (err instanceof RequestFileTooLargeError) {
+    //   return res.status(413).send({error "File too large"};)
+    // }
     const fileData = await req.file();
     if (!fileData) {
-      return res.status(400).send({ error: "Bad request" });
+      return res.status(400).send({ error: "Bad request", code: "no_file" });
     }
 
     const pictureUrl = await storeFile({
       data: fileData,
       namespace: `avatars`,
       urlPrefix: "/uploads",
+      onProcess: (...args) => compressAndResizeImage(...args, 500, 500),
     });
 
     if (fileData.file.truncated) {

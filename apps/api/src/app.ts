@@ -42,7 +42,16 @@ export default async function buildFastify(options = {}) {
     ...options,
   });
 
-  app.register(FastifyMultipart);
+  app.register(FastifyMultipart, {
+    limits: {
+      fieldNameSize: 100, // Max field name size in bytes
+      fieldSize: 100, // Max field value size in bytes
+      fields: 10,
+      fileSize: 1048576 * 5, // 5mb
+      files: 1, // Max number of file fields
+      headerPairs: 2000, // Max number of header key=>value pairs
+    },
+  });
   app.register(FastifyHelmet, {
     crossOriginResourcePolicy: {
       policy: "same-site",
