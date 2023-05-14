@@ -6,6 +6,7 @@ import addTasting from "./addTasting";
 import authBasic from "./authBasic";
 import authDetails from "./authDetails";
 import authGoogle from "./authGoogle";
+import deleteTasting from "./deleteTasting";
 import getBottle from "./getBottle";
 import getEntity from "./getEntity";
 import getTasting from "./getTasting";
@@ -60,6 +61,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(listTastings);
   fastify.route(addTasting);
   fastify.route(getTasting);
+  fastify.route(deleteTasting);
   fastify.route(updateTastingImage);
 
   fastify.route(listUsers);
