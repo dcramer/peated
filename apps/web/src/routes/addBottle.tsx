@@ -95,9 +95,13 @@ export default function AddBottle() {
   }));
 
   const [error, setError] = useState<string | undefined>();
+  const [saving, setSaving] = useState(false);
 
   const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
     e.preventDefault();
+    if (saving) return;
+    setSaving(true);
+
     (async () => {
       try {
         const bottle = await api.post("/bottles", {
@@ -121,12 +125,19 @@ export default function AddBottle() {
           setError("Internal error");
         }
       }
+      setSaving(false);
     })();
   };
 
   return (
     <Layout
-      header={<FormHeader title="Add Bottle" onSave={onSubmit} />}
+      header={
+        <FormHeader
+          title="Add Bottle"
+          onSave={onSubmit}
+          saveDisabled={saving}
+        />
+      }
       gutter
       noMobileGutter
     >

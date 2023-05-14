@@ -44,13 +44,17 @@ export default function AddTasting() {
 
   const navigate = useNavigate();
 
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | undefined>();
   const [image, setImage] = useState<string | File | undefined>();
   const [formData, setFormData] = useState<FormData>({});
 
-  const [error, setError] = useState<string | undefined>();
-
   const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
     e.preventDefault();
+
+    if (saving) return;
+    setSaving(true);
+
     (async () => {
       let tasting;
       try {
@@ -81,13 +85,20 @@ export default function AddTasting() {
           // TODO show some kind of alert, ask them to reusubmit image
         }
       }
+      setSaving(false);
       if (tasting) navigate("/");
     })();
   };
 
   return (
     <Layout
-      header={<FormHeader title="Record Tasting" onSave={onSubmit} />}
+      header={
+        <FormHeader
+          title="Record Tasting"
+          onSave={onSubmit}
+          saveDisabled={saving}
+        />
+      }
       gutter
       noMobileGutter
     >

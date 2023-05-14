@@ -1,15 +1,18 @@
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import classNames from "../lib/classNames";
 
 export default function FormHeader({
   onSave,
   title,
   subtitle,
+  saveDisabled = false,
 }: {
   onSave: (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => void;
   title: string;
   subtitle?: string | undefined | null;
+  saveDisabled?: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -38,10 +41,21 @@ export default function FormHeader({
       </div>
       <div className="flex">
         <button
-          onClick={onSave}
-          className={`group min-h-full ${blockStyles} pl-3 sm:pl-6`}
+          onClick={!saveDisabled ? onSave : undefined}
+          className={classNames(
+            `group min-h-full pl-3 sm:pl-6`,
+            blockStyles,
+            saveDisabled ? "cursor-auto" : "",
+          )}
         >
-          <span className="bg-peated-dark group-hover:bg-peated-darker focus-visible:outline-peated rounded p-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+          <span
+            className={classNames(
+              "rounded p-2.5 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+              saveDisabled
+                ? "bg-peated-darkest text-peated"
+                : "bg-peated-dark group-hover:bg-peated-darker  focus-visible:outline-peated text-white",
+            )}
+          >
             Save
           </span>
         </button>
