@@ -1,3 +1,6 @@
+import { XMarkIcon } from "@heroicons/react/20/solid";
+import { Link, useNavigate } from "react-router-dom";
+import classNames from "../../lib/classNames";
 import { Notification } from "../../types";
 import UserAvatar from "../userAvatar";
 import FollowEntry from "./followEntry";
@@ -9,33 +12,50 @@ export default function NotificationEntry({
   notification: Notification;
   onArchive: () => void;
 }) {
+  const navigate = useNavigate();
+  const link = getLink({ notification });
   return (
-    <div className="p-4">
+    <div
+      className={classNames(
+        "p-3",
+        link ? "cursor-pointer hover:bg-gray-100" : "",
+      )}
+      onClick={
+        link
+          ? () => {
+              navigate(link);
+            }
+          : undefined
+      }
+    >
       <div className="flex flex-1 items-start">
-        <div className="flex-shrink-0 pt-0.5">
-          <UserAvatar user={notification.fromUser} size={36} />
+        <div className="flex-shrink-0 self-center">
+          <UserAvatar user={notification.fromUser} size={32} />
         </div>
-        <div className="ml-3 flex w-0 flex-1 flex-col gap-y-2">
+        <div className="ml-3 flex w-0 flex-1 flex-col">
           <div className="flex flex-1">
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">
-                {notification.fromUser?.displayName || "Unknown User"}
-              </p>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="text-sm">
+                {notification.fromUser && (
+                  <Link
+                    to={`/users/${notification.fromUser.id}`}
+                    className="mr-1 font-semibold"
+                  >
+                    {notification.fromUser.displayName}
+                  </Link>
+                )}
                 {getStatusMessage({ notification })}
               </p>
+              <NotificationEntryRef notification={notification} />
             </div>
             <div className="flex min-h-full flex-shrink">
               <button
                 onClick={onArchive}
-                className="hover:text-peated block h-full w-full rounded border-gray-200 bg-white p-3 text-gray-400 hover:bg-gray-200"
+                className="hover:text-peated block h-full w-full rounded border-gray-200 bg-inherit p-2 px-1 text-gray-400 hover:bg-gray-200"
               >
-                X
+                <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
-          </div>
-          <div>
-            <NotificationEntryRef notification={notification} />
           </div>
         </div>
       </div>
@@ -43,12 +63,34 @@ export default function NotificationEntry({
   );
 }
 
+const getLink = ({ notification }: { notification: Notification }) => {
+  switch (notification.objectType) {
+    case "follow":
+      return `/users/${notification.objectId}`;
+    case "toast":
+      return `/users/${notification.ref.id}`;
+    default:
+      return null;
+  }
+};
+
 const getStatusMessage = ({ notification }: { notification: Notification }) => {
   switch (notification.objectType) {
     case "follow":
-      return <>Wants to follow you</>;
+      return <>wants to follow you</>;
     case "toast":
-      return <>Toasted your tasting</>;
+      return (
+        <>
+          toasted your
+          <Link
+            to={`/tastings/${notification.ref.id}`}
+            className="mx-1 font-semibold"
+          >
+            {notification.ref.bottle.brand.name}
+          </Link>
+          tasting
+        </>
+      );
     default:
       return null;
   }

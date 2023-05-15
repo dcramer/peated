@@ -18,7 +18,7 @@ export default function NotificationList({
   const activeValues = values.filter((n) => archiveList.indexOf(n.id) === -1);
 
   return (
-    <ul role="list" className="divide-y divide-gray-100">
+    <ul role="list" className="text-peated divide-y divide-gray-200 bg-white">
       {activeValues.map((n) => {
         return (
           <NotificationEntry

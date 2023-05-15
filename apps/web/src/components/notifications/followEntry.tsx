@@ -42,18 +42,23 @@ export default ({
   };
 
   return (
-    <Button
-      color="primary"
-      size="small"
-      onClick={() => {
-        if (theirFollowStatus === "pending") {
-          acceptRequest(ref.id);
-        } else {
-          followUser(ref.user.id, myFollowStatus === "none");
-        }
-      }}
-    >
-      {theirFollowStatus === "pending" ? "Accept" : followLabel(myFollowStatus)}
-    </Button>
+    <div className="mt-2">
+      <Button
+        color="primary"
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (theirFollowStatus === "pending") {
+            acceptRequest(ref.id);
+          } else {
+            followUser(ref.user.id, myFollowStatus === "none");
+          }
+        }}
+      >
+        {theirFollowStatus === "pending"
+          ? "Accept"
+          : followLabel(myFollowStatus)}
+      </Button>
+    </div>
   );
 };

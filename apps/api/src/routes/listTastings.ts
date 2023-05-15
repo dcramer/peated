@@ -102,22 +102,23 @@ export default {
       else distillersByBottleId[d.bottleId].push(d.distiller);
     });
 
-    const userToastsList: number[] = req.user
-      ? (
-          await db
-            .select({ tastingId: toasts.tastingId })
-            .from(toasts)
-            .where(
-              and(
-                inArray(
-                  toasts.tastingId,
-                  results.map((t) => t.tasting.id),
+    const userToastsList: number[] =
+      req.user && results.length
+        ? (
+            await db
+              .select({ tastingId: toasts.tastingId })
+              .from(toasts)
+              .where(
+                and(
+                  inArray(
+                    toasts.tastingId,
+                    results.map((t) => t.tasting.id),
+                  ),
+                  eq(toasts.createdById, req.user.id),
                 ),
-                eq(toasts.createdById, req.user.id),
-              ),
-            )
-        ).map((t) => t.tastingId)
-      : [];
+              )
+          ).map((t) => t.tastingId)
+        : [];
 
     res.send({
       results: results

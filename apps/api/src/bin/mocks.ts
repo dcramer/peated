@@ -1,6 +1,6 @@
 import { eq, ne, sql } from "drizzle-orm";
 import { db } from "../db";
-import { bottles, follows, users } from "../db/schema";
+import { bottles, follows, tastings, toasts, users } from "../db/schema";
 import * as Fixtures from "../lib/test/fixtures";
 
 import { program } from "commander";
@@ -15,13 +15,13 @@ program
     "--bottles <number>",
     "number of bottles",
     (v: string) => parseInt(v, 10),
-    25,
+    5,
   )
   .option(
     "--tastings <number>",
     "number of tastings",
     (v: string) => parseInt(v, 10),
-    25,
+    5,
   )
   .action(async (email, options) => {
     for (let i = 0; i < options.bottles; i++) {
@@ -68,6 +68,35 @@ program
           createdAt: follow.createdAt,
         });
         console.log(`Created follow request from ${fromUserId} -> ${toUserId}`);
+      }
+
+      const [lastTasting] = await db
+        .insert(tastings)
+        .values({
+          bottleId: (
+            await db
+              .select()
+              .from(bottles)
+              .orderBy(sql`RANDOM()`)
+              .limit(1)
+          )[0].id,
+          rating: 4.5,
+          createdById: toUserId,
+        })
+        .returning();
+      for (const { id: fromUserId } of userList) {
+        const toast = await Fixtures.Toast({
+          tastingId: lastTasting.id,
+          createdById: fromUserId,
+        });
+        await createNotification(db, {
+          fromUserId: fromUserId,
+          objectType: objectTypeFromSchema(toasts),
+          objectId: toast.id,
+          userId: toUserId,
+          createdAt: toast.createdAt,
+        });
+        console.log(`Created toast from ${fromUserId}`);
       }
     }
   });

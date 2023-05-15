@@ -107,9 +107,21 @@ export type FollowNotification = BaseNotification & {
   ref: FollowRequest;
 };
 
+export type TastingRef = {
+  id: string;
+  bottle: {
+    id: string;
+    name: string;
+    brand: {
+      id: string;
+      name: string;
+    };
+  };
+};
+
 export type ToastNotification = BaseNotification & {
   objectType: "toast";
-  ref: never;
+  ref: TastingRef;
 };
 
 export type Notification = FollowNotification | ToastNotification;
