@@ -7,10 +7,10 @@ export default ({
     <div className="mb-2 flex justify-between">
       <label
         {...props}
-        className={`block font-bold leading-6 text-gray-800 ${className || ""}`}
+        className={`block font-semibold leading-6 ${className || ""}`}
       />
       {!required && (
-        <span className="text-xs leading-6 text-gray-400">Optional</span>
+        <span className="text-xs leading-6 text-slate-500">Optional</span>
       )}
     </div>
   );

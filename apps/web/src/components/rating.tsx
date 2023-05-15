@@ -25,9 +25,9 @@ export const StaticRating = ({ value, size, className }: Props) => {
           <div
             key={item}
             className={classNames(
-              "text-gray-200",
+              "text-slate-600",
               "rating-half-2",
-              value >= item ? "text-yellow-500" : "",
+              value >= item ? "text-highlight" : "",
             )}
           >
             <StarIcon className="h-full" />
@@ -35,9 +35,9 @@ export const StaticRating = ({ value, size, className }: Props) => {
           <div
             key={item - 0.5}
             className={classNames(
-              "text-gray-200",
+              "text-slate-600",
               "rating-half-1",
-              value >= item - 0.5 ? "text-yellow-500" : "",
+              value >= item - 0.5 ? "text-highlight" : "",
             )}
           >
             <StarIcon className="h-full" />
@@ -74,20 +74,21 @@ export default ({
     >
       <div className="rating">
         {[5, 4, 3, 2, 1].map((item) => {
+          console.log(value, item);
           return [
             <RadioGroup.Option
               key={item}
               value={item}
               className={({ active, checked }) =>
                 classNames(
-                  "cursor-pointer text-gray-400",
-                  "hover:text-peated-darkest",
+                  "cursor-pointer",
+                  "hover:text-slate-400",
                   "rating-half-2",
                   "peer",
-                  "peer-hover:text-peated",
-                  active ? "text-peated" : "",
-                  checked ? "text-peated" : "",
-                  value >= item ? "text-peated" : "",
+                  "peer-hover:text-highlight",
+                  active || checked || value >= item
+                    ? "text-highlight"
+                    : "text-slate-600",
                 )
               }
             >
@@ -98,14 +99,14 @@ export default ({
               value={item - 0.5}
               className={({ active, checked }) =>
                 classNames(
-                  "cursor-pointer text-gray-400",
-                  "hover:text-peated-darkest",
+                  "cursor-pointer",
+                  "hover:text-slate-400",
                   "rating-half-1",
                   "peer",
-                  "peer-hover:text-peated",
-                  active ? "text-peated" : "",
-                  checked ? "text-peated" : "",
-                  value >= item - 0.5 ? "text-peated" : "",
+                  "peer-hover:text-highlight",
+                  active || checked || value >= item - 0.5
+                    ? "text-highlight"
+                    : "text-slate-600",
                 )
               }
             >

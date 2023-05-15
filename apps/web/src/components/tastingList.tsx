@@ -3,7 +3,13 @@ import { useState } from "react";
 import { Tasting } from "../types";
 import TastingListItem from "./tastingListItem";
 
-export default ({ values }: { values: Tasting[] }) => {
+export default ({
+  values,
+  noBottle,
+}: {
+  values: Tasting[];
+  noBottle?: boolean;
+}) => {
   const [deletedValues, setDeletedValues] = useState<string[]>([]);
 
   const onDelete = (tasting: Tasting) => {
@@ -20,6 +26,7 @@ export default ({ values }: { values: Tasting[] }) => {
               key={tasting.id}
               tasting={tasting}
               onDelete={onDelete}
+              noBottle={noBottle}
             />
           ))}
       </AnimatePresence>

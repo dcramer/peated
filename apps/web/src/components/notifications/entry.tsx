@@ -17,8 +17,8 @@ export default function NotificationEntry({
   return (
     <div
       className={classNames(
-        "p-3",
-        link ? "cursor-pointer hover:bg-gray-100" : "",
+        "bg-slate-950 p-3 text-white",
+        link ? "group cursor-pointer rounded hover:bg-slate-700" : "",
       )}
       onClick={
         link
@@ -51,7 +51,7 @@ export default function NotificationEntry({
             <div className="flex min-h-full flex-shrink">
               <button
                 onClick={onArchive}
-                className="hover:text-peated block h-full w-full rounded border-gray-200 bg-inherit p-2 px-1 text-gray-400 hover:bg-gray-200"
+                className="block h-full w-full rounded bg-inherit p-2 px-1 text-slate-600 hover:bg-slate-800 hover:text-slate-400 group-hover:text-slate-500"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>

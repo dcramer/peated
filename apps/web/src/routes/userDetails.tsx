@@ -3,6 +3,7 @@ import { useLoaderData } from "react-router-dom";
 
 import { useState } from "react";
 import Button from "../components/button";
+import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import TastingList from "../components/tastingList";
 import UserAvatar from "../components/userAvatar";
@@ -39,16 +40,6 @@ export const loader: LoaderFunction = async ({
   return { user, tastingList };
 };
 
-const EmptyActivity = () => {
-  return (
-    <div className="m-4 mx-auto flex flex-col items-center rounded-lg border border-dashed border-gray-300 p-12">
-      <span className="block font-light text-gray-400">
-        Looks like this ones a bit short on tastings.
-      </span>
-    </div>
-  );
-};
-
 export default function UserDetails() {
   const { user, tastingList } = useLoaderData() as LoaderData;
   const { user: currentUser } = useRequiredAuth();
@@ -69,27 +60,27 @@ export default function UserDetails() {
           <UserAvatar user={user} size={150} />
         </div>
         <div className="flex w-full flex-col justify-center px-4 sm:w-auto sm:flex-1">
-          <h3 className="text-peated mb-2 self-center text-4xl font-semibold leading-normal sm:self-start">
+          <h3 className="mb-2 self-center text-4xl font-semibold leading-normal text-white sm:self-start">
             {user.displayName}
           </h3>
           <div className="flex justify-center sm:justify-start">
             <div className="mr-4 pr-3 text-center">
-              <span className="text-peated block text-xl font-bold uppercase tracking-wide">
+              <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.tastings.toLocaleString()}
               </span>
-              <span className="text-sm text-gray-400">Tastings</span>
+              <span className="text-peated-light text-sm">Tastings</span>
             </div>
             <div className="mb-4 px-3 text-center">
-              <span className="text-peated block text-xl font-bold uppercase tracking-wide">
+              <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.bottles.toLocaleString()}
               </span>
-              <span className="text-sm text-gray-400">Bottles</span>
+              <span className="text-peated-light text-sm">Bottles</span>
             </div>
             <div className="mb-4 pl-3 text-center">
-              <span className="text-peated block text-xl font-bold uppercase tracking-wide">
+              <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.contributions.toLocaleString()}
               </span>
-              <span className="text-sm text-gray-400">Contributions</span>
+              <span className="text-peated-light text-sm">Contributions</span>
             </div>
           </div>
         </div>
@@ -120,7 +111,9 @@ export default function UserDetails() {
       {tastingList.results.length ? (
         <TastingList values={tastingList.results} />
       ) : (
-        <EmptyActivity />
+        <EmptyActivity>
+          Looks like this ones a bit short on tastings.
+        </EmptyActivity>
       )}
     </Layout>
   );

@@ -7,9 +7,9 @@ export default ({
 }: React.ComponentPropsWithoutRef<"input"> & {
   suffixLabel?: string;
 }) => {
-  const baseStyles = "bg-inherit p-0 border-0 text-gray-900 sm:leading-6";
+  const baseStyles = "bg-inherit p-0 border-0 text-white sm:leading-6";
   const inputStyles =
-    "text-gray-900 placeholder:text-gray-400 outline-none focus:ring-0  sm:leading-6";
+    "text-white placeholder:text-slate-700 outline-none focus:ring-0 sm:leading-6";
   if (suffixLabel) {
     return (
       <div className={`flex ${baseStyles}`}>
@@ -21,7 +21,7 @@ export default ({
           )}
           {...props}
         />
-        <span className="flex select-none items-center text-gray-500 sm:text-sm">
+        <span className="flex select-none items-center text-slate-700 sm:text-sm">
           {suffixLabel}
         </span>
       </div>

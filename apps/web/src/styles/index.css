@@ -9,3 +9,110 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    @apply h-full;
+  }
+
+  body {
+    @apply min-h-full text-white;
+
+    background-color: theme("colors.slate.900");
+    background-image: linear-gradient(
+      to right,
+      theme("colors.slate.900"),
+      theme("colors.slate.950"),
+      theme("colors.slate.900")
+    );
+  }
+
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+}
+
+@layer components {
+  .layout {
+    @apply text-white;
+    background-color: theme("colors.slate.900");
+    background-image: linear-gradient(
+      to right,
+      theme("colors.slate.900"),
+      theme("colors.slate.950"),
+      theme("colors.slate.900")
+    );
+  }
+
+  .header .logo {
+    /* @apply text-highlight; */
+  }
+
+  .header .logo {
+    @apply text-highlight;
+    /* -webkit-mask-image: linear-gradient(to bottom, #fff 25%, #000 75%); */
+    mask: linear-gradient(to bottom, transparent 5%, #000 75%);
+  }
+
+  .header > div {
+    @apply text-slate-950;
+    background-color: rgba(15, 23, 42, 0.25);
+    background-image: linear-gradient(
+      to right,
+      rgba(15, 23, 42, 0.5),
+      rgba(0, 0, 0, 0.5),
+      rgba(15, 23, 42, 0.5)
+    );
+
+    -webkit-backdrop-filter: blur(4px);
+    -o-backdrop-filter: blur(4px);
+    -moz-backdrop-filter: blur(4px);
+
+    backdrop-filter: blur(4px);
+  }
+
+  .card {
+    @apply overflow-hidden bg-slate-950 sm:rounded;
+  }
+
+  .card-alt {
+    @apply bg-slate-950 text-white;
+  }
+
+  .card-header {
+    @apply flex items-center space-x-4 p-3;
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  .card-body {
+    @apply py-3;
+  }
+
+  .menu {
+    @apply relative;
+  }
+
+  .menu div[role="menu"] a,
+  .menu div[role="menu"] button {
+    @apply block w-full px-4 py-2 text-left hover:bg-slate-500;
+  }
+
+  .dialog {
+    @apply fixed inset-0 z-10 min-h-screen overflow-y-auto text-center;
+  }
+
+  .dialog-panel {
+    @apply relative h-screen min-h-full min-w-full transform overflow-hidden overflow-y-auto text-left transition-all;
+
+    background-color: rgba(15, 23, 42, 1);
+    background-image: linear-gradient(
+      to right,
+      rgba(15, 23, 42, 1),
+      rgba(0, 0, 0, 1),
+      rgba(15, 23, 42, 1)
+    );
+  }
+}
