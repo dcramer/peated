@@ -1,8 +1,5 @@
 import { Menu } from "@headlessui/react";
-import {
-  EllipsisVerticalIcon,
-  HandThumbUpIcon as SolidHandThumbUpIcon,
-} from "@heroicons/react/20/solid";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import {
   ChatBubbleLeftRightIcon,
   HandThumbUpIcon,
@@ -71,13 +68,11 @@ export default ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="overflow-hidden bg-white p-3 shadow sm:rounded"
+      className="card"
     >
-      <div className="mb-4 flex items-center space-x-4">
-        <span className="w-48-px h-48-px overflow-hidden rounded bg-gray-100">
-          <UserAvatar size={48} user={tasting.createdBy} />
-        </span>
-        <div className="text-peated flex-1 space-y-1 font-medium">
+      <div className="card-header">
+        <UserAvatar size={48} user={tasting.createdBy} />
+        <div className="flex-1 space-y-1 font-semibold">
           <Link
             to={`/users/${tasting.createdBy.id}`}
             className="hover:underline"
@@ -85,7 +80,7 @@ export default ({
             {tasting.createdBy.displayName}
           </Link>
           <TimeSince
-            className="block text-sm font-light text-gray-500 dark:text-gray-400"
+            className="block text-sm font-light"
             date={tasting.createdAt}
           />
         </div>
@@ -95,14 +90,14 @@ export default ({
         </div>
         <div className="flex min-h-full flex-shrink">
           <Menu as="div" className="relative">
-            <Menu.Button className="text-peated block h-full w-full rounded border-gray-200 bg-white p-3 px-1 hover:bg-gray-200">
+            <Menu.Button className="text-light block h-full w-full rounded bg-inherit p-3 px-1">
               <EllipsisVerticalIcon className="h-full w-6" />
             </Menu.Button>
-            <Menu.Items className="absolute right-0 z-10 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-10 focus:outline-none">
+            <Menu.Items className="absolute right-0 z-10 w-44 origin-top-right rounded bg-white shadow-lg ring-1 ring-black ring-opacity-10 focus:outline-none">
               {(user?.admin || isTaster) && (
                 <Menu.Item
                   as="button"
-                  className="text-peated block w-full px-4 py-2 text-left text-sm hover:bg-gray-200"
+                  className="block w-full rounded px-4 py-2 text-left text-sm hover:bg-gray-200"
                   onClick={async () => {
                     await api.delete(`/tastings/${tasting.id}`);
                     if (onDelete) onDelete(tasting);
@@ -117,74 +112,66 @@ export default ({
         </div>
       </div>
       {!noBottle && <BottleCard bottle={bottle} />}
-      {tasting.imageUrl ? (
-        <div className="sm:flex">
-          <div className="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4">
-            <img
-              src={tasting.imageUrl}
-              crossOrigin="anonymous"
-              className="max-w-32 max-h-32"
-            />
+      <div>
+        {tasting.imageUrl ? (
+          <div className="p-3 sm:flex">
+            <div className="flex-shrink-0 sm:mb-0 sm:mr-4">
+              <img src={tasting.imageUrl} className="max-w-32 max-h-32" />
+            </div>
+            <div>
+              {tasting.comments && (
+                <p className="text-peated text-sm">{tasting.comments}</p>
+              )}
+            </div>
           </div>
-          <div>
-            {tasting.comments && (
-              <p className="mb-4 px-3 text-sm text-gray-500 dark:text-gray-400">
-                {tasting.comments}
-              </p>
+        ) : (
+          tasting.comments && (
+            <p className="text-peated p-3 text-sm">{tasting.comments}</p>
+          )
+        )}
+        {!isTaster && user && (
+          <aside className="flex items-center space-x-3 p-3">
+            {!hasToasted ? (
+              <Button
+                icon={
+                  <HandThumbUpIcon
+                    className="-ml-0.5 h-5 w-5"
+                    aria-hidden="true"
+                  />
+                }
+                onClick={async () => {
+                  await api.post(`/tastings/${tasting.id}/toasts`);
+                  setHasToasted(true);
+                  onToast && onToast(tasting);
+                }}
+              >
+                Toast
+              </Button>
+            ) : (
+              <Button
+                icon={
+                  <HandThumbUpIcon className="text-highlight -ml-0.5 h-5 w-5" />
+                }
+                active
+                disabled
+              >
+                1
+              </Button>
             )}
-          </div>
-        </div>
-      ) : (
-        tasting.comments && (
-          <p className="mb-4 px-3 text-sm text-gray-500 dark:text-gray-400">
-            {tasting.comments}
-          </p>
-        )
-      )}
-      {!isTaster && user && (
-        <aside className="flex items-center space-x-3">
-          {!hasToasted ? (
             <Button
-              type="button"
               icon={
-                <HandThumbUpIcon
+                <ChatBubbleLeftRightIcon
                   className="-ml-0.5 h-5 w-5"
                   aria-hidden="true"
                 />
               }
-              onClick={async () => {
-                await api.post(`/tastings/${tasting.id}/toasts`);
-                setHasToasted(true);
-                onToast && onToast(tasting);
-              }}
+              onClick={() => onComment && onComment(tasting)}
             >
-              Toast
+              Comment
             </Button>
-          ) : (
-            <Button
-              type="button"
-              icon={
-                <SolidHandThumbUpIcon className="text-peated -ml-0.5 h-5 w-5" />
-              }
-              disabled
-            >
-              1
-            </Button>
-          )}
-          <Button
-            type="button"
-            icon={
-              <ChatBubbleLeftRightIcon
-                className="-ml-0.5 h-5 w-5"
-                aria-hidden="true"
-              />
-            }
-            onClick={() => onComment && onComment(tasting)}
-          >
-            Comment
-          </Button>
-        </aside>
-      )}
+          </aside>
+        )}
+      </div>
     </motion.li>
   );
 };

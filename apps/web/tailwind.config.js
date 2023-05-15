@@ -13,14 +13,11 @@ module.exports = {
       ...colors,
       transparent: "transparent",
       current: "currentColor",
-      white: "#ffffff",
-      black: "#000000",
-      peated: {
-        light: "#77c1be",
-        DEFAULT: "#005C58",
-        dark: "#00423F",
-        darker: "#002927",
-        darkest: "#000F0F",
+      light: colors.slate[400],
+      highlight: "#68FE9C",
+      background: {
+        DEFAULT: "#111111",
+        alt: "#1F1F1F",
       },
     },
     extend: {
@@ -50,9 +47,9 @@ module.exports = {
           css: {
             color: "#000",
             a: {
-              color: "#005C58",
+              color: "#20242E",
               "&:hover": {
-                color: "#005C58",
+                color: "#20242E",
               },
             },
           },

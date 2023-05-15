@@ -3,6 +3,7 @@ import { Link, useLoaderData } from "react-router-dom";
 
 import BottleName from "../components/bottleName";
 import Button from "../components/button";
+import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import TastingList from "../components/tastingList";
 import TimeSince from "../components/timeSince";
@@ -35,24 +36,6 @@ export const loader: LoaderFunction = async ({
   return { bottle, tastingList };
 };
 
-const EmptyActivity = ({ to }: { to: string }) => {
-  return (
-    <Link
-      type="button"
-      className="hover:border-peated group m-4 mx-auto block flex flex-col items-center rounded-lg border border-dashed border-gray-300 p-12 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      to={to}
-    >
-      <span className="group-hover:text-peated mt-2 block font-semibold text-gray-400">
-        Are you enjoying a dram?
-      </span>
-
-      <span className="group-hover:text-peated mt-2 block font-light text-gray-400">
-        Looks like no ones recorded this spirit. You could be the first!
-      </span>
-    </Link>
-  );
-};
-
 export default function BottleDetails() {
   const { bottle, tastingList } = useLoaderData() as LoaderData;
 
@@ -69,13 +52,18 @@ export default function BottleDetails() {
   return (
     <Layout gutter>
       <div className="my-4 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap sm:py-0">
-        <div className="flex w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
-          <h1 className="text-peated mb-2 flex gap-x-3 text-3xl font-semibold leading-7">
+        <div className="w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
+          <h1 className="mb-2 overflow-hidden text-ellipsis whitespace-nowrap text-3xl font-semibold leading-7">
             <BottleName bottle={bottle} />
           </h1>
-          <p className="prose text-gray-500">
+          <p className="text-slate-500">
             Produced by{" "}
-            <Link to={`/brands/${bottle.brand.id}`}>{bottle.brand.name}</Link>
+            <Link
+              to={`/brands/${bottle.brand.id}`}
+              className="font-medium hover:underline"
+            >
+              {bottle.brand.name}
+            </Link>
             {distillers.length > 0 &&
               (distillers.length > 0 ||
                 bottle.brand.name !== distillers[0].name) && (
@@ -87,7 +75,7 @@ export default function BottleDetails() {
                       <Link
                         key={d.id}
                         to={`/distillers/${d.id}`}
-                        className="hover:underline"
+                        className="font-semibold hover:underline"
                       >
                         {d.name}
                       </Link>
@@ -97,11 +85,11 @@ export default function BottleDetails() {
               )}
           </p>
         </div>
-        <div className="flex w-full flex-col items-center space-y-1 sm:w-auto sm:items-start">
-          <p className="leading-6 text-gray-500">
+        <div className="flex w-full flex-col items-center space-y-1 text-slate-500 sm:w-auto sm:items-start">
+          <p className="leading-6">
             {bottle.category && formatCategoryName(bottle.category)}
           </p>
-          <p className="mt-1 text-sm leading-5 text-gray-500">
+          <p className="mt-1 text-sm leading-5">
             {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
           </p>
         </div>
@@ -117,8 +105,8 @@ export default function BottleDetails() {
       <div className="my-8 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
         {stats.map((stat) => (
           <div key={stat.name}>
-            <p className="leading-7 text-gray-500">{stat.name}</p>
-            <p className="text-peated order-first text-3xl font-semibold tracking-tight sm:text-5xl">
+            <p className="text-peated-light leading-7">{stat.name}</p>
+            <p className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
               {stat.value}
             </p>
           </div>
@@ -126,14 +114,25 @@ export default function BottleDetails() {
       </div>
 
       {tastingList.results.length ? (
-        <TastingList values={tastingList.results} />
+        <TastingList values={tastingList.results} noBottle />
       ) : (
-        <EmptyActivity to={`/bottles/${bottle.id}/addTasting`} />
+        <EmptyActivity to={`/bottles/${bottle.id}/addTasting`}>
+          <span className="mt-2 block font-semibold ">
+            Are you enjoying a dram?
+          </span>
+
+          <span className="mt-2 block font-light">
+            Looks like no ones recorded this spirit. You could be the first!
+          </span>
+        </EmptyActivity>
       )}
       {bottle.createdBy && (
-        <p className="prose mt-8 text-center text-sm text-gray-500 sm:text-left">
+        <p className="mt-8 text-center text-sm text-slate-500 sm:text-left">
           This bottle was first added by{" "}
-          <Link to={`/users/${bottle.createdBy.id}`}>
+          <Link
+            to={`/users/${bottle.createdBy.id}`}
+            className="font-medium hover:underline"
+          >
             {bottle.createdBy.displayName}
           </Link>{" "}
           <TimeSince date={bottle.createdAt} />

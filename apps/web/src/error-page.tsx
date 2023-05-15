@@ -1,5 +1,6 @@
-import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom";
+import { isRouteErrorResponse, useRouteError } from "react-router-dom";
 
+import Button from "./components/button";
 import Layout from "./components/layout";
 import config from "./config";
 import useAuth from "./hooks/useAuth";
@@ -48,40 +49,32 @@ export default function ErrorPage() {
     <Layout gutter>
       <main className="self-justify-center inline self-center">
         <div className="text-center">
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+          <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
             {title}
           </h1>
-          <p className="mt-6 leading-7 text-gray-600">{subtitle}</p>
+          <p className="mt-6 leading-7 text-white">{subtitle}</p>
 
           {config.DEBUG && (
             <>
               {error.remoteStack && (
                 <div className="prose mx-auto mt-4">
-                  <h3>Remote Stack</h3>
+                  <h3 className="text-white">Remote Stack</h3>
                   <pre className="text-left">{error.remoteStack}</pre>
                 </div>
               )}
               {error.stack && (
                 <div className="prose mx-auto mt-4">
-                  <h3>Local Stack</h3>
+                  <h3 className="text-white">Local Stack</h3>
                   <pre className="text-left">{error.stack}</pre>
                 </div>
               )}
             </>
           )}
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Link
-              to="/"
-              className="bg-peated hover:bg-peated-dark focus-visible:outline-peated rounded px-3.5 py-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-            >
+            <Button to="/" color="primary">
               Go back home
-            </Link>
-            <a
-              className="font-semibold text-gray-900"
-              href={config.GITHUB_REPO}
-            >
-              Open a GitHub issue
-            </a>
+            </Button>
+            <Button to={config.GITHUB_REPO}>Open a GitHub issue</Button>
           </div>
         </div>
       </main>

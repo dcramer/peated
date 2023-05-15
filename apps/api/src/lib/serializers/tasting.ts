@@ -31,3 +31,29 @@ export const serializeTasting = (
   };
   return data;
 };
+
+export const serializeTastingRef = (
+  tasting: {
+    id: number;
+    bottle: {
+      id: number;
+      name: string;
+      brand: {
+        id: number;
+        name: string;
+      };
+    };
+  },
+  currentUser?: User,
+) => {
+  return {
+    id: tasting.id,
+    bottle: {
+      name: tasting.bottle.name,
+      brand: {
+        id: tasting.bottle.brand.id,
+        name: tasting.bottle.brand.name,
+      },
+    },
+  };
+};

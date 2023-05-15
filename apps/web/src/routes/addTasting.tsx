@@ -103,8 +103,11 @@ export default function AddTasting() {
       noMobileGutter
     >
       <form className="mx-auto max-w-xl" onSubmit={onSubmit}>
-        <BottleCard bottle={bottle} />
         {error && <FormError values={[error]} />}
+
+        <div className="sm:mb-4">
+          <BottleCard bottle={bottle} />
+        </div>
 
         <Fieldset>
           <RatingField
@@ -144,16 +147,16 @@ export default function AddTasting() {
             }
           />
 
-          <div className="bg-gray-100 p-3 ">
+          <div className="bg-slate-900 p-3 ">
             <div className="mb-4 flex items-center">
               <div className="flex-1">
-                <h2 className="font-bold">Bottle Edition</h2>
-                <p>
+                <h2 className="font-medium">Bottle Edition</h2>
+                <p className="text-sm">
                   If this is a specific series or barrel, feel free to note it
                   below!
                 </p>
               </div>
-              <ArrowDownIcon className="h-8 w-8" />
+              <ArrowDownIcon className="h-8 w-8 text-slate-700" />
             </div>
             <Fieldset>
               <TextField

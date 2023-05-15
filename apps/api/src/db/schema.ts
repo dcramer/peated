@@ -251,6 +251,7 @@ export type NewTasting = InferModel<typeof tastings, "insert">;
 export const toasts = pgTable(
   "toasts",
   {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
     tastingId: bigint("tasting_id", { mode: "number" })
       .references(() => tastings.id)
       .notNull(),
@@ -261,7 +262,10 @@ export const toasts = pgTable(
   },
   (toasts) => {
     return {
-      toastId: primaryKey(toasts.tastingId, toasts.createdById),
+      toastId: uniqueIndex("toast_unq").on(
+        toasts.tastingId,
+        toasts.createdById,
+      ),
     };
   },
 );

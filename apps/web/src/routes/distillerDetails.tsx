@@ -36,10 +36,10 @@ export default function DistillerDetails() {
       <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
         <div className="flex w-full flex-col justify-center sm:w-auto sm:flex-1">
           <div className="flex w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
-            <h1 className="text-peated mb-2 flex gap-x-3 text-3xl font-semibold leading-7">
+            <h1 className="mb-2 flex gap-x-3 text-3xl font-semibold leading-7">
               {distiller.name}
             </h1>
-            <p className="text-sm font-light text-gray-500">
+            <p className="text-peated-light text-sm font-light">
               Located in {distiller.country}
               {distiller.region && <span> &middot; {distiller.region}</span>}
             </p>
@@ -54,8 +54,8 @@ export default function DistillerDetails() {
       <div className="my-8 grid grid-cols-1 items-center gap-3 text-center sm:text-left">
         {stats.map((stat) => (
           <div key={stat.name}>
-            <p className="leading-7 text-gray-400">{stat.name}</p>
-            <p className="text-peated order-first text-3xl font-semibold tracking-tight sm:text-5xl">
+            <p className="text-peated-light leading-7">{stat.name}</p>
+            <p className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
               {stat.value}
             </p>
           </div>

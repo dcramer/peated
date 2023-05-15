@@ -55,7 +55,7 @@ export default function SearchHeader({
             setValue(e.target.value);
             if (onChange) onChange(e.target.value);
           }}
-          className="focus:outline-peated-light bg-peated-darker min-w-full rounded px-2 py-1.5 text-white focus:outline sm:px-3 sm:py-2"
+          className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-700 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
         />
       </form>
       {onDone && (
@@ -64,7 +64,7 @@ export default function SearchHeader({
             onClick={onDone}
             className={`group min-h-full ${blockStyles} pl-3 sm:pl-6`}
           >
-            <span className="bg-peated-dark group-hover:bg-peated-darker focus-visible:outline-peated rounded p-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+            <span className="bg-peated-dark group-hover:bg-peated-dark focus-visible:outline-peated rounded p-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
               Done
             </span>
           </button>

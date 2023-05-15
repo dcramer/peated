@@ -97,15 +97,10 @@ export default ({
   }, [query]);
 
   return (
-    <Dialog
-      as="div"
-      open={open}
-      className="fixed inset-0 z-10 min-h-screen overflow-y-auto text-center"
-      onClose={setOpen}
-    >
+    <Dialog as="div" open={open} className="dialog" onClose={setOpen}>
       <Dialog.Overlay className="fixed inset-0" />
 
-      <Dialog.Panel className="relative h-screen min-h-full min-w-full transform overflow-hidden overflow-y-auto bg-white text-left transition-all">
+      <Dialog.Panel className="dialog-panel">
         <Header>
           <SearchHeader
             onClose={() => setOpen(false)}
@@ -118,23 +113,23 @@ export default ({
           />
         </Header>
         <main className={"m-h-screen relative mx-auto max-w-4xl"}>
-          <ul role="list" className="divide-y divide-gray-100">
+          <ul role="list" className="space-y">
             {optionList.map((option) => {
               return (
                 <ListItem key={`${option.id}-${option.name}`}>
                   <CheckIcon
                     className={classNames(
-                      "h-12 w-12 flex-none rounded-full bg-gray-100 p-2 text-gray-100",
+                      "h-12 w-12 flex-none rounded-full p-2",
                       selectedValues.find(
                         (i) => i.id == option.id && i.name == option.name,
                       )
-                        ? "bg-peated  text-white"
-                        : "group-hover:bg-gray-200",
+                        ? "bg-highlight text-black"
+                        : "bg-slate-900 text-slate-500 group-hover:bg-slate-800",
                     )}
                   />
 
                   <div className="flex min-w-0 flex-auto items-center">
-                    <p className="font-semibold leading-6 text-gray-900">
+                    <p className="font-semibold leading-6 text-white">
                       <button
                         onClick={() => {
                           selectOption(option);
@@ -152,16 +147,16 @@ export default ({
             {(results.length === 0 || query !== "") &&
               (canCreate && createForm ? (
                 <ListItem>
-                  <PlusIcon className="group-hover:bg-peated h-12 w-12 flex-none rounded-full bg-gray-100 p-2 group-hover:text-white" />
+                  <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
                   <div className="min-w-0 flex-auto">
-                    <p className="font-semibold leading-6 text-gray-900">
+                    <p className="font-semibold leading-6">
                       <button onClick={() => setCreateOpen(true)}>
                         <span className="absolute inset-x-0 -top-px bottom-0" />
                         Can't find what you're looking for?
                       </button>
                     </p>
-                    <p className="mt-1 flex gap-x-1 text-sm leading-5 text-gray-500">
+                    <p className="mt-1 flex gap-x-1 text-sm leading-5">
                       {query !== "" ? (
                         <span>
                           Tap here to add{" "}
@@ -180,10 +175,10 @@ export default ({
                 </ListItem>
               ) : (
                 <ListItem>
-                  <PlusIcon className="group-hover:bg-peated h-12 w-12 flex-none rounded-full bg-gray-100 p-2 group-hover:text-white" />
+                  <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
                   <div className="min-w-0 flex-auto">
-                    <p className="font-semibold leading-6 text-gray-900">
+                    <p className="font-semibold leading-6">
                       <a
                         href={config.GITHUB_REPO}
                         target="_blank"
@@ -193,7 +188,7 @@ export default ({
                         Can't find what you're looking for?
                       </a>
                     </p>
-                    <p className="mt-1 flex gap-x-1 text-sm leading-5 text-gray-500">
+                    <p className="mt-1 flex gap-x-1 text-sm leading-5">
                       Well, that stinks. Maybe a open an issue on GitHub?
                     </p>
                   </div>

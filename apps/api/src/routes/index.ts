@@ -8,6 +8,7 @@ import addUserFollow from "./addUserFollow";
 import authBasic from "./authBasic";
 import authDetails from "./authDetails";
 import authGoogle from "./authGoogle";
+import deleteNotification from "./deleteNotification";
 import deleteTasting from "./deleteTasting";
 import deleteUserFollow from "./deleteUserFollow";
 import getBottle from "./getBottle";
@@ -61,6 +62,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(getEntity);
 
   fastify.route(listNotifications);
+  fastify.route(deleteNotification);
 
   fastify.route(listTastings);
   fastify.route(addTasting);

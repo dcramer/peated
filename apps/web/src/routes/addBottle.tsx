@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import BottleName from "../components/bottleName";
+import { PreviewBottleCard } from "../components/bottleCard";
 import BrandField from "../components/brandField";
 import DistillerField from "../components/distillerField";
 import Fieldset from "../components/fieldset";
@@ -20,54 +20,6 @@ type FormData = {
   distillers?: Option[] | undefined;
   statedAge?: number | undefined;
   category?: Option;
-};
-
-const PreviewCard = ({
-  data: { distillers, brand, ...bottle },
-}: {
-  data: Partial<FormData>;
-}) => {
-  return (
-    <div className="text-peated flex items-center space-x-4 rounded bg-gray-100 p-3 sm:mb-4">
-      <div className="flex-1 space-y-1">
-        <p className="text-peated font-semibold leading-6">
-          {bottle.name ? (
-            <BottleName
-              bottle={{
-                name: bottle.name,
-                brand: brand
-                  ? {
-                      name: brand.name,
-                    }
-                  : undefined,
-              }}
-            />
-          ) : (
-            "Unknown Bottle"
-          )}
-        </p>
-        <p className="text-sm font-light text-gray-500">
-          Produced by {brand?.name || "Unknown"}
-          {distillers &&
-            distillers.length > 0 &&
-            (distillers.length > 0 || brand?.name !== distillers[0].name) && (
-              <span>
-                {" "}
-                &middot; Distilled at {distillers.map((d) => d.name).join(", ")}
-              </span>
-            )}
-        </p>
-      </div>
-      <div className="space-y-1">
-        <p className="leading-6 text-gray-500">
-          {bottle.category && bottle.category.name}
-        </p>
-        <p className="mt-1 text-sm leading-5 text-gray-500">
-          {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
-        </p>
-      </div>
-    </div>
-  );
 };
 
 export default function AddBottle() {
@@ -144,7 +96,9 @@ export default function AddBottle() {
       <form className="sm:mx-16">
         {error && <FormError values={[error]} />}
 
-        <PreviewCard data={formData} />
+        <div className="sm:mb-4">
+          <PreviewBottleCard data={formData} />
+        </div>
 
         <Fieldset>
           <BrandField

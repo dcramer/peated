@@ -4,23 +4,13 @@ import { useLoaderData } from "react-router-dom";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../components/button";
+import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import ListItem from "../components/listItem";
 import TimeSince from "../components/timeSince";
 import UserAvatar from "../components/userAvatar";
 import api from "../lib/api";
 import type { FollowRequest, FollowStatus } from "../types";
-
-const EmptyActivity = () => {
-  return (
-    <div className="m-4 mx-auto flex flex-col items-center rounded-lg border border-dashed border-gray-300 p-12">
-      <span className="block font-light text-gray-400">
-        You could definitely use a few more friends. We're not judging or
-        anything.
-      </span>
-    </div>
-  );
-};
 
 type LoaderData = {
   requestList: FollowRequest[];
@@ -80,27 +70,23 @@ export default function Friends() {
 
   return (
     <Layout gutter noMobileGutter>
-      <ul role="list" className="divide-y divide-gray-100">
+      <ul role="list" className="divide-peated-light divide-y">
         {requestList.length ? (
           requestList.map(({ user, ...follow }) => {
             return (
               <ListItem key={user.id}>
-                <div className="mb-4 flex flex-1  items-center space-x-4">
-                  <span className="w-48-px h-48-px overflow-hidden rounded bg-gray-100">
-                    <UserAvatar size={48} user={user} />
-                  </span>
-                  <div className="text-peated flex-1 space-y-1 font-medium">
+                <div className="flex flex-1 items-center space-x-4">
+                  <UserAvatar size={48} user={user} />
+                  <div className="flex-1 space-y-1 font-medium">
                     <Link to={`/users/${user.id}`} className="hover:underline">
                       {user.displayName}
                     </Link>
                     <TimeSince
-                      className="block text-sm font-light text-gray-500 dark:text-gray-400"
+                      className="text-peated-light block text-sm font-light"
                       date={follow.createdAt}
                     />
                   </div>
                   <div className="flex items-center gap-x-4">
-                    {theirFollowStatus[follow.id] === "pending" &&
-                      myFollowStatus[user.id] === "none"}
                     <Button
                       color="primary"
                       onClick={() => {
@@ -124,7 +110,10 @@ export default function Friends() {
             );
           })
         ) : (
-          <EmptyActivity />
+          <EmptyActivity>
+            You could definitely use a few more friends. We're not judging or
+            anything.
+          </EmptyActivity>
         )}
       </ul>
     </Layout>

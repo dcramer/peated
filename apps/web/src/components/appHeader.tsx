@@ -1,25 +1,24 @@
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { ReactComponent as PeatedGlyph } from "../assets/glyph.svg";
 import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
 import useAuth from "../hooks/useAuth";
-import api from "../lib/api";
-import { Notification } from "../types";
+import NotificationsPanel from "./notifications/panel";
 import UserAvatar from "./userAvatar";
 
 const HeaderLogo = () => {
   return (
     <>
-      <div className="hidden sm:flex">
+      <div className="logo hidden sm:flex">
         <Link to="/">
-          <PeatedLogo className="h-10 w-auto text-white" />
+          <PeatedLogo className="h-10 w-auto" />
         </Link>
       </div>
-      <div className="flex sm:hidden">
+      <div className="logo flex sm:hidden ">
         <Link to="/">
-          <PeatedGlyph className="h-8 w-auto text-white" />
+          <PeatedGlyph className="h-8 w-auto" />
         </Link>
       </div>
     </>
@@ -32,28 +31,11 @@ export default function AppHeader() {
 
   const [query, setQuery] = useState("");
 
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [followRequestCount, setFollowRequestCount] = useState(0);
-
-  useEffect(() => {
-    (async () => {
-      const { results } = await api.get("/notifications", {
-        query: {
-          filter: "unread",
-        },
-      });
-      setNotificationCount(results.length);
-      setFollowRequestCount(
-        results.filter((f: Notification) => f.objectType == "follow").length,
-      );
-    })();
-  });
-
   return (
     <>
       <HeaderLogo />
       <form
-        className={`ml-4 flex flex-1 justify-end sm:ml-12`}
+        className={`ml-4 flex flex-1 justify-end sm:ml-8`}
         onSubmit={(e) => {
           e.preventDefault();
           navigate(`/search?q=${encodeURIComponent(query)}`);
@@ -64,25 +46,19 @@ export default function AppHeader() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for a bottle"
           autoComplete="off"
-          className="focus:outline-peated-light bg-peated-darker w-full transform rounded px-2 py-1.5 text-white transition-all duration-500 focus:outline sm:px-3 sm:py-2"
+          className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-700 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
         />
       </form>
       {user && (
-        <div className="ml-4 flex items-center sm:ml-12">
-          <Menu as="div" className="relative">
-            <div>
-              <Menu.Button className="bg-peated focus:ring-offset-peated relative flex max-w-xs items-center rounded text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2">
-                <span className="sr-only">Open user menu</span>
-                <span className="inline-block h-8 w-8 overflow-hidden rounded bg-gray-100 sm:h-10 sm:w-10">
-                  <UserAvatar user={user} />
-                </span>
-                {notificationCount > 0 && (
-                  <div className="absolute -right-2 -top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                    {notificationCount.toLocaleString()}
-                  </div>
-                )}
-              </Menu.Button>
-            </div>
+        <div className="ml-4 flex items-center gap-x-2 sm:ml-8">
+          <NotificationsPanel />
+          <Menu as="div" className="menu">
+            <Menu.Button className="focus:ring-highlight relative flex max-w-xs items-center rounded text-sm text-white hover:bg-slate-800 focus:outline-none focus:ring">
+              <span className="sr-only">Open user menu</span>
+              <span className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded text-white sm:h-10 sm:w-10">
+                <UserAvatar user={user} size={28} />
+              </span>
+            </Menu.Button>
             <Transition
               as={Fragment}
               enter="transition ease-out duration-100"
@@ -92,68 +68,24 @@ export default function AppHeader() {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded bg-slate-800 py-1 text-white shadow-lg focus:outline-none">
                 <Menu.Item>
-                  <Link
-                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
-                    to={`/users/${user.id}`}
-                  >
-                    Profile
-                  </Link>
+                  <Link to={`/users/${user.id}`}>Profile</Link>
                 </Menu.Item>
                 <Menu.Item>
-                  <Link
-                    className="flex w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
-                    to={`/friends`}
-                  >
-                    Friends
-                    {followRequestCount > 0 && (
-                      <div className="bg-peated ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full p-1 text-xs font-bold text-white">
-                        {followRequestCount}
-                      </div>
-                    )}
-                  </Link>
+                  <Link to={`/friends`}>Friends</Link>
                 </Menu.Item>
                 <Menu.Item>
-                  <Link
-                    className="flex w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
-                    to={`/notifications`}
-                  >
-                    Notifications
-                    {notificationCount > 0 && (
-                      <div className="bg-peated ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full p-1 text-xs font-bold text-white">
-                        {notificationCount}
-                      </div>
-                    )}
-                  </Link>
+                  <Link to={`/bottles`}>Bottles</Link>
                 </Menu.Item>
                 <Menu.Item>
-                  <Link
-                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
-                    to={`/bottles`}
-                  >
-                    Bottles
-                  </Link>
+                  <Link to={`/brands`}>Brands</Link>
                 </Menu.Item>
                 <Menu.Item>
-                  <Link
-                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
-                    to={`/brands`}
-                  >
-                    Brands
-                  </Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link
-                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
-                    to={`/distillers`}
-                  >
-                    Distillers
-                  </Link>
+                  <Link to={`/distillers`}>Distillers</Link>
                 </Menu.Item>
                 <Menu.Item>
                   <button
-                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-200"
                     onClick={() => {
                       logout();
                       navigate("/");

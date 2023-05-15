@@ -86,7 +86,7 @@ export default function Search() {
         />
       }
     >
-      <ul role="list" className="divide-y divide-gray-100">
+      <ul role="list" className="space-y-4">
         {state === "loading" ? (
           <>
             <SkeletonItem />
@@ -102,7 +102,7 @@ export default function Search() {
                   <div className="hidden h-12 w-12 flex-none p-2 sm:visible" />
 
                   <div className="min-w-0 flex-auto">
-                    <p className="font-semibold leading-6 text-gray-900">
+                    <p className="font-semibold leading-6">
                       <Link
                         to={
                           directToTasting
@@ -114,21 +114,21 @@ export default function Search() {
                         {title}
                       </Link>
                     </p>
-                    <p className="mt-1 flex truncate text-sm leading-5 text-gray-500">
+                    <p className="mt-1 flex truncate text-sm leading-5 text-slate-500">
                       {bottle.brand.name}
                     </p>
                   </div>
                   <div className="flex items-center gap-x-4">
                     <div className="hidden sm:flex sm:flex-col sm:items-end">
-                      <p className="leading-6 text-gray-900">
+                      <p className="leading-6 text-slate-500">
                         {bottle.category && formatCategoryName(bottle.category)}
                       </p>
-                      <p className="mt-1 text-sm leading-5 text-gray-500">
+                      <p className="mt-1 text-sm leading-5 text-slate-500">
                         {bottle.statedAge ? `${bottle.statedAge} years` : null}
                       </p>
                     </div>
                     <ChevronRightIcon
-                      className="h-10 w-10 flex-none text-gray-500"
+                      className="h-10 w-10 flex-none text-slate-500"
                       aria-hidden="true"
                     />
                   </div>
@@ -137,16 +137,16 @@ export default function Search() {
             })}
             {(results.length < maxResults || query !== "") && (
               <ListItem>
-                <PlusIcon className="group-hover:bg-peated h-12 w-12 flex-none rounded-full bg-gray-100 p-2 group-hover:text-white" />
+                <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold leading-6 text-gray-900">
+                  <p className="font-semibold leading-6">
                     <Link to={`/addBottle?name=${encodeURIComponent(query)}`}>
                       <span className="absolute inset-x-0 -top-px bottom-0" />
                       Can't find a bottle?
                     </Link>
                   </p>
-                  <p className="mt-1 flex gap-x-1 leading-5 text-gray-500">
+                  <p className="text-peated-light mt-1 flex gap-x-1 leading-5">
                     {query !== "" ? (
                       <span>
                         Tap here to add{" "}

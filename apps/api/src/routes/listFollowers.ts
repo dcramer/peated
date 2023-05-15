@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
@@ -64,7 +64,7 @@ export default {
       .leftJoin(followsBack, eq(users.id, followsBack.toUserId))
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(follows.status), asc(follows.createdAt));
+      .orderBy(desc(follows.status), asc(follows.createdAt));
 
     res.send({
       results: results.slice(0, limit).map(({ user, follow, followsBack }) =>

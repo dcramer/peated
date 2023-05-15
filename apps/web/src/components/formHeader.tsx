@@ -52,8 +52,8 @@ export default function FormHeader({
             className={classNames(
               "rounded p-2.5 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
               saveDisabled
-                ? "bg-peated-darkest text-peated"
-                : "bg-peated-dark group-hover:bg-peated-darker  focus-visible:outline-peated text-white",
+                ? "bg-peated-dark text-peated"
+                : "bg-peated-dark group-hover:bg-peated-dark focus-visible:outline-peated text-white",
             )}
           >
             Save
