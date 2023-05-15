@@ -1,11 +1,11 @@
 import { User } from "../types";
 
-export default ({ user, size }: { user: User | null; size?: number }) => {
+export default ({ user, size }: { user?: User | null; size?: number }) => {
   if (user && user.pictureUrl) {
     return (
       <img
         src={user.pictureUrl}
-        className="h-full w-full rounded object-cover"
+        className="h-full w-full rounded bg-gray-100 object-cover"
         style={{
           width: size,
           height: size,
@@ -16,7 +16,7 @@ export default ({ user, size }: { user: User | null; size?: number }) => {
 
   return (
     <svg
-      className="h-full w-full rounded text-gray-300"
+      className="h-full w-full rounded bg-gray-100 text-gray-400"
       fill="currentColor"
       viewBox="0 0 24 24"
       style={{

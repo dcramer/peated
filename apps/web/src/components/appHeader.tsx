@@ -1,12 +1,11 @@
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { ReactComponent as PeatedGlyph } from "../assets/glyph.svg";
 import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
 import useAuth from "../hooks/useAuth";
-import api from "../lib/api";
-import { Notification } from "../types";
+import NotificationtsPanel from "./notifications/panel";
 import UserAvatar from "./userAvatar";
 
 const HeaderLogo = () => {
@@ -32,23 +31,6 @@ export default function AppHeader() {
 
   const [query, setQuery] = useState("");
 
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [followRequestCount, setFollowRequestCount] = useState(0);
-
-  useEffect(() => {
-    (async () => {
-      const { results } = await api.get("/notifications", {
-        query: {
-          filter: "unread",
-        },
-      });
-      setNotificationCount(results.length);
-      setFollowRequestCount(
-        results.filter((f: Notification) => f.objectType == "follow").length,
-      );
-    })();
-  });
-
   return (
     <>
       <HeaderLogo />
@@ -69,20 +51,14 @@ export default function AppHeader() {
       </form>
       {user && (
         <div className="ml-4 flex items-center sm:ml-12">
+          <NotificationtsPanel />
           <Menu as="div" className="relative">
-            <div>
-              <Menu.Button className="bg-peated focus:ring-offset-peated relative flex max-w-xs items-center rounded text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2">
-                <span className="sr-only">Open user menu</span>
-                <span className="inline-block h-8 w-8 overflow-hidden rounded bg-gray-100 sm:h-10 sm:w-10">
-                  <UserAvatar user={user} />
-                </span>
-                {notificationCount > 0 && (
-                  <div className="absolute -right-2 -top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                    {notificationCount.toLocaleString()}
-                  </div>
-                )}
-              </Menu.Button>
-            </div>
+            <Menu.Button className="bg-peated focus:ring-offset-peated relative flex max-w-xs items-center rounded text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2">
+              <span className="sr-only">Open user menu</span>
+              <span className="inline-block h-8 w-8 overflow-hidden rounded bg-gray-100 sm:h-10 sm:w-10">
+                <UserAvatar user={user} />
+              </span>
+            </Menu.Button>
             <Transition
               as={Fragment}
               enter="transition ease-out duration-100"
@@ -107,24 +83,6 @@ export default function AppHeader() {
                     to={`/friends`}
                   >
                     Friends
-                    {followRequestCount > 0 && (
-                      <div className="bg-peated ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full p-1 text-xs font-bold text-white">
-                        {followRequestCount}
-                      </div>
-                    )}
-                  </Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link
-                    className="flex w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
-                    to={`/notifications`}
-                  >
-                    Notifications
-                    {notificationCount > 0 && (
-                      <div className="bg-peated ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full p-1 text-xs font-bold text-white">
-                        {notificationCount}
-                      </div>
-                    )}
                   </Link>
                 </Menu.Item>
                 <Menu.Item>

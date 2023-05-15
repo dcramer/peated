@@ -94,12 +94,25 @@ export type ObjectType =
   | "toast"
   | "follow";
 
-export type Notification = {
-  objectType: ObjectType;
+type BaseNotification = {
+  id: number;
   objectId: number;
   createdAt: string;
   fromUser?: User;
+  read: boolean;
 };
+
+export type FollowNotification = BaseNotification & {
+  objectType: "follow";
+  ref: FollowRequest;
+};
+
+export type ToastNotification = BaseNotification & {
+  objectType: "toast";
+  ref: never;
+};
+
+export type Notification = FollowNotification | ToastNotification;
 
 // locations are where you're tasting from (e.g. a bar, a distillery)
 export type Location = {

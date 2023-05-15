@@ -99,8 +99,6 @@ export default function Friends() {
                     />
                   </div>
                   <div className="flex items-center gap-x-4">
-                    {theirFollowStatus[follow.id] === "pending" &&
-                      myFollowStatus[user.id] === "none"}
                     <Button
                       color="primary"
                       onClick={() => {

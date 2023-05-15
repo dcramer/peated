@@ -1,9 +1,11 @@
-import { SQL, and, desc, eq } from "drizzle-orm";
+import { SQL, and, desc, eq, inArray } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { notifications, users } from "../db/schema";
+import { follows, notifications, tastings, toasts, users } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
+import { serializeFollow } from "../lib/serializers/follow";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -44,10 +46,72 @@ export default {
       .offset(offset)
       .orderBy(desc(notifications.createdAt));
 
+    // follow requests need more details
+    const followFromUserIdList = results
+      .filter(({ notification }) => notification.objectType === "follow")
+      .map(({ notification }) => notification.objectId);
+    const followsBack = alias(follows, "follows_back");
+    const followResults = followFromUserIdList.length
+      ? await db
+          .select({
+            follow: follows,
+            followsBack: followsBack,
+            user: users,
+          })
+          .from(follows)
+          .where(
+            and(
+              eq(follows.toUserId, req.user.id),
+              inArray(follows.fromUserId, followFromUserIdList),
+            ),
+          )
+          .innerJoin(users, eq(users.id, follows.fromUserId))
+          .leftJoin(followsBack, eq(follows.fromUserId, followsBack.toUserId))
+      : [];
+
+    const followResultsByObjectId = Object.fromEntries(
+      followResults.map((r) => [
+        r.follow.fromUserId,
+        {
+          ...r.follow,
+          followsBack: r.followsBack,
+          user: r.user,
+        },
+      ]),
+    );
+
+    // toasts need more details
+    const toastIdList = results
+      .filter(({ notification }) => notification.objectType === "toast")
+      .map(({ notification }) => notification.objectId);
+    const toastResults = toastIdList.length
+      ? await db
+          .select({
+            toastId: toasts.id,
+            tasting: tastings,
+          })
+          .from(tastings)
+          .innerJoin(toasts, eq(tastings.id, toasts.tastingId))
+          .where(inArray(toasts.id, toastIdList))
+      : [];
+
+    const toastResultsByObjectId = Object.fromEntries(
+      toastResults.map((r) => [r.toastId, r.tasting]),
+    );
+
     res.send({
       results: results.map(({ fromUser, notification }) => ({
         ...notification,
         fromUser,
+        ref:
+          notification.objectType === "follow"
+            ? serializeFollow(
+                followResultsByObjectId[notification.objectId],
+                req.user,
+              )
+            : notification.objectType === "toast"
+            ? toastResultsByObjectId[notification.objectId]
+            : undefined,
       })),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
