@@ -25,9 +25,8 @@ export const StaticRating = ({ value, size, className }: Props) => {
           <div
             key={item}
             className={classNames(
-              "text-slate-600",
               "rating-half-2",
-              value >= item ? "text-highlight" : "",
+              value >= item ? "text-highlight" : "text-slate-600",
             )}
           >
             <StarIcon className="h-full" />
@@ -35,9 +34,8 @@ export const StaticRating = ({ value, size, className }: Props) => {
           <div
             key={item - 0.5}
             className={classNames(
-              "text-slate-600",
               "rating-half-1",
-              value >= item - 0.5 ? "text-highlight" : "",
+              value >= item - 0.5 ? "text-highlight" : "text-slate-600",
             )}
           >
             <StarIcon className="h-full" />
