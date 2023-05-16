@@ -10,6 +10,7 @@ import FormHeader from "../components/formHeader";
 import ImageField from "../components/imageField";
 import Layout from "../components/layout";
 import RatingField from "../components/ratingField";
+import { Option } from "../components/selectField";
 import TagsField from "../components/tagsField";
 import TextAreaField from "../components/textAreaField";
 import TextField from "../components/textField";
@@ -17,8 +18,14 @@ import api, { ApiError } from "../lib/api";
 import { toTitleCase } from "../lib/strings";
 import type { Bottle } from "../types";
 
+type Flavor = {
+  name: string;
+  count: number;
+};
+
 type LoaderData = {
   bottle: Bottle;
+  flavorList: Flavor[];
 };
 
 export const loader: LoaderFunction = async ({
@@ -27,7 +34,9 @@ export const loader: LoaderFunction = async ({
   if (!bottleId) throw new Error("Missing bottleId");
   const bottle = await api.get(`/bottles/${bottleId}`);
 
-  return { bottle };
+  const { results: flavorList } = await api.get(`/bottles/${bottleId}/flavors`);
+
+  return { bottle, flavorList };
 };
 
 type FormData = {
@@ -40,7 +49,7 @@ type FormData = {
 };
 
 export default function AddTasting() {
-  const { bottle } = useLoaderData() as LoaderData;
+  const { bottle, flavorList } = useLoaderData() as LoaderData;
 
   const navigate = useNavigate();
 
@@ -131,6 +140,10 @@ export default function AddTasting() {
           <TagsField
             label="Flavor Profile"
             name="tags"
+            suggestedOptions={flavorList.map<Option>((f) => ({
+              id: f.name,
+              name: f.name,
+            }))}
             onChange={(value) =>
               setFormData({ ...formData, tags: value.map((t: any) => t.id) })
             }

@@ -72,7 +72,6 @@ export default ({
     >
       <div className="rating">
         {[5, 4, 3, 2, 1].map((item) => {
-          console.log(value, item);
           return [
             <RadioGroup.Option
               key={item}

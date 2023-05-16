@@ -209,8 +209,8 @@ export default (props: React.ComponentProps<typeof SelectField>) => {
   return (
     <SelectField
       label="Flavors"
-      {...props}
       suggestedOptions={suggestedTags}
+      {...props}
       options={options}
     />
   );
