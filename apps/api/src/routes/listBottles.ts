@@ -18,6 +18,7 @@ export default {
         sort: { type: "string" },
         brand: { type: "number" },
         distiller: { type: "number" },
+        entity: { type: "number" },
       },
     },
   },
@@ -44,6 +45,14 @@ export default {
     if (req.query.distiller) {
       where.push(
         sql`EXISTS(SELECT 1 FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${req.query.distiller} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
+      );
+    }
+    if (req.query.entity) {
+      where.push(
+        or(
+          eq(bottles.brandId, req.query.entity),
+          sql`EXISTS(SELECT 1 FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${req.query.entity} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
+        ),
       );
     }
 
@@ -130,6 +139,7 @@ export default {
       page?: number;
       brand?: number;
       distiller?: number;
+      entity?: number;
       sort?: "name";
     };
   }
