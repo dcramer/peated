@@ -1,6 +1,7 @@
 import type { RouteObject } from "react-router-dom";
 
 import ErrorPage from "./error-page";
+import About from "./routes/about";
 import Activity from "./routes/activity";
 import AddBottle from "./routes/addBottle";
 import AddTasting, { loader as addTastingLoader } from "./routes/addTasting";
@@ -126,6 +127,10 @@ export default function createRoutes() {
           element: <TastingDetails />,
         },
       ],
+    },
+    {
+      path: "about",
+      element: <About />,
     },
     {
       path: "/login",

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import classNames from "../lib/classNames";
 
-type ButtonColor = "primary" | "default" | undefined;
+type ButtonColor = "primary" | "default" | "highlight" | undefined;
 
 type ButtonSize = "small" | "base";
 
@@ -48,14 +48,16 @@ export default ({
     "inline-flex justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
 
   let textColor = "text-white";
-  if (active) {
-    textColor = "text-highlight";
-  } else if (disabled) {
-    textColor = "text-slate-500";
-  }
-
   let colorClassName;
   switch (color) {
+    case "highlight":
+      colorClassName = classNames(
+        disabled
+          ? "bg-highlight border-highlight"
+          : "bg-highlight border-highlight",
+      );
+      textColor = "text-black";
+      break;
     case "primary":
       colorClassName = classNames(
         disabled
@@ -69,6 +71,12 @@ export default ({
           ? "bg-slate-900 border-slate-900"
           : "bg-slate-900 border-slate-900 hover:bg-slate-800",
       );
+  }
+
+  if (active) {
+    textColor = "text-highlight";
+  } else if (disabled) {
+    textColor = "text-slate-500";
   }
 
   if (to) {

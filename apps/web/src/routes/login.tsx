@@ -5,6 +5,7 @@ import Layout from "../components/layout";
 import useAuth from "../hooks/useAuth";
 import api, { ApiError } from "../lib/api";
 
+import { Link } from "react-router-dom";
 import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
 import Alert from "../components/alert";
 import Button from "../components/button";
@@ -75,7 +76,7 @@ const BasicLogin = () => {
         className="mb-2 rounded"
       />
       <div className="flex justify-center">
-        <Button type="submit" disabled={loading} color="primary" fullWidth>
+        <Button type="submit" disabled={loading} color="highlight" fullWidth>
           Sign in
         </Button>
       </div>
@@ -112,7 +113,7 @@ const GoogleLogin = () => {
   return (
     <div className="mx-auto max-w-sm">
       {error && <Alert>{error}</Alert>}
-      <Button fullWidth color="primary" onClick={() => googleLogin()}>
+      <Button fullWidth color="highlight" onClick={() => googleLogin()}>
         <svg
           className="-ml-1 mr-2 h-4 w-4"
           aria-hidden="true"
@@ -137,7 +138,7 @@ const GoogleLogin = () => {
 export default function Login() {
   return (
     <Layout noHeader splash>
-      <PeatedLogo className="h-auto max-w-full text-white" />
+      <PeatedLogo className="text-peated h-auto max-w-full" />
 
       <div className="mt-8">
         {config.GOOGLE_CLIENT_ID && (
@@ -157,6 +158,11 @@ export default function Login() {
           </>
         )}
         <BasicLogin />
+      </div>
+      <div className="mt-6 text-center text-xs">
+        <Link to="/about" className="text-highlight underline">
+          About Peated
+        </Link>
       </div>
     </Layout>
   );
