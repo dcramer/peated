@@ -26,7 +26,7 @@ export default {
       properties: {
         page: { type: "number" },
         bottle: { type: "number" },
-        user: { type: "number" },
+        user: { oneOf: [{ type: "number" }, { const: "me" }] },
         filter: { type: "string", enum: ["global", "friends", "local"] },
       },
     },
@@ -43,7 +43,12 @@ export default {
       where.push(eq(tastings.bottleId, req.query.bottle));
     }
     if (req.query.user) {
-      where.push(eq(tastings.createdById, req.query.user));
+      where.push(
+        eq(
+          tastings.createdById,
+          req.query.user === "me" ? req.user.id : req.query.user,
+        ),
+      );
     }
     if (req.query.filter) {
       if (req.query.filter === "friends") {
@@ -161,7 +166,7 @@ export default {
     Querystring: {
       page?: number;
       bottle?: number;
-      user?: number;
+      user?: number | "me";
       filter?: "global" | "friends" | "local";
     };
   }

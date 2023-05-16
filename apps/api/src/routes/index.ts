@@ -17,6 +17,7 @@ import getTasting from "./getTasting";
 import getUser from "./getUser";
 import listBottleSuggestedFlavors from "./listBottleSuggestedFlavors";
 import listBottles from "./listBottles";
+import listCollections from "./listCollections";
 import listEntities from "./listEntities";
 import listFollowers from "./listFollowers";
 import listFriends from "./listFriends";
@@ -86,6 +87,8 @@ export const router: FastifyPluginCallback = (
   fastify.route(deleteUserFollow);
   fastify.route(listFollowers);
   fastify.route(updateFollower);
+
+  fastify.route(listCollections);
 
   fastify.route(getUpload);
 
