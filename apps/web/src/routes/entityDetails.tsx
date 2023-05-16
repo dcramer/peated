@@ -64,7 +64,7 @@ export default function EntityDetails() {
             <Menu.Button as={Button}>
               <EllipsisVerticalIcon className="h-5 w-5" />
             </Menu.Button>
-            <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+            <Menu.Items className="absolute left-0 z-10 mt-2 w-64 origin-top-left">
               <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
                 Edit Entity
               </Menu.Item>

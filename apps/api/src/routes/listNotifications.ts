@@ -4,7 +4,9 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import {
+  Notification,
   bottles,
+  comments,
   entities,
   follows,
   notifications,
@@ -121,20 +123,75 @@ export default {
       toastResults.map((r) => [r.toastId, r]),
     );
 
-    res.send({
-      results: results.map(({ fromUser, notification }) => ({
+    // comments need more details
+    const commentIdList = results
+      .filter(({ notification }) => notification.objectType === "comment")
+      .map(({ notification }) => notification.objectId);
+    const commentResults = commentIdList.length
+      ? (
+          await db
+            .select({
+              commentId: comments.id,
+              tasting: tastings,
+              bottle: bottles,
+              brand: entities,
+            })
+            .from(tastings)
+            .innerJoin(bottles, eq(tastings.bottleId, bottles.id))
+            .innerJoin(entities, eq(bottles.brandId, entities.id))
+            .innerJoin(comments, eq(tastings.id, comments.tastingId))
+            .where(inArray(comments.id, commentIdList))
+        ).map((r) => ({
+          commentId: r.commentId,
+          ...r.tasting,
+          bottle: {
+            ...r.bottle,
+            brand: r.brand,
+          },
+        }))
+      : [];
+
+    const commentResultsByObjectId = Object.fromEntries(
+      commentResults.map((r) => [r.commentId, r]),
+    );
+
+    const serializeRef = (notification: Notification) => {
+      switch (notification.objectType) {
+        case "follow":
+          return serializeFollow(
+            followResultsByObjectId[notification.objectId],
+            req.user,
+          );
+        case "toast":
+          return serializeTastingRef(
+            toastResultsByObjectId[notification.objectId],
+          );
+        case "comment":
+          return serializeTastingRef(
+            commentResultsByObjectId[notification.objectId],
+          );
+        default:
+          return undefined;
+      }
+    };
+
+    const finalResults = results.map(({ fromUser, notification }) => {
+      let ref: any;
+      try {
+        ref = serializeRef(notification);
+      } catch (err) {
+        return null;
+      }
+      return {
         ...notification,
         fromUser,
-        ref:
-          notification.objectType === "follow"
-            ? serializeFollow(
-                followResultsByObjectId[notification.objectId],
-                req.user,
-              )
-            : notification.objectType === "toast"
-            ? serializeTastingRef(toastResultsByObjectId[notification.objectId])
-            : undefined,
-      })),
+        ref,
+      };
+    });
+
+    res.send({
+      // remove results which are broken (e.g. we failed to delete a row)
+      results: finalResults.filter((r) => !!r),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
         prevPage: page > 1 ? page - 1 : null,

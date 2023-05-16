@@ -34,7 +34,7 @@ export default function NotificationEntry({
         </div>
         <div className="ml-3 flex w-0 flex-1 flex-col">
           <div className="flex flex-1">
-            <div className="flex-1">
+            <div className="flex flex-1 flex-col justify-center">
               <p className="text-sm">
                 {notification.fromUser && (
                   <Link
@@ -83,14 +83,25 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
     case "toast":
       return (
         <>
-          toasted your
+          toasted
           <Link
             to={`/tastings/${notification.ref.id}`}
             className="mx-1 font-semibold"
           >
             {notification.ref.bottle.brand.name}
           </Link>
-          tasting
+        </>
+      );
+    case "comment":
+      return (
+        <>
+          commented on
+          <Link
+            to={`/tastings/${notification.ref.id}`}
+            className="mx-1 font-semibold"
+          >
+            {notification.ref.bottle.brand.name}
+          </Link>
         </>
       );
     default:

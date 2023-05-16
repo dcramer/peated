@@ -142,7 +142,15 @@ export type ToastNotification = BaseNotification & {
   ref: TastingRef;
 };
 
-export type Notification = FollowNotification | ToastNotification;
+export type CommentNotification = BaseNotification & {
+  objectType: "comment";
+  ref: TastingRef;
+};
+
+export type Notification =
+  | FollowNotification
+  | ToastNotification
+  | CommentNotification;
 
 // locations are where you're tasting from (e.g. a bar, a distillery)
 export type Location = {
