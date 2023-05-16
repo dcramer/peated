@@ -22,15 +22,9 @@ export default ({
   });
 
   return (
-    <Dialog
-      open={open}
-      as="div"
-      className="fixed inset-0 z-10 min-h-screen overflow-y-auto text-center"
-      onClose={setOpen}
-    >
+    <Dialog open={open} as="div" className="dialog" onClose={setOpen}>
       <Dialog.Overlay className="fixed inset-0" />
-
-      <Dialog.Panel className="relative flex h-screen min-w-full transform items-center justify-center overflow-hidden bg-white px-4 pb-4 pt-5 text-left transition-all sm:p-6">
+      <Dialog.Panel className="dialog-panel flex items-center justify-center px-4 pb-4 pt-5 sm:p-6">
         <form
           onSubmit={(e) => {
             e.preventDefault();
