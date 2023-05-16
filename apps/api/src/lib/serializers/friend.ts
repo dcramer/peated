@@ -8,7 +8,7 @@ export const serializeFriend = (
   currentUser?: User,
 ) => {
   return {
-    id: follow.fromUserId,
+    id: follow.toUserId,
     status: follow.status,
     createdAt: follow.createdAt,
     user: serializeUser(follow.user, currentUser),
