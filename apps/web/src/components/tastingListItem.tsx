@@ -14,37 +14,10 @@ import { Tasting } from "../types";
 import BottleCard from "./bottleCard";
 import Button from "./button";
 import { StaticRating } from "./rating";
+import Tags from "./tags";
 import TimeSince from "./timeSince";
-import Tooltip from "./tooltip";
 import UserAvatar from "./userAvatar";
 
-const Tags = ({ tags }: { tags: string[] }) => {
-  if (!tags) return null;
-  return (
-    <div className="text-sm">
-      <div className="hidden sm:block">
-        <span>{tags.slice(0, 3).join(", ")}</span>
-        {tags.length > 3 && (
-          <span>
-            , and{" "}
-            <Tooltip title={tags.join(", ")}>
-              <span className="underline decoration-dotted">
-                {tags.length - 3} more
-              </span>
-            </Tooltip>
-          </span>
-        )}
-      </div>
-      <div className="sm:hidden">
-        <Tooltip title={tags.join(", ")}>
-          <span className="underline decoration-dotted">
-            {tags.length} flavor note{tags.length !== 1 ? "s" : ""}
-          </span>
-        </Tooltip>
-      </div>
-    </div>
-  );
-};
 export default ({
   tasting,
   noBottle,
@@ -62,9 +35,7 @@ export default ({
   const { user } = useAuth();
 
   const [hasToasted, setHasToasted] = useState(tasting.hasToasted);
-
   const isTaster = user?.id === tasting.createdBy.id;
-
   const totalToasts =
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
 
@@ -84,10 +55,12 @@ export default ({
           >
             {tasting.createdBy.displayName}
           </Link>
-          <TimeSince
-            className="block text-sm font-light"
-            date={tasting.createdAt}
-          />
+          <Link to={`/tastings/${tasting.id}`} className="hover:underline">
+            <TimeSince
+              className="block text-sm font-light"
+              date={tasting.createdAt}
+            />
+          </Link>
         </div>
         <div className="flex flex-col items-end gap-y-2">
           <StaticRating value={tasting.rating} size="small" />

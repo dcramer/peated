@@ -29,6 +29,7 @@ import ProfileCollections from "./routes/profileCollections";
 import Root from "./routes/root";
 import Search from "./routes/search";
 import Settings, { loader as settingsLoader } from "./routes/settings";
+import TastingDetails from "./routes/tastingDetails";
 
 export default function createRoutes() {
   return [
@@ -119,6 +120,10 @@ export default function createRoutes() {
               element: <ProfileCollections />,
             },
           ],
+        },
+        {
+          path: "tastings/:tastingId",
+          element: <TastingDetails />,
         },
       ],
     },
