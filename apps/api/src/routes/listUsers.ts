@@ -1,4 +1,4 @@
-import { SQL, and, asc, eq, ilike, or } from "drizzle-orm";
+import { SQL, and, asc, ilike, or } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
@@ -30,8 +30,18 @@ export default {
     const where: (SQL<unknown> | undefined)[] = [];
     if (query) {
       where.push(
-        or(ilike(users.displayName, `%${query}%`), eq(users.email, query)),
+        or(ilike(users.displayName, `%${query}%`), ilike(users.email, query)),
       );
+    } else {
+      res.send({
+        results: [],
+        rel: {
+          nextPage: null,
+          next: null,
+          prevPage: null,
+          prev: null,
+        },
+      });
     }
 
     const results = await db

@@ -44,7 +44,7 @@ export default function AppHeader() {
         <input
           name="q"
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for a bottle"
+          placeholder="Search for anything"
           autoComplete="off"
           className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-700 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
         />

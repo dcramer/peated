@@ -1,4 +1,4 @@
-import { SQL, and, asc, desc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { SQL, and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
@@ -28,10 +28,15 @@ export default {
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where: SQL<unknown>[] = [];
+    const where: (SQL<unknown> | undefined)[] = [];
 
     if (query) {
-      where.push(ilike(bottles.name, `%${query}%`));
+      where.push(
+        or(
+          ilike(bottles.name, `%${query}%`),
+          ilike(entities.name, `%${query}%`),
+        ),
+      );
     }
     if (req.query.brand) {
       where.push(eq(bottles.brandId, req.query.brand));
