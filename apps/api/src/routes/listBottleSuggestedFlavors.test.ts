@@ -27,13 +27,13 @@ test("lists flavors", async () => {
   });
   await Fixtures.Tasting({
     bottleId: bottle.id,
-    tags: ["dried fruits", "fruity", "caramel"],
+    tags: ["dried fruits", "caramel"],
     rating: 5,
   });
 
   const response = await app.inject({
     method: "GET",
-    url: `/bottles/${bottle.id}/flavors`,
+    url: `/bottles/${bottle.id}/suggestedFlavors`,
   });
 
   expect(response).toRespondWith(200);

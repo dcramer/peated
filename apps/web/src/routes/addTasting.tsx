@@ -34,7 +34,9 @@ export const loader: LoaderFunction = async ({
   if (!bottleId) throw new Error("Missing bottleId");
   const bottle = await api.get(`/bottles/${bottleId}`);
 
-  const { results: flavorList } = await api.get(`/bottles/${bottleId}/flavors`);
+  const { results: flavorList } = await api.get(
+    `/bottles/${bottleId}/suggestedFlavors`,
+  );
 
   return { bottle, flavorList };
 };

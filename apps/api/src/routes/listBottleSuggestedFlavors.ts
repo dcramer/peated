@@ -6,7 +6,7 @@ import { bottles, tastings } from "../db/schema";
 
 export default {
   method: "GET",
-  url: "/bottles/:bottleId/flavors",
+  url: "/bottles/:bottleId/suggestedFlavors",
   schema: {
     params: {
       type: "object",
@@ -27,12 +27,21 @@ export default {
     }
 
     const tags = await db.execute(
-      sql<
-        [string, number]
-      >`SELECT name, COUNT(name) as count FROM ${tastings}, unnest(${tastings.tags}) as name WHERE ${tastings.bottleId} = ${bottle.id} GROUP BY name ORDER BY COUNT(name) DESC LIMIT 100`,
+      sql<{ name: string; count: number }>`SELECT name, COUNT(name) as count
+        FROM (
+          SELECT unnest(${tastings.tags}) as name
+          FROM ${tastings}
+          JOIN ${bottles} ON ${bottles.id} = ${tastings.bottleId}
+          WHERE ${tastings.bottleId} = ${bottle.id} OR ${bottles.brandId} = ${bottle.brandId}
+        ) as t
+        GROUP BY name
+        ORDER BY count DESC
+        LIMIT 100`,
     );
 
-    res.send({ results: tags.rows });
+    res.send({
+      results: tags.rows,
+    });
   },
 } as RouteOptions<
   Server,
