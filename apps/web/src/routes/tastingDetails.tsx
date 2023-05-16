@@ -110,7 +110,7 @@ const CommentList = ({
   tastingId,
   newValues = [],
 }: {
-  user?: User;
+  user?: User | null;
   tastingId: string;
   newValues?: Comment[];
 }) => {
