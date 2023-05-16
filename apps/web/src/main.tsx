@@ -1,12 +1,13 @@
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import * as Sentry from "@sentry/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import {
+  RouterProvider,
   createBrowserRouter,
   createRoutesFromChildren,
   matchRoutes,
-  RouterProvider,
   useLocation,
   useNavigationType,
 } from "react-router-dom";
@@ -72,25 +73,35 @@ function initMobileControls() {
 
 initMobileControls();
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      suspense: true,
+    },
+  },
+});
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
 );
 root.render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
-      <OnlineStatusProvider>
-        <AuthProvider>
-          <Suspense
-            fallback={
-              <div className="flex h-screen items-center justify-center">
-                <Spinner />
-              </div>
-            }
-          >
-            <RouterProvider router={router} />
-          </Suspense>
-        </AuthProvider>
-      </OnlineStatusProvider>
+      <QueryClientProvider client={queryClient}>
+        <OnlineStatusProvider>
+          <AuthProvider>
+            <Suspense
+              fallback={
+                <div className="flex h-screen items-center justify-center">
+                  <Spinner />
+                </div>
+              }
+            >
+              <RouterProvider router={router} />
+            </Suspense>
+          </AuthProvider>
+        </OnlineStatusProvider>
+      </QueryClientProvider>
     </GoogleOAuthProvider>
   </React.StrictMode>,
 );

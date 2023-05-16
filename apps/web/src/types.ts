@@ -161,7 +161,7 @@ type PrevPagingRel =
       prev: null;
     };
 
-type PagingRel = NextPagingRel & PrevPagingRel;
+export type PagingRel = NextPagingRel & PrevPagingRel;
 
 export type Paginated<T> = {
   results: T[];

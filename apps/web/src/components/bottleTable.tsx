@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { formatCategoryName } from "../lib/strings";
-import { Bottle, Entity } from "../types";
+import { Bottle, Entity, PagingRel } from "../types";
 import BottleName from "./bottleName";
 import Button from "./button";
 
@@ -16,12 +16,7 @@ export default ({
   bottleList: Bottle[];
   groupBy?: (bottle: Bottle) => Grouper;
   groupTo?: (group: Entity) => string;
-  rel?: {
-    next: string | null;
-    nextPage: number | null;
-    prev: string | null;
-    prevPage: number | null;
-  };
+  rel?: PagingRel;
 }) => {
   let lastGroup: Grouper;
   return (

@@ -1,13 +1,13 @@
 import type { RouteObject } from "react-router-dom";
 
 import ErrorPage from "./error-page";
-import Activity, { loader as activityLoader } from "./routes/activity";
+import Activity from "./routes/activity";
 import AddBottle from "./routes/addBottle";
 import AddTasting, { loader as addTastingLoader } from "./routes/addTasting";
 import BottleDetails, {
   loader as bottleDetailsLoader,
 } from "./routes/bottleDetails";
-import BottleList, { loader as bottleListLoader } from "./routes/bottles";
+import BottleList from "./routes/bottles";
 import EditBottle, { loader as editBottleLoader } from "./routes/editBottle";
 import EditEntity, { loader as editEntityLoader } from "./routes/editEntity";
 import EntityList, { loader as entityListLoader } from "./routes/entities";
@@ -35,7 +35,7 @@ export default function createRoutes() {
       element: <Root />,
       errorElement: <ErrorPage />,
       children: [
-        { index: true, element: <Activity />, loader: activityLoader },
+        { index: true, element: <Activity /> },
         {
           path: "addBottle",
           element: <AddBottle />,
@@ -53,7 +53,6 @@ export default function createRoutes() {
         {
           path: "bottles/",
           element: <BottleList />,
-          loader: bottleListLoader,
         },
         {
           path: "bottles/:bottleId/edit",

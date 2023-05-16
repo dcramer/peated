@@ -1,51 +1,32 @@
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
+import { useQuery } from "@tanstack/react-query";
 import BottleTable from "../components/bottleTable";
 import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import api from "../lib/api";
-import type { Bottle } from "../types";
-
-type PagedResponse<T> = {
-  results: T[];
-  rel: {
-    next: string | null;
-    nextPage: number | null;
-    prev: string | null;
-    prevPage: number | null;
-  };
-};
-
-type LoaderData = {
-  bottleListResponse: PagedResponse<Bottle>;
-};
-
-export const loader: LoaderFunction = async ({
-  request,
-}): Promise<LoaderData> => {
-  const url = new URL(request.url);
-
-  const bottleListResponse = await api.get(`/bottles`, {
-    query: {
-      sort: "name",
-      page: url.searchParams.get("page") || undefined,
-    },
-  });
-
-  return { bottleListResponse };
-};
+import { Bottle, Paginated } from "../types";
 
 export default function BottleList() {
-  const { bottleListResponse } = useLoaderData() as LoaderData;
+  const location = useLocation();
+  const qs = new URLSearchParams(location.search);
+  const page = qs.get("page") || 1;
+
+  const { data } = useQuery({
+    queryKey: ["bottles", page],
+    queryFn: (): Promise<Paginated<Bottle>> =>
+      api.get("/bottles", {
+        query: {
+          page,
+          sort: "name",
+        },
+      }),
+  });
 
   return (
     <Layout gutter>
-      {bottleListResponse.results.length > 0 ? (
-        <BottleTable
-          bottleList={bottleListResponse.results}
-          rel={bottleListResponse.rel}
-        />
+      {data && data.results.length > 0 ? (
+        <BottleTable bottleList={data.results} rel={data.rel} />
       ) : (
         <EmptyActivity>
           Looks like there's no bottles in the database yet. Weird.

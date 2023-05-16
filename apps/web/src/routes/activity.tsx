@@ -1,52 +1,65 @@
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData } from "react-router-dom";
-
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 import { ReactComponent as Glyph } from "../assets/glyph.svg";
 import EmptyActivity from "../components/emptyActivity";
 import FloatingButton from "../components/floatingButton";
 import Layout from "../components/layout";
+import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
 import TastingList from "../components/tastingList";
 import api from "../lib/api";
-import type { Tasting } from "../types";
+import type { Paginated, Tasting } from "../types";
 
-type LoaderData = {
-  tastingList: Tasting[];
-};
+const defaultViewParam = "global";
 
-export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const { results: tastingList } = await api.get("/tastings");
-
-  return { tastingList };
+const mapFilterParam = (value: string | null) => {
+  if (value === "friends" || value === "local") return value;
+  return defaultViewParam;
 };
 
 export default function Activity() {
-  const { tastingList } = useLoaderData() as LoaderData;
+  const location = useLocation();
+  const qs = new URLSearchParams(location.search);
+  const filterQ = mapFilterParam(qs.get("view"));
+
+  const { data } = useQuery({
+    queryKey: ["tastings", filterQ],
+    queryFn: (): Promise<Paginated<Tasting>> =>
+      api.get("/tastings", {
+        query: {
+          filter: filterQ,
+        },
+      }),
+  });
 
   return (
     <Layout>
       <FloatingButton to="/search?tasting" />
       <Tabs fullWidth>
-        <Tabs.Item to="?filter=friends">Friends</Tabs.Item>
-        <Tabs.Item to="?filter=global" active>
+        <Tabs.Item to="?view=friends" active={filterQ == "friends"}>
+          Friends
+        </Tabs.Item>
+        <Tabs.Item to="./" active={filterQ === "global"}>
           Global
         </Tabs.Item>
-        <Tabs.Item to="?filter=local">Local</Tabs.Item>
+        <Tabs.Item to="?view=local" active={filterQ === "local"}>
+          Local
+        </Tabs.Item>
       </Tabs>
-      {tastingList.length > 0 ? (
-        <TastingList values={tastingList} />
-      ) : (
-        <EmptyActivity to="/search?tasting">
-          <Glyph className="group-hover:text-peated h-16 w-16 text-gray-400" />
+      <QueryBoundary>
+        {data && data.results.length > 0 ? (
+          <TastingList values={data.results} />
+        ) : (
+          <EmptyActivity to="/search?tasting">
+            <Glyph className="h-16 w-16" />
 
-          <span className="group-hover:text-peated mt-4 block font-semibold text-gray-400">
-            What are you drinking?
-          </span>
-          <span className="blockfont-light group-hover:text-peated mt-2 text-gray-400">
-            Get started by recording your first tasting notes.
-          </span>
-        </EmptyActivity>
-      )}
+            <div className="mt-4 font-semibold">What are you drinking?</div>
+            <div className="mt-2 block">
+              Get started by recording your first tasting notes.
+            </div>
+          </EmptyActivity>
+        )}
+      </QueryBoundary>
     </Layout>
   );
 }

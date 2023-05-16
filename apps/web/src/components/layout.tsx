@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import classNames from "../lib/classNames";
@@ -42,29 +42,15 @@ export default function Layout({
           )}
         >
           <AnimatePresence>
-            <motion.div
-              initial={{ y: 100, opacity: 0 }}
-              animate={{
-                y: 0,
-                opacity: 1,
-                transition: { duration: 0.5, ease: "easeInOut" },
-              }}
-              exit={{
-                y: -100,
-                opacity: 0,
-                transition: { duration: 0.5, ease: "easeInOut" },
-              }}
+            <Suspense
+              fallback={
+                <div className="flex h-screen items-center justify-center">
+                  <Spinner />
+                </div>
+              }
             >
-              <Suspense
-                fallback={
-                  <div className="flex h-screen items-center justify-center">
-                    <Spinner />
-                  </div>
-                }
-              >
-                {children}
-              </Suspense>
-            </motion.div>
+              {children}
+            </Suspense>
           </AnimatePresence>
         </main>
       </div>
