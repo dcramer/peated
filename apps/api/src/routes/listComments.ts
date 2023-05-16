@@ -4,6 +4,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { comments, users } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
+import { serializeUser } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -66,7 +67,7 @@ export default {
     res.send({
       results: results.slice(0, limit).map(({ comment, createdBy }) => ({
         ...comment,
-        createdBy,
+        createdBy: serializeUser(createdBy, req.user),
       })),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
