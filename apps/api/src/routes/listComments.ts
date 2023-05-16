@@ -27,7 +27,7 @@ export default {
     const offset = (page - 1) * limit;
 
     // have to specify at least one so folks dont scrape all comments
-    if (!req.query.tasting && !req.query.user) {
+    if (!req.user.admin && !req.query.tasting && !req.query.user) {
       return res.send({
         results: [],
         rel: {

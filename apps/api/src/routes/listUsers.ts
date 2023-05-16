@@ -32,7 +32,7 @@ export default {
       where.push(
         or(ilike(users.displayName, `%${query}%`), ilike(users.email, query)),
       );
-    } else {
+    } else if (!req.user.admin) {
       return res.send({
         results: [],
         rel: {
