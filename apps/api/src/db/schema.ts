@@ -207,8 +207,11 @@ export const editions = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
 
-    name: varchar("name", { length: 255 }).notNull(),
+    // one of these should be set -- enforced at app level
+    name: varchar("name", { length: 255 }),
     barrel: smallint("barrel"),
+    vintageYear: smallint("vintage_year"),
+
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
@@ -224,6 +227,7 @@ export const editions = pgTable(
         editions.bottleId,
         editions.name,
         editions.barrel,
+        editions.vintageYear,
       ),
     };
   },

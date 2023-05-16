@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { db } from "../db";
-import { bottles, entities, tastings } from "../db/schema";
+import { bottles, editions, entities, tastings } from "../db/schema";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;
@@ -82,4 +82,42 @@ test("creates a new tasting with tags", async () => {
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
   expect(tasting.tags).toEqual(["cherry", "peat"]);
+});
+
+test("creates a new tasting with all edition params", async () => {
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "POST",
+    url: "/tastings",
+    payload: {
+      bottle: bottle.id,
+      rating: 3.5,
+      edition: "Test",
+      vintageYear: 2023,
+      barrel: 69,
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.id));
+
+  expect(tasting.bottleId).toEqual(bottle.id);
+  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.editionId).toBeDefined();
+
+  const [edition] = await db
+    .select()
+    .from(editions)
+    .where(eq(editions.id, tasting.editionId as number));
+  expect(edition.bottleId).toEqual(bottle.id);
+  expect(edition.vintageYear).toEqual(2023);
+  expect(edition.barrel).toEqual(69);
+  expect(edition.name).toEqual("Test");
 });

@@ -1,4 +1,4 @@
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
@@ -28,6 +28,7 @@ export default {
         tastingNotes: { type: "string" },
         tags: { type: "array", items: { type: "string" } },
         edition: { type: "string" },
+        vintageYear: { type: "number" },
         barrel: { type: "number" },
       },
     },
@@ -45,22 +46,42 @@ export default {
       return res.status(400).send({ error: "Could not identify bottle" });
     }
 
+    const hasEdition = body.edition || body.barrel || body.vintageYear;
+
     const tasting = await db.transaction(async (tx) => {
       const getEditionId = async (): Promise<number | undefined> => {
-        if (!body.edition) return;
+        if (!hasEdition) return;
+
+        const lookupParams = [eq(editions.bottleId, bottle.id)];
+        if (body.edition) {
+          lookupParams.push(eq(editions.name, body.edition));
+        } else {
+          lookupParams.push(isNull(editions.name));
+        }
+        if (body.barrel) {
+          lookupParams.push(eq(editions.barrel, body.barrel));
+        } else {
+          lookupParams.push(isNull(editions.barrel));
+        }
+        if (body.vintageYear) {
+          lookupParams.push(eq(editions.vintageYear, body.vintageYear));
+        } else {
+          lookupParams.push(isNull(editions.vintageYear));
+        }
 
         const [edition] = await tx
           .select()
           .from(editions)
-          .where(eq(editions.name, body.edition));
+          .where(and(...lookupParams));
         if (edition) return edition.id;
 
         const [newEdition] = await tx
           .insert(editions)
           .values({
             bottleId: bottle.id,
-            name: body.edition,
-            barrel: body.barrel,
+            name: body.edition || null,
+            vintageYear: body.vintageYear || null,
+            barrel: body.barrel || null,
             createdById: req.user.id,
           })
           .onConflictDoNothing()
@@ -76,6 +97,7 @@ export default {
               bottleId: bottle.id,
               name: body.edition,
               barrel: body.barrel,
+              vintageYear: body.vintageYear,
             }),
           });
           return newEdition?.id;
@@ -84,7 +106,7 @@ export default {
           await tx
             .select()
             .from(editions)
-            .where(eq(editions.name, body.edition))
+            .where(and(...lookupParams))
         )[0].id;
       };
 
@@ -175,6 +197,7 @@ export default {
       bottle: number;
       edition?: string;
       barrel?: number;
+      vintageYear?: number;
     };
   }
 >;

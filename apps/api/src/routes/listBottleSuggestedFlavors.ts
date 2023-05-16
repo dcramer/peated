@@ -27,7 +27,7 @@ export default {
     }
 
     const tags = await db.execute(
-      sql<{ name: string; count: number }>`SELECT name, COUNT(name) as count
+      sql<{ name: string; count: string }>`SELECT name, COUNT(name) as count
         FROM (
           SELECT unnest(${tastings.tags}) as name
           FROM ${tastings}
@@ -40,7 +40,10 @@ export default {
     );
 
     res.send({
-      results: tags.rows,
+      results: tags.rows.map((t) => ({
+        name: t.name,
+        count: parseInt(t.count as string, 10),
+      })),
     });
   },
 } as RouteOptions<

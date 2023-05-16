@@ -35,7 +35,7 @@ export const serializeUser = (
       email: user.email,
       createdAt: user.email,
       admin: user.admin,
-      mod: user.mod,
+      mod: user.admin || user.mod,
     };
   }
   return data;
