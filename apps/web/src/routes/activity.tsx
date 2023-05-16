@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { ReactComponent as Glyph } from "../assets/glyph.svg";
 import EmptyActivity from "../components/emptyActivity";
@@ -7,6 +6,7 @@ import Layout from "../components/layout";
 import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
 import TastingList from "../components/tastingList";
+import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
 import type { Paginated, Tasting } from "../types";
 
@@ -22,15 +22,15 @@ export default function Activity() {
   const qs = new URLSearchParams(location.search);
   const filterQ = mapFilterParam(qs.get("view"));
 
-  const { data } = useQuery({
-    queryKey: ["tastings", filterQ],
-    queryFn: (): Promise<Paginated<Tasting>> =>
+  const { data } = useSuspenseQuery(
+    ["tastings", filterQ],
+    (): Promise<Paginated<Tasting>> =>
       api.get("/tastings", {
         query: {
           filter: filterQ,
         },
       }),
-  });
+  );
 
   return (
     <Layout>
@@ -47,7 +47,7 @@ export default function Activity() {
         </Tabs.Item>
       </Tabs>
       <QueryBoundary>
-        {data && data.results.length > 0 ? (
+        {data.results.length > 0 ? (
           <TastingList values={data.results} />
         ) : (
           <EmptyActivity to="/search?tasting">

@@ -23,10 +23,12 @@ import Login from "./routes/login";
 import Notifications, {
   loader as notificationsLoader,
 } from "./routes/notifications";
+import Profile from "./routes/profile";
+import ProfileActivity from "./routes/profileActivity";
+import ProfileCollections from "./routes/profileCollections";
 import Root from "./routes/root";
 import Search from "./routes/search";
 import Settings, { loader as settingsLoader } from "./routes/settings";
-import UserDetails, { loader as userDetailsLoader } from "./routes/userDetails";
 
 export default function createRoutes() {
   return [
@@ -106,8 +108,17 @@ export default function createRoutes() {
         },
         {
           path: "users/:userId",
-          element: <UserDetails />,
-          loader: userDetailsLoader,
+          element: <Profile />,
+          children: [
+            {
+              index: true,
+              element: <ProfileActivity />,
+            },
+            {
+              path: "collections",
+              element: <ProfileCollections />,
+            },
+          ],
         },
       ],
     },

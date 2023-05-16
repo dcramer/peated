@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import classNames from "../lib/classNames";
 
 type Props = {
@@ -22,9 +22,20 @@ type ItemProps = {
   to: string;
   active?: boolean;
   count?: number;
+  controlled?: boolean;
 } & React.ComponentPropsWithoutRef<typeof Link>;
 
-Tabs.Item = ({ to, active, count, children, ...props }: ItemProps) => {
+Tabs.Item = ({
+  to,
+  active,
+  count,
+  children,
+  controlled,
+  ...props
+}: ItemProps) => {
+  const location = useLocation();
+  if (controlled) active = location.pathname === to;
+
   const activeStyles = "text-highlight border-highlight";
   const inactiveStyles =
     "border-transparent text-slate-700 hover:border-slate-500 hover:text-slate-500";

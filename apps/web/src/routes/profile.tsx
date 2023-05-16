@@ -1,19 +1,16 @@
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData } from "react-router-dom";
-
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Outlet, useParams } from "react-router-dom";
 import Button from "../components/button";
 import Chip from "../components/chip";
-import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import Tabs from "../components/tabs";
-import TastingList from "../components/tastingList";
 import UserAvatar from "../components/userAvatar";
 import { useRequiredAuth } from "../hooks/useAuth";
+import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
-import type { FollowStatus, Paginated, Tasting, User } from "../types";
+import type { FollowStatus, User } from "../types";
 
 type UserDetails = User & {
   followStatus?: FollowStatus;
@@ -24,37 +21,15 @@ type UserDetails = User & {
   };
 };
 
-type LoaderData = {
-  user: UserDetails;
-  tastingList: Paginated<Tasting>;
-};
-
-// TODO: when this executes the apiClient has not configured
-// its token yet as react-dom (thus context) seemingly has
-// not rendered.. so this errors out
-export const loader: LoaderFunction = async ({
-  params: { userId },
-}): Promise<LoaderData> => {
-  if (!userId) throw new Error("Missing userId");
-  const user = await api.get(`/users/${userId}`);
-  const tastingList = await api.get(`/tastings`, {
-    query: { user: user.id },
-  });
-
-  return { user, tastingList };
-};
-
-export default function UserDetails() {
-  const { tastingList, ...loaderData } = useLoaderData() as LoaderData;
+export default function Profile() {
   const { user: currentUser } = useRequiredAuth();
-
-  const [user, setUser] = useState(loaderData.user);
-
-  useEffect(() => {
-    setUser(loaderData.user);
-  }, [loaderData.user]);
-
-  const [followStatus, setFollowStatus] = useState(user.followStatus);
+  const { userId } = useParams();
+  const { data } = useSuspenseQuery(
+    ["user", userId],
+    (): Promise<UserDetails> => api.get(`/users/${userId}`),
+  );
+  const [user, setUser] = useState<UserDetails>(data);
+  const [followStatus, setFollowStatus] = useState(data.followStatus);
 
   const followUser = async (follow: boolean) => {
     const data = await api[follow ? "post" : "delete"](
@@ -153,19 +128,14 @@ export default function UserDetails() {
         </div>
       </div>
       <Tabs fullWidth>
-        <Tabs.Item to={`/users/${user.id}`} active>
+        <Tabs.Item to={`/users/${user.id}`} controlled>
           Activity
         </Tabs.Item>
-        <Tabs.Item to={`/users/${user.id}/collections`}>Collections</Tabs.Item>
+        <Tabs.Item to={`/users/${user.id}/collections`} controlled>
+          Collections
+        </Tabs.Item>
       </Tabs>
-
-      {tastingList.results.length ? (
-        <TastingList values={tastingList.results} />
-      ) : (
-        <EmptyActivity>
-          Looks like this ones a bit short on tastings.
-        </EmptyActivity>
-      )}
+      <Outlet context={{ user }} />
     </Layout>
   );
 }
