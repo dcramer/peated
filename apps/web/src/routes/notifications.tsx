@@ -1,20 +1,11 @@
 import type { LoaderFunction } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 
+import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import NotificationList from "../components/notifications/list";
 import api from "../lib/api";
 import type { Notification, Paginated } from "../types";
-
-const EmptyActivity = () => {
-  return (
-    <div className="m-4 mx-auto flex flex-col items-center rounded-lg border border-dashed border-gray-300 p-12">
-      <span className="block font-light text-gray-400">
-        You don't have any unread notifications.
-      </span>
-    </div>
-  );
-};
 
 type LoaderData = {
   notificationList: Paginated<Notification>;
@@ -39,7 +30,7 @@ export default function Notifications() {
       {notificationList.results.length ? (
         <NotificationList values={notificationList.results} />
       ) : (
-        <EmptyActivity />
+        <EmptyActivity>You don't have any unread notifications.</EmptyActivity>
       )}
     </Layout>
   );

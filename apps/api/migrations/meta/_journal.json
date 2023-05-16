@@ -71,6 +71,13 @@
       "when": 1684207371142,
       "tag": "0009_plain_scarlet_spider",
       "breakpoints": false
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1684211138640,
+      "tag": "0010_faithful_maestro",
+      "breakpoints": false
     }
   ]
 }

@@ -232,6 +232,59 @@ export const editions = pgTable(
 export type Edition = InferModel<typeof editions>;
 export type NewEdition = InferModel<typeof editions, "insert">;
 
+export const collections = pgTable(
+  "collection",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+  },
+  (collections) => {
+    return {
+      collectionIndex: uniqueIndex("collection_name_unq").on(
+        collections.name,
+        collections.createdById,
+      ),
+    };
+  },
+);
+
+export type Collection = InferModel<typeof collections>;
+export type NewCollection = InferModel<typeof collections, "insert">;
+
+export const collectionBottles = pgTable(
+  "collection_bottle",
+  {
+    collectionId: bigint("collection_id", { mode: "number" })
+      .references(() => collections.id)
+      .notNull(),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    editionId: bigint("edition_id", { mode: "number" }).references(
+      () => editions.id,
+    ),
+  },
+  (collectionBottles) => {
+    return {
+      collectionDistillerId: primaryKey(
+        collectionBottles.collectionId,
+        collectionBottles.bottleId,
+        collectionBottles.editionId,
+      ),
+    };
+  },
+);
+
+export type CollectionBottle = InferModel<typeof collectionBottles>;
+export type NewCollectionBottle = InferModel<
+  typeof collectionBottles,
+  "insert"
+>;
+
 export const tastings = pgTable("tasting", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
 
@@ -239,7 +292,7 @@ export const tastings = pgTable("tasting", {
     .references(() => bottles.id)
     .notNull(),
   editionId: bigint("edition_id", { mode: "number" }).references(
-    () => bottles.id,
+    () => editions.id,
   ),
 
   comments: text("comments"),

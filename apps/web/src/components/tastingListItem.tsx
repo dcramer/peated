@@ -63,6 +63,9 @@ export default ({
 
   const isTaster = user?.id === tasting.createdBy.id;
 
+  const totalToasts =
+    tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
+
   return (
     <motion.li
       initial={{ opacity: 0 }}
@@ -125,7 +128,7 @@ export default ({
               active={hasToasted}
               disabled
             >
-              {tasting.toasts.toLocaleString()}
+              {totalToasts.toLocaleString()}
             </Button>
           )}
           {user && (

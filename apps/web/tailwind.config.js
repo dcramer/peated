@@ -14,7 +14,7 @@ module.exports = {
       transparent: "transparent",
       current: "currentColor",
       light: colors.slate[400],
-      highlight: "#68FE9C",
+      highlight: colors.amber[400],
       background: {
         DEFAULT: "#111111",
         alt: "#1F1F1F",

@@ -18,6 +18,7 @@ import getUser from "./getUser";
 import listBottles from "./listBottles";
 import listEntities from "./listEntities";
 import listFollowers from "./listFollowers";
+import listFriends from "./listFriends";
 import listNotifications from "./listNotifications";
 import listTastings from "./listTastings";
 import listUsers from "./listUsers";
@@ -72,6 +73,8 @@ export const router: FastifyPluginCallback = (
   fastify.route(deleteTasting);
   fastify.route(updateTastingImage);
   fastify.route(addTastingToast);
+
+  fastify.route(listFriends);
 
   fastify.route(listUsers);
   fastify.route(getUser);

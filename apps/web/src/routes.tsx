@@ -14,6 +14,9 @@ import EntityList, { loader as entityListLoader } from "./routes/entities";
 import EntityDetails, {
   loader as entityDetailsLoader,
 } from "./routes/entityDetails";
+import FriendRequests, {
+  loader as friendRequestsLoader,
+} from "./routes/friendRequests";
 import Friends, { loader as friendsLoader } from "./routes/friends";
 import Login from "./routes/login";
 import Notifications, {
@@ -75,6 +78,11 @@ export default function createRoutes() {
           path: "friends",
           element: <Friends />,
           loader: friendsLoader,
+        },
+        {
+          path: "friends/requests",
+          element: <FriendRequests />,
+          loader: friendRequestsLoader,
         },
         {
           path: "notifications",

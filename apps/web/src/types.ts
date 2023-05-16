@@ -60,6 +60,13 @@ export type FollowRequest = {
   followsBack: FollowStatus;
 };
 
+export type Friend = {
+  id: string;
+  status: FollowStatus;
+  createdAt: string;
+  user: User;
+};
+
 export type User = {
   id: string;
   admin: boolean;
