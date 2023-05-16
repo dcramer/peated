@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { db } from "../db";
-import { toasts } from "../db/schema";
+import { tastings, toasts } from "../db/schema";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;
@@ -44,6 +44,12 @@ test("new toast", async () => {
 
   expect(toastList.length).toBe(1);
   expect(toastList[0].createdById).toBe(DefaultFixtures.user.id);
+
+  const [updatedTasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, tasting.id));
+  expect(updatedTasting.toasts).toBe(1);
 });
 
 test("already toasted", async () => {

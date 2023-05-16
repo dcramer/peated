@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db, first } from "../db";
@@ -46,6 +46,11 @@ export default {
           .onConflictDoNothing()
           .returning(),
       );
+
+      await tx
+        .update(tastings)
+        .set({ toasts: sql`${tastings.toasts} + 1` })
+        .where(eq(tastings.id, tasting.id));
 
       if (toast)
         createNotification(tx, {

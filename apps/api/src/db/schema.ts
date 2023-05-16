@@ -4,6 +4,7 @@ import {
   bigserial,
   boolean,
   doublePrecision,
+  integer,
   pgEnum,
   pgTable,
   primaryKey,
@@ -238,6 +239,8 @@ export const tastings = pgTable("tasting", {
   tags: text("tags").array(),
   rating: doublePrecision("rating").notNull(),
   imageUrl: text("image_url"),
+
+  toasts: integer("toasts").default(0).notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   createdById: bigint("created_by_id", { mode: "number" })

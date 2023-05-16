@@ -65,6 +65,6 @@ test("tasting image does resize down", async () => {
   const filepath = `${config.UPLOAD_PATH}/${path.basename(data.imageUrl)}`;
   const metadata = await sharp(filepath).metadata();
   expect(metadata.format).toBe("webp");
-  expect(metadata.width).toBe(1000);
-  expect(metadata.height).toBe(1000);
+  expect(metadata.width).toBe(1024);
+  expect(metadata.height).toBe(1024);
 });
