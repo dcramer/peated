@@ -260,9 +260,14 @@ export default function Search() {
     ];
 
     const exactMatches: number[] = [];
+    const lowerQuery = query.toLowerCase();
     results.forEach((value, index) => {
       if (value.type !== "user") {
-        if (value.ref.name === query) {
+        if (value.ref.name.toLowerCase() === lowerQuery) {
+          exactMatches.push(index);
+        }
+      } else {
+        if (value.ref.displayName.toLowerCase() === lowerQuery) {
           exactMatches.push(index);
         }
       }
