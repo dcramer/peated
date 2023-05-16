@@ -8,17 +8,12 @@ import BottleDetails, {
   loader as bottleDetailsLoader,
 } from "./routes/bottleDetails";
 import BottleList, { loader as bottleListLoader } from "./routes/bottles";
-import BrandDetails, {
-  loader as brandDetailsLoader,
-} from "./routes/brandDetails";
-import BrandList, { loader as brandListLoader } from "./routes/brands";
-import DistillerDetails, {
-  loader as distillerDetailsLoader,
-} from "./routes/distillerDetails";
-import DistillerList, {
-  loader as distillerListLoader,
-} from "./routes/distillers";
 import EditBottle, { loader as editBottleLoader } from "./routes/editBottle";
+import EditEntity, { loader as editEntityLoader } from "./routes/editEntity";
+import EntityList, { loader as entityListLoader } from "./routes/entities";
+import EntityDetails, {
+  loader as entityDetailsLoader,
+} from "./routes/entityDetails";
 import Friends, { loader as friendsLoader } from "./routes/friends";
 import Login from "./routes/login";
 import Notifications, {
@@ -62,25 +57,19 @@ export default function createRoutes() {
           loader: editBottleLoader,
         },
         {
-          path: "brands",
-          element: <BrandList />,
-          loader: brandListLoader,
-        },
-
-        {
-          path: "brands/:brandId",
-          element: <BrandDetails />,
-          loader: brandDetailsLoader,
+          path: "entities",
+          element: <EntityList />,
+          loader: entityListLoader,
         },
         {
-          path: "distillers",
-          element: <DistillerList />,
-          loader: distillerListLoader,
+          path: "entities/:entityId",
+          element: <EntityDetails />,
+          loader: entityDetailsLoader,
         },
         {
-          path: "distillers/:distillerId",
-          element: <DistillerDetails />,
-          loader: distillerDetailsLoader,
+          path: "entities/:entityId/edit",
+          element: <EditEntity />,
+          loader: editEntityLoader,
         },
         {
           path: "friends",

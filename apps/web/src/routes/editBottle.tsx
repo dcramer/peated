@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import type { LoaderFunction } from "react-router-dom";
 import { useLoaderData, useNavigate } from "react-router-dom";
 
+import { PreviewBottleCard } from "../components/bottleCard";
 import BrandField from "../components/brandField";
 import DistillerField from "../components/distillerField";
 import Fieldset from "../components/fieldset";
@@ -110,6 +111,10 @@ export default function EditBottle() {
       <form className="sm:mx-16">
         {error && <FormError values={[error]} />}
 
+        <div className="sm:mb-4">
+          <PreviewBottleCard data={formData} />
+        </div>
+
         <Fieldset>
           <TextField
             type="text"
@@ -171,6 +176,7 @@ export default function EditBottle() {
             name="category"
             placeholder="e.g. Single Malt"
             helpText="The kind of spirit."
+            value={formData.category}
             onChange={(value) => setFormData({ ...formData, category: value })}
             suggestedOptions={categoryList}
             options={categoryList}

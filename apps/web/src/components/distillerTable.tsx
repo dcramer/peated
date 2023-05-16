@@ -45,7 +45,7 @@ export default ({
               <tr key={distiller.id} className="border-b border-slate-800">
                 <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
                   <Link
-                    to={`/distillers/${distiller.id}`}
+                    to={`/entities/${distiller.id}`}
                     className="font-medium hover:underline"
                   >
                     {distiller.name}

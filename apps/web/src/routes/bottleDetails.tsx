@@ -56,10 +56,10 @@ export default function BottleDetails() {
           <h1 className="mb-2 overflow-hidden text-ellipsis whitespace-nowrap text-3xl font-semibold leading-7">
             <BottleName bottle={bottle} />
           </h1>
-          <p className="text-slate-500">
+          <p className="overflow-hidden text-ellipsis whitespace-nowrap text-center text-slate-500 sm:text-left">
             Produced by{" "}
             <Link
-              to={`/brands/${bottle.brand.id}`}
+              to={`/entities/${bottle.brand.id}`}
               className="font-medium hover:underline"
             >
               {bottle.brand.name}
@@ -74,7 +74,7 @@ export default function BottleDetails() {
                     .map<React.ReactNode>((d) => (
                       <Link
                         key={d.id}
-                        to={`/distillers/${d.id}`}
+                        to={`/entities/${d.id}`}
                         className="font-semibold hover:underline"
                       >
                         {d.name}
@@ -85,13 +85,10 @@ export default function BottleDetails() {
               )}
           </p>
         </div>
-        <div className="flex w-full flex-col items-center space-y-1 text-slate-500 sm:w-auto sm:items-start">
-          <p className="leading-6">
-            {bottle.category && formatCategoryName(bottle.category)}
-          </p>
-          <p className="mt-1 text-sm leading-5">
-            {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
-          </p>
+
+        <div className="flex w-full flex-col items-center space-y-1 space-y-1 text-sm leading-6 text-slate-500 sm:w-auto sm:items-start sm:items-end">
+          <p>{bottle.category && formatCategoryName(bottle.category)}</p>
+          <p>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</p>
         </div>
       </div>
 

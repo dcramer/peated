@@ -8,6 +8,7 @@ import { router } from "./routes";
 
 import { initSentry } from "./instruments";
 import bottleSchema from "./schemas/bottle";
+import entitySchema from "./schemas/entity";
 import FastifySentry from "./sentryPlugin";
 
 initSentry({
@@ -59,6 +60,7 @@ export default async function buildFastify(options = {}) {
   });
   app.register(FastifyCors, { credentials: true, origin: config.CORS_HOST });
   app.addSchema(bottleSchema);
+  app.addSchema(entitySchema);
   app.register(router);
   app.register(FastifySentry);
 

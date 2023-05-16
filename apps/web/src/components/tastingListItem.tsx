@@ -92,7 +92,7 @@ export default ({
       {!noBottle && <BottleCard bottle={bottle} />}
       <div>
         {!!tasting.imageUrl && (
-          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden sm:mb-0 sm:mr-4">
+          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-black sm:mb-0 sm:mr-4">
             <img src={tasting.imageUrl} className="h-full" />
           </div>
         )}
@@ -121,13 +121,11 @@ export default ({
             </Button>
           ) : (
             <Button
-              icon={
-                <HandThumbUpIcon className="text-highlight -ml-0.5 h-5 w-5" />
-              }
-              active
+              icon={<HandThumbUpIcon className="-ml-0.5 h-5 w-5" />}
+              active={hasToasted}
               disabled
             >
-              1
+              {tasting.toasts.toLocaleString()}
             </Button>
           )}
           {user && (

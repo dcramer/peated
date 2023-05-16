@@ -2,7 +2,7 @@ import { SQL, and, asc, desc, ilike, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { entities } from "../db/schema";
+import { EntityType, entities } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 
 export default {
@@ -15,7 +15,7 @@ export default {
         query: { type: "string" },
         page: { type: "number" },
         sort: { type: "string" },
-        type: { type: "string", enum: ["distiller", "brand"] },
+        type: { type: "string", enum: ["distiller", "brand", "bottler"] },
       },
     },
   },
@@ -76,7 +76,7 @@ export default {
       query?: string;
       page?: number;
       sort?: "name";
-      type?: "brand" | "distiller";
+      type?: EntityType;
     };
   }
 >;

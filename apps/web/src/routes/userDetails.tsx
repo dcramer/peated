@@ -1,8 +1,11 @@
 import type { LoaderFunction } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 
-import { useState } from "react";
+import { Menu } from "@headlessui/react";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { useEffect, useState } from "react";
 import Button from "../components/button";
+import Chip from "../components/chip";
 import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import TastingList from "../components/tastingList";
@@ -41,8 +44,14 @@ export const loader: LoaderFunction = async ({
 };
 
 export default function UserDetails() {
-  const { user, tastingList } = useLoaderData() as LoaderData;
+  const { tastingList, ...loaderData } = useLoaderData() as LoaderData;
   const { user: currentUser } = useRequiredAuth();
+
+  const [user, setUser] = useState(loaderData.user);
+
+  useEffect(() => {
+    setUser(loaderData.user);
+  }, [loaderData.user]);
 
   const [followStatus, setFollowStatus] = useState(user.followStatus);
 
@@ -63,6 +72,17 @@ export default function UserDetails() {
           <h3 className="mb-2 self-center text-4xl font-semibold leading-normal text-white sm:self-start">
             {user.displayName}
           </h3>
+          <div className="mb-4">
+            {user.admin ? (
+              <Chip size="small" color="highlight">
+                Admin
+              </Chip>
+            ) : user.mod ? (
+              <Chip size="small" color="highlight">
+                Moderator
+              </Chip>
+            ) : null}
+          </div>
           <div className="flex justify-center sm:justify-start">
             <div className="mr-4 pr-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
@@ -85,26 +105,50 @@ export default function UserDetails() {
           </div>
         </div>
         <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
-          {user.id !== currentUser.id ? (
-            <>
-              <Button
-                color="primary"
-                onClick={() => followUser(followStatus === "none")}
-              >
-                {followStatus === "none"
-                  ? "Add Friend"
-                  : followStatus === "pending"
-                  ? "Request Pending"
-                  : "Remove Friend"}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button to="/settings" color="primary">
-                Edit Profile
-              </Button>
-            </>
-          )}
+          <div className="flex gap-x-2">
+            {user.id !== currentUser.id ? (
+              <>
+                <Button
+                  color="primary"
+                  onClick={() => followUser(followStatus === "none")}
+                >
+                  {followStatus === "none"
+                    ? "Add Friend"
+                    : followStatus === "pending"
+                    ? "Request Pending"
+                    : "Remove Friend"}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button to="/settings" color="primary">
+                  Edit Profile
+                </Button>
+              </>
+            )}
+            {currentUser.admin && (
+              <Menu as="div" className="menu">
+                <Menu.Button as={Button}>
+                  <EllipsisVerticalIcon className="h-5 w-5" />
+                </Menu.Button>
+                <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+                  <Menu.Item
+                    as="button"
+                    onClick={async () => {
+                      const data = await api.put(`/users/${user.id}`, {
+                        data: {
+                          mod: !user.mod,
+                        },
+                      });
+                      setUser((state) => ({ ...state, ...data }));
+                    }}
+                  >
+                    {user.mod ? "Remove Moderator Role" : "Add Moderator Role"}
+                  </Menu.Item>
+                </Menu.Items>
+              </Menu>
+            )}
+          </div>
         </div>
       </div>
 

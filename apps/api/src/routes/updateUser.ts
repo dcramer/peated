@@ -21,6 +21,8 @@ export default {
       type: "object",
       properties: {
         displayName: { type: "string" },
+        admin: { type: "boolean" },
+        mod: { type: "boolean" },
       },
     },
   },
@@ -34,7 +36,7 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    if (user.id !== req.user.id && !user.admin) {
+    if (user.id !== req.user.id && !req.user.admin) {
       return res.status(403).send({ error: "Forbidden" });
     }
 
@@ -42,6 +44,20 @@ export default {
     const data: { [name: string]: any } = {};
     if (body.displayName) {
       data.displayName = body.displayName;
+    }
+
+    if (body.admin !== undefined) {
+      if (!req.user.admin) {
+        return res.status(403).send({ error: "Forbidden" });
+      }
+      data.admin = body.admin;
+    }
+
+    if (body.mod !== undefined) {
+      if (!req.user.admin) {
+        return res.status(403).send({ error: "Forbidden" });
+      }
+      data.mod = body.mod;
     }
 
     const [newUser] = await db
@@ -60,6 +76,6 @@ export default {
     Params: {
       userId: number | "me";
     };
-    Body: Partial<Pick<User, "displayName">>;
+    Body: Partial<Pick<User, "displayName" | "admin" | "mod">>;
   }
 >;

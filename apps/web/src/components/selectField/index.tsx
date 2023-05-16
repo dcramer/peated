@@ -154,6 +154,7 @@ export default ({
         )}
         {visibleValues.length > 0 &&
           visibleValues.length < targetOptions &&
+          (!options.length || visibleValues.length != options.length) &&
           multiple && (
             <Chip
               onClick={(e) => {

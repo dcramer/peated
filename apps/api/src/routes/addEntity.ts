@@ -3,7 +3,7 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { NewEntity, changes, entities } from "../db/schema";
-import { requireAuth } from "../middleware/auth";
+import { requireMod } from "../middleware/auth";
 
 export default {
   method: "POST",
@@ -11,22 +11,11 @@ export default {
   schema: {
     body: {
       type: "object",
+      $ref: "entitySchema",
       required: ["name"],
-      properties: {
-        name: { type: "string" },
-        country: { type: "string" },
-        region: { type: "string" },
-        type: {
-          type: "array",
-          items: {
-            type: "string",
-            enum: ["distiller", "brand"],
-          },
-        },
-      },
     },
   },
-  preHandler: [requireAuth],
+  preHandler: [requireMod],
   handler: async (req, res) => {
     const body = req.body;
     const data: NewEntity = {

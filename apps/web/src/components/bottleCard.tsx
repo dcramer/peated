@@ -35,7 +35,7 @@ const Distillers = ({
     );
   }
 
-  if (distillers.length == 1 && brand?.name !== distillers[0].name) {
+  if (distillers.length == 1 && brand?.name === distillers[0].name) {
     return null;
   }
 
@@ -45,7 +45,7 @@ const Distillers = ({
       {" "}
       &middot; Distilled at{" "}
       {d.id ? (
-        <Link key={d.id} to={`/distillers/${d.id}`} className="hover:underline">
+        <Link key={d.id} to={`/entities/${d.id}`} className="hover:underline">
           {d.name}
         </Link>
       ) : (
@@ -93,13 +93,9 @@ export const PreviewBottleCard = ({
           <Distillers bottle={data} />
         </p>
       </div>
-      <div className="space-y-1">
-        <p className="leading-6 ">
-          {data.category ? data.category.name : null}
-        </p>
-        <p className="mt-1 text-sm leading-5 ">
-          {data.statedAge ? `Aged ${data.statedAge} years` : null}
-        </p>
+      <div className="flex flex-col items-end space-y-1 text-sm leading-6">
+        <p>{data.category ? data.category.name : null}</p>
+        <p>{data.statedAge ? `Aged ${data.statedAge} years` : null}</p>
       </div>
     </div>
   );
@@ -128,19 +124,15 @@ export default ({
         </p>
         <p className="text-light text-sm">
           Produced by{" "}
-          <Link to={`/brands/${bottle.brand.id}`} className="hover:underline">
+          <Link to={`/entities/${bottle.brand.id}`} className="hover:underline">
             {bottle.brand.name}
           </Link>
           <Distillers bottle={bottle} />
         </p>
       </div>
-      <div className="text-light space-y-1">
-        <p className="leading-6 ">
-          {bottle.category && formatCategoryName(bottle.category)}
-        </p>
-        <p className="mt-1 text-sm leading-5 ">
-          {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
-        </p>
+      <div className="text-light flex flex-col items-end space-y-1 text-sm leading-6">
+        <p>{bottle.category && formatCategoryName(bottle.category)}</p>
+        <p>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</p>
       </div>
     </div>
   );

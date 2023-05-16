@@ -102,6 +102,10 @@ export default {
       }
     }
 
+    if (!user.active) {
+      return res.status(401).send({ error: "Inactive account" });
+    }
+
     return res.send({
       user: serializeUser(user, user),
       accessToken: await createAccessToken(user),

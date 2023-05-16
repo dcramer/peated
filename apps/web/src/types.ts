@@ -63,6 +63,7 @@ export type FollowRequest = {
 export type User = {
   id: string;
   admin: boolean;
+  mod: boolean;
   displayName: string;
   email: string;
   pictureUrl?: string;
@@ -84,6 +85,7 @@ export type Tasting = {
   createdBy: User;
   createdAt: string;
   hasToasted: boolean;
+  toasts: number;
 };
 
 export type ObjectType =

@@ -37,7 +37,7 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    if (user.id !== req.user.id && !user.admin) {
+    if (user.id !== req.user.id && !req.user.admin) {
       return res.status(403).send({ error: "Forbidden" });
     }
 

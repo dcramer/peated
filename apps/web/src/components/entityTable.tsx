@@ -2,12 +2,13 @@ import { Link } from "react-router-dom";
 
 import { Entity } from "../types";
 import Button from "./button";
+import Chip from "./chip";
 
 export default ({
-  brandList,
+  entityList,
   rel,
 }: {
-  brandList: Entity[];
+  entityList: Entity[];
   rel?: {
     next: string | null;
     nextPage: number | null;
@@ -20,42 +21,40 @@ export default ({
       <table className="min-w-full">
         <colgroup>
           <col className="min-w-full sm:w-1/2" />
-          <col className="sm:w-1/6" />
-          <col className="sm:w-1/6" />
+          <col className="sm:w-1/2" />
         </colgroup>
         <thead className="border-b border-slate-800 text-sm font-semibold text-slate-500">
           <tr>
-            <th scope="col" className="py-3.5 pl-4 pr-3 text-left sm:pl-3">
-              Brand
+            <th scope="col" className="px-3 py-2.5 text-left">
+              Entity
             </th>
-            <th
-              scope="col"
-              className="hidden px-3 py-3.5 text-right sm:table-cell"
-            >
-              Country
-            </th>
-            <th scope="col" className="py-3.5 pl-3 pr-4 text-right sm:pr-3">
-              Region
+            <th scope="col" className="px-3 py-2.5 text-right">
+              Location
             </th>
           </tr>
         </thead>
         <tbody>
-          {brandList.map((brand) => {
+          {entityList.map((entity) => {
             return (
-              <tr key={brand.id} className="border-b border-slate-800">
-                <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
+              <tr key={entity.id} className="border-b border-slate-800 text-sm">
+                <td className="max-w-0 px-3 py-3">
                   <Link
-                    to={`/brands/${brand.id}`}
+                    to={`/entities/${entity.id}`}
                     className="font-medium hover:underline"
                   >
-                    {brand.name}
+                    {entity.name}
                   </Link>
+                  <div className="mt-2 space-x-2">
+                    {entity.type.sort().map((t) => (
+                      <Chip key={t} size="small">
+                        {t}
+                      </Chip>
+                    ))}
+                  </div>
                 </td>
-                <td className="hidden px-3 py-4 text-right text-sm sm:table-cell">
-                  {brand.country}
-                </td>
-                <td className="hidden py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
-                  {brand.region || ""}
+                <td className="px-3 py-3 text-right">
+                  {entity.country}
+                  <br /> {entity.region || ""}
                 </td>
               </tr>
             );

@@ -79,10 +79,7 @@ export default function AppHeader() {
                   <Link to={`/bottles`}>Bottles</Link>
                 </Menu.Item>
                 <Menu.Item>
-                  <Link to={`/brands`}>Brands</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link to={`/distillers`}>Distillers</Link>
+                  <Link to={`/entities`}>Brands & Distillers</Link>
                 </Menu.Item>
                 <Menu.Item>
                   <button

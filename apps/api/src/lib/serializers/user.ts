@@ -6,6 +6,7 @@ export interface SerializedUser {
   displayName: string | null;
   pictureUrl: string | null;
   admin?: boolean;
+  mod?: boolean;
   email?: string;
   createdAt?: string;
   followStatus?: "none" | "following" | "pending";
@@ -25,12 +26,16 @@ export const serializeUser = (
       : null,
     followStatus: user.followStatus,
   };
-  if (currentUser && (currentUser.admin || currentUser.id === user.id)) {
+  if (
+    currentUser &&
+    (currentUser.admin || currentUser.mod || currentUser.id === user.id)
+  ) {
     return {
       ...data,
       email: user.email,
       createdAt: user.email,
       admin: user.admin,
+      mod: user.mod,
     };
   }
   return data;

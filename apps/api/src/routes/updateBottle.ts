@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
-import { db } from "../db";
+import { db, first } from "../db";
 import {
   Category,
   bottles,
@@ -10,7 +10,7 @@ import {
   entities,
 } from "../db/schema";
 import { EntityInput, upsertEntity } from "../lib/db";
-import { requireAuth } from "../middleware/auth";
+import { requireMod } from "../middleware/auth";
 
 type BottleInput = {
   name: string;
@@ -36,7 +36,7 @@ export default {
       $ref: "bottleSchema",
     },
   },
-  preHandler: [requireAuth],
+  preHandler: [requireMod],
   handler: async (req, res) => {
     const [{ bottle, brand }] = await db
       .select({
@@ -57,8 +57,11 @@ export default {
     if (body.name && body.name !== bottle.name) {
       bottleData.name = body.name;
     }
-    if (body.category && body.category !== bottle.category) {
+    if (body.category !== undefined && body.category !== bottle.category) {
       bottleData.category = body.category;
+    }
+    if (body.statedAge !== undefined && body.statedAge !== bottle.statedAge) {
+      bottleData.statedAge = body.statedAge;
     }
 
     const currentDistillers = (
@@ -74,11 +77,15 @@ export default {
         .where(eq(bottlesToDistillers.bottleId, bottle.id))
     ).map(({ distiller }) => distiller);
     const newBottle = await db.transaction(async (tx) => {
-      const [newBottle] = await tx
-        .update(bottles)
-        .set(bottleData)
-        .where(eq(bottles.id, bottle.id))
-        .returning();
+      const newBottle = Object.values(bottleData).length
+        ? first(
+            await tx
+              .update(bottles)
+              .set(bottleData)
+              .where(eq(bottles.id, bottle.id))
+              .returning(),
+          )
+        : bottle;
 
       if (body.brand) {
         if (
@@ -172,7 +179,7 @@ export default {
       return newBottle;
     });
 
-    res.status(201).send(newBottle);
+    res.status(200).send(newBottle);
   },
 } as RouteOptions<
   Server,

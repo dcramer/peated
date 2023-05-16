@@ -34,6 +34,7 @@ export const User = async ({ ...data }: Partial<NewUser> = {}) => {
         displayName: faker.name.firstName(),
         email: faker.internet.email(),
         admin: false,
+        mod: false,
         active: true,
         ...data,
       })
@@ -147,9 +148,18 @@ export const AuthToken = async ({ user }: { user?: UserType | null } = {}) => {
 
 export const AuthenticatedHeaders = async ({
   user,
+  mod,
+  admin,
 }: {
   user?: UserType | null;
+  mod?: boolean;
+  admin?: boolean;
 } = {}) => {
+  if (!user && admin) {
+    user = await User({ admin: true });
+  } else if (!user && mod) {
+    user = await User({ mod: true });
+  }
   return {
     Authorization: `Bearer ${await AuthToken({ user })}`,
   };

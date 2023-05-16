@@ -26,6 +26,7 @@ export const users = pgTable(
 
     active: boolean("active").default(true).notNull(),
     admin: boolean("admin").default(false).notNull(),
+    mod: boolean("mod").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (users) => {
@@ -90,7 +91,13 @@ export const follows = pgTable(
 export type Follow = InferModel<typeof follows>;
 export type NewFollow = InferModel<typeof follows, "insert">;
 
-export const entityTypeEnum = pgEnum("entity_type", ["brand", "distiller"]);
+export type EntityType = "brand" | "distiller" | "bottler";
+
+export const entityTypeEnum = pgEnum("entity_type", [
+  "brand",
+  "distiller",
+  "bottler",
+]);
 
 export const entities = pgTable(
   "entity",

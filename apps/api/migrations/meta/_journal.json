@@ -57,6 +57,20 @@
       "when": 1684201534679,
       "tag": "0007_overjoyed_azazel",
       "breakpoints": false
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1684202184084,
+      "tag": "0008_black_tenebrous",
+      "breakpoints": false
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1684207371142,
+      "tag": "0009_plain_scarlet_spider",
+      "breakpoints": false
     }
   ]
 }

@@ -265,7 +265,7 @@ type Props = {
   onChange?: (value: string) => void;
 } & Omit<
   React.ComponentProps<typeof SelectField>,
-  "options" | "onChange" | "multiple" | "endpoint"
+  "options" | "onChange" | "multiple" | "endpoint" | "value"
 >;
 
 export default ({

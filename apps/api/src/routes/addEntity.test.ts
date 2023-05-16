@@ -14,6 +14,19 @@ beforeAll(async () => {
   };
 });
 
+test("must be mod", async () => {
+  const response = await app.inject({
+    method: "POST",
+    url: `/entities`,
+    payload: {
+      name: "Delicious Wood",
+    },
+    headers: await Fixtures.AuthenticatedHeaders(),
+  });
+
+  expect(response).toRespondWith(403);
+});
+
 test("creates a new entity", async () => {
   const response = await app.inject({
     method: "POST",
@@ -21,7 +34,7 @@ test("creates a new entity", async () => {
     payload: {
       name: "Macallan",
     },
-    headers: DefaultFixtures.authHeaders,
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
   });
 
   expect(response).toRespondWith(201);
@@ -33,7 +46,6 @@ test("creates a new entity", async () => {
     .from(entities)
     .where(eq(entities.id, data.id));
   expect(brand.name).toEqual("Macallan");
-  expect(brand.createdById).toEqual(DefaultFixtures.user.id);
 });
 
 test("updates existing entity with new type", async () => {
@@ -48,7 +60,7 @@ test("updates existing entity with new type", async () => {
       name: entity.name,
       type: ["brand"],
     },
-    headers: DefaultFixtures.authHeaders,
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
   });
 
   expect(response).toRespondWith(201);

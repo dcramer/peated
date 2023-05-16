@@ -9,13 +9,13 @@ import * as Fixtures from "../lib/test/fixtures";
 let app: FastifyInstance;
 beforeAll(async () => {
   app = await buildFastify();
+
+  return async () => {
+    app.close();
+  };
 });
 
-afterAll(async () => {
-  await app.close();
-});
-
-test("edits a new bottle with new name param", async () => {
+test("must be mod", async () => {
   const bottle = await Fixtures.Bottle();
   const response = await app.inject({
     method: "PUT",
@@ -26,7 +26,44 @@ test("edits a new bottle with new name param", async () => {
     headers: await Fixtures.AuthenticatedHeaders(),
   });
 
-  expect(response).toRespondWith(201);
+  expect(response).toRespondWith(403);
+});
+
+test("no changes", async () => {
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {},
+    headers: await Fixtures.AuthenticatedHeaders({
+      mod: true,
+    }),
+  });
+
+  expect(response).toRespondWith(200);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(bottle).toEqual(newBottle);
+});
+
+test("edits a new bottle with new name param", async () => {
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      name: "Delicious Wood",
+    },
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
