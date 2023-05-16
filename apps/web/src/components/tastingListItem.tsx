@@ -70,7 +70,7 @@ export default ({
       exit={{ opacity: 0 }}
       className="card"
     >
-      <div className="card-header">
+      <div className="card-header p-3 sm:px-5 sm:py-4">
         <UserAvatar size={48} user={tasting.createdBy} />
         <div className="flex-1 space-y-1 font-semibold">
           <Link
@@ -113,7 +113,7 @@ export default ({
       {!noBottle && <BottleCard bottle={bottle} />}
       <div>
         {tasting.imageUrl ? (
-          <div className="p-3 sm:flex">
+          <div className="p-3 sm:flex sm:px-5 sm:py-4">
             <div className="flex-shrink-0 sm:mb-0 sm:mr-4">
               <img src={tasting.imageUrl} className="max-w-32 max-h-32" />
             </div>
@@ -125,11 +125,13 @@ export default ({
           </div>
         ) : (
           tasting.comments && (
-            <p className="text-peated p-3 text-sm">{tasting.comments}</p>
+            <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
+              {tasting.comments}
+            </p>
           )
         )}
         {!isTaster && user && (
-          <aside className="flex items-center space-x-3 p-3">
+          <aside className="flex items-center space-x-3 p-3 sm:px-5 sm:py-4">
             {!hasToasted ? (
               <Button
                 icon={

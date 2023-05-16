@@ -86,7 +86,7 @@ export default function Search() {
         />
       }
     >
-      <ul role="list" className="space-y-4">
+      <ul role="list" className="divide-y divide-slate-800 sm:rounded">
         {state === "loading" ? (
           <>
             <SkeletonItem />

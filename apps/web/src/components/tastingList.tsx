@@ -17,7 +17,7 @@ export default ({
   };
 
   return (
-    <ul role="list" className="space-y-3">
+    <ul role="list" className="divide-y divide-slate-800 sm:rounded">
       <AnimatePresence>
         {values
           .filter((t) => deletedValues.indexOf(t.id) === -1)

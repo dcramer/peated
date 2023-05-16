@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import classNames from "../lib/classNames";
 import { formatCategoryName } from "../lib/strings";
 import { Bottle } from "../types";
 import BottleName from "./bottleName";
@@ -104,10 +105,21 @@ export const PreviewBottleCard = ({
   );
 };
 
-export default ({ bottle }: { bottle: Bottle }) => {
+export default ({
+  bottle,
+  noGutter,
+}: {
+  bottle: Bottle;
+  noGutter?: boolean;
+}) => {
   const { distillers } = bottle;
   return (
-    <div className="flex items-center space-x-4 bg-slate-950 p-3 sm:px-5 sm:py-4">
+    <div
+      className={classNames(
+        "flex items-center space-x-4 bg-slate-950",
+        noGutter ? "" : "p-3 sm:px-5 sm:py-4",
+      )}
+    >
       <div className="flex-1 space-y-1">
         <p className="font-semibold leading-6">
           <Link to={`/bottles/${bottle.id}`} className="hover:underline">
