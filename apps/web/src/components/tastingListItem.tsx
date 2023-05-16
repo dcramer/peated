@@ -89,15 +89,14 @@ export default ({
           <Tags tags={tasting.tags} />
         </div>
         <div className="flex min-h-full flex-shrink">
-          <Menu as="div" className="relative">
+          <Menu as="div" className="menu">
             <Menu.Button className="text-light block h-full w-full rounded bg-inherit p-3 px-1">
               <EllipsisVerticalIcon className="h-full w-6" />
             </Menu.Button>
-            <Menu.Items className="absolute right-0 z-10 w-44 origin-top-right rounded bg-white shadow-lg ring-1 ring-black ring-opacity-10 focus:outline-none">
+            <Menu.Items className="absolute right-0 z-10 w-44 origin-top-right">
               {(user?.admin || isTaster) && (
                 <Menu.Item
                   as="button"
-                  className="block w-full rounded px-4 py-2 text-left text-sm hover:bg-gray-200"
                   onClick={async () => {
                     await api.delete(`/tastings/${tasting.id}`);
                     if (onDelete) onDelete(tasting);

@@ -68,7 +68,7 @@ export default function AppHeader() {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded bg-slate-800 py-1 text-white shadow-lg focus:outline-none">
+              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right">
                 <Menu.Item>
                   <Link to={`/users/${user.id}`}>Profile</Link>
                 </Menu.Item>
