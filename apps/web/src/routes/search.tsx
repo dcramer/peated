@@ -239,7 +239,7 @@ export default function Search() {
           if (state !== "ready") setState("ready");
         });
     }
-  }, 100);
+  }, 300);
 
   useEffect(() => {
     const qs = new URLSearchParams(location.search);
