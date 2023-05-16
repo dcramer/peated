@@ -19,7 +19,9 @@ type LoaderData = {
 // its token yet as react-dom (thus context) seemingly has
 // not rendered.. so this errors out
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const { results: requestList } = await api.get(`/users/me/followers`);
+  const { results: requestList } = await api.get(`/users/me/followers`, {
+    query: { status: "pending" },
+  });
 
   return { requestList };
 };
