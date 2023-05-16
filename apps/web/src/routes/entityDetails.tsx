@@ -44,12 +44,12 @@ export default function EntityDetails() {
           <h1 className="mb-2 flex gap-x-3 text-3xl font-semibold leading-7">
             {entity.name}
           </h1>
-          <p className="text-sm font-light text-gray-500">
+          <p className="text-light text-sm font-light">
             Located in {entity.country}
             {entity.region && <span> &middot; {entity.region}</span>}
           </p>
         </div>
-        <div className="sm:justify-left mb-4 flex flex w-full justify-center space-x-2 sm:w-auto">
+        <div className="sm:justify-left mb-4 flex w-full justify-center space-x-2 sm:w-auto">
           {entity.type.sort().map((t) => (
             <Chip key={t} size="small" color="highlight">
               {t}
