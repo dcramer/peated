@@ -42,7 +42,10 @@ const pwaOptions: Partial<VitePWAOptions> = {
   },
 };
 
-const replaceOptions = { __DATE__: new Date().toISOString() };
+const replaceOptions = {
+  __DATE__: new Date().toISOString(),
+  preventAssignment: true,
+};
 const claims = process.env.CLAIMS === "true";
 const reload = process.env.RELOAD_SW === "true";
 const selfDestroying = process.env.SW_DESTROY === "true";

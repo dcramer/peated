@@ -1,12 +1,15 @@
 import type { LoaderFunction } from "react-router-dom";
 import { Link, useLoaderData } from "react-router-dom";
 
+import { Menu } from "@headlessui/react";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import BottleName from "../components/bottleName";
 import Button from "../components/button";
 import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import TastingList from "../components/tastingList";
 import TimeSince from "../components/timeSince";
+import useAuth from "../hooks/useAuth";
 import api from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
 import type { Bottle, Paginated, Tasting } from "../types";
@@ -38,6 +41,7 @@ export const loader: LoaderFunction = async ({
 
 export default function BottleDetails() {
   const { bottle, tastingList } = useLoaderData() as LoaderData;
+  const { user: currentUser } = useAuth();
 
   const stats = [
     {
@@ -96,7 +100,25 @@ export default function BottleDetails() {
         <Button to={`/bottles/${bottle.id}/addTasting`} color="primary">
           Record a Tasting
         </Button>
-        <Button to={`/bottles/${bottle.id}/edit`}>Edit Bottle</Button>
+        <Menu as="div" className="menu">
+          <Menu.Button as={Button}>Add to Collection</Menu.Button>
+          <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+            <Menu.Item as="button">Default</Menu.Item>
+          </Menu.Items>
+        </Menu>
+
+        {currentUser?.mod && (
+          <Menu as="div" className="menu">
+            <Menu.Button as={Button}>
+              <EllipsisVerticalIcon className="h-5 w-5" />
+            </Menu.Button>
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+              <Menu.Item as={Link} to={`/bottles/${bottle.id}/edit`}>
+                Edit Bottle
+              </Menu.Item>
+            </Menu.Items>
+          </Menu>
+        )}
       </div>
 
       <div className="my-8 grid grid-cols-3 items-center gap-3 text-center sm:text-left">

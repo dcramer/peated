@@ -8,6 +8,7 @@ import Button from "../components/button";
 import Chip from "../components/chip";
 import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
+import Tabs from "../components/tabs";
 import TastingList from "../components/tastingList";
 import UserAvatar from "../components/userAvatar";
 import { useRequiredAuth } from "../hooks/useAuth";
@@ -151,6 +152,12 @@ export default function UserDetails() {
           </div>
         </div>
       </div>
+      <Tabs fullWidth>
+        <Tabs.Item to={`/users/${user.id}`} active>
+          Activity
+        </Tabs.Item>
+        <Tabs.Item to={`/users/${user.id}/collections`}>Collections</Tabs.Item>
+      </Tabs>
 
       {tastingList.results.length ? (
         <TastingList values={tastingList.results} />

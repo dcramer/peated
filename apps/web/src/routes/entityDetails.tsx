@@ -1,10 +1,14 @@
 import type { LoaderFunction } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 
+import { Menu } from "@headlessui/react";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { Link } from "react-router-dom";
 import BottleTable from "../components/bottleTable";
 import Button from "../components/button";
 import Chip from "../components/chip";
 import Layout from "../components/layout";
+import useAuth from "../hooks/useAuth";
 import api from "../lib/api";
 import type { Bottle, Entity } from "../types";
 
@@ -27,6 +31,7 @@ export const loader: LoaderFunction = async ({
 
 export default function EntityDetails() {
   const { entity, bottleList } = useLoaderData() as LoaderData;
+  const { user: currentUser } = useAuth();
 
   const stats = [
     { name: "Bottles", value: entity.totalBottles.toLocaleString() },
@@ -54,7 +59,18 @@ export default function EntityDetails() {
       </div>
 
       <div className="my-8 flex justify-center gap-4 sm:justify-start">
-        <Button to={`/entities/${entity.id}/edit`}>Edit Entity</Button>
+        {currentUser?.mod && (
+          <Menu as="div" className="menu">
+            <Menu.Button as={Button}>
+              <EllipsisVerticalIcon className="h-5 w-5" />
+            </Menu.Button>
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+              <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
+                Edit Entity
+              </Menu.Item>
+            </Menu.Items>
+          </Menu>
+        )}
       </div>
 
       <div className="my-8 grid grid-cols-1 items-center gap-3 text-center sm:text-left">

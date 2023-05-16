@@ -5,6 +5,7 @@ import { ReactComponent as Glyph } from "../assets/glyph.svg";
 import EmptyActivity from "../components/emptyActivity";
 import FloatingButton from "../components/floatingButton";
 import Layout from "../components/layout";
+import Tabs from "../components/tabs";
 import TastingList from "../components/tastingList";
 import api from "../lib/api";
 import type { Tasting } from "../types";
@@ -23,8 +24,15 @@ export default function Activity() {
   const { tastingList } = useLoaderData() as LoaderData;
 
   return (
-    <Layout gutter>
+    <Layout>
       <FloatingButton to="/search?tasting" />
+      <Tabs fullWidth>
+        <Tabs.Item to="?filter=friends">Friends</Tabs.Item>
+        <Tabs.Item to="?filter=global" active>
+          Global
+        </Tabs.Item>
+        <Tabs.Item to="?filter=local">Local</Tabs.Item>
+      </Tabs>
       {tastingList.length > 0 ? (
         <TastingList values={tastingList} />
       ) : (

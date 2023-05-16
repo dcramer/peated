@@ -96,7 +96,7 @@
   }
 
   .menu div[role="menu"] {
-    @apply rounded bg-slate-800 py-1 text-white shadow-lg focus:outline-none;
+    @apply rounded bg-slate-800 py-1 text-sm text-white shadow-lg focus:outline-none;
   }
 
   .menu div[role="menu"] a,
