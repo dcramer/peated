@@ -1,98 +1,57 @@
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import Button from "../components/button";
-import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
-import ListItem from "../components/listItem";
-import TimeSince from "../components/timeSince";
-import UserAvatar from "../components/userAvatar";
-import api from "../lib/api";
-import type { FollowStatus, Friend } from "../types";
-
-type LoaderData = {
-  friendList: Friend[];
-};
-
-// TODO: when this executes the apiClient has not configured
-// its token yet as react-dom (thus context) seemingly has
-// not rendered.. so this errors out
-export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const { results: friendList } = await api.get(`/friends`);
-
-  return { friendList };
-};
+import classNames from "../lib/classNames";
 
 export default function Friends() {
-  const { friendList } = useLoaderData() as LoaderData;
-
-  const [myFollowStatus, setMyFollowStatus] = useState<
-    Record<string, FollowStatus>
-  >(Object.fromEntries(friendList.map((r) => [r.user.id, r.status])));
-
-  const followUser = async (toUserId: string, follow: boolean) => {
-    const data = await api[follow ? "post" : "delete"](
-      `/users/${toUserId}/follow`,
-    );
-    setMyFollowStatus((state) => ({
-      ...state,
-      [toUserId]: data.status,
-    }));
-  };
-
-  const followLabel = (status: FollowStatus) => {
-    switch (status) {
-      case "following":
-        return "Unfollow";
-      case "pending":
-        return "Request Sent";
-      case "none":
-      default:
-        return "Follow";
-    }
-  };
-
+  const location = useLocation();
+  const activeStyles = "text-highlight border-highlight";
+  const inactiveStyles =
+    "border-transparent text-slate-700 hover:border-slate-500 hover:text-slate-500";
   return (
     <Layout gutter noMobileGutter>
-      <ul role="list" className="divide-y divide-slate-800 sm:rounded">
-        {friendList.length ? (
-          friendList.map(({ user, ...follow }) => {
-            return (
-              <ListItem key={user.id}>
-                <div className="flex flex-1 items-center space-x-4">
-                  <UserAvatar size={48} user={user} />
-                  <div className="flex-1 space-y-1 font-medium">
-                    <Link to={`/users/${user.id}`} className="hover:underline">
-                      {user.displayName}
-                    </Link>
-                    <TimeSince
-                      className="text-peated-light block text-sm font-light"
-                      date={follow.createdAt}
-                    />
-                  </div>
-                  <div className="flex items-center gap-x-4">
-                    <Button
-                      color="primary"
-                      onClick={() => {
-                        followUser(user.id, myFollowStatus[user.id] === "none");
-                      }}
-                    >
-                      {followLabel(myFollowStatus[user.id])}
-                    </Button>
-                  </div>
-                </div>
-              </ListItem>
-            );
-          })
-        ) : (
-          <EmptyActivity>
-            You could definitely use a few more friends. We're not judging or
-            anything.
-          </EmptyActivity>
-        )}
-      </ul>
+      <div>
+        <div className="hidden sm:block">
+          <div className="border-b border-slate-700">
+            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+              <Link
+                to="/friends"
+                className={classNames(
+                  location.pathname === "/friends"
+                    ? activeStyles
+                    : inactiveStyles,
+                  "flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium",
+                )}
+              >
+                Friends
+                {/* {tab.count ? (
+                  <span
+                    className={classNames(
+                      "bg-indigo-100 text-indigo-600",
+                      "ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block",
+                    )}
+                  >
+                    {tab.count}
+                  </span>
+                ) : null} */}
+              </Link>
+              <Link
+                to="/friends/requests"
+                className={classNames(
+                  location.pathname === "/friends/requests"
+                    ? activeStyles
+                    : inactiveStyles,
+                  "flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium",
+                )}
+              >
+                Requests
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </div>
+      <Outlet />
     </Layout>
   );
 }

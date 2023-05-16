@@ -9,41 +9,27 @@ import ListItem from "../components/listItem";
 import TimeSince from "../components/timeSince";
 import UserAvatar from "../components/userAvatar";
 import api from "../lib/api";
-import type { FollowRequest, FollowStatus } from "../types";
+import type { FollowStatus, Friend } from "../types";
 
 type LoaderData = {
-  requestList: FollowRequest[];
+  friendList: Friend[];
 };
 
 // TODO: when this executes the apiClient has not configured
 // its token yet as react-dom (thus context) seemingly has
 // not rendered.. so this errors out
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const { results: requestList } = await api.get(`/users/me/followers`);
+  const { results: friendList } = await api.get(`/friends`);
 
-  return { requestList };
+  return { friendList };
 };
 
-export default function FriendRequests() {
-  const { requestList } = useLoaderData() as LoaderData;
-
-  const [theirFollowStatus, setTheirFollowStatus] = useState<
-    Record<string, FollowStatus>
-  >(Object.fromEntries(requestList.map((r) => [r.id, r.status])));
+export default function FriendList() {
+  const { friendList } = useLoaderData() as LoaderData;
 
   const [myFollowStatus, setMyFollowStatus] = useState<
     Record<string, FollowStatus>
-  >(Object.fromEntries(requestList.map((r) => [r.user.id, r.followsBack])));
-
-  const acceptRequest = async (id: string) => {
-    const data = await api.put(`/users/me/followers/${id}`, {
-      data: { action: "accept" },
-    });
-    setTheirFollowStatus((state) => ({
-      ...state,
-      [id]: data.status,
-    }));
-  };
+  >(Object.fromEntries(friendList.map((r) => [r.user.id, r.status])));
 
   const followUser = async (toUserId: string, follow: boolean) => {
     const data = await api[follow ? "post" : "delete"](
@@ -63,14 +49,14 @@ export default function FriendRequests() {
         return "Request Sent";
       case "none":
       default:
-        return "Follow Back";
+        return "Follow";
     }
   };
 
   return (
     <ul role="list" className="divide-y divide-slate-800 sm:rounded">
-      {requestList.length ? (
-        requestList.map(({ user, ...follow }) => {
+      {friendList.length ? (
+        friendList.map(({ user, ...follow }) => {
           return (
             <ListItem key={user.id}>
               <div className="flex flex-1 items-center space-x-4">
@@ -88,16 +74,10 @@ export default function FriendRequests() {
                   <Button
                     color="primary"
                     onClick={() => {
-                      if (theirFollowStatus[follow.id] === "pending") {
-                        acceptRequest(follow.id);
-                      } else {
-                        followUser(user.id, myFollowStatus[user.id] === "none");
-                      }
+                      followUser(user.id, myFollowStatus[user.id] === "none");
                     }}
                   >
-                    {theirFollowStatus[follow.id] === "pending"
-                      ? "Accept"
-                      : followLabel(myFollowStatus[user.id])}
+                    {followLabel(myFollowStatus[user.id])}
                   </Button>
                 </div>
               </div>
@@ -105,7 +85,10 @@ export default function FriendRequests() {
           );
         })
       ) : (
-        <EmptyActivity>There's no requests pending.</EmptyActivity>
+        <EmptyActivity>
+          You could definitely use a few more friends. We're not judging or
+          anything.
+        </EmptyActivity>
       )}
     </ul>
   );

@@ -43,7 +43,6 @@ export default function Layout({
         >
           <AnimatePresence>
             <motion.div
-              key={location.pathname}
               initial={{ y: 100, opacity: 0 }}
               animate={{
                 y: 0,
