@@ -35,14 +35,14 @@ export const loader: LoaderFunction = async ({
   const bottle = await api.get(`/bottles/${bottleId}`);
 
   const { results: flavorList } = await api.get(
-    `/bottles/${bottleId}/suggestedFlavors`,
+    `/bottles/${bottleId}/suggestedTags`,
   );
 
   return { bottle, flavorList };
 };
 
 type FormData = {
-  comments?: string;
+  notes?: string;
   rating?: number;
   tags?: string[];
 
@@ -132,11 +132,11 @@ export default function AddTasting() {
 
           <TextAreaField
             label="Any notes?"
-            name="comments"
+            name="notes"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
-            defaultValue={formData.comments}
+            defaultValue={formData.notes}
             placeholder="Is it peated?"
           />
 
@@ -150,7 +150,10 @@ export default function AddTasting() {
             onChange={(value) =>
               setFormData({ ...formData, tags: value.map((t: any) => t.id) })
             }
-            value={formData.tags?.map((t) => ({ id: t, name: toTitleCase(t) }))}
+            value={formData.tags?.map((t) => ({
+              id: t,
+              name: toTitleCase(t),
+            }))}
             multiple
           />
 

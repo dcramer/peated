@@ -81,18 +81,27 @@ export type Tasting = {
   bottle: Bottle;
   // optional location for check-in
   location?: Location | null;
-  comments?: string | null;
   // e.g. "Bold", "Peaty", more or less tags
   tags: string[];
   // people that you're with
   friends: string[];
   // 1-5, floating point to make half ratings possible
+  notes?: string;
   rating: number;
   imageUrl?: string;
   createdBy: User;
   createdAt: string;
   hasToasted: boolean;
   toasts: number;
+  comments: number;
+};
+
+export type Comment = {
+  id: string;
+  tastingId: string;
+  comment: string;
+  createdBy: User;
+  createdAt: string;
 };
 
 export type ObjectType =

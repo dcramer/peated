@@ -4,7 +4,7 @@ import { serializeUser } from "./user";
 export const serializeFollow = (
   follow: Follow & {
     user: User;
-    followsBack?: Follow | null;
+    followsBack?: string | null;
   },
   currentUser?: User,
 ) => {
@@ -13,6 +13,6 @@ export const serializeFollow = (
     status: follow.status,
     createdAt: follow.createdAt,
     user: serializeUser(follow.user, currentUser),
-    followsBack: follow.followsBack?.status || "none",
+    followsBack: follow.followsBack || "none",
   };
 };

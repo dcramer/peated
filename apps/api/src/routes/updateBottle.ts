@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
-import { db, first } from "../db";
+import { db } from "../db";
 import {
   Category,
   bottles,
@@ -78,13 +78,13 @@ export default {
     ).map(({ distiller }) => distiller);
     const newBottle = await db.transaction(async (tx) => {
       const newBottle = Object.values(bottleData).length
-        ? first(
+        ? (
             await tx
               .update(bottles)
               .set(bottleData)
               .where(eq(bottles.id, bottle.id))
-              .returning(),
-          )
+              .returning()
+          )[0]
         : bottle;
 
       if (body.brand) {

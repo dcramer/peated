@@ -47,7 +47,7 @@ export default {
         .select({
           followUser: users,
           follow: follows,
-          followsBack: followsBackTable,
+          followsBack: followsBackTable.status,
         })
         .from(follows)
         .innerJoin(users, eq(users.id, follows.fromUserId))
@@ -83,7 +83,7 @@ export default {
         {
           ...newFollow,
           user: followUser,
-          followsBack: followsBack?.status || "none",
+          followsBack: followsBack || "none",
         },
         req.user,
       ),

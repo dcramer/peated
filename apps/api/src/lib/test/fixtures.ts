@@ -6,6 +6,7 @@ import path from "path";
 import { db, first } from "../../db";
 import {
   NewBottle,
+  NewComment,
   NewEntity,
   NewFollow,
   NewTasting,
@@ -14,6 +15,7 @@ import {
   User as UserType,
   bottles,
   bottlesToDistillers,
+  comments,
   entities,
   follows,
   tastings,
@@ -61,7 +63,7 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
   );
   if (existing) return existing;
 
-  return first(
+  return (
     await db
       .insert(entities)
       .values({
@@ -71,8 +73,8 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
         ...data,
         createdById: data.createdById || (await User()).id,
       })
-      .returning(),
-  );
+      .returning()
+  )[0];
 };
 
 export const Bottle = async ({
@@ -115,7 +117,7 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
     await db
       .insert(tastings)
       .values({
-        comments: faker.lorem.sentence(),
+        notes: faker.lorem.sentence(),
         rating: faker.datatype.float({ min: 1, max: 5 }),
         tags: sample(defaultTags, random(1, 5)),
         ...data,
@@ -133,6 +135,20 @@ export const Toast = async ({ ...data }: Partial<NewToast> = {}) => {
       .values({
         createdById: data.createdById || (await User()).id,
         tastingId: data.tastingId || (await Tasting()).id,
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const Comment = async ({ ...data }: Partial<NewComment> = {}) => {
+  return (
+    await db
+      .insert(comments)
+      .values({
+        createdById: data.createdById || (await User()).id,
+        tastingId: data.tastingId || (await Tasting()).id,
+        comment: faker.lorem.sentences(random(2, 5)),
         ...data,
       })
       .returning()

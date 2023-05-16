@@ -23,13 +23,13 @@ export default ({
   noBottle,
   onDelete,
   onToast,
-  onComment,
+  noComment = false,
 }: {
   tasting: Tasting;
   noBottle?: boolean;
   onDelete?: (tasting: Tasting) => void;
   onToast?: (tasting: Tasting) => void;
-  onComment?: (tasting: Tasting) => void;
+  noComment?: boolean;
 }) => {
   const { bottle } = tasting;
   const { user } = useAuth();
@@ -74,9 +74,9 @@ export default ({
             <img src={tasting.imageUrl} className="h-full" />
           </div>
         )}
-        {!!tasting.comments && (
+        {!!tasting.notes && (
           <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
-            {tasting.comments}
+            {tasting.notes}
           </p>
         )}
 
@@ -106,7 +106,7 @@ export default ({
               {totalToasts.toLocaleString()}
             </Button>
           )}
-          {user && (
+          {user && !noComment && (
             <Button
               icon={
                 <ChatBubbleLeftRightIcon
@@ -114,9 +114,9 @@ export default ({
                   aria-hidden="true"
                 />
               }
-              onClick={() => onComment && onComment(tasting)}
+              to={`/tastings/${tasting.id}`}
             >
-              Comment
+              {tasting.comments.toLocaleString()}
             </Button>
           )}
           <Menu as="div" className="menu">

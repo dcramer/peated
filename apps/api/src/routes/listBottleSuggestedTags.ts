@@ -6,7 +6,7 @@ import { bottles, tastings } from "../db/schema";
 
 export default {
   method: "GET",
-  url: "/bottles/:bottleId/suggestedFlavors",
+  url: "/bottles/:bottleId/suggestedTags",
   schema: {
     params: {
       type: "object",

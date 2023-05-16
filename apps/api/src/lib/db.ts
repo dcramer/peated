@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { first } from "../db";
-import { NewEntity, changes, entities } from "../db/schema";
+import { Entity, EntityType, NewEntity, changes, entities } from "../db/schema";
 
 export type EntityInput =
   | number
@@ -28,16 +28,16 @@ export const upsertEntity = async ({
   db: any;
   data: EntityInput;
   userId: number;
-  type?: "distiller" | "brand";
+  type?: EntityType;
 }): Promise<UpsertOutcome<NewEntity>> => {
   if (!data) return undefined;
 
   if (typeof data === "number") {
-    const result = first(
+    const result = first<Entity>(
       await db.select().from(entities).where(eq(entities.id, data)),
     );
 
-    if (result && result.type.indexOf(type) === -1) {
+    if (result && type && result.type.indexOf(type) === -1) {
       await db
         .update(entities)
         .set({ type: [...result.type, type] })
@@ -46,7 +46,7 @@ export const upsertEntity = async ({
     return result ? { id: result.id, result, created: false } : undefined;
   }
 
-  const result = first(
+  const result = first<Entity>(
     await db
       .insert(entities)
       .values({
@@ -71,7 +71,7 @@ export const upsertEntity = async ({
     return { id: result.id, result, created: true };
   }
 
-  const resultConflict = first(
+  const resultConflict = first<Entity>(
     await db.select().from(entities).where(eq(entities.name, data.name)),
   );
 

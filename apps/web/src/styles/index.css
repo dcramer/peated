@@ -92,7 +92,7 @@
   }
 
   .menu {
-    @apply relative;
+    @apply relative text-sm;
   }
 
   .menu div[role="menu"] {

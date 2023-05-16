@@ -11,7 +11,7 @@ afterAll(async () => {
   await app.close();
 });
 
-test("lists flavors", async () => {
+test("lists tags", async () => {
   const bottle = await Fixtures.Bottle({
     name: "Delicious Wood",
   });
@@ -33,7 +33,7 @@ test("lists flavors", async () => {
 
   const response = await app.inject({
     method: "GET",
-    url: `/bottles/${bottle.id}/suggestedFlavors`,
+    url: `/bottles/${bottle.id}/suggestedTags`,
   });
 
   expect(response).toRespondWith(200);

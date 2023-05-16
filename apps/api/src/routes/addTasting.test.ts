@@ -42,7 +42,7 @@ test("creates a new tasting with minimal params", async () => {
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
   expect(tasting.rating).toEqual(3.5);
-  expect(tasting.comments).toBeNull();
+  expect(tasting.notes).toBeNull();
 
   const [newBottle] = await db
     .select()
@@ -82,6 +82,31 @@ test("creates a new tasting with tags", async () => {
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
   expect(tasting.tags).toEqual(["cherry", "peat"]);
+});
+
+test("creates a new tasting with notes", async () => {
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "POST",
+    url: "/tastings",
+    payload: {
+      bottle: bottle.id,
+      rating: 3.5,
+      notes: "hello world",
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.id));
+
+  expect(tasting.notes).toEqual("hello world");
 });
 
 test("creates a new tasting with all edition params", async () => {

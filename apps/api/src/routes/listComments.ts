@@ -1,38 +1,32 @@
-import { SQL, and, asc, ilike, or } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { users } from "../db/schema";
+import { comments, users } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
-import { serializeUser } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
-  url: "/users",
+  url: "/comments",
   schema: {
     querystring: {
       type: "object",
       properties: {
-        query: { type: "string" },
         page: { type: "number" },
+        user: { oneOf: [{ type: "number" }, { const: "me" }] },
+        tasting: { type: "number" },
       },
     },
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
     const page = req.query.page || 1;
-    const query = req.query.query || "";
-
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where: (SQL<unknown> | undefined)[] = [];
-    if (query) {
-      where.push(
-        or(ilike(users.displayName, `%${query}%`), ilike(users.email, query)),
-      );
-    } else {
+    // have to specify at least one so folks dont scrape all comments
+    if (!req.query.tasting && !req.query.user) {
       return res.send({
         results: [],
         rel: {
@@ -44,16 +38,36 @@ export default {
       });
     }
 
+    const where = [];
+    if (req.query.user) {
+      where.push(
+        eq(
+          comments.createdById,
+          req.query.user === "me" ? req.user.id : req.query.user,
+        ),
+      );
+    }
+    if (req.query.tasting) {
+      where.push(eq(comments.tastingId, req.query.tasting));
+    }
+
     const results = await db
-      .select()
-      .from(users)
-      .where(where ? and(...where) : undefined)
+      .select({
+        comment: comments,
+        createdBy: users,
+      })
+      .from(comments)
+      .where(and(...where))
+      .innerJoin(users, eq(comments.createdById, users.id))
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(users.displayName));
+      .orderBy(asc(comments.createdAt));
 
     res.send({
-      results: results.map((u) => serializeUser(u, req.user)),
+      results: results.slice(0, limit).map(({ comment, createdBy }) => ({
+        ...comment,
+        createdBy,
+      })),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
         prevPage: page > 1 ? page - 1 : null,
@@ -74,7 +88,8 @@ export default {
   ServerResponse,
   {
     Querystring: {
-      query?: string;
+      user?: number | "me";
+      tasting?: number;
       page?: number;
     };
   }

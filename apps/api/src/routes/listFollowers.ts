@@ -56,7 +56,7 @@ export default {
       .select({
         user: users,
         follow: follows,
-        followsBack: followsBack,
+        followsBack: followsBack.status,
       })
       .from(follows)
       .where(and(...where))
@@ -70,7 +70,7 @@ export default {
       results: results.slice(0, limit).map(({ user, follow, followsBack }) =>
         serializeFollow({
           ...follow,
-          followsBack,
+          followsBack: followsBack,
           user,
         }),
       ),

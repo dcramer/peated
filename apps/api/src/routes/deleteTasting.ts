@@ -58,8 +58,5 @@ export default {
     Params: {
       tastingId: number;
     };
-    Body: {
-      image?: File;
-    };
   }
 >;

@@ -64,7 +64,7 @@ export default {
       ? await db
           .select({
             follow: follows,
-            followsBack: followsBack,
+            followsBack: followsBack.status,
             user: users,
           })
           .from(follows)

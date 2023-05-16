@@ -299,11 +299,13 @@ export const tastings = pgTable("tasting", {
     () => editions.id,
   ),
 
-  comments: text("comments"),
   tags: text("tags").array(),
   rating: doublePrecision("rating").notNull(),
   imageUrl: text("image_url"),
 
+  notes: text("notes"),
+
+  comments: integer("comments").default(0).notNull(),
   toasts: integer("toasts").default(0).notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -340,8 +342,36 @@ export const toasts = pgTable(
 export type Toast = InferModel<typeof toasts>;
 export type NewToast = InferModel<typeof toasts, "insert">;
 
+export const comments = pgTable(
+  "comments",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    tastingId: bigint("tasting_id", { mode: "number" })
+      .references(() => tastings.id)
+      .notNull(),
+    comment: text("comment").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+  },
+  (comments) => {
+    return {
+      comment: uniqueIndex("comment_unq").on(
+        comments.tastingId,
+        comments.createdById,
+        comments.createdAt,
+      ),
+    };
+  },
+);
+
+export type Comment = InferModel<typeof comments>;
+export type NewComment = InferModel<typeof comments, "insert">;
+
 export type ObjectType =
   | "bottle"
+  | "comment"
   | "edition"
   | "entity"
   | "tasting"
@@ -350,6 +380,7 @@ export type ObjectType =
 
 export const objectTypeEnum = pgEnum("object_type", [
   "bottle",
+  "comment",
   "edition",
   "entity",
   "tasting",

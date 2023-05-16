@@ -3,11 +3,13 @@ import { FastifyInstance, FastifyPluginCallback } from "fastify";
 import addBottle from "./addBottle";
 import addEntity from "./addEntity";
 import addTasting from "./addTasting";
+import addTastingComment from "./addTastingComment";
 import addTastingToast from "./addTastingToast";
 import addUserFollow from "./addUserFollow";
 import authBasic from "./authBasic";
 import authDetails from "./authDetails";
 import authGoogle from "./authGoogle";
+import deleteComment from "./deleteComment";
 import deleteNotification from "./deleteNotification";
 import deleteTasting from "./deleteTasting";
 import deleteUserFollow from "./deleteUserFollow";
@@ -15,9 +17,10 @@ import getBottle from "./getBottle";
 import getEntity from "./getEntity";
 import getTasting from "./getTasting";
 import getUser from "./getUser";
-import listBottleSuggestedFlavors from "./listBottleSuggestedFlavors";
+import listBottleSuggestedTags from "./listBottleSuggestedTags";
 import listBottles from "./listBottles";
 import listCollections from "./listCollections";
+import listComments from "./listComments";
 import listEntities from "./listEntities";
 import listFollowers from "./listFollowers";
 import listFriends from "./listFriends";
@@ -60,7 +63,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(addBottle);
   fastify.route(getBottle);
   fastify.route(updateBottle);
-  fastify.route(listBottleSuggestedFlavors);
+  fastify.route(listBottleSuggestedTags);
 
   fastify.route(listEntities);
   fastify.route(addEntity);
@@ -76,6 +79,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(deleteTasting);
   fastify.route(updateTastingImage);
   fastify.route(addTastingToast);
+  fastify.route(addTastingComment);
 
   fastify.route(listFriends);
 
@@ -89,6 +93,9 @@ export const router: FastifyPluginCallback = (
   fastify.route(updateFollower);
 
   fastify.route(listCollections);
+
+  fastify.route(listComments);
+  fastify.route(deleteComment);
 
   fastify.route(getUpload);
 

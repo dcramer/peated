@@ -25,7 +25,7 @@ export default {
       properties: {
         bottle: { type: "number" },
         rating: { type: "number", minimum: 0, maximum: 5 },
-        tastingNotes: { type: "string" },
+        notes: { type: "string" },
         tags: { type: "array", items: { type: "string" } },
         edition: { type: "string" },
         vintageYear: { type: "number" },
@@ -113,7 +113,7 @@ export default {
       const [tasting] = await tx
         .insert(tastings)
         .values({
-          comments: body.comments || null,
+          notes: body.notes || null,
           rating: body.rating,
           tags: body.tags ? body.tags.map((t) => t.toLowerCase()) : [],
           bottleId: bottle.id,

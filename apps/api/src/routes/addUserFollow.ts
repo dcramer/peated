@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db, first } from "../db";
-import { follows, users } from "../db/schema";
+import { Follow, follows, users } from "../db/schema";
 import { createNotification, objectTypeFromSchema } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
@@ -35,7 +35,7 @@ export default {
 
     const follow = await db.transaction(async (tx) => {
       const follow =
-        first(
+        first<Follow>(
           await tx
             .insert(follows)
             .values({
@@ -45,7 +45,7 @@ export default {
             .onConflictDoNothing()
             .returning(),
         ) ||
-        first(
+        first<Follow>(
           await tx
             .update(follows)
             .set({
@@ -60,7 +60,7 @@ export default {
             )
             .returning(),
         ) ||
-        first(
+        (
           await tx
             .select()
             .from(follows)
@@ -69,17 +69,16 @@ export default {
                 eq(follows.fromUserId, req.user.id),
                 eq(follows.toUserId, user.id),
               ),
-            ),
-        );
+            )
+        )[0];
 
-      if (follow)
-        createNotification(tx, {
-          fromUserId: follow.createdById,
-          objectType: objectTypeFromSchema(follows),
-          objectId: follow.fromUserId,
-          createdAt: follow.createdAt,
-          userId: follow.toUserId,
-        });
+      createNotification(tx, {
+        fromUserId: follow.toUserId,
+        objectType: objectTypeFromSchema(follows),
+        objectId: follow.fromUserId,
+        createdAt: follow.createdAt,
+        userId: follow.toUserId,
+      });
 
       return follow;
     });
