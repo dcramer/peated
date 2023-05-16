@@ -35,7 +35,7 @@ export default function Layout({
 
         <main
           className={classNames(
-            "content m-h-screen relative mx-auto max-w-4xl rounded",
+            "content m-h-screen relative mx-auto max-w-4xl",
             gutter && "sm:px-6 sm:py-6 lg:px-8 lg:py-8",
             gutter && !noMobileGutter && "px-2 py-2",
             splash && "flex-1 self-center px-6 py-12 sm:max-w-sm lg:px-8",
