@@ -112,23 +112,15 @@ export default ({
       </div>
       {!noBottle && <BottleCard bottle={bottle} />}
       <div>
-        {tasting.imageUrl ? (
-          <div className="p-3 sm:flex sm:px-5 sm:py-4">
-            <div className="flex-shrink-0 sm:mb-0 sm:mr-4">
-              <img src={tasting.imageUrl} className="max-w-32 max-h-32" />
-            </div>
-            <div>
-              {tasting.comments && (
-                <p className="text-peated text-sm">{tasting.comments}</p>
-              )}
-            </div>
+        {!!tasting.imageUrl && (
+          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden sm:mb-0 sm:mr-4">
+            <img src={tasting.imageUrl} className="h-full" />
           </div>
-        ) : (
-          tasting.comments && (
-            <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
-              {tasting.comments}
-            </p>
-          )
+        )}
+        {!!tasting.comments && (
+          <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
+            {tasting.comments}
+          </p>
         )}
         {!isTaster && user && (
           <aside className="flex items-center space-x-3 p-3 sm:px-5 sm:py-4">

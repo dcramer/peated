@@ -16,15 +16,15 @@ const pump = promisify(pipeline);
 export const compressAndResizeImage = (
   stream: Readable,
   filename: string,
-  maxWidth: number,
-  maxHeight: number,
+  maxWidth?: number,
+  maxHeight?: number,
 ) => {
   const transformer = sharp()
     .resize({
       width: maxWidth,
       height: maxHeight,
-      fit: "contain",
-      position: "center",
+      fit: sharp.fit.cover,
+      position: sharp.strategy.entropy,
     })
     .webp({ quality: 80 });
 

@@ -47,7 +47,7 @@ export default {
       data: fileData,
       namespace: `tastings`,
       urlPrefix: "/uploads",
-      onProcess: (...args) => compressAndResizeImage(...args, 1000, 1000),
+      onProcess: (...args) => compressAndResizeImage(...args, undefined, 1024),
     });
 
     if (fileData.file.truncated) {

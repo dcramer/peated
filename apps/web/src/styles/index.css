@@ -75,7 +75,7 @@
   }
 
   .card {
-    @apply overflow-hidden bg-slate-950 sm:rounded;
+    @apply overflow-hidden bg-slate-950;
   }
 
   .card-alt {

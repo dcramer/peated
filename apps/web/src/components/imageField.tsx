@@ -1,8 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 
-import Button from "./button";
 import FormField from "./formField";
-import HelpText from "./helpText";
 import TextInput from "./textInput";
 
 type Props = Omit<React.ComponentProps<typeof TextInput>, "value"> & {
@@ -109,19 +107,15 @@ export default ({
       }}
     >
       <div className="col-span-full mt-2 flex min-w-full items-center gap-x-4">
-        <div
-          className="h-24 w-24 flex-none rounded bg-gray-100 object-cover"
-          onClick={(e) => {
-            e.preventDefault();
-            fileRef.current?.click();
-          }}
-        >
-          {imageSrc && (
+        <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden rounded bg-slate-900 object-cover">
+          {imageSrc ? (
             <img
               src={imageSrc}
               ref={imageRef}
-              className="h-full w-full rounded object-cover"
+              className="h-full rounded object-cover"
             />
+          ) : (
+            <em className="p-12">No Image</em>
           )}
         </div>
         <input
@@ -137,7 +131,7 @@ export default ({
             if (onChange) onChange(e);
           }}
         />
-        <div>
+        {/* <div>
           <Button
             type="button"
             color="primary"
@@ -149,7 +143,7 @@ export default ({
             {buttonLabel}
           </Button>
           <HelpText>JPG, GIF or PNG. 1MB max.</HelpText>
-        </div>
+        </div> */}
       </div>
     </FormField>
   );
