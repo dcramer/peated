@@ -68,7 +68,9 @@ const getLink = ({ notification }: { notification: Notification }) => {
     case "follow":
       return `/users/${notification.objectId}`;
     case "toast":
-      return `/users/${notification.ref.id}`;
+      return notification.fromUser
+        ? `/users/${notification.fromUser.id}`
+        : null;
     default:
       return null;
   }
