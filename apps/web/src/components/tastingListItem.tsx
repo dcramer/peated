@@ -15,6 +15,7 @@ import BottleCard from "./bottleCard";
 import Button from "./button";
 import { StaticRating } from "./rating";
 import TimeSince from "./timeSince";
+import Tooltip from "./tooltip";
 import UserAvatar from "./userAvatar";
 
 const Tags = ({ tags }: { tags: string[] }) => {
@@ -22,23 +23,24 @@ const Tags = ({ tags }: { tags: string[] }) => {
   return (
     <div className="text-sm">
       <div className="hidden sm:block">
-        <span>{tags.slice(0, 5).join(", ")}</span>
-        {tags.length > 4 && (
+        <span>{tags.slice(0, 3).join(", ")}</span>
+        {tags.length > 3 && (
           <span>
             , and{" "}
-            <span
-              className="underline decoration-dotted"
-              title={tags.join(", ")}
-            >
-              {tags.length - 4} more
-            </span>
+            <Tooltip title={tags.join(", ")}>
+              <span className="underline decoration-dotted">
+                {tags.length - 3} more
+              </span>
+            </Tooltip>
           </span>
         )}
       </div>
       <div className="sm:hidden">
-        <span className="underline decoration-dotted" title={tags.join(", ")}>
-          {tags.length} flavor note{tags.length !== 1 ? "s" : ""}
-        </span>
+        <Tooltip title={tags.join(", ")}>
+          <span className="underline decoration-dotted">
+            {tags.length} flavor note{tags.length !== 1 ? "s" : ""}
+          </span>
+        </Tooltip>
       </div>
     </div>
   );

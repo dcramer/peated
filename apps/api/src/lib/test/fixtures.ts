@@ -21,10 +21,8 @@ import {
   users,
 } from "../../db/schema";
 import { createAccessToken } from "../auth";
-
-function between(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
+import { random, sample } from "../rand";
+import { defaultTags } from "../tags";
 
 export const User = async ({ ...data }: Partial<NewUser> = {}) => {
   return (
@@ -94,7 +92,7 @@ export const Bottle = async ({
     .returning();
 
   if (!distillerIds.length) {
-    if (between(0, 1) === 1) {
+    if (random(0, 1) === 1) {
       await db.insert(bottlesToDistillers).values({
         bottleId: bottle.id,
         distillerId: (await Entity({ type: ["distiller"] })).id,
@@ -119,6 +117,7 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
       .values({
         comments: faker.lorem.sentence(),
         rating: faker.datatype.float({ min: 1, max: 5 }),
+        tags: sample(defaultTags, random(1, 5)),
         ...data,
         bottleId: data.bottleId || (await Bottle()).id,
         createdById: data.createdById || (await User()).id,

@@ -4,6 +4,7 @@ import { formatCategoryName } from "../lib/strings";
 import { Bottle } from "../types";
 import BottleName from "./bottleName";
 import { Option } from "./selectField";
+import Tooltip from "./tooltip";
 
 const Distillers = ({
   bottle: { distillers, brand },
@@ -25,12 +26,11 @@ const Distillers = ({
       <span>
         {" "}
         &middot;{" "}
-        <span
-          className="underline decoration-dotted"
-          title={distillers.map((d) => d.name).join(", ")}
-        >
-          {distillers.length} distillers
-        </span>
+        <Tooltip title={distillers.map((d) => d.name).join(", ")}>
+          <span className="underline decoration-dotted">
+            {distillers.length} distillers
+          </span>
+        </Tooltip>
       </span>
     );
   }
