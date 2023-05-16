@@ -1,11 +1,11 @@
-import { Menu } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import {
   ChatBubbleLeftRightIcon,
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 
+import { Menu } from "@headlessui/react";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
@@ -88,12 +88,66 @@ export default ({
           <StaticRating value={tasting.rating} size="small" />
           <Tags tags={tasting.tags} />
         </div>
-        <div className="flex min-h-full flex-shrink">
+      </div>
+      {!noBottle && <BottleCard bottle={bottle} />}
+      <div>
+        {!!tasting.imageUrl && (
+          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden sm:mb-0 sm:mr-4">
+            <img src={tasting.imageUrl} className="h-full" />
+          </div>
+        )}
+        {!!tasting.comments && (
+          <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
+            {tasting.comments}
+          </p>
+        )}
+
+        <aside className="flex items-center space-x-3 p-3 sm:px-5 sm:py-4">
+          {!hasToasted && !isTaster && user ? (
+            <Button
+              icon={
+                <HandThumbUpIcon
+                  className="-ml-0.5 h-5 w-5"
+                  aria-hidden="true"
+                />
+              }
+              onClick={async () => {
+                await api.post(`/tastings/${tasting.id}/toasts`);
+                setHasToasted(true);
+                onToast && onToast(tasting);
+              }}
+            >
+              Toast
+            </Button>
+          ) : (
+            <Button
+              icon={
+                <HandThumbUpIcon className="text-highlight -ml-0.5 h-5 w-5" />
+              }
+              active
+              disabled
+            >
+              1
+            </Button>
+          )}
+          {user && (
+            <Button
+              icon={
+                <ChatBubbleLeftRightIcon
+                  className="-ml-0.5 h-5 w-5"
+                  aria-hidden="true"
+                />
+              }
+              onClick={() => onComment && onComment(tasting)}
+            >
+              Comment
+            </Button>
+          )}
           <Menu as="div" className="menu">
-            <Menu.Button className="text-light block h-full w-full rounded bg-inherit p-3 px-1">
-              <EllipsisVerticalIcon className="h-full w-6" />
+            <Menu.Button as={Button}>
+              <EllipsisVerticalIcon className="h-5 w-5" />
             </Menu.Button>
-            <Menu.Items className="absolute right-0 z-10 w-44 origin-top-right">
+            <Menu.Items className="absolute inset-x-0 bottom-10 right-0 z-10 w-44 origin-bottom-right">
               {(user?.admin || isTaster) && (
                 <Menu.Item
                   as="button"
@@ -108,62 +162,7 @@ export default ({
               )}
             </Menu.Items>
           </Menu>
-        </div>
-      </div>
-      {!noBottle && <BottleCard bottle={bottle} />}
-      <div>
-        {!!tasting.imageUrl && (
-          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden sm:mb-0 sm:mr-4">
-            <img src={tasting.imageUrl} className="h-full" />
-          </div>
-        )}
-        {!!tasting.comments && (
-          <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
-            {tasting.comments}
-          </p>
-        )}
-        {!isTaster && user && (
-          <aside className="flex items-center space-x-3 p-3 sm:px-5 sm:py-4">
-            {!hasToasted ? (
-              <Button
-                icon={
-                  <HandThumbUpIcon
-                    className="-ml-0.5 h-5 w-5"
-                    aria-hidden="true"
-                  />
-                }
-                onClick={async () => {
-                  await api.post(`/tastings/${tasting.id}/toasts`);
-                  setHasToasted(true);
-                  onToast && onToast(tasting);
-                }}
-              >
-                Toast
-              </Button>
-            ) : (
-              <Button
-                icon={
-                  <HandThumbUpIcon className="text-highlight -ml-0.5 h-5 w-5" />
-                }
-                active
-                disabled
-              >
-                1
-              </Button>
-            )}
-            <Button
-              icon={
-                <ChatBubbleLeftRightIcon
-                  className="-ml-0.5 h-5 w-5"
-                  aria-hidden="true"
-                />
-              }
-              onClick={() => onComment && onComment(tasting)}
-            >
-              Comment
-            </Button>
-          </aside>
-        )}
+        </aside>
       </div>
     </motion.li>
   );

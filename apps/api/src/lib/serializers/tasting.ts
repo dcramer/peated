@@ -28,6 +28,7 @@ export const serializeTasting = (
     edition: tasting.edition,
     createdAt: tasting.createdAt,
     hasToasted: tasting.hasToasted,
+    toasts: 1,
   };
   return data;
 };
