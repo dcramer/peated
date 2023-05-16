@@ -4,6 +4,7 @@
   "scripts": {
     "start": "ts-node --require dotenv/config ./src/main.ts",
     "import": "ts-node --require dotenv/config ./src/import.ts",
+    "logos": "ts-node --require dotenv/config ./src/logos.ts",
     "tsc": "tsc"
   },
   "dependencies": {
