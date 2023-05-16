@@ -28,7 +28,10 @@ export default ({
             <th scope="col" className="px-3 py-2.5 text-left">
               Entity
             </th>
-            <th scope="col" className="px-3 py-2.5 text-right">
+            <th
+              scope="col"
+              className="hidden px-3 py-2.5 text-right sm:table-cell"
+            >
               Location
             </th>
           </tr>
@@ -52,7 +55,7 @@ export default ({
                     ))}
                   </div>
                 </td>
-                <td className="px-3 py-3 text-right">
+                <td className="hidden px-3 py-3 text-right sm:table-cell">
                   {entity.country}
                   <br /> {entity.region || ""}
                 </td>

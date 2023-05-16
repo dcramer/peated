@@ -73,7 +73,7 @@ export default function UserDetails() {
           <h3 className="mb-2 self-center text-4xl font-semibold leading-normal text-white sm:self-start">
             {user.displayName}
           </h3>
-          <div className="mb-4">
+          <div className="mb-4 self-center sm:self-start">
             {user.admin ? (
               <Chip size="small" color="highlight">
                 Admin

@@ -43,7 +43,10 @@ export default ({
             >
               Category
             </th>
-            <th scope="col" className="py-3.5 pl-3 pr-4 text-right sm:pr-3">
+            <th
+              scope="col"
+              className="hidden py-3.5 pl-3 pr-4 text-right sm:table-cell sm:pr-3"
+            >
               Age
             </th>
           </tr>
