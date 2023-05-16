@@ -53,17 +53,24 @@ export default {
       },
     },
     category: {
-      type: "string",
-      enum: [
-        "",
-        "blend",
-        "bourbon",
-        "rye",
-        "single_grain",
-        "single_malt",
-        "spirit",
+      oneOf: [
+        {
+          type: "string",
+          enum: [
+            "",
+            "blend",
+            "bourbon",
+            "rye",
+            "single_grain",
+            "single_malt",
+            "spirit",
+          ],
+        },
+        { type: "null" },
       ],
     },
-    statedAge: { type: "number" },
+    statedAge: {
+      oneOf: [{ type: "number" }, { type: "null" }],
+    },
   },
 };

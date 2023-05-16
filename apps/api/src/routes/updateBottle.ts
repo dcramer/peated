@@ -14,10 +14,10 @@ import { requireMod } from "../middleware/auth";
 
 type BottleInput = {
   name: string;
-  category: Category;
+  category?: Category | null;
   brand: EntityInput;
   distillers: EntityInput[];
-  statedAge?: number;
+  statedAge?: number | null;
 };
 
 export default {

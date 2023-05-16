@@ -75,3 +75,27 @@ test("edits a new bottle with new name param", async () => {
   expect(omit(bottle, "name")).toEqual(omit(bottle2, "name"));
   expect(bottle2.name).toBe("Delicious Wood");
 });
+
+test("clears category", async () => {
+  const bottle = await Fixtures.Bottle({ category: "single_malt" });
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      category: null,
+    },
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(200);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [bottle2] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(omit(bottle, "category")).toEqual(omit(bottle2, "category"));
+  expect(bottle2.category).toBe(null);
+});
