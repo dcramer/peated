@@ -31,8 +31,8 @@ const pwaOptions: Partial<VitePWAOptions> = {
       },
     ],
     display: "standalone",
-    theme_color: "#005C58",
-    background_color: "#005C58",
+    theme_color: "#fbbf24",
+    background_color: "#fbbf24",
   },
   devOptions: {
     enabled: process.env.NODE_ENV === "development",
