@@ -82,6 +82,9 @@ export default function AppHeader() {
                   <Link to={`/entities`}>Brands & Distillers</Link>
                 </Menu.Item>
                 <Menu.Item>
+                  <Link to={`/about`}>About</Link>
+                </Menu.Item>
+                <Menu.Item>
                   <button
                     onClick={() => {
                       logout();
