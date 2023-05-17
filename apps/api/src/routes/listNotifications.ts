@@ -184,7 +184,7 @@ export default {
       }
       return {
         ...notification,
-        fromUser,
+        fromUser: serializeUser(fromUser, req.user),
         ref,
       };
     });
