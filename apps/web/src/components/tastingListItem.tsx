@@ -50,7 +50,7 @@ export default ({
         <UserAvatar size={48} user={tasting.createdBy} />
         <div className="flex-1 space-y-1 font-semibold">
           <Link
-            to={`/users/${tasting.createdBy.id}`}
+            to={`/users/${tasting.createdBy.username}`}
             className="hover:underline"
           >
             {tasting.createdBy.displayName}

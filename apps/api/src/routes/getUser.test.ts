@@ -11,7 +11,7 @@ beforeAll(async () => {
   };
 });
 
-test("get user", async () => {
+test("get user by id", async () => {
   const user = await Fixtures.User();
 
   const response = await app.inject({
@@ -30,6 +30,18 @@ test("get user:me", async () => {
   const response = await app.inject({
     method: "GET",
     url: `/users/me`,
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(200);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBe(DefaultFixtures.user.id);
+});
+
+test("get user by username", async () => {
+  const response = await app.inject({
+    method: "GET",
+    url: `/users/${DefaultFixtures.user.username}`,
     headers: DefaultFixtures.authHeaders,
   });
 

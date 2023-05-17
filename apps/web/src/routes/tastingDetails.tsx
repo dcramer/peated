@@ -142,7 +142,7 @@ const CommentList = ({
                   <div className="flex-1">
                     <div className="text-sm">
                       <Link
-                        to={`/users/${c.createdBy.id}`}
+                        to={`/users/${c.createdBy.username}`}
                         className="font-medium hover:underline"
                       >
                         {c.createdBy.displayName}

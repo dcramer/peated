@@ -44,6 +44,8 @@ export const createUser = async (
   let attempt = 0;
   const baseUsername = data.username.toLowerCase();
   let currentUsername = baseUsername;
+  if (currentUsername === "me")
+    currentUsername = `${baseUsername}-${random(10000, 99999)}`;
   const maxAttempts = 5;
   while (!user && attempt < maxAttempts) {
     attempt += 1;

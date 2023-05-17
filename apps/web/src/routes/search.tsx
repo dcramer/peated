@@ -145,7 +145,7 @@ const UserResultRow = ({ result: { ref: user } }: { result: UserResult }) => {
 
       <div className="flex min-w-0 flex-auto">
         <p className="flex-1 font-semibold leading-6">
-          <Link to={`/users/${user.id}`}>
+          <Link to={`/users/${user.username}`}>
             <span className="absolute inset-x-0 -top-px bottom-0" />
             {user.displayName}
           </Link>

@@ -70,7 +70,7 @@ export default function AppHeader() {
             >
               <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right">
                 <Menu.Item>
-                  <Link to={`/users/${user.id}`}>Profile</Link>
+                  <Link to={`/users/${user.username}`}>Profile</Link>
                 </Menu.Item>
                 <Menu.Item>
                   <Link to={`/friends`}>Friends</Link>

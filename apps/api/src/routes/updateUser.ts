@@ -14,7 +14,7 @@ export default {
       type: "object",
       required: ["userId"],
       properties: {
-        userId: { oneOf: [{ type: "number" }, { const: "me" }] },
+        userId: { anyOf: [{ type: "number" }, { const: "me" }] },
       },
     },
     body: {
@@ -52,6 +52,9 @@ export default {
 
     if (body.username !== undefined && body.displayName !== user.displayName) {
       data.username = body.username.toLowerCase();
+      if (data.username === "me") {
+        return res.status(400).send({ error: "Invalid username" });
+      }
     }
     if (body.admin !== undefined && body.admin !== user.admin) {
       if (!req.user.admin) {
@@ -65,6 +68,10 @@ export default {
         return res.status(403).send({ error: "Forbidden" });
       }
       data.mod = body.mod;
+    }
+
+    if (!Object.values(data).length) {
+      return res.send(serializeUser(user, req.user));
     }
 
     try {

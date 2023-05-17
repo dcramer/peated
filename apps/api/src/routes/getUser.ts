@@ -14,15 +14,28 @@ export default {
       type: "object",
       required: ["userId"],
       properties: {
-        userId: { oneOf: [{ type: "number" }, { const: "me" }] },
+        userId: {
+          anyOf: [{ type: "number" }, { type: "string" }, { const: "me" }],
+        },
       },
     },
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
-    const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
-
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    let user: User | undefined;
+    if (req.params.userId === "me") {
+      user = req.user;
+    } else if (typeof req.params.userId === "number") {
+      [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, req.params.userId));
+    } else {
+      [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, req.params.userId));
+    }
 
     if (!user) {
       return res.status(404).send({ error: "Not found" });
@@ -78,7 +91,7 @@ export default {
   ServerResponse,
   {
     Params: {
-      userId: number | "me";
+      userId: string | number | "me";
     };
   }
 >;

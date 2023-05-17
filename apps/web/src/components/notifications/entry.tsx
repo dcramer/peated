@@ -38,7 +38,7 @@ export default function NotificationEntry({
               <p className="text-sm">
                 {notification.fromUser && (
                   <Link
-                    to={`/users/${notification.fromUser.id}`}
+                    to={`/users/${notification.fromUser.username}`}
                     className="mr-1 font-semibold"
                   >
                     {notification.fromUser.displayName}
@@ -69,7 +69,7 @@ const getLink = ({ notification }: { notification: Notification }) => {
       return `/users/${notification.objectId}`;
     case "toast":
       return notification.fromUser
-        ? `/users/${notification.fromUser.id}`
+        ? `/users/${notification.fromUser.username}`
         : null;
     default:
       return null;

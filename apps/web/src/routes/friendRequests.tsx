@@ -71,7 +71,10 @@ export default function FriendRequests() {
               <div className="flex flex-1 items-center space-x-4">
                 <UserAvatar size={48} user={user} />
                 <div className="flex-1 space-y-1 font-medium">
-                  <Link to={`/users/${user.id}`} className="hover:underline">
+                  <Link
+                    to={`/users/${user.username}`}
+                    className="hover:underline"
+                  >
                     {user.displayName}
                   </Link>
                   <TimeSince

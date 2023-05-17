@@ -149,7 +149,7 @@ export default function BottleDetails() {
         <p className="mt-8 text-center text-sm text-slate-500 sm:text-left">
           This bottle was first added by{" "}
           <Link
-            to={`/users/${bottle.createdBy.id}`}
+            to={`/users/${bottle.createdBy.username}`}
             className="font-medium hover:underline"
           >
             {bottle.createdBy.displayName}

@@ -66,7 +66,7 @@ export default function Settings() {
           ...newUser,
           ...newAvatar,
         });
-        navigate(`/users/${user.id}`, {
+        navigate(`/users/${newUser.username}`, {
           replace: true,
         });
       } catch (err) {

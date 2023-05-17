@@ -33,6 +33,7 @@ export const serializeUser = (
     return {
       ...data,
       email: user.email,
+      username: user.username,
       createdAt: user.email,
       admin: user.admin,
       mod: user.admin || user.mod,
