@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "71ee900c-24f1-4f3c-a06b-c435c911775a",
-  "prevId": "10bc95db-e462-435e-85ca-b60698d2d539",
+  "id": "24848f18-035a-4900-8068-3a8345fd580b",
+  "prevId": "71ee900c-24f1-4f3c-a06b-c435c911775a",
   "tables": {
     "bottle": {
       "name": "bottle",
@@ -607,6 +607,12 @@
       "name": "follow",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
         "from_user_id": {
           "name": "from_user_id",
           "type": "bigint",
@@ -634,7 +640,16 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "follow_unq": {
+          "name": "follow_unq",
+          "columns": [
+            "from_user_id",
+            "to_user_id"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "follow_from_user_id_user_id_fk": {
           "name": "follow_from_user_id_user_id_fk",
@@ -663,15 +678,7 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {
-        "follow_from_user_id_to_user_id": {
-          "name": "follow_from_user_id_to_user_id",
-          "columns": [
-            "from_user_id",
-            "to_user_id"
-          ]
-        }
-      }
+      "compositePrimaryKeys": {}
     },
     "identity": {
       "name": "identity",
@@ -841,19 +848,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "comments": {
-          "name": "comments",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "tags": {
           "name": "tags",
           "type": "text[]",
@@ -871,6 +865,19 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "comments": {
+          "name": "comments",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
         },
         "toasts": {
           "name": "toasts",

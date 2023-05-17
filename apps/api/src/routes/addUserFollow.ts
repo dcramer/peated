@@ -73,9 +73,9 @@ export default {
         )[0];
 
       createNotification(tx, {
-        fromUserId: follow.toUserId,
+        fromUserId: follow.fromUserId,
         objectType: objectTypeFromSchema(follows),
-        objectId: follow.fromUserId,
+        objectId: follow.id,
         createdAt: follow.createdAt,
         userId: follow.toUserId,
       });

@@ -72,6 +72,7 @@ export const followStatusEnum = pgEnum("follow_status", [
 export const follows = pgTable(
   "follow",
   {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
     fromUserId: bigint("from_user_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
@@ -83,7 +84,10 @@ export const follows = pgTable(
   },
   (follows) => {
     return {
-      follows: primaryKey(follows.fromUserId, follows.toUserId),
+      follows: uniqueIndex("follow_unq").on(
+        follows.fromUserId,
+        follows.toUserId,
+      ),
     };
   },
 );
@@ -343,6 +347,7 @@ export type Toast = InferModel<typeof toasts>;
 export type NewToast = InferModel<typeof toasts, "insert">;
 
 export const comments = pgTable(
+  // oops named this wrong sorry
   "comments",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),

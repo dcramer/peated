@@ -2,7 +2,8 @@ import { and, eq } from "drizzle-orm";
 import { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { db } from "../db";
-import { follows } from "../db/schema";
+import { follows, notifications } from "../db/schema";
+import { objectTypeFromSchema } from "../lib/notifications";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;
@@ -48,6 +49,20 @@ test("can follow new link", async () => {
     );
   expect(follow).toBeDefined();
   expect(follow.status).toBe("pending");
+
+  const [notif] = await db
+    .select()
+    .from(notifications)
+    .where(
+      and(
+        eq(notifications.objectId, follow.id),
+        eq(notifications.objectType, objectTypeFromSchema(follows)),
+      ),
+    );
+
+  expect(notif).toBeDefined();
+  expect(notif.fromUserId).toBe(follow.fromUserId);
+  expect(notif.userId).toBe(follow.toUserId);
 });
 
 test("can follow existing link", async () => {
