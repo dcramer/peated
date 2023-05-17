@@ -33,6 +33,7 @@ export const User = async ({ ...data }: Partial<NewUser> = {}) => {
       .values({
         displayName: faker.name.firstName(),
         email: faker.internet.email(),
+        username: faker.internet.userName(),
         admin: false,
         mod: false,
         active: true,

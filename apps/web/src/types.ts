@@ -71,6 +71,7 @@ export type User = {
   id: string;
   admin: boolean;
   mod: boolean;
+  username: string;
   displayName: string;
   email: string;
   pictureUrl?: string;

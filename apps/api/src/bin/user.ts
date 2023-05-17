@@ -3,7 +3,7 @@ import { program } from "commander";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
-import { createAccessToken } from "../lib/auth";
+import { createAccessToken, createUser } from "../lib/auth";
 
 program.name("user").description("CLI for assisting with user management");
 
@@ -15,15 +15,13 @@ program
   .option("--admin")
   .option("-d", "--display-name <displayName>")
   .action(async (email, password, options) => {
-    const [user] = await db
-      .insert(users)
-      .values({
-        displayName: options.displayName || email.split("@")[0],
-        email,
-        passwordHash: hashSync(password, 8),
-        admin: options.admin || false,
-      })
-      .returning();
+    const user = await createUser(db, {
+      displayName: options.displayName || email.split("@")[0],
+      email,
+      username: email.split("@")[0],
+      passwordHash: hashSync(password, 8),
+      admin: options.admin || false,
+    });
 
     console.log(`${user.email} created.`);
   });

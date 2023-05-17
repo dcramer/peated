@@ -6,7 +6,7 @@ import { OAuth2Client } from "google-auth-library";
 import config from "../config";
 import { db } from "../db";
 import { identities, users } from "../db/schema";
-import { createAccessToken } from "../lib/auth";
+import { createAccessToken, createUser } from "../lib/auth";
 import { serializeUser } from "../lib/serializers/user";
 
 export default {
@@ -82,22 +82,20 @@ export default {
         console.log("Creating new user");
         const userData = {
           displayName: payload.given_name,
+          username: payload.email.split("@", 1)[0],
           email: payload.email,
         };
 
         user = await db.transaction(async (tx) => {
-          const [createdUser] = await tx
-            .insert(users)
-            .values(userData)
-            .returning();
+          const user = await createUser(db, userData);
 
           await tx.insert(identities).values({
             provider: "google",
             externalId: payload.sub,
-            userId: createdUser.id,
+            userId: user.id,
           });
 
-          return createdUser;
+          return user;
         });
       }
     }

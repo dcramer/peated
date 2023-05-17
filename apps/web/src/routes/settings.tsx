@@ -26,6 +26,7 @@ export const loader: LoaderFunction = async (): Promise<LoaderData> => {
 };
 
 type FormData = {
+  username: string;
   displayName?: string;
   picture?: string;
 };
@@ -35,6 +36,7 @@ export default function Settings() {
   const { updateUser } = useRequiredAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
+    username: user.username,
     displayName: user.displayName,
   });
   const [picture, setPicture] = useState<File | string | undefined>(
@@ -92,6 +94,15 @@ export default function Settings() {
             name="displayName"
             label="Name"
             value={formData.displayName}
+            required
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+          />
+          <TextField
+            name="username"
+            label="Username"
+            value={formData.username}
             required
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })

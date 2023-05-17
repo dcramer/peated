@@ -19,6 +19,7 @@ export const users = pgTable(
   "user",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
+    username: text("username").notNull(),
     email: text("email").notNull(),
     passwordHash: varchar("password_hash", { length: 256 }),
     displayName: text("display_name"),
@@ -32,6 +33,7 @@ export const users = pgTable(
   (users) => {
     return {
       emailIndex: uniqueIndex("user_email_unq").on(users.email),
+      usernameIndex: uniqueIndex("user_username_unq").on(users.username),
     };
   },
 );

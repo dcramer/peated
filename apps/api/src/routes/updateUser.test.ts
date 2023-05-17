@@ -50,3 +50,24 @@ test("can change displayName", async () => {
     .where(eq(users.id, DefaultFixtures.user.id));
   expect(user.displayName).toEqual("Joe");
 });
+
+test("can change username", async () => {
+  const response = await app.inject({
+    method: "PUT",
+    url: `/users/${DefaultFixtures.user.id}`,
+    payload: {
+      username: "JoeBlow",
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(200);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, DefaultFixtures.user.id));
+  expect(user.username).toEqual("joeblow");
+});

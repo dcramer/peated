@@ -23,6 +23,7 @@ export default {
         displayName: { type: "string" },
         admin: { type: "boolean" },
         mod: { type: "boolean" },
+        username: { type: "string" },
       },
     },
   },
@@ -42,31 +43,44 @@ export default {
 
     const body = req.body;
     const data: { [name: string]: any } = {};
-    if (body.displayName) {
+    if (
+      body.displayName !== undefined &&
+      body.displayName !== user.displayName
+    ) {
       data.displayName = body.displayName;
     }
 
-    if (body.admin !== undefined) {
+    if (body.username !== undefined && body.displayName !== user.displayName) {
+      data.username = body.username.toLowerCase();
+    }
+    if (body.admin !== undefined && body.admin !== user.admin) {
       if (!req.user.admin) {
         return res.status(403).send({ error: "Forbidden" });
       }
       data.admin = body.admin;
     }
 
-    if (body.mod !== undefined) {
+    if (body.mod !== undefined && body.mod !== user.mod) {
       if (!req.user.admin) {
         return res.status(403).send({ error: "Forbidden" });
       }
       data.mod = body.mod;
     }
 
-    const [newUser] = await db
-      .update(users)
-      .set(data)
-      .where(eq(users.id, userId))
-      .returning();
-
-    res.send(serializeUser(newUser, req.user));
+    try {
+      const [newUser] = await db
+        .update(users)
+        .set(data)
+        .where(eq(users.id, userId))
+        .returning();
+      res.send(serializeUser(newUser, req.user));
+    } catch (err: any) {
+      if (err?.code === "23505" && err?.constraint === "user_username_unq") {
+        return res.status(400).send({ error: "Username already in use" });
+      } else {
+        throw err;
+      }
+    }
   },
 } as RouteOptions<
   Server,
@@ -76,6 +90,6 @@ export default {
     Params: {
       userId: number | "me";
     };
-    Body: Partial<Pick<User, "displayName" | "admin" | "mod">>;
+    Body: Partial<Pick<User, "displayName" | "admin" | "mod" | "username">>;
   }
 >;
