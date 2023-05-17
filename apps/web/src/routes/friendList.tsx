@@ -1,6 +1,3 @@
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData } from "react-router-dom";
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../components/button";
@@ -8,24 +5,17 @@ import EmptyActivity from "../components/emptyActivity";
 import ListItem from "../components/listItem";
 import TimeSince from "../components/timeSince";
 import UserAvatar from "../components/userAvatar";
+import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
-import type { FollowStatus, Friend } from "../types";
-
-type LoaderData = {
-  friendList: Friend[];
-};
-
-// TODO: when this executes the apiClient has not configured
-// its token yet as react-dom (thus context) seemingly has
-// not rendered.. so this errors out
-export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const { results: friendList } = await api.get(`/friends`);
-
-  return { friendList };
-};
+import type { FollowStatus, Friend, Paginated } from "../types";
 
 export default function FriendList() {
-  const { friendList } = useLoaderData() as LoaderData;
+  const {
+    data: { results: friendList },
+  } = useSuspenseQuery(
+    ["friends"],
+    (): Promise<Paginated<Friend>> => api.get("/friends", {}),
+  );
 
   const [myFollowStatus, setMyFollowStatus] = useState<
     Record<string, FollowStatus>
