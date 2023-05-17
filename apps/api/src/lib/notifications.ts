@@ -39,6 +39,11 @@ export const createNotification = async (
   db: NodePgDatabase,
   notification: NewNotification,
 ) => {
+  if (notification.userId === notification.fromUserId) {
+    throw new Error(
+      "You should not create notifications to and from the same user.",
+    );
+  }
   await db.insert(notifications).values(notification).onConflictDoNothing();
 };
 
