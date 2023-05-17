@@ -5,6 +5,7 @@ export interface SerializedUser {
   id: number;
   displayName: string | null;
   pictureUrl: string | null;
+  username: string;
   admin?: boolean;
   mod?: boolean;
   email?: string;
@@ -21,6 +22,7 @@ export const serializeUser = (
   const data: SerializedUser = {
     id: user.id,
     displayName: user.displayName,
+    username: user.username,
     pictureUrl: user.pictureUrl
       ? `${config.URL_PREFIX}${user.pictureUrl}`
       : null,
@@ -33,7 +35,6 @@ export const serializeUser = (
     return {
       ...data,
       email: user.email,
-      username: user.username,
       createdAt: user.email,
       admin: user.admin,
       mod: user.admin || user.mod,
