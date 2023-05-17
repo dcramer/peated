@@ -5,8 +5,10 @@ import Button from "../button";
 
 export default ({
   notification: { ref },
+  onComplete,
 }: {
   notification: FollowNotification;
+  onComplete: () => void;
 }) => {
   const [theirFollowStatus, setTheirFollowStatus] = useState<FollowStatus>(
     ref.status,
@@ -20,6 +22,7 @@ export default ({
       data: { action: "accept" },
     });
     setTheirFollowStatus(data.status);
+    onComplete();
   };
 
   const followUser = async (toUserId: string, follow: boolean) => {

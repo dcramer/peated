@@ -23,6 +23,7 @@ export default function NotificationEntry({
       onClick={
         link
           ? () => {
+              onArchive();
               navigate(link);
             }
           : undefined
@@ -46,7 +47,10 @@ export default function NotificationEntry({
                 )}
                 {getStatusMessage({ notification })}
               </p>
-              <NotificationEntryRef notification={notification} />
+              <NotificationEntryRef
+                notification={notification}
+                onComplete={onArchive}
+              />
             </div>
             <div className="flex min-h-full flex-shrink">
               <button
@@ -67,10 +71,9 @@ const getLink = ({ notification }: { notification: Notification }) => {
   switch (notification.objectType) {
     case "follow":
       return `/users/${notification.objectId}`;
+    case "comment":
     case "toast":
-      return notification.fromUser
-        ? `/users/${notification.fromUser.username}`
-        : null;
+      return `/tastings/${notification.ref.id}`;
     default:
       return null;
   }
@@ -111,12 +114,16 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
 
 const NotificationEntryRef = ({
   notification,
+  onComplete,
 }: {
   notification: Notification;
+  onComplete: () => void;
 }) => {
   switch (notification.objectType) {
     case "follow":
-      return <FollowEntry notification={notification} />;
+      return (
+        <FollowEntry notification={notification} onComplete={onComplete} />
+      );
     default:
       return null;
   }
