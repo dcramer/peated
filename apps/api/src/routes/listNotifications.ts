@@ -17,6 +17,7 @@ import {
 import { buildPageLink } from "../lib/paging";
 import { serializeFollow } from "../lib/serializers/follow";
 import { serializeTastingRef } from "../lib/serializers/tasting";
+import { serializeUser } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -184,7 +185,7 @@ export default {
       }
       return {
         ...notification,
-        fromUser: serializeUser(fromUser, req.user),
+        fromUser: fromUser ? serializeUser(fromUser, req.user) : null,
         ref,
       };
     });
