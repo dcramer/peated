@@ -1,7 +1,5 @@
 # peated
 
-https://www.whiskybase.com/ is a good example of what the kind of db we need. Initial scraper to populate a DB (will need further enriched with other sources) is in `scraper`
-
 ## Dev
 
 Bootstrap the environment:
