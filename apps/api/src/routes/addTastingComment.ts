@@ -70,13 +70,14 @@ export default {
           .set({ comments: sql`${tastings.comments} + 1` })
           .where(eq(tastings.id, tasting.id));
 
-        createNotification(tx, {
-          fromUserId: comment.createdById,
-          objectType: objectTypeFromSchema(comments),
-          objectId: comment.id,
-          createdAt: comment.createdAt,
-          userId: tasting.createdById,
-        });
+        if (comment.createdById !== tasting.createdById)
+          createNotification(tx, {
+            fromUserId: comment.createdById,
+            objectType: objectTypeFromSchema(comments),
+            objectId: comment.id,
+            createdAt: comment.createdAt,
+            userId: tasting.createdById,
+          });
       }
 
       return comment;
