@@ -1,26 +1,21 @@
 import { InboxIcon } from "@heroicons/react/20/solid";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSuspenseQuery } from "../../hooks/useSuspenseQuery";
 import api from "../../lib/api";
-import { Notification } from "../../types";
+import { Notification, Paginated } from "../../types";
 
 export default function NotificationsPanel() {
-  const [notificationList, setNotificationList] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data } = useSuspenseQuery(
+    ["notifications", "unread"],
+    (): Promise<Paginated<Notification>> =>
+      api.get("/notifications", {
+        query: {
+          filter: "unread",
+        },
+      }),
+  );
 
-  useEffect(() => {
-    (async () => {
-      const { results } = await api.get("/notifications", {
-        query: { filter: "unread" },
-      });
-      setNotificationList(results);
-      setLoading(false);
-    })();
-  }, []);
-
-  const unreadNotificationCount = notificationList.filter(
-    (n) => !n.read,
-  ).length;
+  const unreadNotificationCount = data && data.results.length;
 
   return (
     <Link

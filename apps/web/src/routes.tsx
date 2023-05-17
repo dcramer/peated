@@ -21,9 +21,7 @@ import FriendRequests, {
 } from "./routes/friendRequests";
 import { default as Friends } from "./routes/friends";
 import Login from "./routes/login";
-import Notifications, {
-  loader as notificationsLoader,
-} from "./routes/notifications";
+import Notifications from "./routes/notifications";
 import Profile from "./routes/profile";
 import ProfileActivity from "./routes/profileActivity";
 import ProfileCollections from "./routes/profileCollections";
@@ -97,7 +95,6 @@ export default function createRoutes() {
         {
           path: "notifications",
           element: <Notifications />,
-          loader: notificationsLoader,
         },
         {
           path: "search",
