@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
 import BottleMetadata from "../components/bottleMetadata";
 import BottleName from "../components/bottleName";
 import Button from "../components/button";
@@ -50,7 +51,8 @@ export default function BottleDetails() {
   const { distillers } = bottle;
   return (
     <Layout>
-      <div className="my-4 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap sm:py-0">
+      <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4  sm:flex-nowrap sm:py-0">
+        <BottleIcon className="h-14 w-auto" />
         <div className="w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
           <h1 className="mb-2 truncate text-3xl font-semibold leading-7">
             <BottleName bottle={bottle} />

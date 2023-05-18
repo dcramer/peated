@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
 import classNames from "../lib/classNames";
 import { formatCategoryName } from "../lib/strings";
 import { Bottle } from "../types";
@@ -60,10 +61,13 @@ export default ({
   return (
     <div
       className={classNames(
-        "flex items-center space-x-4 bg-slate-950",
+        "flex items-center space-x-2 bg-slate-950 sm:space-x-3",
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
       )}
     >
+      <div>
+        <BottleIcon className="h-10 w-auto" />
+      </div>
       <div className="flex-1 space-y-1">
         <Link
           to={`/bottles/${bottle.id}`}
