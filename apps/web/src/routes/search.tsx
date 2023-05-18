@@ -1,4 +1,4 @@
-import { PlusIcon } from "@heroicons/react/20/solid";
+import { AtSymbolIcon, PlusIcon } from "@heroicons/react/20/solid";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -144,11 +144,18 @@ const UserResultRow = ({ result: { ref: user } }: { result: UserResult }) => {
       </div>
 
       <div className="flex min-w-0 flex-auto">
-        <p className="flex-1 font-semibold leading-6">
-          <Link to={`/users/${user.username}`}>
+        <p className="flex-1 ">
+          <Link
+            to={`/users/${user.username}`}
+            className="font-semibold leading-6"
+          >
             <span className="absolute inset-x-0 -top-px bottom-0" />
             {user.displayName}
           </Link>
+          <div className="text-light flex items-center">
+            <AtSymbolIcon className=" mr-[1px] inline h-4 w-4" />
+            {user.username}
+          </div>
         </p>
         <div className="flex gap-x-2">
           {user.admin ? (

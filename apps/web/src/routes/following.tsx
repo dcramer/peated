@@ -1,15 +1,15 @@
+import { AtSymbolIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../components/button";
 import EmptyActivity from "../components/emptyActivity";
 import ListItem from "../components/listItem";
-import TimeSince from "../components/timeSince";
 import UserAvatar from "../components/userAvatar";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
 import type { FollowStatus, Friend, Paginated } from "../types";
 
-export default function FriendList() {
+export default function Following() {
   const {
     data: { results: followingList },
   } = useSuspenseQuery(
@@ -58,10 +58,10 @@ export default function FriendList() {
                   >
                     {user.displayName}
                   </Link>
-                  <TimeSince
-                    className="text-peated-light block text-sm font-light"
-                    date={follow.createdAt}
-                  />
+                  <div className="text-light flex items-center">
+                    <AtSymbolIcon className=" mr-[1px] inline h-4 w-4" />
+                    {user.username}
+                  </div>
                 </div>
                 <div className="flex items-center gap-x-4">
                   <Button

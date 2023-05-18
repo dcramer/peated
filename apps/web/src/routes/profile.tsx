@@ -1,5 +1,5 @@
 import { Menu } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import Button from "../components/button";
@@ -48,6 +48,10 @@ export default function Profile() {
           <h3 className="mb-2 self-center text-4xl font-semibold leading-normal text-white sm:self-start">
             {user.displayName}
           </h3>
+          <div className="text-light self-center sm:self-start">
+            <AtSymbolIcon className=" mr-[1px] inline h-4 w-4" />
+            {user.username}
+          </div>
           <div className="mb-4 self-center sm:self-start">
             {user.admin ? (
               <Chip size="small" color="highlight">

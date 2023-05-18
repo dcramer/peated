@@ -13,7 +13,7 @@ export default function Friends() {
               <Tabs.Item to="/friends" controlled>
                 Following
               </Tabs.Item>
-              <Tabs.Item to="/friends/requests" controlled>
+              <Tabs.Item to="/friends/followers" controlled>
                 Followers
               </Tabs.Item>
             </Tabs>
