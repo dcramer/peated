@@ -111,7 +111,7 @@ const GoogleLogin = () => {
   });
 
   return (
-    <div className="mx-auto max-w-sm">
+    <div>
       {error && <Alert>{error}</Alert>}
       <Button fullWidth color="highlight" onClick={() => googleLogin()}>
         <svg
@@ -140,11 +140,11 @@ export default function Login() {
     <Layout noHeader splash>
       <PeatedLogo className="text-peated h-auto max-w-full" />
 
-      <div className="mt-8">
+      <div className="mx-auto mt-8 max-w-sm">
         {config.GOOGLE_CLIENT_ID && (
           <>
             <GoogleLogin />
-            <div className="relative mb-2 mt-4 text-slate-700">
+            <div className="relative my-4 text-slate-700">
               <div
                 className="absolute inset-0 flex items-center"
                 aria-hidden="true"

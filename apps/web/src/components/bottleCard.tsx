@@ -64,15 +64,16 @@ export default ({
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
       )}
     >
-      <div className="flex-1 space-y-1">
-        <p className="font-semibold leading-6">
-          <Link to={`/bottles/${bottle.id}`} className="hover:underline">
-            <BottleName bottle={bottle} />
-          </Link>
-        </p>
+      <div className="flex-1 space-y-1 overflow-hidden">
+        <Link
+          to={`/bottles/${bottle.id}`}
+          className="block overflow-hidden text-ellipsis whitespace-nowrap font-semibold leading-6 hover:underline"
+        >
+          <BottleName bottle={bottle} />
+        </Link>
         <BottleMetadata data={bottle} className="text-light text-sm" />
       </div>
-      <div className="text-light flex flex-col items-end space-y-1 text-sm leading-6">
+      <div className="text-light w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
         <p>{bottle.category && formatCategoryName(bottle.category)}</p>
         <p>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</p>
       </div>

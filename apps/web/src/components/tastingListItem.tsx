@@ -45,7 +45,7 @@ export default ({
         <div className="flex-1 space-y-1 font-semibold">
           <Link
             to={`/users/${tasting.createdBy.username}`}
-            className="hover:underline"
+            className="overflow-hidden text-ellipsis whitespace-nowrap hover:underline"
           >
             {tasting.createdBy.displayName}
           </Link>

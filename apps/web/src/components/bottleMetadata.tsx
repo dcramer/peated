@@ -19,15 +19,17 @@ export default ({ data, ...props }: Props) => {
   const brandName = data.brand?.name || "Unknown";
   return (
     <div {...props}>
-      Produced by{" "}
-      {data.brand?.id ? (
-        <Link to={`/entities/${data.brand.id}`} className="hover:underline">
-          {brandName}
-        </Link>
-      ) : (
-        brandName
-      )}
-      <Distillers data={data} />
+      <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+        Produced by{" "}
+        {data.brand?.id ? (
+          <Link to={`/entities/${data.brand.id}`} className="hover:underline">
+            {brandName}
+          </Link>
+        ) : (
+          brandName
+        )}
+        <Distillers data={data} />
+      </div>
     </div>
   );
 };

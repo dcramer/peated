@@ -23,7 +23,7 @@ import {
   users,
 } from "../../db/schema";
 import { createAccessToken } from "../auth";
-import { random, sample } from "../rand";
+import { choose, random, sample } from "../rand";
 import { defaultTags } from "../tags";
 
 export const User = async ({ ...data }: Partial<NewUser> = {}) => {
@@ -88,6 +88,16 @@ export const Bottle = async ({
     .insert(bottles)
     .values({
       name: faker.music.songName(),
+      category: choose([
+        "blend",
+        "bourbon",
+        "rye",
+        "single_grain",
+        "single_malt",
+        "spirit",
+        undefined,
+      ]),
+      statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
       ...data,
       brandId: data.brandId || (await Entity()).id,
       createdById: data.createdById || (await User()).id,
@@ -122,6 +132,7 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
         rating: faker.datatype.float({ min: 1, max: 5 }),
         tags: sample(defaultTags, random(1, 5)),
         ...data,
+
         bottleId: data.bottleId || (await Bottle()).id,
         createdById: data.createdById || (await User()).id,
       })
