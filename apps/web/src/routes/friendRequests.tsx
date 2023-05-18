@@ -14,7 +14,7 @@ export default function FriendRequests() {
     data: { results: followerList },
   } = useSuspenseQuery(
     ["followers"],
-    (): Promise<Paginated<FollowRequest>> => api.get("/users/me/followers"),
+    (): Promise<Paginated<FollowRequest>> => api.get("/followers"),
   );
 
   const [theirFollowStatus, setTheirFollowStatus] = useState<
@@ -26,7 +26,7 @@ export default function FriendRequests() {
   >(Object.fromEntries(followerList.map((r) => [r.user.id, r.followsBack])));
 
   const acceptRequest = async (id: string) => {
-    const data = await api.put(`/users/me/followers/${id}`, {
+    const data = await api.put(`/followers/${id}`, {
       data: { action: "accept" },
     });
     setTheirFollowStatus((state) => ({
