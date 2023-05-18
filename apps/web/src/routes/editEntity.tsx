@@ -26,6 +26,7 @@ export default function EditEntity() {
   const { data: entity } = useSuspenseQuery(
     ["entity", entityId],
     (): Promise<Entity> => api.get(`/entities/${entityId}`),
+    { cacheTime: 0 },
   );
 
   const entityTypes = [

@@ -39,6 +39,7 @@ export default function EditBottle() {
   const { data: bottle } = useSuspenseQuery(
     ["bottles", bottleId],
     (): Promise<Bottle> => api.get(`/bottles/${bottleId}`),
+    { cacheTime: 0 },
   );
 
   const [formData, setFormData] = useState<FormData>({
