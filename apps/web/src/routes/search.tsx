@@ -188,6 +188,7 @@ export default function Search() {
   const [bottleResults, setBottleResults] = useState<readonly Bottle[]>([]);
   const [userResults, setUserResults] = useState<readonly User[]>([]);
   const [entityResults, setEntityResults] = useState<readonly Entity[]>([]);
+  const isUserQuery = query.indexOf("@") !== -1;
 
   const fetch = debounce(async (query: string) => {
     // union results from various apis
@@ -196,7 +197,6 @@ export default function Search() {
     // - bottles
     // - entities
     // (but prioritize exact matches)
-
     if (directToTasting) {
       setUserResults([]);
       setEntityResults([]);
@@ -208,7 +208,7 @@ export default function Search() {
           setBottleResults(results);
           if (state !== "ready") setState("ready");
         });
-    } else if (query.indexOf("@") !== -1) {
+    } else if (isUserQuery) {
       setBottleResults([]);
       setEntityResults([]);
       await api
@@ -328,6 +328,36 @@ export default function Search() {
           </>
         ) : (
           <>
+            {!isUserQuery &&
+              (bottleResults.length < maxResults || query !== "") && (
+                <ListItem>
+                  <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold leading-6">
+                      <Link to={`/addBottle`}>
+                        <span className="absolute inset-x-0 -top-px bottom-0" />
+                        Can't find a bottle?
+                      </Link>
+                    </p>
+                    <p className="text-peated-light mt-1 flex gap-x-1 leading-5">
+                      {query !== "" ? (
+                        <span>
+                          Tap here to add{" "}
+                          <strong className="truncate">
+                            {toTitleCase(query)}
+                          </strong>{" "}
+                          to the database.
+                        </span>
+                      ) : (
+                        <span>
+                          Tap here to add a new entry to the database.
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </ListItem>
+              )}
             {results.map((result) => {
               return (
                 <ListItem key={`${result.type}-${result.ref.id}`}>
@@ -338,33 +368,6 @@ export default function Search() {
                 </ListItem>
               );
             })}
-            {(bottleResults.length < maxResults || query !== "") && (
-              <ListItem>
-                <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
-
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold leading-6">
-                    <Link to={`/addBottle?name=${encodeURIComponent(query)}`}>
-                      <span className="absolute inset-x-0 -top-px bottom-0" />
-                      Can't find a bottle?
-                    </Link>
-                  </p>
-                  <p className="text-peated-light mt-1 flex gap-x-1 leading-5">
-                    {query !== "" ? (
-                      <span>
-                        Tap here to add{" "}
-                        <strong className="truncate">
-                          {toTitleCase(query)}
-                        </strong>{" "}
-                        to the database.
-                      </span>
-                    ) : (
-                      <span>Tap here to add a new entry to the database.</span>
-                    )}
-                  </p>
-                </div>
-              </ListItem>
-            )}
           </>
         )}
       </ul>

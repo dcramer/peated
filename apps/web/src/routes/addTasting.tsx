@@ -1,6 +1,5 @@
 import { FormEvent, useState } from "react";
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import BottleCard from "../components/bottleCard";
@@ -14,31 +13,14 @@ import { Option } from "../components/selectField";
 import TagsField from "../components/tagsField";
 import TextAreaField from "../components/textAreaField";
 import TextField from "../components/textField";
+import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api, { ApiError } from "../lib/api";
 import { toTitleCase } from "../lib/strings";
-import type { Bottle } from "../types";
+import type { Bottle, Paginated } from "../types";
 
-type Flavor = {
+type Tag = {
   name: string;
   count: number;
-};
-
-type LoaderData = {
-  bottle: Bottle;
-  flavorList: Flavor[];
-};
-
-export const loader: LoaderFunction = async ({
-  params: { bottleId },
-}): Promise<LoaderData> => {
-  if (!bottleId) throw new Error("Missing bottleId");
-  const bottle = await api.get(`/bottles/${bottleId}`);
-
-  const { results: flavorList } = await api.get(
-    `/bottles/${bottleId}/suggestedTags`,
-  );
-
-  return { bottle, flavorList };
 };
 
 type FormData = {
@@ -52,7 +34,19 @@ type FormData = {
 };
 
 export default function AddTasting() {
-  const { bottle, flavorList } = useLoaderData() as LoaderData;
+  const { bottleId } = useParams();
+  const { data: bottle } = useSuspenseQuery(
+    ["bottles", bottleId],
+    (): Promise<Bottle> => api.get(`/bottles/${bottleId}`),
+  );
+
+  const {
+    data: { results: flavorList },
+  } = useSuspenseQuery(
+    ["bottles", bottleId, "suggestedTags"],
+    (): Promise<Paginated<Tag>> =>
+      api.get(`/bottles/${bottleId}/suggestedTags`),
+  );
 
   const navigate = useNavigate();
 

@@ -44,24 +44,26 @@ export default function Profile() {
         <div className="flex w-full justify-center sm:w-auto sm:justify-start">
           <UserAvatar user={user} size={150} />
         </div>
-        <div className="flex w-full flex-col justify-center px-4 sm:w-auto sm:flex-1">
-          <h3 className="mb-2 self-center text-4xl font-semibold leading-normal text-white sm:self-start">
+        <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-1 sm:gap-y-2">
+          <h3 className="self-center text-4xl font-semibold leading-normal text-white sm:self-start">
             {user.displayName}
           </h3>
-          <div className="text-light self-center sm:self-start">
-            <AtSymbolIcon className=" mr-[1px] inline h-4 w-4" />
-            {user.username}
-          </div>
-          <div className="mb-4 self-center sm:self-start">
-            {user.admin ? (
-              <Chip size="small" color="highlight">
-                Admin
-              </Chip>
-            ) : user.mod ? (
-              <Chip size="small" color="highlight">
-                Moderator
-              </Chip>
-            ) : null}
+          <div className="text-light flex flex-col items-center gap-x-2 gap-y-2 self-center sm:flex-row sm:self-start">
+            <div>
+              <AtSymbolIcon className=" mr-[1px] inline h-4 w-4" />
+              {user.username}
+            </div>
+            <div>
+              {user.admin ? (
+                <Chip size="small" color="highlight">
+                  Admin
+                </Chip>
+              ) : user.mod ? (
+                <Chip size="small" color="highlight">
+                  Moderator
+                </Chip>
+              ) : null}
+            </div>
           </div>
           <div className="flex justify-center sm:justify-start">
             <div className="mr-4 pr-3 text-center">

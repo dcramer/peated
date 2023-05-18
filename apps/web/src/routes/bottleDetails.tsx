@@ -1,5 +1,4 @@
-import type { LoaderFunction } from "react-router-dom";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
@@ -10,6 +9,7 @@ import Layout from "../components/layout";
 import TastingList from "../components/tastingList";
 import TimeSince from "../components/timeSince";
 import useAuth from "../hooks/useAuth";
+import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
 import type { Bottle, Paginated, Tasting } from "../types";
@@ -20,26 +20,22 @@ type BottleWithStats = Bottle & {
   people: number;
 };
 
-type LoaderData = {
-  bottle: BottleWithStats;
-  tastingList: Paginated<Tasting>;
-};
-
-export const loader: LoaderFunction = async ({
-  params: { bottleId },
-}): Promise<LoaderData> => {
-  if (!bottleId) throw new Error("Missing bottleId");
-  const bottle = await api.get(`/bottles/${bottleId}`);
-  const tastingList = await api.get(`/tastings`, {
-    query: { bottle: bottle.id },
-  });
-
-  return { bottle, tastingList };
-};
-
 export default function BottleDetails() {
-  const { bottle, tastingList } = useLoaderData() as LoaderData;
   const { user: currentUser } = useAuth();
+
+  const { bottleId } = useParams();
+  const { data: bottle } = useSuspenseQuery(
+    ["bottles", bottleId],
+    (): Promise<BottleWithStats> => api.get(`/bottles/${bottleId}`),
+  );
+
+  const { data: tastingList } = useSuspenseQuery(
+    ["bottle", bottleId, "tastings"],
+    (): Promise<Paginated<Tasting>> =>
+      api.get(`/tastings`, {
+        query: { bottle: bottleId },
+      }),
+  );
 
   const stats = [
     {

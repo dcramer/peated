@@ -53,7 +53,7 @@ export default function FormHeader({
               "rounded p-2.5 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
               saveDisabled
                 ? "bg-peated-dark text-peated"
-                : "bg-peated-dark group-hover:bg-peated-dark focus-visible:outline-peated text-white",
+                : "group-hover:text-highlight focus-visible:outline-peatedt bg-slate-950 text-white",
             )}
           >
             Save

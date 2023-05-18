@@ -1,6 +1,7 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { useQueries } from "@tanstack/react-query";
 import { PreviewBottleCard } from "../components/bottleCard";
 import BrandField from "../components/brandField";
 import DistillerField from "../components/distillerField";
@@ -13,6 +14,7 @@ import TextField from "../components/textField";
 import { useRequiredAuth } from "../hooks/useAuth";
 import api, { ApiError } from "../lib/api";
 import { formatCategoryName, toTitleCase } from "../lib/strings";
+import { Entity } from "../types";
 
 type FormData = {
   name: string;
@@ -22,6 +24,18 @@ type FormData = {
   category?: Option;
 };
 
+const categoryList = [
+  "blend",
+  "bourbon",
+  "rye",
+  "single_grain",
+  "single_malt",
+  "spirit",
+].map((c) => ({
+  id: c,
+  name: formatCategoryName(c),
+}));
+
 export default function AddBottle() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -30,21 +44,59 @@ export default function AddBottle() {
   const qs = new URLSearchParams(location.search);
   const name = toTitleCase(qs.get("name") || "");
 
+  const distiller = qs.get("distiller") || null;
+  const brand = qs.get("brand") || null;
+
+  const needsToLoad = Boolean(distiller || brand);
+  const [loading, setLoading] = useState<boolean>(needsToLoad);
+
+  const queries = [];
+  const queryOrder: string[] = [];
+  if (distiller) {
+    queryOrder.push("distiller");
+    queries.push({
+      queryKey: ["entity", distiller],
+      queryFn: async (): Promise<Entity> => {
+        return await api.get(`/entities/${distiller}`);
+      },
+    });
+  }
+  if (brand) {
+    queryOrder.push("brand");
+    queries.push({
+      queryKey: ["entity", brand],
+      queryFn: async (): Promise<Entity> => {
+        return await api.get(`/entities/${brand}`);
+      },
+    });
+  }
+
+  const initialQueries = useQueries({
+    queries: queries,
+  });
+
+  const getQueryResult = (name: string): Entity | undefined => {
+    const index = queryOrder.indexOf(name);
+    if (index === -1) return undefined;
+    return initialQueries[index].data;
+  };
+
+  useEffect(() => {
+    if (loading && !initialQueries.find((q) => q.isLoading)) {
+      const distiller = getQueryResult("distiller");
+      const brand = getQueryResult("brand");
+      setFormData((formData) => ({
+        ...formData,
+        distillers: distiller ? [distiller] : [],
+        brand: brand,
+      }));
+      setLoading(false);
+    }
+  }, [initialQueries.find((q) => q.isLoading)]);
+
   const [formData, setFormData] = useState<Partial<FormData>>({
     name,
   });
-
-  const categoryList = [
-    "blend",
-    "bourbon",
-    "rye",
-    "single_grain",
-    "single_malt",
-    "spirit",
-  ].map((c) => ({
-    id: c,
-    name: formatCategoryName(c),
-  }));
 
   const [error, setError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
@@ -98,7 +150,7 @@ export default function AddBottle() {
           <PreviewBottleCard data={formData} />
         </div>
 
-        <Fieldset>
+        <Fieldset loading={loading}>
           <BrandField
             label="Brand"
             name="brand"

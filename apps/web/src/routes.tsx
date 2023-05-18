@@ -4,17 +4,13 @@ import ErrorPage from "./error-page";
 import About from "./routes/about";
 import Activity from "./routes/activity";
 import AddBottle from "./routes/addBottle";
-import AddTasting, { loader as addTastingLoader } from "./routes/addTasting";
-import BottleDetails, {
-  loader as bottleDetailsLoader,
-} from "./routes/bottleDetails";
+import AddTasting from "./routes/addTasting";
+import BottleDetails from "./routes/bottleDetails";
 import BottleList from "./routes/bottles";
-import EditBottle, { loader as editBottleLoader } from "./routes/editBottle";
-import EditEntity, { loader as editEntityLoader } from "./routes/editEntity";
-import EntityList, { loader as entityListLoader } from "./routes/entities";
-import EntityDetails, {
-  loader as entityDetailsLoader,
-} from "./routes/entityDetails";
+import EditBottle from "./routes/editBottle";
+import EditEntity from "./routes/editEntity";
+import EntityList from "./routes/entities";
+import EntityDetails from "./routes/entityDetails";
 import Followers from "./routes/followers";
 import Following from "./routes/following";
 import { default as Friends } from "./routes/friends";
@@ -25,7 +21,7 @@ import ProfileActivity from "./routes/profileActivity";
 import ProfileCollections from "./routes/profileCollections";
 import Root from "./routes/root";
 import Search from "./routes/search";
-import Settings, { loader as settingsLoader } from "./routes/settings";
+import Settings from "./routes/settings";
 import TastingDetails from "./routes/tastingDetails";
 
 export default function createRoutes() {
@@ -43,12 +39,10 @@ export default function createRoutes() {
         {
           path: "bottles/:bottleId",
           element: <BottleDetails />,
-          loader: bottleDetailsLoader,
         },
         {
           path: "bottles/:bottleId/addTasting",
           element: <AddTasting />,
-          loader: addTastingLoader,
         },
         {
           path: "bottles/",
@@ -57,22 +51,18 @@ export default function createRoutes() {
         {
           path: "bottles/:bottleId/edit",
           element: <EditBottle />,
-          loader: editBottleLoader,
         },
         {
           path: "entities",
           element: <EntityList />,
-          loader: entityListLoader,
         },
         {
           path: "entities/:entityId",
           element: <EntityDetails />,
-          loader: entityDetailsLoader,
         },
         {
           path: "entities/:entityId/edit",
           element: <EditEntity />,
-          loader: editEntityLoader,
         },
         {
           path: "friends",
@@ -103,7 +93,6 @@ export default function createRoutes() {
         {
           path: "settings",
           element: <Settings />,
-          loader: settingsLoader,
         },
         {
           path: "users/:userId",

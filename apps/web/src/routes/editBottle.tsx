@@ -1,6 +1,5 @@
 import { FormEvent, useState } from "react";
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { PreviewBottleCard } from "../components/bottleCard";
 import BrandField from "../components/brandField";
@@ -12,22 +11,10 @@ import Layout from "../components/layout";
 import SelectField, { Option } from "../components/selectField";
 import TextField from "../components/textField";
 import { useRequiredAuth } from "../hooks/useAuth";
+import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api, { ApiError } from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
 import { Bottle } from "../types";
-
-type LoaderData = {
-  bottle: Bottle;
-};
-
-export const loader: LoaderFunction = async ({
-  params: { bottleId },
-}): Promise<LoaderData> => {
-  if (!bottleId) throw new Error("Missing bottleId");
-  const bottle = await api.get(`/bottles/${bottleId}`);
-
-  return { bottle };
-};
 
 type FormData = {
   name?: string;
@@ -47,7 +34,12 @@ const entityToOption = (entity: any) => {
 export default function EditBottle() {
   const navigate = useNavigate();
   const { user } = useRequiredAuth();
-  const { bottle } = useLoaderData() as LoaderData;
+
+  const { bottleId } = useParams();
+  const { data: bottle } = useSuspenseQuery(
+    ["bottles", bottleId],
+    (): Promise<Bottle> => api.get(`/bottles/${bottleId}`),
+  );
 
   const [formData, setFormData] = useState<FormData>({
     name: bottle.name,

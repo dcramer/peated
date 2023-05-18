@@ -1,5 +1,4 @@
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { FormEvent, useState } from "react";
 import Fieldset from "../components/fieldset";
@@ -9,21 +8,9 @@ import ImageField from "../components/imageField";
 import Layout from "../components/layout";
 import TextField from "../components/textField";
 import { useRequiredAuth } from "../hooks/useAuth";
+import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api, { ApiError } from "../lib/api";
 import type { User } from "../types";
-
-type LoaderData = {
-  user: User;
-};
-
-// TODO: when this executes the apiClient has not configured
-// its token yet as react-dom (thus context) seemingly has
-// not rendered.. so this errors out
-export const loader: LoaderFunction = async (): Promise<LoaderData> => {
-  const user = await api.get(`/users/me`);
-
-  return { user };
-};
 
 type FormData = {
   username: string;
@@ -32,8 +19,14 @@ type FormData = {
 };
 
 export default function Settings() {
-  const { user } = useLoaderData() as LoaderData;
   const { updateUser } = useRequiredAuth();
+
+  const { data: user } = useSuspenseQuery(
+    ["user"],
+    (): Promise<User> => api.get(`/users/me`),
+    { cacheTime: 0 },
+  );
+
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     username: user.username,

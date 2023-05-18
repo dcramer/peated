@@ -1,6 +1,5 @@
 import { FormEvent, useState } from "react";
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import CountryField from "../components/countryField";
 import Fieldset from "../components/fieldset";
@@ -9,22 +8,9 @@ import FormHeader from "../components/formHeader";
 import Layout from "../components/layout";
 import SelectField, { Option } from "../components/selectField";
 import TextField from "../components/textField";
-import { useRequiredAuth } from "../hooks/useAuth";
+import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api, { ApiError } from "../lib/api";
 import { Entity } from "../types";
-
-type LoaderData = {
-  entity: Entity;
-};
-
-export const loader: LoaderFunction = async ({
-  params: { entityId },
-}): Promise<LoaderData> => {
-  if (!entityId) throw new Error("Missing brandId");
-  const entity = await api.get(`/entities/${entityId}`);
-
-  return { entity };
-};
 
 type FormData = {
   name?: string;
@@ -35,8 +21,12 @@ type FormData = {
 
 export default function EditEntity() {
   const navigate = useNavigate();
-  const { user } = useRequiredAuth();
-  const { entity } = useLoaderData() as LoaderData;
+
+  const { entityId } = useParams();
+  const { data: entity } = useSuspenseQuery(
+    ["entity", entityId],
+    (): Promise<Entity> => api.get(`/entities/${entityId}`),
+  );
 
   const entityTypes = [
     { id: "brand", name: "Brand" },

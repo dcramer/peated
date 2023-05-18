@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { Entity } from "../types";
+import { Entity, PagingRel } from "../types";
 import Button from "./button";
 import Chip from "./chip";
 
@@ -9,12 +9,7 @@ export default ({
   rel,
 }: {
   entityList: Entity[];
-  rel?: {
-    next: string | null;
-    nextPage: number | null;
-    prev: string | null;
-    prevPage: number | null;
-  };
+  rel?: PagingRel;
 }) => {
   return (
     <>

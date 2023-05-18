@@ -1,5 +1,4 @@
-import type { LoaderFunction } from "react-router-dom";
-import { useLoaderData } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
@@ -9,28 +8,27 @@ import Button from "../components/button";
 import Chip from "../components/chip";
 import Layout from "../components/layout";
 import useAuth from "../hooks/useAuth";
+import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
-import type { Bottle, Entity } from "../types";
-
-type LoaderData = {
-  entity: Entity;
-  bottleList: Bottle[];
-};
-
-export const loader: LoaderFunction = async ({
-  params: { entityId },
-}): Promise<LoaderData> => {
-  if (!entityId) throw new Error("Missing entityId");
-  const entity = await api.get(`/entities/${entityId}`);
-  const { results: bottleList } = await api.get(`/bottles`, {
-    query: { entity: entity.id },
-  });
-
-  return { entity, bottleList };
-};
+import type { Bottle, Entity, Paginated } from "../types";
 
 export default function EntityDetails() {
-  const { entity, bottleList } = useLoaderData() as LoaderData;
+  const { entityId } = useParams();
+  const { data: entity } = useSuspenseQuery(
+    ["entity", entityId],
+    (): Promise<Entity> => api.get(`/entities/${entityId}`),
+  );
+
+  const {
+    data: { results: bottleList },
+  } = useSuspenseQuery(
+    ["entity", entityId, "bottles"],
+    (): Promise<Paginated<Bottle>> =>
+      api.get(`/bottles`, {
+        query: { entity: entityId },
+      }),
+  );
+
   const { user: currentUser } = useAuth();
 
   const stats = [
@@ -59,12 +57,27 @@ export default function EntityDetails() {
       </div>
 
       <div className="my-8 flex justify-center gap-4 sm:justify-start">
+        <Button
+          to={`/addBottle?${
+            entity.type.indexOf("brand") !== -1 ? `brand=${entity.id}&` : ""
+          }${
+            entity.type.indexOf("distiller") !== -1
+              ? `distiller=${entity.id}`
+              : ""
+          }${
+            entity.type.indexOf("bottler") !== -1 ? `bottler=${entity.id}` : ""
+          }`}
+          color="primary"
+        >
+          Add a Bottle
+        </Button>
+
         {currentUser?.mod && (
           <Menu as="div" className="menu">
             <Menu.Button as={Button}>
               <EllipsisVerticalIcon className="h-5 w-5" />
             </Menu.Button>
-            <Menu.Items className="absolute left-0 z-10 mt-2 w-64 origin-top-left">
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
               <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
                 Edit Entity
               </Menu.Item>

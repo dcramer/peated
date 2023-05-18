@@ -14,6 +14,8 @@ export type Category =
   | "single_malt"
   | "spirit";
 
+export type EntityType = "brand" | "distiller" | "bottler";
+
 // e.g. Hibiki
 export type Entity = {
   id: string;
@@ -22,7 +24,7 @@ export type Entity = {
   country?: string;
   // e.g. Speyside
   region?: string;
-  type: ("brand" | "distiller")[];
+  type: EntityType[];
   totalBottles: number;
   totalTastings: number;
   createdAt: string;

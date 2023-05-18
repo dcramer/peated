@@ -129,7 +129,7 @@ export default ({
                   />
 
                   <div className="flex min-w-0 flex-auto items-center">
-                    <p className="font-semibold leading-6 text-white">
+                    <div className="font-semibold leading-6 text-white">
                       <button
                         onClick={() => {
                           selectOption(option);
@@ -138,8 +138,7 @@ export default ({
                         <span className="absolute inset-x-0 -top-px bottom-0" />
                         {option.name}
                       </button>
-                    </p>
-                    <p className="mt-1 flex truncate text-xs leading-5 text-gray-500"></p>
+                    </div>
                   </div>
                 </ListItem>
               );
