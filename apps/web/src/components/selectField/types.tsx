@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 export type Option = {
   id?: string | null;
   name: string;
+  count?: number;
   [key: string]: any;
 };
 

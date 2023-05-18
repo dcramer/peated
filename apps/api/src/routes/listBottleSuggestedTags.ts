@@ -3,6 +3,8 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { bottles, tastings } from "../db/schema";
+import { shuffle } from "../lib/rand";
+import { defaultTags } from "../lib/tags";
 
 export default {
   method: "GET",
@@ -48,8 +50,10 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    const tags = await db.execute(
-      sql<{ name: string; count: string }>`SELECT name, COUNT(name) as count
+    const usedTags = Object.fromEntries(
+      (
+        await db.execute(
+          sql<{ name: string; count: string }>`SELECT name, COUNT(name) as count
         FROM (
           SELECT unnest(${tastings.tags}) as name
           FROM ${tastings}
@@ -59,13 +63,22 @@ export default {
         GROUP BY name
         ORDER BY count DESC
         LIMIT 100`,
+        )
+      ).rows.map((t) => [t.name, parseInt(t.count as string, 10)]),
     );
 
+    const results = shuffle(defaultTags)
+      .map((t) => ({
+        name: t,
+        count: usedTags[t] || 0,
+      }))
+      .sort((a, b) => {
+        const delta = b.count - a.count;
+        if (delta == 0) if (a.count < b.count) return a.count;
+      });
+
     res.send({
-      results: tags.rows.map((t) => ({
-        name: t.name,
-        count: parseInt(t.count as string, 10),
-      })),
+      results,
     });
   },
 } as RouteOptions<

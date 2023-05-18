@@ -100,6 +100,9 @@ export default ({
   const [previousValues, setPreviousValues] = useState<Option[]>(value);
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  if (!suggestedOptions.length)
+    suggestedOptions = options.slice(0, targetOptions);
+
   const toggleOption = (option: Option) => {
     setPreviousValues(filterDupes([option], previousValues));
     if (value.find((i) => i.id == option.id && i.name == option.name)) {

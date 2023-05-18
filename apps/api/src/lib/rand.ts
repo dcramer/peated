@@ -20,3 +20,24 @@ export function sample<T>(choices: T[], num: number): T[] {
   }
   return samples.slice(0, num);
 }
+
+export function shuffle<T>(choices: T[]): T[] {
+  const value = [...choices];
+  let currentIndex = choices.length,
+    randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex != 0) {
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [value[currentIndex], value[randomIndex]] = [
+      value[randomIndex],
+      value[currentIndex],
+    ];
+  }
+
+  return value;
+}

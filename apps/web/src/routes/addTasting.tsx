@@ -9,8 +9,7 @@ import FormHeader from "../components/formHeader";
 import ImageField from "../components/imageField";
 import Layout from "../components/layout";
 import RangeField from "../components/rangeField";
-import { Option } from "../components/selectField";
-import TagsField from "../components/tagsField";
+import SelectField from "../components/selectField";
 import TextAreaField from "../components/textAreaField";
 import TextField from "../components/textField";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
@@ -41,7 +40,7 @@ export default function AddTasting() {
   );
 
   const {
-    data: { results: flavorList },
+    data: { results: suggestedTags },
   } = useSuspenseQuery(
     ["bottles", bottleId, "suggestedTags"],
     (): Promise<Paginated<Tag>> =>
@@ -137,12 +136,14 @@ export default function AddTasting() {
             placeholder="Is it peated?"
           />
 
-          <TagsField
+          <SelectField
             label="Flavors"
             name="tags"
-            suggestedOptions={flavorList.map<Option>((f) => ({
-              id: f.name,
-              name: f.name,
+            targetOptions={5}
+            options={suggestedTags.map((t) => ({
+              id: t.name,
+              name: toTitleCase(t.name),
+              count: t.count,
             }))}
             onChange={(value) =>
               setFormData({ ...formData, tags: value.map((t: any) => t.id) })
