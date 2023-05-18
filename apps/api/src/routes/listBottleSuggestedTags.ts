@@ -50,7 +50,7 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    const usedTags = Object.fromEntries(
+    const usedTags: Record<string, number> = Object.fromEntries(
       (
         await db.execute(
           sql<{ name: string; count: string }>`SELECT name, COUNT(name) as count
@@ -72,10 +72,7 @@ export default {
         name: t,
         count: usedTags[t] || 0,
       }))
-      .sort((a, b) => {
-        const delta = b.count - a.count;
-        if (delta == 0) if (a.count < b.count) return a.count;
-      });
+      .sort((a, b) => b.count - a.count);
 
     res.send({
       results,

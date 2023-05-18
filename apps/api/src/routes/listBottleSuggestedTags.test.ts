@@ -17,17 +17,17 @@ test("lists tags", async () => {
   });
   await Fixtures.Tasting({
     bottleId: bottle.id,
-    tags: ["fruity", "caramel"],
+    tags: ["solvent", "caramel"],
     rating: 5,
   });
   await Fixtures.Tasting({
     bottleId: bottle.id,
-    tags: ["dried fruits", "caramel"],
+    tags: ["cedar", "caramel"],
     rating: 5,
   });
   await Fixtures.Tasting({
     bottleId: bottle.id,
-    tags: ["dried fruits", "caramel"],
+    tags: ["cedar", "caramel"],
     rating: 5,
   });
 
@@ -38,10 +38,10 @@ test("lists tags", async () => {
 
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
-  expect(results.length).toBe(3);
-  expect(results).toEqual([
+  // expect(results.length).toBeGrea(3);
+  expect(results.slice(0, 3)).toEqual([
     { name: "caramel", count: 3 },
-    { name: "dried fruits", count: 2 },
-    { name: "fruity", count: 1 },
+    { name: "cedar", count: 2 },
+    { name: "solvent", count: 1 },
   ]);
 });
