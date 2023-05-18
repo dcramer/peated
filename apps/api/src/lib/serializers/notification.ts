@@ -17,7 +17,6 @@ import { UserSerializer } from "./user";
 
 export const NotificationSerializer: Serializer<Notification> = {
   attrs: async (itemList: Notification[], currentUser: User) => {
-    const itemIds = itemList.map((t) => t.id);
     const fromUserIds = itemList
       .filter((i) => !!i.fromUserId)
       .map<number>((i) => i.fromUserId as number);
@@ -76,7 +75,7 @@ export const NotificationSerializer: Serializer<Notification> = {
             tasting: tastings,
           })
           .from(tastings)
-          .innerJoin(toasts, eq(tastings.id, comments.tastingId))
+          .innerJoin(comments, eq(tastings.id, comments.tastingId))
           .where(inArray(comments.id, commentIdList))
       : [];
     const commentsById = Object.fromEntries(

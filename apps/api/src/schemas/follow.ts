@@ -4,14 +4,13 @@ export const followingSchema = {
   required: ["id", "status", "createdAt", "user", "followsBack"],
   properties: {
     id: { type: "string" },
-    status: { $ref: "#/$defs/status" },
+    status: {
+      type: "string",
+      enum: ["pending", "following", "none"],
+    },
     createdAt: { type: "string" },
     user: { $ref: "/schemas/user" },
-    followsBack: { $ref: "#/$defs/status" },
-  },
-
-  $defs: {
-    status: {
+    followsBack: {
       type: "string",
       enum: ["pending", "following", "none"],
     },

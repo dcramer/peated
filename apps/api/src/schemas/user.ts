@@ -1,7 +1,7 @@
 export const userSchema = {
   $id: "/schemas/user",
   type: "object",
-  required: ["id", "displayName", "username"],
+  required: ["id", "displayName", "username", "pictureUrl"],
   properties: {
     id: { type: "string" },
     displayName: { type: "string" },
@@ -10,6 +10,11 @@ export const userSchema = {
     admin: { type: "boolean" },
     mod: { type: "boolean" },
     createdAt: { type: "string" },
+    pictureUrl: { type: "string" },
+    followStatus: {
+      type: "string",
+      enum: ["pending", "following", "none"],
+    },
   },
 };
 

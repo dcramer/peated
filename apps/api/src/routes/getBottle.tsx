@@ -21,7 +21,6 @@ export default {
       200: {
         type: "object",
         allOf: [{ $ref: "/schemas/bottle" }],
-        // $ref: "bottleSchema",
         properties: {
           avgRating: { type: "number" },
           tastings: { type: "number" },

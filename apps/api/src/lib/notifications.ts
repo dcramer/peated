@@ -44,7 +44,12 @@ export const createNotification = async (
       "You should not create notifications to and from the same user.",
     );
   }
-  await db.insert(notifications).values(notification).onConflictDoNothing();
+  const [notif] = await db
+    .insert(notifications)
+    .values(notification)
+    .onConflictDoNothing()
+    .returning();
+  return notif;
 };
 
 export const deleteNotification = async (
