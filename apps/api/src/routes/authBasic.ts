@@ -6,7 +6,8 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { createAccessToken } from "../lib/auth";
-import { serializeUser } from "../lib/serializers/user";
+import { serialize } from "../lib/serializers";
+import { UserSerializer } from "../lib/serializers/user";
 
 export default {
   method: "POST",
@@ -18,6 +19,19 @@ export default {
       properties: {
         email: { type: "string" },
         password: { type: "string" },
+      },
+    },
+    response: {
+      200: {
+        type: "object",
+        required: ["user", "accessToken"],
+        properties: {
+          user: { $ref: "/schemas/user" },
+          accessToken: { type: "string" },
+        },
+      },
+      401: {
+        $ref: "/errors/401",
       },
     },
   },
@@ -42,7 +56,7 @@ export default {
     }
 
     return res.send({
-      user: serializeUser(user, user),
+      user: await serialize(UserSerializer, user, req.user),
       accessToken: await createAccessToken(user),
     });
   },

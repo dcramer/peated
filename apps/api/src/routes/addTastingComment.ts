@@ -5,6 +5,8 @@ import { db, first } from "../db";
 import { Comment, NewComment, comments, tastings } from "../db/schema";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { createNotification, objectTypeFromSchema } from "../lib/notifications";
+import { serialize } from "../lib/serializers";
+import { CommentSerializer } from "../lib/serializers/comment";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -19,11 +21,11 @@ export default {
       },
     },
     body: {
-      type: "object",
-      required: ["comment"],
-      properties: {
-        comment: { type: "string" },
-        createdAt: { type: "string" },
+      $ref: "/schemas/newComment",
+    },
+    response: {
+      201: {
+        $ref: "/schemas/comment",
       },
     },
   },
@@ -85,7 +87,7 @@ export default {
 
     if (!comment) return res.status(409).send({});
 
-    res.status(200).send(comment);
+    res.status(200).send(serialize(CommentSerializer, comment, req.user));
   },
 } as RouteOptions<
   Server,

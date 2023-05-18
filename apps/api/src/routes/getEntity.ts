@@ -3,6 +3,8 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { entities } from "../db/schema";
+import { serialize } from "../lib/serializers";
+import { EntitySerializer } from "../lib/serializers/entity";
 
 export default {
   method: "GET",
@@ -15,6 +17,11 @@ export default {
         entityId: { type: "number" },
       },
     },
+    response: {
+      200: {
+        $ref: "/schemas/entity",
+      },
+    },
   },
   handler: async (req, res) => {
     const [entity] = await db
@@ -24,8 +31,7 @@ export default {
     if (!entity) {
       return res.status(404).send({ error: "Not found" });
     }
-
-    res.send(entity);
+    res.send(await serialize(EntitySerializer, entity, req.user));
   },
 } as RouteOptions<
   Server,

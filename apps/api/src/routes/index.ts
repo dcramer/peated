@@ -23,7 +23,7 @@ import listCollections from "./listCollections";
 import listComments from "./listComments";
 import listEntities from "./listEntities";
 import listFollowers from "./listFollowers";
-import listFriends from "./listFriends";
+import listFollowing from "./listFollowing";
 import listNotifications from "./listNotifications";
 import listTastings from "./listTastings";
 import listUsers from "./listUsers";
@@ -81,7 +81,9 @@ export const router: FastifyPluginCallback = (
   fastify.route(addTastingToast);
   fastify.route(addTastingComment);
 
-  fastify.route(listFriends);
+  fastify.route(listFollowers);
+  fastify.route(updateFollower);
+  fastify.route(listFollowing);
 
   fastify.route(listUsers);
   fastify.route(getUser);
@@ -89,8 +91,6 @@ export const router: FastifyPluginCallback = (
   fastify.route(updateUserAvatar);
   fastify.route(addUserFollow);
   fastify.route(deleteUserFollow);
-  fastify.route(listFollowers);
-  fastify.route(updateFollower);
 
   fastify.route(listCollections);
 

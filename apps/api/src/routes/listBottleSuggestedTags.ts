@@ -15,6 +15,28 @@ export default {
         bottleId: { type: "number" },
       },
     },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          results: {
+            type: "array",
+            items: {
+              type: "object",
+              required: ["name", "count"],
+              properties: {
+                name: { type: "string" },
+                count: { type: "number" },
+              },
+            },
+          },
+          rel: {
+            type: "object",
+            $ref: "/schemas/paging",
+          },
+        },
+      },
+    },
   },
   handler: async (req, res) => {
     const [bottle] = await db

@@ -4,6 +4,8 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { collections } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
+import { serialize } from "../lib/serializers";
+import { CollectionSerializer } from "../lib/serializers/collection";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -15,6 +17,23 @@ export default {
       properties: {
         page: { type: "number" },
         user: { oneOf: [{ type: "number" }, { const: "me" }] },
+      },
+    },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          results: {
+            type: "array",
+            items: {
+              $ref: "/schemas/collection",
+            },
+          },
+          rel: {
+            type: "object",
+            $ref: "/schemas/paging",
+          },
+        },
       },
     },
   },
@@ -43,10 +62,11 @@ export default {
       .orderBy(asc(collections.name));
 
     res.send({
-      results: results.slice(0, limit).map((collection) => ({
-        id: collection.id,
-        name: collection.name,
-      })),
+      results: await serialize(
+        CollectionSerializer,
+        results.slice(0, limit),
+        req.user,
+      ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
         prevPage: page > 1 ? page - 1 : null,

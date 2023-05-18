@@ -10,6 +10,8 @@ import {
   entities,
 } from "../db/schema";
 import { EntityInput, upsertEntity } from "../lib/db";
+import { serialize } from "../lib/serializers";
+import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireAuth } from "../middleware/auth";
 
 type BottleInput = {
@@ -25,9 +27,12 @@ export default {
   url: "/bottles",
   schema: {
     body: {
-      type: "object",
-      $ref: "bottleSchema",
-      required: ["name", "brand"],
+      $ref: "/schemas/newBottle",
+    },
+    response: {
+      201: {
+        $ref: "/schemas/bottle",
+      },
     },
   },
   preHandler: [requireAuth],
@@ -119,7 +124,7 @@ export default {
       return bottle;
     });
 
-    res.status(201).send(bottle);
+    res.status(201).send(await serialize(BottleSerializer, bottle, req.user));
   },
 } as RouteOptions<
   Server,

@@ -18,6 +18,17 @@ export default {
         tastingId: { type: "number" },
       },
     },
+    response: {
+      200: {
+        type: "object",
+        required: ["imageUrl"],
+        properties: {
+          imageUrl: {
+            type: "string",
+          },
+        },
+      },
+    },
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {

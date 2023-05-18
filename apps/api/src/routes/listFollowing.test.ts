@@ -11,7 +11,7 @@ beforeAll(async () => {
   };
 });
 
-test("lists friends", async () => {
+test("lists following", async () => {
   const follow1 = await Fixtures.Follow({
     fromUserId: DefaultFixtures.user.id,
   });
@@ -19,20 +19,20 @@ test("lists friends", async () => {
 
   const response = await app.inject({
     method: "GET",
-    url: "/friends",
+    url: "/following",
     headers: DefaultFixtures.authHeaders,
   });
 
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].user.id).toBe(follow1.toUserId);
+  expect(results[0].user.id).toBe(`${follow1.toUserId}`);
 });
 
 test("requires auth", async () => {
   const response = await app.inject({
     method: "GET",
-    url: "/friends",
+    url: "/following",
   });
 
   expect(response).toRespondWith(401);

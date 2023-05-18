@@ -43,7 +43,7 @@ export default () => {
   return (
     <div className="m-0 h-0 w-0 p-0">
       {needRefresh && (
-        <div className="fixed bottom-0 right-0 z-10 m-4 rounded border border-gray-400 bg-white p-3 shadow">
+        <div className="border-highlight fixed bottom-0 right-0 z-10 m-4 rounded border bg-slate-950 p-3 text-white shadow">
           <div className="mb-2">
             <span>Update Available</span>
           </div>

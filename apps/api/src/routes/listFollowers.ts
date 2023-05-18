@@ -1,24 +1,17 @@
 import { and, asc, desc, eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { follows, users } from "../db/schema";
+import { follows } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
-import { serializeFollow } from "../lib/serializers/follow";
+import { serialize } from "../lib/serializers";
+import { FollowerSerializer } from "../lib/serializers/follow";
 import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
-  url: "/users/:userId/followers",
+  url: "/followers",
   schema: {
-    params: {
-      type: "object",
-      required: ["userId"],
-      properties: {
-        userId: { oneOf: [{ type: "number" }, { const: "me" }] },
-      },
-    },
     querystring: {
       type: "object",
       properties: {
@@ -27,52 +20,48 @@ export default {
         status: { type: "string", enum: ["pending", "following"] },
       },
     },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          results: {
+            type: "array",
+            items: {
+              $ref: "/schemas/follow",
+            },
+          },
+          rel: {
+            type: "object",
+            $ref: "/schemas/paging",
+          },
+        },
+      },
+    },
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
-    const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
-
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
-
-    if (!user) {
-      return res.status(404).send({ error: "Not found" });
-    }
-
-    if (user.id !== req.user.id && !req.user.admin) {
-      return res.status(403).send({ error: "Forbidden" });
-    }
-
     const page = req.query.page || 1;
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where = [eq(follows.toUserId, user.id)];
+    const where = [eq(follows.toUserId, req.user.id)];
     if (req.query.status) {
       where.push(eq(follows.status, req.query.status));
     }
 
-    const followsBack = alias(follows, "follows_back");
     const results = await db
-      .select({
-        user: users,
-        follow: follows,
-        followsBack: followsBack.status,
-      })
+      .select()
       .from(follows)
       .where(and(...where))
-      .innerJoin(users, eq(users.id, follows.fromUserId))
-      .leftJoin(followsBack, eq(users.id, followsBack.toUserId))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(desc(follows.status), asc(follows.createdAt));
 
     res.send({
-      results: results.slice(0, limit).map(({ user, follow, followsBack }) =>
-        serializeFollow({
-          ...follow,
-          followsBack: followsBack,
-          user,
-        }),
+      results: await serialize(
+        FollowerSerializer,
+        results.slice(0, limit),
+        req.user,
       ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,

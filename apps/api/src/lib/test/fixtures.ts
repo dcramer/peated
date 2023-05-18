@@ -33,7 +33,7 @@ export const User = async ({ ...data }: Partial<NewUser> = {}) => {
       .values({
         displayName: faker.name.firstName(),
         email: faker.internet.email(),
-        username: faker.internet.userName(),
+        username: faker.internet.userName().toLowerCase(),
         admin: false,
         mod: false,
         active: true,
@@ -159,7 +159,7 @@ export const Comment = async ({ ...data }: Partial<NewComment> = {}) => {
 export const AuthToken = async ({ user }: { user?: UserType | null } = {}) => {
   if (!user) user = await User();
 
-  return createAccessToken(user);
+  return await createAccessToken(user);
 };
 
 export const AuthenticatedHeaders = async ({

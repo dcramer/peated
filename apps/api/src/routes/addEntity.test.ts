@@ -71,6 +71,6 @@ test("updates existing entity with new type", async () => {
     .select()
     .from(entities)
     .where(eq(entities.id, data.id));
-  expect(brand.id).toBe(entity.id);
+  expect(brand.id).toEqual(entity.id);
   expect(brand.type).toEqual(["distiller", "brand"]);
 });

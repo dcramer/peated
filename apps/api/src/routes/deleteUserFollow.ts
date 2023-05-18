@@ -34,7 +34,7 @@ export default {
     }
 
     await db.transaction(async (tx) => {
-      await tx
+      const [follow] = await tx
         .update(follows)
         .set({
           status: "none",
@@ -44,12 +44,14 @@ export default {
             eq(follows.fromUserId, req.user.id),
             eq(follows.toUserId, user.id),
           ),
-        );
-      deleteNotification(tx, {
-        objectType: objectTypeFromSchema(follows),
-        objectId: req.user.id,
-        userId: user.id,
-      });
+        )
+        .returning();
+      if (follow)
+        deleteNotification(tx, {
+          objectType: objectTypeFromSchema(follows),
+          objectId: follow.id,
+          userId: user.id,
+        });
     });
 
     res.status(200).send({

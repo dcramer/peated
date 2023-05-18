@@ -3,6 +3,8 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { NewEntity, changes, entities } from "../db/schema";
+import { serialize } from "../lib/serializers";
+import { EntitySerializer } from "../lib/serializers/entity";
 import { requireMod } from "../middleware/auth";
 
 export default {
@@ -10,9 +12,12 @@ export default {
   url: "/entities",
   schema: {
     body: {
-      type: "object",
-      $ref: "entitySchema",
-      required: ["name"],
+      $ref: "/schemas/newEntity",
+    },
+    response: {
+      201: {
+        $ref: "/schemas/entity",
+      },
     },
   },
   preHandler: [requireMod],
@@ -67,7 +72,7 @@ export default {
       return res.status(409).send("Unable to create entity");
     }
 
-    res.status(201).send(entity);
+    res.status(201).send(await serialize(EntitySerializer, entity, req.user));
   },
 } as RouteOptions<
   Server,

@@ -4,7 +4,8 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
-import { serializeUser } from "../lib/serializers/user";
+import { serialize } from "../lib/serializers";
+import { UserSerializer } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -16,6 +17,23 @@ export default {
       properties: {
         query: { type: "string" },
         page: { type: "number" },
+      },
+    },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          results: {
+            type: "array",
+            items: {
+              $ref: "/schemas/user",
+            },
+          },
+          rel: {
+            type: "object",
+            $ref: "/schemas/paging",
+          },
+        },
       },
     },
   },
@@ -53,7 +71,11 @@ export default {
       .orderBy(asc(users.displayName));
 
     res.send({
-      results: results.map((u) => serializeUser(u, req.user)),
+      results: await serialize(
+        UserSerializer,
+        results.slice(0, limit),
+        req.user,
+      ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
         prevPage: page > 1 ? page - 1 : null,

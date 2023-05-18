@@ -2,7 +2,6 @@ import {
   ChatBubbleLeftRightIcon,
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
-import { motion } from "framer-motion";
 
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
@@ -40,12 +39,7 @@ export default ({
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
 
   return (
-    <motion.li
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="card"
-    >
+    <li className="card">
       <div className="card-header p-3 sm:px-5 sm:py-4">
         <UserAvatar size={48} user={tasting.createdBy} />
         <div className="flex-1 space-y-1 font-semibold">
@@ -140,6 +134,6 @@ export default ({
           </Menu>
         </aside>
       </div>
-    </motion.li>
+    </li>
   );
 };

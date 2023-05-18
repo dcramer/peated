@@ -63,7 +63,7 @@ program
         await createNotification(db, {
           fromUserId: follow.fromUserId,
           objectType: objectTypeFromSchema(follows),
-          objectId: follow.fromUserId,
+          objectId: follow.id,
           userId: follow.toUserId,
           createdAt: follow.createdAt,
         });

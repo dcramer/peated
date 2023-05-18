@@ -11,24 +11,19 @@ import type { FollowRequest, FollowStatus, Paginated } from "../types";
 
 export default function FriendRequests() {
   const {
-    data: { results: requestList },
+    data: { results: followerList },
   } = useSuspenseQuery(
-    ["friends", "pending"],
-    (): Promise<Paginated<FollowRequest>> =>
-      api.get("/users/me/followers", {
-        query: {
-          status: "pending",
-        },
-      }),
+    ["followers"],
+    (): Promise<Paginated<FollowRequest>> => api.get("/users/me/followers"),
   );
 
   const [theirFollowStatus, setTheirFollowStatus] = useState<
     Record<string, FollowStatus>
-  >(Object.fromEntries(requestList.map((r) => [r.id, r.status])));
+  >(Object.fromEntries(followerList.map((r) => [r.id, r.status])));
 
   const [myFollowStatus, setMyFollowStatus] = useState<
     Record<string, FollowStatus>
-  >(Object.fromEntries(requestList.map((r) => [r.user.id, r.followsBack])));
+  >(Object.fromEntries(followerList.map((r) => [r.user.id, r.followsBack])));
 
   const acceptRequest = async (id: string) => {
     const data = await api.put(`/users/me/followers/${id}`, {
@@ -64,8 +59,8 @@ export default function FriendRequests() {
 
   return (
     <ul role="list" className="divide-y divide-slate-800 sm:rounded">
-      {requestList.length ? (
-        requestList.map(({ user, ...follow }) => {
+      {followerList.length ? (
+        followerList.map(({ user, ...follow }) => {
           return (
             <ListItem key={user.id}>
               <div className="flex flex-1 items-center space-x-4">

@@ -18,6 +18,17 @@ export default {
         userId: { oneOf: [{ type: "number" }, { const: "me" }] },
       },
     },
+    response: {
+      200: {
+        type: "object",
+        required: ["pictureUrl"],
+        properties: {
+          pictureUrl: {
+            type: "string",
+          },
+        },
+      },
+    },
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
