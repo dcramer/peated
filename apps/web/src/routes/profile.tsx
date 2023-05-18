@@ -5,6 +5,7 @@ import { Outlet, useParams } from "react-router-dom";
 import Button from "../components/button";
 import Chip from "../components/chip";
 import Layout from "../components/layout";
+import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
 import UserAvatar from "../components/userAvatar";
 import { useRequiredAuth } from "../hooks/useAuth";
@@ -50,7 +51,7 @@ export default function Profile() {
           </h3>
           <div className="text-light flex flex-col items-center gap-x-2 gap-y-2 self-center sm:flex-row sm:self-start">
             <div>
-              <AtSymbolIcon className=" mr-[1px] inline h-4 w-4" />
+              <AtSymbolIcon className="inline h-3 w-3" />
               {user.username}
             </div>
             <div>
@@ -141,7 +142,9 @@ export default function Profile() {
           Collections
         </Tabs.Item>
       </Tabs>
-      <Outlet context={{ user }} />
+      <QueryBoundary>
+        <Outlet context={{ user }} />
+      </QueryBoundary>
     </Layout>
   );
 }

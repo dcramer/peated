@@ -153,7 +153,7 @@ const UserResultRow = ({ result: { ref: user } }: { result: UserResult }) => {
             {user.displayName}
           </Link>
           <div className="text-light flex items-center text-sm">
-            <AtSymbolIcon className="inline h-4 w-4" />
+            <AtSymbolIcon className="inline h-3 w-3" />
             {user.username}
           </div>
         </p>

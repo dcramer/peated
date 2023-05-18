@@ -17,29 +17,48 @@ const mapFilterParam = (value: string | null) => {
   return defaultViewParam;
 };
 
-export default function Activity() {
-  const location = useLocation();
-  const qs = new URLSearchParams(location.search);
-  const filterQ = mapFilterParam(qs.get("view"));
-
+const ActivityContent = ({ filter }: { filter: string }) => {
   const { data } = useSuspenseQuery(
-    ["tastings", filterQ],
+    ["tastings", filter],
     (): Promise<Paginated<Tasting>> =>
       api.get("/tastings", {
         query: {
-          filter: filterQ,
+          filter,
         },
       }),
   );
 
   return (
+    <>
+      {data.results.length > 0 ? (
+        <TastingList values={data.results} />
+      ) : (
+        <EmptyActivity to="/search?tasting">
+          <Glyph className="h-16 w-16" />
+
+          <div className="mt-4 font-semibold">What are you drinking?</div>
+          <div className="mt-2 block">
+            Get started by recording your first tasting notes.
+          </div>
+        </EmptyActivity>
+      )}
+    </>
+  );
+};
+
+export default function Activity() {
+  const location = useLocation();
+  const qs = new URLSearchParams(location.search);
+  const filterParam = mapFilterParam(qs.get("view"));
+
+  return (
     <Layout>
       <FloatingButton to="/search?tasting" />
       <Tabs fullWidth>
-        <Tabs.Item to="?view=friends" active={filterQ == "friends"}>
+        <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
           Friends
         </Tabs.Item>
-        <Tabs.Item to="./" active={filterQ === "global"}>
+        <Tabs.Item to="./" active={filterParam === "global"}>
           Global
         </Tabs.Item>
         {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
@@ -47,18 +66,7 @@ export default function Activity() {
         </Tabs.Item> */}
       </Tabs>
       <QueryBoundary>
-        {data.results.length > 0 ? (
-          <TastingList values={data.results} />
-        ) : (
-          <EmptyActivity to="/search?tasting">
-            <Glyph className="h-16 w-16" />
-
-            <div className="mt-4 font-semibold">What are you drinking?</div>
-            <div className="mt-2 block">
-              Get started by recording your first tasting notes.
-            </div>
-          </EmptyActivity>
-        )}
+        <ActivityContent filter={filterParam} />
       </QueryBoundary>
     </Layout>
   );

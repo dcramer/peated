@@ -1,10 +1,8 @@
 import { AnimatePresence } from "framer-motion";
-import { Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import classNames from "../lib/classNames";
 import AppHeader from "./appHeader";
 import Header from "./header";
-import Spinner from "./spinner";
 
 export default function Layout({
   children,
@@ -35,17 +33,7 @@ export default function Layout({
             splash && "flex-1 self-center px-6 py-12 sm:max-w-sm lg:px-8",
           )}
         >
-          <AnimatePresence>
-            <Suspense
-              fallback={
-                <div className="flex h-screen items-center justify-center">
-                  <Spinner />
-                </div>
-              }
-            >
-              {children}
-            </Suspense>
-          </AnimatePresence>
+          <AnimatePresence>{children}</AnimatePresence>
         </main>
       </div>
     </>

@@ -1,13 +1,21 @@
-import { ErrorBoundary } from "@sentry/react";
+import { ErrorBoundary, FallbackRender } from "@sentry/react";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
-import { Suspense } from "react";
+import { ReactNode, Suspense } from "react";
 import Spinner from "./spinner";
 
-export default ({ children }: { children: React.ReactNode }) => (
+export default ({
+  children,
+  fallback,
+  loading,
+}: {
+  children: React.ReactNode;
+  fallback?: FallbackRender;
+  loading?: ReactNode;
+}) => (
   <QueryErrorResetBoundary>
     {({ reset }) => (
-      <ErrorBoundary onReset={reset} fallback={ErrorView}>
-        <Suspense fallback={<Spinner />}>{children}</Suspense>
+      <ErrorBoundary onReset={reset} fallback={fallback || ErrorView}>
+        <Suspense fallback={loading || <Spinner />}>{children}</Suspense>
       </ErrorBoundary>
     )}
   </QueryErrorResetBoundary>

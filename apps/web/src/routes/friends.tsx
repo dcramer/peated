@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 
 import Layout from "../components/layout";
+import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
 
 export default function Friends() {
@@ -20,7 +21,9 @@ export default function Friends() {
           </div>
         </div>
       </div>
-      <Outlet />
+      <QueryBoundary>
+        <Outlet />
+      </QueryBoundary>
     </Layout>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import ReloadPrompt from "../components/reloadPrompt";
 import Screen from "../components/screen";
@@ -25,7 +25,15 @@ export default function Root() {
 
   return (
     <Screen>
-      <Outlet />
+      <Suspense
+        fallback={
+          <div className="flex h-screen items-center justify-center">
+            <Spinner />
+          </div>
+        }
+      >
+        <Outlet />
+      </Suspense>
       <ReloadPrompt />
     </Screen>
   );
