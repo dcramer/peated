@@ -22,7 +22,9 @@ export default function About() {
         <p>
           Peated was started by{" "}
           <a href="https://twitter.com/zeeg">David Cramer</a> and is{" "}
-          <a href={config.GITHUB_REPO}>Open Source on GitHub</a>.
+          <a href={config.GITHUB_REPO}>Open Source on GitHub</a>. A{" "}
+          <a href={config.DISCORD_LINK}>Discord server</a> is available if you
+          want to contribute.
         </p>
       </div>
     </Layout>

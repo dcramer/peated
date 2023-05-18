@@ -40,7 +40,7 @@ test("lists users needs a query", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toBe(user2.id);
+  expect(results[0].id).toBe(`${user2.id}`);
 });
 
 test("lists users requires auth", async () => {

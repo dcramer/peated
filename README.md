@@ -1,4 +1,10 @@
-# peated
+# Peated
+
+The application that powers peated.app.
+
+For more details, take a look at https://peated.app/about
+
+A Discord is available if you want to contribute: https://discord.gg/d7GFPfy88Z
 
 ## Dev
 

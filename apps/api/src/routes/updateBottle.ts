@@ -10,6 +10,8 @@ import {
   entities,
 } from "../db/schema";
 import { EntityInput, upsertEntity } from "../lib/db";
+import { serialize } from "../lib/serializers";
+import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireMod } from "../middleware/auth";
 
 type BottleInput = {
@@ -32,8 +34,12 @@ export default {
       },
     },
     body: {
-      type: "object",
-      $ref: "bottleSchema",
+      $ref: "/schemas/updateBottle",
+    },
+    response: {
+      200: {
+        $ref: "/schemas/bottle",
+      },
     },
   },
   preHandler: [requireMod],
@@ -179,7 +185,9 @@ export default {
       return newBottle;
     });
 
-    res.status(200).send(newBottle);
+    res
+      .status(200)
+      .send(await serialize(BottleSerializer, newBottle, req.user));
   },
 } as RouteOptions<
   Server,

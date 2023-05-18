@@ -18,7 +18,7 @@ export default ({
   );
 
   const acceptRequest = async (id: string) => {
-    const data = await api.put(`/users/me/followers/${id}`, {
+    const data = await api.put(`/followers/${id}`, {
       data: { action: "accept" },
     });
     setTheirFollowStatus(data.status);
@@ -47,7 +47,7 @@ export default ({
   return (
     <div className="mt-2">
       <Button
-        color="primary"
+        color="highlight"
         size="small"
         onClick={(e) => {
           e.stopPropagation();

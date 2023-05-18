@@ -32,8 +32,12 @@ export default {
       },
     },
     body: {
-      type: "object",
-      $ref: "entitySchema",
+      $ref: "/schemas/updateEntity",
+    },
+    response: {
+      200: {
+        $ref: "/schemas/entity",
+      },
     },
   },
   preHandler: [requireMod],

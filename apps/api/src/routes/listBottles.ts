@@ -1,10 +1,11 @@
-import { SQL, and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { SQL, and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { Entity, bottles, bottlesToDistillers, entities } from "../db/schema";
+import { bottles, bottlesToDistillers, entities } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
-import { serializeBottle } from "../lib/serializers/bottle";
+import { serialize } from "../lib/serializers";
+import { BottleSerializer } from "../lib/serializers/bottle";
 
 export default {
   method: "GET",
@@ -21,6 +22,23 @@ export default {
         entity: { type: "number" },
       },
     },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          results: {
+            type: "array",
+            items: {
+              $ref: "/schemas/bottle",
+            },
+          },
+          rel: {
+            type: "object",
+            $ref: "/schemas/paging",
+          },
+        },
+      },
+    },
   },
   handler: async (req, res) => {
     const page = req.query.page || 1;
@@ -35,7 +53,19 @@ export default {
       where.push(
         or(
           ilike(bottles.name, `%${query}%`),
-          ilike(entities.name, `%${query}%`),
+          sql`EXISTS(
+            SELECT 1
+            FROM ${entities} e
+            JOIN ${bottlesToDistillers} b
+            ON e.id = b.distiller_id AND b.bottle_id = ${bottles.id}
+            WHERE e.name ILIKE ${`%${query}%`}
+          )`,
+          sql`EXISTS(
+            SELECT 1
+            FROM ${entities} e
+            WHERE e.id = ${bottles.brandId}
+              AND e.name ILIKE ${`%${query}%`}
+          )`,
         ),
       );
     }
@@ -66,54 +96,18 @@ export default {
     }
 
     const results = await db
-      .select({
-        bottle: bottles,
-        brand: entities,
-      })
+      .select()
       .from(bottles)
-      .innerJoin(entities, eq(entities.id, bottles.brandId))
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
       .orderBy(orderBy);
 
-    const distillers = results.length
-      ? await db
-          .select({
-            bottleId: bottlesToDistillers.bottleId,
-            distiller: entities,
-          })
-          .from(entities)
-          .innerJoin(
-            bottlesToDistillers,
-            eq(bottlesToDistillers.distillerId, entities.id),
-          )
-          .where(
-            inArray(
-              bottlesToDistillers.bottleId,
-              results.map(({ bottle: b }) => b.id),
-            ),
-          )
-      : [];
-    const distillersByBottleId: {
-      [bottleId: number]: Entity[];
-    } = {};
-    distillers.forEach((d) => {
-      if (!distillersByBottleId[d.bottleId])
-        distillersByBottleId[d.bottleId] = [d.distiller];
-      else distillersByBottleId[d.bottleId].push(d.distiller);
-    });
-
     res.send({
-      results: results.slice(0, limit).map(({ bottle, brand }) =>
-        serializeBottle(
-          {
-            ...bottle,
-            brand,
-            distillers: distillersByBottleId[bottle.id],
-          },
-          req.user,
-        ),
+      results: await serialize(
+        BottleSerializer,
+        results.slice(0, limit),
+        req.user,
       ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,

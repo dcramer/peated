@@ -15,11 +15,9 @@ import { formatCategoryName } from "../lib/strings";
 import type { Bottle, Paginated, Tasting } from "../types";
 
 type BottleWithStats = Bottle & {
-  stats: {
-    tastings: number;
-    avgRating: number;
-    people: number;
-  };
+  tastings: number;
+  avgRating: number;
+  people: number;
 };
 
 type LoaderData = {
@@ -46,10 +44,10 @@ export default function BottleDetails() {
   const stats = [
     {
       name: "Avg Rating",
-      value: Math.round(bottle.stats.avgRating * 100) / 100,
+      value: Math.round(bottle.avgRating * 100) / 100,
     },
-    { name: "Tastings", value: bottle.stats.tastings.toLocaleString() },
-    { name: "People", value: bottle.stats.people.toLocaleString() },
+    { name: "Tastings", value: bottle.tastings.toLocaleString() },
+    { name: "People", value: bottle.people.toLocaleString() },
   ];
 
   const { distillers } = bottle;

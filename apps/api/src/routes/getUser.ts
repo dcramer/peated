@@ -1,9 +1,10 @@
-import { and, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { User, changes, follows, tastings, users } from "../db/schema";
-import { serializeUser } from "../lib/serializers/user";
+import { User, changes, tastings, users } from "../db/schema";
+import { serialize } from "../lib/serializers";
+import { UserSerializer } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -56,28 +57,8 @@ export default {
       .from(changes)
       .where(eq(changes.createdById, user.id));
 
-    const getFollowStatus = async (user: User) => {
-      const [follow] = await db
-        .select()
-        .from(follows)
-        .where(
-          and(
-            eq(follows.fromUserId, req.user.id),
-            eq(follows.toUserId, user.id),
-          ),
-        );
-      if (!follow) return "none";
-      return follow.status;
-    };
-
     res.send({
-      ...serializeUser(
-        {
-          ...user,
-          followStatus: await getFollowStatus(user),
-        },
-        req.user,
-      ),
+      ...(await serialize(UserSerializer, user, req.user)),
       stats: {
         tastings: totalTastings,
         bottles: totalBottles,

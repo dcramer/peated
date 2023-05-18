@@ -3,7 +3,8 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { User, users } from "../db/schema";
-import { serializeUser } from "../lib/serializers/user";
+import { serialize } from "../lib/serializers";
+import { UserSerializer } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -18,12 +19,11 @@ export default {
       },
     },
     body: {
-      type: "object",
-      properties: {
-        displayName: { type: "string" },
-        admin: { type: "boolean" },
-        mod: { type: "boolean" },
-        username: { type: "string" },
+      $ref: "/schemas/updateUser",
+    },
+    response: {
+      200: {
+        $ref: "/schemas/user",
       },
     },
   },
@@ -71,7 +71,7 @@ export default {
     }
 
     if (!Object.values(data).length) {
-      return res.send(serializeUser(user, req.user));
+      return res.send(await serialize(UserSerializer, user, req.user));
     }
 
     try {
@@ -80,7 +80,8 @@ export default {
         .set(data)
         .where(eq(users.id, userId))
         .returning();
-      res.send(serializeUser(newUser, req.user));
+
+      res.send(await serialize(UserSerializer, newUser, req.user));
     } catch (err: any) {
       if (err?.code === "23505" && err?.constraint === "user_username_unq") {
         return res.status(400).send({ error: "Username already in use" });

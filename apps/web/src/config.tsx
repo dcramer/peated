@@ -7,6 +7,7 @@ const config = {
 
   VERSION: import.meta.env.VITE_VERSION || "",
   GITHUB_REPO: "https://github.com/dcramer/peated",
+  DISCORD_LINK: "https://discord.gg/d7GFPfy88Z",
 };
 
 export default config;

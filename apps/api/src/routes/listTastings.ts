@@ -1,20 +1,11 @@
-import { SQL, and, desc, eq, inArray, sql } from "drizzle-orm";
+import { SQL, and, desc, eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import {
-  Entity,
-  bottles,
-  bottlesToDistillers,
-  editions,
-  entities,
-  follows,
-  tastings,
-  toasts,
-  users,
-} from "../db/schema";
+import { follows, tastings } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
-import { serializeTasting } from "../lib/serializers/tasting";
+import { serialize } from "../lib/serializers";
+import { TastingSerializer } from "../lib/serializers/tasting";
 import { injectAuth } from "../middleware/auth";
 
 export default {
@@ -62,88 +53,19 @@ export default {
     }
 
     const results = await db
-      .select({
-        tasting: tastings,
-        bottle: bottles,
-        brand: entities,
-        createdBy: users,
-        edition: editions,
-      })
+      .select()
       .from(tastings)
-      .innerJoin(bottles, eq(tastings.bottleId, bottles.id))
-      .innerJoin(entities, eq(entities.id, bottles.brandId))
-      .innerJoin(users, eq(tastings.createdById, users.id))
-      .leftJoin(editions, eq(tastings.editionId, editions.id))
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
       .orderBy(desc(tastings.createdAt));
 
-    const distillers = results.length
-      ? await db
-          .select({
-            bottleId: bottlesToDistillers.bottleId,
-            distiller: entities,
-          })
-          .from(entities)
-          .innerJoin(
-            bottlesToDistillers,
-            eq(bottlesToDistillers.distillerId, entities.id),
-          )
-          .where(
-            inArray(
-              bottlesToDistillers.bottleId,
-              results.map(({ bottle: b }) => b.id),
-            ),
-          )
-      : [];
-
-    const distillersByBottleId: {
-      [bottleId: number]: Entity[];
-    } = {};
-    distillers.forEach((d) => {
-      if (!distillersByBottleId[d.bottleId])
-        distillersByBottleId[d.bottleId] = [d.distiller];
-      else distillersByBottleId[d.bottleId].push(d.distiller);
-    });
-
-    const userToastsList: number[] =
-      req.user && results.length
-        ? (
-            await db
-              .select({ tastingId: toasts.tastingId })
-              .from(toasts)
-              .where(
-                and(
-                  inArray(
-                    toasts.tastingId,
-                    results.map((t) => t.tasting.id),
-                  ),
-                  eq(toasts.createdById, req.user.id),
-                ),
-              )
-          ).map((t) => t.tastingId)
-        : [];
-
     res.send({
-      results: results
-        .slice(0, limit)
-        .map(({ tasting, bottle, brand, createdBy, edition }) =>
-          serializeTasting(
-            {
-              ...tasting,
-              createdBy,
-              edition,
-              bottle: {
-                ...bottle,
-                brand,
-                distillers: distillersByBottleId[bottle.id],
-              },
-              hasToasted: userToastsList.indexOf(tasting.id) !== -1,
-            },
-            req.user,
-          ),
-        ),
+      results: await serialize(
+        TastingSerializer,
+        results.slice(0, limit),
+        req.user,
+      ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
         prevPage: page > 1 ? page - 1 : null,

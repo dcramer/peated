@@ -128,10 +128,10 @@ export default function Profile() {
         </div>
       </div>
       <Tabs fullWidth>
-        <Tabs.Item to={`/users/${user.id}`} controlled>
+        <Tabs.Item to={`/users/${user.username}`} controlled>
           Activity
         </Tabs.Item>
-        <Tabs.Item to={`/users/${user.id}/collections`} controlled>
+        <Tabs.Item to={`/users/${user.username}/collections`} controlled>
           Collections
         </Tabs.Item>
       </Tabs>

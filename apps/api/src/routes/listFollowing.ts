@@ -1,15 +1,16 @@
-import { and, asc, desc, eq, ne } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { follows, users } from "../db/schema";
+import { follows } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
-import { serializeFriend } from "../lib/serializers/friend";
+import { serialize } from "../lib/serializers";
+import { FollowingSerializer } from "../lib/serializers/follow";
 import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
-  url: "/friends",
+  url: "/following",
   schema: {
     querystring: {
       type: "object",
@@ -19,6 +20,22 @@ export default {
         status: { type: "string", enum: ["pending", "following"] },
       },
     },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          results: {
+            type: "array",
+            items: {
+              $ref: "/schemas/follow",
+            },
+          },
+          rel: {
+            $ref: "/schemas/paging",
+          },
+        },
+      },
+    },
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
@@ -26,32 +43,24 @@ export default {
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where = [
-      eq(follows.fromUserId, req.user.id),
-      ne(follows.status, "none"),
-    ];
+    const where = [eq(follows.fromUserId, req.user.id)];
     if (req.query.status) {
       where.push(eq(follows.status, req.query.status));
     }
 
     const results = await db
-      .select({
-        user: users,
-        follow: follows,
-      })
+      .select()
       .from(follows)
       .where(and(...where))
-      .innerJoin(users, eq(users.id, follows.toUserId))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(desc(follows.status), asc(follows.createdAt));
 
     res.send({
-      results: results.slice(0, limit).map(({ user, follow }) =>
-        serializeFriend({
-          ...follow,
-          user,
-        }),
+      results: await serialize(
+        FollowingSerializer,
+        results.slice(0, limit),
+        req.user,
       ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
@@ -72,6 +81,9 @@ export default {
   IncomingMessage,
   ServerResponse,
   {
+    Params: {
+      userId: number | "me";
+    };
     Querystring: {
       page?: number;
       status?: "pending" | "following";

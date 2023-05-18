@@ -4,6 +4,8 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { EntityType, entities } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
+import { serialize } from "../lib/serializers";
+import { EntitySerializer } from "../lib/serializers/entity";
 
 export default {
   method: "GET",
@@ -16,6 +18,22 @@ export default {
         page: { type: "number" },
         sort: { type: "string" },
         type: { type: "string", enum: ["distiller", "brand", "bottler"] },
+      },
+    },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          results: {
+            type: "array",
+            items: {
+              $ref: "/schemas/entity",
+            },
+          },
+          rel: {
+            $ref: "/schemas/paging",
+          },
+        },
       },
     },
   },
@@ -52,7 +70,11 @@ export default {
       .orderBy(orderBy);
 
     res.send({
-      results: results.slice(0, limit),
+      results: await serialize(
+        EntitySerializer,
+        results.slice(0, limit),
+        req.user,
+      ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
         prevPage: page > 1 ? page - 1 : null,

@@ -3,20 +3,22 @@ import { sign, verify } from "jsonwebtoken";
 import config from "../config";
 import { NewUser, User, users } from "../db/schema";
 import { random } from "./rand";
-import { SerializedUser, serializeUser } from "./serializers/user";
+import { serialize } from "./serializers";
+import { UserSerializer } from "./serializers/user";
 
-export const createAccessToken = (user: User): Promise<string | undefined> => {
+export const createAccessToken = async (
+  user: User,
+): Promise<string | undefined> => {
+  const payload = await serialize(UserSerializer, user, user);
   return new Promise<string | undefined>((res, rej) => {
-    sign(serializeUser(user, user), config.JWT_SECRET, {}, (err, token) => {
+    sign(payload, config.JWT_SECRET, {}, (err, token) => {
       if (err) rej(err);
       res(token);
     });
   });
 };
 
-export const verifyToken = (
-  token: string | undefined,
-): Promise<SerializedUser> => {
+export const verifyToken = (token: string | undefined): Promise<any> => {
   return new Promise((res, rej) => {
     if (!token) {
       rej("invalid token");
@@ -31,7 +33,7 @@ export const verifyToken = (
       if (!decoded || typeof decoded === "string") {
         rej("invalid token");
       }
-      res(decoded as SerializedUser);
+      res(decoded);
     });
   });
 };

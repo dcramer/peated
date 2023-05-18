@@ -19,20 +19,20 @@ test("cannot act others requests", async () => {
   const otherUser = await Fixtures.User();
 
   const follow = await Fixtures.Follow({
-    fromUserId: otherUser.id,
-    toUserId: user.id,
+    fromUserId: user.id,
+    toUserId: otherUser.id,
   });
 
   const response = await app.inject({
     method: "PUT",
-    url: `/users/${otherUser.id}/followers/${user.id}`,
+    url: `/followers/${follow.id}`,
     payload: {
       action: "accept",
     },
     headers: await Fixtures.AuthenticatedHeaders({ user }),
   });
 
-  expect(response).toRespondWith(403);
+  expect(response).toRespondWith(404);
 });
 
 test("can accept request", async () => {
@@ -46,7 +46,7 @@ test("can accept request", async () => {
 
   const response = await app.inject({
     method: "PUT",
-    url: `/users/${user.id}/followers/${otherUser.id}`,
+    url: `/followers/${follow.id}`,
     payload: {
       action: "accept",
     },

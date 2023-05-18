@@ -2,13 +2,9 @@ import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import {
-  bottles,
-  bottlesToDistillers,
-  entities,
-  tastings,
-  users,
-} from "../db/schema";
+import { bottles, tastings } from "../db/schema";
+import { serialize } from "../lib/serializers";
+import { BottleSerializer } from "../lib/serializers/bottle";
 
 export default {
   method: "GET",
@@ -21,33 +17,28 @@ export default {
         bottleId: { type: "number" },
       },
     },
+    response: {
+      200: {
+        type: "object",
+        allOf: [{ $ref: "/schemas/bottle" }],
+        // $ref: "bottleSchema",
+        properties: {
+          avgRating: { type: "number" },
+          tastings: { type: "number" },
+          people: { type: "number" },
+        },
+      },
+    },
   },
   handler: async (req, res) => {
-    const [{ bottle, brand, createdBy }] = await db
-      .select({
-        bottle: bottles,
-        brand: entities,
-        createdBy: users,
-      })
+    const [bottle] = await db
+      .select()
       .from(bottles)
-      .innerJoin(entities, eq(entities.id, bottles.brandId))
-      .innerJoin(users, eq(users.id, bottles.createdById))
       .where(eq(bottles.id, req.params.bottleId));
 
     if (!bottle) {
       return res.status(404).send({ error: "Not found" });
     }
-
-    const distillers = await db
-      .select({
-        distiller: entities,
-      })
-      .from(entities)
-      .innerJoin(
-        bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id),
-      )
-      .where(eq(bottlesToDistillers.bottleId, bottle.id));
 
     const [{ count: totalPeople }] = await db
       .select({
@@ -64,15 +55,10 @@ export default {
       .where(eq(tastings.bottleId, bottle.id));
 
     res.send({
-      ...bottle,
-      createdBy,
-      brand,
-      distillers: distillers.map(({ distiller }) => distiller),
-      stats: {
-        tastings: bottle.totalTastings,
-        avgRating: avgRating,
-        people: totalPeople,
-      },
+      ...(await serialize(BottleSerializer, bottle, req.user)),
+      tastings: bottle.totalTastings,
+      avgRating: avgRating,
+      people: totalPeople,
     });
   },
 } as RouteOptions<

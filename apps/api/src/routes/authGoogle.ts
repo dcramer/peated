@@ -7,7 +7,8 @@ import config from "../config";
 import { db } from "../db";
 import { identities, users } from "../db/schema";
 import { createAccessToken, createUser } from "../lib/auth";
-import { serializeUser } from "../lib/serializers/user";
+import { serialize } from "../lib/serializers";
+import { UserSerializer } from "../lib/serializers/user";
 
 export default {
   method: "POST",
@@ -18,6 +19,19 @@ export default {
       required: ["code"],
       properties: {
         code: { type: "string" },
+      },
+    },
+    response: {
+      200: {
+        type: "object",
+        required: ["user", "accessToken"],
+        properties: {
+          user: { $ref: "/schemas/user" },
+          accessToken: { type: "string" },
+        },
+      },
+      401: {
+        $ref: "/errors/401",
       },
     },
   },
@@ -105,7 +119,7 @@ export default {
     }
 
     return res.send({
-      user: serializeUser(user, user),
+      user: await serialize(UserSerializer, user, req.user),
       accessToken: await createAccessToken(user),
     });
   },

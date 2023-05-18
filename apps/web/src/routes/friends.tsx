@@ -11,10 +11,10 @@ export default function Friends() {
           <div className="border-b border-slate-700">
             <Tabs fullWidth>
               <Tabs.Item to="/friends" controlled>
-                Friends
+                Following
               </Tabs.Item>
               <Tabs.Item to="/friends/requests" controlled>
-                Requests
+                Followers
               </Tabs.Item>
             </Tabs>
           </div>

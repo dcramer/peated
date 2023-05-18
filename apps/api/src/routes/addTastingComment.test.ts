@@ -21,6 +21,7 @@ test("new comment", async () => {
     url: `/tastings/${tasting.id}/comments`,
     payload: {
       comment: "Hello world!",
+      createdAt: new Date().toISOString(),
     },
     headers: DefaultFixtures.authHeaders,
   });

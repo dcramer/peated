@@ -11,15 +11,15 @@ import type { FollowStatus, Friend, Paginated } from "../types";
 
 export default function FriendList() {
   const {
-    data: { results: friendList },
+    data: { results: followingList },
   } = useSuspenseQuery(
-    ["friends"],
-    (): Promise<Paginated<Friend>> => api.get("/friends", {}),
+    ["following"],
+    (): Promise<Paginated<Friend>> => api.get("/following", {}),
   );
 
   const [myFollowStatus, setMyFollowStatus] = useState<
     Record<string, FollowStatus>
-  >(Object.fromEntries(friendList.map((r) => [r.user.id, r.status])));
+  >(Object.fromEntries(followingList.map((r) => [r.user.id, r.status])));
 
   const followUser = async (toUserId: string, follow: boolean) => {
     const data = await api[follow ? "post" : "delete"](
@@ -45,8 +45,8 @@ export default function FriendList() {
 
   return (
     <ul role="list" className="divide-y divide-slate-800 sm:rounded">
-      {friendList.length ? (
-        friendList.map(({ user, ...follow }) => {
+      {followingList.length ? (
+        followingList.map(({ user, ...follow }) => {
           return (
             <ListItem key={user.id}>
               <div className="flex flex-1 items-center space-x-4">

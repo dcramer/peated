@@ -18,10 +18,11 @@ test("lists followers", async () => {
   const follow2 = await Fixtures.Follow({
     toUserId: DefaultFixtures.user.id,
   });
+  await Fixtures.Follow();
 
   const response = await app.inject({
     method: "GET",
-    url: "/users/me/followers",
+    url: "/followers",
     headers: DefaultFixtures.authHeaders,
   });
 
@@ -33,21 +34,8 @@ test("lists followers", async () => {
 test("lists follow requests requires auth", async () => {
   const response = await app.inject({
     method: "GET",
-    url: "/users/me/followers",
+    url: "/followers",
   });
 
   expect(response).toRespondWith(401);
-});
-
-test("lists follow requests cannot query others", async () => {
-  const user = await Fixtures.User();
-  const otherUser = await Fixtures.User();
-
-  const response = await app.inject({
-    method: "GET",
-    url: `/users/${otherUser.id}/followers`,
-    headers: await Fixtures.AuthenticatedHeaders({ user }),
-  });
-
-  expect(response).toRespondWith(403);
 });

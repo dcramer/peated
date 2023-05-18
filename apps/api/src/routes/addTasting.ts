@@ -10,9 +10,9 @@ import {
   editions,
   entities,
   tastings,
-  users,
 } from "../db/schema";
-import { serializeTasting } from "../lib/serializers/tasting";
+import { serialize } from "../lib/serializers";
+import { TastingSerializer } from "../lib/serializers/tasting";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -20,16 +20,11 @@ export default {
   url: "/tastings",
   schema: {
     body: {
-      type: "object",
-      required: ["bottle", "rating"],
-      properties: {
-        bottle: { type: "number" },
-        rating: { type: "number", minimum: 0, maximum: 5 },
-        notes: { type: "string" },
-        tags: { type: "array", items: { type: "string" } },
-        edition: { type: "string" },
-        vintageYear: { type: "number" },
-        barrel: { type: "number" },
+      $ref: "/schemas/newTasting",
+    },
+    response: {
+      201: {
+        $ref: "/schemas/tasting",
       },
     },
   },
@@ -44,6 +39,15 @@ export default {
       .where(eq(bottles.id, body.bottle));
     if (!bottle) {
       return res.status(400).send({ error: "Could not identify bottle" });
+    }
+
+    if (body.vintageYear) {
+      if (body.vintageYear > new Date().getFullYear()) {
+        return res.status(400).send({ error: "Invalid vintageYear" });
+      }
+      if (body.vintageYear < 1495) {
+        return res.status(400).send({ error: "Invalid vintageYear" });
+      }
     }
 
     const hasEdition = body.edition || body.barrel || body.vintageYear;
@@ -147,46 +151,7 @@ export default {
       return tasting;
     });
 
-    const [{ brand, createdBy, edition }] = await db
-      .select({
-        brand: entities,
-        createdBy: users,
-        edition: editions,
-      })
-      .from(tastings)
-      .innerJoin(bottles, eq(tastings.bottleId, bottles.id))
-      .innerJoin(entities, eq(entities.id, bottles.brandId))
-      .innerJoin(users, eq(tastings.createdById, users.id))
-      .leftJoin(editions, eq(tastings.editionId, editions.id))
-      .where(eq(tastings.id, tasting.id))
-      .limit(1);
-
-    const distillersQuery = await db
-      .select({
-        distiller: entities,
-      })
-      .from(entities)
-      .innerJoin(
-        bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id),
-      )
-      .where(eq(bottlesToDistillers.bottleId, bottle.id));
-
-    res.status(201).send(
-      serializeTasting(
-        {
-          ...tasting,
-          bottle: {
-            ...bottle,
-            brand,
-            distillers: distillersQuery.map(({ distiller }) => distiller),
-          },
-          edition,
-          createdBy,
-        },
-        req.user,
-      ),
-    );
+    res.status(201).send(await serialize(TastingSerializer, tasting, req.user));
   },
 } as RouteOptions<
   Server,
