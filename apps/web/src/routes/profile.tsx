@@ -39,7 +39,7 @@ export default function Profile() {
   };
 
   return (
-    <Layout gutter>
+    <Layout>
       <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
         <div className="flex w-full justify-center sm:w-auto sm:justify-start">
           <UserAvatar user={user} size={150} />

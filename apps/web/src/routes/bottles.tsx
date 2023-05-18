@@ -24,7 +24,7 @@ export default function BottleList() {
   });
 
   return (
-    <Layout gutter>
+    <Layout>
       {data && data.results.length > 0 ? (
         <BottleTable bottleList={data.results} rel={data.rel} />
       ) : (

@@ -78,11 +78,7 @@ export default function EditEntity() {
   };
 
   return (
-    <Layout
-      header={<FormHeader title="Edit Entity" onSave={onSubmit} />}
-      gutter
-      noMobileGutter
-    >
+    <Layout header={<FormHeader title="Edit Entity" onSave={onSubmit} />}>
       <form className="sm:mx-16">
         {error && <FormError values={[error]} />}
 

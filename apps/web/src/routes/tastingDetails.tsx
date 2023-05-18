@@ -197,7 +197,7 @@ export default function TastingDetails() {
   const [newComments, setNewComments] = useState<Comment[]>([]);
 
   return (
-    <Layout gutter>
+    <Layout>
       <QueryBoundary>
         <ul className="mb-4">
           <TastingListItem

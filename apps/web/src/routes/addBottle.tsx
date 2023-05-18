@@ -90,8 +90,6 @@ export default function AddBottle() {
           saveDisabled={saving}
         />
       }
-      gutter
-      noMobileGutter
     >
       <form className="sm:mx-16">
         {error && <FormError values={[error]} />}

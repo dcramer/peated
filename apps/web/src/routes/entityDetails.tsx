@@ -38,7 +38,7 @@ export default function EntityDetails() {
   ];
 
   return (
-    <Layout gutter>
+    <Layout>
       <div className="mb-4 mt-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
         <div className="flex w-full flex-1 flex-col items-center space-y-1 sm:items-start">
           <h1 className="mb-2 flex gap-x-3 text-3xl font-semibold leading-7">

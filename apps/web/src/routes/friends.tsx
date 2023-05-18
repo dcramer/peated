@@ -5,7 +5,7 @@ import Tabs from "../components/tabs";
 
 export default function Friends() {
   return (
-    <Layout gutter noMobileGutter>
+    <Layout>
       <div>
         <div className="hidden sm:block">
           <div className="border-b border-slate-700">

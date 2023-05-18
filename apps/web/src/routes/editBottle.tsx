@@ -103,11 +103,7 @@ export default function EditBottle() {
   };
 
   return (
-    <Layout
-      header={<FormHeader title="Edit Bottle" onSave={onSubmit} />}
-      gutter
-      noMobileGutter
-    >
+    <Layout header={<FormHeader title="Edit Bottle" onSave={onSubmit} />}>
       <form className="sm:mx-16">
         {error && <FormError values={[error]} />}
 

@@ -40,7 +40,7 @@ export default function EntityList() {
   const { entityListResponse } = useLoaderData() as LoaderData;
 
   return (
-    <Layout gutter>
+    <Layout>
       {entityListResponse.results.length > 0 ? (
         <EntityTable
           entityList={entityListResponse.results}

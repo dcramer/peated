@@ -15,7 +15,7 @@ export default ({ noMobile, children }: Props) => {
       )}
     >
       <div className="fixed left-0 right-0 z-10">
-        <div className="mx-auto flex h-14 w-full max-w-4xl items-center justify-between px-3 sm:h-20 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-14 w-full max-w-4xl items-center justify-between px-3 sm:h-20 sm:px-3 lg:px-0">
           {children}
         </div>
       </div>

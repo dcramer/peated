@@ -81,11 +81,7 @@ export default function Settings() {
   };
 
   return (
-    <Layout
-      header={<FormHeader title="Settings" onSave={onSubmit} />}
-      gutter
-      noMobileGutter
-    >
+    <Layout header={<FormHeader title="Settings" onSave={onSubmit} />}>
       <form className="sm:mx-16">
         {error && <FormError values={[error]} />}
 

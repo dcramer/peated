@@ -46,7 +46,7 @@ export default function ErrorPage() {
   console.error(error);
 
   return (
-    <Layout gutter>
+    <Layout>
       <main className="self-justify-center inline self-center">
         <div className="text-center">
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">

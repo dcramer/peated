@@ -17,7 +17,7 @@ export default function Notifications() {
   );
 
   return (
-    <Layout gutter noMobileGutter>
+    <Layout>
       {data.results.length ? (
         <NotificationList values={data.results} />
       ) : (

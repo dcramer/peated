@@ -111,8 +111,6 @@ export default function AddTasting() {
           saveDisabled={saving}
         />
       }
-      gutter
-      noMobileGutter
     >
       <form className="mx-auto max-w-xl" onSubmit={onSubmit}>
         {error && <FormError values={[error]} />}
