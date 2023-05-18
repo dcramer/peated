@@ -19,12 +19,18 @@ export default ({ data, ...props }: Props) => {
   const brandName = data.brand?.name || "Unknown";
   return (
     <div {...props}>
-      <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-        Produced by{" "}
+      <div className="space-x-1">
+        <span className="hidden sm:inline-block">Produced by</span>
         {data.brand?.id ? (
-          <Link to={`/entities/${data.brand.id}`} className="hover:underline">
-            {brandName}
-          </Link>
+          <Tooltip title={brandName} origin="left">
+            <Link
+              to={`/entities/${data.brand.id}`}
+              title={brandName}
+              className="inline-block max-w-[80px] truncate align-bottom hover:underline sm:max-w-[120px]"
+            >
+              {brandName}
+            </Link>
+          </Tooltip>
         ) : (
           brandName
         )}
@@ -57,16 +63,26 @@ const Distillers = ({ data: { distillers, brand } }: Props) => {
 
   const d = distillers[0];
   return (
-    <span>
-      {" "}
-      &middot; Distilled at{" "}
+    <>
+      <span>&middot;</span>
+      <span className="hidden sm:inline-block">Distilled at</span>
       {d.id ? (
-        <Link key={d.id} to={`/entities/${d.id}`} className="hover:underline">
-          {d.name}
-        </Link>
+        <Tooltip
+          origin="center"
+          title={distillers.map((d) => d.name).join(", ")}
+        >
+          <Link
+            key={d.id}
+            to={`/entities/${d.id}`}
+            title={d.name}
+            className="inline-block max-w-[80px] truncate align-bottom hover:underline sm:max-w-[120px]"
+          >
+            {d.name}
+          </Link>
+        </Tooltip>
       ) : (
         d.name
       )}
-    </span>
+    </>
   );
 };

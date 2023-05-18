@@ -64,10 +64,10 @@ export default ({
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
       )}
     >
-      <div className="flex-1 space-y-1 overflow-hidden">
+      <div className="flex-1 space-y-1">
         <Link
           to={`/bottles/${bottle.id}`}
-          className="block overflow-hidden text-ellipsis whitespace-nowrap font-semibold leading-6 hover:underline"
+          className="block max-w-[260px] truncate font-semibold leading-6 hover:underline sm:max-w-[480px]"
         >
           <BottleName bottle={bottle} />
         </Link>

@@ -1,7 +1,7 @@
 import Tooltip from "./tooltip";
 
 export default ({ tags }: { tags: string[] }) => {
-  if (!tags) return null;
+  if (!tags || !tags.length) return null;
   return (
     <div className="text-sm">
       <div className="hidden sm:block">

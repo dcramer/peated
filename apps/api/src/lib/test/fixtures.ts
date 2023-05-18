@@ -105,7 +105,7 @@ export const Bottle = async ({
     .returning();
 
   if (!distillerIds.length) {
-    if (random(0, 1) === 1) {
+    for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
       await db.insert(bottlesToDistillers).values({
         bottleId: bottle.id,
         distillerId: (await Entity({ type: ["distiller"] })).id,

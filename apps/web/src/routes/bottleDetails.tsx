@@ -52,12 +52,12 @@ export default function BottleDetails() {
     <Layout>
       <div className="my-4 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap sm:py-0">
         <div className="w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
-          <h1 className="mb-2 overflow-hidden text-ellipsis whitespace-nowrap text-3xl font-semibold leading-7">
+          <h1 className="mb-2 truncate text-3xl font-semibold leading-7">
             <BottleName bottle={bottle} />
           </h1>
           <BottleMetadata
             data={bottle}
-            className="overflow-hidden text-ellipsis whitespace-nowrap text-center text-slate-500 sm:text-left"
+            className="truncate text-center text-slate-500 sm:text-left"
           />
         </div>
 
