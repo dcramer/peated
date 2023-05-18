@@ -48,7 +48,6 @@ export default function BottleDetails() {
     { name: "People", value: bottle.people.toLocaleString() },
   ];
 
-  const { distillers } = bottle;
   return (
     <Layout>
       <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4  sm:flex-nowrap sm:py-0">

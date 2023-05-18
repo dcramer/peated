@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Link } from "react-router-dom";
+import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
 import BottleName from "../components/bottleName";
 import Chip from "../components/chip";
 import Layout from "../components/layout";
@@ -12,6 +13,8 @@ import UserAvatar from "../components/userAvatar";
 import api, { debounce } from "../lib/api";
 import { formatCategoryName, toTitleCase } from "../lib/strings";
 import { Bottle, Entity, User } from "../types";
+
+import { ReactComponent as EntityIcon } from "../assets/entity.svg";
 
 const SkeletonItem = () => {
   return (
@@ -79,6 +82,8 @@ const BottleResultRow = ({
 }) => {
   return (
     <>
+      <BottleIcon className="m-2 hidden h-10 w-auto sm:block" />
+
       <div className="min-w-0 flex-auto">
         <p className="font-semibold leading-6">
           <Link
@@ -117,6 +122,8 @@ const EntityResultRow = ({
 }) => {
   return (
     <>
+      <EntityIcon className="m-2 hidden h-10 w-auto sm:block" />
+
       <div className="flex min-w-0 flex-auto">
         <p className="flex-1 font-semibold leading-6">
           <Link to={`/entities/${entity.id}`}>

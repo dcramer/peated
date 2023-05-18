@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { Link } from "react-router-dom";
+import { ReactComponent as EntityIcon } from "../assets/entity.svg";
 import BottleTable from "../components/bottleTable";
 import Button from "../components/button";
 import Chip from "../components/chip";
@@ -37,12 +38,14 @@ export default function EntityDetails() {
 
   return (
     <Layout>
-      <div className="mb-4 mt-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
-        <div className="flex w-full flex-1 flex-col items-center space-y-1 sm:items-start">
-          <h1 className="mb-2 flex gap-x-3 text-3xl font-semibold leading-7">
+      <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4  sm:flex-nowrap sm:py-0">
+        <EntityIcon className="h-14 w-auto" />
+
+        <div className="w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
+          <h1 className="mb-2 truncate text-3xl font-semibold leading-7">
             {entity.name}
           </h1>
-          <p className="text-light text-sm font-light">
+          <p className="truncate text-center text-slate-500 sm:text-left">
             Located in {entity.country}
             {entity.region && <span> &middot; {entity.region}</span>}
           </p>
