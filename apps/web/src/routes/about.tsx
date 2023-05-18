@@ -4,7 +4,7 @@ import config from "../config";
 export default function About() {
   return (
     <Layout>
-      <div className="prose">
+      <div className="prose p-6">
         <h1>About Peated</h1>
         <p>
           Peated, inspired by apps like Untapped and Vivino, aims to create a
