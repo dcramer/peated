@@ -108,16 +108,7 @@ export default async function buildFastify(options = {}) {
   app.register(FastifySentry);
 
   app.setErrorHandler(function (error, request, reply) {
-    const { validation, validationContext } = error;
-
-    if (validation) {
-      reply.status(error.statusCode || 500).send({
-        // validationContext will be 'body' or 'params' or 'headers' or 'query'
-        message: `A validation error occurred when validating the ${validationContext}...`,
-        // this is the result of your validation library...
-        errors: validation,
-      });
-    } else if (error instanceof fastify.errorCodes.FST_ERR_BAD_STATUS_CODE) {
+    if (error instanceof fastify.errorCodes.FST_ERR_BAD_STATUS_CODE) {
       // Log error
       this.log.error(error);
       // Send error response

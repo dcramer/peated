@@ -27,6 +27,17 @@ test("must be mod", async () => {
   expect(response).toRespondWith(403);
 });
 
+test("name is required", async () => {
+  const response = await app.inject({
+    method: "POST",
+    url: "/entities",
+    payload: {},
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(400);
+});
+
 test("creates a new entity", async () => {
   const response = await app.inject({
     method: "POST",
