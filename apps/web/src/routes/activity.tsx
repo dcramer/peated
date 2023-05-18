@@ -42,9 +42,9 @@ export default function Activity() {
         <Tabs.Item to="./" active={filterQ === "global"}>
           Global
         </Tabs.Item>
-        <Tabs.Item to="?view=local" active={filterQ === "local"}>
+        {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
           Local
-        </Tabs.Item>
+        </Tabs.Item> */}
       </Tabs>
       <QueryBoundary>
         {data.results.length > 0 ? (
