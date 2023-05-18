@@ -36,23 +36,21 @@ export default {
     }
 
     await db.transaction(async (tx) => {
-      const toast = first(
+      const [toast] = await tx
+        .insert(toasts)
+        .values({
+          createdById: req.user.id,
+          tastingId: tasting.id,
+        })
+        .onConflictDoNothing()
+        .returning();
+
+      if (toast) {
         await tx
-          .insert(toasts)
-          .values({
-            createdById: req.user.id,
-            tastingId: tasting.id,
-          })
-          .onConflictDoNothing()
-          .returning(),
-      );
+          .update(tastings)
+          .set({ toasts: sql`${tastings.toasts} + 1` })
+          .where(eq(tastings.id, tasting.id));
 
-      await tx
-        .update(tastings)
-        .set({ toasts: sql`${tastings.toasts} + 1` })
-        .where(eq(tastings.id, tasting.id));
-
-      if (toast)
         createNotification(tx, {
           fromUserId: toast.createdById,
           objectType: objectTypeFromSchema(toasts),
@@ -60,6 +58,7 @@ export default {
           createdAt: toast.createdAt,
           userId: tasting.createdById,
         });
+      }
     });
 
     res.status(200).send({});

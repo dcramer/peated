@@ -53,7 +53,7 @@ test("new toast", async () => {
 });
 
 test("already toasted", async () => {
-  const tasting = await Fixtures.Tasting();
+  const tasting = await Fixtures.Tasting({ toasts: 1 });
   await Fixtures.Toast({
     tastingId: tasting.id,
     createdById: DefaultFixtures.user.id,
@@ -73,4 +73,10 @@ test("already toasted", async () => {
 
   expect(toastList.length).toBe(1);
   expect(toastList[0].createdById).toBe(DefaultFixtures.user.id);
+
+  const [updatedTasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, tasting.id));
+  expect(updatedTasting.toasts).toBe(1);
 });
