@@ -96,3 +96,46 @@ test("can follow existing link", async () => {
   expect(newFollow).toBeDefined();
   expect(newFollow.status).toBe(follow.status);
 });
+
+test("automatically approves follow when mutual", async () => {
+  const otherUser = await Fixtures.User();
+  await Fixtures.Follow({
+    fromUserId: otherUser.id,
+    toUserId: DefaultFixtures.user.id,
+    status: "following",
+  });
+
+  const response = await app.inject({
+    method: "POST",
+    url: `/users/${otherUser.id}/follow`,
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(200);
+  const data = JSON.parse(response.payload);
+  expect(data.status).toBe("following");
+
+  const [follow] = await db
+    .select()
+    .from(follows)
+    .where(
+      and(
+        eq(follows.fromUserId, DefaultFixtures.user.id),
+        eq(follows.toUserId, otherUser.id),
+      ),
+    );
+  expect(follow).toBeDefined();
+  expect(follow.status).toBe("following");
+
+  const [notif] = await db
+    .select()
+    .from(notifications)
+    .where(
+      and(
+        eq(notifications.objectId, follow.id),
+        eq(notifications.objectType, objectTypeFromSchema(follows)),
+      ),
+    );
+
+  expect(notif).toBeUndefined();
+});

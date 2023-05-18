@@ -33,6 +33,21 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
+    // XXX: could make this a subquery to avoid a small race
+    const isFollowedBy =
+      (
+        await db
+          .select()
+          .from(follows)
+          .where(
+            and(
+              eq(follows.fromUserId, user.id),
+              eq(follows.toUserId, req.user.id),
+              eq(follows.status, "following"),
+            ),
+          )
+      ).length === 1;
+
     const follow = await db.transaction(async (tx) => {
       const follow =
         first<Follow>(
@@ -41,6 +56,7 @@ export default {
             .values({
               fromUserId: req.user.id,
               toUserId: user.id,
+              status: isFollowedBy ? "following" : "pending",
             })
             .onConflictDoNothing()
             .returning(),
@@ -49,7 +65,7 @@ export default {
           await tx
             .update(follows)
             .set({
-              status: "pending",
+              status: isFollowedBy ? "following" : "pending",
             })
             .where(
               and(
@@ -72,13 +88,14 @@ export default {
             )
         )[0];
 
-      createNotification(tx, {
-        fromUserId: follow.fromUserId,
-        objectType: objectTypeFromSchema(follows),
-        objectId: follow.id,
-        createdAt: follow.createdAt,
-        userId: follow.toUserId,
-      });
+      if (follow.status === "pending")
+        createNotification(tx, {
+          fromUserId: follow.fromUserId,
+          objectType: objectTypeFromSchema(follows),
+          objectId: follow.id,
+          createdAt: follow.createdAt,
+          userId: follow.toUserId,
+        });
 
       return follow;
     });
