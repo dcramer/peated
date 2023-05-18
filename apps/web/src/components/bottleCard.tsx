@@ -2,58 +2,9 @@ import { Link } from "react-router-dom";
 import classNames from "../lib/classNames";
 import { formatCategoryName } from "../lib/strings";
 import { Bottle } from "../types";
+import BottleMetadata from "./bottleMetadata";
 import BottleName from "./bottleName";
 import { Option } from "./selectField";
-import Tooltip from "./tooltip";
-
-const Distillers = ({
-  bottle: { distillers, brand },
-}: {
-  bottle: {
-    brand?: {
-      name: string;
-    };
-    distillers?: {
-      id?: string | undefined | null;
-      name: string;
-    }[];
-  };
-}) => {
-  if (!distillers || !distillers.length) return null;
-
-  if (distillers.length > 1) {
-    return (
-      <span>
-        {" "}
-        &middot;{" "}
-        <Tooltip title={distillers.map((d) => d.name).join(", ")}>
-          <span className="underline decoration-dotted">
-            {distillers.length} distillers
-          </span>
-        </Tooltip>
-      </span>
-    );
-  }
-
-  if (distillers.length == 1 && brand?.name === distillers[0].name) {
-    return null;
-  }
-
-  const d = distillers[0];
-  return (
-    <span>
-      {" "}
-      &middot; Distilled at{" "}
-      {d.id ? (
-        <Link key={d.id} to={`/entities/${d.id}`} className="hover:underline">
-          {d.name}
-        </Link>
-      ) : (
-        d.name
-      )}
-    </span>
-  );
-};
 
 type BottleFormData = {
   name: string;
@@ -88,10 +39,7 @@ export const PreviewBottleCard = ({
             "Unknown Bottle"
           )}
         </p>
-        <p className="text-sm">
-          Produced by {brand?.name || "Unknown"}
-          <Distillers bottle={data} />
-        </p>
+        <BottleMetadata className="text-sm" data={data} />
       </div>
       <div className="flex flex-col items-end space-y-1 text-sm leading-6">
         <p>{data.category ? data.category.name : null}</p>
@@ -122,13 +70,7 @@ export default ({
             <BottleName bottle={bottle} />
           </Link>
         </p>
-        <p className="text-light text-sm">
-          Produced by{" "}
-          <Link to={`/entities/${bottle.brand.id}`} className="hover:underline">
-            {bottle.brand.name}
-          </Link>
-          <Distillers bottle={bottle} />
-        </p>
+        <BottleMetadata data={bottle} className="text-light text-sm" />
       </div>
       <div className="text-light flex flex-col items-end space-y-1 text-sm leading-6">
         <p>{bottle.category && formatCategoryName(bottle.category)}</p>

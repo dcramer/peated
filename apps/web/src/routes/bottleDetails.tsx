@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import BottleMetadata from "../components/bottleMetadata";
 import BottleName from "../components/bottleName";
 import Button from "../components/button";
 import EmptyActivity from "../components/emptyActivity";
@@ -54,34 +55,10 @@ export default function BottleDetails() {
           <h1 className="mb-2 overflow-hidden text-ellipsis whitespace-nowrap text-3xl font-semibold leading-7">
             <BottleName bottle={bottle} />
           </h1>
-          <p className="overflow-hidden text-ellipsis whitespace-nowrap text-center text-slate-500 sm:text-left">
-            Produced by{" "}
-            <Link
-              to={`/entities/${bottle.brand.id}`}
-              className="font-medium hover:underline"
-            >
-              {bottle.brand.name}
-            </Link>
-            {distillers.length > 0 &&
-              (distillers.length > 0 ||
-                bottle.brand.name !== distillers[0].name) && (
-                <span>
-                  {" "}
-                  &middot; Distilled at{" "}
-                  {distillers
-                    .map<React.ReactNode>((d) => (
-                      <Link
-                        key={d.id}
-                        to={`/entities/${d.id}`}
-                        className="font-semibold hover:underline"
-                      >
-                        {d.name}
-                      </Link>
-                    ))
-                    .reduce((prev, curr) => [prev, ", ", curr])}
-                </span>
-              )}
-          </p>
+          <BottleMetadata
+            data={bottle}
+            className="overflow-hidden text-ellipsis whitespace-nowrap text-center text-slate-500 sm:text-left"
+          />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-1 space-y-1 text-sm leading-6 text-slate-500 sm:w-auto sm:items-start sm:items-end">
