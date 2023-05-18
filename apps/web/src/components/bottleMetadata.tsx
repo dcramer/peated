@@ -26,7 +26,7 @@ export default ({ data, ...props }: Props) => {
             <Link
               to={`/entities/${data.brand.id}`}
               title={brandName}
-              className="inline-block max-w-[80px] truncate align-bottom hover:underline sm:max-w-[120px]"
+              className="inline-block max-w-[150px] truncate align-bottom hover:underline"
             >
               {brandName}
             </Link>
@@ -75,7 +75,7 @@ const Distillers = ({ data: { distillers, brand } }: Props) => {
             key={d.id}
             to={`/entities/${d.id}`}
             title={d.name}
-            className="inline-block max-w-[80px] truncate align-bottom hover:underline sm:max-w-[120px]"
+            className="inline-block max-w-[150px] truncate align-bottom hover:underline"
           >
             {d.name}
           </Link>
