@@ -50,7 +50,7 @@ export default {
         deleteNotification(tx, {
           objectType: objectTypeFromSchema(follows),
           objectId: follow.id,
-          userId: user.id,
+          userId: follow.toUserId,
         });
     });
 
