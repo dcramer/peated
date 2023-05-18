@@ -54,10 +54,10 @@ jobs:
           environment-url: ${{ steps.deployment.outputs.environment_url }}
           deployment-id: ${{ steps.deployment.outputs.deployment_id }}
           state: "failure"
-      # - name: Discord notification
-      #   env:
-      #     DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-      #   uses: Ilshidur/action-discord@0.3.2
-      #   with:
-      #     args: |
-      #       "${{ github.actor }} deployed version [${{ steps.vars.outputs.sha_short }}](https://github.com/{{ EVENT_PAYLOAD.repository.full_name }}/commit/${{ github.sha }})."
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: |
+            "${{ github.actor }} deployed version [${{ steps.vars.outputs.sha_short }}](https://github.com/{{ EVENT_PAYLOAD.repository.full_name }}/commit/${{ github.sha }})."
