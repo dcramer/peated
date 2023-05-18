@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 
+import { PhotoIcon } from "@heroicons/react/20/solid";
 import FormField from "./formField";
 import TextInput from "./textInput";
 
@@ -115,7 +116,10 @@ export default ({
               className="h-full rounded object-cover"
             />
           ) : (
-            <em className="p-12">No Image</em>
+            <em className="text-light flex h-[250px] flex-col items-center justify-center text-sm">
+              <PhotoIcon className="h-12 w-12" />
+              Tap to Upload an Image
+            </em>
           )}
         </div>
         <input

@@ -24,7 +24,7 @@ export const PreviewBottleCard = ({
   return (
     <div className="bg-highlight flex items-center space-x-4 p-3 text-black sm:px-5 sm:py-4">
       <div className="flex-1 space-y-1">
-        <p className="font-semibold leading-6">
+        <p className="block max-w-[260px] truncate font-semibold leading-6 hover:underline sm:max-w-[480px]">
           {data.name ? (
             <BottleName
               bottle={{
@@ -42,7 +42,7 @@ export const PreviewBottleCard = ({
         </p>
         <BottleMetadata className="text-sm" data={data} />
       </div>
-      <div className="flex flex-col items-end space-y-1 text-sm leading-6">
+      <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
         <p>{data.category ? data.category.name : null}</p>
         <p>{data.statedAge ? `Aged ${data.statedAge} years` : null}</p>
       </div>
@@ -53,15 +53,20 @@ export const PreviewBottleCard = ({
 export default ({
   bottle,
   noGutter,
+  color,
 }: {
   bottle: Bottle;
   noGutter?: boolean;
+  color?: "highlight" | "default";
 }) => {
   const { distillers } = bottle;
   return (
     <div
       className={classNames(
-        "flex items-center space-x-2 bg-slate-950 sm:space-x-3",
+        "flex items-center space-x-2 sm:space-x-3",
+        color === "highlight"
+          ? "bg-highlight text-black"
+          : "bg-slate-950 text-white",
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
       )}
     >
@@ -75,9 +80,20 @@ export default ({
         >
           <BottleName bottle={bottle} />
         </Link>
-        <BottleMetadata data={bottle} className="text-light text-sm" />
+        <BottleMetadata
+          data={bottle}
+          className={classNames(
+            color === "highlight" ? "" : "text-light",
+            "text-sm",
+          )}
+        />
       </div>
-      <div className="text-light w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
+      <div
+        className={classNames(
+          color === "highlight" ? "" : "text-light",
+          "w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6",
+        )}
+      >
         <p>{bottle.category && formatCategoryName(bottle.category)}</p>
         <p>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</p>
       </div>

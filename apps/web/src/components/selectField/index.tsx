@@ -165,7 +165,7 @@ export default ({
           <div className="text-gray-400 sm:leading-6">{placeholder}</div>
         )}
         {visibleValues.length > 0 &&
-          visibleValues.length < targetOptions &&
+          value.length < targetOptions &&
           (!options.length || visibleValues.length != options.length) &&
           multiple && (
             <Chip

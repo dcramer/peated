@@ -105,11 +105,11 @@ export default function AddTasting() {
         />
       }
     >
-      <form className="mx-auto max-w-xl" onSubmit={onSubmit}>
+      <form className="mx-auto my-6 max-w-xl" onSubmit={onSubmit}>
         {error && <FormError values={[error]} />}
 
         <div className="sm:mb-4">
-          <BottleCard bottle={bottle} />
+          <BottleCard bottle={bottle} color="highlight" />
         </div>
 
         <Fieldset>
@@ -124,16 +124,6 @@ export default function AddTasting() {
                 rating: value,
               }));
             }}
-          />
-
-          <TextAreaField
-            label="Tasting Notes"
-            name="notes"
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            value={formData.notes}
-            placeholder="Is it peated?"
           />
 
           <SelectField
@@ -155,6 +145,16 @@ export default function AddTasting() {
             multiple
           />
 
+          <TextAreaField
+            label="Tasting Notes"
+            name="notes"
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            value={formData.notes}
+            placeholder="Is it peated?"
+          />
+
           <ImageField
             name="image"
             label="Picture"
@@ -164,40 +164,35 @@ export default function AddTasting() {
             }
           />
 
-          <div className="bg-slate-900 p-3 ">
-            <div className="mb-4 flex items-center">
+          <div className="bg-highlight my-4 px-4 py-3 text-black">
+            <div className="flex items-center">
               <div className="flex-1">
-                <h2 className="font-medium">Additional Details</h2>
-                <p className="text-sm">
-                  If this is a specific series or barrel, feel free to note it
-                  below.
-                </p>
+                <h2 className="font-medium">Vintage Details</h2>
+                <p className="text-sm">Is this bottle a specific vintage?</p>
               </div>
               <ArrowDownIcon className="h-8 w-8 text-slate-700" />
             </div>
-            <Fieldset>
-              <TextField
-                type="number"
-                name="vintageYear"
-                label="Vintage"
-                value={formData.vintageYear}
-                placeholder="e.g. 2023"
-              />
-              <TextField
-                name="edition"
-                label="Edition"
-                value={formData.edition}
-                placeholder="e.g. Healthy Spirits"
-              />
-              <TextField
-                type="number"
-                name="barrel"
-                label="Barrel No."
-                value={formData.barrel}
-                placeholder="e.g. 56"
-              />
-            </Fieldset>
           </div>
+          <TextField
+            type="number"
+            name="vintageYear"
+            label="Year"
+            value={formData.vintageYear}
+            placeholder="e.g. 2023"
+          />
+          <TextField
+            name="edition"
+            label="Edition"
+            value={formData.edition}
+            placeholder="e.g. Healthy Spirits"
+          />
+          <TextField
+            type="number"
+            name="barrel"
+            label="Barrel No."
+            value={formData.barrel}
+            placeholder="e.g. 56"
+          />
         </Fieldset>
       </form>
     </Layout>
