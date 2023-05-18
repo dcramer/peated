@@ -45,6 +45,7 @@ export default function Settings() {
         const newUser = await api.put("/users/me", {
           data: {
             displayName: formData.displayName,
+            username: formData.username,
           },
         });
         const newAvatar =
