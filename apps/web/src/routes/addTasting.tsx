@@ -8,7 +8,7 @@ import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
 import ImageField from "../components/imageField";
 import Layout from "../components/layout";
-import RatingField from "../components/ratingField";
+import RangeField from "../components/rangeField";
 import { Option } from "../components/selectField";
 import TagsField from "../components/tagsField";
 import TextAreaField from "../components/textAreaField";
@@ -114,26 +114,31 @@ export default function AddTasting() {
         </div>
 
         <Fieldset>
-          <RatingField
-            label="How was it?"
+          <RangeField
+            label="Rating"
             required
+            name="rating"
+            value={formData.rating}
             onChange={(value) => {
-              setFormData({ ...formData, rating: value });
+              setFormData((formData) => ({
+                ...formData,
+                rating: value,
+              }));
             }}
           />
 
           <TextAreaField
-            label="Any notes?"
+            label="Tasting Notes"
             name="notes"
             onChange={(e) =>
               setFormData({ ...formData, [e.target.name]: e.target.value })
             }
-            defaultValue={formData.notes}
+            value={formData.notes}
             placeholder="Is it peated?"
           />
 
           <TagsField
-            label="Flavor Profile"
+            label="Flavors"
             name="tags"
             suggestedOptions={flavorList.map<Option>((f) => ({
               id: f.name,

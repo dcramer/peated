@@ -6,6 +6,7 @@ import HelpText from "./helpText";
 
 type Props = React.ComponentPropsWithoutRef<"div"> & {
   label?: string;
+  labelNote?: ReactNode;
   htmlFor?: string;
   helpText?: string;
   required?: boolean;
@@ -20,6 +21,7 @@ export default ({
   children,
   required,
   label,
+  labelNote,
   helpText,
   htmlFor,
   labelAction,
@@ -38,6 +40,7 @@ export default ({
         <FormLabel
           htmlFor={htmlFor}
           required={required}
+          labelNote={labelNote}
           className="flex flex-1 cursor-pointer items-center"
         >
           {label}
