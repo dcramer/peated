@@ -1,22 +1,24 @@
 import { inArray } from "drizzle-orm";
-import { Serializer } from ".";
+import { Serializer, serialize } from ".";
 import { db } from "../../db";
 import { Comment, User, users } from "../../db/schema";
+import { UserSerializer } from "./user";
 
 export const CommentSerializer: Serializer<Comment> = {
   attrs: async (itemList: Comment[], currentUser?: User) => {
+    const userList = await db
+      .select()
+      .from(users)
+      .where(
+        inArray(
+          users.id,
+          itemList.map((i) => i.createdById),
+        ),
+      );
     const usersById = Object.fromEntries(
-      (
-        await db
-          .select()
-          .from(users)
-          .where(
-            inArray(
-              users.id,
-              itemList.map((i) => i.createdById),
-            ),
-          )
-      ).map((u) => [u.id, u]),
+      (await serialize(UserSerializer, userList, currentUser)).map(
+        (data, index) => [userList[index].id, data],
+      ),
     );
 
     return Object.fromEntries(
@@ -24,7 +26,7 @@ export const CommentSerializer: Serializer<Comment> = {
         return [
           item.id,
           {
-            createdBy: usersById[item.id],
+            createdBy: usersById[item.createdById],
           },
         ];
       }),
@@ -34,7 +36,7 @@ export const CommentSerializer: Serializer<Comment> = {
   item: (item: Comment, attrs: Record<string, any>, currentUser?: User) => {
     return {
       id: `${item.id}`,
-      comments: item.comment,
+      comment: item.comment,
       createdAt: item.createdAt,
       createdBy: attrs.createdBy,
     };
