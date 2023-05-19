@@ -54,7 +54,7 @@ export const BottleSerializer: Serializer<Bottle> = {
 
   item: (item: Bottle, attrs: Record<string, any>, currentUser?: User) => {
     return {
-      id: `${item.id}`,
+      id: item.id,
       name: item.name,
       statedAge: item.statedAge,
       category: item.category,

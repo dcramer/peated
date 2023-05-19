@@ -26,6 +26,9 @@ type BaseProps = {
   label?: string;
   helpText?: string;
   required?: boolean;
+  error?: {
+    message?: string;
+  };
   placeholder?: string;
   children?: ReactNode;
   className?: string;
@@ -79,6 +82,7 @@ export default ({
   endpoint,
   options = [],
   onChange,
+  error,
   ...props
 }: Props) => {
   const initialValue = Array.isArray(props.value)
@@ -143,6 +147,7 @@ export default ({
       required={required}
       helpText={helpText}
       className={className}
+      error={error}
       labelAction={() => {
         setDialogOpen(true);
       }}

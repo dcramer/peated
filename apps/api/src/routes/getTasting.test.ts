@@ -21,5 +21,5 @@ test("get tasting", async () => {
 
   expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
-  expect(data.id).toBe(`${tasting.id}`);
+  expect(data.id).toBe(tasting.id);
 });

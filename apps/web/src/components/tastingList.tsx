@@ -10,7 +10,7 @@ export default ({
   values: Tasting[];
   noBottle?: boolean;
 }) => {
-  const [deletedValues, setDeletedValues] = useState<string[]>([]);
+  const [deletedValues, setDeletedValues] = useState<number[]>([]);
 
   const onDelete = (tasting: Tasting) => {
     setDeletedValues((arr) => [...arr, tasting.id]);

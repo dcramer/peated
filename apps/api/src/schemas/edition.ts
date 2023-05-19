@@ -3,7 +3,7 @@ export const editionSchema = {
   type: "object",
   required: ["id", "name", "barrel", "vintageYear"],
   properties: {
-    id: { type: "string" },
+    id: { type: "number" },
     name: { type: "string", nullable: true },
     barrel: { type: "number", nullable: true },
     vintageYear: { type: "number", nullable: true },

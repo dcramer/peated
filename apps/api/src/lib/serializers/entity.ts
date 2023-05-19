@@ -5,7 +5,7 @@ import { Serializer } from ".";
 export const EntitySerializer: Serializer<Entity> = {
   item: (item: Entity, attrs: Record<string, any>, currentUser?: User) => {
     return {
-      id: `${item.id}`,
+      id: item.id,
       name: item.name,
       country: item.country,
       region: item.region,

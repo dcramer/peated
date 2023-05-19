@@ -11,7 +11,7 @@ export const entitySchema = {
     "totalBottles",
   ],
   properties: {
-    id: { type: "string" },
+    id: { type: "number" },
     name: { type: "string" },
     type: {
       $ref: "#/$defs/type",

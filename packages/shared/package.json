@@ -1,9 +1,16 @@
 {
   "private": true,
   "name": "@peated/shared",
+  "scripts": {
+    "build": "tsc"
+  },
   "files": [
+    "schemas.ts",
     "tsconfig.json",
     "tsconfig.node.json"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "typescript": "^5.0.4",
+    "zod": "^3.21.4"
+  }
 }

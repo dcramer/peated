@@ -1,9 +1,13 @@
 import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
+
+import { NewTasting } from "@peated/shared/schemas";
+
 import { db } from "../db";
 import {
-  NewTasting,
   bottles,
   bottlesToDistillers,
   changes,
@@ -19,9 +23,7 @@ export default {
   method: "POST",
   url: "/tastings",
   schema: {
-    body: {
-      $ref: "/schemas/newTasting",
-    },
+    body: zodToJsonSchema(NewTasting),
     response: {
       201: {
         $ref: "/schemas/tasting",
@@ -158,11 +160,6 @@ export default {
   IncomingMessage,
   ServerResponse,
   {
-    Body: NewTasting & {
-      bottle: number;
-      edition?: string;
-      barrel?: number;
-      vintageYear?: number;
-    };
+    Body: z.infer<typeof NewTasting>;
   }
 >;

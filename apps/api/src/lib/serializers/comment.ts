@@ -35,7 +35,7 @@ export const CommentSerializer: Serializer<Comment> = {
 
   item: (item: Comment, attrs: Record<string, any>, currentUser?: User) => {
     return {
-      id: `${item.id}`,
+      id: item.id,
       comment: item.comment,
       createdAt: item.createdAt,
       createdBy: attrs.createdBy,

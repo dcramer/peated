@@ -26,7 +26,7 @@ test("lists following", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].user.id).toBe(`${follow1.toUserId}`);
+  expect(results[0].user.id).toBe(follow1.toUserId);
 });
 
 test("requires auth", async () => {

@@ -91,7 +91,7 @@ export const TastingSerializer: Serializer<Tasting> = {
 
   item: (item: Tasting, attrs: Record<string, any>, currentUser?: User) => {
     return {
-      id: `${item.id}`,
+      id: item.id,
       imageUrl: item.imageUrl ? `${config.URL_PREFIX}${item.imageUrl}` : null,
       notes: item.notes,
       tags: item.tags || [],

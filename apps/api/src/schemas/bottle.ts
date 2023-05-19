@@ -3,7 +3,7 @@ export const bottleSchema = {
   type: "object",
   required: ["id", "name", "brand", "distillers", "category", "statedAge"],
   properties: {
-    id: { type: "string" },
+    id: { type: "number" },
     name: { type: "string" },
     brand: {
       $ref: "/schemas/entity",

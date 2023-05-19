@@ -39,7 +39,7 @@ export const UserSerializer: Serializer<User> = {
   },
   item: (item: User, attrs: Record<string, any>, currentUser?: User) => {
     const data = {
-      id: `${item.id}`,
+      id: item.id,
       displayName: item.displayName,
       username: item.username,
       pictureUrl: item.pictureUrl

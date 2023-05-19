@@ -5,9 +5,9 @@ export const notificationSchema = {
   // XXX: ref isnt working right
   additionalProperties: true,
   properties: {
-    id: { type: "string" },
+    id: { type: "number" },
     objectType: { type: "string", enum: ["follow", "toast", "comment"] },
-    objectId: { type: "string" },
+    objectId: { type: "number" },
     createdAt: { type: "string" },
     fromUser: { $ref: "/schemas/user" },
     // ref: {

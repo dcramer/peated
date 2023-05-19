@@ -3,7 +3,7 @@ export const followingSchema = {
   type: "object",
   required: ["id", "status", "createdAt", "user", "followsBack"],
   properties: {
-    id: { type: "string" },
+    id: { type: "number" },
     status: {
       type: "string",
       enum: ["pending", "following", "none"],

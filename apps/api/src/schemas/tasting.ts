@@ -1,18 +1,3 @@
-export const newTastingSchema = {
-  $id: "/schemas/newTasting",
-  type: "object",
-  required: ["bottle", "rating"],
-  properties: {
-    bottle: { type: "number" },
-    rating: { type: "number", minimum: 0, maximum: 5 },
-    notes: { type: "string", nullable: true },
-    tags: { type: "array", items: { type: "string" } },
-    edition: { type: "string", nullable: true },
-    vintageYear: { type: "number", nullable: true },
-    barrel: { type: "number", nullable: true },
-  },
-};
-
 export const tastingSchema = {
   $id: "/schemas/tasting",
   type: "object",
@@ -29,11 +14,11 @@ export const tastingSchema = {
     "createdBy",
   ],
   properties: {
-    id: { type: "string" },
+    id: { type: "number" },
     imageUrl: { type: "string", nullable: true },
     notes: { type: "string", nullable: true },
     bottle: { $ref: "/schemas/bottle" },
-    rating: { type: "number", minimum: 0, maximum: 5 },
+    rating: { type: "number", minimum: 0, maximum: 5, nullable: true },
     tags: { type: "array", items: { type: "string" } },
 
     comments: { type: "number" },

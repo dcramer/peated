@@ -1,5 +1,5 @@
-import { FormEvent, ReactNode, useState } from "react";
-
+import { ChangeEvent, FormEvent, ReactNode, forwardRef, useState } from "react";
+import { FieldError } from "react-hook-form";
 import FormField from "./formField";
 
 type Props = {
@@ -10,11 +10,11 @@ type Props = {
   children?: ReactNode;
   className?: string;
   value?: number;
-  min?: number;
-  max?: number;
-  step?: number;
-  factor?: number;
-  onChange?: (value: number) => void;
+  min?: string | number;
+  max?: string | number;
+  step?: string | number;
+  error?: FieldError;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
 type InputEvent = FormEvent<HTMLInputElement> & {
@@ -23,58 +23,71 @@ type InputEvent = FormEvent<HTMLInputElement> & {
   };
 };
 
-export default ({
-  name,
-  helpText,
-  label,
-  required,
-  className,
-  min = 0,
-  max = 20,
-  step = 1,
-  factor = 4,
-  value: initialValue,
-  onChange,
-  ...props
-}: Props) => {
-  const [value, setValue] = useState<number>(initialValue || 0);
-  return (
-    <FormField
-      label={label}
-      labelNote={
-        <div className="text-sm font-medium">
-          {!value || typeof value !== "number" ? (
-            "Not Rated"
-          ) : (
-            <span className="text-highlight">{value.toFixed(2)}</span>
-          )}
-        </div>
-      }
-      htmlFor={`f-${name}`}
-      required={required}
-      helpText={helpText}
-      className={className}
-    >
-      <input
-        name={name}
-        id={`f-${name}`}
+export default forwardRef<HTMLInputElement, Props>(
+  (
+    {
+      name,
+      helpText,
+      label,
+      required,
+      className,
+      min = "0.00",
+      max = "5.00",
+      step = "0.25",
+      value: initialValue,
+      error,
+      onChange,
+      ...props
+    },
+    ref,
+  ) => {
+    const [value, setValue] = useState<number>(initialValue || 0);
+    return (
+      <FormField
+        label={label}
+        labelNote={
+          <div className="text-sm font-medium">
+            {!value || typeof value !== "number" ? (
+              "Not Rated"
+            ) : (
+              <span className="text-highlight">{value.toFixed(2)}</span>
+            )}
+          </div>
+        }
+        htmlFor={`f-${name}`}
         required={required}
-        min={min}
-        max={max}
-        step={step}
-        onInput={(e) => {
-          setValue(parseInt((e as InputEvent).target.value, 10) / factor);
-        }}
-        onChange={(e) => {
-          const value = parseInt(e.target.value, 10) / factor;
-          setValue(value);
-          onChange && onChange(value);
-        }}
-        value={value * factor}
-        type="range"
-        className="range range-sm mb-6 block h-1 w-full cursor-pointer appearance-none rounded-lg border-0 bg-gray-200 bg-inherit p-0"
-        {...props}
-      />
-    </FormField>
-  );
-};
+        helpText={helpText}
+        error={error}
+        className={className}
+      >
+        <input
+          name={name}
+          id={`f-${name}`}
+          required={required}
+          min={min}
+          max={max}
+          step={step}
+          ref={ref}
+          value={value.toFixed(2)}
+          type="range"
+          list={`m-${name}`}
+          className="range range-sm mb-6 block h-1 w-full cursor-pointer"
+          {...props}
+          onInput={(e) => {
+            setValue(parseFloat((e as InputEvent).target.value));
+          }}
+          onChange={(e) => {
+            setValue(parseFloat(e.target.value));
+            onChange && onChange(e);
+          }}
+        />
+        <datalist id={`m-${name}`}>
+          <option></option>
+          <option value="2"></option>
+          <option value="3"></option>
+          <option value="4"></option>
+        </datalist>
+      </FormField>
+    );
+  },
+);

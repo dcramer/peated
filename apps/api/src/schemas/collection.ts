@@ -3,7 +3,7 @@ export const collectionSchema = {
   type: "object",
   required: ["id", "name", "createdAt"],
   properties: {
-    id: { type: "string" },
+    id: { type: "number" },
     name: { type: "string" },
     createdBy: { $ref: "/schemas/user" },
     createdAt: { type: "string" },

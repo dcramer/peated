@@ -14,7 +14,7 @@ import CreateOptionDialog from "./createOptionDialog";
 import { CreateOptionForm } from "./types";
 
 export type Option = {
-  id?: string | null;
+  id?: string | number | null;
   name: string;
   [key: string]: any;
 };

@@ -3,7 +3,7 @@ export const userSchema = {
   type: "object",
   required: ["id", "displayName", "username", "pictureUrl"],
   properties: {
-    id: { type: "string" },
+    id: { type: "number" },
     displayName: { type: "string" },
     email: { type: "string", format: "email" },
     username: { type: "string" },

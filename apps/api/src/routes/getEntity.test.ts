@@ -21,5 +21,5 @@ test("get entity", async () => {
 
   expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
-  expect(data.id).toBe(`${brand.id}`);
+  expect(data.id).toBe(brand.id);
 });

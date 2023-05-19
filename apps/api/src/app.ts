@@ -26,7 +26,7 @@ import { error401Schema } from "./schemas/errors";
 import { followingSchema } from "./schemas/follow";
 import { notificationSchema } from "./schemas/notification";
 import pagingSchema from "./schemas/paging";
-import { newTastingSchema, tastingSchema } from "./schemas/tasting";
+import { tastingSchema } from "./schemas/tasting";
 import { updateUserSchema, userSchema } from "./schemas/user";
 
 initSentry({
@@ -98,7 +98,6 @@ export default async function buildFastify(options = {}) {
   app.addSchema(collectionSchema);
   app.addSchema(commentSchema);
   app.addSchema(newCommentSchema);
-  app.addSchema(newTastingSchema);
   app.addSchema(editionSchema);
   app.addSchema(newEditionSchema);
 

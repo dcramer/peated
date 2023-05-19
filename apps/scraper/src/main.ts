@@ -126,7 +126,7 @@ function parseName(brandName: string, bottleName: string) {
 function parseAbv(value: string) {
   if (!value || value === "") return;
   const amt = value.split(" % ")[0];
-  const abv = parseInt(amt * 10, 10) / 100;
+  const abv = ((parseInt(amt, 10) * 10) / 100).toFixed(2);
   if (!abv) {
     console.warn(`Unable to parse abv: ${value}`);
     return;

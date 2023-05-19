@@ -276,6 +276,7 @@ export default ({
   className,
   onChange,
   value,
+  error,
 }: Props) => {
   const options = countryList.map((c) => ({
     id: c,
@@ -290,6 +291,7 @@ export default ({
       helpText={helpText}
       className={className}
       options={options}
+      error={error}
       onChange={(value) => onChange && onChange(value ? value.name : "")}
     />
   );

@@ -3,7 +3,7 @@ export const commentSchema = {
   type: "object",
   required: ["id", "comment", "createdBy", "createdAt"],
   properties: {
-    id: { type: "string" },
+    id: { type: "number" },
     comment: { type: "string" },
     createdBy: { $ref: "/schemas/user" },
     createdAt: { type: "string" },

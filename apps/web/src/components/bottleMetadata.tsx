@@ -5,11 +5,11 @@ import Tooltip from "./tooltip";
 type Props = {
   data: {
     brand?: {
-      id?: string | undefined | null;
+      id?: string | number | undefined | null;
       name: string;
     };
     distillers?: {
-      id?: string | undefined | null;
+      id?: string | number | undefined | null;
       name: string;
     }[];
   };

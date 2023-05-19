@@ -40,7 +40,7 @@ test("lists bottles with query", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toBe(`${bottle1.id}`);
+  expect(results[0].id).toBe(bottle1.id);
 });
 
 test("lists bottles with distiller", async () => {
@@ -62,7 +62,7 @@ test("lists bottles with distiller", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toBe(`${bottle1.id}`);
+  expect(results[0].id).toBe(bottle1.id);
 });
 
 test("lists bottles with brand", async () => {
@@ -84,5 +84,5 @@ test("lists bottles with brand", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toBe(`${bottle1.id}`);
+  expect(results[0].id).toBe(bottle1.id);
 });

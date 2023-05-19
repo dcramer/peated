@@ -25,7 +25,7 @@ export default function Followers() {
     Record<string, FollowStatus>
   >(Object.fromEntries(followerList.map((r) => [r.user.id, r.followsBack])));
 
-  const acceptRequest = async (id: string) => {
+  const acceptRequest = async (id: number) => {
     const data = await api.put(`/followers/${id}`, {
       data: { action: "accept" },
     });
@@ -35,7 +35,7 @@ export default function Followers() {
     }));
   };
 
-  const followUser = async (toUserId: string, follow: boolean) => {
+  const followUser = async (toUserId: number, follow: boolean) => {
     const data = await api[follow ? "post" : "delete"](
       `/users/${toUserId}/follow`,
     );

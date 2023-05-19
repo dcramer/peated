@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 export type Option = {
-  id?: string | null;
+  id?: string | number | null;
   name: string;
   count?: number;
   [key: string]: any;
