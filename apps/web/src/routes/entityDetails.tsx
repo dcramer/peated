@@ -39,7 +39,7 @@ export default function EntityDetails() {
   return (
     <Layout>
       <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4  sm:flex-nowrap sm:py-0">
-        <EntityIcon className="h-14 w-auto" />
+        <EntityIcon className="hidden h-14 w-auto sm:inline-block" />
 
         <div className="w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
           <h1 className="mb-2 truncate text-3xl font-semibold leading-7">
