@@ -1,28 +1,46 @@
+import { setUser } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { onRequestHookHandler } from "fastify";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { verifyToken } from "../lib/auth";
+import { logError } from "../lib/log";
 
 const getUser = async (req: any) => {
   const auth = req.headers["authorization"];
   const token = auth?.replace("Bearer ", "");
+  if (!token) return null;
 
   const { id } = await verifyToken(token);
-  if (!id) throw new Error("Invalid token");
+  if (!id) {
+    logError("Invalid token");
+    return null;
+  }
   const [user] = await db.select().from(users).where(eq(users.id, id));
-  if (!user) throw new Error("User not found");
-  if (!user.active) throw new Error("User not active");
+  if (!user) {
+    logError("User not found", { userId: id });
+    return null;
+  }
+
+  if (!user.active) {
+    // this code path is expected, no need to log
+    return null;
+  }
+
+  setUser({
+    id: `${user.id}`,
+    username: user.username,
+    email: user.email,
+  });
+
   return user;
 };
 
 // TODO: need to chain these to DRY it up
 export const requireAuth: onRequestHookHandler = async (req, res) => {
-  try {
-    const user = await getUser(req);
-    req.user = user;
-  } catch (error) {
-    console.error(error);
+  const user = await getUser(req);
+  req.user = user;
+  if (!user) {
     return res
       .status(401)
       .send({ error: "Unauthorized!", name: "invalid_token" });
@@ -30,28 +48,14 @@ export const requireAuth: onRequestHookHandler = async (req, res) => {
 };
 
 export const injectAuth: onRequestHookHandler = async (req, res) => {
-  try {
-    const auth = req.headers["authorization"];
-    const token = auth?.replace("Bearer ", "");
-    if (token) {
-      const { id } = await verifyToken(token);
-      [req.user] = await db.select().from(users).where(eq(users.id, id));
-      if (!req.user.active) throw new Error("User not active");
-    } else {
-      req.user = null;
-    }
-  } catch (error) {
-    console.error(error);
-    req.user = null;
-  }
+  const user = await getUser(req);
+  req.user = user;
 };
 
 export const requireAdmin: onRequestHookHandler = async (req, res) => {
-  try {
-    const user = await getUser(req);
-    req.user = user;
-  } catch (error) {
-    console.error(error);
+  const user = await getUser(req);
+  req.user = user;
+  if (!user) {
     return res
       .status(401)
       .send({ error: "Unauthorized!", name: "invalid_token" });
@@ -65,11 +69,9 @@ export const requireAdmin: onRequestHookHandler = async (req, res) => {
 };
 
 export const requireMod: onRequestHookHandler = async (req, res) => {
-  try {
-    const user = await getUser(req);
-    req.user = user;
-  } catch (error) {
-    console.error(error);
+  const user = await getUser(req);
+  req.user = user;
+  if (!user) {
     return res
       .status(401)
       .send({ error: "Unauthorized!", name: "invalid_token" });
