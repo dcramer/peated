@@ -13,26 +13,16 @@ type Props = {
       name: string;
     }[];
   };
+  showBrand?: boolean;
 } & ComponentPropsWithoutRef<"p">;
 
-export default ({ data, ...props }: Props) => {
-  const brandName = data.brand?.name || "Unknown";
+export default ({ data, showBrand = false, ...props }: Props) => {
   return (
     <div {...props}>
-      <div className="space-x-1">
-        <span className="hidden sm:inline-block">Produced by</span>
-        {data.brand?.id ? (
-          <Tooltip title={brandName} origin="left">
-            <Link
-              to={`/entities/${data.brand.id}`}
-              title={brandName}
-              className="inline-block max-w-[150px] truncate align-bottom hover:underline"
-            >
-              {brandName}
-            </Link>
-          </Tooltip>
-        ) : (
-          brandName
+      <div className="inline-flex space-x-1">
+        <Brand data={data} />
+        {!!data.distillers?.length && (
+          <span className="hidden sm:inline-block">&middot;</span>
         )}
         <Distillers data={data} />
       </div>
@@ -40,31 +30,45 @@ export default ({ data, ...props }: Props) => {
   );
 };
 
-const Distillers = ({ data: { distillers, brand } }: Props) => {
-  if (!distillers || !distillers.length) return null;
+const Brand = ({ data: { brand } }: Props) => {
+  const brandName = brand?.name || "Unknown";
+
+  return (
+    <div className="hidden space-x-1 sm:inline-block">
+      <span className="hidden sm:inline-block">Produced by</span>
+      {brand?.id ? (
+        <Tooltip title={brandName} origin="left">
+          <Link
+            to={`/entities/${brand.id}`}
+            title={brandName}
+            className="inline-block max-w-[150px] truncate align-bottom hover:underline"
+          >
+            {brandName}
+          </Link>
+        </Tooltip>
+      ) : (
+        brandName
+      )}
+    </div>
+  );
+};
+
+const Distillers = ({ data: { distillers } }: Props) => {
+  if (!distillers?.length) return null;
 
   if (distillers.length > 1) {
     return (
-      <span>
-        {" "}
-        &middot;{" "}
-        <Tooltip title={distillers.map((d) => d.name).join(", ")}>
-          <span className="underline decoration-dotted">
-            {distillers.length} distillers
-          </span>
-        </Tooltip>
-      </span>
+      <Tooltip title={distillers.map((d) => d.name).join(", ")}>
+        <span className="underline decoration-dotted">
+          {distillers.length} distillers
+        </span>
+      </Tooltip>
     );
-  }
-
-  if (distillers.length == 1 && brand?.name === distillers[0].name) {
-    return null;
   }
 
   const d = distillers[0];
   return (
     <>
-      <span>&middot;</span>
       <span className="hidden sm:inline-block">Distilled at</span>
       {d.id ? (
         <Tooltip

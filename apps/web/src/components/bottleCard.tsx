@@ -59,7 +59,6 @@ export default ({
   noGutter?: boolean;
   color?: "highlight" | "default";
 }) => {
-  const { distillers } = bottle;
   return (
     <div
       className={classNames(
@@ -70,9 +69,7 @@ export default ({
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
       )}
     >
-      <div>
-        <BottleIcon className="h-10 w-auto" />
-      </div>
+      <BottleIcon className="hidden h-10 w-auto sm:inline-block" />
       <div className="flex-1 space-y-1">
         <Link
           to={`/bottles/${bottle.id}`}
@@ -91,7 +88,7 @@ export default ({
       <div
         className={classNames(
           color === "highlight" ? "" : "text-light",
-          "w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6",
+          "flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6",
         )}
       >
         <p>{bottle.category && formatCategoryName(bottle.category)}</p>
