@@ -11,6 +11,7 @@ import {
 import { eq, inArray } from "drizzle-orm";
 import { Serializer, serialize } from ".";
 import { db } from "../../db";
+import { logError } from "../log";
 import { FollowerSerializer } from "./follow";
 import { TastingSerializer } from "./tasting";
 import { UserSerializer } from "./user";
@@ -18,7 +19,7 @@ import { UserSerializer } from "./user";
 export const NotificationSerializer: Serializer<Notification> = {
   attrs: async (itemList: Notification[], currentUser: User) => {
     const fromUserIds = itemList
-      .filter((i) => !!i.fromUserId)
+      .filter((i) => Boolean(i.fromUserId))
       .map<number>((i) => i.fromUserId as number);
 
     const fromUserList = fromUserIds.length
@@ -29,6 +30,11 @@ export const NotificationSerializer: Serializer<Notification> = {
         (data, index) => [fromUserList[index].id, data],
       ),
     );
+    if (fromUserIds.length !== fromUserList.length) {
+      logError("Failed to fetch all fromUser relations for notifications", {
+        userId: currentUser.id,
+      });
+    }
 
     const followIdList = itemList
       .filter((i) => i.objectType === "follow")
@@ -41,6 +47,11 @@ export const NotificationSerializer: Serializer<Notification> = {
         (data, index) => [followList[index].id, data],
       ),
     );
+    if (followIdList.length !== followList.length) {
+      logError("Failed to fetch all follow relations for notifications", {
+        userId: currentUser.id,
+      });
+    }
 
     const toastIdList = itemList
       .filter((i) => i.objectType === "toast")
