@@ -146,3 +146,54 @@ test("creates a new tasting with all edition params", async () => {
   expect(edition.barrel).toEqual(69);
   expect(edition.name).toEqual("Test");
 });
+
+test("creates a new tasting with empty rating", async () => {
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "POST",
+    url: "/tastings",
+    payload: {
+      bottle: bottle.id,
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.id));
+
+  expect(tasting.bottleId).toEqual(bottle.id);
+  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.rating).toBeNull();
+});
+
+test("creates a new tasting with zero rating", async () => {
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "POST",
+    url: "/tastings",
+    payload: {
+      bottle: bottle.id,
+      rating: 0,
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.id));
+
+  expect(tasting.bottleId).toEqual(bottle.id);
+  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.rating).toBeNull();
+});
