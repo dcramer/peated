@@ -5,7 +5,13 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
+import {
+  Bottle,
+  bottles,
+  bottlesToDistillers,
+  changes,
+  entities,
+} from "../db/schema";
 import { upsertEntity } from "../lib/db";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
@@ -67,9 +73,11 @@ export default {
         )
         .where(eq(bottlesToDistillers.bottleId, bottle.id))
     ).map(({ distiller }) => distiller);
+
     const newBottle = await db.transaction(async (tx) => {
+      let newBottle: Bottle | undefined;
       try {
-        const newBottle = Object.values(bottleData).length
+        newBottle = Object.values(bottleData).length
           ? (
               await tx
                 .update(bottles)
@@ -80,10 +88,12 @@ export default {
           : bottle;
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
-          return res
+          res
             .status(409)
-            .send({ error: "Bottle with name already exists under brand." });
+            .send({ error: "Bottle with name already exists under brand" });
+          return;
         }
+        throw err;
       }
 
       if (body.brand) {
@@ -177,6 +187,10 @@ export default {
 
       return newBottle;
     });
+
+    if (!newBottle) {
+      return res.status(500).send({ error: "Failed to update bottle" });
+    }
 
     res
       .status(200)

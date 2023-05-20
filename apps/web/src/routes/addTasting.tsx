@@ -65,7 +65,10 @@ export default function AddTasting() {
     let tasting;
     try {
       tasting = await api.post("/tastings", {
-        data,
+        data: {
+          ...data,
+          createdAt: new Date().toISOString(),
+        },
       });
     } catch (err) {
       if (err instanceof ApiError) {

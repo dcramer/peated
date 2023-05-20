@@ -295,30 +295,42 @@ export type NewCollectionBottle = InferModel<
   "insert"
 >;
 
-export const tastings = pgTable("tasting", {
-  id: bigserial("id", { mode: "number" }).primaryKey(),
+export const tastings = pgTable(
+  "tasting",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
 
-  bottleId: bigint("bottle_id", { mode: "number" })
-    .references(() => bottles.id)
-    .notNull(),
-  editionId: bigint("edition_id", { mode: "number" }).references(
-    () => editions.id,
-  ),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    editionId: bigint("edition_id", { mode: "number" }).references(
+      () => editions.id,
+    ),
 
-  tags: text("tags").array(),
-  rating: doublePrecision("rating"),
-  imageUrl: text("image_url"),
+    tags: text("tags").array(),
+    rating: doublePrecision("rating"),
+    imageUrl: text("image_url"),
 
-  notes: text("notes"),
+    notes: text("notes"),
 
-  comments: integer("comments").default(0).notNull(),
-  toasts: integer("toasts").default(0).notNull(),
+    comments: integer("comments").default(0).notNull(),
+    toasts: integer("toasts").default(0).notNull(),
 
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  createdById: bigint("created_by_id", { mode: "number" })
-    .references(() => users.id)
-    .notNull(),
-});
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+  },
+  (tastings) => {
+    return {
+      tasting: uniqueIndex("tasting_unq").on(
+        tastings.bottleId,
+        tastings.createdById,
+        tastings.createdAt,
+      ),
+    };
+  },
+);
 
 export type Tasting = InferModel<typeof tastings>;
 export type NewTasting = InferModel<typeof tastings, "insert">;

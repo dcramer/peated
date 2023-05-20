@@ -68,7 +68,7 @@ export default {
     });
 
     if (!entity) {
-      return res.status(409).send({ error: "Unable to create entity" });
+      return res.status(500).send({ error: "Failed to create entity" });
     }
 
     res.status(201).send(await serialize(EntitySerializer, entity, req.user));

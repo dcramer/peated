@@ -8,6 +8,8 @@ import { TastingInputSchema, TastingSchema } from "@peated/shared/schemas";
 
 import { db } from "../db";
 import {
+  NewTasting,
+  Tasting,
   bottles,
   bottlesToDistillers,
   changes,
@@ -15,6 +17,7 @@ import {
   entities,
   tastings,
 } from "../db/schema";
+import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { serialize } from "../lib/serializers";
 import { TastingSerializer } from "../lib/serializers/tasting";
 import { requireAuth } from "../middleware/auth";
@@ -31,7 +34,6 @@ export default {
   preHandler: [requireAuth],
   handler: async (req, res) => {
     const body = req.body;
-    const user = req.user;
 
     const [bottle] = await db
       .select()
@@ -41,12 +43,20 @@ export default {
       return res.status(400).send({ error: "Could not identify bottle" });
     }
 
-    if (body.vintageYear) {
-      if (body.vintageYear > new Date().getFullYear()) {
-        return res.status(400).send({ error: "Invalid vintageYear" });
+    const data: NewTasting = {
+      bottleId: bottle.id,
+      notes: body.notes || null,
+      rating: body.rating,
+      tags: body.tags ? body.tags.map((t) => t.toLowerCase()) : [],
+      createdById: req.user.id,
+    };
+    if (body.createdAt) {
+      data.createdAt = new Date(body.createdAt);
+      if (isDistantFuture(data.createdAt, 60 * 5)) {
+        return res.status(400).send({ error: "createdAt too far in future" });
       }
-      if (body.vintageYear < 1495) {
-        return res.status(400).send({ error: "Invalid vintageYear" });
+      if (isDistantPast(data.createdAt, 60 * 60 * 24 * 7)) {
+        return res.status(400).send({ error: "createdAt too far in past" });
       }
     }
 
@@ -114,17 +124,23 @@ export default {
         )[0].id;
       };
 
-      const [tasting] = await tx
-        .insert(tastings)
-        .values({
-          notes: body.notes || null,
-          rating: body.rating,
-          tags: body.tags ? body.tags.map((t) => t.toLowerCase()) : [],
-          bottleId: bottle.id,
-          editionId: await getEditionId(),
-          createdById: user.id,
-        })
-        .returning();
+      let tasting: Tasting | undefined;
+      try {
+        [tasting] = await tx
+          .insert(tastings)
+          .values({
+            ...data,
+            editionId: await getEditionId(),
+          })
+          .returning();
+      } catch (err: any) {
+        if (err?.code === "23505" && err?.constraint === "tasting_unq") {
+          res.status(409).send({ error: "Tasting already exists" });
+          return;
+        }
+        throw err;
+      }
+      if (!tasting) return;
 
       await tx
         .update(bottles)
@@ -151,6 +167,9 @@ export default {
       return tasting;
     });
 
+    if (!tasting) {
+      return res.status(500).send({ error: "Unable to create tasting" });
+    }
     res.status(201).send(await serialize(TastingSerializer, tasting, req.user));
   },
 } as RouteOptions<

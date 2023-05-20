@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS "tasting_unq" ON "tasting" ("bottle_id","created_by_id","created_at");

@@ -56,34 +56,42 @@ export default {
     }
 
     const comment = await db.transaction(async (tx) => {
-      const comment = first<Comment>(
-        await tx
+      let comment: Comment | undefined;
+      try {
+        [comment] = await tx
           .insert(comments)
           .values(data)
           .onConflictDoNothing()
-          .returning(),
-      );
-
-      if (comment) {
-        await tx
-          .update(tastings)
-          .set({ comments: sql`${tastings.comments} + 1` })
-          .where(eq(tastings.id, tasting.id));
-
-        if (comment.createdById !== tasting.createdById)
-          createNotification(tx, {
-            fromUserId: comment.createdById,
-            objectType: objectTypeFromSchema(comments),
-            objectId: comment.id,
-            createdAt: comment.createdAt,
-            userId: tasting.createdById,
-          });
+          .returning();
+      } catch (err: any) {
+        if (err?.code === "23505" && err?.constraint === "comment_unq") {
+          res.status(409).send({ error: "Comment already exists" });
+          return;
+        }
+        throw err;
       }
+      if (!comment) return;
+
+      await tx
+        .update(tastings)
+        .set({ comments: sql`${tastings.comments} + 1` })
+        .where(eq(tastings.id, tasting.id));
+
+      if (comment.createdById !== tasting.createdById)
+        createNotification(tx, {
+          fromUserId: comment.createdById,
+          objectType: objectTypeFromSchema(comments),
+          objectId: comment.id,
+          createdAt: comment.createdAt,
+          userId: tasting.createdById,
+        });
 
       return comment;
     });
 
-    if (!comment) return res.status(409).send({});
+    if (!comment) {
+      return res.status(500).send({ error: "Unable to create comment" });
+    }
 
     res.status(200).send(serialize(CommentSerializer, comment, req.user));
   },

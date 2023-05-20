@@ -15,6 +15,7 @@ import TextField from "../components/textField";
 import { useRequiredAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
 import { formatCategoryName, toTitleCase } from "../lib/strings";
+import { Bottle, Entity } from "../types";
 
 const categoryList = [
   "blend",
@@ -28,6 +29,13 @@ const categoryList = [
   name: formatCategoryName(c),
 }));
 
+const entityToOption = (entity: Entity): Option => {
+  return {
+    id: entity.id,
+    name: entity.name,
+  };
+};
+
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
 
 export default ({
@@ -35,7 +43,7 @@ export default ({
   initialData,
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
-  initialData: Record<string, any>;
+  initialData: Partial<Bottle>;
 }) => {
   const { user } = useRequiredAuth();
 
@@ -73,9 +81,11 @@ export default ({
     }
   };
 
-  const [brandValue, setBrandValue] = useState<Option>(initialData.brand);
+  const [brandValue, setBrandValue] = useState<Option | undefined>(
+    initialData.brand ? entityToOption(initialData.brand) : undefined,
+  );
   const [distillersValue, setDistillersValue] = useState<Option[]>(
-    initialData.distillers || [],
+    initialData.distillers ? initialData.distillers.map(entityToOption) : [],
   );
 
   return (

@@ -107,12 +107,13 @@ export const TastingInputSchema = z.object({
   edition: z.string().optional(),
   vintageYear: z.number().gte(1495).lte(new Date().getFullYear()).optional(),
   barrel: z.number().optional(),
+  createdAt: z.string().datetime().optional(),
 });
 
 export const CommentSchema = z.object({
   id: z.number(),
   comment: z.string().min(1, "Required"),
-  createdAt: z.string().datetime(),
+  createdAt: z.string().datetime().optional(),
   createdBy: UserSchema,
 });
 

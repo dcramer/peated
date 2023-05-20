@@ -1,4 +1,4 @@
-import { ReactNode, forwardRef } from "react";
+import { ForwardedRef, ReactNode, forwardRef } from "react";
 import { Link } from "react-router-dom";
 import classNames from "../lib/classNames";
 
@@ -31,7 +31,7 @@ type ConditionalProps =
 
 type Props = BaseProps & ConditionalProps;
 
-export default forwardRef<HTMLButtonElement | typeof Link, Props>(
+export default forwardRef<null | HTMLButtonElement | typeof Link, Props>(
   (
     {
       icon,
@@ -84,6 +84,7 @@ export default forwardRef<HTMLButtonElement | typeof Link, Props>(
     }
 
     if (to) {
+      // TODO: ref doesnt get passed here yet
       return (
         <Link
           className={classNames(
@@ -97,7 +98,6 @@ export default forwardRef<HTMLButtonElement | typeof Link, Props>(
             textColor,
           )}
           to={to}
-          ref={ref}
           {...props}
         >
           {icon}
@@ -118,7 +118,7 @@ export default forwardRef<HTMLButtonElement | typeof Link, Props>(
           textColor,
         )}
         type={type || "button"}
-        ref={ref}
+        ref={ref as ForwardedRef<HTMLButtonElement | null>}
         {...props}
       >
         {icon}

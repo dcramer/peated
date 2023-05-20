@@ -7,7 +7,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 
 import { db } from "../db";
-import { changes, entities } from "../db/schema";
+import { Entity, changes, entities } from "../db/schema";
 import { requireMod } from "../middleware/auth";
 
 function arraysEqual<T>(one: T[], two: T[]) {
@@ -66,11 +66,21 @@ export default {
     }
 
     const newEntity = await db.transaction(async (tx) => {
-      const [newEntity] = await tx
-        .update(entities)
-        .set(data)
-        .where(eq(entities.id, entity.id))
-        .returning();
+      let newEntity: Entity | undefined;
+      try {
+        [newEntity] = await tx
+          .update(entities)
+          .set(data)
+          .where(eq(entities.id, entity.id))
+          .returning();
+      } catch (err: any) {
+        if (err?.code === "23505" && err?.constraint === "entity_name_unq") {
+          res.status(409).send({ error: "Entity with name already exists" });
+          return;
+        }
+        throw err;
+      }
+      if (!newEntity) return;
 
       await tx.insert(changes).values({
         objectType: "entity",
@@ -83,6 +93,10 @@ export default {
 
       return newEntity;
     });
+
+    if (!newEntity) {
+      return res.status(500).send({ error: "Failed to update entity" });
+    }
 
     res.status(200).send(newEntity);
   },

@@ -5,7 +5,13 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
+import {
+  Bottle,
+  bottles,
+  bottlesToDistillers,
+  changes,
+  entities,
+} from "../db/schema";
 import { upsertEntity } from "../lib/db";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
@@ -24,7 +30,7 @@ export default {
   handler: async (req, res) => {
     const body = req.body;
 
-    const bottle = await db.transaction(async (tx) => {
+    const bottle: Bottle | undefined = await db.transaction(async (tx) => {
       const [brand] =
         typeof body.brand === "number"
           ? await tx.select().from(entities).where(eq(entities.id, body.brand))
@@ -41,7 +47,8 @@ export default {
               .returning();
 
       if (!brand) {
-        return res.status(400).send({ error: "Could not identify brand" });
+        res.status(400).send({ error: "Could not identify brand" });
+        return;
       }
 
       if (typeof body.brand !== "number") {
@@ -53,8 +60,9 @@ export default {
         });
       }
 
+      let bottle: Bottle | undefined;
       try {
-        const [bottle] = await tx
+        [bottle] = await tx
           .insert(bottles)
           .values({
             name: body.name,
@@ -66,10 +74,15 @@ export default {
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
-          return res
+          res
             .status(409)
-            .send({ error: "Bottle with name already exists under brand." });
+            .send({ error: "Bottle with name already exists under brand" });
+          return;
         }
+        throw err;
+      }
+      if (!bottle) {
+        return;
       }
 
       const distillerIds: number[] = [];
@@ -116,6 +129,10 @@ export default {
 
       return bottle;
     });
+
+    if (!bottle) {
+      return res.status(500).send({ error: "Failed to create bottle" });
+    }
 
     res.status(201).send(await serialize(BottleSerializer, bottle, req.user));
   },
