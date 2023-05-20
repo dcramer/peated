@@ -9,7 +9,7 @@ export default forwardRef<HTMLInputElement, Props>(
   ({ suffixLabel, className, ...props }, ref) => {
     const baseStyles = "bg-inherit p-0 border-0 sm:leading-6";
     const inputStyles =
-      "placeholder:text-slate-700 outline-none focus:ring-0 sm:leading-6";
+      "placeholder:text-slate-500 outline-none focus:ring-0 sm:leading-6";
     if (suffixLabel) {
       return (
         <div className={`flex ${baseStyles}`}>

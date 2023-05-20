@@ -147,8 +147,8 @@ export default function AddTasting() {
           <TextAreaField
             {...register("notes")}
             error={errors.notes}
-            label="Tasting Notes"
-            placeholder="Is it peated?"
+            label="Comments"
+            placeholder="Tell us how you really feel."
           />
 
           <ImageField
