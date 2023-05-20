@@ -1,6 +1,9 @@
+import { UserSchema } from "@peated/shared/schemas";
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { User, changes, tastings, users } from "../db/schema";
 import { serialize } from "../lib/serializers";
@@ -19,6 +22,17 @@ export default {
           anyOf: [{ type: "number" }, { type: "string" }, { const: "me" }],
         },
       },
+    },
+    response: {
+      200: zodToJsonSchema(
+        UserSchema.extend({
+          stats: z.object({
+            tastings: z.number(),
+            bottles: z.number(),
+            contributions: z.number(),
+          }),
+        }),
+      ),
     },
   },
   preHandler: [requireAuth],

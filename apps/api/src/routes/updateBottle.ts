@@ -1,26 +1,15 @@
+import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
 import { and, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import {
-  Category,
-  bottles,
-  bottlesToDistillers,
-  changes,
-  entities,
-} from "../db/schema";
-import { EntityInput, upsertEntity } from "../lib/db";
+import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
+import { upsertEntity } from "../lib/db";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireMod } from "../middleware/auth";
-
-type BottleInput = {
-  name: string;
-  category?: Category | null;
-  brand: EntityInput;
-  distillers: EntityInput[];
-  statedAge?: number | null;
-};
 
 export default {
   method: "PUT",
@@ -33,13 +22,9 @@ export default {
         bottleId: { type: "number" },
       },
     },
-    body: {
-      $ref: "/schemas/updateBottle",
-    },
+    body: zodToJsonSchema(BottleInputSchema.partial()),
     response: {
-      200: {
-        $ref: "/schemas/bottle",
-      },
+      200: zodToJsonSchema(BottleSchema),
     },
   },
   preHandler: [requireMod],
@@ -83,15 +68,23 @@ export default {
         .where(eq(bottlesToDistillers.bottleId, bottle.id))
     ).map(({ distiller }) => distiller);
     const newBottle = await db.transaction(async (tx) => {
-      const newBottle = Object.values(bottleData).length
-        ? (
-            await tx
-              .update(bottles)
-              .set(bottleData)
-              .where(eq(bottles.id, bottle.id))
-              .returning()
-          )[0]
-        : bottle;
+      try {
+        const newBottle = Object.values(bottleData).length
+          ? (
+              await tx
+                .update(bottles)
+                .set(bottleData)
+                .where(eq(bottles.id, bottle.id))
+                .returning()
+            )[0]
+          : bottle;
+      } catch (err: any) {
+        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+          return res
+            .status(409)
+            .send({ error: "Bottle with name already exists under brand." });
+        }
+      }
 
       if (body.brand) {
         if (
@@ -197,6 +190,6 @@ export default {
     Params: {
       bottleId: number;
     };
-    Body: Partial<BottleInput>;
+    Body: Partial<z.infer<typeof BottleInputSchema>>;
   }
 >;

@@ -67,8 +67,7 @@ export const TastingSerializer: Serializer<Tasting> = {
     );
 
     const editionList = results.map((r) => r.edition).filter(notEmpty);
-
-    const editionsByRef = Object.fromEntries(
+    const editionsById = Object.fromEntries(
       (await serialize(EditionSerializer, editionList, currentUser)).map(
         (data, index) => [editionList[index].id, data],
       ),
@@ -80,7 +79,7 @@ export const TastingSerializer: Serializer<Tasting> = {
           item.id,
           {
             hasToasted: userToastsList.indexOf(item.id) !== -1,
-            edition: item.editionId ? editionsByRef[item.id] : null,
+            edition: item.editionId ? editionsById[item.editionId] : null,
             createdBy: usersByRef[item.id] || null,
             bottle: bottlesByRef[item.id] || null,
           },

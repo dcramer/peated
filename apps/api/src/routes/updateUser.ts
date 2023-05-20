@@ -1,8 +1,12 @@
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
+
+import { UserInputSchema, UserSchema } from "@peated/shared/schemas";
 import { db } from "../db";
-import { User, users } from "../db/schema";
+import { users } from "../db/schema";
 import { serialize } from "../lib/serializers";
 import { UserSerializer } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
@@ -18,13 +22,9 @@ export default {
         userId: { anyOf: [{ type: "number" }, { const: "me" }] },
       },
     },
-    body: {
-      $ref: "/schemas/updateUser",
-    },
+    body: zodToJsonSchema(UserInputSchema.partial()),
     response: {
-      200: {
-        $ref: "/schemas/user",
-      },
+      200: zodToJsonSchema(UserSchema),
     },
   },
   preHandler: [requireAuth],
@@ -98,6 +98,6 @@ export default {
     Params: {
       userId: number | "me";
     };
-    Body: Partial<Pick<User, "displayName" | "admin" | "mod" | "username">>;
+    Body: Partial<z.infer<typeof UserInputSchema>>;
   }
 >;

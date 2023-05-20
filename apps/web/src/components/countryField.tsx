@@ -291,6 +291,7 @@ export default ({
       helpText={helpText}
       className={className}
       options={options}
+      suggestedOptions={[]}
       error={error}
       onChange={(value) => onChange && onChange(value ? value.name : "")}
     />

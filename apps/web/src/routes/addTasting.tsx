@@ -5,7 +5,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 
-import { NewTasting } from "@peated/shared/schemas";
+import { TastingInputSchema } from "@peated/shared/schemas";
 
 import BottleCard from "../components/bottleCard";
 import Fieldset from "../components/fieldset";
@@ -27,7 +27,7 @@ type Tag = {
   count: number;
 };
 
-type FormSchemaType = z.infer<typeof NewTasting>;
+type FormSchemaType = z.infer<typeof TastingInputSchema>;
 
 export default function AddTasting() {
   const { bottleId } = useParams();
@@ -55,7 +55,7 @@ export default function AddTasting() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(NewTasting),
+    resolver: zodResolver(TastingInputSchema),
     defaultValues: {
       bottle: bottle.id,
     },
@@ -109,29 +109,28 @@ export default function AddTasting() {
 
         <Fieldset>
           <RangeField
-            label="Rating"
-            error={errors.rating}
             {...register("rating", {
               valueAsNumber: true,
               setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
             })}
+            error={errors.rating}
+            label="Rating"
           />
 
           <Controller
             name="tags"
             control={control}
-            render={({ field: { name, onChange, value, ref, ...field } }) => (
+            render={({ field: { onChange, value, ref, ...field } }) => (
               <SelectField
-                label="Flavors"
+                {...field}
                 error={errors.tags}
-                name={name}
+                label="Flavors"
                 targetOptions={5}
                 options={suggestedTags.map((t) => ({
                   id: t.name,
                   name: toTitleCase(t.name),
                   count: t.count,
                 }))}
-                {...field}
                 onChange={(value) => onChange(value.map((t: any) => t.id))}
                 value={value?.map((t) => ({
                   id: t,
@@ -143,9 +142,9 @@ export default function AddTasting() {
           />
 
           <TextAreaField
-            label="Tasting Notes"
-            error={errors.notes}
             {...register("notes")}
+            error={errors.notes}
+            label="Tasting Notes"
             placeholder="Is it peated?"
           />
 
@@ -169,13 +168,13 @@ export default function AddTasting() {
           </div>
 
           <TextField
-            type="number"
             {...register("vintageYear", {
               // valueAsNumber: true,
               // SIGH https://github.com/orgs/react-hook-form/discussions/6980
               setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
             })}
             error={errors.vintageYear}
+            type="number"
             label="Year"
             placeholder="e.g. 2023"
           />
@@ -186,12 +185,12 @@ export default function AddTasting() {
             placeholder="e.g. Healthy Spirits"
           />
           <TextField
-            type="number"
             {...register("barrel", {
               // valueAsNumber: true,
               setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
             })}
             error={errors.barrel}
+            type="number"
             label="Barrel No."
             placeholder="e.g. 56"
           />

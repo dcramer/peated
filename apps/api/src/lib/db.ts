@@ -4,7 +4,12 @@ import { Entity, EntityType, NewEntity, changes, entities } from "../db/schema";
 
 export type EntityInput =
   | number
-  | { name: string; country: string; region?: string };
+  | {
+      name: string;
+      country?: string;
+      region?: string;
+      type?: ("brand" | "bottler" | "distiller")[];
+    };
 
 export type UpsertOutcome<T> =
   | {
@@ -53,7 +58,7 @@ export const upsertEntity = async ({
         name: data.name,
         country: data.country || null,
         region: data.region || null,
-        type: [type],
+        type: Array.from(new Set([type, ...(data.type || [])])),
         createdById: userId,
       })
       .onConflictDoNothing()

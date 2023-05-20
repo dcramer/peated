@@ -75,7 +75,7 @@ export default ({
   className,
   multiple,
   targetOptions = 5,
-  suggestedOptions = [],
+  suggestedOptions,
   canCreate,
   createForm,
   placeholder,
@@ -104,8 +104,7 @@ export default ({
   const [previousValues, setPreviousValues] = useState<Option[]>(value);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  if (!suggestedOptions.length)
-    suggestedOptions = options.slice(0, targetOptions);
+  if (!suggestedOptions) suggestedOptions = options.slice(0, targetOptions);
 
   const toggleOption = (option: Option) => {
     setPreviousValues(filterDupes([option], previousValues));

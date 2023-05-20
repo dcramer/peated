@@ -1,6 +1,9 @@
+import { CommentSchema, PaginatedSchema } from "@peated/shared/schemas";
 import { and, asc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { comments } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
@@ -21,21 +24,11 @@ export default {
       },
     },
     response: {
-      200: {
-        type: "object",
-        properties: {
-          results: {
-            type: "array",
-            items: {
-              $ref: "/schemas/comment",
-            },
-          },
-          rel: {
-            type: "object",
-            $ref: "/schemas/paging",
-          },
-        },
-      },
+      200: zodToJsonSchema(
+        PaginatedSchema.extend({
+          results: z.array(CommentSchema),
+        }),
+      ),
     },
   },
   preHandler: [requireAuth],

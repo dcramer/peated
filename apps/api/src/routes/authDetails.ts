@@ -1,7 +1,9 @@
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 
+import { AuthSchema } from "@peated/shared/schemas";
 import { eq } from "drizzle-orm";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { serialize } from "../lib/serializers";
@@ -14,16 +16,7 @@ export default {
   preHandler: [requireAuth],
   schema: {
     response: {
-      200: {
-        type: "object",
-        required: ["user"],
-        properties: {
-          user: { $ref: "/schemas/user" },
-        },
-      },
-      401: {
-        $ref: "/errors/401",
-      },
+      200: zodToJsonSchema(AuthSchema),
     },
   },
   handler: async function (req, res) {

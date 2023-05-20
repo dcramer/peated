@@ -1,6 +1,9 @@
+import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { NewEntity, changes, entities } from "../db/schema";
 import { serialize } from "../lib/serializers";
@@ -11,13 +14,9 @@ export default {
   method: "POST",
   url: "/entities",
   schema: {
-    body: {
-      $ref: "/schemas/newEntity",
-    },
+    body: zodToJsonSchema(EntityInputSchema),
     response: {
-      201: {
-        $ref: "/schemas/entity",
-      },
+      201: zodToJsonSchema(EntitySchema),
     },
   },
   preHandler: [requireMod],
@@ -69,7 +68,7 @@ export default {
     });
 
     if (!entity) {
-      return res.status(409).send("Unable to create entity");
+      return res.status(409).send({ error: "Unable to create entity" });
     }
 
     res.status(201).send(await serialize(EntitySerializer, entity, req.user));
@@ -79,6 +78,6 @@ export default {
   IncomingMessage,
   ServerResponse,
   {
-    Body: NewEntity;
+    Body: z.infer<typeof EntityInputSchema>;
   }
 >;

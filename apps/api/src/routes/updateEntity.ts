@@ -1,16 +1,14 @@
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
-import { db } from "../db";
-import { EntityType, changes, entities } from "../db/schema";
-import { requireMod } from "../middleware/auth";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
-type EntityInput = {
-  name: string;
-  country: string;
-  region: string;
-  type: EntityType[];
-};
+import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
+
+import { db } from "../db";
+import { changes, entities } from "../db/schema";
+import { requireMod } from "../middleware/auth";
 
 function arraysEqual<T>(one: T[], two: T[]) {
   if (one.length !== two.length) return false;
@@ -31,13 +29,9 @@ export default {
         entityId: { type: "number" },
       },
     },
-    body: {
-      $ref: "/schemas/updateEntity",
-    },
+    body: zodToJsonSchema(EntityInputSchema.partial()),
     response: {
-      200: {
-        $ref: "/schemas/entity",
-      },
+      200: zodToJsonSchema(EntitySchema),
     },
   },
   preHandler: [requireMod],
@@ -100,6 +94,6 @@ export default {
     Params: {
       entityId: number;
     };
-    Body: Partial<EntityInput>;
+    Body: Partial<z.infer<typeof EntityInputSchema>>;
   }
 >;

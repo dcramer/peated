@@ -4,14 +4,20 @@ import Tooltip from "./tooltip";
 
 type Props = {
   data: {
-    brand?: {
-      id?: string | number | undefined | null;
-      name: string;
-    };
-    distillers?: {
-      id?: string | number | undefined | null;
-      name: string;
-    }[];
+    brand?:
+      | {
+          id?: string | number | undefined | null;
+          name: string;
+        }
+      | undefined
+      | null;
+    distillers?:
+      | {
+          id?: string | number | undefined | null;
+          name: string;
+        }[]
+      | undefined
+      | null;
   };
   showBrand?: boolean;
 } & ComponentPropsWithoutRef<"p">;
@@ -47,7 +53,7 @@ const Brand = ({ data: { brand } }: Props) => {
           </Link>
         </Tooltip>
       ) : (
-        brandName
+        <span>{brandName}</span>
       )}
     </div>
   );

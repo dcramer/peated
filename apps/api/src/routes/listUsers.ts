@@ -1,6 +1,10 @@
 import { SQL, and, asc, ilike, or } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+
+import { PaginatedSchema, UserSchema } from "@peated/shared/schemas";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
@@ -20,21 +24,11 @@ export default {
       },
     },
     response: {
-      200: {
-        type: "object",
-        properties: {
-          results: {
-            type: "array",
-            items: {
-              $ref: "/schemas/user",
-            },
-          },
-          rel: {
-            type: "object",
-            $ref: "/schemas/paging",
-          },
-        },
-      },
+      200: zodToJsonSchema(
+        PaginatedSchema.extend({
+          results: z.array(UserSchema),
+        }),
+      ),
     },
   },
   preHandler: [requireAuth],

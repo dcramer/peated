@@ -4,7 +4,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
-import { NewTasting } from "@peated/shared/schemas";
+import { TastingInputSchema, TastingSchema } from "@peated/shared/schemas";
 
 import { db } from "../db";
 import {
@@ -23,11 +23,9 @@ export default {
   method: "POST",
   url: "/tastings",
   schema: {
-    body: zodToJsonSchema(NewTasting),
+    body: zodToJsonSchema(TastingInputSchema),
     response: {
-      201: {
-        $ref: "/schemas/tasting",
-      },
+      201: zodToJsonSchema(TastingSchema),
     },
   },
   preHandler: [requireAuth],
@@ -160,6 +158,6 @@ export default {
   IncomingMessage,
   ServerResponse,
   {
-    Body: z.infer<typeof NewTasting>;
+    Body: z.infer<typeof TastingInputSchema>;
   }
 >;

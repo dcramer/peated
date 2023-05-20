@@ -20,21 +20,12 @@ export default {
       },
     },
     response: {
-      200: {
-        type: "object",
-        properties: {
-          results: {
-            type: "array",
-            items: {
-              $ref: "/schemas/notification",
-            },
-          },
-          rel: {
-            type: "object",
-            $ref: "/schemas/paging",
-          },
-        },
-      },
+      // TODO: theres an issue w/ the ref type
+      // 200: zodToJsonSchema(
+      //   PaginatedSchema.extend({
+      //     results: z.array(NotificationSchema),
+      //   }),
+      // ),
     },
   },
   preHandler: [requireAuth],

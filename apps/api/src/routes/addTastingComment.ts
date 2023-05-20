@@ -1,6 +1,8 @@
+import { CommentInputSchema, CommentSchema } from "@peated/shared/schemas";
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db, first } from "../db";
 import { Comment, NewComment, comments, tastings } from "../db/schema";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
@@ -20,13 +22,9 @@ export default {
         tastingId: { type: "number" },
       },
     },
-    body: {
-      $ref: "/schemas/newComment",
-    },
+    body: zodToJsonSchema(CommentInputSchema),
     response: {
-      201: {
-        $ref: "/schemas/comment",
-      },
+      201: zodToJsonSchema(CommentSchema),
     },
   },
   preHandler: [requireAuth],
