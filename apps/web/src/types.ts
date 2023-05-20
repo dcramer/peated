@@ -45,8 +45,9 @@ export type Bottle = {
 
 export type Edition = {
   id: number;
-  name: string;
   bottle: Bottle;
+  name?: string;
+  vintageYear?: number;
   barrel?: number;
   createdAt: string;
   createdBy?: User;
@@ -148,6 +149,13 @@ export type ToastNotification = BaseNotification & {
 export type CommentNotification = BaseNotification & {
   objectType: "comment";
   ref: TastingRef;
+};
+
+export type Collection = {
+  id: number;
+  name: string;
+  createdAt?: string;
+  createdBy?: User;
 };
 
 export type Notification =

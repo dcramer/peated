@@ -55,7 +55,7 @@ export default function SearchHeader({
             setValue(e.target.value);
             if (onChange) onChange(e.target.value);
           }}
-          className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-700 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
+          className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-500 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
         />
       </form>
       {onDone && (

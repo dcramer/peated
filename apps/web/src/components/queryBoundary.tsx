@@ -9,7 +9,7 @@ export default ({
   loading,
 }: {
   children: React.ReactNode;
-  fallback?: FallbackRender;
+  fallback?: FallbackRender | null;
   loading?: ReactNode;
 }) => (
   <QueryErrorResetBoundary>

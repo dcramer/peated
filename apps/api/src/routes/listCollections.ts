@@ -1,11 +1,11 @@
 import { CollectionSchema, PaginatedSchema } from "@peated/shared/schemas";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { collections } from "../db/schema";
+import { collectionBottles, collections } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { CollectionSerializer } from "../lib/serializers/collection";
@@ -20,6 +20,7 @@ export default {
       properties: {
         page: { type: "number" },
         user: { oneOf: [{ type: "number" }, { const: "me" }] },
+        bottle: { type: "number" },
       },
     },
     response: {
@@ -43,6 +44,12 @@ export default {
           collections.createdById,
           req.query.user === "me" ? req.user.id : req.query.user,
         ),
+      );
+    }
+
+    if (req.query.bottle) {
+      where.push(
+        sql`EXISTS(SELECT 1 FROM ${collectionBottles} WHERE ${collectionBottles.bottleId} = ${req.query.bottle} AND ${collectionBottles.collectionId} = ${collections.id})`,
       );
     }
 
@@ -81,6 +88,7 @@ export default {
   {
     Querystring: {
       user: number | "me";
+      bottle: number;
       page?: number;
     };
   }

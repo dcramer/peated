@@ -46,7 +46,7 @@ export default function AppHeader() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for anything"
           autoComplete="off"
-          className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-600 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
+          className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-500 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
         />
       </form>
       {user && (

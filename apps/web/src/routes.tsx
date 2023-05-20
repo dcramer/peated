@@ -5,7 +5,9 @@ import About from "./routes/about";
 import Activity from "./routes/activity";
 import AddBottle from "./routes/addBottle";
 import AddTasting from "./routes/addTasting";
+import BottleActivity from "./routes/bottleActivity";
 import BottleDetails from "./routes/bottleDetails";
+import BottleVintages from "./routes/bottleVintages";
 import BottleList from "./routes/bottles";
 import EditBottle from "./routes/editBottle";
 import EditEntity from "./routes/editEntity";
@@ -39,6 +41,16 @@ export default function createRoutes() {
         {
           path: "bottles/:bottleId",
           element: <BottleDetails />,
+          children: [
+            {
+              index: true,
+              element: <BottleActivity />,
+            },
+            {
+              path: "vintages",
+              element: <BottleVintages />,
+            },
+          ],
         },
         {
           path: "bottles/:bottleId/addTasting",

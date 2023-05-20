@@ -121,7 +121,7 @@ export default ({
             label="Bottle"
             required
             helpText="The full name of the bottle, excluding its specific cask information."
-            placeholder="e.g. Macallan 12"
+            placeholder="e.g. 12-year-old"
           />
 
           <Controller

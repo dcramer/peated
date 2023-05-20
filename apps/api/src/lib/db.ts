@@ -1,6 +1,15 @@
 import { eq } from "drizzle-orm";
+import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { first } from "../db";
-import { Entity, EntityType, NewEntity, changes, entities } from "../db/schema";
+import {
+  Collection,
+  Entity,
+  EntityType,
+  NewEntity,
+  changes,
+  collections,
+  entities,
+} from "../db/schema";
 
 export type EntityInput =
   | number
@@ -30,7 +39,7 @@ export const upsertEntity = async ({
   userId,
   type,
 }: {
-  db: any;
+  db: NodePgDatabase;
   data: EntityInput;
   userId: number;
   type?: EntityType;
@@ -58,7 +67,9 @@ export const upsertEntity = async ({
         name: data.name,
         country: data.country || null,
         region: data.region || null,
-        type: Array.from(new Set([type, ...(data.type || [])])),
+        type: Array.from(
+          new Set([...(type ? [type] : []), ...(data.type || [])]),
+        ),
         createdById: userId,
       })
       .onConflictDoNothing()
@@ -83,4 +94,36 @@ export const upsertEntity = async ({
   if (resultConflict)
     return { id: resultConflict.id, result: resultConflict, created: false };
   throw new Error("We should never hit this case in upsert");
+};
+
+export const getDefaultCollection = async (
+  db: NodePgDatabase,
+  userId: number,
+) => {
+  return (
+    first<Collection>(
+      await db
+        .select()
+        .from(collections)
+        .where(eq(collections.createdById, userId))
+        .limit(1),
+    ) ||
+    first<Collection>(
+      await db
+        .insert(collections)
+        .values({
+          name: "Default",
+          createdById: userId,
+        })
+        .onConflictDoNothing()
+        .returning(),
+    ) ||
+    (
+      await db
+        .select()
+        .from(collections)
+        .where(eq(collections.createdById, userId))
+        .limit(1)
+    )[0]
+  );
 };

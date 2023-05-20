@@ -139,7 +139,7 @@ export default function Profile() {
           Activity
         </Tabs.Item>
         <Tabs.Item to={`/users/${user.username}/collections`} controlled>
-          Collections
+          Collection
         </Tabs.Item>
       </Tabs>
       <QueryBoundary>
