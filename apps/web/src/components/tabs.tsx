@@ -38,7 +38,7 @@ Tabs.Item = ({
 
   const activeStyles = "text-highlight border-highlight";
   const inactiveStyles =
-    "border-transparent text-slate-700 hover:border-slate-500 hover:text-slate-500";
+    "border-transparent text-slate-500 hover:border-slate-500 hover:text-slate-500";
 
   return (
     <Link
