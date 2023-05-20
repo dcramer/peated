@@ -46,7 +46,7 @@ export default {
     const data: NewTasting = {
       bottleId: bottle.id,
       notes: body.notes || null,
-      rating: body.rating,
+      rating: body.rating || null,
       tags: body.tags ? body.tags.map((t) => t.toLowerCase()) : [],
       createdById: req.user.id,
     };
