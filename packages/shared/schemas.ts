@@ -96,6 +96,8 @@ export const TastingSchema = z.object({
   notes: z.string().nullable(),
   bottle: BottleSchema,
   rating: z.number().gte(0).lte(5).nullable(),
+  tags: z.array(z.string()).optional(),
+
   comments: z.number().gte(0),
   toasts: z.number().gte(0),
   hasToasted: z.boolean().optional(),
@@ -106,9 +108,9 @@ export const TastingSchema = z.object({
 
 export const TastingInputSchema = z.object({
   bottle: z.number(),
-  notes: z.string().optional(),
-  rating: z.number().gte(0).lte(5).optional(),
-  tags: z.array(z.string()).optional(),
+  notes: z.string().nullable().optional(),
+  rating: z.number().gte(0).lte(5).nullable().optional(),
+  tags: z.array(z.string()).nullable().optional(),
   edition: z.string().trim().nullable().optional(),
   vintageYear: z
     .number()
