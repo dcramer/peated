@@ -69,7 +69,7 @@ test("creates a new bottle with all params", async () => {
     method: "POST",
     url: "/bottles",
     payload: {
-      name: "Delicious Wood",
+      name: "Delicious Wood 12-year-old",
       brand: brand.id,
       distillers: [distiller.id],
       statedAge: 12,
@@ -85,7 +85,7 @@ test("creates a new bottle with all params", async () => {
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.name).toEqual("Delicious Wood");
+  expect(bottle.name).toEqual("Delicious Wood 12-year-old");
   expect(bottle.brandId).toEqual(brand.id);
   expect(bottle.statedAge).toEqual(12);
   expect(bottle.createdById).toBe(DefaultFixtures.user.id);
@@ -459,4 +459,21 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
       ),
     );
   expect(changeList.length).toBe(1);
+});
+
+test("refuses bottle w/ age signal", async () => {
+  const brand = await Fixtures.Entity();
+  const distiller = await Fixtures.Entity();
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood 12-year-old",
+      brand: brand.id,
+      distillers: [distiller.id],
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(400);
 });

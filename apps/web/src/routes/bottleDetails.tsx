@@ -1,20 +1,21 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
 
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { Fragment, useState } from "react";
 import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
 import BottleMetadata from "../components/bottleMetadata";
 import BottleName from "../components/bottleName";
 import Button from "../components/button";
-import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
-import TastingList from "../components/tastingList";
+import QueryBoundary from "../components/queryBoundary";
+import Tabs from "../components/tabs";
 import TimeSince from "../components/timeSince";
 import useAuth from "../hooks/useAuth";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
-import type { Bottle, Paginated, Tasting } from "../types";
+import type { Bottle, Collection, Paginated } from "../types";
 
 type BottleWithStats = Bottle & {
   tastings: number;
@@ -22,21 +23,66 @@ type BottleWithStats = Bottle & {
   people: number;
 };
 
+const CollectionAction = () => {
+  const { bottleId } = useParams();
+  const {
+    data: { results: collectionList },
+  } = useSuspenseQuery(
+    ["bottles", bottleId, "collections"],
+    (): Promise<Paginated<Collection>> =>
+      api.get(`/collections`, {
+        query: {
+          user: "me",
+          bottle: bottleId,
+        },
+      }),
+  );
+
+  const [isCollected, setIsCollected] = useState(collectionList.length > 0);
+  const [loading, setLoading] = useState(false);
+
+  const collect = async () => {
+    if (loading) return;
+    setLoading(true);
+    if (isCollected) {
+      await api.delete(`/collections/default/bottles/${bottleId}`);
+      setIsCollected(false);
+    } else {
+      await api.post("/collections/default/bottles", {
+        data: { bottle: bottleId },
+      });
+      setIsCollected(true);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <Button onClick={collect} disabled={loading}>
+      {isCollected ? "Remove from Collection" : "Add to Collection"}
+    </Button>
+  );
+
+  // return (
+  //   <Menu as="div" className="menu">
+  //     <Menu.Button as={Button}>
+  //       {collectionList.length ? "Collected" : "Add to Collection"}
+  //     </Menu.Button>
+  //     <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+  //       <Menu.Item as="button">Default</Menu.Item>
+  //     </Menu.Items>
+  //   </Menu>
+  // );
+};
+
 export default function BottleDetails() {
   const { user: currentUser } = useAuth();
 
   const { bottleId } = useParams();
+  if (!bottleId) return null;
+
   const { data: bottle } = useSuspenseQuery(
     ["bottles", bottleId],
     (): Promise<BottleWithStats> => api.get(`/bottles/${bottleId}`),
-  );
-
-  const { data: tastingList } = useSuspenseQuery(
-    ["bottle", bottleId, "tastings"],
-    (): Promise<Paginated<Tasting>> =>
-      api.get(`/tastings`, {
-        query: { bottle: bottleId },
-      }),
   );
 
   const stats = [
@@ -72,12 +118,9 @@ export default function BottleDetails() {
         <Button to={`/bottles/${bottle.id}/addTasting`} color="primary">
           Record a Tasting
         </Button>
-        <Menu as="div" className="menu">
-          <Menu.Button as={Button}>Add to Collection</Menu.Button>
-          <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
-            <Menu.Item as="button">Default</Menu.Item>
-          </Menu.Items>
-        </Menu>
+        <QueryBoundary loading={<Fragment />} fallback={() => <Fragment />}>
+          <CollectionAction />
+        </QueryBoundary>
 
         {currentUser?.mod && (
           <Menu as="div" className="menu">
@@ -104,19 +147,20 @@ export default function BottleDetails() {
         ))}
       </div>
 
-      {tastingList.results.length ? (
-        <TastingList values={tastingList.results} noBottle />
-      ) : (
-        <EmptyActivity to={`/bottles/${bottle.id}/addTasting`}>
-          <span className="mt-2 block font-semibold ">
-            Are you enjoying a dram?
-          </span>
+      <div className="border-b border-slate-700">
+        <Tabs fullWidth>
+          <Tabs.Item to={`/bottles/${bottle.id}`} controlled>
+            Activity
+          </Tabs.Item>
+          <Tabs.Item to={`/bottles/${bottle.id}/vintages`} controlled>
+            Vintages
+          </Tabs.Item>
+        </Tabs>
+      </div>
+      <QueryBoundary>
+        <Outlet />
+      </QueryBoundary>
 
-          <span className="mt-2 block font-light">
-            Looks like no ones recorded this spirit. You could be the first!
-          </span>
-        </EmptyActivity>
-      )}
       {bottle.createdBy && (
         <p className="mt-8 text-center text-sm text-slate-500 sm:text-left">
           This bottle was first added by{" "}

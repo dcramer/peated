@@ -77,9 +77,14 @@ export const BottleInputSchema = z.object({
 export const EditionSchema = z.object({
   id: z.number(),
 
-  name: z.string().optional(),
-  vintageYear: z.number().gte(1495).lte(new Date().getFullYear()).optional(),
-  barrel: z.number().optional(),
+  name: z.string().nullable().optional(),
+  vintageYear: z
+    .number()
+    .gte(1495)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .optional(),
+  barrel: z.number().nullable().optional(),
 
   createdAt: z.string().datetime().optional(),
   createdBy: UserSchema.optional(),
@@ -104,9 +109,14 @@ export const TastingInputSchema = z.object({
   notes: z.string().optional(),
   rating: z.number().gte(0).lte(5).optional(),
   tags: z.array(z.string()).optional(),
-  edition: z.string().optional(),
-  vintageYear: z.number().gte(1495).lte(new Date().getFullYear()).optional(),
-  barrel: z.number().optional(),
+  edition: z.string().trim().nullable().optional(),
+  vintageYear: z
+    .number()
+    .gte(1495)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .optional(),
+  barrel: z.number().nullable().optional(),
   createdAt: z.string().datetime().optional(),
 });
 

@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyPluginCallback } from "fastify";
 
 import addBottle from "./addBottle";
+import addCollectionBottle from "./addCollectionBottle";
 import addEntity from "./addEntity";
 import addTasting from "./addTasting";
 import addTastingComment from "./addTastingComment";
@@ -9,6 +10,7 @@ import addUserFollow from "./addUserFollow";
 import authBasic from "./authBasic";
 import authDetails from "./authDetails";
 import authGoogle from "./authGoogle";
+import deleteCollectionBottle from "./deleteCollectionBottle";
 import deleteComment from "./deleteComment";
 import deleteNotification from "./deleteNotification";
 import deleteTasting from "./deleteTasting";
@@ -17,6 +19,7 @@ import getBottle from "./getBottle";
 import getEntity from "./getEntity";
 import getTasting from "./getTasting";
 import getUser from "./getUser";
+import listBottleEditions from "./listBottleEditions";
 import listBottleSuggestedTags from "./listBottleSuggestedTags";
 import listBottles from "./listBottles";
 import listCollections from "./listCollections";
@@ -63,7 +66,10 @@ export const router: FastifyPluginCallback = (
   fastify.route(addBottle);
   fastify.route(getBottle);
   fastify.route(updateBottle);
+
   fastify.route(listBottleSuggestedTags);
+
+  fastify.route(listBottleEditions);
 
   fastify.route(listEntities);
   fastify.route(addEntity);
@@ -93,6 +99,8 @@ export const router: FastifyPluginCallback = (
   fastify.route(deleteUserFollow);
 
   fastify.route(listCollections);
+  fastify.route(addCollectionBottle);
+  fastify.route(deleteCollectionBottle);
 
   fastify.route(listComments);
   fastify.route(deleteComment);

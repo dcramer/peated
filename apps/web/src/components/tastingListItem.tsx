@@ -57,7 +57,9 @@ export default ({
           </Link>
         </div>
         <div className="flex flex-col items-end gap-y-2">
-          <StaticRating value={tasting.rating} size="small" />
+          {tasting.rating && (
+            <StaticRating value={tasting.rating} size="small" />
+          )}
           <Tags tags={tasting.tags} />
         </div>
       </div>

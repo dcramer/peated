@@ -17,6 +17,14 @@ import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireAuth } from "../middleware/auth";
 
+const fixBottleName = (name: string, age?: number | null): string => {
+  // try to ease UX and normalize common name components
+  return name
+    .replace(" years old", "-year-old")
+    .replace(" year old", "-year-old")
+    .replace("-years-old", "-year-old");
+};
+
 export default {
   method: "POST",
   url: "/bottles",
@@ -29,6 +37,19 @@ export default {
   preHandler: [requireAuth],
   handler: async (req, res) => {
     const body = req.body;
+
+    if (
+      (body.name.indexOf("-year-old") !== -1 ||
+        body.name.indexOf("-years-old") !== -1 ||
+        body.name.indexOf("year old") !== -1 ||
+        body.name.indexOf("years old") !== -1) &&
+      !body.statedAge
+    ) {
+      res
+        .status(400)
+        .send({ error: "You should include the Stated Age of the bottle" });
+      return;
+    }
 
     const bottle: Bottle | undefined = await db.transaction(async (tx) => {
       const [brand] =
@@ -65,7 +86,7 @@ export default {
         [bottle] = await tx
           .insert(bottles)
           .values({
-            name: body.name,
+            name: fixBottleName(body.name, body.statedAge),
             statedAge: body.statedAge || null,
             category: body.category || null,
             brandId: brand.id,

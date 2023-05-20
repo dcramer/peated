@@ -268,6 +268,7 @@ export type NewCollection = InferModel<typeof collections, "insert">;
 export const collectionBottles = pgTable(
   "collection_bottle",
   {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
     collectionId: bigint("collection_id", { mode: "number" })
       .references(() => collections.id)
       .notNull(),
@@ -280,7 +281,7 @@ export const collectionBottles = pgTable(
   },
   (collectionBottles) => {
     return {
-      collectionDistillerId: primaryKey(
+      collectionDistillerId: uniqueIndex("collection_bottle_unq").on(
         collectionBottles.collectionId,
         collectionBottles.bottleId,
         collectionBottles.editionId,

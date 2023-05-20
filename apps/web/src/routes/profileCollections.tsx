@@ -1,30 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { useOutletContext } from "react-router-dom";
+import BottleTable from "../components/bottleTable";
 import EmptyActivity from "../components/emptyActivity";
-import QueryBoundary from "../components/queryBoundary";
 import api from "../lib/api";
-import { Paginated, Tasting, User } from "../types";
+import { Bottle, Paginated, User } from "../types";
 
 export default function ProfileCollections() {
   const { user } = useOutletContext<{ user: User }>();
 
   const { data } = useQuery({
     queryKey: ["collections", "user", user.id],
-    queryFn: (): Promise<Paginated<Tasting>> =>
-      api.get("/collections", {
+    queryFn: (): Promise<Paginated<Bottle>> =>
+      api.get("/bottles", {
         query: {
           user: user.id,
+          collection: "default",
         },
       }),
   });
 
   return (
-    <QueryBoundary>
+    <>
       {data && data.results.length ? (
-        <p>Show collections here</p>
+        <BottleTable bottleList={data.results} rel={data.rel} />
       ) : (
         <EmptyActivity>No collections started yet.</EmptyActivity>
       )}
-    </QueryBoundary>
+    </>
   );
 }
