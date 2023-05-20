@@ -11,7 +11,8 @@
     "@fontsource/raleway": "^4.5.12",
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.17",
-    "@peated/shared": "file:../../packages/shared",
+    "@hookform/resolvers": "^3.1.0",
+    "@peated/shared": "workspace:*",
     "@react-oauth/google": "^0.11.0",
     "@rollup/plugin-replace": "^5.0.2",
     "@sentry/react": "^7.51.0",
@@ -30,6 +31,7 @@
     "postcss": "^8.4.23",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.9",
     "react-router-dom": "^6.11.0",
     "tailwindcss": "^3.3.2",
     "typescript": "^5.0.4",
@@ -50,7 +52,8 @@
     "workbox-routing": "^6.5.4",
     "workbox-strategies": "^6.5.4",
     "workbox-streams": "^6.5.4",
-    "workbox-window": "^6.5.4"
+    "workbox-window": "^6.5.4",
+    "zod": "^3.21.4"
   },
   "proxy": "http://localhost:4000"
 }

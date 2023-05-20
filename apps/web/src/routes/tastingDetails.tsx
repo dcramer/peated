@@ -22,7 +22,7 @@ const CommentForm = ({
   user,
   onComment,
 }: {
-  tastingId: string;
+  tastingId: number;
   user: User;
   onComment: (comment: Comment) => void;
 }) => {
@@ -32,7 +32,7 @@ const CommentForm = ({
   const [saving, setSaving] = useState(false);
 
   return (
-    <div className="flex items-start space-x-4">
+    <div className="flex items-start space-x-4 px-3">
       <div className="flex-shrink-0">
         <UserAvatar user={user} size={36} />
       </div>
@@ -111,7 +111,7 @@ const CommentList = ({
   newValues = [],
 }: {
   user?: User | null;
-  tastingId: string;
+  tastingId: number;
   newValues?: Comment[];
 }) => {
   const { data } = useSuspenseQuery(
@@ -120,7 +120,7 @@ const CommentList = ({
       api.get(`/comments`, { query: { tasting: tastingId } }),
   );
 
-  const [deleted, setDeleted] = useState<string[]>([]);
+  const [deleted, setDeleted] = useState<number[]>([]);
 
   return (
     <ul className="my-4 space-y-4">

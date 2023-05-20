@@ -87,6 +87,7 @@ const createDefaultUser = async () => {
   return await User({
     email: "fizz.buzz@example.com",
     displayName: "Fizzy Buzz",
+    username: "fizz.buzz",
   });
 };
 

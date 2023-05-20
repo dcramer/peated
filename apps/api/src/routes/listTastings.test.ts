@@ -41,7 +41,7 @@ test("lists tastings with bottle", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toEqual(`${tasting.id}`);
+  expect(results[0].id).toEqual(tasting.id);
 });
 
 test("lists tastings with user", async () => {
@@ -61,7 +61,7 @@ test("lists tastings with user", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toEqual(`${tasting.id}`);
+  expect(results[0].id).toEqual(tasting.id);
 });
 
 test("lists tastings filter friends unauthenticated", async () => {
@@ -103,5 +103,5 @@ test("lists tastings filter friends", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toEqual(`${lastTasting.id}`);
+  expect(results[0].id).toEqual(lastTasting.id);
 });

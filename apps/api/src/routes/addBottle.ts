@@ -1,38 +1,23 @@
+import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
 import { eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import {
-  Category,
-  bottles,
-  bottlesToDistillers,
-  changes,
-  entities,
-} from "../db/schema";
-import { EntityInput, upsertEntity } from "../lib/db";
+import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
+import { upsertEntity } from "../lib/db";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireAuth } from "../middleware/auth";
-
-type BottleInput = {
-  name: string;
-  category: Category;
-  brand: EntityInput;
-  distillers: EntityInput[];
-  statedAge?: number;
-};
 
 export default {
   method: "POST",
   url: "/bottles",
   schema: {
-    body: {
-      $ref: "/schemas/newBottle",
-    },
+    body: zodToJsonSchema(BottleInputSchema),
     response: {
-      201: {
-        $ref: "/schemas/bottle",
-      },
+      201: zodToJsonSchema(BottleSchema),
     },
   },
   preHandler: [requireAuth],
@@ -68,16 +53,24 @@ export default {
         });
       }
 
-      const [bottle] = await tx
-        .insert(bottles)
-        .values({
-          name: body.name,
-          statedAge: body.statedAge || null,
-          category: body.category || null,
-          brandId: brand.id,
-          createdById: req.user.id,
-        })
-        .returning();
+      try {
+        const [bottle] = await tx
+          .insert(bottles)
+          .values({
+            name: body.name,
+            statedAge: body.statedAge || null,
+            category: body.category || null,
+            brandId: brand.id,
+            createdById: req.user.id,
+          })
+          .returning();
+      } catch (err: any) {
+        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+          return res
+            .status(409)
+            .send({ error: "Bottle with name already exists under brand." });
+        }
+      }
 
       const distillerIds: number[] = [];
       if (body.distillers)
@@ -131,6 +124,6 @@ export default {
   IncomingMessage,
   ServerResponse,
   {
-    Body: BottleInput;
+    Body: z.infer<typeof BottleInputSchema>;
   }
 >;

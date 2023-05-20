@@ -9,26 +9,6 @@ import { router } from "./routes";
 import { initSentry } from "./instruments";
 import FastifySentry from "./sentryPlugin";
 
-import {
-  bottleSchema,
-  newBottleSchema,
-  updateBottleSchema,
-} from "./schemas/bottle";
-import { collectionSchema } from "./schemas/collection";
-import { commentSchema, newCommentSchema } from "./schemas/comment";
-import { editionSchema, newEditionSchema } from "./schemas/edition";
-import {
-  entitySchema,
-  newEntitySchema,
-  updateEntitySchema,
-} from "./schemas/entity";
-import { error401Schema } from "./schemas/errors";
-import { followingSchema } from "./schemas/follow";
-import { notificationSchema } from "./schemas/notification";
-import pagingSchema from "./schemas/paging";
-import { newTastingSchema, tastingSchema } from "./schemas/tasting";
-import { updateUserSchema, userSchema } from "./schemas/user";
-
 initSentry({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
@@ -82,27 +62,6 @@ export default async function buildFastify(options = {}) {
     },
   });
   app.register(FastifyCors, { credentials: true, origin: config.CORS_HOST });
-
-  app.addSchema(bottleSchema);
-  app.addSchema(newBottleSchema);
-  app.addSchema(updateBottleSchema);
-  app.addSchema(entitySchema);
-  app.addSchema(newEntitySchema);
-  app.addSchema(updateEntitySchema);
-  app.addSchema(followingSchema);
-  app.addSchema(pagingSchema);
-  app.addSchema(userSchema);
-  app.addSchema(updateUserSchema);
-  app.addSchema(notificationSchema);
-  app.addSchema(tastingSchema);
-  app.addSchema(collectionSchema);
-  app.addSchema(commentSchema);
-  app.addSchema(newCommentSchema);
-  app.addSchema(newTastingSchema);
-  app.addSchema(editionSchema);
-  app.addSchema(newEditionSchema);
-
-  app.addSchema(error401Schema);
 
   app.register(router);
   app.register(FastifySentry);

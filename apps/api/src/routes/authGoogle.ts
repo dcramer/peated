@@ -1,8 +1,10 @@
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 
+import { AuthSchema } from "@peated/shared/schemas";
 import { and, eq } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
+import zodToJsonSchema from "zod-to-json-schema";
 import config from "../config";
 import { db } from "../db";
 import { identities, users } from "../db/schema";
@@ -22,17 +24,7 @@ export default {
       },
     },
     response: {
-      200: {
-        type: "object",
-        required: ["user", "accessToken"],
-        properties: {
-          user: { $ref: "/schemas/user" },
-          accessToken: { type: "string" },
-        },
-      },
-      401: {
-        $ref: "/errors/401",
-      },
+      200: zodToJsonSchema(AuthSchema),
     },
   },
   handler: async function (req, res) {

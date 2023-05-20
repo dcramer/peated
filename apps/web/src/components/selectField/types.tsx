@@ -1,16 +1,19 @@
 import { ReactNode } from "react";
 
-export type Option = {
-  id?: string | null;
+export type Option = Record<string, any> & {
+  id?: string | number | null;
   name: string;
   count?: number;
-  [key: string]: any;
 };
 
 export type CreateOptionForm = ({
+  onSubmit,
+  onClose,
   data,
   onFieldChange,
 }: {
   data: Option;
   onFieldChange: (arg0: Partial<Option>) => void;
+  onSubmit: (newOption: Option) => void;
+  onClose: () => void;
 }) => ReactNode;

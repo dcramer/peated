@@ -26,6 +26,9 @@ type BaseProps = {
   label?: string;
   helpText?: string;
   required?: boolean;
+  error?: {
+    message?: string;
+  };
   placeholder?: string;
   children?: ReactNode;
   className?: string;
@@ -72,13 +75,14 @@ export default ({
   className,
   multiple,
   targetOptions = 5,
-  suggestedOptions = [],
+  suggestedOptions,
   canCreate,
   createForm,
   placeholder,
   endpoint,
   options = [],
   onChange,
+  error,
   ...props
 }: Props) => {
   const initialValue = Array.isArray(props.value)
@@ -100,8 +104,7 @@ export default ({
   const [previousValues, setPreviousValues] = useState<Option[]>(value);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  if (!suggestedOptions.length)
-    suggestedOptions = options.slice(0, targetOptions);
+  if (!suggestedOptions) suggestedOptions = options.slice(0, targetOptions);
 
   const toggleOption = (option: Option) => {
     setPreviousValues(filterDupes([option], previousValues));
@@ -143,6 +146,7 @@ export default ({
       required={required}
       helpText={helpText}
       className={className}
+      error={error}
       labelAction={() => {
         setDialogOpen(true);
       }}

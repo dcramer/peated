@@ -57,7 +57,7 @@ export const FollowerSerializer: Serializer<Follow> = {
   },
   item: (item: Follow, attrs: Record<string, any>, currentUser?: User) => {
     return {
-      id: `${item.id}`,
+      id: item.id,
       status: item.status,
       createdAt: item.createdAt,
       user: attrs.user,
@@ -116,7 +116,7 @@ export const FollowingSerializer: Serializer<Follow> = {
   },
   item: (item: Follow, attrs: Record<string, any>, currentUser?: User) => {
     return {
-      id: `${item.id}`,
+      id: item.id,
       status: item.status,
       createdAt: item.createdAt,
       user: attrs.user,

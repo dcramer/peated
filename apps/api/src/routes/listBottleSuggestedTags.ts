@@ -1,6 +1,8 @@
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { bottles, tastings } from "../db/schema";
 import { shuffle } from "../lib/rand";
@@ -18,26 +20,16 @@ export default {
       },
     },
     response: {
-      200: {
-        type: "object",
-        properties: {
-          results: {
-            type: "array",
-            items: {
-              type: "object",
-              required: ["name", "count"],
-              properties: {
-                name: { type: "string" },
-                count: { type: "number" },
-              },
-            },
-          },
-          rel: {
-            type: "object",
-            $ref: "/schemas/paging",
-          },
-        },
-      },
+      200: zodToJsonSchema(
+        z.object({
+          results: z.array(
+            z.object({
+              name: z.string(),
+              count: z.number(),
+            }),
+          ),
+        }),
+      ),
     },
   },
   handler: async (req, res) => {

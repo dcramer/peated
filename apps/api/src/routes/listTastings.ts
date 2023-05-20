@@ -1,6 +1,9 @@
+import { PaginatedSchema, TastingSchema } from "@peated/shared/schemas";
 import { SQL, and, desc, eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { follows, tastings } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
@@ -20,6 +23,13 @@ export default {
         user: { oneOf: [{ type: "number" }, { const: "me" }] },
         filter: { type: "string", enum: ["global", "friends", "local"] },
       },
+    },
+    response: {
+      200: zodToJsonSchema(
+        PaginatedSchema.extend({
+          results: z.array(TastingSchema),
+        }),
+      ),
     },
   },
   preValidation: [injectAuth],

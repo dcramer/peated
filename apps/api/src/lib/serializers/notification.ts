@@ -18,9 +18,13 @@ import { UserSerializer } from "./user";
 
 export const NotificationSerializer: Serializer<Notification> = {
   attrs: async (itemList: Notification[], currentUser: User) => {
-    const fromUserIds = itemList
-      .filter((i) => Boolean(i.fromUserId))
-      .map<number>((i) => i.fromUserId as number);
+    const fromUserIds = Array.from(
+      new Set(
+        itemList
+          .filter((i) => Boolean(i.fromUserId))
+          .map<number>((i) => i.fromUserId as number),
+      ),
+    );
 
     const fromUserList = fromUserIds.length
       ? await db.select().from(users).where(inArray(users.id, fromUserIds))
@@ -129,12 +133,13 @@ export const NotificationSerializer: Serializer<Notification> = {
 
   item: (item: Notification, attrs: Record<string, any>, currentUser: User) => {
     return {
-      id: `${item.id}`,
+      id: item.id,
       objectType: item.objectType,
       objectId: item.objectId,
       createdAt: item.createdAt,
       fromUser: attrs.fromUser,
       ref: attrs.ref,
+      read: item.read,
     };
   },
 };

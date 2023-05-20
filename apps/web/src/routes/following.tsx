@@ -21,7 +21,7 @@ export default function Following() {
     Record<string, FollowStatus>
   >(Object.fromEntries(followingList.map((r) => [r.user.id, r.status])));
 
-  const followUser = async (toUserId: string, follow: boolean) => {
+  const followUser = async (toUserId: number, follow: boolean) => {
     const data = await api[follow ? "post" : "delete"](
       `/users/${toUserId}/follow`,
     );

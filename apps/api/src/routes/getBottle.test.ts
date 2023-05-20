@@ -22,5 +22,5 @@ test("get bottle", async () => {
 
   expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
-  expect(data.id).toEqual(`${bottle1.id}`);
+  expect(data.id).toEqual(bottle1.id);
 });

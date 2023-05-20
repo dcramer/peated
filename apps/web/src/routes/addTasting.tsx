@@ -1,7 +1,12 @@
-import { FormEvent, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
+import { z } from "zod";
+
+import { TastingInputSchema } from "@peated/shared/schemas";
+
 import BottleCard from "../components/bottleCard";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
@@ -22,15 +27,7 @@ type Tag = {
   count: number;
 };
 
-type FormData = {
-  notes?: string;
-  rating?: number;
-  tags?: string[];
-
-  edition?: string;
-  vintageYear?: number;
-  barrel?: number;
-};
+type FormSchemaType = z.infer<typeof TastingInputSchema>;
 
 export default function AddTasting() {
   const { bottleId } = useParams();
@@ -49,50 +46,48 @@ export default function AddTasting() {
 
   const navigate = useNavigate();
 
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [image, setImage] = useState<string | File | undefined>();
-  const [formData, setFormData] = useState<FormData>({});
 
-  const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
-    e.preventDefault();
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormSchemaType>({
+    resolver: zodResolver(TastingInputSchema),
+    defaultValues: {
+      bottle: bottle.id,
+    },
+  });
 
-    if (saving) return;
-    setSaving(true);
-
-    (async () => {
-      let tasting;
+  const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
+    let tasting;
+    try {
+      tasting = await api.post("/tastings", {
+        data,
+      });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        console.error(err);
+        setError("Internal error");
+      }
+    }
+    if (image) {
       try {
-        tasting = await api.post("/tastings", {
+        await api.post(`/tastings/${tasting.id}/image`, {
           data: {
-            ...formData,
-            bottle: bottle.id,
+            image,
           },
         });
       } catch (err) {
-        if (err instanceof ApiError) {
-          setError(err.message);
-        } else {
-          console.error(err);
-          setError("Internal error");
-        }
+        console.error(err);
+        // TODO show some kind of alert, ask them to reusubmit image
       }
-      // TODO(dcramer): graceful failure here
-      if (image) {
-        try {
-          await api.post(`/tastings/${tasting.id}/image`, {
-            data: {
-              image,
-            },
-          });
-        } catch (err) {
-          console.error(err);
-          // TODO show some kind of alert, ask them to reusubmit image
-        }
-      }
-      setSaving(false);
-      if (tasting) navigate("/");
-    })();
+    }
+    if (tasting) navigate(`/tastings/${tasting.id}`);
   };
 
   return (
@@ -100,12 +95,12 @@ export default function AddTasting() {
       header={
         <FormHeader
           title="Record Tasting"
-          onSave={onSubmit}
-          saveDisabled={saving}
+          onSave={handleSubmit(onSubmit)}
+          saveDisabled={isSubmitting}
         />
       }
     >
-      <form className="mx-auto my-6 max-w-xl" onSubmit={onSubmit}>
+      <form className="mx-auto my-6 max-w-xl" onSubmit={handleSubmit(onSubmit)}>
         {error && <FormError values={[error]} />}
 
         <div className="sm:mb-4">
@@ -114,44 +109,42 @@ export default function AddTasting() {
 
         <Fieldset>
           <RangeField
+            {...register("rating", {
+              valueAsNumber: true,
+              setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+            })}
+            error={errors.rating}
             label="Rating"
-            required
-            name="rating"
-            value={formData.rating}
-            onChange={(value) => {
-              setFormData((formData) => ({
-                ...formData,
-                rating: value,
-              }));
-            }}
           />
 
-          <SelectField
-            label="Flavors"
+          <Controller
             name="tags"
-            targetOptions={5}
-            options={suggestedTags.map((t) => ({
-              id: t.name,
-              name: toTitleCase(t.name),
-              count: t.count,
-            }))}
-            onChange={(value) =>
-              setFormData({ ...formData, tags: value.map((t: any) => t.id) })
-            }
-            value={formData.tags?.map((t) => ({
-              id: t,
-              name: toTitleCase(t),
-            }))}
-            multiple
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.tags}
+                label="Flavors"
+                targetOptions={5}
+                options={suggestedTags.map((t) => ({
+                  id: t.name,
+                  name: toTitleCase(t.name),
+                  count: t.count,
+                }))}
+                onChange={(value) => onChange(value.map((t: any) => t.id))}
+                value={value?.map((t) => ({
+                  id: t,
+                  name: toTitleCase(t),
+                }))}
+                multiple
+              />
+            )}
           />
 
           <TextAreaField
+            {...register("notes")}
+            error={errors.notes}
             label="Tasting Notes"
-            name="notes"
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            value={formData.notes}
             placeholder="Is it peated?"
           />
 
@@ -173,24 +166,32 @@ export default function AddTasting() {
               <ArrowDownIcon className="h-8 w-8 text-slate-700" />
             </div>
           </div>
+
           <TextField
+            {...register("vintageYear", {
+              // valueAsNumber: true,
+              // SIGH https://github.com/orgs/react-hook-form/discussions/6980
+              setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
+            })}
+            error={errors.vintageYear}
             type="number"
-            name="vintageYear"
             label="Year"
-            value={formData.vintageYear}
             placeholder="e.g. 2023"
           />
           <TextField
-            name="edition"
+            {...register("edition")}
+            error={errors.edition}
             label="Edition"
-            value={formData.edition}
             placeholder="e.g. Healthy Spirits"
           />
           <TextField
+            {...register("barrel", {
+              // valueAsNumber: true,
+              setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
+            })}
+            error={errors.barrel}
             type="number"
-            name="barrel"
             label="Barrel No."
-            value={formData.barrel}
             placeholder="e.g. 56"
           />
         </Fieldset>

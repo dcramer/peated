@@ -25,7 +25,7 @@
     "@opentelemetry/auto-instrumentations-node": "^0.36.6",
     "@opentelemetry/sdk-node": "^0.38.0",
     "@paralleldrive/cuid2": "^2.2.0",
-    "@peated/shared": "file:../../packages/shared",
+    "@peated/shared": "workspace:*",
     "@sentry/node": "^7.51.0",
     "@sentry/opentelemetry-node": "^7.51.0",
     "@sentry/profiling-node": "^0.3.0",
@@ -59,6 +59,8 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4",
     "vite-tsconfig-paths": "^4.0.8",
-    "vitest": "^0.29.8"
+    "vitest": "^0.29.8",
+    "zod": "^3.21.4",
+    "zod-to-json-schema": "^3.21.1"
   }
 }

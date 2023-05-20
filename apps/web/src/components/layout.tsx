@@ -1,4 +1,3 @@
-import { AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import classNames from "../lib/classNames";
 import AppHeader from "./appHeader";
@@ -33,7 +32,7 @@ export default function Layout({
             splash && "flex-1 self-center px-6 py-12 sm:max-w-sm lg:px-8",
           )}
         >
-          <AnimatePresence>{children}</AnimatePresence>
+          {children}
         </main>
       </div>
     </>

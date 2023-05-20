@@ -16,7 +16,7 @@ export default ({
         className={`block font-semibold leading-6 ${className || ""}`}
       />
       <span className="text-xs leading-6 text-slate-500">
-        {labelNote || (required && "Optional")}
+        {labelNote || (!required && "Optional")}
       </span>
     </div>
   );

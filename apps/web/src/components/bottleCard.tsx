@@ -9,10 +9,10 @@ import { Option } from "./selectField";
 
 type BottleFormData = {
   name: string;
-  brand: Option;
-  distillers?: Option[] | undefined;
-  statedAge?: number | undefined;
-  category?: Option;
+  brand?: Option | null | undefined;
+  distillers?: Option[] | null | undefined;
+  statedAge?: number | null | undefined;
+  category?: string | null | undefined;
 };
 
 export const PreviewBottleCard = ({
@@ -20,7 +20,7 @@ export const PreviewBottleCard = ({
 }: {
   data: Partial<BottleFormData>;
 }) => {
-  const { distillers, brand } = data;
+  const { brand } = data;
   return (
     <div className="bg-highlight flex items-center space-x-4 p-3 text-black sm:px-5 sm:py-4">
       <div className="flex-1 space-y-1">
@@ -43,7 +43,7 @@ export const PreviewBottleCard = ({
         <BottleMetadata className="text-sm" data={data} />
       </div>
       <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
-        <p>{data.category ? data.category.name : null}</p>
+        <p>{data.category ? data.category : null}</p>
         <p>{data.statedAge ? `Aged ${data.statedAge} years` : null}</p>
       </div>
     </div>

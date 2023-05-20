@@ -36,10 +36,10 @@ test("lists notifications w/ toast", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toEqual(`${notification.id}`);
+  expect(results[0].id).toEqual(notification.id);
   expect(results[0].objectType).toEqual("toast");
   expect(results[0].ref).toBeDefined();
-  expect(results[0].ref.id).toEqual(`${tasting.id}`);
+  expect(results[0].ref.id).toEqual(tasting.id);
 });
 
 test("lists notifications w/ comment", async () => {
@@ -64,10 +64,10 @@ test("lists notifications w/ comment", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toEqual(`${notification.id}`);
+  expect(results[0].id).toEqual(notification.id);
   expect(results[0].objectType).toEqual("comment");
   expect(results[0].ref).toBeDefined();
-  expect(results[0].ref.id).toEqual(`${tasting.id}`);
+  expect(results[0].ref.id).toEqual(tasting.id);
 });
 
 test("lists notifications w/ follow", async () => {
@@ -89,8 +89,8 @@ test("lists notifications w/ follow", async () => {
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
-  expect(results[0].id).toEqual(`${notification.id}`);
+  expect(results[0].id).toEqual(notification.id);
   expect(results[0].objectType).toEqual("follow");
   expect(results[0].ref).toBeDefined();
-  expect(results[0].ref.id).toEqual(`${follow.id}`);
+  expect(results[0].ref.id).toEqual(follow.id);
 });

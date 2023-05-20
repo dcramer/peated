@@ -1,6 +1,8 @@
+import { TastingSchema } from "@peated/shared/schemas";
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { tastings } from "../db/schema";
 import { serialize } from "../lib/serializers";
@@ -18,9 +20,7 @@ export default {
       },
     },
     response: {
-      200: {
-        $ref: "/schemas/tasting",
-      },
+      200: zodToJsonSchema(TastingSchema),
     },
   },
   handler: async (req, res) => {

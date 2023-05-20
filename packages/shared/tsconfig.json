@@ -20,7 +20,8 @@
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "./dist"
   },
   "references": [{ "path": "./tsconfig.node.json" }],
   "ts-node": {
@@ -28,5 +29,6 @@
     "compilerOptions": {
       "module": "commonjs"
     }
-  }
+  },
+  "include": ["src", "index.ts", "schemas.ts"]
 }

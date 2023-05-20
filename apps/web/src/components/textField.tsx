@@ -1,5 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode, forwardRef } from "react";
 
+import { FieldError } from "react-hook-form";
 import FormField from "./formField";
 import TextInput from "./textInput";
 
@@ -8,26 +9,29 @@ type Props = {
   helpText?: string;
   required?: boolean;
   children?: ReactNode;
+  error?: FieldError;
   className?: string;
 } & React.ComponentProps<typeof TextInput>;
 
-export default ({
-  name,
-  helpText,
-  label,
-  required,
-  className,
-  ...props
-}: Props) => {
-  return (
-    <FormField
-      label={label}
-      htmlFor={`f-${name}`}
-      required={required}
-      helpText={helpText}
-      className={className}
-    >
-      <TextInput name={name} id={`f-${name}`} required={required} {...props} />
-    </FormField>
-  );
-};
+export default forwardRef<HTMLInputElement, Props>(
+  ({ name, helpText, label, required, className, error, ...props }, ref) => {
+    return (
+      <FormField
+        label={label}
+        htmlFor={`f-${name}`}
+        required={required}
+        helpText={helpText}
+        className={className}
+        error={error}
+      >
+        <TextInput
+          name={name}
+          id={`f-${name}`}
+          required={required}
+          ref={ref}
+          {...props}
+        />
+      </FormField>
+    );
+  },
+);

@@ -1,6 +1,9 @@
+import { BottleSchema } from "@peated/shared/schemas";
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { bottles, tastings } from "../db/schema";
 import { serialize } from "../lib/serializers";
@@ -18,15 +21,13 @@ export default {
       },
     },
     response: {
-      200: {
-        type: "object",
-        allOf: [{ $ref: "/schemas/bottle" }],
-        properties: {
-          avgRating: { type: "number" },
-          tastings: { type: "number" },
-          people: { type: "number" },
-        },
-      },
+      200: zodToJsonSchema(
+        BottleSchema.extend({
+          avgRating: z.number(),
+          tastings: z.number(),
+          people: z.number(),
+        }),
+      ),
     },
   },
   handler: async (req, res) => {

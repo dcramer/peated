@@ -1,6 +1,9 @@
+import { EntitySchema, PaginatedSchema } from "@peated/shared/schemas";
 import { SQL, and, asc, desc, ilike, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { EntityType, entities } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
@@ -21,20 +24,11 @@ export default {
       },
     },
     response: {
-      200: {
-        type: "object",
-        properties: {
-          results: {
-            type: "array",
-            items: {
-              $ref: "/schemas/entity",
-            },
-          },
-          rel: {
-            $ref: "/schemas/paging",
-          },
-        },
-      },
+      200: zodToJsonSchema(
+        PaginatedSchema.extend({
+          results: z.array(EntitySchema),
+        }),
+      ),
     },
   },
   handler: async (req, res) => {

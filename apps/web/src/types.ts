@@ -18,7 +18,7 @@ export type EntityType = "brand" | "distiller" | "bottler";
 
 // e.g. Hibiki
 export type Entity = {
-  id: string;
+  id: number;
   name: string;
   // e.g. Scotland
   country?: string;
@@ -32,7 +32,7 @@ export type Entity = {
 };
 
 export type Bottle = {
-  id: string;
+  id: number;
   name: string;
   brand: Entity;
   distillers: Entity[];
@@ -44,7 +44,7 @@ export type Bottle = {
 };
 
 export type Edition = {
-  id: string;
+  id: number;
   name: string;
   bottle: Bottle;
   barrel?: number;
@@ -55,7 +55,7 @@ export type Edition = {
 export type FollowStatus = "none" | "following" | "pending";
 
 export type FollowRequest = {
-  id: string;
+  id: number;
   status: FollowStatus;
   createdAt: string;
   user: User;
@@ -63,14 +63,14 @@ export type FollowRequest = {
 };
 
 export type Friend = {
-  id: string;
+  id: number;
   status: FollowStatus;
   createdAt: string;
   user: User;
 };
 
 export type User = {
-  id: string;
+  id: number;
   admin: boolean;
   mod: boolean;
   username: string;
@@ -80,7 +80,7 @@ export type User = {
 };
 
 export type Tasting = {
-  id: string;
+  id: number;
   bottle: Bottle;
   // optional location for check-in
   location?: Location | null;
@@ -100,7 +100,7 @@ export type Tasting = {
 };
 
 export type Comment = {
-  id: string;
+  id: number;
   tastingId: string;
   comment: string;
   createdBy: User;
@@ -129,12 +129,12 @@ export type FollowNotification = BaseNotification & {
 };
 
 export type TastingRef = {
-  id: string;
+  id: number;
   bottle: {
-    id: string;
+    id: number;
     name: string;
     brand: {
-      id: string;
+      id: number;
       name: string;
     };
   };
@@ -157,13 +157,13 @@ export type Notification =
 
 // locations are where you're tasting from (e.g. a bar, a distillery)
 export type Location = {
-  id: string;
+  id: number;
   name: string;
 };
 
 type NextPagingRel =
   | {
-      nextPage: string;
+      nextPage: number;
       next: string;
     }
   | {
@@ -173,7 +173,7 @@ type NextPagingRel =
 
 type PrevPagingRel =
   | {
-      prevPage: string;
+      prevPage: number;
       prev: string;
     }
   | {

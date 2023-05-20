@@ -306,7 +306,7 @@ export const tastings = pgTable("tasting", {
   ),
 
   tags: text("tags").array(),
-  rating: doublePrecision("rating").notNull(),
+  rating: doublePrecision("rating"),
   imageUrl: text("image_url"),
 
   notes: text("notes"),

@@ -4,7 +4,7 @@ import { Dialog } from "@headlessui/react";
 import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 
 import config from "../../config";
-import api from "../../lib/api";
+import api, { debounce } from "../../lib/api";
 import classNames from "../../lib/classNames";
 import { toTitleCase } from "../../lib/strings";
 import Header from "../header";
@@ -14,7 +14,7 @@ import CreateOptionDialog from "./createOptionDialog";
 import { CreateOptionForm } from "./types";
 
 export type Option = {
-  id?: string | null;
+  id?: string | number | null;
   name: string;
   [key: string]: any;
 };
@@ -66,7 +66,7 @@ export default ({
 
   const [createOpen, setCreateOpen] = useState(false);
 
-  const onSearch = async (query = "") => {
+  const fetch = debounce(async (query = "") => {
     const results = endpoint
       ? (
           await api.get(endpoint, {
@@ -77,7 +77,9 @@ export default ({
           (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1,
         );
     setResults(results);
-  };
+  }, 300);
+
+  const onSearch = fetch;
 
   const selectOption = async (option: Option) => {
     setPreviousValues(filterDupes([option], previousValues));
@@ -197,6 +199,7 @@ export default ({
         </main>
         {canCreate && createForm && (
           <CreateOptionDialog
+            query={query}
             open={createOpen}
             setOpen={setCreateOpen}
             render={createForm}
