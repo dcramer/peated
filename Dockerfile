@@ -13,6 +13,7 @@ ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
 ADD packages ./packages
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/api/package.json ./apps/api/package.json
+ADD apps/scraper/package.json ./apps/scraper/package.json
 RUN pnpm install
 
 ARG VERSION
