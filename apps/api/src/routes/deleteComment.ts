@@ -38,12 +38,14 @@ export default {
         .update(tastings)
         .set({ comments: sql`${tastings.comments} - 1` })
         .where(eq(tastings.id, comment.tastingId));
-      await tx.delete(comments).where(eq(comments.id, comment.id));
+
       await deleteNotification(tx, {
         objectType: objectTypeFromSchema(comments),
         objectId: comment.id,
         userId: comment.createdById,
       });
+
+      await tx.delete(comments).where(eq(comments.id, comment.id));
     });
     res.status(204).send();
   },

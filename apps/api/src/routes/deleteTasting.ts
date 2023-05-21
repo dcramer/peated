@@ -2,7 +2,7 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { notifications, tastings, toasts } from "../db/schema";
+import { bottles, notifications, tastings, toasts } from "../db/schema";
 import { objectTypeFromSchema } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
@@ -47,6 +47,14 @@ export default {
         );
       await tx.delete(toasts).where(eq(toasts.tastingId, tasting.id));
       await tx.delete(tastings).where(eq(tastings.id, tasting.id));
+
+      // update stats
+      await tx
+        .update(bottles)
+        .set({
+          totalTastings: sql<number>`${bottles.totalTastings} - 1`,
+        })
+        .where(eq(bottles.id, tasting.bottleId));
     });
     res.status(204).send();
   },
