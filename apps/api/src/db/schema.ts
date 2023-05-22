@@ -208,45 +208,14 @@ export const bottlesToDistillers = pgTable(
   },
 );
 
-export const editions = pgTable(
-  "edition",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-
-    // one of these should be set -- enforced at app level
-    name: varchar("name", { length: 255 }),
-    barrel: smallint("barrel"),
-    vintageYear: smallint("vintage_year"),
-
-    bottleId: bigint("bottle_id", { mode: "number" })
-      .references(() => bottles.id)
-      .notNull(),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    createdById: bigint("created_by_id", { mode: "number" })
-      .references(() => users.id)
-      .notNull(),
-  },
-  (editions) => {
-    return {
-      editionIndex: uniqueIndex("edition_unq").on(
-        editions.bottleId,
-        editions.name,
-        editions.barrel,
-        editions.vintageYear,
-      ),
-    };
-  },
-);
-
-export type Edition = InferModel<typeof editions>;
-export type NewEdition = InferModel<typeof editions, "insert">;
-
 export const collections = pgTable(
   "collection",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
+    totalBottles: bigint("total_bottles", { mode: "number" })
+      .default(0)
+      .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
@@ -275,16 +244,18 @@ export const collectionBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    editionId: bigint("edition_id", { mode: "number" }).references(
-      () => editions.id,
-    ),
+
+    vintageFingerprint: varchar("vintage_fingerprint", { length: 128 }),
+    series: varchar("series", { length: 255 }),
+    vintageYear: smallint("vintage_year"),
+    barrel: smallint("barrel"),
   },
   (collectionBottles) => {
     return {
       collectionDistillerId: uniqueIndex("collection_bottle_unq").on(
         collectionBottles.collectionId,
         collectionBottles.bottleId,
-        collectionBottles.editionId,
+        collectionBottles.vintageFingerprint,
       ),
     };
   },
@@ -304,15 +275,14 @@ export const tastings = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    editionId: bigint("edition_id", { mode: "number" }).references(
-      () => editions.id,
-    ),
-
     tags: text("tags").array(),
     rating: doublePrecision("rating"),
     imageUrl: text("image_url"),
-
     notes: text("notes"),
+
+    series: varchar("series", { length: 255 }),
+    vintageYear: smallint("vintage_year"),
+    barrel: smallint("barrel"),
 
     comments: integer("comments").default(0).notNull(),
     toasts: integer("toasts").default(0).notNull(),
@@ -392,7 +362,6 @@ export type NewComment = InferModel<typeof comments, "insert">;
 export type ObjectType =
   | "bottle"
   | "comment"
-  | "edition"
   | "entity"
   | "tasting"
   | "toast"
@@ -401,7 +370,6 @@ export type ObjectType =
 export const objectTypeEnum = pgEnum("object_type", [
   "bottle",
   "comment",
-  "edition",
   "entity",
   "tasting",
   "toast",

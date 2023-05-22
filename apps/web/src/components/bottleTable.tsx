@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 
 import { formatCategoryName } from "../lib/strings";
-import { Bottle, Entity, PagingRel } from "../types";
+import { Bottle, CollectionBottle, Entity, PagingRel } from "../types";
 import BottleName from "./bottleName";
 import Button from "./button";
+import VintageName from "./vintageName";
 
 type Grouper = undefined | null | Entity;
 
@@ -13,7 +14,7 @@ export default ({
   groupTo,
   rel,
 }: {
-  bottleList: Bottle[];
+  bottleList: (Bottle | CollectionBottle)[];
   groupBy?: (bottle: Bottle) => Grouper;
   groupTo?: (group: Entity) => string;
   rel?: PagingRel;
@@ -47,7 +48,17 @@ export default ({
           </tr>
         </thead>
         <tbody>
-          {bottleList.map((bottle) => {
+          {bottleList.map((bottleOrCb) => {
+            const bottle =
+              "bottle" in bottleOrCb ? bottleOrCb.bottle : bottleOrCb;
+            const vintage =
+              "bottle" in bottleOrCb
+                ? {
+                    vintageYear: bottleOrCb.vintageYear,
+                    series: bottleOrCb.series,
+                    barrel: bottleOrCb.barrel,
+                  }
+                : null;
             const group = groupBy && groupBy(bottle);
             const showGroup = group && group.id !== lastGroup?.id;
             if (group) lastGroup = group;
@@ -75,6 +86,11 @@ export default ({
                   >
                     <BottleName bottle={bottle} />
                   </Link>
+                  {vintage && (
+                    <div className="font-sm text-light">
+                      <VintageName {...vintage} />
+                    </div>
+                  )}
                 </td>
                 <td className="hidden px-3 py-4 text-right text-sm sm:table-cell">
                   {formatCategoryName(bottle.category)}

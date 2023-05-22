@@ -5,13 +5,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import {
-  bottles,
-  bottlesToDistillers,
-  collectionBottles,
-  entities,
-} from "../db/schema";
-import { getDefaultCollection } from "../lib/db";
+import { bottles, bottlesToDistillers, entities } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
@@ -29,8 +23,6 @@ export default {
         brand: { type: "number" },
         distiller: { type: "number" },
         entity: { type: "number" },
-        user: { type: "number" },
-        collection: { anyOf: [{ type: "number" }, { const: "default" }] },
       },
     },
     response: {
@@ -86,19 +78,6 @@ export default {
         ),
       );
     }
-    if (req.query.collection) {
-      const userId = req.query.user || req.user?.id;
-      if (req.query.collection === "default" && !userId) {
-        return res.status(401).send({});
-      }
-      const collectionId =
-        req.query.collection === "default"
-          ? (await getDefaultCollection(db, userId)).id
-          : req.query.collection;
-      where.push(
-        sql`EXISTS(SELECT 1 FROM ${collectionBottles} WHERE ${collectionBottles.bottleId} = ${bottles.id} AND ${collectionBottles.collectionId} = ${collectionId})`,
-      );
-    }
 
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
@@ -148,8 +127,6 @@ export default {
       brand?: number;
       distiller?: number;
       entity?: number;
-      collection?: number | "default";
-      user?: number;
       sort?: "name";
     };
   }

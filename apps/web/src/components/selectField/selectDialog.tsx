@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-
 import { Dialog } from "@headlessui/react";
 import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { useEffect, useState } from "react";
+
+import { toTitleCase } from "@peated/shared/lib/strings";
 
 import config from "../../config";
 import api, { debounce } from "../../lib/api";
 import classNames from "../../lib/classNames";
-import { toTitleCase } from "../../lib/strings";
 import Header from "../header";
 import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";

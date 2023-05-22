@@ -134,6 +134,13 @@
       "when": 1684625241433,
       "tag": "0018_swift_amazoness",
       "breakpoints": false
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1684773803115,
+      "tag": "0019_lucky_wild_child",
+      "breakpoints": false
     }
   ]
 }

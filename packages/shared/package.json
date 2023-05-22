@@ -5,6 +5,7 @@
     "build": "tsc"
   },
   "files": [
+    "lib",
     "schemas.ts",
     "tsconfig.json",
     "tsconfig.node.json"

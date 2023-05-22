@@ -1,9 +1,11 @@
 import { AtSymbolIcon, PlusIcon } from "@heroicons/react/20/solid";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { Link } from "react-router-dom";
+import { toTitleCase } from "@peated/shared/lib/strings";
+
 import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
+import { ReactComponent as EntityIcon } from "../assets/entity.svg";
 import BottleName from "../components/bottleName";
 import Chip from "../components/chip";
 import Layout from "../components/layout";
@@ -11,10 +13,8 @@ import ListItem from "../components/listItem";
 import SearchHeader from "../components/searchHeader";
 import UserAvatar from "../components/userAvatar";
 import api, { debounce } from "../lib/api";
-import { formatCategoryName, toTitleCase } from "../lib/strings";
+import { formatCategoryName } from "../lib/strings";
 import { Bottle, Entity, User } from "../types";
-
-import { ReactComponent as EntityIcon } from "../assets/entity.svg";
 
 const SkeletonItem = () => {
   return (

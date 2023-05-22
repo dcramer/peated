@@ -1,6 +1,9 @@
-import { eq, inArray } from "drizzle-orm";
+import { CollectionBottleInputSchema } from "@peated/shared/schemas";
+import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 import { db, first } from "../db";
 import {
   Collection,
@@ -9,6 +12,7 @@ import {
   collections,
 } from "../db/schema";
 import { getDefaultCollection } from "../lib/db";
+import { sha1 } from "../lib/hash";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -22,18 +26,7 @@ export default {
         collectionId: { anyOf: [{ type: "number" }, { const: "default" }] },
       },
     },
-    body: {
-      type: "object",
-      required: ["bottle"],
-      properties: {
-        bottle: {
-          anyOf: [
-            { type: "number" },
-            { type: "array", items: { type: "number" } },
-          ],
-        },
-      },
-    },
+    body: zodToJsonSchema(CollectionBottleInputSchema),
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
@@ -57,28 +50,40 @@ export default {
         .send({ error: "Cannot modify another persons collection" });
     }
 
-    // find bottles
-    const bottleIds = Array.from(
-      new Set(
-        typeof req.body.bottle === "number"
-          ? [req.body.bottle]
-          : req.body.bottle,
-      ),
-    );
-    const bottleList = await db
+    const [bottle] = await db
       .select()
       .from(bottles)
-      .where(inArray(bottles.id, bottleIds));
-    if (bottleList.length !== bottleIds.length) {
-      // could error out here
+      .where(eq(bottles.id, req.body.bottle));
+    if (!bottle) {
+      return res.status(404).send({ error: "Not found" });
     }
 
+    const vintageFingerprint = sha1(
+      req.body.series,
+      req.body.vintageYear,
+      req.body.barrel,
+    );
+
     await db.transaction(async (tx) => {
-      for (const bottle of bottleList) {
-        await tx.insert(collectionBottles).values({
+      const [cb] = await tx
+        .insert(collectionBottles)
+        .values({
           collectionId: collection.id,
           bottleId: bottle.id,
-        });
+          vintageFingerprint,
+          series: req.body.series,
+          vintageYear: req.body.vintageYear,
+          barrel: req.body.barrel,
+        })
+        .onConflictDoNothing()
+        .returning();
+      if (cb) {
+        await tx
+          .update(collections)
+          .set({
+            totalBottles: sql`${collections.totalBottles} + 1`,
+          })
+          .where(eq(collections.id, collection.id));
       }
     });
 
@@ -92,8 +97,6 @@ export default {
     Params: {
       collectionId: number | "default";
     };
-    Body: {
-      bottle: number | number[];
-    };
+    Body: z.infer<typeof CollectionBottleInputSchema>;
   }
 >;

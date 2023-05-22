@@ -6,7 +6,6 @@ import {
   Notification,
   bottles,
   comments,
-  editions,
   entities,
   follows,
   notifications,
@@ -20,8 +19,6 @@ export const objectTypeFromSchema = (schema: AnyPgTable) => {
       return "bottle";
     case comments:
       return "comment";
-    case editions:
-      return "edition";
     case entities:
       return "entity";
     case follows:

@@ -7,6 +7,7 @@ export const CollectionSerializer: Serializer<Collection> = {
     return {
       id: item.id,
       name: item.name,
+      totalBottles: item.totalBottles,
       createdAt: item.createdAt,
     };
   },

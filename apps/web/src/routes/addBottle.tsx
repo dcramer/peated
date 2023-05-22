@@ -1,11 +1,12 @@
 import { useQueries } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-
 import { useNavigate } from "react-router-dom";
+
+import { toTitleCase } from "@peated/shared/lib/strings";
+
 import BottleForm from "../components/bottleForm";
 import Spinner from "../components/spinner";
 import api from "../lib/api";
-import { toTitleCase } from "../lib/strings";
 import { Entity } from "../types";
 
 export default function AddBottle() {

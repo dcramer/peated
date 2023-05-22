@@ -74,53 +74,39 @@ export const BottleInputSchema = z.object({
   category: CategoryEnum.nullable().optional(),
 });
 
-export const EditionSchema = z.object({
-  id: z.number(),
-
-  name: z.string().nullable().optional(),
-  vintageYear: z
-    .number()
-    .gte(1495)
-    .lte(new Date().getFullYear())
-    .nullable()
-    .optional(),
-  barrel: z.number().nullable().optional(),
-
-  createdAt: z.string().datetime().optional(),
-  createdBy: UserSchema.optional(),
+const VintageSchema = z.object({
+  series: z.string().nullable(),
+  barrel: z.number().nullable(),
+  vintageYear: z.number().gte(1495).lte(new Date().getFullYear()).nullable(),
 });
 
-export const TastingSchema = z.object({
-  id: z.number(),
-  imageUrl: z.string().nullable(),
-  notes: z.string().nullable(),
-  bottle: BottleSchema,
-  rating: z.number().gte(0).lte(5).nullable(),
-  tags: z.array(z.string()).optional(),
+export const TastingSchema = z
+  .object({
+    id: z.number(),
+    imageUrl: z.string().nullable(),
+    notes: z.string().nullable(),
+    bottle: BottleSchema,
+    rating: z.number().gte(0).lte(5).nullable(),
+    tags: z.array(z.string()),
 
-  comments: z.number().gte(0),
-  toasts: z.number().gte(0),
-  hasToasted: z.boolean().optional(),
-  edition: EditionSchema.nullable(),
-  createdAt: z.string().datetime(),
-  createdBy: UserSchema,
-});
+    comments: z.number().gte(0),
+    toasts: z.number().gte(0),
+    hasToasted: z.boolean().optional(),
+    createdAt: z.string().datetime(),
+    createdBy: UserSchema,
+  })
+  .merge(VintageSchema);
 
-export const TastingInputSchema = z.object({
-  bottle: z.number(),
-  notes: z.string().nullable().optional(),
-  rating: z.number().gte(0).lte(5).nullable().optional(),
-  tags: z.array(z.string()).nullable().optional(),
-  edition: z.string().trim().nullable().optional(),
-  vintageYear: z
-    .number()
-    .gte(1495)
-    .lte(new Date().getFullYear())
-    .nullable()
-    .optional(),
-  barrel: z.number().nullable().optional(),
-  createdAt: z.string().datetime().optional(),
-});
+export const TastingInputSchema = z
+  .object({
+    bottle: z.number(),
+    notes: z.string().nullable().optional(),
+    rating: z.number().gte(0).lte(5).nullable().optional(),
+    tags: z.array(z.string()).nullable().optional(),
+
+    createdAt: z.string().datetime().optional(),
+  })
+  .merge(VintageSchema.partial());
 
 export const CommentSchema = z.object({
   id: z.number(),
@@ -137,6 +123,7 @@ export const CommentInputSchema = z.object({
 export const CollectionSchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
+  totalBottles: z.number(),
   createdAt: z.string().datetime().optional(),
   createdBy: UserSchema.optional(),
 });
@@ -144,6 +131,18 @@ export const CollectionSchema = z.object({
 export const CollectionInputSchema = z.object({
   name: z.string(),
 });
+
+export const CollectionBottleSchema = z
+  .object({
+    bottle: BottleSchema,
+  })
+  .merge(VintageSchema);
+
+export const CollectionBottleInputSchema = z
+  .object({
+    bottle: z.number(),
+  })
+  .merge(VintageSchema.partial());
 
 export const FollowSchema = z.object({
   id: z.number(),
