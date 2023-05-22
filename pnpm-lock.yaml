@@ -239,8 +239,8 @@ importers:
         specifier: ^7.52.1
         version: 7.52.1(react@18.2.0)
       '@sentry/vite-plugin':
-        specifier: ^2.0.0-alpha.7
-        version: 2.0.0-alpha.7
+        specifier: ^2.0.0
+        version: 2.0.0
       '@tailwindcss/forms':
         specifier: ^0.5.3
         version: 0.5.3(tailwindcss@3.3.2)
@@ -3266,8 +3266,8 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /@sentry/bundler-plugin-core@2.0.0-alpha.7:
-    resolution: {integrity: sha512-8nWV2uXlyBMss6OSstQwmmgsZ1y5S0XmFdzAs0ZZd6h8UDRJ34xriXNGSBEedTtKlfjPgrs9fDNxVSle21n2bQ==}
+  /@sentry/bundler-plugin-core@2.0.0:
+    resolution: {integrity: sha512-Snjal1TbVAD4Ww72CM9JULcQF/3S62y/5gFnUe+9WnWSCaCw2xSorWppCEMpL+gxncYHtOpG2ZfkCazeT6chgA==}
     engines: {node: '>= 10'}
     dependencies:
       '@sentry/cli': 2.17.5
@@ -3494,11 +3494,11 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /@sentry/vite-plugin@2.0.0-alpha.7:
-    resolution: {integrity: sha512-EJWOuVuHLdWYg/kjamy7dYUvOnPgNKaB+1+PPEL8I8/Se8MvUmVnHn/NqmhWOWC5+xOH94u0Y7A9cvU4lUELGQ==}
+  /@sentry/vite-plugin@2.0.0:
+    resolution: {integrity: sha512-cdY6uN16SObJ9vzYliMAdR2jM9VE4ZhCaXG9g5lbRFUCYsk5Zrmr5lm5D+aqDf64cff6YnGixh2dcUO0bwqn6A==}
     engines: {node: '>= 10'}
     dependencies:
-      '@sentry/bundler-plugin-core': 2.0.0-alpha.7
+      '@sentry/bundler-plugin-core': 2.0.0
       unplugin: 1.0.1
     transitivePeerDependencies:
       - encoding
