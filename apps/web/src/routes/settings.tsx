@@ -10,12 +10,12 @@ import TextField from "../components/textField";
 import { useRequiredAuth } from "../hooks/useAuth";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api, { ApiError } from "../lib/api";
+import { toBlob } from "../lib/blobs";
 import type { User } from "../types";
 
 type FormData = {
   username: string;
   displayName?: string;
-  picture?: string;
 };
 
 export default function Settings() {
@@ -32,9 +32,7 @@ export default function Settings() {
     username: user.username,
     displayName: user.displayName,
   });
-  const [picture, setPicture] = useState<File | string | undefined>(
-    user.pictureUrl,
-  );
+  const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
 
   const [error, setError] = useState<string | undefined>();
 
@@ -48,14 +46,25 @@ export default function Settings() {
             username: formData.username,
           },
         });
-        const newAvatar =
-          picture !== user.pictureUrl
-            ? await api.post("/users/me/avatar", {
-                data: {
-                  picture,
-                },
-              })
-            : {};
+        let newAvatar: any;
+        if (picture) {
+          const blob = await toBlob(picture);
+          newAvatar = await api.post("/users/me/avatar", {
+            data: {
+              picture: blob,
+            },
+          });
+        } else {
+          newAvatar = {};
+        }
+        // const newAvatar =
+        //   picture !== user.pictureUrl
+        //     ? await api.post("/users/me/avatar", {
+        //         data: {
+        //           picture,
+        //         },
+        //       })
+        //     : {};
         updateUser({
           ...newUser,
           ...newAvatar,
@@ -101,10 +110,8 @@ export default function Settings() {
           <ImageField
             name="picture"
             label="Picture"
-            value={picture}
-            onChange={(e) =>
-              setPicture(e.target.files?.length ? e.target.files[0] : undefined)
-            }
+            value={user.pictureUrl}
+            onChange={(value) => setPicture(value)}
           />
         </Fieldset>
       </form>
