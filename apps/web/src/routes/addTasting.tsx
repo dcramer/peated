@@ -19,6 +19,7 @@ import TextAreaField from "../components/textAreaField";
 import TextField from "../components/textField";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api, { ApiError } from "../lib/api";
+import { toBlob } from "../lib/blobs";
 import { toTitleCase } from "../lib/strings";
 import type { Bottle, Paginated } from "../types";
 
@@ -47,7 +48,7 @@ export default function AddTasting() {
   const navigate = useNavigate();
 
   const [error, setError] = useState<string | undefined>();
-  const [image, setImage] = useState<string | File | undefined>();
+  const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
 
   const {
     control,
@@ -78,11 +79,13 @@ export default function AddTasting() {
         setError("Internal error");
       }
     }
-    if (image) {
+
+    if (picture) {
+      const blob = await toBlob(picture);
       try {
         await api.post(`/tastings/${tasting.id}/image`, {
           data: {
-            image,
+            image: blob,
           },
         });
       } catch (err) {
@@ -154,10 +157,9 @@ export default function AddTasting() {
           <ImageField
             name="image"
             label="Picture"
-            value={image}
-            onChange={(e) =>
-              setImage(e.target.files?.length ? e.target.files[0] : undefined)
-            }
+            onChange={(value) => setPicture(value)}
+            imageWidth={1024 / 2}
+            imageHeight={768 / 2}
           />
 
           <div className="bg-highlight my-4 px-4 py-3 text-black">

@@ -3,9 +3,6 @@ import config from "../config";
 type ApiRequestOptions = {
   method: "GET" | "POST" | "DELETE" | "PUT";
   data?: { [name: string]: any } | undefined;
-  files?: {
-    [name: string]: Blob;
-  };
   query?: any;
 };
 
