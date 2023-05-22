@@ -1,7 +1,8 @@
 import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
 
-import { toTitleCase } from "../../lib/strings";
+import { toTitleCase } from "@peated/shared/lib/strings";
+
 import { CreateOptionForm, Option } from "./types";
 
 // TODO(dcramer): hitting escape doesnt do what you want here (it does nothing)

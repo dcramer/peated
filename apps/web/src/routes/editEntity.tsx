@@ -4,6 +4,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 
+import { toTitleCase } from "@peated/shared/lib/strings";
 import { EntityInputSchema } from "@peated/shared/schemas";
 
 import CountryField from "../components/countryField";
@@ -15,7 +16,6 @@ import SelectField from "../components/selectField";
 import TextField from "../components/textField";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api, { ApiError } from "../lib/api";
-import { toTitleCase } from "../lib/strings";
 import { Entity } from "../types";
 
 const entityTypes = [

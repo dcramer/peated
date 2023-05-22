@@ -43,16 +43,6 @@ export type Bottle = {
   createdBy?: User;
 };
 
-export type Edition = {
-  id: number;
-  bottle: Bottle;
-  name?: string;
-  vintageYear?: number;
-  barrel?: number;
-  createdAt: string;
-  createdBy?: User;
-};
-
 export type FollowStatus = "none" | "following" | "pending";
 
 export type FollowRequest = {
@@ -93,6 +83,11 @@ export type Tasting = {
   notes?: string;
   rating: number;
   imageUrl?: string;
+
+  series?: string;
+  vintageYear?: number;
+  barrel?: number;
+
   createdBy: User;
   createdAt: string;
   hasToasted: boolean;
@@ -108,13 +103,7 @@ export type Comment = {
   createdAt: string;
 };
 
-export type ObjectType =
-  | "bottle"
-  | "edition"
-  | "entity"
-  | "tasting"
-  | "toast"
-  | "follow";
+export type ObjectType = "bottle" | "entity" | "tasting" | "toast" | "follow";
 
 type BaseNotification = {
   id: number;
@@ -154,8 +143,17 @@ export type CommentNotification = BaseNotification & {
 export type Collection = {
   id: number;
   name: string;
+  totalBottles: number;
   createdAt?: string;
   createdBy?: User;
+};
+
+export type CollectionBottle = {
+  id: number;
+  bottle: Bottle;
+  series?: string;
+  vintageYear?: number;
+  barrel?: number;
 };
 
 export type Notification =

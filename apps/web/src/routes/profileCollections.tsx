@@ -11,12 +11,7 @@ export default function ProfileCollections() {
   const { data } = useQuery({
     queryKey: ["collections", "user", user.id],
     queryFn: (): Promise<Paginated<Bottle>> =>
-      api.get("/bottles", {
-        query: {
-          user: user.id,
-          collection: "default",
-        },
-      }),
+      api.get(`/users/${user.id}/collections/default/bottles`),
   });
 
   return (

@@ -6,14 +6,11 @@ import {
   Tasting,
   User,
   bottles,
-  editions,
   tastings,
   toasts,
   users,
 } from "../../db/schema";
-import { notEmpty } from "../filter";
 import { BottleSerializer } from "./bottle";
-import { EditionSerializer } from "./edition";
 import { UserSerializer } from "./user";
 
 export const TastingSerializer: Serializer<Tasting> = {
@@ -24,12 +21,10 @@ export const TastingSerializer: Serializer<Tasting> = {
         id: tastings.id,
         bottle: bottles,
         createdBy: users,
-        edition: editions,
       })
       .from(tastings)
       .innerJoin(users, eq(tastings.createdById, users.id))
       .innerJoin(bottles, eq(tastings.bottleId, bottles.id))
-      .leftJoin(editions, eq(tastings.editionId, editions.id))
       .where(inArray(tastings.id, itemIds));
 
     const userToastsList: number[] = currentUser
@@ -66,20 +61,12 @@ export const TastingSerializer: Serializer<Tasting> = {
       ).map((data, index) => [results[index].id, data]),
     );
 
-    const editionList = results.map((r) => r.edition).filter(notEmpty);
-    const editionsById = Object.fromEntries(
-      (await serialize(EditionSerializer, editionList, currentUser)).map(
-        (data, index) => [editionList[index].id, data],
-      ),
-    );
-
     return Object.fromEntries(
       itemList.map((item) => {
         return [
           item.id,
           {
             hasToasted: userToastsList.indexOf(item.id) !== -1,
-            edition: item.editionId ? editionsById[item.editionId] : null,
             createdBy: usersByRef[item.id] || null,
             bottle: bottlesByRef[item.id] || null,
           },
@@ -95,6 +82,10 @@ export const TastingSerializer: Serializer<Tasting> = {
       notes: item.notes,
       tags: item.tags || [],
       rating: item.rating,
+      series: item.series,
+      vintageYear: item.vintageYear,
+      barrel: item.barrel,
+
       createdAt: item.createdAt,
 
       comments: item.comments,
@@ -102,7 +93,6 @@ export const TastingSerializer: Serializer<Tasting> = {
 
       bottle: attrs.bottle,
       createdBy: attrs.createdBy,
-      edition: attrs.edition,
       hasToasted: attrs.hasToasted,
     };
   },

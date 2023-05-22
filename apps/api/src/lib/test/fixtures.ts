@@ -1,8 +1,10 @@
 import { faker } from "@faker-js/faker";
 import { eq } from "drizzle-orm";
-
 import { readFile } from "fs/promises";
 import path from "path";
+
+import { toTitleCase } from "@peated/shared/lib/strings";
+
 import { db, first } from "../../db";
 import {
   NewBottle,
@@ -87,7 +89,12 @@ export const Bottle = async ({
   const [bottle] = await db
     .insert(bottles)
     .values({
-      name: faker.music.songName(),
+      name: toTitleCase(
+        choose([
+          faker.company.bsNoun(),
+          `${faker.company.bsAdjective()} ${faker.company.bsNoun()}`,
+        ]),
+      ),
       category: choose([
         "blend",
         "bourbon",

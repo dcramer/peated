@@ -5,6 +5,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 
+import { toTitleCase } from "@peated/shared/lib/strings";
 import { TastingInputSchema } from "@peated/shared/schemas";
 
 import BottleCard from "../components/bottleCard";
@@ -20,7 +21,6 @@ import TextField from "../components/textField";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api, { ApiError } from "../lib/api";
 import { toBlob } from "../lib/blobs";
-import { toTitleCase } from "../lib/strings";
 import type { Bottle, Paginated } from "../types";
 
 type Tag = {
@@ -184,9 +184,9 @@ export default function AddTasting() {
             placeholder="e.g. 2023"
           />
           <TextField
-            {...register("edition")}
-            error={errors.edition}
-            label="Edition"
+            {...register("series")}
+            error={errors.series}
+            label="Series"
             placeholder="e.g. Healthy Spirits"
           />
           <TextField

@@ -4,7 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { BottleInputSchema } from "@peated/shared/schemas";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { toTitleCase } from "@peated/shared/lib/strings";
 import { PreviewBottleCard } from "../components/bottleCard";
+
 import EntityField from "../components/entityField";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
@@ -14,7 +17,7 @@ import SelectField, { Option } from "../components/selectField";
 import TextField from "../components/textField";
 import { useRequiredAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
-import { formatCategoryName, toTitleCase } from "../lib/strings";
+import { formatCategoryName } from "../lib/strings";
 import { Bottle, Entity } from "../types";
 
 const categoryList = [
@@ -98,7 +101,7 @@ export default ({
         />
       }
     >
-      <form className="sm:mx-16">
+      <form className="sm:mx-16" onSubmit={handleSubmit(onSubmitHandler)}>
         {error && <FormError values={[error]} />}
 
         <div className="sm:mb-4">
