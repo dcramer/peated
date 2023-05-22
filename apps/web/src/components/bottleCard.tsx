@@ -3,9 +3,9 @@ import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
 import classNames from "../lib/classNames";
 import { formatCategoryName } from "../lib/strings";
 import { Bottle } from "../types";
-import BottleMetadata from "./bottleMetadata";
 import BottleName from "./bottleName";
 import { Option } from "./selectField";
+import VintageName from "./vintageName";
 
 type BottleFormData = {
   name: string;
@@ -40,7 +40,6 @@ export const PreviewBottleCard = ({
             "Unknown Bottle"
           )}
         </p>
-        <BottleMetadata className="text-sm" data={data} />
       </div>
       <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
         <p>{data.category ? data.category : null}</p>
@@ -52,10 +51,16 @@ export const PreviewBottleCard = ({
 
 export default ({
   bottle,
+  vintage,
   noGutter,
   color,
 }: {
   bottle: Bottle;
+  vintage?: {
+    series?: string;
+    vintageYear?: number;
+    barrel?: number;
+  };
   noGutter?: boolean;
   color?: "highlight" | "default";
 }) => {
@@ -77,13 +82,7 @@ export default ({
         >
           <BottleName bottle={bottle} />
         </Link>
-        <BottleMetadata
-          data={bottle}
-          className={classNames(
-            color === "highlight" ? "" : "text-light",
-            "text-sm",
-          )}
-        />
+        {vintage && <VintageName {...vintage} />}
       </div>
       <div
         className={classNames(

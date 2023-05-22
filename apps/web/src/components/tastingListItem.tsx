@@ -63,7 +63,16 @@ export default ({
           <Tags tags={tasting.tags} />
         </div>
       </div>
-      {!noBottle && <BottleCard bottle={bottle} />}
+      {!noBottle && (
+        <BottleCard
+          bottle={bottle}
+          vintage={{
+            series: tasting.series,
+            vintageYear: tasting.vintageYear,
+            barrel: tasting.barrel,
+          }}
+        />
+      )}
       <div>
         {!!tasting.imageUrl && (
           <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-black sm:mb-0 sm:mr-4">

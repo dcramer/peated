@@ -129,14 +129,18 @@ export default function BottleDetails() {
             </h1>
             <BottleMetadata
               data={bottle}
-              className="truncate text-center text-slate-500 sm:text-left"
+              className="text-center text-sm text-slate-500 sm:text-left"
             />
           </div>
 
-          <div className="flex w-full flex-col items-center space-y-1 space-y-1 text-sm leading-6 text-slate-500 sm:w-auto sm:items-start sm:items-end">
-            <p>{bottle.category && formatCategoryName(bottle.category)}</p>
-            <p>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</p>
-          </div>
+          {(bottle.category || bottle.statedAge) && (
+            <div className="flex w-full flex-col items-center space-y-1 text-sm leading-6 text-slate-500 sm:w-auto sm:items-end">
+              <p>{bottle.category && formatCategoryName(bottle.category)}</p>
+              <p>
+                {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="my-8 flex justify-center gap-4 sm:justify-start">
