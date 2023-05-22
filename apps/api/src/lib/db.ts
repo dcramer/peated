@@ -1,9 +1,6 @@
 import { eq } from "drizzle-orm";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { first } from "../db";
+import { DatabaseType, TransactionType } from "../db";
 import {
-  Collection,
-  Entity,
   EntityType,
   NewEntity,
   changes,
@@ -39,7 +36,7 @@ export const upsertEntity = async ({
   userId,
   type,
 }: {
-  db: NodePgDatabase;
+  db: DatabaseType | TransactionType;
   data: EntityInput;
   userId: number;
   type?: EntityType;
@@ -47,9 +44,9 @@ export const upsertEntity = async ({
   if (!data) return undefined;
 
   if (typeof data === "number") {
-    const result = first<Entity>(
-      await db.select().from(entities).where(eq(entities.id, data)),
-    );
+    const result = await db.query.entities.findFirst({
+      where: (entities, { eq }) => eq(entities.id, data),
+    });
 
     if (result && type && result.type.indexOf(type) === -1) {
       await db
@@ -60,21 +57,19 @@ export const upsertEntity = async ({
     return result ? { id: result.id, result, created: false } : undefined;
   }
 
-  const result = first<Entity>(
-    await db
-      .insert(entities)
-      .values({
-        name: data.name,
-        country: data.country || null,
-        region: data.region || null,
-        type: Array.from(
-          new Set([...(type ? [type] : []), ...(data.type || [])]),
-        ),
-        createdById: userId,
-      })
-      .onConflictDoNothing()
-      .returning(),
-  );
+  const [result] = await db
+    .insert(entities)
+    .values({
+      name: data.name,
+      country: data.country || null,
+      region: data.region || null,
+      type: Array.from(
+        new Set([...(type ? [type] : []), ...(data.type || [])]),
+      ),
+      createdById: userId,
+    })
+    .onConflictDoNothing()
+    .returning();
 
   if (result) {
     await db.insert(changes).values({
@@ -87,9 +82,9 @@ export const upsertEntity = async ({
     return { id: result.id, result, created: true };
   }
 
-  const resultConflict = first<Entity>(
-    await db.select().from(entities).where(eq(entities.name, data.name)),
-  );
+  const resultConflict = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.name, data.name),
+  });
 
   if (resultConflict)
     return { id: resultConflict.id, result: resultConflict, created: false };
@@ -97,18 +92,14 @@ export const upsertEntity = async ({
 };
 
 export const getDefaultCollection = async (
-  db: NodePgDatabase,
+  db: DatabaseType | TransactionType,
   userId: number,
 ) => {
   return (
-    first<Collection>(
-      await db
-        .select()
-        .from(collections)
-        .where(eq(collections.createdById, userId))
-        .limit(1),
-    ) ||
-    first<Collection>(
+    (await db.query.collections.findFirst({
+      where: (collections, { eq }) => eq(collections.createdById, userId),
+    })) ||
+    (
       await db
         .insert(collections)
         .values({
@@ -116,14 +107,10 @@ export const getDefaultCollection = async (
           createdById: userId,
         })
         .onConflictDoNothing()
-        .returning(),
-    ) ||
-    (
-      await db
-        .select()
-        .from(collections)
-        .where(eq(collections.createdById, userId))
-        .limit(1)
-    )[0]
+        .returning()
+    ).find(() => true) ||
+    (await db.query.collections.findFirst({
+      where: (collections, { eq }) => eq(collections.createdById, userId),
+    }))
   );
 };

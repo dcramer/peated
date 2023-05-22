@@ -4,13 +4,8 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db, first } from "../db";
-import {
-  Collection,
-  bottles,
-  collectionBottles,
-  collections,
-} from "../db/schema";
+import { db } from "../db";
+import { bottles, collectionBottles, collections } from "../db/schema";
 import { getDefaultCollection } from "../lib/db";
 import { sha1 } from "../lib/hash";
 import { requireAuth } from "../middleware/auth";
@@ -33,12 +28,10 @@ export default {
     const collection =
       req.params.collectionId === "default"
         ? await getDefaultCollection(db, req.user.id)
-        : first<Collection>(
-            await db
-              .select()
-              .from(collections)
-              .where(eq(collections.id, req.params.collectionId)),
-          );
+        : await db.query.collections.findFirst({
+            where: (collections, { eq }) =>
+              eq(collections.id, req.params.collectionId as number),
+          });
 
     if (!collection) {
       return res.status(404).send({ error: "Not found" });

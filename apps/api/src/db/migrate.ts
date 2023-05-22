@@ -1,13 +1,13 @@
 import { sql } from "drizzle-orm";
 import { readMigrationFiles } from "drizzle-orm/migrator";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
+import { DatabaseType } from ".";
 
 export const migrate = async function ({
   db,
   fake = false,
   migrationsFolder = "./migrations",
 }: {
-  db: NodePgDatabase;
+  db: DatabaseType;
   fake?: boolean;
   migrationsFolder?: string;
 }) {

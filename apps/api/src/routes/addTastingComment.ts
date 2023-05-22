@@ -3,7 +3,7 @@ import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db, first } from "../db";
+import { db } from "../db";
 import { Comment, NewComment, comments, tastings } from "../db/schema";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { createNotification, objectTypeFromSchema } from "../lib/notifications";
@@ -29,12 +29,9 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
-    const tasting = first(
-      await db
-        .select()
-        .from(tastings)
-        .where(eq(tastings.id, req.params.tastingId)),
-    );
+    const tasting = await db.query.tastings.findFirst({
+      where: (tastings, { eq }) => eq(tastings.id, req.params.tastingId),
+    });
 
     if (!tasting) {
       return res.status(404).send({ error: "Not found" });
