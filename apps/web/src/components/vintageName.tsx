@@ -7,6 +7,7 @@ export default ({
   vintageYear?: number;
   barrel?: number;
 }) => {
+  if (!series && !vintageYear && !barrel) return null;
   const displayName =
     series && vintageYear
       ? `${series} - ${vintageYear}`
