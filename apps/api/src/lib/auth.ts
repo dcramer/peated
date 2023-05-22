@@ -1,6 +1,6 @@
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
+import { DatabaseType, TransactionType } from "../db";
 import { NewUser, User, users } from "../db/schema";
 import { random } from "./rand";
 import { serialize } from "./serializers";
@@ -39,7 +39,7 @@ export const verifyToken = (token: string | undefined): Promise<any> => {
 };
 
 export const createUser = async (
-  db: NodePgDatabase,
+  db: DatabaseType | TransactionType,
   data: NewUser,
 ): Promise<User> => {
   let user: User | undefined;

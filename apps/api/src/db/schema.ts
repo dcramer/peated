@@ -1,4 +1,4 @@
-import { InferModel } from "drizzle-orm";
+import { InferModel, relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
@@ -65,6 +65,13 @@ export const identities = pgTable(
   },
 );
 
+export const identitiesRelations = relations(identities, ({ one }) => ({
+  user: one(users, {
+    fields: [identities.userId],
+    references: [users.id],
+  }),
+}));
+
 export const followStatusEnum = pgEnum("follow_status", [
   "none",
   "pending",
@@ -93,6 +100,17 @@ export const follows = pgTable(
     };
   },
 );
+
+export const followsRelations = relations(follows, ({ one, many }) => ({
+  fromUser: one(users, {
+    fields: [follows.fromUserId],
+    references: [users.id],
+  }),
+  toUser: one(users, {
+    fields: [follows.toUserId],
+    references: [users.id],
+  }),
+}));
 
 export type Follow = InferModel<typeof follows>;
 export type NewFollow = InferModel<typeof follows, "insert">;
@@ -133,6 +151,15 @@ export const entities = pgTable(
     };
   },
 );
+
+export const entitiesRelations = relations(entities, ({ one, many }) => ({
+  distillersToBottles: many(bottlesToDistillers),
+  brandsToBottles: many(bottles),
+  createdBy: one(users, {
+    fields: [entities.createdById],
+    references: [users.id],
+  }),
+}));
 
 export type Entity = InferModel<typeof entities>;
 export type NewEntity = InferModel<typeof entities, "insert">;
@@ -185,6 +212,18 @@ export const bottles = pgTable(
   },
 );
 
+export const bottlesRelations = relations(bottles, ({ one, many }) => ({
+  brand: one(entities, {
+    fields: [bottles.brandId],
+    references: [entities.id],
+  }),
+  bottlesToDistillers: many(bottlesToDistillers),
+  createdBy: one(users, {
+    fields: [bottles.createdById],
+    references: [users.id],
+  }),
+}));
+
 export type Bottle = InferModel<typeof bottles>;
 export type NewBottle = InferModel<typeof bottles, "insert">;
 
@@ -206,6 +245,20 @@ export const bottlesToDistillers = pgTable(
       ),
     };
   },
+);
+
+export const bottlesToDistillersRelations = relations(
+  bottlesToDistillers,
+  ({ one }) => ({
+    bottle: one(bottles, {
+      fields: [bottlesToDistillers.bottleId],
+      references: [bottles.id],
+    }),
+    distiller: one(entities, {
+      fields: [bottlesToDistillers.distillerId],
+      references: [entities.id],
+    }),
+  }),
 );
 
 export const collections = pgTable(
@@ -230,6 +283,14 @@ export const collections = pgTable(
     };
   },
 );
+
+export const collectionsRelations = relations(collections, ({ one, many }) => ({
+  collectionBottles: many(collectionBottles),
+  createdBy: one(users, {
+    fields: [collections.createdById],
+    references: [users.id],
+  }),
+}));
 
 export type Collection = InferModel<typeof collections>;
 export type NewCollection = InferModel<typeof collections, "insert">;
@@ -259,6 +320,20 @@ export const collectionBottles = pgTable(
       ),
     };
   },
+);
+
+export const collectionBottlesRelations = relations(
+  collectionBottles,
+  ({ one }) => ({
+    collection: one(collections, {
+      fields: [collectionBottles.collectionId],
+      references: [collections.id],
+    }),
+    bottle: one(bottles, {
+      fields: [collectionBottles.bottleId],
+      references: [bottles.id],
+    }),
+  }),
 );
 
 export type CollectionBottle = InferModel<typeof collectionBottles>;
@@ -303,6 +378,17 @@ export const tastings = pgTable(
   },
 );
 
+export const tastingsRelations = relations(tastings, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [tastings.bottleId],
+    references: [bottles.id],
+  }),
+  createdBy: one(users, {
+    fields: [tastings.createdById],
+    references: [users.id],
+  }),
+}));
+
 export type Tasting = InferModel<typeof tastings>;
 export type NewTasting = InferModel<typeof tastings, "insert">;
 
@@ -327,6 +413,17 @@ export const toasts = pgTable(
     };
   },
 );
+
+export const toastsRelations = relations(toasts, ({ one }) => ({
+  tasting: one(tastings, {
+    fields: [toasts.tastingId],
+    references: [tastings.id],
+  }),
+  createdBy: one(users, {
+    fields: [toasts.createdById],
+    references: [users.id],
+  }),
+}));
 
 export type Toast = InferModel<typeof toasts>;
 export type NewToast = InferModel<typeof toasts, "insert">;
@@ -355,6 +452,17 @@ export const comments = pgTable(
     };
   },
 );
+
+export const commentsRelations = relations(comments, ({ one }) => ({
+  tasting: one(tastings, {
+    fields: [comments.tastingId],
+    references: [tastings.id],
+  }),
+  createdBy: one(users, {
+    fields: [comments.createdById],
+    references: [users.id],
+  }),
+}));
 
 export type Comment = InferModel<typeof comments>;
 export type NewComment = InferModel<typeof comments, "insert">;
@@ -390,6 +498,13 @@ export const changes = pgTable("change", {
     .notNull(),
 });
 
+export const changesRelations = relations(changes, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [changes.createdById],
+    references: [users.id],
+  }),
+}));
+
 export type Change = InferModel<typeof changes>;
 export type NewChange = InferModel<typeof changes, "insert">;
 
@@ -423,6 +538,17 @@ export const notifications = pgTable(
     };
   },
 );
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+  }),
+  fromUser: one(users, {
+    fields: [notifications.fromUserId],
+    references: [users.id],
+  }),
+}));
 
 export type Notification = InferModel<typeof notifications>;
 export type NewNotification = InferModel<typeof notifications, "insert">;

@@ -28,7 +28,7 @@ export default ({
           <col className="sm:w-1/6" />
           <col className="sm:w-1/6" />
         </colgroup>
-        <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-cell">
+        <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-header-group">
           <tr>
             <th scope="col" className="py-3.5 pl-4 pr-3 text-left sm:pl-3">
               Bottle

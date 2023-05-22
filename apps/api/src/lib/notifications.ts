@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { AnyPgTable } from "drizzle-orm/pg-core";
+import { DatabaseType, TransactionType } from "../db";
 import {
   NewNotification,
   Notification,
@@ -33,7 +33,7 @@ export const objectTypeFromSchema = (schema: AnyPgTable) => {
 };
 
 export const createNotification = async (
-  db: NodePgDatabase,
+  db: DatabaseType | TransactionType,
   notification: NewNotification,
 ) => {
   if (notification.userId === notification.fromUserId) {
@@ -50,7 +50,7 @@ export const createNotification = async (
 };
 
 export const deleteNotification = async (
-  db: NodePgDatabase,
+  db: DatabaseType | TransactionType,
   {
     objectType,
     objectId,

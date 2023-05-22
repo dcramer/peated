@@ -7,14 +7,8 @@ import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db, first } from "../db";
-import {
-  Collection,
-  bottles,
-  collectionBottles,
-  collections,
-  entities,
-} from "../db/schema";
+import { db } from "../db";
+import { bottles, collectionBottles, entities } from "../db/schema";
 import { getDefaultCollection } from "../lib/db";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
@@ -53,17 +47,13 @@ export default {
     const collection =
       req.params.collectionId === "default"
         ? await getDefaultCollection(db, userId)
-        : first<Collection>(
-            await db
-              .select()
-              .from(collections)
-              .where(
-                and(
-                  eq(collections.createdById, userId),
-                  eq(collections.id, req.params.collectionId),
-                ),
+        : await db.query.collections.findFirst({
+            where: (collections, { and, eq }) =>
+              and(
+                eq(collections.createdById, userId),
+                eq(collections.id, req.params.collectionId as number),
               ),
-          );
+          });
 
     if (!collection) {
       return res.status(404).send({ error: "Not found" });

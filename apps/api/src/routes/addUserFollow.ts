@@ -1,8 +1,8 @@
 import { and, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
-import { db, first } from "../db";
-import { Follow, follows, users } from "../db/schema";
+import { db } from "../db";
+import { follows, users } from "../db/schema";
 import { createNotification, objectTypeFromSchema } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
@@ -50,7 +50,7 @@ export default {
 
     const follow = await db.transaction(async (tx) => {
       const follow =
-        first<Follow>(
+        (
           await tx
             .insert(follows)
             .values({
@@ -59,9 +59,9 @@ export default {
               status: isFollowedBy ? "following" : "pending",
             })
             .onConflictDoNothing()
-            .returning(),
-        ) ||
-        first<Follow>(
+            .returning()
+        ).find(() => true) ||
+        (
           await tx
             .update(follows)
             .set({
@@ -74,19 +74,17 @@ export default {
                 eq(follows.toUserId, user.id),
               ),
             )
-            .returning(),
-        ) ||
-        (
-          await tx
-            .select()
-            .from(follows)
-            .where(
-              and(
-                eq(follows.fromUserId, req.user.id),
-                eq(follows.toUserId, user.id),
-              ),
-            )
-        )[0];
+            .returning()
+        ).find(() => true) ||
+        (await db.query.follows.findFirst({
+          where: (follows, { eq, and }) =>
+            and(
+              eq(follows.fromUserId, req.user.id),
+              eq(follows.toUserId, user.id),
+            ),
+        }));
+
+      if (!follow) return;
 
       if (follow.status === "pending")
         createNotification(tx, {
@@ -99,6 +97,10 @@ export default {
 
       return follow;
     });
+
+    if (!follow) {
+      return res.status(500).send({ error: "Failed to create follow" });
+    }
 
     res.status(200).send({
       status: follow.status,

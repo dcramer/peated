@@ -1,11 +1,10 @@
 import { faker } from "@faker-js/faker";
-import { eq } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
-import { db, first } from "../../db";
+import { db } from "../../db";
 import {
   NewBottle,
   NewComment,
@@ -61,9 +60,9 @@ export const Follow = async ({ ...data }: Partial<NewFollow> = {}) => {
 
 export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
   const name = faker.company.name();
-  const existing = first(
-    await db.select().from(entities).where(eq(entities.name, name)),
-  );
+  const existing = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.name, name),
+  });
   if (existing) return existing;
 
   return (
