@@ -78,6 +78,7 @@ export default function EditEntity() {
           onSave={handleSubmit(onSubmit)}
         />
       }
+      noFooter
     >
       <form className="sm:mx-16" onSubmit={handleSubmit(onSubmit)}>
         {error && <FormError values={[error]} />}

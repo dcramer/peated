@@ -105,6 +105,7 @@ export default function AddTasting() {
           saveDisabled={isSubmitting}
         />
       }
+      noFooter
     >
       <form className="mx-auto my-6 max-w-xl" onSubmit={handleSubmit(onSubmit)}>
         {error && <FormError values={[error]} />}

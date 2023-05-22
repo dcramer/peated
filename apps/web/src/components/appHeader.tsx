@@ -51,13 +51,15 @@ export default function AppHeader() {
       </form>
       {user && (
         <div className="ml-4 flex items-center gap-x-2 sm:ml-8">
-          <NotificationsPanel />
+          <div className="hidden sm:block">
+            <NotificationsPanel />
+          </div>
           <Menu as="div" className="menu">
-            <Menu.Button className="focus:ring-highlight relative flex max-w-xs items-center rounded text-sm text-white hover:bg-slate-800 focus:outline-none focus:ring">
+            <Menu.Button className="focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm text-slate-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring">
               <span className="sr-only">Open user menu</span>
-              <span className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded text-white sm:h-10 sm:w-10">
-                <UserAvatar user={user} size={28} />
-              </span>
+              <div className="h-8 w-8 sm:h-8 sm:w-8">
+                <UserAvatar user={user} />
+              </div>
             </Menu.Button>
             <Transition
               as={Fragment}

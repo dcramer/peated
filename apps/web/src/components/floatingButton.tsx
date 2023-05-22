@@ -6,7 +6,7 @@ export default ({ to }: { to: string }) => {
     <div className="absolute right-24 sm:right-20">
       <Link
         type="button"
-        className="bg-highlight fixed bottom-8 z-10 rounded-full p-2 text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        className="bg-highlight fixed bottom-24 z-10 rounded-full p-2 text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         to={to}
       >
         <PlusIcon className="h-12 w-12 sm:h-8 sm:w-8" aria-hidden="true" />

@@ -1,9 +1,9 @@
 import { InboxIcon } from "@heroicons/react/20/solid";
 import { Suspense } from "react";
-import { Link } from "react-router-dom";
 import { useSuspenseQuery } from "../../hooks/useSuspenseQuery";
 import api from "../../lib/api";
 import { Notification, Paginated } from "../../types";
+import NavLink from "../navLink";
 
 const NotificationCount = () => {
   const { data } = useSuspenseQuery(
@@ -29,17 +29,11 @@ const NotificationCount = () => {
 
 export default function NotificationsPanel() {
   return (
-    <Link
-      className="focus:ring-highlight relative flex max-w-xs items-center rounded text-sm text-white hover:bg-slate-800 focus:outline-none focus:ring"
-      to="/notifications"
-    >
-      <span className="sr-only">Open user menu</span>
-      <span className="inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded text-slate-500 sm:h-10 sm:w-10">
-        <InboxIcon className="h-9 w-9" />
-        <Suspense>
-          <NotificationCount />
-        </Suspense>
-      </span>
-    </Link>
+    <NavLink to="/notifications">
+      <InboxIcon className="h-8 w-8 sm:h-9 sm:w-9" />
+      <Suspense>
+        <NotificationCount />
+      </Suspense>
+    </NavLink>
   );
 }

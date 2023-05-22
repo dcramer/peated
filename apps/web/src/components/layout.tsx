@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import classNames from "../lib/classNames";
 import AppHeader from "./appHeader";
+import Footer from "./footer";
 import Header from "./header";
 
 export default function Layout({
@@ -8,11 +9,13 @@ export default function Layout({
   header,
   splash,
   noHeader,
+  noFooter,
   noMobileHeader,
 }: {
   children: any;
   header?: any;
   noHeader?: boolean;
+  noFooter?: boolean;
   splash?: boolean;
   noMobileHeader?: boolean;
   onSave?: any;
@@ -34,6 +37,8 @@ export default function Layout({
         >
           {children}
         </main>
+
+        {!noFooter && <Footer />}
       </div>
     </>
   );

@@ -100,6 +100,7 @@ export default ({
           onSave={handleSubmit(onSubmitHandler)}
         />
       }
+      noFooter
     >
       <form className="sm:mx-16" onSubmit={handleSubmit(onSubmitHandler)}>
         {error && <FormError values={[error]} />}

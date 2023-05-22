@@ -74,6 +74,23 @@
     backdrop-filter: blur(4px);
   }
 
+  .footer > div {
+    @apply border-t border-t-slate-700 bg-slate-950 text-white;
+    /* background-color: rgba(15, 23, 42, 1);
+    background-image: linear-gradient(
+      to right,
+      rgba(15, 23, 42, 0.5),
+      rgba(0, 0, 0, 0.5),
+      rgba(15, 23, 42, 0.5)
+    ); */
+    /*
+    -webkit-backdrop-filter: blur(4px);
+    -o-backdrop-filter: blur(4px);
+    -moz-backdrop-filter: blur(4px);
+
+    backdrop-filter: blur(4px); */
+  }
+
   .card {
     @apply overflow-hidden bg-slate-950;
   }

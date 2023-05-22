@@ -1,7 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { ReactComponent as Glyph } from "../assets/glyph.svg";
 import EmptyActivity from "../components/emptyActivity";
-import FloatingButton from "../components/floatingButton";
 import Layout from "../components/layout";
 import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
@@ -53,7 +52,6 @@ export default function Activity() {
 
   return (
     <Layout>
-      <FloatingButton to="/search?tasting" />
       <Tabs fullWidth>
         <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
           Friends
