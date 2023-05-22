@@ -147,7 +147,7 @@ const UserResultRow = ({ result: { ref: user } }: { result: UserResult }) => {
   return (
     <>
       <div className="hidden h-12 w-12 flex-none p-2 sm:block">
-        <UserAvatar user={user} size={32} />
+        <UserAvatar user={user} />
       </div>
 
       <div className="flex min-w-0 flex-auto">
@@ -338,8 +338,8 @@ export default function Search() {
           <>
             {!isUserQuery &&
               (bottleResults.length < maxResults || query !== "") && (
-                <ListItem>
-                  <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+                <ListItem color="highlight">
+                  <PlusIcon className="hidden h-12 w-12 flex-none rounded-full p-2 sm:block" />
 
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold leading-6">

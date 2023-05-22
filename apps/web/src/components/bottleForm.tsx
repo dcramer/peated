@@ -44,9 +44,11 @@ type FormSchemaType = z.infer<typeof BottleInputSchema>;
 export default ({
   onSubmit,
   initialData,
+  title,
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
   initialData: Partial<Bottle>;
+  title: string;
 }) => {
   const { user } = useRequiredAuth();
 
@@ -95,7 +97,7 @@ export default ({
     <Layout
       header={
         <FormHeader
-          title="Edit Bottle"
+          title={title}
           saveDisabled={isSubmitting}
           onSave={handleSubmit(onSubmitHandler)}
         />

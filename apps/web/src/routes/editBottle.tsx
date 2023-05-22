@@ -25,6 +25,7 @@ export default function EditBottle() {
         navigate(`/bottles/${bottle.id}`);
       }}
       initialData={bottle}
+      title="Edit Bottle"
     />
   );
 }

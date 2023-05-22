@@ -24,7 +24,7 @@ export const PreviewBottleCard = ({
   return (
     <div className="bg-highlight flex items-center space-x-4 p-3 text-black sm:px-5 sm:py-4">
       <div className="flex-1 space-y-1">
-        <p className="block max-w-[260px] truncate font-semibold leading-6 hover:underline sm:max-w-[480px]">
+        <p className="block max-w-[260px] truncate font-semibold leading-6 sm:max-w-[480px]">
           {data.name ? (
             <BottleName
               bottle={{

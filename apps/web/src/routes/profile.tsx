@@ -1,7 +1,7 @@
 import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import Button from "../components/button";
 import Chip from "../components/chip";
 import Layout from "../components/layout";
@@ -24,8 +24,10 @@ type UserDetails = User & {
 };
 
 export default function Profile() {
-  const { user: currentUser } = useRequiredAuth();
+  const { user: currentUser, logout } = useRequiredAuth();
   const { userId } = useParams();
+  const navigate = useNavigate();
+
   const { data } = useSuspenseQuery(
     ["user", userId],
     (): Promise<UserDetails> => api.get(`/users/${userId}`),
@@ -113,6 +115,15 @@ export default function Profile() {
               <>
                 <Button to="/settings" color="primary">
                   Edit Profile
+                </Button>
+                <Button
+                  onClick={() => {
+                    logout();
+                    navigate("/");
+                  }}
+                  color="primary"
+                >
+                  Sign Out
                 </Button>
               </>
             )}

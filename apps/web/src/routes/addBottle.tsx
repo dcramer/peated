@@ -81,6 +81,7 @@ export default function AddBottle() {
         });
       }}
       initialData={initialData}
+      title="Add Bottle"
     />
   );
 }

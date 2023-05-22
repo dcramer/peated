@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ReactComponent as PeatedGlyph } from "../assets/glyph.svg";
 import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
 import useAuth from "../hooks/useAuth";
+import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 import UserAvatar from "./userAvatar";
 
@@ -54,7 +55,14 @@ export default function AppHeader() {
           <div className="hidden sm:block">
             <NotificationsPanel />
           </div>
-          <Menu as="div" className="menu">
+          <div className="block sm:hidden">
+            <NavLink to={`/users/${user.username}`}>
+              <div className="h-8 w-8 sm:h-8 sm:w-8">
+                <UserAvatar user={user} />
+              </div>
+            </NavLink>
+          </div>
+          <Menu as="div" className="menu hidden sm:block">
             <Menu.Button className="focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm text-slate-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring">
               <span className="sr-only">Open user menu</span>
               <div className="h-8 w-8 sm:h-8 sm:w-8">
