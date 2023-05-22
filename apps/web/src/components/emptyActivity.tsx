@@ -13,7 +13,7 @@ type Props =
 
 export default ({ to, children }: Props) => {
   const baseStyles =
-    "border-slate-700 text-slate-700 m-4 mx-auto flex flex-col items-center rounded-lg border border-dashed p-12 font-light";
+    "border-slate-700 text-slate-700 m-3 sm:my-4 sm:mx-auto flex flex-col items-center rounded-lg border border-dashed p-12 font-light";
 
   if (to) {
     return (
