@@ -19,6 +19,7 @@ type UserDetails = User & {
     bottles: number;
     tastings: number;
     contributions: number;
+    collected: number;
   };
 };
 
@@ -78,6 +79,12 @@ export default function Profile() {
                 {user.stats.bottles.toLocaleString()}
               </span>
               <span className="text-peated-light text-sm">Bottles</span>
+            </div>
+            <div className="mb-4 px-3 text-center">
+              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+                {user.stats.collected.toLocaleString()}
+              </span>
+              <span className="text-peated-light text-sm">Collected</span>
             </div>
             <div className="mb-4 pl-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">

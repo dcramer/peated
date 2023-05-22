@@ -5,7 +5,14 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { User, changes, tastings, users } from "../db/schema";
+import {
+  User,
+  changes,
+  collectionBottles,
+  collections,
+  tastings,
+  users,
+} from "../db/schema";
 import { serialize } from "../lib/serializers";
 import { UserSerializer } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";
@@ -30,6 +37,7 @@ export default {
             tastings: z.number(),
             bottles: z.number(),
             contributions: z.number(),
+            collected: z.number(),
           }),
         }),
       ),
@@ -64,6 +72,17 @@ export default {
       .from(tastings)
       .where(eq(tastings.createdById, user.id));
 
+    const [{ collectedBottles }] = await db
+      .select({
+        collectedBottles: sql`COUNT(DISTINCT ${collectionBottles.bottleId})`,
+      })
+      .from(collections)
+      .innerJoin(
+        collectionBottles,
+        eq(collections.id, collectionBottles.collectionId),
+      )
+      .where(eq(collections.createdById, user.id));
+
     const [{ totalContributions }] = await db
       .select({
         totalContributions: sql`COUNT(${changes.createdById})`,
@@ -76,6 +95,7 @@ export default {
       stats: {
         tastings: totalTastings,
         bottles: totalBottles,
+        collected: collectedBottles,
         contributions: totalContributions,
       },
     });
