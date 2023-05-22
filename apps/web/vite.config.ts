@@ -1,4 +1,5 @@
 import replace from "@rollup/plugin-replace";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import type { ManifestOptions, VitePWAOptions } from "vite-plugin-pwa";
@@ -77,6 +78,7 @@ export default defineConfig(() => {
     // issues with rolling out the frontend (aka index.html pointing to an old version that doesnt exist).
     // Realistically we need push these assets to a CDN.
     build: {
+      sourcemap: true,
       rollupOptions: {
         output: {
           entryFileNames: `assets/[name].js`,
@@ -109,22 +111,20 @@ export default defineConfig(() => {
         //  A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should ignore. By default no files are ignored.
         exclude: "",
       }),
-      // https://github.com/getsentry/sentry-javascript/issues/8059
-      // sentryVitePlugin({
-      //   org: env.SENTRY_ORG,
-      //   project: env.SENTRY_PROJECT,
-
-      //   // Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
-      //   // and need `project:releases` and `org:read` scopes
-      //   authToken: env.SENTRY_AUTH_TOKEN,
-
-      //   release: env.VERSION,
-
-      //   sourcemaps: {
-      //     // Specify the directory containing build artifacts
-      //     assets: "./dist/**",
-      //   },
-      // }),
+      sentryVitePlugin({
+        org: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
+        // Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
+        // and need `project:releases` and `org:read` scopes
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        release: {
+          name: process.env.VERSION,
+        },
+        sourcemaps: {
+          assets: "./dist/**",
+          deleteFilesAfterUpload: "./dist/**/*.map",
+        },
+      }),
       replace(replaceOptions),
     ],
   };
