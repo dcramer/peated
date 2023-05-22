@@ -1,10 +1,18 @@
 import { ComponentProps } from "react";
-import { Link } from "react-router-dom";
+import { NavLink as RRNavLink } from "react-router-dom";
+import classNames from "../lib/classNames";
 
-export default function NavLink(props: ComponentProps<typeof Link>) {
+export default function NavLink(props: ComponentProps<typeof RRNavLink>) {
+  const baseClassNames =
+    "focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm hover:bg-slate-800 focus:outline-none focus:ring";
   return (
-    <Link
-      className="focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm text-slate-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring"
+    <RRNavLink
+      className={({ isActive, isPending }) =>
+        classNames(
+          baseClassNames,
+          isActive ? "text-highlight" : "text-slate-500 hover:text-white",
+        )
+      }
       {...props}
     />
   );
