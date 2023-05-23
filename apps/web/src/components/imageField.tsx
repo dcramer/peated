@@ -144,13 +144,15 @@ export default forwardRef<HTMLInputElement, Props>(
               />
             ) : (
               <em
-                className={`text-light flex flex-col items-center justify-center text-sm`}
+                className={`text-light flex flex-col items-center justify-center`}
                 style={{
                   maxHeight: imageHeight,
                 }}
               >
-                <PhotoIcon className="h-12 w-12" />
-                Tap to Upload an Image
+                <div className="flex flex-col items-center justify-center p-4 text-sm">
+                  <PhotoIcon className="h-12 w-12" />
+                  Tap to Upload an Image
+                </div>
               </em>
             )}
           </div>
