@@ -90,7 +90,6 @@ export default ({
         );
       }}
       {...props}
-      label="Brand"
     />
   );
 };

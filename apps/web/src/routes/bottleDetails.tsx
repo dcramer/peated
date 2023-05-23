@@ -123,7 +123,7 @@ export default function BottleDetails() {
       <div className="p-3 sm:py-0">
         <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 sm:flex-nowrap">
           <BottleIcon className="hidden h-14 w-auto sm:inline-block" />
-          <div className="w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
+          <div className="w-full flex-1 flex-col items-center sm:w-auto sm:items-start">
             <h1 className="mb-2 truncate text-center text-3xl font-semibold leading-7 sm:text-left">
               <BottleName bottle={bottle} />
             </h1>
@@ -134,7 +134,7 @@ export default function BottleDetails() {
           </div>
 
           {(bottle.category || bottle.statedAge) && (
-            <div className="flex w-full flex-col items-center space-y-1 text-sm leading-6 text-slate-500 sm:w-auto sm:items-end">
+            <div className="flex w-full flex-col items-center justify-center gap-x-1 text-sm text-slate-500 sm:w-auto sm:items-end sm:leading-7">
               <p>{bottle.category && formatCategoryName(bottle.category)}</p>
               <p>
                 {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}

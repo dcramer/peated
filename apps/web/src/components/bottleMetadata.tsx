@@ -19,7 +19,7 @@ type Props = {
 export default ({ data, ...props }: Props) => {
   return (
     <div {...props}>
-      <div className="inline-flex flex-col space-x-1 sm:flex-row">
+      <div className="inline-flex flex-col items-center space-x-1 sm:flex-row sm:items-start">
         <Brand data={data} />
         {!!data.distillers?.length && (
           <span className="hidden sm:inline-block">&middot;</span>
