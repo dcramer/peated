@@ -310,6 +310,8 @@ export const collectionBottles = pgTable(
     series: varchar("series", { length: 255 }),
     vintageYear: smallint("vintage_year"),
     barrel: smallint("barrel"),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (collectionBottles) => {
     return {

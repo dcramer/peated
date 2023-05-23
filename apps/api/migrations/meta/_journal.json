@@ -141,6 +141,13 @@
       "when": 1684773803115,
       "tag": "0019_lucky_wild_child",
       "breakpoints": false
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1684872883926,
+      "tag": "0020_handy_inhumans",
+      "breakpoints": false
     }
   ]
 }
