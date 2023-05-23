@@ -137,7 +137,7 @@ const GoogleLogin = () => {
 
 export default function Login() {
   return (
-    <Layout noHeader splash>
+    <Layout noHeader splash noFooter>
       <PeatedLogo className="text-peated h-auto max-w-full" />
 
       <div className="mx-auto mt-8 max-w-sm">

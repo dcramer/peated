@@ -41,9 +41,13 @@ export const requireAuth: onRequestHookHandler = async (req, res) => {
   const user = await getUser(req);
   req.user = user;
   if (!user) {
-    return res
-      .status(401)
-      .send({ error: "Unauthorized!", name: "invalid_token" });
+    const auth = req.headers["authorization"];
+    const token = auth?.replace("Bearer ", "");
+
+    return res.status(401).send({
+      error: "Unauthorized!",
+      name: token ? "invalid_token" : "auth_required",
+    });
   }
 };
 
