@@ -48,7 +48,7 @@ const Distillers = ({ data: { distillers } }: Props) => {
 
   if (distillers.length > 1) {
     return (
-      <Tooltip title={distillers.map((d) => d.name).join(", ")}>
+      <Tooltip title={distillers.map((d) => d.name).join(", ")} origin="center">
         <span className="underline decoration-dotted">
           {distillers.length} distillers
         </span>
