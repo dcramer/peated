@@ -5,6 +5,7 @@ import {
   boolean,
   doublePrecision,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -554,3 +555,58 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 
 export type Notification = InferModel<typeof notifications>;
 export type NewNotification = InferModel<typeof notifications, "insert">;
+
+export const activities = pgTable(
+  "activities",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    // tracks ref of what owns the notification
+    objectId: bigint("object_id", { mode: "number" }).notNull(),
+    objectType: objectTypeEnum("object_type").notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+    // does not default as it should be set to object's createdAt timestamp
+    createdAt: timestamp("created_at").notNull(),
+    data: jsonb("data").$type<Record<string, any>>().default({}).notNull(),
+  },
+  (activities) => {
+    return {
+      constraint: uniqueIndex("activities_unq").on(
+        activities.objectId,
+        activities.objectType,
+      ),
+    };
+  },
+);
+
+export const activitiesRelations = relations(activities, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [activities.createdById],
+    references: [users.id],
+  }),
+}));
+
+export type Activity = InferModel<typeof activities>;
+export type NewActivity = InferModel<typeof activities, "insert">;
+
+export const activityGroups = pgTable("activity_groups", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  objectIds: bigint("object_ids", { mode: "number" }).array().notNull(),
+  objectType: objectTypeEnum("object_type").notNull(),
+  createdById: bigint("created_by_id", { mode: "number" })
+    .references(() => users.id)
+    .notNull(),
+  createdAt: timestamp("created_at").notNull(),
+  data: jsonb("data").$type<Record<string, any>>().default({}).notNull(),
+});
+
+export const activityGroupsRelations = relations(activityGroups, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [activityGroups.createdById],
+    references: [users.id],
+  }),
+}));
+
+export type ActivityGroup = InferModel<typeof activityGroups>;
+export type NewActivityGroup = InferModel<typeof activityGroups, "insert">;

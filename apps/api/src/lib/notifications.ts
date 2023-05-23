@@ -4,29 +4,20 @@ import { DatabaseType, TransactionType } from "../db";
 import {
   NewNotification,
   Notification,
-  bottles,
   comments,
-  entities,
   follows,
   notifications,
-  tastings,
   toasts,
 } from "../db/schema";
 
 export const objectTypeFromSchema = (schema: AnyPgTable) => {
   switch (schema) {
-    case bottles:
-      return "bottle";
     case comments:
       return "comment";
-    case entities:
-      return "entity";
     case follows:
       return "follow";
     case toasts:
       return "toast";
-    case tastings:
-      return "tasting";
     default:
       throw new Error("Invalid schema");
   }

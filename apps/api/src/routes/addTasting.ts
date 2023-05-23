@@ -15,6 +15,7 @@ import {
   entities,
   tastings,
 } from "../db/schema";
+import { createActivity, objectTypeForActivity } from "../lib/activities";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { serialize } from "../lib/serializers";
 import { TastingSerializer } from "../lib/serializers/tasting";
@@ -100,6 +101,13 @@ export default {
             Array.from(new Set([bottle.brandId, ...distillerIds])),
           ),
         );
+
+      await createActivity(tx, {
+        objectType: objectTypeForActivity(tastings),
+        objectId: tasting.id,
+        createdById: tasting.createdById,
+        createdAt: tasting.createdAt,
+      });
 
       return tasting;
     });
