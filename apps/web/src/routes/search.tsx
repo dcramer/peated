@@ -298,7 +298,7 @@ export default function Search() {
 
   return (
     <Layout
-      noFooter
+      footer={null}
       header={
         <SearchHeader
           name="q"

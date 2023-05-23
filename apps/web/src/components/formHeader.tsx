@@ -1,18 +1,22 @@
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { FormEvent } from "react";
+import { FormEvent, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import classNames from "../lib/classNames";
 
 export default function FormHeader({
+  onClose,
   onSave,
   title,
   subtitle,
+  icon,
   saveDisabled = false,
 }: {
-  onSave: (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => void;
   title: string;
   subtitle?: string | undefined | null;
+  icon?: ReactNode;
   saveDisabled?: boolean;
+  onClose?: () => void;
+  onSave: (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => void;
 }) {
   const navigate = useNavigate();
 
@@ -22,11 +26,13 @@ export default function FormHeader({
     <nav className="flex min-w-full items-center justify-between text-white">
       <div className="flex text-white hover:text-white">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => (onClose ? onClose() : navigate(-1))}
           className={`-m-1.5 p-1.5 ${blockStyles} pr-3 sm:pr-6`}
         >
           <span className="sr-only">Back</span>
-          <ChevronLeftIcon className="h-10 w-10" />
+          <div className="h-10 w-10">
+            {icon || <ChevronLeftIcon className="h-10 w-10" />}
+          </div>
         </button>
       </div>
       <div

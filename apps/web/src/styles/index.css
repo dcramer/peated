@@ -47,8 +47,8 @@
     );
   }
 
-  .header .logo {
-    /* @apply text-highlight; */
+  .header {
+    @apply text-white;
   }
 
   .header .logo {
@@ -57,8 +57,7 @@
     mask: linear-gradient(to bottom, transparent 5%, #000 75%);
   }
 
-  .header > div {
-    @apply text-slate-950;
+  .main-gradient {
     background-color: rgba(15, 23, 42, 0.25);
     background-image: linear-gradient(
       to right,
@@ -66,7 +65,9 @@
       rgba(0, 0, 0, 0.5),
       rgba(15, 23, 42, 0.5)
     );
+  }
 
+  .backdrop-blur {
     -webkit-backdrop-filter: blur(4px);
     -o-backdrop-filter: blur(4px);
     -moz-backdrop-filter: blur(4px);
@@ -74,21 +75,8 @@
     backdrop-filter: blur(4px);
   }
 
-  .footer > div {
-    @apply border-t border-t-slate-700 bg-slate-950 text-white;
-    /* background-color: rgba(15, 23, 42, 1);
-    background-image: linear-gradient(
-      to right,
-      rgba(15, 23, 42, 0.5),
-      rgba(0, 0, 0, 0.5),
-      rgba(15, 23, 42, 0.5)
-    ); */
-    /*
-    -webkit-backdrop-filter: blur(4px);
-    -o-backdrop-filter: blur(4px);
-    -moz-backdrop-filter: blur(4px);
-
-    backdrop-filter: blur(4px); */
+  .footer {
+    @apply text-white;
   }
 
   .card {

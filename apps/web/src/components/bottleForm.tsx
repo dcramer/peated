@@ -19,6 +19,7 @@ import { useRequiredAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
 import { Bottle, Entity } from "../types";
+import Header from "./header";
 
 const categoryList = [
   "blend",
@@ -96,13 +97,15 @@ export default ({
   return (
     <Layout
       header={
-        <FormHeader
-          title={title}
-          saveDisabled={isSubmitting}
-          onSave={handleSubmit(onSubmitHandler)}
-        />
+        <Header>
+          <FormHeader
+            title={title}
+            saveDisabled={isSubmitting}
+            onSave={handleSubmit(onSubmitHandler)}
+          />
+        </Header>
       }
-      noFooter
+      footer={null}
     >
       <form className="sm:mx-16" onSubmit={handleSubmit(onSubmitHandler)}>
         {error && <FormError values={[error]} />}

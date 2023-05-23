@@ -1,5 +1,6 @@
-import { useLocation } from "react-router-dom";
+import { ReactNode } from "react";
 import classNames from "../lib/classNames";
+import { AppFooter } from "./appFooter";
 import AppHeader from "./appHeader";
 import Footer from "./footer";
 import Header from "./header";
@@ -7,38 +8,42 @@ import Header from "./header";
 export default function Layout({
   children,
   header,
+  footer,
   splash,
-  noHeader,
-  noFooter,
-  noMobileHeader,
 }: {
-  children: any;
-  header?: any;
-  noHeader?: boolean;
-  noFooter?: boolean;
+  children: ReactNode;
+  header?: ReactNode;
+  footer?: ReactNode;
   splash?: boolean;
-  noMobileHeader?: boolean;
   onSave?: any;
 }) {
-  const location = useLocation();
-
   return (
     <>
-      <div className={`layout ${splash ? "flex" : ""}`}>
-        {!noHeader && (
-          <Header noMobile={noMobileHeader}>{header || <AppHeader />}</Header>
+      <div className="layout flex min-h-screen flex-1 flex-col">
+        {header !== undefined ? (
+          header
+        ) : (
+          <Header color="primary">
+            <AppHeader />
+          </Header>
         )}
 
         <main
           className={classNames(
-            "content m-h-screen relative mx-auto max-w-4xl",
+            "content relative mx-auto flex w-full max-w-4xl flex-1 flex-col",
             splash && "flex-1 self-center px-6 py-12 sm:max-w-sm lg:px-8",
           )}
         >
           {children}
         </main>
 
-        {!noFooter && <Footer />}
+        {footer !== undefined ? (
+          footer
+        ) : (
+          <Footer>
+            <AppFooter />
+          </Footer>
+        )}
       </div>
     </>
   );

@@ -137,10 +137,10 @@ const GoogleLogin = () => {
 
 export default function Login() {
   return (
-    <Layout noHeader splash noFooter>
+    <Layout splash header={null} footer={null}>
       <PeatedLogo className="text-peated h-auto max-w-full" />
 
-      <div className="mx-auto mt-8 max-w-sm">
+      <div className="mt-8 max-w-sm">
         {config.GOOGLE_CLIENT_ID && (
           <>
             <GoogleLogin />

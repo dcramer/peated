@@ -12,6 +12,7 @@ import BottleCard from "../components/bottleCard";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
+import Header from "../components/header";
 import ImageField from "../components/imageField";
 import Layout from "../components/layout";
 import RangeField from "../components/rangeField";
@@ -99,15 +100,20 @@ export default function AddTasting() {
   return (
     <Layout
       header={
-        <FormHeader
-          title="Record Tasting"
-          onSave={handleSubmit(onSubmit)}
-          saveDisabled={isSubmitting}
-        />
+        <Header>
+          <FormHeader
+            title="Record Tasting"
+            onSave={handleSubmit(onSubmit)}
+            saveDisabled={isSubmitting}
+          />
+        </Header>
       }
-      noFooter
+      footer={null}
     >
-      <form className="mx-auto my-6 max-w-xl" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="my-6 max-w-xl self-center"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         {error && <FormError values={[error]} />}
 
         <div className="sm:mb-4">

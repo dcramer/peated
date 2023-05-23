@@ -4,7 +4,7 @@ import { PhotoIcon } from "@heroicons/react/20/solid";
 import { FieldError } from "react-hook-form";
 import setRef from "../lib/setRef";
 import FormField from "./formField";
-import ImageModal from "./imageModal";
+import ImageEditorModal from "./imageEditorModal";
 import TextInput from "./textInput";
 
 type Props = Omit<
@@ -186,7 +186,7 @@ export default forwardRef<HTMLInputElement, Props>(
             <HelpText>JPG, GIF or PNG. 1MB max.</HelpText>
           </div> */}
         </div>
-        <ImageModal
+        <ImageEditorModal
           image={imageSrc}
           open={editorOpen}
           setOpen={setEditorOpen}

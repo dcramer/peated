@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
+import Header from "../components/header";
 import ImageField from "../components/imageField";
 import Layout from "../components/layout";
 import TextField from "../components/textField";
@@ -84,7 +85,13 @@ export default function Settings() {
   };
 
   return (
-    <Layout header={<FormHeader title="Settings" onSave={onSubmit} />}>
+    <Layout
+      header={
+        <Header>
+          <FormHeader title="Settings" onSave={onSubmit} />
+        </Header>
+      }
+    >
       <form className="sm:mx-16">
         {error && <FormError values={[error]} />}
 

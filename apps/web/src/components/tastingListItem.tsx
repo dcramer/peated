@@ -12,6 +12,7 @@ import api from "../lib/api";
 import { Tasting } from "../types";
 import BottleCard from "./bottleCard";
 import Button from "./button";
+import { ImageModal } from "./imageModal";
 import { StaticRating } from "./rating";
 import Tags from "./tags";
 import TimeSince from "./timeSince";
@@ -32,6 +33,8 @@ export default ({
 }) => {
   const { bottle } = tasting;
   const { user } = useAuth();
+
+  const [imageOpen, setImageOpen] = useState(false);
 
   const [hasToasted, setHasToasted] = useState(tasting.hasToasted);
   const isTaster = user?.id === tasting.createdBy.id;
@@ -76,7 +79,16 @@ export default ({
       <div>
         {!!tasting.imageUrl && (
           <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-black sm:mb-0 sm:mr-4">
-            <img src={tasting.imageUrl} className="h-full" />
+            <img
+              src={tasting.imageUrl}
+              className="h-full"
+              onClick={() => setImageOpen(true)}
+            />
+            <ImageModal
+              image={tasting.imageUrl}
+              open={imageOpen}
+              setOpen={setImageOpen}
+            />
           </div>
         )}
         {!!tasting.notes && (

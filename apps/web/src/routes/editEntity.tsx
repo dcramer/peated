@@ -11,6 +11,7 @@ import CountryField from "../components/countryField";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
+import Header from "../components/header";
 import Layout from "../components/layout";
 import SelectField from "../components/selectField";
 import TextField from "../components/textField";
@@ -72,13 +73,15 @@ export default function EditEntity() {
   return (
     <Layout
       header={
-        <FormHeader
-          title="Edit Entity"
-          saveDisabled={isSubmitting}
-          onSave={handleSubmit(onSubmit)}
-        />
+        <Header>
+          <FormHeader
+            title="Edit Entity"
+            saveDisabled={isSubmitting}
+            onSave={handleSubmit(onSubmit)}
+          />
+        </Header>
       }
-      noFooter
+      footer={null}
     >
       <form className="sm:mx-16" onSubmit={handleSubmit(onSubmit)}>
         {error && <FormError values={[error]} />}
