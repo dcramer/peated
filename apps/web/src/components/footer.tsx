@@ -10,7 +10,8 @@ import NotificationsPanel from "./notifications/panel";
 
 export default function Footer() {
   const { user } = useAuth();
-  if (!user) return;
+  if (!user) return null;
+
   return (
     <footer className="footer block h-14 overflow-hidden sm:hidden sm:h-20">
       <div className="fixed bottom-0 left-0 right-0 z-10">
