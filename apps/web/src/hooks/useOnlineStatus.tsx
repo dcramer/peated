@@ -5,7 +5,7 @@ const OnlineStatusContext = React.createContext(true);
 export const OnlineStatusProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [onlineStatus, setOnlineStatus] = useState<boolean>(true);
+  const [onlineStatus, setOnlineStatus] = useState<boolean>(navigator.onLine);
 
   useEffect(() => {
     window.addEventListener("offline", () => {

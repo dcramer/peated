@@ -1,12 +1,12 @@
 import { InboxIcon } from "@heroicons/react/20/solid";
+import { useQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
-import { useSuspenseQuery } from "../../hooks/useSuspenseQuery";
 import api from "../../lib/api";
 import { Notification, Paginated } from "../../types";
 import NavLink from "../navLink";
 
 const NotificationCount = () => {
-  const { data } = useSuspenseQuery(
+  const { data } = useQuery(
     ["notifications", "unread"],
     (): Promise<Paginated<Notification>> =>
       api.get("/notifications", {
@@ -16,7 +16,7 @@ const NotificationCount = () => {
       }),
   );
 
-  const unreadNotificationCount = data && data.results.length;
+  const unreadNotificationCount = (data && data.results.length) || 0;
 
   if (unreadNotificationCount > 0)
     return (

@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { ReactComponent as Glyph } from "../assets/glyph.svg";
 import EmptyActivity from "../components/emptyActivity";
@@ -5,9 +6,10 @@ import Layout from "../components/layout";
 import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
 import TastingList from "../components/tastingList";
-import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
 import type { Paginated, Tasting } from "../types";
+
+import { useOnlineStatus } from "../hooks/useOnlineStatus";
 
 const defaultViewParam = "global";
 
@@ -17,7 +19,7 @@ const mapFilterParam = (value: string | null) => {
 };
 
 const ActivityContent = ({ filter }: { filter: string }) => {
-  const { data } = useSuspenseQuery(
+  const { data } = useQuery(
     ["tastings", filter],
     (): Promise<Paginated<Tasting>> =>
       api.get("/tastings", {
@@ -26,6 +28,8 @@ const ActivityContent = ({ filter }: { filter: string }) => {
         },
       }),
   );
+
+  if (!data) return null;
 
   return (
     <>
@@ -49,23 +53,32 @@ export default function Activity() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const filterParam = mapFilterParam(qs.get("view"));
+  const isOnline = useOnlineStatus();
 
   return (
     <Layout>
-      <Tabs fullWidth>
-        <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
-          Friends
-        </Tabs.Item>
-        <Tabs.Item to="./" active={filterParam === "global"}>
-          Global
-        </Tabs.Item>
-        {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
+      {isOnline ? (
+        <>
+          <Tabs fullWidth>
+            <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
+              Friends
+            </Tabs.Item>
+            <Tabs.Item to="./" active={filterParam === "global"}>
+              Global
+            </Tabs.Item>
+            {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
           Local
         </Tabs.Item> */}
-      </Tabs>
-      <QueryBoundary>
-        <ActivityContent filter={filterParam} />
-      </QueryBoundary>
+          </Tabs>
+          <QueryBoundary>
+            <ActivityContent filter={filterParam} />
+          </QueryBoundary>
+        </>
+      ) : (
+        <EmptyActivity>
+          You'll need to connect to the internet see activity.
+        </EmptyActivity>
+      )}
     </Layout>
   );
 }
