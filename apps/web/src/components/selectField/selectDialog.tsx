@@ -190,7 +190,7 @@ export default ({
                       </a>
                     </p>
                     <p className="mt-1 flex gap-x-1 text-sm leading-5">
-                      Well, that stinks. Maybe a open an issue on GitHub?
+                      Well, that stinks. Maybe open an issue on GitHub?
                     </p>
                   </div>
                 </ListItem>
