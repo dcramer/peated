@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
 import classNames from "../lib/classNames";
 import { formatCategoryName } from "../lib/strings";
 import { Bottle } from "../types";
@@ -74,7 +73,6 @@ export default ({
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
       )}
     >
-      <BottleIcon className="hidden h-10 w-auto sm:inline-block" />
       <div className="flex-1 space-y-1">
         <Link
           to={`/bottles/${bottle.id}`}
@@ -82,7 +80,11 @@ export default ({
         >
           <BottleName bottle={bottle} />
         </Link>
-        {vintage && <VintageName {...vintage} />}
+        {vintage && (
+          <div className="text-light">
+            <VintageName {...vintage} />
+          </div>
+        )}
       </div>
       <div
         className={classNames(
