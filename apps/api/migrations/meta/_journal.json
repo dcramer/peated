@@ -155,6 +155,13 @@
       "when": 1684947618684,
       "tag": "0021_lush_redwing",
       "breakpoints": false
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1684955200978,
+      "tag": "0022_outgoing_black_queen",
+      "breakpoints": false
     }
   ]
 }

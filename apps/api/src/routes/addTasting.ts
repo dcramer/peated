@@ -8,13 +8,16 @@ import { TastingInputSchema, TastingSchema } from "@peated/shared/schemas";
 
 import { db } from "../db";
 import {
+  Entity,
   NewTasting,
   Tasting,
+  badgeAwards,
   bottles,
   bottlesToDistillers,
   entities,
   tastings,
 } from "../db/schema";
+import { checkBadges } from "../lib/badges";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { serialize } from "../lib/serializers";
 import { TastingSerializer } from "../lib/serializers/tasting";
@@ -85,7 +88,7 @@ export default {
         .where(eq(bottles.id, bottle.id));
 
       const distillerIds = (
-        await db
+        await tx
           .select({ id: bottlesToDistillers.distillerId })
           .from(bottlesToDistillers)
           .where(eq(bottlesToDistillers.bottleId, bottle.id))
@@ -100,6 +103,37 @@ export default {
             Array.from(new Set([bottle.brandId, ...distillerIds])),
           ),
         );
+
+      const badgeList = await checkBadges({
+        ...tasting,
+        bottle: {
+          ...bottle,
+          brand: (await tx.query.entities.findFirst({
+            where: (entities, { eq }) => eq(entities.id, bottle.brandId),
+          })) as Entity,
+          distillers: await tx.query.entities.findMany({
+            where: (entities) => inArray(entities.id, distillerIds),
+          }),
+        },
+      });
+
+      for (const badge of badgeList) {
+        await tx
+          .insert(badgeAwards)
+          .values({
+            badgeId: badge.id,
+            userId: tasting.createdById,
+            xp: 1,
+            level: 1,
+          })
+          .onConflictDoUpdate({
+            target: [badgeAwards.badgeId, badgeAwards.userId],
+            set: {
+              xp: sql`${badgeAwards.xp} + 1`,
+              level: sql`(${badgeAwards.xp} + 1) / 5 + 1`,
+            },
+          });
+      }
 
       return tasting;
     });
