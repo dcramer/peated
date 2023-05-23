@@ -40,7 +40,7 @@ export default function Layout({
         {footer !== undefined ? (
           footer
         ) : (
-          <Footer>
+          <Footer mobileOnly>
             <AppFooter />
           </Footer>
         )}
