@@ -127,7 +127,6 @@ test("creates a new tasting with all vintage params", async () => {
     payload: {
       bottle: bottle.id,
       rating: 3.5,
-      series: "Test",
       vintageYear: 2023,
       barrel: 69,
     },
@@ -147,7 +146,6 @@ test("creates a new tasting with all vintage params", async () => {
   expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
   expect(tasting.vintageYear).toEqual(2023);
   expect(tasting.barrel).toEqual(69);
-  expect(tasting.series).toEqual("Test");
 });
 
 test("creates a new tasting with empty rating", async () => {

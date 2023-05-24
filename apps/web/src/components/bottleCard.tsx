@@ -9,6 +9,7 @@ import VintageName from "./vintageName";
 type BottleFormData = {
   name: string;
   brand?: Option | null | undefined;
+  series?: string | null | undefined;
   distillers?: Option[] | null | undefined;
   statedAge?: number | null | undefined;
   category?: string | null | undefined;

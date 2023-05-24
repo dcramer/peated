@@ -51,11 +51,7 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    const vintageFingerprint = sha1(
-      req.body.series,
-      req.body.vintageYear,
-      req.body.barrel,
-    );
+    const vintageFingerprint = sha1(req.body.vintageYear, req.body.barrel);
 
     await db.transaction(async (tx) => {
       const [cb] = await tx
@@ -64,7 +60,6 @@ export default {
           collectionId: collection.id,
           bottleId: bottle.id,
           vintageFingerprint,
-          series: req.body.series,
           vintageYear: req.body.vintageYear,
           barrel: req.body.barrel,
         })

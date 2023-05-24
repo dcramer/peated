@@ -68,7 +68,6 @@ export default {
           .insert(tastings)
           .values({
             ...data,
-            series: body.series,
             vintageYear: body.vintageYear,
             barrel: body.barrel,
           })
