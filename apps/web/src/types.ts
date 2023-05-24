@@ -36,6 +36,7 @@ export type Bottle = {
   name: string;
   brand: Entity;
   distillers: Entity[];
+  bottler?: Entity;
   category?: Category | null;
   statedAge?: number;
   totalTastings: number;

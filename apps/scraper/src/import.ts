@@ -28,9 +28,17 @@ const importDistillers = async () => {
   });
 };
 
+const importBottlers = async () => {
+  await importJson("bottlers.json", async (row) => {
+    console.log(row.name);
+    await submitEntity({ ...row, type: ["bottler"] });
+  });
+};
+
 async function main() {
   await importBrands();
   await importDistillers();
+  await importBottlers();
 }
 
 main();

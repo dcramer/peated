@@ -261,7 +261,7 @@ type Props = {
   required?: boolean;
   children?: ReactNode;
   className?: string;
-  value?: string;
+  value?: string | null;
   onChange?: (value: string) => void;
 } & Omit<
   React.ComponentProps<typeof SelectField>,

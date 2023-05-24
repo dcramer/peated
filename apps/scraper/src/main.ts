@@ -31,6 +31,8 @@ async function scrapeWhisky(id: number) {
   const maybeRegion = $("ul.breadcrumb > li:nth-child(3)").text();
   const region = maybeRegion !== brandName ? maybeRegion : null;
 
+  bottle.votes = parseInt($(".votes-count").text(), 10);
+
   bottle.brand = {
     name: brandName,
     country: $("ul.breadcrumb > li:nth-child(2)").text(),
@@ -46,16 +48,16 @@ async function scrapeWhisky(id: number) {
     region,
   };
 
-  // bottle.bottler = {
-  //   name: $("dt:contains('Bottler') + dd").text(),
-  // };
-  // bottle.series = $("dt:contains('Bottling serie') + dd").text();
+  bottle.bottler = {
+    name: $("dt:contains('Bottler') + dd").text(),
+  };
+  bottle.series = $("dt:contains('Bottling serie') + dd").text();
 
-  // bottle.vintageYear = parseYear($("dt:contains('Vintage') + dd").text());
-  // bottle.bottleYear = parseYear($("dt:contains('Bottled') + dd").text());
+  bottle.vintageYear = parseYear($("dt:contains('Vintage') + dd").text());
+  bottle.bottleYear = parseYear($("dt:contains('Bottled') + dd").text());
 
-  // bottle.caskType = $("dt:contains('Casktype') + dd").text();
-  // bottle.caskNumber = $("dt:contains('Casknumber') + dd").text();
+  bottle.caskType = $("dt:contains('Casktype') + dd").text();
+  bottle.caskNumber = $("dt:contains('Casknumber') + dd").text();
 
   bottle.abv = parseAbv($("dt:contains('Strength') + dd").text());
 
@@ -115,6 +117,31 @@ async function scrapeBrand(id: number) {
   return result;
 }
 
+// e.g. https://www.whiskybase.com/whiskies/bottlers/2
+async function scrapeBottler(id: number) {
+  console.log(`Processing Bottler ${id}`);
+
+  const data = await getUrl(
+    `https://www.whiskybase.com/whiskies/bottler/${id}/about`,
+  );
+
+  const $ = cheerio(data);
+
+  const maybeRegion = $("ul.breadcrumb > li:last-child").text();
+  const country = $("ul.breadcrumb > li:first-child").text();
+
+  const result = {
+    name: $("#company-name > h1").text(),
+    country,
+    region: maybeRegion !== country ? maybeRegion : null,
+  };
+
+  console.log(
+    `[Bottler ${id}] Identified as ${result.name} (${result.country} - ${result.region})`,
+  );
+  return result;
+}
+
 function parseName(brandName: string, bottleName: string) {
   const bottleNameWithoutAge = bottleName.split("-year-old")[0];
   if (bottleNameWithoutAge !== bottleName) {
@@ -169,8 +196,8 @@ async function scrapeTable(
 
 async function scrapeDistillers() {
   const tableUrl =
-    "https://www.whiskybase.com/whiskies/distilleries?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style";
-  const distillerList: any[] = [];
+    "https://www.whiskybase.com/whiskies/distilleries?style=table&search=null&chr=null&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style";
+  const results: any[] = [];
   await scrapeTable(tableUrl, async (url, totalBottles) => {
     if (totalBottles < 20) {
       console.warn(`Discarding ${url} - too few bottles`);
@@ -180,17 +207,17 @@ async function scrapeDistillers() {
     if (!match) return;
     const id = parseInt(match[1], 10);
     const result = await scrapeDistiller(id);
-    if (result) distillerList.push(result);
+    if (result) results.push(result);
   });
 
-  console.log(`Found ${distillerList.length} distillers`);
-  saveResults("distillers.json", distillerList);
+  console.log(`Found ${results.length} distillers`);
+  saveResults("distillers.json", results);
 }
 
 async function scrapeBrands() {
   const tableUrl =
-    "https://www.whiskybase.com/whiskies/brands?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style";
-  const distillerList: any[] = [];
+    "https://www.whiskybase.com/whiskies/brands?style=table&search=null&chr=null&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style";
+  const results: any[] = [];
   await scrapeTable(tableUrl, async (url, totalBottles) => {
     if (totalBottles < 5) {
       console.warn(`Discarding ${url} - too few bottles`);
@@ -201,11 +228,49 @@ async function scrapeBrands() {
     if (!match) return;
     const id = parseInt(match[1], 10);
     const result = await scrapeBrand(id);
-    if (result) distillerList.push(result);
+    if (result) results.push(result);
   });
 
-  console.log(`Found ${distillerList.length} brands`);
-  saveResults("brands.json", distillerList);
+  console.log(`Found ${results.length} brands`);
+  saveResults("brands.json", results);
+}
+
+async function scrapeBottlers() {
+  const tableUrl =
+    "https://www.whiskybase.com/whiskies/bottlers?search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.country,companies.whiskies&direction=desc";
+  const results: any[] = [];
+  await scrapeTable(tableUrl, async (url, totalBottles) => {
+    if (totalBottles < 5) {
+      console.warn(`Discarding ${url} - too few bottles`);
+      return;
+    }
+
+    const match = url.match(/\/bottler\/(\d+)\//);
+    if (!match) return;
+    const id = parseInt(match[1], 10);
+    const result = await scrapeBottler(id);
+    if (result) results.push(result);
+  });
+
+  console.log(`Found ${results.length} bottlers`);
+  saveResults("bottlers.json", results);
+}
+
+async function scrapeBottles() {
+  const year = 2023;
+  const tableUrl = `https://www.whiskybase.com/whiskies/new-releases?bottle_date_year=${year}&sort=whisky.name&direction=asc`;
+  const results: any[] = [];
+  await scrapeTable(tableUrl, async (url) => {
+    const match = url.match(/\/bottler\/(\d+)\//);
+    if (!match) return;
+    const id = parseInt(match[1], 10);
+    console.log(id);
+    // const result = await scrapeBottler(id);
+    // if (result) results.push(result);
+  });
+
+  console.log(`Found ${results.length} bottlers`);
+  saveResults("bottlers.json", results);
 }
 
 async function saveResults(filename: string, results: any) {
@@ -221,6 +286,7 @@ function sleep(ms: number) {
 async function main() {
   await scrapeDistillers();
   await scrapeBrands();
+  await scrapeBottlers();
 }
 
 main();

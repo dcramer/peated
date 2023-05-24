@@ -15,6 +15,7 @@
     "db:generate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:generate",
     "mocks": "dotenv -e .env.local -- pnpm --filter='./apps/api' mocks",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/api' user",
+    "scraper": "pnpm --filter './apps/scraper' scraper",
     "typecheck": "pnpm -r --parallel run typecheck",
     "test": "pnpm -r --stream run test",
     "test:ci": "CI=true pnpm -r --stream run test",

@@ -1,7 +1,8 @@
 import { inArray } from "drizzle-orm";
-import { Result, Serializer, serialize } from ".";
+import { Serializer, serialize } from ".";
 import { db } from "../../db";
 import { Bottle, User, bottlesToDistillers, entities } from "../../db/schema";
+import { notEmpty } from "../filter";
 import { EntitySerializer } from "./entity";
 
 export const BottleSerializer: Serializer<Bottle> = {
@@ -14,10 +15,13 @@ export const BottleSerializer: Serializer<Bottle> = {
       .where(inArray(bottlesToDistillers.bottleId, itemIds));
 
     const entityIds = Array.from(
-      new Set([
-        ...itemList.map((i) => i.brandId),
-        ...distillerList.map((d) => d.distillerId),
-      ]),
+      new Set(
+        [
+          ...itemList.map((i) => i.brandId),
+          ...itemList.map((i) => i.bottlerId),
+          ...distillerList.map((d) => d.distillerId),
+        ].filter(notEmpty),
+      ),
     );
 
     const entityList = await db
@@ -31,7 +35,7 @@ export const BottleSerializer: Serializer<Bottle> = {
     );
 
     const distillersByBottleId: {
-      [bottleId: number]: Result;
+      [bottleId: number]: ReturnType<(typeof EntitySerializer)["item"]>;
     } = {};
     distillerList.forEach((d) => {
       if (!distillersByBottleId[d.bottleId])
@@ -46,6 +50,7 @@ export const BottleSerializer: Serializer<Bottle> = {
           {
             brand: entitiesById[item.brandId],
             distillers: distillersByBottleId[item.id] || [],
+            bottler: item.bottlerId ? entitiesById[item.bottlerId] : null,
           },
         ];
       }),
@@ -60,6 +65,7 @@ export const BottleSerializer: Serializer<Bottle> = {
       category: item.category,
       brand: attrs.brand,
       distillers: attrs.distillers,
+      bottler: attrs.bottler,
     };
   },
 };
