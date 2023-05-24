@@ -54,8 +54,8 @@ export default ({
             const vintage =
               "bottle" in bottleOrCb
                 ? {
+                    series: bottle.series,
                     vintageYear: bottleOrCb.vintageYear,
-                    series: bottleOrCb.series,
                     barrel: bottleOrCb.barrel,
                   }
                 : null;

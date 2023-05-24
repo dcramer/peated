@@ -79,7 +79,6 @@ export const BottleInputSchema = z.object({
 });
 
 const VintageSchema = z.object({
-  series: z.string().nullable(),
   barrel: z.number().nullable(),
   vintageYear: z.number().gte(1495).lte(new Date().getFullYear()).nullable(),
 });
