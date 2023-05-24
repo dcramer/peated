@@ -4,6 +4,7 @@ import EmptyActivity from "../components/emptyActivity";
 import EntityTable from "../components/entityTable";
 import Layout from "../components/layout";
 import QueryBoundary from "../components/queryBoundary";
+import { SearchTerm } from "../components/searchTerm";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
 import type { Entity, Paginated } from "../types";
@@ -50,9 +51,20 @@ export default function EntityList() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const page = parseInt(qs.get("page") || "1", 10);
+  const type = qs.get("type") || undefined;
+  const country = qs.get("country") || undefined;
+  const region = qs.get("region") || undefined;
 
   return (
     <Layout title="Brands, Bottler, and Distillers">
+      {(type || country || region) && (
+        <p className="text-light space-x-2 p-3">
+          <span className="font-medium">Results for</span>
+          <SearchTerm name="type" value={type} />
+          <SearchTerm name="country" value={country} />
+          <SearchTerm name="region" value={region} />
+        </p>
+      )}
       <QueryBoundary>
         <Content
           page={page}

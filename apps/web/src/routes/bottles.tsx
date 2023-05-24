@@ -5,6 +5,7 @@ import BottleTable from "../components/bottleTable";
 import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import QueryBoundary from "../components/queryBoundary";
+import { SearchTerm } from "../components/searchTerm";
 import api from "../lib/api";
 import { Bottle, Paginated } from "../types";
 
@@ -52,15 +53,22 @@ export default function BottleList() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const page = qs.get("page") || 1;
+  const category = qs.get("category") || undefined;
+  const age = qs.get("age") || undefined;
+  const tag = qs.get("tag") || undefined;
+
   return (
     <Layout title="Bottles">
+      {(category || age || tag) && (
+        <p className="text-light space-x-2 p-3">
+          <span className="font-medium">Results for</span>
+          <SearchTerm name="age" value={age} />
+          <SearchTerm name="category" value={category} />
+          <SearchTerm name="tag" value={tag} />
+        </p>
+      )}
       <QueryBoundary>
-        <Content
-          page={page}
-          category={qs.get("category") || undefined}
-          age={qs.get("age") || undefined}
-          tag={qs.get("tag") || undefined}
-        />
+        <Content page={page} category={category} age={age} tag={tag} />
       </QueryBoundary>
     </Layout>
   );

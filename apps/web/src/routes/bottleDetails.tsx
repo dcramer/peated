@@ -120,11 +120,12 @@ const TagDistribution = ({ bottleId }: { bottleId: number }) => {
           const pct = (t.count / total) * 100;
           pctRemaining -= pct;
           return (
-            <div
+            <Link
               key={t.tag}
               title={t.tag}
               className={`${colorNames[index]} flex h-6 items-center justify-center`}
               style={{ minWidth: `${pct}%` }}
+              to={`/bottles?tag=${encodeURIComponent(t.tag)}`}
               onMouseEnter={(e) => setActive(t)}
               onMouseLeave={(e) => setActive(null)}
             >
@@ -133,7 +134,7 @@ const TagDistribution = ({ bottleId }: { bottleId: number }) => {
                   {t.tag}
                 </span>
               )}
-            </div>
+            </Link>
           );
         })}
         {results.length > 4 && (
