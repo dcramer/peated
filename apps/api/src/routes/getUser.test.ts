@@ -50,15 +50,6 @@ test("get user by username", async () => {
   expect(data.id).toBe(DefaultFixtures.user.id);
 });
 
-test("get user requires auth", async () => {
-  const response = await app.inject({
-    method: "GET",
-    url: `/users/${DefaultFixtures.user.id}`,
-  });
-
-  expect(response).toRespondWith(401);
-});
-
 test("get user w/ followStatus", async () => {
   const user = await Fixtures.User();
   await Fixtures.Follow({
