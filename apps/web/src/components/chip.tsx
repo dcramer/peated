@@ -1,25 +1,31 @@
 import { motion } from "framer-motion";
-import { MouseEvent, ReactNode } from "react";
+import { ElementType } from "react";
 import classNames from "../lib/classNames";
+import { PolymorphicProps } from "../types";
 
 type ChipSize = "small" | "base";
 
 type ChipColor = "default" | "highlight";
 
-export default ({
+type Props<E extends ElementType> = PolymorphicProps<E> & {
+  active?: boolean;
+  color?: ChipColor;
+  size?: ChipSize;
+};
+
+const defaultElement = motion.li;
+
+export default function Chip<E extends ElementType = typeof defaultElement>({
   children,
   active,
   onClick,
   size = "base",
   color = "default",
+  as,
   ...props
-}: {
-  children: ReactNode;
-  active?: boolean;
-  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
-  color?: ChipColor;
-  size?: ChipSize;
-} & React.ComponentPropsWithoutRef<typeof motion.div>) => {
+}: Props<E>) {
+  const Component = as ?? defaultElement;
+
   let colorClass = "";
   switch (color) {
     case "highlight":
@@ -31,7 +37,7 @@ export default ({
   }
 
   return (
-    <motion.div
+    <Component
       layout
       className={classNames(
         "[word-wrap: break-word] inline-flex items-center justify-between truncate rounded border py-0 font-normal normal-case leading-loose shadow-none transition-[opacity] duration-300 ease-linear hover:!shadow-none",
@@ -45,6 +51,6 @@ export default ({
       {...props}
     >
       {children}
-    </motion.div>
+    </Component>
   );
-};
+}

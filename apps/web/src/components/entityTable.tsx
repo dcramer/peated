@@ -44,15 +44,39 @@ export default ({
                   </Link>
                   <div className="mt-2 space-x-2">
                     {entity.type.sort().map((t) => (
-                      <Chip key={t} size="small">
+                      <Chip
+                        key={t}
+                        size="small"
+                        as={Link}
+                        to={`/entities?type=${encodeURIComponent(t)}`}
+                      >
                         {t}
                       </Chip>
                     ))}
                   </div>
                 </td>
                 <td className="hidden px-3 py-3 text-right sm:table-cell">
-                  {entity.country}
-                  <br /> {entity.region || ""}
+                  {!!entity.country && (
+                    <Link
+                      to={`/entities?country=${encodeURIComponent(
+                        entity.country,
+                      )}`}
+                      className="hover:underline"
+                    >
+                      {entity.country}
+                    </Link>
+                  )}
+                  <br />{" "}
+                  {!!entity.region && (
+                    <Link
+                      to={`/entities?region=${encodeURIComponent(
+                        entity.region,
+                      )}`}
+                      className="hover:underline"
+                    >
+                      {entity.region}
+                    </Link>
+                  )}
                 </td>
               </tr>
             );

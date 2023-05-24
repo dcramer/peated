@@ -1,17 +1,19 @@
-import { ElementType, ReactNode } from "react";
+import { motion } from "framer-motion";
+import { ElementType } from "react";
 import classNames from "../lib/classNames";
+import { PolymorphicProps } from "../types";
 
-export default ({
-  children,
-  noHover = false,
-  color = "default",
-  as: Component = "li",
-}: {
-  children?: ReactNode;
+type Props<E extends ElementType> = PolymorphicProps<E> & {
   noHover?: boolean;
-  as?: ElementType;
   color?: "default" | "highlight";
-}) => {
+};
+
+const defaultElement = motion.div;
+
+export default function ListItem<
+  E extends ElementType = typeof defaultElement,
+>({ children, noHover = false, color = "default", as, ...props }: Props<E>) {
+  const Component = as ?? defaultElement;
   return (
     <Component
       className={classNames(
@@ -25,4 +27,4 @@ export default ({
       </div>
     </Component>
   );
-};
+}

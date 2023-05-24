@@ -4,35 +4,60 @@ import { useQuery } from "@tanstack/react-query";
 import BottleTable from "../components/bottleTable";
 import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
+import QueryBoundary from "../components/queryBoundary";
 import api from "../lib/api";
 import { Bottle, Paginated } from "../types";
 
-export default function BottleList() {
-  const location = useLocation();
-  const qs = new URLSearchParams(location.search);
-  const page = qs.get("page") || 1;
-
+const Content = ({
+  page,
+  category,
+  age,
+}: {
+  page: string | number;
+  category?: string;
+  age?: string;
+}) => {
   const { data } = useQuery({
-    queryKey: ["bottles", page],
+    queryKey: ["bottles", page, "category", category, "age", age],
     queryFn: (): Promise<Paginated<Bottle>> =>
       api.get("/bottles", {
         query: {
-          ...Object.fromEntries(qs.entries()),
+          category,
+          age,
           page,
           sort: "name",
         },
       }),
   });
 
+  if (!data) return null;
+
   return (
-    <Layout>
-      {data && data.results.length > 0 ? (
+    <>
+      {data.results.length > 0 ? (
         <BottleTable bottleList={data.results} rel={data.rel} />
       ) : (
         <EmptyActivity>
-          Looks like there's no bottles in the database yet. Weird.
+          Looks like there's nothing in the database yet. Weird.
         </EmptyActivity>
       )}
+    </>
+  );
+};
+
+export default function BottleList() {
+  const location = useLocation();
+  const qs = new URLSearchParams(location.search);
+  const page = qs.get("page") || 1;
+  return (
+    <Layout>
+      <QueryBoundary>
+        <Content
+          page={page}
+          category={qs.get("category") || undefined}
+          age={qs.get("age") || undefined}
+        />
+      </QueryBoundary>
     </Layout>
   );
 }

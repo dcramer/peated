@@ -8,12 +8,25 @@ import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
 import type { Entity, Paginated } from "../types";
 
-const Content = ({ page }: { page: number }) => {
+const Content = ({
+  page,
+  type,
+  country,
+  region,
+}: {
+  page: number;
+  type?: string;
+  country?: string;
+  region?: string;
+}) => {
   const { data: entityList } = useSuspenseQuery(
-    ["entities", page],
+    ["entities", page, "type", type, "country", country, "region", region],
     (): Promise<Paginated<Entity>> =>
       api.get(`/entities`, {
         query: {
+          type,
+          country,
+          region,
           sort: "name",
           page,
         },
@@ -41,7 +54,12 @@ export default function EntityList() {
   return (
     <Layout>
       <QueryBoundary>
-        <Content page={page} />
+        <Content
+          page={page}
+          type={qs.get("type") || undefined}
+          country={qs.get("country") || undefined}
+          region={qs.get("region") || undefined}
+        />
       </QueryBoundary>
     </Layout>
   );

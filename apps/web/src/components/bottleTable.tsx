@@ -106,7 +106,7 @@ export default ({
                   {bottle.statedAge && (
                     <Link
                       className="hover:underline"
-                      to={`/bottles/?categoagery=${bottle.statedAge}`}
+                      to={`/bottles/?age=${bottle.statedAge}`}
                     >{`${bottle.statedAge} years`}</Link>
                   )}
                 </td>

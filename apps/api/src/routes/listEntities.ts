@@ -20,6 +20,8 @@ export default {
         query: { type: "string" },
         page: { type: "number" },
         sort: { type: "string" },
+        country: { type: "string" },
+        region: { type: "string" },
         type: { type: "string", enum: ["distiller", "brand", "bottler"] },
       },
     },
@@ -44,6 +46,12 @@ export default {
     }
     if (req.query.type) {
       where.push(sql`${req.query.type} = ANY(${entities.type})`);
+    }
+    if (req.query.country) {
+      where.push(ilike(entities.country, req.query.country));
+    }
+    if (req.query.region) {
+      where.push(ilike(entities.region, req.query.region));
     }
 
     let orderBy: SQL<unknown>;
@@ -93,6 +101,8 @@ export default {
       page?: number;
       sort?: "name";
       type?: EntityType;
+      country?: string;
+      region?: string;
     };
   }
 >;

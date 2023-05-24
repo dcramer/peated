@@ -6,6 +6,12 @@
 //   wheat: number;
 // };
 
+import {
+  ComponentPropsWithoutRef,
+  ElementType,
+  PropsWithChildren,
+} from "react";
+
 export type Category =
   | "blend"
   | "bourbon"
@@ -194,3 +200,11 @@ export type Paginated<T> = {
   results: T[];
   rel: PagingRel;
 };
+
+export type PolymorphicAsProp<E extends ElementType> = {
+  as?: E;
+};
+
+export type PolymorphicProps<E extends ElementType> = PropsWithChildren<
+  ComponentPropsWithoutRef<E> & PolymorphicAsProp<E>
+>;

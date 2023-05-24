@@ -46,13 +46,40 @@ export default function EntityDetails() {
             {entity.name}
           </h1>
           <p className="truncate text-center text-slate-500 sm:text-left">
-            Located in {entity.country}
-            {entity.region && <span> &middot; {entity.region}</span>}
+            {!!entity.country && (
+              <>
+                Located in{" "}
+                <Link
+                  to={`/entities?country=${encodeURIComponent(entity.country)}`}
+                  className="hover:underline"
+                >
+                  {entity.country}
+                </Link>
+              </>
+            )}
+            {!!entity.region && (
+              <span>
+                {" "}
+                &middot;{" "}
+                <Link
+                  to={`/entities?region=${encodeURIComponent(entity.region)}`}
+                  className="hover:underline"
+                >
+                  {entity.region}
+                </Link>
+              </span>
+            )}
           </p>
         </div>
         <div className="sm:justify-left mb-4 flex w-full justify-center space-x-2 sm:w-auto">
           {entity.type.sort().map((t) => (
-            <Chip key={t} size="small" color="highlight">
+            <Chip
+              key={t}
+              size="small"
+              color="highlight"
+              as={Link}
+              to={`/entities?type=${encodeURIComponent(t)}`}
+            >
               {t}
             </Chip>
           ))}
