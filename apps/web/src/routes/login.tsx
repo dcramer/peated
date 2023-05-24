@@ -138,12 +138,12 @@ export default function Login() {
   const location = useLocation();
   const navigate = useNavigate();
   const qs = new URLSearchParams(location.search);
-  let redirectTo = qs.get("redirectTo");
-  if (!redirectTo || redirectTo?.indexOf("/") !== 0) redirectTo = "/";
+  let redirectTo: string | null = qs.get("redirectTo");
+  if (!redirectTo || redirectTo?.indexOf("/") !== 0) redirectTo = null;
 
   useEffect(() => {
     if (user?.id) {
-      navigate(redirectTo || "/");
+      navigate(redirectTo || !user.pictureUrl ? "/settings" : "/");
     }
   }, [user?.id]);
 
