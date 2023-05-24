@@ -2,7 +2,6 @@ import type { MultipartFile } from "@fastify/multipart";
 import { Storage } from "@google-cloud/storage";
 import { createId } from "@paralleldrive/cuid2";
 import { createWriteStream } from "node:fs";
-import { extname } from "node:path";
 import sharp from "sharp";
 
 import { trace } from "@sentry/node";
@@ -30,7 +29,9 @@ export const compressAndResizeImage = (
 
   return {
     stream: stream.pipe(transformer),
-    filename: `${filename.substring(0, filename.lastIndexOf("."))}.webp`,
+    filename: `${
+      filename.substring(0, filename.lastIndexOf(".")) || filename
+    }.webp`,
   };
 };
 
@@ -50,7 +51,7 @@ export const storeFile = async ({
   urlPrefix: string;
   onProcess?: ProcessCallback;
 }) => {
-  const tmpFilename = `${namespace}-${createId()}${extname(data.filename)}`;
+  const tmpFilename = `${namespace}-${createId()}`;
   const { stream, filename: newFilename } = onProcess
     ? onProcess(data.file, tmpFilename)
     : { stream: data.file, filename: tmpFilename };
