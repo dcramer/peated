@@ -110,3 +110,21 @@ test("lists bottles with bottler", async () => {
   expect(results.length).toBe(1);
   expect(results[0].id).toBe(bottle1.id);
 });
+
+test("lists bottles with query matching brand and name", async () => {
+  const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood 10-year-old" });
+  await Fixtures.Bottle({ name: "Something Else" });
+
+  const response = await app.inject({
+    method: "GET",
+    url: "/bottles",
+    query: {
+      query: "wood 10",
+    },
+  });
+
+  expect(response).toRespondWith(200);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
