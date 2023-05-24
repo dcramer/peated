@@ -5,7 +5,7 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { bottles, bottlesToDistillers, entities } from "../db/schema";
+import { Category, bottles, bottlesToDistillers, entities } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
@@ -23,6 +23,18 @@ export default {
         brand: { type: "number" },
         distiller: { type: "number" },
         entity: { type: "number" },
+        category: {
+          type: "string",
+          enum: [
+            "blend",
+            "bourbon",
+            "rye",
+            "single_grain",
+            "single_malt",
+            "spirit",
+          ],
+        },
+        age: { type: "number" },
       },
     },
     response: {
@@ -78,6 +90,12 @@ export default {
         ),
       );
     }
+    if (req.query.category) {
+      where.push(eq(bottles.category, req.query.category));
+    }
+    if (req.query.age) {
+      where.push(eq(bottles.statedAge, req.query.age));
+    }
 
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
@@ -127,6 +145,8 @@ export default {
       brand?: number;
       distiller?: number;
       entity?: number;
+      category?: Category;
+      age?: number;
       sort?: "name";
     };
   }

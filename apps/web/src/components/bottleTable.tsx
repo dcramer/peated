@@ -93,10 +93,22 @@ export default ({
                   )}
                 </td>
                 <td className="hidden px-3 py-4 text-right text-sm sm:table-cell">
-                  {formatCategoryName(bottle.category)}
+                  {!!bottle.category && (
+                    <Link
+                      to={`/bottles/?category=${bottle.category}`}
+                      className="hover:underline"
+                    >
+                      {formatCategoryName(bottle.category)}
+                    </Link>
+                  )}
                 </td>
                 <td className="hidden py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
-                  {bottle.statedAge && `${bottle.statedAge} years`}
+                  {bottle.statedAge && (
+                    <Link
+                      className="hover:underline"
+                      to={`/bottles/?categoagery=${bottle.statedAge}`}
+                    >{`${bottle.statedAge} years`}</Link>
+                  )}
                 </td>
               </tr>,
             ];

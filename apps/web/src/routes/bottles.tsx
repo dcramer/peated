@@ -17,6 +17,7 @@ export default function BottleList() {
     queryFn: (): Promise<Paginated<Bottle>> =>
       api.get("/bottles", {
         query: {
+          ...Object.fromEntries(qs.entries()),
           page,
           sort: "name",
         },
