@@ -12,7 +12,7 @@ program
   .description("Create a user")
   .argument("<email>")
   .argument("<password>")
-  .option("--admin")
+  .option("-a", "--admin")
   .option("-d", "--display-name <displayName>")
   .action(async (email, password, options) => {
     const user = await createUser(db, {
