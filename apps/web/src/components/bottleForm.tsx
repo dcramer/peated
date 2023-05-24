@@ -130,25 +130,6 @@ export default ({
         </div>
 
         <Fieldset>
-          <TextField
-            {...register("name")}
-            error={errors.name}
-            type="text"
-            label="Bottle"
-            required
-            helpText="The name of the bottle, excluding the brand and series"
-            placeholder="e.g. 12-year-old"
-          />
-
-          <TextField
-            {...register("series")}
-            error={errors.name}
-            type="series"
-            label="Series"
-            helpText="The bottling series."
-            placeholder="e.g. Offerman Edition Charred Oak Cask"
-          />
-
           <Controller
             name="brand"
             control={control}
@@ -168,6 +149,62 @@ export default ({
                   setBrandValue(value);
                 }}
                 value={brandValue}
+              />
+            )}
+          />
+
+          <TextField
+            {...register("name")}
+            error={errors.name}
+            type="text"
+            label="Bottle"
+            required
+            helpText="The name of the bottle, excluding the brand and series"
+            placeholder="e.g. 12-year-old"
+          />
+
+          <TextField
+            {...register("series")}
+            error={errors.name}
+            type="series"
+            label="Series"
+            helpText="The bottling series."
+            placeholder="e.g. Offerman Edition Charred Oak Cask"
+          />
+
+          <TextField
+            {...register("statedAge", {
+              setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
+            })}
+            error={errors.statedAge}
+            type="number"
+            label="Stated Age"
+            placeholder="e.g. 12"
+            helpText="The number of years the spirit was aged."
+            suffixLabel="years"
+          />
+
+          <Controller
+            name="category"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.category}
+                label="Category"
+                placeholder="e.g. Single Malt"
+                helpText="The kind of spirit."
+                targetOptions={categoryList.length}
+                options={categoryList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: toTitleCase(value),
+                      }
+                    : undefined
+                }
               />
             )}
           />
@@ -210,43 +247,6 @@ export default ({
                   setBottlerValue(value);
                 }}
                 value={bottlerValue}
-              />
-            )}
-          />
-
-          <TextField
-            {...register("statedAge", {
-              setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
-            })}
-            error={errors.statedAge}
-            type="number"
-            label="Stated Age"
-            placeholder="e.g. 12"
-            helpText="The number of years the spirit was aged."
-            suffixLabel="years"
-          />
-
-          <Controller
-            name="category"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.category}
-                label="Category"
-                placeholder="e.g. Single Malt"
-                helpText="The kind of spirit."
-                targetOptions={categoryList.length}
-                options={categoryList}
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name: toTitleCase(value),
-                      }
-                    : undefined
-                }
               />
             )}
           />
