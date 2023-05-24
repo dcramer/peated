@@ -162,6 +162,13 @@
       "when": 1684957188358,
       "tag": "0022_curved_flatman",
       "breakpoints": false
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1684959550411,
+      "tag": "0023_stiff_tiger_shark",
+      "breakpoints": false
     }
   ]
 }

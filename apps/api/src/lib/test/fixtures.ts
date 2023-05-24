@@ -4,6 +4,7 @@ import path from "path";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
+import { sql } from "drizzle-orm";
 import { db } from "../../db";
 import {
   NewBottle,
@@ -14,6 +15,7 @@ import {
   NewToast,
   NewUser,
   User as UserType,
+  bottleTags,
   bottles,
   bottlesToDistillers,
   comments,
@@ -130,20 +132,36 @@ export const Bottle = async ({
 };
 
 export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
-  return (
-    await db
+  return await db.transaction(async (tx) => {
+    const [result] = await tx
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
         rating: faker.datatype.float({ min: 1, max: 5 }),
         tags: sample(defaultTags, random(1, 5)),
         ...data,
-
         bottleId: data.bottleId || (await Bottle()).id,
         createdById: data.createdById || (await User()).id,
       })
-      .returning()
-  )[0];
+      .returning();
+
+    for (const tag of result.tags) {
+      await tx
+        .insert(bottleTags)
+        .values({
+          bottleId: result.bottleId,
+          tag,
+          count: 1,
+        })
+        .onConflictDoUpdate({
+          target: [bottleTags.bottleId, bottleTags.tag],
+          set: {
+            count: sql<number>`${bottleTags.count} + 1`,
+          },
+        });
+    }
+    return result;
+  });
 };
 
 export const Toast = async ({ ...data }: Partial<NewToast> = {}) => {

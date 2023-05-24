@@ -1,4 +1,4 @@
-import { InferModel, relations } from "drizzle-orm";
+import { InferModel, relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
@@ -385,7 +385,10 @@ export const tastings = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    tags: varchar("tags", { length: 64 }).array(),
+    tags: varchar("tags", { length: 64 })
+      .default(sql`[]`)
+      .array()
+      .notNull(),
     rating: doublePrecision("rating"),
     imageUrl: text("image_url"),
     notes: text("notes"),

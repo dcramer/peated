@@ -104,8 +104,9 @@ export default {
           ),
         );
 
-      for (const tag in tasting.tags) {
-        tx.insert(bottleTags)
+      for (const tag of tasting.tags) {
+        await tx
+          .insert(bottleTags)
           .values({
             bottleId: bottle.id,
             tag,

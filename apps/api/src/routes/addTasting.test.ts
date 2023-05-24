@@ -82,6 +82,16 @@ test("creates a new tasting with tags", async () => {
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
   expect(tasting.tags).toEqual(["cherry", "peat"]);
+
+  const tags = await db.query.bottleTags.findMany({
+    where: (bottleTags, { eq }) => eq(bottleTags.bottleId, tasting.bottleId),
+    orderBy: (bottleTags, { asc }) => asc(bottleTags.tag),
+  });
+  expect(tags.length).toBe(2);
+  expect(tags[0].tag).toBe("cherry");
+  expect(tags[0].count).toBe(1);
+  expect(tags[1].tag).toBe("peat");
+  expect(tags[1].count).toBe(1);
 });
 
 test("creates a new tasting with notes", async () => {
