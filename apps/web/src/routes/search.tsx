@@ -8,6 +8,7 @@ import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
 import { ReactComponent as EntityIcon } from "../assets/entity.svg";
 import BottleName from "../components/bottleName";
 import Chip from "../components/chip";
+import Header from "../components/header";
 import Layout from "../components/layout";
 import ListItem from "../components/listItem";
 import SearchHeader from "../components/searchHeader";
@@ -300,22 +301,24 @@ export default function Search() {
     <Layout
       footer={null}
       header={
-        <SearchHeader
-          name="q"
-          placeholder="Search for anything"
-          value={query}
-          onChange={setQuery}
-          onSubmit={(value) => {
-            navigate(
-              `${location.pathname}?q=${encodeURIComponent(value)}&${
-                directToTasting ? "tasting" : ""
-              }`,
-              {
-                replace: true,
-              },
-            );
-          }}
-        />
+        <Header>
+          <SearchHeader
+            name="q"
+            placeholder="Search for anything"
+            value={query}
+            onChange={setQuery}
+            onSubmit={(value) => {
+              navigate(
+                `${location.pathname}?q=${encodeURIComponent(value)}&${
+                  directToTasting ? "tasting" : ""
+                }`,
+                {
+                  replace: true,
+                },
+              );
+            }}
+          />
+        </Header>
       }
     >
       <ul role="list" className="divide-y divide-slate-800 sm:rounded">
