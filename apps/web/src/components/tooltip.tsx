@@ -7,7 +7,7 @@ type Props = {
   children?: ReactNode;
   className?: string;
   origin?: "left" | "right" | "center";
-  style: Record<string, any>;
+  style?: Record<string, any>;
 };
 
 export default function Tooltip({
