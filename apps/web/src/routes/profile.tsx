@@ -8,7 +8,7 @@ import Layout from "../components/layout";
 import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
 import UserAvatar from "../components/userAvatar";
-import { useRequiredAuth } from "../hooks/useAuth";
+import useAuth from "../hooks/useAuth";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
 import type { FollowStatus, User } from "../types";
@@ -24,7 +24,7 @@ type UserDetails = User & {
 };
 
 export default function Profile() {
-  const { user: currentUser, logout } = useRequiredAuth();
+  const { user: currentUser, logout } = useAuth();
   const { userId } = useParams();
   const navigate = useNavigate();
 
@@ -43,7 +43,7 @@ export default function Profile() {
   };
 
   return (
-    <Layout>
+    <Layout title={`@${user.username}`}>
       <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
         <div className="flex w-full justify-center sm:w-auto sm:justify-start">
           <UserAvatar user={user} size={150} />
@@ -97,59 +97,62 @@ export default function Profile() {
           </div>
         </div>
         <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
-          <div className="flex gap-x-2">
-            {user.id !== currentUser.id ? (
-              <>
-                <Button
-                  color="primary"
-                  onClick={() => followUser(followStatus === "none")}
-                >
-                  {followStatus === "none"
-                    ? "Add Friend"
-                    : followStatus === "pending"
-                    ? "Request Pending"
-                    : "Remove Friend"}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button to="/settings" color="primary">
-                  Edit Profile
-                </Button>
-                <Button
-                  onClick={() => {
-                    logout();
-                    navigate("/");
-                  }}
-                  color="primary"
-                >
-                  Sign Out
-                </Button>
-              </>
-            )}
-            {currentUser.admin && (
-              <Menu as="div" className="menu">
-                <Menu.Button as={Button}>
-                  <EllipsisVerticalIcon className="h-5 w-5" />
-                </Menu.Button>
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
-                  <Menu.Item
-                    as="button"
-                    onClick={async () => {
-                      const data = await api.put(`/users/${user.id}`, {
-                        data: {
-                          mod: !user.mod,
-                        },
-                      });
-                      setUser((state) => ({ ...state, ...data }));
-                    }}
+          {currentUser && (
+            <div className="flex gap-x-2">
+              {user.id !== currentUser.id ? (
+                <>
+                  <Button
+                    color="primary"
+                    onClick={() => followUser(followStatus === "none")}
                   >
-                    {user.mod ? "Remove Moderator Role" : "Add Moderator Role"}
-                  </Menu.Item>
-                </Menu.Items>
-              </Menu>
-            )}
-          </div>
+                    {followStatus === "none"
+                      ? "Add Friend"
+                      : followStatus === "pending"
+                      ? "Request Pending"
+                      : "Remove Friend"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button to="/settings" color="primary">
+                    Edit Profile
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      logout();
+                    }}
+                    color="primary"
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              )}
+              {currentUser.admin && (
+                <Menu as="div" className="menu">
+                  <Menu.Button as={Button}>
+                    <EllipsisVerticalIcon className="h-5 w-5" />
+                  </Menu.Button>
+                  <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+                    <Menu.Item
+                      as="button"
+                      onClick={async () => {
+                        const data = await api.put(`/users/${user.id}`, {
+                          data: {
+                            mod: !user.mod,
+                          },
+                        });
+                        setUser((state) => ({ ...state, ...data }));
+                      }}
+                    >
+                      {user.mod
+                        ? "Remove Moderator Role"
+                        : "Add Moderator Role"}
+                    </Menu.Item>
+                  </Menu.Items>
+                </Menu>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <Tabs fullWidth>

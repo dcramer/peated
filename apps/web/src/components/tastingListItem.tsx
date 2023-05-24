@@ -136,25 +136,27 @@ export default ({
               {tasting.comments.toLocaleString()}
             </Button>
           )}
-          <Menu as="div" className="menu">
-            <Menu.Button as={Button}>
-              <EllipsisVerticalIcon className="h-5 w-5" />
-            </Menu.Button>
-            <Menu.Items className="absolute inset-x-0 bottom-10 right-0 z-10 w-44 origin-bottom-right">
-              {(user?.admin || isTaster) && (
-                <Menu.Item
-                  as="button"
-                  onClick={async () => {
-                    await api.delete(`/tastings/${tasting.id}`);
-                    if (onDelete) onDelete(tasting);
-                    else location.reload();
-                  }}
-                >
-                  Delete Tasting
-                </Menu.Item>
-              )}
-            </Menu.Items>
-          </Menu>
+          {(user?.admin || isTaster) && (
+            <Menu as="div" className="menu">
+              <Menu.Button as={Button}>
+                <EllipsisVerticalIcon className="h-5 w-5" />
+              </Menu.Button>
+              <Menu.Items className="absolute inset-x-0 bottom-10 right-0 z-10 w-44 origin-bottom-right">
+                {(user?.admin || isTaster) && (
+                  <Menu.Item
+                    as="button"
+                    onClick={async () => {
+                      await api.delete(`/tastings/${tasting.id}`);
+                      if (onDelete) onDelete(tasting);
+                      else location.reload();
+                    }}
+                  >
+                    Delete Tasting
+                  </Menu.Item>
+                )}
+              </Menu.Items>
+            </Menu>
+          )}
         </aside>
       </div>
     </li>

@@ -43,33 +43,15 @@ export default function ErrorPage() {
     }
   }
 
-  console.error(error);
-
   return (
-    <Layout splash>
-      <main className="self-justify-center inline self-center">
+    <Layout>
+      <main className="self-justify-center inline self-center p-3">
         <div className="text-center">
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
             {title}
           </h1>
           <p className="mt-6 leading-7 text-white">{subtitle}</p>
 
-          {config.DEBUG && (
-            <>
-              {error.remoteStack && (
-                <div className="prose mx-auto mt-4">
-                  <h3 className="text-white">Remote Stack</h3>
-                  <pre className="text-left">{error.remoteStack}</pre>
-                </div>
-              )}
-              {error.stack && (
-                <div className="prose mx-auto mt-4">
-                  <h3 className="text-white">Local Stack</h3>
-                  <pre className="text-left">{error.stack}</pre>
-                </div>
-              )}
-            </>
-          )}
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Button to="/" color="primary">
               Go back home
@@ -77,6 +59,27 @@ export default function ErrorPage() {
             <Button to={config.GITHUB_REPO}>Open a GitHub issue</Button>
           </div>
         </div>
+
+        {config.DEBUG && (
+          <div className="mt-12">
+            {error.remoteStack && (
+              <div className="prose mx-auto mb-4">
+                <h3 className="text-white">Remote Stack</h3>
+                <pre className="whitespace-pre-wrap break-all text-left">
+                  {error.remoteStack}
+                </pre>
+              </div>
+            )}
+            {error.stack && (
+              <div className="prose mx-auto mb-4">
+                <h3 className="text-white">Local Stack</h3>
+                <pre className="whitespace-pre-wrap break-all text-left">
+                  {error.stack}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </Layout>
   );

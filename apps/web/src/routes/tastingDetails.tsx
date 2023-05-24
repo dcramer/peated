@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Button from "../components/button";
+import EmbeddedLogin from "../components/embeddedLogin";
 import Fieldset from "../components/fieldset";
 import FormField from "../components/formField";
 import Layout from "../components/layout";
@@ -30,7 +31,6 @@ const CommentForm = ({
     comment: "",
   });
   const [saving, setSaving] = useState(false);
-
   return (
     <div className="flex items-start space-x-4 px-3">
       <div className="flex-shrink-0">
@@ -197,7 +197,7 @@ export default function TastingDetails() {
   const [newComments, setNewComments] = useState<Comment[]>([]);
 
   return (
-    <Layout>
+    <Layout title="Tasting Details">
       <QueryBoundary>
         <ul className="mb-4">
           <TastingListItem
@@ -209,7 +209,7 @@ export default function TastingDetails() {
           />
         </ul>
       </QueryBoundary>
-      {currentUser && (
+      {currentUser ? (
         <CommentForm
           tastingId={data.id}
           user={currentUser}
@@ -217,6 +217,8 @@ export default function TastingDetails() {
             setNewComments((comments) => [...comments, comment]);
           }}
         />
+      ) : (
+        <EmbeddedLogin />
       )}
       <QueryBoundary>
         <CommentList

@@ -5,6 +5,7 @@ import About from "./routes/about";
 import Activity from "./routes/activity";
 import AddBottle from "./routes/addBottle";
 import AddTasting from "./routes/addTasting";
+import AuthRequired from "./routes/authRequired";
 import BottleActivity from "./routes/bottleActivity";
 import BottleDetails from "./routes/bottleDetails";
 import BottleList from "./routes/bottles";
@@ -34,8 +35,12 @@ export default function createRoutes() {
       children: [
         { index: true, element: <Activity /> },
         {
-          path: "addBottle",
-          element: <AddBottle />,
+          path: "about",
+          element: <About />,
+        },
+        {
+          path: "bottles/",
+          element: <BottleList />,
         },
         {
           path: "bottles/:bottleId",
@@ -48,16 +53,8 @@ export default function createRoutes() {
           ],
         },
         {
-          path: "bottles/:bottleId/addTasting",
-          element: <AddTasting />,
-        },
-        {
-          path: "bottles/",
-          element: <BottleList />,
-        },
-        {
-          path: "bottles/:bottleId/edit",
-          element: <EditBottle />,
+          path: "search",
+          element: <Search />,
         },
         {
           path: "entities",
@@ -68,38 +65,8 @@ export default function createRoutes() {
           element: <EntityDetails />,
         },
         {
-          path: "entities/:entityId/edit",
-          element: <EditEntity />,
-        },
-        {
-          path: "friends",
-          element: <Friends />,
-          children: [
-            {
-              index: true,
-              element: <Following />,
-            },
-            {
-              index: "following",
-              element: <Following />,
-            },
-            {
-              path: "followers",
-              element: <Followers />,
-            },
-          ],
-        },
-        {
-          path: "notifications",
-          element: <Notifications />,
-        },
-        {
-          path: "search",
-          element: <Search />,
-        },
-        {
-          path: "settings",
-          element: <Settings />,
+          path: "/login",
+          element: <Login />,
         },
         {
           path: "users/:userId",
@@ -119,15 +86,55 @@ export default function createRoutes() {
           path: "tastings/:tastingId",
           element: <TastingDetails />,
         },
+        {
+          path: "/",
+          element: <AuthRequired />,
+          children: [
+            {
+              path: "addBottle",
+              element: <AddBottle />,
+            },
+            {
+              path: "bottles/:bottleId/addTasting",
+              element: <AddTasting />,
+            },
+            {
+              path: "bottles/:bottleId/edit",
+              element: <EditBottle />,
+            },
+            {
+              path: "entities/:entityId/edit",
+              element: <EditEntity />,
+            },
+            {
+              path: "friends",
+              element: <Friends />,
+              children: [
+                {
+                  index: true,
+                  element: <Following />,
+                },
+                {
+                  index: "following",
+                  element: <Following />,
+                },
+                {
+                  path: "followers",
+                  element: <Followers />,
+                },
+              ],
+            },
+            {
+              path: "notifications",
+              element: <Notifications />,
+            },
+            {
+              path: "settings",
+              element: <Settings />,
+            },
+          ],
+        },
       ],
-    },
-    {
-      path: "about",
-      element: <About />,
-    },
-    {
-      path: "/login",
-      element: <Login />,
     },
   ] as RouteObject[];
 }

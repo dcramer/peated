@@ -15,7 +15,7 @@ import {
 } from "../db/schema";
 import { serialize } from "../lib/serializers";
 import { UserSerializer } from "../lib/serializers/user";
-import { requireAuth } from "../middleware/auth";
+import { injectAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -43,7 +43,7 @@ export default {
       ),
     },
   },
-  preHandler: [requireAuth],
+  preHandler: [injectAuth],
   handler: async (req, res) => {
     let user: User | undefined;
     if (req.params.userId === "me") {

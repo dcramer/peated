@@ -9,6 +9,7 @@ import TastingList from "../components/tastingList";
 import api from "../lib/api";
 import type { Paginated, Tasting } from "../types";
 
+import useAuth from "../hooks/useAuth";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 
 const defaultViewParam = "global";
@@ -50,6 +51,7 @@ const ActivityContent = ({ filter }: { filter: string }) => {
 };
 
 export default function Activity() {
+  const { user } = useAuth();
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const filterParam = mapFilterParam(qs.get("view"));
@@ -60,9 +62,11 @@ export default function Activity() {
       {isOnline ? (
         <>
           <Tabs fullWidth>
-            <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
-              Friends
-            </Tabs.Item>
+            {user && (
+              <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
+                Friends
+              </Tabs.Item>
+            )}
             <Tabs.Item to="./" active={filterParam === "global"}>
               Global
             </Tabs.Item>

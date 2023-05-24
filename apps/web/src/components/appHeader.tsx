@@ -1,6 +1,6 @@
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { ReactComponent as PeatedGlyph } from "../assets/glyph.svg";
 import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
@@ -29,6 +29,7 @@ const HeaderLogo = () => {
 export default function AppHeader() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [query, setQuery] = useState("");
 
@@ -50,7 +51,7 @@ export default function AppHeader() {
           className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-500 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
         />
       </form>
-      {user && (
+      {user ? (
         <div className="ml-4 flex items-center gap-x-2 sm:ml-8">
           <div className="hidden sm:block">
             <NotificationsPanel />
@@ -98,7 +99,6 @@ export default function AppHeader() {
                   <button
                     onClick={() => {
                       logout();
-                      navigate("/");
                     }}
                   >
                     Sign out
@@ -107,6 +107,16 @@ export default function AppHeader() {
               </Menu.Items>
             </Transition>
           </Menu>
+        </div>
+      ) : (
+        <div className="ml-4 flex items-center gap-x-2 sm:ml-8">
+          <NavLink
+            to={`/login?redirectTo=${encodeURIComponent(location.pathname)}`}
+          >
+            <div className="h-8 w-8 sm:h-8 sm:w-8">
+              <UserAvatar />
+            </div>
+          </NavLink>
         </div>
       )}
     </>

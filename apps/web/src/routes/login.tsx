@@ -1,6 +1,6 @@
 import { useGoogleLogin } from "@react-oauth/google";
-import { FormEvent, useState } from "react";
-import { LoaderFunction, useNavigate } from "react-router-dom";
+import { FormEvent, useEffect, useState } from "react";
+import { LoaderFunction, useLocation, useNavigate } from "react-router-dom";
 import Layout from "../components/layout";
 import useAuth from "../hooks/useAuth";
 import api, { ApiError } from "../lib/api";
@@ -40,7 +40,6 @@ const BasicLogin = () => {
           data,
         });
         login(user, accessToken);
-        navigate("/");
       } catch (err) {
         setLoading(false);
         if (err instanceof ApiError) {
@@ -100,7 +99,6 @@ const GoogleLogin = () => {
           },
         });
         login(user, accessToken);
-        navigate("/");
       } catch (err) {
         setError("There was an error communicating with the server.");
       }
@@ -136,6 +134,19 @@ const GoogleLogin = () => {
 };
 
 export default function Login() {
+  const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const qs = new URLSearchParams(location.search);
+  let redirectTo = qs.get("redirectTo");
+  if (!redirectTo || redirectTo?.indexOf("/") !== 0) redirectTo = "/";
+
+  useEffect(() => {
+    if (user?.id) {
+      navigate(redirectTo || "/");
+    }
+  }, [user?.id]);
+
   return (
     <Layout splash header={null} footer={null}>
       <PeatedLogo className="text-peated h-auto max-w-full" />

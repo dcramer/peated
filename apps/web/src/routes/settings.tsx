@@ -86,6 +86,7 @@ export default function Settings() {
 
   return (
     <Layout
+      title="Settings"
       header={
         <Header>
           <FormHeader title="Settings" onSave={onSubmit} />

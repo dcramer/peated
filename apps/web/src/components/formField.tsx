@@ -34,7 +34,7 @@ export default ({
   return (
     <div
       className={classNames(
-        `relative block bg-slate-950 px-3 py-2.5 text-white focus-within:z-10 focus-within:bg-slate-900 hover:bg-slate-900 sm:px-5 sm:py-4`,
+        `relative block bg-slate-950 px-4 py-5 text-white focus-within:z-10 focus-within:bg-slate-900 hover:bg-slate-900`,
         className,
         onClick ? "cursor-pointer" : "",
         error ? "border border-red-500" : "",

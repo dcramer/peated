@@ -3,7 +3,7 @@ import config from "../config";
 
 export default function About() {
   return (
-    <Layout>
+    <Layout title="About">
       <div className="prose p-6">
         <h1>About Peated</h1>
         <p>

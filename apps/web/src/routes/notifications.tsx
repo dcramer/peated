@@ -17,7 +17,7 @@ export default function Notifications() {
   );
 
   return (
-    <Layout>
+    <Layout title="Notifications">
       {data.results.length ? (
         <NotificationList values={data.results} />
       ) : (

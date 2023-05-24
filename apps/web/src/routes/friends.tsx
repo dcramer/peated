@@ -6,7 +6,7 @@ import Tabs from "../components/tabs";
 
 export default function Friends() {
   return (
-    <Layout>
+    <Layout title="Friends">
       <div className="border-b border-slate-700">
         <Tabs fullWidth>
           <Tabs.Item to="/friends" controlled>

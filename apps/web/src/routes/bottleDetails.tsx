@@ -98,6 +98,8 @@ const TagDistribution = ({ bottleId }: { bottleId: number }) => {
     (): Promise<Paginated<Tag>> => api.get(`/bottles/${bottleId}/tags`),
   );
 
+  if (!results.length) return null;
+
   const total = results.reduce((acc, d) => acc + d.count, 0);
   let pctRemaining = 100;
 
@@ -113,7 +115,7 @@ const TagDistribution = ({ bottleId }: { bottleId: number }) => {
 
   return (
     <div>
-      <div className="relative mb-4 flex h-6 w-full flex-row bg-gray-200 text-xs font-bold">
+      <div className="relative mb-4 flex h-6 w-full flex-row bg-slate-500 text-xs font-bold">
         {results.slice(0, 4).map((t, index) => {
           const pct = (t.count / total) * 100;
           pctRemaining -= pct;
@@ -189,7 +191,7 @@ export default function BottleDetails() {
   ];
 
   return (
-    <Layout>
+    <Layout title={`${bottle.brand?.name || ""} ${bottle.name}`}>
       <div className="p-3 sm:py-0">
         <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 sm:flex-nowrap">
           <BottleIcon className="hidden h-14 w-auto sm:inline-block" />
@@ -217,9 +219,11 @@ export default function BottleDetails() {
           <Button to={`/bottles/${bottle.id}/addTasting`} color="primary">
             Record a Tasting
           </Button>
-          <Suspense>
-            <CollectionAction bottle={bottle} />
-          </Suspense>
+          {currentUser && (
+            <Suspense fallback={null}>
+              <CollectionAction bottle={bottle} />
+            </Suspense>
+          )}
 
           {currentUser?.mod && (
             <Menu as="div" className="menu">

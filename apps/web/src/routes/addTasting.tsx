@@ -99,6 +99,7 @@ export default function AddTasting() {
 
   return (
     <Layout
+      title="Record Tasting"
       header={
         <Header>
           <FormHeader
@@ -111,7 +112,7 @@ export default function AddTasting() {
       footer={null}
     >
       <form
-        className="my-6 max-w-xl self-center"
+        className="max-w-xl self-center bg-slate-950 pb-6 sm:my-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         {error && <FormError values={[error]} />}

@@ -13,6 +13,7 @@ import Layout from "../components/layout";
 import ListItem from "../components/listItem";
 import SearchHeader from "../components/searchHeader";
 import UserAvatar from "../components/userAvatar";
+import useAuth from "../hooks/useAuth";
 import api, { debounce } from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
 import { Bottle, Entity, User } from "../types";
@@ -182,6 +183,7 @@ const UserResultRow = ({ result: { ref: user } }: { result: UserResult }) => {
 };
 
 export default function Search() {
+  const { user: currentUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const qs = new URLSearchParams(location.search);
@@ -219,24 +221,31 @@ export default function Search() {
     } else if (isUserQuery) {
       setBottleResults([]);
       setEntityResults([]);
-      await api
-        .get("/users", {
-          query: { query, limit: maxResults },
-        })
-        .then(({ results }: { results: readonly User[] }) => {
-          setUserResults(results);
-          if (state !== "ready") setState("ready");
-        });
+      if (currentUser) {
+        await api
+          .get("/users", {
+            query: { query, limit: maxResults },
+          })
+          .then(({ results }: { results: readonly User[] }) => {
+            setUserResults(results);
+            if (state !== "ready") setState("ready");
+          });
+      } else {
+        setUserResults([]);
+        setState("ready");
+      }
     } else {
       setUserResults([]);
-      await api
-        .get("/users", {
-          query: { query, limit: maxResults },
-        })
-        .then(({ results }: { results: readonly User[] }) => {
-          setUserResults(results);
-          if (state !== "ready") setState("ready");
-        });
+      if (currentUser) {
+        await api
+          .get("/users", {
+            query: { query, limit: maxResults },
+          })
+          .then(({ results }: { results: readonly User[] }) => {
+            setUserResults(results);
+            if (state !== "ready") setState("ready");
+          });
+      }
       await api
         .get("/bottles", {
           query: { query, limit: maxResults },
@@ -299,6 +308,7 @@ export default function Search() {
 
   return (
     <Layout
+      title="Search"
       footer={null}
       header={
         <Header>

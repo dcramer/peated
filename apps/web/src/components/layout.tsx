@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import { Helmet } from "react-helmet";
+
 import classNames from "../lib/classNames";
 import { AppFooter } from "./appFooter";
 import AppHeader from "./appHeader";
@@ -7,11 +9,13 @@ import Header from "./header";
 
 export default function Layout({
   children,
+  title,
   header,
   footer,
   splash,
 }: {
   children: ReactNode;
+  title?: string;
   header?: ReactNode;
   footer?: ReactNode;
   splash?: boolean;
@@ -19,6 +23,9 @@ export default function Layout({
 }) {
   return (
     <>
+      <Helmet>
+        <title>{title ? `${title} | Peated` : "Peated"}</title>
+      </Helmet>
       <div className="layout flex min-h-screen flex-1 flex-col">
         {header !== undefined ? (
           header

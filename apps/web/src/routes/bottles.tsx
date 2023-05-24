@@ -53,7 +53,7 @@ export default function BottleList() {
   const qs = new URLSearchParams(location.search);
   const page = qs.get("page") || 1;
   return (
-    <Layout>
+    <Layout title="Bottles">
       <QueryBoundary>
         <Content
           page={page}

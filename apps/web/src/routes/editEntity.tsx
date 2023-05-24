@@ -72,6 +72,7 @@ export default function EditEntity() {
 
   return (
     <Layout
+      title="Edit Entity"
       header={
         <Header>
           <FormHeader

@@ -37,7 +37,7 @@ export default function EntityDetails() {
   ];
 
   return (
-    <Layout>
+    <Layout title={entity.name}>
       <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4  p-3 sm:flex-nowrap sm:py-0">
         <EntityIcon className="hidden h-14 w-auto sm:inline-block" />
 

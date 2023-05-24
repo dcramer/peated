@@ -52,7 +52,7 @@ export default function EntityList() {
   const page = parseInt(qs.get("page") || "1", 10);
 
   return (
-    <Layout>
+    <Layout title="Brands, Bottler, and Distillers">
       <QueryBoundary>
         <Content
           page={page}

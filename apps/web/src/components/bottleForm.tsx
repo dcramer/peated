@@ -100,6 +100,7 @@ export default ({
 
   return (
     <Layout
+      title={title}
       header={
         <Header>
           <FormHeader
