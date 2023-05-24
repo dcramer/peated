@@ -23,7 +23,7 @@ test("lists tags", async () => {
   });
   await Fixtures.Tasting({
     bottleId: bottle.id,
-    tags: ["cedar", "caramel"],
+    tags: ["caramel"],
     rating: 5,
   });
   await Fixtures.Tasting({
@@ -34,15 +34,13 @@ test("lists tags", async () => {
 
   const response = await app.inject({
     method: "GET",
-    url: `/bottles/${bottle.id}/suggestedTags`,
+    url: `/bottles/${bottle.id}/tags`,
   });
 
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
-  expect(results.length).toBeGreaterThan(3);
-  expect(results.slice(0, 3)).toEqual([
-    { tag: "caramel", count: 3 },
-    { tag: "cedar", count: 2 },
+  expect(results).toEqual([
+    { tag: "caramel", count: 2 },
     { tag: "solvent", count: 1 },
   ]);
 });

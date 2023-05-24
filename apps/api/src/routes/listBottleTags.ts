@@ -1,16 +1,14 @@
-import { desc, eq, or, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { bottleTags, bottles } from "../db/schema";
-import { shuffle } from "../lib/rand";
-import { defaultTags } from "../lib/tags";
+import { bottles } from "../db/schema";
 
 export default {
   method: "GET",
-  url: "/bottles/:bottleId/suggestedTags",
+  url: "/bottles/:bottleId/tags",
   schema: {
     params: {
       type: "object",
@@ -42,32 +40,10 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    const usedTags = Object.fromEntries(
-      (
-        await db
-          .select({
-            tag: bottleTags.tag,
-            total: sql<number>`SUM(${bottleTags.count})`.as("total"),
-          })
-          .from(bottleTags)
-          .innerJoin(bottles, eq(bottles.id, bottleTags.bottleId))
-          .where(
-            or(
-              eq(bottleTags.bottleId, bottle.id),
-              eq(bottles.brandId, bottle.brandId),
-            ),
-          )
-          .groupBy(bottleTags.tag)
-          .orderBy(desc(sql`total`))
-      ).map((t) => [t.tag, t.total]),
-    );
-
-    const results = shuffle(defaultTags)
-      .map((t) => ({
-        tag: t,
-        count: usedTags[t] || 0,
-      }))
-      .sort((a, b) => b.count - a.count);
+    const results = await db.query.bottleTags.findMany({
+      where: (bottleTags, { eq }) => eq(bottleTags.bottleId, bottle.id),
+      orderBy: (bottleTags, { desc }) => desc(bottleTags.count),
+    });
 
     res.send({
       results,

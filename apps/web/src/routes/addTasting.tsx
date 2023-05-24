@@ -25,7 +25,7 @@ import { toBlob } from "../lib/blobs";
 import type { Bottle, Paginated } from "../types";
 
 type Tag = {
-  name: string;
+  tag: string;
   count: number;
 };
 
@@ -140,8 +140,8 @@ export default function AddTasting() {
                 label="Flavors"
                 targetOptions={5}
                 options={suggestedTags.map((t) => ({
-                  id: t.name,
-                  name: toTitleCase(t.name),
+                  id: t.tag,
+                  name: toTitleCase(t.tag),
                   count: t.count,
                 }))}
                 onChange={(value) => onChange(value.map((t: any) => t.id))}
