@@ -77,8 +77,8 @@ export default {
             SELECT 1
             FROM ${entities} e
             WHERE e.id = ${bottles.brandId}
-              AND e.name ILIKE ${`%${query}%`}
-              OR e.name || ' ' || ${bottles.name} ILIKE ${`%${query}%`}
+              AND (e.name ILIKE ${`%${query}%`}
+              OR e.name || ' ' || ${bottles.name} ILIKE ${`%${query}%`})
           )`,
         ),
       );
