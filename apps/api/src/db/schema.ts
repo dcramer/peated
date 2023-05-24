@@ -268,6 +268,32 @@ export const bottlesToDistillersRelations = relations(
   }),
 );
 
+export const bottleTags = pgTable(
+  "bottle_tag",
+  {
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    tag: varchar("tag", { length: 64 }).notNull(),
+    count: integer("count").default(0).notNull(),
+  },
+  (bottleTags) => {
+    return {
+      pk: primaryKey(bottleTags.bottleId, bottleTags.tag),
+    };
+  },
+);
+
+export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [bottleTags.bottleId],
+    references: [bottles.id],
+  }),
+}));
+
+export type BottleTag = InferModel<typeof bottleTags>;
+export type NewBottleTag = InferModel<typeof bottleTags, "insert">;
+
 export const collections = pgTable(
   "collection",
   {
@@ -359,7 +385,7 @@ export const tastings = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    tags: text("tags").array(),
+    tags: varchar("tags", { length: 64 }).array(),
     rating: doublePrecision("rating"),
     imageUrl: text("image_url"),
     notes: text("notes"),

@@ -10,6 +10,7 @@ import { db } from "../db";
 import {
   NewTasting,
   Tasting,
+  bottleTags,
   bottles,
   bottlesToDistillers,
   entities,
@@ -45,7 +46,9 @@ export default {
       bottleId: bottle.id,
       notes: body.notes || null,
       rating: body.rating || null,
-      tags: body.tags ? body.tags.map((t) => t.toLowerCase()) : [],
+      tags: body.tags
+        ? Array.from(new Set(body.tags.map((t) => t.toLowerCase())))
+        : [],
       createdById: req.user.id,
     };
     if (body.createdAt) {
@@ -100,6 +103,21 @@ export default {
             Array.from(new Set([bottle.brandId, ...distillerIds])),
           ),
         );
+
+      for (const tag in tasting.tags) {
+        tx.insert(bottleTags)
+          .values({
+            bottleId: bottle.id,
+            tag,
+            count: 1,
+          })
+          .onConflictDoUpdate({
+            target: [bottleTags.bottleId, bottleTags.tag],
+            set: {
+              count: sql<number>`${bottleTags.count} + 1`,
+            },
+          });
+      }
 
       return tasting;
     });
