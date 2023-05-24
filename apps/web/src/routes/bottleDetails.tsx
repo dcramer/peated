@@ -2,7 +2,8 @@ import { Link, Outlet, useParams } from "react-router-dom";
 
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { Fragment, useState } from "react";
+import { toTitleCase } from "@peated/shared/lib/strings";
+import { Suspense, useState } from "react";
 import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
 import AddToCollectionModal from "../components/addToCollectionModal";
 import BottleMetadata from "../components/bottleMetadata";
@@ -85,17 +86,86 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
       />
     </>
   );
+};
 
-  // return (
-  //   <Menu as="div" className="menu">
-  //     <Menu.Button as={Button}>
-  //       {collectionList.length ? "Collected" : "Add to Collection"}
-  //     </Menu.Button>
-  //     <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
-  //       <Menu.Item as="button">Default</Menu.Item>
-  //     </Menu.Items>
-  //   </Menu>
-  // );
+type Tag = { tag: string; count: number };
+
+const TagDistribution = ({ bottleId }: { bottleId: number }) => {
+  const {
+    data: { results },
+  } = useSuspenseQuery(
+    ["bottles", bottleId, "tags"],
+    (): Promise<Paginated<Tag>> => api.get(`/bottles/${bottleId}/tags`),
+  );
+
+  const total = results.reduce((acc, d) => acc + d.count, 0);
+  let pctRemaining = 100;
+
+  const colorNames = [
+    "bg-slate-600 text-white",
+    "bg-slate-700 text-white",
+    "bg-slate-800 text-white",
+    "bg-slate-900 text-white",
+    "bg-slate-950 text-white",
+  ];
+
+  const [active, setActive] = useState<Tag | null>(null);
+
+  return (
+    <div>
+      <div className="relative mb-4 flex h-6 w-full flex-row bg-gray-200 text-xs font-bold">
+        {results.slice(0, 4).map((t, index) => {
+          const pct = (t.count / total) * 100;
+          pctRemaining -= pct;
+          return (
+            <div
+              key={t.tag}
+              title={t.tag}
+              className={`${colorNames[index]} flex h-6 items-center justify-center`}
+              style={{ minWidth: `${pct}%` }}
+              onMouseEnter={(e) => setActive(t)}
+              onMouseLeave={(e) => setActive(null)}
+            >
+              {pct > 15 && (
+                <span className={pct < 50 ? "hidden px-2 sm:block" : "px-2"}>
+                  {t.tag}
+                </span>
+              )}
+            </div>
+          );
+        })}
+        {results.length > 4 && (
+          <div
+            className={`${colorNames[4]} flex h-6 items-center justify-center`}
+            style={{ minWidth: `${pctRemaining}%` }}
+            onMouseEnter={(e) =>
+              setActive({
+                tag: "Other",
+                count: (total * pctRemaining) / 100,
+              })
+            }
+            onMouseLeave={(e) => setActive(null)}
+          >
+            {pctRemaining > 15 && (
+              <span
+                className={pctRemaining < 50 ? "hidden px-2 sm:block" : "px-2"}
+              >
+                Other
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="text-light flex h-5 items-center justify-center text-sm">
+        {!!active && (
+          <span>
+            {toTitleCase(active.tag)} &mdash;{" "}
+            {Math.round((active.count / total) * 100)}%
+          </span>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default function BottleDetails() {
@@ -147,9 +217,9 @@ export default function BottleDetails() {
           <Button to={`/bottles/${bottle.id}/addTasting`} color="primary">
             Record a Tasting
           </Button>
-          <QueryBoundary loading={<Fragment />} fallback={() => <Fragment />}>
+          <Suspense>
             <CollectionAction bottle={bottle} />
-          </QueryBoundary>
+          </Suspense>
 
           {currentUser?.mod && (
             <Menu as="div" className="menu">
@@ -165,7 +235,11 @@ export default function BottleDetails() {
           )}
         </div>
 
-        <div className="my-8 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
+        <Suspense>
+          <TagDistribution bottleId={bottle.id} />
+        </Suspense>
+
+        <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
           {stats.map((stat) => (
             <div key={stat.name}>
               <p className="text-peated-light leading-7">{stat.name}</p>
