@@ -62,6 +62,7 @@ export const BottleSchema = z.object({
   bottler: EntitySchema.nullable(),
   statedAge: z.number().nullable(),
   category: CategoryEnum.nullable(),
+  series: z.string().nullable(),
 
   createdAt: z.string().datetime().optional(),
   createdBy: UserSchema.optional(),
@@ -74,6 +75,7 @@ export const BottleInputSchema = z.object({
   bottler: z.union([EntityInputSchema, z.number()]).nullable().optional(),
   statedAge: z.number().nullable().optional(),
   category: CategoryEnum.nullable().optional(),
+  series: z.string().nullable().optional(),
 });
 
 const VintageSchema = z.object({

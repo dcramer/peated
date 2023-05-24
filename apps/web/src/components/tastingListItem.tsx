@@ -70,7 +70,7 @@ export default ({
         <BottleCard
           bottle={bottle}
           vintage={{
-            series: tasting.series,
+            series: bottle.series,
             vintageYear: tasting.vintageYear,
             barrel: tasting.barrel,
           }}

@@ -12,8 +12,8 @@ program
   .description("Create a user")
   .argument("<email>")
   .argument("<password>")
-  .option("-a", "--admin")
-  .option("-d", "--display-name <displayName>")
+  .option("-a, --admin")
+  .option("--display-name <displayName>")
   .action(async (email, password, options) => {
     const user = await createUser(db, {
       displayName: options.displayName || email.split("@")[0],

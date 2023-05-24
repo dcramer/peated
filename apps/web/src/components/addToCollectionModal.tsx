@@ -87,12 +87,6 @@ export default ({
               placeholder="e.g. 2023"
             />
             <TextField
-              {...register("series")}
-              error={errors.series}
-              label="Series"
-              placeholder="e.g. Healthy Spirits"
-            />
-            <TextField
               {...register("barrel", {
                 setValueAs: (v) =>
                   v === "" || !v ? undefined : parseInt(v, 10),

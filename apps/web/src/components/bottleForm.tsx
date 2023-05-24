@@ -66,6 +66,7 @@ export default ({
       category: initialData.category,
       bottler: initialData.bottler?.id,
       brand: initialData.brand?.id,
+      series: initialData.series,
       distillers: initialData.distillers
         ? initialData.distillers.map((d) => d.id)
         : [],
@@ -123,6 +124,7 @@ export default ({
               statedAge: watch("statedAge"),
               distillers: distillersValue,
               brand: brandValue,
+              series: watch("series"),
             }}
           />
         </div>
@@ -134,8 +136,17 @@ export default ({
             type="text"
             label="Bottle"
             required
-            helpText="The full name of the bottle, excluding its specific cask information."
+            helpText="The name of the bottle, excluding the brand and series"
             placeholder="e.g. 12-year-old"
+          />
+
+          <TextField
+            {...register("series")}
+            error={errors.name}
+            type="series"
+            label="Series"
+            helpText="The bottling series."
+            placeholder="e.g. Offerman Edition Charred Oak Cask"
           />
 
           <Controller

@@ -87,7 +87,7 @@ export default function AddBottle() {
   return (
     <BottleForm
       onSubmit={async (data) => {
-        const [newBottle] = await api.post(`/bottles`, { data });
+        const newBottle = await api.post(`/bottles`, { data });
         navigate(`/bottles/${newBottle.id}/addTasting`, {
           replace: true,
         });

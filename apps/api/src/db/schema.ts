@@ -195,6 +195,7 @@ export const bottles = pgTable(
       () => entities.id,
     ),
     statedAge: smallint("stated_age"),
+    series: varchar("series", { length: 255 }),
 
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
@@ -386,8 +387,8 @@ export const tastings = pgTable(
       .references(() => bottles.id)
       .notNull(),
     tags: varchar("tags", { length: 64 })
-      .default(sql`[]`)
       .array()
+      .default(sql`array[]::varchar[]`)
       .notNull(),
     rating: doublePrecision("rating"),
     imageUrl: text("image_url"),

@@ -40,6 +40,7 @@ export type Entity = {
 export type Bottle = {
   id: number;
   name: string;
+  series?: string;
   brand: Entity;
   distillers: Entity[];
   bottler?: Entity;

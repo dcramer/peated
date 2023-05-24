@@ -61,6 +61,7 @@ export const BottleSerializer: Serializer<Bottle> = {
     return {
       id: item.id,
       name: item.name,
+      series: item.series,
       statedAge: item.statedAge,
       category: item.category,
       brand: attrs.brand,

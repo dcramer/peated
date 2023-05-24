@@ -57,6 +57,9 @@ export default {
     if (body.name && body.name !== bottle.name) {
       bottleData.name = body.name;
     }
+    if (body.series && body.series !== bottle.series) {
+      bottleData.series = body.series;
+    }
     if (body.category !== undefined && body.category !== bottle.category) {
       bottleData.category = body.category;
     }

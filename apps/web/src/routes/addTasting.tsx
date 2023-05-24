@@ -1,4 +1,3 @@
-import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -170,16 +169,6 @@ export default function AddTasting() {
             imageHeight={768 / 2}
           />
 
-          <div className="bg-highlight my-4 px-4 py-3 text-black">
-            <div className="flex items-center">
-              <div className="flex-1">
-                <h2 className="font-medium">Vintage Details</h2>
-                <p className="text-sm">Is this bottle a specific vintage?</p>
-              </div>
-              <ArrowDownIcon className="h-8 w-8 text-slate-700" />
-            </div>
-          </div>
-
           <TextField
             {...register("vintageYear", {
               // valueAsNumber: true,
@@ -190,12 +179,6 @@ export default function AddTasting() {
             type="number"
             label="Year"
             placeholder="e.g. 2023"
-          />
-          <TextField
-            {...register("series")}
-            error={errors.series}
-            label="Series"
-            placeholder="e.g. Healthy Spirits"
           />
           <TextField
             {...register("barrel", {
