@@ -100,7 +100,7 @@ const GoogleLogin = () => {
           },
         });
         login(user, accessToken);
-        navigate("/");
+        navigate(!user.pictureUrl ? "/settings" : "/");
       } catch (err) {
         setError("There was an error communicating with the server.");
       }
