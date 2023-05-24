@@ -5,7 +5,13 @@ import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { Category, bottles, bottlesToDistillers, entities } from "../db/schema";
+import {
+  Category,
+  bottles,
+  bottlesToDistillers,
+  entities,
+  tastings,
+} from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
@@ -24,6 +30,7 @@ export default {
         distiller: { type: "number" },
         bottler: { type: "number" },
         entity: { type: "number" },
+        tag: { type: "string" },
         category: {
           type: "string",
           enum: [
@@ -101,6 +108,11 @@ export default {
     if (req.query.age) {
       where.push(eq(bottles.statedAge, req.query.age));
     }
+    if (req.query.tag) {
+      where.push(
+        sql`EXISTS(SELECT 1 FROM ${tastings} WHERE ${req.query.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
+      );
+    }
 
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
@@ -153,6 +165,7 @@ export default {
       entity?: number;
       category?: Category;
       age?: number;
+      tag?: string;
       sort?: "name";
     };
   }

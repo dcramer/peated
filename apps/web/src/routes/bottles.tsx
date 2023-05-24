@@ -12,18 +12,21 @@ const Content = ({
   page,
   category,
   age,
+  tag,
 }: {
   page: string | number;
   category?: string;
   age?: string;
+  tag?: string;
 }) => {
   const { data } = useQuery({
-    queryKey: ["bottles", page, "category", category, "age", age],
+    queryKey: ["bottles", page, "category", category, "age", age, "tag", tag],
     queryFn: (): Promise<Paginated<Bottle>> =>
       api.get("/bottles", {
         query: {
           category,
           age,
+          tag,
           page,
           sort: "name",
         },
@@ -56,6 +59,7 @@ export default function BottleList() {
           page={page}
           category={qs.get("category") || undefined}
           age={qs.get("age") || undefined}
+          tag={qs.get("tag") || undefined}
         />
       </QueryBoundary>
     </Layout>

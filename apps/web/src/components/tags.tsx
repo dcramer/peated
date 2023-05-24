@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import Separated from "./separated";
 import Tooltip from "./tooltip";
 
 export default ({ tags }: { tags: string[] }) => {
@@ -5,7 +7,17 @@ export default ({ tags }: { tags: string[] }) => {
   return (
     <div className="text-sm">
       <div className="hidden sm:block">
-        <span>{tags.slice(0, 3).join(", ")}</span>
+        <Separated separator=", ">
+          {tags.slice(0, 3).map((item) => (
+            <Link
+              key={item}
+              className="hover:underline"
+              to={`/bottles?tag=${encodeURIComponent(item)}`}
+            >
+              {item}
+            </Link>
+          ))}
+        </Separated>
         {tags.length > 3 && (
           <span>
             , and{" "}
