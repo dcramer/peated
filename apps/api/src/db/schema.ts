@@ -191,6 +191,9 @@ export const bottles = pgTable(
     brandId: bigint("brand_id", { mode: "number" })
       .references(() => entities.id)
       .notNull(),
+    bottlerId: bigint("bottler_id", { mode: "number" }).references(
+      () => entities.id,
+    ),
     statedAge: smallint("stated_age"),
 
     totalTastings: bigint("total_tastings", { mode: "number" })
@@ -215,6 +218,10 @@ export const bottles = pgTable(
 export const bottlesRelations = relations(bottles, ({ one, many }) => ({
   brand: one(entities, {
     fields: [bottles.brandId],
+    references: [entities.id],
+  }),
+  bottler: one(entities, {
+    fields: [bottles.bottlerId],
     references: [entities.id],
   }),
   bottlesToDistillers: many(bottlesToDistillers),

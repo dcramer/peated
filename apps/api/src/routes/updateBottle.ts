@@ -35,15 +35,18 @@ export default {
   },
   preHandler: [requireMod],
   handler: async (req, res) => {
-    const [{ bottle, brand }] = await db
-      .select({
-        bottle: bottles,
-        brand: entities,
-      })
-      .from(bottles)
-      .innerJoin(entities, eq(entities.id, bottles.brandId))
-      .where(eq(bottles.id, req.params.bottleId));
-
+    const bottle = await db.query.bottles.findFirst({
+      where: (bottles, { eq }) => eq(entities.id, req.params.bottleId),
+      with: {
+        brand: true,
+        bottler: true,
+        bottlesToDistillers: {
+          with: {
+            distiller: true,
+          },
+        },
+      },
+    });
     if (!bottle) {
       return res.status(404).send({ error: "Not found" });
     }
@@ -60,19 +63,6 @@ export default {
     if (body.statedAge !== undefined && body.statedAge !== bottle.statedAge) {
       bottleData.statedAge = body.statedAge;
     }
-
-    const currentDistillers = (
-      await db
-        .select({
-          distiller: entities,
-        })
-        .from(entities)
-        .innerJoin(
-          bottlesToDistillers,
-          eq(bottlesToDistillers.distillerId, entities.id),
-        )
-        .where(eq(bottlesToDistillers.bottleId, bottle.id))
-    ).map(({ distiller }) => distiller);
 
     const newBottle = await db.transaction(async (tx) => {
       let newBottle: Bottle | undefined;
@@ -99,8 +89,8 @@ export default {
       if (body.brand) {
         if (
           typeof body.brand === "number"
-            ? body.brand !== bottle.brandId
-            : body.brand.name !== brand.name
+            ? body.brand !== bottle.brand.id
+            : body.brand.name !== bottle.brand.name
         ) {
           const brandUpsert = await upsertEntity({
             db: tx,
@@ -116,8 +106,31 @@ export default {
         }
       }
 
+      if (body.bottler) {
+        if (
+          typeof body.bottler === "number"
+            ? body.bottler !== bottle.bottler?.id
+            : body.bottler.name !== bottle.bottler?.name
+        ) {
+          const bottlerUpsert = await upsertEntity({
+            db: tx,
+            data: body.bottler,
+            userId: req.user.id,
+            type: "bottler",
+          });
+          if (!bottlerUpsert)
+            throw new Error(`Unable to find entity: ${body.bottler}`);
+          if (bottlerUpsert.id !== bottle.bottlerId) {
+            bottleData.bottlerId = bottlerUpsert.id;
+          }
+        }
+      }
+
       const distillerIds: number[] = [];
       const newDistillerIds: number[] = [];
+      const currentDistillers = bottle.bottlesToDistillers.map(
+        (d) => d.distiller,
+      );
 
       // find newly added distillers and connect them
       if (body.distillers) {

@@ -193,7 +193,7 @@ export default ({
         canCreate={canCreate}
         createForm={createForm}
         selectedValues={value}
-        searchPlaceholder="Search for a distiller"
+        searchPlaceholder="Search"
         endpoint={endpoint}
         options={options}
       />

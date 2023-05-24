@@ -148,6 +148,13 @@
       "when": 1684872883926,
       "tag": "0020_handy_inhumans",
       "breakpoints": false
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1684947618684,
+      "tag": "0021_lush_redwing",
+      "breakpoints": false
     }
   ]
 }

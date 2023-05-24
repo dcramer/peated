@@ -64,6 +64,7 @@ export default ({
     defaultValues: {
       name: initialData.name,
       category: initialData.category,
+      bottler: initialData.bottler?.id,
       brand: initialData.brand?.id,
       distillers: initialData.distillers
         ? initialData.distillers.map((d) => d.id)
@@ -92,6 +93,9 @@ export default ({
   );
   const [distillersValue, setDistillersValue] = useState<Option[]>(
     initialData.distillers ? initialData.distillers.map(entityToOption) : [],
+  );
+  const [bottlerValue, setBottlerValue] = useState<Option | undefined>(
+    initialData.bottler ? entityToOption(initialData.bottler) : undefined,
   );
 
   return (
@@ -174,6 +178,26 @@ export default ({
                 value={distillersValue}
                 canCreate={user.admin}
                 multiple
+              />
+            )}
+          />
+
+          <Controller
+            name="bottler"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <EntityField
+                {...field}
+                error={errors.bottler}
+                label="Bottler"
+                helpText="The company bottling the spirit."
+                placeholder="e.g. The Scotch Malt Whisky Society"
+                canCreate={user.admin}
+                onChange={(value) => {
+                  onChange(value?.id || value);
+                  setBottlerValue(value);
+                }}
+                value={bottlerValue}
               />
             )}
           />

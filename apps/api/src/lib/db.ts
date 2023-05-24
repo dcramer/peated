@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { DatabaseType, TransactionType } from "../db";
 import {
+  Entity,
   EntityType,
-  NewEntity,
   changes,
   collections,
   entities,
@@ -12,21 +12,16 @@ export type EntityInput =
   | number
   | {
       name: string;
-      country?: string;
-      region?: string;
+      country?: string | null;
+      region?: string | null;
       type?: ("brand" | "bottler" | "distiller")[];
     };
 
 export type UpsertOutcome<T> =
   | {
       id: number;
-      result?: T;
-      created: false;
-    }
-  | {
-      id: number;
       result: T;
-      created: true;
+      created: boolean;
     }
   | undefined;
 
@@ -40,7 +35,7 @@ export const upsertEntity = async ({
   data: EntityInput;
   userId: number;
   type?: EntityType;
-}): Promise<UpsertOutcome<NewEntity>> => {
+}): Promise<UpsertOutcome<Entity>> => {
   if (!data) return undefined;
 
   if (typeof data === "number") {

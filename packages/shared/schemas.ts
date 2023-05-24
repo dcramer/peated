@@ -26,16 +26,16 @@ const EntityTypeEnum = z.enum(["brand", "bottler", "distiller"]);
 
 export const EntityInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
-  country: z.string().trim().optional(),
-  region: z.string().trim().optional(),
+  country: z.string().trim().nullable().optional(),
+  region: z.string().trim().nullable().optional(),
   type: z.array(EntityTypeEnum).optional(),
 });
 
 export const EntitySchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
-  country: z.string().trim().optional(),
-  region: z.string().trim().optional(),
+  country: z.string().trim().nullable().optional(),
+  region: z.string().trim().nullable().optional(),
   type: z.array(EntityTypeEnum),
 
   totalTastings: z.number(),
@@ -59,6 +59,7 @@ export const BottleSchema = z.object({
   name: z.string().trim().min(1, "Required"),
   brand: EntitySchema,
   distillers: z.array(EntitySchema),
+  bottler: EntitySchema.nullable(),
   statedAge: z.number().nullable(),
   category: CategoryEnum.nullable(),
 
@@ -70,6 +71,7 @@ export const BottleInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
   brand: z.union([EntityInputSchema, z.number()]),
   distillers: z.array(z.union([EntityInputSchema, z.number()])).optional(),
+  bottler: z.union([EntityInputSchema, z.number()]).nullable().optional(),
   statedAge: z.number().nullable().optional(),
   category: CategoryEnum.nullable().optional(),
 });

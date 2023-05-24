@@ -1,5 +1,5 @@
 import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
-import { eq, inArray, sql } from "drizzle-orm";
+import { inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
@@ -7,6 +7,7 @@ import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import {
   Bottle,
+  Entity,
   bottles,
   bottlesToDistillers,
   changes,
@@ -52,33 +53,34 @@ export default {
     }
 
     const bottle: Bottle | undefined = await db.transaction(async (tx) => {
-      const [brand] =
-        typeof body.brand === "number"
-          ? await tx.select().from(entities).where(eq(entities.id, body.brand))
-          : await tx
-              .insert(entities)
-              .values({
-                name: body.brand.name,
-                country: body.brand.country || null,
-                region: body.brand.region || null,
-                type: ["brand"],
-                createdById: req.user.id,
-              })
-              .onConflictDoNothing()
-              .returning();
+      const brandUpsert = await upsertEntity({
+        db: tx,
+        data: body.brand,
+        type: "brand",
+        userId: req.user.id,
+      });
 
-      if (!brand) {
+      if (!brandUpsert) {
         res.status(400).send({ error: "Could not identify brand" });
         return;
       }
 
-      if (typeof body.brand !== "number") {
-        await tx.insert(changes).values({
-          objectType: "entity",
-          objectId: brand.id,
-          createdById: req.user.id,
-          data: JSON.stringify(body.brand),
+      const brand = brandUpsert.result;
+
+      let bottler: Entity | null = null;
+      if (body.bottler) {
+        const bottlerUpsert = await upsertEntity({
+          db: tx,
+          data: body.bottler,
+          type: "bottler",
+          userId: req.user.id,
         });
+        if (bottlerUpsert) {
+          bottler = bottlerUpsert.result;
+        } else {
+          res.status(400).send({ error: "Could not identify bottler" });
+          return;
+        }
       }
 
       let bottle: Bottle | undefined;
@@ -90,6 +92,7 @@ export default {
             statedAge: body.statedAge || null,
             category: body.category || null,
             brandId: brand.id,
+            bottlerId: bottler?.id || null,
             createdById: req.user.id,
           })
           .returning();

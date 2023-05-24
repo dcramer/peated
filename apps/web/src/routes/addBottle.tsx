@@ -16,8 +16,9 @@ export default function AddBottle() {
 
   const distiller = qs.get("distiller") || null;
   const brand = qs.get("brand") || null;
+  const bottler = qs.get("bottler") || null;
 
-  const needsToLoad = Boolean(distiller || brand);
+  const needsToLoad = Boolean(distiller || brand || bottler);
   const [loading, setLoading] = useState<boolean>(needsToLoad);
 
   const [initialData, setInitialData] = useState<Record<string, any>>({
@@ -44,6 +45,15 @@ export default function AddBottle() {
       },
     });
   }
+  if (bottler) {
+    queryOrder.push("bottler");
+    queries.push({
+      queryKey: ["entity", bottler],
+      queryFn: async (): Promise<Entity> => {
+        return await api.get(`/entities/${bottler}`);
+      },
+    });
+  }
 
   const initialQueries = useQueries({
     queries: queries,
@@ -59,10 +69,12 @@ export default function AddBottle() {
     if (loading && !initialQueries.find((q) => q.isLoading)) {
       const distiller = getQueryResult("distiller");
       const brand = getQueryResult("brand");
+      const bottler = getQueryResult("bottler");
       setInitialData((initialData) => ({
         ...initialData,
         distillers: distiller ? [distiller] : [],
-        brand: brand,
+        brand,
+        bottler,
       }));
       setLoading(false);
     }
