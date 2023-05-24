@@ -89,7 +89,11 @@ export default function Settings() {
       title="Settings"
       header={
         <Header>
-          <FormHeader title="Settings" onSave={onSubmit} />
+          <FormHeader
+            title="Settings"
+            onSave={onSubmit}
+            onClose={() => navigate("/")}
+          />
         </Header>
       }
     >

@@ -91,14 +91,14 @@ export default ({
     ? [props.value]
     : [];
 
-  useEffect(() => {
-    const newValue = Array.isArray(props.value)
-      ? props.value
-      : props.value
-      ? [props.value]
-      : [];
-    setValue(newValue);
-  }, [JSON.stringify(props.value)]);
+  // useEffect(() => {
+  //   const newValue = Array.isArray(props.value)
+  //     ? props.value
+  //     : props.value
+  //     ? [props.value]
+  //     : [];
+  //   setValue(newValue);
+  // }, [JSON.stringify(props.value)]);
 
   const [value, setValue] = useState<Option[]>(initialValue);
   const [previousValues, setPreviousValues] = useState<Option[]>(value);
@@ -166,7 +166,7 @@ export default ({
           </Chip>
         ))}
         {visibleValues.length === 0 && placeholder && (
-          <div className="text-gray-400 sm:leading-6">{placeholder}</div>
+          <div className="text-slate-500 sm:leading-6">{placeholder}</div>
         )}
         {visibleValues.length > 0 &&
           value.length < targetOptions &&

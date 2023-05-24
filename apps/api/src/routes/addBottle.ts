@@ -39,11 +39,12 @@ export default {
   handler: async (req, res) => {
     const body = req.body;
 
+    const name = fixBottleName(body.name, body.statedAge);
     if (
-      (body.name.indexOf("-year-old") !== -1 ||
-        body.name.indexOf("-years-old") !== -1 ||
-        body.name.indexOf("year old") !== -1 ||
-        body.name.indexOf("years old") !== -1) &&
+      (name.indexOf("-year-old") !== -1 ||
+        name.indexOf("-years-old") !== -1 ||
+        name.indexOf("year old") !== -1 ||
+        name.indexOf("years old") !== -1) &&
       !body.statedAge
     ) {
       res
@@ -88,7 +89,7 @@ export default {
         [bottle] = await tx
           .insert(bottles)
           .values({
-            name: fixBottleName(body.name, body.statedAge),
+            name,
             statedAge: body.statedAge || null,
             category: body.category || null,
             brandId: brand.id,
