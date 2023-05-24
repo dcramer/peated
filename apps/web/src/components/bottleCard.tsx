@@ -41,7 +41,7 @@ export const PreviewBottleCard = ({
         </p>
       </div>
       <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
-        <p>{data.category ? data.category : null}</p>
+        <p>{data.category ? formatCategoryName(data.category) : null}</p>
         <p>{data.statedAge ? `Aged ${data.statedAge} years` : null}</p>
       </div>
     </div>
