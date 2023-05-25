@@ -85,6 +85,7 @@ export default {
       await tx.insert(changes).values({
         objectType: "entity",
         objectId: newEntity.id,
+        displayName: newEntity.name,
         createdById: req.user.id,
         type: "update",
         data: JSON.stringify({

@@ -36,36 +36,36 @@ const ChangeType = ({ type }: { type: string }) => {
 const ObjectDesc = ({
   objectType,
   objectId,
-  data,
+  displayName,
 }: {
   objectType: string;
   objectId: number;
-  data: Record<string, any>;
+  displayName: string;
 }) => {
   switch (objectType) {
     case "entity":
       return (
-        <div>
-          the {data.type.length === 1 ? data.type[0] : "business"}{" "}
+        <>
+          <div>the entity</div>
           <Link
             to={`/entities/${objectId}`}
             className="text-highlight font-medium hover:underline"
           >
-            {data.name}
+            {displayName}
           </Link>
-        </div>
+        </>
       );
     case "bottle":
       return (
-        <div>
-          the bottle{" "}
+        <>
+          <div>the bottle</div>
           <Link
             to={`/bottles/${objectId}`}
             className="text-highlight font-medium hover:underline"
           >
-            {data.name}
+            {displayName}
           </Link>
-        </div>
+        </>
       );
     default:
       throw new Error(`Invalid object type: ${objectType}`);
@@ -82,13 +82,13 @@ export default ({ values, rel }: { values: Change[]; rel?: PagingRel }) => {
               <div className="flex items-center gap-x-2 text-sm">
                 <UserAvatar user={change.createdBy} size={36} />
                 <div>
-                  <div className="flex items-center gap-x-1">
+                  <div className="flex flex-wrap items-start justify-start gap-x-1">
                     <ChangeAuthor user={change.createdBy} />
                     <ChangeType type={change.type} />
                     <ObjectDesc
                       objectType={change.objectType}
                       objectId={change.objectId}
-                      data={change.data}
+                      displayName={change.displayName}
                     />
                   </div>
                   <div className="text-light">

@@ -117,6 +117,7 @@ export type Change = {
   id: number;
   objectId: number;
   objectType: "bottle" | "entity";
+  displayName: string;
   type: "add" | "update" | "delete";
   createdAt: string;
   createdBy?: User;

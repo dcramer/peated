@@ -7,6 +7,7 @@ import { toTitleCase } from "@peated/shared/lib/strings";
 import { sql } from "drizzle-orm";
 import { db } from "../../db";
 import {
+  Entity as EntityType,
   NewBottle,
   NewComment,
   NewEntity,
@@ -84,6 +85,7 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
       objectId: entity.id,
       objectType: "entity",
       type: "add",
+      displayName: entity.name,
       createdAt: entity.createdAt,
       createdById: entity.createdById,
       data: entity,
@@ -100,6 +102,14 @@ export const Bottle = async ({
   distillerIds?: number[];
 } = {}) => {
   return await db.transaction(async (tx) => {
+    const brand = (
+      data.brandId
+        ? await db.query.entities.findFirst({
+            where: (entities, { eq }) =>
+              eq(entities.id, data.brandId as number),
+          })
+        : await Entity()
+    ) as EntityType;
     const [bottle] = await tx
       .insert(bottles)
       .values({
@@ -120,7 +130,7 @@ export const Bottle = async ({
         ]),
         statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
         ...data,
-        brandId: data.brandId || (await Entity()).id,
+        brandId: brand.id,
         createdById: data.createdById || (await User()).id,
       })
       .returning();
@@ -144,6 +154,7 @@ export const Bottle = async ({
     await tx.insert(changes).values({
       objectId: bottle.id,
       objectType: "bottle",
+      displayName: `${brand.name} ${bottle.name}`,
       type: "add",
       createdAt: bottle.createdAt,
       createdById: bottle.createdById,

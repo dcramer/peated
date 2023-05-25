@@ -7,6 +7,7 @@ import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import {
   Bottle,
+  Entity,
   bottles,
   bottlesToDistillers,
   changes,
@@ -68,6 +69,7 @@ export default {
     }
 
     const newBottle = await db.transaction(async (tx) => {
+      let brand: Brand | null = null;
       if (body.brand) {
         if (
           typeof body.brand === "number"
@@ -85,6 +87,7 @@ export default {
           if (brandUpsert.id !== bottle.brandId) {
             bottleData.brandId = brandUpsert.id;
           }
+          brand = brandUpsert.result;
         }
       }
 
@@ -128,6 +131,8 @@ export default {
         }
         throw err;
       }
+
+      if (!newBottle) return;
 
       const distillerIds: number[] = [];
       const newDistillerIds: number[] = [];
@@ -182,10 +187,18 @@ export default {
         }
       }
 
+      if (!brand) {
+        brand = (await tx.query.entities.findFirst({
+          where: (entities, { eq }) =>
+            eq(entities.id, (newBottle as Bottle).brandId),
+        })) as Entity;
+      }
+
       await tx.insert(changes).values({
         objectType: "bottle",
         objectId: newBottle.id,
         createdById: req.user.id,
+        displayName: `${brand.name} ${newBottle.name}`,
         type: "update",
         data: JSON.stringify({
           ...bottleData,

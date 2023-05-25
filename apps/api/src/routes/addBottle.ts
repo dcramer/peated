@@ -139,7 +139,9 @@ export default {
       await tx.insert(changes).values({
         objectType: "bottle",
         objectId: bottle.id,
+        createdAt: bottle.createdAt,
         createdById: req.user.id,
+        displayName: `${brand.name} ${bottle.name}`,
         type: "add",
         data: JSON.stringify({
           ...bottle,

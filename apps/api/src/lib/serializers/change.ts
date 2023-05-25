@@ -49,6 +49,7 @@ export const ChangeSerializer: Serializer<Change> = {
       id: item.id,
       objectType: item.objectType,
       objectId: item.objectId,
+      displayName: item.displayName,
       type: item.type,
       createdAt: item.createdAt,
       createdBy: attrs.createdBy,

@@ -532,7 +532,7 @@ export const changes = pgTable("change", {
   objectId: bigint("object_id", { mode: "number" }).notNull(),
   objectType: objectTypeEnum("object_type").notNull(),
   type: changeTypeEnum("type").default("add").notNull(),
-
+  displayName: text("display_name"),
   data: jsonb("data").default({}).notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),

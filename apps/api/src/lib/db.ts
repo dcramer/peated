@@ -70,8 +70,11 @@ export const upsertEntity = async ({
     await db.insert(changes).values({
       objectType: "entity",
       objectId: result.id,
-      createdById: userId,
+      displayName: result.name,
+      type: "add",
       data: JSON.stringify(result),
+      createdById: userId,
+      createdAt: result.createdAt,
     });
 
     return { id: result.id, result, created: true };

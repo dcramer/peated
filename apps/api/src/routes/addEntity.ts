@@ -60,7 +60,9 @@ export default {
       await tx.insert(changes).values({
         objectType: "entity",
         objectId: entity.id,
+        displayName: entity.name,
         type: "add",
+        createdAt: entity.createdAt,
         createdById: req.user.id,
         data: JSON.stringify(data),
       });

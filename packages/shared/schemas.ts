@@ -169,6 +169,7 @@ export const ChangeSchema = z.object({
   id: z.number(),
   objectId: z.number(),
   objectType: ObjectTypeEnum,
+  displayName: z.string().nullable(),
   type: ChangeTypeEnum,
   createdBy: UserSchema.optional(),
   createdAt: z.string().datetime(),
