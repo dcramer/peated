@@ -21,7 +21,7 @@ const UpdatesContent = () => {
   return (
     <>
       {data.results.length > 0 ? (
-        <ChangeList values={data.results} />
+        <ChangeList values={data.results} rel={data.rel} />
       ) : (
         <EmptyActivity>
           Looks like theres no updates in the system. That's odd.
