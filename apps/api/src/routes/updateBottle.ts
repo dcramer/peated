@@ -68,27 +68,6 @@ export default {
     }
 
     const newBottle = await db.transaction(async (tx) => {
-      let newBottle: Bottle | undefined;
-      try {
-        newBottle = Object.values(bottleData).length
-          ? (
-              await tx
-                .update(bottles)
-                .set(bottleData)
-                .where(eq(bottles.id, bottle.id))
-                .returning()
-            )[0]
-          : bottle;
-      } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
-          res
-            .status(409)
-            .send({ error: "Bottle with name already exists under brand" });
-          return;
-        }
-        throw err;
-      }
-
       if (body.brand) {
         if (
           typeof body.brand === "number"
@@ -127,6 +106,27 @@ export default {
             bottleData.bottlerId = bottlerUpsert.id;
           }
         }
+      }
+
+      let newBottle: Bottle | undefined;
+      try {
+        newBottle = Object.values(bottleData).length
+          ? (
+              await tx
+                .update(bottles)
+                .set(bottleData)
+                .where(eq(bottles.id, bottle.id))
+                .returning()
+            )[0]
+          : bottle;
+      } catch (err: any) {
+        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+          res
+            .status(409)
+            .send({ error: "Bottle with name already exists under brand" });
+          return;
+        }
+        throw err;
       }
 
       const distillerIds: number[] = [];
