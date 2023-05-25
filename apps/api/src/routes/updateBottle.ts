@@ -60,14 +60,16 @@ export default {
       bottleData.statedAge = body.statedAge;
     }
     if (body.name && body.name !== bottle.name) {
-      bottleData.name = fixBottleName(body.name, body.statedAge);
+      const statedAge = bottleData.statedAge ?? bottle.statedAge;
+      bottleData.name = fixBottleName(body.name, statedAge);
       if (
         (bottleData.name.indexOf("-year-old") !== -1 ||
           bottleData.name.indexOf("-years-old") !== -1 ||
           bottleData.name.indexOf("year old") !== -1 ||
           bottleData.name.indexOf("years old") !== -1) &&
-        !(bottleData.statedAge ?? bottle.statedAge)
+        !statedAge
       ) {
+        console.log(bottleData.statedAge, bottle.statedAge);
         res
           .status(400)
           .send({ error: "You should include the Stated Age of the bottle" });

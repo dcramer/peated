@@ -99,3 +99,42 @@ test("clears category", async () => {
   expect(omit(bottle, "category")).toEqual(omit(bottle2, "category"));
   expect(bottle2.category).toBe(null);
 });
+
+test("requires age with matching name", async () => {
+  const bottle = await Fixtures.Bottle({ statedAge: null });
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      name: "Delicious 10-year-old",
+    },
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(400);
+});
+
+test("manipulates name to conform with age", async () => {
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      name: "Delicious 10",
+      statedAge: 10,
+    },
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(200);
+  const [bottle2] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(omit(bottle, "name", "statedAge")).toEqual(
+    omit(bottle2, "name", "statedAge"),
+  );
+  expect(bottle2.statedAge).toBe(10);
+  expect(bottle2.name).toBe("Delicious 10-year-old");
+});
