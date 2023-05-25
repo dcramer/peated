@@ -14,6 +14,9 @@ const NotificationCount = () => {
           filter: "unread",
         },
       }),
+    {
+      staleTime: 60 * 1000,
+    },
   );
 
   const unreadNotificationCount = (data && data.results.length) || 0;

@@ -15,6 +15,9 @@ export default function Following() {
   } = useSuspenseQuery(
     ["following"],
     (): Promise<Paginated<Friend>> => api.get("/following", {}),
+    {
+      staleTime: 5 * 60 * 1000,
+    },
   );
 
   const [myFollowStatus, setMyFollowStatus] = useState<
