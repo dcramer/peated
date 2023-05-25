@@ -13,21 +13,11 @@ import {
   changes,
   entities,
 } from "../db/schema";
+import { fixBottleName } from "../lib/api";
 import { upsertEntity } from "../lib/db";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireAuth } from "../middleware/auth";
-
-const fixBottleName = (name: string, age?: number | null): string => {
-  // try to ease UX and normalize common name components
-  if (age && name == `${age}`) return `${age}-year-old`;
-  return name
-    .replace(" years old", "-year-old")
-    .replace(" year old", "-year-old")
-    .replace("-years-old", "-year-old")
-    .replace(" years", "-year-old")
-    .replace(" year", "-year-old");
-};
 
 export default {
   method: "POST",

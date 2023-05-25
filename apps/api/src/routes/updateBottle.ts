@@ -13,6 +13,7 @@ import {
   changes,
   entities,
 } from "../db/schema";
+import { fixBottleName } from "../lib/api";
 import { upsertEntity } from "../lib/db";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
@@ -55,17 +56,29 @@ export default {
     const body = req.body;
     const bottleData: { [name: string]: any } = {};
 
+    if (body.statedAge !== undefined && body.statedAge !== bottle.statedAge) {
+      bottleData.statedAge = body.statedAge;
+    }
     if (body.name && body.name !== bottle.name) {
-      bottleData.name = body.name;
+      bottleData.name = fixBottleName(body.name, body.statedAge);
+      if (
+        (bottleData.name.indexOf("-year-old") !== -1 ||
+          bottleData.name.indexOf("-years-old") !== -1 ||
+          bottleData.name.indexOf("year old") !== -1 ||
+          bottleData.name.indexOf("years old") !== -1) &&
+        !(bottleData.statedAge ?? bottle.statedAge)
+      ) {
+        res
+          .status(400)
+          .send({ error: "You should include the Stated Age of the bottle" });
+        return;
+      }
     }
     if (body.series && body.series !== bottle.series) {
       bottleData.series = body.series;
     }
     if (body.category !== undefined && body.category !== bottle.category) {
       bottleData.category = body.category;
-    }
-    if (body.statedAge !== undefined && body.statedAge !== bottle.statedAge) {
-      bottleData.statedAge = body.statedAge;
     }
 
     const newBottle = await db.transaction(async (tx) => {

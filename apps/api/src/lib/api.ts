@@ -40,3 +40,14 @@ export async function getUserFromId(
     })) || null
   );
 }
+
+export const fixBottleName = (name: string, age?: number | null): string => {
+  // try to ease UX and normalize common name components
+  if (age && name == `${age}`) return `${age}-year-old`;
+  return name
+    .replace(" years old", "-year-old")
+    .replace(" year old", "-year-old")
+    .replace("-years-old", "-year-old")
+    .replace(" years", "-year-old")
+    .replace(" year", "-year-old");
+};
