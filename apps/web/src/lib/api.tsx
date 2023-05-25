@@ -22,7 +22,12 @@ export class ApiError extends Error {
   }
 }
 
-export class ApiUnavailable extends Error {}
+export class ApiUnavailable extends Error {
+  constructor(message: string, response: Response, data: any) {
+    super(data.error || message);
+    this.name = this.constructor.name;
+  }
+}
 
 export class ApiUnauthorized extends ApiError {}
 
