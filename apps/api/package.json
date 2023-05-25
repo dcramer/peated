@@ -37,7 +37,7 @@
     "commander": "^10.0.1",
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.1.0",
-    "drizzle-kit": "^0.18.0",
+    "drizzle-kit": "^0.18.1",
     "drizzle-orm": "^0.26.1",
     "fastify": "^4.15.0",
     "fastify-plugin": "^4.5.0",
