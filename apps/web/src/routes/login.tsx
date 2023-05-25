@@ -25,7 +25,6 @@ type BasicLoginForm = {
 
 const BasicLogin = () => {
   const { login } = useAuth();
-  const navigate = useNavigate();
   const [data, setData] = useState<BasicLoginForm>({});
   const [error, setError] = useState<string | null>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -85,9 +84,9 @@ const BasicLogin = () => {
 
 const GoogleLogin = () => {
   const { login } = useAuth();
-  const navigate = useNavigate();
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const googleLogin = useGoogleLogin({
     flow: "auth-code",
@@ -99,19 +98,30 @@ const GoogleLogin = () => {
           },
         });
         login(user, accessToken);
+        setLoading(false);
       } catch (err) {
         setError("There was an error communicating with the server.");
+        setLoading(false);
       }
     },
     onError: () => {
       console.log("Login Failed");
+      setLoading(false);
     },
   });
 
   return (
     <div>
       {error && <Alert>{error}</Alert>}
-      <Button fullWidth color="highlight" onClick={() => googleLogin()}>
+      <Button
+        fullWidth
+        color="highlight"
+        onClick={() => {
+          setLoading(true);
+          googleLogin();
+        }}
+        disabled={loading}
+      >
         <svg
           className="-ml-1 mr-2 h-4 w-4"
           aria-hidden="true"
@@ -143,7 +153,7 @@ export default function Login() {
 
   useEffect(() => {
     if (user?.id) {
-      navigate(redirectTo || !user.pictureUrl ? "/settings" : "/");
+      navigate(redirectTo || (!user.pictureUrl ? "/settings" : "/"));
     }
   }, [user?.id]);
 
