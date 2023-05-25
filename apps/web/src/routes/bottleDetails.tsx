@@ -134,7 +134,11 @@ export default function BottleDetails() {
             <h1 className="mb-2 truncate text-center text-3xl font-semibold leading-7 sm:text-left">
               <BottleName bottle={bottle} />
             </h1>
-            {bottle.series && <VintageName series={bottle.series} />}
+            {bottle.series && (
+              <div className="text-light">
+                <VintageName series={bottle.series} />
+              </div>
+            )}
             <BottleMetadata
               data={bottle}
               className="text-center text-sm text-slate-500 sm:text-left"
