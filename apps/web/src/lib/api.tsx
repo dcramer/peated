@@ -29,7 +29,12 @@ export class ApiUnavailable extends Error {
   }
 }
 
-export class ApiUnauthorized extends ApiError {}
+export class ApiUnauthorized extends ApiError {
+  constructor(message: string, response: Response, data: any) {
+    super(message, response, data);
+    this.name = this.constructor.name;
+  }
+}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const debounce = (fn: Function, ms = 300) => {
