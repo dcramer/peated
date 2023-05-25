@@ -68,8 +68,8 @@ export default {
         or(
           ilike(bottles.name, likeQuery),
           ilike(bottles.series, likeQuery),
-          sql<string>`${bottles.series} || ' ' || ${bottles.name} ILIKE ${likeQuery}`,
-          sql<string>`${bottles.name} || ' ' || ${bottles.series} ILIKE ${likeQuery}`,
+          sql`${bottles.series} || ' ' || ${bottles.name} ILIKE ${likeQuery}`,
+          sql`${bottles.name} || ' ' || ${bottles.series} ILIKE ${likeQuery}`,
           sql`EXISTS(
             SELECT 1
             FROM ${entities} e
