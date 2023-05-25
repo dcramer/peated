@@ -63,22 +63,32 @@ export default {
     const where: (SQL<unknown> | undefined)[] = [];
 
     if (query) {
+      const likeQuery = `%${query}%`;
       where.push(
         or(
-          ilike(bottles.name, `%${query}%`),
+          ilike(bottles.name, likeQuery),
+          ilike(bottles.series, likeQuery),
+          sql<string>`${bottles.series} || ' ' || ${bottles.name} ILIKE ${likeQuery}`,
+          sql<string>`${bottles.name} || ' ' || ${bottles.series} ILIKE ${likeQuery}`,
           sql`EXISTS(
             SELECT 1
             FROM ${entities} e
             JOIN ${bottlesToDistillers} b
             ON e.id = b.distiller_id AND b.bottle_id = ${bottles.id}
-            WHERE e.name ILIKE ${`%${query}%`}
+            WHERE e.name ILIKE ${likeQuery}
           )`,
+          // lol welcome to search
           sql`EXISTS(
             SELECT 1
             FROM ${entities} e
             WHERE e.id = ${bottles.brandId}
-              AND (e.name ILIKE ${`%${query}%`}
-              OR e.name || ' ' || ${bottles.name} ILIKE ${`%${query}%`})
+              AND (
+                e.name ILIKE ${likeQuery}
+                OR e.name || ' ' || ${bottles.name} ILIKE ${likeQuery}
+                OR e.name || ' ' || ${bottles.series} ILIKE ${likeQuery}
+                OR e.name || ' ' || ${bottles.name} || ' ' || ${bottles.series} ILIKE ${likeQuery}
+                OR e.name || ' ' || ${bottles.series} || ' ' || ${bottles.name} ILIKE ${likeQuery}
+              )
           )`,
         ),
       );

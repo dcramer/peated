@@ -13,6 +13,7 @@ import Layout from "../components/layout";
 import ListItem from "../components/listItem";
 import SearchHeader from "../components/searchHeader";
 import UserAvatar from "../components/userAvatar";
+import VintageName from "../components/vintageName";
 import useAuth from "../hooks/useAuth";
 import api, { debounce } from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
@@ -99,8 +100,8 @@ const BottleResultRow = ({
             <BottleName bottle={bottle} />
           </Link>
         </p>
-        <p className="mt-1 flex truncate text-sm leading-5 text-slate-500">
-          {bottle.brand.name}
+        <p className="text-light mt-1 flex truncate text-sm leading-5">
+          {bottle.series && <VintageName series={bottle.series} />}
         </p>
       </div>
       <div className="flex items-center gap-x-4">
