@@ -80,7 +80,8 @@ export default forwardRef<null | HTMLButtonElement | typeof Link, Props>(
     if (active) {
       textColor = "text-highlight";
     } else if (disabled) {
-      textColor = "text-slate-500";
+      textColor =
+        color === "highlight" ? "text-highlight-dark" : "text-slate-500";
     }
 
     if (to) {
