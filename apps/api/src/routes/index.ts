@@ -22,6 +22,7 @@ import getUser from "./getUser";
 import listBottleSuggestedTags from "./listBottleSuggestedTags";
 import listBottleTags from "./listBottleTags";
 import listBottles from "./listBottles";
+import listChanges from "./listChanges";
 import listCollections from "./listCollections";
 import listComments from "./listComments";
 import listEntities from "./listEntities";
@@ -75,6 +76,8 @@ export const router: FastifyPluginCallback = (
   fastify.route(addEntity);
   fastify.route(getEntity);
   fastify.route(updateEntity);
+
+  fastify.route(listChanges);
 
   fastify.route(listNotifications);
   fastify.route(deleteNotification);

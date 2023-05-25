@@ -50,7 +50,7 @@ export default ({
             to={`/users/${tasting.createdBy.username}`}
             className="truncate hover:underline"
           >
-            {tasting.createdBy.displayName}
+            {tasting.createdBy.username}
           </Link>
           <Link to={`/tastings/${tasting.id}`} className="hover:underline">
             <TimeSince

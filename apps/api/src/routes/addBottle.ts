@@ -140,6 +140,7 @@ export default {
         objectType: "bottle",
         objectId: bottle.id,
         createdById: req.user.id,
+        type: "add",
         data: JSON.stringify({
           ...bottle,
           distillerIds,

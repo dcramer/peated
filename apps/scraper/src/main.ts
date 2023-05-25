@@ -2,8 +2,8 @@ import { load as cheerio } from "cheerio";
 import { open } from "fs/promises";
 import { getUrl } from "./scraper";
 
-async function scrapeWhisky(id: number) {
-  console.log(`Processing Whisky ${id}`);
+async function scrapeBottle(id: number) {
+  console.log(`Processing Bottle ${id}`);
 
   const data = await getUrl(
     `https://www.whiskybase.com/whiskies/whisky/${id}/`,
@@ -28,38 +28,45 @@ async function scrapeWhisky(id: number) {
 
   const brandName = headerEl.find("a").first().text();
 
-  const maybeRegion = $("ul.breadcrumb > li:nth-child(3)").text();
-  const region = maybeRegion !== brandName ? maybeRegion : null;
-
-  bottle.votes = parseInt($(".votes-count").text(), 10);
+  bottle.votes = parseFloat(
+    $("#partial-aggregate-rating dd.votes-count").first().text(),
+  );
 
   bottle.brand = {
     name: brandName,
-    country: $("ul.breadcrumb > li:nth-child(2)").text(),
-    region,
   };
   bottle.name = parseName(brandName, headerEl.get()[0]?.lastChild?.data.trim());
 
-  bottle.category = mapCategory($("dt:contains('Category') + dd").text());
+  bottle.category = mapCategory(
+    $("dt:contains('Category') + dd").first().text(),
+  );
 
-  bottle.distiller = {
-    name: $("dt:contains('Distillery') + dd").text(),
-    country: bottle.brand.country,
-    region,
-  };
+  const distillerName = $("dt:contains('Distillery') + dd > a").first().text();
+  bottle.distiller = distillerName
+    ? {
+        name: distillerName,
+      }
+    : null;
 
-  bottle.bottler = {
-    name: $("dt:contains('Bottler') + dd").text(),
-  };
-  bottle.series = $("dt:contains('Bottling serie') + dd").text();
+  const bottlerName = $("dt:contains('Bottler') + dd > a").first().text();
+  bottle.bottler = bottlerName
+    ? {
+        name: bottlerName,
+      }
+    : null;
+  bottle.series = $("dt:contains('Bottling serie') + dd").first().text();
 
-  bottle.vintageYear = parseYear($("dt:contains('Vintage') + dd").text());
-  bottle.bottleYear = parseYear($("dt:contains('Bottled') + dd").text());
+  bottle.vintageYear = parseYear(
+    $("dt:contains('Vintage') + dd").first().text(),
+  );
+  bottle.bottleYear = parseYear(
+    $("dt:contains('Bottled') + dd").first().text(),
+  );
 
-  bottle.caskType = $("dt:contains('Casktype') + dd").text();
-  bottle.caskNumber = $("dt:contains('Casknumber') + dd").text();
+  bottle.caskType = $("dt:contains('Casktype') + dd").first().text();
+  bottle.caskNumber = $("dt:contains('Casknumber') + dd").first().text();
 
-  bottle.abv = parseAbv($("dt:contains('Strength') + dd").text());
+  bottle.abv = parseAbv($("dt:contains('Strength') + dd").first().text());
 
   console.log(`[Whisky ${id}] Identified as ${bottle.name} - ${bottle.series}`);
 
@@ -153,7 +160,7 @@ function parseName(brandName: string, bottleName: string) {
 function parseAbv(value: string) {
   if (!value || value === "") return;
   const amt = value.split(" % ")[0];
-  const abv = ((parseInt(amt, 10) * 10) / 100).toFixed(2);
+  const abv = parseFloat(amt);
   if (!abv) {
     console.warn(`Unable to parse abv: ${value}`);
     return;
@@ -185,7 +192,7 @@ async function scrapeTable(
   const $ = cheerio(data);
   const results: [string, number][] = [];
   $("tbody > tr").each(async (_, el) => {
-    const href = $("td:first-child > a", el).attr("href");
+    const href = $("td > a", el).attr("href");
     const bottleCount = parseInt($("td:nth-child(3)", el).text() || "0", 10);
     if (href) results.push([href, bottleCount]);
   });
@@ -256,21 +263,47 @@ async function scrapeBottlers() {
   saveResults("bottlers.json", results);
 }
 
-async function scrapeBottles() {
-  const year = 2023;
-  const tableUrl = `https://www.whiskybase.com/whiskies/new-releases?bottle_date_year=${year}&sort=whisky.name&direction=asc`;
-  const results: any[] = [];
-  await scrapeTable(tableUrl, async (url) => {
-    const match = url.match(/\/bottler\/(\d+)\//);
-    if (!match) return;
-    const id = parseInt(match[1], 10);
-    console.log(id);
-    // const result = await scrapeBottler(id);
-    // if (result) results.push(result);
+async function scrapeBottleTable(
+  url: string,
+  cb: (url: string) => Promise<void>,
+) {
+  const data = await getUrl(url);
+  const $ = cheerio(data);
+  const results: [string][] = [];
+  $("tbody > tr").each(async (_, el) => {
+    const href = $("td:nth-child(2) > a", el).attr("href");
+    if (href) results.push([href]);
   });
+  for (const result of results) {
+    await cb(...result);
+  }
+}
 
-  console.log(`Found ${results.length} bottlers`);
-  saveResults("bottlers.json", results);
+async function scrapeBottles() {
+  const years = [...Array(100).keys()].map((i) => 2023 - i);
+  const results: any[] = [];
+  for (const year of years) {
+    const tableUrl = `https://www.whiskybase.com/whiskies/new-releases?bottle_date_year=${year}&sort=whisky.name&direction=asc`;
+    console.log(tableUrl);
+    await scrapeBottleTable(tableUrl, async (url) => {
+      const match = url.match(/\/whisky\/(\d+)\//);
+      if (!match) return;
+      const id = parseInt(match[1], 10);
+      try {
+        const result = await scrapeBottle(id);
+        if (result.votes < 100) {
+          console.warn(`Discarding ${url} - too few votes`);
+          return;
+        }
+        if (result) results.push(result);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  }
+
+  console.log(`Found ${results.length} bottles`);
+  saveResults("bottles.json", results);
 }
 
 async function saveResults(filename: string, results: any) {
@@ -284,9 +317,10 @@ function sleep(ms: number) {
 }
 
 async function main() {
-  await scrapeDistillers();
-  await scrapeBrands();
-  await scrapeBottlers();
+  // await scrapeDistillers();
+  // await scrapeBrands();
+  // await scrapeBottlers();
+  await scrapeBottles();
 }
 
 main();

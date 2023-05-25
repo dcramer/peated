@@ -155,7 +155,25 @@ export const FollowSchema = z.object({
   followsBack: FollowStatusEnum,
 });
 
-const ObjectTypeEnum = z.enum(["follow", "toast", "comment"]);
+const ObjectTypeEnum = z.enum([
+  "follow",
+  "toast",
+  "comment",
+  "bottle",
+  "entity",
+]);
+
+const ChangeTypeEnum = z.enum(["add", "update", "delete"]);
+
+export const ChangeSchema = z.object({
+  id: z.number(),
+  objectId: z.number(),
+  objectType: ObjectTypeEnum,
+  type: ChangeTypeEnum,
+  createdBy: UserSchema.optional(),
+  createdAt: z.string().datetime(),
+  data: z.any(),
+});
 
 export const NotificationSchema = z.object({
   id: z.number(),

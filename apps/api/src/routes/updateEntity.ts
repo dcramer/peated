@@ -86,6 +86,7 @@ export default {
         objectType: "entity",
         objectId: newEntity.id,
         createdById: req.user.id,
+        type: "update",
         data: JSON.stringify({
           ...data,
         }),

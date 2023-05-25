@@ -113,6 +113,16 @@ export type Comment = {
 
 export type ObjectType = "bottle" | "entity" | "tasting" | "toast" | "follow";
 
+export type Change = {
+  id: number;
+  objectId: number;
+  objectType: "bottle" | "entity";
+  type: "add" | "update" | "delete";
+  createdAt: string;
+  createdBy?: User;
+  data: Record<string, any>;
+};
+
 type BaseNotification = {
   id: number;
   objectId: number;
@@ -148,6 +158,11 @@ export type CommentNotification = BaseNotification & {
   ref: TastingRef;
 };
 
+export type Notification =
+  | FollowNotification
+  | ToastNotification
+  | CommentNotification;
+
 export type Collection = {
   id: number;
   name: string;
@@ -163,11 +178,6 @@ export type CollectionBottle = {
   vintageYear?: number;
   barrel?: number;
 };
-
-export type Notification =
-  | FollowNotification
-  | ToastNotification
-  | CommentNotification;
 
 // locations are where you're tasting from (e.g. a bar, a distillery)
 export type Location = {

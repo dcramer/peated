@@ -25,6 +25,7 @@ import Root from "./routes/root";
 import Search from "./routes/search";
 import Settings from "./routes/settings";
 import TastingDetails from "./routes/tastingDetails";
+import Updates from "./routes/updates";
 
 export default function createRoutes() {
   return [
@@ -51,6 +52,10 @@ export default function createRoutes() {
               element: <BottleActivity />,
             },
           ],
+        },
+        {
+          path: "updates",
+          element: <Updates />,
         },
         {
           path: "search",

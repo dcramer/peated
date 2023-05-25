@@ -73,6 +73,9 @@ export default function Activity() {
             {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
           Local
         </Tabs.Item> */}
+            <Tabs.Item to="/updates" controlled>
+              Updates
+            </Tabs.Item>
           </Tabs>
           <QueryBoundary>
             <ActivityContent filter={filterParam} />

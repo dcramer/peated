@@ -182,19 +182,11 @@ export default {
         }
       }
 
-      if (body.brand && typeof body.brand !== "number") {
-        await tx.insert(changes).values({
-          objectType: "entity",
-          objectId: bottle.brandId,
-          createdById: req.user.id,
-          data: JSON.stringify(body.brand),
-        });
-      }
-
       await tx.insert(changes).values({
         objectType: "bottle",
         objectId: newBottle.id,
         createdById: req.user.id,
+        type: "update",
         data: JSON.stringify({
           ...bottleData,
           distillerIds: newDistillerIds,

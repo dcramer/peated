@@ -18,6 +18,7 @@ import {
   bottleTags,
   bottles,
   bottlesToDistillers,
+  changes,
   comments,
   entities,
   follows,
@@ -67,8 +68,8 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
   });
   if (existing) return existing;
 
-  return (
-    await db
+  return await db.transaction(async (tx) => {
+    const [entity] = await db
       .insert(entities)
       .values({
         name,
@@ -77,8 +78,19 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
         ...data,
         createdById: data.createdById || (await User()).id,
       })
-      .returning()
-  )[0];
+      .returning();
+
+    await tx.insert(changes).values({
+      objectId: entity.id,
+      objectType: "entity",
+      type: "add",
+      createdAt: entity.createdAt,
+      createdById: entity.createdById,
+      data: entity,
+    });
+
+    return entity;
+  });
 };
 
 export const Bottle = async ({
@@ -87,48 +99,59 @@ export const Bottle = async ({
 }: Partial<NewBottle> & {
   distillerIds?: number[];
 } = {}) => {
-  const [bottle] = await db
-    .insert(bottles)
-    .values({
-      name: toTitleCase(
-        choose([
-          faker.company.bsNoun(),
-          `${faker.company.bsAdjective()} ${faker.company.bsNoun()}`,
+  return await db.transaction(async (tx) => {
+    const [bottle] = await tx
+      .insert(bottles)
+      .values({
+        name: toTitleCase(
+          choose([
+            faker.company.bsNoun(),
+            `${faker.company.bsAdjective()} ${faker.company.bsNoun()}`,
+          ]),
+        ),
+        category: choose([
+          "blend",
+          "bourbon",
+          "rye",
+          "single_grain",
+          "single_malt",
+          "spirit",
+          undefined,
         ]),
-      ),
-      category: choose([
-        "blend",
-        "bourbon",
-        "rye",
-        "single_grain",
-        "single_malt",
-        "spirit",
-        undefined,
-      ]),
-      statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
-      ...data,
-      brandId: data.brandId || (await Entity()).id,
-      createdById: data.createdById || (await User()).id,
-    })
-    .returning();
+        statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
+        ...data,
+        brandId: data.brandId || (await Entity()).id,
+        createdById: data.createdById || (await User()).id,
+      })
+      .returning();
 
-  if (!distillerIds.length) {
-    for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
-      await db.insert(bottlesToDistillers).values({
-        bottleId: bottle.id,
-        distillerId: (await Entity({ type: ["distiller"] })).id,
-      });
+    if (!distillerIds.length) {
+      for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
+        await tx.insert(bottlesToDistillers).values({
+          bottleId: bottle.id,
+          distillerId: (await Entity({ type: ["distiller"] })).id,
+        });
+      }
+    } else {
+      for (const d of distillerIds) {
+        await tx.insert(bottlesToDistillers).values({
+          bottleId: bottle.id,
+          distillerId: d,
+        });
+      }
     }
-  } else {
-    for (const d of distillerIds) {
-      await db.insert(bottlesToDistillers).values({
-        bottleId: bottle.id,
-        distillerId: d,
-      });
-    }
-  }
 
-  return bottle;
+    await tx.insert(changes).values({
+      objectId: bottle.id,
+      objectType: "bottle",
+      type: "add",
+      createdAt: bottle.createdAt,
+      createdById: bottle.createdById,
+      data: bottle,
+    });
+
+    return bottle;
+  });
 };
 
 export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
@@ -160,6 +183,7 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
           },
         });
     }
+
     return result;
   });
 };

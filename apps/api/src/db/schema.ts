@@ -5,6 +5,7 @@ import {
   boolean,
   doublePrecision,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -523,13 +524,16 @@ export const objectTypeEnum = pgEnum("object_type", [
   "follow",
 ]);
 
+export const changeTypeEnum = pgEnum("type", ["add", "update", "delete"]);
+
 export const changes = pgTable("change", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
 
   objectId: bigint("object_id", { mode: "number" }).notNull(),
   objectType: objectTypeEnum("object_type").notNull(),
+  type: changeTypeEnum("type").default("add").notNull(),
 
-  data: text("data").notNull(),
+  data: jsonb("data").default({}).notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   createdById: bigint("created_by_id", { mode: "number" })
