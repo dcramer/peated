@@ -54,7 +54,7 @@ const ActivityContent = ({ filter }: { filter: string }) => {
 
   return (
     <>
-      {data.pages.length ? (
+      {data.pages.length > 1 || data.pages[0].results.length ? (
         data.pages.map((group, i) => (
           <Fragment key={i}>
             <TastingList values={group.results} />
