@@ -91,14 +91,14 @@ export default ({
     ? [props.value]
     : [];
 
-  // useEffect(() => {
-  //   const newValue = Array.isArray(props.value)
-  //     ? props.value
-  //     : props.value
-  //     ? [props.value]
-  //     : [];
-  //   setValue(newValue);
-  // }, [JSON.stringify(props.value)]);
+  useEffect(() => {
+    const newValue = Array.isArray(props.value)
+      ? props.value
+      : props.value
+      ? [props.value]
+      : [];
+    setValue(newValue);
+  }, [JSON.stringify(props.value)]);
 
   const [value, setValue] = useState<Option[]>(initialValue);
   const [previousValues, setPreviousValues] = useState<Option[]>(value);

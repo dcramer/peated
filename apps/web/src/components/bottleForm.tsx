@@ -5,7 +5,6 @@ import { BottleInputSchema } from "@peated/shared/schemas";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { toTitleCase } from "@peated/shared/lib/strings";
 import { PreviewBottleCard } from "../components/bottleCard";
 
 import EntityField from "../components/entityField";
@@ -201,7 +200,7 @@ export default ({
                   value
                     ? {
                         id: value,
-                        name: toTitleCase(value),
+                        name: formatCategoryName(value),
                       }
                     : undefined
                 }
