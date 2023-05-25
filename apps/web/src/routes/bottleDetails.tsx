@@ -135,7 +135,7 @@ export default function BottleDetails() {
               <BottleName bottle={bottle} />
             </h1>
             {bottle.series && (
-              <div className="text-light">
+              <div className="text-light text-center sm:text-left">
                 <VintageName series={bottle.series} />
               </div>
             )}
