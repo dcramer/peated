@@ -19,6 +19,7 @@ export default forwardRef<HTMLInputElement, Props>(
               inputStyles,
               className || "",
             )}
+            ref={ref}
             {...props}
           />
           <span className="flex select-none items-center text-slate-700 sm:text-sm">
