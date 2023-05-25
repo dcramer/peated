@@ -69,7 +69,7 @@ export default {
     }
 
     const newBottle = await db.transaction(async (tx) => {
-      let brand: Brand | null = null;
+      let brand: Entity | null = null;
       if (body.brand) {
         if (
           typeof body.brand === "number"
