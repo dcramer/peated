@@ -40,12 +40,12 @@ export default function EditEntity() {
 
   const saveEntity = useMutation({
     mutationFn: async (data: FormSchemaType) => {
-      await api.put(`/entities/${entityId}`, {
+      return await api.put(`/entities/${entityId}`, {
         data,
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["bottles", entityId]);
+    onSuccess: (newEntity) => {
+      queryClient.setQueryData(["entities", entityId], newEntity);
     },
   });
 
