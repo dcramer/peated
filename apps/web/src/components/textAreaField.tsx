@@ -1,6 +1,5 @@
 import { ReactNode, forwardRef } from "react";
 
-import { FieldError } from "react-hook-form";
 import FormField from "./formField";
 import TextArea from "./textArea";
 
@@ -10,7 +9,9 @@ type Props = {
   required?: boolean;
   children?: ReactNode;
   className?: string;
-  error?: FieldError;
+  error?: {
+    message?: string;
+  };
 } & React.ComponentProps<typeof TextArea>;
 
 export default forwardRef<HTMLTextAreaElement, Props>(

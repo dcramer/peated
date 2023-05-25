@@ -1,6 +1,5 @@
 import { ReactNode, forwardRef } from "react";
 
-import { FieldError } from "react-hook-form";
 import FormField from "./formField";
 import TextInput from "./textInput";
 
@@ -9,7 +8,9 @@ type Props = {
   helpText?: string;
   required?: boolean;
   children?: ReactNode;
-  error?: FieldError;
+  error?: {
+    message?: string;
+  };
   className?: string;
 } & React.ComponentProps<typeof TextInput>;
 

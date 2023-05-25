@@ -1,7 +1,6 @@
 import { ReactNode, forwardRef, useEffect, useRef, useState } from "react";
 
 import { PhotoIcon } from "@heroicons/react/20/solid";
-import { FieldError } from "react-hook-form";
 import setRef from "../lib/setRef";
 import FormField from "./formField";
 import ImageEditorModal from "./imageEditorModal";
@@ -17,7 +16,9 @@ type Props = Omit<
   children?: ReactNode;
   className?: string;
   value?: string | null | undefined;
-  error?: FieldError;
+  error?: {
+    message?: string;
+  };
   onChange: (value: HTMLCanvasElement | null) => void;
   imageWidth?: number;
   imageHeight?: number;
