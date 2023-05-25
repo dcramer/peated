@@ -1,7 +1,7 @@
 import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import Button from "../components/button";
 import Chip from "../components/chip";
 import Layout from "../components/layout";
@@ -25,12 +25,11 @@ type UserDetails = User & {
 
 export default function Profile() {
   const { user: currentUser, logout } = useAuth();
-  const { userId } = useParams();
-  const navigate = useNavigate();
+  const { username } = useParams();
 
   const { data } = useSuspenseQuery(
-    ["user", userId],
-    (): Promise<UserDetails> => api.get(`/users/${userId}`),
+    ["users", username],
+    (): Promise<UserDetails> => api.get(`/users/${username}`),
   );
   const [user, setUser] = useState<UserDetails>(data);
   const [followStatus, setFollowStatus] = useState(data.followStatus);

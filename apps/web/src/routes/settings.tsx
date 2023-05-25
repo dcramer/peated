@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
+import { XMarkIcon } from "@heroicons/react/20/solid";
+import { useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
@@ -20,10 +22,11 @@ type FormData = {
 };
 
 export default function Settings() {
-  const { updateUser } = useRequiredAuth();
+  const { user: currentUser, updateUser } = useRequiredAuth();
+  const queryClient = useQueryClient();
 
   const { data: user } = useSuspenseQuery(
-    ["user"],
+    ["users", currentUser.username],
     (): Promise<User> => api.get(`/users/me`),
     { cacheTime: 0 },
   );
@@ -58,21 +61,12 @@ export default function Settings() {
         } else {
           newAvatar = {};
         }
-        // const newAvatar =
-        //   picture !== user.pictureUrl
-        //     ? await api.post("/users/me/avatar", {
-        //         data: {
-        //           picture,
-        //         },
-        //       })
-        //     : {};
         updateUser({
           ...newUser,
           ...newAvatar,
         });
-        navigate(`/users/${newUser.username}`, {
-          replace: true,
-        });
+        await queryClient.invalidateQueries(["users", currentUser.username]);
+        navigate(`/users/${newUser.username}`);
       } catch (err) {
         if (err instanceof ApiError) {
           setError(err.message);
@@ -92,7 +86,8 @@ export default function Settings() {
           <FormHeader
             title="Settings"
             onSave={onSubmit}
-            onClose={() => navigate("/")}
+            icon={<XMarkIcon className="h-full w-full" />}
+            onClose={() => navigate(`/users/${currentUser.username}`)}
           />
         </Header>
       }

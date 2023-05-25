@@ -74,7 +74,7 @@ export default function createRoutes() {
           element: <Login />,
         },
         {
-          path: "users/:userId",
+          path: "users/:username",
           element: <Profile />,
           children: [
             {
