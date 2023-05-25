@@ -7,6 +7,7 @@ import config from "./config";
 import { router } from "./routes";
 
 import { initSentry } from "./instruments";
+import { injectAuth } from "./middleware/auth";
 import FastifySentry from "./sentryPlugin";
 
 initSentry({
@@ -65,6 +66,8 @@ export default async function buildFastify(options = {}) {
 
   app.register(router);
   app.register(FastifySentry);
+
+  app.addHook("preHandler", injectAuth);
 
   app.setErrorHandler(function (error, request, reply) {
     const { validation, validationContext } = error;

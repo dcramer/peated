@@ -13,7 +13,6 @@ import { getDefaultCollection } from "../lib/db";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { CollectionBottleSerializer } from "../lib/serializers/collectionBottle";
-import { injectAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -41,7 +40,6 @@ export default {
       ),
     },
   },
-  preHandler: [injectAuth],
   handler: async (req, res) => {
     const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
     const collection =

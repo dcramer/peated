@@ -36,11 +36,18 @@ const getUser = async (req: any) => {
   return user;
 };
 
-// TODO: need to chain these to DRY it up
-export const requireAuth: onRequestHookHandler = async (req, res) => {
+// XXX: this happens globally at the app level
+export const injectAuth: onRequestHookHandler = async (req, res) => {
   const user = await getUser(req);
   req.user = user;
-  if (!user) {
+};
+
+export const requireAuth: onRequestHookHandler = async (req, res) => {
+  if (req.user === undefined) {
+    const user = await getUser(req);
+    req.user = user;
+  }
+  if (!req.user) {
     const auth = req.headers["authorization"];
     const token = auth?.replace("Bearer ", "");
 
@@ -50,16 +57,12 @@ export const requireAuth: onRequestHookHandler = async (req, res) => {
     });
   }
 };
-
-export const injectAuth: onRequestHookHandler = async (req, res) => {
-  const user = await getUser(req);
-  req.user = user;
-};
-
 export const requireAdmin: onRequestHookHandler = async (req, res) => {
-  const user = await getUser(req);
-  req.user = user;
-  if (!user) {
+  if (req.user === undefined) {
+    const user = await getUser(req);
+    req.user = user;
+  }
+  if (!req.user) {
     return res
       .status(401)
       .send({ error: "Unauthorized!", name: "invalid_token" });
@@ -73,9 +76,11 @@ export const requireAdmin: onRequestHookHandler = async (req, res) => {
 };
 
 export const requireMod: onRequestHookHandler = async (req, res) => {
-  const user = await getUser(req);
-  req.user = user;
-  if (!user) {
+  if (req.user === undefined) {
+    const user = await getUser(req);
+    req.user = user;
+  }
+  if (!req.user) {
     return res
       .status(401)
       .send({ error: "Unauthorized!", name: "invalid_token" });

@@ -9,7 +9,6 @@ import { comments } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { CommentSerializer } from "../lib/serializers/comment";
-import { injectAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -31,7 +30,6 @@ export default {
       ),
     },
   },
-  preHandler: [injectAuth],
   handler: async (req, res) => {
     const page = req.query.page || 1;
     const limit = 100;
