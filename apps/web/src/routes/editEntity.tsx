@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
@@ -7,6 +6,7 @@ import { z } from "zod";
 import { toTitleCase } from "@peated/shared/lib/strings";
 import { EntityInputSchema } from "@peated/shared/schemas";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CountryField from "../components/countryField";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
@@ -16,7 +16,7 @@ import Layout from "../components/layout";
 import SelectField from "../components/selectField";
 import TextField from "../components/textField";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
-import api, { ApiError } from "../lib/api";
+import api from "../lib/api";
 import { Entity } from "../types";
 
 const entityTypes = [
@@ -29,6 +29,7 @@ type FormSchemaType = z.infer<typeof EntityInputSchema>;
 
 export default function EditEntity() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { entityId } = useParams();
   const { data: entity } = useSuspenseQuery(
@@ -36,6 +37,17 @@ export default function EditEntity() {
     (): Promise<Entity> => api.get(`/entities/${entityId}`),
     { cacheTime: 0 },
   );
+
+  const saveEntity = useMutation({
+    mutationFn: async (data: FormSchemaType) => {
+      await api.put(`/entities/${entityId}`, {
+        data,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["bottles", entityId]);
+    },
+  });
 
   const {
     control,
@@ -52,22 +64,12 @@ export default function EditEntity() {
     },
   });
 
-  const [error, setError] = useState<string | undefined>();
-
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    try {
-      await api.put(`/entities/${entity.id}`, {
-        data,
-      });
-      navigate(`/entities/${entity.id}`);
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        console.error(err);
-        setError("Internal error");
-      }
-    }
+    await saveEntity.mutateAsync(data, {
+      onSuccess: () => navigate(`/entities/${entityId}`),
+    });
+
+    await saveEntity.mutateAsync(data);
   };
 
   return (
@@ -85,7 +87,9 @@ export default function EditEntity() {
       footer={null}
     >
       <form className="sm:mx-16" onSubmit={handleSubmit(onSubmit)}>
-        {error && <FormError values={[error]} />}
+        {saveEntity.isError && (
+          <FormError values={[(saveEntity.error as Error).message]} />
+        )}
 
         <Fieldset>
           <TextField

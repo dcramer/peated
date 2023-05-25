@@ -26,8 +26,9 @@ export default function EditBottle() {
       await api.put(`/bottles/${bottleId}`, {
         data,
       });
-      await queryClient.invalidateQueries(["bottles", bottleId]);
-      navigate(`/bottles/${bottleId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["bottles", bottleId]);
     },
   });
 
@@ -35,8 +36,10 @@ export default function EditBottle() {
 
   return (
     <BottleForm
-      onSubmit={(data) => {
-        saveBottle.mutate(data);
+      onSubmit={async (data) => {
+        await saveBottle.mutateAsync(data, {
+          onSuccess: () => navigate(`/bottles/${bottleId}`),
+        });
       }}
       initialData={bottle}
       title="Edit Bottle"

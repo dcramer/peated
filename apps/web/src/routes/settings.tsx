@@ -16,7 +16,7 @@ import Layout from "../components/layout";
 import TextField from "../components/textField";
 import { useRequiredAuth } from "../hooks/useAuth";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
-import api, { ApiError } from "../lib/api";
+import api from "../lib/api";
 import { toBlob } from "../lib/blobs";
 import type { User } from "../types";
 
@@ -36,41 +36,32 @@ export default function Settings() {
 
   const saveUser = useMutation({
     mutationFn: async (data: FormSchemaType) => {
-      try {
-        const newUser = await api.put("/users/me", {
-          data,
+      const newUser = await api.put("/users/me", {
+        data,
+      });
+      let newAvatar: any;
+      if (picture) {
+        const blob = await toBlob(picture);
+        newAvatar = await api.post("/users/me/avatar", {
+          data: {
+            picture: blob,
+          },
         });
-        let newAvatar: any;
-        if (picture) {
-          const blob = await toBlob(picture);
-          newAvatar = await api.post("/users/me/avatar", {
-            data: {
-              picture: blob,
-            },
-          });
-        } else {
-          newAvatar = {};
-        }
-        updateUser({
-          ...newUser,
-          ...newAvatar,
-        });
-        await queryClient.invalidateQueries(["users", currentUser.username]);
-        navigate(`/users/${newUser.username}`);
-      } catch (err) {
-        if (err instanceof ApiError) {
-          setError(err.message);
-        } else {
-          console.error(err);
-          setError("Internal error");
-        }
+      } else {
+        newAvatar = {};
       }
+      updateUser({
+        ...newUser,
+        ...newAvatar,
+      });
+      return newUser;
+    },
+    onSuccess: (newUser) => {
+      queryClient.invalidateQueries(["users", newUser.username]);
     },
   });
 
   const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
-  const [error, setError] = useState<string | undefined>();
-
   const {
     register,
     handleSubmit,
@@ -80,8 +71,10 @@ export default function Settings() {
     defaultValues: user,
   });
 
-  const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    saveUser.mutate(data);
+  const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
+    await saveUser.mutateAsync(data, {
+      onSuccess: (newUser) => navigate(`/users/${newUser.username}`),
+    });
   };
 
   return (
@@ -100,7 +93,9 @@ export default function Settings() {
       }
     >
       <form className="sm:mx-16" onSubmit={handleSubmit(onSubmit)}>
-        {error && <FormError values={[error]} />}
+        {saveUser.isError && (
+          <FormError values={[(saveUser.error as Error).message]} />
+        )}
 
         <Fieldset>
           <TextField
