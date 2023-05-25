@@ -1,8 +1,12 @@
 import { useNavigate } from "react-router-dom";
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import { useQueryClient } from "@tanstack/react-query";
-import { FormEvent, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UserInputSchema } from "@peated/shared/schemas";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
@@ -16,10 +20,7 @@ import api, { ApiError } from "../lib/api";
 import { toBlob } from "../lib/blobs";
 import type { User } from "../types";
 
-type FormData = {
-  username: string;
-  displayName?: string;
-};
+type FormSchemaType = z.infer<typeof UserInputSchema>;
 
 export default function Settings() {
   const { user: currentUser, updateUser } = useRequiredAuth();
@@ -32,23 +33,12 @@ export default function Settings() {
   );
 
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<FormData>({
-    username: user.username,
-    displayName: user.displayName,
-  });
-  const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
 
-  const [error, setError] = useState<string | undefined>();
-
-  const onSubmit = (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
-    e.preventDefault();
-    (async () => {
+  const saveUser = useMutation({
+    mutationFn: async (data: FormSchemaType) => {
       try {
         const newUser = await api.put("/users/me", {
-          data: {
-            displayName: formData.displayName,
-            username: formData.username,
-          },
+          data,
         });
         let newAvatar: any;
         if (picture) {
@@ -75,7 +65,23 @@ export default function Settings() {
           setError("Internal error");
         }
       }
-    })();
+    },
+  });
+
+  const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
+  const [error, setError] = useState<string | undefined>();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormSchemaType>({
+    resolver: zodResolver(UserInputSchema),
+    defaultValues: user,
+  });
+
+  const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
+    saveUser.mutate(data);
   };
 
   return (
@@ -85,34 +91,29 @@ export default function Settings() {
         <Header>
           <FormHeader
             title="Settings"
-            onSave={onSubmit}
+            onSave={handleSubmit(onSubmit)}
             icon={<XMarkIcon className="h-full w-full" />}
+            saveDisabled={isSubmitting}
             onClose={() => navigate(`/users/${currentUser.username}`)}
           />
         </Header>
       }
     >
-      <form className="sm:mx-16">
+      <form className="sm:mx-16" onSubmit={handleSubmit(onSubmit)}>
         {error && <FormError values={[error]} />}
 
         <Fieldset>
           <TextField
-            name="displayName"
+            {...register("displayName")}
+            error={errors.displayName}
             label="Name"
-            value={formData.displayName}
             required
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
           />
           <TextField
-            name="username"
+            {...register("username")}
+            error={errors.username}
             label="Username"
-            value={formData.username}
             required
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
           />
           <ImageField
             name="picture"
