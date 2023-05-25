@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { ReactComponent as Glyph } from "../assets/glyph.svg";
 import EmptyActivity from "../components/emptyActivity";
@@ -9,6 +9,9 @@ import TastingList from "../components/tastingList";
 import api from "../lib/api";
 import type { Paginated, Tasting } from "../types";
 
+import { Fragment } from "react";
+import { useEventListener } from "usehooks-ts";
+import Spinner from "../components/spinner";
 import useAuth from "../hooks/useAuth";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 
@@ -20,22 +23,45 @@ const mapFilterParam = (value: string | null) => {
 };
 
 const ActivityContent = ({ filter }: { filter: string }) => {
-  const { data } = useQuery(
-    ["tastings", filter],
-    (): Promise<Paginated<Tasting>> =>
-      api.get("/tastings", {
-        query: {
-          filter,
-        },
-      }),
-  );
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
+    useInfiniteQuery(
+      ["tastings", { filter }],
+      ({ pageParam = 0 }): Promise<Paginated<Tasting>> =>
+        api.get("/tastings", {
+          query: {
+            page: pageParam,
+            filter,
+          },
+        }),
+      {
+        getNextPageParam: (lastPage, pages) => lastPage.rel.nextPage,
+      },
+    );
+
+  console.log(hasNextPage);
+
+  const onScroll = () => {
+    if (!hasNextPage) return;
+    const scrollTop = document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = document.documentElement.clientHeight;
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      fetchNextPage();
+    }
+  };
+
+  useEventListener("scroll", onScroll);
 
   if (!data) return null;
 
   return (
     <>
-      {data.results.length > 0 ? (
-        <TastingList values={data.results} />
+      {data.pages.length ? (
+        data.pages.map((group, i) => (
+          <Fragment key={i}>
+            <TastingList values={group.results} />
+          </Fragment>
+        ))
       ) : (
         <EmptyActivity to="/search?tasting">
           <Glyph className="h-16 w-16" />
@@ -46,6 +72,7 @@ const ActivityContent = ({ filter }: { filter: string }) => {
           </div>
         </EmptyActivity>
       )}
+      <div>{isFetching && !isFetchingNextPage ? <Spinner /> : null}</div>
     </>
   );
 };

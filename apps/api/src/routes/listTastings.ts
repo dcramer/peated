@@ -19,6 +19,7 @@ export default {
       type: "object",
       properties: {
         page: { type: "number" },
+        limit: { type: "number", minimum: 1, maximum: 100 },
         bottle: { type: "number" },
         user: { oneOf: [{ type: "number" }, { const: "me" }] },
         filter: { type: "string", enum: ["global", "friends", "local"] },
@@ -36,7 +37,7 @@ export default {
   handler: async (req, res) => {
     const page = req.query.page || 1;
 
-    const limit = 100;
+    const limit = req.query.limit || 25;
     const offset = (page - 1) * limit;
 
     const where: SQL<unknown>[] = [];
@@ -96,6 +97,7 @@ export default {
   ServerResponse,
   {
     Querystring: {
+      limit?: number;
       page?: number;
       bottle?: number;
       user?: number | "me";
