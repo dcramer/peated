@@ -40,11 +40,7 @@ export const PreviewBottleCard = ({
             "Unknown Bottle"
           )}
         </p>
-        {data.series && (
-          <div className="text-light">
-            <VintageName series={data.series} />
-          </div>
-        )}
+        {data.series && <VintageName series={data.series} />}
       </div>
       <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
         <p>{data.category ? formatCategoryName(data.category) : null}</p>

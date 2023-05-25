@@ -13,6 +13,7 @@ import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
 import { TagDistribution } from "../components/tagDistribution";
 import TimeSince from "../components/timeSince";
+import VintageName from "../components/vintageName";
 import useAuth from "../hooks/useAuth";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
@@ -133,6 +134,7 @@ export default function BottleDetails() {
             <h1 className="mb-2 truncate text-center text-3xl font-semibold leading-7 sm:text-left">
               <BottleName bottle={bottle} />
             </h1>
+            {bottle.series && <VintageName series={bottle.series} />}
             <BottleMetadata
               data={bottle}
               className="text-center text-sm text-slate-500 sm:text-left"
