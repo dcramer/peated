@@ -220,3 +220,5 @@ export type PolymorphicAsProp<E extends ElementType> = {
 export type PolymorphicProps<E extends ElementType> = PropsWithChildren<
   ComponentPropsWithoutRef<E> & PolymorphicAsProp<E>
 >;
+
+export type Tag = { tag: string; count: number };

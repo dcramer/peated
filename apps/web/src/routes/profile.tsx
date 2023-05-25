@@ -7,11 +7,12 @@ import Chip from "../components/chip";
 import Layout from "../components/layout";
 import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
+import { TagDistribution } from "../components/tagDistribution";
 import UserAvatar from "../components/userAvatar";
 import useAuth from "../hooks/useAuth";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
 import api from "../lib/api";
-import type { FollowStatus, User } from "../types";
+import type { FollowStatus, Paginated, Tag, User } from "../types";
 
 type UserDetails = User & {
   followStatus?: FollowStatus;
@@ -21,6 +22,20 @@ type UserDetails = User & {
     contributions: number;
     collected: number;
   };
+};
+
+const UserTagDistribution = ({ userId }: { userId: number }) => {
+  const {
+    data: { results, totalCount },
+  } = useSuspenseQuery(
+    ["users", userId, "tags"],
+    (): Promise<Paginated<Tag> & { totalCount: number }> =>
+      api.get(`/users/${userId}/tags`),
+  );
+
+  if (!results.length) return null;
+
+  return <TagDistribution tags={results} totalCount={totalCount} />;
 };
 
 export default function Profile() {
@@ -154,6 +169,9 @@ export default function Profile() {
           )}
         </div>
       </div>
+
+      <UserTagDistribution userId={user.id} />
+
       <Tabs fullWidth>
         <Tabs.Item to={`/users/${user.username}`} controlled>
           Activity

@@ -9,6 +9,7 @@ import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { bottles, collectionBottles, entities } from "../db/schema";
+import { getUserFromId } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
@@ -28,7 +29,9 @@ export default {
     params: {
       type: "object",
       properties: {
-        userId: { anyOf: [{ type: "number" }, { const: "me" }] },
+        userId: {
+          anyOf: [{ type: "number" }, { type: "string" }, { const: "me" }],
+        },
         collectionId: { anyOf: [{ type: "number" }, { const: "default" }] },
       },
     },
@@ -41,14 +44,18 @@ export default {
     },
   },
   handler: async (req, res) => {
-    const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
+    const user = await getUserFromId(db, req.params.userId, req.user);
+    if (!user) {
+      return res.status(404).send({ error: "Not found" });
+    }
+
     const collection =
       req.params.collectionId === "default"
-        ? await getDefaultCollection(db, userId)
+        ? await getDefaultCollection(db, user.id)
         : await db.query.collections.findFirst({
             where: (collections, { and, eq }) =>
               and(
-                eq(collections.createdById, userId),
+                eq(collections.createdById, user.id),
                 eq(collections.id, req.params.collectionId as number),
               ),
           });
@@ -105,7 +112,7 @@ export default {
   ServerResponse,
   {
     Params: {
-      userId: number | "me";
+      userId: number | string | "me";
       collectionId: number | "default";
     };
     Querystring: {

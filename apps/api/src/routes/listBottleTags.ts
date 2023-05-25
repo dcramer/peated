@@ -26,6 +26,7 @@ export default {
               count: z.number(),
             }),
           ),
+          totalCount: z.number(),
         }),
       ),
     },
@@ -43,10 +44,14 @@ export default {
     const results = await db.query.bottleTags.findMany({
       where: (bottleTags, { eq }) => eq(bottleTags.bottleId, bottle.id),
       orderBy: (bottleTags, { desc }) => desc(bottleTags.count),
+      limit: 25,
     });
+
+    const totalCount = results.reduce((acc, row) => acc + row.count, 0);
 
     res.send({
       results,
+      totalCount,
     });
   },
 } as RouteOptions<

@@ -2,7 +2,6 @@ import { Link, Outlet, useParams } from "react-router-dom";
 
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { toTitleCase } from "@peated/shared/lib/strings";
 import { Suspense, useState } from "react";
 import { ReactComponent as BottleIcon } from "../assets/bottle.svg";
 import AddToCollectionModal from "../components/addToCollectionModal";
@@ -12,6 +11,7 @@ import Button from "../components/button";
 import Layout from "../components/layout";
 import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
+import { TagDistribution } from "../components/tagDistribution";
 import TimeSince from "../components/timeSince";
 import useAuth from "../hooks/useAuth";
 import { useSuspenseQuery } from "../hooks/useSuspenseQuery";
@@ -90,85 +90,18 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
 
 type Tag = { tag: string; count: number };
 
-const TagDistribution = ({ bottleId }: { bottleId: number }) => {
+const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
   const {
-    data: { results },
+    data: { results, totalCount },
   } = useSuspenseQuery(
     ["bottles", bottleId, "tags"],
-    (): Promise<Paginated<Tag>> => api.get(`/bottles/${bottleId}/tags`),
+    (): Promise<Paginated<Tag> & { totalCount: number }> =>
+      api.get(`/bottles/${bottleId}/tags`),
   );
 
   if (!results.length) return null;
 
-  const total = results.reduce((acc, d) => acc + d.count, 0);
-  let pctRemaining = 100;
-
-  const colorNames = [
-    "bg-slate-600 text-white",
-    "bg-slate-700 text-white",
-    "bg-slate-800 text-white",
-    "bg-slate-900 text-white",
-    "bg-slate-950 text-white",
-  ];
-
-  const [active, setActive] = useState<Tag | null>(null);
-
-  return (
-    <div>
-      <div className="relative mb-4 flex h-6 w-full flex-row bg-slate-500 text-xs font-bold">
-        {results.slice(0, 4).map((t, index) => {
-          const pct = (t.count / total) * 100;
-          pctRemaining -= pct;
-          return (
-            <Link
-              key={t.tag}
-              title={t.tag}
-              className={`${colorNames[index]} flex h-6 items-center justify-center`}
-              style={{ minWidth: `${pct}%` }}
-              to={`/bottles?tag=${encodeURIComponent(t.tag)}`}
-              onMouseEnter={(e) => setActive(t)}
-              onMouseLeave={(e) => setActive(null)}
-            >
-              {pct > 15 && (
-                <span className={pct < 50 ? "hidden px-2 sm:block" : "px-2"}>
-                  {t.tag}
-                </span>
-              )}
-            </Link>
-          );
-        })}
-        {results.length > 4 && (
-          <div
-            className={`${colorNames[4]} flex h-6 items-center justify-center`}
-            style={{ minWidth: `${pctRemaining}%` }}
-            onMouseEnter={(e) =>
-              setActive({
-                tag: "Other",
-                count: (total * pctRemaining) / 100,
-              })
-            }
-            onMouseLeave={(e) => setActive(null)}
-          >
-            {pctRemaining > 15 && (
-              <span
-                className={pctRemaining < 50 ? "hidden px-2 sm:block" : "px-2"}
-              >
-                Other
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-      <div className="text-light flex h-5 items-center justify-center text-sm">
-        {!!active && (
-          <span>
-            {toTitleCase(active.tag)} &mdash;{" "}
-            {Math.round((active.count / total) * 100)}%
-          </span>
-        )}
-      </div>
-    </div>
-  );
+  return <TagDistribution tags={results} totalCount={totalCount} />;
 };
 
 export default function BottleDetails() {
@@ -241,7 +174,7 @@ export default function BottleDetails() {
         </div>
 
         <Suspense>
-          <TagDistribution bottleId={bottle.id} />
+          <BottleTagDistribution bottleId={bottle.id} />
         </Suspense>
 
         <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:text-left">

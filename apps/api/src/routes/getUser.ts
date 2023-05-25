@@ -6,13 +6,12 @@ import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import {
-  User,
   changes,
   collectionBottles,
   collections,
   tastings,
-  users,
 } from "../db/schema";
+import { getUserFromId } from "../lib/api";
 import { serialize } from "../lib/serializers";
 import { UserSerializer } from "../lib/serializers/user";
 
@@ -43,21 +42,7 @@ export default {
     },
   },
   handler: async (req, res) => {
-    let user: User | undefined;
-    if (req.params.userId === "me") {
-      user = req.user;
-    } else if (typeof req.params.userId === "number") {
-      [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, req.params.userId));
-    } else {
-      [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.username, req.params.userId));
-    }
-
+    const user = await getUserFromId(db, req.params.userId, req.user);
     if (!user) {
       return res.status(404).send({ error: "Not found" });
     }

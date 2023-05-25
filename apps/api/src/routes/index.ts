@@ -31,6 +31,7 @@ import listFollowing from "./listFollowing";
 import listNotifications from "./listNotifications";
 import listTastings from "./listTastings";
 import listUserCollectionBottles from "./listUserCollectionBottles";
+import listUserTags from "./listUserTags";
 import listUsers from "./listUsers";
 import updateBottle from "./updateBottle";
 import updateEntity from "./updateEntity";
@@ -102,6 +103,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(deleteUserFollow);
 
   fastify.route(listUserCollectionBottles);
+  fastify.route(listUserTags);
 
   fastify.route(listCollections);
   fastify.route(addCollectionBottle);
