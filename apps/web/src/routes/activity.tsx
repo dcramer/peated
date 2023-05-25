@@ -11,6 +11,7 @@ import type { Paginated, Tasting } from "../types";
 
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
+import FloatingButton from "../components/floatingButton";
 import Spinner from "../components/spinner";
 import useAuth from "../hooks/useAuth";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
@@ -103,6 +104,9 @@ export default function Activity() {
             </Tabs.Item>
           </Tabs>
           <QueryBoundary>
+            <div className="hidden sm:block">
+              <FloatingButton to="/search?tasting" />
+            </div>
             <ActivityContent filter={filterParam} />
           </QueryBoundary>
         </>
