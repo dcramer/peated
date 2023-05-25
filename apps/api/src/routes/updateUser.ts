@@ -50,7 +50,7 @@ export default {
       data.displayName = body.displayName;
     }
 
-    if (body.username !== undefined && body.displayName !== user.displayName) {
+    if (body.username !== undefined && body.username !== user.username) {
       data.username = body.username.toLowerCase();
       if (data.username === "me") {
         return res.status(400).send({ error: "Invalid username" });
