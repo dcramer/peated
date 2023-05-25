@@ -37,7 +37,7 @@ export default ({
               e.stopPropagation();
               return handleSubmit(onSubmit)(e);
             }}
-            className="max-w-md"
+            className="max-w-md flex-1"
           >
             <Fieldset>
               <p className="mb-4">{createDialogHelpText}</p>
