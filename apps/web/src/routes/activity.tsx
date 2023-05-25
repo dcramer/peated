@@ -38,8 +38,6 @@ const ActivityContent = ({ filter }: { filter: string }) => {
       },
     );
 
-  console.log(hasNextPage);
-
   const onScroll = () => {
     if (!hasNextPage) return;
     const scrollTop = document.documentElement.scrollTop;
