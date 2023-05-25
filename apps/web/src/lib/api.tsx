@@ -23,8 +23,8 @@ export class ApiError extends Error {
 }
 
 export class ApiUnavailable extends Error {
-  constructor(message: string, response: Response, data: any) {
-    super(data.error || message);
+  constructor(message: string) {
+    super(message);
     this.name = this.constructor.name;
   }
 }
