@@ -32,9 +32,9 @@ const CommentForm = ({
   });
   const [saving, setSaving] = useState(false);
   return (
-    <div className="flex items-start space-x-4 px-3">
-      <div className="flex-shrink-0">
-        <UserAvatar user={user} size={36} />
+    <div className="flex items-start space-x-2 px-3 sm:px-2">
+      <div className="h-8 w-8 flex-shrink-0">
+        <UserAvatar size={32} user={user} />
       </div>
       <div className="min-w-0 flex-1">
         <form
@@ -92,7 +92,7 @@ const CommentForm = ({
             </FormField>
           </Fieldset>
 
-          <div className="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
+          <div className="absolute inset-x-0 bottom-0 z-10 flex justify-between py-2 pl-3 pr-2">
             <div className="flex-shrink-0">
               <Button type="submit" color="primary" disabled={saving}>
                 Post Comment
@@ -123,7 +123,7 @@ const CommentList = ({
   const [deleted, setDeleted] = useState<number[]>([]);
 
   return (
-    <ul className="my-4 space-y-4">
+    <ul className="my-4 space-y-4 px-3 sm:px-2">
       <AnimatePresence>
         {[...data.results, ...newValues].map((c) => {
           if (deleted.indexOf(c.id) !== -1) return null;
@@ -132,10 +132,10 @@ const CommentList = ({
             <motion.li
               layout
               key={c.id}
-              className="relative flex items-start space-x-4 text-white"
+              className="relative flex items-start space-x-2 text-white"
             >
-              <div className="py-2">
-                <UserAvatar size={36} user={c.createdBy} />
+              <div className="h-10 w-10 py-2 sm:h-12 sm:w-12 ">
+                <UserAvatar size={32} user={c.createdBy} />
               </div>
               <div className="min-w-0 flex-1 rounded bg-slate-900 px-3 py-2">
                 <div className="flex flex-row">
