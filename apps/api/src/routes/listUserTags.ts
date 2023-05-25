@@ -55,11 +55,10 @@ export default {
     const totalCount = (
       await db.execute(
         sql<{ count: number }>`SELECT COUNT(*) as count
-    FROM (
-      SELECT unnest(${tastings.tags}) as tag
-      FROM ${tastings}
-      WHERE ${tastings.createdById} = ${user.id}
-    ) as t`,
+        FROM ${tastings}
+        WHERE ${tastings.createdById} = ${user.id}
+        AND array_length(${tastings.tags}, 1) > 0
+      `,
       )
     ).rows[0].count;
 

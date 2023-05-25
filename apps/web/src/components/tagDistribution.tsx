@@ -33,9 +33,9 @@ export function TagDistribution({
       ...t,
       name: toTitleCase(t.tag),
     })),
-    ...(totalCount !== totalCountVisible
-      ? [{ name: "Other", count: totalCount - totalCountVisible, tag: null }]
-      : []),
+    // ...(totalCount !== totalCountVisible
+    //   ? [{ name: "Other", count: totalCount - totalCountVisible, tag: null }]
+    //   : []),
   ].sort((a, b) => b.count - a.count);
 
   return (

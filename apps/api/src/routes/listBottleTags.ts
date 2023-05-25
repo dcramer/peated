@@ -1,10 +1,10 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { bottles } from "../db/schema";
+import { bottles, tastings } from "../db/schema";
 
 export default {
   method: "GET",
@@ -47,7 +47,16 @@ export default {
       limit: 25,
     });
 
-    const totalCount = results.reduce((acc, row) => acc + row.count, 0);
+    // TODO: denormalize this into (num)tastings or similar in the tags table
+    const totalCount = (
+      await db.execute(
+        sql<{ count: number }>`SELECT COUNT(*) as count
+        FROM ${tastings}
+        WHERE ${tastings.bottleId} = ${bottle.id}
+        AND array_length(${tastings.tags}, 1) > 0
+      `,
+      )
+    ).rows[0].count;
 
     res.send({
       results,
