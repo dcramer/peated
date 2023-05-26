@@ -4,14 +4,10 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/20/solid";
 import { ReactComponent as PeatedGlyph } from "../assets/glyph.svg";
-import useAuth from "../hooks/useAuth";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 
 export function AppFooter() {
-  const { user } = useAuth();
-  if (!user) return null;
-
   return (
     <nav className="sm:min-h-18 min-h-14 mx-auto flex w-full max-w-4xl items-center justify-center gap-x-6 px-3 sm:px-3 lg:px-0">
       <NavLink to="/">

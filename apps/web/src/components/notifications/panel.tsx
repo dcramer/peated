@@ -1,9 +1,10 @@
 import { InboxIcon } from "@heroicons/react/20/solid";
 import { useQuery } from "@tanstack/react-query";
-import { Suspense } from "react";
+import { Fragment } from "react";
 import api from "../../lib/api";
 import { Notification, Paginated } from "../../types";
 import NavLink from "../navLink";
+import QueryBoundary from "../queryBoundary";
 
 const NotificationCount = () => {
   const { data } = useQuery(
@@ -34,9 +35,9 @@ export default function NotificationsPanel() {
   return (
     <NavLink to="/notifications">
       <InboxIcon className="h-8 w-8 sm:h-9 sm:w-9" />
-      <Suspense>
+      <QueryBoundary fallback={<Fragment />} loading={<Fragment />}>
         <NotificationCount />
-      </Suspense>
+      </QueryBoundary>
     </NavLink>
   );
 }
