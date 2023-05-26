@@ -58,12 +58,12 @@ export default function EntityList() {
   return (
     <Layout title="Brands, Bottler, and Distillers">
       {(type || country || region) && (
-        <p className="text-light space-x-2 p-3">
+        <div className="text-light space-x-2 p-3">
           <span className="font-medium">Results for</span>
           <SearchTerm name="type" value={type} />
           <SearchTerm name="country" value={country} />
           <SearchTerm name="region" value={region} />
-        </p>
+        </div>
       )}
       <QueryBoundary>
         <Content

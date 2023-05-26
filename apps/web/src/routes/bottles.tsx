@@ -60,12 +60,12 @@ export default function BottleList() {
   return (
     <Layout title="Bottles">
       {(category || age || tag) && (
-        <p className="text-light space-x-2 p-3">
+        <div className="text-light space-x-2 p-3">
           <span className="font-medium">Results for</span>
           <SearchTerm name="age" value={age} />
           <SearchTerm name="category" value={category} />
           <SearchTerm name="tag" value={tag} />
-        </p>
+        </div>
       )}
       <QueryBoundary>
         <Content page={page} category={category} age={age} tag={tag} />
