@@ -161,7 +161,7 @@ export default function Login() {
     <Layout splash header={null} footer={null}>
       <PeatedLogo className="text-peated h-auto max-w-full" />
 
-      <div className="mt-8 max-w-sm">
+      <div className="min-w-sm mt-8 flex-1">
         {config.GOOGLE_CLIENT_ID && (
           <>
             <GoogleLogin />

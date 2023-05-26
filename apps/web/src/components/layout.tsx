@@ -38,7 +38,7 @@ export default function Layout({
         <main
           className={classNames(
             "content relative mx-auto flex w-full max-w-4xl flex-1 flex-col",
-            splash && "flex-1 self-center px-6 py-12 sm:max-w-sm lg:px-8",
+            splash && "self-center px-6 py-12 sm:max-w-sm lg:px-8",
           )}
         >
           {children}
