@@ -12,11 +12,12 @@ export function SearchTerm({ name, value }: { name: string; value?: string }) {
     .map(([k, v]) => `${k}=${v}`)
     .join("&");
   return (
-    <div className="inline-flex items-center rounded border border-slate-600 px-2 text-sm">
+    <Link
+      to={`${location.pathname}?${query}`}
+      className="inline-flex items-center rounded border border-slate-600 px-2 text-sm hover:text-white"
+    >
       {name} = {value}
-      <Link to={`${location.pathname}?${query}`} className="hover:text-white">
-        <XMarkIcon className="-mr-1 ml-1 h-4 w-4" />
-      </Link>
-    </div>
+      <XMarkIcon className="-mr-1 ml-1 h-4 w-4" />
+    </Link>
   );
 }
