@@ -45,7 +45,7 @@ export default function ImageEditorModal({
                 onClose={() => setOpen(false)}
                 onSave={() => {
                   if (ref.current) {
-                    onSave(ref.current.getImageScaledToCanvas());
+                    onSave(ref.current.getImage());
                     setOpen(false);
                   }
                 }}
