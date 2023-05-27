@@ -8,6 +8,7 @@ import { db } from "../db";
 import { NewEntity, changes, entities } from "../db/schema";
 import { serialize } from "../lib/serializers";
 import { EntitySerializer } from "../lib/serializers/entity";
+import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "POST",
