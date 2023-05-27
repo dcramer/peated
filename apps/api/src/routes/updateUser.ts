@@ -56,6 +56,11 @@ export default {
         return res.status(400).send({ error: "Invalid username" });
       }
     }
+
+    if (body.private !== undefined && body.private !== user.private) {
+      data.private = body.private;
+    }
+
     if (body.admin !== undefined && body.admin !== user.admin) {
       if (!req.user.admin) {
         return res.status(403).send({ error: "Forbidden" });

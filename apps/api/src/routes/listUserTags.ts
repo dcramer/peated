@@ -5,7 +5,7 @@ import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { tastings } from "../db/schema";
-import { getUserFromId } from "../lib/api";
+import { getUserFromId, profileVisible } from "../lib/api";
 
 export default {
   method: "GET",
@@ -38,6 +38,10 @@ export default {
     const user = await getUserFromId(db, req.params.userId, req.user);
     if (!user) {
       return res.status(404).send({ error: "Not found" });
+    }
+
+    if (!(await profileVisible(db, user, req.user))) {
+      return res.status(400).send({ error: "User's profile is private" });
     }
 
     const results = await db.execute(

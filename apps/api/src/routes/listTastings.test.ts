@@ -105,3 +105,46 @@ test("lists tastings filter friends", async () => {
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(lastTasting.id);
 });
+
+test("lists tastings hides private while authenticated", async () => {
+  const friend = await Fixtures.User({ private: true });
+  await Fixtures.Follow({
+    fromUserId: DefaultFixtures.user.id,
+    toUserId: friend.id,
+    status: "following",
+  });
+
+  // should hide tasting from non-friend
+  await Fixtures.Tasting({
+    createdById: (await Fixtures.User({ private: true })).id,
+  });
+  // should show tasting from friend
+  const tasting = await Fixtures.Tasting({ createdById: friend.id });
+
+  const response = await app.inject({
+    method: "GET",
+    url: "/tastings",
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(200);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toEqual(tasting.id);
+});
+
+test("lists tastings hides private while anonymous", async () => {
+  const tasting = await Fixtures.Tasting();
+  await Fixtures.Tasting({
+    createdById: (await Fixtures.User({ private: true })).id,
+  });
+  const response = await app.inject({
+    method: "GET",
+    url: "/tastings",
+  });
+
+  expect(response).toRespondWith(200);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toEqual(tasting.id);
+});

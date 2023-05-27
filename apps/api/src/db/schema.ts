@@ -26,6 +26,7 @@ export const users = pgTable(
     displayName: text("display_name"),
     pictureUrl: text("picture_url"),
 
+    private: boolean("private").default(false).notNull(),
     active: boolean("active").default(true).notNull(),
     admin: boolean("admin").default(false).notNull(),
     mod: boolean("mod").default(false).notNull(),

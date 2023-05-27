@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import Button from "../components/button";
 import Chip from "../components/chip";
+import EmptyActivity from "../components/emptyActivity";
 import Layout from "../components/layout";
 import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
@@ -55,6 +56,12 @@ export default function Profile() {
     );
     setFollowStatus(data.status);
   };
+
+  const isPrivate =
+    user.private &&
+    currentUser &&
+    user.id !== currentUser.id &&
+    followStatus !== "following";
 
   return (
     <Layout title={`@${user.username}`}>
@@ -170,19 +177,25 @@ export default function Profile() {
         </div>
       </div>
 
-      <UserTagDistribution userId={user.id} />
+      {isPrivate ? (
+        <EmptyActivity>This users profile is private.</EmptyActivity>
+      ) : (
+        <>
+          <UserTagDistribution userId={user.id} />
 
-      <Tabs fullWidth>
-        <Tabs.Item to={`/users/${user.username}`} controlled>
-          Activity
-        </Tabs.Item>
-        <Tabs.Item to={`/users/${user.username}/collections`} controlled>
-          Collection
-        </Tabs.Item>
-      </Tabs>
-      <QueryBoundary>
-        <Outlet context={{ user }} />
-      </QueryBoundary>
+          <Tabs fullWidth>
+            <Tabs.Item to={`/users/${user.username}`} controlled>
+              Activity
+            </Tabs.Item>
+            <Tabs.Item to={`/users/${user.username}/collections`} controlled>
+              Collection
+            </Tabs.Item>
+          </Tabs>
+          <QueryBoundary>
+            <Outlet context={{ user }} />
+          </QueryBoundary>
+        </>
+      )}
     </Layout>
   );
 }

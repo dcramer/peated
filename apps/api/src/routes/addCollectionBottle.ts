@@ -6,18 +6,22 @@ import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { bottles, collectionBottles, collections } from "../db/schema";
+import { getUserFromId } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
 import { sha1 } from "../lib/hash";
 import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "POST",
-  url: "/collections/:collectionId/bottles",
+  url: "/users/:userId/collections/:collectionId/bottles",
   schema: {
     params: {
       type: "object",
       required: ["collectionId"],
       properties: {
+        userId: {
+          anyOf: [{ type: "number" }, { type: "string" }, { const: "me" }],
+        },
         collectionId: { anyOf: [{ type: "number" }, { const: "default" }] },
       },
     },
@@ -25,9 +29,20 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    const user = await getUserFromId(db, req.params.userId, req.user);
+    if (!user) {
+      return res.status(404).send({ error: "Not found" });
+    }
+
+    if (user.id !== req.user.id) {
+      return res
+        .status(400)
+        .send({ error: "Cannot modify another persons collection" });
+    }
+
     const collection =
       req.params.collectionId === "default"
-        ? await getDefaultCollection(db, req.user.id)
+        ? await getDefaultCollection(db, user.id)
         : await db.query.collections.findFirst({
             where: (collections, { eq }) =>
               eq(collections.id, req.params.collectionId as number),
@@ -83,6 +98,7 @@ export default {
   ServerResponse,
   {
     Params: {
+      userId: number | string | "me";
       collectionId: number | "default";
     };
     Body: z.infer<typeof CollectionBottleInputSchema>;

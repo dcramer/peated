@@ -23,7 +23,6 @@ import listBottleSuggestedTags from "./listBottleSuggestedTags";
 import listBottleTags from "./listBottleTags";
 import listBottles from "./listBottles";
 import listChanges from "./listChanges";
-import listCollections from "./listCollections";
 import listComments from "./listComments";
 import listEntities from "./listEntities";
 import listFollowers from "./listFollowers";
@@ -31,6 +30,7 @@ import listFollowing from "./listFollowing";
 import listNotifications from "./listNotifications";
 import listTastings from "./listTastings";
 import listUserCollectionBottles from "./listUserCollectionBottles";
+import listUserCollections from "./listUserCollections";
 import listUserTags from "./listUserTags";
 import listUsers from "./listUsers";
 import updateBottle from "./updateBottle";
@@ -105,7 +105,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(listUserCollectionBottles);
   fastify.route(listUserTags);
 
-  fastify.route(listCollections);
+  fastify.route(listUserCollections);
   fastify.route(addCollectionBottle);
   fastify.route(deleteCollectionBottle);
 

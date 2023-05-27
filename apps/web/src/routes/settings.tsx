@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
+import BooleanField from "../components/booleanField";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
 import FormHeader from "../components/formHeader";
@@ -63,6 +64,7 @@ export default function Settings() {
 
   const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -115,6 +117,13 @@ export default function Settings() {
             label="Picture"
             value={user.pictureUrl}
             onChange={(value) => setPicture(value)}
+          />
+          <BooleanField
+            control={control}
+            label="Private"
+            helpText="Limit visibility of your activity to friends-only."
+            name="private"
+            defaultValue={user.private}
           />
         </Fieldset>
       </form>
