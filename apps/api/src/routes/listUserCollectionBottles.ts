@@ -9,7 +9,7 @@ import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { bottles, collectionBottles, entities } from "../db/schema";
-import { getUserFromId } from "../lib/api";
+import { getUserFromId, profileVisible } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
@@ -47,6 +47,10 @@ export default {
     const user = await getUserFromId(db, req.params.userId, req.user);
     if (!user) {
       return res.status(404).send({ error: "Not found" });
+    }
+
+    if (!(await profileVisible(db, user, req.user))) {
+      return res.status(400).send({ error: "User's profile is private" });
     }
 
     const collection =

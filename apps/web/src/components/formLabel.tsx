@@ -1,23 +1,29 @@
-import { ReactNode } from "react";
+import { ElementType, ReactNode } from "react";
+import { PolymorphicProps } from "../types";
 
-export default ({
-  className,
-  required,
-  labelNote,
-  ...props
-}: {
+type Props<E extends ElementType> = PolymorphicProps<E> & {
   required?: boolean;
   labelNote?: ReactNode;
-} & React.ComponentPropsWithoutRef<"label">) => {
+} & React.ComponentPropsWithoutRef<"label">;
+
+const defaultElement = "label";
+
+export default function FormLabel<
+  E extends ElementType = typeof defaultElement,
+>({ className, as, required, labelNote, children, ...props }: Props<E>) {
+  const Component = as ?? defaultElement;
+
   return (
-    <div className="mb-2 flex justify-between">
-      <label
-        {...props}
-        className={`block font-semibold leading-6 ${className || ""}`}
-      />
+    <Component
+      {...props}
+      className={`mb-2 flex justify-between font-semibold leading-6 ${
+        className || ""
+      }`}
+    >
+      <div>{children}</div>
       <span className="text-xs leading-6 text-slate-500">
         {labelNote || (!required && "Optional")}
       </span>
-    </div>
+    </Component>
   );
-};
+}

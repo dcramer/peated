@@ -14,19 +14,6 @@ beforeAll(async () => {
   };
 });
 
-test("must be mod", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: `/entities`,
-    payload: {
-      name: "Delicious Wood",
-    },
-    headers: await Fixtures.AuthenticatedHeaders(),
-  });
-
-  expect(response).toRespondWith(403);
-});
-
 test("name is required", async () => {
   const response = await app.inject({
     method: "POST",

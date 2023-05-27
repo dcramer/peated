@@ -70,12 +70,14 @@ export type Friend = {
 
 export type User = {
   id: number;
-  admin: boolean;
-  mod: boolean;
   username: string;
   displayName: string;
-  email: string;
   pictureUrl?: string;
+  private: boolean;
+
+  admin?: boolean;
+  mod?: boolean;
+  email?: string;
 };
 
 export type Tasting = {

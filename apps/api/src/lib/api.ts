@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { DatabaseType, TransactionType } from "../db";
-import { User, users } from "../db/schema";
+import { User, follows, users } from "../db/schema";
 
 // export async function getUserFromId(
 //   db: DatabaseType | TransactionType,
@@ -55,4 +55,26 @@ export const fixBottleName = (name: string, age?: number | null): string => {
     name = `${name}-year-old`;
   }
   return name.replace(` ${age} `, ` ${age}-year-old `);
+};
+
+export const profileVisible = async (
+  db: DatabaseType | TransactionType,
+  user: User,
+  currentUser?: User | null,
+) => {
+  if (!user.private) return true;
+  if (!currentUser) return false;
+  if (currentUser.id === user.id) return true;
+  return !!(
+    await db
+      .select()
+      .from(follows)
+      .where(
+        and(
+          eq(follows.fromUserId, currentUser.id),
+          eq(follows.toUserId, user.id),
+          eq(follows.status, "following"),
+        ),
+      )
+  ).find((d) => !!d);
 };

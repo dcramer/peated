@@ -46,6 +46,7 @@ export const UserSerializer: Serializer<User> = {
         ? `${config.URL_PREFIX}${item.pictureUrl}`
         : null,
       followStatus: attrs.followStatus,
+      private: item.private,
     };
 
     if (

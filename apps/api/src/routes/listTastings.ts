@@ -1,11 +1,11 @@
 import { PaginatedSchema, TastingSchema } from "@peated/shared/schemas";
-import { SQL, and, desc, eq, sql } from "drizzle-orm";
+import { SQL, and, desc, eq, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { follows, tastings } from "../db/schema";
+import { follows, tastings, users } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { TastingSerializer } from "../lib/serializers/tasting";
@@ -38,7 +38,7 @@ export default {
     const limit = req.query.limit || 25;
     const offset = (page - 1) * limit;
 
-    const where: SQL<unknown>[] = [];
+    const where: (SQL<unknown> | undefined)[] = [];
     if (req.query.bottle) {
       where.push(eq(tastings.bottleId, req.query.bottle));
     }
@@ -50,6 +50,8 @@ export default {
         ),
       );
     }
+
+    const limitPrivate = req.query.filter !== "friends";
     if (req.query.filter) {
       if (req.query.filter === "friends") {
         if (!req.user) {
@@ -61,9 +63,26 @@ export default {
       }
     }
 
+    if (limitPrivate) {
+      where.push(
+        or(
+          eq(users.private, false),
+          ...(req.user
+            ? [
+                eq(tastings.createdById, req.user.id),
+                sql`${tastings.createdById} IN (
+                  SELECT ${follows.toUserId} FROM ${follows} WHERE ${follows.fromUserId} = ${req.user.id} AND ${follows.status} = 'following'
+                )`,
+              ]
+            : []),
+        ),
+      );
+    }
+
     const results = await db
-      .select()
+      .select({ tastings })
       .from(tastings)
+      .innerJoin(users, eq(users.id, tastings.createdById))
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
@@ -72,7 +91,7 @@ export default {
     res.send({
       results: await serialize(
         TastingSerializer,
-        results.slice(0, limit),
+        results.map((t) => t.tastings).slice(0, limit),
         req.user,
       ),
       rel: {

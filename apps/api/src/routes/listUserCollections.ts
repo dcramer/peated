@@ -1,25 +1,32 @@
 import { CollectionSchema, PaginatedSchema } from "@peated/shared/schemas";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { collectionBottles, collections } from "../db/schema";
+import { getUserFromId, profileVisible } from "../lib/api";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { CollectionSerializer } from "../lib/serializers/collection";
-import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
-  url: "/collections",
+  url: "/users/:userId/collections",
   schema: {
+    params: {
+      type: "object",
+      properties: {
+        userId: {
+          anyOf: [{ type: "number" }, { type: "string" }, { const: "me" }],
+        },
+      },
+    },
     querystring: {
       type: "object",
       properties: {
         page: { type: "number" },
-        user: { oneOf: [{ type: "number" }, { const: "me" }] },
         bottle: { type: "number" },
       },
     },
@@ -31,22 +38,21 @@ export default {
       ),
     },
   },
-  preHandler: [requireAuth],
   handler: async (req, res) => {
+    const user = await getUserFromId(db, req.params.userId, req.user);
+    if (!user) {
+      return res.status(404).send({ error: "Not found" });
+    }
+
+    if (!(await profileVisible(db, user, req.user))) {
+      return res.status(400).send({ error: "User's profile is private" });
+    }
+
     const page = req.query.page || 1;
     const limit = 100;
     const offset = (page - 1) * limit;
 
     const where = [];
-    if (req.query.user) {
-      where.push(
-        eq(
-          collections.createdById,
-          req.query.user === "me" ? req.user.id : req.query.user,
-        ),
-      );
-    }
-
     if (req.query.bottle) {
       where.push(
         sql`EXISTS(SELECT 1 FROM ${collectionBottles} WHERE ${collectionBottles.bottleId} = ${req.query.bottle} AND ${collectionBottles.collectionId} = ${collections.id})`,
@@ -86,8 +92,10 @@ export default {
   IncomingMessage,
   ServerResponse,
   {
+    Params: {
+      userId: number | string | "me";
+    };
     Querystring: {
-      user: number | "me";
       bottle: number;
       page?: number;
     };

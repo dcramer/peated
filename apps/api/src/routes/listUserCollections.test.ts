@@ -10,49 +10,11 @@ beforeAll(async () => {
     app.close();
   };
 });
-
-test("lists tags", async () => {
-  const bottle = await Fixtures.Bottle();
-  const bottle2 = await Fixtures.Bottle({
-    brandId: bottle.brandId,
-  });
-  await Fixtures.Tasting({
-    bottleId: bottle.id,
-    tags: ["solvent", "caramel"],
-    rating: 5,
-    createdById: DefaultFixtures.user.id,
-  });
-  await Fixtures.Tasting({
-    bottleId: bottle.id,
-    tags: ["caramel"],
-    rating: 5,
-    createdById: DefaultFixtures.user.id,
-  });
-  await Fixtures.Tasting({
-    bottleId: bottle2.id,
-    tags: ["cedar", "caramel"],
-    rating: 5,
-  });
-
-  const response = await app.inject({
-    method: "GET",
-    url: `/users/me/tags`,
-    headers: DefaultFixtures.authHeaders,
-  });
-
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
-  expect(results).toEqual([
-    { tag: "caramel", count: 2 },
-    { tag: "solvent", count: 1 },
-  ]);
-});
-
 test("cannot list private without friend", async () => {
   const otherUser = await Fixtures.User({ private: true });
   const response = await app.inject({
     method: "GET",
-    url: `/users/${otherUser.id}/tags`,
+    url: `/users/${otherUser.id}/collections`,
     headers: DefaultFixtures.authHeaders,
   });
 
@@ -68,7 +30,7 @@ test("can list private with friend", async () => {
   });
   const response = await app.inject({
     method: "GET",
-    url: `/users/${otherUser.id}/tags`,
+    url: `/users/${otherUser.id}/collections`,
     headers: DefaultFixtures.authHeaders,
   });
 
@@ -79,7 +41,7 @@ test("can list public without friend", async () => {
   const otherUser = await Fixtures.User({ private: false });
   const response = await app.inject({
     method: "GET",
-    url: `/users/${otherUser.id}/tags`,
+    url: `/users/${otherUser.id}/collections`,
     headers: DefaultFixtures.authHeaders,
   });
 

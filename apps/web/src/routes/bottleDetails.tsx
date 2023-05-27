@@ -33,9 +33,8 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
   } = useSuspenseQuery(
     ["bottles", bottle.id, "collections"],
     (): Promise<Paginated<Collection>> =>
-      api.get(`/collections`, {
+      api.get(`/users/me/collections`, {
         query: {
-          user: "me",
           bottle: bottle.id,
         },
       }),
@@ -50,7 +49,7 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
     if (isCollected) {
       setLoading(true);
       try {
-        await api.delete(`/collections/default/bottles/${bottle.id}`);
+        await api.delete(`/users/me/collections/default/bottles/${bottle.id}`);
         setIsCollected(false);
       } catch (err: any) {
         logError(err);
@@ -74,7 +73,7 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
           if (loading) return;
           setLoading(true);
           try {
-            await api.post("/collections/default/bottles", {
+            await api.post("/users/me/collections/default/bottles", {
               data,
             });
             setIsCollected(true);
