@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { PreviewBottleCard } from "../components/bottleCard";
 
+import { Link } from "react-router-dom";
 import EntityField from "../components/entityField";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
@@ -128,6 +129,12 @@ export default ({
           />
         </div>
 
+        <p className="prose sm:mb-4">
+          Accuracy is key for Peated! Have any suggestions for making it easier?
+          Open an{" "}
+          <Link to="https://github.com/dcramer/peated">issue on GitHub</Link>.
+        </p>
+
         <Fieldset>
           <Controller
             name="brand"
@@ -142,7 +149,6 @@ export default ({
                 createDialogHelpText="The brand is the group that bottles the spirit. Sometimes this is
                 the same as the distiller."
                 required
-                canCreate={user.admin}
                 onChange={(value) => {
                   onChange(value?.id || value);
                   setBrandValue(value);
@@ -224,7 +230,6 @@ export default ({
                   setDistillersValue(value);
                 }}
                 value={distillersValue}
-                canCreate={user.admin}
                 multiple
               />
             )}
@@ -240,7 +245,6 @@ export default ({
                 label="Bottler"
                 helpText="The company bottling the spirit."
                 placeholder="e.g. The Scotch Malt Whisky Society"
-                canCreate={user.admin}
                 onChange={(value) => {
                   onChange(value?.id || value);
                   setBottlerValue(value);

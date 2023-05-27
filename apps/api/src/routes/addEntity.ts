@@ -8,7 +8,6 @@ import { db } from "../db";
 import { NewEntity, changes, entities } from "../db/schema";
 import { serialize } from "../lib/serializers";
 import { EntitySerializer } from "../lib/serializers/entity";
-import { requireMod } from "../middleware/auth";
 
 export default {
   method: "POST",
@@ -19,7 +18,7 @@ export default {
       201: zodToJsonSchema(EntitySchema),
     },
   },
-  preHandler: [requireMod],
+  preHandler: [requireAuth],
   handler: async (req, res) => {
     const body = req.body;
     const data: NewEntity = {
