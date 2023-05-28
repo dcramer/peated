@@ -92,7 +92,11 @@ export default {
           })
           .returning();
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+        if (
+          err?.code === "23505" &&
+          (err?.constraint === "bottle_brand_unq" ||
+            err?.constraint === "bottle_series_unq")
+        ) {
           res
             .status(409)
             .send({ error: "Bottle with name already exists under brand" });
