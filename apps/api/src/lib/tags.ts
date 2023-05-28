@@ -109,7 +109,8 @@ const aromaDescriptions = [
   "hot",
   "zesty",
   "fiery",
-  "spiced",
+  "spiced", // baking spices
+  "black pepper",
   "cinnamon",
   "nutmeg",
   "cloves",
