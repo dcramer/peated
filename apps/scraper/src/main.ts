@@ -282,6 +282,7 @@ async function scrapeBottleTable(
 async function scrapeBottles() {
   const years = [...Array(100).keys()].map((i) => 2023 - i);
   const results: any[] = [];
+  const bottleDedupeSet: Record<string, any> = {};
   for (const year of years) {
     const tableUrl = `https://www.whiskybase.com/whiskies/new-releases?bottle_date_year=${year}&sort=whisky.name&direction=asc`;
     console.log(tableUrl);
@@ -291,11 +292,19 @@ async function scrapeBottles() {
       const id = parseInt(match[1], 10);
       try {
         const result = await scrapeBottle(id);
-        if (result.votes < 100) {
-          console.warn(`Discarding ${url} - too few votes`);
-          return;
+        const bottleId = `${result.brand.name} - ${result.name} - ${
+          result.series || ""
+        }`;
+        if (!bottleDedupeSet[bottleId]) {
+          bottleDedupeSet[bottleId] = {
+            ...result,
+            ids: [id],
+          };
+          results.push(bottleDedupeSet[bottleId]);
+        } else {
+          bottleDedupeSet[bottleId].votes += result.votes;
+          bottleDedupeSet[bottleId].ids.push(id);
         }
-        if (result) results.push(result);
       } catch (err) {
         console.error(err);
       }
