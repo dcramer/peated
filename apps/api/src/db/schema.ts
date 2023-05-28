@@ -210,10 +210,12 @@ export const bottles = pgTable(
   },
   (bottles) => {
     return {
-      bottleBrandIndex: uniqueIndex("bottle_brand_unq").on(
-        bottles.name,
-        bottles.brandId,
-      ),
+      unique: uniqueIndex("bottle_brand_unq")
+        .on(bottles.name, bottles.brandId)
+        .where(sql`series IS NULL`),
+      uniqueSeries: uniqueIndex("bottle_series_unq")
+        .on(bottles.name, bottles.brandId, bottles.series)
+        .where(sql`series IS NOT NULL`),
     };
   },
 );
