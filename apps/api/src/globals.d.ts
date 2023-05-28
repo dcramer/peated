@@ -25,8 +25,8 @@ interface CustomMatchers<R = unknown> {
 
 declare global {
   namespace Vi {
-    type Assertion = CustomMatchers;
-    type AsymmetricMatchersContaining = CustomMatchers;
+    interface Assertion<T = any> extends CustomMatchers<T> {}
+    interface AsymmetricMatchersContaining extends CustomMatchers {}
   }
 
   const DefaultFixtures = {
