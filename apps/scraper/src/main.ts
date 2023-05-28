@@ -56,6 +56,12 @@ async function scrapeBottle(id: number) {
     : null;
   bottle.series = $("dt:contains('Bottling serie') + dd").first().text();
 
+  const ageData = $("dt:contains('Stated Age') + dd > a")
+    .first()
+    .text()
+    .split(" ")[0];
+  bottle.statedAge = parseInt(ageData, 10) >= 3 ? ageData : 0;
+
   bottle.vintageYear = parseYear(
     $("dt:contains('Vintage') + dd").first().text(),
   );
@@ -68,7 +74,9 @@ async function scrapeBottle(id: number) {
 
   bottle.abv = parseAbv($("dt:contains('Strength') + dd").first().text());
 
-  console.log(`[Whisky ${id}] Identified as ${bottle.name} - ${bottle.series}`);
+  console.log(
+    `[Whisky ${id}] Identified as ${bottle.brand.name} - ${bottle.name} ${bottle.series}`,
+  );
 
   return bottle;
 }
@@ -280,7 +288,8 @@ async function scrapeBottleTable(
 }
 
 async function scrapeBottles() {
-  const years = [...Array(100).keys()].map((i) => 2023 - i);
+  // const years = [...Array(100).keys()].map((i) => 2023 - i);
+  const years = [2022, 2023];
   const results: any[] = [];
   const bottleDedupeSet: Record<string, any> = {};
   for (const year of years) {
@@ -311,8 +320,12 @@ async function scrapeBottles() {
     });
   }
 
-  console.log(`Found ${results.length} bottles`);
-  saveResults("bottles.json", results);
+  const keepBottles = results.filter((v) => v.votes >= 50);
+
+  console.log(
+    `Found ${results.length} bottles - keeping ${keepBottles.length}`,
+  );
+  saveResults("bottles.json", keepBottles);
 }
 
 async function saveResults(filename: string, results: any) {
