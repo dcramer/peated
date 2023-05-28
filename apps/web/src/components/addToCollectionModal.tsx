@@ -1,5 +1,4 @@
 import { Dialog } from "@headlessui/react";
-import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -57,8 +56,11 @@ export default ({
   return (
     <Dialog open={open} as="div" className="dialog" onClose={setOpen}>
       <Dialog.Overlay className="fixed inset-0" />
-      <Dialog.Panel className="dialog-panel flex flex-col items-center justify-center px-4 pb-4 pt-5 sm:p-6">
-        <form className="sm:mx-16" onSubmit={handleSubmit(onSubmitHandler)}>
+      <Dialog.Panel className="dialog-panel flex items-center justify-center px-4 pb-4 pt-5 sm:p-6">
+        <form
+          className="max-w-md flex-1"
+          onSubmit={handleSubmit(onSubmitHandler)}
+        >
           <div className="sm:mb-3">
             <BottleCard bottle={bottle} color="highlight" />
           </div>
@@ -66,16 +68,6 @@ export default ({
           {error && <FormError values={[error]} />}
 
           <Fieldset>
-            <div className="bg-highlight my-4 px-4 py-3 text-black">
-              <div className="flex items-center">
-                <div className="flex-1">
-                  <h2 className="font-medium">Vintage Details</h2>
-                  <p className="text-sm">Is this bottle a specific vintage?</p>
-                </div>
-                <ArrowDownIcon className="h-8 w-8 text-slate-700" />
-              </div>
-            </div>
-
             <TextField
               {...register("vintageYear", {
                 setValueAs: (v) =>
