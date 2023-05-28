@@ -58,7 +58,6 @@ export default ({
 }: {
   bottle: Bottle;
   vintage?: {
-    series?: string;
     vintageYear?: number;
     barrel?: number;
   };
@@ -82,9 +81,9 @@ export default ({
         >
           <BottleName bottle={bottle} />
         </Link>
-        {vintage && (
+        {(vintage || bottle.series) && (
           <div className="text-light">
-            <VintageName {...vintage} />
+            <VintageName series={bottle.series} {...vintage} />
           </div>
         )}
       </div>
