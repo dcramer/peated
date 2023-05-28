@@ -56,11 +56,11 @@ async function scrapeBottle(id: number) {
     : null;
   bottle.series = $("dt:contains('Bottling serie') + dd").first().text();
 
-  const ageData = $("dt:contains('Stated Age') + dd > a")
+  const ageData = $("dt:contains('Stated Age') + dd")
     .first()
     .text()
     .split(" ")[0];
-  bottle.statedAge = parseInt(ageData, 10) >= 3 ? ageData : 0;
+  bottle.statedAge = parseInt(ageData, 10) >= 3 ? parseInt(ageData, 10) : null;
 
   bottle.vintageYear = parseYear(
     $("dt:contains('Vintage') + dd").first().text(),
@@ -320,7 +320,7 @@ async function scrapeBottles() {
     });
   }
 
-  const keepBottles = results.filter((v) => v.votes >= 50);
+  const keepBottles = results.filter((v) => v.votes >= 100);
 
   console.log(
     `Found ${results.length} bottles - keeping ${keepBottles.length}`,
