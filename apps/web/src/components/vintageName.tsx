@@ -15,7 +15,7 @@ export default ({
   return (
     <>
       {displayName}
-      {!!barrel && ` (#${barrel.toLocaleString()})`}
+      {!!barrel && ` (Barrel ${barrel.toLocaleString()})`}
     </>
   );
 };
