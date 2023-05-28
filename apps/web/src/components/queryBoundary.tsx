@@ -25,7 +25,7 @@ export default ({
 const ErrorView = ({ error, resetErrorBoundary }: any) => {
   return (
     <div>
-      <div>{error.message || error.toString()}</div>
+      <div>{error ? error.message || error.toString() : "Unknown Error"}</div>
       <button title="Retry" onClick={resetErrorBoundary} />
     </div>
   );
