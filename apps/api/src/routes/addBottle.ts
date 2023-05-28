@@ -32,7 +32,7 @@ export default {
   handler: async (req, res) => {
     const body = req.body;
 
-    const name = fixBottleName(body.name, body.statedAge);
+    let name = fixBottleName(body.name, body.statedAge);
     if (
       (name.indexOf("-year-old") !== -1 ||
         name.indexOf("-years-old") !== -1 ||
@@ -60,6 +60,12 @@ export default {
       }
 
       const brand = brandUpsert.result;
+
+      // TODO: we need to pull all this name uniform logic into a shared helper, as this
+      // is missing from updateBottle
+      if (name.indexOf(brand.name) === 0) {
+        name = name.substring(brand.name.length + 1);
+      }
 
       let bottler: Entity | null = null;
       if (body.bottler) {

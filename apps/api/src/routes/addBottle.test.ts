@@ -477,3 +477,26 @@ test("refuses bottle w/ age signal", async () => {
 
   expect(response).toRespondWith(400);
 });
+
+test("removes duplicated brand name", async () => {
+  const brand = await Fixtures.Entity({ name: "Delicious Wood" });
+  const response = await app.inject({
+    method: "POST",
+    url: "/bottles",
+    payload: {
+      name: "Delicious Wood Yum Yum",
+      brand: brand.id,
+    },
+    headers: DefaultFixtures.authHeaders,
+  });
+
+  expect(response).toRespondWith(201);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+
+  const [bottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+  expect(bottle.name).toEqual("Yum Yum");
+});
