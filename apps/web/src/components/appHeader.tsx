@@ -34,6 +34,7 @@ export default function AppHeader() {
 
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
 
   return (
     <>
@@ -47,12 +48,20 @@ export default function AppHeader() {
       >
         <input
           name="q"
-          onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for anything"
           autoComplete="off"
           className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-500 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            if (!searchOpen) setSearchOpen(true);
+          }}
           onFocus={() => {
-            setSearchOpen(true);
+            // not sure a better way to work around default focus
+            if (!searchFocused) {
+              setSearchFocused(true);
+              setSearchOpen(true);
+            }
           }}
         />
         <Dialog
@@ -63,7 +72,13 @@ export default function AppHeader() {
         >
           <Dialog.Overlay className="fixed inset-0" />
           <Dialog.Panel className="dialog-panel">
-            <SearchPanel onQueryChange={(value) => setQuery(value)} />
+            <SearchPanel
+              onQueryChange={(value) => setQuery(value)}
+              onClose={() => {
+                setSearchOpen(false);
+                setTimeout(() => setSearchFocused(false), 100);
+              }}
+            />
           </Dialog.Panel>
         </Dialog>
       </form>

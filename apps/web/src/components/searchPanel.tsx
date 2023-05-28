@@ -184,13 +184,14 @@ const UserResultRow = ({ result: { ref: user } }: { result: UserResult }) => {
 };
 
 export type Props = {
+  onClose?: () => void;
   onQueryChange?: (value: string) => void;
 };
 
-export default function SearchPanel({ onQueryChange }: Props) {
+export default function SearchPanel({ onClose, onQueryChange }: Props) {
   const { user: currentUser } = useAuth();
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
   const qs = new URLSearchParams(location.search);
 
   const maxResults = 50;
@@ -336,6 +337,7 @@ export default function SearchPanel({ onQueryChange }: Props) {
                 },
               );
             }}
+            onClose={onClose}
           />
         </Header>
       }
