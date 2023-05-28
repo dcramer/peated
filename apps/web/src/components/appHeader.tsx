@@ -1,4 +1,4 @@
-import { Menu, Transition } from "@headlessui/react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -7,6 +7,7 @@ import { ReactComponent as PeatedLogo } from "../assets/logo.svg";
 import useAuth from "../hooks/useAuth";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
+import SearchPanel from "./searchPanel";
 import UserAvatar from "./userAvatar";
 
 const HeaderLogo = () => {
@@ -32,6 +33,7 @@ export default function AppHeader() {
   const location = useLocation();
 
   const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <>
@@ -49,7 +51,21 @@ export default function AppHeader() {
           placeholder="Search for anything"
           autoComplete="off"
           className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-500 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
+          onFocus={() => {
+            setSearchOpen(true);
+          }}
         />
+        <Dialog
+          open={searchOpen}
+          as="div"
+          className="dialog"
+          onClose={setSearchOpen}
+        >
+          <Dialog.Overlay className="fixed inset-0" />
+          <Dialog.Panel className="dialog-panel">
+            <SearchPanel onQueryChange={(value) => setQuery(value)} />
+          </Dialog.Panel>
+        </Dialog>
       </form>
       {user ? (
         <div className="ml-4 flex items-center gap-x-2 sm:ml-8">
