@@ -7,7 +7,6 @@ import { z } from "zod";
 
 import { PreviewBottleCard } from "../components/bottleCard";
 
-import { Link } from "react-router-dom";
 import EntityField from "../components/entityField";
 import Fieldset from "../components/fieldset";
 import FormError from "../components/formError";
@@ -15,6 +14,7 @@ import FormHeader from "../components/formHeader";
 import Layout from "../components/layout";
 import SelectField, { Option } from "../components/selectField";
 import TextField from "../components/textField";
+import config from "../config";
 import { useRequiredAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
@@ -116,6 +116,25 @@ export default ({
       <form className="sm:mx-16" onSubmit={handleSubmit(onSubmitHandler)}>
         {error && <FormError values={[error]} />}
 
+        <div className="border border-slate-700 p-3 sm:my-4 sm:p-4">
+          <div className="prose text-light max-w-full text-sm leading-6">
+            <p>
+              It can be tricky to find the right information, so if you're
+              struggling, just try to fill in the components that you're
+              confident about. The brand will almost always have multiple
+              bottles (e.g. <em>Hibiki</em>), and the bottle name, if nothing
+              else, you can use the full bottle label.
+            </p>
+            <p>
+              Have any suggestions for making it easier to enter correct data?
+              <a href={config.GITHUB_REPO}>Open an Issue on GitHub</a> or{" "}
+              <a href={config.DISCORD_LINK}>drop a note on Discord</a> if you
+              have feedback. We'll update the bottle preview as you enter
+              information.
+            </p>
+          </div>
+        </div>
+
         <div className="sm:mb-4">
           <PreviewBottleCard
             data={{
@@ -127,15 +146,6 @@ export default ({
               series: watch("series"),
             }}
           />
-        </div>
-
-        <div className="prose text-light px-4">
-          <p>
-            Accuracy is key for Peated! Have any suggestions for making it
-            easier to enter correct data? Open an{" "}
-            <Link to="https://github.com/dcramer/peated">issue on GitHub</Link>{" "}
-            and let us know.
-          </p>
         </div>
 
         <Fieldset>
