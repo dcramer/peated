@@ -156,6 +156,7 @@ export default ({
                   onChange(value?.id || value);
                   setBrandValue(value);
                 }}
+                canCreate
                 value={brandValue}
               />
             )}
@@ -232,6 +233,7 @@ export default ({
                   onChange(value.map((t: any) => t.id || t));
                   setDistillersValue(value);
                 }}
+                canCreate
                 value={distillersValue}
                 multiple
               />
@@ -252,6 +254,7 @@ export default ({
                   onChange(value?.id || value);
                   setBottlerValue(value);
                 }}
+                canCreate
                 value={bottlerValue}
               />
             )}
