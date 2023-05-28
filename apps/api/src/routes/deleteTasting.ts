@@ -51,13 +51,14 @@ export default {
             ),
           ),
         );
-      await tx.delete(toasts).where(eq(toasts.tastingId, tasting.id));
-      await tx.delete(tastings).where(eq(tastings.id, tasting.id));
 
-      for (const tag in tasting.tags) {
-        tx.update(bottleTags)
+      await tx.delete(toasts).where(eq(toasts.tastingId, tasting.id));
+
+      for (const tag of tasting.tags) {
+        await tx
+          .update(bottleTags)
           .set({
-            count: sql<number>`${bottleTags.count} - 1`,
+            count: sql`${bottleTags.count} - 1`,
           })
           .where(
             and(
@@ -67,13 +68,14 @@ export default {
           );
       }
 
-      // update stats
       await tx
         .update(bottles)
         .set({
-          totalTastings: sql<number>`${bottles.totalTastings} - 1`,
+          totalTastings: sql`${bottles.totalTastings} - 1`,
         })
         .where(eq(bottles.id, tasting.bottleId));
+
+      await tx.delete(tastings).where(eq(tastings.id, tasting.id));
     });
     res.status(204).send();
   },
