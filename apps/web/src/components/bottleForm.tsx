@@ -129,11 +129,14 @@ export default ({
           />
         </div>
 
-        <p className="prose sm:mb-4">
-          Accuracy is key for Peated! Have any suggestions for making it easier?
-          Open an{" "}
-          <Link to="https://github.com/dcramer/peated">issue on GitHub</Link>.
-        </p>
+        <div className="prose text-light px-4">
+          <p>
+            Accuracy is key for Peated! Have any suggestions for making it
+            easier to enter correct data? Open an{" "}
+            <Link to="https://github.com/dcramer/peated">issue on GitHub</Link>{" "}
+            and let us know.
+          </p>
+        </div>
 
         <Fieldset>
           <Controller
