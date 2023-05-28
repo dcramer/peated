@@ -93,7 +93,16 @@ export default ({
           "flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6",
         )}
       >
-        <p>{bottle.category && formatCategoryName(bottle.category)}</p>
+        <p>
+          {bottle.category && (
+            <Link
+              to={`/bottles?category=${bottle.category}`}
+              className="hover:underline"
+            >
+              {formatCategoryName(bottle.category)}
+            </Link>
+          )}
+        </p>
         <p>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</p>
       </div>
     </div>
