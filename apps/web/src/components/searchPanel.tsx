@@ -242,7 +242,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
       }
     } else {
       setUserResults([]);
-      if (currentUser) {
+      if (currentUser && query) {
         await api
           .get("/users", {
             query: { query, limit: maxResults },
@@ -321,7 +321,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
         <Header>
           <SearchHeader
             name="q"
-            placeholder="Search for anything"
+            placeholder="Search for bottles, brands, and people"
             value={query}
             onChange={(value) => {
               setQuery(value);
