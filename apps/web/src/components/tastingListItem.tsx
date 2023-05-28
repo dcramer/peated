@@ -42,7 +42,7 @@ export default ({
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
 
   return (
-    <li className="card">
+    <li className="card ring-1 ring-slate-800 md:w-1/2">
       <div className="card-header p-3 sm:px-5 sm:py-4">
         <UserAvatar size={48} user={tasting.createdBy} />
         <div className="flex-1 space-y-1 font-semibold">
