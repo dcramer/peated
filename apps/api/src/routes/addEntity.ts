@@ -1,11 +1,12 @@
 import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { NewEntity, changes, entities } from "../db/schema";
+import type { NewEntity } from "../db/schema";
+import { changes, entities } from "../db/schema";
 import { serialize } from "../lib/serializers";
 import { EntitySerializer } from "../lib/serializers/entity";
 import { requireAuth } from "../middleware/auth";

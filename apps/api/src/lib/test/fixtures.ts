@@ -6,7 +6,7 @@ import { toTitleCase } from "@peated/shared/lib/strings";
 
 import { sql } from "drizzle-orm";
 import { db } from "../../db";
-import {
+import type {
   Entity as EntityType,
   NewBottle,
   NewComment,
@@ -16,6 +16,8 @@ import {
   NewToast,
   NewUser,
   User as UserType,
+} from "../../db/schema";
+import {
   bottleTags,
   bottles,
   bottlesToDistillers,
@@ -36,7 +38,7 @@ export const User = async ({ ...data }: Partial<NewUser> = {}) => {
     await db
       .insert(users)
       .values({
-        displayName: faker.name.firstName(),
+        displayName: faker.person.firstName(),
         email: faker.internet.email(),
         username: faker.internet.userName().toLowerCase(),
         admin: false,
@@ -74,7 +76,7 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
       .insert(entities)
       .values({
         name,
-        country: faker.address.country(),
+        country: faker.location.country(),
         type: ["brand", "distiller"],
         ...data,
         createdById: data.createdById || (await User()).id,
@@ -115,8 +117,8 @@ export const Bottle = async ({
       .values({
         name: toTitleCase(
           choose([
-            faker.company.bsNoun(),
-            `${faker.company.bsAdjective()} ${faker.company.bsNoun()}`,
+            faker.company.buzzNoun(),
+            `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
           ]),
         ),
         category: choose([
@@ -171,7 +173,7 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
-        rating: faker.datatype.float({ min: 1, max: 5 }),
+        rating: faker.number.float({ min: 1, max: 5 }),
         tags: sample(defaultTags, random(1, 5)),
         ...data,
         bottleId: data.bottleId || (await Bottle()).id,

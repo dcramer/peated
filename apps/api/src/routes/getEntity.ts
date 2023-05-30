@@ -1,7 +1,7 @@
 import { EntitySchema } from "@peated/shared/schemas";
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { entities } from "../db/schema";

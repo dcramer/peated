@@ -1,0 +1,13 @@
+.root {
+  z-index: 2147483647;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+}
+
+.progress {
+  background: var(--highlight-color);
+  height: 0.5rem;
+}

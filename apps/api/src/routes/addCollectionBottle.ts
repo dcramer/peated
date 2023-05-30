@@ -1,8 +1,8 @@
 import { CollectionBottleInputSchema } from "@peated/shared/schemas";
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { bottles, collectionBottles, collections } from "../db/schema";

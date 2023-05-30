@@ -1,7 +1,9 @@
 import { inArray } from "drizzle-orm";
-import { Serializer, serialize } from ".";
+import type { Serializer } from ".";
+import { serialize } from ".";
 import { db } from "../../db";
-import { Bottle, User, bottlesToDistillers, entities } from "../../db/schema";
+import type { Bottle, User } from "../../db/schema";
+import { bottlesToDistillers, entities } from "../../db/schema";
 import { notEmpty } from "../filter";
 import { EntitySerializer } from "./entity";
 

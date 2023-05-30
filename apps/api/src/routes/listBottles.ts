@@ -1,17 +1,13 @@
 import { BottleSchema, PaginatedSchema } from "@peated/shared/schemas";
-import { SQL, and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import {
-  Category,
-  bottles,
-  bottlesToDistillers,
-  entities,
-  tastings,
-} from "../db/schema";
+import type { Category } from "../db/schema";
+import { bottles, bottlesToDistillers, entities, tastings } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";

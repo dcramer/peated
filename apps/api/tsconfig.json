@@ -1,7 +1,10 @@
 {
   "extends": "@peated/shared/tsconfig.json",
   "compilerOptions": {
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["src/test/setup-test-env.ts"]

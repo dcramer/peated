@@ -27,6 +27,21 @@ program
   });
 
 program
+  .command("set-password")
+  .description("Set a users password")
+  .argument("<email>")
+  .argument("<password>")
+  .action(async (email, password) => {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    await db
+      .update(users)
+      .set({ passwordHash: hashSync(password, 8) })
+      .where(eq(users.id, user.id));
+
+    console.log(`${user.email} password changed`);
+  });
+
+program
   .command("make-admin")
   .description("Make a user admin")
   .argument("<email>")

@@ -1,10 +1,11 @@
 import { CommentInputSchema, CommentSchema } from "@peated/shared/schemas";
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { Comment, NewComment, comments, tastings } from "../db/schema";
+import type { Comment, NewComment } from "../db/schema";
+import { comments, tastings } from "../db/schema";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { createNotification, objectTypeFromSchema } from "../lib/notifications";
 import { serialize } from "../lib/serializers";

@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import * as Fixtures from "../lib/test/fixtures";
 

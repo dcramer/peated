@@ -1,6 +1,7 @@
-import { Bottle, CollectionBottle, User } from "../../db/schema";
+import type { Bottle, CollectionBottle, User } from "../../db/schema";
 
-import { Serializer, serialize } from ".";
+import type { Serializer } from ".";
+import { serialize } from ".";
 import { BottleSerializer } from "./bottle";
 
 export const CollectionBottleSerializer: Serializer<

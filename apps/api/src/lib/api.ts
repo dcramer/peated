@@ -1,6 +1,7 @@
 import { and, eq } from "drizzle-orm";
-import { DatabaseType, TransactionType } from "../db";
-import { User, follows, users } from "../db/schema";
+import type { DatabaseType, TransactionType } from "../db";
+import type { User } from "../db/schema";
+import { follows, users } from "../db/schema";
 
 // export async function getUserFromId(
 //   db: DatabaseType | TransactionType,

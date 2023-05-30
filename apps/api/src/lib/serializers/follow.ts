@@ -1,9 +1,11 @@
-import { Follow, User, users } from "../../db/schema";
+import type { Follow, User } from "../../db/schema";
+import { users } from "../../db/schema";
 
 import { follows } from "../../db/schema";
 
 import { and, eq, inArray } from "drizzle-orm";
-import { Serializer, serialize } from ".";
+import type { Serializer } from ".";
+import { serialize } from ".";
 import { db } from "../../db";
 import { UserSerializer } from "./user";
 

@@ -1,6 +1,6 @@
-import { Entity, User } from "../../db/schema";
+import type { Entity, User } from "../../db/schema";
 
-import { Serializer } from ".";
+import type { Serializer } from ".";
 
 export const EntitySerializer: Serializer<Entity> = {
   item: (item: Entity, attrs: Record<string, any>, currentUser?: User) => {

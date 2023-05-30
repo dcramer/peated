@@ -18,11 +18,9 @@ RUN pnpm install
 
 ARG VERSION
 ENV VERSION $VERSION
-ENV VITE_VERSION $VERSION
 
 ARG SENTRY_DSN
 ENV SENTRY_DSN $SENTRY_DSN
-ENV VITE_SENTRY_DSN $SENTRY_DSN
 
 ARG SENTRY_ORG
 ENV SENTRY_ORG $SENTRY_ORG
@@ -32,11 +30,9 @@ ENV SENTRY_PROJECT $SENTRY_PROJECT
 
 ARG API_SERVER
 ENV API_SERVER $API_SERVER
-ENV VITE_API_SERVER $API_SERVER
 
 ARG GOOGLE_CLIENT_ID
 ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
-ENV VITE_GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
 
 ADD . .
 
@@ -45,17 +41,25 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     pnpm build
 
 # web service
-FROM nginx:alpine as web
+FROM build as api
 
-COPY --from=build /app/apps/web/dist /usr/share/nginx/html
+WORKDIR /app
 
-RUN rm /etc/nginx/conf.d/default.conf
+COPY --from=build /app/ ./
 
-COPY nginx/nginx.conf /etc/nginx/conf.d
+ARG VERSION
+ENV VERSION $VERSION
 
-EXPOSE 8043
+RUN echo $VERSION > VERSION
 
-CMD ["nginx", "-g", "daemon off;"]
+ENV HOST 0.0.0.0
+ENV PORT 3000
+
+EXPOSE 3000
+
+WORKDIR /app/apps/web
+
+CMD ["pnpm", "start"]
 
 # api service
 FROM build as api

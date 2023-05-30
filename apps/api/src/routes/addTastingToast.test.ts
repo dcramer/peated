@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { db } from "../db";
 import { tastings, toasts } from "../db/schema";
