@@ -41,19 +41,28 @@ async function scrapeBottle(id: number) {
     $("dt:contains('Category') + dd").first().text(),
   );
 
-  const distillerName = $("dt:contains('Distillery') + dd > a").first().text();
+  const distillerName = $("dt:contains('Distillery') + dd a").first().text();
   bottle.distiller = distillerName
     ? {
         name: distillerName,
       }
     : null;
 
-  const bottlerName = $("dt:contains('Bottler') + dd > a").first().text();
-  bottle.bottler = bottlerName
-    ? {
-        name: bottlerName,
-      }
-    : null;
+  const bottlerName = $("dt:contains('Bottler') + dd a").first().text();
+  if (
+    !bottlerName &&
+    bottle.distiller &&
+    $("dt:contains('Bottler') + dd").first().text() === "Distillery Bottling"
+  ) {
+    bottle.bottler = bottle.distiller;
+  } else {
+    bottle.bottler = bottlerName
+      ? {
+          name: bottlerName,
+        }
+      : null;
+  }
+
   bottle.series = $("dt:contains('Bottling serie') + dd").first().text();
 
   const ageData = $("dt:contains('Stated Age') + dd")
@@ -320,7 +329,11 @@ async function scrapeBottles() {
     });
   }
 
-  const keepBottles = results.filter((v) => v.votes >= 100);
+  const keepBottles = results
+    // discard low votes as the data might be bad
+    .filter((v) => v.votes >= 100)
+    // discard series specific stuff (for now)
+    .filter((v) => v.series === null);
 
   console.log(
     `Found ${results.length} bottles - keeping ${keepBottles.length}`,
