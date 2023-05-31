@@ -63,6 +63,20 @@ function initMobileControls() {
 
 initMobileControls();
 
+function unregisterServiceWorkers() {
+  if (typeof navigator === "undefined") return;
+
+  if (window.navigator && navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+      for (const registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+}
+
+unregisterServiceWorkers();
+
 export const meta: V2_MetaFunction = () => {
   return [
     { name: "description", content: config.DESCRIPTION },
