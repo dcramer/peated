@@ -2,11 +2,17 @@ import { Link } from "@remix-run/react";
 import Separated from "./separated";
 import Tooltip from "./tooltip";
 
-export default function Tags({ tags }: { tags: string[] }) {
+export default function Tags({
+  tags,
+  fullWidth = false,
+}: {
+  tags: string[];
+  fullWidth?: boolean;
+}) {
   if (!tags || !tags.length) return null;
   return (
     <div className="text-sm">
-      <div className="hidden sm:block">
+      <div className={fullWidth ? "hidden sm:block" : ""}>
         <Separated separator=", ">
           {tags.slice(0, 3).map((item) => (
             <Link
@@ -29,13 +35,15 @@ export default function Tags({ tags }: { tags: string[] }) {
           </span>
         )}
       </div>
-      <div className="sm:hidden">
-        <Tooltip title={tags.join(", ")}>
-          <span className="underline decoration-dotted">
-            {tags.length} flavor note{tags.length !== 1 ? "s" : ""}
-          </span>
-        </Tooltip>
-      </div>
+      {fullWidth && (
+        <div className="sm:hidden">
+          <Tooltip title={tags.join(", ")}>
+            <span className="underline decoration-dotted">
+              {tags.length} flavor note{tags.length !== 1 ? "s" : ""}
+            </span>
+          </Tooltip>
+        </div>
+      )}
     </div>
   );
 }
