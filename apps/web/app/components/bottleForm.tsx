@@ -128,7 +128,7 @@ export default function BottleForm({
               else, you can use the full bottle label.
             </p>
             <p>
-              Have any suggestions for making it easier to enter correct data?
+              Have any suggestions for making it easier to enter correct data?{" "}
               <a href={config.GITHUB_REPO}>Open an Issue on GitHub</a> or{" "}
               <a href={config.DISCORD_LINK}>drop a note on Discord</a> if you
               have feedback. We'll update the bottle preview as you enter
