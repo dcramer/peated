@@ -1,4 +1,5 @@
-import { InferModel, relations, sql } from "drizzle-orm";
+import type { InferModel } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,

@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginCallback } from "fastify";
+import type { FastifyInstance, FastifyPluginCallback } from "fastify";
 
 import addBottle from "./addBottle";
 import addCollectionBottle from "./addCollectionBottle";

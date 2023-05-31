@@ -1,7 +1,9 @@
-import { Change, User, users } from "../../db/schema";
+import type { Change, User } from "../../db/schema";
+import { users } from "../../db/schema";
 
 import { inArray } from "drizzle-orm";
-import { Serializer, serialize } from ".";
+import type { Serializer } from ".";
+import { serialize } from ".";
 import { db } from "../../db";
 import { logError } from "../log";
 import { UserSerializer } from "./user";

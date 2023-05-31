@@ -1,4 +1,5 @@
-import { SQL, SQLChunk, StringChunk, eq } from "drizzle-orm";
+import type { SQLChunk } from "drizzle-orm";
+import { SQL, StringChunk, eq } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 

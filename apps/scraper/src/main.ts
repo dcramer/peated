@@ -288,8 +288,8 @@ async function scrapeBottleTable(
 }
 
 async function scrapeBottles() {
-  // const years = [...Array(100).keys()].map((i) => 2023 - i);
-  const years = [2022, 2023];
+  const years = [...Array(100).keys()].map((i) => 2023 - i);
+  // const years = [2022, 2023];
   const results: any[] = [];
   const bottleDedupeSet: Record<string, any> = {};
   for (const year of years) {

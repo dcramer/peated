@@ -1,6 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { tastings, toasts } from "../db/schema";
 import { createNotification, objectTypeFromSchema } from "../lib/notifications";

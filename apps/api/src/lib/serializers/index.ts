@@ -1,4 +1,4 @@
-import { User } from "../../db/schema";
+import type { User } from "../../db/schema";
 
 export type Result = Record<string, any>;
 

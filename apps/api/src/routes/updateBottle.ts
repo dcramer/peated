@@ -1,18 +1,12 @@
 import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
 import { and, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import {
-  Bottle,
-  Entity,
-  bottles,
-  bottlesToDistillers,
-  changes,
-  entities,
-} from "../db/schema";
+import type { Bottle, Entity } from "../db/schema";
+import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
 import { fixBottleName } from "../lib/api";
 import { upsertEntity } from "../lib/db";
 import { serialize } from "../lib/serializers";

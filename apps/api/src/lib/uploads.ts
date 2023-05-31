@@ -5,7 +5,7 @@ import { createWriteStream } from "node:fs";
 import sharp from "sharp";
 
 import { trace } from "@sentry/node";
-import { Readable } from "node:stream";
+import type { Readable } from "node:stream";
 import { promisify } from "node:util";
 import { pipeline } from "stream";
 import config from "../config";

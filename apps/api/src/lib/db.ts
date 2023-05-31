@@ -1,12 +1,7 @@
 import { eq } from "drizzle-orm";
-import { DatabaseType, TransactionType } from "../db";
-import {
-  Entity,
-  EntityType,
-  changes,
-  collections,
-  entities,
-} from "../db/schema";
+import type { DatabaseType, TransactionType } from "../db";
+import type { Entity, EntityType } from "../db/schema";
+import { changes, collections, entities } from "../db/schema";
 
 export type EntityInput =
   | number

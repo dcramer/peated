@@ -1,7 +1,8 @@
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
-import { DatabaseType, TransactionType } from "../db";
-import { NewUser, User, users } from "../db/schema";
+import type { DatabaseType, TransactionType } from "../db";
+import type { NewUser, User } from "../db/schema";
+import { users } from "../db/schema";
 import { random } from "./rand";
 import { serialize } from "./serializers";
 import { UserSerializer } from "./serializers/user";

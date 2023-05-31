@@ -1,7 +1,9 @@
 import { inArray } from "drizzle-orm";
-import { Serializer, serialize } from ".";
+import type { Serializer } from ".";
+import { serialize } from ".";
 import { db } from "../../db";
-import { Comment, User, users } from "../../db/schema";
+import type { Comment, User } from "../../db/schema";
+import { users } from "../../db/schema";
 import { UserSerializer } from "./user";
 
 export const CommentSerializer: Serializer<Comment> = {

@@ -1,0 +1,204 @@
+import { Menu } from "@headlessui/react";
+import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { Outlet, useParams, useSubmit } from "@remix-run/react";
+import { useState } from "react";
+import Button from "~/components/button";
+import Chip from "~/components/chip";
+import EmptyActivity from "~/components/emptyActivity";
+import Layout from "~/components/layout";
+import QueryBoundary from "~/components/queryBoundary";
+import Tabs from "~/components/tabs";
+import { TagDistribution } from "~/components/tagDistribution";
+import UserAvatar from "~/components/userAvatar";
+import useApi from "~/hooks/useApi";
+import useAuth from "~/hooks/useAuth";
+import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
+import type { FollowStatus, Paginated, Tag, User } from "~/types";
+
+type UserDetails = User & {
+  followStatus?: FollowStatus;
+  stats: {
+    bottles: number;
+    tastings: number;
+    contributions: number;
+    collected: number;
+  };
+};
+
+const UserTagDistribution = ({ userId }: { userId: number }) => {
+  const api = useApi();
+  const {
+    data: { results, totalCount },
+  } = useSuspenseQuery(
+    ["users", userId, "tags"],
+    (): Promise<Paginated<Tag> & { totalCount: number }> =>
+      api.get(`/users/${userId}/tags`),
+  );
+
+  if (!results.length) return null;
+
+  return <TagDistribution tags={results} totalCount={totalCount} />;
+};
+
+export default function Profile() {
+  const api = useApi();
+  const { user: currentUser } = useAuth();
+  const submit = useSubmit();
+  const { username } = useParams();
+
+  const { data } = useSuspenseQuery(
+    ["users", username],
+    (): Promise<UserDetails> => api.get(`/users/${username}`),
+  );
+  const [user, setUser] = useState<UserDetails>(data);
+  const [followStatus, setFollowStatus] = useState(data.followStatus);
+
+  const followUser = async (follow: boolean) => {
+    const data = await api[follow ? "post" : "delete"](
+      `/users/${user.id}/follow`,
+    );
+    setFollowStatus(data.status);
+  };
+
+  const isPrivate =
+    user.private &&
+    currentUser &&
+    user.id !== currentUser.id &&
+    followStatus !== "following";
+
+  return (
+    <Layout title={`@${user.username}`}>
+      <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
+        <div className="flex w-full justify-center sm:w-auto sm:justify-start">
+          <UserAvatar user={user} size={150} />
+        </div>
+        <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-1 sm:gap-y-2">
+          <h3 className="self-center text-4xl font-semibold leading-normal text-white sm:self-start">
+            {user.displayName}
+          </h3>
+          <div className="text-light flex flex-col items-center gap-x-2 gap-y-2 self-center sm:flex-row sm:self-start">
+            <div>
+              <AtSymbolIcon className="inline h-3 w-3" />
+              {user.username}
+            </div>
+            <div>
+              {user.admin ? (
+                <Chip size="small" color="highlight">
+                  Admin
+                </Chip>
+              ) : user.mod ? (
+                <Chip size="small" color="highlight">
+                  Moderator
+                </Chip>
+              ) : null}
+            </div>
+          </div>
+          <div className="flex justify-center sm:justify-start">
+            <div className="mr-4 pr-3 text-center">
+              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+                {user.stats.tastings.toLocaleString()}
+              </span>
+              <span className="text-peated-light text-sm">Tastings</span>
+            </div>
+            <div className="mb-4 px-3 text-center">
+              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+                {user.stats.bottles.toLocaleString()}
+              </span>
+              <span className="text-peated-light text-sm">Bottles</span>
+            </div>
+            <div className="mb-4 px-3 text-center">
+              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+                {user.stats.collected.toLocaleString()}
+              </span>
+              <span className="text-peated-light text-sm">Collected</span>
+            </div>
+            <div className="mb-4 pl-3 text-center">
+              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+                {user.stats.contributions.toLocaleString()}
+              </span>
+              <span className="text-peated-light text-sm">Contributions</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
+          {currentUser && (
+            <div className="flex gap-x-2">
+              {user.id !== currentUser.id ? (
+                <>
+                  <Button
+                    color="primary"
+                    onClick={() => followUser(followStatus === "none")}
+                  >
+                    {followStatus === "none"
+                      ? "Add Friend"
+                      : followStatus === "pending"
+                      ? "Request Pending"
+                      : "Remove Friend"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button to="/settings" color="primary">
+                    Edit Profile
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      submit(null, { method: "POST", action: "/logout" });
+                    }}
+                    color="primary"
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              )}
+              {currentUser.admin && (
+                <Menu as="div" className="menu">
+                  <Menu.Button as={Button}>
+                    <EllipsisVerticalIcon className="h-5 w-5" />
+                  </Menu.Button>
+                  <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+                    <Menu.Item
+                      as="button"
+                      onClick={async () => {
+                        const data = await api.put(`/users/${user.id}`, {
+                          data: {
+                            mod: !user.mod,
+                          },
+                        });
+                        setUser((state) => ({ ...state, ...data }));
+                      }}
+                    >
+                      {user.mod
+                        ? "Remove Moderator Role"
+                        : "Add Moderator Role"}
+                    </Menu.Item>
+                  </Menu.Items>
+                </Menu>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {isPrivate ? (
+        <EmptyActivity>This users profile is private.</EmptyActivity>
+      ) : (
+        <>
+          <UserTagDistribution userId={user.id} />
+
+          <Tabs fullWidth>
+            <Tabs.Item to={`/users/${user.username}`} controlled>
+              Activity
+            </Tabs.Item>
+            <Tabs.Item to={`/users/${user.username}/collections`} controlled>
+              Collection
+            </Tabs.Item>
+          </Tabs>
+          <QueryBoundary>
+            <Outlet context={{ user }} />
+          </QueryBoundary>
+        </>
+      )}
+    </Layout>
+  );
+}

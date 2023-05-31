@@ -1,6 +1,7 @@
-import { SQL, and, asc, ilike, or } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { and, asc, ilike, or } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 
 import { PaginatedSchema, UserSchema } from "@peated/shared/schemas";
