@@ -41,7 +41,7 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     pnpm build
 
 # web service
-FROM build as api
+FROM build as web
 
 WORKDIR /app
 
