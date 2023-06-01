@@ -1,8 +1,10 @@
-import { useNavigate } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/shared/schemas";
+import type { LoaderArgs} from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -18,26 +20,29 @@ import Layout from "~/components/layout";
 import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
 import { useRequiredAuth } from "~/hooks/useAuth";
-import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
+import { defaultClient } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
+import { authMiddleware } from "~/services/auth.server";
 import type { User } from "~/types";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 
+export async function loader({ request }: LoaderArgs) {
+  const intercept = await authMiddleware({ request });
+  if (intercept) return intercept;
+
+  const user: User = await defaultClient.get("/users/me");
+
+  return json({ user });
+}
+
 export default function Settings() {
   const api = useApi();
-
-  const { user: currentUser, setUser } = useRequiredAuth();
-  const queryClient = useQueryClient();
-
-  const { data: user } = useSuspenseQuery(
-    ["users", currentUser.username],
-    (): Promise<User> => api.get(`/users/me`),
-    { cacheTime: 0 },
-  );
-
   const navigate = useNavigate();
+  const { user } = useLoaderData<typeof loader>();
+  const { setUser } = useRequiredAuth();
 
+  const queryClient = useQueryClient();
   const saveUser = useMutation({
     mutationFn: async (data: FormSchemaType) => {
       const newUser = await api.put("/users/me", {
@@ -92,7 +97,7 @@ export default function Settings() {
             onSave={handleSubmit(onSubmit)}
             icon={<XMarkIcon className="h-full w-full" />}
             saveDisabled={isSubmitting}
-            onClose={() => navigate(`/users/${currentUser.username}`)}
+            onClose={() => navigate(`/users/${user.username}`)}
           />
         </Header>
       }

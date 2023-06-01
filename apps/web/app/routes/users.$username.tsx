@@ -1,7 +1,10 @@
 import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { Outlet, useParams, useSubmit } from "@remix-run/react";
+import type { LoaderArgs} from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Outlet, useLoaderData, useParams, useSubmit } from "@remix-run/react";
 import { useState } from "react";
+import invariant from "tiny-invariant";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
 import EmptyActivity from "~/components/emptyActivity";
@@ -13,6 +16,8 @@ import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
+import { defaultClient } from "~/lib/api";
+import { authMiddleware } from "~/services/auth.server";
 import type { FollowStatus, Paginated, Tag, User } from "~/types";
 
 type UserDetails = User & {
@@ -40,18 +45,27 @@ const UserTagDistribution = ({ userId }: { userId: number }) => {
   return <TagDistribution tags={results} totalCount={totalCount} />;
 };
 
+export async function loader({ params, request }: LoaderArgs) {
+  invariant(params.username);
+  const intercept = await authMiddleware({ request });
+  if (intercept) return intercept;
+
+  const user: UserDetails = await defaultClient.get(
+    `/users/${params.username}`,
+  );
+
+  return json({ user });
+}
+
 export default function Profile() {
   const api = useApi();
   const { user: currentUser } = useAuth();
   const submit = useSubmit();
   const { username } = useParams();
+  const data = useLoaderData<typeof loader>();
 
-  const { data } = useSuspenseQuery(
-    ["users", username],
-    (): Promise<UserDetails> => api.get(`/users/${username}`),
-  );
-  const [user, setUser] = useState<UserDetails>(data);
-  const [followStatus, setFollowStatus] = useState(data.followStatus);
+  const [user, setUser] = useState<UserDetails>(data.user);
+  const [followStatus, setFollowStatus] = useState(user.followStatus);
 
   const followUser = async (follow: boolean) => {
     const data = await api[follow ? "post" : "delete"](
