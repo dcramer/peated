@@ -3,7 +3,7 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/shared/schemas";
-import type { LoaderArgs} from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -20,18 +20,13 @@ import Layout from "~/components/layout";
 import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
 import { useRequiredAuth } from "~/hooks/useAuth";
-import { defaultClient } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
-import { authMiddleware } from "~/services/auth.server";
 import type { User } from "~/types";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 
-export async function loader({ request }: LoaderArgs) {
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
-
-  const user: User = await defaultClient.get("/users/me");
+export async function loader({ context }: LoaderArgs) {
+  const user: User = await context.api.get("/users/me");
 
   return json({ user });
 }

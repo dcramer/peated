@@ -1,17 +1,14 @@
 import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
+import config from "~/config";
 
-import api from "~/lib/api";
-import {
-  getAccessToken,
-  getSession,
-  getUser,
-  logout,
-  sessionStorage,
-} from "~/services/session.server";
+import { ApiClient } from "~/lib/api";
+import { sessionStorage } from "~/services/session.server";
 import type { SessionPayload } from "~/types";
 
 export const authenticator = new Authenticator<SessionPayload>(sessionStorage);
+
+const api = new ApiClient(config.API_SERVER);
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {
@@ -35,15 +32,3 @@ authenticator.use(
   }),
   "default",
 );
-
-export async function authMiddleware({ request }: { request: Request }) {
-  const session = await getSession(request);
-  const user = await getUser(session);
-  const accessToken = await getAccessToken(session);
-
-  if (accessToken) {
-    api.setAccessToken(accessToken);
-  } else if (user) {
-    return await logout(request);
-  }
-}

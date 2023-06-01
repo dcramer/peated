@@ -36,8 +36,6 @@ import LoadingIndicator from "./components/loadingIndicator";
 import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
 import { ApiUnauthorized } from "./lib/api";
-import { authMiddleware } from "./services/auth.server";
-import { getAccessToken, getSession, getUser } from "./services/session.server";
 
 function initMobileControls() {
   if (typeof document === "undefined") return;
@@ -143,17 +141,10 @@ function Document({
   );
 }
 
-export async function loader({ request }: LoaderArgs) {
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
-
-  const session = await getSession(request);
-  const user = await getUser(session);
-  const accessToken = await getAccessToken(session);
-
+export async function loader({ context }: LoaderArgs) {
   return json({
-    accessToken,
-    user,
+    accessToken: context.accessToken,
+    user: context.user,
     config,
   });
 }

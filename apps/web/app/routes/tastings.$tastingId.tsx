@@ -19,8 +19,6 @@ import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
-import { defaultClient } from "~/lib/api";
-import { authMiddleware } from "~/services/auth.server";
 import type { Comment, Paginated, Tasting, User } from "~/types";
 
 const CommentForm = ({
@@ -194,13 +192,10 @@ const CommentList = ({
   );
 };
 
-export async function loader({ params, request }: LoaderArgs) {
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
-
+export async function loader({ params, context }: LoaderArgs) {
   invariant(params.tastingId);
 
-  const tasting: Tasting = await defaultClient.get(
+  const tasting: Tasting = await context.api.get(
     `/tastings/${params.tastingId}`,
   );
 

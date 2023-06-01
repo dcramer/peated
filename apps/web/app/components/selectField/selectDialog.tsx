@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
+import useApi from "~/hooks/useApi";
 import config from "../../config";
-import api, { debounce } from "../../lib/api";
+import { debounce } from "../../lib/api";
 import classNames from "../../lib/classNames";
 import Header from "../header";
 import ListItem from "../listItem";
@@ -57,6 +58,7 @@ export default ({
   endpoint?: string;
   options?: Option[];
 }) => {
+  const api = useApi();
   const [query, setQuery] = useState("");
   const [optionList, setOptionList] = useState<Option[]>([...selectedValues]);
   const [results, setResults] = useState<Option[]>([]);

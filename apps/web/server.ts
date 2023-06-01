@@ -6,6 +6,14 @@ import { wrapExpressCreateRequestHandler } from "@sentry/remix";
 import compression from "compression";
 import express from "express";
 import morgan from "morgan";
+import config from "~/config";
+import { ApiClient } from "~/lib/api";
+import {
+  getAccessToken,
+  getSession,
+  getUser,
+  logout,
+} from "~/services/session.server";
 
 const app = express();
 const metricsApp = express();
@@ -82,6 +90,25 @@ const BUILD_DIR = path.join(process.cwd(), "build");
 const createSentryRequestHandler =
   wrapExpressCreateRequestHandler(createRequestHandler);
 
+app.all("*", async (req, res, next) => {
+  const session = await getSession(req);
+  const user = await getUser(session);
+  const accessToken = await getAccessToken(session);
+
+  req.user = user || null;
+  req.accessToken = accessToken || null;
+  req.api = new ApiClient({
+    server: config.API_SERVER,
+    accessToken,
+  });
+
+  if (accessToken && !user) {
+    return logout(req);
+  }
+
+  next();
+});
+
 app.all(
   "*",
   MODE === "production"
@@ -91,6 +118,13 @@ app.all(
         const requestHandler = createSentryRequestHandler({
           build: require(BUILD_DIR),
           mode: MODE,
+          getLoadContext: async function getLoadContext(req: any, res: any) {
+            return {
+              api: req.api,
+              user: req.user,
+              accessToken: req.accessToken,
+            };
+          },
         });
         return requestHandler(...args);
       },

@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
+import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import type { Bottle, Entity, User } from "~/types";
-import api, { debounce } from "../lib/api";
+import { debounce } from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
 import BottleIcon from "./assets/Bottle";
 import EntityIcon from "./assets/Entity";
@@ -190,6 +191,7 @@ export type Props = {
 
 export default function SearchPanel({ onClose, onQueryChange }: Props) {
   const { user } = useAuth();
+  const api = useApi();
   const navigate = useNavigate();
   const location = useLocation();
   const qs = new URLSearchParams(location.search);

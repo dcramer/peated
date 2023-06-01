@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { LoaderArgs} from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, useLoaderData, useParams, useSubmit } from "@remix-run/react";
 import { useState } from "react";
@@ -16,8 +16,6 @@ import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
-import { defaultClient } from "~/lib/api";
-import { authMiddleware } from "~/services/auth.server";
 import type { FollowStatus, Paginated, Tag, User } from "~/types";
 
 type UserDetails = User & {
@@ -45,14 +43,10 @@ const UserTagDistribution = ({ userId }: { userId: number }) => {
   return <TagDistribution tags={results} totalCount={totalCount} />;
 };
 
-export async function loader({ params, request }: LoaderArgs) {
+export async function loader({ params, context }: LoaderArgs) {
   invariant(params.username);
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
 
-  const user: UserDetails = await defaultClient.get(
-    `/users/${params.username}`,
-  );
+  const user: UserDetails = await context.api.get(`/users/${params.username}`);
 
   return json({ user });
 }

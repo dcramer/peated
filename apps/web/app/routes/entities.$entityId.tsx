@@ -13,19 +13,12 @@ import Layout from "~/components/layout";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
-import { defaultClient } from "~/lib/api";
-import { authMiddleware } from "~/services/auth.server";
 import type { Bottle, Entity, Paginated } from "~/types";
 
-export async function loader({ params, request }: LoaderArgs) {
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
-
+export async function loader({ params, context }: LoaderArgs) {
   invariant(params.entityId);
 
-  const entity: Entity = await defaultClient.get(
-    `/entities/${params.entityId}`,
-  );
+  const entity: Entity = await context.api.get(`/entities/${params.entityId}`);
 
   return json({ entity });
 }

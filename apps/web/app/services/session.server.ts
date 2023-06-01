@@ -1,6 +1,8 @@
-import type { Session} from "@remix-run/node";
+import type { Session } from "@remix-run/node";
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import type { Request as ExpressRequest } from "express";
 import invariant from "tiny-invariant";
+
 import type { SessionPayload } from "~/types";
 
 invariant(process.env.SECRET, "SECRET must be set");
@@ -16,8 +18,11 @@ export const sessionStorage = createCookieSessionStorage({
   },
 });
 
-export async function getSession(request: Request) {
-  const cookie = request.headers.get("Cookie");
+export async function getSession(request: Request | ExpressRequest) {
+  const cookie =
+    "get" in request
+      ? request.get("Cookie")
+      : (request as Request).headers.get("Cookie");
   return await sessionStorage.getSession(cookie);
 }
 
@@ -62,7 +67,7 @@ export async function createSession({
   );
 }
 
-export async function logout(request: Request) {
+export async function logout(request: Request | ExpressRequest) {
   const s = await getSession(request);
   return redirect("/", {
     headers: {

@@ -7,21 +7,16 @@ import EmptyActivity from "~/components/emptyActivity";
 import TastingList from "~/components/tastingList";
 import useApi from "~/hooks/useApi";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
-import { authMiddleware } from "~/services/auth.server";
 import type { Paginated, Tasting } from "~/types";
-import { defaultClient } from "../lib/api";
 
-export async function loader({ params: { bottleId }, request }: LoaderArgs) {
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
-
+export async function loader({ params: { bottleId }, context }: LoaderArgs) {
   invariant(bottleId);
 
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery(
     ["bottle", bottleId, "tastings"],
     (): Promise<Paginated<Tasting>> =>
-      defaultClient.get(`/tastings`, {
+      context.api.get(`/tastings`, {
         query: { bottle: bottleId },
       }),
   );

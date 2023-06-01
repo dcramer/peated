@@ -157,7 +157,3 @@ const createDefaultClient = () => {
     server: config.API_SERVER,
   });
 };
-
-export const defaultClient = createDefaultClient();
-const api = defaultClient;
-export default api;

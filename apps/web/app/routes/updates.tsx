@@ -1,4 +1,4 @@
-import type { LoaderArgs} from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import ChangeList from "~/components/changeList";
@@ -9,9 +9,7 @@ import Tabs from "~/components/tabs";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { useOnlineStatus } from "~/hooks/useOnlineStatus";
-import { authMiddleware } from "~/services/auth.server";
 import type { Change, Paginated } from "~/types";
-import { defaultClient } from "../lib/api";
 
 const UpdatesContent = () => {
   const api = useApi();
@@ -35,15 +33,12 @@ const UpdatesContent = () => {
   );
 };
 
-export async function loader({ request }: LoaderArgs) {
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
-
+export async function loader({ context }: LoaderArgs) {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(
     ["changes"],
-    (): Promise<Paginated<Change>> => defaultClient.get("/changes"),
+    (): Promise<Paginated<Change>> => context.api.get("/changes"),
   );
 
   return json({ dehydratedState: dehydrate(queryClient) });

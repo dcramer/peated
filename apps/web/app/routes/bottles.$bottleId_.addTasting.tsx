@@ -22,9 +22,9 @@ import RangeField from "~/components/rangeField";
 import SelectField from "~/components/selectField";
 import TextAreaField from "~/components/textAreaField";
 import TextField from "~/components/textField";
-import api, { ApiError } from "~/lib/api";
+import useApi from "~/hooks/useApi";
+import { ApiError } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
-import { authMiddleware } from "~/services/auth.server";
 import type { Bottle, Paginated } from "~/types";
 
 type Tag = {
@@ -34,14 +34,11 @@ type Tag = {
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
 
-export async function loader({ params, request }: LoaderArgs) {
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
-
+export async function loader({ params, context }: LoaderArgs) {
   invariant(params.bottleId);
-  const bottle: Bottle = await api.get(`/bottles/${params.bottleId}`);
+  const bottle: Bottle = await context.api.get(`/bottles/${params.bottleId}`);
 
-  const suggestedTags: Paginated<Tag> = await api.get(
+  const suggestedTags: Paginated<Tag> = await context.api.get(
     `/bottles/${params.bottleId}/suggestedTags`,
   );
 
@@ -49,6 +46,7 @@ export async function loader({ params, request }: LoaderArgs) {
 }
 
 export default function AddTasting() {
+  const api = useApi();
   const { bottle, suggestedTags } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 

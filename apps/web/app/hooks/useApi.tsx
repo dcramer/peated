@@ -1,7 +1,8 @@
 import { createContext, useContext } from "react";
-import api, { ApiClient } from "~/lib/api";
+import config from "~/config";
+import { ApiClient } from "~/lib/api";
 
-const ApiContext = createContext<ApiClient>(api);
+const ApiContext = createContext<ApiClient>(new ApiClient(config.API_SERVER));
 
 export const ApiProvider = ({
   server,

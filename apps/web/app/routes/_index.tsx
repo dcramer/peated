@@ -10,8 +10,7 @@ import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
 import TastingList from "~/components/tastingList";
-import type { ApiClient} from "~/lib/api";
-import { defaultClient } from "~/lib/api";
+import type { ApiClient } from "~/lib/api";
 import type { Paginated, Tasting } from "~/types";
 
 import type { LoaderArgs } from "@remix-run/node";
@@ -23,7 +22,6 @@ import Spinner from "~/components/spinner";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { useOnlineStatus } from "~/hooks/useOnlineStatus";
-import { authMiddleware } from "~/services/auth.server";
 
 const defaultViewParam = "global";
 
@@ -98,10 +96,7 @@ const ActivityContent = ({ filter }: { filter: string }) => {
   );
 };
 
-export async function loader({ request }: LoaderArgs) {
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
-
+export async function loader({ context, request }: LoaderArgs) {
   const url = new URL(request.url);
   const filterParam = mapFilterParam(url.searchParams.get("view"));
   const queryClient = new QueryClient();
@@ -109,7 +104,7 @@ export async function loader({ request }: LoaderArgs) {
   await queryClient.prefetchInfiniteQuery(
     ["tastings", { filter: filterParam }],
     async () =>
-      await getTastings({ filterParam: filterParam, api: defaultClient }),
+      await getTastings({ filterParam: filterParam, api: context.api }),
   );
 
   return json({ dehydratedState: dehydrate(queryClient) });

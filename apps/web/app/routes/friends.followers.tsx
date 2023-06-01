@@ -1,5 +1,5 @@
 import { AtSymbolIcon } from "@heroicons/react/20/solid";
-import type { LoaderArgs} from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
@@ -9,18 +9,13 @@ import EmptyActivity from "~/components/emptyActivity";
 import ListItem from "~/components/listItem";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
-import { authMiddleware } from "~/services/auth.server";
 import type { FollowRequest, FollowStatus, Friend, Paginated } from "~/types";
-import { defaultClient } from "../lib/api";
 
-export async function loader({ request }: LoaderArgs) {
-  const intercept = await authMiddleware({ request });
-  if (intercept) return intercept;
-
+export async function loader({ context }: LoaderArgs) {
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery(
     ["following"],
-    (): Promise<Paginated<Friend>> => defaultClient.get("/followers"),
+    (): Promise<Paginated<Friend>> => context.api.get("/followers"),
   );
 
   return json({ dehydratedState: dehydrate(queryClient) });
