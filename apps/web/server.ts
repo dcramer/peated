@@ -109,22 +109,24 @@ app.all("*", async (req, res, next) => {
   next();
 });
 
+function getLoadContext(req: any, res: any) {
+  return {
+    api: req.api,
+    user: req.user,
+    accessToken: req.accessToken,
+  };
+}
+
 app.all(
   "*",
   MODE === "production"
-    ? createSentryRequestHandler({ build: require(BUILD_DIR) })
+    ? createSentryRequestHandler({ build: require(BUILD_DIR), getLoadContext })
     : (...args) => {
         purgeRequireCache();
         const requestHandler = createSentryRequestHandler({
           build: require(BUILD_DIR),
           mode: MODE,
-          getLoadContext: async function getLoadContext(req: any, res: any) {
-            return {
-              api: req.api,
-              user: req.user,
-              accessToken: req.accessToken,
-            };
-          },
+          getLoadContext,
         });
         return requestHandler(...args);
       },
