@@ -33,7 +33,7 @@ export default function ErrorPage() {
   }
 
   return (
-    <Layout>
+    <Layout footer={null} header={null}>
       <main className="self-justify-center inline self-center p-3">
         <div className="text-center">
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
