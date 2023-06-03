@@ -17,7 +17,7 @@ export const AuthProvider = ({
   user = null,
   children,
 }: {
-  user?: User | null;
+  user: User | null;
   children: any;
 }) => {
   const [value, setValue] = useState<User | null>(user);
