@@ -44,6 +44,9 @@ export default {
   handler: async (req, res) => {
     const user = await getUserFromId(db, req.params.userId, req.user);
     if (!user) {
+      if (req.params.userId === "me") {
+        return res.status(401).send({ error: "Unauthorized " });
+      }
       return res.status(404).send({ error: "Not found" });
     }
 
