@@ -9,5 +9,5 @@
 
 .progress {
   background: var(--highlight-color);
-  height: 0.5rem;
+  height: 5px;
 }

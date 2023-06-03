@@ -33,7 +33,7 @@ function useProgress(): MutableRefObject<HTMLDivElement | null> {
       }, ms);
     };
 
-    updateWidth(300);
+    updateWidth(100);
 
     return () => {
       clearTimeout(timeout.current);
