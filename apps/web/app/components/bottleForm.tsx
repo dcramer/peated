@@ -1,13 +1,13 @@
-import { useState } from "react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BottleInputSchema } from "@peated/shared/schemas";
+import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
-import { PreviewBottleCard } from "~/components/bottleCard";
+import { BottleInputSchema } from "@peated/shared/schemas";
+import { CategoryValues } from "@peated/shared/types";
 
+import { PreviewBottleCard } from "~/components/bottleCard";
 import EntityField from "~/components/entityField";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
@@ -23,14 +23,7 @@ import { formatCategoryName } from "~/lib/strings";
 import type { Bottle, Entity } from "~/types";
 import Header from "./header";
 
-const categoryList = [
-  "blend",
-  "bourbon",
-  "rye",
-  "single_grain",
-  "single_malt",
-  "spirit",
-].map((c) => ({
+const categoryList = CategoryValues.map((c) => ({
   id: c,
   name: formatCategoryName(c),
 }));

@@ -1,3 +1,14 @@
+export const CategoryValues = [
+  "blend",
+  "bourbon",
+  "rye",
+  "single_grain",
+  "single_malt",
+  "spirit",
+] as const;
+
+export type Category = (typeof CategoryValues)[number];
+
 type NextPagingRel =
   | {
       nextPage: number;

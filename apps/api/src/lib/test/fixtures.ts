@@ -4,6 +4,7 @@ import path from "path";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
+import { CategoryValues } from "@peated/shared/types";
 import { sql } from "drizzle-orm";
 import { db } from "../../db";
 import type {
@@ -121,15 +122,7 @@ export const Bottle = async ({
             `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
           ]),
         ),
-        category: choose([
-          "blend",
-          "bourbon",
-          "rye",
-          "single_grain",
-          "single_malt",
-          "spirit",
-          undefined,
-        ]),
+        category: choose([...CategoryValues, undefined]),
         statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
         ...data,
         brandId: brand.id,

@@ -1,4 +1,6 @@
 import { BottleSchema, PaginatedSchema } from "@peated/shared/schemas";
+import type { Category} from "@peated/shared/types";
+import { CategoryValues } from "@peated/shared/types";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
@@ -6,7 +8,6 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import type { Category } from "../db/schema";
 import { bottles, bottlesToDistillers, entities, tastings } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
@@ -29,14 +30,7 @@ export default {
         tag: { type: "string" },
         category: {
           type: "string",
-          enum: [
-            "blend",
-            "bourbon",
-            "rye",
-            "single_grain",
-            "single_malt",
-            "spirit",
-          ],
+          enum: CategoryValues,
         },
         age: { type: "number" },
       },

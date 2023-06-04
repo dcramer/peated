@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { CategoryValues } from "./types";
+
 const FollowStatusEnum = z.enum(["pending", "following", "none"]);
 
 export const UserSchema = z.object({
@@ -47,14 +49,7 @@ export const EntitySchema = z.object({
   createdBy: UserSchema.optional(),
 });
 
-const CategoryEnum = z.enum([
-  "blend",
-  "bourbon",
-  "rye",
-  "single_grain",
-  "single_malt",
-  "spirit",
-]);
+const CategoryEnum = z.enum(CategoryValues);
 
 export const BottleSchema = z.object({
   id: z.number(),

@@ -17,6 +17,8 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { CategoryValues } from "@peated/shared/types";
+
 export const users = pgTable(
   "user",
   {
@@ -167,22 +169,7 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
 export type Entity = InferModel<typeof entities>;
 export type NewEntity = InferModel<typeof entities, "insert">;
 
-export type Category =
-  | "blend"
-  | "bourbon"
-  | "rye"
-  | "single_grain"
-  | "single_malt"
-  | "spirit";
-
-export const categoryEnum = pgEnum("category", [
-  "blend",
-  "bourbon",
-  "rye",
-  "single_grain",
-  "single_malt",
-  "spirit",
-]);
+export const categoryEnum = pgEnum("category", CategoryValues);
 // type MyEnum = InferModel<typeof myTable>["myColWithEnum”]
 
 export const bottles = pgTable(

@@ -63,7 +63,8 @@ async function scrapeBottle(id: number) {
       : null;
   }
 
-  bottle.series = $("dt:contains('Bottling serie') + dd").first().text();
+  bottle.series =
+    $("dt:contains('Bottling serie') + dd").first().text() || null;
 
   const ageData = $("dt:contains('Stated Age') + dd")
     .first()

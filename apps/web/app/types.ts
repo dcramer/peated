@@ -12,14 +12,6 @@ import type {
   PropsWithChildren,
 } from "react";
 
-export type Category =
-  | "blend"
-  | "bourbon"
-  | "rye"
-  | "single_grain"
-  | "single_malt"
-  | "spirit";
-
 export type EntityType = "brand" | "distiller" | "bottler";
 
 // e.g. Hibiki
