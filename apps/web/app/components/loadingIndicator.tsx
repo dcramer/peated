@@ -22,7 +22,6 @@ function useProgress(): MutableRefObject<HTMLDivElement | null> {
 
     const updateWidth = (ms: number) => {
       timeout.current = setTimeout(() => {
-        console.log(el.current);
         if (!el.current) return;
         const width = parseFloat(el.current.style.width);
         const percent = !isNaN(width) ? 10 + 0.9 * width : 0;

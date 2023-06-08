@@ -32,14 +32,17 @@ export default {
 
     const [user] = await db.select().from(users).where(eq(users.email, email));
     if (!user) {
+      console.log("user not found");
       return res.status(401).send({ error: "Invalid credentials" });
     }
 
     if (!user.passwordHash) {
+      console.log("user has no password set");
       return res.status(401).send({ error: "Invalid credentials" });
     }
 
     if (!compareSync(password, user.passwordHash)) {
+      console.log("invalid password");
       return res.status(401).send({ error: "Invalid credentials" });
     }
 

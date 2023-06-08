@@ -1,8 +1,9 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, Link, useLocation, useSubmit } from "@remix-run/react";
+import { Form, Link, useActionData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
+import Alert from "~/components/alert";
 
 import PeatedLogo from "~/components/assets/Logo";
 import Button from "~/components/button";
@@ -13,19 +14,24 @@ import { authenticator } from "~/services/auth.server";
 import { createSession } from "~/services/session.server";
 
 export async function action({ request }: ActionArgs) {
-  const session = await authenticator.authenticate("default", request, {});
-
-  if (!session) {
-    return json({ error: "Invalid credentials" });
-  }
   const url = new URL(request.url);
   const redirectTo = url.searchParams.get("redirectTo");
 
-  return await createSession({
-    request,
-    session,
-    redirectTo,
-  });
+  try {
+    const session = await authenticator.authenticate("default", request, {});
+
+    if (!session) {
+      return json({ error: "Invalid credentials" });
+    }
+
+    return await createSession({
+      request,
+      session,
+      redirectTo,
+    });
+  } catch (err) {
+    return json({ error: "Invalid credentials" });
+  }
 }
 
 export const loader = ({ request }: LoaderArgs) => {
@@ -114,10 +120,7 @@ const GoogleLogin = () => {
 };
 
 export default function Login() {
-  const location = useLocation();
-  const qs = new URLSearchParams(location.search);
-  let redirectTo: string | null = qs.get("redirectTo");
-  if (!redirectTo || redirectTo?.indexOf("/") !== 0) redirectTo = null;
+  const { error } = useActionData<typeof action>() || { error: null };
 
   return (
     <Layout splash header={null} footer={null}>
@@ -126,6 +129,7 @@ export default function Login() {
       </Link>
 
       <div className="min-w-sm mt-8 flex-1">
+        {error ? <Alert>{error}</Alert> : null}
         {config.GOOGLE_CLIENT_ID && (
           <>
             <GoogleLogin />
