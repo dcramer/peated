@@ -17,6 +17,7 @@ import deleteTasting from "./deleteTasting";
 import deleteUserFollow from "./deleteUserFollow";
 import getBottle from "./getBottle";
 import getEntity from "./getEntity";
+import getStats from "./getStats";
 import getTasting from "./getTasting";
 import getUser from "./getUser";
 import listBottleSuggestedTags from "./listBottleSuggestedTags";
@@ -61,6 +62,8 @@ export const router: FastifyPluginCallback = (
       res.status(200).send();
     },
   });
+
+  fastify.route(getStats);
 
   fastify.route(authDetails);
   fastify.route(authBasic);
