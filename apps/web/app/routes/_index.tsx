@@ -13,7 +13,7 @@ import TastingList from "~/components/tastingList";
 import type { ApiClient } from "~/lib/api";
 import type { Paginated, Tasting } from "~/types";
 
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
@@ -109,6 +109,14 @@ export async function loader({ context, request }: LoaderArgs) {
 
   return json({ dehydratedState: dehydrate(queryClient) });
 }
+
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Activity",
+    },
+  ];
+};
 
 export default function Activity() {
   const { user } = useAuth();
