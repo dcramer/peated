@@ -138,6 +138,10 @@ export default function EntityDetails() {
         )}
       </div>
 
+      <QueryBoundary fallback={<Fragment />} loading={<Fragment />}>
+        <EntitySpiritDistribution entityId={entity.id} />
+      </QueryBoundary>
+
       <div className="my-8 grid grid-cols-1 items-center gap-3 text-center sm:w-1/2 sm:text-left">
         {stats.map((stat) => (
           <div key={stat.name}>
@@ -148,10 +152,6 @@ export default function EntityDetails() {
           </div>
         ))}
       </div>
-
-      <QueryBoundary fallback={<Fragment />} loading={<Fragment />}>
-        <EntitySpiritDistribution entityId={entity.id} />
-      </QueryBoundary>
 
       <BottleTable
         bottleList={bottleList}
