@@ -10,6 +10,9 @@ function fixDistillerName(name: string) {
     case "Balvenie":
       return "The Balvenie";
 
+    case "1770":
+      return "Glasgow 1770";
+
     default:
       return name;
   }
