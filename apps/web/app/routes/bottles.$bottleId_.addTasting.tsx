@@ -20,6 +20,7 @@ import ImageField from "~/components/imageField";
 import Layout from "~/components/layout";
 import RangeField from "~/components/rangeField";
 import SelectField from "~/components/selectField";
+import Spinner from "~/components/spinner";
 import TextAreaField from "~/components/textAreaField";
 import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
@@ -113,6 +114,12 @@ export default function AddTasting() {
       }
       footer={null}
     >
+      {isSubmitting && (
+        <div className="fixed inset-0 z-10">
+          <div className="absolute inset-0 bg-slate-800 opacity-50" />
+          <Spinner />
+        </div>
+      )}
       <form
         className="w-full max-w-xl self-center bg-slate-950 pb-6 sm:my-6"
         onSubmit={handleSubmit(onSubmit)}
