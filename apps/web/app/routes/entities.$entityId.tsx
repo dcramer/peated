@@ -3,16 +3,21 @@ import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useParams } from "@remix-run/react";
+import { useQuery } from "@tanstack/react-query";
+import { Fragment } from "react";
 import invariant from "tiny-invariant";
 
 import EntityIcon from "~/components/assets/Entity";
 import BottleTable from "~/components/bottleTable";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
+import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
+import QueryBoundary from "~/components/queryBoundary";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
+import { formatCategoryName } from "~/lib/strings";
 import type { Bottle, Entity, Paginated } from "~/types";
 
 export async function loader({ params, context }: LoaderArgs) {
@@ -55,7 +60,7 @@ export default function EntityDetails() {
 
   return (
     <Layout>
-      <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4  p-3 sm:flex-nowrap sm:py-0">
+      <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
         <EntityIcon className="hidden h-14 w-auto sm:inline-block" />
 
         <div className="w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
@@ -133,7 +138,7 @@ export default function EntityDetails() {
         )}
       </div>
 
-      <div className="my-8 grid grid-cols-1 items-center gap-3 text-center sm:text-left">
+      <div className="my-8 grid grid-cols-1 items-center gap-3 text-center sm:w-1/2 sm:text-left">
         {stats.map((stat) => (
           <div key={stat.name}>
             <p className="text-peated-light leading-7">{stat.name}</p>
@@ -144,6 +149,10 @@ export default function EntityDetails() {
         ))}
       </div>
 
+      <QueryBoundary fallback={<Fragment />} loading={<Fragment />}>
+        <EntitySpiritDistribution entityId={entity.id} />
+      </QueryBoundary>
+
       <BottleTable
         bottleList={bottleList}
         groupBy={(bottle) => bottle.brand}
@@ -152,3 +161,40 @@ export default function EntityDetails() {
     </Layout>
   );
 }
+
+type Category = {
+  category: string;
+  count: number;
+};
+
+const EntitySpiritDistribution = ({ entityId }: { entityId: number }) => {
+  const api = useApi();
+
+  const { data } = useQuery(
+    ["entities", entityId, "categories"],
+    (): Promise<Paginated<Category> & { totalCount: number }> =>
+      api.get(`/entities/${entityId}/categories`),
+  );
+
+  if (!data) return null;
+
+  const { results, totalCount } = data;
+
+  if (!results.length) return null;
+
+  return (
+    <DistributionChart
+      items={results.map((t) => ({
+        name: formatCategoryName(t.category),
+        count: t.count,
+        category: t.category,
+      }))}
+      totalCount={totalCount}
+      to={(item) =>
+        `/bottles?entity=${entityId}&category=${encodeURIComponent(
+          item.category,
+        )}`
+      }
+    />
+  );
+};

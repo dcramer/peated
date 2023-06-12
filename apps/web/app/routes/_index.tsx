@@ -1,9 +1,5 @@
 import { useLocation } from "@remix-run/react";
-import {
-  QueryClient,
-  dehydrate,
-  useInfiniteQuery,
-} from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import Glyph from "~/components/assets/Glyph";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
@@ -13,8 +9,7 @@ import TastingList from "~/components/tastingList";
 import type { ApiClient } from "~/lib/api";
 import type { Paginated, Tasting } from "~/types";
 
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { V2_MetaFunction } from "@remix-run/node";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 import FloatingButton from "~/components/floatingButton";
@@ -96,19 +91,19 @@ const ActivityContent = ({ filter }: { filter: string }) => {
   );
 };
 
-export async function loader({ context, request }: LoaderArgs) {
-  const url = new URL(request.url);
-  const filterParam = mapFilterParam(url.searchParams.get("view"));
-  const queryClient = new QueryClient();
+// export async function loader({ context, request }: LoaderArgs) {
+//   const url = new URL(request.url);
+//   const filterParam = mapFilterParam(url.searchParams.get("view"));
+//   const queryClient = new QueryClient();
 
-  await queryClient.prefetchInfiniteQuery(
-    ["tastings", { filter: filterParam }],
-    async () =>
-      await getTastings({ filterParam: filterParam, api: context.api }),
-  );
+//   await queryClient.prefetchInfiniteQuery(
+//     ["tastings", { filter: filterParam }],
+//     async () =>
+//       await getTastings({ filterParam: filterParam, api: context.api }),
+//   );
 
-  return json({ dehydratedState: dehydrate(queryClient) });
-}
+//   return json({ dehydratedState: dehydrate(queryClient) });
+// }
 
 export const meta: V2_MetaFunction = () => {
   return [

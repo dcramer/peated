@@ -15,22 +15,36 @@ const Content = ({
   category,
   age,
   tag,
+  entity,
 }: {
   page: string | number;
   category?: string;
   age?: string;
   tag?: string;
+  entity?: string;
 }) => {
   const api = useApi();
 
   const { data } = useQuery({
-    queryKey: ["bottles", page, "category", category, "age", age, "tag", tag],
+    queryKey: [
+      "bottles",
+      page,
+      "category",
+      category,
+      "age",
+      age,
+      "tag",
+      tag,
+      "entity",
+      entity,
+    ],
     queryFn: (): Promise<Paginated<Bottle>> =>
       api.get("/bottles", {
         query: {
           category,
           age,
           tag,
+          entity,
           page,
           sort: "name",
         },
@@ -67,19 +81,27 @@ export default function BottleList() {
   const category = qs.get("category") || undefined;
   const age = qs.get("age") || undefined;
   const tag = qs.get("tag") || undefined;
+  const entity = qs.get("entity") || undefined;
 
   return (
     <Layout>
-      {(category || age || tag) && (
+      {(category || age || tag || entity) && (
         <div className="text-light space-x-2 p-3">
           <span className="font-medium">Results for</span>
           <SearchTerm name="age" value={age} />
           <SearchTerm name="category" value={category} />
           <SearchTerm name="tag" value={tag} />
+          <SearchTerm name="entity" value={entity} />
         </div>
       )}
       <QueryBoundary>
-        <Content page={page} category={category} age={age} tag={tag} />
+        <Content
+          page={page}
+          category={category}
+          age={age}
+          tag={tag}
+          entity={entity}
+        />
       </QueryBoundary>
     </Layout>
   );

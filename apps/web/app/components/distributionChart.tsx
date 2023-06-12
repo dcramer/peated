@@ -1,13 +1,19 @@
-import { toTitleCase } from "@peated/shared/lib/strings";
 import { Link } from "@remix-run/react";
-import type { Tag } from "~/types";
 
-export function TagDistribution({
-  tags,
+type Item = {
+  name: string;
+  count: number;
+  [key: string]: any;
+};
+
+export function DistributionChart({
+  items,
   totalCount,
+  to,
 }: {
-  tags: Tag[];
+  items: Item[];
   totalCount: number;
+  to?: (item: Item) => string;
 }) {
   const colorNames = [
     // "bg-slate-100 text-black border-slate-700 border",
@@ -21,7 +27,7 @@ export function TagDistribution({
     "bg-slate-900 text-white border-slate-700 border",
   ];
 
-  const visibleTags = tags.slice(0, 7);
+  const visibleItems = items.slice(0, 7);
 
   // const totalCountVisible = visibleTags.reduce(
   //   (acc, tag) => acc + tag.count,
@@ -29,10 +35,7 @@ export function TagDistribution({
   // );
 
   const results = [
-    ...visibleTags.map((t) => ({
-      ...t,
-      name: toTitleCase(t.tag),
-    })),
+    ...visibleItems,
     // ...(totalCount !== totalCountVisible
     //   ? [{ name: "Other", count: totalCount - totalCountVisible, tag: null }]
     //   : []),
@@ -40,24 +43,25 @@ export function TagDistribution({
 
   return (
     <div className="relative mb-4 flex flex-col space-y-1 text-xs font-bold">
-      {results.map((t, index) => {
-        const pct = (t.count / totalCount) * 100;
-        return t.tag ? (
+      {results.map((item, index) => {
+        const pct = (item.count / totalCount) * 100;
+        const itemTo = to && to(item);
+        return itemTo ? (
           <Link
-            key={t.name}
+            key={item.name}
             className={`${colorNames[index]} flex h-6 items-center justify-end rounded-r`}
             style={{ width: `${pct}%` }}
-            to={`/bottles?tag=${encodeURIComponent(t.tag)}`}
+            to={itemTo}
           >
-            <span className="truncate px-2">{t.name}</span>
+            <span className="truncate px-2">{item.name}</span>
           </Link>
         ) : (
           <div
-            key={t.name}
+            key={item.name}
             className={`${colorNames[index]} flex h-6 items-center justify-end rounded-r`}
             style={{ width: `${pct}%` }}
           >
-            <span className="truncate px-2">{t.name}</span>
+            <span className="truncate px-2">{item.name}</span>
           </div>
         );
       })}

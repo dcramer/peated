@@ -115,7 +115,7 @@ export default function AppHeader() {
 const UserDropdown = () => {
   const { user } = useAuth();
   const submit = useSubmit();
-  const buttonRef = useRef<HTMLAnchorElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const timeoutDuration = 200;
   let timeoutId: ReturnType<typeof setTimeout>;
@@ -146,22 +146,18 @@ const UserDropdown = () => {
     <Menu as="div" className="menu hidden sm:block">
       {({ open }) => (
         <>
-          <div
+          <Menu.Button
+            ref={buttonRef}
+            className="focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm text-slate-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring"
             onClick={openMenu}
             onMouseEnter={() => onMouseEnter(!open)}
             onMouseLeave={() => onMouseLeave(open)}
           >
-            <Menu.Button
-              ref={buttonRef}
-              as="a"
-              className="focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm text-slate-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring"
-            >
-              <span className="sr-only">Open user menu</span>
-              <div className="h-8 w-8 sm:h-8 sm:w-8">
-                <UserAvatar user={user} />
-              </div>
-            </Menu.Button>
-          </div>
+            <span className="sr-only">Open user menu</span>
+            <div className="h-8 w-8 sm:h-8 sm:w-8">
+              <UserAvatar user={user} />
+            </div>
+          </Menu.Button>
           <Transition
             as={Fragment}
             enter="transition ease-out duration-100"

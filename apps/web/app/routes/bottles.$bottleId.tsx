@@ -3,7 +3,9 @@ import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import { Suspense, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Fragment, Suspense, useState } from "react";
+import { ClientOnly } from "remix-utils";
 import invariant from "tiny-invariant";
 
 import AddToCollectionModal from "~/components/addToCollectionModal";
@@ -11,10 +13,10 @@ import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import BottleName from "~/components/bottleName";
 import Button from "~/components/button";
+import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
-import { TagDistribution } from "~/components/tagDistribution";
 import TimeSince from "~/components/timeSince";
 import VintageName from "~/components/vintageName";
 import useApi from "~/hooks/useApi";
@@ -98,17 +100,29 @@ type Tag = { tag: string; count: number };
 const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
   const api = useApi();
 
-  const {
-    data: { results, totalCount },
-  } = useSuspenseQuery(
+  const { data } = useQuery(
     ["bottles", bottleId, "tags"],
     (): Promise<Paginated<Tag> & { totalCount: number }> =>
       api.get(`/bottles/${bottleId}/tags`),
   );
 
+  if (!data) return null;
+
+  const { results, totalCount } = data;
+
   if (!results.length) return null;
 
-  return <TagDistribution tags={results} totalCount={totalCount} />;
+  return (
+    <DistributionChart
+      items={results.map((t) => ({
+        name: t.tag,
+        count: t.count,
+        tag: t.tag,
+      }))}
+      totalCount={totalCount}
+      to={(item) => `/bottles?tag=${encodeURIComponent(item.name)}`}
+    />
+  );
 };
 
 export async function loader({ params, context }: LoaderArgs) {
@@ -197,9 +211,13 @@ export default function BottleDetails() {
           )}
         </div>
 
-        <Suspense>
-          <BottleTagDistribution bottleId={bottle.id} />
-        </Suspense>
+        <ClientOnly>
+          {() => (
+            <QueryBoundary fallback={<Fragment />} loading={<Fragment />}>
+              <BottleTagDistribution bottleId={bottle.id} />
+            </QueryBoundary>
+          )}
+        </ClientOnly>
 
         <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
           {stats.map((stat) => (

@@ -9,6 +9,7 @@ import type {
 import { json } from "@remix-run/node";
 import {
   Links,
+  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -134,8 +135,7 @@ function Document({
           }}
         />
         <Scripts />
-        {/* LiveReload causes issues as child loaders will attempt to reload ignoring the behavior of the root loader */}
-        {/* <LiveReload /> */}
+        <LiveReload />
       </body>
     </html>
   );
@@ -159,7 +159,7 @@ export default withSentry(function App() {
           queries: {
             suspense: true,
             retry: false,
-            cacheTime: 0,
+            // cacheTime: 0,
           },
         },
       }),

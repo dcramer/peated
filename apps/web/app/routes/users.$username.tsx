@@ -3,19 +3,19 @@ import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, useLoaderData, useParams, useSubmit } from "@remix-run/react";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
+import { DistributionChart } from "~/components/distributionChart";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
-import { TagDistribution } from "~/components/tagDistribution";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
 import type { FollowStatus, Paginated, Tag, User } from "~/types";
 
 type UserDetails = User & {
@@ -30,17 +30,29 @@ type UserDetails = User & {
 
 const UserTagDistribution = ({ userId }: { userId: number }) => {
   const api = useApi();
-  const {
-    data: { results, totalCount },
-  } = useSuspenseQuery(
+  const { data } = useQuery(
     ["users", userId, "tags"],
     (): Promise<Paginated<Tag> & { totalCount: number }> =>
       api.get(`/users/${userId}/tags`),
   );
 
+  if (!data) return null;
+
+  const { results, totalCount } = data;
+
   if (!results.length) return null;
 
-  return <TagDistribution tags={results} totalCount={totalCount} />;
+  return (
+    <DistributionChart
+      items={results.map((t) => ({
+        name: t.tag,
+        count: t.count,
+        tag: t.tag,
+      }))}
+      totalCount={totalCount}
+      to={(item) => `/bottles?tag=${encodeURIComponent(item.name)}`}
+    />
+  );
 };
 
 export async function loader({ params, context }: LoaderArgs) {
