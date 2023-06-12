@@ -2,44 +2,37 @@ import { program } from "commander";
 import { eq, ne, sql } from "drizzle-orm";
 
 import { db } from "../db";
-import type {
-  Entity} from "../db/schema";
-import {
-  bottles,
-  follows,
-  tastings,
-  toasts,
-  users,
-} from "../db/schema";
+import type { Entity } from "../db/schema";
+import { bottles, follows, tastings, toasts, users } from "../db/schema";
 import { createNotification, objectTypeFromSchema } from "../lib/notifications";
 import { choose } from "../lib/rand";
 import * as Fixtures from "../lib/test/fixtures";
 
 const loadDefaultEntities = async () => {
-  const mocks = [
+  const mocks: Pick<Entity, "name" | "country" | "region" | "type">[] = [
     {
       name: "The Macallan",
       country: "Scotland",
       region: "Speyside",
-      type: "brand",
+      type: ["brand", "distiller", "bottler"],
     },
     {
       name: "The Balvenie",
       country: "Scotland",
       region: "Speyside",
-      type: "brand",
+      type: ["brand", "distiller", "bottler"],
     },
     {
       name: "Jack Daniel's",
       country: "United States of America",
       region: "Tennessee",
-      type: "brand",
+      type: ["brand", "distiller", "bottler"],
     },
     {
       name: "Maker's Mark",
       country: "United States of America",
       region: "Kentucky",
-      type: "brand",
+      type: ["brand"],
     },
   ];
 
