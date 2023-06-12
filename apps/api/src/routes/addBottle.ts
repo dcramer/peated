@@ -1,14 +1,17 @@
-import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
 import { inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
+
+import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
+
 import { db } from "../db";
 import type { Bottle, Entity } from "../db/schema";
 import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
 import { fixBottleName } from "../lib/api";
 import { upsertEntity } from "../lib/db";
+import { notEmpty } from "../lib/filter";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireAuth } from "../middleware/auth";
@@ -149,7 +152,9 @@ export default {
         .where(
           inArray(
             entities.id,
-            Array.from(new Set([brand.id, ...distillerIds])),
+            Array.from(
+              new Set([brand.id, ...distillerIds, bottler?.id]),
+            ).filter(notEmpty),
           ),
         );
 

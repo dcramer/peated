@@ -138,3 +138,35 @@ test("manipulates name to conform with age", async () => {
   expect(bottle2.statedAge).toBe(10);
   expect(bottle2.name).toBe("Delicious 10-year-old");
 });
+
+test("changes brand", async () => {
+  const newBrand = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      brand: newBrand.id,
+    },
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(200);
+  const [bottle2] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(omit(bottle, "brandId")).toEqual(omit(bottle2, "brandId"));
+  expect(bottle2.brandId).toBe(newBrand.id);
+
+  const newBrandRef = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, newBrand.id),
+  });
+  expect(newBrandRef?.totalBottles).toBe(1);
+
+  const oldBrand = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, bottle.brandId),
+  });
+  expect(oldBrand?.totalBottles).toBe(0);
+});

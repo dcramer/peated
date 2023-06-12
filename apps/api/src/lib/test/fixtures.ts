@@ -111,7 +111,9 @@ export const Bottle = async ({
             where: (entities, { eq }) =>
               eq(entities.id, data.brandId as number),
           })
-        : await Entity()
+        : await Entity({
+            totalBottles: 1,
+          })
     ) as EntityType;
     const [bottle] = await tx
       .insert(bottles)
@@ -134,7 +136,9 @@ export const Bottle = async ({
       for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
         await tx.insert(bottlesToDistillers).values({
           bottleId: bottle.id,
-          distillerId: (await Entity({ type: ["distiller"] })).id,
+          distillerId: (
+            await Entity({ type: ["distiller"], totalBottles: 1 })
+          ).id,
         });
       }
     } else {

@@ -1,9 +1,10 @@
 import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
+import { notEmpty } from "~/lib/filter";
 import { db } from "../db";
 import type { Bottle, Entity } from "../db/schema";
 import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
@@ -150,6 +151,7 @@ export default {
 
       const distillerIds: number[] = [];
       const newDistillerIds: number[] = [];
+      const removedDistillerIds: number[] = [];
       const currentDistillers = bottle.bottlesToDistillers.map(
         (d) => d.distiller,
       );
@@ -190,6 +192,7 @@ export default {
           distillerIds.indexOf(d.id) === -1;
         });
         for (const distiller of removedDistillers) {
+          removedDistillerIds.push(distiller.id);
           await tx
             .delete(bottlesToDistillers)
             .where(
@@ -206,6 +209,34 @@ export default {
           where: (entities, { eq }) =>
             eq(entities.id, (newBottle as Bottle).brandId),
         })) as Entity;
+      }
+
+      const newEntityIds = Array.from(
+        new Set([
+          bottleData?.brandId,
+          ...newDistillerIds,
+          bottleData?.bottlerId,
+        ]),
+      ).filter(notEmpty);
+      if (newEntityIds.length) {
+        await tx
+          .update(entities)
+          .set({ totalBottles: sql`${entities.totalBottles} + 1` })
+          .where(inArray(entities.id, newEntityIds));
+      }
+
+      const removedEntityIds = Array.from(
+        new Set([
+          bottleData?.brandId ? bottle.brandId : undefined,
+          ...removedDistillerIds,
+          bottleData?.bottlerId ? bottle.bottlerId : undefined,
+        ]),
+      ).filter(notEmpty);
+      if (removedEntityIds.length) {
+        await tx
+          .update(entities)
+          .set({ totalBottles: sql`${entities.totalBottles} - 1` })
+          .where(inArray(entities.id, removedEntityIds));
       }
 
       await tx.insert(changes).values({

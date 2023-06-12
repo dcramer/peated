@@ -71,6 +71,7 @@ test("creates a new bottle with all params", async () => {
     payload: {
       name: "Delicious Wood 12-year-old",
       brand: brand.id,
+      bottler: distiller.id,
       distillers: [distiller.id],
       statedAge: 12,
     },
@@ -95,6 +96,16 @@ test("creates a new bottle with all params", async () => {
     .where(eq(bottlesToDistillers.bottleId, bottle.id));
   expect(distillers.length).toBe(1);
   expect(distillers[0].distillerId).toEqual(distiller.id);
+
+  const newDistiller = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, distiller.id),
+  });
+  expect(newDistiller?.totalBottles).toBe(1);
+
+  const newBrand = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, brand.id),
+  });
+  expect(newBrand?.totalBottles).toBe(1);
 
   const changeList = await db
     .select({ change: changes })
