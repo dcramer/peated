@@ -33,6 +33,6 @@ export default {
       return res.status(401).send({ error: "Unauthorized" });
     }
 
-    return res.send({ user: await serialize(UserSerializer, user, req.user) });
+    return res.send({ user: await serialize(UserSerializer, user, user) });
   },
 } as RouteOptions<Server, IncomingMessage, ServerResponse>;
