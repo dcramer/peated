@@ -1,10 +1,60 @@
+import { program } from "commander";
 import { eq, ne, sql } from "drizzle-orm";
+
 import { db } from "../db";
-import { bottles, follows, tastings, toasts, users } from "../db/schema";
+import type {
+  Entity} from "../db/schema";
+import {
+  bottles,
+  follows,
+  tastings,
+  toasts,
+  users,
+} from "../db/schema";
+import { createNotification, objectTypeFromSchema } from "../lib/notifications";
+import { choose } from "../lib/rand";
 import * as Fixtures from "../lib/test/fixtures";
 
-import { program } from "commander";
-import { createNotification, objectTypeFromSchema } from "../lib/notifications";
+const loadDefaultEntities = async () => {
+  const mocks = [
+    {
+      name: "The Macallan",
+      country: "Scotland",
+      region: "Speyside",
+      type: "brand",
+    },
+    {
+      name: "The Balvenie",
+      country: "Scotland",
+      region: "Speyside",
+      type: "brand",
+    },
+    {
+      name: "Jack Daniel's",
+      country: "United States of America",
+      region: "Tennessee",
+      type: "brand",
+    },
+    {
+      name: "Maker's Mark",
+      country: "United States of America",
+      region: "Kentucky",
+      type: "brand",
+    },
+  ];
+
+  const results: Entity[] = [];
+
+  for (const data of mocks) {
+    results.push(
+      (await db.query.entities.findFirst({
+        where: (entities, { eq }) => eq(entities.name, data.name),
+      })) || (await Fixtures.Entity(data)),
+    );
+  }
+
+  return results;
+};
 
 program.name("mocks").description("CLI for assisting with Drizzle");
 
@@ -24,8 +74,14 @@ program
     5,
   )
   .action(async (email, options) => {
+    // load some realistic entities
+
+    const brands = await loadDefaultEntities();
+
     for (let i = 0; i < options.bottles; i++) {
-      const bottle = await Fixtures.Bottle();
+      const bottle = await Fixtures.Bottle({
+        brandId: choose(brands).id,
+      });
       console.log(`bottle ${bottle.name} created.`);
     }
 
