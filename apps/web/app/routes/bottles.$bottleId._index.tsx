@@ -1,12 +1,11 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
-import { QueryClient, dehydrate } from "@tanstack/react-query";
+import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
 import EmptyActivity from "~/components/emptyActivity";
 import TastingList from "~/components/tastingList";
 import useApi from "~/hooks/useApi";
-import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
 import type { Paginated, Tasting } from "~/types";
 
 export async function loader({ params: { bottleId }, context }: LoaderArgs) {
@@ -30,13 +29,15 @@ export default function BottleActivity() {
   const { bottleId } = useParams<"bottleId">();
   invariant(bottleId);
 
-  const { data: tastingList } = useSuspenseQuery(
+  const { data: tastingList } = useQuery(
     ["bottle", bottleId, "tastings"],
     (): Promise<Paginated<Tasting>> =>
       api.get(`/tastings`, {
         query: { bottle: bottleId },
       }),
   );
+
+  if (!tastingList) return null;
 
   return (
     <>
