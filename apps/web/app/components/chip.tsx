@@ -36,9 +36,10 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
       colorClass = " border-slate-700 text-slate-500";
   }
 
+  const moreProps = Component === defaultElement ? { layout: true } : {};
+
   return (
     <Component
-      layout
       className={classNames(
         "[word-wrap: break-word] inline-flex items-center justify-between truncate rounded border py-0 font-normal normal-case leading-loose shadow-none transition-[opacity] duration-300 ease-linear hover:!shadow-none",
         onClick ? "cursor-pointer hover:bg-slate-800" : "",
@@ -49,6 +50,7 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
       )}
       onClick={onClick}
       {...props}
+      {...moreProps}
     >
       {children}
     </Component>
