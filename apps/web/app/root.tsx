@@ -159,6 +159,7 @@ export default withSentry(function App() {
           queries: {
             suspense: true,
             retry: false,
+            cacheTime: 0,
           },
         },
       }),
