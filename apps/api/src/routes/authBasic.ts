@@ -51,7 +51,7 @@ export default {
     }
 
     return res.send({
-      user: await serialize(UserSerializer, user, req.user),
+      user: await serialize(UserSerializer, user, user),
       accessToken: await createAccessToken(user),
     });
   },

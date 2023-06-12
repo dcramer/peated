@@ -29,6 +29,7 @@ authenticator.use(
               password,
             },
           });
+
       return session;
     } catch (err) {
       if (err instanceof ApiError && err.statusCode === 401) {
