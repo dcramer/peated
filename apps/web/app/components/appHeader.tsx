@@ -1,6 +1,6 @@
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { Link, useLocation, useNavigate, useSubmit } from "@remix-run/react";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 
 import useAuth from "~/hooks/useAuth";
 import PeatedGlyph from "./assets/Glyph";
@@ -95,50 +95,7 @@ export default function AppHeader() {
               </div>
             </NavLink>
           </div>
-          <Menu as="div" className="menu hidden sm:block">
-            <Menu.Button className="focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm text-slate-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring">
-              <span className="sr-only">Open user menu</span>
-              <div className="h-8 w-8 sm:h-8 sm:w-8">
-                <UserAvatar user={user} />
-              </div>
-            </Menu.Button>
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
-              leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
-            >
-              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right">
-                <Menu.Item>
-                  <Link to={`/users/${user.username}`}>Profile</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link to={`/friends`}>Friends</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link to={`/bottles`}>Bottles</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link to={`/entities`}>Brands & Distillers</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link to={`/about`}>About</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <button
-                    onClick={() => {
-                      submit(null, { method: "POST", action: "/logout" });
-                    }}
-                  >
-                    Sign out
-                  </button>
-                </Menu.Item>
-              </Menu.Items>
-            </Transition>
-          </Menu>
+          <UserDropdown />
         </div>
       ) : (
         <div className="ml-4 flex items-center gap-x-2 sm:ml-8">
@@ -154,3 +111,99 @@ export default function AppHeader() {
     </>
   );
 }
+
+const UserDropdown = () => {
+  const { user } = useAuth();
+  const submit = useSubmit();
+  const buttonRef = useRef<HTMLAnchorElement | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const timeoutDuration = 200;
+  let timeout: any;
+
+  if (!user) return null;
+
+  const openMenu = () => buttonRef?.current?.click();
+  const closeMenu = () =>
+    dropdownRef?.current?.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+
+  const onMouseEnter = (closed?: boolean) => {
+    clearTimeout(timeout);
+    closed && openMenu();
+  };
+  const onMouseLeave = (open: boolean) => {
+    open && (timeout = setTimeout(() => closeMenu(), timeoutDuration));
+  };
+
+  return (
+    <Menu as="div" className="menu hidden sm:block">
+      {({ open }) => (
+        <>
+          <div
+            onClick={openMenu}
+            onMouseEnter={() => onMouseEnter(!open)}
+            onMouseLeave={() => onMouseLeave(open)}
+          >
+            <Menu.Button
+              ref={buttonRef}
+              as="a"
+              className="focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm text-slate-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring"
+            >
+              <span className="sr-only">Open user menu</span>
+              <div className="h-8 w-8 sm:h-8 sm:w-8">
+                <UserAvatar user={user} />
+              </div>
+            </Menu.Button>
+          </div>
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
+          >
+            <Menu.Items
+              ref={dropdownRef}
+              onMouseEnter={() => onMouseEnter()}
+              onMouseLeave={() => onMouseLeave(open)}
+              static
+              className="absolute right-0 z-10 mt-2 w-48 origin-top-right"
+            >
+              <Menu.Item>
+                <Link to={`/users/${user.username}`}>Profile</Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to={`/friends`}>Friends</Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to={`/bottles`}>Bottles</Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to={`/entities`}>Brands & Distillers</Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to={`/about`}>About</Link>
+              </Menu.Item>
+              <Menu.Item>
+                <button
+                  onClick={() => {
+                    submit(null, { method: "POST", action: "/logout" });
+                  }}
+                >
+                  Sign out
+                </button>
+              </Menu.Item>
+            </Menu.Items>
+          </Transition>
+        </>
+      )}
+    </Menu>
+  );
+};
