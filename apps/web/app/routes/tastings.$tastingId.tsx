@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useNavigate } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -202,6 +202,14 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({ tasting });
 }
 
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Tasting Details",
+    },
+  ];
+};
+
 export default function TastingDetails() {
   const { tasting } = useLoaderData<typeof loader>();
   const { user } = useAuth();
@@ -210,7 +218,7 @@ export default function TastingDetails() {
   const [newComments, setNewComments] = useState<Comment[]>([]);
 
   return (
-    <Layout title="Tasting Details">
+    <Layout>
       <QueryBoundary>
         <ul className="mb-4">
           <TastingListItem

@@ -7,6 +7,7 @@ import type { z } from "zod";
 import { toTitleCase } from "@peated/shared/lib/strings";
 import { EntityInputSchema } from "@peated/shared/schemas";
 
+import type { V2_MetaFunction } from "@remix-run/node";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CountryField from "~/components/countryField";
 import Fieldset from "~/components/fieldset";
@@ -28,6 +29,14 @@ const entityTypes = [
 ];
 
 type FormSchemaType = z.infer<typeof EntityInputSchema>;
+
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Edit Entity",
+    },
+  ];
+};
 
 export default function EditEntity() {
   const api = useApi();
@@ -78,7 +87,6 @@ export default function EditEntity() {
 
   return (
     <Layout
-      title="Edit Entity"
       header={
         <Header>
           <FormHeader

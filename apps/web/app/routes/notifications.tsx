@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import EmptyActivity from "~/components/emptyActivity";
@@ -22,6 +22,14 @@ export async function loader({ context }: LoaderArgs) {
   return json({ dehydratedState: dehydrate(queryClient) });
 }
 
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Notifications",
+    },
+  ];
+};
+
 export default function Notifications() {
   const api = useApi();
   const { data } = useQuery(
@@ -35,7 +43,7 @@ export default function Notifications() {
   );
 
   return (
-    <Layout title="Notifications">
+    <Layout>
       {data && data.results.length ? (
         <NotificationList values={data.results} />
       ) : (

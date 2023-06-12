@@ -1,7 +1,10 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { Link, Outlet, useParams } from "@remix-run/react";
+import type { LoaderArgs, V2_MetaFunction} from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Suspense, useState } from "react";
+import invariant from "tiny-invariant";
 
 import AddToCollectionModal from "~/components/addToCollectionModal";
 import BottleIcon from "~/components/assets/Bottle";
@@ -108,15 +111,28 @@ const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
   return <TagDistribution tags={results} totalCount={totalCount} />;
 };
 
+export async function loader({ params, context }: LoaderArgs) {
+  invariant(params.bottleId);
+
+  const bottle: BottleWithStats = await context.api.get(
+    `/bottles/${params.bottleId}`,
+  );
+
+  return json({ bottle });
+}
+
+export const meta: V2_MetaFunction = ({ data: { bottle } }) => {
+  return [
+    {
+      title: bottle.name,
+    },
+  ];
+};
+
 export default function BottleDetails() {
-  const api = useApi();
   const { user } = useAuth();
 
-  const { bottleId } = useParams();
-  const { data: bottle } = useSuspenseQuery(
-    ["bottles", bottleId],
-    (): Promise<BottleWithStats> => api.get(`/bottles/${bottleId}`),
-  );
+  const { bottle } = useLoaderData<typeof loader>();
 
   const stats = [
     {

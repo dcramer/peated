@@ -3,7 +3,7 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/shared/schemas";
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -30,6 +30,14 @@ export async function loader({ context }: LoaderArgs) {
 
   return json({ user });
 }
+
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Settings",
+    },
+  ];
+};
 
 export default function Settings() {
   const api = useApi();
@@ -84,7 +92,6 @@ export default function Settings() {
 
   return (
     <Layout
-      title="Settings"
       header={
         <Header>
           <FormHeader

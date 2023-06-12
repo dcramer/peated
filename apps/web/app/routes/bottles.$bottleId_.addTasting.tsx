@@ -8,7 +8,7 @@ import type { z } from "zod";
 import { toTitleCase } from "@peated/shared/lib/strings";
 import { TastingInputSchema } from "@peated/shared/schemas";
 
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import BottleCard from "~/components/bottleCard";
@@ -45,6 +45,14 @@ export async function loader({ params, context }: LoaderArgs) {
 
   return json({ bottle, suggestedTags });
 }
+
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Record Tasting",
+    },
+  ];
+};
 
 export default function AddTasting() {
   const api = useApi();
@@ -102,7 +110,6 @@ export default function AddTasting() {
 
   return (
     <Layout
-      title="Record Tasting"
       header={
         <Header>
           <FormHeader

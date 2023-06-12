@@ -1,3 +1,4 @@
+import type { V2_MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -51,6 +52,14 @@ const Content = ({
   );
 };
 
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Bottles",
+    },
+  ];
+};
+
 export default function BottleList() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
@@ -60,7 +69,7 @@ export default function BottleList() {
   const tag = qs.get("tag") || undefined;
 
   return (
-    <Layout title="Bottles">
+    <Layout>
       {(category || age || tag) && (
         <div className="text-light space-x-2 p-3">
           <span className="font-medium">Results for</span>

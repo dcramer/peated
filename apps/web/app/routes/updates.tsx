@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import ChangeList from "~/components/changeList";
@@ -43,6 +43,14 @@ export async function loader({ context }: LoaderArgs) {
 
   return json({ dehydratedState: dehydrate(queryClient) });
 }
+
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Updates",
+    },
+  ];
+};
 
 export default function Updates() {
   const { user } = useAuth();

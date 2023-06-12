@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -22,6 +22,14 @@ export async function loader({ params, context }: LoaderArgs) {
 
   return json({ entity });
 }
+
+export const meta: V2_MetaFunction = ({ data: { entity } }) => {
+  return [
+    {
+      title: entity.name,
+    },
+  ];
+};
 
 export default function EntityDetails() {
   const api = useApi();
@@ -46,7 +54,7 @@ export default function EntityDetails() {
   ];
 
   return (
-    <Layout title={entity.name}>
+    <Layout>
       <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4  p-3 sm:flex-nowrap sm:py-0">
         <EntityIcon className="hidden h-14 w-auto sm:inline-block" />
 

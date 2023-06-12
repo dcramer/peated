@@ -1,5 +1,5 @@
 import { useGoogleLogin } from "@react-oauth/google";
-import type { ActionArgs, LoaderArgs } from "@remix-run/node";
+import type { ActionArgs, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, useActionData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
@@ -38,6 +38,14 @@ export const loader = ({ request }: LoaderArgs) => {
   const url = new URL(request.url);
   const redirectTo = url.searchParams.get("redirectTo");
   return json({ redirectTo });
+};
+
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Login",
+    },
+  ];
 };
 
 const BasicLogin = () => {

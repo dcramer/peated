@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, useLoaderData, useParams, useSubmit } from "@remix-run/react";
 import { useState } from "react";
@@ -51,6 +51,14 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({ user });
 }
 
+export const meta: V2_MetaFunction = ({ data: { user } }) => {
+  return [
+    {
+      title: `@${user.username}`,
+    },
+  ];
+};
+
 export default function Profile() {
   const api = useApi();
   const { user: currentUser } = useAuth();
@@ -75,7 +83,7 @@ export default function Profile() {
     followStatus !== "following";
 
   return (
-    <Layout title={`@${user.username}`}>
+    <Layout>
       <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
         <div className="flex w-full justify-center sm:w-auto sm:justify-start">
           <UserAvatar user={user} size={150} />

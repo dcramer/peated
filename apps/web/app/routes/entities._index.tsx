@@ -1,3 +1,4 @@
+import type { V2_MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 
 import EmptyActivity from "~/components/emptyActivity";
@@ -49,6 +50,14 @@ const Content = ({
   );
 };
 
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Brands, Bottler, and Distillers",
+    },
+  ];
+};
+
 export default function EntityList() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
@@ -58,7 +67,7 @@ export default function EntityList() {
   const region = qs.get("region") || undefined;
 
   return (
-    <Layout title="Brands, Bottler, and Distillers">
+    <Layout>
       {(type || country || region) && (
         <div className="text-light space-x-2 p-3">
           <span className="font-medium">Results for</span>

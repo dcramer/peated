@@ -1,9 +1,18 @@
+import type { V2_MetaFunction } from "@remix-run/node";
 import Layout from "~/components/layout";
 import config from "~/config";
 
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "About",
+    },
+  ];
+};
+
 export default function About() {
   return (
-    <Layout title="About">
+    <Layout>
       <div className="prose p-6">
         <h1>About Peated</h1>
         <p>
