@@ -5,14 +5,14 @@ import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment, Suspense, useState } from "react";
-import { ClientOnly } from "remix-utils";
 import invariant from "tiny-invariant";
 
-import AddToCollectionModal from "~/components/addToCollectionModal";
+import AddToCollectionModal from "~/components/addToCollectionModal.client";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import BottleName from "~/components/bottleName";
 import Button from "~/components/button";
+import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
@@ -72,25 +72,29 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
       <Button onClick={collect} disabled={loading}>
         {isCollected ? "Remove from Collection" : "Add to Collection"}
       </Button>
-      <AddToCollectionModal
-        bottle={bottle}
-        open={modalIsOpen}
-        setOpen={setModalIsOpen}
-        onSubmit={async (data) => {
-          if (loading) return;
-          setLoading(true);
-          try {
-            await api.post("/users/me/collections/default/bottles", {
-              data,
-            });
-            setIsCollected(true);
-            setModalIsOpen(false);
-          } catch (err: any) {
-            logError(err);
-          }
-          setLoading(false);
-        }}
-      />
+      <ClientOnly>
+        {() => (
+          <AddToCollectionModal
+            bottle={bottle}
+            open={modalIsOpen}
+            setOpen={setModalIsOpen}
+            onSubmit={async (data) => {
+              if (loading) return;
+              setLoading(true);
+              try {
+                await api.post("/users/me/collections/default/bottles", {
+                  data,
+                });
+                setIsCollected(true);
+                setModalIsOpen(false);
+              } catch (err: any) {
+                logError(err);
+              }
+              setLoading(false);
+            }}
+          />
+        )}
+      </ClientOnly>
     </>
   );
 };
@@ -211,13 +215,17 @@ export default function BottleDetails() {
           )}
         </div>
 
-        <ClientOnly>
-          {() => (
-            <QueryBoundary fallback={<Fragment />} loading={<Fragment />}>
-              <BottleTagDistribution bottleId={bottle.id} />
-            </QueryBoundary>
-          )}
-        </ClientOnly>
+        <QueryBoundary
+          fallback={
+            <div
+              className="mb-4 animate-pulse bg-slate-800"
+              style={{ height: 200 }}
+            />
+          }
+          loading={<Fragment />}
+        >
+          <BottleTagDistribution bottleId={bottle.id} />
+        </QueryBoundary>
 
         <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
           {stats.map((stat) => (

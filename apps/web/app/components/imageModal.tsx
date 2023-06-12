@@ -1,5 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import { ClientOnly } from "remix-utils";
+import { ClientOnly } from "./clientOnly";
 
 export function ImageModal({
   image,
