@@ -1,5 +1,5 @@
 import { BottleSchema, PaginatedSchema } from "@peated/shared/schemas";
-import type { Category} from "@peated/shared/types";
+import type { Category } from "@peated/shared/types";
 import { CategoryValues } from "@peated/shared/types";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
