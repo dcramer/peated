@@ -15,6 +15,7 @@ import FormHeader from "~/components/formHeader";
 import Header from "~/components/header";
 import Layout from "~/components/layout";
 import SelectField from "~/components/selectField";
+import Spinner from "~/components/spinner";
 import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
@@ -89,6 +90,13 @@ export default function EditEntity() {
       }
       footer={null}
     >
+      {isSubmitting && (
+        <div className="fixed inset-0 z-10">
+          <div className="absolute inset-0 bg-slate-800 opacity-50" />
+          <Spinner />
+        </div>
+      )}
+
       <form className="sm:mx-16" onSubmit={handleSubmit(onSubmit)}>
         {saveEntity.isError && (
           <FormError values={[(saveEntity.error as Error).message]} />

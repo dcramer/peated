@@ -22,6 +22,7 @@ import { ApiError } from "~/lib/api";
 import { formatCategoryName } from "~/lib/strings";
 import type { Bottle, Entity } from "~/types";
 import Header from "./header";
+import Spinner from "./spinner";
 
 const categoryList = CategoryValues.map((c) => ({
   id: c,
@@ -108,6 +109,13 @@ export default function BottleForm({
       }
       footer={null}
     >
+      {isSubmitting && (
+        <div className="fixed inset-0 z-10">
+          <div className="absolute inset-0 bg-slate-800 opacity-50" />
+          <Spinner />
+        </div>
+      )}
+
       <form className="sm:mx-16" onSubmit={handleSubmit(onSubmitHandler)}>
         {error && <FormError values={[error]} />}
 
