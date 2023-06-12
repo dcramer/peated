@@ -2,7 +2,7 @@ import { BottleSchema, PaginatedSchema } from "@peated/shared/schemas";
 import type { Category } from "@peated/shared/types";
 import { CategoryValues } from "@peated/shared/types";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
@@ -118,15 +118,16 @@ export default {
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
       case "name":
-        orderBy = asc(bottles.name);
+        orderBy = sql`${entities.name} || ${bottles.name} ASC`;
         break;
       default:
         orderBy = desc(bottles.totalTastings);
     }
 
     const results = await db
-      .select()
+      .select({ bottles })
       .from(bottles)
+      .innerJoin(entities, eq(entities.id, bottles.brandId))
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
@@ -135,7 +136,7 @@ export default {
     res.send({
       results: await serialize(
         BottleSerializer,
-        results.slice(0, limit),
+        results.slice(0, limit).map((r) => r.bottles),
         req.user,
       ),
       rel: {
@@ -167,7 +168,7 @@ export default {
       category?: Category;
       age?: number;
       tag?: string;
-      sort?: "name";
+      sort?: string;
     };
   }
 >;
