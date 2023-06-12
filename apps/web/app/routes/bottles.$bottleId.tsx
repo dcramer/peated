@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { LoaderArgs, V2_MetaFunction} from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Suspense, useState } from "react";
@@ -124,7 +124,7 @@ export async function loader({ params, context }: LoaderArgs) {
 export const meta: V2_MetaFunction = ({ data: { bottle } }) => {
   return [
     {
-      title: bottle.name,
+      title: `${bottle.brand?.name || ""} ${bottle.name}`,
     },
   ];
 };
@@ -144,7 +144,7 @@ export default function BottleDetails() {
   ];
 
   return (
-    <Layout title={`${bottle.brand?.name || ""} ${bottle.name}`}>
+    <Layout>
       <div className="p-3 sm:py-0">
         <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 sm:flex-nowrap">
           <BottleIcon className="hidden h-14 w-auto sm:inline-block" />
