@@ -2,6 +2,19 @@ import { load as cheerio } from "cheerio";
 import { open } from "fs/promises";
 import { getUrl } from "./scraper";
 
+function fixDistillerName(name: string) {
+  switch (name) {
+    case "Macallan":
+      return "The Macallan";
+
+    case "Balvenie":
+      return "The Balvenie";
+
+    default:
+      return name;
+  }
+}
+
 async function scrapeBottle(id: number) {
   console.log(`Processing Bottle ${id}`);
 
@@ -26,7 +39,7 @@ async function scrapeBottle(id: number) {
 
   const headerEl = $("header > h1").first();
 
-  const brandName = headerEl.find("a").first().text();
+  const brandName = fixDistillerName(headerEl.find("a").first().text());
 
   bottle.votes = parseFloat(
     $("#partial-aggregate-rating dd.votes-count").first().text(),
@@ -44,7 +57,7 @@ async function scrapeBottle(id: number) {
   const distillerName = $("dt:contains('Distillery') + dd a").first().text();
   bottle.distiller = distillerName
     ? {
-        name: distillerName,
+        name: fixDistillerName(distillerName),
       }
     : null;
 
@@ -58,7 +71,7 @@ async function scrapeBottle(id: number) {
   } else {
     bottle.bottler = bottlerName
       ? {
-          name: bottlerName,
+          name: fixDistillerName(bottlerName),
         }
       : null;
   }
@@ -332,9 +345,9 @@ async function scrapeBottles() {
 
   const keepBottles = results
     // discard low votes as the data might be bad
-    .filter((v) => v.votes >= 100)
-    // discard series specific stuff (for now)
-    .filter((v) => v.series === null);
+    .filter((v) => v.votes >= 100);
+  // // discard series specific stuff (for now)
+  // .filter((v) => v.series === null);
 
   console.log(
     `Found ${results.length} bottles - keeping ${keepBottles.length}`,
