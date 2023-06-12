@@ -56,58 +56,72 @@ export const storeFile = async ({
     ? onProcess(data.file, tmpFilename)
     : { stream: data.file, filename: tmpFilename };
 
-  if (process.env.USE_GCS_STORAGE) {
-    const bucketName = config.GCS_BUCKET_NAME as string;
-    const bucketPath = config.GCS_BUCKET_PATH
-      ? `${config.GCS_BUCKET_PATH}/`
-      : "";
-
-    const cloudStorage = new Storage({
-      credentials: config.GCP_CREDENTIALS,
-    });
-
-    await trace(
-      {
-        op: "gcs.file",
-        name: "gcs.file",
-        description: newFilename,
-        data: { bucketName },
+  return await trace(
+    {
+      op: "peated.store-file",
+      name: "peated.store-file",
+      description: data.filename,
+      data: {
+        filename: data.filename,
+        namespace,
+        onProcess: Boolean(onProcess),
       },
-      async () => {
-        const file = cloudStorage
-          .bucket(bucketName)
-          .file(`${bucketPath}${newFilename}`);
+    },
+    async () => {
+      if (process.env.USE_GCS_STORAGE) {
+        const bucketName = config.GCS_BUCKET_NAME as string;
+        const bucketPath = config.GCS_BUCKET_PATH
+          ? `${config.GCS_BUCKET_PATH}/`
+          : "";
+
+        const cloudStorage = new Storage({
+          credentials: config.GCP_CREDENTIALS,
+        });
 
         await trace(
           {
-            op: "gcs.file.write-stream",
-            name: "gcs.file.write-stream",
+            op: "gcs.file",
+            name: "gcs.file",
+            description: newFilename,
+            data: { bucketName },
+          },
+          async () => {
+            const file = cloudStorage
+              .bucket(bucketName)
+              .file(`${bucketPath}${newFilename}`);
+
+            await trace(
+              {
+                op: "gcs.file.write-stream",
+                name: "gcs.file.write-stream",
+                description: newFilename,
+              },
+              async () => {
+                const writeStream = file.createWriteStream();
+                await pump(stream, writeStream);
+              },
+            );
+          },
+        );
+      } else {
+        const uploadPath = `${config.UPLOAD_PATH}/${newFilename}`;
+
+        await trace(
+          {
+            op: "file.write-stream",
+            name: "file.write-stream",
             description: newFilename,
           },
           async () => {
-            const writeStream = file.createWriteStream();
+            const writeStream = createWriteStream(uploadPath);
             await pump(stream, writeStream);
           },
         );
-      },
-    );
-  } else {
-    const uploadPath = `${config.UPLOAD_PATH}/${newFilename}`;
 
-    await trace(
-      {
-        op: "file.write-stream",
-        name: "file.write-stream",
-        description: newFilename,
-      },
-      async () => {
-        const writeStream = createWriteStream(uploadPath);
-        await pump(stream, writeStream);
-      },
-    );
+        console.info(`File written to ${uploadPath}`);
+      }
 
-    console.info(`File written to ${uploadPath}`);
-  }
-
-  return `${urlPrefix}/${newFilename}`;
+      return `${urlPrefix}/${newFilename}`;
+    },
+  );
 };
