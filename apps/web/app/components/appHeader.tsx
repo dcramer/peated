@@ -118,7 +118,7 @@ const UserDropdown = () => {
   const buttonRef = useRef<HTMLAnchorElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const timeoutDuration = 200;
-  let timeout: any;
+  let timeoutId: ReturnType<typeof setTimeout>;
 
   if (!user) return null;
 
@@ -133,11 +133,13 @@ const UserDropdown = () => {
     );
 
   const onMouseEnter = (closed?: boolean) => {
-    clearTimeout(timeout);
-    closed && openMenu();
+    if (timeoutId) clearTimeout(timeoutId);
+    if (closed) openMenu();
   };
   const onMouseLeave = (open: boolean) => {
-    open && (timeout = setTimeout(() => closeMenu(), timeoutDuration));
+    if (open) {
+      timeoutId = setTimeout(() => closeMenu(), timeoutDuration);
+    }
   };
 
   return (
