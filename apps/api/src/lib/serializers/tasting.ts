@@ -80,6 +80,7 @@ export const TastingSerializer: Serializer<Tasting> = {
       series: item.series,
       vintageYear: item.vintageYear,
       barrel: item.barrel,
+      servingStyle: item.servingStyle,
 
       createdAt: item.createdAt,
 

@@ -225,6 +225,13 @@
       "when": 1686597438510,
       "tag": "0031_grey_avengers",
       "breakpoints": false
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1686616279074,
+      "tag": "0032_outstanding_cobalt_man",
+      "breakpoints": false
     }
   ]
 }

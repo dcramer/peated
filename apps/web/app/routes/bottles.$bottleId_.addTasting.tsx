@@ -1,16 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
+import invariant from "tiny-invariant";
 import type { z } from "zod";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 import { TastingInputSchema } from "@peated/shared/schemas";
+import type { ServingStyle} from "@peated/shared/types";
+import { ServingStyleValues } from "@peated/shared/types";
 
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import invariant from "tiny-invariant";
 import BottleCard from "~/components/bottleCard";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
@@ -34,6 +36,15 @@ type Tag = {
 };
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
+
+function formatServingStyle(style: ServingStyle) {
+  return toTitleCase(style);
+}
+
+const servingStyleList = ServingStyleValues.map((c) => ({
+  id: c,
+  name: formatServingStyle(c),
+}));
 
 export async function loader({ params, context }: LoaderArgs) {
   invariant(params.bottleId);
@@ -186,6 +197,29 @@ export default function AddTasting() {
             imageHeight={768 / 2}
           />
 
+          <Controller
+            name="servingStyle"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.servingStyle}
+                label="Serving Style"
+                targetOptions={servingStyleList.length}
+                options={servingStyleList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: formatServingStyle(value),
+                      }
+                    : undefined
+                }
+              />
+            )}
+          />
+
           <TextField
             {...register("vintageYear", {
               // valueAsNumber: true,
@@ -197,6 +231,7 @@ export default function AddTasting() {
             label="Year"
             placeholder="e.g. 2023"
           />
+
           <TextField
             {...register("barrel", {
               // valueAsNumber: true,

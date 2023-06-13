@@ -17,7 +17,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { CategoryValues } from "@peated/shared/types";
+import { CategoryValues, ServingStyleValues } from "@peated/shared/types";
 
 export const users = pgTable(
   "user",
@@ -370,6 +370,8 @@ export type NewCollectionBottle = InferModel<
   "insert"
 >;
 
+export const servingStyleEnum = pgEnum("servingStyle", ServingStyleValues);
+
 export const tastings = pgTable(
   "tasting",
   {
@@ -385,6 +387,7 @@ export const tastings = pgTable(
     rating: doublePrecision("rating"),
     imageUrl: text("image_url"),
     notes: text("notes"),
+    servingStyle: servingStyleEnum("serving_style"),
 
     series: varchar("series", { length: 255 }),
     vintageYear: smallint("vintage_year"),

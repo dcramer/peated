@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { CategoryValues } from "./types";
+import { CategoryValues, ServingStyleValues } from "./types";
 
 const FollowStatusEnum = z.enum(["pending", "following", "none"]);
 
@@ -80,6 +80,8 @@ const VintageSchema = z.object({
   vintageYear: z.number().gte(1495).lte(new Date().getFullYear()).nullable(),
 });
 
+const ServiceStyleEnum = z.enum(ServingStyleValues);
+
 export const TastingSchema = z
   .object({
     id: z.number(),
@@ -88,6 +90,7 @@ export const TastingSchema = z
     bottle: BottleSchema,
     rating: z.number().gte(0).lte(5).nullable(),
     tags: z.array(z.string()),
+    servingStyle: ServiceStyleEnum.nullable(),
 
     comments: z.number().gte(0),
     toasts: z.number().gte(0),
@@ -103,6 +106,7 @@ export const TastingInputSchema = z
     notes: z.string().nullable().optional(),
     rating: z.number().gte(0).lte(5).nullable().optional(),
     tags: z.array(z.string()).nullable().optional(),
+    servingStyle: ServiceStyleEnum.nullable().optional(),
 
     createdAt: z.string().datetime().optional(),
   })

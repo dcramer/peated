@@ -9,6 +9,10 @@ export const CategoryValues = [
 
 export type Category = (typeof CategoryValues)[number];
 
+export const ServingStyleValues = ["neat", "rocks", "splash"] as const;
+
+export type ServingStyle = (typeof ServingStyleValues)[number];
+
 type NextPagingRel =
   | {
       nextPage: number;
