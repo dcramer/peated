@@ -60,8 +60,6 @@ export default function EntityDetails() {
 
   const baseUrl = getEntityUrl(entity);
 
-  console.log(entity);
-
   return (
     <Layout>
       <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">

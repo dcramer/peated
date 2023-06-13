@@ -55,13 +55,13 @@ export default {
       where.push(
         sql`EXISTS(
           SELECT FROM ${bottles}
-          WHERE ${bottles.brandId} = ${req.query.entity}
+          WHERE (${bottles.brandId} = ${req.query.entity}
              OR ${bottles.bottlerId} = ${req.query.entity}
              OR EXISTS(
               SELECT FROM ${bottlesToDistillers}
               WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
                 AND ${bottlesToDistillers.distillerId} = ${req.query.entity}
-             )
+             )) AND ${bottles.id} = ${tastings.bottleId}
           )`,
       );
     }
