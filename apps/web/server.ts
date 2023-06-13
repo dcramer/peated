@@ -17,6 +17,7 @@ import {
 
 const app = express();
 const metricsApp = express();
+
 app.use(
   prom({
     metricsPath: "/metrics",
@@ -84,12 +85,6 @@ app.use(express.static("public", { maxAge: "1h" }));
 
 app.use(morgan("tiny"));
 
-const MODE = process.env.NODE_ENV;
-const BUILD_DIR = path.join(process.cwd(), "build");
-
-const createSentryRequestHandler =
-  wrapExpressCreateRequestHandler(createRequestHandler);
-
 app.all("*", async (req, res, next) => {
   const session = await getSession(req);
   const user = await getUser(session);
@@ -116,6 +111,12 @@ function getLoadContext(req: any, res: any) {
     accessToken: req.accessToken,
   };
 }
+
+const MODE = process.env.NODE_ENV;
+const BUILD_DIR = path.join(process.cwd(), "build");
+
+const createSentryRequestHandler =
+  wrapExpressCreateRequestHandler(createRequestHandler);
 
 app.all(
   "*",

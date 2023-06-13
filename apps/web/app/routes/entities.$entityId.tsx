@@ -1,24 +1,32 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type { Paginated } from "@peated/shared/types";
+import type {
+  LinksFunction,
+  LoaderArgs,
+  V2_MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, useLoaderData, useParams } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
+import type { LatLngTuple } from "leaflet";
 import { Fragment } from "react";
 import invariant from "tiny-invariant";
 
 import EntityIcon from "~/components/assets/Entity";
-import BottleTable from "~/components/bottleTable";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
+import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
+import { Map } from "~/components/map.client";
 import QueryBoundary from "~/components/queryBoundary";
+import Tabs from "~/components/tabs";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
 import { formatCategoryName } from "~/lib/strings";
-import type { Bottle, Entity, Paginated } from "~/types";
+import { getEntityUrl } from "~/lib/urls";
+import type { Entity } from "~/types";
 
 export async function loader({ params, context }: LoaderArgs) {
   invariant(params.entityId);
@@ -36,27 +44,23 @@ export const meta: V2_MetaFunction = ({ data: { entity } }) => {
   ];
 };
 
+export const links: LinksFunction = () => [
+  {
+    rel: "stylesheet",
+    href: "https://unpkg.com/leaflet@1.8.0/dist/leaflet.css",
+  },
+];
+
 export default function EntityDetails() {
-  const api = useApi();
   const { entity } = useLoaderData<typeof loader>();
   const params = useParams();
   invariant(params.entityId);
 
-  const {
-    data: { results: bottleList },
-  } = useSuspenseQuery(
-    ["entity", params.entityId, "bottles"],
-    (): Promise<Paginated<Bottle>> =>
-      api.get(`/bottles`, {
-        query: { entity: params.entityId },
-      }),
-  );
-
   const { user } = useAuth();
 
-  const stats = [
-    { name: "Bottles", value: entity.totalBottles.toLocaleString() },
-  ];
+  const baseUrl = getEntityUrl(entity);
+
+  console.log(entity);
 
   return (
     <Layout>
@@ -108,60 +112,67 @@ export default function EntityDetails() {
         </div>
       </div>
 
-      <div className="my-8 flex justify-center gap-4 sm:justify-start">
-        <Button
-          to={`/addBottle?${
-            entity.type.indexOf("brand") !== -1 ? `brand=${entity.id}&` : ""
-          }${
-            entity.type.indexOf("distiller") !== -1
-              ? `distiller=${entity.id}`
-              : ""
-          }${
-            entity.type.indexOf("bottler") !== -1 ? `bottler=${entity.id}` : ""
-          }`}
-          color="primary"
-        >
-          Add a Bottle
-        </Button>
+      <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="flex-1">
+          <div className="my-8 flex justify-center gap-4 sm:justify-start">
+            <Button
+              to={`/addBottle?${
+                entity.type.indexOf("brand") !== -1 ? `brand=${entity.id}&` : ""
+              }${
+                entity.type.indexOf("distiller") !== -1
+                  ? `distiller=${entity.id}`
+                  : ""
+              }${
+                entity.type.indexOf("bottler") !== -1
+                  ? `bottler=${entity.id}`
+                  : ""
+              }`}
+              color="primary"
+            >
+              Add a Bottle
+            </Button>
 
-        {user?.mod && (
-          <Menu as="div" className="menu">
-            <Menu.Button as={Button}>
-              <EllipsisVerticalIcon className="h-5 w-5" />
-            </Menu.Button>
-            <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
-              <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
-                Edit Entity
-              </Menu.Item>
-            </Menu.Items>
-          </Menu>
-        )}
-      </div>
-
-      <QueryBoundary fallback={<Fragment />} loading={<Fragment />}>
-        <EntitySpiritDistribution entityId={entity.id} />
-      </QueryBoundary>
-
-      <div className="my-8 grid grid-cols-1 items-center gap-3 text-center sm:w-1/2 sm:text-left">
-        {stats.map((stat) => (
-          <div key={stat.name}>
-            <p className="text-peated-light leading-7">{stat.name}</p>
-            <p className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-              {stat.value}
-            </p>
+            {user?.mod && (
+              <Menu as="div" className="menu">
+                <Menu.Button as={Button}>
+                  <EllipsisVerticalIcon className="h-5 w-5" />
+                </Menu.Button>
+                <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+                  <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
+                    Edit Entity
+                  </Menu.Item>
+                </Menu.Items>
+              </Menu>
+            )}
           </div>
-        ))}
-      </div>
 
-      <BottleTable
-        bottleList={bottleList}
-        groupBy={(bottle) => bottle.brand}
-        groupTo={(group) => `/entities/${group.id}`}
-      />
+          <QueryBoundary
+            loading={
+              <div
+                className="mb-4 animate-pulse rounded bg-slate-800"
+                style={{ height: 200 }}
+              />
+            }
+            fallback={<Fragment />}
+          >
+            <EntitySpiritDistribution entityId={entity.id} />
+          </QueryBoundary>
+        </div>
+        <EntityMap position={entity.location} />
+      </div>
+      <Tabs fullWidth>
+        <Tabs.Item to={baseUrl} controlled>
+          Activity
+        </Tabs.Item>
+        <Tabs.Item to={`${baseUrl}/bottles`} controlled>
+          Bottles ({entity.totalBottles.toLocaleString()})
+        </Tabs.Item>
+      </Tabs>
+
+      <Outlet context={{ entity }} />
     </Layout>
   );
 }
-
 type Category = {
   category: string;
   count: number;
@@ -196,5 +207,25 @@ const EntitySpiritDistribution = ({ entityId }: { entityId: number }) => {
         )}`
       }
     />
+  );
+};
+
+const EntityMap = ({ position }: { position: LatLngTuple | null }) => {
+  const mapHeight = "200px";
+  const mapWidth = mapHeight;
+
+  if (!position) return null;
+
+  return (
+    <ClientOnly
+      fallback={
+        <div
+          className="animate-pulse bg-slate-800"
+          style={{ height: mapHeight, width: mapWidth }}
+        />
+      }
+    >
+      {() => <Map height={mapHeight} width={mapWidth} position={position} />}
+    </ClientOnly>
   );
 };

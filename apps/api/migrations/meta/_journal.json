@@ -232,6 +232,20 @@
       "when": 1686616279074,
       "tag": "0032_outstanding_cobalt_man",
       "breakpoints": false
+    },
+    {
+      "idx": 33,
+      "version": "5",
+      "when": 1686618557905,
+      "tag": "0033_nasty_callisto",
+      "breakpoints": false
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1686620557352,
+      "tag": "0034_round_prodigy",
+      "breakpoints": false
     }
   ]
 }

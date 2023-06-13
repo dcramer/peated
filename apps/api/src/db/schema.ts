@@ -18,6 +18,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { CategoryValues, ServingStyleValues } from "@peated/shared/types";
+import { geography } from "./columns";
 
 export const users = pgTable(
   "user",
@@ -137,6 +138,8 @@ export const entities = pgTable(
     country: text("country"),
     region: text("region"),
     type: entityTypeEnum("type").array().notNull(),
+
+    location: geography("location"),
 
     totalBottles: bigint("total_bottles", { mode: "number" })
       .default(0)

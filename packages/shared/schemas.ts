@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { CategoryValues, ServingStyleValues } from "./types";
 
+export const PointSchema = z.tuple([z.number(), z.number()]);
+
 const FollowStatusEnum = z.enum(["pending", "following", "none"]);
 
 export const UserSchema = z.object({
@@ -33,14 +35,16 @@ export const EntityInputSchema = z.object({
   country: z.string().trim().nullable().optional(),
   region: z.string().trim().nullable().optional(),
   type: z.array(EntityTypeEnum).optional(),
+  location: PointSchema.nullable().optional(),
 });
 
 export const EntitySchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
-  country: z.string().trim().nullable().optional(),
-  region: z.string().trim().nullable().optional(),
+  country: z.string().trim().nullable(),
+  region: z.string().trim().nullable(),
   type: z.array(EntityTypeEnum),
+  location: PointSchema.nullable(),
 
   totalTastings: z.number(),
   totalBottles: z.number(),

@@ -1,13 +1,18 @@
 version: "3.7"
 services:
   postgres:
-    image: postgres:latest
-    restart: always
+    image: postgis/postgis:15-master
+    restart: on-failure
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
+      # - ALLOW_IP_RANGE=0.0.0.0/0
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - postgis-data:/var/lib/postgresql
+    healthcheck:
+      test: "PGPASSWORD=postgres pg_isready -h 127.0.0.1 -U postgres -d postgres"
+volumes:
+  postgis-data:

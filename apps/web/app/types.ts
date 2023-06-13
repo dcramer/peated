@@ -1,18 +1,15 @@
-// these are %'s, so floating point
-// export type MashBill = {
-//   barley: number;
-//   corn: number;
-//   rye: number;
-//   wheat: number;
-// };
-
 import type {
   ComponentPropsWithoutRef,
   ElementType,
   PropsWithChildren,
 } from "react";
 
+import type { Category } from "@peated/shared/types";
+
 export type EntityType = "brand" | "distiller" | "bottler";
+
+// lat, lng
+export type Point = [number, number];
 
 // e.g. Hibiki
 export type Entity = {
@@ -22,6 +19,7 @@ export type Entity = {
   country?: string;
   // e.g. Speyside
   region?: string;
+  location: Point;
   type: EntityType[];
   totalBottles: number;
   totalTastings: number;

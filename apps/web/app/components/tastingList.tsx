@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { Tasting } from "~/types";
 import TastingListItem from "./tastingListItem";
 
-export default function TastlingList({
+export default function TastingList({
   values,
   noBottle,
 }: {

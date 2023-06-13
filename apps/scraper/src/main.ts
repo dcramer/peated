@@ -214,7 +214,21 @@ function parseYear(value: string) {
 }
 
 function mapCategory(value: string) {
-  return value.toLowerCase().replace(" ", "_");
+  const result = value.toLowerCase().replace(" ", "_");
+  switch (result) {
+    case "blended_scotch":
+    case "blended_malt":
+    case "blend":
+      return "blend";
+    case "single_malt":
+    case "single_grain":
+    case "bourbon":
+    case "rye":
+    case "spirit":
+      return result;
+    default:
+      return null;
+  }
 }
 
 // https://www.whiskybase.com/whiskies/distilleries?style=table&search=null&chr=null&country_id=&region_id=&wbRanking=&sort=companies.name&direction=asc&h=companies.country,companies.whiskies,style

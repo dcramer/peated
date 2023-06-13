@@ -4,7 +4,7 @@ import Button from "~/components/button";
 import Layout from "~/components/layout";
 import config from "~/config";
 import { useOnlineStatus } from "~/hooks/useOnlineStatus";
-import { ApiUnauthorized, ApiUnavailable } from "~/lib/api";
+import { ApiError, ApiUnauthorized, ApiUnavailable } from "~/lib/api";
 
 export default function ErrorPage() {
   const error = useRouteError();
@@ -21,6 +21,9 @@ export default function ErrorPage() {
     title = "Identify Yourself";
     subtitle =
       "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
+  } else if (error instanceof ApiError && error.statusCode === 404) {
+    title = "Not Found";
+    subtitle = "We couldn't find the page you were looking for.";
   } else if (isRouteErrorResponse(error)) {
     if (error.status === 404) {
       title = "Not Found";
@@ -49,26 +52,24 @@ export default function ErrorPage() {
           </div>
         </div>
 
-        {config.DEBUG && (
-          <div className="mt-12">
-            {error.remoteStack && (
-              <div className="prose mx-auto mb-4">
-                <h3 className="text-white">Remote Stack</h3>
-                <pre className="whitespace-pre-wrap break-all text-left">
-                  {error.remoteStack}
-                </pre>
-              </div>
-            )}
-            {error.stack && (
-              <div className="prose mx-auto mb-4">
-                <h3 className="text-white">Local Stack</h3>
-                <pre className="whitespace-pre-wrap break-all text-left">
-                  {error.stack}
-                </pre>
-              </div>
-            )}
-          </div>
-        )}
+        <div className="mt-12">
+          {error.remoteStack && (
+            <div className="prose mx-auto mb-4">
+              <h3 className="text-white">Remote Stack</h3>
+              <pre className="whitespace-pre-wrap break-all text-left">
+                {error.remoteStack}
+              </pre>
+            </div>
+          )}
+          {error.stack && (
+            <div className="prose mx-auto mb-4">
+              <h3 className="text-white">Local Stack</h3>
+              <pre className="whitespace-pre-wrap break-all text-left">
+                {error.stack}
+              </pre>
+            </div>
+          )}
+        </div>
       </main>
     </Layout>
   );

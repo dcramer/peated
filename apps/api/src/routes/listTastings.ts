@@ -6,7 +6,13 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { follows, tastings, users } from "../db/schema";
+import {
+  bottles,
+  bottlesToDistillers,
+  follows,
+  tastings,
+  users,
+} from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { TastingSerializer } from "../lib/serializers/tasting";
@@ -21,6 +27,7 @@ export default {
         page: { type: "number" },
         limit: { type: "number", minimum: 1, maximum: 100 },
         bottle: { type: "number" },
+        entity: { type: "number" },
         user: { oneOf: [{ type: "number" }, { const: "me" }] },
         filter: { type: "string", enum: ["global", "friends", "local"] },
       },
@@ -43,6 +50,22 @@ export default {
     if (req.query.bottle) {
       where.push(eq(tastings.bottleId, req.query.bottle));
     }
+
+    if (req.query.entity) {
+      where.push(
+        sql`EXISTS(
+          SELECT FROM ${bottles}
+          WHERE ${bottles.brandId} = ${req.query.entity}
+             OR ${bottles.bottlerId} = ${req.query.entity}
+             OR EXISTS(
+              SELECT FROM ${bottlesToDistillers}
+              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+                AND ${bottlesToDistillers.distillerId} = ${req.query.entity}
+             )
+          )`,
+      );
+    }
+
     if (req.query.user) {
       where.push(
         eq(
@@ -118,6 +141,7 @@ export default {
       limit?: number;
       page?: number;
       bottle?: number;
+      entity?: number;
       user?: number | "me";
       filter?: "global" | "friends" | "local";
     };
