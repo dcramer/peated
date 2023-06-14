@@ -1,11 +1,7 @@
 import FontStyles from "@fontsource/raleway/index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type {
-  LinksFunction,
-  LoaderArgs,
-  V2_MetaFunction,
-} from "@remix-run/node";
+import type { LinksFunction, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   Links,
@@ -76,23 +72,6 @@ function unregisterServiceWorkers() {
 }
 
 unregisterServiceWorkers();
-
-export const meta: V2_MetaFunction = ({ data }) => {
-  const out = [
-    { name: "description", content: config.DESCRIPTION },
-    { name: "twitter:description", content: config.DESCRIPTION },
-
-    { name: "msapplication-TileColor", content: config.THEME_COLOR },
-    { name: "theme-color", content: config.THEME_COLOR },
-  ];
-  if (data?.sentryTrace) {
-    out.push({ name: "sentry-trace", content: data.sentryTrace });
-  }
-  if (data?.sentryBaggage) {
-    out.push({ name: "baggage", content: data.sentryBaggage });
-  }
-  return out;
-};
 
 export const links: LinksFunction = () => [
   { rel: "manifest", href: "/resources/manifest.webmanifest" },
