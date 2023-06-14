@@ -17,7 +17,9 @@ jobs:
         uses: actions/setup-node@v3
       - name: Run docker images
         run: docker-compose up -d
-      - name: Install deps
+      - name: Install system deps
+        run: apt-get update && apt-get install libvips libvips-dev libc-dev fftw-dev gcc g++ make libc6 libheif libde265 libspng
+      - name: Install node deps
         run: pnpm install
       - name: Build packages
         run: pnpm build
