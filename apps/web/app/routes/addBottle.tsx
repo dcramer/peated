@@ -1,4 +1,4 @@
-import { useNavigate } from "@remix-run/react";
+import { useLocation, useNavigate } from "@remix-run/react";
 import { useQueries } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
@@ -21,6 +21,7 @@ export const meta: V2_MetaFunction = () => {
 export default function AddBottle() {
   const api = useApi();
   const navigate = useNavigate();
+  const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const name = toTitleCase(qs.get("name") || "");
 
