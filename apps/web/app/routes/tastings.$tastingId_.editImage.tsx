@@ -11,6 +11,8 @@ import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 
+import { MAX_FILESIZE } from "@peated/shared/constants";
+
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
 import FormHeader from "~/components/formHeader";
@@ -26,8 +28,9 @@ export async function action({ context, request, params }: ActionArgs) {
   invariant(params.tastingId);
 
   const uploadHandler = unstable_createMemoryUploadHandler({
-    maxPartSize: 1048576 * 5,
+    maxPartSize: MAX_FILESIZE,
   });
+
   const formData =
     (request.headers.get("Content-Type") || "").indexOf(
       "application/x-www-form-urlencoded",

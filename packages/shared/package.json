@@ -7,6 +7,8 @@
   "files": [
     "lib",
     "schemas.ts",
+    "types.ts",
+    "constants.ts",
     "tsconfig.json",
     "tsconfig.node.json"
   ],
