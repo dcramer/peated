@@ -293,6 +293,9 @@ importers:
       '@types/morgan':
         specifier: ^1.9.4
         version: 1.9.4
+      '@types/pica':
+        specifier: ^9.0.1
+        version: 9.0.1
       '@types/react':
         specifier: ^18.2.11
         version: 18.2.11
@@ -347,6 +350,9 @@ importers:
       npm-watch:
         specifier: ^0.11.0
         version: 0.11.0
+      pica:
+        specifier: ^9.0.1
+        version: 9.0.1
       postcss:
         specifier: ^8.4.24
         version: 8.4.24
@@ -4011,6 +4017,10 @@ packages:
       pg-types: 4.0.1
     dev: false
 
+  /@types/pica@9.0.1:
+    resolution: {integrity: sha512-hTsYxcy0MqIOKzeALuh3zOHyozBlndxV/bX9X52GBFq2XUQchZF6T0vcRYeT5P1ggmswi2LlIwHAH+bKWxxalg==}
+    dev: false
+
   /@types/prop-types@15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
     dev: false
@@ -7550,6 +7560,10 @@ packages:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
     dev: false
 
+  /glur@1.1.2:
+    resolution: {integrity: sha512-l+8esYHTKOx2G/Aao4lEQ0bnHWg4fWtJbVoZZT9Knxi01pB8C80BR85nONLFwkkQoFRCmXY+BUcGZN3yZ2QsRA==}
+    dev: false
+
   /google-auth-library@8.8.0:
     resolution: {integrity: sha512-0iJn7IDqObDG5Tu9Tn2WemmJ31ksEa96IyK0J0OZCpTh6CrC6FrattwKX87h3qKVuprCJpdOGKc1Xi8V0kMh8Q==}
     engines: {node: '>=12'}
@@ -9429,6 +9443,13 @@ packages:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
     dev: false
 
+  /multimath@2.0.0:
+    resolution: {integrity: sha512-toRx66cAMJ+Ccz7pMIg38xSIrtnbozk0dchXezwQDMgQmbGpfxjtv68H+L00iFL8hxDaVjrmwAFSb3I6bg8Q2g==}
+    dependencies:
+      glur: 1.1.2
+      object-assign: 4.1.1
+    dev: false
+
   /mustache@2.3.2:
     resolution: {integrity: sha512-KpMNwdQsYz3O/SBS1qJ/o3sqUJ5wSb8gb0pul8CO0S56b9Y2ALm8zCfsjPXsqGFfoNBkDwZuZIAjhsZI03gYVQ==}
     engines: {npm: '>=1.4.0'}
@@ -10148,6 +10169,15 @@ packages:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
     dependencies:
       split2: 4.2.0
+    dev: false
+
+  /pica@9.0.1:
+    resolution: {integrity: sha512-v0U4vY6Z3ztz9b4jBIhCD3WYoecGXCQeCsYep+sXRefViL+mVVoTL+wqzdPeE+GpBFsRUtQZb6dltvAt2UkMtQ==}
+    dependencies:
+      glur: 1.1.2
+      multimath: 2.0.0
+      object-assign: 4.1.1
+      webworkify: 1.5.0
     dev: false
 
   /picocolors@1.0.0:
@@ -12696,6 +12726,10 @@ packages:
 
   /webpack-virtual-modules@0.5.0:
     resolution: {integrity: sha512-kyDivFZ7ZM0BVOUteVbDFhlRt7Ah/CSPwJdi8hBpkK7QLumUqdLtVfm/PX/hkcnrvr0i77fO5+TjZ94Pe+C9iw==}
+    dev: false
+
+  /webworkify@1.5.0:
+    resolution: {integrity: sha512-AMcUeyXAhbACL8S2hqqdqOLqvJ8ylmIbNwUIqQujRSouf4+eUFaXbG6F1Rbu+srlJMmxQWsiU7mOJi0nMBfM1g==}
     dev: false
 
   /whatwg-url@5.0.0:
