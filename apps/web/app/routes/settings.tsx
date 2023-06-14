@@ -63,7 +63,7 @@ export default function Settings() {
       });
       let newAvatar: any;
       if (picture) {
-        const blob = await toBlob(picture);
+        const blob = await toBlob(picture, 0.8);
         newAvatar = await api.post("/users/me/avatar", {
           data: {
             picture: blob,

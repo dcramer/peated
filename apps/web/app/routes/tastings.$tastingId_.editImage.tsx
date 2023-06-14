@@ -94,7 +94,7 @@ export default function EditTastingImage() {
   const onSubmit: SubmitHandler<Record<string, never>> = async () => {
     const data = new FormData();
     if (image) {
-      const blob = await toBlob(image);
+      const blob = await toBlob(image, 0.8);
       if (blob) data.append("image", blob);
     }
     submit(data, { method: "POST", encType: "multipart/form-data" });
