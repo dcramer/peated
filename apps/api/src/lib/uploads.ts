@@ -55,7 +55,6 @@ export const storeFile = async ({
 
   return await trace(
     {
-      op: "peated.store-file",
       name: "peated.store-file",
       description: data.filename,
       data: {
@@ -77,7 +76,6 @@ export const storeFile = async ({
 
         await trace(
           {
-            op: "gcs.file",
             name: "gcs.file",
             description: newFilename,
             data: { bucketName },
@@ -89,7 +87,6 @@ export const storeFile = async ({
 
             await trace(
               {
-                op: "gcs.file.write-stream",
                 name: "gcs.file.write-stream",
                 description: newFilename,
               },
@@ -105,7 +102,6 @@ export const storeFile = async ({
 
         await trace(
           {
-            op: "file.write-stream",
             name: "file.write-stream",
             description: newFilename,
           },
