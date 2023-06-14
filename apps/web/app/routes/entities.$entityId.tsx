@@ -148,7 +148,7 @@ export default function EntityDetails() {
             loading={
               <div
                 className="mb-4 animate-pulse rounded bg-slate-800"
-                style={{ height: 200 }}
+                style={{ height: 50 }}
               />
             }
             fallback={<Fragment />}

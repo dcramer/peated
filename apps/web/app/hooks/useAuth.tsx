@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { User } from "~/types";
 
 type Auth = {
-  setUser: (user: User) => void;
+  setUser: (user: User | null) => void;
   user: User | null;
 };
 
@@ -29,7 +29,12 @@ export const AuthProvider = ({
   return (
     <AuthContext.Provider
       value={{
-        user: value,
+        user: value
+          ? {
+              ...user,
+              ...value,
+            }
+          : null,
         setUser: setValue,
       }}
     >
@@ -37,12 +42,6 @@ export const AuthProvider = ({
     </AuthContext.Provider>
   );
 };
-
-export function useRequiredAuth() {
-  const { user, ...params } = useContext(AuthContext);
-  if (!user) throw new Error("Not authenticated.");
-  return { user, ...params };
-}
 
 export default function useAuth() {
   return useContext(AuthContext);

@@ -4,7 +4,7 @@ import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, useLoaderData, useParams, useSubmit } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import invariant from "tiny-invariant";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
@@ -212,8 +212,17 @@ export default function Profile() {
         <EmptyActivity>This users profile is private.</EmptyActivity>
       ) : (
         <>
-          <UserTagDistribution userId={user.id} />
-
+          <QueryBoundary
+            loading={
+              <div
+                className="mb-4 animate-pulse rounded bg-slate-800"
+                style={{ height: 100 }}
+              />
+            }
+            fallback={<Fragment />}
+          >
+            <UserTagDistribution userId={user.id} />
+          </QueryBoundary>
           <Tabs fullWidth>
             <Tabs.Item to={`/users/${user.username}`} controlled>
               Activity

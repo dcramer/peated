@@ -7,6 +7,8 @@ import type { z } from "zod";
 import { BottleInputSchema } from "@peated/shared/schemas";
 import { CategoryValues } from "@peated/shared/types";
 
+import type { LoaderArgs} from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { PreviewBottleCard } from "~/components/bottleCard";
 import EntityField from "~/components/entityField";
 import Fieldset from "~/components/fieldset";
@@ -17,7 +19,6 @@ import type { Option } from "~/components/selectField";
 import SelectField from "~/components/selectField";
 import TextField from "~/components/textField";
 import config from "~/config";
-import { useRequiredAuth } from "~/hooks/useAuth";
 import { ApiError } from "~/lib/api";
 import { formatCategoryName } from "~/lib/strings";
 import type { Bottle, Entity } from "~/types";
@@ -38,6 +39,14 @@ const entityToOption = (entity: Entity): Option => {
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
 
+export function loader({ context, request }: LoaderArgs) {
+  if (!context.user) {
+    return redirect(
+      `/login?redirectTo=${encodeURIComponent(new URL(request.url).pathname)}`,
+    );
+  }
+}
+
 export default function BottleForm({
   onSubmit,
   initialData,
@@ -47,8 +56,6 @@ export default function BottleForm({
   initialData: Partial<Bottle>;
   title: string;
 }) {
-  useRequiredAuth();
-
   const {
     control,
     register,

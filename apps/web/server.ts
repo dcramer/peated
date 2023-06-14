@@ -4,6 +4,7 @@ import prom from "@isaacs/express-prometheus-middleware";
 import { createRequestHandler } from "@remix-run/express";
 import { wrapExpressCreateRequestHandler } from "@sentry/remix";
 import compression from "compression";
+import type { Request } from "express";
 import express from "express";
 import morgan from "morgan";
 import config from "~/config";
@@ -104,7 +105,7 @@ app.all("*", async (req, res, next) => {
   next();
 });
 
-function getLoadContext(req: any, res: any) {
+function getLoadContext(req: Request) {
   return {
     api: req.api,
     user: req.user,

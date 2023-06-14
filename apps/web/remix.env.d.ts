@@ -5,12 +5,6 @@ import "express-serve-static-core";
 import type { ApiClient } from "~/lib/api";
 import type { User } from "~/types";
 
-declare global {
-  interface Window {
-    CONFIG: Record<string, any>;
-  }
-}
-
 interface Context {
   user: User | null;
   accessToken: string | null;
@@ -23,6 +17,27 @@ declare global {
   }
 }
 
-module "@remix-run/server-runtime" {
+declare module "@remix-run/server-runtime" {
   interface AppLoadContext extends Context {}
+}
+
+interface Config {
+  GOOGLE_CLIENT_ID?: string;
+  DEBUG?: string;
+  API_SERVER?: string;
+  SENTRY_DSN?: string;
+  SECRET?: string;
+  VERSION?: string;
+  NODE_ENV: "development" | "production";
+  PORT?: string;
+}
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv extends Config {}
+  }
+
+  interface Window {
+    CONFIG: Config;
+  }
 }

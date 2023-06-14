@@ -4,7 +4,7 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/shared/schemas";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -19,14 +19,24 @@ import ImageField from "~/components/imageField";
 import Layout from "~/components/layout";
 import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
-import { useRequiredAuth } from "~/hooks/useAuth";
+import useAuth from "~/hooks/useAuth";
 import { toBlob } from "~/lib/blobs";
 import type { User } from "~/types";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 
-export async function loader({ context }: LoaderArgs) {
+export async function loader({ context, request }: LoaderArgs) {
   const user: User = await context.api.get("/users/me");
+
+  if (!user) {
+    if (!context.user) {
+      return redirect(
+        `/login?redirectTo=${encodeURIComponent(
+          new URL(request.url).pathname,
+        )}`,
+      );
+    }
+  }
 
   return json({ user });
 }
@@ -43,7 +53,7 @@ export default function Settings() {
   const api = useApi();
   const navigate = useNavigate();
   const { user } = useLoaderData<typeof loader>();
-  const { setUser } = useRequiredAuth();
+  const { setUser } = useAuth();
 
   const queryClient = useQueryClient();
   const saveUser = useMutation({

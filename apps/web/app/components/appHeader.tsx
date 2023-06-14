@@ -29,7 +29,6 @@ const HeaderLogo = () => {
 
 export default function AppHeader() {
   const { user } = useAuth();
-  const submit = useSubmit();
   const navigate = useNavigate();
   const location = useLocation();
 
