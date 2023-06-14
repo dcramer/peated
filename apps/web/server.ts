@@ -16,6 +16,16 @@ import {
   logout,
 } from "~/services/session.server";
 
+import * as Sentry from "@sentry/remix";
+
+Sentry.init({
+  dsn: config.SENTRY_DSN,
+  release: config.VERSION,
+  debug: config.DEBUG,
+  tracesSampleRate: 1.0,
+  // tracePropagationTargets: ["localhost", "api.peated.app", "peated.app"],
+});
+
 const app = express();
 const metricsApp = express();
 
@@ -90,6 +100,12 @@ app.all("*", async (req, res, next) => {
   const session = await getSession(req);
   const user = await getUser(session);
   const accessToken = await getAccessToken(session);
+
+  Sentry.setUser({
+    id: `${user?.id}`,
+    username: user?.username,
+    email: user?.email,
+  });
 
   req.user = user || null;
   req.accessToken = accessToken || null;

@@ -16,6 +16,7 @@ import {
   useLoaderData,
   useRouteError,
 } from "@remix-run/react";
+import * as Sentry from "@sentry/remix";
 import { withSentry } from "@sentry/remix";
 import {
   Hydrate,
@@ -123,6 +124,16 @@ export async function loader({ context }: LoaderArgs) {
 
 export default withSentry(function App() {
   const { accessToken, user, config } = useLoaderData<typeof loader>();
+
+  if (user) {
+    Sentry.setUser({
+      id: `${user?.id}`,
+      username: user?.username,
+      email: user?.email,
+    });
+  } else {
+    Sentry.setUser(null);
+  }
 
   const [queryClient] = useState(
     () =>
