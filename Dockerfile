@@ -3,7 +3,7 @@ FROM node:18-alpine as base
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
 
-RUN apk update && apk add vips vips-dev libc-dev fftw-dev gcc g++ make libc6-compat libheif libde265
+RUN apk update && apk add vips vips-dev libc-dev fftw-dev gcc g++ make libc6-compat libheif libde265 libspng
 
 RUN npm install -g pnpm
 
