@@ -11,7 +11,11 @@ Sentry.init({
 
   integrations: [
     new Sentry.BrowserTracing({
-      tracePropagationTargets: ["localhost", /^\//, "api.peated.app"],
+      tracePropagationTargets: [
+        "localhost",
+        /^\//,
+        /^https:\/\/api\.peated\.app/,
+      ],
       routingInstrumentation: Sentry.remixRouterInstrumentation(
         useEffect,
         useLocation,

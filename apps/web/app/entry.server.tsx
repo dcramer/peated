@@ -16,6 +16,7 @@ Sentry.init({
   release: config.VERSION,
   debug: config.DEBUG,
   tracesSampleRate: 1.0,
+  // tracePropagationTargets: ["localhost", "api.peated.app", "peated.app"],
 });
 
 export default function handleRequest(

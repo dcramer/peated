@@ -9,7 +9,6 @@ import type {
 import { json } from "@remix-run/node";
 import {
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -76,14 +75,21 @@ function unregisterServiceWorkers() {
 
 unregisterServiceWorkers();
 
-export const meta: V2_MetaFunction = () => {
-  return [
+export const meta: V2_MetaFunction = ({ data }) => {
+  const out = [
     { name: "description", content: config.DESCRIPTION },
     { name: "twitter:description", content: config.DESCRIPTION },
 
     { name: "msapplication-TileColor", content: config.THEME_COLOR },
     { name: "theme-color", content: config.THEME_COLOR },
   ];
+  if (data?.sentryTrace) {
+    out.push({ name: "sentry-trace", content: data.sentryTrace });
+  }
+  if (data?.sentryBaggage) {
+    out.push({ name: "baggage", content: data.sentryBaggage });
+  }
+  return out;
 };
 
 export const links: LinksFunction = () => [
@@ -106,40 +112,6 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: FontStyles },
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
-
-function Document({
-  children,
-  title,
-  config,
-}: PropsWithChildren<{ title?: string; config?: Record<string, any> }>) {
-  return (
-    <html lang="en" className="h-full">
-      <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0"
-        />
-        <meta charSet="utf-8" />
-        <Meta />
-        {title ? <title>{title}</title> : null}
-        <Links />
-      </head>
-      <body className="h-full">
-        <LoadingIndicator />
-
-        {children}
-        <ScrollRestoration />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.CONFIG = ${JSON.stringify(config)};`,
-          }}
-        />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
-  );
-}
 
 export async function loader({ context }: LoaderArgs) {
   return json({
@@ -204,5 +176,39 @@ export function ErrorBoundary() {
     <Document>
       <ErrorPage />
     </Document>
+  );
+}
+
+function Document({
+  children,
+  title,
+  config,
+}: PropsWithChildren<{ title?: string; config?: Record<string, any> }>) {
+  return (
+    <html lang="en" className="h-full">
+      <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0"
+        />
+        <meta charSet="utf-8" />
+        <Meta />
+        {title ? <title>{title}</title> : null}
+        <Links />
+      </head>
+      <body className="h-full">
+        <LoadingIndicator />
+
+        {children}
+        <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.CONFIG = ${JSON.stringify(config)};`,
+          }}
+        />
+        <Scripts />
+        {/* <LiveReload /> */}
+      </body>
+    </html>
   );
 }
