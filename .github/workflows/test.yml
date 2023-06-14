@@ -18,7 +18,7 @@ jobs:
       - name: Run docker images
         run: docker-compose up -d
       - name: Install system deps
-        run: apt-get update && apt-get install libvips libvips-dev libc-dev fftw-dev gcc g++ make libc6 libheif libde265 libspng
+        run: sudo apt-get -y update && sudo apt-get -y install libvips libvips-dev libc-dev fftw-dev gcc g++ make libc6 libheif-dev libde265-0 libpng-dev
       - name: Install node deps
         run: pnpm install
       - name: Build packages
