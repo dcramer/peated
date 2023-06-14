@@ -3,21 +3,19 @@ import { PassThrough } from "stream";
 import type { EntryContext } from "@remix-run/node";
 import { Response } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
-import * as Sentry from "@sentry/remix";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 
-import config from "./config";
-
 const ABORT_DELAY = 5_000;
 
-Sentry.init({
-  dsn: config.SENTRY_DSN,
-  release: config.VERSION,
-  debug: config.DEBUG,
-  tracesSampleRate: 1.0,
-  // tracePropagationTargets: ["localhost", "api.peated.app", "peated.app"],
-});
+// XXX: This is in server.ts
+// Sentry.init({
+//   dsn: config.SENTRY_DSN,
+//   release: config.VERSION,
+//   debug: config.DEBUG,
+//   tracesSampleRate: 1.0,
+//   // tracePropagationTargets: ["localhost", "api.peated.app", "peated.app"],
+// });
 
 export default function handleRequest(
   request: Request,
