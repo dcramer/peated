@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
+import { logError } from "~/lib/log";
 import config from "../config";
 import { db } from "../db";
 import { users } from "../db/schema";
