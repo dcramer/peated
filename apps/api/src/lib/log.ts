@@ -14,5 +14,5 @@ export function logError(
     captureMessage(error, {
       extra: context || undefined,
     });
-  console.log(error);
+  console.error(error);
 }

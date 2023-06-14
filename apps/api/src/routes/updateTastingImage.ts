@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
+import { logError } from "~/lib/log";
 import config from "../config";
 import { db } from "../db";
 import { tastings } from "../db/schema";
@@ -63,6 +64,9 @@ export default {
 
     if (fileData.file.truncated) {
       // TODO: delete the file
+      logError("Payload Too Large", {
+        tastingId: tasting.id,
+      });
       return res.status(413).send({
         code: "FST_FILES_LIMIT",
         error: "Payload Too Large",

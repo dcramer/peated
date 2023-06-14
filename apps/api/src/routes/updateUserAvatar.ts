@@ -68,6 +68,9 @@ export default {
 
     if (fileData.file.truncated) {
       // TODO: delete the file
+      logError("Payload Too Large", {
+        userId: user.id,
+      });
       return res.status(413).send({
         code: "FST_FILES_LIMIT",
         error: "Payload Too Large",
