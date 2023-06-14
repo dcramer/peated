@@ -14,6 +14,7 @@ import deleteCollectionBottle from "./deleteCollectionBottle";
 import deleteComment from "./deleteComment";
 import deleteNotification from "./deleteNotification";
 import deleteTasting from "./deleteTasting";
+import deleteTastingImage from "./deleteTastingImage";
 import deleteUserFollow from "./deleteUserFollow";
 import getBottle from "./getBottle";
 import getEntity from "./getEntity";
@@ -94,6 +95,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(getTasting);
   fastify.route(deleteTasting);
   fastify.route(updateTastingImage);
+  fastify.route(deleteTastingImage);
   fastify.route(addTastingToast);
   fastify.route(addTastingComment);
 
