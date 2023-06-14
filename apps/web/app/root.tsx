@@ -37,6 +37,7 @@ import LoadingIndicator from "./components/loadingIndicator";
 import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
 import { ApiUnauthorized } from "./lib/api";
+import type { User } from "./types";
 
 function initMobileControls() {
   if (typeof document === "undefined") return;
@@ -122,8 +123,16 @@ export async function loader({ context }: LoaderArgs) {
   });
 }
 
+type LoaderData = {
+  sentryTrace?: string;
+  sentryBaggage?: string;
+  accessToken: string;
+  user: User | null;
+  config: typeof config;
+};
+
 export default withSentry(function App() {
-  const { accessToken, user, config } = useLoaderData<typeof loader>();
+  const { accessToken, user, config, ...data } = useLoaderData<LoaderData>();
 
   if (user) {
     Sentry.setUser({
@@ -151,7 +160,7 @@ export default withSentry(function App() {
   const dehydratedState = useDehydratedState();
 
   return (
-    <Document config={config}>
+    <Document config={config} data={data}>
       <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
         <QueryClientProvider client={queryClient}>
           <Hydrate state={dehydratedState}>
@@ -194,7 +203,12 @@ function Document({
   children,
   title,
   config,
-}: PropsWithChildren<{ title?: string; config?: Record<string, any> }>) {
+  data,
+}: PropsWithChildren<{
+  title?: string;
+  config?: Record<string, any>;
+  data?: Record<string, any>;
+}>) {
   return (
     <html lang="en" className="h-full">
       <head>
@@ -204,6 +218,20 @@ function Document({
         />
         <meta charSet="utf-8" />
         <Meta />
+        {config && (
+          <>
+            <meta name="description" content={config.DESCRIPTION} />
+            <meta name="twitter:description" content={config.DESCRIPTION} />
+            <meta name="msapplication-TileColor" content={config.THEME_COLOR} />
+            <meta name="theme-color" content={config.THEME_COLOR} />
+          </>
+        )}
+        {data?.sentryTrace && (
+          <meta name="sentry-trace" content={data.sentryTrace} />
+        )}
+        {data?.sentryBaggage && (
+          <meta name="baggage" content={data.sentryBaggage} />
+        )}
         {title ? <title>{title}</title> : null}
         <Links />
       </head>
