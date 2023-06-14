@@ -29,7 +29,7 @@ export const AuthProvider = ({
   return (
     <AuthContext.Provider
       value={{
-        user: value
+        user: user
           ? {
               ...user,
               ...value,
