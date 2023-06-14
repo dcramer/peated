@@ -38,7 +38,6 @@ export async function action({ context, request, params }: ActionArgs) {
   const image = formData.get("image");
   if (!image) {
     await context.api.delete(`/tastings/${params.tastingId}/image`);
-    return redirect(`/tastings/${params.tastingId}`);
   } else {
     try {
       await context.api.post(`/tastings/${params.tastingId}/image`, {
@@ -46,7 +45,6 @@ export async function action({ context, request, params }: ActionArgs) {
           image,
         },
       });
-      return redirect(`/tastings/${params.tastingId}`);
     } catch (err) {
       if (err instanceof ApiError) {
         return json({ error: err.message });
@@ -56,6 +54,7 @@ export async function action({ context, request, params }: ActionArgs) {
       }
     }
   }
+  return redirect(`/tastings/${params.tastingId}`);
 }
 
 export async function loader({ params, context }: LoaderArgs) {
