@@ -1,6 +1,11 @@
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import type { ActionArgs, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import {
+  json,
+  redirect,
+  unstable_createMemoryUploadHandler,
+  unstable_parseMultipartFormData,
+} from "@remix-run/node";
+import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -13,10 +18,45 @@ import Header from "~/components/header";
 import ImageField from "~/components/imageField";
 import Layout from "~/components/layout";
 import Spinner from "~/components/spinner";
-import useApi from "~/hooks/useApi";
 import { ApiError } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
 import type { Tasting } from "~/types";
+
+export async function action({ context, request, params }: ActionArgs) {
+  invariant(params.tastingId);
+
+  const uploadHandler = unstable_createMemoryUploadHandler({
+    maxPartSize: 1048576 * 5,
+  });
+  const formData =
+    (request.headers.get("Content-Type") || "").indexOf(
+      "application/x-www-form-urlencoded",
+    ) === 0
+      ? await request.formData()
+      : await unstable_parseMultipartFormData(request, uploadHandler);
+
+  const image = formData.get("image");
+  if (!image) {
+    await context.api.delete(`/tastings/${params.tastingId}/image`);
+    return redirect(`/tastings/${params.tastingId}`);
+  } else {
+    try {
+      await context.api.post(`/tastings/${params.tastingId}/image`, {
+        data: {
+          image,
+        },
+      });
+      return redirect(`/tastings/${params.tastingId}`);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        return json({ error: err.message });
+      } else {
+        console.error(err);
+        return json({ error: "Unknown error" });
+      }
+    }
+  }
+}
 
 export async function loader({ params, context }: LoaderArgs) {
   invariant(params.tastingId);
@@ -37,11 +77,11 @@ export const meta: V2_MetaFunction = () => {
 };
 
 export default function EditTastingImage() {
-  const api = useApi();
+  const { error } = useActionData<typeof action>() || {};
   const { tasting } = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
 
-  const [error, setError] = useState<string | undefined>();
+  const submit = useSubmit();
+
   const [image, setImage] = useState<HTMLCanvasElement | null>(null);
 
   const {
@@ -49,28 +89,13 @@ export default function EditTastingImage() {
     formState: { isSubmitting, errors },
   } = useForm<Record<string, never>>({});
 
-  const onSubmit: SubmitHandler<Record<string, never>> = async (data) => {
-    if (!image) {
-      await api.delete(`/tastings/${tasting.id}/image`);
-      navigate(`/tastings/${tasting.id}`);
-    } else {
-      try {
-        const blob = await toBlob(image);
-        await api.post(`/tastings/${tasting.id}/image`, {
-          data: {
-            image: blob,
-          },
-        });
-        navigate(`/tastings/${tasting.id}`);
-      } catch (err) {
-        if (err instanceof ApiError) {
-          setError(err.message);
-        } else {
-          console.error(err);
-          setError("Internal error");
-        }
-      }
+  const onSubmit: SubmitHandler<Record<string, never>> = async () => {
+    const data = new FormData();
+    if (image) {
+      const blob = await toBlob(image);
+      if (blob) data.append("image", blob);
     }
+    submit(data, { method: "POST", encType: "multipart/form-data" });
   };
 
   return (
