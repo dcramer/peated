@@ -34,11 +34,40 @@ test("cannot update another users tasting", async () => {
 
 test("tasting image does resize down", async () => {
   const form = new FormData();
-  form.append(
-    "file",
-    await Fixtures.SampleSquareImage(),
-    "sample-square-image.jpg",
-  );
+  form.append("file", await Fixtures.SampleSquareImage(), "blob");
+
+  const encoder = new FormDataEncoder(form);
+
+  const tasting = await Fixtures.Tasting({
+    createdById: DefaultFixtures.user.id,
+  });
+  const response = await app.inject({
+    method: "POST",
+    url: `/tastings/${tasting.id}/image`,
+    payload: Readable.from(encoder.encode()),
+    headers: {
+      ...DefaultFixtures.authHeaders,
+      ...encoder.headers,
+    },
+  });
+
+  expect(response).toRespondWith(200);
+  const data = JSON.parse(response.payload);
+  expect(data.imageUrl).toBeDefined();
+
+  expect(path.extname(data.imageUrl)).toBe(".webp");
+
+  // grab the file
+  const filepath = `${config.UPLOAD_PATH}/${path.basename(data.imageUrl)}`;
+  const metadata = await sharp(filepath).metadata();
+  expect(metadata.format).toBe("webp");
+  expect(metadata.width).toBe(1024);
+  expect(metadata.height).toBe(1024);
+});
+
+test("allows heic", async () => {
+  const form = new FormData();
+  form.append("file", await Fixtures.SampleHEICImage(), "blob");
 
   const encoder = new FormDataEncoder(form);
 

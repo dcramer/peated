@@ -257,3 +257,11 @@ export const SampleSquareImage = async () => {
 export const SampleSquareImagePath = async () => {
   return path.join(__dirname, "assets", "sample-square-image.jpg");
 };
+
+export const SampleHEICImage = async () => {
+  return new Blob([await readFile(await SampleHEICImagePath())]);
+};
+
+export const SampleHEICImagePath = async () => {
+  return path.join(__dirname, "assets", "sample.heic");
+};
