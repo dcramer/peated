@@ -6,11 +6,8 @@ import sharp from "sharp";
 
 import { trace } from "@sentry/node";
 import type { Readable } from "node:stream";
-import { promisify } from "node:util";
-import { pipeline } from "stream";
+import { pipeline } from "node:stream/promises";
 import config from "../config";
-
-const pump = promisify(pipeline);
 
 export const compressAndResizeImage = (
   stream: Readable,
@@ -98,7 +95,7 @@ export const storeFile = async ({
               },
               async () => {
                 const writeStream = file.createWriteStream();
-                await pump(stream, writeStream);
+                await pipeline(stream, writeStream);
               },
             );
           },
@@ -114,7 +111,7 @@ export const storeFile = async ({
           },
           async () => {
             const writeStream = createWriteStream(uploadPath);
-            await pump(stream, writeStream);
+            await pipeline(stream, writeStream);
           },
         );
 
