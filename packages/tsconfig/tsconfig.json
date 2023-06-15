@@ -29,6 +29,5 @@
     "compilerOptions": {
       "module": "commonjs"
     }
-  },
-  "include": ["src", "index.ts", "schemas.ts"]
+  }
 }
