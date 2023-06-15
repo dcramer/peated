@@ -14,6 +14,7 @@ type BaseProps = {
   type?: "button" | "submit" | "reset";
   children?: ReactNode;
   disabled?: boolean;
+  loading?: boolean;
   active?: boolean;
   fullWidth?: boolean;
   fullHeight?: boolean;
@@ -44,6 +45,7 @@ export default forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       fullWidth = false,
       fullHeight = false,
       disabled = false,
+      loading = false,
       active = false,
       ...props
     },
@@ -96,7 +98,8 @@ export default forwardRef<null | HTMLButtonElement | typeof Link, Props>(
             size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm",
             fullWidth ? "w-full" : "",
             fullHeight ? "h-full" : "",
-            disabled ? "cursor-auto" : "",
+            disabled ? "cursor-auto" : "cursor-pointer",
+            loading ? "animate-pulse" : "",
             textColor,
           )}
           to={to}
@@ -116,7 +119,8 @@ export default forwardRef<null | HTMLButtonElement | typeof Link, Props>(
           icon ? "inline-flex items-center gap-x-1.5" : "",
           size === "small" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm",
           fullWidth ? "w-full" : "",
-          disabled ? "cursor-auto" : "",
+          disabled ? "cursor-auto" : "cursor-pointer",
+          loading ? "animate-pulse" : "",
           textColor,
         )}
         type={type || "button"}

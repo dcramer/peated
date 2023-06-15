@@ -17,12 +17,12 @@ import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
+import SkeletonButton from "~/components/skeletonButton";
 import Tabs from "~/components/tabs";
 import TimeSince from "~/components/timeSince";
 import VintageName from "~/components/vintageName";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
 import { logError } from "~/lib/log";
 import { formatCategoryName } from "~/lib/strings";
 import type { Bottle, Collection } from "~/types";
@@ -36,9 +36,7 @@ type BottleWithStats = Bottle & {
 const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
   const api = useApi();
 
-  const {
-    data: { results: collectionList },
-  } = useSuspenseQuery(
+  const { data } = useQuery(
     ["bottles", bottle.id, "collections"],
     (): Promise<Paginated<Collection>> =>
       api.get(`/users/me/collections`, {
@@ -47,6 +45,10 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
         },
       }),
   );
+
+  if (!data) return null;
+
+  const { results: collectionList } = data;
 
   const [isCollected, setIsCollected] = useState(collectionList.length > 0);
   const [loading, setLoading] = useState(false);
@@ -197,7 +199,7 @@ export default function BottleDetails() {
             Record a Tasting
           </Button>
           {user && (
-            <Suspense fallback={null}>
+            <Suspense fallback={<SkeletonButton />}>
               <CollectionAction bottle={bottle} />
             </Suspense>
           )}
