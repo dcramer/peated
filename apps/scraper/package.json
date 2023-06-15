@@ -3,12 +3,14 @@
   "name": "@peated/scraper",
   "scripts": {
     "build": "tsc",
-    "scraper": "ts-node --require dotenv/config ./src/main.ts",
+    "bottles:whiskybase": "ts-node --require dotenv/config ./src/bottle-scraper/whiskybase.ts",
+    "prices:totalwines": "ts-node --require dotenv/config ./src/price-scraper/totalwines.ts",
     "import": "ts-node --require dotenv/config ./src/import.ts",
     "logos": "ts-node --require dotenv/config ./src/logos.ts"
   },
   "dependencies": {
     "@peated/shared": "workspace:*",
+    "@peated/tsconfig": "workspace:*",
     "@swc/core": "^1.3.46",
     "@types/cheerio": "^0.22.31",
     "axios": "^1.3.5",

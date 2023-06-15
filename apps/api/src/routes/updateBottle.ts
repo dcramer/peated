@@ -9,13 +9,13 @@ import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
 import { db } from "../db";
 import type { Bottle, Entity } from "../db/schema";
 import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
-import { fixBottleName } from "../lib/api";
 import { upsertEntity } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireMod } from "../middleware/auth";
 
+import { normalizeBottleName } from "@peated/shared/lib/normalize";
 export default {
   method: "PUT",
   url: "/bottles/:bottleId",
@@ -61,7 +61,7 @@ export default {
       (body.statedAge !== undefined && body.statedAge !== bottle.statedAge)
     ) {
       bottleData.statedAge = bottleData.statedAge ?? bottle.statedAge;
-      bottleData.name = fixBottleName(
+      bottleData.name = normalizeBottleName(
         body.name || bottle.name,
         bottleData.statedAge,
       );

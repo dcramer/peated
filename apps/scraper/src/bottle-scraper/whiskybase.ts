@@ -1,6 +1,9 @@
 import { load as cheerio } from "cheerio";
 import { open } from "fs/promises";
-import { getUrl } from "./scraper";
+
+import { normalizeBottleName } from "@peated/shared/lib/normalize";
+
+import { getUrl } from "../scraper";
 
 function fixDistillerName(name: string) {
   switch (name) {
@@ -51,7 +54,9 @@ async function scrapeBottle(id: number) {
   bottle.brand = {
     name: brandName,
   };
-  bottle.name = parseName(brandName, headerEl.get()[0]?.lastChild?.data.trim());
+  bottle.name = normalizeBottleName(
+    parseName(brandName, headerEl.get()[0]?.lastChild?.data.trim()),
+  );
 
   bottle.category = mapCategory(
     $("dt:contains('Category') + dd").first().text(),
@@ -389,4 +394,6 @@ async function main() {
   await scrapeBottles();
 }
 
-main();
+if (typeof require !== "undefined" && require.main === module) {
+  main();
+}

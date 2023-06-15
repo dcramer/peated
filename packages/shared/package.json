@@ -2,7 +2,9 @@
   "private": true,
   "name": "@peated/shared",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --single-thread"
   },
   "files": [
     "lib",
@@ -13,6 +15,9 @@
     "tsconfig.node.json"
   ],
   "dependencies": {
+    "@peated/tsconfig": "workspace:*",
+    "vite-tsconfig-paths": "^4.2.0",
+    "vitest": "^0.29.8",
     "typescript": "^5.0.4",
     "zod": "^3.21.4"
   }

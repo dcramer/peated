@@ -1,5 +1,5 @@
 {
-  "extends": "@peated/shared/tsconfig.json",
+  "extends": "@peated/tsconfig/tsconfig.json",
   "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "baseUrl": ".",

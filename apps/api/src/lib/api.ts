@@ -42,22 +42,6 @@ export async function getUserFromId(
   );
 }
 
-export const fixBottleName = (name: string, age?: number | null): string => {
-  // try to ease UX and normalize common name components
-  if (age && name == `${age}`) return `${age}-year-old`;
-  name = name
-    .replace(/ years? old/i, "-year-old")
-    .replace(/-years?-old/i, "-year-old")
-    .replace(/ years?/, "-year-old");
-  if (name.indexOf(`${age} `) === 0) {
-    name = name.replace(`${age} `, `${age}-year-old `);
-  }
-  if (name.endsWith(` ${age}`)) {
-    name = `${name}-year-old`;
-  }
-  return name.replace(` ${age} `, ` ${age}-year-old `);
-};
-
 export const profileVisible = async (
   db: DatabaseType | TransactionType,
   user: User,

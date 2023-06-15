@@ -28,10 +28,22 @@ export async function getUrl(url: string) {
 }
 
 export async function cacheUrl(url: string, filename: string) {
+  const urlParts = new URL(url);
+
   let data = "";
   let status = 0;
   try {
-    ({ status, data } = await axios.get(url));
+    ({ status, data } = await axios.get(url, {
+      headers: {
+        Authority: urlParts.hostname,
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7,",
+        "Accept-Language": "en-US,en:q=0.9",
+        Referer: urlParts.origin,
+      },
+    }));
   } catch (err: any) {
     status = err?.response?.status;
     if (status !== 404) {

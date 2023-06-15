@@ -4,12 +4,12 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
+import { normalizeBottleName } from "@peated/shared/lib/normalize";
 import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
 
 import { db } from "../db";
 import type { Bottle, Entity } from "../db/schema";
 import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
-import { fixBottleName } from "../lib/api";
 import { upsertEntity } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { serialize } from "../lib/serializers";
@@ -29,7 +29,7 @@ export default {
   handler: async (req, res) => {
     const body = req.body;
 
-    let name = fixBottleName(body.name, body.statedAge);
+    let name = normalizeBottleName(body.name, body.statedAge);
     if (
       (name.indexOf("-year-old") !== -1 ||
         name.indexOf("-years-old") !== -1 ||

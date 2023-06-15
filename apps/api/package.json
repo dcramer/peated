@@ -23,6 +23,7 @@
     "@google-cloud/storage": "^6.10.1",
     "@paralleldrive/cuid2": "^2.2.0",
     "@peated/shared": "workspace:*",
+    "@peated/tsconfig": "workspace:*",
     "@sentry/node": "^7.51.0",
     "@sentry/profiling-node": "^1.0.2",
     "@sentry/utils": "^7.51.0",
