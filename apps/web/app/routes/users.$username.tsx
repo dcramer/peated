@@ -1,5 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, useLoaderData, useParams, useSubmit } from "@remix-run/react";
@@ -16,7 +17,7 @@ import Tabs from "~/components/tabs";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import type { FollowStatus, Paginated, Tag, User } from "~/types";
+import type { FollowStatus, Tag, User } from "~/types";
 
 type UserDetails = User & {
   followStatus?: FollowStatus;

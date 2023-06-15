@@ -1,17 +1,17 @@
-export const CategoryValues = [
-  "blend",
-  "bourbon",
-  "rye",
-  "single_grain",
-  "single_malt",
-  "spirit",
-] as const;
+import type {
+  CATEGORY_LIST,
+  COUNTRY_LIST,
+  SERVING_STYLE_LIST,
+  STORE_TYPE_LIST,
+} from "./constants";
 
-export type Category = (typeof CategoryValues)[number];
+export type Category = (typeof CATEGORY_LIST)[number];
 
-export const ServingStyleValues = ["neat", "rocks", "splash"] as const;
+export type ServingStyle = (typeof SERVING_STYLE_LIST)[number];
 
-export type ServingStyle = (typeof ServingStyleValues)[number];
+export type StoreType = (typeof STORE_TYPE_LIST)[number];
+
+export type Country = (typeof COUNTRY_LIST)[number];
 
 type NextPagingRel =
   | {

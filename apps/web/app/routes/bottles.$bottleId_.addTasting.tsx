@@ -10,9 +10,9 @@ import type { z } from "zod";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 import { TastingInputSchema } from "@peated/shared/schemas";
-import type { ServingStyle} from "@peated/shared/types";
-import { ServingStyleValues } from "@peated/shared/types";
+import type { Paginated, ServingStyle } from "@peated/shared/types";
 
+import { SERVING_STYLE_LIST } from "@peated/shared/constants";
 import BottleCard from "~/components/bottleCard";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
@@ -28,7 +28,8 @@ import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
 import { ApiError } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
-import type { Bottle, Paginated } from "~/types";
+import { logError } from "~/lib/log";
+import type { Bottle } from "~/types";
 
 type Tag = {
   tag: string;
@@ -41,7 +42,7 @@ function formatServingStyle(style: ServingStyle) {
   return toTitleCase(style);
 }
 
-const servingStyleList = ServingStyleValues.map((c) => ({
+const servingStyleList = SERVING_STYLE_LIST.map((c) => ({
   id: c,
   name: formatServingStyle(c),
 }));
@@ -98,7 +99,7 @@ export default function AddTasting() {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        console.error(err);
+        logError(err);
         setError("Internal error");
       }
     }
@@ -112,7 +113,7 @@ export default function AddTasting() {
           },
         });
       } catch (err) {
-        console.error(err);
+        logError(err);
         // TODO show some kind of alert, ask them to reusubmit image
       }
     }

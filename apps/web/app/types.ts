@@ -4,7 +4,7 @@ import type {
   PropsWithChildren,
 } from "react";
 
-import type { Category } from "@peated/shared/types";
+import type { Category, StoreType } from "@peated/shared/types";
 
 export type EntityType = "brand" | "distiller" | "bottler";
 
@@ -183,33 +183,6 @@ export type SessionPayload = {
   accessToken: string;
 };
 
-type NextPagingRel =
-  | {
-      nextPage: number;
-      next: string;
-    }
-  | {
-      nextPage: null;
-      next: null;
-    };
-
-type PrevPagingRel =
-  | {
-      prevPage: number;
-      prev: string;
-    }
-  | {
-      prevPage: null;
-      prev: null;
-    };
-
-export type PagingRel = NextPagingRel & PrevPagingRel;
-
-export type Paginated<T> = {
-  results: T[];
-  rel: PagingRel;
-};
-
 export type PolymorphicAsProp<E extends ElementType> = {
   as?: E;
 };
@@ -219,3 +192,10 @@ export type PolymorphicProps<E extends ElementType> = PropsWithChildren<
 >;
 
 export type Tag = { tag: string; count: number };
+
+export type Store = {
+  id: string;
+  name: string;
+  type: StoreType;
+  lastRunAt: string;
+};

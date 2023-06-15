@@ -7,8 +7,9 @@ import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
 import TastingList from "~/components/tastingList";
 import type { ApiClient } from "~/lib/api";
-import type { Paginated, Tasting } from "~/types";
+import type { Tasting } from "~/types";
 
+import type { Paginated } from "@peated/shared/types";
 import type { V2_MetaFunction } from "@remix-run/node";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";

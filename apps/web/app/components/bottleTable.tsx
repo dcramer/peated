@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 
-import type { Bottle, CollectionBottle, Entity, PagingRel } from "~/types";
+import type { PagingRel } from "@peated/shared/types";
+import type { Bottle, CollectionBottle, Entity } from "~/types";
 import { formatCategoryName } from "../lib/strings";
 import BottleName from "./bottleName";
 import Button from "./button";

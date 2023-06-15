@@ -1,3 +1,4 @@
+import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
@@ -5,7 +6,7 @@ import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
 import NotificationList from "~/components/notifications/list";
 import useApi from "~/hooks/useApi";
-import type { Notification, Paginated } from "~/types";
+import type { Notification } from "~/types";
 
 export async function loader({ context }: LoaderArgs) {
   const queryClient = new QueryClient();

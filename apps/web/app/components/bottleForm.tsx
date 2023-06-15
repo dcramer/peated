@@ -4,10 +4,10 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
+import { CATEGORY_LIST } from "@peated/shared/constants";
 import { BottleInputSchema } from "@peated/shared/schemas";
-import { CategoryValues } from "@peated/shared/types";
 
-import type { LoaderArgs} from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { PreviewBottleCard } from "~/components/bottleCard";
 import EntityField from "~/components/entityField";
@@ -20,12 +20,13 @@ import SelectField from "~/components/selectField";
 import TextField from "~/components/textField";
 import config from "~/config";
 import { ApiError } from "~/lib/api";
+import { logError } from "~/lib/log";
 import { formatCategoryName } from "~/lib/strings";
 import type { Bottle, Entity } from "~/types";
 import Header from "./header";
 import Spinner from "./spinner";
 
-const categoryList = CategoryValues.map((c) => ({
+const categoryList = CATEGORY_LIST.map((c) => ({
   id: c,
   name: formatCategoryName(c),
 }));
@@ -86,7 +87,7 @@ export default function BottleForm({
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        console.error(err);
+        logError(err);
         setError("Internal error");
       }
     }
@@ -104,7 +105,6 @@ export default function BottleForm({
 
   return (
     <Layout
-      title={title}
       header={
         <Header>
           <FormHeader
@@ -223,7 +223,7 @@ export default function BottleForm({
                 label="Category"
                 placeholder="e.g. Single Malt"
                 helpText="The kind of spirit."
-                targetOptions={categoryList.length}
+                simple
                 options={categoryList}
                 onChange={(value) => onChange(value?.id)}
                 value={

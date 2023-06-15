@@ -3,6 +3,7 @@ import type { FastifyInstance, FastifyPluginCallback } from "fastify";
 import addBottle from "./addBottle";
 import addCollectionBottle from "./addCollectionBottle";
 import addEntity from "./addEntity";
+import addStore from "./addStore";
 import addTasting from "./addTasting";
 import addTastingComment from "./addTastingComment";
 import addTastingToast from "./addTastingToast";
@@ -31,6 +32,7 @@ import listEntityCategories from "./listEntityCategories";
 import listFollowers from "./listFollowers";
 import listFollowing from "./listFollowing";
 import listNotifications from "./listNotifications";
+import listStores from "./listStores";
 import listTastings from "./listTastings";
 import listUserCollectionBottles from "./listUserCollectionBottles";
 import listUserCollections from "./listUserCollections";
@@ -121,6 +123,9 @@ export const router: FastifyPluginCallback = (
   fastify.route(deleteComment);
 
   fastify.route(getUpload);
+
+  fastify.route(listStores);
+  fastify.route(addStore);
 
   next();
 };

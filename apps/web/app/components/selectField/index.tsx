@@ -33,6 +33,7 @@ type BaseProps = {
   placeholder?: string;
   children?: ReactNode;
   className?: string;
+  simple?: boolean;
 };
 
 type MultiProps =
@@ -77,6 +78,7 @@ export default ({
   multiple,
   targetOptions = 5,
   suggestedOptions,
+  simple = false,
   canCreate,
   createForm,
   placeholder,
@@ -91,6 +93,10 @@ export default ({
     : props.value
     ? [props.value]
     : [];
+
+  if (simple) {
+    targetOptions = options.length;
+  }
 
   useEffect(() => {
     const newValue = Array.isArray(props.value)

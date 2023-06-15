@@ -1,15 +1,15 @@
 import { Link } from "@remix-run/react";
 
 import type { PagingRel } from "@peated/shared/types";
-import type { Entity } from "~/types";
-import Button from "./button";
-import Chip from "./chip";
+import type { Store } from "~/types";
+import Button from "../button";
+import TimeSince from "../timeSince";
 
 export default ({
-  entityList,
+  storeList,
   rel,
 }: {
-  entityList: Entity[];
+  storeList: Store[];
   rel?: PagingRel;
 }) => {
   return (
@@ -22,61 +22,34 @@ export default ({
         <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left">
-              Entity
+              Store
             </th>
             <th
               scope="col"
               className="hidden px-3 py-2.5 text-right sm:table-cell"
             >
-              Location
+              Last Run
             </th>
           </tr>
         </thead>
         <tbody>
-          {entityList.map((entity) => {
+          {storeList.map((store) => {
             return (
-              <tr key={entity.id} className="border-b border-slate-800 text-sm">
+              <tr key={store.id} className="border-b border-slate-800 text-sm">
                 <td className="max-w-0 px-3 py-3">
                   <Link
-                    to={`/entities/${entity.id}`}
+                    to={`/admin/stores/${store.id}`}
                     className="font-medium hover:underline"
                   >
-                    {entity.name}
+                    {store.name}
                   </Link>
-                  <div className="mt-2 space-x-2">
-                    {entity.type.sort().map((t) => (
-                      <Chip
-                        key={t}
-                        size="small"
-                        as={Link}
-                        to={`/entities?type=${encodeURIComponent(t)}`}
-                      >
-                        {t}
-                      </Chip>
-                    ))}
-                  </div>
+                  <div className="mt-2 space-x-2">{store.type}</div>
                 </td>
                 <td className="hidden px-3 py-3 text-right sm:table-cell">
-                  {!!entity.country && (
-                    <Link
-                      to={`/entities?country=${encodeURIComponent(
-                        entity.country,
-                      )}`}
-                      className="hover:underline"
-                    >
-                      {entity.country}
-                    </Link>
-                  )}
-                  <br />{" "}
-                  {!!entity.region && (
-                    <Link
-                      to={`/entities?region=${encodeURIComponent(
-                        entity.region,
-                      )}`}
-                      className="hover:underline"
-                    >
-                      {entity.region}
-                    </Link>
+                  {store.lastRunAt ? (
+                    <TimeSince date={store.lastRunAt} />
+                  ) : (
+                    <>&mdash;</>
                   )}
                 </td>
               </tr>

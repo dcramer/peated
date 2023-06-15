@@ -1,4 +1,5 @@
 import { AtSymbolIcon } from "@heroicons/react/20/solid";
+import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
@@ -9,7 +10,7 @@ import EmptyActivity from "~/components/emptyActivity";
 import ListItem from "~/components/listItem";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
-import type { FollowStatus, Friend, Paginated } from "~/types";
+import type { FollowStatus, Friend } from "~/types";
 
 export async function loader({ context }: LoaderArgs) {
   const queryClient = new QueryClient();

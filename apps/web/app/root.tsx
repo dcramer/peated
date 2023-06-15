@@ -9,6 +9,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
   useLoaderData,
   useRouteError,
 } from "@remix-run/react";
@@ -33,6 +34,7 @@ import LoadingIndicator from "./components/loadingIndicator";
 import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
 import { ApiUnauthorized } from "./lib/api";
+import { logError } from "./lib/log";
 import type { User } from "./types";
 
 function initMobileControls() {
@@ -162,7 +164,7 @@ export default withSentry(function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  console.error(error);
+  if (!isRouteErrorResponse(error)) logError(error);
 
   if (error instanceof ApiUnauthorized && error.data.name === "invalid_token") {
     // need middleware!

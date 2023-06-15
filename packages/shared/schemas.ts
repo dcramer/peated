@@ -1,10 +1,16 @@
 import { z } from "zod";
 
-import { CategoryValues, ServingStyleValues } from "./types";
+import {
+  CATEGORY_LIST,
+  COUNTRY_LIST,
+  ENTITY_TYPE_LIST,
+  SERVING_STYLE_LIST,
+  STORE_TYPE_LIST,
+} from "./constants";
 
 export const PointSchema = z.tuple([z.number(), z.number()]);
 
-const FollowStatusEnum = z.enum(["pending", "following", "none"]);
+export const FollowStatusEnum = z.enum(["pending", "following", "none"]);
 
 export const UserSchema = z.object({
   id: z.number(),
@@ -28,7 +34,7 @@ export const UserInputSchema = z.object({
   mod: z.boolean().optional(),
 });
 
-const EntityTypeEnum = z.enum(["brand", "bottler", "distiller"]);
+export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
 
 export const EntityInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
@@ -53,7 +59,7 @@ export const EntitySchema = z.object({
   createdBy: UserSchema.optional(),
 });
 
-const CategoryEnum = z.enum(CategoryValues);
+export const CategoryEnum = z.enum(CATEGORY_LIST);
 
 export const BottleSchema = z.object({
   id: z.number(),
@@ -79,12 +85,12 @@ export const BottleInputSchema = z.object({
   series: z.string().nullable().optional(),
 });
 
-const VintageSchema = z.object({
+export const VintageSchema = z.object({
   barrel: z.number().nullable(),
   vintageYear: z.number().gte(1495).lte(new Date().getFullYear()).nullable(),
 });
 
-const ServiceStyleEnum = z.enum(ServingStyleValues);
+export const ServiceStyleEnum = z.enum(SERVING_STYLE_LIST);
 
 export const TastingSchema = z
   .object({
@@ -160,7 +166,7 @@ export const FollowSchema = z.object({
   followsBack: FollowStatusEnum,
 });
 
-const ObjectTypeEnum = z.enum([
+export const ObjectTypeEnum = z.enum([
   "follow",
   "toast",
   "comment",
@@ -168,7 +174,7 @@ const ObjectTypeEnum = z.enum([
   "entity",
 ]);
 
-const ChangeTypeEnum = z.enum(["add", "update", "delete"]);
+export const ChangeTypeEnum = z.enum(["add", "update", "delete"]);
 
 export const ChangeSchema = z.object({
   id: z.number(),
@@ -205,7 +211,25 @@ export const PaginatedSchema = z.object({
   rel: PagingRelSchema,
 });
 
+export const CountryEnum = z.enum(COUNTRY_LIST);
+
 export const AuthSchema = z.object({
   user: UserSchema,
   accessToken: z.string().optional(),
+});
+
+export const StoreTypeEnum = z.enum(STORE_TYPE_LIST);
+
+export const StoreSchema = z.object({
+  id: z.number(),
+  type: StoreTypeEnum,
+  name: z.string(),
+  country: z.string().nullable(),
+  lastRunAt: z.string().datetime().nullable(),
+});
+
+export const StoreInputSchema = z.object({
+  type: StoreTypeEnum,
+  name: z.string(),
+  country: z.string().nullable().optional(),
 });

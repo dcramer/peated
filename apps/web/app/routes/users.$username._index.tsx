@@ -1,10 +1,11 @@
+import type { Paginated } from "@peated/shared/types";
 import { useOutletContext } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import EmptyActivity from "~/components/emptyActivity";
 import QueryBoundary from "~/components/queryBoundary";
 import TastingList from "~/components/tastingList";
 import useApi from "~/hooks/useApi";
-import type { Paginated, Tasting, User } from "~/types";
+import type { Tasting, User } from "~/types";
 
 export default function ProfileActivity() {
   const api = useApi();

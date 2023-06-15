@@ -1,6 +1,6 @@
+import { CATEGORY_LIST } from "@peated/shared/constants";
 import { BottleSchema, PaginatedSchema } from "@peated/shared/schemas";
 import type { Category } from "@peated/shared/types";
-import { CategoryValues } from "@peated/shared/types";
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
@@ -30,7 +30,7 @@ export default {
         tag: { type: "string" },
         category: {
           type: "string",
-          enum: CategoryValues,
+          enum: CATEGORY_LIST,
         },
         age: { type: "number" },
       },

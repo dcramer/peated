@@ -1,3 +1,4 @@
+import type { Paginated } from "@peated/shared/types";
 import type { V2_MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 
@@ -8,7 +9,7 @@ import QueryBoundary from "~/components/queryBoundary";
 import { SearchTerm } from "~/components/searchTerm";
 import useApi from "~/hooks/useApi";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
-import type { Entity, Paginated } from "~/types";
+import type { Entity } from "~/types";
 
 const Content = ({
   page,

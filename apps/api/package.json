@@ -12,7 +12,7 @@
     "user": "ts-node --require dotenv/config ./src/bin/user.ts",
     "start": "ts-node --require dotenv/config ./src/server.ts",
     "typecheck": "tsc --noEmit",
-    "test": "dotenv -e .env.test -- vitest --single-thread"
+    "test": "dotenv -e .env.test -- vitest --no-threads"
   },
   "dependencies": {
     "@faker-js/faker": "^8.0.2",

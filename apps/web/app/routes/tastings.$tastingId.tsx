@@ -1,5 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useNavigate } from "@remix-run/react";
@@ -19,7 +20,8 @@ import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
-import type { Comment, Paginated, Tasting, User } from "~/types";
+import { logError } from "~/lib/log";
+import type { Comment, Tasting, User } from "~/types";
 
 const CommentForm = ({
   tastingId,
@@ -63,7 +65,7 @@ const CommentForm = ({
                 setSaving(false);
               })
               .catch((err) => {
-                console.error(err);
+                logError(err);
               });
           }}
         >

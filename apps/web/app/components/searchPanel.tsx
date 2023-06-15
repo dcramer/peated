@@ -317,7 +317,6 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
 
   return (
     <Layout
-      title="Search"
       footer={null}
       header={
         <Header>

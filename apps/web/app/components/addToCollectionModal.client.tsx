@@ -8,6 +8,7 @@ import type { z } from "zod";
 import { CollectionBottleInputSchema } from "@peated/shared/schemas";
 
 import { ApiError } from "~/lib/api";
+import { logError } from "~/lib/log";
 import type { Bottle } from "~/types";
 import BottleCard from "./bottleCard";
 import Button from "./button";
@@ -48,7 +49,7 @@ export default ({
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        console.error(err);
+        logError(err);
         setError("Internal error");
       }
     }

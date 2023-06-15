@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityInputSchema } from "@peated/shared/schemas";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import Button from "./button";
 import CountryField from "./countryField";
@@ -51,18 +51,14 @@ export default ({
                 required
                 autoComplete="off"
               />
-              <Controller
-                name="country"
+
+              <CountryField
                 control={control}
-                render={({ field: { ref, ...field } }) => (
-                  <CountryField
-                    {...field}
-                    error={errors.country}
-                    label="Country"
-                    placeholder="e.g. Scotland, United States of America"
-                    required
-                  />
-                )}
+                name="country"
+                error={errors.country}
+                label="Country"
+                placeholder="e.g. Scotland, United States of America"
+                required
               />
               <TextField
                 {...register("region")}

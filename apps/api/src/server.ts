@@ -7,7 +7,7 @@ const start = async () => {
     console.info(`API exposed at http://${config.HOST}:${config.PORT}/`);
     await fastify.listen({ port: config.PORT as number, host: config.HOST });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     process.exit(1);
   }
 };

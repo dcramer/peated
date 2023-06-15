@@ -4,7 +4,6 @@ import path from "path";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
-import { CategoryValues } from "@peated/shared/types";
 import { sql } from "drizzle-orm";
 import { db } from "../../db";
 import type {
@@ -34,6 +33,7 @@ import { createAccessToken } from "../auth";
 import { choose, random, sample } from "../rand";
 import { defaultTags } from "../tags";
 
+import { CATEGORY_LIST } from "@peated/shared/constants";
 export const User = async ({ ...data }: Partial<NewUser> = {}) => {
   return (
     await db
@@ -124,7 +124,7 @@ export const Bottle = async ({
             `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
           ]),
         ),
-        category: choose([...CategoryValues, undefined]),
+        category: choose([...CATEGORY_LIST, undefined]),
         statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
         ...data,
         brandId: brand.id,

@@ -1,5 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
@@ -24,7 +25,7 @@ import useAuth from "~/hooks/useAuth";
 import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
 import { logError } from "~/lib/log";
 import { formatCategoryName } from "~/lib/strings";
-import type { Bottle, Collection, Paginated } from "~/types";
+import type { Bottle, Collection } from "~/types";
 
 type BottleWithStats = Bottle & {
   tastings: number;

@@ -17,7 +17,11 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { CategoryValues, ServingStyleValues } from "@peated/shared/types";
+import {
+  CATEGORY_LIST,
+  SERVING_STYLE_LIST,
+  STORE_TYPE_LIST,
+} from "@peated/shared/constants";
 import { geography } from "./columns";
 
 export const users = pgTable(
@@ -172,7 +176,7 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
 export type Entity = InferModel<typeof entities>;
 export type NewEntity = InferModel<typeof entities, "insert">;
 
-export const categoryEnum = pgEnum("category", CategoryValues);
+export const categoryEnum = pgEnum("category", CATEGORY_LIST);
 // type MyEnum = InferModel<typeof myTable>["myColWithEnum”]
 
 export const bottles = pgTable(
@@ -373,7 +377,7 @@ export type NewCollectionBottle = InferModel<
   "insert"
 >;
 
-export const servingStyleEnum = pgEnum("servingStyle", ServingStyleValues);
+export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
 
 export const tastings = pgTable(
   "tasting",
@@ -592,3 +596,66 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 
 export type Notification = InferModel<typeof notifications>;
 export type NewNotification = InferModel<typeof notifications, "insert">;
+
+export const priceScraperTypeEnum = pgEnum(
+  "price_scraper_type",
+  STORE_TYPE_LIST,
+);
+
+export const stores = pgTable(
+  "store",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    type: priceScraperTypeEnum("type").notNull(),
+    name: text("name").notNull(),
+    country: text("country"),
+    lastRunAt: timestamp("last_run_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (stores) => {
+    return {
+      type: uniqueIndex("store_type").on(stores.type),
+    };
+  },
+);
+
+export type Store = InferModel<typeof stores>;
+export type NewStore = InferModel<typeof stores, "insert">;
+
+export const bottlePrices = pgTable(
+  "bottle_price",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    storeId: bigint("store_id", { mode: "number" })
+      .references(() => stores.id)
+      .notNull(),
+    price: integer("price").notNull(),
+    url: text("url").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (bottlePrices) => {
+    return {
+      toastId: uniqueIndex("bottle_price_unq").on(
+        bottlePrices.bottleId,
+        bottlePrices.storeId,
+      ),
+    };
+  },
+);
+
+export const bottlePricesRelations = relations(bottlePrices, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [bottlePrices.bottleId],
+    references: [bottles.id],
+  }),
+  store: one(stores, {
+    fields: [bottlePrices.storeId],
+    references: [stores.id],
+  }),
+}));
+
+export type BottlePrice = InferModel<typeof bottlePrices>;
+export type NewBottlePrice = InferModel<typeof bottlePrices, "insert">;

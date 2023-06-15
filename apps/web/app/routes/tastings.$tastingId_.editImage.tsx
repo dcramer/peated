@@ -22,6 +22,7 @@ import Layout from "~/components/layout";
 import Spinner from "~/components/spinner";
 import { ApiError } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
+import { logError } from "~/lib/log";
 import type { Tasting } from "~/types";
 
 export async function action({ context, request, params }: ActionArgs) {
@@ -52,7 +53,7 @@ export async function action({ context, request, params }: ActionArgs) {
       if (err instanceof ApiError) {
         return json({ error: err.message });
       } else {
-        console.error(err);
+        logError(err);
         return json({ error: "Unknown error" });
       }
     }

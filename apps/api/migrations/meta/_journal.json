@@ -246,6 +246,27 @@
       "when": 1686620557352,
       "tag": "0034_round_prodigy",
       "breakpoints": false
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1686857162539,
+      "tag": "0035_aspiring_richard_fisk",
+      "breakpoints": false
+    },
+    {
+      "idx": 36,
+      "version": "5",
+      "when": 1686861231574,
+      "tag": "0036_flippant_starjammers",
+      "breakpoints": false
+    },
+    {
+      "idx": 37,
+      "version": "5",
+      "when": 1686862013560,
+      "tag": "0037_common_silhouette",
+      "breakpoints": false
     }
   ]
 }

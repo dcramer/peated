@@ -121,18 +121,13 @@ export default function EditEntity() {
             required
             autoComplete="off"
           />
-          <Controller
-            name="country"
+          <CountryField
             control={control}
-            render={({ field: { ref, ...field } }) => (
-              <CountryField
-                {...field}
-                error={errors.country}
-                label="Country"
-                placeholder="e.g. Scotland, United States of America"
-                required
-              />
-            )}
+            name="country"
+            error={errors.country}
+            label="Country"
+            placeholder="e.g. Scotland, United States of America"
+            required
           />
           <TextField
             {...register("region")}
@@ -154,8 +149,8 @@ export default function EditEntity() {
                   id: t,
                   name: toTitleCase(t),
                 }))}
-                suggestedOptions={entityTypes}
                 options={entityTypes}
+                simple
                 multiple
               />
             )}

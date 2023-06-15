@@ -1,9 +1,12 @@
 import { InboxIcon } from "@heroicons/react/20/solid";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
+
+import type { Paginated } from "@peated/shared/types";
+
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import type { Notification, Paginated } from "../../types";
+import type { Notification } from "../../types";
 import NavLink from "../navLink";
 import QueryBoundary from "../queryBoundary";
 
@@ -21,7 +24,7 @@ const NotificationCount = () => {
       }),
     {
       staleTime: 60 * 1000,
-      enabled: !!user,
+      enabled: !!user && typeof document !== "undefined",
     },
   );
 
