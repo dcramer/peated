@@ -1,6 +1,6 @@
 import type { OAuth2Namespace } from "@fastify/oauth2";
 import "fastify";
-import { User } from "./db/schema";
+import type { User } from "./db/schema";
 
 declare namespace NodeJS {
   export interface ProcessEnv {
@@ -29,10 +29,10 @@ declare global {
     interface AsymmetricMatchersContaining extends CustomMatchers {}
   }
 
-  const DefaultFixtures = {
-    user: User,
+  export const DefaultFixtures: {
+    user: User;
     authHeaders: {
-      Authorization: string,
-    },
+      Authorization: string;
+    };
   };
 }
