@@ -3,7 +3,7 @@ import {
   PaginatedSchema,
 } from "@peated/shared/schemas";
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
@@ -86,7 +86,7 @@ export default {
       .innerJoin(entities, eq(entities.id, bottles.brandId))
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(sql<string>`(${entities.name} || ' ' || ${bottles.name})`));
+      .orderBy(asc(bottles.fullName));
 
     res.send({
       results: await serialize(

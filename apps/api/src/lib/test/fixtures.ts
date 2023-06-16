@@ -119,18 +119,22 @@ export const Bottle = async ({
             totalBottles: 1,
           })
     ) as EntityType;
+    const name =
+      data.name ??
+      toTitleCase(
+        choose([
+          faker.company.buzzNoun(),
+          `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
+        ]),
+      );
     const [bottle] = await tx
       .insert(bottles)
       .values({
-        name: toTitleCase(
-          choose([
-            faker.company.buzzNoun(),
-            `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
-          ]),
-        ),
         category: choose([...CATEGORY_LIST, undefined]),
         statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
         ...data,
+        name,
+        fullName: [brand.name, name, data.series].filter(Boolean).join(" "),
         brandId: brand.id,
         createdById: data.createdById || (await User()).id,
       })
@@ -157,7 +161,7 @@ export const Bottle = async ({
     await tx.insert(changes).values({
       objectId: bottle.id,
       objectType: "bottle",
-      displayName: `${brand.name} ${bottle.name}`,
+      displayName: bottle.fullName,
       type: "add",
       createdAt: bottle.createdAt,
       createdById: bottle.createdById,
@@ -260,6 +264,7 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
         storeId: data.storeId || (await Store()).id,
         price: parseInt(faker.finance.amount(50, 200, 0), 10),
         url: faker.internet.url(),
+        name: "", // just to fix tsc
         ...data,
       })
       .returning()

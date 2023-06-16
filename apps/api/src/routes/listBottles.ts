@@ -2,7 +2,7 @@ import { CATEGORY_LIST } from "@peated/shared/constants";
 import { BottleSchema, PaginatedSchema } from "@peated/shared/schemas";
 import type { Category } from "@peated/shared/types";
 import type { SQL } from "drizzle-orm";
-import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
@@ -67,6 +67,7 @@ export default {
             ON e.id = b.distiller_id AND b.bottle_id = ${bottles.id}
             WHERE e.name ILIKE ${likeQuery}
           )`,
+          sql`${bottles.fullName} ILIKE ${likeQuery}`,
           // lol welcome to search
           sql`EXISTS(
             SELECT 1
@@ -76,7 +77,6 @@ export default {
                 e.name ILIKE ${likeQuery}
                 OR e.name || ' ' || ${bottles.name} ILIKE ${likeQuery}
                 OR e.name || ' ' || ${bottles.series} ILIKE ${likeQuery}
-                OR e.name || ' ' || ${bottles.name} || ' ' || ${bottles.series} ILIKE ${likeQuery}
                 OR e.name || ' ' || ${bottles.series} || ' ' || ${bottles.name} ILIKE ${likeQuery}
               )
           )`,
@@ -118,7 +118,7 @@ export default {
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
       case "name":
-        orderBy = sql`${entities.name} || ' ' || ${bottles.name} ASC`;
+        orderBy = asc(bottles.fullName);
         break;
       default:
         orderBy = desc(bottles.totalTastings);

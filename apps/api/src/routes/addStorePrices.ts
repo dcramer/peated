@@ -4,9 +4,9 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { eq, sql } from "drizzle-orm";
+import { eq, ilike, sql } from "drizzle-orm";
 import { db } from "../db";
-import { bottles, entities, storePrices, stores } from "../db/schema";
+import { bottles, storePrices, stores } from "../db/schema";
 import { requireAdmin } from "../middleware/auth";
 
 export default {
@@ -36,10 +36,8 @@ export default {
       const [bottle] = await db
         .select({ id: bottles.id })
         .from(bottles)
-        .innerJoin(entities, eq(entities.id, bottles.brandId))
-        .where(
-          sql<string>`${entities.name} || ' ' || ${bottles.name} = ${sp.name}`,
-        );
+        .where(ilike(bottles.fullName, sp.name))
+        .limit(1);
       await db
         .insert(storePrices)
         .values({

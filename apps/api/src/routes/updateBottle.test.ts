@@ -53,7 +53,8 @@ test("no changes", async () => {
 });
 
 test("edits a new bottle with new name param", async () => {
-  const bottle = await Fixtures.Bottle();
+  const brand = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle({ brandId: brand.id });
   const response = await app.inject({
     method: "PUT",
     url: `/bottles/${bottle.id}`,
@@ -72,8 +73,11 @@ test("edits a new bottle with new name param", async () => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
 
-  expect(omit(bottle, "name")).toEqual(omit(bottle2, "name"));
+  expect(omit(bottle, "name", "fullName")).toEqual(
+    omit(bottle2, "name", "fullName"),
+  );
   expect(bottle2.name).toBe("Delicious Wood");
+  expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
 });
 
 test("clears category", async () => {
@@ -115,7 +119,8 @@ test("requires age with matching name", async () => {
 });
 
 test("manipulates name to conform with age", async () => {
-  const bottle = await Fixtures.Bottle();
+  const brand = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle({ brandId: brand.id });
   const response = await app.inject({
     method: "PUT",
     url: `/bottles/${bottle.id}`,
@@ -132,11 +137,12 @@ test("manipulates name to conform with age", async () => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(omit(bottle, "name", "statedAge")).toEqual(
-    omit(bottle2, "name", "statedAge"),
+  expect(omit(bottle, "name", "fullName", "statedAge")).toEqual(
+    omit(bottle2, "name", "fullName", "statedAge"),
   );
   expect(bottle2.statedAge).toBe(10);
   expect(bottle2.name).toBe("Delicious 10-year-old");
+  expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
 });
 
 test("changes brand", async () => {
@@ -157,8 +163,11 @@ test("changes brand", async () => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(omit(bottle, "brandId")).toEqual(omit(bottle2, "brandId"));
+  expect(omit(bottle, "brandId", "fullName")).toEqual(
+    omit(bottle2, "brandId", "fullName"),
+  );
   expect(bottle2.brandId).toBe(newBrand.id);
+  expect(bottle2.fullName).toBe(`${newBrand.name} ${bottle.name}`);
 
   const newBrandRef = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.id, newBrand.id),

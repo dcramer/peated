@@ -183,6 +183,7 @@ export const bottles = pgTable(
   "bottle",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     category: categoryEnum("category"),
     brandId: bigint("brand_id", { mode: "number" })
@@ -208,6 +209,7 @@ export const bottles = pgTable(
       unique: uniqueIndex("bottle_brand_unq")
         .on(bottles.name, bottles.brandId)
         .where(sql`series IS NULL`),
+      uniqueName: uniqueIndex("bottle_name_unq").on(bottles.fullName),
       uniqueSeries: uniqueIndex("bottle_series_unq")
         .on(bottles.name, bottles.brandId, bottles.series)
         .where(sql`series IS NOT NULL`),

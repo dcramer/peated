@@ -30,7 +30,9 @@ test("processes new price", async () => {
   const bottle = await Fixtures.Bottle({
     name: "10-year-old",
     brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
+    series: null,
   });
+  expect(bottle.fullName).toBe("Ardbeg 10-year-old");
 
   const response = await app.inject({
     method: "POST",
@@ -63,7 +65,9 @@ test("processes existing price", async () => {
   const bottle = await Fixtures.Bottle({
     name: "10-year-old",
     brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
+    series: null,
   });
+  expect(bottle.fullName).toBe("Ardbeg 10-year-old");
   const existingPrice = await Fixtures.StorePrice({
     bottleId: bottle.id,
     storeId: store.id,

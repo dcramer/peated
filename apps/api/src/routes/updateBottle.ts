@@ -35,7 +35,7 @@ export default {
   preHandler: [requireMod],
   handler: async (req, res) => {
     const bottle = await db.query.bottles.findFirst({
-      where: (bottles, { eq }) => eq(entities.id, req.params.bottleId),
+      where: (bottles, { eq }) => eq(bottles.id, req.params.bottleId),
       with: {
         brand: true,
         bottler: true,
@@ -66,10 +66,7 @@ export default {
         bottleData.statedAge,
       );
       if (
-        (bottleData.name.indexOf("-year-old") !== -1 ||
-          bottleData.name.indexOf("-years-old") !== -1 ||
-          bottleData.name.indexOf("year old") !== -1 ||
-          bottleData.name.indexOf("years old") !== -1) &&
+        bottleData.name.indexOf("-year-old") !== -1 &&
         !bottleData.statedAge
       ) {
         res
@@ -126,6 +123,23 @@ export default {
             bottleData.bottlerId = bottlerUpsert.id;
           }
         }
+      }
+
+      if (bottleData.name || bottleData.brandId || bottleData.series) {
+        if (!brand) {
+          brand =
+            (await db.query.entities.findFirst({
+              where: eq(entities.id, bottle.brandId),
+            })) || null;
+          if (!brand) throw new Error("Unexpected");
+        }
+        bottleData.fullName = [
+          brand.name,
+          bottleData.name ?? bottle.name,
+          bottleData.series ?? bottle.series,
+        ]
+          .filter(Boolean)
+          .join(" ");
       }
 
       let newBottle: Bottle | undefined;
@@ -245,7 +259,7 @@ export default {
         objectType: "bottle",
         objectId: newBottle.id,
         createdById: req.user.id,
-        displayName: `${brand.name} ${newBottle.name}`,
+        displayName: newBottle.fullName,
         type: "update",
         data: JSON.stringify({
           ...bottleData,

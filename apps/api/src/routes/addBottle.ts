@@ -30,13 +30,7 @@ export default {
     const body = req.body;
 
     let name = normalizeBottleName(body.name, body.statedAge);
-    if (
-      (name.indexOf("-year-old") !== -1 ||
-        name.indexOf("-years-old") !== -1 ||
-        name.indexOf("year old") !== -1 ||
-        name.indexOf("years old") !== -1) &&
-      !body.statedAge
-    ) {
+    if (name.indexOf("-year-old") !== -1 && !body.statedAge) {
       res
         .status(400)
         .send({ error: "You should include the Stated Age of the bottle" });
@@ -86,6 +80,7 @@ export default {
           .insert(bottles)
           .values({
             name,
+            fullName: [brand.name, name, body.series].filter(Boolean).join(" "),
             series: body.series || null,
             statedAge: body.statedAge || null,
             category: body.category || null,
@@ -98,7 +93,8 @@ export default {
         if (
           err?.code === "23505" &&
           (err?.constraint === "bottle_brand_unq" ||
-            err?.constraint === "bottle_series_unq")
+            err?.constraint === "bottle_series_unq" ||
+            err?.constraint === "bottle_name_unq")
         ) {
           res
             .status(409)
@@ -138,7 +134,7 @@ export default {
         objectId: bottle.id,
         createdAt: bottle.createdAt,
         createdById: req.user.id,
-        displayName: `${brand.name} ${bottle.name}`,
+        displayName: bottle.fullName,
         type: "add",
         data: JSON.stringify({
           ...bottle,
