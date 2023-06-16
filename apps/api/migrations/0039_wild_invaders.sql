@@ -6,7 +6,7 @@ UPDATE "bottle" SET "full_name" = (
     SELECT TRIM(TRAILING FROM CONCAT("entity"."name", ' ', "bottle"."name", ' ', "bottle"."series")) as "full_name"
     FROM "entity"
     WHERE "entity"."id" = "bottle"."brand_id" LIMIT 1
-) ON CONFLICT ON CONSTRAINT "bottle_name_unq" DO NOTHING;
+) ON CONFLICT DO NOTHING;
 
 DELETE FROM "change" WHERE "object_type" = "bottle" and "object_id" IN (
     SELECT "id" FROM "bottle" WHERE "full_name" IS NULL;
