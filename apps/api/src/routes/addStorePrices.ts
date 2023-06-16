@@ -58,6 +58,10 @@ export default {
         });
     }
 
+    db.update(stores)
+      .set({ lastRunAt: sql`NOW()` })
+      .where(eq(stores.id, store.id));
+
     res.status(201).send({});
   },
 } as RouteOptions<
