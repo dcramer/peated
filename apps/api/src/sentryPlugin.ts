@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { extractTraceparentData } from "@sentry/utils";
+import type { onRequestHookHandler } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 
 export interface SentryContext {
@@ -25,11 +26,20 @@ export default fastifyPlugin(async (fastify, options) => {
       );
 
     const transactionName = request.routerPath;
-    const transaction = Sentry.startTransaction({
-      name: transactionName,
-      op: "http.server",
-      ...traceparentData,
-    });
+    const transaction = Sentry.startTransaction(
+      {
+        name: transactionName,
+        op: "http.server",
+        ...traceparentData,
+      },
+      {
+        request: Sentry.extractRequestData({
+          method: request.method,
+          query: request.query as { [key: string]: any | any[] },
+          headers: request.headers,
+        }),
+      },
+    );
 
     request._sentryContext = {
       transaction,
@@ -37,10 +47,13 @@ export default fastifyPlugin(async (fastify, options) => {
 
     Sentry.configureScope((scope) => {
       // LOVE THAT I HAVE TO CALL TWO CALLS FOR BASICS
+      scope.setSDKProcessingMetadata({
+        request,
+      });
       scope.setSpan(transaction);
       scope.setTransactionName(transactionName);
     });
-  });
+  } as onRequestHookHandler);
 
   fastify.addHook("onResponse", async (request, reply) => {
     setImmediate(() => {
