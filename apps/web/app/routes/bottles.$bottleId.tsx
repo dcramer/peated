@@ -316,6 +316,9 @@ function BottlePrices({ bottleId }: { bottleId: number }) {
                   <span className="flex-1">{price.store?.name}</span>
                   <span>${(price.price / 100).toFixed(2)}</span>
                 </a>
+                <span className="text-light text-xs">
+                  <TimeSince date={price.updatedAt} />
+                </span>
               </li>
             );
           })}

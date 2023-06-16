@@ -206,4 +206,5 @@ export type StorePrice = {
   url: string;
   bottleId?: string | null;
   store?: Store;
+  updatedAt: string;
 };

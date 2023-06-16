@@ -239,6 +239,7 @@ export const StorePriceSchema = z.object({
   price: z.number(),
   url: z.string(),
   store: StoreSchema.optional(),
+  updatedAt: z.string().datetime(),
 });
 
 export const StorePriceInputSchema = z.object({

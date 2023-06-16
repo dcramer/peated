@@ -7,6 +7,7 @@ export default function TimeSince({
   date,
   ...props
 }: { date: string } & React.ComponentProps<"time">) {
+  if (!date) return null;
   return (
     <time dateTime={date} {...props}>
       {dayjs(date).fromNow()}

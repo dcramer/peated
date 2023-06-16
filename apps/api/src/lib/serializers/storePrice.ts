@@ -11,6 +11,7 @@ export const StorePriceSerializer: Serializer<StorePrice> = {
       name: item.name,
       price: item.price,
       url: item.url,
+      updatedAt: attrs.updatedAt,
     };
   },
 };
@@ -55,6 +56,7 @@ export const StorePriceWithStoreSerializer: Serializer<
       price: item.price,
       url: item.url,
       store: attrs.store,
+      updatedAt: item.updatedAt,
     };
   },
 };
