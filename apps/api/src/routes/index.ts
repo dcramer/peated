@@ -21,6 +21,7 @@ import deleteUserFollow from "./deleteUserFollow";
 import getBottle from "./getBottle";
 import getEntity from "./getEntity";
 import getStats from "./getStats";
+import getStore from "./getStore";
 import getTasting from "./getTasting";
 import getUser from "./getUser";
 import listBottleSuggestedTags from "./listBottleSuggestedTags";
@@ -33,6 +34,7 @@ import listEntityCategories from "./listEntityCategories";
 import listFollowers from "./listFollowers";
 import listFollowing from "./listFollowing";
 import listNotifications from "./listNotifications";
+import listStorePrices from "./listStorePrices";
 import listStores from "./listStores";
 import listTastings from "./listTastings";
 import listUserCollectionBottles from "./listUserCollectionBottles";
@@ -126,7 +128,10 @@ export const router: FastifyPluginCallback = (
   fastify.route(getUpload);
 
   fastify.route(listStores);
+  fastify.route(getStore);
   fastify.route(addStore);
+
+  fastify.route(listStorePrices);
   fastify.route(addStorePrices);
 
   next();

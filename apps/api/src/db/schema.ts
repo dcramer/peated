@@ -622,40 +622,42 @@ export const stores = pgTable(
 export type Store = InferModel<typeof stores>;
 export type NewStore = InferModel<typeof stores, "insert">;
 
-export const bottlePrices = pgTable(
-  "bottle_price",
+export const storePrices = pgTable(
+  "store_price",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    bottleId: bigint("bottle_id", { mode: "number" })
-      .references(() => bottles.id)
-      .notNull(),
     storeId: bigint("store_id", { mode: "number" })
       .references(() => stores.id)
       .notNull(),
+    name: text("name").notNull(),
+    bottleId: bigint("bottle_id", { mode: "number" }).references(
+      () => bottles.id,
+    ),
     price: integer("price").notNull(),
     url: text("url").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (bottlePrices) => {
+  (storePrices) => {
     return {
-      toastId: uniqueIndex("bottle_price_unq").on(
-        bottlePrices.bottleId,
-        bottlePrices.storeId,
+      storeName: uniqueIndex("store_price_unq_name").on(
+        storePrices.storeId,
+        storePrices.name,
       ),
     };
   },
 );
 
-export const bottlePricesRelations = relations(bottlePrices, ({ one }) => ({
+export const storePricesRelations = relations(storePrices, ({ one }) => ({
   bottle: one(bottles, {
-    fields: [bottlePrices.bottleId],
+    fields: [storePrices.bottleId],
     references: [bottles.id],
   }),
   store: one(stores, {
-    fields: [bottlePrices.storeId],
+    fields: [storePrices.storeId],
     references: [stores.id],
   }),
 }));
 
-export type BottlePrice = InferModel<typeof bottlePrices>;
-export type NewBottlePrice = InferModel<typeof bottlePrices, "insert">;
+export type StorePrice = InferModel<typeof storePrices>;
+export type NewStorePrice = InferModel<typeof storePrices, "insert">;

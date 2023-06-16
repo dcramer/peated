@@ -267,6 +267,13 @@
       "when": 1686862013560,
       "tag": "0037_common_silhouette",
       "breakpoints": false
+    },
+    {
+      "idx": 38,
+      "version": "5",
+      "when": 1686937710427,
+      "tag": "0038_shiny_george_stacy",
+      "breakpoints": false
     }
   ]
 }

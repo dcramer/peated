@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
-import { bottlePrices } from "~/db/schema";
+import { storePrices } from "~/db/schema";
 import buildFastify from "../app";
 import { db } from "../db";
 import * as Fixtures from "../lib/test/fixtures";
@@ -49,11 +49,12 @@ test("processes new price", async () => {
 
   const prices = await db
     .select()
-    .from(bottlePrices)
-    .where(eq(bottlePrices.storeId, store.id));
+    .from(storePrices)
+    .where(eq(storePrices.storeId, store.id));
   expect(prices.length).toBe(1);
   expect(prices[0].bottleId).toBe(bottle.id);
   expect(prices[0].price).toBe(9999);
+  expect(prices[0].name).toBe("Ardbeg 10-year-old");
   expect(prices[0].url).toBe("http://example.com");
 });
 
@@ -63,7 +64,7 @@ test("processes existing price", async () => {
     name: "10-year-old",
     brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
   });
-  const existingPrice = await Fixtures.BottlePrice({
+  const existingPrice = await Fixtures.StorePrice({
     bottleId: bottle.id,
     storeId: store.id,
   });
@@ -85,11 +86,41 @@ test("processes existing price", async () => {
 
   const prices = await db
     .select()
-    .from(bottlePrices)
-    .where(eq(bottlePrices.storeId, store.id));
+    .from(storePrices)
+    .where(eq(storePrices.storeId, store.id));
   expect(prices.length).toBe(1);
   expect(prices[0].id).toBe(existingPrice.id);
   expect(prices[0].bottleId).toBe(bottle.id);
   expect(prices[0].price).toBe(2999);
+  expect(prices[0].name).toBe("Ardbeg 10-year-old");
+  expect(prices[0].url).toBe("http://example.com");
+});
+
+test("processes new price without bottle", async () => {
+  const store = await Fixtures.Store({ type: "totalwines" });
+
+  const response = await app.inject({
+    method: "POST",
+    url: `/stores/${store.id}/prices`,
+    payload: [
+      {
+        name: "Ardbeg 10-year-old",
+        price: 2999,
+        url: "http://example.com",
+      },
+    ],
+    headers: await Fixtures.AuthenticatedHeaders({ admin: true }),
+  });
+
+  expect(response).toRespondWith(201);
+
+  const prices = await db
+    .select()
+    .from(storePrices)
+    .where(eq(storePrices.storeId, store.id));
+  expect(prices.length).toBe(1);
+  expect(prices[0].bottleId).toBeNull();
+  expect(prices[0].price).toBe(2999);
+  expect(prices[0].name).toBe("Ardbeg 10-year-old");
   expect(prices[0].url).toBe("http://example.com");
 });

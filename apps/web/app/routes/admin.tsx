@@ -8,6 +8,7 @@ export const meta: V2_MetaFunction = () => {
   return [
     {
       title: "Admin",
+      current: true,
     },
   ];
 };
@@ -17,7 +18,7 @@ export default function AdminLayout() {
     <Layout>
       <div className="flex">
         <nav className="w-56">
-          <ul role="list" className="mr-6 flex flex-1 flex-col gap-y-6">
+          <ul role="list" className="mr-6 flex flex-1 flex-col gap-y-4">
             <li>
               <NavLink
                 to="/admin/stores"
@@ -26,7 +27,7 @@ export default function AdminLayout() {
                     isActive
                       ? "bg-slate-800 text-white"
                       : "text-slate-400 hover:bg-slate-800 hover:text-white",
-                    "flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
+                    "flex gap-x-3 rounded-md p-2 text-sm font-semibold",
                   )
                 }
               >

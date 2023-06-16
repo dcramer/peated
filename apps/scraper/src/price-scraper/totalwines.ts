@@ -27,6 +27,8 @@ import { getUrl } from "../scraper";
 
 import { normalizeBottleName } from "@peated/shared/lib/normalize";
 
+import { submitStorePrices } from "../api";
+
 type Product = {
   name: string;
   price: number;
@@ -72,12 +74,20 @@ async function scrapeProducts(
 export async function main() {
   const products: Product[] = [];
   await scrapeProducts(
-    "https://www.totalwine.com/spirits/scotch/single-malt/c/000887?viewall=true&pageSize=120&aty=0,0,0,0",
+    "https://www.totalwine.com/spirits/scotch/c/000887?viewall=true&pageSize=120&aty=0,0,0,0",
     async (product: Product) => {
       products.push(product);
     },
   );
-  console.log(products);
+
+  await scrapeProducts(
+    "https://www.totalwine.com/spirits/whiskey/c/9238919?viewall=true&pageSize=120&aty=0,0,0,0",
+    async (product: Product) => {
+      products.push(product);
+    },
+  );
+
+  await submitStorePrices(1, products);
 }
 
 if (typeof require !== "undefined" && require.main === module) {

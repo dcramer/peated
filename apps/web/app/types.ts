@@ -199,3 +199,10 @@ export type Store = {
   type: StoreType;
   lastRunAt: string;
 };
+
+export type StorePrice = {
+  name: string;
+  price: number;
+  url: string;
+  bottleId: string | null;
+};

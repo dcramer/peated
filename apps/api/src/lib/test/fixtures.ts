@@ -4,23 +4,22 @@ import path from "path";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../../db";
 import type {
   Entity as EntityType,
   NewBottle,
-  NewBottlePrice,
   NewComment,
   NewEntity,
   NewFollow,
   NewStore,
+  NewStorePrice,
   NewTasting,
   NewToast,
   NewUser,
   User as UserType,
 } from "../../db/schema";
 import {
-  bottlePrices,
   bottleTags,
   bottles,
   bottlesToDistillers,
@@ -28,6 +27,7 @@ import {
   comments,
   entities,
   follows,
+  storePrices,
   stores,
   tastings,
   toasts,
@@ -243,15 +243,21 @@ export const Store = async ({ ...data }: Partial<NewStore> = {}) => {
   )[0];
 };
 
-export const BottlePrice = async ({
-  ...data
-}: Partial<NewBottlePrice> = {}) => {
+export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
+  if (!data.name) {
+    if (!data.bottleId) data.bottleId = (await Bottle()).id;
+    const bottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, data.bottleId),
+      with: { brand: true },
+    });
+    if (!bottle) throw new Error("Unexpected");
+    data.name = `${bottle.brand.name} ${bottle.name}`;
+  }
   return (
     await db
-      .insert(bottlePrices)
+      .insert(storePrices)
       .values({
         storeId: data.storeId || (await Store()).id,
-        bottleId: data.bottleId || (await Bottle()).id,
         price: parseInt(faker.finance.amount(50, 200, 0), 10),
         url: faker.internet.url(),
         ...data,
