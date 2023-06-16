@@ -4,6 +4,7 @@ import addBottle from "./addBottle";
 import addCollectionBottle from "./addCollectionBottle";
 import addEntity from "./addEntity";
 import addStore from "./addStore";
+import addStorePrices from "./addStorePrices";
 import addTasting from "./addTasting";
 import addTastingComment from "./addTastingComment";
 import addTastingToast from "./addTastingToast";
@@ -126,6 +127,7 @@ export const router: FastifyPluginCallback = (
 
   fastify.route(listStores);
   fastify.route(addStore);
+  fastify.route(addStorePrices);
 
   next();
 };

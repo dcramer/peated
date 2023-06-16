@@ -233,3 +233,9 @@ export const StoreInputSchema = z.object({
   name: z.string(),
   country: z.string().nullable().optional(),
 });
+
+export const BottlePriceInputSchema = z.object({
+  name: z.string(),
+  price: z.number(),
+  url: z.string(),
+});

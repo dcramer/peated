@@ -14,7 +14,7 @@ beforeAll(async () => {
   };
 });
 
-test("requiers admin", async () => {
+test("requires admin", async () => {
   const response = await app.inject({
     method: "POST",
     url: "/stores",

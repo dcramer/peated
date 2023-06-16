@@ -9,15 +9,18 @@ import { db } from "../../db";
 import type {
   Entity as EntityType,
   NewBottle,
+  NewBottlePrice,
   NewComment,
   NewEntity,
   NewFollow,
+  NewStore,
   NewTasting,
   NewToast,
   NewUser,
   User as UserType,
 } from "../../db/schema";
 import {
+  bottlePrices,
   bottleTags,
   bottles,
   bottlesToDistillers,
@@ -25,6 +28,7 @@ import {
   comments,
   entities,
   follows,
+  stores,
   tastings,
   toasts,
   users,
@@ -219,6 +223,37 @@ export const Comment = async ({ ...data }: Partial<NewComment> = {}) => {
         createdById: data.createdById || (await User()).id,
         tastingId: data.tastingId || (await Tasting()).id,
         comment: faker.lorem.sentences(random(2, 5)),
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const Store = async ({ ...data }: Partial<NewStore> = {}) => {
+  return (
+    await db
+      .insert(stores)
+      .values({
+        name: faker.company.name(),
+        country: faker.location.country(),
+        type: "totalwines",
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const BottlePrice = async ({
+  ...data
+}: Partial<NewBottlePrice> = {}) => {
+  return (
+    await db
+      .insert(bottlePrices)
+      .values({
+        storeId: data.storeId || (await Store()).id,
+        bottleId: data.bottleId || (await Bottle()).id,
+        price: parseInt(faker.finance.amount(50, 200, 0), 10),
+        url: faker.internet.url(),
         ...data,
       })
       .returning()
