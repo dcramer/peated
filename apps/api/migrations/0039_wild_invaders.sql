@@ -8,7 +8,7 @@ FROM (
     -- lol postgres
     SELECT DISTINCT ON (TRIM(TRAILING FROM CONCAT(e."name", ' ', b."name", ' ', b."series"))) TRIM(TRAILING FROM CONCAT(e."name", ' ', b."name", ' ', b."series")) as "full_name", b."id" as "bottle_id"
     FROM "bottle" as b
-    JOIN "entity" as e ON b."brand_id" = e."id";
+    JOIN "entity" as e ON b."brand_id" = e."id"
 ) AS f
 WHERE f."bottle_id" = "bottle"."id"
   AND NOT EXISTS (
