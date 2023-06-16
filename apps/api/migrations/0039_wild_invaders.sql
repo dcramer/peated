@@ -17,7 +17,7 @@ WHERE f."bottle_id" = "bottle"."id"
       AND b2."id" != "bottle"."id"
   );
 
-DELETE FROM "change" WHERE "objectq_type" = 'bottle' and "object_id" IN (
+DELETE FROM "change" WHERE "object_type" = 'bottle' and "object_id" IN (
   SELECT "id" FROM "bottle" WHERE "full_name" IS NULL
 );
 
