@@ -7,7 +7,7 @@ import Spinner from "./spinner";
 
 export default ({
   children = <Spinner />,
-  fallback = <ErrorView />,
+  fallback = ErrorView,
   loading,
 }: {
   children: ReactNode;
@@ -16,7 +16,7 @@ export default ({
 }) => (
   <QueryErrorResetBoundary>
     {({ reset }) => (
-      <ErrorBoundary onReset={reset} fallback={fallback}>
+      <ErrorBoundary onReset={reset} fallbackRender={fallback}>
         <Suspense fallback={loading}>{children}</Suspense>
       </ErrorBoundary>
     )}
