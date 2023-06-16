@@ -208,7 +208,7 @@ export const PagingRelSchema = z.object({
 export const PaginatedSchema = z.object({
   results: z.array(z.any()),
 
-  rel: PagingRelSchema,
+  rel: PagingRelSchema.optional(),
 });
 
 export const CountryEnum = z.enum(COUNTRY_LIST);
@@ -238,6 +238,7 @@ export const StorePriceSchema = z.object({
   name: z.string(),
   price: z.number(),
   url: z.string(),
+  store: StoreSchema.optional(),
 });
 
 export const StorePriceInputSchema = z.object({

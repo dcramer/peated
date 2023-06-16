@@ -204,5 +204,6 @@ export type StorePrice = {
   name: string;
   price: number;
   url: string;
-  bottleId: string | null;
+  bottleId?: string | null;
+  store?: Store;
 };

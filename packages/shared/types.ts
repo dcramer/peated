@@ -37,5 +37,5 @@ export type PagingRel = NextPagingRel & PrevPagingRel;
 
 export type Paginated<T> = {
   results: T[];
-  rel: PagingRel;
+  rel?: PagingRel;
 };

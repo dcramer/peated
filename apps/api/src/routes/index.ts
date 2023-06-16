@@ -24,6 +24,7 @@ import getStats from "./getStats";
 import getStore from "./getStore";
 import getTasting from "./getTasting";
 import getUser from "./getUser";
+import listBottlePrices from "./listBottlePrices";
 import listBottleSuggestedTags from "./listBottleSuggestedTags";
 import listBottleTags from "./listBottleTags";
 import listBottles from "./listBottles";
@@ -82,6 +83,8 @@ export const router: FastifyPluginCallback = (
 
   fastify.route(listBottleTags);
   fastify.route(listBottleSuggestedTags);
+
+  fastify.route(listBottlePrices);
 
   fastify.route(listEntities);
   fastify.route(addEntity);

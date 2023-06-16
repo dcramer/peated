@@ -25,7 +25,7 @@ import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { logError } from "~/lib/log";
 import { formatCategoryName } from "~/lib/strings";
-import type { Bottle, Collection } from "~/types";
+import type { Bottle, Collection, StorePrice } from "~/types";
 
 type BottleWithStats = Bottle & {
   tastings: number;
@@ -242,29 +242,87 @@ export default function BottleDetails() {
         </div>
       </div>
 
-      <div className="border-b border-slate-700">
-        <Tabs fullWidth>
-          <Tabs.Item to={`/bottles/${bottle.id}`} controlled>
-            Activity
-          </Tabs.Item>
-        </Tabs>
-      </div>
-      <QueryBoundary>
-        <Outlet context={{ bottle }} />
-      </QueryBoundary>
+      <div className="flex">
+        <div className="flex-1">
+          <div className="border-b border-slate-700">
+            <Tabs fullWidth>
+              <Tabs.Item to={`/bottles/${bottle.id}`} controlled>
+                Activity
+              </Tabs.Item>
+            </Tabs>
+          </div>
+          <QueryBoundary>
+            <Outlet context={{ bottle }} />
+          </QueryBoundary>
 
-      {bottle.createdBy && (
-        <p className="mt-8 text-center text-sm text-slate-500 sm:text-left">
-          This bottle was first added by{" "}
-          <Link
-            to={`/users/${bottle.createdBy.username}`}
-            className="font-medium hover:underline"
-          >
-            {bottle.createdBy.displayName}
-          </Link>{" "}
-          <TimeSince date={bottle.createdAt} />
-        </p>
-      )}
+          {bottle.createdBy && (
+            <p className="mt-8 text-center text-sm text-slate-500 sm:text-left">
+              This bottle was first added by{" "}
+              <Link
+                to={`/users/${bottle.createdBy.username}`}
+                className="font-medium hover:underline"
+              >
+                {bottle.createdBy.displayName}
+              </Link>{" "}
+              <TimeSince date={bottle.createdAt} />
+            </p>
+          )}
+        </div>
+        <div className="ml-4 hidden w-[200px] sm:block">
+          <QueryBoundary loading={<BottlePricesSkeleton />}>
+            <BottlePrices bottleId={bottle.id} />
+          </QueryBoundary>
+        </div>
+      </div>
     </Layout>
+  );
+}
+
+function BottlePricesSkeleton() {
+  return (
+    <div>
+      <Tabs fullWidth>
+        <Tabs.Item active>Prices</Tabs.Item>
+      </Tabs>
+      <div
+        className="mt-4 animate-pulse bg-slate-800"
+        style={{ height: 200 }}
+      />
+    </div>
+  );
+}
+
+function BottlePrices({ bottleId }: { bottleId: number }) {
+  const api = useApi();
+  const { data } = useQuery(
+    ["bottles", bottleId, "prices"],
+    (): Promise<Paginated<StorePrice>> =>
+      api.get(`/bottles/${bottleId}/prices`),
+  );
+
+  if (!data) return null;
+
+  return (
+    <div>
+      <Tabs fullWidth>
+        <Tabs.Item active>Prices</Tabs.Item>
+      </Tabs>
+      {data.results.length ? (
+        <ul className="mt-4 gap-y-2 text-sm">
+          {data.results.map((price) => {
+            return (
+              <li key={price.store?.id}>
+                <a href={price.url} className="flex hover:underline">
+                  <span className="flex-1">{price.store?.name}</span>
+                  <span>${(price.price / 100).toFixed(2)}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="mt-4 text-center text-sm">No sellers found.</p>
+      )}
+    </div>
   );
 }

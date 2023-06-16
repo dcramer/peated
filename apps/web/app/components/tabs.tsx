@@ -19,11 +19,11 @@ const Tabs = ({ fullWidth, ...props }: Props) => {
 };
 
 type ItemProps = {
-  to: string;
+  to?: string;
   active?: boolean;
   count?: number;
   controlled?: boolean;
-} & React.ComponentPropsWithoutRef<typeof Link>;
+} & Omit<React.ComponentPropsWithoutRef<typeof Link>, "to">;
 
 Tabs.Item = function TabItem({
   to,
