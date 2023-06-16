@@ -1,10 +1,24 @@
+import { Link } from "@remix-run/react";
+import { Breadcrumbs } from "~/components/breadcrumbs";
+
 export default function Admin() {
   return (
-    <div className="flex items-center">
-      <div>&lt;&mdash;</div>
-      <p className="ml-4">
-        Click one of those pages to do something useful with yourself.
-      </p>
-    </div>
+    <>
+      <Breadcrumbs
+        pages={[
+          {
+            name: "Admin",
+            to: "/admin",
+          },
+        ]}
+      />
+      <div className="prose">
+        <ul>
+          <li>
+            <Link to="/admin/stores">Manage Stores & Pricing Aggregators</Link>
+          </li>
+        </ul>
+      </div>
+    </>
   );
 }
