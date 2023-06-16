@@ -118,7 +118,7 @@ export default {
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
       case "name":
-        orderBy = sql`${entities.name} || ${bottles.name} ASC`;
+        orderBy = sql`${entities.name} || ' ' || ${bottles.name} ASC`;
         break;
       default:
         orderBy = desc(bottles.totalTastings);
