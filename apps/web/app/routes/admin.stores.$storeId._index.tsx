@@ -8,7 +8,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   invariant(params.storeId);
 
   const url = new URL(request.url);
-  const page = url.searchParams.get("page");
+  const page = url.searchParams.get("page") || 1;
 
   const priceList = await context.api.get(`/stores/${params.storeId}/prices`, {
     query: {

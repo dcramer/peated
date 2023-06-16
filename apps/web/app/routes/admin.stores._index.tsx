@@ -11,7 +11,7 @@ import EmptyActivity from "~/components/emptyActivity";
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url);
-  const page = url.searchParams.get("page");
+  const page = url.searchParams.get("page") || 1;
   const storeList = await context.api.get("/stores", {
     query: {
       page,
