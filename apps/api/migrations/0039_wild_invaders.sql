@@ -8,9 +8,9 @@ UPDATE "bottle" SET "full_name" = (
     WHERE "entity"."id" = "bottle"."brand_id" LIMIT 1
 ) ON CONFLICT ON CONSTRAINT "bottle_name_unq" DO NOTHING;
 
-ALTER TABLE "bottle" ALTER COLUMN "full_name" SET NOT NULL;
-
 DELETE FROM "change" WHERE "object_type" = "bottle" and "object_id" IN (
     SELECT "id" FROM "bottle" WHERE "full_name" IS NULL;
 );
 DELETE FROM "bottle" WHERE "full_name" IS NULL;
+
+ALTER TABLE "bottle" ALTER COLUMN "full_name" SET NOT NULL;
