@@ -5,6 +5,7 @@
     "build": "tsc",
     "bottles:whiskybase": "ts-node --require dotenv/config ./src/bottle-scraper/whiskybase.ts",
     "prices": "run-p prices:*",
+    "prices:bevmo": "ts-node --require dotenv/config ./src/price-scraper/bevmo.ts",
     "prices:totalwines": "ts-node --require dotenv/config ./src/price-scraper/totalwines.ts",
     "import": "ts-node --require dotenv/config ./src/import.ts",
     "logos": "ts-node --require dotenv/config ./src/logos.ts"
