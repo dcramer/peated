@@ -12,7 +12,7 @@ FROM (
 WHERE f."bottle_id" = "bottle"."id"
   AND NOT EXISTS (
     SELECT FROM "bottle" b2
-    WHERE b2."full_name" != f."full_name"
+    WHERE b2."full_name" = f."full_name"
   );
 
 DELETE FROM "change" WHERE "object_type" = 'bottle' and "object_id" IN (
