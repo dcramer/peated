@@ -87,7 +87,12 @@ export async function main() {
     },
   );
 
-  await submitStorePrices(1, products);
+  if (process.env.ACCESS_TOKEN) {
+    await submitStorePrices(1, products);
+  } else {
+    console.log("DRY RUN");
+    console.log(`- ${products.length} products found`);
+  }
 }
 
 if (typeof require !== "undefined" && require.main === module) {
