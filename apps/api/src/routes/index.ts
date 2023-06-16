@@ -42,6 +42,7 @@ import listUserCollectionBottles from "./listUserCollectionBottles";
 import listUserCollections from "./listUserCollections";
 import listUserTags from "./listUserTags";
 import listUsers from "./listUsers";
+import triggerSentry from "./triggerSentry";
 import updateBottle from "./updateBottle";
 import updateEntity from "./updateEntity";
 import updateFollower from "./updateFollower";
@@ -136,6 +137,8 @@ export const router: FastifyPluginCallback = (
 
   fastify.route(listStorePrices);
   fastify.route(addStorePrices);
+
+  fastify.route(triggerSentry);
 
   next();
 };
