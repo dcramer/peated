@@ -43,7 +43,7 @@ async function scrapeProducts(
       );
       return;
     }
-    console.log(name);
+    console.log(`${name} - ${(price / 100).toFixed(2)}`);
     cb({
       name: normalizeBottleName(name),
       price,
@@ -74,8 +74,7 @@ export async function main() {
   if (process.env.ACCESS_TOKEN) {
     await submitStorePrices(2, products);
   } else {
-    console.log("DRY RUN");
-    console.log(`- ${products.length} products found`);
+    console.log(`Dry Run Complete - ${products.length} products found`);
   }
 }
 

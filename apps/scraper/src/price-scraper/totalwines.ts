@@ -25,6 +25,7 @@ async function scrapeProducts(
     const productUrl = $("h2.title__2RoYeYuO > a", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");
     const price = parsePrice($("span.price__1JvDDp_x", el).first().text());
+    console.log(`${name} - ${(price / 100).toFixed(2)}`);
     cb({
       name: normalizeBottleName(name),
       price,
@@ -53,8 +54,7 @@ export async function main() {
   if (process.env.ACCESS_TOKEN) {
     await submitStorePrices(1, products);
   } else {
-    console.log("DRY RUN");
-    console.log(`- ${products.length} products found`);
+    console.log(`Dry Run Complete - ${products.length} products found`);
   }
 }
 
