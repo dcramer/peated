@@ -19,12 +19,20 @@ Sentry.init({
   ],
 });
 
-function jobWrapper(name: string, cb: () => Promise<void>) {
+function jobWrapper(schedule: string, name: string, cb: () => Promise<void>) {
   return async () => {
-    const checkInId = Sentry.captureCheckIn({
-      monitorSlug: name,
-      status: "in_progress",
-    });
+    const checkInId = Sentry.captureCheckIn(
+      {
+        monitorSlug: name,
+        status: "in_progress",
+      },
+      {
+        schedule: {
+          type: "crontab",
+          value: schedule,
+        },
+      },
+    );
 
     const transaction = Sentry.startTransaction({
       op: "job",
@@ -56,7 +64,7 @@ function jobWrapper(name: string, cb: () => Promise<void>) {
 
 scheduleJob(
   "0 0 * * *",
-  jobWrapper("scrape-wooden-cork", async () => {
+  jobWrapper("0 0 * * *", "scrape-wooden-cork", async () => {
     console.log("Scraping Wooden Cork");
     await woodencork();
   }),
@@ -64,7 +72,7 @@ scheduleJob(
 
 scheduleJob(
   "0 1 * * *",
-  jobWrapper("scrape-total-wines", async () => {
+  jobWrapper("0 1 * * *", "scrape-total-wines", async () => {
     console.log("Scraping Total Wines");
     await totalwines();
   }),
