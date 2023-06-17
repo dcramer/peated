@@ -92,7 +92,7 @@ job("*/60 * * * *", "scrape-total-wines", async () => {
 });
 
 job("*/60 * * * *", "scrape-astor-wines", async () => {
-  console.log("Scraping Total Wines");
+  console.log("Scraping Astor Wines");
   await astorwines();
 });
 
