@@ -44,7 +44,6 @@ async function scrapeProducts(
       return;
     }
     console.log(`${name} - ${(price / 100).toFixed(2)}`);
-    if (name.indexOf("Ardbeg 25") !== -1) process.exit(1);
 
     cb({
       name: normalizeBottleName(name),
