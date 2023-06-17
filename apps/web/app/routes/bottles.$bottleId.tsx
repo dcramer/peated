@@ -186,7 +186,17 @@ export default function BottleDetails() {
 
           {(bottle.category || bottle.statedAge) && (
             <div className="flex w-full flex-col items-center justify-center gap-x-1 text-sm text-slate-500 sm:w-auto sm:items-end sm:leading-7">
-              <p>{bottle.category && formatCategoryName(bottle.category)}</p>
+              <p>
+                {bottle.category && (
+                  <Link
+                    to={`/bottles?category=${encodeURIComponent(
+                      bottle.category,
+                    )}`}
+                  >
+                    {formatCategoryName(bottle.category)}
+                  </Link>
+                )}
+              </p>
               <p>
                 {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
               </p>
