@@ -1,8 +1,12 @@
 import axios from "axios";
-import { existsSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import { open } from "fs/promises";
 
 const CACHE = ".cache";
+
+if (!existsSync(CACHE)) {
+  mkdirSync(CACHE);
+}
 
 export class PageNotFound extends Error {}
 
