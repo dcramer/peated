@@ -6,7 +6,12 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { eq, ilike, sql } from "drizzle-orm";
 import { db } from "../db";
-import { bottles, storePrices, stores } from "../db/schema";
+import {
+  bottles,
+  storePriceHistories,
+  storePrices,
+  stores,
+} from "../db/schema";
 import { requireAdmin } from "../middleware/auth";
 
 export async function findBottle(name: string): Promise<{ id: number } | null> {
@@ -69,24 +74,36 @@ export default {
 
     for (const sp of req.body) {
       const bottle = await findBottle(sp.name);
-      await db
-        .insert(storePrices)
-        .values({
-          bottleId: bottle ? bottle.id : null,
-          storeId: store.id,
-          name: sp.name,
-          price: sp.price,
-          url: sp.url,
-        })
-        .onConflictDoUpdate({
-          target: [storePrices.storeId, storePrices.name],
-          set: {
+      await db.transaction(async (tx) => {
+        const [{ priceId }] = await tx
+          .insert(storePrices)
+          .values({
             bottleId: bottle ? bottle.id : null,
+            storeId: store.id,
+            name: sp.name,
             price: sp.price,
             url: sp.url,
-            updatedAt: sql`NOW()`,
-          },
-        });
+          })
+          .onConflictDoUpdate({
+            target: [storePrices.storeId, storePrices.name],
+            set: {
+              bottleId: bottle ? bottle.id : null,
+              price: sp.price,
+              url: sp.url,
+              updatedAt: sql`NOW()`,
+            },
+          })
+          .returning({ priceId: storePrices.id });
+
+        await tx
+          .insert(storePriceHistories)
+          .values({
+            priceId: priceId,
+            price: sp.price,
+            date: sql`CURRENT_DATE`,
+          })
+          .onConflictDoNothing();
+      });
     }
 
     await db

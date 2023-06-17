@@ -4,6 +4,7 @@ import {
   bigint,
   bigserial,
   boolean,
+  date,
   doublePrecision,
   integer,
   jsonb,
@@ -663,3 +664,40 @@ export const storePricesRelations = relations(storePrices, ({ one }) => ({
 
 export type StorePrice = InferModel<typeof storePrices>;
 export type NewStorePrice = InferModel<typeof storePrices, "insert">;
+
+export const storePriceHistories = pgTable(
+  "store_price_history",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+
+    priceId: bigint("price_id", { mode: "number" })
+      .references(() => storePrices.id)
+      .notNull(),
+    price: integer("price").notNull(),
+    date: date("date").defaultNow().notNull(),
+  },
+  (storePriceHistories) => {
+    return {
+      priceDate: uniqueIndex("store_price_history_unq").on(
+        storePriceHistories.priceId,
+        storePriceHistories.date,
+      ),
+    };
+  },
+);
+
+export const storePriceHistoriesRelations = relations(
+  storePriceHistories,
+  ({ one }) => ({
+    price: one(storePrices, {
+      fields: [storePriceHistories.priceId],
+      references: [storePrices.id],
+    }),
+  }),
+);
+
+export type StorePriceHistory = InferModel<typeof storePriceHistories>;
+export type NewStorePriceHistory = InferModel<
+  typeof storePriceHistories,
+  "insert"
+>;

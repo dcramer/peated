@@ -295,6 +295,13 @@
       "when": 1686985271015,
       "tag": "0041_thin_domino",
       "breakpoints": false
+    },
+    {
+      "idx": 42,
+      "version": "5",
+      "when": 1687036018243,
+      "tag": "0042_chemical_starbolt",
+      "breakpoints": false
     }
   ]
 }
