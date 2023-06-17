@@ -1,4 +1,4 @@
-import type { SQL} from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import { and, asc, eq, ilike } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
@@ -45,7 +45,7 @@ export default {
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where: SQL[] = [];
+    const where: SQL[] = [eq(storePrices.storeId, store.id)];
     if (query) {
       where.push(ilike(storePrices.name, `%${query}%`));
     }
