@@ -42,6 +42,8 @@ export function ProfileDropdown() {
             ref={buttonRef}
             className="focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm text-slate-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring"
             onClick={openMenu}
+            as={Link}
+            to={`/users/${user.username}`}
             onMouseEnter={() => onMouseEnter(!open)}
             onMouseLeave={() => onMouseLeave(open)}
           >
