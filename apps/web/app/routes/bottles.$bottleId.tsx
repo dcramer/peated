@@ -308,7 +308,7 @@ function BottlePrices({ bottleId }: { bottleId: number }) {
         <Tabs.Item active>Prices</Tabs.Item>
       </Tabs>
       {data.results.length ? (
-        <ul className="mt-4 gap-y-2 text-sm">
+        <ul className="mt-4 space-y-2 text-sm">
           {data.results.map((price) => {
             return (
               <li key={price.store?.id}>
