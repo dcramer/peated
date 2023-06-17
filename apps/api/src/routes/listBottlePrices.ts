@@ -1,5 +1,5 @@
 import { PaginatedSchema, StorePriceSchema } from "@peated/shared/schemas";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
@@ -46,7 +46,12 @@ export default {
       })
       .from(storePrices)
       .innerJoin(stores, eq(storePrices.storeId, stores.id))
-      .where(eq(storePrices.bottleId, bottle.id));
+      .where(
+        and(
+          eq(storePrices.bottleId, bottle.id),
+          sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
+        ),
+      );
 
     res.send({
       results: await serialize(
