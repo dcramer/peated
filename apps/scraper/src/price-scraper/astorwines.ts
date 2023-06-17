@@ -49,6 +49,8 @@ export async function main() {
   // TODO: support pagination
   const products: Product[] = [];
 
+  const uniqueProducts = new Set();
+
   let hasProducts = true;
   let page = 1;
   while (hasProducts) {
@@ -56,7 +58,9 @@ export async function main() {
     await scrapeProducts(
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=3_41&srt=1&instockonly=True&Page=${page}`,
       async (product: Product) => {
+        if (uniqueProducts.has(product.name)) return;
         products.push(product);
+        uniqueProducts.add(product.name);
         hasProducts = true;
       },
     );
@@ -70,7 +74,9 @@ export async function main() {
     await scrapeProducts(
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=2_32&srt=1&instockonly=True&Page=${page}`,
       async (product: Product) => {
+        if (uniqueProducts.has(product.name)) return;
         products.push(product);
+        uniqueProducts.add(product.name);
         hasProducts = true;
       },
     );
