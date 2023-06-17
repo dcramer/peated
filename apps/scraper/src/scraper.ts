@@ -1,8 +1,10 @@
 import axios from "axios";
-import { existsSync, mkdirSync } from "fs";
+import { existsSync, mkdirSync, statSync } from "fs";
 import { open } from "fs/promises";
 
 const CACHE = ".cache";
+
+const CACHE_EXPIRE = 60 * 60 * 18 * 1000;
 
 if (!existsSync(CACHE)) {
   mkdirSync(CACHE);
@@ -17,6 +19,9 @@ export async function getUrl(url: string) {
     status = 0;
   if (!existsSync(filename)) {
     console.log(`${url} not cached, fetching from internet`);
+    ({ data, status } = await cacheUrl(url, filename));
+  } else if (statSync(filename).mtimeMs < new Date().getTime() - CACHE_EXPIRE) {
+    console.log(`${url} cache outdated, fetching from internet`);
     ({ data, status } = await cacheUrl(url, filename));
   } else {
     const fs = await open(filename, "r");
