@@ -4,6 +4,7 @@ import { storePrices } from "~/db/schema";
 import buildFastify from "../app";
 import { db } from "../db";
 import * as Fixtures from "../lib/test/fixtures";
+import { findBottle } from "./addStorePrices";
 
 let app: FastifyInstance;
 beforeAll(async () => {
@@ -127,4 +128,33 @@ test("processes new price without bottle", async () => {
   expect(prices[0].price).toBe(2999);
   expect(prices[0].name).toBe("Ardbeg 10-year-old");
   expect(prices[0].url).toBe("http://example.com");
+});
+
+test("findBottle matches exact", async () => {
+  const bottle = await Fixtures.Bottle();
+  const result = await findBottle(bottle.fullName);
+  expect(result?.id).toBe(bottle.id);
+});
+
+test("findBottle matches fullName as prefix", async () => {
+  const bottle = await Fixtures.Bottle();
+  const result = await findBottle(bottle.fullName + " Single Grain");
+  expect(result?.id).toBe(bottle.id);
+});
+
+test("findBottle matches partial fullName", async () => {
+  const brand = await Fixtures.Entity({ name: "The Macallan" });
+  const bottle = await Fixtures.Bottle({
+    brandId: brand.id,
+    name: "12-year-old",
+    series: "Double Cask",
+  });
+  const result = await findBottle("The Macallan 12-year-old");
+  expect(result?.id).toBe(bottle.id);
+});
+
+test("findBottle doesnt match random junk", async () => {
+  const bottle = await Fixtures.Bottle();
+  const result = await findBottle("No Chance");
+  expect(result?.id).toBe(undefined);
 });
