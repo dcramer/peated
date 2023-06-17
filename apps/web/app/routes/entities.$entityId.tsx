@@ -10,7 +10,6 @@ import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import type { LatLngTuple } from "leaflet";
-import { Fragment } from "react";
 import invariant from "tiny-invariant";
 
 import EntityIcon from "~/components/assets/Entity";
@@ -151,7 +150,7 @@ export default function EntityDetails() {
                 style={{ height: 50 }}
               />
             }
-            fallback={<Fragment />}
+            fallback={() => null}
           >
             <EntitySpiritDistribution entityId={entity.id} />
           </QueryBoundary>

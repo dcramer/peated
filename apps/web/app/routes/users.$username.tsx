@@ -5,7 +5,7 @@ import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, useLoaderData, useParams, useSubmit } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import invariant from "tiny-invariant";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
@@ -220,7 +220,7 @@ export default function Profile() {
                 style={{ height: 100 }}
               />
             }
-            fallback={<Fragment />}
+            fallback={() => null}
           >
             <UserTagDistribution userId={user.id} />
           </QueryBoundary>

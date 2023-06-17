@@ -2,7 +2,6 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLocation, useOutletContext } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
-import { Fragment } from "react";
 import invariant from "tiny-invariant";
 import BottleTable from "~/components/bottleTable";
 import QueryBoundary from "~/components/queryBoundary";
@@ -37,7 +36,7 @@ export default function EntityIndex() {
           style={{ height: 200 }}
         />
       }
-      fallback={<Fragment />}
+      fallback={() => null}
     >
       <EntityBottles entityId={entity.id} />
     </QueryBoundary>
