@@ -24,3 +24,16 @@ export function parsePrice(value: string) {
 
   return price * 100;
 }
+
+export async function chunked<T>(
+  items: T[],
+  count: number,
+  cb: (items: T[]) => Promise<void>,
+) {
+  const len = items.length;
+  let at = 0;
+  while (at < len) {
+    await cb(items.slice(at, at + count));
+    at += count;
+  }
+}

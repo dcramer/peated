@@ -4,7 +4,7 @@ import { getUrl } from "../scraper";
 import { normalizeBottleName } from "@peated/shared/lib/normalize";
 
 import { submitStorePrices } from "../api";
-import { absoluteUrl, parsePrice } from "./utils";
+import { absoluteUrl, chunked, parsePrice } from "./utils";
 
 type Product = {
   name: string;
@@ -73,7 +73,9 @@ export async function main() {
   }
 
   if (process.env.ACCESS_TOKEN) {
-    await submitStorePrices(2, products);
+    console.log("Pushing new price data to API");
+
+    chunked(products, 100, async (items) => await submitStorePrices(2, items));
   } else {
     console.log(`Dry Run Complete - ${products.length} products found`);
   }
