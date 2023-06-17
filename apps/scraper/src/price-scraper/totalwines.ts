@@ -4,6 +4,7 @@ import { getUrl } from "../scraper";
 import { normalizeBottleName } from "@peated/shared/lib/normalize";
 
 import { submitStorePrices } from "../api";
+import { absoluteUrl, parsePrice } from "./utils";
 
 type Product = {
   name: string;
@@ -11,20 +12,6 @@ type Product = {
   priceUnit: "USD";
   url: string;
 };
-
-function absoluteUrl(url: string, baseUrl: string) {
-  if (url.indexOf("/") !== 0) return url;
-  const urlParts = new URL(baseUrl);
-  return `${urlParts.origin}${url};`;
-}
-
-function parsePrice(value: string) {
-  // $XX.YY
-  if (value.indexOf("$") !== 0)
-    throw new Error(`Invalid price value: ${value}`);
-
-  return parseInt(value.substring(1).split(".").join(""), 10);
-}
 
 async function scrapeProducts(
   url: string,
