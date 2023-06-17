@@ -21,6 +21,11 @@ Sentry.init({
 
 function jobWrapper(name: string, cb: () => Promise<void>) {
   return async () => {
+    const checkInId = Sentry.captureCheckIn({
+      monitorSlug: name,
+      status: "in_progress",
+    });
+
     const transaction = Sentry.startTransaction({
       op: "job",
       name: name,
@@ -30,8 +35,19 @@ function jobWrapper(name: string, cb: () => Promise<void>) {
 
     try {
       await cb();
+
+      Sentry.captureCheckIn({
+        checkInId,
+        monitorSlug: name,
+        status: "ok",
+      });
     } catch (e) {
       Sentry.captureException(e);
+      Sentry.captureCheckIn({
+        checkInId,
+        monitorSlug: name,
+        status: "error",
+      });
     } finally {
       transaction.finish();
     }
@@ -40,7 +56,7 @@ function jobWrapper(name: string, cb: () => Promise<void>) {
 
 scheduleJob(
   "0 0 * * *",
-  jobWrapper("woodencork", async () => {
+  jobWrapper("scrape-wooden-cork", async () => {
     console.log("Scraping Wooden Cork");
     await woodencork();
   }),
@@ -48,7 +64,7 @@ scheduleJob(
 
 scheduleJob(
   "0 1 * * *",
-  jobWrapper("totalwines", async () => {
+  jobWrapper("scrape-total-wines", async () => {
     console.log("Scraping Total Wines");
     await totalwines();
   }),
