@@ -22,7 +22,7 @@ jobs:
           environment: production
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: |
-          flyctl deploy -a peated-api \
+          flyctl deploy \
             --remote-only \
             --config fly.api.toml \
             --build-arg VERSION=${{ github.sha }} \
@@ -30,7 +30,15 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_TOKEN_API }}
       - run: |
-          flyctl deploy -a peated-web \
+          flyctl deploy \
+            --remote-only \
+            --config fly.scraper.toml \
+            --build-arg VERSION=${{ github.sha }} \
+            --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_TOKEN_SCRAPER }}
+      - run: |
+          flyctl deploy \
             --remote-only \
             --config fly.web.toml \
             --build-arg VERSION=${{ github.sha }} \

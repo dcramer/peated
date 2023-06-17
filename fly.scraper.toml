@@ -1,0 +1,53 @@
+# fly.toml app configuration file generated for peated-api on 2023-05-06T10:56:06-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "peated-scraper"
+primary_region = "den"
+
+[env]
+  GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
+  CORS_HOST = "https://peated.app"
+  URL_PREFIX = "https://api.peated.app"
+  USE_GCS_STORAGE = "1"
+  GCS_BUCKET_NAME = "peated"
+  GCS_BUCKET_PATH = "uploads"
+
+[build]
+  build-target = "scraper"
+
+  [build.args]
+    API_SERVER = "https://api.peated.app"
+    SENTRY_ORG = "cramer"
+    SENTRY_PROJECT = "peated-web"
+    GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
+    SENTRY_DSN = "https://883a3e8bec6a4c4bae25f967d792b492@o172566.ingest.sentry.io/4505138086019073"
+
+
+# [[services]]
+#   http_checks = []
+#   internal_port = 4000
+#   processes = ["app"]
+#   protocol = "tcp"
+#   script_checks = []
+
+#   [services.concurrency]
+#     hard_limit = 25
+#     soft_limit = 20
+#     type = "connections"
+
+#   [[services.ports]]
+#     handlers = ["http"]
+#     port = 80
+#     force_https = true
+
+#   [[services.ports]]
+#     handlers = ["tls", "http"]
+#     port = 443
+
+#   [[services.tcp_checks]]
+#     grace_period = "1s"
+#     interval = "15s"
+#     restart_limit = 0
+#     timeout = "2s"

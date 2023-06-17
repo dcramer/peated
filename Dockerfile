@@ -63,6 +63,22 @@ WORKDIR /app/apps/web
 
 CMD ["pnpm", "start"]
 
+# scraper service
+FROM build as scraper
+
+WORKDIR /app
+
+COPY --from=build /app/ ./
+
+ARG VERSION
+ENV VERSION $VERSION
+
+RUN echo $VERSION > VERSION
+
+WORKDIR /app/apps/scraper
+
+CMD ["pnpm", "start"]
+
 # api service
 FROM build as api
 
