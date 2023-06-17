@@ -27,6 +27,9 @@ test("new comment", async () => {
   });
 
   expect(response).toRespondWith(200);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+  expect(data.comment).toBe("Hello world!");
 
   const commentList = await db
     .select()

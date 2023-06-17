@@ -91,7 +91,7 @@ export default {
       return res.status(500).send({ error: "Unable to create comment" });
     }
 
-    res.status(200).send(serialize(CommentSerializer, comment, req.user));
+    res.status(200).send(await serialize(CommentSerializer, comment, req.user));
   },
 } as RouteOptions<
   Server,
