@@ -264,6 +264,10 @@ export const CATEGORY_LIST = [
 
 export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
-export const STORE_TYPE_LIST = ["totalwines", "woodencork"] as const;
+export const STORE_TYPE_LIST = [
+  "astorwines",
+  "totalwines",
+  "woodencork",
+] as const;
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;

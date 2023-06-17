@@ -4,6 +4,7 @@ import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 
 const scheduler = new ToadScheduler();
 
+import { main as astorwines } from "./price-scraper/astorwines";
 import { main as totalwines } from "./price-scraper/totalwines";
 import { main as woodencork } from "./price-scraper/woodencork";
 
@@ -88,6 +89,11 @@ job("*/60 * * * *", "scrape-wooden-cork", async () => {
 job("*/60 * * * *", "scrape-total-wines", async () => {
   console.log("Scraping Total Wines");
   await totalwines();
+});
+
+job("*/60 * * * *", "scrape-astor-wines", async () => {
+  console.log("Scraping Total Wines");
+  await astorwines();
 });
 
 process.on("SIGINT", function () {
