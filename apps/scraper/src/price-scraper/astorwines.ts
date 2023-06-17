@@ -63,6 +63,20 @@ export async function main() {
     page += 1;
   }
 
+  hasProducts = true;
+  page = 1;
+  while (hasProducts) {
+    hasProducts = false;
+    await scrapeProducts(
+      `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=2_32&srt=1&instockonly=True&Page=${page}`,
+      async (product: Product) => {
+        products.push(product);
+        hasProducts = true;
+      },
+    );
+    page += 1;
+  }
+
   if (process.env.ACCESS_TOKEN) {
     await submitStorePrices(3, products);
   } else {
