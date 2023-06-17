@@ -20,7 +20,6 @@ import TimeSince from "~/components/timeSince";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { logError } from "~/lib/log";
 import type { Comment, Tasting, User } from "~/types";
 
 const CommentForm = ({
@@ -46,27 +45,25 @@ const CommentForm = ({
       <div className="min-w-0 flex-1">
         <form
           className="relative"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
 
             if (saving) return;
             setSaving(true);
 
-            api
-              .post(`/tastings/${tastingId}/comments`, {
+            const newComment = await api.post(
+              `/tastings/${tastingId}/comments`,
+              {
                 data: { ...formData, createdAt: new Date().toISOString() },
-              })
-              .then((newComment) => {
-                onComment({
-                  ...newComment,
-                  createdBy: user,
-                });
-                setFormData({ comment: "" });
-                setSaving(false);
-              })
-              .catch((err) => {
-                logError(err);
-              });
+              },
+            );
+
+            onComment({
+              ...newComment,
+              createdBy: user,
+            });
+            setFormData({ comment: "" });
+            setSaving(false);
           }}
         >
           <Fieldset>
