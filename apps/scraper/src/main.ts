@@ -39,6 +39,12 @@ function jobWrapper(schedule: string, name: string, cb: () => Promise<void>) {
       name: name,
     });
 
+    Sentry.configureScope(function (scope) {
+      scope.setContext("monitor", {
+        slug: name,
+      });
+    });
+
     console.log(`Running job: ${name}`);
 
     try {
