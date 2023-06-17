@@ -80,12 +80,12 @@ function job(schedule: string, name: string, cb: () => Promise<void>) {
   scheduler.addCronJob(job);
 }
 
-job("0 0 * * *", "scrape-wooden-cork", async () => {
+job("*/60 * * * *", "scrape-wooden-cork", async () => {
   console.log("Scraping Wooden Cork");
   await woodencork();
 });
 
-job("0 1 * * *", "scrape-total-wines", async () => {
+job("*/60 * * * *", "scrape-total-wines", async () => {
   console.log("Scraping Total Wines");
   await totalwines();
 });
