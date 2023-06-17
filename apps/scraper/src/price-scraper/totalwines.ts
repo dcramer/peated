@@ -21,10 +21,17 @@ async function scrapeProducts(
   const $ = cheerio(data);
   $("#main article").each(async (_, el) => {
     const name = $("h2.title__2RoYeYuO > a", el).first().text();
-    if (!name) throw new Error("Unable to identify Product Name");
+    if (!name) {
+      console.warn("Unable to identify Product Name");
+      return;
+    }
     const productUrl = $("h2.title__2RoYeYuO > a", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");
     const price = parsePrice($("span.price__1JvDDp_x", el).first().text());
+    if (!price) {
+      console.warn("Invalid price");
+      return;
+    }
     console.log(`${name} - ${(price / 100).toFixed(2)}`);
     cb({
       name: normalizeBottleName(name),
