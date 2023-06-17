@@ -4,6 +4,7 @@ import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useNavigate } from "@remix-run/react";
+import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import invariant from "tiny-invariant";
@@ -19,7 +20,6 @@ import TimeSince from "~/components/timeSince";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
 import { logError } from "~/lib/log";
 import type { Comment, Tasting, User } from "~/types";
 
@@ -123,11 +123,13 @@ const CommentList = ({
 }) => {
   const api = useApi();
 
-  const { data } = useSuspenseQuery(
+  const { data } = useQuery(
     ["comments", tastingId],
     (): Promise<Paginated<Comment>> =>
       api.get(`/comments`, { query: { tasting: tastingId } }),
   );
+
+  if (!data) return;
 
   const [deleted, setDeleted] = useState<number[]>([]);
 

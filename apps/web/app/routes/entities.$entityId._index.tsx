@@ -1,5 +1,5 @@
 import type { Paginated } from "@peated/shared/types";
-import type { LoaderArgs} from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useOutletContext } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
@@ -42,7 +42,7 @@ export default function EntityActivity() {
   return (
     <>
       {tastingList.results.length ? (
-        <TastingList values={tastingList.results} noBottle />
+        <TastingList values={tastingList.results} />
       ) : (
         <EmptyActivity to={`/search?tasting`}>
           <span className="mt-2 block font-semibold ">
