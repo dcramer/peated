@@ -14,8 +14,8 @@ export const normalizeBottleName = (
 
   // abberviated yr
   name = name
-    .replace(/(\d+)\s?yrs?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
-    .replace(/(\d+)\s?yrs?($|\s)/i, `$1${ageSuffix}$2`);
+    .replace(/(\d+)\s?yrs?\.?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
+    .replace(/(\d+)\s?yrs?\.?($|\s)/i, `$1${ageSuffix}$2`);
 
   if (name.indexOf(`${age} `) === 0) {
     name = name.replace(`${age} `, `${age}${ageSuffix} `);

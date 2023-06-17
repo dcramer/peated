@@ -44,6 +44,11 @@ describe("normalizeBottleName", () => {
     expect(rv).toBe("Delicious 12-year-old");
   });
 
+  test("Name 12yr.", async () => {
+    const rv = normalizeBottleName("Delicious 12yr.");
+    expect(rv).toBe("Delicious 12-year-old");
+  });
+
   test("Name 12yrs", async () => {
     const rv = normalizeBottleName("Delicious 12yrs");
     expect(rv).toBe("Delicious 12-year-old");
