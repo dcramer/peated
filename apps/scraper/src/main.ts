@@ -1,9 +1,11 @@
-import { gracefulShutdown, scheduleJob } from "node-schedule";
-import { main as totalwines } from "./price-scraper/totalwines";
-import { main as woodencork } from "./price-scraper/woodencork";
-
 import * as Sentry from "@sentry/node";
 import { ProfilingIntegration } from "@sentry/profiling-node";
+import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
+
+const scheduler = new ToadScheduler();
+
+import { main as totalwines } from "./price-scraper/totalwines";
+import { main as woodencork } from "./price-scraper/woodencork";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -19,8 +21,8 @@ Sentry.init({
   ],
 });
 
-function jobWrapper(schedule: string, name: string, cb: () => Promise<void>) {
-  return async () => {
+function job(schedule: string, name: string, cb: () => Promise<void>) {
+  const task = new AsyncTask(name, async () => {
     const checkInId = Sentry.captureCheckIn(
       {
         monitorSlug: name,
@@ -65,25 +67,31 @@ function jobWrapper(schedule: string, name: string, cb: () => Promise<void>) {
     } finally {
       transaction.finish();
     }
-  };
+  });
+  const job = new CronJob(
+    {
+      cronExpression: schedule,
+    },
+    task,
+    {
+      preventOverrun: true,
+    },
+  );
+  scheduler.addCronJob(job);
 }
 
-scheduleJob(
-  "0 0 * * *",
-  jobWrapper("0 0 * * *", "scrape-wooden-cork", async () => {
-    console.log("Scraping Wooden Cork");
-    await woodencork();
-  }),
-);
+job("0 0 * * *", "scrape-wooden-cork", async () => {
+  console.log("Scraping Wooden Cork");
+  await woodencork();
+});
 
-scheduleJob(
-  "0 1 * * *",
-  jobWrapper("0 1 * * *", "scrape-total-wines", async () => {
-    console.log("Scraping Total Wines");
-    await totalwines();
-  }),
-);
+job("0 1 * * *", "scrape-total-wines", async () => {
+  console.log("Scraping Total Wines");
+  await totalwines();
+});
 
 process.on("SIGINT", function () {
-  gracefulShutdown().then(() => process.exit(0));
+  scheduler.stop();
 });
+
+console.log("Scheduler Running...");
