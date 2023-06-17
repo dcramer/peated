@@ -15,7 +15,7 @@ export function parsePrice(value: string) {
   }
 
   const unit = value.substring(0, 1);
-  const price = parseInt(value.substring(1).replaceAll(/[,.]/, ""), 10);
+  const price = parseInt(value.substring(1).replaceAll(/[,.]/gi, ""), 10);
 
   // only working for USD atm
   if (unit === "$" && value.indexOf(".") !== -1) {
