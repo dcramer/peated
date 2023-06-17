@@ -1,7 +1,7 @@
 export function absoluteUrl(url: string, baseUrl: string) {
-  if (url.indexOf("/") !== 0) return url;
+  if (url.indexOf("https://") === 0) return url;
   const urlParts = new URL(baseUrl);
-  return `${urlParts.origin}${url}`;
+  return `${urlParts.origin}${url.indexOf("/") !== 0 ? "/" : ""}${url}`;
 }
 
 export function removeBottleSize(name: string) {
