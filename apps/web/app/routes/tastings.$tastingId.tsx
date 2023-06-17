@@ -231,7 +231,6 @@ export default function TastingDetails() {
             onDelete={() => {
               navigate("/");
             }}
-            fullWidth
           />
         </ul>
       </QueryBoundary>

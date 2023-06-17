@@ -25,14 +25,12 @@ export default function TastingListItem({
   onDelete,
   onToast,
   noComment = false,
-  fullWidth = false,
 }: {
   tasting: Tasting;
   noBottle?: boolean;
   onDelete?: (tasting: Tasting) => void;
   onToast?: (tasting: Tasting) => void;
   noComment?: boolean;
-  fullWidth?: boolean;
 }) {
   const api = useApi();
   const { bottle } = tasting;
@@ -46,12 +44,7 @@ export default function TastingListItem({
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
 
   return (
-    <li
-      className={classNames(
-        "card p-2 ring-1 ring-inset ring-slate-800",
-        fullWidth ? "" : "md:w-1/2",
-      )}
-    >
+    <li className={classNames("card p-2 ring-1 ring-inset ring-slate-800")}>
       <div className="card-header p-3 sm:px-5 sm:py-4">
         <UserAvatar size={48} user={tasting.createdBy} />
         <div className="flex-1 space-y-1 font-semibold">

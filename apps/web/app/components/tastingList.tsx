@@ -17,7 +17,7 @@ export default function TastingList({
   };
 
   return (
-    <ul className="sm:rounded md:flex md:flex-wrap">
+    <ul className="sm:rounded">
       <AnimatePresence>
         {values
           .filter((t) => deletedValues.indexOf(t.id) === -1)
