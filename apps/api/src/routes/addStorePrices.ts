@@ -58,7 +58,8 @@ export default {
         });
     }
 
-    db.update(stores)
+    await db
+      .update(stores)
       .set({ lastRunAt: sql`NOW()` })
       .where(eq(stores.id, store.id));
 
