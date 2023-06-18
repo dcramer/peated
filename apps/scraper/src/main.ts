@@ -96,6 +96,11 @@ job("*/60 * * * *", "scrape-astor-wines", async () => {
   await astorwines();
 });
 
+job("*/60 * * * *", "scrape-healthy-spirits", async () => {
+  console.log("Scraping Healthy Spirits");
+  await healthyspirits();
+});
+
 process.on("SIGINT", function () {
   scheduler.stop();
 });

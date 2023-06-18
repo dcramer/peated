@@ -6,6 +6,7 @@
     "bottles:whiskybase": "ts-node --require dotenv/config ./src/bottle-scraper/whiskybase.ts",
     "prices": "run-p prices:*",
     "prices:astorwines": "ts-node --require dotenv/config ./src/price-scraper/astorwines.ts",
+    "prices:healthyspirits": "ts-node --require dotenv/config ./src/price-scraper/healthyspirits.ts",
     "prices:totalwines": "ts-node --require dotenv/config ./src/price-scraper/totalwines.ts",
     "prices:woodencork": "ts-node --require dotenv/config ./src/price-scraper/woodencork.ts",
     "import": "ts-node --require dotenv/config ./src/import.ts",

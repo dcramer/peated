@@ -266,6 +266,7 @@ export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
 export const STORE_TYPE_LIST = [
   "astorwines",
+  "healthyspirits",
   "totalwines",
   "woodencork",
 ] as const;
