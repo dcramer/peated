@@ -5,22 +5,18 @@ import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
-import { Fragment, Suspense, useState } from "react";
+import { Fragment, useState } from "react";
 import invariant from "tiny-invariant";
 
-import AddToCollectionModal from "~/components/addToCollectionModal.client";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
-import BottleName from "~/components/bottleName";
 import Button from "~/components/button";
-import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import SkeletonButton from "~/components/skeletonButton";
 import Tabs from "~/components/tabs";
 import TimeSince from "~/components/timeSince";
-import VintageName from "~/components/vintageName";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { logError } from "~/lib/log";
@@ -52,22 +48,26 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
 
   const [isCollected, setIsCollected] = useState(collectionList.length > 0);
   const [loading, setLoading] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const collect = async () => {
     if (loading) return;
-    if (isCollected) {
-      setLoading(true);
-      try {
+    setLoading(true);
+    try {
+      if (isCollected) {
         await api.delete(`/users/me/collections/default/bottles/${bottle.id}`);
         setIsCollected(false);
-      } catch (err: any) {
-        logError(err);
+      } else {
+        await api.post("/users/me/collections/default/bottles", {
+          data: {
+            bottle: bottle.id,
+          },
+        });
+        setIsCollected(true);
       }
-      setLoading(false);
-    } else {
-      setModalIsOpen(true);
+    } catch (err: any) {
+      logError(err);
     }
+    setLoading(false);
   };
 
   return (
@@ -75,29 +75,6 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
       <Button onClick={collect} disabled={loading}>
         {isCollected ? "Remove from Collection" : "Add to Collection"}
       </Button>
-      <ClientOnly>
-        {() => (
-          <AddToCollectionModal
-            bottle={bottle}
-            open={modalIsOpen}
-            setOpen={setModalIsOpen}
-            onSubmit={async (data) => {
-              if (loading) return;
-              setLoading(true);
-              try {
-                await api.post("/users/me/collections/default/bottles", {
-                  data,
-                });
-                setIsCollected(true);
-                setModalIsOpen(false);
-              } catch (err: any) {
-                logError(err);
-              }
-              setLoading(false);
-            }}
-          />
-        )}
-      </ClientOnly>
     </>
   );
 };
@@ -171,13 +148,11 @@ export default function BottleDetails() {
           <BottleIcon className="hidden h-14 w-auto sm:inline-block" />
           <div className="w-full flex-1 flex-col items-center sm:w-auto sm:items-start">
             <h1 className="mb-2 truncate text-center text-3xl font-semibold leading-7 sm:text-left">
-              <BottleName bottle={bottle} />
+              {bottle.brand.name}
             </h1>
-            {bottle.series && (
-              <div className="text-light text-center sm:text-left">
-                <VintageName series={bottle.series} />
-              </div>
-            )}
+            <div className="text-light text-center sm:text-left">
+              {bottle.name}
+            </div>
             <BottleMetadata
               data={bottle}
               className="text-center text-sm text-slate-500 sm:text-left"
@@ -209,9 +184,9 @@ export default function BottleDetails() {
             Record a Tasting
           </Button>
           {user && (
-            <Suspense fallback={<SkeletonButton />}>
+            <QueryBoundary loading={<SkeletonButton />} fallback={() => null}>
               <CollectionAction bottle={bottle} />
-            </Suspense>
+            </QueryBoundary>
           )}
 
           {user?.mod && (

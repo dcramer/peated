@@ -2,14 +2,11 @@ import { Link } from "@remix-run/react";
 import type { Bottle } from "~/types";
 import classNames from "../lib/classNames";
 import { formatCategoryName } from "../lib/strings";
-import BottleName from "./bottleName";
 import type { Option } from "./selectField";
-import VintageName from "./vintageName";
 
 type BottleFormData = {
   name: string;
   brand?: Option | null | undefined;
-  series?: string | null | undefined;
   distillers?: Option[] | null | undefined;
   statedAge?: number | null | undefined;
   category?: string | null | undefined;
@@ -25,24 +22,9 @@ export const PreviewBottleCard = ({
     <div className="bg-highlight flex items-center space-x-4 p-3 text-black sm:px-5 sm:py-4">
       <div className="flex-1 space-y-1">
         <p className="block max-w-[260px] truncate font-semibold leading-6 sm:max-w-[480px]">
-          {data.name ? (
-            <BottleName
-              bottle={{
-                name: data.name,
-                brand: brand
-                  ? {
-                      name: brand.name,
-                    }
-                  : undefined,
-              }}
-            />
-          ) : (
-            "Unknown Bottle"
-          )}
+          {brand ? brand.name : "Unknown Bottle"}
         </p>
-        <div className="text-sm">
-          {data.series && <VintageName series={data.series} />}
-        </div>
+        <div className="text-sm">{data.name}</div>
       </div>
       <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
         <p>{data.category ? formatCategoryName(data.category) : null}</p>
@@ -54,15 +36,10 @@ export const PreviewBottleCard = ({
 
 export default function BottleCard({
   bottle,
-  vintage,
   noGutter,
   color,
 }: {
   bottle: Bottle;
-  vintage?: {
-    vintageYear?: number;
-    barrel?: number;
-  };
   noGutter?: boolean;
   color?: "highlight" | "default";
 }) {
@@ -81,18 +58,16 @@ export default function BottleCard({
           to={`/bottles/${bottle.id}`}
           className="block max-w-[260px] truncate font-semibold leading-6 hover:underline sm:max-w-[480px]"
         >
-          <BottleName bottle={bottle} />
+          {bottle.brand.name}
         </Link>
-        {(vintage || bottle.series) && (
-          <div
-            className={classNames(
-              "text-sm",
-              color === "highlight" ? "" : "text-light",
-            )}
-          >
-            <VintageName series={bottle.series} {...vintage} />
-          </div>
-        )}
+        <div
+          className={classNames(
+            "text-sm",
+            color === "highlight" ? "" : "text-light",
+          )}
+        >
+          {bottle.name}
+        </div>
       </div>
       <div
         className={classNames(

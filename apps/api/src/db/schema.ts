@@ -194,7 +194,6 @@ export const bottles = pgTable(
       () => entities.id,
     ),
     statedAge: smallint("stated_age"),
-    series: varchar("series", { length: 255 }),
 
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
@@ -207,13 +206,8 @@ export const bottles = pgTable(
   },
   (bottles) => {
     return {
-      unique: uniqueIndex("bottle_brand_unq")
-        .on(bottles.name, bottles.brandId)
-        .where(sql`series IS NULL`),
+      unique: uniqueIndex("bottle_brand_unq").on(bottles.name, bottles.brandId),
       uniqueName: uniqueIndex("bottle_name_unq").on(bottles.fullName),
-      uniqueSeries: uniqueIndex("bottle_series_unq")
-        .on(bottles.name, bottles.brandId, bottles.series)
-        .where(sql`series IS NOT NULL`),
     };
   },
 );
@@ -342,11 +336,6 @@ export const collectionBottles = pgTable(
       .references(() => bottles.id)
       .notNull(),
 
-    vintageFingerprint: varchar("vintage_fingerprint", { length: 128 }),
-    series: varchar("series", { length: 255 }),
-    vintageYear: smallint("vintage_year"),
-    barrel: smallint("barrel"),
-
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (collectionBottles) => {
@@ -354,7 +343,6 @@ export const collectionBottles = pgTable(
       collectionDistillerId: uniqueIndex("collection_bottle_unq").on(
         collectionBottles.collectionId,
         collectionBottles.bottleId,
-        collectionBottles.vintageFingerprint,
       ),
     };
   },
@@ -398,10 +386,6 @@ export const tastings = pgTable(
     imageUrl: text("image_url"),
     notes: text("notes"),
     servingStyle: servingStyleEnum("serving_style"),
-
-    series: varchar("series", { length: 255 }),
-    vintageYear: smallint("vintage_year"),
-    barrel: smallint("barrel"),
 
     comments: integer("comments").default(0).notNull(),
     toasts: integer("toasts").default(0).notNull(),

@@ -68,15 +68,7 @@ export default function TastingListItem({
           <Tags tags={tasting.tags} />
         </div>
       </div>
-      {!noBottle && (
-        <BottleCard
-          bottle={bottle}
-          vintage={{
-            vintageYear: tasting.vintageYear,
-            barrel: tasting.barrel,
-          }}
-        />
-      )}
+      {!noBottle && <BottleCard bottle={bottle} />}
       <div>
         {!!tasting.imageUrl && (
           <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-black sm:mb-0 sm:mr-4">

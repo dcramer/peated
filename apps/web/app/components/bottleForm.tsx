@@ -70,7 +70,6 @@ export default function BottleForm({
       category: initialData.category,
       bottler: initialData.bottler?.id,
       brand: initialData.brand?.id,
-      series: initialData.series,
       distillers: initialData.distillers
         ? initialData.distillers.map((d) => d.id)
         : [],
@@ -153,7 +152,6 @@ export default function BottleForm({
               statedAge: watch("statedAge"),
               distillers: distillersValue,
               brand: brandValue,
-              series: watch("series"),
             }}
           />
         </div>
@@ -190,15 +188,6 @@ export default function BottleForm({
             required
             helpText="The name of the bottle."
             placeholder="e.g. 12-year-old"
-          />
-
-          <TextField
-            {...register("series")}
-            error={errors.name}
-            type="series"
-            label="Series"
-            helpText="The bottling series. Generally indicates if this is a limited or special release."
-            placeholder="e.g. Offerman Edition Charred Oak Cask"
           />
 
           <TextField

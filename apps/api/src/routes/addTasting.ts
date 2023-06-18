@@ -63,14 +63,7 @@ export default {
     const tasting = await db.transaction(async (tx) => {
       let tasting: Tasting | undefined;
       try {
-        [tasting] = await tx
-          .insert(tastings)
-          .values({
-            ...data,
-            vintageYear: body.vintageYear,
-            barrel: body.barrel,
-          })
-          .returning();
+        [tasting] = await tx.insert(tastings).values(data).returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "tasting_unq") {
           res.status(409).send({ error: "Tasting already exists" });

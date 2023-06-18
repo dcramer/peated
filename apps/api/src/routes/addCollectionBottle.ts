@@ -8,7 +8,6 @@ import { db } from "../db";
 import { bottles, collectionBottles, collections } from "../db/schema";
 import { getUserFromId } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
-import { sha1 } from "../lib/hash";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -66,17 +65,12 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    const vintageFingerprint = sha1(req.body.vintageYear, req.body.barrel);
-
     await db.transaction(async (tx) => {
       const [cb] = await tx
         .insert(collectionBottles)
         .values({
           collectionId: collection.id,
           bottleId: bottle.id,
-          vintageFingerprint,
-          vintageYear: req.body.vintageYear,
-          barrel: req.body.barrel,
         })
         .onConflictDoNothing()
         .returning();

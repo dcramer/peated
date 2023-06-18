@@ -134,7 +134,7 @@ export const Bottle = async ({
         statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
         ...data,
         name,
-        fullName: [brand.name, name, data.series].filter(Boolean).join(" "),
+        fullName: `${brand.name} ${name}`,
         brandId: brand.id,
         createdById: data.createdById || (await User()).id,
       })

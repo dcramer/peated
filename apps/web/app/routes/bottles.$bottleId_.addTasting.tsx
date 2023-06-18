@@ -24,7 +24,6 @@ import RangeField from "~/components/rangeField";
 import SelectField from "~/components/selectField";
 import Spinner from "~/components/spinner";
 import TextAreaField from "~/components/textAreaField";
-import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
 import { ApiError } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
@@ -219,29 +218,6 @@ export default function AddTasting() {
                 }
               />
             )}
-          />
-
-          <TextField
-            {...register("vintageYear", {
-              // valueAsNumber: true,
-              // SIGH https://github.com/orgs/react-hook-form/discussions/6980
-              setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
-            })}
-            error={errors.vintageYear}
-            type="number"
-            label="Year"
-            placeholder="e.g. 2023"
-          />
-
-          <TextField
-            {...register("barrel", {
-              // valueAsNumber: true,
-              setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
-            })}
-            error={errors.barrel}
-            type="number"
-            label="Barrel No."
-            placeholder="e.g. 56"
           />
         </Fieldset>
       </form>

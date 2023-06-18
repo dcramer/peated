@@ -30,7 +30,6 @@ export type Entity = {
 export type Bottle = {
   id: number;
   name: string;
-  series?: string;
   brand: Entity;
   distillers: Entity[];
   bottler?: Entity;
@@ -83,10 +82,6 @@ export type Tasting = {
   notes?: string;
   rating: number;
   imageUrl?: string;
-
-  series?: string;
-  vintageYear?: number;
-  barrel?: number;
 
   createdBy: User;
   createdAt: string;
@@ -167,9 +162,6 @@ export type Collection = {
 export type CollectionBottle = {
   id: number;
   bottle: Bottle;
-  series?: string;
-  vintageYear?: number;
-  barrel?: number;
 };
 
 // locations are where you're tasting from (e.g. a bar, a distillery)

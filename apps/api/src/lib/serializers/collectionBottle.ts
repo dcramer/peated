@@ -42,9 +42,6 @@ export const CollectionBottleSerializer: Serializer<
   ) => {
     return {
       id: item.id,
-      series: item.series,
-      vintageYear: item.vintageYear,
-      barrel: item.barrel,
       bottle: attrs.bottle,
     };
   },

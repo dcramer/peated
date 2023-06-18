@@ -75,9 +75,7 @@ export default {
         return;
       }
     }
-    if (body.series && body.series !== bottle.series) {
-      bottleData.series = body.series;
-    }
+
     if (body.category !== undefined && body.category !== bottle.category) {
       bottleData.category = body.category;
     }
@@ -125,7 +123,7 @@ export default {
         }
       }
 
-      if (bottleData.name || bottleData.brandId || bottleData.series) {
+      if (bottleData.name || bottleData.brandId) {
         if (!brand) {
           brand =
             (await db.query.entities.findFirst({
@@ -133,13 +131,7 @@ export default {
             })) || null;
           if (!brand) throw new Error("Unexpected");
         }
-        bottleData.fullName = [
-          brand.name,
-          bottleData.name ?? bottle.name,
-          bottleData.series ?? bottle.series,
-        ]
-          .filter(Boolean)
-          .join(" ");
+        bottleData.fullName = `${brand.name} ${bottleData.name ?? bottle.name}`;
       }
 
       let newBottle: Bottle | undefined;

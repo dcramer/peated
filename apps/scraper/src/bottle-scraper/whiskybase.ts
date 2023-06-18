@@ -84,8 +84,8 @@ async function scrapeBottle(id: number) {
       : null;
   }
 
-  bottle.series =
-    $("dt:contains('Bottling serie') + dd").first().text() || null;
+  const series = $("dt:contains('Bottling serie') + dd").first().text() || null;
+  if (series) bottle.name = `${bottle.name} ${series}`;
 
   const ageData = $("dt:contains('Stated Age') + dd")
     .first()
@@ -106,7 +106,7 @@ async function scrapeBottle(id: number) {
   bottle.abv = parseAbv($("dt:contains('Strength') + dd").first().text());
 
   console.log(
-    `[Whisky ${id}] Identified as ${bottle.brand.name} - ${bottle.name} ${bottle.series}`,
+    `[Whisky ${id}] Identified as ${bottle.brand.name} - ${bottle.name}`,
   );
 
   return bottle;

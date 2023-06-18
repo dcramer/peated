@@ -77,9 +77,6 @@ export const TastingSerializer: Serializer<Tasting> = {
       notes: item.notes,
       tags: item.tags || [],
       rating: item.rating,
-      series: item.series,
-      vintageYear: item.vintageYear,
-      barrel: item.barrel,
       servingStyle: item.servingStyle,
 
       createdAt: item.createdAt,

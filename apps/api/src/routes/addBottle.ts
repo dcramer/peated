@@ -80,8 +80,7 @@ export default {
           .insert(bottles)
           .values({
             name,
-            fullName: [brand.name, name, body.series].filter(Boolean).join(" "),
-            series: body.series || null,
+            fullName: [brand.name, name].filter(Boolean).join(" "),
             statedAge: body.statedAge || null,
             category: body.category || null,
             brandId: brand.id,
@@ -93,7 +92,6 @@ export default {
         if (
           err?.code === "23505" &&
           (err?.constraint === "bottle_brand_unq" ||
-            err?.constraint === "bottle_series_unq" ||
             err?.constraint === "bottle_name_unq")
         ) {
           res

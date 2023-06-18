@@ -119,35 +119,6 @@ test("creates a new tasting with notes", async () => {
   expect(tasting.notes).toEqual("hello world");
 });
 
-test("creates a new tasting with all vintage params", async () => {
-  const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "POST",
-    url: "/tastings",
-    payload: {
-      bottle: bottle.id,
-      rating: 3.5,
-      vintageYear: 2023,
-      barrel: 69,
-    },
-    headers: DefaultFixtures.authHeaders,
-  });
-
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
-  expect(data.id).toBeDefined();
-
-  const [tasting] = await db
-    .select()
-    .from(tastings)
-    .where(eq(tastings.id, data.id));
-
-  expect(tasting.bottleId).toEqual(bottle.id);
-  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
-  expect(tasting.vintageYear).toEqual(2023);
-  expect(tasting.barrel).toEqual(69);
-});
-
 test("creates a new tasting with empty rating", async () => {
   const bottle = await Fixtures.Bottle();
   const response = await app.inject({

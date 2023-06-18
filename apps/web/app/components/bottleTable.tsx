@@ -3,9 +3,7 @@ import { Link } from "@remix-run/react";
 import type { PagingRel } from "@peated/shared/types";
 import type { Bottle, CollectionBottle, Entity } from "~/types";
 import { formatCategoryName } from "../lib/strings";
-import BottleName from "./bottleName";
 import Button from "./button";
-import VintageName from "./vintageName";
 
 type Grouper = undefined | null | Entity;
 
@@ -52,14 +50,6 @@ export default ({
           {bottleList.map((bottleOrCb) => {
             const bottle =
               "bottle" in bottleOrCb ? bottleOrCb.bottle : bottleOrCb;
-            const vintage =
-              "bottle" in bottleOrCb
-                ? {
-                    series: bottle.series,
-                    vintageYear: bottleOrCb.vintageYear,
-                    barrel: bottleOrCb.barrel,
-                  }
-                : null;
             const group = groupBy && groupBy(bottle);
             const showGroup = group && group.id !== lastGroup?.id;
             if (group) lastGroup = group;
@@ -85,13 +75,9 @@ export default ({
                     to={`/bottles/${bottle.id}`}
                     className="font-medium hover:underline"
                   >
-                    <BottleName bottle={bottle} />
+                    {bottle.brand.name}
                   </Link>
-                  {vintage && (
-                    <div className="font-sm text-light">
-                      <VintageName {...vintage} />
-                    </div>
-                  )}
+                  <div className="font-sm text-light">{bottle.name}</div>
                 </td>
                 <td className="hidden px-3 py-4 text-right text-sm sm:table-cell">
                   {!!bottle.category && (

@@ -11,14 +11,12 @@ import { debounce } from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
 import BottleIcon from "./assets/Bottle";
 import EntityIcon from "./assets/Entity";
-import BottleName from "./bottleName";
 import Chip from "./chip";
 import Header from "./header";
 import Layout from "./layout";
 import ListItem from "./listItem";
 import SearchHeader from "./searchHeader";
 import UserAvatar from "./userAvatar";
-import VintageName from "./vintageName";
 
 const SkeletonItem = () => {
   return (
@@ -98,11 +96,11 @@ const BottleResultRow = ({
             }
           >
             <span className="absolute inset-x-0 -top-px bottom-0" />
-            <BottleName bottle={bottle} />
+            {bottle.brand.name}
           </Link>
         </p>
         <p className="text-light mt-1 flex truncate text-sm leading-5">
-          {bottle.series && <VintageName series={bottle.series} />}
+          {bottle.name}
         </p>
       </div>
       <div className="flex items-center gap-x-4">

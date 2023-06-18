@@ -31,7 +31,6 @@ test("processes new price", async () => {
   const bottle = await Fixtures.Bottle({
     name: "10-year-old",
     brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
-    series: null,
   });
   expect(bottle.fullName).toBe("Ardbeg 10-year-old");
 
@@ -66,7 +65,6 @@ test("processes existing price", async () => {
   const bottle = await Fixtures.Bottle({
     name: "10-year-old",
     brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
-    series: null,
   });
   expect(bottle.fullName).toBe("Ardbeg 10-year-old");
   const existingPrice = await Fixtures.StorePrice({
@@ -146,8 +144,7 @@ test("findBottle matches partial fullName", async () => {
   const brand = await Fixtures.Entity({ name: "The Macallan" });
   const bottle = await Fixtures.Bottle({
     brandId: brand.id,
-    name: "12-year-old",
-    series: "Double Cask",
+    name: "12-year-old Double Cask",
   });
   const result = await findBottle("The Macallan 12-year-old");
   expect(result?.id).toBe(bottle.id);

@@ -57,9 +57,6 @@ export default {
       where.push(
         or(
           ilike(bottles.name, likeQuery),
-          ilike(bottles.series, likeQuery),
-          sql`${bottles.series} || ' ' || ${bottles.name} ILIKE ${likeQuery}`,
-          sql`${bottles.name} || ' ' || ${bottles.series} ILIKE ${likeQuery}`,
           sql`EXISTS(
             SELECT 1
             FROM ${entities} e
@@ -76,8 +73,6 @@ export default {
               AND (
                 e.name ILIKE ${likeQuery}
                 OR e.name || ' ' || ${bottles.name} ILIKE ${likeQuery}
-                OR e.name || ' ' || ${bottles.series} ILIKE ${likeQuery}
-                OR e.name || ' ' || ${bottles.series} || ' ' || ${bottles.name} ILIKE ${likeQuery}
               )
           )`,
         ),
