@@ -18,7 +18,7 @@ export async function loader({ request, context, params }: LoaderArgs) {
     ["entity", params.entityId, "bottles", "page", page],
     (): Promise<Paginated<Bottle>> =>
       context.api.get(`/bottles`, {
-        query: { entity: params.entityId, page },
+        query: { entity: params.entityId, page, sort: "name" },
       }),
   );
 
