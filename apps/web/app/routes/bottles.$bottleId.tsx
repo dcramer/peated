@@ -1,16 +1,18 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment, useState } from "react";
 import invariant from "tiny-invariant";
 
+import type { Paginated } from "@peated/shared/types";
+
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
+import ConfirmationButton from "~/components/confirmationButton";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
@@ -129,6 +131,8 @@ export const meta: V2_MetaFunction = ({ data: { bottle } }) => {
 
 export default function BottleDetails() {
   const { user } = useAuth();
+  const api = useApi();
+  const navigate = useNavigate();
 
   const { bottle } = useLoaderData<typeof loader>();
 
@@ -140,6 +144,12 @@ export default function BottleDetails() {
     { name: "Tastings", value: bottle.tastings.toLocaleString() },
     { name: "People", value: bottle.people.toLocaleString() },
   ];
+
+  const deleteBottle = async () => {
+    // TODO: show confirmation message
+    await api.delete(`/bottles/${bottle.id}`);
+    navigate("/");
+  };
 
   return (
     <Layout>
@@ -194,10 +204,18 @@ export default function BottleDetails() {
               <Menu.Button as={Button}>
                 <EllipsisVerticalIcon className="h-5 w-5" />
               </Menu.Button>
-              <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+              <Menu.Items
+                className="absolute right-0 z-10 mt-2 w-64 origin-top-right"
+                unmount={false}
+              >
                 <Menu.Item as={Link} to={`/bottles/${bottle.id}/edit`}>
                   Edit Bottle
                 </Menu.Item>
+                {user.admin && (
+                  <Menu.Item as={ConfirmationButton} onContinue={deleteBottle}>
+                    Delete Bottle
+                  </Menu.Item>
+                )}
               </Menu.Items>
             </Menu>
           )}

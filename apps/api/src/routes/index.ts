@@ -12,6 +12,7 @@ import addUserFollow from "./addUserFollow";
 import authBasic from "./authBasic";
 import authDetails from "./authDetails";
 import authGoogle from "./authGoogle";
+import deleteBottle from "./deleteBottle";
 import deleteCollectionBottle from "./deleteCollectionBottle";
 import deleteComment from "./deleteComment";
 import deleteNotification from "./deleteNotification";
@@ -81,6 +82,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(addBottle);
   fastify.route(getBottle);
   fastify.route(updateBottle);
+  fastify.route(deleteBottle);
 
   fastify.route(listBottleTags);
   fastify.route(listBottleSuggestedTags);
