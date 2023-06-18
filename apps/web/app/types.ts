@@ -30,6 +30,7 @@ export type Entity = {
 export type Bottle = {
   id: number;
   name: string;
+  fullName: string;
   brand: Entity;
   distillers: Entity[];
   bottler?: Entity;

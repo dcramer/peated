@@ -96,11 +96,11 @@ const BottleResultRow = ({
             }
           >
             <span className="absolute inset-x-0 -top-px bottom-0" />
-            {bottle.brand.name}
+            {bottle.name}
           </Link>
         </p>
         <p className="text-light mt-1 flex truncate text-sm leading-5">
-          {bottle.name}
+          {bottle.brand.name}
         </p>
       </div>
       <div className="flex items-center gap-x-4">

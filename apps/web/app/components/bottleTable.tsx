@@ -75,9 +75,8 @@ export default ({
                     to={`/bottles/${bottle.id}`}
                     className="font-medium hover:underline"
                   >
-                    {bottle.brand.name}
+                    {bottle.fullName}
                   </Link>
-                  <div className="font-sm text-light">{bottle.name}</div>
                 </td>
                 <td className="hidden px-3 py-4 text-right text-sm sm:table-cell">
                   {!!bottle.category && (

@@ -21,10 +21,10 @@ export const PreviewBottleCard = ({
   return (
     <div className="bg-highlight flex items-center space-x-4 p-3 text-black sm:px-5 sm:py-4">
       <div className="flex-1 space-y-1">
-        <p className="block max-w-[260px] truncate font-semibold leading-6 sm:max-w-[480px]">
-          {brand ? brand.name : "Unknown Bottle"}
-        </p>
-        <div className="text-sm">{data.name}</div>
+        <h4 className="block max-w-[260px] space-x-1 truncate font-semibold leading-6 sm:max-w-[480px]">
+          <span>{brand ? brand.name : "Unknown Bottle"}</span>
+          <span>{data.name}</span>
+        </h4>
       </div>
       <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
         <p>{data.category ? formatCategoryName(data.category) : null}</p>
@@ -54,25 +54,26 @@ export default function BottleCard({
       )}
     >
       <div className="flex-1 space-y-1">
-        <Link
-          to={`/bottles/${bottle.id}`}
-          className="block max-w-[260px] truncate font-semibold leading-6 hover:underline sm:max-w-[480px]"
-        >
-          {bottle.brand.name}
-        </Link>
-        <div
-          className={classNames(
-            "text-sm",
-            color === "highlight" ? "" : "text-light",
-          )}
-        >
-          {bottle.name}
+        <h4>
+          <Link
+            to={`/bottles/${bottle.id}`}
+            className="block max-w-[260px] truncate font-semibold hover:underline sm:max-w-[480px]"
+            title={bottle.fullName}
+          >
+            {bottle.fullName}
+          </Link>
+        </h4>
+        <div className="text-light text-sm">
+          <span className="hidden sm:inline">Produced by </span>
+          <Link to={`/entities/${bottle.brand.id}`} className="hover:underline">
+            {bottle.brand.name}
+          </Link>
         </div>
       </div>
       <div
         className={classNames(
           color === "highlight" ? "" : "text-light",
-          "flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6",
+          "flex flex-col items-end space-y-1 whitespace-nowrap text-sm",
         )}
       >
         <p>

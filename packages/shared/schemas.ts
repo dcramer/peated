@@ -64,6 +64,7 @@ export const CategoryEnum = z.enum(CATEGORY_LIST);
 export const BottleSchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
+  fullName: z.string(),
   brand: EntitySchema,
   distillers: z.array(EntitySchema),
   bottler: EntitySchema.nullable(),
