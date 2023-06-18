@@ -21,10 +21,10 @@ export const PreviewBottleCard = ({
   return (
     <div className="bg-highlight flex items-center space-x-4 p-3 text-black sm:px-5 sm:py-4">
       <div className="flex-1 space-y-1">
-        <h4 className="block max-w-[260px] space-x-1 truncate font-semibold leading-6 sm:max-w-[480px]">
-          <span>{brand ? brand.name : "Unknown Bottle"}</span>
-          <span>{data.name}</span>
+        <h4 className="block max-w-[260px] truncate font-semibold leading-6 sm:max-w-[480px]">
+          {data.name}
         </h4>
+        <div className="text-sm">{brand ? brand.name : "Unknown Bottle"}</div>
       </div>
       <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
         <p>{data.category ? formatCategoryName(data.category) : null}</p>
@@ -60,11 +60,16 @@ export default function BottleCard({
             className="block max-w-[260px] truncate font-semibold hover:underline sm:max-w-[480px]"
             title={bottle.fullName}
           >
-            {bottle.fullName}
+            {bottle.name}
           </Link>
         </h4>
-        <div className="text-light text-sm">
-          <span className="hidden sm:inline">Produced by </span>
+        <div
+          className={classNames(
+            "text-sm",
+            color === "highlight" ? "" : "text-light",
+          )}
+        >
+          <span className="hidden sm:inline"></span>
           <Link to={`/entities/${bottle.brand.id}`} className="hover:underline">
             {bottle.brand.name}
           </Link>

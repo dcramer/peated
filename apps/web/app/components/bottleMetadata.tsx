@@ -35,7 +35,6 @@ const Brand = ({ data: { brand } }: Props) => {
 
   return (
     <div className="inline-block space-x-1">
-      <span>Produced by</span>
       <Link to={`/entities/${brand.id}`} className="hover:underline">
         {brandName}
       </Link>
