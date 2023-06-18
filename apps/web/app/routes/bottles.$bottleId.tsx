@@ -161,7 +161,7 @@ export default function BottleDetails() {
               className="mx-auto max-w-[260px] truncate text-center text-3xl font-semibold sm:mx-0 sm:max-w-[480px] sm:text-left"
               title={bottle.fullName}
             >
-              {bottle.fullName}
+              {bottle.name}
             </h1>
             <BottleMetadata
               data={bottle}

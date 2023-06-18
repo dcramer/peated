@@ -5,6 +5,7 @@ import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 const scheduler = new ToadScheduler();
 
 import { main as astorwines } from "./price-scraper/astorwines";
+import { main as healthyspirits } from "./price-scraper/healthyspirits";
 import { main as totalwines } from "./price-scraper/totalwines";
 import { main as woodencork } from "./price-scraper/woodencork";
 
