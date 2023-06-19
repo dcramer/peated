@@ -11,7 +11,22 @@ type Product = {
   price: number;
   priceUnit: "USD";
   url: string;
+  image: string | null;
 };
+
+function getLargestImage(srcset: string) {
+  const srcList = srcset
+    .split(", ")
+    .map((data) => {
+      const [src, size] = data.split(" ");
+      return {
+        src,
+        size: parseInt(size.replace(/^[\d+]/, ""), 10),
+      };
+    })
+    .sort((a, b) => b.size - a.size);
+  return srcList.length ? srcList[0].src : null;
+}
 
 async function scrapeProducts(
   url: string,
@@ -43,11 +58,25 @@ async function scrapeProducts(
       );
       return;
     }
+
+    // 'data-src': '//cdn.shopify.com/s/files/1/0276/1621/5176/products/bushmills-peeky-blinders_{width}x.png?v=1653415529',
+    // 'data-widths': '[160, 200, 280, 360, 540, 720, 900]',
+
+    const img = $("div.grid-product__image-wrap img", el).first();
+
+    const imgSrc = img.attr("data-src");
+    const imgWidths = img.attr("data-widths");
+    const image =
+      imgSrc && imgWidths
+        ? imgSrc.replace("{width}", JSON.parse(imgWidths).slice(-1))
+        : null;
+
     console.log(`${name} - ${(price / 100).toFixed(2)}`);
 
     cb({
       name: normalizeBottleName(name),
       price,
+      image,
       priceUnit: "USD",
       url: absoluteUrl(productUrl, url),
     });
