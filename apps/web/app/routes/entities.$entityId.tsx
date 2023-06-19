@@ -117,11 +117,11 @@ export default function EntityDetails() {
                 entity.type.indexOf("brand") !== -1 ? `brand=${entity.id}&` : ""
               }${
                 entity.type.indexOf("distiller") !== -1
-                  ? `distiller=${entity.id}`
+                  ? `distiller=${entity.id}&`
                   : ""
               }${
                 entity.type.indexOf("bottler") !== -1
-                  ? `bottler=${entity.id}`
+                  ? `bottler=${entity.id}&`
                   : ""
               }`}
               color="primary"
