@@ -32,6 +32,9 @@ importers:
       lint-staged:
         specifier: ^13.2.2
         version: 13.2.2
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
       pnpm:
         specifier: ^8.6.0
         version: 8.6.0

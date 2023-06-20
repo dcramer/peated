@@ -31,4 +31,11 @@ yarn-error.log*
 .eslintcache
 .cache/
 
+.coverage/
+htmlcov/
+.mypy_cache/
+*.egg-info/
+.venv/
+.direnv/
+
 /postgres-data

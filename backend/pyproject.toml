@@ -1,0 +1,35 @@
+[project]
+name = "peated"
+version = "0.0.0"
+description = ""
+authors = [
+    {name = "David Cramer", email = "dcramer@gmail.com"},
+]
+dependencies = [
+    "fastapi>=0.97.0",
+    "uvicorn[standard]>=0.22.0",
+    "python-multipart>=0.0.6",
+    "email-validator>=2.0.0.post2",
+    "celery>=5.3.1",
+    "pytest>=7.3.2",
+    "sqlalchemy>=2.0.16",
+    "psycopg2-binary>=2.9.6",
+    "pydantic>=1.10.9",
+    "starlette>=0.27.0",
+    "alembic>=1.11.1",
+    "tenacity>=8.2.2",
+    "sentry-sdk>=1.25.1",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib>=1.7.4",
+    "geoalchemy2>=0.13.3",
+]
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest-cov>=4.1.0",
+]

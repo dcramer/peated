@@ -1,4 +1,3 @@
 {
-  "recommendations": [],
-  "unwantedRecommendations": []
+  "recommendations": ["charliermarsh.ruff"]
 }

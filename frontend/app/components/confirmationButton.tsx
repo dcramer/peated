@@ -1,4 +1,4 @@
-import type { PropsWithChildren} from "react";
+import type { PropsWithChildren } from "react";
 import { forwardRef, useState } from "react";
 import { ClientOnly } from "./clientOnly";
 import ConfirmationDialog from "./confirmationDialog.client";

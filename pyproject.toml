@@ -1,0 +1,24 @@
+[project]
+name = ""
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "-e peated @ file:///${PROJECT_ROOT}/backend",
+    "black>=23.3.0",
+    "pytest-cov>=4.1.0",
+    "pre-commit>=3.3.3",
+    "ruff>=0.0.274",
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tools.pyright]
+reportMissingTypeArgument = true  # Report generic classes used without type arguments
+strictListInference = true  # Use union types when inferring types of lists elements, instead of Any
+
+[tool.ruff.isort]
+known-third-party = ["peated"]

@@ -5,7 +5,7 @@ on:
       - main
   pull_request:
 jobs:
-  test:
+  test_frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,3 +23,13 @@ jobs:
         run: pnpm build
       - name: Run tests
         run: pnpm test:ci
+  test_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+      - name: Lint
+        uses: chartboost/ruff-action@v1

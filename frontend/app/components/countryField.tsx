@@ -1,12 +1,8 @@
 import type { ReactNode } from "react";
 
 import { COUNTRY_LIST } from "@peated/shared/constants";
-import type {
-  FieldValues,
-  UseControllerProps} from "react-hook-form";
-import {
-  useController,
-} from "react-hook-form";
+import type { FieldValues, UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
 import SelectField from "./selectField";
 
 type Props<T extends FieldValues> = {

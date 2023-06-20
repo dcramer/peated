@@ -1,13 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { STORE_TYPE_LIST } from "@peated/shared/constants";
 import { StoreInputSchema } from "@peated/shared/schemas";
-import type {
-  ActionFunction} from "@remix-run/node";
-import {
-  json,
-  redirect,
-  type V2_MetaFunction,
-} from "@remix-run/node";
+import type { ActionFunction } from "@remix-run/node";
+import { json, redirect, type V2_MetaFunction } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { Controller } from "react-hook-form";
 import { getValidatedFormData, useRemixForm } from "remix-hook-form";
