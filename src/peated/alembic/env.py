@@ -1,10 +1,13 @@
 from __future__ import with_statement
 
-import os
 from logging.config import fileConfig
 
 from alembic import context
+from geoalchemy2 import alembic_helpers
 from sqlalchemy import engine_from_config, pool
+
+from peated.core.config import settings
+from peated.db.base import Base  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -20,8 +23,6 @@ fileConfig(config.config_file_name)
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 
-from app.db.base import Base  # noqa
-
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
@@ -31,11 +32,7 @@ target_metadata = Base.metadata
 
 
 def get_url():
-    user = os.getenv("POSTGRES_USER", "postgres")
-    password = os.getenv("POSTGRES_PASSWORD", "")
-    server = os.getenv("POSTGRES_SERVER", "db")
-    db = os.getenv("POSTGRES_DB", "app")
-    return f"postgresql://{user}:{password}@{server}/{db}"
+    return settings.DATABASE_URL
 
 
 def run_migrations_offline():
@@ -50,8 +47,15 @@ def run_migrations_offline():
     script output.
 
     """
-    url = get_url()
-    context.configure(url=url, target_metadata=target_metadata, literal_binds=True, compare_type=True)
+    context.configure(
+        url=get_url(),
+        target_metadata=target_metadata,
+        literal_binds=True,
+        compare_type=True,
+        include_object=alembic_helpers.include_object,
+        process_revision_directives=alembic_helpers.writer,
+        render_item=alembic_helpers.render_item,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
@@ -64,13 +68,13 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    configuration = config.get_section(config.config_ini_section)
+    configuration = context.config.get_section(config.config_ini_section)
     configuration["sqlalchemy.url"] = get_url()
 
     connectable = context.config.attributes.get("connection", None)
     if connectable is None:
         connectable = engine_from_config(
-            context.config.get_section(context.config.config_ini_section),
+            configuration,
             prefix="sqlalchemy.",
             poolclass=pool.NullPool,
         )
@@ -81,6 +85,9 @@ def run_migrations_online():
             compare_type=True,
             compare_server_default=True,
             include_schemas=True,
+            include_object=alembic_helpers.include_object,
+            process_revision_directives=alembic_helpers.writer,
+            render_item=alembic_helpers.render_item,
         )
 
         with context.begin_transaction():

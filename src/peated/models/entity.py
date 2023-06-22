@@ -1,3 +1,5 @@
+import enum
+
 from geoalchemy2 import Geometry
 from sqlalchemy import (
     ARRAY,
@@ -15,6 +17,12 @@ from sqlalchemy import (
 from peated.db.base import Base
 
 
+class EntityType(enum.Enum):
+    brand = "brand"
+    distiller = "distiller"
+    bottler = "bottler"
+
+
 class Entity(Base):
     __tablename__ = "entity"
     __table_args__ = (
@@ -28,11 +36,8 @@ class Entity(Base):
     type = Column(
         ARRAY(
             Enum(
-                "brand",
-                "distiller",
-                "bottler",
+                EntityType,
                 name="entity_type",
-                _create_events=False,
             )
         ),
         nullable=False,

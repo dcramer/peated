@@ -1,3 +1,3 @@
-from peated.models.user import User  # noqa
+from peated.models import *  # noqa
 
 from .base import Base  # noqa
