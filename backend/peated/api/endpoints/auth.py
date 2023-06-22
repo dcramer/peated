@@ -4,7 +4,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Form, HTTPException
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from pydantic import SecretStr
+from pydantic import BaseModel, SecretStr
 from sqlalchemy.orm import Session
 
 from peated import crud, models, schemas
@@ -13,6 +13,15 @@ from peated.core import security
 from peated.core.config import settings
 
 router = APIRouter()
+
+
+class BasicAuth(BaseModel):
+    email: Annotated[str, Form()]
+    password: Annotated[SecretStr, Form()]
+
+
+class GoogleCodeAuth(BaseModel):
+    code: Annotated[str, Form()]
 
 
 @router.get("/", response_model=schemas.Token)
@@ -24,29 +33,29 @@ def auth_details(
 
 @router.post("/basic", response_model=schemas.Token)
 def auth_basic(
-    email: Annotated[str, Form()],
-    password: Annotated[SecretStr, Form()],
+    data: BasicAuth,
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    user = crud.user.authenticate(db, email=email, password=password)
+    user = crud.user.authenticate(db, email=data.email, password=data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
         "access_token": security.create_access_token(user.id, expires_delta=access_token_expires),
-        "token_type": "bearer",
+        "user": user,
     }
 
 
 @router.post("/google", response_model=schemas.Token)
-def auth_google(code: Annotated[SecretStr, Form()], db: Session = Depends(deps.get_db)) -> Any:
+def auth_google(data=GoogleCodeAuth, db: Session = Depends(deps.get_db)) -> Any:
     resp = requests.post(
         "https://www.googleapis.com/oauth2/v4/token",
         json={
             "grant_type": "authorization_code",
-            "code": code,
+            "code": data.code,
             "redirect_uri": "postmessage",
             "client_id": settings.GOOGLE_CLIENT_ID,
             "client_secret": settings.GOOGLE_CLIENT_SECRET,

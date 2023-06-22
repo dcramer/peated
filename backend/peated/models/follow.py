@@ -1,13 +1,4 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    DateTime,
-    Enum,
-    ForeignKeyConstraint,
-    Index,
-    PrimaryKeyConstraint,
-    text,
-)
+from sqlalchemy import BigInteger, Column, DateTime, Enum, ForeignKeyConstraint, Index, PrimaryKeyConstraint, text
 from sqlalchemy.orm import relationship
 
 from peated.db.base_class import Base
@@ -32,5 +23,5 @@ class Follow(Base):
     created_at = Column(DateTime, nullable=False, server_default=text("now()"))
     id = Column(BigInteger)
 
-    from_user = relationship("User", foreign_keys=[from_user_id], back_populates="follow")
-    to_user = relationship("User", foreign_keys=[to_user_id], back_populates="follow_")
+    from_user = relationship("User", foreign_keys=[from_user_id])
+    to_user = relationship("User", foreign_keys=[to_user_id])

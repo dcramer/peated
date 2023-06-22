@@ -50,5 +50,5 @@ class Notification(Base):
     read = Column(Boolean, nullable=False, server_default=text("false"))
     from_user_id = Column(BigInteger)
 
-    from_user = relationship("User", foreign_keys=[from_user_id], back_populates="notifications")
-    user = relationship("User", foreign_keys=[user_id], back_populates="notifications_")
+    from_user = relationship("User", foreign_keys=[from_user_id])
+    user = relationship("User", foreign_keys=[user_id])

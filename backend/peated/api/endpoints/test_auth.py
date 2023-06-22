@@ -6,5 +6,5 @@ client = TestClient(app)
 
 
 def test_auth_basic():
-    response = client.post("/auth/basic")
+    response = client.post("/auth/basic", json={"email": "foo@example.com", "password": "foobar"})
     assert response.status_code == 400

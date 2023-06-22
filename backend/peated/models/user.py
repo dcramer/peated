@@ -1,15 +1,4 @@
-from sqlalchemy import (
-    BigInteger,
-    Boolean,
-    Column,
-    DateTime,
-    Index,
-    PrimaryKeyConstraint,
-    String,
-    Text,
-    text,
-)
-from sqlalchemy.orm import relationship
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, Index, PrimaryKeyConstraint, String, Text, text
 
 from peated.db.base_class import Base
 
@@ -34,18 +23,19 @@ class User(Base):
     display_name = Column(Text)
     picture_url = Column(Text)
 
-    change = relationship("Change", back_populates="created_by")
-    collection = relationship("Collection", back_populates="created_by")
-    entity = relationship("Entity", back_populates="created_by")
-    follow = relationship("Follow", foreign_keys="[Follow.from_user_id]", back_populates="from_user")
-    follow_ = relationship("Follow", foreign_keys="[Follow.to_user_id]", back_populates="to_user")
-    identity = relationship("Identity", back_populates="user")
-    notifications = relationship(
-        "Notifications",
-        foreign_keys="[Notifications.from_user_id]",
-        back_populates="from_user",
-    )
-    notifications_ = relationship("Notifications", foreign_keys="[Notifications.user_id]", back_populates="user")
-    bottle = relationship("Bottle", back_populates="created_by")
-    tasting = relationship("Tasting", back_populates="created_by")
-    comments = relationship("Comments", back_populates="created_by")
+    # change = relationship("Change", back_populates="created_by")
+    # collection = relationship("Collection", back_populates="created_by")
+    # entity = relationship("Entity", back_populates="created_by")
+    # following = relationship("Follow", foreign_keys="[Follow.from_user_id]", back_populates="from_user")
+    # followers = relationship("Follow", foreign_keys="[Follow.to_user_id]", back_populates="to_user")
+    # identity = relationship("Identity", back_populates="user")
+    # notifications = relationship(
+    #     "Notifications",
+    #     foreign_keys="[Notifications.from_user_id]",
+    #     back_populates="from_user",
+    # )
+    # notifications = relationship("Notification", foreign_keys="[Notifications.user_id]", back_populates="user")
+    # bottle = relationship("Bottle", back_populates="created_by")
+    # tasting = relationship("Tasting", back_populates="created_by")
+    # comments = relationship("Comment", back_populates="created_by")
+    # toasts = relationship("Toast", back_populates="created_by")

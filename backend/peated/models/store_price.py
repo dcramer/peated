@@ -32,6 +32,6 @@ class StorePrice(Base):
     updated_at = Column(DateTime, nullable=False, server_default=text("now()"))
     bottle_id = Column(BigInteger)
 
-    bottle = relationship("Bottle", back_populates="store_price")
-    store = relationship("Store", back_populates="store_price")
-    store_price_history = relationship("StorePriceHistory", back_populates="price_")
+    bottle = relationship("Bottle")
+    store = relationship("Store")
+    store_price_history = relationship("StorePriceHistory")

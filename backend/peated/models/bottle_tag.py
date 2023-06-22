@@ -1,15 +1,7 @@
-from peated.db.base_class import Base
-
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    ForeignKeyConstraint,
-    Integer,
-    PrimaryKeyConstraint,
-    String,
-    text,
-)
+from sqlalchemy import BigInteger, Column, ForeignKeyConstraint, Integer, PrimaryKeyConstraint, String, text
 from sqlalchemy.orm import relationship
+
+from peated.db.base_class import Base
 
 
 class BottleTag(Base):
@@ -23,4 +15,4 @@ class BottleTag(Base):
     tag = Column(String(64), nullable=False)
     count = Column(Integer, nullable=False, server_default=text("0"))
 
-    bottle = relationship("Bottle", back_populates="bottle_tag")
+    bottle = relationship("Bottle")

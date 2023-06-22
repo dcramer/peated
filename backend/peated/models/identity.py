@@ -1,12 +1,4 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    Enum,
-    ForeignKeyConstraint,
-    Index,
-    PrimaryKeyConstraint,
-    Text,
-)
+from sqlalchemy import BigInteger, Column, Enum, ForeignKeyConstraint, Index, PrimaryKeyConstraint, Text
 from sqlalchemy.orm import relationship
 
 from peated.db.base_class import Base
@@ -25,4 +17,4 @@ class Identity(Base):
     external_id = Column(Text, nullable=False)
     user_id = Column(BigInteger, nullable=False)
 
-    user = relationship("User", back_populates="identity")
+    user = relationship("User")

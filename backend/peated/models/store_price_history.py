@@ -1,13 +1,4 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    Date,
-    ForeignKeyConstraint,
-    Index,
-    Integer,
-    PrimaryKeyConstraint,
-    text,
-)
+from sqlalchemy import BigInteger, Column, Date, ForeignKeyConstraint, Index, Integer, PrimaryKeyConstraint, text
 from sqlalchemy.orm import relationship
 
 from peated.db.base_class import Base
@@ -30,4 +21,4 @@ class StorePriceHistory(Base):
     price = Column(Integer, nullable=False)
     date = Column(Date, nullable=False, server_default=text("now()"))
 
-    price_ = relationship("StorePrice", back_populates="store_price_history")
+    price_ = relationship("StorePrice")

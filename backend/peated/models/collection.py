@@ -1,13 +1,4 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    DateTime,
-    ForeignKeyConstraint,
-    Index,
-    PrimaryKeyConstraint,
-    String,
-    text,
-)
+from sqlalchemy import BigInteger, Column, DateTime, ForeignKeyConstraint, Index, PrimaryKeyConstraint, String, text
 from sqlalchemy.orm import relationship
 
 from peated.db.base_class import Base
@@ -27,5 +18,5 @@ class Collection(Base):
     created_by_id = Column(BigInteger, nullable=False)
     total_bottles = Column(BigInteger, nullable=False, server_default=text("0"))
 
-    created_by = relationship("User", back_populates="collection")
-    collection_bottle = relationship("CollectionBottle", back_populates="collection")
+    created_by = relationship("User")
+    collection_bottle = relationship("CollectionBottle")

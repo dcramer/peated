@@ -1,12 +1,4 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    DateTime,
-    ForeignKeyConstraint,
-    Index,
-    PrimaryKeyConstraint,
-    text,
-)
+from sqlalchemy import BigInteger, Column, DateTime, ForeignKeyConstraint, Index, PrimaryKeyConstraint, text
 from sqlalchemy.orm import relationship
 
 from peated.db.base_class import Base
@@ -34,5 +26,5 @@ class CollectionBottle(Base):
     id = Column(BigInteger)
     created_at = Column(DateTime, nullable=False, server_default=text("now()"))
 
-    bottle = relationship("Bottle", back_populates="collection_bottle")
-    collection = relationship("Collection", back_populates="collection_bottle")
+    bottle = relationship("Bottle")
+    collection = relationship("Collection")

@@ -1,13 +1,4 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    DateTime,
-    Enum,
-    ForeignKeyConstraint,
-    PrimaryKeyConstraint,
-    Text,
-    text,
-)
+from sqlalchemy import BigInteger, Column, DateTime, Enum, ForeignKeyConstraint, PrimaryKeyConstraint, Text, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
@@ -46,4 +37,4 @@ class Change(Base):
     )
     display_name = Column(Text)
 
-    created_by = relationship("User", back_populates="change")
+    created_by = relationship("User")

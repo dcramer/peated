@@ -43,6 +43,7 @@ class Tasting(Base):
     image_url = Column(Text)
     serving_style = Column(Enum("neat", "rocks", "splash", name="servingStyle"))
 
-    bottle = relationship("Bottle", back_populates="tasting")
-    created_by = relationship("User", back_populates="tasting")
-    comments_ = relationship("Comments", back_populates="tasting")
+    bottle = relationship("Bottle")
+    created_by = relationship("User")
+    # comments_ = relationship("Comment", back_populates="tasting")
+    # toasts_ = relationship("Toast", back_populates="tasting")

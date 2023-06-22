@@ -46,7 +46,4 @@ class Entity(Base):
     region = Column(Text)
     location = Column(Geometry(geometry_type="POINT", srid=4326))
 
-    created_by = relationship("User", back_populates="entity")
-    bottle = relationship("Bottle", foreign_keys="[Bottle.bottler_id]", back_populates="bottler")
-    bottle_ = relationship("Bottle", foreign_keys="[Bottle.brand_id]", back_populates="brand")
-    bottle1 = relationship("Bottle", secondary="bottle_distiller", back_populates="distiller")
+    created_by = relationship("User")

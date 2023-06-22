@@ -1,13 +1,4 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    DateTime,
-    Enum,
-    Index,
-    PrimaryKeyConstraint,
-    Text,
-    text,
-)
+from sqlalchemy import BigInteger, Column, DateTime, Enum, Index, PrimaryKeyConstraint, Text, text
 from sqlalchemy.orm import relationship
 
 from peated.db.base_class import Base
@@ -30,4 +21,4 @@ class Store(Base):
     last_run_at = Column(DateTime)
     country = Column(Text)
 
-    store_price = relationship("StorePrice", back_populates="store")
+    store_price = relationship("StorePrice")

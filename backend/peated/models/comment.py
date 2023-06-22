@@ -1,13 +1,4 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    DateTime,
-    ForeignKeyConstraint,
-    Index,
-    PrimaryKeyConstraint,
-    Text,
-    text,
-)
+from sqlalchemy import BigInteger, Column, DateTime, ForeignKeyConstraint, Index, PrimaryKeyConstraint, Text, text
 from sqlalchemy.orm import relationship
 
 from peated.db.base_class import Base
@@ -28,5 +19,5 @@ class Comment(Base):
     created_at = Column(DateTime, nullable=False, server_default=text("now()"))
     created_by_id = Column(BigInteger, nullable=False)
 
-    created_by = relationship("User", back_populates="comments")
-    tasting = relationship("Tasting", back_populates="comments_")
+    created_by = relationship("User")
+    tasting = relationship("Tasting")
