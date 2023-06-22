@@ -1,24 +1,68 @@
 [project]
-name = ""
+name = "peated"
+version = "0.0.0"
+description = ""
+authors = [
+    {name = "David Cramer", email = "dcramer@gmail.com"},
+]
 requires-python = ">=3.11"
-dependencies = []
+license = {text = "Apache-2.0"}
+dependencies = [
+    "fastapi>=0.97.0",
+    "uvicorn[standard]>=0.22.0",
+    "python-multipart>=0.0.6",
+    "email-validator>=2.0.0.post2",
+    "celery>=5.3.1",
+    "pytest>=7.3.2",
+    "sqlalchemy>=2.0.16",
+    "psycopg2-binary>=2.9.6",
+    "pydantic>=1.10.9",
+    "starlette>=0.27.0",
+    "alembic>=1.11.1",
+    "tenacity>=8.2.2",
+    "sentry-sdk>=1.25.1",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib>=1.7.4",
+    "geoalchemy2>=0.13.3",
+    "requests>=2.31.0",
+    "google-auth>=2.20.0",
+]
+
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "-e peated @ file:///${PROJECT_ROOT}/backend",
     "black>=23.3.0",
     "pytest-cov>=4.1.0",
     "pre-commit>=3.3.3",
     "ruff>=0.0.274",
+    "pytest-watcher>=0.3.3",
+    "httpx>=0.24.1",
+    "pip>=23.1.2",
+    "sqlalchemy-stubs>=0.4",
+    "pytest-mock-resources>=2.7.0",
 ]
 
 [tool.black]
-line-length = 100
+line-length = 120
 target-version = ['py311']
 
 [tools.pyright]
 reportMissingTypeArgument = true  # Report generic classes used without type arguments
 strictListInference = true  # Use union types when inferring types of lists elements, instead of Any
 
+[tool.ruff]
+line-length = 120
+
 [tool.ruff.isort]
 known-third-party = ["peated"]
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "backend",
+]
+
+[tool.pytest-watcher]
+now = true
