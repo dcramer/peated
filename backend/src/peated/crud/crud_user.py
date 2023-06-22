@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, Union
 from sqlalchemy.orm import Session
 
 from peated.core.security import get_password_hash, verify_password
-from peated.models.user import User
+from peated.models import Identity, User
 from peated.schemas.user import UserCreate, UserUpdate
 
 from .base import CRUDBase
@@ -13,12 +13,22 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
         return db.query(User).filter(User.email == email).first()
 
+    def get_by_identity(
+        self, db: Session, *, provider: str, external_id: str
+    ) -> Optional[User]:
+        return (
+            db.query(User)
+            .join(Identity, Identity.user_id == User.id)
+            .filter(Identity.provider == provider, Identity.external_id == external_id)
+            .first()
+        )
+
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
         db_obj = User(
             email=obj_in.email,
-            hashed_password=get_password_hash(obj_in.password),
+            password=get_password_hash(obj_in.password) if obj_in.password else None,
             full_name=obj_in.full_name,
-            is_superuser=obj_in.is_superuser,
+            admin=obj_in.admin,
         )
         db.add(db_obj)
         db.commit()
@@ -47,10 +57,13 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return user
 
     def is_active(self, user: User) -> bool:
-        return user.is_active
+        return user.active
 
-    def is_superuser(self, user: User) -> bool:
-        return user.is_superuser
+    def is_admin(self, user: User) -> bool:
+        return user.admin
+
+    def is_mod(self, user: User) -> bool:
+        return user.mod
 
 
 user = CRUDUser(User)
