@@ -197,6 +197,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "factory-boy"
+version = "3.2.1"
+requires_python = ">=3.6"
+summary = "A versatile test fixtures replacement based on thoughtbot's factory_bot for Ruby."
+dependencies = [
+    "Faker>=0.7.0",
+]
+
+[[package]]
+name = "faker"
+version = "18.11.1"
+requires_python = ">=3.7"
+summary = "Faker is a Python package that generates fake data for you."
+dependencies = [
+    "python-dateutil>=2.4",
+]
+
+[[package]]
 name = "fastapi"
 version = "0.97.0"
 requires_python = ">=3.7"
@@ -712,7 +730,7 @@ summary = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
 lock_version = "4.2"
 cross_platform = true
 groups = ["default", "dev"]
-content_hash = "sha256:149e0ec25fe4cb2f5a1c257ce6559443a1477cd4bea9c4e3dff638e6a14a32de"
+content_hash = "sha256:d3eda9e88c5cd8c487fdec49cf3ec0a20666627915b2b358aed27bb785a166af"
 
 [metadata.files]
 "alembic 1.11.1" = [
@@ -1035,6 +1053,14 @@ content_hash = "sha256:149e0ec25fe4cb2f5a1c257ce6559443a1477cd4bea9c4e3dff638e6a
 "email-validator 2.0.0.post2" = [
     {url = "https://files.pythonhosted.org/packages/01/c4/b3972387f0ed2374035b61b46c17367c2363b958c966cfb1607282db5b56/email_validator-2.0.0.post2.tar.gz", hash = "sha256:1ff6e86044200c56ae23595695c54e9614f4a9551e0e393614f764860b3d7900"},
     {url = "https://files.pythonhosted.org/packages/b3/f1/1645adf5a12df4889bebc77701f2b44ba37409e7db92be9eef7dded2d04c/email_validator-2.0.0.post2-py3-none-any.whl", hash = "sha256:2466ba57cda361fb7309fd3d5a225723c788ca4bbad32a0ebd5373b99730285c"},
+]
+"factory-boy 3.2.1" = [
+    {url = "https://files.pythonhosted.org/packages/50/20/18b99c494ba37054bee29a72c4cfc7aa938ed465411f0d66a4ddfb09f7fc/factory_boy-3.2.1.tar.gz", hash = "sha256:a98d277b0c047c75eb6e4ab8508a7f81fb03d2cb21986f627913546ef7a2a55e"},
+    {url = "https://files.pythonhosted.org/packages/8a/31/df38bc685d1c06501afd7ca97fac2ab13af6bae6871519682a04a2e14044/factory_boy-3.2.1-py2.py3-none-any.whl", hash = "sha256:eb02a7dd1b577ef606b75a253b9818e6f9eaf996d94449c9d5ebb124f90dc795"},
+]
+"faker 18.11.1" = [
+    {url = "https://files.pythonhosted.org/packages/c7/e6/7b8f0449fb2b2535289931a83d89d708eaf224a8e9ce30a08a446613a603/Faker-18.11.1.tar.gz", hash = "sha256:df4ee36d058a6a96de9d5e645571ef8536946a0b62db841494f8a3bc3bcdc5af"},
+    {url = "https://files.pythonhosted.org/packages/e4/b4/36d6e235132f2221714e40e8ad4260c49c2fadf2fdec17ab3b9a7809a710/Faker-18.11.1-py3-none-any.whl", hash = "sha256:02980fe15acd58861305568bae0a277680792a505a5a45a309d352f79c452dd1"},
 ]
 "fastapi 0.97.0" = [
     {url = "https://files.pythonhosted.org/packages/04/af/1749185fe149662b1f0af3bea74ab0620294752366306cd6098fdb52eafa/fastapi-0.97.0-py3-none-any.whl", hash = "sha256:95d757511c596409930bd20673358d4a4d709004edb85c5d24d6ffc48fabcbf2"},

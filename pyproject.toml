@@ -40,6 +40,7 @@ dev = [
     "pip>=23.1.2",
     "sqlalchemy-stubs>=0.4",
     "pytest-mock-resources>=2.7.0",
+    "factory-boy>=3.2.1",
 ]
 
 [tool.black]
@@ -57,12 +58,15 @@ line-length = 120
 known-third-party = ["peated"]
 
 [tool.setuptools.packages.find]
-where = ["backend"]
+where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = [
-    "backend",
+    "src",
 ]
+addopts = "--tb=short -p no:doctest"
 
 [tool.pytest-watcher]
 now = true
+runner = "pytest"
+runner_args = ["--tb=short", "-p no:doctest"]
