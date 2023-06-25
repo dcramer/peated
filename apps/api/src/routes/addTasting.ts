@@ -116,7 +116,7 @@ export default {
           });
       }
 
-      const badgeList = await checkBadges({
+      const badgeList = await checkBadges(tx, {
         ...tasting,
         bottle,
       });

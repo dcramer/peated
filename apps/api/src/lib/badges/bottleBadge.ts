@@ -1,4 +1,4 @@
-import { IBadge, TastingWithRelations } from "./base";
+import type { IBadge, TastingWithRelations } from "./base";
 
 export type BottleConfig = {
   id: number[];

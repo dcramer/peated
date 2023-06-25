@@ -8,6 +8,7 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "../../db";
 import type {
   Entity as EntityType,
+  NewBadge,
   NewBottle,
   NewComment,
   NewEntity,
@@ -20,6 +21,7 @@ import type {
   User as UserType,
 } from "../../db/schema";
 import {
+  badges,
   bottleTags,
   bottles,
   bottlesToDistillers,
@@ -227,6 +229,22 @@ export const Comment = async ({ ...data }: Partial<NewComment> = {}) => {
         createdById: data.createdById || (await User()).id,
         tastingId: data.tastingId || (await Tasting()).id,
         comment: faker.lorem.sentences(random(2, 5)),
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const Badge = async ({ ...data }: Partial<NewBadge> = {}) => {
+  return (
+    await db
+      .insert(badges)
+      .values({
+        name: faker.word.noun(),
+        type: "category",
+        config: {
+          category: "single_malt",
+        },
         ...data,
       })
       .returning()

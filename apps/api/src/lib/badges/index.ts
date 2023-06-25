@@ -1,4 +1,4 @@
-import { db } from "../../db";
+import type { DatabaseType, TransactionType } from "~/db";
 import type { Badge } from "../../db/schema";
 import type { TastingWithRelations } from "./base";
 import { BottleBadge } from "./bottleBadge";
@@ -18,11 +18,10 @@ function getBadgeImpl(type: string) {
   }
 }
 
-const badgeList = [[RegionBadge, { country: "Scotland", region: "Islay" }]];
-
 // TODO(dcramer): at some point we'll want to cache this/optimize the db layer
 // but for now its probably fine
 export async function checkBadges(
+  db: DatabaseType | TransactionType,
   tasting: TastingWithRelations,
 ): Promise<Badge[]> {
   const badgeList = await db.query.badges.findMany();

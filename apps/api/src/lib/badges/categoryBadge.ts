@@ -1,5 +1,6 @@
-import { Category } from "../../db/schema";
-import { IBadge, TastingWithRelations } from "./base";
+import type { Category } from "@peated/shared/types";
+
+import type { IBadge, TastingWithRelations } from "./base";
 
 export type CategoryConfig = {
   category: Category;
