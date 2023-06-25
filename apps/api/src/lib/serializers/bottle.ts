@@ -1,7 +1,9 @@
-import { inArray } from "drizzle-orm";
-import { Serializer, serialize } from ".";
+import { getTableColumns, inArray, sql } from "drizzle-orm";
+import type { Serializer } from ".";
+import { serialize } from ".";
 import { db } from "../../db";
-import { Bottle, User, bottlesToDistillers, entities } from "../../db/schema";
+import type { Bottle, User } from "../../db/schema";
+import { bottlesToDistillers, entities } from "../../db/schema";
 import { notEmpty } from "../filter";
 import { EntitySerializer } from "./entity";
 
@@ -25,7 +27,10 @@ export const BottleSerializer: Serializer<Bottle> = {
     );
 
     const entityList = await db
-      .select()
+      .select({
+        ...getTableColumns(entities),
+        location: sql`ST_AsGeoJSON(${entities.location}) as location`,
+      })
       .from(entities)
       .where(inArray(entities.id, entityIds));
     const entitiesById = Object.fromEntries(
@@ -61,6 +66,7 @@ export const BottleSerializer: Serializer<Bottle> = {
     return {
       id: item.id,
       name: item.name,
+      fullName: item.fullName,
       statedAge: item.statedAge,
       category: item.category,
       brand: attrs.brand,

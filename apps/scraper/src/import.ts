@@ -1,5 +1,5 @@
 import { open } from "fs/promises";
-import { submitEntity } from "./api";
+import { submitBottle, submitEntity } from "./api";
 
 const importJson = async (
   filename: string,
@@ -12,6 +12,13 @@ const importJson = async (
   for (const r of rows) {
     await cb(r);
   }
+};
+
+const importBottles = async () => {
+  await importJson("bottles.json", async (row) => {
+    console.log(row.name);
+    await submitBottle({ ...row });
+  });
 };
 
 const importBrands = async () => {
@@ -36,9 +43,10 @@ const importBottlers = async () => {
 };
 
 async function main() {
-  await importBrands();
-  await importDistillers();
-  await importBottlers();
+  // await importBrands();
+  // await importDistillers();
+  // await importBottlers();
+  await importBottles();
 }
 
 main();

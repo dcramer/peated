@@ -2,18 +2,19 @@ import {
   CollectionBottleSchema,
   PaginatedSchema,
 } from "@peated/shared/schemas";
-import { SQL, and, asc, eq, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { bottles, collectionBottles, entities } from "../db/schema";
+import { getUserFromId, profileVisible } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { CollectionBottleSerializer } from "../lib/serializers/collectionBottle";
-import { injectAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -29,7 +30,9 @@ export default {
     params: {
       type: "object",
       properties: {
-        userId: { anyOf: [{ type: "number" }, { const: "me" }] },
+        userId: {
+          anyOf: [{ type: "number" }, { type: "string" }, { const: "me" }],
+        },
         collectionId: { anyOf: [{ type: "number" }, { const: "default" }] },
       },
     },
@@ -41,16 +44,23 @@ export default {
       ),
     },
   },
-  preHandler: [injectAuth],
   handler: async (req, res) => {
-    const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
+    const user = await getUserFromId(db, req.params.userId, req.user);
+    if (!user) {
+      return res.status(404).send({ error: "Not found" });
+    }
+
+    if (!(await profileVisible(db, user, req.user))) {
+      return res.status(400).send({ error: "User's profile is private" });
+    }
+
     const collection =
       req.params.collectionId === "default"
-        ? await getDefaultCollection(db, userId)
+        ? await getDefaultCollection(db, user.id)
         : await db.query.collections.findFirst({
             where: (collections, { and, eq }) =>
               and(
-                eq(collections.createdById, userId),
+                eq(collections.createdById, user.id),
                 eq(collections.id, req.params.collectionId as number),
               ),
           });
@@ -76,7 +86,7 @@ export default {
       .innerJoin(entities, eq(entities.id, bottles.brandId))
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(sql<string>`(${entities.name} || ' ' || ${bottles.name})`));
+      .orderBy(asc(bottles.fullName));
 
     res.send({
       results: await serialize(
@@ -107,7 +117,7 @@ export default {
   ServerResponse,
   {
     Params: {
-      userId: number | "me";
+      userId: number | string | "me";
       collectionId: number | "default";
     };
     Querystring: {

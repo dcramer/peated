@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { db } from "../db";
-import { tastings } from "../db/schema";
+import { bottleTags, tastings } from "../db/schema";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;
@@ -17,6 +17,7 @@ beforeAll(async () => {
 test("delete own tasting", async () => {
   const tasting = await Fixtures.Tasting({
     createdById: DefaultFixtures.user.id,
+    tags: ["spiced", "caramel"],
   });
 
   const response = await app.inject({
@@ -32,6 +33,16 @@ test("delete own tasting", async () => {
     .from(tastings)
     .where(eq(tastings.id, tasting.id));
   expect(newTasting).toBeUndefined();
+
+  const tags = await db
+    .select()
+    .from(bottleTags)
+    .where(eq(bottleTags.bottleId, tasting.bottleId));
+
+  expect(tags.length).toBe(2);
+  for (const tag of tags) {
+    expect(tag.count).toBe(0);
+  }
 });
 
 test("cannot delete others tasting", async () => {

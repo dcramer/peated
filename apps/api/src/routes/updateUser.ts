@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
 import { UserInputSchema, UserSchema } from "@peated/shared/schemas";
@@ -50,12 +50,17 @@ export default {
       data.displayName = body.displayName;
     }
 
-    if (body.username !== undefined && body.displayName !== user.displayName) {
+    if (body.username !== undefined && body.username !== user.username) {
       data.username = body.username.toLowerCase();
       if (data.username === "me") {
         return res.status(400).send({ error: "Invalid username" });
       }
     }
+
+    if (body.private !== undefined && body.private !== user.private) {
+      data.private = body.private;
+    }
+
     if (body.admin !== undefined && body.admin !== user.admin) {
       if (!req.user.admin) {
         return res.status(403).send({ error: "Forbidden" });

@@ -1,4 +1,12 @@
 {
-  "extends": "@peated/shared/tsconfig.json",
-  "include": ["src", "vite-env.d.ts"]
+  "extends": "@peated/tsconfig/tsconfig.json",
+  "include": ["remix.env.d.ts", "app/**/*.ts", "app/**/*.tsx", "server.ts"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./app/*"]
+    },
+    // Remix takes care of building everything in `remix build`.
+    "noEmit": true
+  }
 }

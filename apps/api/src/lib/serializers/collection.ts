@@ -1,6 +1,6 @@
-import { Collection, User } from "../../db/schema";
+import type { Collection, User } from "../../db/schema";
 
-import { Serializer } from ".";
+import type { Serializer } from ".";
 
 export const CollectionSerializer: Serializer<Collection> = {
   item: (item: Collection, attrs: Record<string, any>, currentUser?: User) => {

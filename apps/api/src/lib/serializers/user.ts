@@ -1,8 +1,9 @@
 import config from "../../config";
-import { User, follows } from "../../db/schema";
+import type { User } from "../../db/schema";
+import { follows } from "../../db/schema";
 
 import { and, eq, inArray } from "drizzle-orm";
-import { Serializer } from ".";
+import type { Serializer } from ".";
 import { db } from "../../db";
 
 export const UserSerializer: Serializer<User> = {
@@ -46,6 +47,7 @@ export const UserSerializer: Serializer<User> = {
         ? `${config.URL_PREFIX}${item.pictureUrl}`
         : null,
       followStatus: attrs.followStatus,
+      private: item.private,
     };
 
     if (

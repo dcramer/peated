@@ -1,8 +1,10 @@
-import { InferModel, relations } from "drizzle-orm";
+import type { InferModel } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
   boolean,
+  date,
   doublePrecision,
   integer,
   jsonb,
@@ -16,6 +18,13 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import {
+  CATEGORY_LIST,
+  SERVING_STYLE_LIST,
+  STORE_TYPE_LIST,
+} from "@peated/shared/constants";
+import { geography } from "./columns";
+
 export const users = pgTable(
   "user",
   {
@@ -26,6 +35,7 @@ export const users = pgTable(
     displayName: text("display_name"),
     pictureUrl: text("picture_url"),
 
+    private: boolean("private").default(false).notNull(),
     active: boolean("active").default(true).notNull(),
     admin: boolean("admin").default(false).notNull(),
     mod: boolean("mod").default(false).notNull(),
@@ -134,6 +144,8 @@ export const entities = pgTable(
     region: text("region"),
     type: entityTypeEnum("type").array().notNull(),
 
+    location: geography("location"),
+
     totalBottles: bigint("total_bottles", { mode: "number" })
       .default(0)
       .notNull(),
@@ -165,28 +177,14 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
 export type Entity = InferModel<typeof entities>;
 export type NewEntity = InferModel<typeof entities, "insert">;
 
-export type Category =
-  | "blend"
-  | "bourbon"
-  | "rye"
-  | "single_grain"
-  | "single_malt"
-  | "spirit";
-
-export const categoryEnum = pgEnum("category", [
-  "blend",
-  "bourbon",
-  "rye",
-  "single_grain",
-  "single_malt",
-  "spirit",
-]);
+export const categoryEnum = pgEnum("category", CATEGORY_LIST);
 // type MyEnum = InferModel<typeof myTable>["myColWithEnum”]
 
 export const bottles = pgTable(
   "bottle",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     category: categoryEnum("category"),
     brandId: bigint("brand_id", { mode: "number" })
@@ -208,10 +206,8 @@ export const bottles = pgTable(
   },
   (bottles) => {
     return {
-      bottleBrandIndex: uniqueIndex("bottle_brand_unq").on(
-        bottles.name,
-        bottles.brandId,
-      ),
+      unique: uniqueIndex("bottle_brand_unq").on(bottles.name, bottles.brandId),
+      uniqueName: uniqueIndex("bottle_name_unq").on(bottles.fullName),
     };
   },
 );
@@ -269,6 +265,32 @@ export const bottlesToDistillersRelations = relations(
   }),
 );
 
+export const bottleTags = pgTable(
+  "bottle_tag",
+  {
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    tag: varchar("tag", { length: 64 }).notNull(),
+    count: integer("count").default(0).notNull(),
+  },
+  (bottleTags) => {
+    return {
+      pk: primaryKey(bottleTags.bottleId, bottleTags.tag),
+    };
+  },
+);
+
+export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [bottleTags.bottleId],
+    references: [bottles.id],
+  }),
+}));
+
+export type BottleTag = InferModel<typeof bottleTags>;
+export type NewBottleTag = InferModel<typeof bottleTags, "insert">;
+
 export const collections = pgTable(
   "collection",
   {
@@ -314,11 +336,6 @@ export const collectionBottles = pgTable(
       .references(() => bottles.id)
       .notNull(),
 
-    vintageFingerprint: varchar("vintage_fingerprint", { length: 128 }),
-    series: varchar("series", { length: 255 }),
-    vintageYear: smallint("vintage_year"),
-    barrel: smallint("barrel"),
-
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (collectionBottles) => {
@@ -326,7 +343,6 @@ export const collectionBottles = pgTable(
       collectionDistillerId: uniqueIndex("collection_bottle_unq").on(
         collectionBottles.collectionId,
         collectionBottles.bottleId,
-        collectionBottles.vintageFingerprint,
       ),
     };
   },
@@ -352,6 +368,8 @@ export type NewCollectionBottle = InferModel<
   "insert"
 >;
 
+export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
+
 export const tastings = pgTable(
   "tasting",
   {
@@ -360,14 +378,14 @@ export const tastings = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    tags: text("tags").array(),
+    tags: varchar("tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
     rating: doublePrecision("rating"),
     imageUrl: text("image_url"),
     notes: text("notes"),
-
-    series: varchar("series", { length: 255 }),
-    vintageYear: smallint("vintage_year"),
-    barrel: smallint("barrel"),
+    servingStyle: servingStyleEnum("serving_style"),
 
     comments: integer("comments").default(0).notNull(),
     toasts: integer("toasts").default(0).notNull(),
@@ -494,13 +512,16 @@ export const objectTypeEnum = pgEnum("object_type", [
   "follow",
 ]);
 
+export const changeTypeEnum = pgEnum("type", ["add", "update", "delete"]);
+
 export const changes = pgTable("change", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
 
   objectId: bigint("object_id", { mode: "number" }).notNull(),
   objectType: objectTypeEnum("object_type").notNull(),
-
-  data: text("data").notNull(),
+  type: changeTypeEnum("type").default("add").notNull(),
+  displayName: text("display_name"),
+  data: jsonb("data").default({}).notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   createdById: bigint("created_by_id", { mode: "number" })
@@ -624,3 +645,105 @@ export const badgeAwardsRelations = relations(badgeAwards, ({ one }) => ({
 
 export type BadgeAward = InferModel<typeof badgeAwards>;
 export type NewBadgeAward = InferModel<typeof badgeAwards, "insert">;
+
+export const priceScraperTypeEnum = pgEnum(
+  "price_scraper_type",
+  STORE_TYPE_LIST,
+);
+
+export const stores = pgTable(
+  "store",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    type: priceScraperTypeEnum("type").notNull(),
+    name: text("name").notNull(),
+    country: text("country"),
+    lastRunAt: timestamp("last_run_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (stores) => {
+    return {
+      type: uniqueIndex("store_type").on(stores.type),
+    };
+  },
+);
+
+export type Store = InferModel<typeof stores>;
+export type NewStore = InferModel<typeof stores, "insert">;
+
+export const storePrices = pgTable(
+  "store_price",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    storeId: bigint("store_id", { mode: "number" })
+      .references(() => stores.id)
+      .notNull(),
+    name: text("name").notNull(),
+    bottleId: bigint("bottle_id", { mode: "number" }).references(
+      () => bottles.id,
+    ),
+    price: integer("price").notNull(),
+    url: text("url").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (storePrices) => {
+    return {
+      storeName: uniqueIndex("store_price_unq_name").on(
+        storePrices.storeId,
+        storePrices.name,
+      ),
+    };
+  },
+);
+
+export const storePricesRelations = relations(storePrices, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [storePrices.bottleId],
+    references: [bottles.id],
+  }),
+  store: one(stores, {
+    fields: [storePrices.storeId],
+    references: [stores.id],
+  }),
+}));
+
+export type StorePrice = InferModel<typeof storePrices>;
+export type NewStorePrice = InferModel<typeof storePrices, "insert">;
+
+export const storePriceHistories = pgTable(
+  "store_price_history",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+
+    priceId: bigint("price_id", { mode: "number" })
+      .references(() => storePrices.id)
+      .notNull(),
+    price: integer("price").notNull(),
+    date: date("date").defaultNow().notNull(),
+  },
+  (storePriceHistories) => {
+    return {
+      priceDate: uniqueIndex("store_price_history_unq").on(
+        storePriceHistories.priceId,
+        storePriceHistories.date,
+      ),
+    };
+  },
+);
+
+export const storePriceHistoriesRelations = relations(
+  storePriceHistories,
+  ({ one }) => ({
+    price: one(storePrices, {
+      fields: [storePriceHistories.priceId],
+      references: [storePrices.id],
+    }),
+  }),
+);
+
+export type StorePriceHistory = InferModel<typeof storePriceHistories>;
+export type NewStorePriceHistory = InferModel<
+  typeof storePriceHistories,
+  "insert"
+>;

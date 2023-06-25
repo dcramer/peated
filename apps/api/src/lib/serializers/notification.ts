@@ -1,15 +1,9 @@
-import {
-  Notification,
-  User,
-  comments,
-  follows,
-  tastings,
-  toasts,
-  users,
-} from "../../db/schema";
+import type { Notification, User } from "../../db/schema";
+import { comments, follows, tastings, toasts, users } from "../../db/schema";
 
 import { eq, inArray } from "drizzle-orm";
-import { Serializer, serialize } from ".";
+import type { Serializer } from ".";
+import { serialize } from ".";
 import { db } from "../../db";
 import { logError } from "../log";
 import { FollowerSerializer } from "./follow";

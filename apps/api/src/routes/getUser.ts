@@ -1,21 +1,19 @@
 import { UserSchema } from "@peated/shared/schemas";
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import {
-  User,
   changes,
   collectionBottles,
   collections,
   tastings,
-  users,
 } from "../db/schema";
+import { getUserFromId } from "../lib/api";
 import { serialize } from "../lib/serializers";
 import { UserSerializer } from "../lib/serializers/user";
-import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -43,24 +41,12 @@ export default {
       ),
     },
   },
-  preHandler: [requireAuth],
   handler: async (req, res) => {
-    let user: User | undefined;
-    if (req.params.userId === "me") {
-      user = req.user;
-    } else if (typeof req.params.userId === "number") {
-      [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, req.params.userId));
-    } else {
-      [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.username, req.params.userId));
-    }
-
+    const user = await getUserFromId(db, req.params.userId, req.user);
     if (!user) {
+      if (req.params.userId === "me") {
+        return res.status(401).send({ error: "Unauthorized " });
+      }
       return res.status(404).send({ error: "Not found" });
     }
 

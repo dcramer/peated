@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { FormDataEncoder } from "form-data-encoder";
 import { FormData } from "formdata-node";
 import path from "path";

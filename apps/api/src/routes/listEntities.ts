@@ -1,11 +1,13 @@
 import { EntitySchema, PaginatedSchema } from "@peated/shared/schemas";
-import { SQL, and, asc, desc, ilike, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { and, asc, desc, getTableColumns, ilike, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { EntityType, entities } from "../db/schema";
+import type { EntityType } from "../db/schema";
+import { entities } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { EntitySerializer } from "../lib/serializers/entity";
@@ -64,7 +66,10 @@ export default {
     }
 
     const results = await db
-      .select()
+      .select({
+        ...getTableColumns(entities),
+        location: sql`ST_AsGeoJSON(${entities.location}) as location`,
+      })
       .from(entities)
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)

@@ -1,23 +1,26 @@
 import { CollectionBottleInputSchema } from "@peated/shared/schemas";
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
 import { bottles, collectionBottles, collections } from "../db/schema";
+import { getUserFromId } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
-import { sha1 } from "../lib/hash";
 import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "POST",
-  url: "/collections/:collectionId/bottles",
+  url: "/users/:userId/collections/:collectionId/bottles",
   schema: {
     params: {
       type: "object",
       required: ["collectionId"],
       properties: {
+        userId: {
+          anyOf: [{ type: "number" }, { type: "string" }, { const: "me" }],
+        },
         collectionId: { anyOf: [{ type: "number" }, { const: "default" }] },
       },
     },
@@ -25,9 +28,20 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    const user = await getUserFromId(db, req.params.userId, req.user);
+    if (!user) {
+      return res.status(404).send({ error: "Not found" });
+    }
+
+    if (user.id !== req.user.id) {
+      return res
+        .status(400)
+        .send({ error: "Cannot modify another persons collection" });
+    }
+
     const collection =
       req.params.collectionId === "default"
-        ? await getDefaultCollection(db, req.user.id)
+        ? await getDefaultCollection(db, user.id)
         : await db.query.collections.findFirst({
             where: (collections, { eq }) =>
               eq(collections.id, req.params.collectionId as number),
@@ -51,22 +65,12 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
-    const vintageFingerprint = sha1(
-      req.body.series,
-      req.body.vintageYear,
-      req.body.barrel,
-    );
-
     await db.transaction(async (tx) => {
       const [cb] = await tx
         .insert(collectionBottles)
         .values({
           collectionId: collection.id,
           bottleId: bottle.id,
-          vintageFingerprint,
-          series: req.body.series,
-          vintageYear: req.body.vintageYear,
-          barrel: req.body.barrel,
         })
         .onConflictDoNothing()
         .returning();
@@ -88,6 +92,7 @@ export default {
   ServerResponse,
   {
     Params: {
+      userId: number | string | "me";
       collectionId: number | "default";
     };
     Body: z.infer<typeof CollectionBottleInputSchema>;

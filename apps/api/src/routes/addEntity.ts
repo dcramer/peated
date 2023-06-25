@@ -1,14 +1,15 @@
 import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { NewEntity, changes, entities } from "../db/schema";
+import type { NewEntity } from "../db/schema";
+import { changes, entities } from "../db/schema";
 import { serialize } from "../lib/serializers";
 import { EntitySerializer } from "../lib/serializers/entity";
-import { requireMod } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "POST",
@@ -19,7 +20,7 @@ export default {
       201: zodToJsonSchema(EntitySchema),
     },
   },
-  preHandler: [requireMod],
+  preHandler: [requireAuth],
   handler: async (req, res) => {
     const body = req.body;
     const data: NewEntity = {
@@ -60,6 +61,9 @@ export default {
       await tx.insert(changes).values({
         objectType: "entity",
         objectId: entity.id,
+        displayName: entity.name,
+        type: "add",
+        createdAt: entity.createdAt,
         createdById: req.user.id,
         data: JSON.stringify(data),
       });

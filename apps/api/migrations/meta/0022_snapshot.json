@@ -1,83 +1,41 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "0b99e599-4acb-45f8-8d6f-50ab87a77d84",
+  "id": "c9f3b3d9-81c1-4c88-9243-14001d750434",
   "prevId": "a8aea8ab-2773-4bf9-8806-2a5933bd4eb9",
   "tables": {
-    "badge_award": {
-      "name": "badge_award",
+    "bottle_tag": {
+      "name": "bottle_tag",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "bigserial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "badge_id": {
-          "name": "badge_id",
+        "bottle_id": {
+          "name": "bottle_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "bigint",
+        "tag": {
+          "name": "tag",
+          "type": "varchar(64)",
           "primaryKey": false,
           "notNull": true
         },
-        "points": {
-          "name": "points",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "level": {
-          "name": "level",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
+        "count": {
+          "name": "count",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "default": "now()"
+          "default": 0
         }
       },
-      "indexes": {
-        "badge_award_unq": {
-          "name": "badge_award_unq",
-          "columns": [
-            "badge_id",
-            "user_id"
-          ],
-          "isUnique": true
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "badge_award_badge_id_badges_id_fk": {
-          "name": "badge_award_badge_id_badges_id_fk",
-          "tableFrom": "badge_award",
-          "tableTo": "badges",
+        "bottle_tag_bottle_id_bottle_id_fk": {
+          "name": "bottle_tag_bottle_id_bottle_id_fk",
+          "tableFrom": "bottle_tag",
+          "tableTo": "bottle",
           "columnsFrom": [
-            "badge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "badge_award_user_id_user_id_fk": {
-          "name": "badge_award_user_id_user_id_fk",
-          "tableFrom": "badge_award",
-          "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
+            "bottle_id"
           ],
           "columnsTo": [
             "id"
@@ -86,49 +44,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {}
-    },
-    "badges": {
-      "name": "badges",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "bigserial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "type": {
-          "name": "type",
-          "type": "badge_type",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "config": {
-          "name": "config",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::jsonb"
-        }
-      },
-      "indexes": {
-        "badge_name_unq": {
-          "name": "badge_name_unq",
+      "compositePrimaryKeys": {
+        "bottle_tag_bottle_id_tag": {
+          "name": "bottle_tag_bottle_id_tag",
           "columns": [
-            "name"
-          ],
-          "isUnique": true
+            "bottle_id",
+            "tag"
+          ]
         }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {}
+      }
     },
     "bottle": {
       "name": "bottle",
@@ -925,7 +849,7 @@
         },
         "tags": {
           "name": "tags",
-          "type": "text[]",
+          "type": "varchar(64)[]",
           "primaryKey": false,
           "notNull": false
         },
@@ -1194,14 +1118,6 @@
     }
   },
   "enums": {
-    "badge_type": {
-      "name": "badge_type",
-      "values": {
-        "bottle": "bottle",
-        "region": "region",
-        "category": "category"
-      }
-    },
     "category": {
       "name": "category",
       "values": {

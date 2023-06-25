@@ -1,8 +1,14 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
-import { bottles, notifications, tastings, toasts } from "../db/schema";
+import {
+  bottleTags,
+  bottles,
+  notifications,
+  tastings,
+  toasts,
+} from "../db/schema";
 import { objectTypeFromSchema } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
@@ -45,16 +51,31 @@ export default {
             ),
           ),
         );
-      await tx.delete(toasts).where(eq(toasts.tastingId, tasting.id));
-      await tx.delete(tastings).where(eq(tastings.id, tasting.id));
 
-      // update stats
+      await tx.delete(toasts).where(eq(toasts.tastingId, tasting.id));
+
+      for (const tag of tasting.tags) {
+        await tx
+          .update(bottleTags)
+          .set({
+            count: sql`${bottleTags.count} - 1`,
+          })
+          .where(
+            and(
+              eq(bottleTags.bottleId, tasting.bottleId),
+              eq(bottleTags.tag, tag),
+            ),
+          );
+      }
+
       await tx
         .update(bottles)
         .set({
-          totalTastings: sql<number>`${bottles.totalTastings} - 1`,
+          totalTastings: sql`${bottles.totalTastings} - 1`,
         })
         .where(eq(bottles.id, tasting.bottleId));
+
+      await tx.delete(tastings).where(eq(tastings.id, tasting.id));
     });
     res.status(204).send();
   },

@@ -159,8 +159,169 @@
     {
       "idx": 22,
       "version": "5",
-      "when": 1684955200978,
-      "tag": "0022_outgoing_black_queen",
+      "when": 1684957188358,
+      "tag": "0022_curved_flatman",
+      "breakpoints": false
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1684959550411,
+      "tag": "0023_stiff_tiger_shark",
+      "breakpoints": false
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1684969757333,
+      "tag": "0024_noisy_lester",
+      "breakpoints": false
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1684969921781,
+      "tag": "0025_wandering_titanium_man",
+      "breakpoints": false
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1684976309638,
+      "tag": "0026_condemned_skaar",
+      "breakpoints": false
+    },
+    {
+      "idx": 27,
+      "version": "5",
+      "when": 1684981782082,
+      "tag": "0027_flawless_baron_zemo",
+      "breakpoints": false
+    },
+    {
+      "idx": 28,
+      "version": "5",
+      "when": 1685202223644,
+      "tag": "0028_deep_piledriver",
+      "breakpoints": false
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1685237736227,
+      "tag": "0029_cloudy_tony_stark",
+      "breakpoints": false
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1685238080230,
+      "tag": "0030_whole_captain_universe",
+      "breakpoints": false
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1686597438510,
+      "tag": "0031_grey_avengers",
+      "breakpoints": false
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1686616279074,
+      "tag": "0032_outstanding_cobalt_man",
+      "breakpoints": false
+    },
+    {
+      "idx": 33,
+      "version": "5",
+      "when": 1686618557905,
+      "tag": "0033_nasty_callisto",
+      "breakpoints": false
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1686620557352,
+      "tag": "0034_round_prodigy",
+      "breakpoints": false
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1686857162539,
+      "tag": "0035_aspiring_richard_fisk",
+      "breakpoints": false
+    },
+    {
+      "idx": 36,
+      "version": "5",
+      "when": 1686861231574,
+      "tag": "0036_flippant_starjammers",
+      "breakpoints": false
+    },
+    {
+      "idx": 37,
+      "version": "5",
+      "when": 1686862013560,
+      "tag": "0037_common_silhouette",
+      "breakpoints": false
+    },
+    {
+      "idx": 38,
+      "version": "5",
+      "when": 1686937710427,
+      "tag": "0038_shiny_george_stacy",
+      "breakpoints": false
+    },
+    {
+      "idx": 39,
+      "version": "5",
+      "when": 1686940689689,
+      "tag": "0039_wild_invaders",
+      "breakpoints": false
+    },
+    {
+      "idx": 40,
+      "version": "5",
+      "when": 1686970367136,
+      "tag": "0040_tired_sharon_carter",
+      "breakpoints": false
+    },
+    {
+      "idx": 41,
+      "version": "5",
+      "when": 1686985271015,
+      "tag": "0041_thin_domino",
+      "breakpoints": false
+    },
+    {
+      "idx": 42,
+      "version": "5",
+      "when": 1687036018243,
+      "tag": "0042_chemical_starbolt",
+      "breakpoints": false
+    },
+    {
+      "idx": 43,
+      "version": "5",
+      "when": 1687066887184,
+      "tag": "0043_grey_jamie_braddock",
+      "breakpoints": false
+    },
+    {
+      "idx": 44,
+      "version": "5",
+      "when": 1687073851096,
+      "tag": "0044_stale_silk_fever",
+      "breakpoints": false
+    },
+    {
+      "idx": 45,
+      "version": "5",
+      "when": 1687715016751,
+      "tag": "0045_bitter_starjammers",
       "breakpoints": false
     }
   ]

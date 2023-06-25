@@ -6,7 +6,9 @@ import { fastify } from "fastify";
 import config from "./config";
 import { router } from "./routes";
 
+import { MAX_FILESIZE } from "@peated/shared/constants";
 import { initSentry } from "./instruments";
+import { injectAuth } from "./middleware/auth";
 import FastifySentry from "./sentryPlugin";
 
 initSentry({
@@ -51,7 +53,7 @@ export default async function buildFastify(options = {}) {
       fieldNameSize: 100, // Max field name size in bytes
       fieldSize: 100, // Max field value size in bytes
       fields: 10,
-      fileSize: 1048576 * 5, // 5mb
+      fileSize: MAX_FILESIZE,
       files: 1, // Max number of file fields
       headerPairs: 2000, // Max number of header key=>value pairs
     },
@@ -65,6 +67,8 @@ export default async function buildFastify(options = {}) {
 
   app.register(router);
   app.register(FastifySentry);
+
+  app.addHook("preHandler", injectAuth);
 
   app.setErrorHandler(function (error, request, reply) {
     const { validation, validationContext } = error;

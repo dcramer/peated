@@ -1,19 +1,23 @@
 import { and, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { collectionBottles } from "../db/schema";
+import { getUserFromId } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
 import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "DELETE",
-  url: "/collections/:collectionId/bottles/:bottleId",
+  url: "/users/:userId/collections/:collectionId/bottles/:bottleId",
   schema: {
     params: {
       type: "object",
       required: ["collectionId", "bottleId"],
       properties: {
+        userId: {
+          anyOf: [{ type: "number" }, { type: "string" }, { const: "me" }],
+        },
         collectionId: { anyOf: [{ type: "number" }, { const: "default" }] },
         bottleId: { type: "number" },
       },
@@ -21,6 +25,17 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    const user = await getUserFromId(db, req.params.userId, req.user);
+    if (!user) {
+      return res.status(404).send({ error: "Not found" });
+    }
+
+    if (user.id !== req.user.id) {
+      return res
+        .status(400)
+        .send({ error: "Cannot modify another persons collection" });
+    }
+
     const collection =
       req.params.collectionId === "default"
         ? await getDefaultCollection(db, req.user.id)
@@ -56,6 +71,7 @@ export default {
   ServerResponse,
   {
     Params: {
+      userId: number | string | "me";
       collectionId: number | "default";
       bottleId: number;
     };

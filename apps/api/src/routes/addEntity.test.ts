@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { db } from "../db";
 import { entities } from "../db/schema";
@@ -12,19 +12,6 @@ beforeAll(async () => {
   return async () => {
     await app.close();
   };
-});
-
-test("must be mod", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: `/entities`,
-    payload: {
-      name: "Delicious Wood",
-    },
-    headers: await Fixtures.AuthenticatedHeaders(),
-  });
-
-  expect(response).toRespondWith(403);
 });
 
 test("name is required", async () => {

@@ -1,15 +1,10 @@
 import { and, eq, inArray } from "drizzle-orm";
-import { Serializer, serialize } from ".";
+import type { Serializer } from ".";
+import { serialize } from ".";
 import config from "../../config";
 import { db } from "../../db";
-import {
-  Tasting,
-  User,
-  bottles,
-  tastings,
-  toasts,
-  users,
-} from "../../db/schema";
+import type { Tasting, User } from "../../db/schema";
+import { bottles, tastings, toasts, users } from "../../db/schema";
 import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
 
@@ -82,9 +77,7 @@ export const TastingSerializer: Serializer<Tasting> = {
       notes: item.notes,
       tags: item.tags || [],
       rating: item.rating,
-      series: item.series,
-      vintageYear: item.vintageYear,
-      barrel: item.barrel,
+      servingStyle: item.servingStyle,
 
       createdAt: item.createdAt,
 

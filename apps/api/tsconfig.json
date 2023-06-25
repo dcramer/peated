@@ -1,7 +1,11 @@
 {
-  "extends": "@peated/shared/tsconfig.json",
+  "extends": "@peated/tsconfig/tsconfig.json",
   "compilerOptions": {
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["src/test/setup-test-env.ts"]

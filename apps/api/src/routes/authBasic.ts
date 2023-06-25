@@ -1,5 +1,5 @@
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 
 import { AuthSchema } from "@peated/shared/schemas";
 import { compareSync } from "bcrypt";
@@ -32,14 +32,17 @@ export default {
 
     const [user] = await db.select().from(users).where(eq(users.email, email));
     if (!user) {
+      console.log("user not found");
       return res.status(401).send({ error: "Invalid credentials" });
     }
 
     if (!user.passwordHash) {
+      console.log("user has no password set");
       return res.status(401).send({ error: "Invalid credentials" });
     }
 
     if (!compareSync(password, user.passwordHash)) {
+      console.log("invalid password");
       return res.status(401).send({ error: "Invalid credentials" });
     }
 
@@ -48,7 +51,7 @@ export default {
     }
 
     return res.send({
-      user: await serialize(UserSerializer, user, req.user),
+      user: await serialize(UserSerializer, user, user),
       accessToken: await createAccessToken(user),
     });
   },

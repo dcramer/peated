@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { db } from "../db";
 import { comments, tastings } from "../db/schema";
@@ -27,6 +27,9 @@ test("new comment", async () => {
   });
 
   expect(response).toRespondWith(200);
+  const data = JSON.parse(response.payload);
+  expect(data.id).toBeDefined();
+  expect(data.comment).toBe("Hello world!");
 
   const commentList = await db
     .select()

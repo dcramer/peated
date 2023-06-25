@@ -1,17 +1,20 @@
 import { eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
 import { TastingInputSchema, TastingSchema } from "@peated/shared/schemas";
 
+import { XP_PER_LEVEL } from "@peated/shared/constants";
 import { db } from "../db";
-import {
+import type {
   Entity,
   NewTasting,
-  Tasting,
+  Tasting} from "../db/schema";
+import {
   badgeAwards,
+  bottleTags,
   bottles,
   bottlesToDistillers,
   entities,
@@ -48,7 +51,9 @@ export default {
       bottleId: bottle.id,
       notes: body.notes || null,
       rating: body.rating || null,
-      tags: body.tags ? body.tags.map((t) => t.toLowerCase()) : [],
+      tags: body.tags
+        ? Array.from(new Set(body.tags.map((t) => t.toLowerCase())))
+        : [],
       createdById: req.user.id,
     };
     if (body.createdAt) {
@@ -64,15 +69,7 @@ export default {
     const tasting = await db.transaction(async (tx) => {
       let tasting: Tasting | undefined;
       try {
-        [tasting] = await tx
-          .insert(tastings)
-          .values({
-            ...data,
-            series: body.series,
-            vintageYear: body.vintageYear,
-            barrel: body.barrel,
-          })
-          .returning();
+        [tasting] = await tx.insert(tastings).values(data).returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "tasting_unq") {
           res.status(409).send({ error: "Tasting already exists" });
@@ -104,6 +101,22 @@ export default {
           ),
         );
 
+      for (const tag of tasting.tags) {
+        await tx
+          .insert(bottleTags)
+          .values({
+            bottleId: bottle.id,
+            tag,
+            count: 1,
+          })
+          .onConflictDoUpdate({
+            target: [bottleTags.bottleId, bottleTags.tag],
+            set: {
+              count: sql<number>`${bottleTags.count} + 1`,
+            },
+          });
+      }
+
       const badgeList = await checkBadges({
         ...tasting,
         bottle: {
@@ -130,7 +143,7 @@ export default {
             target: [badgeAwards.badgeId, badgeAwards.userId],
             set: {
               xp: sql`${badgeAwards.xp} + 1`,
-              level: sql`(${badgeAwards.xp} + 1) / 5 + 1`,
+              level: sql`(${badgeAwards.xp} + 1) / ${XP_PER_LEVEL} + 1`,
             },
           });
       }

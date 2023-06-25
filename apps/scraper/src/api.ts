@@ -53,3 +53,35 @@ export async function submitEntity(data: any) {
     }
   }
 }
+
+type StorePrice = {
+  name: string;
+  price: number;
+  url: string;
+};
+
+export async function submitStorePrices(storeId: number, data: StorePrice[]) {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+  };
+
+  try {
+    await axios.post(`${API_SERVER}/stores/${storeId}/prices`, data, {
+      headers,
+    });
+  } catch (err: any) {
+    const data = err?.response?.data;
+    if (!data) {
+      console.error(err.toString());
+    } else {
+      console.error(
+        `Failed to submit prices: ${err?.response.status} -${JSON.stringify(
+          data,
+          null,
+          2,
+        )}`,
+      );
+    }
+  }
+}

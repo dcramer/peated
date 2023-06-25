@@ -1,5 +1,5 @@
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 
 import { AuthSchema } from "@peated/shared/schemas";
 import { and, eq } from "drizzle-orm";
@@ -111,7 +111,7 @@ export default {
     }
 
     return res.send({
-      user: await serialize(UserSerializer, user, req.user),
+      user: await serialize(UserSerializer, user, user),
       accessToken: await createAccessToken(user),
     });
   },

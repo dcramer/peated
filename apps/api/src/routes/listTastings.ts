@@ -1,15 +1,21 @@
 import { PaginatedSchema, TastingSchema } from "@peated/shared/schemas";
-import { SQL, and, desc, eq, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { follows, tastings } from "../db/schema";
+import {
+  bottles,
+  bottlesToDistillers,
+  follows,
+  tastings,
+  users,
+} from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { TastingSerializer } from "../lib/serializers/tasting";
-import { injectAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -19,7 +25,9 @@ export default {
       type: "object",
       properties: {
         page: { type: "number" },
+        limit: { type: "number", minimum: 1, maximum: 100 },
         bottle: { type: "number" },
+        entity: { type: "number" },
         user: { oneOf: [{ type: "number" }, { const: "me" }] },
         filter: { type: "string", enum: ["global", "friends", "local"] },
       },
@@ -32,17 +40,32 @@ export default {
       ),
     },
   },
-  preValidation: [injectAuth],
   handler: async (req, res) => {
     const page = req.query.page || 1;
 
-    const limit = 100;
+    const limit = req.query.limit || 25;
     const offset = (page - 1) * limit;
 
-    const where: SQL<unknown>[] = [];
+    const where: (SQL<unknown> | undefined)[] = [];
     if (req.query.bottle) {
       where.push(eq(tastings.bottleId, req.query.bottle));
     }
+
+    if (req.query.entity) {
+      where.push(
+        sql`EXISTS(
+          SELECT FROM ${bottles}
+          WHERE (${bottles.brandId} = ${req.query.entity}
+             OR ${bottles.bottlerId} = ${req.query.entity}
+             OR EXISTS(
+              SELECT FROM ${bottlesToDistillers}
+              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+                AND ${bottlesToDistillers.distillerId} = ${req.query.entity}
+             )) AND ${bottles.id} = ${tastings.bottleId}
+          )`,
+      );
+    }
+
     if (req.query.user) {
       where.push(
         eq(
@@ -51,6 +74,8 @@ export default {
         ),
       );
     }
+
+    const limitPrivate = req.query.filter !== "friends";
     if (req.query.filter) {
       if (req.query.filter === "friends") {
         if (!req.user) {
@@ -62,9 +87,26 @@ export default {
       }
     }
 
+    if (limitPrivate) {
+      where.push(
+        or(
+          eq(users.private, false),
+          ...(req.user
+            ? [
+                eq(tastings.createdById, req.user.id),
+                sql`${tastings.createdById} IN (
+                  SELECT ${follows.toUserId} FROM ${follows} WHERE ${follows.fromUserId} = ${req.user.id} AND ${follows.status} = 'following'
+                )`,
+              ]
+            : []),
+        ),
+      );
+    }
+
     const results = await db
-      .select()
+      .select({ tastings })
       .from(tastings)
+      .innerJoin(users, eq(users.id, tastings.createdById))
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
@@ -73,7 +115,7 @@ export default {
     res.send({
       results: await serialize(
         TastingSerializer,
-        results.slice(0, limit),
+        results.map((t) => t.tastings).slice(0, limit),
         req.user,
       ),
       rel: {
@@ -96,8 +138,10 @@ export default {
   ServerResponse,
   {
     Querystring: {
+      limit?: number;
       page?: number;
       bottle?: number;
+      entity?: number;
       user?: number | "me";
       filter?: "global" | "friends" | "local";
     };

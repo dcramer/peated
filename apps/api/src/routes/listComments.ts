@@ -1,7 +1,7 @@
 import { CommentSchema, PaginatedSchema } from "@peated/shared/schemas";
 import { and, asc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
@@ -9,7 +9,6 @@ import { comments } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { CommentSerializer } from "../lib/serializers/comment";
-import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
@@ -31,14 +30,13 @@ export default {
       ),
     },
   },
-  preHandler: [requireAuth],
   handler: async (req, res) => {
     const page = req.query.page || 1;
     const limit = 100;
     const offset = (page - 1) * limit;
 
     // have to specify at least one so folks dont scrape all comments
-    if (!req.user.admin && !req.query.tasting && !req.query.user) {
+    if (!req.user?.admin && !req.query.tasting && !req.query.user) {
       return res.send({
         results: [],
         rel: {
@@ -59,6 +57,7 @@ export default {
         ),
       );
     }
+
     if (req.query.tasting) {
       where.push(eq(comments.tastingId, req.query.tasting));
     }

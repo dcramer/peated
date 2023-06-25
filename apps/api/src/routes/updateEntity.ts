@@ -1,13 +1,14 @@
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
 import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 
 import { db } from "../db";
-import { Entity, changes, entities } from "../db/schema";
+import type { Entity } from "../db/schema";
+import { changes, entities } from "../db/schema";
 import { requireMod } from "../middleware/auth";
 
 function arraysEqual<T>(one: T[], two: T[]) {
@@ -85,7 +86,9 @@ export default {
       await tx.insert(changes).values({
         objectType: "entity",
         objectId: newEntity.id,
+        displayName: newEntity.name,
         createdById: req.user.id,
+        type: "update",
         data: JSON.stringify({
           ...data,
         }),

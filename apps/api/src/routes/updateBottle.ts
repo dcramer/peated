@@ -1,22 +1,21 @@
-import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
+
+import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
+
 import { db } from "../db";
-import {
-  Bottle,
-  bottles,
-  bottlesToDistillers,
-  changes,
-  entities,
-} from "../db/schema";
+import type { Bottle, Entity } from "../db/schema";
+import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
 import { upsertEntity } from "../lib/db";
+import { notEmpty } from "../lib/filter";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireMod } from "../middleware/auth";
 
+import { normalizeBottleName } from "@peated/shared/lib/normalize";
 export default {
   method: "PUT",
   url: "/bottles/:bottleId",
@@ -36,7 +35,7 @@ export default {
   preHandler: [requireMod],
   handler: async (req, res) => {
     const bottle = await db.query.bottles.findFirst({
-      where: (bottles, { eq }) => eq(entities.id, req.params.bottleId),
+      where: (bottles, { eq }) => eq(bottles.id, req.params.bottleId),
       with: {
         brand: true,
         bottler: true,
@@ -54,38 +53,35 @@ export default {
     const body = req.body;
     const bottleData: { [name: string]: any } = {};
 
-    if (body.name && body.name !== bottle.name) {
-      bottleData.name = body.name;
-    }
-    if (body.category !== undefined && body.category !== bottle.category) {
-      bottleData.category = body.category;
-    }
     if (body.statedAge !== undefined && body.statedAge !== bottle.statedAge) {
       bottleData.statedAge = body.statedAge;
     }
+    if (
+      (body.name && body.name !== bottle.name) ||
+      (body.statedAge !== undefined && body.statedAge !== bottle.statedAge)
+    ) {
+      bottleData.statedAge = bottleData.statedAge ?? bottle.statedAge;
+      bottleData.name = normalizeBottleName(
+        body.name || bottle.name,
+        bottleData.statedAge,
+      );
+      if (
+        bottleData.name.indexOf("-year-old") !== -1 &&
+        !bottleData.statedAge
+      ) {
+        res
+          .status(400)
+          .send({ error: "You should include the Stated Age of the bottle" });
+        return;
+      }
+    }
+
+    if (body.category !== undefined && body.category !== bottle.category) {
+      bottleData.category = body.category;
+    }
 
     const newBottle = await db.transaction(async (tx) => {
-      let newBottle: Bottle | undefined;
-      try {
-        newBottle = Object.values(bottleData).length
-          ? (
-              await tx
-                .update(bottles)
-                .set(bottleData)
-                .where(eq(bottles.id, bottle.id))
-                .returning()
-            )[0]
-          : bottle;
-      } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
-          res
-            .status(409)
-            .send({ error: "Bottle with name already exists under brand" });
-          return;
-        }
-        throw err;
-      }
-
+      let brand: Entity | null = null;
       if (body.brand) {
         if (
           typeof body.brand === "number"
@@ -103,6 +99,7 @@ export default {
           if (brandUpsert.id !== bottle.brandId) {
             bottleData.brandId = brandUpsert.id;
           }
+          brand = brandUpsert.result;
         }
       }
 
@@ -126,8 +123,43 @@ export default {
         }
       }
 
+      if (bottleData.name || bottleData.brandId) {
+        if (!brand) {
+          brand =
+            (await db.query.entities.findFirst({
+              where: eq(entities.id, bottle.brandId),
+            })) || null;
+          if (!brand) throw new Error("Unexpected");
+        }
+        bottleData.fullName = `${brand.name} ${bottleData.name ?? bottle.name}`;
+      }
+
+      let newBottle: Bottle | undefined;
+      try {
+        newBottle = Object.values(bottleData).length
+          ? (
+              await tx
+                .update(bottles)
+                .set(bottleData)
+                .where(eq(bottles.id, bottle.id))
+                .returning()
+            )[0]
+          : bottle;
+      } catch (err: any) {
+        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+          res
+            .status(409)
+            .send({ error: "Bottle with name already exists under brand" });
+          return;
+        }
+        throw err;
+      }
+
+      if (!newBottle) return;
+
       const distillerIds: number[] = [];
       const newDistillerIds: number[] = [];
+      const removedDistillerIds: number[] = [];
       const currentDistillers = bottle.bottlesToDistillers.map(
         (d) => d.distiller,
       );
@@ -168,6 +200,7 @@ export default {
           distillerIds.indexOf(d.id) === -1;
         });
         for (const distiller of removedDistillers) {
+          removedDistillerIds.push(distiller.id);
           await tx
             .delete(bottlesToDistillers)
             .where(
@@ -179,19 +212,47 @@ export default {
         }
       }
 
-      if (body.brand && typeof body.brand !== "number") {
-        await tx.insert(changes).values({
-          objectType: "entity",
-          objectId: bottle.brandId,
-          createdById: req.user.id,
-          data: JSON.stringify(body.brand),
-        });
+      if (!brand) {
+        brand = (await tx.query.entities.findFirst({
+          where: (entities, { eq }) =>
+            eq(entities.id, (newBottle as Bottle).brandId),
+        })) as Entity;
+      }
+
+      const newEntityIds = Array.from(
+        new Set([
+          bottleData?.brandId,
+          ...newDistillerIds,
+          bottleData?.bottlerId,
+        ]),
+      ).filter(notEmpty);
+      if (newEntityIds.length) {
+        await tx
+          .update(entities)
+          .set({ totalBottles: sql`${entities.totalBottles} + 1` })
+          .where(inArray(entities.id, newEntityIds));
+      }
+
+      const removedEntityIds = Array.from(
+        new Set([
+          bottleData?.brandId ? bottle.brandId : undefined,
+          ...removedDistillerIds,
+          bottleData?.bottlerId ? bottle.bottlerId : undefined,
+        ]),
+      ).filter(notEmpty);
+      if (removedEntityIds.length) {
+        await tx
+          .update(entities)
+          .set({ totalBottles: sql`${entities.totalBottles} - 1` })
+          .where(inArray(entities.id, removedEntityIds));
       }
 
       await tx.insert(changes).values({
         objectType: "bottle",
         objectId: newBottle.id,
         createdById: req.user.id,
+        displayName: newBottle.fullName,
+        type: "update",
         data: JSON.stringify({
           ...bottleData,
           distillerIds: newDistillerIds,

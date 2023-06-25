@@ -1,11 +1,14 @@
+import { CATEGORY_LIST } from "@peated/shared/constants";
 import { BottleSchema, PaginatedSchema } from "@peated/shared/schemas";
-import { SQL, and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import type { Category } from "@peated/shared/types";
+import type { SQL } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { Category, bottles, bottlesToDistillers, entities } from "../db/schema";
+import { bottles, bottlesToDistillers, entities, tastings } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
@@ -24,16 +27,10 @@ export default {
         distiller: { type: "number" },
         bottler: { type: "number" },
         entity: { type: "number" },
+        tag: { type: "string" },
         category: {
           type: "string",
-          enum: [
-            "blend",
-            "bourbon",
-            "rye",
-            "single_grain",
-            "single_malt",
-            "spirit",
-          ],
+          enum: CATEGORY_LIST,
         },
         age: { type: "number" },
       },
@@ -56,21 +53,27 @@ export default {
     const where: (SQL<unknown> | undefined)[] = [];
 
     if (query) {
+      const likeQuery = `%${query}%`;
       where.push(
         or(
-          ilike(bottles.name, `%${query}%`),
+          ilike(bottles.name, likeQuery),
           sql`EXISTS(
             SELECT 1
             FROM ${entities} e
             JOIN ${bottlesToDistillers} b
             ON e.id = b.distiller_id AND b.bottle_id = ${bottles.id}
-            WHERE e.name ILIKE ${`%${query}%`}
+            WHERE e.name ILIKE ${likeQuery}
           )`,
+          sql`${bottles.fullName} ILIKE ${likeQuery}`,
+          // lol welcome to search
           sql`EXISTS(
             SELECT 1
             FROM ${entities} e
             WHERE e.id = ${bottles.brandId}
-              AND e.name ILIKE ${`%${query}%`}
+              AND (
+                e.name ILIKE ${likeQuery}
+                OR e.name || ' ' || ${bottles.name} ILIKE ${likeQuery}
+              )
           )`,
         ),
       );
@@ -101,19 +104,25 @@ export default {
     if (req.query.age) {
       where.push(eq(bottles.statedAge, req.query.age));
     }
+    if (req.query.tag) {
+      where.push(
+        sql`EXISTS(SELECT 1 FROM ${tastings} WHERE ${req.query.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
+      );
+    }
 
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
       case "name":
-        orderBy = asc(bottles.name);
+        orderBy = asc(bottles.fullName);
         break;
       default:
         orderBy = desc(bottles.totalTastings);
     }
 
     const results = await db
-      .select()
+      .select({ bottles })
       .from(bottles)
+      .innerJoin(entities, eq(entities.id, bottles.brandId))
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
@@ -122,7 +131,7 @@ export default {
     res.send({
       results: await serialize(
         BottleSerializer,
-        results.slice(0, limit),
+        results.slice(0, limit).map((r) => r.bottles),
         req.user,
       ),
       rel: {
@@ -153,7 +162,8 @@ export default {
       entity?: number;
       category?: Category;
       age?: number;
-      sort?: "name";
+      tag?: string;
+      sort?: string;
     };
   }
 >;

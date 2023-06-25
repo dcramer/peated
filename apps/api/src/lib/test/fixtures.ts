@@ -4,21 +4,31 @@ import path from "path";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
+import { eq, sql } from "drizzle-orm";
 import { db } from "../../db";
-import {
+import type {
+  Entity as EntityType,
   NewBottle,
   NewComment,
   NewEntity,
   NewFollow,
+  NewStore,
+  NewStorePrice,
   NewTasting,
   NewToast,
   NewUser,
   User as UserType,
+} from "../../db/schema";
+import {
+  bottleTags,
   bottles,
   bottlesToDistillers,
+  changes,
   comments,
   entities,
   follows,
+  storePrices,
+  stores,
   tastings,
   toasts,
   users,
@@ -27,12 +37,13 @@ import { createAccessToken } from "../auth";
 import { choose, random, sample } from "../rand";
 import { defaultTags } from "../tags";
 
+import { CATEGORY_LIST } from "@peated/shared/constants";
 export const User = async ({ ...data }: Partial<NewUser> = {}) => {
   return (
     await db
       .insert(users)
       .values({
-        displayName: faker.name.firstName(),
+        displayName: faker.person.firstName(),
         email: faker.internet.email(),
         username: faker.internet.userName().toLowerCase(),
         admin: false,
@@ -65,18 +76,30 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
   });
   if (existing) return existing;
 
-  return (
-    await db
+  return await db.transaction(async (tx) => {
+    const [entity] = await db
       .insert(entities)
       .values({
         name,
-        country: faker.address.country(),
+        country: faker.location.country(),
         type: ["brand", "distiller"],
         ...data,
         createdById: data.createdById || (await User()).id,
       })
-      .returning()
-  )[0];
+      .returning();
+
+    await tx.insert(changes).values({
+      objectId: entity.id,
+      objectType: "entity",
+      type: "add",
+      displayName: entity.name,
+      createdAt: entity.createdAt,
+      createdById: entity.createdById,
+      data: entity,
+    });
+
+    return entity;
+  });
 };
 
 export const Bottle = async ({
@@ -85,65 +108,102 @@ export const Bottle = async ({
 }: Partial<NewBottle> & {
   distillerIds?: number[];
 } = {}) => {
-  const [bottle] = await db
-    .insert(bottles)
-    .values({
-      name: toTitleCase(
+  return await db.transaction(async (tx) => {
+    const brand = (
+      data.brandId
+        ? await db.query.entities.findFirst({
+            where: (entities, { eq }) =>
+              eq(entities.id, data.brandId as number),
+          })
+        : await Entity({
+            totalBottles: 1,
+          })
+    ) as EntityType;
+    const name =
+      data.name ??
+      toTitleCase(
         choose([
-          faker.company.bsNoun(),
-          `${faker.company.bsAdjective()} ${faker.company.bsNoun()}`,
+          faker.company.buzzNoun(),
+          `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
         ]),
-      ),
-      category: choose([
-        "blend",
-        "bourbon",
-        "rye",
-        "single_grain",
-        "single_malt",
-        "spirit",
-        undefined,
-      ]),
-      statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
-      ...data,
-      brandId: data.brandId || (await Entity()).id,
-      createdById: data.createdById || (await User()).id,
-    })
-    .returning();
+      );
+    const [bottle] = await tx
+      .insert(bottles)
+      .values({
+        category: choose([...CATEGORY_LIST, undefined]),
+        statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
+        ...data,
+        name,
+        fullName: `${brand.name} ${name}`,
+        brandId: brand.id,
+        createdById: data.createdById || (await User()).id,
+      })
+      .returning();
 
-  if (!distillerIds.length) {
-    for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
-      await db.insert(bottlesToDistillers).values({
-        bottleId: bottle.id,
-        distillerId: (await Entity({ type: ["distiller"] })).id,
-      });
+    if (!distillerIds.length) {
+      for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
+        await tx.insert(bottlesToDistillers).values({
+          bottleId: bottle.id,
+          distillerId: (
+            await Entity({ type: ["distiller"], totalBottles: 1 })
+          ).id,
+        });
+      }
+    } else {
+      for (const d of distillerIds) {
+        await tx.insert(bottlesToDistillers).values({
+          bottleId: bottle.id,
+          distillerId: d,
+        });
+      }
     }
-  } else {
-    for (const d of distillerIds) {
-      await db.insert(bottlesToDistillers).values({
-        bottleId: bottle.id,
-        distillerId: d,
-      });
-    }
-  }
 
-  return bottle;
+    await tx.insert(changes).values({
+      objectId: bottle.id,
+      objectType: "bottle",
+      displayName: bottle.fullName,
+      type: "add",
+      createdAt: bottle.createdAt,
+      createdById: bottle.createdById,
+      data: bottle,
+    });
+
+    return bottle;
+  });
 };
 
 export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
-  return (
-    await db
+  return await db.transaction(async (tx) => {
+    const [result] = await tx
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
-        rating: faker.datatype.float({ min: 1, max: 5 }),
+        rating: faker.number.float({ min: 1, max: 5 }),
         tags: sample(defaultTags, random(1, 5)),
         ...data,
-
         bottleId: data.bottleId || (await Bottle()).id,
         createdById: data.createdById || (await User()).id,
       })
-      .returning()
-  )[0];
+      .returning();
+
+    for (const tag of result.tags) {
+      await tx
+        .insert(bottleTags)
+        .values({
+          bottleId: result.bottleId,
+          tag,
+          count: 1,
+        })
+        .onConflictDoUpdate({
+          target: [bottleTags.bottleId, bottleTags.tag],
+          set: {
+            count: sql<number>`${bottleTags.count} + 1`,
+          },
+        });
+    }
+
+    return result;
+  });
 };
 
 export const Toast = async ({ ...data }: Partial<NewToast> = {}) => {
@@ -167,6 +227,44 @@ export const Comment = async ({ ...data }: Partial<NewComment> = {}) => {
         createdById: data.createdById || (await User()).id,
         tastingId: data.tastingId || (await Tasting()).id,
         comment: faker.lorem.sentences(random(2, 5)),
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const Store = async ({ ...data }: Partial<NewStore> = {}) => {
+  return (
+    await db
+      .insert(stores)
+      .values({
+        name: faker.company.name(),
+        country: faker.location.country(),
+        type: "totalwines",
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
+  if (!data.name) {
+    if (!data.bottleId) data.bottleId = (await Bottle()).id;
+    const bottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, data.bottleId),
+      with: { brand: true },
+    });
+    if (!bottle) throw new Error("Unexpected");
+    data.name = `${bottle.brand.name} ${bottle.name}`;
+  }
+  return (
+    await db
+      .insert(storePrices)
+      .values({
+        storeId: data.storeId || (await Store()).id,
+        price: parseInt(faker.finance.amount(50, 200, 0), 10),
+        url: faker.internet.url(),
+        name: "", // just to fix tsc
         ...data,
       })
       .returning()

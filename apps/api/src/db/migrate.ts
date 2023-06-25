@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { readMigrationFiles } from "drizzle-orm/migrator";
-import { DatabaseType } from ".";
+import type { DatabaseType } from ".";
 
 export const migrate = async function ({
   db,

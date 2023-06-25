@@ -1,6 +1,7 @@
-import { SQL, and, desc, eq } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { notifications } from "../db/schema";
 import { buildPageLink } from "../lib/paging";

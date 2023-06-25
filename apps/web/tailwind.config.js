@@ -4,7 +4,7 @@ const defaultTheme = require("tailwindcss/defaultTheme");
 const colors = require("tailwindcss/colors");
 
 module.exports = {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: ["./app/**/*.{js,ts,jsx,tsx}"],
   future: {
     hoverOnlyWhenSupported: true,
   },
@@ -14,7 +14,10 @@ module.exports = {
       transparent: "transparent",
       current: "currentColor",
       light: colors.slate[400],
-      highlight: colors.amber[400],
+      highlight: {
+        DEFAULT: colors.amber[400],
+        dark: colors.amber[800],
+      },
       background: {
         DEFAULT: "#111111",
         alt: "#1F1F1F",

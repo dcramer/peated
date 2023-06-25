@@ -1,30 +1,20 @@
-import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
 import { inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { z } from "zod";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
+
+import { normalizeBottleName } from "@peated/shared/lib/normalize";
+import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
+
 import { db } from "../db";
-import {
-  Bottle,
-  Entity,
-  bottles,
-  bottlesToDistillers,
-  changes,
-  entities,
-} from "../db/schema";
+import type { Bottle, Entity } from "../db/schema";
+import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
 import { upsertEntity } from "../lib/db";
+import { notEmpty } from "../lib/filter";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireAuth } from "../middleware/auth";
-
-const fixBottleName = (name: string, age?: number | null): string => {
-  // try to ease UX and normalize common name components
-  return name
-    .replace(" years old", "-year-old")
-    .replace(" year old", "-year-old")
-    .replace("-years-old", "-year-old");
-};
 
 export default {
   method: "POST",
@@ -39,13 +29,8 @@ export default {
   handler: async (req, res) => {
     const body = req.body;
 
-    if (
-      (body.name.indexOf("-year-old") !== -1 ||
-        body.name.indexOf("-years-old") !== -1 ||
-        body.name.indexOf("year old") !== -1 ||
-        body.name.indexOf("years old") !== -1) &&
-      !body.statedAge
-    ) {
+    let name = normalizeBottleName(body.name, body.statedAge);
+    if (name.indexOf("-year-old") !== -1 && !body.statedAge) {
       res
         .status(400)
         .send({ error: "You should include the Stated Age of the bottle" });
@@ -66,6 +51,12 @@ export default {
       }
 
       const brand = brandUpsert.result;
+
+      // TODO: we need to pull all this name uniform logic into a shared helper, as this
+      // is missing from updateBottle
+      if (name.indexOf(brand.name) === 0) {
+        name = name.substring(brand.name.length + 1);
+      }
 
       let bottler: Entity | null = null;
       if (body.bottler) {
@@ -88,7 +79,8 @@ export default {
         [bottle] = await tx
           .insert(bottles)
           .values({
-            name: fixBottleName(body.name, body.statedAge),
+            name,
+            fullName: [brand.name, name].filter(Boolean).join(" "),
             statedAge: body.statedAge || null,
             category: body.category || null,
             brandId: brand.id,
@@ -97,7 +89,11 @@ export default {
           })
           .returning();
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+        if (
+          err?.code === "23505" &&
+          (err?.constraint === "bottle_brand_unq" ||
+            err?.constraint === "bottle_name_unq")
+        ) {
           res
             .status(409)
             .send({ error: "Bottle with name already exists under brand" });
@@ -134,7 +130,10 @@ export default {
       await tx.insert(changes).values({
         objectType: "bottle",
         objectId: bottle.id,
+        createdAt: bottle.createdAt,
         createdById: req.user.id,
+        displayName: bottle.fullName,
+        type: "add",
         data: JSON.stringify({
           ...bottle,
           distillerIds,
@@ -147,7 +146,9 @@ export default {
         .where(
           inArray(
             entities.id,
-            Array.from(new Set([brand.id, ...distillerIds])),
+            Array.from(
+              new Set([brand.id, ...distillerIds, bottler?.id]),
+            ).filter(notEmpty),
           ),
         );
 

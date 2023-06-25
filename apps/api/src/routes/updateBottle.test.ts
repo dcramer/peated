@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { db } from "../db";
 import { bottles } from "../db/schema";
@@ -53,7 +53,8 @@ test("no changes", async () => {
 });
 
 test("edits a new bottle with new name param", async () => {
-  const bottle = await Fixtures.Bottle();
+  const brand = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle({ brandId: brand.id });
   const response = await app.inject({
     method: "PUT",
     url: `/bottles/${bottle.id}`,
@@ -72,8 +73,11 @@ test("edits a new bottle with new name param", async () => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
 
-  expect(omit(bottle, "name")).toEqual(omit(bottle2, "name"));
+  expect(omit(bottle, "name", "fullName")).toEqual(
+    omit(bottle2, "name", "fullName"),
+  );
   expect(bottle2.name).toBe("Delicious Wood");
+  expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
 });
 
 test("clears category", async () => {
@@ -98,4 +102,80 @@ test("clears category", async () => {
 
   expect(omit(bottle, "category")).toEqual(omit(bottle2, "category"));
   expect(bottle2.category).toBe(null);
+});
+
+test("requires age with matching name", async () => {
+  const bottle = await Fixtures.Bottle({ statedAge: null });
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      name: "Delicious 10-year-old",
+    },
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(400);
+});
+
+test("manipulates name to conform with age", async () => {
+  const brand = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle({ brandId: brand.id });
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      name: "Delicious 10",
+      statedAge: 10,
+    },
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(200);
+  const [bottle2] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(omit(bottle, "name", "fullName", "statedAge")).toEqual(
+    omit(bottle2, "name", "fullName", "statedAge"),
+  );
+  expect(bottle2.statedAge).toBe(10);
+  expect(bottle2.name).toBe("Delicious 10-year-old");
+  expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
+});
+
+test("changes brand", async () => {
+  const newBrand = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle();
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      brand: newBrand.id,
+    },
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(200);
+  const [bottle2] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(omit(bottle, "brandId", "fullName")).toEqual(
+    omit(bottle2, "brandId", "fullName"),
+  );
+  expect(bottle2.brandId).toBe(newBrand.id);
+  expect(bottle2.fullName).toBe(`${newBrand.name} ${bottle.name}`);
+
+  const newBrandRef = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, newBrand.id),
+  });
+  expect(newBrandRef?.totalBottles).toBe(1);
+
+  const oldBrand = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, bottle.brandId),
+  });
+  expect(oldBrand?.totalBottles).toBe(0);
 });

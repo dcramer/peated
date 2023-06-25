@@ -1,6 +1,6 @@
 import type { RouteOptions } from "fastify";
 import { open } from "fs/promises";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 
 import { contentType } from "mime-types";
 import { format } from "path";

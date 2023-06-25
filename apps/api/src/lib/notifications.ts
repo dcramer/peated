@@ -1,9 +1,8 @@
 import { and, eq } from "drizzle-orm";
-import { AnyPgTable } from "drizzle-orm/pg-core";
-import { DatabaseType, TransactionType } from "../db";
+import type { AnyPgTable } from "drizzle-orm/pg-core";
+import type { DatabaseType, TransactionType } from "../db";
+import type { NewNotification, Notification } from "../db/schema";
 import {
-  NewNotification,
-  Notification,
   bottles,
   comments,
   entities,

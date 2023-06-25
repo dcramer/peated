@@ -1,6 +1,10 @@
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+
+import { MAX_FILESIZE } from "@peated/shared/constants";
+import { humanizeBytes } from "@peated/shared/lib/strings";
+
 import config from "../config";
 import { db } from "../db";
 import { users } from "../db/schema";
@@ -59,20 +63,27 @@ export default {
       return res.status(400).send({ error: "Bad request", code: "no_file" });
     }
 
-    const pictureUrl = await storeFile({
-      data: fileData,
-      namespace: `avatars`,
-      urlPrefix: "/uploads",
-      onProcess: (...args) => compressAndResizeImage(...args, 500, 500),
-    });
-
-    if (fileData.file.truncated) {
-      // TODO: delete the file
-      return res.status(413).send({
-        code: "FST_FILES_LIMIT",
-        error: "Payload Too Large",
-        message: "reach files limit",
+    let pictureUrl: string;
+    try {
+      pictureUrl = await storeFile({
+        data: fileData,
+        namespace: `avatars`,
+        urlPrefix: "/uploads",
+        onProcess: (...args) => compressAndResizeImage(...args, 500, 500),
       });
+    } catch (err) {
+      if (fileData.file.truncated) {
+        // TODO: delete the file
+        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(
+          MAX_FILESIZE,
+        )}`;
+        return res.status(413).send({
+          code: "FST_FILES_LIMIT",
+          error: "Payload Too Large",
+          message: errMessage,
+        });
+      }
+      throw err;
     }
 
     await db.update(users).set({ pictureUrl }).where(eq(users.id, user.id));

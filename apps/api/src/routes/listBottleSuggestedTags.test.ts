@@ -1,19 +1,20 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;
 beforeAll(async () => {
   app = await buildFastify();
-});
 
-afterAll(async () => {
-  await app.close();
+  return async () => {
+    app.close();
+  };
 });
 
 test("lists tags", async () => {
-  const bottle = await Fixtures.Bottle({
-    name: "Delicious Wood",
+  const bottle = await Fixtures.Bottle();
+  const bottle2 = await Fixtures.Bottle({
+    brandId: bottle.brandId,
   });
   await Fixtures.Tasting({
     bottleId: bottle.id,
@@ -26,7 +27,7 @@ test("lists tags", async () => {
     rating: 5,
   });
   await Fixtures.Tasting({
-    bottleId: bottle.id,
+    bottleId: bottle2.id,
     tags: ["cedar", "caramel"],
     rating: 5,
   });
@@ -38,10 +39,10 @@ test("lists tags", async () => {
 
   expect(response).toRespondWith(200);
   const { results } = JSON.parse(response.payload);
-  // expect(results.length).toBeGrea(3);
+  expect(results.length).toBeGreaterThan(3);
   expect(results.slice(0, 3)).toEqual([
-    { name: "caramel", count: 3 },
-    { name: "cedar", count: 2 },
-    { name: "solvent", count: 1 },
+    { tag: "caramel", count: 3 },
+    { tag: "cedar", count: 2 },
+    { tag: "solvent", count: 1 },
   ]);
 });
