@@ -130,6 +130,7 @@ export default withSentry(function App() {
       new QueryClient({
         defaultOptions: {
           queries: {
+            networkMode: "offlineFirst",
             suspense: true,
             retry: false,
             // cacheTime: 0,
