@@ -1,8 +1,9 @@
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
+import { useOnlineStatus } from "~/hooks/useOnlineStatus";
+import EmptyActivity from "./emptyActivity";
 import Spinner from "./spinner";
 
 export default ({
@@ -17,17 +18,26 @@ export default ({
   <QueryErrorResetBoundary>
     {({ reset }) => (
       <ErrorBoundary onReset={reset} fallbackRender={fallback}>
-        <Suspense fallback={loading}>{children}</Suspense>
+        {children}
       </ErrorBoundary>
     )}
   </QueryErrorResetBoundary>
 );
 
 const ErrorView = ({ error, resetErrorBoundary }: any) => {
+  const isOnline = useOnlineStatus();
+
+  if (!isOnline) {
+    return (
+      <EmptyActivity>
+        You'll need to connect to the internet to load this content.
+      </EmptyActivity>
+    );
+  }
   return (
-    <div>
+    <EmptyActivity>
       <div>{error ? error.message || error.toString() : "Unknown Error"}</div>
       <button title="Retry" onClick={resetErrorBoundary} />
-    </div>
+    </EmptyActivity>
   );
 };

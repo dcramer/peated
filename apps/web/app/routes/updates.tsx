@@ -9,7 +9,6 @@ import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { useOnlineStatus } from "~/hooks/useOnlineStatus";
 import type { Change } from "~/types";
 
 const UpdatesContent = () => {
@@ -55,28 +54,21 @@ export const meta: V2_MetaFunction = () => {
 
 export default function Updates() {
   const { user } = useAuth();
-  const isOnline = useOnlineStatus();
 
   return (
     <Layout>
-      {isOnline ? (
-        <>
-          <Tabs fullWidth>
-            {user && <Tabs.Item to="/?view=friends">Friends</Tabs.Item>}
-            <Tabs.Item to="/">Global</Tabs.Item>
-            <Tabs.Item to="/updates" controlled>
-              Updates
-            </Tabs.Item>
-          </Tabs>
-          <QueryBoundary>
-            <UpdatesContent />
-          </QueryBoundary>
-        </>
-      ) : (
-        <EmptyActivity>
-          You'll need to connect to the internet see activity.
-        </EmptyActivity>
-      )}
+      <>
+        <Tabs fullWidth>
+          {user && <Tabs.Item to="/?view=friends">Friends</Tabs.Item>}
+          <Tabs.Item to="/">Global</Tabs.Item>
+          <Tabs.Item to="/updates" controlled>
+            Updates
+          </Tabs.Item>
+        </Tabs>
+        <QueryBoundary>
+          <UpdatesContent />
+        </QueryBoundary>
+      </>
     </Layout>
   );
 }

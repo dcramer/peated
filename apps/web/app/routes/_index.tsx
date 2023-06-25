@@ -17,7 +17,6 @@ import FloatingButton from "~/components/floatingButton";
 import Spinner from "~/components/spinner";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { useOnlineStatus } from "~/hooks/useOnlineStatus";
 
 const defaultViewParam = "global";
 
@@ -119,40 +118,33 @@ export default function Activity() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const filterParam = mapFilterParam(qs.get("view"));
-  const isOnline = useOnlineStatus();
 
   return (
     <Layout>
-      {isOnline ? (
-        <>
-          <Tabs fullWidth>
-            {user && (
-              <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
-                Friends
-              </Tabs.Item>
-            )}
-            <Tabs.Item to="./" active={filterParam === "global"}>
-              Global
+      <>
+        <Tabs fullWidth>
+          {user && (
+            <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
+              Friends
             </Tabs.Item>
-            {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
+          )}
+          <Tabs.Item to="./" active={filterParam === "global"}>
+            Global
+          </Tabs.Item>
+          {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
           Local
         </Tabs.Item> */}
-            <Tabs.Item to="/updates" controlled>
-              Updates
-            </Tabs.Item>
-          </Tabs>
-          <QueryBoundary>
-            <div className="hidden sm:block">
-              <FloatingButton to="/search?tasting" />
-            </div>
-            <ActivityContent filter={filterParam} />
-          </QueryBoundary>
-        </>
-      ) : (
-        <EmptyActivity>
-          You'll need to connect to the internet see activity.
-        </EmptyActivity>
-      )}
+          <Tabs.Item to="/updates" controlled>
+            Updates
+          </Tabs.Item>
+        </Tabs>
+        <QueryBoundary>
+          <div className="hidden sm:block">
+            <FloatingButton to="/search?tasting" />
+          </div>
+          <ActivityContent filter={filterParam} />
+        </QueryBoundary>
+      </>
     </Layout>
   );
 }
