@@ -1,6 +1,7 @@
-import { db } from "~/db";
-import { checkBadges } from ".";
+import { db } from "../../db";
 import * as Fixtures from "../../lib/test/fixtures";
+
+import { checkBadges } from ".";
 
 describe("checkBadges", () => {
   test("returns matching region badge from brand", async () => {
