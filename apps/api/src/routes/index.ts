@@ -25,6 +25,7 @@ import getStats from "./getStats";
 import getStore from "./getStore";
 import getTasting from "./getTasting";
 import getUser from "./getUser";
+import listBadges from "./listBadges";
 import listBottlePrices from "./listBottlePrices";
 import listBottleSuggestedTags from "./listBottleSuggestedTags";
 import listBottleTags from "./listBottleTags";
@@ -139,6 +140,8 @@ export const router: FastifyPluginCallback = (
 
   fastify.route(listStorePrices);
   fastify.route(addStorePrices);
+
+  fastify.route(listBadges);
 
   fastify.route(triggerSentry);
 

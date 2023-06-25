@@ -1,4 +1,5 @@
 import type {
+  BADGE_TYPE_LIST,
   CATEGORY_LIST,
   COUNTRY_LIST,
   SERVING_STYLE_LIST,
@@ -12,6 +13,8 @@ export type ServingStyle = (typeof SERVING_STYLE_LIST)[number];
 export type StoreType = (typeof STORE_TYPE_LIST)[number];
 
 export type Country = (typeof COUNTRY_LIST)[number];
+
+export type BadgeType = (typeof BADGE_TYPE_LIST)[number];
 
 type NextPagingRel =
   | {

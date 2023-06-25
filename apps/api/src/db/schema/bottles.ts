@@ -1,0 +1,134 @@
+import type { InferModel } from "drizzle-orm";
+import { relations } from "drizzle-orm";
+import {
+  bigint,
+  bigserial,
+  integer,
+  pgTable,
+  primaryKey,
+  smallint,
+  timestamp,
+  uniqueIndex,
+  varchar,
+} from "drizzle-orm/pg-core";
+
+import { entities } from "./entities";
+import { categoryEnum } from "./enums";
+import { users } from "./users";
+
+export const bottles = pgTable(
+  "bottle",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    category: categoryEnum("category"),
+    brandId: bigint("brand_id", { mode: "number" })
+      .references(() => entities.id)
+      .notNull(),
+    bottlerId: bigint("bottler_id", { mode: "number" }).references(
+      () => entities.id,
+    ),
+    statedAge: smallint("stated_age"),
+
+    totalTastings: bigint("total_tastings", { mode: "number" })
+      .default(0)
+      .notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+  },
+  (bottles) => {
+    return {
+      unique: uniqueIndex("bottle_brand_unq").on(bottles.name, bottles.brandId),
+      uniqueName: uniqueIndex("bottle_name_unq").on(bottles.fullName),
+    };
+  },
+);
+
+export const bottlesRelations = relations(bottles, ({ one, many }) => ({
+  brand: one(entities, {
+    fields: [bottles.brandId],
+    references: [entities.id],
+  }),
+  bottler: one(entities, {
+    fields: [bottles.bottlerId],
+    references: [entities.id],
+  }),
+  bottlesToDistillers: many(bottlesToDistillers),
+  createdBy: one(users, {
+    fields: [bottles.createdById],
+    references: [users.id],
+  }),
+}));
+
+export type Bottle = InferModel<typeof bottles>;
+export type NewBottle = InferModel<typeof bottles, "insert">;
+
+export const bottlesToDistillers = pgTable(
+  "bottle_distiller",
+  {
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    distillerId: bigint("distiller_id", { mode: "number" })
+      .references(() => entities.id)
+      .notNull(),
+  },
+  (bottlesToDistillers) => {
+    return {
+      bottleDistillerId: primaryKey(
+        bottlesToDistillers.bottleId,
+        bottlesToDistillers.distillerId,
+      ),
+    };
+  },
+);
+
+export const bottlesToDistillersRelations = relations(
+  bottlesToDistillers,
+  ({ one }) => ({
+    bottle: one(bottles, {
+      fields: [bottlesToDistillers.bottleId],
+      references: [bottles.id],
+    }),
+    distiller: one(entities, {
+      fields: [bottlesToDistillers.distillerId],
+      references: [entities.id],
+    }),
+  }),
+);
+
+export type BottlesToDistillers = InferModel<typeof bottlesToDistillers>;
+export type NewBottlesToDistillers = InferModel<
+  typeof bottlesToDistillers,
+  "insert"
+>;
+
+export const bottleTags = pgTable(
+  "bottle_tag",
+  {
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    tag: varchar("tag", { length: 64 }).notNull(),
+    count: integer("count").default(0).notNull(),
+  },
+  (bottleTags) => {
+    return {
+      pk: primaryKey(bottleTags.bottleId, bottleTags.tag),
+    };
+  },
+);
+
+export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [bottleTags.bottleId],
+    references: [bottles.id],
+  }),
+}));
+
+export type BottleTag = InferModel<typeof bottleTags>;
+export type NewBottleTag = InferModel<typeof bottleTags, "insert">;

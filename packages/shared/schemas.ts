@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  BADGE_TYPE_LIST,
   CATEGORY_LIST,
   COUNTRY_LIST,
   ENTITY_TYPE_LIST,
@@ -232,4 +233,13 @@ export const StorePriceInputSchema = z.object({
   name: z.string(),
   price: z.number(),
   url: z.string(),
+});
+
+export const BadgeTypeEnum = z.enum(BADGE_TYPE_LIST);
+
+export const BadgeSchema = z.object({
+  id: z.number(),
+  type: StoreTypeEnum,
+  name: z.string(),
+  config: z.any(),
 });

@@ -4,7 +4,7 @@ import type {
   PropsWithChildren,
 } from "react";
 
-import type { Category, StoreType } from "@peated/shared/types";
+import type { BadgeType, Category, StoreType } from "@peated/shared/types";
 
 export type EntityType = "brand" | "distiller" | "bottler";
 
@@ -200,4 +200,11 @@ export type StorePrice = {
   bottleId?: string | null;
   store?: Store;
   updatedAt: string;
+};
+
+export type Badge = {
+  id: string;
+  name: string;
+  type: BadgeType;
+  config: Record<string, any>;
 };

@@ -274,3 +274,5 @@ export const STORE_TYPE_LIST = [
 ] as const;
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
+
+export const BADGE_TYPE_LIST = ["bottle", "region", "category"] as const;
