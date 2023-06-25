@@ -1,10 +1,11 @@
+import { and, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
+import { OAuth2Client } from "google-auth-library";
 import type { IncomingMessage, Server, ServerResponse } from "http";
+import zodToJsonSchema from "zod-to-json-schema";
 
 import { AuthSchema } from "@peated/shared/schemas";
-import { and, eq } from "drizzle-orm";
-import { OAuth2Client } from "google-auth-library";
-import zodToJsonSchema from "zod-to-json-schema";
+
 import config from "../config";
 import { db } from "../db";
 import { identities, users } from "../db/schema";

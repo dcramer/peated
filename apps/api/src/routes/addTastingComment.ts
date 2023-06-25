@@ -1,8 +1,10 @@
-import { CommentInputSchema, CommentSchema } from "@peated/shared/schemas";
 import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
+
+import { CommentInputSchema, CommentSchema } from "@peated/shared/schemas";
+
 import { db } from "../db";
 import type { Comment, NewComment } from "../db/schema";
 import { comments, tastings } from "../db/schema";

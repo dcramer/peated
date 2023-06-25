@@ -1,10 +1,11 @@
-import type { RouteOptions } from "fastify";
-import type { IncomingMessage, Server, ServerResponse } from "http";
-
-import { AuthSchema } from "@peated/shared/schemas";
 import { compareSync } from "bcrypt";
 import { eq } from "drizzle-orm";
+import type { RouteOptions } from "fastify";
+import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
+
+import { AuthSchema } from "@peated/shared/schemas";
+
 import { db } from "../db";
 import { users } from "../db/schema";
 import { createAccessToken } from "../lib/auth";

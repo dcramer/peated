@@ -1,9 +1,10 @@
+import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
+import zodToJsonSchema from "zod-to-json-schema";
 
 import { AuthSchema } from "@peated/shared/schemas";
-import { eq } from "drizzle-orm";
-import zodToJsonSchema from "zod-to-json-schema";
+
 import { db } from "../db";
 import { users } from "../db/schema";
 import { serialize } from "../lib/serializers";

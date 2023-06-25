@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyPluginCallback } from "fastify";
 
+import addBadge from "./addBadge";
 import addBottle from "./addBottle";
 import addCollectionBottle from "./addCollectionBottle";
 import addEntity from "./addEntity";
@@ -142,6 +143,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(addStorePrices);
 
   fastify.route(listBadges);
+  fastify.route(addBadge);
 
   fastify.route(triggerSentry);
 
