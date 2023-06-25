@@ -265,6 +265,12 @@ export const bottlesToDistillersRelations = relations(
   }),
 );
 
+export type BottlesToDistillers = InferModel<typeof bottlesToDistillers>;
+export type NewBottlesToDistillers = InferModel<
+  typeof bottlesToDistillers,
+  "insert"
+>;
+
 export const bottleTags = pgTable(
   "bottle_tag",
   {

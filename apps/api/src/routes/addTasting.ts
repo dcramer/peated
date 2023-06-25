@@ -8,15 +8,11 @@ import { TastingInputSchema, TastingSchema } from "@peated/shared/schemas";
 
 import { XP_PER_LEVEL } from "@peated/shared/constants";
 import { db } from "../db";
-import type {
-  Entity,
-  NewTasting,
-  Tasting} from "../db/schema";
+import type { NewTasting, Tasting } from "../db/schema";
 import {
   badgeAwards,
   bottleTags,
   bottles,
-  bottlesToDistillers,
   entities,
   tastings,
 } from "../db/schema";
@@ -39,10 +35,18 @@ export default {
   handler: async (req, res) => {
     const body = req.body;
 
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, body.bottle));
+    const bottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, body.bottle),
+      with: {
+        bottler: true,
+        brand: true,
+        bottlesToDistillers: {
+          with: {
+            distiller: true,
+          },
+        },
+      },
+    });
     if (!bottle) {
       return res.status(400).send({ error: "Could not identify bottle" });
     }
@@ -84,12 +88,7 @@ export default {
         .set({ totalTastings: sql`${bottles.totalTastings} + 1` })
         .where(eq(bottles.id, bottle.id));
 
-      const distillerIds = (
-        await tx
-          .select({ id: bottlesToDistillers.distillerId })
-          .from(bottlesToDistillers)
-          .where(eq(bottlesToDistillers.bottleId, bottle.id))
-      ).map((d) => d.id);
+      const distillerIds = bottle.bottlesToDistillers.map((d) => d.distillerId);
 
       await tx
         .update(entities)
@@ -119,15 +118,7 @@ export default {
 
       const badgeList = await checkBadges({
         ...tasting,
-        bottle: {
-          ...bottle,
-          brand: (await tx.query.entities.findFirst({
-            where: (entities, { eq }) => eq(entities.id, bottle.brandId),
-          })) as Entity,
-          distillers: await tx.query.entities.findMany({
-            where: (entities) => inArray(entities.id, distillerIds),
-          }),
-        },
+        bottle,
       });
 
       for (const badge of badgeList) {

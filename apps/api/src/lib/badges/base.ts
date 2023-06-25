@@ -1,11 +1,19 @@
-import { Bottle, Entity, Tasting } from "../../db/schema";
+import type {
+  Bottle,
+  BottlesToDistillers,
+  Entity,
+  Tasting,
+} from "../../db/schema";
 
 export type BadgeConfig = Record<string, any>;
 
 export type TastingWithRelations = Tasting & {
   bottle: Bottle & {
     brand: Entity;
-    distillers: Entity[];
+    bottler: Entity | null;
+    bottlesToDistillers: (BottlesToDistillers & {
+      distiller: Entity;
+    })[];
   };
 };
 

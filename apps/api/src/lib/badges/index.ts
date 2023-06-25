@@ -1,6 +1,6 @@
 import { db } from "../../db";
-import { Badge } from "../../db/schema";
-import { TastingWithRelations } from "./base";
+import type { Badge } from "../../db/schema";
+import type { TastingWithRelations } from "./base";
 import { BottleBadge } from "./bottleBadge";
 import { CategoryBadge } from "./categoryBadge";
 import { RegionBadge } from "./regionBadge";
@@ -25,7 +25,6 @@ const badgeList = [[RegionBadge, { country: "Scotland", region: "Islay" }]];
 export async function checkBadges(
   tasting: TastingWithRelations,
 ): Promise<Badge[]> {
-  const results: Badge[] = [];
   const badgeList = await db.query.badges.findMany();
   return badgeList.filter((badge) => {
     const impl = getBadgeImpl(badge.type);
