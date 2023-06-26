@@ -1,32 +1,13 @@
 import { Dialog } from "@headlessui/react";
-import { Link, useLocation, useNavigate } from "@remix-run/react";
+import { useLocation, useNavigate } from "@remix-run/react";
 import { useState } from "react";
 
 import useAuth from "~/hooks/useAuth";
-import PeatedGlyph from "./assets/Glyph";
-import PeatedLogo from "./assets/Logo";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 import { ProfileDropdown } from "./profileDropdown";
 import SearchPanel from "./searchPanel";
 import UserAvatar from "./userAvatar";
-
-const HeaderLogo = () => {
-  return (
-    <>
-      <div className="logo hidden sm:flex">
-        <Link to="/">
-          <PeatedLogo className="h-10 w-auto" />
-        </Link>
-      </div>
-      <div className="logo flex sm:hidden ">
-        <Link to="/">
-          <PeatedGlyph className="h-8 w-auto" />
-        </Link>
-      </div>
-    </>
-  );
-};
 
 export default function AppHeader() {
   const { user } = useAuth();
@@ -39,7 +20,6 @@ export default function AppHeader() {
 
   return (
     <>
-      <HeaderLogo />
       <form
         className={`ml-4 flex flex-1 justify-end sm:ml-8`}
         onSubmit={(e) => {

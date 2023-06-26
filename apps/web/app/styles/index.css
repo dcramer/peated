@@ -67,16 +67,6 @@
     );
   }
 
-  .header {
-    @apply text-white;
-  }
-
-  .header .logo {
-    /* @apply text-highlight; */
-    /* -webkit-mask-image: linear-gradient(to bottom, #fff 25%, #000 75%); */
-    color: var(--color-slate-500);
-  }
-
   .main-gradient {
     background-color: rgba(15, 23, 42, 0.25);
     background-image: linear-gradient(

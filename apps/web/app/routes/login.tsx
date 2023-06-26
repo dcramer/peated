@@ -131,10 +131,12 @@ export default function Login() {
   const { error } = useActionData<typeof action>() || { error: null };
 
   return (
-    <Layout splash header={null} footer={null}>
-      <Link to="/">
-        <PeatedLogo className="text-peated h-auto max-w-full" />
-      </Link>
+    <Layout splash>
+      <div className="flex flex-grow items-center justify-center px-4">
+        <Link to="/" className="max-w-xs">
+          <PeatedLogo className="text-highlight h-auto w-full" />
+        </Link>
+      </div>
 
       <div className="min-w-sm mt-8 flex-1">
         {error ? <Alert>{error}</Alert> : null}
