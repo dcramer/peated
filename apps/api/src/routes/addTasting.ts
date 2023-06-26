@@ -6,15 +6,17 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 
 import { TastingInputSchema, TastingSchema } from "@peated/shared/schemas";
 
+import { XP_PER_LEVEL } from "@peated/shared/constants";
 import { db } from "../db";
 import type { NewTasting, Tasting } from "../db/schema";
 import {
+  badgeAwards,
   bottleTags,
   bottles,
-  bottlesToDistillers,
   entities,
   tastings,
 } from "../db/schema";
+import { checkBadges } from "../lib/badges";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { serialize } from "../lib/serializers";
 import { TastingSerializer } from "../lib/serializers/tasting";
@@ -33,10 +35,18 @@ export default {
   handler: async (req, res) => {
     const body = req.body;
 
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, body.bottle));
+    const bottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, body.bottle),
+      with: {
+        bottler: true,
+        brand: true,
+        bottlesToDistillers: {
+          with: {
+            distiller: true,
+          },
+        },
+      },
+    });
     if (!bottle) {
       return res.status(400).send({ error: "Could not identify bottle" });
     }
@@ -78,12 +88,7 @@ export default {
         .set({ totalTastings: sql`${bottles.totalTastings} + 1` })
         .where(eq(bottles.id, bottle.id));
 
-      const distillerIds = (
-        await db
-          .select({ id: bottlesToDistillers.distillerId })
-          .from(bottlesToDistillers)
-          .where(eq(bottlesToDistillers.bottleId, bottle.id))
-      ).map((d) => d.id);
+      const distillerIds = bottle.bottlesToDistillers.map((d) => d.distillerId);
 
       await tx
         .update(entities)
@@ -107,6 +112,29 @@ export default {
             target: [bottleTags.bottleId, bottleTags.tag],
             set: {
               count: sql<number>`${bottleTags.count} + 1`,
+            },
+          });
+      }
+
+      const badgeList = await checkBadges(tx, {
+        ...tasting,
+        bottle,
+      });
+
+      for (const badge of badgeList) {
+        await tx
+          .insert(badgeAwards)
+          .values({
+            badgeId: badge.id,
+            userId: tasting.createdById,
+            xp: 1,
+            level: 1,
+          })
+          .onConflictDoUpdate({
+            target: [badgeAwards.badgeId, badgeAwards.userId],
+            set: {
+              xp: sql`${badgeAwards.xp} + 1`,
+              level: sql`(${badgeAwards.xp} + 1) / ${XP_PER_LEVEL} + 1`,
             },
           });
       }

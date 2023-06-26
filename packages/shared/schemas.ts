@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  BADGE_TYPE_LIST,
   CATEGORY_LIST,
   COUNTRY_LIST,
   ENTITY_TYPE_LIST,
@@ -232,4 +233,36 @@ export const StorePriceInputSchema = z.object({
   name: z.string(),
   price: z.number(),
   url: z.string(),
+});
+
+export const BadgeTypeEnum = z.enum(BADGE_TYPE_LIST);
+
+export const BadgeSchema = z.object({
+  id: z.number(),
+  type: BadgeTypeEnum,
+  name: z.string(),
+  config: z.any(),
+});
+
+export const CategoryBadgeConfigSchema = z.object({
+  category: CategoryEnum,
+});
+
+export const BottleBadgeConfigSchema = z.object({
+  bottle: z.number(),
+});
+
+export const RegionBadgeConfigSchema = z.object({
+  country: z.string().trim().min(1, "Required"),
+  region: z.string().trim().min(1, "Required"),
+});
+
+export const BadgeInputSchema = z.object({
+  type: BadgeTypeEnum,
+  name: z.string(),
+  config: z.union([
+    CategoryBadgeConfigSchema,
+    RegionBadgeConfigSchema,
+    BottleBadgeConfigSchema,
+  ]),
 });

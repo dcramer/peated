@@ -1,69 +1,68 @@
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, ilike, sql } from "drizzle-orm";
+import { and, asc, ilike } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
+
+import { BadgeSchema, PaginatedSchema } from "@peated/shared/schemas";
 
 import { db } from "../db";
-import { storePrices, stores } from "../db/schema";
+import { badges } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
-import { StorePriceSerializer } from "../lib/serializers/storePrice";
-import { requireAdmin } from "../middleware/auth";
+import { BadgeSerializer } from "../lib/serializers/badge";
 
 export default {
   method: "GET",
-  url: "/stores/:storeId/prices",
+  url: "/badges",
   schema: {
     querystring: {
       type: "object",
       properties: {
         query: { type: "string" },
         page: { type: "number" },
+        sort: { type: "string" },
       },
     },
-    params: {
-      type: "object",
-      required: ["storeId"],
-      properties: {
-        userId: { type: "number" },
-      },
+    response: {
+      200: zodToJsonSchema(
+        PaginatedSchema.extend({
+          results: z.array(BadgeSchema),
+        }),
+      ),
     },
   },
-  preHandler: [requireAdmin],
   handler: async (req, res) => {
-    const store = await db.query.stores.findFirst({
-      where: eq(stores.id, req.params.storeId),
-    });
-
-    if (!store) {
-      return res.status(404).send({ error: "Not found" });
-    }
-
     const page = req.query.page || 1;
     const query = req.query.query || "";
 
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where: SQL[] = [
-      eq(storePrices.storeId, store.id),
-      sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
-    ];
+    const where: SQL<unknown>[] = [];
     if (query) {
-      where.push(ilike(storePrices.name, `%${query}%`));
+      where.push(ilike(badges.name, `%${query}%`));
+    }
+
+    let orderBy: SQL<unknown>;
+    switch (req.query.sort) {
+      default:
+        orderBy = asc(badges.name);
+        break;
     }
 
     const results = await db
       .select()
-      .from(storePrices)
+      .from(badges)
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(storePrices.name));
+      .orderBy(orderBy);
 
     res.send({
       results: await serialize(
-        StorePriceSerializer,
+        BadgeSerializer,
         results.slice(0, limit),
         req.user,
       ),
@@ -86,12 +85,10 @@ export default {
   IncomingMessage,
   ServerResponse,
   {
-    Params: {
-      storeId: number;
-    };
     Querystring: {
-      page?: number;
       query?: string;
+      page?: number;
+      sort?: "name";
     };
   }
 >;

@@ -1,8 +1,9 @@
-import { StoreInputSchema, StoreSchema } from "@peated/shared/schemas";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
+
+import { StoreInputSchema, StoreSchema } from "@peated/shared/schemas";
 
 import { db } from "../db";
 import { stores } from "../db/schema";

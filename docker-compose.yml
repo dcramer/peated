@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   postgres:
-    image: postgis/postgis:15-master
+    image: ghcr.io/baosystems/postgis:15-3.3
     restart: on-failure
     environment:
       - POSTGRES_USER=postgres

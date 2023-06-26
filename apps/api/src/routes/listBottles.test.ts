@@ -5,10 +5,10 @@ import * as Fixtures from "../lib/test/fixtures";
 let app: FastifyInstance;
 beforeAll(async () => {
   app = await buildFastify();
-});
 
-afterAll(async () => {
-  await app.close();
+  return async () => {
+    await app.close();
+  };
 });
 
 test("lists bottles", async () => {

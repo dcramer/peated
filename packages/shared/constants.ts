@@ -1,5 +1,7 @@
 export const MAX_FILESIZE = 1048576 * 20;
 
+export const XP_PER_LEVEL = 5;
+
 export const COUNTRY_LIST = [
   "Afghanistan",
   "Albania",
@@ -272,3 +274,5 @@ export const STORE_TYPE_LIST = [
 ] as const;
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
+
+export const BADGE_TYPE_LIST = ["bottle", "region", "category"] as const;
