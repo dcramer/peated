@@ -5,9 +5,9 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { BadgeInputSchema, BadgeSchema } from "@peated/shared/schemas";
 
-import { checkBadgeConfig } from "~/lib/badges";
 import { db } from "../db";
 import { badges } from "../db/schema";
+import { checkBadgeConfig } from "../lib/badges";
 import { serialize } from "../lib/serializers";
 import { BadgeSerializer } from "../lib/serializers/badge";
 import { requireAdmin } from "../middleware/auth";
