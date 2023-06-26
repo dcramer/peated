@@ -7,7 +7,7 @@ describe("checkBadges", () => {
   test("returns matching region badge from brand", async () => {
     const badge = await Fixtures.Badge({
       type: "region",
-      config: { country: "Scotland", region: "Islay" },
+      config: { regions: [{ country: "Scotland", region: "Islay" }] },
     });
 
     const brand = await Fixtures.Entity({

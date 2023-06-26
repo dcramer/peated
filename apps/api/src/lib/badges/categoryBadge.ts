@@ -1,12 +1,22 @@
-import type { Category } from "@peated/shared/types";
+import { z } from "zod";
+
+import { CategoryEnum } from "@peated/shared/schemas";
+
 import type { IBadge, TastingWithRelations } from "./base";
 
-export type CategoryConfig = {
-  category: Category;
-};
+export const CategoryConfig = z.object({
+  category: z.array(CategoryEnum),
+});
 
-export const CategoryBadge: IBadge<CategoryConfig> = {
-  test: (config: CategoryConfig, tasting: TastingWithRelations) => {
-    return tasting.bottle.category === config.category;
+type CategoryConfigType = z.infer<typeof CategoryConfig>;
+
+export const CategoryBadge: IBadge<CategoryConfigType> = {
+  test: (config: CategoryConfigType, tasting: TastingWithRelations) => {
+    if (!tasting.bottle.category) return false;
+    return config.category.includes(tasting.bottle.category);
+  },
+
+  checkConfig: async (config: unknown) => {
+    return CategoryConfig.parse(config);
   },
 };

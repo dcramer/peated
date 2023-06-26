@@ -5,6 +5,7 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { BadgeInputSchema, BadgeSchema } from "@peated/shared/schemas";
 
+import { checkBadgeConfig } from "~/lib/badges";
 import { db } from "../db";
 import { badges } from "../db/schema";
 import { serialize } from "../lib/serializers";
@@ -24,10 +25,13 @@ export default {
   handler: async (req, res) => {
     const body = req.body;
 
-    // TODO: validate config based on type
+    const config = await checkBadgeConfig(body.type, body.config);
 
     const badge = await db.transaction(async (tx) => {
-      const [badge] = await tx.insert(badges).values(body).returning();
+      const [badge] = await tx
+        .insert(badges)
+        .values({ ...body, config })
+        .returning();
 
       return badge;
     });

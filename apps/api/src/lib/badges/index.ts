@@ -1,11 +1,13 @@
-import type { DatabaseType, TransactionType } from "~/db";
+import type { BadgeType } from "@peated/shared/types";
+
+import type { DatabaseType, TransactionType } from "../../db";
 import type { Badge } from "../../db/schema";
 import type { TastingWithRelations } from "./base";
 import { BottleBadge } from "./bottleBadge";
 import { CategoryBadge } from "./categoryBadge";
 import { RegionBadge } from "./regionBadge";
 
-function getBadgeImpl(type: string) {
+function getBadgeImpl(type: BadgeType) {
   switch (type) {
     case "bottle":
       return BottleBadge;
@@ -30,4 +32,9 @@ export async function checkBadges(
     // how to type this? does it even matter?
     return impl.test(badge.config as any, tasting);
   });
+}
+
+export async function checkBadgeConfig(type: BadgeType, config: unknown) {
+  const impl = getBadgeImpl(type);
+  return await impl.checkConfig(config);
 }

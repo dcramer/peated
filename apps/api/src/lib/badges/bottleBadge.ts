@@ -1,11 +1,18 @@
+import { z } from "zod";
 import type { IBadge, TastingWithRelations } from "./base";
 
-export type BottleConfig = {
-  id: number[];
-};
+export const BottleConfig = z.object({
+  id: z.array(z.number()),
+});
 
-export const BottleBadge: IBadge<BottleConfig> = {
-  test: (config: BottleConfig, tasting: TastingWithRelations) => {
-    return config.id.indexOf(tasting.bottle.id) !== -1;
+type BottleConfigType = z.infer<typeof BottleConfig>;
+
+export const BottleBadge: IBadge<BottleConfigType> = {
+  test: (config: BottleConfigType, tasting: TastingWithRelations) => {
+    return config.id.includes(tasting.bottle.id);
+  },
+
+  checkConfig: async (config: unknown) => {
+    return BottleConfig.parse(config);
   },
 };

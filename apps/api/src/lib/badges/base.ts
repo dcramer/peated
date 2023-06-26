@@ -19,4 +19,6 @@ export type TastingWithRelations = Tasting & {
 
 export interface IBadge<T extends BadgeConfig> {
   test: (config: T, tasting: TastingWithRelations) => boolean;
+
+  checkConfig: (config: unknown) => Promise<T>;
 }
