@@ -3,10 +3,13 @@ import { json } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
+
+import type { Paginated } from "@peated/shared/types";
+
 import EmptyActivity from "~/components/emptyActivity";
 import TastingList from "~/components/tastingList";
 import useApi from "~/hooks/useApi";
-import type { Paginated, Tasting } from "~/types";
+import type { Tasting } from "~/types";
 
 export async function loader({ params: { bottleId }, context }: LoaderArgs) {
   invariant(bottleId);

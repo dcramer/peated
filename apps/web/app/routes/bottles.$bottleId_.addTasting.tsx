@@ -8,11 +8,11 @@ import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
 
+import { SERVING_STYLE_LIST } from "@peated/shared/constants";
 import { toTitleCase } from "@peated/shared/lib/strings";
 import { TastingInputSchema } from "@peated/shared/schemas";
 import type { Paginated, ServingStyle } from "@peated/shared/types";
 
-import { SERVING_STYLE_LIST } from "@peated/shared/constants";
 import BottleCard from "~/components/bottleCard";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";

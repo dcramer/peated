@@ -3,7 +3,7 @@ import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Outlet, useLoaderData, useParams, useSubmit } from "@remix-run/react";
+import { Outlet, useLoaderData, useSubmit } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import invariant from "tiny-invariant";
@@ -78,7 +78,6 @@ export default function Profile() {
   const api = useApi();
   const { user: currentUser } = useAuth();
   const submit = useSubmit();
-  const { username } = useParams();
   const data = useLoaderData<typeof loader>();
 
   const [user, setUser] = useState<UserDetails>(data.user);

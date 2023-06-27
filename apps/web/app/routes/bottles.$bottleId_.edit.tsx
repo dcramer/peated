@@ -1,10 +1,10 @@
+import type { V2_MetaFunction } from "@remix-run/node";
 import { useNavigate, useParams } from "@remix-run/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { z } from "zod";
 
 import type { BottleInputSchema } from "@peated/shared/schemas";
 
-import type { V2_MetaFunction } from "@remix-run/node";
 import BottleForm from "~/components/bottleForm";
 import Spinner from "~/components/spinner";
 import useApi from "~/hooks/useApi";
