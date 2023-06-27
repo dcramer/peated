@@ -125,6 +125,7 @@ export const meta: V2_MetaFunction = ({ data: { bottle } }) => {
   return [
     {
       title: bottle.fullName,
+      "twitter:card": "product",
     },
   ];
 };

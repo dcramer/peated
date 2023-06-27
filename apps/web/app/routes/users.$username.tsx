@@ -68,6 +68,8 @@ export const meta: V2_MetaFunction = ({ data: { user } }) => {
   return [
     {
       title: `@${user.username}`,
+      "og:type": "profile",
+      "og:profile:username": user.username,
     },
   ];
 };
