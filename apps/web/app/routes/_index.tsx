@@ -1,22 +1,22 @@
+import type { V2_MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { Fragment } from "react";
+import { useEventListener } from "usehooks-ts";
+
+import type { Paginated } from "@peated/shared/types";
+
 import Glyph from "~/components/assets/Glyph";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
+import Spinner from "~/components/spinner";
 import Tabs from "~/components/tabs";
 import TastingList from "~/components/tastingList";
-import type { ApiClient } from "~/lib/api";
-import type { Tasting } from "~/types";
-
-import type { Paginated } from "@peated/shared/types";
-import type { V2_MetaFunction } from "@remix-run/node";
-import { Fragment } from "react";
-import { useEventListener } from "usehooks-ts";
-import FloatingButton from "~/components/floatingButton";
-import Spinner from "~/components/spinner";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
+import type { ApiClient } from "~/lib/api";
+import type { Tasting } from "~/types";
 
 const defaultViewParam = "global";
 
@@ -139,9 +139,6 @@ export default function Activity() {
           </Tabs.Item>
         </Tabs>
         <QueryBoundary>
-          <div className="hidden sm:block">
-            <FloatingButton to="/search?tasting" />
-          </div>
           <ActivityContent filter={filterParam} />
         </QueryBoundary>
       </>

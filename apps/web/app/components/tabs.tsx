@@ -45,7 +45,7 @@ Tabs.Item = function TabItem({
       to={to}
       className={classNames(
         active ? activeStyles : inactiveStyles,
-        "flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium",
+        "flex whitespace-nowrap border-b-4 px-1 py-4 text-sm font-medium",
       )}
       {...props}
     >
