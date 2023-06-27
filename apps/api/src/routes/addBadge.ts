@@ -8,6 +8,7 @@ import { BadgeInputSchema, BadgeSchema } from "@peated/shared/schemas";
 import { db } from "../db";
 import { badges } from "../db/schema";
 import { checkBadgeConfig } from "../lib/badges";
+import { logError } from "../lib/log";
 import { serialize } from "../lib/serializers";
 import { BadgeSerializer } from "../lib/serializers/badge";
 import { requireAdmin } from "../middleware/auth";
@@ -25,7 +26,15 @@ export default {
   handler: async (req, res) => {
     const body = req.body;
 
-    const config = await checkBadgeConfig(body.type, body.config);
+    let config: Record<string, any>;
+    try {
+      config = await checkBadgeConfig(body.type, body.config);
+    } catch (err) {
+      logError(err);
+      return res
+        .status(400)
+        .send({ error: "Failed to validate badge config " });
+    }
 
     const badge = await db.transaction(async (tx) => {
       const [badge] = await tx

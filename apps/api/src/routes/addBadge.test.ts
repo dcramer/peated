@@ -21,7 +21,7 @@ test("requires admin", async () => {
     payload: {
       type: "category",
       name: "Single Malts",
-      config: { category: "single_malt" },
+      config: { category: ["single_malt"] },
     },
     headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
   });
@@ -35,7 +35,7 @@ test("name is required", async () => {
     url: "/badges",
     payload: {
       type: "category",
-      config: { category: "single_malt" },
+      config: { category: ["single_malt"] },
     },
     headers: await Fixtures.AuthenticatedHeaders({ admin: true }),
   });
@@ -49,7 +49,7 @@ test("type is required", async () => {
     url: "/badges",
     payload: {
       name: "Single Malts",
-      config: { category: "single_malt" },
+      config: { category: ["single_malt"] },
     },
     headers: await Fixtures.AuthenticatedHeaders({ admin: true }),
   });
@@ -64,7 +64,7 @@ test("validates config for category", async () => {
     payload: {
       type: "category",
       name: "Single Malts",
-      config: { bottle: 1 },
+      config: { bottle: [1] },
     },
     headers: await Fixtures.AuthenticatedHeaders({ admin: true }),
   });
@@ -78,7 +78,7 @@ test("creates badge", async () => {
     payload: {
       type: "category",
       name: "Single Malts",
-      config: { category: "single_malt" },
+      config: { category: ["single_malt"] },
     },
     headers: await Fixtures.AuthenticatedHeaders({ admin: true }),
   });
@@ -90,5 +90,5 @@ test("creates badge", async () => {
   const [badge] = await db.select().from(badges).where(eq(badges.id, data.id));
   expect(badge.name).toEqual("Single Malts");
   expect(badge.type).toEqual("category");
-  expect(badge.config).toEqual({ category: "single_malt" });
+  expect(badge.config).toEqual({ category: ["single_malt"] });
 });

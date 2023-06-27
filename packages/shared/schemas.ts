@@ -244,25 +244,8 @@ export const BadgeSchema = z.object({
   config: z.any(),
 });
 
-export const CategoryBadgeConfigSchema = z.object({
-  category: CategoryEnum,
-});
-
-export const BottleBadgeConfigSchema = z.object({
-  bottle: z.number(),
-});
-
-export const RegionBadgeConfigSchema = z.object({
-  country: z.string().trim().min(1, "Required"),
-  region: z.string().trim().min(1, "Required"),
-});
-
 export const BadgeInputSchema = z.object({
   type: BadgeTypeEnum,
   name: z.string(),
-  config: z.union([
-    CategoryBadgeConfigSchema,
-    RegionBadgeConfigSchema,
-    BottleBadgeConfigSchema,
-  ]),
+  config: z.any(),
 });
