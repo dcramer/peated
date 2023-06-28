@@ -4,10 +4,8 @@ import {
   InboxIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import { Link } from "@remix-run/react";
-import type { ElementType, PropsWithChildren } from "react";
-import { Fragment } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "@remix-run/react";
+import { Fragment, type ElementType, type PropsWithChildren } from "react";
 import useAuth from "~/hooks/useAuth";
 import classNames from "~/lib/classNames";
 import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
@@ -60,44 +58,6 @@ function SidebarLink({
 export default function Sidebar() {
   const location = useLocation();
   const { user } = useAuth();
-
-  const navigation = [
-    {
-      name: "Activity",
-      href: "/",
-      icon: HomeIcon,
-      current: location.pathname === "/",
-    },
-    {
-      name: "Search",
-      href: "/search",
-      icon: MagnifyingGlassIcon,
-      current: location.pathname.startsWith("/search"),
-    },
-    {
-      name: "Notifications",
-      href: "/notifications",
-      icon: InboxIcon,
-      current: location.pathname.startsWith("/notifications"),
-      extra: () => (
-        <QueryBoundary fallback={() => null} loading={<Fragment />}>
-          <NotificationCount />
-        </QueryBoundary>
-      ),
-    },
-    {
-      name: "Bottles",
-      href: "/bottles",
-      icon: BottleIcon,
-      current: location.pathname.startsWith("/bottles"),
-    },
-    {
-      name: "Brands & Distillers",
-      href: "/entities",
-      icon: EntityIcon,
-      current: location.pathname.startsWith("/entities"),
-    },
-  ];
 
   return (
     <>

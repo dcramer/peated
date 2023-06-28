@@ -5,23 +5,11 @@ import type { ReactNode } from "react";
 // import Footer from "./footer";
 // import Header from "./header";
 
-import { FolderIcon, HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { AppFooter } from "./appFooter";
 import AppHeader from "./appHeader";
 import Footer from "./footer";
 import Header from "./header";
 import Sidebar from "./sidebar";
-
-const navigation = [
-  { name: "Activity", href: "/", icon: HomeIcon, current: true },
-  { name: "Bottles", href: "/bottles", icon: UsersIcon, current: false },
-  {
-    name: "Brands & Distillers",
-    href: "/entities",
-    icon: FolderIcon,
-    current: false,
-  },
-];
 
 export default function Layout({
   children,

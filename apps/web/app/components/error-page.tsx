@@ -1,7 +1,6 @@
 import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 
 import Button from "~/components/button";
-import Layout from "~/components/layout";
 import config from "~/config";
 import { useOnlineStatus } from "~/hooks/useOnlineStatus";
 import { ApiError, ApiUnauthorized, ApiUnavailable } from "~/lib/api";
@@ -36,41 +35,43 @@ export default function ErrorPage() {
   }
 
   return (
-    <Layout footer={null} header={null}>
-      <main className="self-justify-center inline self-center p-3">
-        <div className="text-center">
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
-            {title}
-          </h1>
-          <p className="mt-6 leading-7 text-white">{subtitle}</p>
+    <main className="mx-auto flex h-screen max-w-xl items-center justify-center p-4 lg:p-8">
+      <div className="flex-1">
+        <main className="self-justify-center inline self-center p-3">
+          <div className="text-center">
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
+              {title}
+            </h1>
+            <p className="mt-6 leading-7 text-white">{subtitle}</p>
 
-          <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Button to="/" color="primary">
-              Go back home
-            </Button>
-            <Button to={config.GITHUB_REPO}>Open a GitHub issue</Button>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <Button to="/" color="primary">
+                Go back home
+              </Button>
+              <Button to={config.GITHUB_REPO}>Open a GitHub issue</Button>
+            </div>
           </div>
-        </div>
 
-        <div className="mt-12">
-          {error.remoteStack && (
-            <div className="prose mx-auto mb-4">
-              <h3 className="text-white">Remote Stack</h3>
-              <pre className="whitespace-pre-wrap break-all text-left">
-                {error.remoteStack}
-              </pre>
-            </div>
-          )}
-          {error.stack && (
-            <div className="prose mx-auto mb-4">
-              <h3 className="text-white">Local Stack</h3>
-              <pre className="whitespace-pre-wrap break-all text-left">
-                {error.stack}
-              </pre>
-            </div>
-          )}
-        </div>
-      </main>
-    </Layout>
+          <div className="mt-12">
+            {error.remoteStack && (
+              <div className="prose mx-auto mb-4">
+                <h3 className="text-white">Remote Stack</h3>
+                <pre className="whitespace-pre-wrap break-all text-left">
+                  {error.remoteStack}
+                </pre>
+              </div>
+            )}
+            {error.stack && (
+              <div className="prose mx-auto mb-4">
+                <h3 className="text-white">Local Stack</h3>
+                <pre className="whitespace-pre-wrap break-all text-left">
+                  {error.stack}
+                </pre>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    </main>
   );
 }
