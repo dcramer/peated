@@ -13,13 +13,13 @@ jobs:
       - uses: actions/checkout@v3
       - id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-      - uses: chrnorm/deployment-action@v2
-        name: Create GitHub deployment
-        id: deployment
-        with:
-          token: "${{ github.token }}"
-          environment-url: https://peated.app
-          environment: production
+      # - uses: chrnorm/deployment-action@v2
+      #   name: Create GitHub deployment
+      #   id: deployment
+      #   with:
+      #     token: "${{ github.token }}"
+      #     environment-url: https://peated.app
+      #     environment: production
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: |
           flyctl deploy \
@@ -45,24 +45,23 @@ jobs:
             --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_TOKEN_WEB }}
-      - name: Update deployment status (success)
-        if: success()
-        uses: chrnorm/deployment-status@v2
-        with:
-          token: "${{ github.token }}"
-          environment-url: ${{ steps.deployment.outputs.environment_url }}
-          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
-          state: "success"
+      # - name: Update deployment status (success)
+      #   if: success()
+      #   uses: chrnorm/deployment-status@v2
+      #   with:
+      #     token: "${{ github.token }}"
+      #     environment-url: ${{ steps.deployment.outputs.environment_url }}
+      #     deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+      #     state: "success"
 
-      - name: Update deployment status (failure)
-        if: failure()
-        uses: chrnorm/deployment-status@v2
-        with:
-          token: "${{ github.token }}"
-          environment-url: ${{ steps.deployment.outputs.environment_url }}
-          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
-          state: "failure"
-
+      # - name: Update deployment status (failure)
+      #   if: failure()
+      #   uses: chrnorm/deployment-status@v2
+      #   with:
+      #     token: "${{ github.token }}"
+      #     environment-url: ${{ steps.deployment.outputs.environment_url }}
+      #     deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+      #     state: "failure"
       - name: Discord notification (success)
         if: success()
         env:
@@ -71,7 +70,6 @@ jobs:
         with:
           args: |
             "${{ github.actor }} deployed version [${{ steps.vars.outputs.sha_short }}](https://github.com/{{ EVENT_PAYLOAD.repository.full_name }}/commit/${{ github.sha }})."
-
       - name: Discord notification (failure)
         if: failure()
         env:
