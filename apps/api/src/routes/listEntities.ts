@@ -21,7 +21,7 @@ export default {
       properties: {
         query: { type: "string" },
         page: { type: "number" },
-        sort: { type: "string" },
+        sort: { type: "string", enum: ["name", "tastings", "bottles"] },
         country: { type: "string" },
         region: { type: "string" },
         type: { type: "string", enum: ["distiller", "brand", "bottler"] },
@@ -61,6 +61,10 @@ export default {
       case "name":
         orderBy = asc(entities.name);
         break;
+      case "bottles":
+        orderBy = desc(entities.totalBottles);
+        break;
+      case "tastings":
       default:
         orderBy = desc(entities.totalTastings);
     }
