@@ -15,11 +15,13 @@ export default function Layout({
   children,
   header,
   footer,
+  rightSidebar,
   splash,
 }: {
   children: ReactNode;
   header?: ReactNode;
   footer?: ReactNode;
+  rightSidebar?: ReactNode;
   splash?: boolean;
   onSave?: any;
 }) {
@@ -43,9 +45,17 @@ export default function Layout({
 
       <Sidebar />
 
-      <main className="max-w-6xl lg:pl-64">
-        <div className="mx-auto lg:p-8">{children}</div>
-      </main>
+      <div className="flex">
+        <main className="max-w-6xl flex-1 lg:pl-64">
+          <div className="mx-auto lg:p-8">{children}</div>
+        </main>
+
+        {rightSidebar ? (
+          <div className="hidden lg:z-50 lg:w-64 lg:flex-col xl:flex">
+            {rightSidebar}
+          </div>
+        ) : null}
+      </div>
 
       {footer !== undefined ? (
         footer

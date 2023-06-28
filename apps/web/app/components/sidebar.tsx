@@ -5,55 +5,15 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "@remix-run/react";
-import { Fragment, type ElementType, type PropsWithChildren } from "react";
+import { Fragment } from "react";
 import useAuth from "~/hooks/useAuth";
-import classNames from "~/lib/classNames";
 import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
 import Button from "./button";
 import HeaderLogo from "./headerLogo";
 import { NotificationCount } from "./notifications/count";
 import QueryBoundary from "./queryBoundary";
+import SidebarLink from "./sidebarLink";
 import UserAvatar from "./userAvatar";
-
-function SidebarLink({
-  to,
-  active = false,
-  icon,
-  children,
-}: PropsWithChildren<{
-  to: string;
-  active?: boolean;
-  icon?: ElementType;
-}>) {
-  const Icon = icon;
-  return (
-    <li>
-      <Link
-        to={to}
-        className={classNames(
-          active
-            ? "text-highlight border-highlight"
-            : "border-transparent text-slate-500 hover:border-slate-400 hover:text-slate-400",
-          "border-l-4",
-          "group flex gap-x-3 p-2 text-sm font-semibold leading-6",
-        )}
-      >
-        {Icon && (
-          <Icon
-            className={classNames(
-              active
-                ? "text-highlight"
-                : "text-slate-500 group-hover:text-slate-400",
-              "h-6 w-6 shrink-0",
-            )}
-            aria-hidden="true"
-          />
-        )}
-        {children}
-      </Link>
-    </li>
-  );
-}
 
 export default function Sidebar() {
   const location = useLocation();
