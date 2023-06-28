@@ -172,7 +172,7 @@ export default function BottleDetails() {
 
           {(bottle.category || bottle.statedAge) && (
             <div className="flex w-full flex-col items-center justify-center gap-x-1 text-sm text-slate-500 sm:w-auto sm:items-end">
-              <p>
+              <div>
                 {bottle.category && (
                   <Link
                     to={`/bottles?category=${encodeURIComponent(
@@ -182,10 +182,10 @@ export default function BottleDetails() {
                     {formatCategoryName(bottle.category)}
                   </Link>
                 )}
-              </p>
-              <p>
+              </div>
+              <div>
                 {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
-              </p>
+              </div>
             </div>
           )}
         </div>
@@ -237,10 +237,10 @@ export default function BottleDetails() {
         <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
           {stats.map((stat) => (
             <div key={stat.name}>
-              <p className="text-peated-light leading-7">{stat.name}</p>
-              <p className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
+              <div className="text-peated-light leading-7">{stat.name}</div>
+              <div className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
                 {stat.value}
-              </p>
+              </div>
             </div>
           ))}
         </div>
@@ -260,7 +260,7 @@ export default function BottleDetails() {
           </QueryBoundary>
 
           {bottle.createdBy && (
-            <p className="mt-8 text-center text-sm text-slate-500 sm:text-left">
+            <div className="mt-8 text-center text-sm text-slate-500 sm:text-left">
               This bottle was first added by{" "}
               <Link
                 to={`/users/${bottle.createdBy.username}`}
@@ -269,7 +269,7 @@ export default function BottleDetails() {
                 {bottle.createdBy.displayName}
               </Link>{" "}
               <TimeSince date={bottle.createdAt} />
-            </p>
+            </div>
           )}
         </div>
         <div className="ml-4 hidden w-[200px] sm:block">

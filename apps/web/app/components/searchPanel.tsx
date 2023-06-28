@@ -25,12 +25,12 @@ const SkeletonItem = () => {
         <div className="hidden h-12 w-12 flex-none p-2 sm:visible" />
 
         <div className="min-w-0 flex-auto animate-pulse">
-          <p className="overflow-hidden rounded bg-slate-800 -indent-96 font-semibold leading-6">
+          <div className="overflow-hidden rounded bg-slate-800 -indent-96 font-semibold leading-6">
             Title
-          </p>
-          <p className="mt-2 flex w-32 overflow-hidden truncate rounded bg-slate-800 -indent-96 text-xs leading-5">
+          </div>
+          <div className="mt-2 flex w-32 overflow-hidden truncate rounded bg-slate-800 -indent-96 text-xs leading-5">
             Subtext
-          </p>
+          </div>
         </div>
       </div>
     </ListItem>
@@ -87,7 +87,7 @@ const BottleResultRow = ({
       <BottleIcon className="m-2 hidden h-10 w-auto sm:block" />
 
       <div className="min-w-0 flex-auto">
-        <p className="font-semibold leading-6">
+        <div className="font-semibold leading-6">
           <Link
             to={
               directToTasting
@@ -98,19 +98,19 @@ const BottleResultRow = ({
             <span className="absolute inset-x-0 -top-px bottom-0" />
             {bottle.name}
           </Link>
-        </p>
-        <p className="text-light mt-1 flex truncate text-sm leading-5">
+        </div>
+        <div className="text-light mt-1 flex truncate text-sm leading-5">
           {bottle.brand.name}
-        </p>
+        </div>
       </div>
       <div className="flex items-center gap-x-4">
         <div className="hidden sm:flex sm:flex-col sm:items-end">
-          <p className="leading-6 text-slate-500">
+          <div className="leading-6 text-slate-500">
             {bottle.category && formatCategoryName(bottle.category)}
-          </p>
-          <p className="mt-1 text-sm leading-5 text-slate-500">
+          </div>
+          <div className="mt-1 text-sm leading-5 text-slate-500">
             {bottle.statedAge ? `${bottle.statedAge} years` : null}
-          </p>
+          </div>
         </div>
       </div>
     </>
@@ -127,12 +127,12 @@ const EntityResultRow = ({
       <EntityIcon className="m-2 hidden h-10 w-auto sm:block" />
 
       <div className="flex min-w-0 flex-auto">
-        <p className="flex-1 font-semibold leading-6">
+        <div className="flex-1 font-semibold leading-6">
           <Link to={`/entities/${entity.id}`}>
             <span className="absolute inset-x-0 -top-px bottom-0" />
             {entity.name}
           </Link>
-        </p>
+        </div>
         <div className="flex gap-x-2">
           {entity.type.map((t) => (
             <Chip key={t} size="small" color="highlight">
@@ -153,7 +153,7 @@ const UserResultRow = ({ result: { ref: user } }: { result: UserResult }) => {
       </div>
 
       <div className="flex min-w-0 flex-auto">
-        <p className="flex-1 ">
+        <div className="flex-1">
           <Link
             to={`/users/${user.username}`}
             className="font-semibold leading-6"
@@ -165,7 +165,7 @@ const UserResultRow = ({ result: { ref: user } }: { result: UserResult }) => {
             <AtSymbolIcon className="inline h-3 w-3" />
             {user.username}
           </div>
-        </p>
+        </div>
         <div className="flex gap-x-2">
           {user.admin ? (
             <Chip size="small" color="highlight">
@@ -365,13 +365,13 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
                   <PlusIcon className="hidden h-12 w-12 flex-none rounded-full p-2 sm:block" />
 
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold leading-6">
+                    <div className="font-semibold leading-6">
                       <Link to={`/addBottle`}>
                         <span className="absolute inset-x-0 -top-px bottom-0" />
                         Can't find a bottle?
                       </Link>
-                    </p>
-                    <p className="text-peated-light mt-1 flex gap-x-1 leading-5">
+                    </div>
+                    <div className="text-peated-light mt-1 flex gap-x-1 leading-5">
                       {query !== "" ? (
                         <span>
                           Tap here to add{" "}
@@ -385,7 +385,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
                           Tap here to add a new entry to the database.
                         </span>
                       )}
-                    </p>
+                    </div>
                   </div>
                 </ListItem>
               )}

@@ -68,7 +68,7 @@ export default function EntityDetails() {
           <h1 className="mb-2 truncate text-center text-3xl font-semibold leading-7 sm:text-left">
             {entity.name}
           </h1>
-          <p className="truncate text-center text-slate-500 sm:text-left">
+          <div className="truncate text-center text-slate-500 sm:text-left">
             {!!entity.country && (
               <>
                 Located in{" "}
@@ -92,7 +92,7 @@ export default function EntityDetails() {
                 </Link>
               </span>
             )}
-          </p>
+          </div>
         </div>
         <div className="sm:justify-left mb-4 flex w-full justify-center space-x-2 sm:w-auto">
           {entity.type.sort().map((t) => (

@@ -36,7 +36,7 @@ export default function NotificationEntry({
         <div className="ml-3 flex w-0 flex-1 flex-col">
           <div className="flex flex-1">
             <div className="flex flex-1 flex-col justify-center">
-              <p className="text-sm">
+              <div className="text-sm">
                 {notification.fromUser && (
                   <Link
                     to={`/users/${notification.fromUser.username}`}
@@ -46,7 +46,7 @@ export default function NotificationEntry({
                   </Link>
                 )}
                 {getStatusMessage({ notification })}
-              </p>
+              </div>
               <NotificationEntryRef
                 notification={notification}
                 onComplete={onArchive}

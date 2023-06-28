@@ -153,13 +153,13 @@ export default ({
                   <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
                   <div className="min-w-0 flex-auto">
-                    <p className="font-semibold leading-6">
+                    <div className="font-semibold leading-6">
                       <button onClick={() => setCreateOpen(true)}>
                         <span className="absolute inset-x-0 -top-px bottom-0" />
                         Can't find what you're looking for?
                       </button>
-                    </p>
-                    <p className="mt-1 flex gap-x-1 text-sm leading-5">
+                    </div>
+                    <div className="mt-1 flex gap-x-1 text-sm leading-5">
                       {query !== "" ? (
                         <span>
                           Tap here to add{" "}
@@ -173,7 +173,7 @@ export default ({
                           Tap here to add a new entry to the database.
                         </span>
                       )}
-                    </p>
+                    </div>
                   </div>
                 </ListItem>
               ) : (
@@ -181,7 +181,7 @@ export default ({
                   <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
                   <div className="min-w-0 flex-auto">
-                    <p className="font-semibold leading-6">
+                    <div className="font-semibold leading-6">
                       <a
                         href={config.GITHUB_REPO}
                         target="_blank"
@@ -190,10 +190,10 @@ export default ({
                         <span className="absolute inset-x-0 -top-px bottom-0" />
                         Can't find what you're looking for?
                       </a>
-                    </p>
-                    <p className="mt-1 flex gap-x-1 text-sm leading-5">
+                    </div>
+                    <div className="mt-1 flex gap-x-1 text-sm leading-5">
                       Well, that stinks. Maybe open an issue on GitHub?
-                    </p>
+                    </div>
                   </div>
                 </ListItem>
               ))}

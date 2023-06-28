@@ -156,9 +156,9 @@ const CommentList = ({
                         {c.createdBy.displayName}
                       </Link>
                     </div>
-                    <p className="text-light text-sm">
+                    <div className="text-light text-sm">
                       <TimeSince date={c.createdAt} />
-                    </p>
+                    </div>
                   </div>
                   <div>
                     <Menu as="div" className="menu">

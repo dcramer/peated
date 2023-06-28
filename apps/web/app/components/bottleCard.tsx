@@ -27,8 +27,8 @@ export const PreviewBottleCard = ({
         <div className="text-sm">{brand ? brand.name : "Unknown Bottle"}</div>
       </div>
       <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
-        <p>{data.category ? formatCategoryName(data.category) : null}</p>
-        <p>{data.statedAge ? `Aged ${data.statedAge} years` : null}</p>
+        <div>{data.category ? formatCategoryName(data.category) : null}</div>
+        <div>{data.statedAge ? `Aged ${data.statedAge} years` : null}</div>
       </div>
     </div>
   );
@@ -81,7 +81,7 @@ export default function BottleCard({
           "flex flex-col items-end space-y-1 whitespace-nowrap text-sm",
         )}
       >
-        <p>
+        <div>
           {bottle.category && (
             <Link
               to={`/bottles?category=${bottle.category}`}
@@ -90,8 +90,8 @@ export default function BottleCard({
               {formatCategoryName(bottle.category)}
             </Link>
           )}
-        </p>
-        <p>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</p>
+        </div>
+        <div>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</div>
       </div>
     </div>
   );

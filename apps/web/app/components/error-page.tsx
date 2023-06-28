@@ -42,7 +42,7 @@ export default function ErrorPage() {
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
               {title}
             </h1>
-            <p className="mt-6 leading-7 text-white">{subtitle}</p>
+            <div className="mt-6 leading-7 text-white">{subtitle}</div>
 
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button to="/" color="primary">
