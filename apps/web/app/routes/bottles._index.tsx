@@ -16,6 +16,7 @@ import SidebarLink from "~/components/sidebarLink";
 import useApi from "~/hooks/useApi";
 import type { ApiClient } from "~/lib/api";
 import { formatCategoryName } from "~/lib/strings";
+import { buildQueryString } from "~/lib/urls";
 import type { Bottle } from "~/types";
 
 function buildQuery(api: ApiClient, queryString: URLSearchParams) {
@@ -94,14 +95,6 @@ export const loader: LoaderFunction = async ({ context, request }) => {
   return json({ dehydratedState: dehydrate(queryClient) });
 };
 
-function buildQueryString(search: string, newParams: Record<string, any>) {
-  const qs = new URLSearchParams(search);
-  for (const [key, value] of Object.entries(newParams)) {
-    qs.set(key, value);
-  }
-  return qs.toString();
-}
-
 function FilterSidebar() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
@@ -116,31 +109,34 @@ function FilterSidebar() {
         <li>
           <div className="text-sm font-semibold text-slate-200">Category</div>
           <ul role="list" className="-mx-3 mt-2 space-y-1">
-            <li>
+            <SidebarLink
+              active={!qs.get("category")}
+              to={{
+                pathname: location.pathname,
+                search: buildQueryString(location.search, {
+                  category: "",
+                  page: 1,
+                }),
+              }}
+              size="small"
+            >
+              Any Category
+            </SidebarLink>
+            {CATEGORY_LIST.map((category) => (
               <SidebarLink
-                active={!qs.get("category")}
+                key={category}
+                active={qs.get("category") === category}
                 to={{
-                  pathname: "/bottles",
-                  search: buildQueryString(location.search, { category: "" }),
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    category,
+                    page: 1,
+                  }),
                 }}
                 size="small"
               >
-                Any Category
+                {formatCategoryName(category)}
               </SidebarLink>
-            </li>
-            {CATEGORY_LIST.map((category) => (
-              <li key={category}>
-                <SidebarLink
-                  active={qs.get("category") === category}
-                  to={{
-                    pathname: "/bottles",
-                    search: buildQueryString(location.search, { category }),
-                  }}
-                  size="small"
-                >
-                  {formatCategoryName(category)}
-                </SidebarLink>
-              </li>
             ))}
           </ul>
         </li>
@@ -150,30 +146,32 @@ function FilterSidebar() {
               Relationship
             </div>
             <ul role="list" className="-mx-3 mt-2 space-y-1">
-              <li>
-                <SidebarLink
-                  active={!qs.get("entity")}
-                  to={{
-                    pathname: "/bottles",
-                    search: buildQueryString(location.search, { entity: "" }),
-                  }}
-                  size="small"
-                >
-                  Any Relationship
-                </SidebarLink>
-              </li>
-              <li>
-                <SidebarLink
-                  active={qs.get("entity") === entity}
-                  to={{
-                    pathname: "/bottles",
-                    search: buildQueryString(location.search, { entity }),
-                  }}
-                  size="small"
-                >
-                  TODO: {entity}
-                </SidebarLink>
-              </li>
+              <SidebarLink
+                active={!qs.get("entity")}
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    entity: "",
+                    page: 1,
+                  }),
+                }}
+                size="small"
+              >
+                Any Relationship
+              </SidebarLink>
+              <SidebarLink
+                active={qs.get("entity") === entity}
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    entity,
+                    page: 1,
+                  }),
+                }}
+                size="small"
+              >
+                TODO: {entity}
+              </SidebarLink>
             </ul>
           </li>
         )}
@@ -181,30 +179,29 @@ function FilterSidebar() {
           <li>
             <div className="text-sm font-semibold text-slate-200">Age</div>
             <ul role="list" className="-mx-3 mt-2 space-y-1">
-              <li>
-                <SidebarLink
-                  active={!qs.get("age")}
-                  to={{
-                    pathname: "/bottles",
-                    search: buildQueryString(location.search, { age: "" }),
-                  }}
-                  size="small"
-                >
-                  Any Age
-                </SidebarLink>
-              </li>
-              <li>
-                <SidebarLink
-                  active={qs.get("age") === age}
-                  to={{
-                    pathname: "/bottles",
-                    search: buildQueryString(location.search, { age }),
-                  }}
-                  size="small"
-                >
-                  {age} years
-                </SidebarLink>
-              </li>
+              <SidebarLink
+                active={!qs.get("age")}
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    age: "",
+                    page: 1,
+                  }),
+                }}
+                size="small"
+              >
+                Any Age
+              </SidebarLink>
+              <SidebarLink
+                active={qs.get("age") === age}
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, { age, page: 1 }),
+                }}
+                size="small"
+              >
+                {age} years
+              </SidebarLink>
             </ul>
           </li>
         )}
@@ -214,30 +211,29 @@ function FilterSidebar() {
               Flavor Profile
             </div>
             <ul role="list" className="-mx-3 mt-2 space-y-1">
-              <li>
-                <SidebarLink
-                  active={!qs.get("tag")}
-                  to={{
-                    pathname: "/bottles",
-                    search: buildQueryString(location.search, { tag: "" }),
-                  }}
-                  size="small"
-                >
-                  Any Flavors
-                </SidebarLink>
-              </li>
-              <li>
-                <SidebarLink
-                  active={qs.get("tag") === tag}
-                  to={{
-                    pathname: "/bottles",
-                    search: buildQueryString(location.search, { tag }),
-                  }}
-                  size="small"
-                >
-                  {tag}
-                </SidebarLink>
-              </li>
+              <SidebarLink
+                active={!qs.get("tag")}
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    tag: "",
+                    page: 1,
+                  }),
+                }}
+                size="small"
+              >
+                Any Flavors
+              </SidebarLink>
+              <SidebarLink
+                active={qs.get("tag") === tag}
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, { tag, page: 1 }),
+                }}
+                size="small"
+              >
+                {tag}
+              </SidebarLink>
             </ul>
           </li>
         )}

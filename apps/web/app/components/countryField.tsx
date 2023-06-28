@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { COUNTRY_LIST } from "@peated/shared/constants";
+import { COUNTRY_LIST, MAJOR_COUNTRIES } from "@peated/shared/constants";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { useController } from "react-hook-form";
 import SelectField from "./selectField";
@@ -26,15 +26,6 @@ function formatOption(c: string) {
   };
 }
 
-// basically the most significant producers
-const MAJOR_COUNTRIES = new Set([
-  "Scotland",
-  "United States of America",
-  "Canada",
-  "Ireland",
-  "Japan",
-]);
-
 export default function CountryField<T extends FieldValues>({
   helpText,
   label,
@@ -57,7 +48,9 @@ export default function CountryField<T extends FieldValues>({
       helpText={helpText}
       className={className}
       options={options}
-      suggestedOptions={options.filter(({ id }) => MAJOR_COUNTRIES.has(id))}
+      suggestedOptions={options.filter(
+        ({ id }) => Object.keys(MAJOR_COUNTRIES).indexOf(id) !== -1,
+      )}
       error={error}
       onChange={(value) => onChange && onChange(value ? value.name : "")}
     />

@@ -18,6 +18,7 @@ import UserAvatar from "./userAvatar";
 export default function Sidebar() {
   const location = useLocation();
   const { user } = useAuth();
+  const queryString = new URLSearchParams(location.search);
 
   return (
     <>
@@ -71,23 +72,41 @@ export default function Sidebar() {
                     Bottles
                   </SidebarLink>
                   <SidebarLink
-                    to="/distillers"
+                    to={{
+                      pathname: "/entities",
+                      search: "?type=distiller",
+                    }}
                     icon={EntityIcon}
-                    active={location.pathname.startsWith("/distillers")}
+                    active={
+                      location.pathname === "/entities" &&
+                      queryString.get("type") === "distiller"
+                    }
                   >
                     Distillers
                   </SidebarLink>
                   <SidebarLink
-                    to="/brands"
+                    to={{
+                      pathname: "/entities",
+                      search: "?type=brand",
+                    }}
                     icon={EntityIcon}
-                    active={location.pathname.startsWith("/brands")}
+                    active={
+                      location.pathname === "/entities" &&
+                      queryString.get("type") === "brand"
+                    }
                   >
                     Brands
                   </SidebarLink>
                   <SidebarLink
-                    to="/bottlers"
+                    to={{
+                      pathname: "/entities",
+                      search: "?type=bottler",
+                    }}
                     icon={EntityIcon}
-                    active={location.pathname.startsWith("/bottlers")}
+                    active={
+                      location.pathname === "/entities" &&
+                      queryString.get("type") === "bottler"
+                    }
                   >
                     Bottlers
                   </SidebarLink>

@@ -255,6 +255,14 @@ export const COUNTRY_LIST = [
   "Åland Islands",
 ] as const;
 
+export const MAJOR_COUNTRIES = [
+  "Scotland",
+  "United States of America",
+  "Canada",
+  "Ireland",
+  "Japan",
+] as const;
+
 export const CATEGORY_LIST = [
   "blend",
   "bourbon",
