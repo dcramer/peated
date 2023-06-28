@@ -7,6 +7,7 @@ import { useEventListener } from "usehooks-ts";
 import type { Paginated } from "@peated/shared/types";
 
 import Glyph from "~/components/assets/Glyph";
+import { ClientOnly } from "~/components/clientOnly";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
@@ -50,7 +51,7 @@ const ActivityContent = ({ filter }: { filter: string }) => {
       ["tastings", { filter }],
       ({ pageParam }) => getTastings({ pageParam, api }),
       {
-        getNextPageParam: (lastPage) => lastPage.rel.nextPage,
+        getNextPageParam: (lastPage) => lastPage.rel?.nextPage,
       },
     );
 
@@ -138,9 +139,13 @@ export default function Activity() {
             Updates
           </Tabs.Item>
         </Tabs>
-        <QueryBoundary>
-          <ActivityContent filter={filterParam} />
-        </QueryBoundary>
+        <ClientOnly>
+          {() => (
+            <QueryBoundary>
+              <ActivityContent filter={filterParam} />
+            </QueryBoundary>
+          )}
+        </ClientOnly>
       </>
     </Layout>
   );
