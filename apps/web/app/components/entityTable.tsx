@@ -16,13 +16,17 @@ export default ({
     <>
       <table className="min-w-full">
         <colgroup>
-          <col className="min-w-full sm:w-1/2" />
-          <col className="sm:w-1/2" />
+          <col className="min-w-full sm:w-3/5" />
+          <col className="sm:w-1/10" />
+          <col className="sm:w-3/10" />
         </colgroup>
         <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left">
               Entity
+            </th>
+            <th scope="col" className="px-3 py-2.5 text-center sm:table-cell">
+              Bottles
             </th>
             <th
               scope="col"
@@ -56,27 +60,33 @@ export default ({
                     ))}
                   </div>
                 </td>
-                <td className="hidden px-3 py-3 text-right sm:table-cell">
+                <td className="hidden px-3 py-3 text-center sm:table-cell">
+                  {entity.totalBottles.toLocaleString()}
+                </td>
+                <td className="hidden space-y-2 px-3 py-3 text-right sm:table-cell">
                   {!!entity.country && (
-                    <Link
-                      to={`/entities?country=${encodeURIComponent(
-                        entity.country,
-                      )}`}
-                      className="hover:underline"
-                    >
-                      {entity.country}
-                    </Link>
+                    <div>
+                      <Link
+                        to={`/entities?country=${encodeURIComponent(
+                          entity.country,
+                        )}`}
+                        className="hover:underline"
+                      >
+                        {entity.country}
+                      </Link>
+                    </div>
                   )}
-                  <br />{" "}
                   {!!entity.region && (
-                    <Link
-                      to={`/entities?region=${encodeURIComponent(
-                        entity.region,
-                      )}`}
-                      className="hover:underline"
-                    >
-                      {entity.region}
-                    </Link>
+                    <div>
+                      <Link
+                        to={`/entities?region=${encodeURIComponent(
+                          entity.region,
+                        )}`}
+                        className="text-slate-500 hover:underline"
+                      >
+                        {entity.region}
+                      </Link>
+                    </div>
                   )}
                 </td>
               </tr>
