@@ -8,7 +8,6 @@ import type { Paginated } from "@peated/shared/types";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 import EmptyActivity from "~/components/emptyActivity";
-import { buildQuery } from "~/components/entityList";
 import EntityTable from "~/components/entityTable";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
