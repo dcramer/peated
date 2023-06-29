@@ -1,6 +1,5 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { Paginated } from "@peated/shared/types";
 import type {
   LinksFunction,
   LoaderArgs,
@@ -11,6 +10,8 @@ import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import type { LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
+
+import type { Paginated } from "@peated/shared/types";
 
 import EntityIcon from "~/components/assets/Entity";
 import Button from "~/components/button";
@@ -134,7 +135,7 @@ export default function EntityDetails() {
                 <Menu.Button as={Button}>
                   <EllipsisVerticalIcon className="h-5 w-5" />
                 </Menu.Button>
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+                <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right lg:origin-top-left">
                   <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
                     Edit Entity
                   </Menu.Item>
@@ -143,17 +144,21 @@ export default function EntityDetails() {
             )}
           </div>
 
-          <QueryBoundary
-            loading={
-              <div
-                className="mb-4 animate-pulse rounded bg-slate-800"
-                style={{ height: 50 }}
-              />
-            }
-            fallback={() => null}
-          >
-            <EntitySpiritDistribution entityId={entity.id} />
-          </QueryBoundary>
+          <ClientOnly>
+            {() => (
+              <QueryBoundary
+                loading={
+                  <div
+                    className="mb-4 animate-pulse rounded bg-slate-800"
+                    style={{ height: 50 }}
+                  />
+                }
+                fallback={() => null}
+              >
+                <EntitySpiritDistribution entityId={entity.id} />
+              </QueryBoundary>
+            )}
+          </ClientOnly>
         </div>
         <EntityMap position={entity.location} />
       </div>

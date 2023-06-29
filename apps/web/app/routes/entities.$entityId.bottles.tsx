@@ -25,7 +25,7 @@ export async function loader({ request, context, params }: LoaderArgs) {
   return json({ dehydratedState: dehydrate(queryClient) });
 }
 
-export default function EntityIndex() {
+export default function EntityBottles() {
   const { entity } = useOutletContext<{ entity: Entity }>();
 
   return (
@@ -38,12 +38,12 @@ export default function EntityIndex() {
       }
       fallback={() => null}
     >
-      <EntityBottles entityId={entity.id} />
+      <Content entityId={`${entity.id}`} />
     </QueryBoundary>
   );
 }
 
-const EntityBottles = ({ entityId }: { entityId: number }) => {
+const Content = ({ entityId }: { entityId: number }) => {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const page = qs.get("page") || 1;

@@ -30,7 +30,7 @@ export default function EntityActivity() {
   const { entity } = useOutletContext<{ entity: Entity }>();
 
   const { data: tastingList } = useQuery(
-    ["entity", entity.id, "tastings"],
+    ["entity", `${entity.id}`, "tastings"],
     (): Promise<Paginated<Tasting>> =>
       api.get(`/tastings`, {
         query: { entity: entity.id },
