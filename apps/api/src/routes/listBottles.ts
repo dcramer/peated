@@ -13,6 +13,15 @@ import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 
+const SORT_OPTIONS = [
+  "name",
+  "age",
+  "tastings",
+  "-name",
+  "-age",
+  "-tastings",
+] as const;
+
 export default {
   method: "GET",
   url: "/bottles",
@@ -22,7 +31,10 @@ export default {
       properties: {
         query: { type: "string" },
         page: { type: "number" },
-        sort: { type: "string" },
+        sort: {
+          type: "string",
+          enum: SORT_OPTIONS,
+        },
         brand: { type: "number" },
         distiller: { type: "number" },
         bottler: { type: "number" },
@@ -115,6 +127,19 @@ export default {
       case "name":
         orderBy = asc(bottles.fullName);
         break;
+      case "-name":
+        orderBy = desc(bottles.fullName);
+        break;
+      case "age":
+        orderBy = asc(bottles.statedAge);
+        break;
+      case "-age":
+        orderBy = desc(bottles.statedAge);
+        break;
+      case "tastings":
+        orderBy = asc(bottles.totalTastings);
+        break;
+      case "-tastings":
       default:
         orderBy = desc(bottles.totalTastings);
     }
@@ -163,7 +188,7 @@ export default {
       category?: Category;
       age?: number;
       tag?: string;
-      sort?: string;
+      sort?: (typeof SORT_OPTIONS)[number];
     };
   }
 >;

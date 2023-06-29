@@ -26,7 +26,6 @@ import { formatCategoryName } from "~/lib/strings";
 import type { Bottle, Collection, StorePrice } from "~/types";
 
 type BottleWithStats = Bottle & {
-  tastings: number;
   avgRating: number;
   people: number;
 };
@@ -142,7 +141,7 @@ export default function BottleDetails() {
       name: "Avg Rating",
       value: Math.round(bottle.avgRating * 100) / 100,
     },
-    { name: "Tastings", value: bottle.tastings.toLocaleString() },
+    { name: "Tastings", value: bottle.totalTastings.toLocaleString() },
     { name: "People", value: bottle.people.toLocaleString() },
   ];
 

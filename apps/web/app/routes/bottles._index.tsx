@@ -25,6 +25,7 @@ function buildQuery(api: ApiClient, queryString: URLSearchParams) {
   const age = queryString.get("age") || undefined;
   const tag = queryString.get("tag") || undefined;
   const entity = queryString.get("entity") || undefined;
+  const sort = queryString.get("sort") || "name";
 
   return {
     queryKey: [
@@ -38,6 +39,8 @@ function buildQuery(api: ApiClient, queryString: URLSearchParams) {
       tag,
       "entity",
       entity,
+      "sort",
+      sort,
     ],
     queryFn: (): Promise<Paginated<Bottle>> =>
       api.get("/bottles", {
@@ -47,7 +50,7 @@ function buildQuery(api: ApiClient, queryString: URLSearchParams) {
           tag,
           entity,
           page,
-          sort: "name",
+          sort,
         },
       }),
   };

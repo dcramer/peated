@@ -24,7 +24,6 @@ export default {
       200: zodToJsonSchema(
         BottleSchema.extend({
           avgRating: z.number(),
-          tastings: z.number(),
           people: z.number(),
         }),
       ),
@@ -56,7 +55,6 @@ export default {
 
     res.send({
       ...(await serialize(BottleSerializer, bottle, req.user)),
-      tastings: bottle.totalTastings,
       avgRating: avgRating,
       people: totalPeople,
     });
