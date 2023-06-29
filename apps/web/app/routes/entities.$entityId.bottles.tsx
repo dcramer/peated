@@ -3,11 +3,14 @@ import { json } from "@remix-run/node";
 import { useLocation, useOutletContext } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
+
+import type { Paginated } from "@peated/shared/types";
+
 import BottleTable from "~/components/bottleTable";
 import QueryBoundary from "~/components/queryBoundary";
 import useApi from "~/hooks/useApi";
 import type { ApiClient } from "~/lib/api";
-import type { Entity, Paginated } from "~/types";
+import type { Entity } from "~/types";
 
 export function buildQuery(
   api: ApiClient,
