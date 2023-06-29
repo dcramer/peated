@@ -1,6 +1,7 @@
-import { Link } from "@remix-run/react";
+import { Link, useLocation } from "@remix-run/react";
 
 import type { PagingRel } from "@peated/shared/types";
+import { buildQueryString } from "~/lib/urls";
 import type { Entity } from "~/types";
 import Button from "./button";
 import Chip from "./chip";
@@ -12,6 +13,9 @@ export default ({
   entityList: Entity[];
   rel?: PagingRel;
 }) => {
+  const location = useLocation();
+  const sort = new URLSearchParams(location.search).get("sort");
+
   return (
     <>
       <table className="min-w-full">
@@ -23,10 +27,30 @@ export default ({
         <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left">
-              Entity
+              <Link
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    sort: sort === "name" ? "-name" : "name",
+                  }),
+                }}
+                className="hover:underline"
+              >
+                Entity
+              </Link>
             </th>
             <th scope="col" className="px-3 py-2.5 text-center sm:table-cell">
-              Bottles
+              <Link
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    sort: sort === "bottles" ? "-bottles" : "bottles",
+                  }),
+                }}
+                className="hover:underline"
+              >
+                Bottles
+              </Link>
             </th>
             <th
               scope="col"

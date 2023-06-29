@@ -1,3 +1,4 @@
+import { ENTITY_TYPE_LIST } from "@peated/shared/constants";
 import { EntitySchema, PaginatedSchema } from "@peated/shared/schemas";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, getTableColumns, ilike, sql } from "drizzle-orm";
@@ -12,6 +13,15 @@ import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { EntitySerializer } from "../lib/serializers/entity";
 
+const SORT_OPTIONS = [
+  "name",
+  "tastings",
+  "bottles",
+  "-name",
+  "-tastings",
+  "-bottles",
+] as const;
+
 export default {
   method: "GET",
   url: "/entities",
@@ -21,10 +31,10 @@ export default {
       properties: {
         query: { type: "string" },
         page: { type: "number" },
-        sort: { type: "string", enum: ["name", "tastings", "bottles"] },
+        sort: { type: "string", enum: SORT_OPTIONS },
         country: { type: "string" },
         region: { type: "string" },
-        type: { type: "string", enum: ["distiller", "brand", "bottler"] },
+        type: { type: "string", enum: ENTITY_TYPE_LIST },
       },
     },
     response: {
@@ -61,10 +71,19 @@ export default {
       case "name":
         orderBy = asc(entities.name);
         break;
+      case "-name":
+        orderBy = desc(entities.name);
+        break;
       case "bottles":
+        orderBy = asc(entities.totalBottles);
+        break;
+      case "-bottles":
         orderBy = desc(entities.totalBottles);
         break;
       case "tastings":
+        orderBy = asc(entities.totalTastings);
+        break;
+      case "-tastings":
       default:
         orderBy = desc(entities.totalTastings);
     }
@@ -108,7 +127,7 @@ export default {
     Querystring: {
       query?: string;
       page?: number;
-      sort?: "name" | "bottles" | "tastings";
+      sort?: (typeof SORT_OPTIONS)[number];
       type?: EntityType;
       country?: string;
       region?: string;

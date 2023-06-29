@@ -1,4 +1,4 @@
-import type { LoaderFunction} from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
 import { json, type V2_MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
@@ -52,6 +52,7 @@ export function buildQuery(api: ApiClient, queryString: URLSearchParams) {
   const type = queryString.get("type") || undefined;
   const country = queryString.get("country") || undefined;
   const region = queryString.get("region") || undefined;
+  const sort = queryString.get("sort") || "name";
 
   return {
     queryKey: [
@@ -63,6 +64,8 @@ export function buildQuery(api: ApiClient, queryString: URLSearchParams) {
       country,
       "region",
       region,
+      "sort",
+      sort,
     ],
     queryFn: (): Promise<Paginated<Entity>> =>
       api.get("/entities", {
@@ -70,7 +73,7 @@ export function buildQuery(api: ApiClient, queryString: URLSearchParams) {
           type,
           country,
           region,
-          sort: "name",
+          sort,
           page,
         },
       }),
