@@ -23,7 +23,6 @@ export default {
     response: {
       200: zodToJsonSchema(
         BottleSchema.extend({
-          avgRating: z.number(),
           people: z.number(),
         }),
       ),
@@ -46,16 +45,8 @@ export default {
       .from(tastings)
       .where(eq(tastings.bottleId, bottle.id));
 
-    const [{ avgRating }] = await db
-      .select({
-        avgRating: sql<number>`AVG(${tastings.rating})`,
-      })
-      .from(tastings)
-      .where(eq(tastings.bottleId, bottle.id));
-
     res.send({
       ...(await serialize(BottleSerializer, bottle, req.user)),
-      avgRating: avgRating,
       people: totalPeople,
     });
   },

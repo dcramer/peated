@@ -36,6 +36,7 @@ export type Bottle = {
   bottler?: Entity;
   category?: Category | null;
   statedAge?: number;
+  avgRating: number;
   totalTastings: number;
   createdAt: string;
   createdBy?: User;

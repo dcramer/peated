@@ -65,9 +65,19 @@ export default ({
             </th>
             <th
               scope="col"
-              className="hidden px-3 py-3.5 text-right sm:table-cell"
+              className="hidden px-3 py-3.5 text-center sm:table-cell"
             >
-              Category
+              <Link
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    sort: sort === "rating" ? "-rating" : "rating",
+                  }),
+                }}
+                className="hover:underline"
+              >
+                Rating
+              </Link>
             </th>
             <th
               scope="col"
@@ -118,19 +128,20 @@ export default ({
                   >
                     {bottle.fullName}
                   </Link>
-                </td>
-                <td className="hidden px-3 py-4 text-center text-sm sm:table-cell">
-                  {bottle.totalTastings.toLocaleString()}
-                </td>
-                <td className="hidden px-3 py-4 text-right text-sm sm:table-cell">
-                  {!!bottle.category && (
+                  <div className="text-sm text-slate-500">
                     <Link
                       to={`/bottles/?category=${bottle.category}`}
                       className="hover:underline"
                     >
                       {formatCategoryName(bottle.category)}
                     </Link>
-                  )}
+                  </div>
+                </td>
+                <td className="hidden px-3 py-4 text-center text-sm sm:table-cell">
+                  {bottle.totalTastings.toLocaleString()}
+                </td>
+                <td className="hidden px-3 py-4 text-center text-sm sm:table-cell">
+                  {bottle.avgRating ? bottle.avgRating.toFixed(2) : null}
                 </td>
                 <td className="hidden py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
                   {bottle.statedAge && (

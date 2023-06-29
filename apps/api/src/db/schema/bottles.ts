@@ -3,6 +3,7 @@ import { relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  doublePrecision,
   integer,
   pgTable,
   primaryKey,
@@ -31,6 +32,7 @@ export const bottles = pgTable(
     ),
     statedAge: smallint("stated_age"),
 
+    avgRating: doublePrecision("avg_rating"),
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
       .notNull(),

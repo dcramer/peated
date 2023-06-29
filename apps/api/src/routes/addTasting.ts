@@ -85,7 +85,10 @@ export default {
 
       await tx
         .update(bottles)
-        .set({ totalTastings: sql`${bottles.totalTastings} + 1` })
+        .set({
+          totalTastings: sql`${bottles.totalTastings} + 1`,
+          avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
+        })
         .where(eq(bottles.id, bottle.id));
 
       const distillerIds = bottle.bottlesToDistillers.map((d) => d.distillerId);

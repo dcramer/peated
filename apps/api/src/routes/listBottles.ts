@@ -16,9 +16,11 @@ import { BottleSerializer } from "../lib/serializers/bottle";
 const SORT_OPTIONS = [
   "name",
   "age",
+  "rating",
   "tastings",
   "-name",
   "-age",
+  "-rating",
   "-tastings",
 ] as const;
 
@@ -138,6 +140,12 @@ export default {
         break;
       case "tastings":
         orderBy = asc(bottles.totalTastings);
+        break;
+      case "rating":
+        orderBy = sql`${bottles.avgRating} ASC NULLS LAST`;
+        break;
+      case "-rating":
+        orderBy = sql`${bottles.avgRating} DESC NULLS LAST`;
         break;
       case "-tastings":
       default:

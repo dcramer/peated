@@ -72,6 +72,7 @@ export const BottleSchema = z.object({
   statedAge: z.number().nullable(),
   category: CategoryEnum.nullable(),
 
+  avgRating: z.number().gte(0).lte(5).nullable(),
   totalTastings: z.number().gte(0),
 
   createdAt: z.string().datetime().optional(),

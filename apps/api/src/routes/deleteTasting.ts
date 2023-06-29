@@ -53,7 +53,9 @@ export default {
         );
 
       await tx.delete(toasts).where(eq(toasts.tastingId, tasting.id));
+      await tx.delete(tastings).where(eq(tastings.id, tasting.id));
 
+      // update aggregates after tasting row is removed
       for (const tag of tasting.tags) {
         await tx
           .update(bottleTags)
@@ -72,10 +74,11 @@ export default {
         .update(bottles)
         .set({
           totalTastings: sql`${bottles.totalTastings} - 1`,
+          avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
         })
         .where(eq(bottles.id, tasting.bottleId));
 
-      await tx.delete(tastings).where(eq(tastings.id, tasting.id));
+      // TODO: update badge qualifiers
     });
     res.status(204).send();
   },
