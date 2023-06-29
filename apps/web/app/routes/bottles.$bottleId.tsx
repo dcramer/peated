@@ -12,6 +12,7 @@ import type { Paginated } from "@peated/shared/types";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
+import { ClientOnly } from "~/components/clientOnly";
 import ConfirmationButton from "~/components/confirmationButton";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
@@ -194,9 +195,16 @@ export default function BottleDetails() {
             Record a Tasting
           </Button>
           {user && (
-            <QueryBoundary loading={<SkeletonButton />} fallback={() => null}>
-              <CollectionAction bottle={bottle} />
-            </QueryBoundary>
+            <ClientOnly fallback={<SkeletonButton />}>
+              {() => (
+                <QueryBoundary
+                  loading={<SkeletonButton />}
+                  fallback={() => null}
+                >
+                  <CollectionAction bottle={bottle} />
+                </QueryBoundary>
+              )}
+            </ClientOnly>
           )}
 
           {user?.mod && (
@@ -205,7 +213,7 @@ export default function BottleDetails() {
                 <EllipsisVerticalIcon className="h-5 w-5" />
               </Menu.Button>
               <Menu.Items
-                className="absolute right-0 z-10 mt-2 w-64 origin-top-right"
+                className="absolute right-0 z-10 mt-2 w-32 origin-top-right"
                 unmount={false}
               >
                 <Menu.Item as={Link} to={`/bottles/${bottle.id}/edit`}>
@@ -221,17 +229,28 @@ export default function BottleDetails() {
           )}
         </div>
 
-        <QueryBoundary
+        <ClientOnly
           fallback={
             <div
               className="mb-4 animate-pulse bg-slate-800"
               style={{ height: 200 }}
             />
           }
-          loading={<Fragment />}
         >
-          <BottleTagDistribution bottleId={bottle.id} />
-        </QueryBoundary>
+          {() => (
+            <QueryBoundary
+              fallback={
+                <div
+                  className="mb-4 animate-pulse bg-slate-800"
+                  style={{ height: 200 }}
+                />
+              }
+              loading={<Fragment />}
+            >
+              <BottleTagDistribution bottleId={bottle.id} />
+            </QueryBoundary>
+          )}
+        </ClientOnly>
 
         <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
           {stats.map((stat) => (
@@ -254,9 +273,7 @@ export default function BottleDetails() {
               </Tabs.Item>
             </Tabs>
           </div>
-          <QueryBoundary>
-            <Outlet context={{ bottle }} />
-          </QueryBoundary>
+          <Outlet context={{ bottle }} />
 
           {bottle.createdBy && (
             <div className="mt-8 text-center text-sm text-slate-500 sm:text-left">
@@ -272,9 +289,13 @@ export default function BottleDetails() {
           )}
         </div>
         <div className="ml-4 hidden w-[200px] sm:block">
-          <QueryBoundary loading={<BottlePricesSkeleton />}>
-            <BottlePrices bottleId={bottle.id} />
-          </QueryBoundary>
+          <ClientOnly fallback={<BottlePricesSkeleton />}>
+            {() => (
+              <QueryBoundary loading={<BottlePricesSkeleton />}>
+                <BottlePrices bottleId={bottle.id} />
+              </QueryBoundary>
+            )}
+          </ClientOnly>
         </div>
       </div>
     </Layout>

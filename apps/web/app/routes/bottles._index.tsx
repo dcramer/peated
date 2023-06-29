@@ -20,7 +20,7 @@ import { buildQueryString } from "~/lib/urls";
 import type { Bottle } from "~/types";
 
 function buildQuery(api: ApiClient, queryString: URLSearchParams) {
-  const page = queryString.get("page") || 1;
+  const page = queryString.get("page") || "1";
   const category = queryString.get("category") || undefined;
   const age = queryString.get("age") || undefined;
   const tag = queryString.get("tag") || undefined;

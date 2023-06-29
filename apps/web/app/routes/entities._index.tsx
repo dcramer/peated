@@ -48,7 +48,7 @@ export default function Entities() {
 }
 
 export function buildQuery(api: ApiClient, queryString: URLSearchParams) {
-  const page = queryString.get("page") || 1;
+  const page = queryString.get("page") || "1";
   const type = queryString.get("type") || undefined;
   const country = queryString.get("country") || undefined;
   const region = queryString.get("region") || undefined;
