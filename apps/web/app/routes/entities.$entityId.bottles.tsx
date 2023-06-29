@@ -20,7 +20,7 @@ export function buildQuery(
       api.get(`/bottles`, {
         query: {
           ...Object.fromEntries(queryParams.entries()),
-          entityId,
+          entity: entityId,
         },
       }),
     cacheTime: 0,
