@@ -12,7 +12,7 @@ module.exports = {
   appDirectory: "app",
   assetsBuildDirectory: "public/build",
   serverBuildPath: "build/index.js",
-  serverDependenciesToBundle: [/^@peated\/.*/],
+  serverDependenciesToBundle: [/^@peated\/.*/, "@remix-pwa/sw"],
   serverModuleFormat: "cjs",
   publicPath: "/build/",
   postcss: true,

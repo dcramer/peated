@@ -1,5 +1,6 @@
 import FontStyles from "@fontsource/raleway/index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { useSWEffect } from "@remix-pwa/sw";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -114,6 +115,8 @@ type LoaderData = {
 
 export default withSentry(function App() {
   const { accessToken, user, config, ...data } = useLoaderData<LoaderData>();
+
+  useSWEffect();
 
   if (user) {
     Sentry.setUser({

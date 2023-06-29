@@ -1,7 +1,9 @@
+import { loadServiceWorker } from "@remix-pwa/sw";
 import { RemixBrowser, useLocation, useMatches } from "@remix-run/react";
 import * as Sentry from "@sentry/remix";
 import { startTransition, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
+
 import config from "./config";
 
 Sentry.init({
@@ -32,6 +34,8 @@ Sentry.init({
   replaysSessionSampleRate: 0.01,
   replaysOnErrorSampleRate: 1.0,
 });
+
+loadServiceWorker();
 
 startTransition(() => {
   hydrateRoot(document, <RemixBrowser />);
