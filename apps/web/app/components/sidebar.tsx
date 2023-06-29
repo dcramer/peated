@@ -117,16 +117,22 @@ export default function Sidebar() {
                   <div className="text-xs font-semibold leading-6 text-slate-700">
                     Admin
                   </div>
-                  <Link
-                    to="/admin/stores"
-                    className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-slate-500 hover:bg-slate-800 hover:text-slate-300"
-                  >
-                    <Cog6ToothIcon
-                      className="h-6 w-6 shrink-0 text-slate-500 group-hover:text-slate-300"
-                      aria-hidden="true"
-                    />
-                    Stores
-                  </Link>
+                  <ul role="list" className="-mx-2 space-y-1">
+                    <SidebarLink
+                      to="/admin/stores"
+                      icon={Cog6ToothIcon}
+                      active={location.pathname.startsWith("/admin/stores")}
+                    >
+                      Stores
+                    </SidebarLink>
+                    <SidebarLink
+                      to="/admin/badges"
+                      icon={Cog6ToothIcon}
+                      active={location.pathname.startsWith("/admin/badges")}
+                    >
+                      Badges
+                    </SidebarLink>
+                  </ul>
                 </li>
               )}
               <li className="-mx-6 mt-auto">
