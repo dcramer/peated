@@ -74,7 +74,7 @@ export default function TastingListItem({
           <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-black sm:mb-0 sm:mr-4">
             <img
               src={tasting.imageUrl}
-              className="h-full"
+              className="h-full cursor-pointer"
               alt=""
               onClick={() => setImageOpen(true)}
             />
