@@ -138,8 +138,9 @@ export default function AddTasting() {
           <Spinner />
         </div>
       )}
+
       <form
-        className="w-full max-w-xl self-center bg-slate-950 pb-6 sm:my-6"
+        className="self-center bg-slate-950 pb-6 sm:mx-16 sm:my-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         {error && <FormError values={[error]} />}

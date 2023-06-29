@@ -114,7 +114,10 @@ export default function Settings() {
         </Header>
       }
     >
-      <form className="sm:mx-16" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="self-center bg-slate-950 pb-6 sm:mx-16 sm:my-6"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         {saveUser.isError && (
           <FormError values={[(saveUser.error as Error).message]} />
         )}

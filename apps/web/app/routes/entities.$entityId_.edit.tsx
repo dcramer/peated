@@ -105,7 +105,10 @@ export default function EditEntity() {
         </div>
       )}
 
-      <form className="sm:mx-16" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="self-center bg-slate-950 pb-6 sm:mx-16 sm:my-6"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         {saveEntity.isError && (
           <FormError values={[(saveEntity.error as Error).message]} />
         )}

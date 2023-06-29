@@ -122,7 +122,10 @@ export default function BottleForm({
         </div>
       )}
 
-      <form className="sm:mx-16" onSubmit={handleSubmit(onSubmitHandler)}>
+      <form
+        className="self-center bg-slate-950 pb-6 sm:mx-16 sm:my-6"
+        onSubmit={handleSubmit(onSubmitHandler)}
+      >
         {error && <FormError values={[error]} />}
 
         <div className="border border-slate-700 p-3 sm:my-4 sm:p-4">
