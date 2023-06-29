@@ -108,7 +108,7 @@ export default {
     Querystring: {
       query?: string;
       page?: number;
-      sort?: "name";
+      sort?: "name" | "bottles" | "tastings";
       type?: EntityType;
       country?: string;
       region?: string;
