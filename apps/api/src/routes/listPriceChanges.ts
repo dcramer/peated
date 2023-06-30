@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { and, eq, getTableColumns, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
@@ -36,39 +36,58 @@ export default {
     const offset = (page - 1) * limit;
 
     const where: SQL[] = [
-      sql`${storePrices.price} != ${storePriceHistories.price}`,
       sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
-      sql`${storePriceHistories.date} < DATE(${storePrices.updatedAt})`,
-      sql`${storePriceHistories.date} > NOW() - interval '1 week'`,
     ];
     if (query) {
       where.push(ilike(storePrices.name, `%${query}%`));
     }
+
+    const previous = db
+      .select({
+        ...getTableColumns(storePriceHistories),
+      })
+      .from(storePriceHistories)
+      .innerJoin(storePrices, eq(storePriceHistories.priceId, storePrices.id))
+      .where(
+        and(
+          sql`${storePrices.price} != ${storePriceHistories.price}`,
+          sql`${storePriceHistories.date} < DATE(${storePrices.updatedAt})`,
+          sql`${storePriceHistories.date} > NOW() - interval '1 week'`,
+        ),
+      )
+      .orderBy(desc(storePriceHistories.date))
+      .limit(1)
+      .as("previous");
 
     const results = await db
       .select({
         ...getTableColumns(storePrices),
         store: stores,
         bottle: bottles,
-        previous: storePriceHistories,
+        // XXX(dcramer): Drizzle doesnt seem to handle typing on the subquery select correctly
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        previous,
       })
       .from(storePrices)
       .innerJoin(bottles, eq(bottles.id, storePrices.bottleId))
       .innerJoin(stores, eq(stores.id, storePrices.storeId))
-      .innerJoin(
-        storePriceHistories,
-        eq(storePrices.id, storePriceHistories.priceId),
-      )
+      .innerJoin(previous, eq(previous.priceId, storePrices.id))
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(
-        sql`ABS(${storePriceHistories.price} - ${storePrices.price}) DESC`,
-      );
+      .orderBy(sql`ABS(${previous.price} - ${storePrices.price}) DESC`);
 
     res.send({
+      // XXX(dcramer): Drizzle doesnt seem to handle typing on the subquery select correctly
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       results: await serialize(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         PriceChangeSerializer,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         results.slice(0, limit),
         req.user,
       ),
