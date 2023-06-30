@@ -1,12 +1,15 @@
-import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import {
+  ChatBubbleLeftIcon,
+  CodeBracketSquareIcon,
   Cog6ToothIcon,
   HomeIcon,
   InboxIcon,
+  InformationCircleIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "@remix-run/react";
 import { Fragment } from "react";
+import config from "~/config";
 import useAuth from "~/hooks/useAuth";
 import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
 import Button from "./button";
@@ -116,11 +119,23 @@ export default function Sidebar() {
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
                   <SidebarLink
+                    to={config.GITHUB_REPO}
+                    icon={CodeBracketSquareIcon}
+                  >
+                    GitHub
+                  </SidebarLink>
+                  <SidebarLink
+                    to={config.DISCORD_LINK}
+                    icon={ChatBubbleLeftIcon}
+                  >
+                    Discord
+                  </SidebarLink>
+                  <SidebarLink
                     to="/about"
                     icon={InformationCircleIcon}
                     active={location.pathname.startsWith("/about")}
                   >
-                    About Peated
+                    About
                   </SidebarLink>
                 </ul>
               </li>
