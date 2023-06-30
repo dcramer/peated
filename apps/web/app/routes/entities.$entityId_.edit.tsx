@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, useParams } from "@remix-run/react";
+import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -7,8 +7,10 @@ import type { z } from "zod";
 import { toTitleCase } from "@peated/shared/lib/strings";
 import { EntityInputSchema } from "@peated/shared/schemas";
 
-import type { V2_MetaFunction } from "@remix-run/node";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { LoaderFunction} from "@remix-run/node";
+import { json, type V2_MetaFunction } from "@remix-run/node";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import invariant from "tiny-invariant";
 import CountryField from "~/components/countryField";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
@@ -37,20 +39,19 @@ export const meta: V2_MetaFunction = () => {
   ];
 };
 
+export const loader: LoaderFunction = async ({ params, context }) => {
+  invariant(params.entityId);
+  const entity: Entity = await context.api.get(`/entities/${params.entityId}`);
+
+  return json({ entity });
+};
+
 export default function EditEntity() {
   const api = useApi();
-
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
+  const { entity } = useLoaderData<typeof loader>();
   const { entityId } = useParams();
-  const { data: entity } = useQuery(
-    ["entity", entityId],
-    (): Promise<Entity> => api.get(`/entities/${entityId}`),
-    { cacheTime: 0 },
-  );
-
-  if (!entity) return null;
 
   const saveEntity = useMutation({
     mutationFn: async (data: FormSchemaType) => {
