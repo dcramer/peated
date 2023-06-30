@@ -12,32 +12,6 @@ import { BottleSerializer } from "./bottle";
 import { StoreSerializer } from "./store";
 
 export const StorePriceSerializer: Serializer<StorePrice> = {
-  attrs: async (
-    itemList: (StorePrice & { previous: PreviousPrice })[],
-    currentUser?: User,
-  ) => {
-    const storesByRef = Object.fromEntries(
-      (
-        await serialize(
-          StoreSerializer,
-          itemList.map((r) => r.store),
-          currentUser,
-        )
-      ).map((data, index) => [itemList[index].id, data]),
-    );
-
-    return Object.fromEntries(
-      itemList.map((item) => {
-        return [
-          item.id,
-          {
-            store: storesByRef[item.id] || null,
-          },
-        ];
-      }),
-    );
-  },
-
   item: (item: StorePrice, attrs: Record<string, any>, currentUser?: User) => {
     return {
       id: item.id,
