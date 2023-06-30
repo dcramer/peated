@@ -3,7 +3,14 @@ import { eq, ne, sql } from "drizzle-orm";
 
 import { db } from "../db";
 import type { Entity } from "../db/schema";
-import { bottles, follows, tastings, toasts, users } from "../db/schema";
+import {
+  bottles,
+  follows,
+  stores,
+  tastings,
+  toasts,
+  users,
+} from "../db/schema";
 import { createNotification, objectTypeFromSchema } from "../lib/notifications";
 import { choose } from "../lib/rand";
 import * as Fixtures from "../lib/test/fixtures";
@@ -71,7 +78,7 @@ program
 
     const store =
       (await db.query.stores.findFirst({
-        where: (stores, { eq }) => eq(stores.name, "Gimmicky Whiskeys"),
+        where: eq(stores.name, "Gimmicky Whiskeys"),
       })) ||
       (await Fixtures.Store({
         name: "Gimmicky Whiskeys",
