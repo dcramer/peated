@@ -269,14 +269,16 @@ export const Store = async ({ ...data }: Partial<NewStore> = {}) => {
 
 export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
   if (!data.name) {
-    const bottleId = (await Bottle()).id;
-    if (!data.bottleId) data.bottleId = bottleId;
-    const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, bottleId),
-      with: { brand: true },
-    });
+    const bottle = data.bottleId
+      ? await db.query.bottles.findFirst({
+          where: eq(bottles.id, data.bottleId),
+          with: { brand: true },
+        })
+      : await Bottle();
     if (!bottle) throw new Error("Unexpected");
-    data.name = `${bottle.brand.name} ${bottle.name}`;
+    data.bottleId = bottle.id;
+    data.name = bottle.fullName;
+    console.log(data, bottle);
   }
 
   if (!data.price) data.price = parseInt(faker.finance.amount(50, 200, 0), 10);

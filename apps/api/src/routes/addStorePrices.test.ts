@@ -71,6 +71,7 @@ test("processes existing price", async () => {
     bottleId: bottle.id,
     storeId: store.id,
   });
+  expect(existingPrice.name).toBe(bottle.fullName);
 
   const response = await app.inject({
     method: "POST",
@@ -91,6 +92,7 @@ test("processes existing price", async () => {
     .select()
     .from(storePrices)
     .where(eq(storePrices.storeId, store.id));
+
   expect(prices.length).toBe(1);
   expect(prices[0].id).toBe(existingPrice.id);
   expect(prices[0].bottleId).toBe(bottle.id);
