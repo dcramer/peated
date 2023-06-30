@@ -14,10 +14,10 @@ import QueryBoundary from "~/components/queryBoundary";
 import Spinner from "~/components/spinner";
 import Tabs from "~/components/tabs";
 import TastingList from "~/components/tastingList";
-import TimeSince from "~/components/timeSince";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import type { ApiClient } from "~/lib/api";
+import classNames from "~/lib/classNames";
 import type { StorePrice, Tasting } from "~/types";
 
 const defaultViewParam = "global";
@@ -196,15 +196,26 @@ function PriceChanges() {
                 >
                   {price.bottle?.fullName}
                 </Link>
-                <div className="text-light">
+                <div className="text-light flex flex-col">
                   <a href={price.url} className="flex hover:underline">
                     <span className="flex-1">{price.store?.name}</span>
                     <span>${(price.price / 100).toFixed(2)}</span>
                   </a>
                   {price.previous && (
-                    <span className="text-xs">
-                      vs ${(price.previous.price / 100).toFixed(2)}{" "}
-                      <TimeSince date={price.previous.date} />
+                    <span
+                      className={classNames(
+                        "flex self-end text-xs",
+                        price.previous.price > price.price
+                          ? "text-green-500"
+                          : "text-red-500",
+                      )}
+                    >
+                      <span>
+                        $
+                        {((price.price - price.previous.price) / 100).toFixed(
+                          2,
+                        )}
+                      </span>
                     </span>
                   )}
                 </div>
