@@ -1,3 +1,4 @@
+import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import {
   Cog6ToothIcon,
   HomeIcon,
@@ -109,6 +110,17 @@ export default function Sidebar() {
                     }
                   >
                     Bottlers
+                  </SidebarLink>
+                </ul>
+              </li>
+              <li>
+                <ul role="list" className="-mx-2 space-y-1">
+                  <SidebarLink
+                    to="/about"
+                    icon={InformationCircleIcon}
+                    active={location.pathname.startsWith("/about")}
+                  >
+                    About Peated
                   </SidebarLink>
                 </ul>
               </li>
