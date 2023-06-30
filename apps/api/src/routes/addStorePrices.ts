@@ -76,6 +76,7 @@ export default {
     for (const sp of req.body) {
       const bottle = await findBottle(sp.name);
       await db.transaction(async (tx) => {
+        // XXX: maybe we should constrain on URL?
         const [{ priceId }] = await tx
           .insert(storePrices)
           .values({

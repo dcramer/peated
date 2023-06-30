@@ -131,7 +131,7 @@ export default withSentry(function App() {
         defaultOptions: {
           queries: {
             networkMode: "offlineFirst",
-            suspense: true,
+            // suspense: true,
             retry: false,
             // cacheTime: 0,
           },

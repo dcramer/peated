@@ -8,7 +8,7 @@ import { toTitleCase } from "@peated/shared/lib/strings";
 import { EntityInputSchema } from "@peated/shared/schemas";
 
 import type { V2_MetaFunction } from "@remix-run/node";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import CountryField from "~/components/countryField";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
@@ -19,7 +19,6 @@ import SelectField from "~/components/selectField";
 import Spinner from "~/components/spinner";
 import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
-import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
 import type { Entity } from "~/types";
 
 const entityTypes = [
@@ -45,11 +44,13 @@ export default function EditEntity() {
   const queryClient = useQueryClient();
 
   const { entityId } = useParams();
-  const { data: entity } = useSuspenseQuery(
+  const { data: entity } = useQuery(
     ["entity", entityId],
     (): Promise<Entity> => api.get(`/entities/${entityId}`),
     { cacheTime: 0 },
   );
+
+  if (!entity) return null;
 
   const saveEntity = useMutation({
     mutationFn: async (data: FormSchemaType) => {

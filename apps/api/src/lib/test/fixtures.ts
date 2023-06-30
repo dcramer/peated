@@ -15,6 +15,7 @@ import type {
   NewFollow,
   NewStore,
   NewStorePrice,
+  NewStorePriceHistory,
   NewTasting,
   NewToast,
   NewUser,
@@ -29,6 +30,7 @@ import {
   comments,
   entities,
   follows,
+  storePriceHistories,
   storePrices,
   stores,
   tastings,
@@ -267,23 +269,64 @@ export const Store = async ({ ...data }: Partial<NewStore> = {}) => {
 
 export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
   if (!data.name) {
-    if (!data.bottleId) data.bottleId = (await Bottle()).id;
+    const bottleId = (await Bottle()).id;
+    if (!data.bottleId) data.bottleId = bottleId;
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, data.bottleId),
+      where: eq(bottles.id, bottleId),
       with: { brand: true },
     });
     if (!bottle) throw new Error("Unexpected");
     data.name = `${bottle.brand.name} ${bottle.name}`;
   }
-  return (
-    await db
+
+  if (!data.price) data.price = parseInt(faker.finance.amount(50, 200, 0), 10);
+  if (!data.url) data.url = faker.internet.url();
+
+  return await db.transaction(async (tx) => {
+    const [price] = await db
       .insert(storePrices)
       .values({
-        storeId: data.storeId || (await Store()).id,
-        price: parseInt(faker.finance.amount(50, 200, 0), 10),
-        url: faker.internet.url(),
-        name: "", // just to fix tsc
+        // lazy fix for tsc
+        name: "",
+        price: 0,
+        url: "",
         ...data,
+        storeId: data.storeId || (await Store()).id,
+      })
+      .onConflictDoUpdate({
+        target: [storePrices.storeId, storePrices.name],
+        set: {
+          bottleId: data.bottleId,
+          price: data.price,
+          url: data.url,
+          updatedAt: sql`NOW()`,
+        },
+      })
+      .returning();
+
+    await tx
+      .insert(storePriceHistories)
+      .values({
+        priceId: price.id,
+        price: price.price,
+        date: sql`CURRENT_DATE`,
+      })
+      .onConflictDoNothing();
+
+    return price;
+  });
+};
+
+export const StorePriceHistory = async ({
+  ...data
+}: Partial<NewStorePriceHistory> = {}) => {
+  return (
+    await db
+      .insert(storePriceHistories)
+      .values({
+        price: parseInt(faker.finance.amount(50, 200, 0), 10),
+        ...data,
+        priceId: data.priceId || (await StorePrice()).id,
       })
       .returning()
   )[0];

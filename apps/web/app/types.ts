@@ -200,6 +200,11 @@ export type StorePrice = {
   url: string;
   bottleId?: string | null;
   store?: Store;
+  previous?: {
+    price: number;
+    date: string;
+  };
+  bottle?: Bottle;
   updatedAt: string;
 };
 

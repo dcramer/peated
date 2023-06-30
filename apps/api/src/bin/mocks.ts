@@ -69,12 +69,33 @@ program
   .action(async (email, options) => {
     // load some realistic entities
 
+    const store =
+      (await db.query.stores.findFirst({
+        where: (stores, { eq }) => eq(stores.name, "Gimmicky Whiskeys"),
+      })) ||
+      (await Fixtures.Store({
+        name: "Gimmicky Whiskeys",
+      }));
+
     const brands = await loadDefaultEntities();
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
 
     for (let i = 0; i < options.bottles; i++) {
       const bottle = await Fixtures.Bottle({
         brandId: choose(brands).id,
       });
+      const price = await Fixtures.StorePrice({
+        storeId: store.id,
+        bottleId: bottle.id,
+      });
+
+      await Fixtures.StorePriceHistory({
+        priceId: price.id,
+        date: yesterday.toDateString(),
+      });
+
       console.log(`bottle ${bottle.name} created.`);
     }
 

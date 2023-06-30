@@ -1,6 +1,6 @@
 import type { V2_MetaFunction } from "@remix-run/node";
 import { useNavigate, useParams } from "@remix-run/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { z } from "zod";
 
 import type { BottleInputSchema } from "@peated/shared/schemas";
@@ -8,7 +8,6 @@ import type { BottleInputSchema } from "@peated/shared/schemas";
 import BottleForm from "~/components/bottleForm";
 import Spinner from "~/components/spinner";
 import useApi from "~/hooks/useApi";
-import { useSuspenseQuery } from "~/hooks/useSuspenseQuery";
 import type { Bottle } from "~/types";
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
@@ -26,11 +25,13 @@ export default function EditBottle() {
   const navigate = useNavigate();
   const { bottleId } = useParams();
   const queryClient = useQueryClient();
-  const { data: bottle } = useSuspenseQuery(
+  const { data: bottle } = useQuery(
     ["bottles", bottleId],
     (): Promise<Bottle> => api.get(`/bottles/${bottleId}`),
     { cacheTime: 0 },
   );
+
+  if (!bottle) return null;
 
   const saveBottle = useMutation({
     mutationFn: async (data: FormSchemaType) => {

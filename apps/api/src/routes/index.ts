@@ -38,6 +38,7 @@ import listEntityCategories from "./listEntityCategories";
 import listFollowers from "./listFollowers";
 import listFollowing from "./listFollowing";
 import listNotifications from "./listNotifications";
+import listPriceChanges from "./listPriceChanges";
 import listStorePrices from "./listStorePrices";
 import listStores from "./listStores";
 import listTastings from "./listTastings";
@@ -141,6 +142,8 @@ export const router: FastifyPluginCallback = (
 
   fastify.route(listStorePrices);
   fastify.route(addStorePrices);
+
+  fastify.route(listPriceChanges);
 
   fastify.route(listBadges);
   fastify.route(addBadge);

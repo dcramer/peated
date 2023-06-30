@@ -1,6 +1,6 @@
 import type { V2_MetaFunction } from "@remix-run/node";
-import { useLocation } from "@remix-run/react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { Link, useLocation } from "@remix-run/react";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 
@@ -14,10 +14,11 @@ import QueryBoundary from "~/components/queryBoundary";
 import Spinner from "~/components/spinner";
 import Tabs from "~/components/tabs";
 import TastingList from "~/components/tastingList";
+import TimeSince from "~/components/timeSince";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import type { ApiClient } from "~/lib/api";
-import type { Tasting } from "~/types";
+import type { StorePrice, Tasting } from "~/types";
 
 const defaultViewParam = "global";
 
@@ -122,31 +123,98 @@ export default function Activity() {
 
   return (
     <Layout>
-      <>
-        <Tabs fullWidth>
-          {user && (
-            <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
-              Friends
-            </Tabs.Item>
-          )}
-          <Tabs.Item to="./" active={filterParam === "global"}>
-            Global
-          </Tabs.Item>
-          {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
+      <div className="flex">
+        <div className="flex-1">
+          <div className="border-b border-slate-700">
+            <Tabs fullWidth>
+              {user && (
+                <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
+                  Friends
+                </Tabs.Item>
+              )}
+              <Tabs.Item to="./" active={filterParam === "global"}>
+                Global
+              </Tabs.Item>
+              {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
           Local
         </Tabs.Item> */}
-          <Tabs.Item to="/updates" controlled>
-            Updates
-          </Tabs.Item>
-        </Tabs>
-        <ClientOnly>
-          {() => (
-            <QueryBoundary>
-              <ActivityContent filter={filterParam} />
-            </QueryBoundary>
-          )}
-        </ClientOnly>
-      </>
+              <Tabs.Item to="/updates" controlled>
+                Updates
+              </Tabs.Item>
+            </Tabs>
+          </div>
+          <ClientOnly>
+            {() => (
+              <QueryBoundary>
+                <ActivityContent filter={filterParam} />
+              </QueryBoundary>
+            )}
+          </ClientOnly>
+        </div>
+        <div className="ml-4 hidden w-[200px] sm:block">
+          <Tabs fullWidth>
+            <Tabs.Item active>Market Prices</Tabs.Item>
+          </Tabs>
+          <ClientOnly fallback={<PricesSkeleton />}>
+            {() => (
+              <QueryBoundary loading={<PricesSkeleton />}>
+                <PriceChanges />
+              </QueryBoundary>
+            )}
+          </ClientOnly>
+        </div>
+      </div>
     </Layout>
+  );
+}
+
+function PricesSkeleton() {
+  return (
+    <div className="mt-4 animate-pulse bg-slate-800" style={{ height: 200 }} />
+  );
+}
+
+function PriceChanges() {
+  const api = useApi();
+  const { data } = useQuery(
+    ["price-changes"],
+    (): Promise<Paginated<StorePrice>> => api.get(`/priceChanges`),
+  );
+
+  if (!data) return null;
+
+  return (
+    <div>
+      {data.results.length ? (
+        <ul className="mt-4 space-y-2 text-sm">
+          {data.results.map((price) => {
+            return (
+              <li key={price.store?.id}>
+                <Link
+                  to={`/bottles/${price.bottle?.id}`}
+                  className="hover:underline"
+                >
+                  {price.bottle?.fullName}
+                </Link>
+                <div className="text-light">
+                  <a href={price.url} className="flex hover:underline">
+                    <span className="flex-1">{price.store?.name}</span>
+                    <span>${(price.price / 100).toFixed(2)}</span>
+                  </a>
+                  {price.previous && (
+                    <span className="text-xs">
+                      vs ${(price.previous.price / 100).toFixed(2)}{" "}
+                      <TimeSince date={price.previous.date} />
+                    </span>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="mt-4 text-center text-sm">No price history found.</p>
+      )}
+    </div>
   );
 }
