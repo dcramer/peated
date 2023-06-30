@@ -210,12 +210,10 @@ function PriceChanges() {
                           : "text-red-500",
                       )}
                     >
-                      <span>
-                        $
-                        {((price.price - price.previous.price) / 100).toFixed(
-                          2,
-                        )}
-                      </span>
+                      <PriceDelta
+                        price={price.price}
+                        previous={price.previous.price}
+                      />
                     </span>
                   )}
                 </div>
@@ -227,5 +225,14 @@ function PriceChanges() {
         <p className="mt-4 text-center text-sm">No price history found.</p>
       )}
     </div>
+  );
+}
+
+function PriceDelta({ price, previous }: { price: number; previous: number }) {
+  const sign = price > previous ? "+" : "-";
+  return (
+    <span className="flex items-center">
+      {sign}${(Math.abs(price - previous) / 100).toFixed(2)}
+    </span>
   );
 }
