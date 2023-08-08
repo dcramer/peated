@@ -10,7 +10,7 @@
   "trailingComma": "all",
   "overrides": [
     {
-      "files": ["*.json5"],
+      "files": ["*.json"],
       "options": {
         "singleQuote": false,
         "quoteProps": "preserve"
