@@ -2,7 +2,6 @@ import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { useOnlineStatus } from "~/hooks/useOnlineStatus";
 import EmptyActivity from "./emptyActivity";
 import Spinner from "./spinner";
 
@@ -25,15 +24,15 @@ export default ({
 );
 
 const ErrorView = ({ error, resetErrorBoundary }: any) => {
-  const isOnline = useOnlineStatus();
+  // const isOnline = useOnlineStatus();
 
-  if (!isOnline) {
-    return (
-      <EmptyActivity>
-        You'll need to connect to the internet to load this content.
-      </EmptyActivity>
-    );
-  }
+  // if (!isOnline) {
+  //   return (
+  //     <EmptyActivity>
+  //       You'll need to connect to the internet to load this content.
+  //     </EmptyActivity>
+  //   );
+  // }
   return (
     <EmptyActivity>
       <div>{error ? error.message || error.toString() : "Unknown Error"}</div>
