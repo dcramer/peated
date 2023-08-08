@@ -8,11 +8,10 @@ type Props = {
       id: string | number | undefined | null;
       name: string;
     };
-    distillers:
-      | {
-          id: string | number | undefined | null;
-          name: string;
-        }[];
+    distillers: {
+      id: string | number | undefined | null;
+      name: string;
+    }[];
   };
 } & ComponentPropsWithoutRef<"p">;
 
