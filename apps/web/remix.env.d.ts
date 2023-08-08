@@ -26,7 +26,6 @@ interface Config {
   DEBUG?: string;
   API_SERVER?: string;
   SENTRY_DSN?: string;
-  SECRET?: string;
   VERSION?: string;
   NODE_ENV: "development" | "production";
   PORT?: string;
@@ -34,7 +33,9 @@ interface Config {
 
 declare global {
   namespace NodeJS {
-    interface ProcessEnv extends Config {}
+    interface ProcessEnv extends Config {
+      SECRET?: string;
+    }
   }
 
   interface Window {
