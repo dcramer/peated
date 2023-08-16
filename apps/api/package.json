@@ -13,7 +13,7 @@
     "start": "ts-node --require dotenv/config ./src/server.ts",
     "typecheck": "tsc --noEmit",
     "test": "dotenv -e .env.test -- vitest --no-threads",
-    "test:ci": "dotenv -e .env.test -- vitest --no-threads --coverage --reporter=junit --outputFile=junit.xml --reporter=default"
+    "test:ci": "dotenv -e .env.test -- vitest --no-threads --coverage"
   },
   "dependencies": {
     "@faker-js/faker": "^8.0.2",
