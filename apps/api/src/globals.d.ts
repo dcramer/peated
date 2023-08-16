@@ -1,5 +1,6 @@
 import type { OAuth2Namespace } from "@fastify/oauth2";
 import "fastify";
+import "vitest";
 import type { User } from "./db/schema";
 
 declare namespace NodeJS {
@@ -23,12 +24,12 @@ interface CustomMatchers<R = unknown> {
   toRespondWith(statusCode: number): R;
 }
 
-declare global {
-  namespace Vi {
-    interface Assertion<T = any> extends CustomMatchers<T> {}
-    interface AsymmetricMatchersContaining extends CustomMatchers {}
-  }
+declare module "vitest" {
+  interface Assertion<T = any> extends CustomMatchers<T> {}
+  interface AsymmetricMatchersContaining extends CustomMatchers {}
+}
 
+declare global {
   export const DefaultFixtures: {
     user: User;
     authHeaders: {

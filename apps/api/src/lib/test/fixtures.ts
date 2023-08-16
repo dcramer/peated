@@ -148,8 +148,9 @@ export const Bottle = async ({
       for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
         await tx.insert(bottlesToDistillers).values({
           bottleId: bottle.id,
-          distillerId: (await Entity({ type: ["distiller"], totalBottles: 1 }))
-            .id,
+          distillerId: (
+            await Entity({ type: ["distiller"], totalBottles: 1 })
+          ).id,
         });
       }
     } else {
@@ -277,7 +278,6 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
     if (!bottle) throw new Error("Unexpected");
     data.bottleId = bottle.id;
     data.name = bottle.fullName;
-    console.log(data, bottle);
   }
 
   if (!data.price) data.price = parseInt(faker.finance.amount(50, 200, 0), 10);

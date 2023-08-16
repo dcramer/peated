@@ -8,6 +8,7 @@ package-lock.json
 
 # testing
 coverage/
+junit.xml
 
 # production
 build/
