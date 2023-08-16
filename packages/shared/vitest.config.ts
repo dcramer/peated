@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     coverage: {
+      provider: "v8",
       reporter: ["json"],
     },
     globals: true,
