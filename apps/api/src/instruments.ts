@@ -7,6 +7,7 @@ export const initSentry = ({ ...params }) => {
     tracesSampleRate: 1.0,
     profilesSampleRate: 1.0,
     integrations: [
+      new Sentry.Integrations.Postgres(),
       new Sentry.Integrations.Http({ tracing: true }),
       new ProfilingIntegration(),
       ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),

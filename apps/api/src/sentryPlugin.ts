@@ -46,10 +46,10 @@ export default fastifyPlugin(async (fastify, options) => {
     };
 
     Sentry.configureScope((scope) => {
+      // scope.setSDKProcessingMetadata({
+      //   request,
+      // });
       // LOVE THAT I HAVE TO CALL TWO CALLS FOR BASICS
-      scope.setSDKProcessingMetadata({
-        request,
-      });
       scope.setSpan(transaction);
       scope.setTransactionName(transactionName);
     });

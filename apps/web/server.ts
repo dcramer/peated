@@ -1,5 +1,3 @@
-import path from "path";
-
 import prom from "@isaacs/express-prometheus-middleware";
 import { createRequestHandler } from "@remix-run/express";
 import { wrapExpressCreateRequestHandler } from "@sentry/remix";
@@ -7,6 +5,7 @@ import compression from "compression";
 import type { Request } from "express";
 import express from "express";
 import morgan from "morgan";
+import path from "path";
 import config from "~/config";
 import { ApiClient } from "~/lib/api";
 import {
@@ -23,6 +22,10 @@ Sentry.init({
   release: config.VERSION,
   debug: config.DEBUG,
   tracesSampleRate: 1.0,
+  integrations: [
+    new Sentry.Integrations.Http({ tracing: true }),
+    ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
+  ],
   // tracePropagationTargets: ["localhost", "api.peated.app", "peated.app"],
 });
 
