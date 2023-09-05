@@ -1,5 +1,8 @@
 PG_CONTAINER=docker exec -t peated-postgres-1
 
+setup:
+	pnpm run setup
+
 reset-db:
 	$(MAKE) drop-db
 	$(MAKE) create-db
