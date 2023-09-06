@@ -26,6 +26,7 @@ import Spinner from "~/components/spinner";
 import TextAreaField from "~/components/textAreaField";
 import useApi from "~/hooks/useApi";
 import { ApiError } from "~/lib/api";
+import { redirectToAuth } from "~/lib/auth.server";
 import { toBlob } from "~/lib/blobs";
 import { logError } from "~/lib/log";
 import type { Bottle } from "~/types";
@@ -46,7 +47,9 @@ const servingStyleList = SERVING_STYLE_LIST.map((c) => ({
   name: formatServingStyle(c),
 }));
 
-export async function loader({ params, context }: LoaderArgs) {
+export async function loader({ request, params, context }: LoaderArgs) {
+  if (!context.user) return redirectToAuth({ request });
+
   invariant(params.bottleId);
   const bottle: Bottle = await context.api.get(`/bottles/${params.bottleId}`);
 
