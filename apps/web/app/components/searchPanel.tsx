@@ -206,6 +206,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
   const [entityResults, setEntityResults] = useState<readonly Entity[]>([]);
   const isUserQuery = query.indexOf("@") !== -1;
 
+  // TODO: handle errors
   const fetch = debounce(async (query: string) => {
     // union results from various apis
     // priority is:
