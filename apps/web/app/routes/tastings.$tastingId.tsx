@@ -126,9 +126,9 @@ const CommentList = ({
       api.get(`/comments`, { query: { tasting: tastingId } }),
   );
 
-  if (!data) return;
-
   const [deleted, setDeleted] = useState<number[]>([]);
+
+  if (!data) return;
 
   return (
     <ul className="my-4 space-y-4 px-3 sm:px-2">
