@@ -1,13 +1,20 @@
 import { tmpdir } from "node:os";
 
 export default {
-  ENV: process.env.NODE_ENV || "production",
-  DEBUG: process.env.NODE_ENV === "development",
+  ENV: process.env.NODE_ENV === "production" ? "production" : "development",
+  DEBUG: !!process.env.DEBUG,
   PORT: process.env.PORT || 4000,
   HOST: process.env.HOST || "localhost",
   CORS_HOST: process.env.CORS_HOST || "http://localhost:3000",
   JWT_SECRET: process.env.JWT_SECRET || "",
   URL_PREFIX: process.env.URL_PREFIX || "http://localhost:4000",
+
+  SMTP_FROM: process.env.SMTP_FROM,
+  SMTP_HOST: process.env.SMTP_HOST || "localhost",
+  SMTP_PORT: process.env.SMTP_PORT || 465,
+  SMTP_USER: process.env.SMTP_USER,
+  SMTP_PASS: process.env.SMTP_PASS,
+  SMTP_FROM_NAME: "Peated",
 
   VERSION: process.env.VERSION || "",
 

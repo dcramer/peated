@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyPluginCallback } from "fastify";
 
+import config from "~/config";
 import addBadge from "./addBadge";
 import addBottle from "./addBottle";
 import addCollectionBottle from "./addCollectionBottle";
@@ -13,6 +14,8 @@ import addUserFollow from "./addUserFollow";
 import authBasic from "./authBasic";
 import authDetails from "./authDetails";
 import authGoogle from "./authGoogle";
+import previewCommentEmail from "./debug/previewCommentEmail";
+import triggerSentry from "./debug/triggerSentry";
 import deleteBottle from "./deleteBottle";
 import deleteCollectionBottle from "./deleteCollectionBottle";
 import deleteComment from "./deleteComment";
@@ -46,7 +49,6 @@ import listUserCollectionBottles from "./listUserCollectionBottles";
 import listUserCollections from "./listUserCollections";
 import listUserTags from "./listUserTags";
 import listUsers from "./listUsers";
-import triggerSentry from "./triggerSentry";
 import updateBottle from "./updateBottle";
 import updateEntity from "./updateEntity";
 import updateFollower from "./updateFollower";
@@ -148,7 +150,14 @@ export const router: FastifyPluginCallback = (
   fastify.route(listBadges);
   fastify.route(addBadge);
 
-  fastify.route(triggerSentry);
+  if (config.ENV === "development") {
+    registerDebugRoutes(fastify);
+  }
 
   next();
 };
+
+function registerDebugRoutes(fastify: FastifyInstance) {
+  fastify.route(triggerSentry);
+  fastify.route(previewCommentEmail);
+}

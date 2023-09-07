@@ -1,9 +1,12 @@
-/** @type {import('tailwindcss').Config} */
-const defaultTheme = require("tailwindcss/defaultTheme");
+import type { Config } from "tailwindcss";
 
-const colors = require("tailwindcss/colors");
+import tailwindForms from "@tailwindcss/forms";
+import tailwindTypography from "@tailwindcss/typography";
 
-module.exports = {
+import colors from "tailwindcss/colors";
+import defaultTheme from "tailwindcss/defaultTheme";
+
+export default {
   content: ["./app/**/*.{js,ts,jsx,tsx}"],
   future: {
     hoverOnlyWhenSupported: true,
@@ -36,12 +39,12 @@ module.exports = {
       // that is actual animation
       keyframes: (theme) => ({
         fadeIn: {
-          "0%": { opacity: 0, transform: "translate(-20px, 0)" },
-          "100%": { opacity: 1, transform: "translate(0, 0)" },
+          "0%": { opacity: "0", transform: "translate(-20px, 0)" },
+          "100%": { opacity: "1", transform: "translate(0, 0)" },
         },
         fadeOut: {
-          "0%": { opacity: 1, transform: "translate(0, 0)" },
-          "100%": { opacity: 0, transform: "translate(-20px, 0)" },
+          "0%": { opacity: "1", transform: "translate(0, 0)" },
+          "100%": { opacity: "0", transform: "translate(-20px, 0)" },
         },
       }),
 
@@ -85,5 +88,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],
-};
+  plugins: [tailwindForms, tailwindTypography],
+} satisfies Config;

@@ -1,0 +1,10 @@
+{
+  "extends": "@peated/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./*"]
+    }
+  },
+  "include": ["./"]
+}

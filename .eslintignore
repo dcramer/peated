@@ -1,4 +1,4 @@
-tailwind.config.js
+tailwind.config.ts
 dev-dist/
 dist/
 build/

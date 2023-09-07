@@ -1,6 +1,11 @@
 {
   "private": true,
   "name": "@peated/tsconfig",
+  "dependencies": {
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2"
+  },
   "files": [
     "tsconfig.json",
     "tsconfig.node.json"

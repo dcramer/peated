@@ -3,7 +3,7 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 
 export default {
   method: "GET",
-  url: "/triggerSentry",
+  url: "/debug/triggerSentry",
   handler: async (req, res) => {
     throw new Error("This is a test.");
   },

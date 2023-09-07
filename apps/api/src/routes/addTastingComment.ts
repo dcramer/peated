@@ -5,6 +5,7 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { CommentInputSchema, CommentSchema } from "@peated/shared/schemas";
 
+import { notifyComment } from "~/lib/email";
 import { db } from "../db";
 import type { Comment, NewComment } from "../db/schema";
 import { comments, tastings } from "../db/schema";
@@ -34,6 +35,10 @@ export default {
   handler: async (req, res) => {
     const tasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) => eq(tastings.id, req.params.tastingId),
+      with: {
+        createdBy: true,
+        bottle: true,
+      },
     });
 
     if (!tasting) {
@@ -77,7 +82,7 @@ export default {
         .set({ comments: sql`${tastings.comments} + 1` })
         .where(eq(tastings.id, tasting.id));
 
-      if (comment.createdById !== tasting.createdById)
+      if (comment.createdById !== tasting.createdById) {
         createNotification(tx, {
           fromUserId: comment.createdById,
           objectType: objectTypeFromSchema(comments),
@@ -85,6 +90,15 @@ export default {
           createdAt: comment.createdAt,
           userId: tasting.createdById,
         });
+
+        await notifyComment({
+          comment: {
+            ...comment,
+            createdBy: req.user,
+            tasting,
+          },
+        });
+      }
 
       return comment;
     });

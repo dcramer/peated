@@ -21,6 +21,7 @@
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.1",
     "@isaacs/express-prometheus-middleware": "^1.2.1",
+    "@peated/design": "workspace:*",
     "@peated/shared": "workspace:*",
     "@peated/tsconfig": "workspace:*",
     "@react-oauth/google": "^0.11.1",

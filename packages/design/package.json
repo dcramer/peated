@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "@peated/design",
+  "scripts": {
+    "build": "tsc"
+  },
+  "files": [
+    "index.ts",
+    "tailwind.config.ts"
+  ],
+  "dependencies": {
+    "@peated/tsconfig": "workspace:*",
+    "@tailwindcss/forms": "^0.5.6",
+    "@tailwindcss/typography": "^0.5.10",
+    "tailwindcss": "^3.3.3"
+  }
+}
