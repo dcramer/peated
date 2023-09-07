@@ -1,5 +1,4 @@
 import { BADGE_TYPE_LIST } from "@peated/shared/constants";
-import type { InferModel } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -31,8 +30,8 @@ export const badges = pgTable(
   },
 );
 
-export type Badge = InferModel<typeof badges>;
-export type NewBadge = InferModel<typeof badges, "insert">;
+export type Badge = typeof badges.$inferSelect;
+export type NewBadge = typeof badges.$inferInsert;
 
 export const badgeAwards = pgTable(
   "badge_award",
@@ -69,5 +68,5 @@ export const badgeAwardsRelations = relations(badgeAwards, ({ one }) => ({
   }),
 }));
 
-export type BadgeAward = InferModel<typeof badgeAwards>;
-export type NewBadgeAward = InferModel<typeof badgeAwards, "insert">;
+export type BadgeAward = typeof badgeAwards.$inferSelect;
+export type NewBadgeAward = typeof badgeAwards.$inferInsert;

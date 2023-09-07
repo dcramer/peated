@@ -1,4 +1,3 @@
-import type { InferModel } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -48,5 +47,5 @@ export const commentsRelations = relations(comments, ({ one }) => ({
   }),
 }));
 
-export type Comment = InferModel<typeof comments>;
-export type NewComment = InferModel<typeof comments, "insert">;
+export type Comment = typeof comments.$inferSelect;
+export type NewComment = typeof comments.$inferInsert;

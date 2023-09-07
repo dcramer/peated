@@ -1,4 +1,3 @@
-import type { InferModel } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -44,5 +43,5 @@ export const toastsRelations = relations(toasts, ({ one }) => ({
   }),
 }));
 
-export type Toast = InferModel<typeof toasts>;
-export type NewToast = InferModel<typeof toasts, "insert">;
+export type Toast = typeof toasts.$inferSelect;
+export type NewToast = typeof toasts.$inferInsert;

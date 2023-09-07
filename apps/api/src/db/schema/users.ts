@@ -1,4 +1,3 @@
-import type { InferModel } from "drizzle-orm";
 import {
   bigserial,
   boolean,
@@ -33,5 +32,5 @@ export const users = pgTable(
   },
 );
 
-export type User = InferModel<typeof users>;
-export type NewUser = InferModel<typeof users, "insert">;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;

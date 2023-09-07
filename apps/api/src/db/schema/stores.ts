@@ -1,4 +1,3 @@
-import type { InferModel } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -37,8 +36,8 @@ export const stores = pgTable(
   },
 );
 
-export type Store = InferModel<typeof stores>;
-export type NewStore = InferModel<typeof stores, "insert">;
+export type Store = typeof stores.$inferSelect;
+export type NewStore = typeof stores.$inferInsert;
 
 export const storePrices = pgTable(
   "store_price",
@@ -77,8 +76,8 @@ export const storePricesRelations = relations(storePrices, ({ one }) => ({
   }),
 }));
 
-export type StorePrice = InferModel<typeof storePrices>;
-export type NewStorePrice = InferModel<typeof storePrices, "insert">;
+export type StorePrice = typeof storePrices.$inferSelect;
+export type NewStorePrice = typeof storePrices.$inferInsert;
 
 export const storePriceHistories = pgTable(
   "store_price_history",
@@ -111,8 +110,5 @@ export const storePriceHistoriesRelations = relations(
   }),
 );
 
-export type StorePriceHistory = InferModel<typeof storePriceHistories>;
-export type NewStorePriceHistory = InferModel<
-  typeof storePriceHistories,
-  "insert"
->;
+export type StorePriceHistory = typeof storePriceHistories.$inferSelect;
+export type NewStorePriceHistory = typeof storePriceHistories.$inferInsert;

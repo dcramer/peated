@@ -1,4 +1,3 @@
-import type { InferModel } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -51,5 +50,5 @@ export const followsRelations = relations(follows, ({ one, many }) => ({
   }),
 }));
 
-export type Follow = InferModel<typeof follows>;
-export type NewFollow = InferModel<typeof follows, "insert">;
+export type Follow = typeof follows.$inferSelect;
+export type NewFollow = typeof follows.$inferInsert;

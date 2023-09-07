@@ -1,4 +1,3 @@
-import type { InferModel } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -54,5 +53,5 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   }),
 }));
 
-export type Notification = InferModel<typeof notifications>;
-export type NewNotification = InferModel<typeof notifications, "insert">;
+export type Notification = typeof notifications.$inferSelect;
+export type NewNotification = typeof notifications.$inferInsert;

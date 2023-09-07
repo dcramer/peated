@@ -66,8 +66,8 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
   }),
 }));
 
-export type Bottle = InferModel<typeof bottles>;
-export type NewBottle = InferModel<typeof bottles, "insert">;
+export type Bottle = typeof bottles.$inferSelect;
+export type NewBottle = typeof bottles.$inferInsert;
 
 export const bottlesToDistillers = pgTable(
   "bottle_distiller",
@@ -132,5 +132,5 @@ export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
   }),
 }));
 
-export type BottleTag = InferModel<typeof bottleTags>;
-export type NewBottleTag = InferModel<typeof bottleTags, "insert">;
+export type BottleTag = typeof bottleTags.$inferSelect;
+export type NewBottleTags = typeof bottleTags.$inferInsert;

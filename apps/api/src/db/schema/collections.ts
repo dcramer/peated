@@ -43,8 +43,8 @@ export const collectionsRelations = relations(collections, ({ one, many }) => ({
   }),
 }));
 
-export type Collection = InferModel<typeof collections>;
-export type NewCollection = InferModel<typeof collections, "insert">;
+export type Collection = typeof collections.$inferSelect;
+export type NewCollection = typeof collections.$inferInsert;
 
 export const collectionBottles = pgTable(
   "collection_bottle",

@@ -1,4 +1,3 @@
-import type { InferModel } from "drizzle-orm";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
@@ -67,5 +66,5 @@ export const tastingsRelations = relations(tastings, ({ one }) => ({
   }),
 }));
 
-export type Tasting = InferModel<typeof tastings>;
-export type NewTasting = InferModel<typeof tastings, "insert">;
+export type Tasting = typeof tastings.$inferSelect;
+export type NewTasting = typeof tastings.$inferInsert;

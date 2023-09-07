@@ -1,4 +1,3 @@
-import type { InferModel } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -63,5 +62,5 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
   }),
 }));
 
-export type Entity = InferModel<typeof entities>;
-export type NewEntity = InferModel<typeof entities, "insert">;
+export type Entity = typeof entities.$inferSelect;
+export type NewEntity = typeof entities.$inferInsert;
