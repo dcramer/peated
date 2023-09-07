@@ -11,7 +11,7 @@ export default {
 
   SMTP_FROM: process.env.SMTP_FROM,
   SMTP_HOST: process.env.SMTP_HOST || "localhost",
-  SMTP_PORT: process.env.SMTP_PORT || 465,
+  SMTP_PORT: parseInt(process.env.SMTP_PORT || "465", 10),
   SMTP_USER: process.env.SMTP_USER,
   SMTP_PASS: process.env.SMTP_PASS,
   SMTP_FROM_NAME: "Peated",

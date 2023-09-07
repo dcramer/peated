@@ -46,7 +46,7 @@ const createMailTransport = () => {
     port: config.SMTP_PORT,
     secure: true,
     auth,
-  });
+  } satisfies SMTPTransport.Options);
 };
 
 export async function notifyComment({
