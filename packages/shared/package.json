@@ -19,6 +19,7 @@
     "@peated/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^0.34.3",
     "typescript": "^5.2.2",
+    "tsconfig-paths": "^4.2.0",
     "vite-tsconfig-paths": "^4.2.0",
     "vitest": "^0.34.3",
     "zod": "^3.22.2"

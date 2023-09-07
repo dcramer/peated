@@ -1,11 +1,7 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
   "compilerOptions": {
-    "types": ["vitest/globals"],
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./*"]
-    }
+    "types": ["vitest/globals"]
   },
   "include": ["./"]
 }
