@@ -13,6 +13,7 @@ import { users } from "./users";
 
 // this table is intended to delete notifications which are older than X time and read
 export const notifications = pgTable(
+  // oops named this wrong sorry
   "notifications",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),

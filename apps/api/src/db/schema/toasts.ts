@@ -11,6 +11,7 @@ import { tastings } from "./tastings";
 import { users } from "./users";
 
 export const toasts = pgTable(
+  // oops named this wrong sorry
   "toasts",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),

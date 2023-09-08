@@ -330,6 +330,13 @@
       "when": 1688060754516,
       "tag": "0046_wet_toro",
       "breakpoints": false
+    },
+    {
+      "idx": 47,
+      "version": "5",
+      "when": 1694172234610,
+      "tag": "0047_narrow_retro_girl",
+      "breakpoints": false
     }
   ]
 }
