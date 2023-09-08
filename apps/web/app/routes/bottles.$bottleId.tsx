@@ -3,8 +3,8 @@ import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
-import { useQuery } from "@tanstack/react-query";
-import { Fragment, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Fragment } from "react";
 import invariant from "tiny-invariant";
 
 import type { Paginated } from "@peated/shared/types";
@@ -22,9 +22,8 @@ import Tabs from "~/components/tabs";
 import TimeSince from "~/components/timeSince";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { logError } from "~/lib/log";
 import { formatCategoryName } from "~/lib/strings";
-import type { Bottle, Collection, StorePrice } from "~/types";
+import type { Bottle, StorePrice } from "~/types";
 
 type BottleWithStats = Bottle & {
   avgRating: number;
@@ -34,47 +33,48 @@ type BottleWithStats = Bottle & {
 const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
   const api = useApi();
 
-  const { data } = useQuery(
+  const { data: isCollected, isLoading } = useQuery(
     ["bottles", bottle.id, "collections"],
-    (): Promise<Paginated<Collection>> =>
-      api.get(`/users/me/collections`, {
+    async () => {
+      const res = await api.get(`/users/me/collections`, {
         query: {
           bottle: bottle.id,
         },
-      }),
+      });
+      return res.results.length > 0;
+    },
   );
 
-  if (!data) return null;
-
-  const { results: collectionList } = data;
-
-  const [isCollected, setIsCollected] = useState(collectionList.length > 0);
-  const [loading, setLoading] = useState(false);
-
-  const collect = async () => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      if (isCollected) {
+  const queryClient = useQueryClient();
+  const collectBottle = useMutation({
+    mutationFn: async (collect: boolean) => {
+      if (!collect) {
         await api.delete(`/users/me/collections/default/bottles/${bottle.id}`);
-        setIsCollected(false);
+        return false;
       } else {
         await api.post("/users/me/collections/default/bottles", {
           data: {
             bottle: bottle.id,
           },
         });
-        setIsCollected(true);
+        return true;
       }
-    } catch (err: any) {
-      logError(err);
-    }
-    setLoading(false);
-  };
+    },
+    onSuccess: (newData) => {
+      queryClient.setQueryData(["bottles", bottle.id, "collections"], newData);
+    },
+  });
+
+  if (isCollected === undefined) return null;
 
   return (
     <>
-      <Button onClick={collect} disabled={loading}>
+      <Button
+        onClick={async () => {
+          await collectBottle.mutateAsync(!isCollected);
+        }}
+        disabled={isLoading}
+      >
         {isCollected ? "Remove from Collection" : "Add to Collection"}
       </Button>
     </>
