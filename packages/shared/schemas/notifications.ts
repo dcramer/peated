@@ -13,3 +13,7 @@ export const NotificationSchema = z.object({
   read: z.boolean(),
   ref: z.union([TastingSchema, FollowSchema, z.null()]),
 });
+
+export const NotificationInputSchema = z.object({
+  read: z.boolean(),
+});

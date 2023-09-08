@@ -1,12 +1,20 @@
+import {
+  NotificationInputSchema,
+  NotificationSchema,
+} from "@peated/shared/schemas";
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
+import type { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
+import { serialize } from "~/lib/serializers";
+import { NotificationSerializer } from "~/lib/serializers/notification";
 import { db } from "../db";
 import { notifications } from "../db/schema";
 import { requireAuth } from "../middleware/auth";
 
 export default {
-  method: "DELETE",
+  method: "PUT",
   url: "/notifications/:notificationId",
   schema: {
     params: {
@@ -16,10 +24,9 @@ export default {
         notificationId: { type: "number" },
       },
     },
+    body: zodToJsonSchema(NotificationInputSchema.partial()),
     response: {
-      204: {
-        type: "null",
-      },
+      200: zodToJsonSchema(NotificationSchema),
     },
   },
   preHandler: [requireAuth],
@@ -34,12 +41,24 @@ export default {
     }
 
     if (notification.userId !== req.user.id) {
-      return res.status(403).send({ error: "Forbidden" });
+      return res.status(403).send({ error: "Forbidden " });
     }
 
-    await db.delete(notifications).where(eq(notifications.id, notification.id));
+    const body = req.body;
+    const data: { [name: string]: any } = {};
+    if (body.read !== undefined) {
+      data.read = body.read;
+    }
 
-    res.status(204).send();
+    const [newNotification] = await db
+      .update(notifications)
+      .set(data)
+      .where(eq(notifications.id, notification.id))
+      .returning();
+
+    res.send(
+      await serialize(NotificationSerializer, newNotification, req.user),
+    );
   },
 } as RouteOptions<
   Server,
@@ -49,5 +68,6 @@ export default {
     Params: {
       notificationId: number;
     };
+    Body: Partial<z.infer<typeof NotificationInputSchema>>;
   }
 >;
