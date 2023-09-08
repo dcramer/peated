@@ -83,8 +83,6 @@ export default function EditEntity() {
     await saveEntity.mutateAsync(data, {
       onSuccess: () => navigate(`/entities/${entityId}`),
     });
-
-    await saveEntity.mutateAsync(data);
   };
 
   return (
