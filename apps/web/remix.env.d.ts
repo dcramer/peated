@@ -35,6 +35,8 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv extends Config {
       SECRET?: string;
+
+      PLAYWRIGHT_URL?: string;
     }
   }
 

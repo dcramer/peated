@@ -95,5 +95,8 @@
       "extensions": "svg",
       "quiet": false
     }
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.37.1"
   }
 }

@@ -1,11 +1,17 @@
-name: Test
+name: Playwright Tests
 on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      baseUrl:
+        description: "Base URL of the deployment to test against"
+        required: true
   push:
-    branches:
-      - main
+    branches: [main, master]
   pull_request:
+    branches: [main, master]
 jobs:
-  integration-tests:
+  test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -16,8 +22,6 @@ jobs:
         uses: actions/setup-node@v3
       - name: Install dependencies
         run: pnpm install
-      - name: Run docker images
-        run: docker-compose up -d
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "::set-output name=version::$(npx playwright --version | grep -h 'Version ')"
@@ -33,32 +37,11 @@ jobs:
         run: pnpm exec playwright install --with-deps
       - name: Run Playwright tests
         run: pnpm exec playwright test
+        env:
+          PLAYWRIGHT_URL: ${{ github.event.inputs.baseUrl }}
       - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-      - name: Setup Node
-        uses: actions/setup-node@v3
-      - name: Run docker images
-        run: docker-compose up -d
-      - name: Install deps
-        run: pnpm install
-      - name: Build packages
-        run: pnpm build
-      - name: Run tests
-        run: pnpm test:ci
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
