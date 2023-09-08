@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import useApi from "~/hooks/useApi";
 import type { Notification } from "../../types";
@@ -9,12 +10,31 @@ export default function NotificationList({
   values: Notification[];
 }) {
   const [archiveList, setArchiveList] = useState<number[]>([]);
+  const [readList, setReadList] = useState<number[]>([]);
+
   const api = useApi();
 
-  const archive = async (notification: Notification) => {
-    await api.delete(`/notifications/${notification.id}`);
-    setArchiveList((results) => [...results, notification.id]);
-  };
+  const queryClient = useQueryClient();
+
+  const deleteNotification = useMutation({
+    mutationFn: async (notification: Notification) => {
+      await api.delete(`/notifications/${notification.id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["notifications", "count", "unread"]);
+    },
+  });
+
+  const markNotificationRead = useMutation({
+    mutationFn: async (notification: Notification) => {
+      await api.put(`/notifications/${notification.id}`, {
+        data: { read: true },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["notifications", "count", "unread"]);
+    },
+  });
 
   const activeValues = values.filter((n) => archiveList.indexOf(n.id) === -1);
 
@@ -24,9 +44,17 @@ export default function NotificationList({
         return (
           <NotificationEntry
             key={n.id}
-            notification={n}
+            notification={{
+              ...n,
+              read: readList.indexOf(n.id) !== -1 || n.read,
+            }}
+            onMarkRead={() => {
+              markNotificationRead.mutate(n);
+              setReadList((results) => [...results, n.id]);
+            }}
             onArchive={() => {
-              archive(n);
+              deleteNotification.mutate(n);
+              setArchiveList((results) => [...results, n.id]);
             }}
           />
         );

@@ -8,9 +8,11 @@ import FollowEntry from "./followEntry";
 export default function NotificationEntry({
   notification,
   onArchive,
+  onMarkRead,
 }: {
   notification: Notification;
   onArchive: () => void;
+  onMarkRead: () => void;
 }) {
   const navigate = useNavigate();
   const link = getLink({ notification });
@@ -18,12 +20,13 @@ export default function NotificationEntry({
     <div
       className={classNames(
         "bg-slate-950 p-3 text-white",
+        notification.read ? "opacity-50" : "",
         link ? "group cursor-pointer rounded hover:bg-slate-700" : "",
       )}
       onClick={
         link
           ? () => {
-              onArchive();
+              onMarkRead();
               navigate(link);
             }
           : undefined
