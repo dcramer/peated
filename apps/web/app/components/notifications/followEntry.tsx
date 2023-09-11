@@ -66,7 +66,6 @@ export default ({
           : followLabel(myFollowStatus)}
       </Button>
       <Button
-        color="default"
         size="small"
         onClick={(e) => {
           e.stopPropagation();
