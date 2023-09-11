@@ -7,22 +7,22 @@ app = "peated-scraper"
 primary_region = "den"
 
 [env]
-  GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
-  CORS_HOST = "https://peated.app"
-  URL_PREFIX = "https://api.peated.app"
-  USE_GCS_STORAGE = "1"
-  GCS_BUCKET_NAME = "peated"
-  GCS_BUCKET_PATH = "uploads"
+GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
+CORS_HOST = "https://peated.app"
+URL_PREFIX = "https://api.peated.app"
+USE_GCS_STORAGE = "1"
+GCS_BUCKET_NAME = "peated"
+GCS_BUCKET_PATH = "uploads"
 
 [build]
-  build-target = "scraper"
+build-target = "scraper"
 
-  [build.args]
-    API_SERVER = "https://api.peated.app"
-    SENTRY_ORG = "cramer"
-    SENTRY_PROJECT = "peated-scraper"
-    GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
-    SENTRY_DSN = "https://8eff9f1a6d424be8a7716ab47ceb44d7@o172566.ingest.sentry.io/4505373023993856"
+[build.args]
+API_SERVER = "https://api.peated.app"
+SENTRY_ORG = "peated"
+SENTRY_PROJECT = "peated-scraper"
+GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
+SENTRY_DSN = "https://8eff9f1a6d424be8a7716ab47ceb44d7@o172566.ingest.sentry.io/4505373023993856"
 
 
 # [[services]]
