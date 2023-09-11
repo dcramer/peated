@@ -311,6 +311,7 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
       .values({
         priceId: price.id,
         price: price.price,
+        volume: price.volume,
         date: sql`CURRENT_DATE`,
       })
       .onConflictDoNothing();
@@ -327,6 +328,7 @@ export const StorePriceHistory = async ({
       .insert(storePriceHistories)
       .values({
         price: parseInt(faker.finance.amount(50, 200, 0), 10),
+        volume: 750,
         ...data,
         priceId: data.priceId || (await StorePrice()).id,
       })
