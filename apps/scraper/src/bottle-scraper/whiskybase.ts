@@ -54,8 +54,10 @@ async function scrapeBottle(id: number) {
   bottle.brand = {
     name: brandName,
   };
+
+  // TODO(dcramer): not sure this still works
   bottle.name = normalizeBottleName(
-    parseName(brandName, headerEl.get()[0]?.lastChild?.data.trim()),
+    parseName(brandName, headerEl.first().last().text().trim()),
   );
 
   bottle.category = mapCategory(
@@ -244,7 +246,7 @@ async function scrapeTable(
   const data = await getUrl(url);
   const $ = cheerio(data);
   const results: [string, number][] = [];
-  $("tbody > tr").each(async (_, el) => {
+  $("tbody > tr").each((_, el) => {
     const href = $("td > a", el).attr("href");
     const bottleCount = parseInt($("td:nth-child(3)", el).text() || "0", 10);
     if (href) results.push([href, bottleCount]);
@@ -323,7 +325,7 @@ async function scrapeBottleTable(
   const data = await getUrl(url);
   const $ = cheerio(data);
   const results: [string][] = [];
-  $("tbody > tr").each(async (_, el) => {
+  $("tbody > tr").each((_, el) => {
     const href = $("td:nth-child(2) > a", el).attr("href");
     if (href) results.push([href]);
   });

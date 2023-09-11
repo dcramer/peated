@@ -19,7 +19,7 @@ async function scrapeProducts(
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
-  $("#search-results .item-teaser").each(async (_, el) => {
+  $("#search-results .item-teaser").each((_, el) => {
     const name = ($(".header > h2", el).first().attr("title") || "").trim();
     if (!name) {
       console.warn("Unable to identify Product Name");

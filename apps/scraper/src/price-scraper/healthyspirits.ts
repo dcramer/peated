@@ -24,7 +24,7 @@ async function scrapeProducts(
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
-  $(".collection-products-row .product-block").each(async (_, el) => {
+  $(".collection-products-row .product-block").each((_, el) => {
     const brand = $("div.brand", el).first().text().trim();
     const bottle = $("a.title", el).first().text().trim();
     if (!bottle || !brand) {
