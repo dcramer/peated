@@ -9,3 +9,15 @@ export async function fetchNotifications(
     query: { filter },
   });
 }
+
+export async function countNotifications(
+  api: ApiClient,
+  filter: "unread" | string | undefined,
+): Promise<number> {
+  const result = await api.get("/countNotifications", {
+    query: {
+      filter,
+    },
+  });
+  return result.count;
+}

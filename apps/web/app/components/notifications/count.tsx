@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
+import { countNotifications } from "~/queries/notifications";
 import { ClientOnly } from "../clientOnly";
 
 function NotificationCountContent() {
@@ -10,14 +11,7 @@ function NotificationCountContent() {
 
   const { data: unreadNotificationCount } = useQuery(
     ["notifications", "count", "unread"],
-    async (): Promise<number> => {
-      const result = await api.get("/countNotifications", {
-        query: {
-          filter: "unread",
-        },
-      });
-      return result.count;
-    },
+    () => countNotifications(context.api, "unread"),
     {
       staleTime: 60 * 1000,
       enabled: !!user && typeof document !== "undefined",
