@@ -34,6 +34,8 @@ export default {
   },
   preHandler: [requireMod],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401);
+
     const bottle = await db.query.bottles.findFirst({
       where: (bottles, { eq }) => eq(bottles.id, req.params.bottleId),
       with: {
@@ -80,6 +82,7 @@ export default {
       bottleData.category = body.category;
     }
 
+    const user = req.user;
     const newBottle = await db.transaction(async (tx) => {
       let brand: Entity | null = null;
       if (body.brand) {
@@ -91,7 +94,7 @@ export default {
           const brandUpsert = await upsertEntity({
             db: tx,
             data: body.brand,
-            userId: req.user.id,
+            userId: user.id,
             type: "brand",
           });
           if (!brandUpsert)
@@ -112,7 +115,7 @@ export default {
           const bottlerUpsert = await upsertEntity({
             db: tx,
             data: body.bottler,
-            userId: req.user.id,
+            userId: user.id,
             type: "bottler",
           });
           if (!bottlerUpsert)
@@ -177,7 +180,7 @@ export default {
             const distUpsert = await upsertEntity({
               db: tx,
               data: distData,
-              userId: req.user.id,
+              userId: user.id,
               type: "distiller",
             });
             if (!distUpsert)
@@ -250,7 +253,7 @@ export default {
       await tx.insert(changes).values({
         objectType: "bottle",
         objectId: newBottle.id,
-        createdById: req.user.id,
+        createdById: user.id,
         displayName: newBottle.fullName,
         type: "update",
         data: JSON.stringify({

@@ -20,6 +20,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401);
+
     if (req.user.id === req.params.userId) {
       return res.status(400).send({ error: "Cannot unfollow yourself" });
     }
@@ -33,6 +35,7 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
+    const currentUser = req.user;
     await db.transaction(async (tx) => {
       const [follow] = await tx
         .update(follows)
@@ -41,7 +44,7 @@ export default {
         })
         .where(
           and(
-            eq(follows.fromUserId, req.user.id),
+            eq(follows.fromUserId, currentUser.id),
             eq(follows.toUserId, user.id),
           ),
         )

@@ -65,6 +65,8 @@ export default {
   },
   preHandler: [requireAdmin],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     const store = await db.query.stores.findFirst({
       where: eq(stores.id, req.params.storeId),
     });

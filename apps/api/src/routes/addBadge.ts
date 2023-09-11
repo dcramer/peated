@@ -24,6 +24,8 @@ export default {
   },
   preHandler: [requireAdmin],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     const body = req.body;
 
     let config: Record<string, any>;

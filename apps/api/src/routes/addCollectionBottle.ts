@@ -30,6 +30,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     const user = await getUserFromId(db, req.params.userId, req.user);
     if (!user) {
       return res.status(404).send({ error: "Not found" });

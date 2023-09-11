@@ -29,6 +29,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401);
+
     const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
 
     const [user] = await db.select().from(users).where(eq(users.id, userId));

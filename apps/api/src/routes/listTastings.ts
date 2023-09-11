@@ -67,12 +67,13 @@ export default {
     }
 
     if (req.query.user) {
-      where.push(
-        eq(
-          tastings.createdById,
-          req.query.user === "me" ? req.user.id : req.query.user,
-        ),
-      );
+      if (req.query.user === "me") {
+        if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
+        where.push(eq(tastings.createdById, req.user.id));
+      } else {
+        where.push(eq(tastings.createdById, req.query.user));
+      }
     }
 
     const limitPrivate = req.query.filter !== "friends";

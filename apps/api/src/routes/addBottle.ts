@@ -27,6 +27,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     const body = req.body;
 
     let name = normalizeBottleName(body.name, body.statedAge);
@@ -37,12 +39,13 @@ export default {
       return;
     }
 
+    const user = req.user;
     const bottle: Bottle | undefined = await db.transaction(async (tx) => {
       const brandUpsert = await upsertEntity({
         db: tx,
         data: body.brand,
         type: "brand",
-        userId: req.user.id,
+        userId: user.id,
       });
 
       if (!brandUpsert) {
@@ -64,7 +67,7 @@ export default {
           db: tx,
           data: body.bottler,
           type: "bottler",
-          userId: req.user.id,
+          userId: user.id,
         });
         if (bottlerUpsert) {
           bottler = bottlerUpsert.result;
@@ -85,7 +88,7 @@ export default {
             category: body.category || null,
             brandId: brand.id,
             bottlerId: bottler?.id || null,
-            createdById: req.user.id,
+            createdById: user.id,
           })
           .returning();
       } catch (err: any) {
@@ -111,7 +114,7 @@ export default {
           const distUpsert = await upsertEntity({
             db: tx,
             data: distData,
-            userId: req.user.id,
+            userId: user.id,
             type: "distiller",
           });
           if (!distUpsert) {
@@ -131,7 +134,7 @@ export default {
         objectType: "bottle",
         objectId: bottle.id,
         createdAt: bottle.createdAt,
-        createdById: req.user.id,
+        createdById: user.id,
         displayName: bottle.fullName,
         type: "add",
         data: JSON.stringify({

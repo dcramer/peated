@@ -43,12 +43,13 @@ export default {
       where.push(eq(changes.objectType, req.query.type));
     }
     if (req.query.user) {
-      where.push(
-        eq(
-          changes.createdById,
-          req.query.user === "me" ? req.user.id : req.query.user,
-        ),
-      );
+      if (req.query.user === "me") {
+        if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
+        where.push(eq(changes.createdById, req.user.id));
+      } else {
+        where.push(eq(changes.createdById, req.query.user));
+      }
     }
 
     const results = await db

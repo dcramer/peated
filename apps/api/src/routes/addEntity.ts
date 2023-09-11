@@ -24,6 +24,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     const body = req.body;
     const data: NewEntity = {
       ...body,
@@ -31,6 +33,7 @@ export default {
       createdById: req.user.id,
     };
 
+    const user = req.user;
     const entity = await db.transaction(async (tx) => {
       const [entity] = await tx
         .insert(entities)
@@ -66,7 +69,7 @@ export default {
         displayName: entity.name,
         type: "add",
         createdAt: entity.createdAt,
-        createdById: req.user.id,
+        createdById: user.id,
         data: JSON.stringify(data),
       });
 

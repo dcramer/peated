@@ -37,6 +37,8 @@ export default {
   },
   preHandler: [requireMod],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401);
+
     const [entity] = await db
       .select()
       .from(entities)
@@ -66,6 +68,7 @@ export default {
       return res.status(200).send(entity);
     }
 
+    const user = req.user;
     const newEntity = await db.transaction(async (tx) => {
       let newEntity: Entity | undefined;
       try {
@@ -87,7 +90,7 @@ export default {
         objectType: "entity",
         objectId: newEntity.id,
         displayName: newEntity.name,
-        createdById: req.user.id,
+        createdById: user.id,
         type: "update",
         data: JSON.stringify({
           ...data,

@@ -21,6 +21,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     if (req.user.id === req.params.userId) {
       return res.status(400).send({ error: "Cannot follow yourself" });
     }
@@ -49,13 +51,14 @@ export default {
           )
       ).length === 1;
 
+    const currentUser = req.user;
     const follow = await db.transaction(async (tx) => {
       const follow =
         (
           await tx
             .insert(follows)
             .values({
-              fromUserId: req.user.id,
+              fromUserId: currentUser.id,
               toUserId: user.id,
               status: isFollowedBy ? "following" : "pending",
             })
@@ -71,7 +74,7 @@ export default {
             .where(
               and(
                 eq(follows.status, "none"),
-                eq(follows.fromUserId, req.user.id),
+                eq(follows.fromUserId, currentUser.id),
                 eq(follows.toUserId, user.id),
               ),
             )
@@ -80,7 +83,7 @@ export default {
         (await db.query.follows.findFirst({
           where: (follows, { eq, and }) =>
             and(
-              eq(follows.fromUserId, req.user.id),
+              eq(follows.fromUserId, currentUser.id),
               eq(follows.toUserId, user.id),
             ),
         }));

@@ -11,7 +11,7 @@ import {
   entities,
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
-import { requireAuth } from "../middleware/auth";
+import { requireAdmin } from "../middleware/auth";
 
 export default {
   method: "DELETE",
@@ -25,8 +25,10 @@ export default {
       },
     },
   },
-  preHandler: [requireAuth],
+  preHandler: [requireAdmin],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     const [bottle] = await db
       .select()
       .from(bottles)
@@ -34,10 +36,6 @@ export default {
       .limit(1);
     if (!bottle) {
       return res.status(404).send({ error: "Not found" });
-    }
-
-    if (!req.user.admin) {
-      return res.status(403).send({ error: "Forbidden" });
     }
 
     const distillerIds = (
@@ -51,12 +49,13 @@ export default {
         .where(eq(bottlesToDistillers.bottleId, bottle.id))
     ).map(({ id }) => id);
 
+    const user = req.user;
     await db.transaction(async (tx) => {
       await tx.insert(changes).values({
         objectType: "bottle",
         objectId: bottle.id,
         createdAt: bottle.createdAt,
-        createdById: req.user.id,
+        createdById: user.id,
         displayName: bottle.fullName,
         type: "delete",
         data: JSON.stringify({

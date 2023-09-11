@@ -9,17 +9,17 @@ type Item = {
 export type Attrs<T extends Item> = Record<number, Record<string, any>>;
 
 export interface Serializer<T extends Item> {
-  attrs?(itemList: T[], currentUser?: User): Promise<Attrs<T>>;
+  attrs?(itemList: T[], currentUser?: User | null): Promise<Attrs<T>>;
   item(
     item: T,
     attrs: Record<string, Record<string, any>>,
-    currentUser?: User,
+    currentUser?: User | null,
   ): Result;
 }
 
 export async function DefaultAttrs<T extends Item>(
   itemList: T[],
-  currentUser?: User,
+  currentUser?: User | null,
 ): Promise<Attrs<T>> {
   return Object.fromEntries(itemList.map((i) => [i, {}]));
 }
@@ -27,17 +27,17 @@ export async function DefaultAttrs<T extends Item>(
 export async function serialize<T extends Item>(
   serializer: Serializer<T>,
   item: T,
-  currentUser?: User,
+  currentUser?: User | null,
 ): Promise<Result>;
 export async function serialize<T extends Item>(
   serializer: Serializer<T>,
   itemList: T[],
-  currentUser?: User,
+  currentUser?: User | null,
 ): Promise<Result[]>;
 export async function serialize<T extends Item>(
   serializer: Serializer<T>,
   itemList: T | T[],
-  currentUser?: User,
+  currentUser?: User | null,
 ): Promise<Result | Result[]> {
   if (Array.isArray(itemList) && !itemList.length) return [];
 

@@ -25,7 +25,6 @@
   },
   "references": [{ "path": "./tsconfig.node.json" }],
   "ts-node": {
-    "swc": true,
     "require": ["tsconfig-paths/register"],
     "compilerOptions": {
       "module": "commonjs"

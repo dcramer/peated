@@ -33,6 +33,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     const tasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) => eq(tastings.id, req.params.tastingId),
       with: {
@@ -60,6 +62,7 @@ export default {
       }
     }
 
+    const user = req.user;
     const comment = await db.transaction(async (tx) => {
       let comment: Comment | undefined;
       try {
@@ -94,7 +97,7 @@ export default {
         await notifyComment({
           comment: {
             ...comment,
-            createdBy: req.user,
+            createdBy: user,
             tasting,
           },
         });

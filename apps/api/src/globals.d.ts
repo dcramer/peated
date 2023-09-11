@@ -12,11 +12,11 @@ declare namespace NodeJS {
 }
 
 declare module "fastify" {
-  interface FastifyInstance {
+  export interface FastifyInstance {
     googleOAuth2: OAuth2Namespace;
   }
   export interface FastifyRequest {
-    user: any;
+    user: User | null;
   }
 }
 

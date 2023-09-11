@@ -33,6 +33,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401);
+
     const [follow] = await db
       .select()
       .from(follows)

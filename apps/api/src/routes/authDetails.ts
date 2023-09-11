@@ -21,6 +21,8 @@ export default {
     },
   },
   handler: async function (req, res) {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     // this would be a good place to add refreshTokens (swap to POST for that)
     const [user] = await db
       .select()

@@ -26,6 +26,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     const [tasting] = await db
       .select()
       .from(tastings)

@@ -21,6 +21,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
+
     const tasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) => eq(tastings.id, req.params.tastingId),
     });
@@ -33,11 +35,12 @@ export default {
       return res.status(400).send({ error: "Cannot toast yourself" });
     }
 
+    const user = req.user;
     await db.transaction(async (tx) => {
       const [toast] = await tx
         .insert(toasts)
         .values({
-          createdById: req.user.id,
+          createdById: user.id,
           tastingId: tasting.id,
         })
         .onConflictDoNothing()

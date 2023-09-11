@@ -31,6 +31,8 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
+    if (!req.user) return res.status(401);
+
     const [notification] = await db
       .select()
       .from(notifications)
