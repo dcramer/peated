@@ -11,7 +11,7 @@ function NotificationCountContent() {
 
   const { data: unreadNotificationCount } = useQuery(
     ["notifications", "count", "unread"],
-    () => countNotifications(context.api, "unread"),
+    () => countNotifications(api, "unread"),
     {
       staleTime: 60 * 1000,
       enabled: !!user && typeof document !== "undefined",
