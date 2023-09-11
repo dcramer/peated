@@ -7,6 +7,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import { TastingInputSchema, TastingSchema } from "@peated/shared/schemas";
 
 import { XP_PER_LEVEL } from "@peated/shared/constants";
+import { notEmpty } from "~/lib/filter";
 import { db } from "../db";
 import type { NewTasting, Tasting } from "../db/schema";
 import {
@@ -99,7 +100,13 @@ export default {
         .where(
           inArray(
             entities.id,
-            Array.from(new Set([bottle.brandId, ...distillerIds])),
+            Array.from(
+              new Set(
+                [bottle.brandId, ...distillerIds, bottle.bottlerId].filter(
+                  notEmpty,
+                ),
+              ),
+            ),
           ),
         );
 

@@ -1,4 +1,3 @@
-import type { InferModel } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -103,11 +102,8 @@ export const bottlesToDistillersRelations = relations(
   }),
 );
 
-export type BottlesToDistillers = InferModel<typeof bottlesToDistillers>;
-export type NewBottlesToDistillers = InferModel<
-  typeof bottlesToDistillers,
-  "insert"
->;
+export type BottlesToDistillers = typeof bottlesToDistillers.$inferSelect;
+export type NewBottlesToDistillers = typeof bottlesToDistillers.$inferInsert;
 
 export const bottleTags = pgTable(
   "bottle_tag",
