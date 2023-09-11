@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import Layout from "~/components/layout";
 import config from "~/config";
 import useApi from "~/hooks/useApi";
+import { fetchStats } from "~/queries/stats";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -16,7 +17,7 @@ export default function About() {
   return (
     <Layout>
       <div className="flex gap-4 px-2 sm:px-0">
-        <div className="prose py-6">
+        <div className="prose w-9/12 py-6">
           <h1>The Mission</h1>
           <p>
             Peated, inspired by apps like Untapped and Vivino, aims to create a
@@ -39,7 +40,7 @@ export default function About() {
             want to contribute.
           </p>
         </div>
-        <div className="hidden flex-1 sm:block">
+        <div className="hidden w-3/12 sm:block">
           <div className="prose py-6 text-center">
             <h1>Key Data</h1>
           </div>
@@ -50,14 +51,38 @@ export default function About() {
   );
 }
 
+function Skeleton({ names }: { names: string[] }) {
+  return (
+    <div className="hidden items-center gap-4 text-center sm:grid sm:grid-cols-1 lg:grid-cols-2">
+      {names.map((name) => (
+        <SkeletonStat key={name} name={name} />
+      ))}
+    </div>
+  );
+}
+
+function SkeletonStat({ name }: { name: string }) {
+  return (
+    <div className="animate-pulse">
+      <div className="leading-7">{name}</div>
+      <div className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
+        &ndash;
+      </div>
+    </div>
+  );
+}
+
 const Stats = () => {
   const api = useApi();
-  const { data } = useQuery(
-    ["stats"],
-    (): Promise<Record<string, number>> => api.get(`/stats`),
-  );
+  const { data, isLoading } = useQuery(["stats"], () => fetchStats(api));
 
-  if (!data) return null;
+  if (!data) {
+    if (isLoading) {
+      return <Skeleton names={["Tastings", "Bottles", "Entities"]} />;
+    } else {
+      return <div>Oops, maybe you're offline?</div>;
+    }
+  }
 
   const stats = [
     { name: "Tastings", value: data.totalTastings.toLocaleString() },
