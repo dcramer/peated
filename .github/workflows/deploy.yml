@@ -33,7 +33,6 @@ jobs:
           flyctl deploy \
             --remote-only \
             --config fly.scraper.toml \
-            --wait-timeout 300
             --build-arg VERSION=${{ github.sha }} \
             --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
         env:
