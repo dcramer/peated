@@ -1,26 +1,25 @@
 import { load as cheerio } from "cheerio";
 import { getUrl } from "../scraper";
 
-import { normalizeBottleName } from "@peated/shared/lib/normalize";
+import {
+  normalizeBottleName,
+  normalizeVolume,
+} from "@peated/shared/lib/normalize";
 import { toTitleCase } from "@peated/shared/lib/strings";
 
+import type { StorePrice} from "../api";
 import { submitStorePrices } from "../api";
 import { absoluteUrl, chunked, parsePrice } from "./utils";
 
-type Product = {
-  name: string;
-  price: number;
-  priceUnit: "USD";
-  url: string;
-};
-
-function removeSize(name: string) {
-  return name.replace(/ [\d]+ml$/i, "");
+function extractVolume(name: string) {
+  const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
+  if (!match) return [name];
+  return match.slice(1, 3);
 }
 
-async function scrapeProducts(
+export async function scrapeProducts(
   url: string,
-  cb: (product: Product) => Promise<void>,
+  cb: (product: StorePrice) => Promise<void>,
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
@@ -31,20 +30,36 @@ async function scrapeProducts(
       console.warn("Unable to identify Product Name");
       return;
     }
-    const name = toTitleCase(`${brand} ${bottle}`);
-    const productUrl = $("a.title", el).first().attr("href");
-    if (!productUrl) throw new Error("Unable to identify Product URL");
-    const price = parsePrice(
-      $("div.product-block-price > strong", el).first().text().trim(),
+
+    const [name, volumeRaw] = extractVolume(
+      normalizeBottleName(toTitleCase(`${brand} ${bottle}`)),
     );
-    if (!price) {
-      console.warn("Invalid price value");
+
+    const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;
+    if (!volume) {
+      console.warn(`Invalid size: ${volumeRaw}`);
       return;
     }
+
+    const productUrl = $("a.title", el).first().attr("href");
+    if (!productUrl) throw new Error("Unable to identify Product URL");
+
+    const priceRaw = $("div.product-block-price > strong", el)
+      .first()
+      .text()
+      .trim();
+    const price = parsePrice(priceRaw);
+    if (!price) {
+      console.warn(`Invalid price: ${priceRaw}`);
+      return;
+    }
+    console.log(`${name} - ${(price / 100).toFixed(2)}`);
+
     cb({
-      name: removeSize(normalizeBottleName(name)),
+      name,
       price,
       priceUnit: "USD",
+      volume,
       url: absoluteUrl(productUrl, url),
     });
   });
@@ -52,7 +67,7 @@ async function scrapeProducts(
 
 export async function main() {
   // TODO: support pagination
-  const products: Product[] = [];
+  const products: StorePrice[] = [];
 
   const uniqueProducts = new Set();
 
@@ -62,7 +77,7 @@ export async function main() {
     hasProducts = false;
     await scrapeProducts(
       `https://www.healthyspirits.com/spirits/whiskey/page${page}.html?limit=72`,
-      async (product: Product) => {
+      async (product) => {
         console.log(`${product.name} - ${(product.price / 100).toFixed(2)}`);
         if (uniqueProducts.has(product.name)) return;
         products.push(product);

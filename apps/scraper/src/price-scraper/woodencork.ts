@@ -1,18 +1,19 @@
 import { load as cheerio } from "cheerio";
 import { getUrl } from "../scraper";
 
-import { normalizeBottleName } from "@peated/shared/lib/normalize";
-
+import {
+  normalizeBottleName,
+  normalizeVolume,
+} from "@peated/shared/lib/normalize";
+import type { StorePrice} from "../api";
 import { submitStorePrices } from "../api";
 import { absoluteUrl, chunked, parsePrice } from "./utils";
 
-type Product = {
-  name: string;
-  price: number;
-  priceUnit: "USD";
-  url: string;
-  image: string | null;
-};
+function extractVolume(name: string) {
+  const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
+  if (!match) return [name];
+  return match.slice(1, 3);
+}
 
 function getLargestImage(srcset: string) {
   const srcList = srcset
@@ -28,56 +29,64 @@ function getLargestImage(srcset: string) {
   return srcList.length ? srcList[0].src : null;
 }
 
-async function scrapeProducts(
+export async function scrapeProducts(
   url: string,
-  cb: (product: Product) => Promise<void>,
+  cb: (product: StorePrice) => Promise<void>,
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
   $("#CollectionAjaxContent div.grid-item").each((_, el) => {
-    const name = $("div.grid-product__title", el).first().text();
-    if (!name) {
+    const bottle = $("div.grid-product__title", el).first().text();
+    if (!bottle) {
       console.warn("Unable to identify Product Name");
       return;
     }
+
+    const [nameRaw, volumeRaw] = extractVolume(bottle);
+    const name = normalizeBottleName(nameRaw);
+
     const productUrl = $("a.grid-item__link", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");
-    const price = parsePrice(
-      $("span.grid-product__price--current > span.visually-hidden", el)
-        .first()
-        .text(),
-    );
+
+    // XXX: WC seems to default to 750ml in listings
+    const volume = volumeRaw ? normalizeVolume(volumeRaw) : 750;
+    if (!volume) {
+      console.warn(`Invalid size: ${volumeRaw}`);
+      return;
+    }
+
+    const priceRaw = $(
+      "span.grid-product__price--current > span.visually-hidden",
+      el,
+    )
+      .first()
+      .text();
+    const price = parsePrice(priceRaw);
     if (!price) {
-      console.warn(
-        `Invalid price value: ${$(
-          "span.grid-product__price--current > span.visually-hidden",
-          el,
-        )
-          .first()
-          .text()}`,
-      );
+      console.warn(`Invalid price: ${priceRaw}`);
       return;
     }
 
     // 'data-src': '//cdn.shopify.com/s/files/1/0276/1621/5176/products/bushmills-peeky-blinders_{width}x.png?v=1653415529',
     // 'data-widths': '[160, 200, 280, 360, 540, 720, 900]',
 
-    const img = $("div.grid-product__image-wrap img", el).first();
+    // const img = $("div.grid-product__image-wrap img", el).first();
 
-    const imgSrc = img.attr("data-src");
-    const imgWidths = img.attr("data-widths");
-    const image =
-      imgSrc && imgWidths
-        ? imgSrc.replace("{width}", JSON.parse(imgWidths).slice(-1))
-        : null;
+    // const imgSrc = img.attr("data-src");
+    // const imgWidths = img.attr("data-widths");
+    // const image =
+    //   imgSrc && imgWidths
+    //     ? imgSrc.replace("{width}", JSON.parse(imgWidths).slice(-1))
+    //     : null;
 
     console.log(`${name} - ${(price / 100).toFixed(2)}`);
 
     cb({
-      name: normalizeBottleName(name),
+      name,
       price,
-      image,
       priceUnit: "USD",
+      volume,
+      // image,
       url: absoluteUrl(productUrl, url),
     });
   });
@@ -85,7 +94,7 @@ async function scrapeProducts(
 
 export async function main() {
   // TODO: support pagination
-  const products: Product[] = [];
+  const products: StorePrice[] = [];
 
   let hasProducts = true;
   let page = 1;
@@ -93,7 +102,7 @@ export async function main() {
     hasProducts = false;
     await scrapeProducts(
       `https://woodencork.com/collections/whiskey?page=${page}`,
-      async (product: Product) => {
+      async (product) => {
         products.push(product);
         hasProducts = true;
       },

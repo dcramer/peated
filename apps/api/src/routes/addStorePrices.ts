@@ -86,14 +86,16 @@ export default {
             storeId: store.id,
             name: sp.name,
             price: sp.price,
+            volume: sp.volume,
             url: sp.url,
           })
           .onConflictDoUpdate({
-            target: [storePrices.storeId, storePrices.name],
+            target: [storePrices.storeId, storePrices.name, storePrices.volume],
             set: {
               bottleId: bottle ? bottle.id : null,
               price: sp.price,
               url: sp.url,
+              volume: sp.volume,
               updatedAt: sql`NOW()`,
             },
           })
@@ -104,6 +106,7 @@ export default {
           .values({
             priceId: priceId,
             price: sp.price,
+            volume: sp.volume,
             date: sql`CURRENT_DATE`,
           })
           .onConflictDoNothing();

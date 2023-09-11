@@ -54,10 +54,12 @@ export async function submitEntity(data: any) {
   }
 }
 
-type StorePrice = {
+export type StorePrice = {
   name: string;
   price: number;
+  priceUnit: string;
   url: string;
+  volume: number;
 };
 
 export async function submitStorePrices(storeId: number, data: StorePrice[]) {

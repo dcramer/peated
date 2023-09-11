@@ -4,7 +4,7 @@ import { scrapeProducts } from "./totalwine";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
-test("selects only 750ml", async () => {
+test("simple", async () => {
   const url =
     "https://www.totalwine.com/spirits/scotch/single-malt/c/000887?viewall=true&pageSize=120&aty=0,0,0,0";
   const result = await loadFixture("totalwine", "bottle-list.html");
@@ -21,5 +21,12 @@ test("selects only 750ml", async () => {
 
   await fn;
 
-  expect(items.length).toBe(102);
+  expect(items.length).toBe(119);
+  expect(items[0]).toEqual({
+    name: "Grangestone Bourbon Cask Finish Single Malt Scotch Whisky",
+    price: 6499,
+    priceUnit: "USD",
+    volume: 1750,
+    url: "https://www.totalwine.com/spirits/scotch/single-malt/grangestone-bourbon-cask-finish-single-malt-scotch-whisky/p/135113175?s=1203&igrules=true",
+  });
 });

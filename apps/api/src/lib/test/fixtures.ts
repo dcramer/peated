@@ -290,12 +290,13 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
         // lazy fix for tsc
         name: "",
         price: 0,
+        volume: 750,
         url: "",
         ...data,
         storeId: data.storeId || (await Store()).id,
       })
       .onConflictDoUpdate({
-        target: [storePrices.storeId, storePrices.name],
+        target: [storePrices.storeId, storePrices.name, storePrices.volume],
         set: {
           bottleId: data.bottleId,
           price: data.price,

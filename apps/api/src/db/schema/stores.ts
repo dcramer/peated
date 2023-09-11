@@ -51,6 +51,7 @@ export const storePrices = pgTable(
       () => bottles.id,
     ),
     price: integer("price").notNull(),
+    volume: integer("volume").notNull(),
     url: text("url").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -60,6 +61,7 @@ export const storePrices = pgTable(
       storeName: uniqueIndex("store_price_unq_name").on(
         storePrices.storeId,
         storePrices.name,
+        storePrices.volume,
       ),
     };
   },
@@ -88,12 +90,14 @@ export const storePriceHistories = pgTable(
       .references(() => storePrices.id)
       .notNull(),
     price: integer("price").notNull(),
+    volume: integer("volume").notNull(),
     date: date("date").defaultNow().notNull(),
   },
   (storePriceHistories) => {
     return {
       priceDate: uniqueIndex("store_price_history_unq").on(
         storePriceHistories.priceId,
+        storePriceHistories.volume,
         storePriceHistories.date,
       ),
     };

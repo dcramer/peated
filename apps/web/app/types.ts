@@ -197,6 +197,7 @@ export type Store = {
 export type StorePrice = {
   name: string;
   price: number;
+  volume: number;
   url: string;
   bottleId?: string | null;
   store?: Store;

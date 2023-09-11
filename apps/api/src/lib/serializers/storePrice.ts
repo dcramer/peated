@@ -18,6 +18,7 @@ export const StorePriceSerializer: Serializer<StorePrice> = {
       bottleId: item.bottleId,
       name: item.name,
       price: item.price,
+      volume: item.volume,
       url: item.url,
       updatedAt: attrs.updatedAt,
     };
@@ -62,6 +63,7 @@ export const StorePriceWithStoreSerializer: Serializer<
       id: item.id,
       name: item.name,
       price: item.price,
+      volume: item.volume,
       url: item.url,
       store: attrs.store,
       updatedAt: item.updatedAt,
@@ -120,6 +122,7 @@ export const PriceChangeSerializer: Serializer<StorePrice & { store: Store }> =
         id: item.id,
         name: item.name,
         price: item.price,
+        volume: item.volume,
         url: item.url,
         store: attrs.store,
         bottle: attrs.bottle,

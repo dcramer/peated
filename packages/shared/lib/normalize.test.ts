@@ -1,4 +1,4 @@
-import { normalizeBottleName } from "./normalize";
+import { normalizeBottleName, normalizeVolume } from "./normalize";
 
 describe("normalizeBottleName", () => {
   test("just the age", async () => {
@@ -62,5 +62,20 @@ describe("normalizeBottleName", () => {
   test("Name 12 year thing", async () => {
     const rv = normalizeBottleName("Delicious 12 Year thing");
     expect(rv).toBe("Delicious 12-year-old thing");
+  });
+});
+
+describe("normalizeVolume", () => {
+  test("750ml", async () => {
+    const rv = normalizeVolume("750ml");
+    expect(rv).toBe(750);
+  });
+  test("1.75L", async () => {
+    const rv = normalizeVolume("1.75L");
+    expect(rv).toBe(1750);
+  });
+  test("invalid", async () => {
+    const rv = normalizeVolume("1.75");
+    expect(rv).toBe(null);
   });
 });

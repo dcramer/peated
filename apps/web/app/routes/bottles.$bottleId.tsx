@@ -341,7 +341,7 @@ function BottlePrices({ bottleId }: { bottleId: number }) {
                   <span>${(price.price / 100).toFixed(2)}</span>
                 </a>
                 <span className="text-light text-xs">
-                  <TimeSince date={price.updatedAt} />
+                  {price.volume}mL &mdash; <TimeSince date={price.updatedAt} />
                 </span>
               </li>
             );
