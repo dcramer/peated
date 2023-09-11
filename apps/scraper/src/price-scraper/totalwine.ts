@@ -13,13 +13,13 @@ type Product = {
   url: string;
 };
 
-async function scrapeProducts(
+export async function scrapeProducts(
   url: string,
   cb: (product: Product) => Promise<void>,
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
-  $("#main article").each(async (_, el) => {
+  $("#main article").each((_, el) => {
     const name = $("h2.title__2RoYeYuO > a", el).first().text();
     if (!name) {
       console.warn("Unable to identify Product Name");
@@ -53,14 +53,14 @@ export async function main() {
   const products: Product[] = [];
   await scrapeProducts(
     "https://www.totalwine.com/spirits/scotch/c/000887?viewall=true&pageSize=120&aty=0,0,0,0",
-    async (product: Product) => {
+    async (product) => {
       products.push(product);
     },
   );
 
   await scrapeProducts(
     "https://www.totalwine.com/spirits/whiskey/c/9238919?viewall=true&pageSize=120&aty=0,0,0,0",
-    async (product: Product) => {
+    async (product) => {
       products.push(product);
     },
   );

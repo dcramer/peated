@@ -1,7 +1,8 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
-  "include": ["src"],
+  "include": ["src", "__mocks__"],
   "compilerOptions": {
+    "types": ["vitest/globals"],
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"]
