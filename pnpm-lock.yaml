@@ -221,6 +221,9 @@ importers:
       cheerio:
         specifier: 1.0.0-rc.12
         version: 1.0.0-rc.12
+      croner:
+        specifier: ^7.0.1
+        version: 7.0.1
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
@@ -5234,6 +5237,11 @@ packages:
 
   /create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
+    dev: false
+
+  /croner@7.0.1:
+    resolution: {integrity: sha512-G2w4l4ZRwvfUBSUaBXqOS0xtsHpIGsROuOYqLxkV9VWfU7O6ZRuEncvxx08a8vAbKVc3WFD3/rxIFBGfg6Sbww==}
+    engines: {node: '>=6.0'}
     dev: false
 
   /cross-env@7.0.3:
