@@ -5,10 +5,12 @@ import Button from "../button";
 
 export default ({
   notification: { ref },
-  onComplete,
+  onArchive,
+  onMarkRead,
 }: {
   notification: FollowNotification;
-  onComplete: () => void;
+  onArchive: () => void;
+  onMarkRead: () => void;
 }) => {
   const api = useApi();
   const [theirFollowStatus, setTheirFollowStatus] = useState<FollowStatus>(
@@ -23,7 +25,7 @@ export default ({
       data: { action: "accept" },
     });
     setTheirFollowStatus(data.status);
-    onComplete();
+    onMarkRead();
   };
 
   const followUser = async (toUserId: number, follow: boolean) => {
@@ -46,7 +48,7 @@ export default ({
   };
 
   return (
-    <div className="mt-2">
+    <div className="mt-2 flex gap-x-2">
       <Button
         color="highlight"
         size="small"
@@ -62,6 +64,16 @@ export default ({
         {theirFollowStatus === "pending"
           ? "Accept"
           : followLabel(myFollowStatus)}
+      </Button>
+      <Button
+        color="default"
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          onArchive();
+        }}
+      >
+        Ignore
       </Button>
     </div>
   );

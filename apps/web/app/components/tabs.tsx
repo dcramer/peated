@@ -18,15 +18,19 @@ const Tabs = ({ fullWidth, ...props }: Props) => {
   );
 };
 
-type ItemProps = {
-  to?: string;
+type BaseItemProps = {
   active?: boolean;
   count?: number;
   controlled?: boolean;
-} & Omit<React.ComponentPropsWithoutRef<typeof Link>, "to">;
+};
+
+type LinkItemProps = BaseItemProps &
+  React.ComponentPropsWithoutRef<typeof Link>;
+type ButtonItemProps = BaseItemProps & React.ComponentPropsWithoutRef<"button">;
+
+type ItemProps = LinkItemProps | ButtonItemProps;
 
 Tabs.Item = function TabItem({
-  to,
   active,
   count,
   children,
@@ -34,15 +38,39 @@ Tabs.Item = function TabItem({
   ...props
 }: ItemProps) {
   const location = useLocation();
-  if (controlled) active = location.pathname === to;
 
   const activeStyles = "text-highlight border-highlight";
   const inactiveStyles =
     "border-transparent text-slate-500 hover:border-slate-500 hover:text-slate-400";
 
+  if ("to" in props) {
+    if (controlled) active = location.pathname === props.to;
+
+    return (
+      <Link
+        className={classNames(
+          active ? activeStyles : inactiveStyles,
+          "flex whitespace-nowrap border-b-4 px-1 py-4 text-sm font-medium",
+        )}
+        {...props}
+      >
+        {children}
+        {count !== undefined && (
+          <span
+            className={classNames(
+              "bg-slate-700 text-slate-500",
+              "ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block",
+            )}
+          >
+            {count}
+          </span>
+        )}
+      </Link>
+    );
+  }
+
   return (
-    <Link
-      to={to}
+    <button
       className={classNames(
         active ? activeStyles : inactiveStyles,
         "flex whitespace-nowrap border-b-4 px-1 py-4 text-sm font-medium",
@@ -60,7 +88,7 @@ Tabs.Item = function TabItem({
           {count}
         </span>
       )}
-    </Link>
+    </button>
   );
 };
 

@@ -31,10 +31,6 @@
 }
 
 @layer base {
-  html {
-    @apply h-full;
-  }
-
   body {
     @apply min-h-full text-white;
 

@@ -19,8 +19,8 @@ export default function NotificationEntry({
   return (
     <div
       className={classNames(
-        "bg-slate-950 p-3 text-white",
-        notification.read ? "opacity-50" : "",
+        "bg-slate-950 p-3",
+        notification.read ? "text-light" : "text-white",
         link ? "group cursor-pointer rounded hover:bg-slate-700" : "",
       )}
       onClick={
@@ -52,7 +52,8 @@ export default function NotificationEntry({
               </div>
               <NotificationEntryRef
                 notification={notification}
-                onComplete={onArchive}
+                onArchive={onArchive}
+                onMarkRead={onMarkRead}
               />
             </div>
             <div className="flex min-h-full flex-shrink">
@@ -120,16 +121,21 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
 
 const NotificationEntryRef = ({
   notification,
-  onComplete,
+  onArchive,
+  onMarkRead,
 }: {
   notification: Notification;
-  onComplete: () => void;
+  onArchive: () => void;
+  onMarkRead: () => void;
 }) => {
+  const props = {
+    notification,
+    onArchive,
+    onMarkRead,
+  };
   switch (notification.objectType) {
     case "follow":
-      return (
-        <FollowEntry notification={notification} onComplete={onComplete} />
-      );
+      return <FollowEntry {...props} />;
     default:
       return null;
   }

@@ -22,6 +22,8 @@ export default function NotificationList({
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["notifications", "count", "unread"]);
+      queryClient.invalidateQueries(["notifications", "unread"]);
+      queryClient.invalidateQueries(["notifications", "all"]);
     },
   });
 
@@ -33,32 +35,36 @@ export default function NotificationList({
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["notifications", "count", "unread"]);
+      queryClient.invalidateQueries(["notifications", "unread"]);
+      queryClient.invalidateQueries(["notifications", "all"]);
     },
   });
 
   const activeValues = values.filter((n) => archiveList.indexOf(n.id) === -1);
 
   return (
-    <ul className="divide-y divide-slate-800 sm:rounded">
-      {activeValues.map((n) => {
-        return (
-          <NotificationEntry
-            key={n.id}
-            notification={{
-              ...n,
-              read: readList.indexOf(n.id) !== -1 || n.read,
-            }}
-            onMarkRead={() => {
-              markNotificationRead.mutate(n);
-              setReadList((results) => [...results, n.id]);
-            }}
-            onArchive={() => {
-              deleteNotification.mutate(n);
-              setArchiveList((results) => [...results, n.id]);
-            }}
-          />
-        );
-      })}
-    </ul>
+    <>
+      <ul className="divide-y divide-slate-800 sm:rounded">
+        {activeValues.map((n) => {
+          return (
+            <NotificationEntry
+              key={n.id}
+              notification={{
+                ...n,
+                read: readList.indexOf(n.id) !== -1 || n.read,
+              }}
+              onMarkRead={() => {
+                markNotificationRead.mutate(n);
+                setReadList((results) => [...results, n.id]);
+              }}
+              onArchive={() => {
+                deleteNotification.mutate(n);
+                setArchiveList((results) => [...results, n.id]);
+              }}
+            />
+          );
+        })}
+      </ul>
+    </>
   );
 }

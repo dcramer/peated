@@ -1,17 +1,14 @@
 import type { SQL } from "drizzle-orm";
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { notifications } from "../db/schema";
-import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
-import { NotificationSerializer } from "../lib/serializers/notification";
 import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
-  url: "/notifications",
+  url: "/countNotifications",
   schema: {
     querystring: {
       type: "object",
@@ -43,33 +40,12 @@ export default {
       where.push(eq(notifications.read, false));
     }
 
-    const results = await db
-      .select()
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)` })
       .from(notifications)
-      .where(where ? and(...where) : undefined)
-      .limit(limit + 1)
-      .offset(offset)
-      .orderBy(desc(notifications.createdAt));
+      .where(where ? and(...where) : undefined);
 
-    res.send({
-      results: await serialize(
-        NotificationSerializer,
-        results.slice(0, limit),
-        req.user,
-      ),
-      rel: {
-        nextPage: results.length > limit ? page + 1 : null,
-        prevPage: page > 1 ? page - 1 : null,
-        next:
-          results.length > limit
-            ? buildPageLink(req.routeOptions.url, req.query, page + 1)
-            : null,
-        prev:
-          page > 1
-            ? buildPageLink(req.routeOptions.url, req.query, page - 1)
-            : null,
-      },
-    });
+    res.send({ count: count });
   },
 } as RouteOptions<
   Server,

@@ -11,12 +11,12 @@ function NotificationCountContent() {
   const { data: unreadNotificationCount } = useQuery(
     ["notifications", "count", "unread"],
     async (): Promise<number> => {
-      const result = await api.get("/notifications", {
+      const result = await api.get("/countNotifications", {
         query: {
           filter: "unread",
         },
       });
-      return result.results.length;
+      return result.count;
     },
     {
       staleTime: 60 * 1000,

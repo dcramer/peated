@@ -224,7 +224,7 @@ function Document({
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.CONFIG = ${JSON.stringify(config)};`,
+            __html: `window.CONFIG = ${JSON.stringify(config || {})};`,
           }}
         />
         <Scripts />

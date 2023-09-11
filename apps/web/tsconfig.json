@@ -1,6 +1,6 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
-  "include": ["remix.env.d.ts", "app/**/*.ts", "app/**/*.tsx", "server.ts"],
+  "include": ["global.d.ts", "app/**/*.ts", "app/**/*.tsx", "server.ts"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

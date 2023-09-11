@@ -14,6 +14,7 @@ import addUserFollow from "./addUserFollow";
 import authBasic from "./authBasic";
 import authDetails from "./authDetails";
 import authGoogle from "./authGoogle";
+import countNotifications from "./countNotifications";
 import previewCommentEmail from "./debug/previewCommentEmail";
 import triggerSentry from "./debug/triggerSentry";
 import deleteBottle from "./deleteBottle";
@@ -104,6 +105,7 @@ export const router: FastifyPluginCallback = (
 
   fastify.route(listChanges);
 
+  fastify.route(countNotifications);
   fastify.route(listNotifications);
   fastify.route(deleteNotification);
   fastify.route(updateNotification);

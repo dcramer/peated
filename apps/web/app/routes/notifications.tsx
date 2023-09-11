@@ -1,18 +1,21 @@
-import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import { useLocation } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
 import NotificationList from "~/components/notifications/list";
+import Tabs from "~/components/tabs";
 import useApi from "~/hooks/useApi";
-import type { Notification } from "~/types";
+import { fetchNotifications } from "~/queries/notifications";
 
-export async function loader({ context }: LoaderArgs) {
+export async function loader({ context, request }: LoaderArgs) {
+  const location = new URL(request.url);
+  const filter = location.searchParams.get("filter") || "unread";
+
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(
-    ["notifications"],
-    (): Promise<Paginated<Notification>> => context.api.get("/notifications"),
+  await queryClient.prefetchQuery(["notifications", filter], () =>
+    fetchNotifications(context.api, filter),
   );
 
   return json({ dehydratedState: dehydrate(queryClient) });
@@ -27,14 +30,37 @@ export const meta: V2_MetaFunction = () => {
 };
 
 export default function Notifications() {
+  const location = useLocation();
+  const qs = new URLSearchParams(location.search);
+  const filter = qs.get("filter") || "unread";
+
   const api = useApi();
-  const { data } = useQuery(
-    ["notifications"],
-    (): Promise<Paginated<Notification>> => api.get("/notifications"),
+  const { data } = useQuery(["notifications", filter], () =>
+    fetchNotifications(api, filter),
   );
 
   return (
     <Layout>
+      <Tabs>
+        <Tabs.Item
+          active={filter === "unread"}
+          to={{
+            pathname: "/notifications",
+          }}
+        >
+          Unread
+        </Tabs.Item>
+        <Tabs.Item
+          active={filter === "all"}
+          to={{
+            pathname: "/notifications",
+            search: "?filter=all",
+          }}
+        >
+          All
+        </Tabs.Item>
+      </Tabs>
+
       {data && data.results.length ? (
         <NotificationList values={data.results} />
       ) : (
