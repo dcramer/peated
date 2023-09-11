@@ -25,6 +25,13 @@ async function scrapeProducts(
       console.warn("Unable to identify Product Name");
       return;
     }
+
+    const size = $("h2.title__2RoYeYuO > span", el).first().text();
+    if (size !== "750ml") {
+      console.warn(`Invalid size: ${size}`);
+      return;
+    }
+
     const productUrl = $("h2.title__2RoYeYuO > a", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");
     const price = parsePrice($("span.price__1JvDDp_x", el).first().text());
