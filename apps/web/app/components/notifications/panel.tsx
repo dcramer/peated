@@ -2,8 +2,8 @@ import { InboxIcon } from "@heroicons/react/20/solid";
 import { Fragment } from "react";
 
 import NavLink from "../navLink";
+import { NotificationCount } from "../notificationCount";
 import QueryBoundary from "../queryBoundary";
-import { NotificationCount } from "./count";
 
 export default function NotificationsPanel() {
   return (

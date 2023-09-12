@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { countNotifications } from "~/queries/notifications";
-import { ClientOnly } from "../clientOnly";
+import { ClientOnly } from "./clientOnly";
 
 function NotificationCountContent() {
   const { user } = useAuth();

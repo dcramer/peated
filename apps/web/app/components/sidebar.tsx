@@ -14,7 +14,7 @@ import useAuth from "~/hooks/useAuth";
 import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
 import Button from "./button";
 import HeaderLogo from "./headerLogo";
-import { NotificationCount } from "./notifications/count";
+import { NotificationCount } from "./notificationCount";
 import QueryBoundary from "./queryBoundary";
 import SidebarLink from "./sidebarLink";
 import UserAvatar from "./userAvatar";
