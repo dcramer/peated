@@ -25,6 +25,7 @@ import deleteTasting from "./deleteTasting";
 import deleteTastingImage from "./deleteTastingImage";
 import deleteUserFollow from "./deleteUserFollow";
 import getBottle from "./getBottle";
+import getBottlePriceHistory from "./getBottlePriceHistory";
 import getEntity from "./getEntity";
 import getStats from "./getStats";
 import getStore from "./getStore";
@@ -95,6 +96,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(listBottleSuggestedTags);
 
   fastify.route(listBottlePrices);
+  fastify.route(getBottlePriceHistory);
 
   fastify.route(listEntities);
   fastify.route(addEntity);
