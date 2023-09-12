@@ -1,3 +1,4 @@
+import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
 import { Link } from "@remix-run/react";
 import type { Bottle } from "~/types";
 import classNames from "../lib/classNames";
@@ -54,7 +55,7 @@ export default function BottleCard({
       )}
     >
       <div className="flex-1 space-y-1">
-        <h4>
+        <h4 className="flex items-center space-x-1">
           <Link
             to={`/bottles/${bottle.id}`}
             className="block max-w-[260px] truncate font-semibold hover:underline sm:max-w-[480px]"
@@ -62,6 +63,12 @@ export default function BottleCard({
           >
             {bottle.name}
           </Link>
+          {bottle.isFavorite && (
+            <StarIcon className="h-4 w-4" aria-hidden="true" />
+          )}
+          {bottle.hasTasted && (
+            <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
+          )}
         </h4>
         <div
           className={classNames(

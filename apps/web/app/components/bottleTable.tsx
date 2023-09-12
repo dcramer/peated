@@ -123,7 +123,7 @@ export default ({
               ) : null,
               <tr key={bottle.id} className="border-b border-slate-800">
                 <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
-                  <div className="flex flex-row space-x-2">
+                  <div className="flex items-center space-x-1">
                     <Link
                       to={`/bottles/${bottle.id}`}
                       className="font-medium hover:underline"
