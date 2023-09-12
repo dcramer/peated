@@ -229,8 +229,8 @@ export default function Profile() {
             <Tabs.Item to={`/users/${user.username}`} controlled>
               Activity
             </Tabs.Item>
-            <Tabs.Item to={`/users/${user.username}/collections`} controlled>
-              Collection
+            <Tabs.Item to={`/users/${user.username}/favorites`} controlled>
+              Favorites
             </Tabs.Item>
           </Tabs>
           <QueryBoundary>

@@ -9,6 +9,8 @@ import invariant from "tiny-invariant";
 
 import type { Paginated } from "@peated/shared/types";
 
+import { StarIcon as StarIconFilled } from "@heroicons/react/20/solid";
+import { StarIcon } from "@heroicons/react/24/outline";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
@@ -74,8 +76,16 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
           await collectBottle.mutateAsync(!isCollected);
         }}
         disabled={isLoading}
+        color="primary"
       >
-        {isCollected ? "Remove from Collection" : "Add to Collection"}
+        {isCollected ? (
+          <StarIconFilled
+            className="text-highlight h-4 w-4"
+            aria-hidden="true"
+          />
+        ) : (
+          <StarIcon className="h-4 w-4" aria-hidden="true" />
+        )}
       </Button>
     </>
   );
@@ -191,14 +201,11 @@ export default function BottleDetails() {
         </div>
 
         <div className="my-8 flex justify-center gap-4 sm:justify-start">
-          <Button to={`/bottles/${bottle.id}/addTasting`} color="primary">
-            Record a Tasting
-          </Button>
           {user && (
-            <ClientOnly fallback={<SkeletonButton />}>
+            <ClientOnly fallback={<SkeletonButton className="w-10" />}>
               {() => (
                 <QueryBoundary
-                  loading={<SkeletonButton />}
+                  loading={<SkeletonButton className="w-10" />}
                   fallback={() => null}
                 >
                   <CollectionAction bottle={bottle} />
@@ -206,6 +213,10 @@ export default function BottleDetails() {
               )}
             </ClientOnly>
           )}
+
+          <Button to={`/bottles/${bottle.id}/addTasting`} color="primary">
+            Record a Tasting
+          </Button>
 
           {user?.mod && (
             <Menu as="div" className="menu">
