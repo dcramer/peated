@@ -327,7 +327,7 @@ export const StorePriceHistory = async ({
     await db
       .insert(storePriceHistories)
       .values({
-        price: parseInt(faker.finance.amount(50, 200, 0), 10),
+        price: parseInt(faker.finance.amount(50, 200, 0), 10) * 100,
         volume: 750,
         ...data,
         priceId: data.priceId || (await StorePrice()).id,
