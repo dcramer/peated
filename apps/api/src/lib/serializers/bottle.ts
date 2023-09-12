@@ -1,9 +1,15 @@
-import { getTableColumns, inArray, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import type { Serializer } from ".";
 import { serialize } from ".";
 import { db } from "../../db";
 import type { Bottle, User } from "../../db/schema";
-import { bottlesToDistillers, entities } from "../../db/schema";
+import {
+  bottlesToDistillers,
+  collectionBottles,
+  collections,
+  entities,
+  tastings,
+} from "../../db/schema";
 import { notEmpty } from "../filter";
 import { EntitySerializer } from "./entity";
 
@@ -48,11 +54,50 @@ export const BottleSerializer: Serializer<Bottle> = {
       else distillersByBottleId[d.bottleId].push(entitiesById[d.distillerId]);
     });
 
+    const favoriteSet = currentUser
+      ? new Set(
+          (
+            await db
+              .selectDistinct({ id: collectionBottles.bottleId })
+              .from(collectionBottles)
+              .innerJoin(
+                collections,
+                eq(collectionBottles.collectionId, collections.id),
+              )
+              .where(
+                and(
+                  inArray(collectionBottles.bottleId, itemIds),
+                  eq(collections.name, "Default"),
+                  eq(collections.createdById, currentUser.id),
+                ),
+              )
+          ).map((r) => r.id),
+        )
+      : new Set();
+
+    const tastedSet = currentUser
+      ? new Set(
+          (
+            await db
+              .selectDistinct({ id: tastings.bottleId })
+              .from(tastings)
+              .where(
+                and(
+                  inArray(tastings.bottleId, itemIds),
+                  eq(tastings.createdById, currentUser.id),
+                ),
+              )
+          ).map((r) => r.id),
+        )
+      : new Set();
+
     return Object.fromEntries(
       itemList.map((item) => {
         return [
           item.id,
           {
+            isFavorite: favoriteSet.has(item.id),
+            hasTasted: tastedSet.has(item.id),
             brand: entitiesById[item.brandId],
             distillers: distillersByBottleId[item.id] || [],
             bottler: item.bottlerId ? entitiesById[item.bottlerId] : null,
@@ -74,6 +119,8 @@ export const BottleSerializer: Serializer<Bottle> = {
       bottler: attrs.bottler,
       avgRating: item.avgRating,
       totalTastings: item.totalTastings,
+      isFavorite: attrs.isFavorite,
+      hasTasted: attrs.hasTasted,
     };
   },
 };

@@ -20,6 +20,9 @@ export const BottleSchema = z.object({
 
   createdAt: z.string().datetime().optional(),
   createdBy: UserSchema.optional(),
+
+  isFavorite: z.boolean().optional(),
+  hasTasted: z.boolean().optional(),
 });
 
 export const BottleInputSchema = z.object({

@@ -74,7 +74,7 @@ export default {
       }
     }
 
-    if (body.friends) {
+    if (body.friends && body.friends.length) {
       const friendUserIds = Array.from(new Set(body.friends));
       const matches = await db
         .select()

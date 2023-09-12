@@ -1,5 +1,6 @@
 import { Link, useLocation } from "@remix-run/react";
 
+import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
 import type { PagingRel } from "@peated/shared/types";
 import { buildQueryString } from "~/lib/urls";
 import type { Bottle, CollectionBottle, Entity } from "~/types";
@@ -122,12 +123,20 @@ export default ({
               ) : null,
               <tr key={bottle.id} className="border-b border-slate-800">
                 <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
-                  <Link
-                    to={`/bottles/${bottle.id}`}
-                    className="font-medium hover:underline"
-                  >
-                    {bottle.fullName}
-                  </Link>
+                  <div className="flex flex-row space-x-2">
+                    <Link
+                      to={`/bottles/${bottle.id}`}
+                      className="font-medium hover:underline"
+                    >
+                      {bottle.fullName}
+                    </Link>
+                    {bottle.isFavorite && (
+                      <StarIcon className="h-4 w-4" aria-hidden="true" />
+                    )}
+                    {bottle.hasTasted && (
+                      <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
+                    )}
+                  </div>
                   <div className="text-sm text-slate-500">
                     <Link
                       to={`/bottles/?category=${bottle.category}`}

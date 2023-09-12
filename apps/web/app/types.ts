@@ -40,6 +40,8 @@ export type Bottle = {
   totalTastings: number;
   createdAt: string;
   createdBy?: User;
+  isFavorite?: boolean;
+  hasTasted?: boolean;
 };
 
 export type FollowStatus = "none" | "following" | "pending";
