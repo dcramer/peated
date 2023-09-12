@@ -280,7 +280,8 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
     data.name = bottle.fullName;
   }
 
-  if (!data.price) data.price = parseInt(faker.finance.amount(50, 200, 0), 10);
+  if (!data.price)
+    data.price = parseInt(faker.finance.amount(50, 200, 0), 10) * 100;
   if (!data.url) data.url = faker.internet.url();
 
   return await db.transaction(async (tx) => {
