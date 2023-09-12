@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
@@ -30,22 +30,27 @@ export default {
     const results = await db
       .select({
         date: storePriceHistories.date,
-        pricePerMl: sql<string>`ROUND(AVG(${storePriceHistories.price} / ${storePriceHistories.volume})) as price_per_ml`,
+        avgPrice: sql<string>`ROUND(AVG(${storePriceHistories.price} / ${storePriceHistories.volume}))`,
+        minPrice: sql<string>`ROUND(MIN(${storePriceHistories.price} / ${storePriceHistories.volume}))`,
+        maxPrice: sql<string>`ROUND(MAX(${storePriceHistories.price} / ${storePriceHistories.volume}))`,
       })
       .from(storePriceHistories)
       .innerJoin(storePrices, eq(storePriceHistories.priceId, storePrices.id))
       .where(
         and(
           eq(storePrices.bottleId, bottle.id),
-          sql`${storePrices.updatedAt} > NOW() - interval '3 month'`,
+          sql`${storePrices.updatedAt} > NOW() - interval '1 year'`,
         ),
       )
-      .groupBy(storePriceHistories.date);
+      .groupBy(storePriceHistories.date)
+      .orderBy(desc(storePriceHistories.date));
 
     res.send({
       results: results.map((r) => ({
         date: r.date,
-        pricePerMl: parseInt(r.pricePerMl, 10),
+        avgPrice: parseInt(r.avgPrice, 10),
+        minPrice: parseInt(r.minPrice, 10),
+        maxPrice: parseInt(r.maxPrice, 10),
       })),
     });
   },
