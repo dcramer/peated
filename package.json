@@ -18,7 +18,7 @@
     "scraper": "pnpm --filter './apps/scraper' scraper",
     "price-scraper": "pnpm --filter './apps/scraper' prices",
     "typecheck": "pnpm -r --parallel run typecheck",
-    "test": "pnpm -r --stream run test",
+    "test": "pnpm -r --stream --parallel run test",
     "test:ci": "CI=true pnpm -r run test:ci",
     "token": "dotenv -e .env.local -- pnpm --filter='./apps/api' token",
     "preinstall": "npx only-allow pnpm",
