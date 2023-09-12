@@ -42,6 +42,10 @@ export default {
       return res.status(404).send({ error: "Not found" });
     }
 
+    // TODO: change the logic to be weighted:
+    // 1. high: recorded for this bottle (e.g. Hibiki 12-year-old)
+    // 2. medium: recorded for this brand (e.g. Hibiki)
+    // 3. low: recorded for this category (e.g. bourbon)
     const usedTags = Object.fromEntries(
       (
         await db
