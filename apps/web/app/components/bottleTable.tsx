@@ -55,7 +55,7 @@ export default ({
                 to={{
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
-                    sort: sort === "tastings" ? "-tastings" : "tastings",
+                    sort: sort === "-tastings" ? "tastings" : "-tastings",
                   }),
                 }}
                 className="hover:underline"
@@ -71,7 +71,7 @@ export default ({
                 to={{
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
-                    sort: sort === "rating" ? "-rating" : "rating",
+                    sort: sort === "-rating" ? "rating" : "-rating",
                   }),
                 }}
                 className="hover:underline"
@@ -87,7 +87,7 @@ export default ({
                 to={{
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
-                    sort: sort === "age" ? "-age" : "age",
+                    sort: sort === "-age" ? "age" : "-age",
                   }),
                 }}
                 className="hover:underline"
