@@ -35,6 +35,10 @@ export const tastings = pgTable(
     imageUrl: text("image_url"),
     notes: text("notes"),
     servingStyle: servingStyleEnum("serving_style"),
+    friends: bigint("friends", { mode: "number" })
+      .array()
+      .default(sql`array[]::bigint[]`)
+      .notNull(),
 
     comments: integer("comments").default(0).notNull(),
     toasts: integer("toasts").default(0).notNull(),
