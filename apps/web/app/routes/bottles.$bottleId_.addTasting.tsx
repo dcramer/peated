@@ -21,6 +21,7 @@ import Header from "~/components/header";
 import ImageField from "~/components/imageField";
 import Layout from "~/components/layout";
 import RangeField from "~/components/rangeField";
+import type { Option } from "~/components/selectField";
 import SelectField from "~/components/selectField";
 import Spinner from "~/components/spinner";
 import TextAreaField from "~/components/textAreaField";
@@ -75,6 +76,7 @@ export default function AddTasting() {
 
   const [error, setError] = useState<string | undefined>();
   const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
+  const [friendsValue, setFriendsValue] = useState<Option[]>([]);
 
   const {
     control,
@@ -220,6 +222,38 @@ export default function AddTasting() {
                       }
                     : undefined
                 }
+              />
+            )}
+          />
+
+          <Controller
+            name="friends"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                endpoint={{
+                  path: "/following",
+                  query: {
+                    status: "following",
+                  },
+                }}
+                onResults={(data) => {
+                  return data.map((d) => ({
+                    id: d.user.id,
+                    name: d.user.username,
+                  }));
+                }}
+                multiple
+                error={errors.friends}
+                label="Friends"
+                helpText="The people you're enjoying this tasting with."
+                placeholder="e.g. Bob Dylan"
+                onChange={(value) => {
+                  onChange(value.map((t: any) => t.id || t));
+                  setFriendsValue(value);
+                }}
+                value={friendsValue}
               />
             )}
           />

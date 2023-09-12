@@ -5,6 +5,7 @@ import config from "../../config";
 import { db } from "../../db";
 import type { Tasting, User } from "../../db/schema";
 import { bottles, tastings, toasts, users } from "../../db/schema";
+import { notEmpty } from "../filter";
 import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
 
@@ -46,6 +47,7 @@ export const TastingSerializer: Serializer<Tasting> = {
       ).map((data, index) => [results[index].id, data]),
     );
 
+    // TODO: combine friends + createdBy
     const usersByRef = Object.fromEntries(
       (
         await serialize(
@@ -56,6 +58,21 @@ export const TastingSerializer: Serializer<Tasting> = {
       ).map((data, index) => [results[index].id, data]),
     );
 
+    const friendIds = Array.from(
+      new Set<number>(itemList.map((r) => r.friends).flat()),
+    );
+    const usersById = friendIds.length
+      ? Object.fromEntries(
+          (
+            await serialize(
+              UserSerializer,
+              await db.select().from(users).where(inArray(users.id, friendIds)),
+              currentUser,
+            )
+          ).map((data) => [data.id, data]),
+        )
+      : {};
+
     return Object.fromEntries(
       itemList.map((item) => {
         return [
@@ -64,6 +81,7 @@ export const TastingSerializer: Serializer<Tasting> = {
             hasToasted: userToastsList.indexOf(item.id) !== -1,
             createdBy: usersByRef[item.id] || null,
             bottle: bottlesByRef[item.id] || null,
+            friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
           },
         ];
       }),
@@ -78,6 +96,7 @@ export const TastingSerializer: Serializer<Tasting> = {
       tags: item.tags || [],
       rating: item.rating,
       servingStyle: item.servingStyle,
+      friends: attrs.friends,
 
       createdAt: item.createdAt,
 

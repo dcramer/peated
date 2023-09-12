@@ -1,0 +1,1 @@
+ALTER TABLE "tasting" ADD COLUMN "friends" bigint[] DEFAULT array[]::bigint[] NOT NULL;

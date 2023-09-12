@@ -17,3 +17,12 @@ export type CreateOptionForm = ({
   onSubmit: (newOption: Option) => void;
   onClose: () => void;
 }) => ReactNode;
+
+export type EndpointOptions =
+  | string
+  | {
+      path: string;
+      query?: Record<string, any>;
+    };
+
+export type OnResults = (results: any[]) => Option[];

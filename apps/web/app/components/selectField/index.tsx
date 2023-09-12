@@ -5,7 +5,12 @@ import { useEffect, useState } from "react";
 import Chip from "../chip";
 import FormField from "../formField";
 import SelectDialog from "./selectDialog";
-import type { CreateOptionForm, Option } from "./types";
+import type {
+  CreateOptionForm,
+  EndpointOptions,
+  OnResults,
+  Option,
+} from "./types";
 
 const filterDupes = (firstList: Option[], ...moreLists: Option[][]) => {
   const results: Option[] = [...firstList];
@@ -50,7 +55,9 @@ type MultiProps =
 
 type OptionProps = {
   // options are gathered either via dynamic query
-  endpoint?: string;
+  endpoint?: EndpointOptions;
+  // coerce results to Options
+  onResults?: OnResults;
   // or fixed value
   options?: Option[];
   // static suggestions can also be provided
@@ -83,6 +90,7 @@ export default ({
   createForm,
   placeholder,
   endpoint,
+  onResults,
   options = [],
   onChange,
   error,
@@ -202,6 +210,7 @@ export default ({
         selectedValues={value}
         searchPlaceholder="Search"
         endpoint={endpoint}
+        onResults={onResults}
         options={options}
       />
     </FormField>

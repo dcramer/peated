@@ -6,13 +6,14 @@ import { toTitleCase } from "@peated/shared/lib/strings";
 
 import useApi from "~/hooks/useApi";
 import config from "../../config";
+import type { ApiRequestOptions} from "../../lib/api";
 import { debounce } from "../../lib/api";
 import classNames from "../../lib/classNames";
 import Header from "../header";
 import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";
 import CreateOptionDialog from "./createOptionDialog";
-import type { CreateOptionForm } from "./types";
+import type { CreateOptionForm, EndpointOptions, OnResults } from "./types";
 
 export type Option = {
   id?: string | number | null;
@@ -45,6 +46,7 @@ export default ({
   createForm,
   multiple = false,
   endpoint,
+  onResults,
   options,
 }: {
   open: boolean;
@@ -55,7 +57,8 @@ export default ({
   canCreate?: boolean;
   multiple?: boolean;
   createForm?: CreateOptionForm;
-  endpoint?: string;
+  endpoint?: EndpointOptions;
+  onResults?: OnResults;
   options?: Option[];
 }) => {
   const api = useApi();
@@ -68,17 +71,31 @@ export default ({
 
   const [createOpen, setCreateOpen] = useState(false);
 
+  const apiPath = endpoint
+    ? typeof endpoint === "string"
+      ? endpoint
+      : endpoint.path
+    : null;
+  const apiOptions: ApiRequestOptions = endpoint
+    ? typeof endpoint === "string"
+      ? {}
+      : endpoint
+    : {};
+
+  if (!apiOptions.query) apiOptions.query = {};
+  apiOptions.query.query = query;
+
   const fetch = debounce(async (query = "") => {
-    const results = endpoint
+    const results = apiPath
       ? (
-          await api.get(endpoint, {
-            query: { query },
+          await api.get(apiPath, {
+            ...apiOptions,
           })
         ).results
       : options?.filter(
           (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1,
         );
-    setResults(results);
+    setResults(onResults ? onResults(results) : results);
   }, 300);
 
   const onSearch = fetch;

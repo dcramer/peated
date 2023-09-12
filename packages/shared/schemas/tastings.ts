@@ -13,6 +13,7 @@ export const TastingSchema = z.object({
   rating: z.number().gte(0).lte(5).nullable(),
   tags: z.array(z.string()),
   servingStyle: ServiceStyleEnum.nullable(),
+  friends: z.array(UserSchema),
 
   comments: z.number().gte(0),
   toasts: z.number().gte(0),
@@ -27,6 +28,7 @@ export const TastingInputSchema = z.object({
   rating: z.number().gte(0).lte(5).nullable().optional(),
   tags: z.array(z.string()).nullable().optional(),
   servingStyle: ServiceStyleEnum.nullable().optional(),
+  friends: z.array(z.number()).optional(),
 
   createdAt: z.string().datetime().optional(),
 });

@@ -1,4 +1,4 @@
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
@@ -15,6 +15,7 @@ import {
   bottleTags,
   bottles,
   entities,
+  follows,
   tastings,
 } from "../db/schema";
 import { checkBadges } from "../lib/badges";
@@ -71,6 +72,26 @@ export default {
       if (isDistantPast(data.createdAt, 60 * 60 * 24 * 7)) {
         return res.status(400).send({ error: "createdAt too far in past" });
       }
+    }
+
+    if (body.friends) {
+      const friendUserIds = Array.from(new Set(body.friends));
+      const matches = await db
+        .select()
+        .from(follows)
+        .where(
+          and(
+            eq(follows.fromUserId, req.user.id),
+            eq(follows.status, "following"),
+            inArray(follows.toUserId, friendUserIds),
+          ),
+        );
+      if (matches.length != friendUserIds.length) {
+        res
+          .status(400)
+          .send({ error: "friends must all be active relationships" });
+      }
+      data.friends = body.friends;
     }
 
     const tasting = await db.transaction(async (tx) => {
