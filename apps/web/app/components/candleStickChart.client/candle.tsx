@@ -22,7 +22,7 @@ export default function Candle({
   const down = previousData && previousData.avg < data.avg;
   const barTop = pixelFor(data.avg);
   const barBottom = pixelFor(data.avg);
-  const barHeight = 2;
+  const barHeight = 5;
   const wickTop = pixelFor(data.high);
   const wickBottom = pixelFor(data.low);
 
