@@ -1,3 +1,6 @@
+// make sure to import this _before_ all other code
+import "./sentry";
+
 import FastifyCors from "@fastify/cors";
 import FastifyHelmet from "@fastify/helmet";
 import FastifyMultipart from "@fastify/multipart";
@@ -7,15 +10,8 @@ import config from "./config";
 import { router } from "./routes";
 
 import { MAX_FILESIZE } from "@peated/shared/constants";
-import { initSentry } from "./instruments";
 import { injectAuth } from "./middleware/auth";
 import FastifySentry from "./sentryPlugin";
-
-initSentry({
-  dsn: config.SENTRY_DSN,
-  release: config.VERSION,
-  debug: config.DEBUG,
-});
 
 const envToLogger: {
   [env: string]: any;

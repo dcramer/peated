@@ -1,4 +1,4 @@
-import { setUser } from "@sentry/node";
+import { setUser } from "@sentry/node-experimental";
 import { eq } from "drizzle-orm";
 import type { onRequestHookHandler } from "fastify";
 import { db } from "../db";

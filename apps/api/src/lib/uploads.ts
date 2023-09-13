@@ -4,7 +4,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { createWriteStream } from "node:fs";
 import sharp from "sharp";
 
-import { trace } from "@sentry/node";
+import { startSpan } from "@sentry/node-experimental";
 import type { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import config from "../config";
@@ -53,7 +53,7 @@ export const storeFile = async ({
     ? onProcess(data.file, tmpFilename)
     : { stream: data.file, filename: tmpFilename };
 
-  return await trace(
+  return await startSpan(
     {
       name: "peated.store-file",
       description: data.filename,
@@ -74,7 +74,7 @@ export const storeFile = async ({
           credentials: config.GCP_CREDENTIALS,
         });
 
-        await trace(
+        await startSpan(
           {
             name: "gcs.file",
             description: newFilename,
@@ -85,7 +85,7 @@ export const storeFile = async ({
               .bucket(bucketName)
               .file(`${bucketPath}${newFilename}`);
 
-            await trace(
+            await startSpan(
               {
                 name: "gcs.file.write-stream",
                 description: newFilename,
@@ -100,7 +100,7 @@ export const storeFile = async ({
       } else {
         const uploadPath = `${config.UPLOAD_PATH}/${newFilename}`;
 
-        await trace(
+        await startSpan(
           {
             name: "file.write-stream",
             description: newFilename,
