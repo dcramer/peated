@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/node";
+import * as Sentry from "@sentry/node-experimental";
 import { ProfilingIntegration } from "@sentry/profiling-node";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 
@@ -16,11 +16,7 @@ Sentry.init({
     process.env.NODE_ENV === "production" ? "production" : "development",
   tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
-  integrations: [
-    new Sentry.Integrations.Http({ tracing: true }),
-    new ProfilingIntegration(),
-    ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
-  ],
+  integrations: [new ProfilingIntegration()],
 });
 
 function job(schedule: string, name: string, cb: () => Promise<void>) {
