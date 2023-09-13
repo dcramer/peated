@@ -15,6 +15,7 @@ import type { Bottle } from "@peated/shared/types";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
+import { CandleStickChart } from "~/components/candleStickChart.client";
 import { ClientOnly } from "~/components/clientOnly";
 import ConfirmationButton from "~/components/confirmationButton";
 import { DistributionChart } from "~/components/distributionChart";
@@ -27,6 +28,7 @@ import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { formatCategoryName } from "~/lib/strings";
 import {
+  fetchBottlePriceHistory,
   fetchBottlePrices,
   fetchBottleTags,
   getBottle,
@@ -317,26 +319,23 @@ function BottlePricesSkeleton() {
   );
 }
 
-// function BottlePriceHistory({ bottleId }: { bottleId: number }) {
-//   const api = useApi();
-//   const { data, isLoading } = useQuery(["bottles", bottleId, "prices"], () =>
-//     fetchBottlePriceHistory(api, bottleId),
-//   );
+function BottlePriceHistory({ bottleId }: { bottleId: number }) {
+  const api = useApi();
+  const { data, isLoading } = useQuery(
+    ["bottles", bottleId, "priceHistory"],
+    () => fetchBottlePriceHistory(api, bottleId),
+  );
 
-//   if (isLoading) return <div className="h-6 animate-pulse" />;
+  if (isLoading) return <div className="h-6 animate-pulse" />;
 
-//   if (!data) return null;
+  if (!data) return null;
 
-//   <Sparklines
-//     data={data.results.map((r) => r.avgPrice)}
-//     limit={5}
-//     width={100}
-//     height={20}
-//     margin={5}
-//   >
-//     <SparklinesBars color="white" />
-//   </Sparklines>;
-// }
+  const points = data.results.reverse().map((r, idx) => {
+    return { time: idx, high: r.maxPrice, low: r.minPrice, avg: r.avgPrice };
+  });
+
+  return <CandleStickChart data={points} width={200} height={100} />;
+}
 
 function BottlePrices({ bottleId }: { bottleId: number }) {
   const api = useApi();
@@ -351,7 +350,9 @@ function BottlePrices({ bottleId }: { bottleId: number }) {
         <Tabs.Item active>Prices</Tabs.Item>
       </Tabs>
 
-      {/* <BottlePriceHistory bottleId={bottleId} /> */}
+      <ClientOnly fallback={<div className="h-6 animate-pulse" />}>
+        {() => <BottlePriceHistory bottleId={bottleId} />}
+      </ClientOnly>
 
       {data.results.length ? (
         <ul className="mt-4 space-y-2 text-sm">
