@@ -4,13 +4,12 @@ import { useLocation, useOutletContext } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
 
-import type { Paginated } from "@peated/shared/types";
-
+import type { Entity } from "@peated/shared/types";
 import BottleTable from "~/components/bottleTable";
 import QueryBoundary from "~/components/queryBoundary";
 import useApi from "~/hooks/useApi";
 import type { ApiClient } from "~/lib/api";
-import type { Entity } from "~/types";
+import { fetchBottles } from "~/queries/bottles";
 
 export function buildQuery(
   api: ApiClient,
@@ -19,12 +18,10 @@ export function buildQuery(
 ) {
   return {
     queryKey: ["entity", entityId, "bottles"],
-    queryFn: (): Promise<Paginated<Entity>> =>
-      api.get(`/bottles`, {
-        query: {
-          ...Object.fromEntries(queryParams.entries()),
-          entity: entityId,
-        },
+    queryFn: () =>
+      fetchBottles(api, {
+        ...Object.fromEntries(queryParams.entries()),
+        entity: entityId,
       }),
     cacheTime: 0,
   };
@@ -34,7 +31,7 @@ export async function loader({ request, context, params }: LoaderArgs) {
   invariant(params.entityId);
   const { searchParams } = new URL(request.url);
 
-  const query = buildQuery(context.api, params.entityid, searchParams);
+  const query = buildQuery(context.api, params.entityId, searchParams);
 
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery(query);

@@ -1,4 +1,4 @@
-import type { Paginated } from "@peated/shared/types";
+import type { Entity } from "@peated/shared/types";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useOutletContext } from "@remix-run/react";
@@ -7,18 +7,16 @@ import invariant from "tiny-invariant";
 import EmptyActivity from "~/components/emptyActivity";
 import TastingList from "~/components/tastingList";
 import useApi from "~/hooks/useApi";
-import type { Entity, Tasting } from "~/types";
+import { fetchTastings } from "~/queries/tastings";
 
 export async function loader({ params: { entityId }, context }: LoaderArgs) {
   invariant(entityId);
 
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(
-    ["entity", entityId, "tastings"],
-    (): Promise<Paginated<Tasting>> =>
-      context.api.get(`/tastings`, {
-        query: { entity: entityId },
-      }),
+  await queryClient.prefetchQuery(["entity", entityId, "tastings"], () =>
+    fetchTastings(context.api, {
+      entity: entityId,
+    }),
   );
 
   return json({ dehydratedState: dehydrate(queryClient) });
@@ -31,9 +29,9 @@ export default function EntityActivity() {
 
   const { data: tastingList } = useQuery(
     ["entity", `${entity.id}`, "tastings"],
-    (): Promise<Paginated<Tasting>> =>
-      api.get(`/tastings`, {
-        query: { entity: entity.id },
+    () =>
+      fetchTastings(api, {
+        entity: entity.id,
       }),
   );
 

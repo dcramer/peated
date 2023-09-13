@@ -11,8 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
 
-import type { Paginated } from "@peated/shared/types";
-
+import type { Entity, Paginated } from "@peated/shared/types";
 import EntityIcon from "~/components/assets/Entity";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
@@ -26,12 +25,12 @@ import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { formatCategoryName } from "~/lib/strings";
 import { getEntityUrl } from "~/lib/urls";
-import type { Entity } from "~/types";
+import { getEntity } from "~/queries/entities";
 
 export async function loader({ params, context }: LoaderArgs) {
   invariant(params.entityId);
 
-  const entity: Entity = await context.api.get(`/entities/${params.entityId}`);
+  const entity: Entity = await getEntity(context.api, params.entityId);
 
   return json({ entity });
 }

@@ -3,8 +3,8 @@ import type { ActionArgs, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, useActionData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
-import Alert from "~/components/alert";
 
+import Alert from "~/components/alert";
 import PeatedLogo from "~/components/assets/Logo";
 import Button from "~/components/button";
 import Layout from "~/components/layout";

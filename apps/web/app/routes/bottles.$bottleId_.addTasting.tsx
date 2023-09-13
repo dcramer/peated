@@ -11,8 +11,7 @@ import type { z } from "zod";
 import { SERVING_STYLE_LIST } from "@peated/shared/constants";
 import { toTitleCase } from "@peated/shared/lib/strings";
 import { TastingInputSchema } from "@peated/shared/schemas";
-import type { Paginated, ServingStyle } from "@peated/shared/types";
-
+import type { Bottle, Paginated, ServingStyle } from "@peated/shared/types";
 import BottleCard from "~/components/bottleCard";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
@@ -30,7 +29,6 @@ import { ApiError } from "~/lib/api";
 import { redirectToAuth } from "~/lib/auth.server";
 import { toBlob } from "~/lib/blobs";
 import { logError } from "~/lib/log";
-import type { Bottle } from "~/types";
 
 type Tag = {
   tag: string;

@@ -1,10 +1,10 @@
-import type { Paginated } from "@peated/shared/types";
+import type { User } from "@peated/shared/types";
 import { useOutletContext } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import BottleTable from "~/components/bottleTable";
 import EmptyActivity from "~/components/emptyActivity";
 import useApi from "~/hooks/useApi";
-import type { Bottle, User } from "~/types";
+import { fetchBottlesInCollection } from "~/queries/collections";
 
 export default function ProfileCollections() {
   const api = useApi();
@@ -12,8 +12,7 @@ export default function ProfileCollections() {
 
   const { data } = useQuery({
     queryKey: ["collections", "user", user.id],
-    queryFn: (): Promise<Paginated<Bottle>> =>
-      api.get(`/users/${user.id}/collections/default/bottles`),
+    queryFn: () => fetchBottlesInCollection(api, user.id, "default"),
   });
 
   return (

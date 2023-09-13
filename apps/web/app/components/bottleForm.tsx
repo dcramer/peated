@@ -6,7 +6,7 @@ import type { z } from "zod";
 
 import { CATEGORY_LIST } from "@peated/shared/constants";
 import { BottleInputSchema } from "@peated/shared/schemas";
-
+import type { Bottle, Entity } from "@peated/shared/types";
 import type { LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { PreviewBottleCard } from "~/components/bottleCard";
@@ -22,7 +22,6 @@ import config from "~/config";
 import { ApiError } from "~/lib/api";
 import { logError } from "~/lib/log";
 import { formatCategoryName } from "~/lib/strings";
-import type { Bottle, Entity } from "~/types";
 import Header from "./header";
 import Spinner from "./spinner";
 

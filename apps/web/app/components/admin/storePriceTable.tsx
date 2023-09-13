@@ -1,14 +1,15 @@
 import { Link } from "@remix-run/react";
 
-import type { PagingRel } from "@peated/shared/types";
-import type { StorePrice } from "~/types";
+import type { Bottle, PagingRel, StorePrice } from "@peated/shared/types";
 import Button from "../button";
 
 export default ({
   priceList,
   rel,
 }: {
-  priceList: StorePrice[];
+  priceList: (StorePrice & {
+    bottle?: Bottle;
+  })[];
   rel?: PagingRel;
 }) => {
   return (
@@ -43,9 +44,9 @@ export default ({
                     {price.name}
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
-                    {price.bottleId ? (
-                      <Link to={`/bottles/${price.bottleId}`}>
-                        Bottle {price.bottleId}
+                    {price.bottle ? (
+                      <Link to={`/bottles/${price.bottle.id}`}>
+                        Bottle {price.bottle.id}
                       </Link>
                     ) : (
                       <em>No Bottle</em>

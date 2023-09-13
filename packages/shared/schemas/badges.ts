@@ -14,5 +14,5 @@ export const BadgeSchema = z.object({
 export const BadgeInputSchema = z.object({
   type: BadgeTypeEnum,
   name: z.string(),
-  config: z.any(),
+  config: z.record(z.any()),
 });

@@ -5,12 +5,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { z } from "zod";
 
 import type { BottleInputSchema } from "@peated/shared/schemas";
-
+import type { Bottle } from "@peated/shared/types";
 import invariant from "tiny-invariant";
 import BottleForm from "~/components/bottleForm";
 import Spinner from "~/components/spinner";
 import useApi from "~/hooks/useApi";
-import type { Bottle } from "~/types";
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
 

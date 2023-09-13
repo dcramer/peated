@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { STORE_TYPE_LIST } from "../constants";
+import { BottleSchema } from "./bottles";
 
 export const StoreTypeEnum = z.enum(STORE_TYPE_LIST);
 
@@ -18,12 +19,18 @@ export const StoreInputSchema = z.object({
 });
 
 export const StorePriceSchema = z.object({
+  id: z.number(),
   name: z.string(),
   price: z.number(),
   url: z.string(),
   volume: z.number(),
   store: StoreSchema.optional(),
   updatedAt: z.string().datetime(),
+});
+
+export const StorePriceChangeSchema = StorePriceSchema.extend({
+  previous: StorePriceSchema.nullable(),
+  bottle: BottleSchema,
 });
 
 export const StorePriceInputSchema = z.object({

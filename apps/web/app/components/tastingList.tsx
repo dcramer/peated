@@ -1,6 +1,6 @@
+import type { Tasting } from "@peated/shared/types";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import type { Tasting } from "~/types";
 import TastingListItem from "./tastingListItem";
 
 export default function TastingList({

@@ -13,6 +13,7 @@ import invariant from "tiny-invariant";
 
 import { MAX_FILESIZE } from "@peated/shared/constants";
 
+import type { Tasting } from "@peated/shared/types";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
 import FormHeader from "~/components/formHeader";
@@ -23,7 +24,6 @@ import Spinner from "~/components/spinner";
 import { ApiError } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
 import { logError } from "~/lib/log";
-import type { Tasting } from "~/types";
 
 export async function action({ context, request, params }: ActionArgs) {
   invariant(params.tastingId);
@@ -39,6 +39,7 @@ export async function action({ context, request, params }: ActionArgs) {
       ? await request.formData()
       : await unstable_parseMultipartFormData(request, uploadHandler);
 
+  // TODO: move to queries
   const image = formData.get("image");
   if (!image) {
     await context.api.delete(`/tastings/${params.tastingId}/image`);

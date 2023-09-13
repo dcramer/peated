@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { Paginated } from "@peated/shared/types";
+import type { Comment, User } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useNavigate } from "@remix-run/react";
@@ -20,7 +20,8 @@ import TimeSince from "~/components/timeSince";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import type { Comment, Tasting, User } from "~/types";
+import { fetchComments } from "~/queries/comments";
+import { getTasting } from "~/queries/tastings";
 
 const CommentForm = ({
   tastingId,
@@ -120,10 +121,8 @@ const CommentList = ({
 }) => {
   const api = useApi();
 
-  const { data } = useQuery(
-    ["comments", tastingId],
-    (): Promise<Paginated<Comment>> =>
-      api.get(`/comments`, { query: { tasting: tastingId } }),
+  const { data } = useQuery(["comments", tastingId], () =>
+    fetchComments(api, tastingId),
   );
 
   const [deleted, setDeleted] = useState<number[]>([]);
@@ -196,9 +195,7 @@ const CommentList = ({
 export async function loader({ params, context }: LoaderArgs) {
   invariant(params.tastingId);
 
-  const tasting: Tasting = await context.api.get(
-    `/tastings/${params.tastingId}`,
-  );
+  const tasting = await getTasting(context.api, params.tastingId);
 
   return json({ tasting });
 }

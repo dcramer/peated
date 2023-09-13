@@ -1,6 +1,6 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
+import type { Bottle } from "@peated/shared/types";
 import { Link } from "@remix-run/react";
-import type { Bottle } from "~/types";
 import classNames from "../lib/classNames";
 import { formatCategoryName } from "../lib/strings";
 import type { Option } from "./selectField";

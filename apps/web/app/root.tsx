@@ -24,6 +24,7 @@ import type { PropsWithChildren } from "react";
 import { useState } from "react";
 import { useDehydratedState } from "use-dehydrated-state";
 
+import type { User } from "@peated/shared/types";
 import glyphUrl from "~/assets/glyph.png";
 import logo192Url from "~/assets/logo192.png";
 import ErrorPage from "~/components/error-page";
@@ -35,7 +36,6 @@ import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
 import { ApiUnauthorized } from "./lib/api";
 import { logError } from "./lib/log";
-import type { User } from "./types";
 
 function initMobileControls() {
   if (typeof document === "undefined") return;

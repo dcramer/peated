@@ -1,10 +1,10 @@
 /// <reference types="@remix-run/dev" />
 /// <reference types="@remix-run/node" />
 
+import type { User } from "@peated/shared/types";
 import "@remix-run/server-runtime";
 import "express-serve-static-core";
 import type { ApiClient } from "~/lib/api";
-import type { User } from "~/types";
 
 interface Context {
   user: User | null;

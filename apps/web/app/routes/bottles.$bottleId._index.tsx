@@ -4,23 +4,17 @@ import { useParams } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
 
-import type { Paginated } from "@peated/shared/types";
-
 import EmptyActivity from "~/components/emptyActivity";
 import TastingList from "~/components/tastingList";
 import useApi from "~/hooks/useApi";
-import type { Tasting } from "~/types";
+import { fetchTastings } from "~/queries/tastings";
 
 export async function loader({ params: { bottleId }, context }: LoaderArgs) {
   invariant(bottleId);
 
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(
-    ["bottle", bottleId, "tastings"],
-    (): Promise<Paginated<Tasting>> =>
-      context.api.get(`/tastings`, {
-        query: { bottle: bottleId },
-      }),
+  await queryClient.prefetchQuery(["bottle", bottleId, "tastings"], () =>
+    fetchTastings(context.api, { bottle: bottleId }),
   );
 
   return json({ dehydratedState: dehydrate(queryClient) });
@@ -32,12 +26,8 @@ export default function BottleActivity() {
   const { bottleId } = useParams<"bottleId">();
   invariant(bottleId);
 
-  const { data: tastingList } = useQuery(
-    ["bottle", bottleId, "tastings"],
-    (): Promise<Paginated<Tasting>> =>
-      api.get(`/tastings`, {
-        query: { bottle: bottleId },
-      }),
+  const { data: tastingList } = useQuery(["bottle", bottleId, "tastings"], () =>
+    fetchTastings(api, { bottle: bottleId }),
   );
 
   if (!tastingList) return null;

@@ -7,10 +7,10 @@ import {
 import { Link } from "@remix-run/react";
 import { useState } from "react";
 
+import type { Tasting } from "@peated/shared/types";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import classNames from "~/lib/classNames";
-import type { Tasting } from "~/types";
 import BottleCard from "./bottleCard";
 import Button from "./button";
 import { ImageModal } from "./imageModal";

@@ -1,5 +1,9 @@
 import { Menu } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import {
+  EllipsisVerticalIcon,
+  StarIcon as StarIconFilled,
+} from "@heroicons/react/20/solid";
+import { StarIcon } from "@heroicons/react/24/outline";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
@@ -7,10 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Fragment } from "react";
 import invariant from "tiny-invariant";
 
-import type { Paginated } from "@peated/shared/types";
-
-import { StarIcon as StarIconFilled } from "@heroicons/react/20/solid";
-import { StarIcon } from "@heroicons/react/24/outline";
+import type { Bottle } from "@peated/shared/types";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
@@ -25,23 +26,25 @@ import TimeSince from "~/components/timeSince";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { formatCategoryName } from "~/lib/strings";
-import type { Bottle, StorePrice } from "~/types";
-
-type BottleWithStats = Bottle & {
-  avgRating: number;
-  people: number;
-};
+import {
+  fetchBottlePrices,
+  fetchBottleTags,
+  getBottle,
+} from "~/queries/bottles";
+import {
+  favoriteBottle,
+  fetchCollections,
+  unfavoriteBottle,
+} from "~/queries/collections";
 
 const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
   const api = useApi();
 
   const { data: isCollected, isLoading } = useQuery(
-    ["bottles", bottle.id, "collections"],
+    ["bottles", bottle.id, "isCollected"],
     async () => {
-      const res = await api.get(`/users/me/collections`, {
-        query: {
-          bottle: bottle.id,
-        },
+      const res = await fetchCollections(api, "me", {
+        bottle: bottle.id,
       });
       return res.results.length > 0;
     },
@@ -51,19 +54,13 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
   const collectBottle = useMutation({
     mutationFn: async (collect: boolean) => {
       if (!collect) {
-        await api.delete(`/users/me/collections/default/bottles/${bottle.id}`);
-        return false;
+        return await unfavoriteBottle(api, bottle.id);
       } else {
-        await api.post("/users/me/collections/default/bottles", {
-          data: {
-            bottle: bottle.id,
-          },
-        });
-        return true;
+        return await favoriteBottle(api, bottle.id);
       }
     },
     onSuccess: (newData) => {
-      queryClient.setQueryData(["bottles", bottle.id, "collections"], newData);
+      queryClient.setQueryData(["bottles", bottle.id, "isCollected"], newData);
     },
   });
 
@@ -91,15 +88,11 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
   );
 };
 
-type Tag = { tag: string; count: number };
-
 const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
   const api = useApi();
 
-  const { data } = useQuery(
-    ["bottles", bottleId, "tags"],
-    (): Promise<Paginated<Tag> & { totalCount: number }> =>
-      api.get(`/bottles/${bottleId}/tags`),
+  const { data } = useQuery(["bottles", bottleId, "tags"], () =>
+    fetchBottleTags(api, bottleId),
   );
 
   if (!data) return null;
@@ -124,9 +117,7 @@ const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
 export async function loader({ params, context }: LoaderArgs) {
   invariant(params.bottleId);
 
-  const bottle: BottleWithStats = await context.api.get(
-    `/bottles/${params.bottleId}`,
-  );
+  const bottle = await getBottle(context.api, params.bottleId);
 
   return json({ bottle });
 }
@@ -294,7 +285,7 @@ export default function BottleDetails() {
               >
                 {bottle.createdBy.displayName}
               </Link>{" "}
-              <TimeSince date={bottle.createdAt} />
+              {bottle.createdAt && <TimeSince date={bottle.createdAt} />}
             </div>
           )}
         </div>
@@ -326,26 +317,47 @@ function BottlePricesSkeleton() {
   );
 }
 
+// function BottlePriceHistory({ bottleId }: { bottleId: number }) {
+//   const api = useApi();
+//   const { data, isLoading } = useQuery(["bottles", bottleId, "prices"], () =>
+//     fetchBottlePriceHistory(api, bottleId),
+//   );
+
+//   if (isLoading) return <div className="h-6 animate-pulse" />;
+
+//   if (!data) return null;
+
+//   <Sparklines
+//     data={data.results.map((r) => r.avgPrice)}
+//     limit={5}
+//     width={100}
+//     height={20}
+//     margin={5}
+//   >
+//     <SparklinesBars color="white" />
+//   </Sparklines>;
+// }
+
 function BottlePrices({ bottleId }: { bottleId: number }) {
   const api = useApi();
-  const { data } = useQuery(
-    ["bottles", bottleId, "prices"],
-    (): Promise<Paginated<StorePrice>> =>
-      api.get(`/bottles/${bottleId}/prices`),
+  const { data } = useQuery(["bottles", bottleId, "prices"], () =>
+    fetchBottlePrices(api, bottleId),
   );
 
   if (!data) return null;
-
   return (
     <div>
       <Tabs fullWidth>
         <Tabs.Item active>Prices</Tabs.Item>
       </Tabs>
+
+      {/* <BottlePriceHistory bottleId={bottleId} /> */}
+
       {data.results.length ? (
         <ul className="mt-4 space-y-2 text-sm">
           {data.results.map((price) => {
             return (
-              <li key={price.store?.id}>
+              <li key={price.id}>
                 <a href={price.url} className="flex hover:underline">
                   <span className="flex-1">{price.store?.name}</span>
                   <span>${(price.price / 100).toFixed(2)}</span>

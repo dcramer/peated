@@ -1,11 +1,11 @@
-import type { Paginated } from "@peated/shared/types";
+import type { User } from "@peated/shared/types";
 import { useOutletContext } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import EmptyActivity from "~/components/emptyActivity";
 import QueryBoundary from "~/components/queryBoundary";
 import TastingList from "~/components/tastingList";
 import useApi from "~/hooks/useApi";
-import type { Tasting, User } from "~/types";
+import { fetchTastings } from "~/queries/tastings";
 
 export default function ProfileActivity() {
   const api = useApi();
@@ -13,11 +13,9 @@ export default function ProfileActivity() {
 
   const { data } = useQuery({
     queryKey: ["tastings", "user", user.id],
-    queryFn: (): Promise<Paginated<Tasting>> =>
-      api.get("/tastings", {
-        query: {
-          user: user.id,
-        },
+    queryFn: () =>
+      fetchTastings(api, {
+        user: user.id,
       }),
   });
 

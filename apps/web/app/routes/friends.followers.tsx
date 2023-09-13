@@ -1,5 +1,5 @@
 import { AtSymbolIcon } from "@heroicons/react/20/solid";
-import type { Paginated } from "@peated/shared/types";
+import type { FollowStatus } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
@@ -10,13 +10,12 @@ import EmptyActivity from "~/components/emptyActivity";
 import ListItem from "~/components/listItem";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
-import type { FollowRequest, FollowStatus, Friend } from "~/types";
+import { fetchFollowers } from "~/queries/follows";
 
 export async function loader({ context }: LoaderArgs) {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(
-    ["following"],
-    (): Promise<Paginated<Friend>> => context.api.get("/followers"),
+  await queryClient.prefetchQuery(["following"], () =>
+    fetchFollowers(context.api),
   );
 
   return json({ dehydratedState: dehydrate(queryClient) });
@@ -35,7 +34,7 @@ export default function Followers() {
 
   const { data: followerList } = useQuery(
     ["followers"],
-    (): Promise<Paginated<FollowRequest>> => api.get("/followers"),
+    () => fetchFollowers(api),
     {
       staleTime: 5 * 60 * 1000,
     },
@@ -59,6 +58,7 @@ export default function Followers() {
     ),
   );
 
+  // TODO: move to mutations
   const acceptRequest = async (id: number) => {
     const data = await api.put(`/followers/${id}`, {
       data: { action: "accept" },
@@ -69,6 +69,7 @@ export default function Followers() {
     }));
   };
 
+  // TODO: move to mutations
   const followUser = async (toUserId: number, follow: boolean) => {
     const data = await api[follow ? "post" : "delete"](
       `/users/${toUserId}/follow`,

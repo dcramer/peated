@@ -1,8 +1,7 @@
 import { Link, useLocation } from "@remix-run/react";
 
-import type { PagingRel } from "@peated/shared/types";
+import type { Entity, PagingRel } from "@peated/shared/types";
 import { buildQueryString } from "~/lib/urls";
-import type { Entity } from "~/types";
 import Button from "./button";
 import Chip from "./chip";
 

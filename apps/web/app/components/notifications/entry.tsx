@@ -1,7 +1,8 @@
 import { XMarkIcon } from "@heroicons/react/20/solid";
+import type { Notification } from "@peated/shared/types";
 import { Link, useNavigate } from "@remix-run/react";
+import type { FollowNotification } from "~/types";
 import classNames from "../../lib/classNames";
-import type { Notification } from "../../types";
 import UserAvatar from "../userAvatar";
 import FollowEntry from "./followEntry";
 
@@ -80,7 +81,8 @@ const getLink = ({ notification }: { notification: Notification }) => {
       return `/users/${notification.objectId}`;
     case "comment":
     case "toast":
-      return `/tastings/${notification.ref.id}`;
+      if (notification.ref) return `/tastings/${notification.ref.id}`;
+      return null;
     default:
       return null;
   }
@@ -94,24 +96,32 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
       return (
         <>
           toasted
-          <Link
-            to={`/tastings/${notification.ref.id}`}
-            className="mx-1 font-semibold"
-          >
-            {notification.ref.bottle.brand.name}
-          </Link>
+          {notification.ref && "bottle" in notification.ref ? (
+            <Link
+              to={`/tastings/${notification.ref.id}`}
+              className="mx-1 font-semibold"
+            >
+              {notification.ref.bottle.brand.name}
+            </Link>
+          ) : (
+            "unknown tasting"
+          )}
         </>
       );
     case "comment":
       return (
         <>
           commented on
-          <Link
-            to={`/tastings/${notification.ref.id}`}
-            className="mx-1 font-semibold"
-          >
-            {notification.ref.bottle.brand.name}
-          </Link>
+          {notification.ref && "bottle" in notification.ref ? (
+            <Link
+              to={`/tastings/${notification.ref.id}`}
+              className="mx-1 font-semibold"
+            >
+              {notification.ref.bottle.brand.name}
+            </Link>
+          ) : (
+            "unknown tasting"
+          )}
         </>
       );
     default:
@@ -135,7 +145,12 @@ const NotificationEntryRef = ({
   };
   switch (notification.objectType) {
     case "follow":
-      return <FollowEntry {...props} />;
+      return (
+        <FollowEntry
+          {...props}
+          notification={notification as FollowNotification}
+        />
+      );
     default:
       return null;
   }

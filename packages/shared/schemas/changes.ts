@@ -12,5 +12,5 @@ export const ChangeSchema = z.object({
   type: ChangeTypeEnum,
   createdBy: UserSchema.optional(),
   createdAt: z.string().datetime(),
-  data: z.any(),
+  data: z.record(z.any()),
 });

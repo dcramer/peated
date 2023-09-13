@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
+import type { Bottle, Entity, User } from "@peated/shared/types";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import type { Bottle, Entity, User } from "~/types";
 import { debounce } from "../lib/api";
 import { formatCategoryName } from "../lib/strings";
 import BottleIcon from "./assets/Bottle";

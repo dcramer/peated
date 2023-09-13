@@ -1,4 +1,4 @@
-import type { Paginated } from "@peated/shared/types";
+import type { Change, Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
@@ -10,7 +10,6 @@ import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import type { Change } from "~/types";
 
 const UpdatesContent = () => {
   const api = useApi();

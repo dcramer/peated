@@ -1,5 +1,5 @@
 import { AtSymbolIcon } from "@heroicons/react/20/solid";
-import type { Paginated } from "@peated/shared/types";
+import type { FollowStatus } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
@@ -10,13 +10,12 @@ import EmptyActivity from "~/components/emptyActivity";
 import ListItem from "~/components/listItem";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
-import type { FollowStatus, Friend } from "~/types";
+import { fetchFollowing } from "~/queries/follows";
 
 export async function loader({ context }: LoaderArgs) {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(
-    ["following"],
-    (): Promise<Paginated<Friend>> => context.api.get("/following"),
+  await queryClient.prefetchQuery(["following"], () =>
+    fetchFollowing(context.api),
   );
 
   return json({ dehydratedState: dehydrate(queryClient) });
@@ -35,7 +34,7 @@ export default function Following() {
 
   const { data: followingList } = useQuery(
     ["following"],
-    (): Promise<Paginated<Friend>> => api.get("/following"),
+    () => fetchFollowing(api),
     {
       staleTime: 5 * 60 * 1000,
     },

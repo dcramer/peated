@@ -6,6 +6,7 @@ import { useEventListener } from "usehooks-ts";
 
 import type { Paginated } from "@peated/shared/types";
 
+import type { Tasting } from "@peated/shared/types";
 import Glyph from "~/components/assets/Glyph";
 import { ClientOnly } from "~/components/clientOnly";
 import EmptyActivity from "~/components/emptyActivity";
@@ -18,7 +19,7 @@ import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import type { ApiClient } from "~/lib/api";
 import classNames from "~/lib/classNames";
-import type { StorePrice, Tasting } from "~/types";
+import { fetchPriceChanges } from "~/queries/stores";
 
 const defaultViewParam = "global";
 
@@ -178,10 +179,7 @@ function PricesSkeleton() {
 
 function PriceChanges() {
   const api = useApi();
-  const { data } = useQuery(
-    ["price-changes"],
-    (): Promise<Paginated<StorePrice>> => api.get(`/priceChanges`),
-  );
+  const { data } = useQuery(["price-changes"], () => fetchPriceChanges(api));
 
   if (!data) return null;
 

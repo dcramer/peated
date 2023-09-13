@@ -15,7 +15,6 @@ export const StorePriceSerializer: Serializer<StorePrice> = {
   item: (item: StorePrice, attrs: Record<string, any>, currentUser?: User) => {
     return {
       id: item.id,
-      bottleId: item.bottleId,
       name: item.name,
       price: item.price,
       volume: item.volume,

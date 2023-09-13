@@ -1,16 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { LoaderFunction } from "@remix-run/node";
+import { json, type V2_MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
+import invariant from "tiny-invariant";
 import type { z } from "zod";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 import { EntityInputSchema } from "@peated/shared/schemas";
-
-import type { LoaderFunction } from "@remix-run/node";
-import { json, type V2_MetaFunction } from "@remix-run/node";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import invariant from "tiny-invariant";
 import CountryField from "~/components/countryField";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
@@ -21,7 +20,7 @@ import SelectField from "~/components/selectField";
 import Spinner from "~/components/spinner";
 import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
-import type { Entity } from "~/types";
+import { getEntity } from "~/queries/entities";
 
 const entityTypes = [
   { id: "brand", name: "Brand" },
@@ -41,7 +40,7 @@ export const meta: V2_MetaFunction = () => {
 
 export const loader: LoaderFunction = async ({ params, context }) => {
   invariant(params.entityId);
-  const entity: Entity = await context.api.get(`/entities/${params.entityId}`);
+  const entity = await getEntity(context.api, params.entityId);
 
   return json({ entity });
 };
@@ -53,6 +52,7 @@ export default function EditEntity() {
   const { entity } = useLoaderData<typeof loader>();
   const { entityId } = useParams();
 
+  // TODO: move to queries
   const saveEntity = useMutation({
     mutationFn: async (data: FormSchemaType) => {
       return await api.put(`/entities/${entityId}`, {

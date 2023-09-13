@@ -1,5 +1,5 @@
+import type { User } from "@peated/shared/types";
 import { createContext, useContext, useEffect, useState } from "react";
-import type { User } from "~/types";
 
 type Auth = {
   setUser: (user: User | null) => void;

@@ -1,9 +1,13 @@
 import { Link, useLocation } from "@remix-run/react";
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
-import type { PagingRel } from "@peated/shared/types";
+import type {
+  Bottle,
+  CollectionBottle,
+  Entity,
+  PagingRel,
+} from "@peated/shared/types";
 import { buildQueryString } from "~/lib/urls";
-import type { Bottle, CollectionBottle, Entity } from "~/types";
 import { formatCategoryName } from "../lib/strings";
 import Button from "./button";
 

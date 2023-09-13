@@ -4,9 +4,8 @@ import { useLocation } from "@remix-run/react";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
 
 import { ENTITY_TYPE_LIST, MAJOR_COUNTRIES } from "@peated/shared/constants";
-import type { Paginated } from "@peated/shared/types";
-
 import { toTitleCase } from "@peated/shared/lib/strings";
+import type { EntityType } from "@peated/shared/types";
 import EmptyActivity from "~/components/emptyActivity";
 import EntityTable from "~/components/entityTable";
 import Layout from "~/components/layout";
@@ -15,7 +14,7 @@ import SidebarLink from "~/components/sidebarLink";
 import useApi from "~/hooks/useApi";
 import type { ApiClient } from "~/lib/api";
 import { buildQueryString } from "~/lib/urls";
-import type { Entity } from "~/types";
+import { fetchEntities } from "~/queries/entities";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -66,15 +65,13 @@ export function buildQuery(api: ApiClient, queryString: URLSearchParams) {
       "sort",
       sort,
     ],
-    queryFn: (): Promise<Paginated<Entity>> =>
-      api.get("/entities", {
-        query: {
-          type,
-          country,
-          region,
-          sort,
-          page,
-        },
+    queryFn: () =>
+      fetchEntities(api, {
+        type: type as EntityType,
+        country,
+        region,
+        sort,
+        page,
       }),
   };
 }

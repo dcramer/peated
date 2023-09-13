@@ -1,6 +1,7 @@
+import type { FollowStatus } from "@peated/shared/types";
 import { useState } from "react";
 import useApi from "~/hooks/useApi";
-import type { FollowNotification, FollowStatus } from "../../types";
+import type { FollowNotification } from "../../types";
 import Button from "../button";
 
 export default ({
@@ -13,12 +14,8 @@ export default ({
   onMarkRead: () => void;
 }) => {
   const api = useApi();
-  const [theirFollowStatus, setTheirFollowStatus] = useState<FollowStatus>(
-    ref.status,
-  );
-  const [myFollowStatus, setMyFollowStatus] = useState<FollowStatus>(
-    ref.followsBack,
-  );
+  const [theirFollowStatus, setTheirFollowStatus] = useState(ref.status);
+  const [myFollowStatus, setMyFollowStatus] = useState(ref.followsBack);
 
   const acceptRequest = async (id: number) => {
     const data = await api.put(`/followers/${id}`, {

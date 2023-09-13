@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
+import type { Entity } from "@peated/shared/types";
 import { type LoaderFunction, type V2_MetaFunction } from "@remix-run/node";
 import BottleForm from "~/components/bottleForm";
 import Spinner from "~/components/spinner";
 import useApi from "~/hooks/useApi";
 import { redirectToAuth } from "~/lib/auth.server";
-import type { Entity } from "~/types";
 
 export const loader: LoaderFunction = ({ request, context }) => {
   if (!context.user) return redirectToAuth({ request });

@@ -1,6 +1,5 @@
 import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useSubmit } from "@remix-run/react";
@@ -17,24 +16,12 @@ import Tabs from "~/components/tabs";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import type { FollowStatus, Tag, User } from "~/types";
-
-type UserDetails = User & {
-  followStatus?: FollowStatus;
-  stats: {
-    bottles: number;
-    tastings: number;
-    contributions: number;
-    collected: number;
-  };
-};
+import { fetchUserTags, getUser } from "~/queries/users";
 
 const UserTagDistribution = ({ userId }: { userId: number }) => {
   const api = useApi();
-  const { data } = useQuery(
-    ["users", userId, "tags"],
-    (): Promise<Paginated<Tag> & { totalCount: number }> =>
-      api.get(`/users/${userId}/tags`),
+  const { data } = useQuery(["users", userId, "tags"], () =>
+    fetchUserTags(api, userId),
   );
 
   if (!data) return null;
@@ -59,7 +46,7 @@ const UserTagDistribution = ({ userId }: { userId: number }) => {
 export async function loader({ params, context }: LoaderArgs) {
   invariant(params.username);
 
-  const user: UserDetails = await context.api.get(`/users/${params.username}`);
+  const user = await getUser(context.api, params.username);
 
   return json({ user });
 }
@@ -80,7 +67,7 @@ export default function Profile() {
   const submit = useSubmit();
   const data = useLoaderData<typeof loader>();
 
-  const [user, setUser] = useState<UserDetails>(data.user);
+  const [user, setUser] = useState(data.user);
   const [followStatus, setFollowStatus] = useState(user.followStatus);
 
   const followUser = async (follow: boolean) => {

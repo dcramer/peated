@@ -3,6 +3,7 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/shared/schemas";
+import type { User } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,7 +22,6 @@ import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { toBlob } from "~/lib/blobs";
-import type { User } from "~/types";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 

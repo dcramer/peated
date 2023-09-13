@@ -1,7 +1,7 @@
+import type { Notification } from "@peated/shared/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import useApi from "~/hooks/useApi";
-import type { Notification } from "../../types";
 import NotificationEntry from "./entry";
 
 export default function NotificationList({

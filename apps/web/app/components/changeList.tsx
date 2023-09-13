@@ -1,7 +1,6 @@
-import type { PagingRel } from "@peated/shared/types";
+import type { Change, PagingRel, User } from "@peated/shared/types";
 import { Link } from "@remix-run/react";
 import { AnimatePresence } from "framer-motion";
-import type { Change, User } from "~/types";
 import Button from "./button";
 import ListItem from "./listItem";
 import TimeSince from "./timeSince";

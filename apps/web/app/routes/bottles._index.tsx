@@ -1,5 +1,4 @@
 import { CATEGORY_LIST } from "@peated/shared/constants";
-import type { Paginated } from "@peated/shared/types";
 import {
   json,
   type LoaderFunction,
@@ -17,7 +16,7 @@ import useApi from "~/hooks/useApi";
 import type { ApiClient } from "~/lib/api";
 import { formatCategoryName } from "~/lib/strings";
 import { buildQueryString } from "~/lib/urls";
-import type { Bottle } from "~/types";
+import { fetchBottles } from "~/queries/bottles";
 
 function buildQuery(api: ApiClient, queryString: URLSearchParams) {
   const page = queryString.get("page") || "1";
@@ -42,16 +41,14 @@ function buildQuery(api: ApiClient, queryString: URLSearchParams) {
       "sort",
       sort,
     ],
-    queryFn: (): Promise<Paginated<Bottle>> =>
-      api.get("/bottles", {
-        query: {
-          category,
-          age,
-          tag,
-          entity,
-          page,
-          sort,
-        },
+    queryFn: () =>
+      fetchBottles(api, {
+        category,
+        age,
+        tag,
+        entity,
+        page,
+        sort,
       }),
   };
 }
