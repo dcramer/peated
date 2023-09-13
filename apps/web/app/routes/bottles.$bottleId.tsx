@@ -277,13 +277,12 @@ export default function BottleDetails() {
 
       <div className="flex">
         <div className="flex-1">
-          <div className="border-b border-slate-700">
-            <Tabs fullWidth>
-              <Tabs.Item to={`/bottles/${bottle.id}`} controlled>
-                Activity
-              </Tabs.Item>
-            </Tabs>
-          </div>
+          <Tabs fullWidth border>
+            <Tabs.Item as={Link} to={`/bottles/${bottle.id}`} controlled>
+              Activity
+            </Tabs.Item>
+          </Tabs>
+
           <Outlet context={{ bottle }} />
 
           {bottle.createdBy && (

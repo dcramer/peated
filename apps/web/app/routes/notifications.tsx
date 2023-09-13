@@ -1,6 +1,6 @@
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLocation } from "@remix-run/react";
+import { Link, useLocation } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
@@ -43,6 +43,7 @@ export default function Notifications() {
     <Layout>
       <Tabs>
         <Tabs.Item
+          as={Link}
           active={filter === "unread"}
           to={{
             pathname: "/notifications",
@@ -51,6 +52,7 @@ export default function Notifications() {
           Unread
         </Tabs.Item>
         <Tabs.Item
+          as={Link}
           active={filter === "all"}
           to={{
             pathname: "/notifications",

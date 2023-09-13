@@ -163,10 +163,10 @@ export default function EntityDetails() {
         <EntityMap position={entity.location} />
       </div>
       <Tabs fullWidth>
-        <Tabs.Item to={baseUrl} controlled>
+        <Tabs.Item as={Link} to={baseUrl} controlled>
           Activity
         </Tabs.Item>
-        <Tabs.Item to={`${baseUrl}/bottles`} controlled>
+        <Tabs.Item as={Link} to={`${baseUrl}/bottles`} controlled>
           Bottles ({entity.totalBottles.toLocaleString()})
         </Tabs.Item>
       </Tabs>

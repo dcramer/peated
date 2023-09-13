@@ -1,5 +1,5 @@
 import type { V2_MetaFunction } from "@remix-run/node";
-import { Outlet } from "@remix-run/react";
+import { Link, Outlet } from "@remix-run/react";
 
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
@@ -16,16 +16,14 @@ export const meta: V2_MetaFunction = () => {
 export default function Friends() {
   return (
     <Layout>
-      <div className="border-b border-slate-700">
-        <Tabs fullWidth>
-          <Tabs.Item to="/friends" controlled>
-            Following
-          </Tabs.Item>
-          <Tabs.Item to="/friends/followers" controlled>
-            Followers
-          </Tabs.Item>
-        </Tabs>
-      </div>
+      <Tabs fullWidth border>
+        <Tabs.Item as={Link} to="/friends" controlled>
+          Following
+        </Tabs.Item>
+        <Tabs.Item as={Link} to="/friends/followers" controlled>
+          Followers
+        </Tabs.Item>
+      </Tabs>
       <QueryBoundary>
         <Outlet />
       </QueryBoundary>

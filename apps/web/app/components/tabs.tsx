@@ -1,16 +1,20 @@
-import { Link, useLocation } from "@remix-run/react";
+import { useLocation } from "@remix-run/react";
+import type { ElementType } from "react";
+import type { PolymorphicProps } from "~/types";
 import classNames from "../lib/classNames";
 
 type Props = {
   fullWidth?: boolean;
+  border?: boolean;
 } & React.ComponentPropsWithoutRef<"nav">;
 
-const Tabs = ({ fullWidth, ...props }: Props) => {
+const Tabs = ({ fullWidth, border, ...props }: Props) => {
   return (
     <nav
       className={classNames(
         "-mb-px flex space-x-8",
         fullWidth ? "[&>*]:flex-1 [&>*]:justify-center" : "",
+        border ? "border-b border-slate-700" : "",
       )}
       aria-label="Tabs"
       {...props}
@@ -18,25 +22,24 @@ const Tabs = ({ fullWidth, ...props }: Props) => {
   );
 };
 
-type BaseItemProps = {
+type ItemProps<E extends ElementType> = PolymorphicProps<E> & {
   active?: boolean;
   count?: number;
   controlled?: boolean;
 };
 
-type LinkItemProps = BaseItemProps &
-  React.ComponentPropsWithoutRef<typeof Link>;
-type ButtonItemProps = BaseItemProps & React.ComponentPropsWithoutRef<"button">;
+const defaultElement = "button";
 
-type ItemProps = LinkItemProps | ButtonItemProps;
-
-Tabs.Item = function TabItem({
+Tabs.Item = function TabItem<E extends ElementType = typeof defaultElement>({
+  as,
   active,
   count,
   children,
   controlled,
   ...props
-}: ItemProps) {
+}: ItemProps<E>) {
+  const Component = as ?? defaultElement;
+
   const location = useLocation();
 
   const activeStyles = "text-highlight border-highlight";
@@ -45,38 +48,15 @@ Tabs.Item = function TabItem({
 
   if ("to" in props) {
     if (controlled) active = location.pathname === props.to;
-
-    return (
-      <Link
-        className={classNames(
-          active ? activeStyles : inactiveStyles,
-          "flex whitespace-nowrap border-b-4 px-1 py-4 text-sm font-medium",
-        )}
-        {...props}
-      >
-        {children}
-        {count !== undefined && (
-          <span
-            className={classNames(
-              "bg-slate-700 text-slate-500",
-              "ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block",
-            )}
-          >
-            {count}
-          </span>
-        )}
-      </Link>
-    );
   }
 
+  const className = classNames(
+    active ? activeStyles : inactiveStyles,
+    "flex whitespace-nowrap border-b-4 px-1 py-4 text-sm font-medium",
+  );
+
   return (
-    <button
-      className={classNames(
-        active ? activeStyles : inactiveStyles,
-        "flex whitespace-nowrap border-b-4 px-1 py-4 text-sm font-medium",
-      )}
-      {...props}
-    >
+    <Component className={className} {...props}>
       {children}
       {count !== undefined && (
         <span
@@ -88,7 +68,7 @@ Tabs.Item = function TabItem({
           {count}
         </span>
       )}
-    </button>
+    </Component>
   );
 };
 

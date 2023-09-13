@@ -125,24 +125,26 @@ export default function Activity() {
     <Layout>
       <div className="flex">
         <div className="flex-1">
-          <div className="border-b border-slate-700">
-            <Tabs fullWidth>
-              {user && (
-                <Tabs.Item to="?view=friends" active={filterParam == "friends"}>
-                  Friends
-                </Tabs.Item>
-              )}
-              <Tabs.Item to="./" active={filterParam === "global"}>
-                Global
+          <Tabs fullWidth border>
+            {user && (
+              <Tabs.Item
+                as={Link}
+                to="?view=friends"
+                active={filterParam == "friends"}
+              >
+                Friends
               </Tabs.Item>
-              {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
+            )}
+            <Tabs.Item as={Link} to="./" active={filterParam === "global"}>
+              Global
+            </Tabs.Item>
+            {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
           Local
         </Tabs.Item> */}
-              <Tabs.Item to="/updates" controlled>
-                Updates
-              </Tabs.Item>
-            </Tabs>
-          </div>
+            <Tabs.Item as={Link} to="/updates" controlled>
+              Updates
+            </Tabs.Item>
+          </Tabs>
           <ClientOnly>
             {() => (
               <QueryBoundary>

@@ -3,7 +3,7 @@ import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Outlet, useLoaderData, useSubmit } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useSubmit } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import invariant from "tiny-invariant";
@@ -225,11 +225,15 @@ export default function Profile() {
           >
             <UserTagDistribution userId={user.id} />
           </QueryBoundary>
-          <Tabs fullWidth>
-            <Tabs.Item to={`/users/${user.username}`} controlled>
+          <Tabs fullWidth border>
+            <Tabs.Item as={Link} to={`/users/${user.username}`} controlled>
               Activity
             </Tabs.Item>
-            <Tabs.Item to={`/users/${user.username}/favorites`} controlled>
+            <Tabs.Item
+              as={Link}
+              to={`/users/${user.username}/favorites`}
+              controlled
+            >
               Favorites
             </Tabs.Item>
           </Tabs>

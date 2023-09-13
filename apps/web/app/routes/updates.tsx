@@ -1,6 +1,7 @@
 import type { Paginated } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import ChangeList from "~/components/changeList";
 import EmptyActivity from "~/components/emptyActivity";
@@ -59,9 +60,15 @@ export default function Updates() {
     <Layout>
       <>
         <Tabs fullWidth>
-          {user && <Tabs.Item to="/?view=friends">Friends</Tabs.Item>}
-          <Tabs.Item to="/">Global</Tabs.Item>
-          <Tabs.Item to="/updates" controlled>
+          {user && (
+            <Tabs.Item as={Link} to="/?view=friends">
+              Friends
+            </Tabs.Item>
+          )}
+          <Tabs.Item as={Link} to="/">
+            Global
+          </Tabs.Item>
+          <Tabs.Item as={Link} to="/updates" controlled>
             Updates
           </Tabs.Item>
         </Tabs>
