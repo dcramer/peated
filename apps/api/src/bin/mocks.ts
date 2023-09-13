@@ -12,7 +12,7 @@ import {
   users,
 } from "../db/schema";
 import { createNotification, objectTypeFromSchema } from "../lib/notifications";
-import { choose } from "../lib/rand";
+import { choose, random } from "../lib/rand";
 import * as Fixtures from "../lib/test/fixtures";
 
 const loadDefaultEntities = async () => {
@@ -86,8 +86,12 @@ program
 
     const brands = await loadDefaultEntities();
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
+    const dates = [];
+    const tDate = new Date();
+    for (let i = 0; i < 30; i++) {
+      tDate.setDate(tDate.getDate() - 1);
+      dates.push(new Date(tDate.getTime()));
+    }
 
     for (let i = 0; i < options.bottles; i++) {
       const bottle = await Fixtures.Bottle({
@@ -98,10 +102,16 @@ program
         bottleId: bottle.id,
       });
 
-      await Fixtures.StorePriceHistory({
-        priceId: price.id,
-        date: yesterday.toDateString(),
-      });
+      for (let i = 0; i < dates.length; i++) {
+        await Fixtures.StorePriceHistory({
+          priceId: price.id,
+          price:
+            price.price +
+            (random(0, 1) === 0 ? -1 : 1 * random(100, price.price / 2)),
+          volume: price.volume,
+          date: dates[i].toDateString(),
+        });
+      }
 
       console.log(`bottle ${bottle.name} created.`);
     }
