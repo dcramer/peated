@@ -16,7 +16,7 @@ export async function fetchCollections(
   userId: number | string | "me" = "me",
   params: CollectionQueryParams,
 ): Promise<Paginated<Collection>> {
-  return api.get(`/users/${userId}/collections/`, {
+  return api.get(`/users/${userId}/collections`, {
     query: params,
   });
 }
