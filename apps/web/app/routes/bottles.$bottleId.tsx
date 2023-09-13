@@ -266,7 +266,7 @@ export default function BottleDetails() {
         <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
           {stats.map((stat) => (
             <div key={stat.name}>
-              <div className="text-peated-light leading-7">{stat.name}</div>
+              <div className="text-light leading-7">{stat.name}</div>
               <div className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
                 {stat.value}
               </div>

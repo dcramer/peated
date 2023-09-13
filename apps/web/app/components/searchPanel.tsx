@@ -372,7 +372,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
                         Can't find a bottle?
                       </Link>
                     </div>
-                    <div className="text-peated-light mt-1 flex gap-x-1 leading-5">
+                    <div className="text-light mt-1 flex gap-x-1 leading-5">
                       {query !== "" ? (
                         <span>
                           Tap here to add{" "}

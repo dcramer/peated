@@ -40,7 +40,7 @@ export default function FormHeader({
       >
         <h1 className="text-lg">{title}</h1>
         {subtitle && (
-          <h2 className="text-peated-light hidden truncate text-sm sm:block">
+          <h2 className="text-light hidden truncate text-sm sm:block">
             {subtitle}
           </h2>
         )}

@@ -94,7 +94,7 @@ const Stats = () => {
     <div className="hidden items-center gap-4 text-center sm:grid sm:grid-cols-1 lg:grid-cols-2">
       {stats.map((stat) => (
         <div key={stat.name}>
-          <div className="text-peated-light leading-7">{stat.name}</div>
+          <div className="text-light leading-7">{stat.name}</div>
           <div className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
             {stat.value}
           </div>
