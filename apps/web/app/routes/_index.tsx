@@ -196,29 +196,24 @@ function PriceChanges() {
                 >
                   {price.bottle?.fullName}
                 </Link>
-                <div className="text-light flex flex-col">
-                  <a href={price.url} className="flex hover:underline">
-                    <span className="flex-1">{price.store?.name}</span>
-                    <span>${(price.price / 100).toFixed(2)}</span>
+                <div className="text-light flex items-center text-xs">
+                  <a href={price.url} className="flex-1 hover:underline">
+                    ${(price.price / 100).toFixed(2)}
                   </a>
-                  <div className="flex text-xs">
-                    <span className="flex-1">{price.volume}mL</span>
-                    {price.previous && (
-                      <span
-                        className={classNames(
-                          "flex self-end text-xs",
-                          price.previous.price > price.price
-                            ? "text-green-500"
-                            : "text-red-500",
-                        )}
-                      >
-                        <PriceDelta
-                          price={price.price}
-                          previous={price.previous.price}
-                        />
-                      </span>
-                    )}
-                  </div>
+                  {price.previous && (
+                    <span
+                      className={classNames(
+                        price.previous.price > price.price
+                          ? "text-green-500"
+                          : "text-red-500",
+                      )}
+                    >
+                      <PriceDelta
+                        price={price.price}
+                        previous={price.previous.price}
+                      />
+                    </span>
+                  )}
                 </div>
               </li>
             );
