@@ -42,7 +42,7 @@
     "dotenv-cli": "^7.3.0",
     "drizzle-kit": "^0.19.13",
     "drizzle-orm": "^0.28.6",
-    "fastify": "^4.23.0",
+    "fastify": "^4.23.1",
     "fastify-plugin": "^4.5.1",
     "form-data-encoder": "^3.0.0",
     "formdata-node": "^5.0.1",

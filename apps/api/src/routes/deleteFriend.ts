@@ -3,12 +3,12 @@ import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { follows, users } from "../db/schema";
-import { deleteNotification, objectTypeFromSchema } from "../lib/notifications";
+import { deleteNotification } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "DELETE",
-  url: "/users/:userId/follow",
+  url: "/friends/:userId",
   schema: {
     params: {
       type: "object",
@@ -23,7 +23,7 @@ export default {
     if (!req.user) return res.status(401);
 
     if (req.user.id === req.params.userId) {
-      return res.status(400).send({ error: "Cannot unfollow yourself" });
+      return res.status(400).send({ error: "Cannot unfriend yourself" });
     }
 
     const [user] = await db
@@ -49,9 +49,22 @@ export default {
           ),
         )
         .returning();
+
+      await tx
+        .update(follows)
+        .set({
+          status: "none",
+        })
+        .where(
+          and(
+            eq(follows.fromUserId, user.id),
+            eq(follows.toUserId, currentUser.id),
+          ),
+        );
+
       if (follow)
         deleteNotification(tx, {
-          objectType: objectTypeFromSchema(follows),
+          type: "friend_request",
           objectId: follow.id,
           userId: follow.toUserId,
         });

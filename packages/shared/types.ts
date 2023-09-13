@@ -17,6 +17,8 @@ import type {
   EntityTypeEnum,
   FollowSchema,
   FollowStatusEnum,
+  FriendSchema,
+  FriendStatusEnum,
   NotificationSchema,
   ObjectTypeEnum,
   PointSchema,
@@ -35,6 +37,7 @@ export type BadgeType = (typeof BADGE_TYPE_LIST)[number];
 export type EntityType = z.infer<typeof EntityTypeEnum>;
 export type ObjectType = z.infer<typeof ObjectTypeEnum>;
 export type FollowStatus = z.infer<typeof FollowStatusEnum>;
+export type FriendStatus = z.infer<typeof FriendStatusEnum>;
 export type Point = z.infer<typeof PointSchema>;
 
 export type Badge = z.infer<typeof BadgeSchema>;
@@ -45,6 +48,7 @@ export type CollectionBottle = z.infer<typeof CollectionBottleSchema>;
 export type Comment = z.infer<typeof CommentSchema>;
 export type Entity = z.infer<typeof EntitySchema>;
 export type Follow = z.infer<typeof FollowSchema>;
+export type Friend = z.infer<typeof FriendSchema>;
 export type Notification = z.infer<typeof NotificationSchema>;
 export type Store = z.infer<typeof StoreSchema>;
 export type StorePrice = z.infer<typeof StorePriceSchema>;

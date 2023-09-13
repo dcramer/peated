@@ -6,6 +6,7 @@ import {
   InboxIcon,
   InformationCircleIcon,
   MagnifyingGlassIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "@remix-run/react";
 import { Fragment } from "react";
@@ -63,6 +64,13 @@ export default function Sidebar() {
                     <QueryBoundary fallback={() => null} loading={<Fragment />}>
                       <NotificationCount />
                     </QueryBoundary>
+                  </SidebarLink>
+                  <SidebarLink
+                    to="/friends"
+                    icon={UserGroupIcon}
+                    active={location.pathname.startsWith("/friends")}
+                  >
+                    Friends
                   </SidebarLink>
                 </ul>
               </li>

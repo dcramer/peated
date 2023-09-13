@@ -51,16 +51,16 @@ export const createNotification = async (
 export const deleteNotification = async (
   db: DatabaseType | TransactionType,
   {
-    objectType,
+    type,
     objectId,
     userId,
-  }: Pick<Notification, "objectType" | "objectId" | "userId">,
+  }: Pick<Notification, "type" | "objectId" | "userId">,
 ) => {
   await db
     .delete(notifications)
     .where(
       and(
-        eq(notifications.objectType, objectType),
+        eq(notifications.type, type),
         eq(notifications.objectId, objectId),
         eq(notifications.userId, userId),
       ),

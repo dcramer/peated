@@ -32,7 +32,7 @@ export const UserSerializer: Serializer<User> = {
         return [
           item.id,
           {
-            followStatus: followsByRef[item.id]?.status || "none",
+            friendStatus: followsByRef[item.id]?.status || "none",
           },
         ];
       }),
@@ -46,7 +46,8 @@ export const UserSerializer: Serializer<User> = {
       pictureUrl: item.pictureUrl
         ? `${config.URL_PREFIX}${item.pictureUrl}`
         : null,
-      followStatus: attrs.followStatus,
+      friendStatus:
+        attrs.friendStatus === "following" ? "friends" : attrs.friendStatus,
       private: item.private,
     };
 

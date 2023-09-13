@@ -1,32 +1,32 @@
-import { FollowSchema, PaginatedSchema } from "@peated/shared/schemas";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { FriendSchema, PaginatedSchema } from "@peated/shared/schemas";
+import { and, asc, desc, eq, not } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
+import { FriendSerializer } from "~/lib/serializers/friend";
 import { db } from "../db";
 import { follows } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
-import { FollowingSerializer } from "../lib/serializers/follow";
 import { requireAuth } from "../middleware/auth";
 
 export default {
   method: "GET",
-  url: "/following",
+  url: "/friends",
   schema: {
     querystring: {
       type: "object",
       properties: {
         query: { type: "string" },
         page: { type: "number" },
-        status: { type: "string", enum: ["pending", "following"] },
+        filter: { type: "string", enum: ["pending"] },
       },
     },
     response: {
       200: zodToJsonSchema(
         PaginatedSchema.extend({
-          results: z.array(FollowSchema),
+          results: z.array(FriendSchema),
         }),
       ),
     },
@@ -39,9 +39,12 @@ export default {
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where = [eq(follows.fromUserId, req.user.id)];
-    if (req.query.status) {
-      where.push(eq(follows.status, req.query.status));
+    const where = [
+      eq(follows.fromUserId, req.user.id),
+      not(eq(follows.status, "none")),
+    ];
+    if (req.query.filter === "pending") {
+      where.push(eq(follows.status, "pending"));
     }
 
     const results = await db
@@ -54,7 +57,7 @@ export default {
 
     res.send({
       results: await serialize(
-        FollowingSerializer,
+        FriendSerializer,
         results.slice(0, limit),
         req.user,
       ),
@@ -77,12 +80,9 @@ export default {
   IncomingMessage,
   ServerResponse,
   {
-    Params: {
-      userId: number | "me";
-    };
     Querystring: {
       page?: number;
-      status?: "pending" | "following";
+      filter?: "pending";
     };
   }
 >;

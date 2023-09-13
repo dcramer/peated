@@ -4,7 +4,7 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 
 import { db } from "../db";
 import { tastings, toasts } from "../db/schema";
-import { createNotification, objectTypeFromSchema } from "../lib/notifications";
+import { createNotification } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -54,7 +54,7 @@ export default {
 
         createNotification(tx, {
           fromUserId: toast.createdById,
-          objectType: objectTypeFromSchema(toasts),
+          type: "toast",
           objectId: toast.id,
           createdAt: toast.createdAt,
           userId: tasting.createdById,

@@ -20,7 +20,7 @@ test("delete own notification", async () => {
     .values({
       userId: DefaultFixtures.user.id,
       fromUserId: (await Fixtures.User()).id,
-      objectType: "tasting",
+      type: "friend_request",
       objectId: 1,
       createdAt: new Date(),
     })
@@ -47,7 +47,7 @@ test("cannot delete others notification", async () => {
     .values({
       userId: (await Fixtures.User()).id,
       fromUserId: DefaultFixtures.user.id,
-      objectType: "tasting",
+      type: "friend_request",
       objectId: 1,
       createdAt: new Date(),
     })

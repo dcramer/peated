@@ -1,10 +1,10 @@
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import type { Notification } from "@peated/shared/types";
 import { Link, useNavigate } from "@remix-run/react";
-import type { FollowNotification } from "~/types";
+import type { FriendRequestNotification } from "~/types";
 import classNames from "../../lib/classNames";
 import UserAvatar from "../userAvatar";
-import FollowEntry from "./followEntry";
+import FriendRequestEntry from "./friendRequestEntry";
 
 export default function NotificationEntry({
   notification,
@@ -76,8 +76,8 @@ export default function NotificationEntry({
 }
 
 const getLink = ({ notification }: { notification: Notification }) => {
-  switch (notification.objectType) {
-    case "follow":
+  switch (notification.type) {
+    case "friend_request":
       return `/users/${notification.objectId}`;
     case "comment":
     case "toast":
@@ -89,9 +89,9 @@ const getLink = ({ notification }: { notification: Notification }) => {
 };
 
 const getStatusMessage = ({ notification }: { notification: Notification }) => {
-  switch (notification.objectType) {
-    case "follow":
-      return <>wants to follow you</>;
+  switch (notification.type) {
+    case "friend_request":
+      return <>sent you a friend request</>;
     case "toast":
       return (
         <>
@@ -143,12 +143,12 @@ const NotificationEntryRef = ({
     onArchive,
     onMarkRead,
   };
-  switch (notification.objectType) {
-    case "follow":
+  switch (notification.type) {
+    case "friend_request":
       return (
-        <FollowEntry
+        <FriendRequestEntry
           {...props}
-          notification={notification as FollowNotification}
+          notification={notification as FriendRequestNotification}
         />
       );
     default:

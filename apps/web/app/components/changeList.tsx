@@ -40,7 +40,7 @@ const ObjectDesc = ({
 }: {
   objectType: string;
   objectId: number;
-  displayName: string;
+  displayName?: string | null;
 }) => {
   switch (objectType) {
     case "entity":

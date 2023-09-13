@@ -1,17 +1,21 @@
 import { z } from "zod";
-import { FollowSchema } from "./follows";
-import { ObjectTypeEnum } from "./shared";
-import { TastingSchema } from "./tastings";
 import { UserSchema } from "./users";
+
+export const NotificationTypeEnum = z.enum([
+  "friend_request",
+  "toast",
+  "comment",
+]);
 
 export const NotificationSchema = z.object({
   id: z.number(),
   objectId: z.number(),
-  objectType: ObjectTypeEnum,
+  type: NotificationTypeEnum,
   fromUser: UserSchema.optional(),
   createdAt: z.string().datetime(),
   read: z.boolean(),
-  ref: z.union([TastingSchema, FollowSchema, z.null()]),
+  ref: z.any(),
+  // ref: z.union([TastingSchema, FriendSchema, z.null()]),
 });
 
 export const NotificationInputSchema = z.object({

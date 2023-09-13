@@ -6,6 +6,7 @@ export * from "./collections";
 export * from "./comments";
 export * from "./entities";
 export * from "./follows";
+export * from "./friends";
 export * from "./notifications";
 export * from "./shared";
 export * from "./stores";
