@@ -78,14 +78,14 @@ export default async function buildFastify(options = {}) {
         // this is the result of your validation library...
         errors: validation,
       });
-    } else if (error instanceof fastify.errorCodes.FST_ERR_BAD_STATUS_CODE) {
-      // Log error
-      this.log.error(error);
-      // Send error response
-      reply.status(error.statusCode || 500).send({
-        ok: false,
-        stack: config.ENV !== "production" ? error.stack : undefined,
-      });
+      // } else if (error instanceof errorCodes.FST_ERR_BAD_STATUS_CODE) {
+      //   // Log error
+      //   this.log.error(error);
+      //   // Send error response
+      //   reply.status(error.statusCode || 500).send({
+      //     ok: false,
+      //     stack: config.ENV !== "production" ? error.stack : undefined,
+      //   });
     } else {
       console.error(error);
       // fastify will use parent error handler to handle this

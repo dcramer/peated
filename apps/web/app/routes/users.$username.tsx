@@ -68,20 +68,18 @@ export default function Profile() {
   const data = useLoaderData<typeof loader>();
 
   const [user, setUser] = useState(data.user);
-  const [followStatus, setFollowStatus] = useState(user.followStatus);
+  const [friendStatus, setFriendStatus] = useState(user.friendStatus);
 
-  const followUser = async (follow: boolean) => {
-    const data = await api[follow ? "post" : "delete"](
-      `/users/${user.id}/follow`,
-    );
-    setFollowStatus(data.status);
+  const friendUser = async (follow: boolean) => {
+    const data = await api[follow ? "post" : "delete"](`/friends/${user.id}`);
+    setFriendStatus(data.status);
   };
 
   const isPrivate =
     user.private &&
     currentUser &&
     user.id !== currentUser.id &&
-    followStatus !== "following";
+    friendStatus !== "friends";
 
   return (
     <Layout>
@@ -144,11 +142,11 @@ export default function Profile() {
                 <>
                   <Button
                     color="primary"
-                    onClick={() => followUser(followStatus === "none")}
+                    onClick={() => friendUser(friendStatus === "none")}
                   >
-                    {followStatus === "none"
+                    {friendStatus === "none"
                       ? "Add Friend"
-                      : followStatus === "pending"
+                      : friendStatus === "pending"
                       ? "Request Pending"
                       : "Remove Friend"}
                   </Button>

@@ -3,7 +3,7 @@ import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { db } from "../db";
 import { comments, tastings } from "../db/schema";
-import { deleteNotification, objectTypeFromSchema } from "../lib/notifications";
+import { deleteNotification } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -42,7 +42,7 @@ export default {
         .where(eq(tastings.id, comment.tastingId));
 
       await deleteNotification(tx, {
-        objectType: objectTypeFromSchema(comments),
+        type: "comment",
         objectId: comment.id,
         userId: comment.createdById,
       });

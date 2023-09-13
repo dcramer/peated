@@ -14,22 +14,22 @@ beforeAll(async () => {
   };
 });
 
-test("cannot unfollow self", async () => {
+test("cannot unfriend self", async () => {
   const response = await app.inject({
     method: "DELETE",
-    url: `/users/${DefaultFixtures.user.id}/follow`,
+    url: `/friends/${DefaultFixtures.user.id}`,
     headers: DefaultFixtures.authHeaders,
   });
 
   expect(response).toRespondWith(400);
 });
 
-test("can unfollow new link", async () => {
+test("can unfriend new link", async () => {
   const otherUser = await Fixtures.User();
 
   const response = await app.inject({
     method: "DELETE",
-    url: `/users/${otherUser.id}/follow`,
+    url: `/friends/${otherUser.id}`,
     headers: DefaultFixtures.authHeaders,
   });
 
@@ -49,7 +49,7 @@ test("can unfollow new link", async () => {
   expect(follow).toBeUndefined();
 });
 
-test("can unfollow existing link", async () => {
+test("can unfriend existing link", async () => {
   const otherUser = await Fixtures.User();
 
   await Fixtures.Follow({
@@ -59,7 +59,7 @@ test("can unfollow existing link", async () => {
 
   const response = await app.inject({
     method: "DELETE",
-    url: `/users/${otherUser.id}/follow`,
+    url: `/friends/${otherUser.id}`,
     headers: DefaultFixtures.authHeaders,
   });
 

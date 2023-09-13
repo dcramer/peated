@@ -10,7 +10,7 @@ import { db } from "../db";
 import type { Comment, NewComment } from "../db/schema";
 import { comments, tastings } from "../db/schema";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
-import { createNotification, objectTypeFromSchema } from "../lib/notifications";
+import { createNotification } from "../lib/notifications";
 import { serialize } from "../lib/serializers";
 import { CommentSerializer } from "../lib/serializers/comment";
 import { requireAuth } from "../middleware/auth";
@@ -88,7 +88,7 @@ export default {
       if (comment.createdById !== tasting.createdById) {
         createNotification(tx, {
           fromUserId: comment.createdById,
-          objectType: objectTypeFromSchema(comments),
+          type: "comment",
           objectId: comment.id,
           createdAt: comment.createdAt,
           userId: tasting.createdById,

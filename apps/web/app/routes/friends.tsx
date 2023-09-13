@@ -18,10 +18,7 @@ export default function Friends() {
     <Layout>
       <Tabs fullWidth border>
         <Tabs.Item as={Link} to="/friends" controlled>
-          Following
-        </Tabs.Item>
-        <Tabs.Item as={Link} to="/friends/followers" controlled>
-          Followers
+          All
         </Tabs.Item>
       </Tabs>
       <QueryBoundary>

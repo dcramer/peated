@@ -3,13 +3,19 @@ import {
   bigint,
   bigserial,
   boolean,
+  pgEnum,
   pgTable,
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-import { objectTypeEnum } from "./enums";
 import { users } from "./users";
+
+export const notificationTypeEnum = pgEnum("notification_type", [
+  "comment",
+  "toast",
+  "friend_request",
+]);
 
 // this table is intended to delete notifications which are older than X time and read
 export const notifications = pgTable(
@@ -25,7 +31,7 @@ export const notifications = pgTable(
     ),
     // tracks ref of what owns the notification
     objectId: bigint("object_id", { mode: "number" }).notNull(),
-    objectType: objectTypeEnum("object_type").notNull(),
+    type: notificationTypeEnum("type").notNull(),
     // does not default as it should be set to object's createdAt timestamp
     createdAt: timestamp("created_at").notNull(),
 
@@ -36,7 +42,7 @@ export const notifications = pgTable(
       notificationUnique: uniqueIndex("notifications_unq").on(
         notifications.userId,
         notifications.objectId,
-        notifications.objectType,
+        notifications.type,
         notifications.createdAt,
       ),
     };

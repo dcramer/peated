@@ -3,7 +3,6 @@ import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { db } from "../db";
 import { follows, notifications } from "../db/schema";
-import { objectTypeFromSchema } from "../lib/notifications";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;
@@ -18,7 +17,7 @@ beforeAll(async () => {
 test("cannot follow self", async () => {
   const response = await app.inject({
     method: "POST",
-    url: `/users/${DefaultFixtures.user.id}/follow`,
+    url: `/friends/${DefaultFixtures.user.id}`,
     headers: DefaultFixtures.authHeaders,
   });
 
@@ -30,7 +29,7 @@ test("can follow new link", async () => {
 
   const response = await app.inject({
     method: "POST",
-    url: `/users/${otherUser.id}/follow`,
+    url: `/friends/${otherUser.id}`,
     headers: DefaultFixtures.authHeaders,
   });
 
@@ -56,7 +55,7 @@ test("can follow new link", async () => {
     .where(
       and(
         eq(notifications.objectId, follow.id),
-        eq(notifications.objectType, objectTypeFromSchema(follows)),
+        eq(notifications.type, "friend_request"),
       ),
     );
 
@@ -76,13 +75,13 @@ test("can follow existing link", async () => {
 
   const response = await app.inject({
     method: "POST",
-    url: `/users/${otherUser.id}/follow`,
+    url: `/friends/${otherUser.id}`,
     headers: DefaultFixtures.authHeaders,
   });
 
   expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
-  expect(data.status).toBe("following");
+  expect(data.status).toBe("friends");
 
   const [newFollow] = await db
     .select()
@@ -97,23 +96,23 @@ test("can follow existing link", async () => {
   expect(newFollow.status).toBe(follow.status);
 });
 
-test("automatically approves follow when mutual", async () => {
+test("approves when mutual", async () => {
   const otherUser = await Fixtures.User();
   await Fixtures.Follow({
     fromUserId: otherUser.id,
     toUserId: DefaultFixtures.user.id,
-    status: "following",
+    status: "pending",
   });
 
   const response = await app.inject({
     method: "POST",
-    url: `/users/${otherUser.id}/follow`,
+    url: `/friends/${otherUser.id}`,
     headers: DefaultFixtures.authHeaders,
   });
 
   expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
-  expect(data.status).toBe("following");
+  expect(data.status).toBe("friends");
 
   const [follow] = await db
     .select()
@@ -133,7 +132,7 @@ test("automatically approves follow when mutual", async () => {
     .where(
       and(
         eq(notifications.objectId, follow.id),
-        eq(notifications.objectType, objectTypeFromSchema(follows)),
+        eq(notifications.type, "friend_request"),
       ),
     );
 

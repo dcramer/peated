@@ -1,4 +1,4 @@
-import type { Notification, User } from "../../db/schema";
+import type { Follow, Notification, User } from "../../db/schema";
 import { comments, follows, tastings, toasts, users } from "../../db/schema";
 
 import { eq, inArray } from "drizzle-orm";
@@ -6,7 +6,6 @@ import type { Serializer } from ".";
 import { serialize } from ".";
 import { db } from "../../db";
 import { logError } from "../log";
-import { FollowerSerializer } from "./follow";
 import { TastingSerializer } from "./tasting";
 import { UserSerializer } from "./user";
 
@@ -35,15 +34,19 @@ export const NotificationSerializer: Serializer<Notification> = {
     }
 
     const followIdList = itemList
-      .filter((i) => i.objectType === "follow")
+      .filter((i) => i.type === "friend_request")
       .map((i) => i.objectId);
     const followList = followIdList.length
       ? await db.select().from(follows).where(inArray(follows.id, followIdList))
       : [];
     const followsById = Object.fromEntries(
-      (await serialize(FollowerSerializer, followList, currentUser)).map(
-        (data, index) => [followList[index].id, data],
-      ),
+      (
+        await serialize(
+          FriendRequestReceipientSerializer,
+          followList,
+          currentUser,
+        )
+      ).map((data, index) => [followList[index].id, data]),
     );
     if (followIdList.length !== followList.length) {
       logError("Failed to fetch all follow relations for notifications", {
@@ -52,7 +55,7 @@ export const NotificationSerializer: Serializer<Notification> = {
     }
 
     const toastIdList = itemList
-      .filter((i) => i.objectType === "toast")
+      .filter((i) => i.type === "toast")
       .map((i) => i.objectId);
     const toastTastingList = toastIdList.length
       ? await db
@@ -75,7 +78,7 @@ export const NotificationSerializer: Serializer<Notification> = {
     );
 
     const commentIdList = itemList
-      .filter((i) => i.objectType === "comment")
+      .filter((i) => i.type === "comment")
       .map((i) => i.objectId);
     const commentTastingList = commentIdList.length
       ? await db
@@ -98,8 +101,8 @@ export const NotificationSerializer: Serializer<Notification> = {
     );
 
     const getRef = (notification: Notification) => {
-      switch (notification.objectType) {
-        case "follow":
+      switch (notification.type) {
+        case "friend_request":
           return followsById[notification.objectId];
         case "toast":
           return toastsById[notification.objectId];
@@ -128,12 +131,50 @@ export const NotificationSerializer: Serializer<Notification> = {
   item: (item: Notification, attrs: Record<string, any>, currentUser: User) => {
     return {
       id: item.id,
-      objectType: item.objectType,
+      type: item.type,
       objectId: item.objectId,
       createdAt: item.createdAt,
       fromUser: attrs.fromUser,
       ref: attrs.ref,
       read: item.read,
+    };
+  },
+};
+
+export const FriendRequestReceipientSerializer: Serializer<Follow> = {
+  attrs: async (itemList: Follow[], currentUser?: User) => {
+    const userList = await db
+      .select()
+      .from(users)
+      .where(
+        inArray(
+          users.id,
+          itemList.map((i) => i.fromUserId),
+        ),
+      );
+    const usersById = Object.fromEntries(
+      (await serialize(UserSerializer, userList, currentUser)).map(
+        (data, index) => [userList[index].id, data],
+      ),
+    );
+
+    return Object.fromEntries(
+      itemList.map((item) => {
+        return [
+          item.id,
+          {
+            user: usersById[item.fromUserId],
+          },
+        ];
+      }),
+    );
+  },
+  item: (item: Follow, attrs: Record<string, any>, currentUser?: User) => {
+    return {
+      id: attrs.user.id,
+      status: item.status === "following" ? "friends" : item.status,
+      createdAt: item.createdAt,
+      user: attrs.user,
     };
   },
 };

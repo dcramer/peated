@@ -4,13 +4,13 @@ import type {
   PropsWithChildren,
 } from "react";
 
-import type { FollowSchema, TastingSchema } from "@peated/shared/schemas";
+import type { FriendSchema, TastingSchema } from "@peated/shared/schemas";
 import type { Notification, User } from "@peated/shared/types";
 import type { z } from "zod";
 
-export type FollowNotification = Notification & {
-  objectType: "follow";
-  ref: z.infer<typeof FollowSchema>;
+export type FriendRequestNotification = Notification & {
+  objectType: "friend_request";
+  ref: z.infer<typeof FriendSchema>;
 };
 
 export type ToastNotification = Notification & {

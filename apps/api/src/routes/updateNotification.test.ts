@@ -20,7 +20,7 @@ test("mark own notification as read", async () => {
     .values({
       userId: DefaultFixtures.user.id,
       fromUserId: (await Fixtures.User()).id,
-      objectType: "tasting",
+      type: "toast",
       objectId: 1,
       createdAt: new Date(),
     })
@@ -52,7 +52,7 @@ test("cannot update others notification", async () => {
     .values({
       userId: (await Fixtures.User()).id,
       fromUserId: DefaultFixtures.user.id,
-      objectType: "tasting",
+      type: "toast",
       objectId: 1,
       createdAt: new Date(),
     })

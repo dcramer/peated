@@ -3,15 +3,8 @@ import { eq, ne, sql } from "drizzle-orm";
 
 import { db } from "../db";
 import type { Entity } from "../db/schema";
-import {
-  bottles,
-  follows,
-  stores,
-  tastings,
-  toasts,
-  users,
-} from "../db/schema";
-import { createNotification, objectTypeFromSchema } from "../lib/notifications";
+import { bottles, stores, tastings, users } from "../db/schema";
+import { createNotification } from "../lib/notifications";
 import { choose, random } from "../lib/rand";
 import * as Fixtures from "../lib/test/fixtures";
 
@@ -149,7 +142,7 @@ program
         });
         await createNotification(db, {
           fromUserId: follow.fromUserId,
-          objectType: objectTypeFromSchema(follows),
+          type: "friend_request",
           objectId: follow.id,
           userId: follow.toUserId,
           createdAt: follow.createdAt,
@@ -178,7 +171,7 @@ program
         });
         await createNotification(db, {
           fromUserId: fromUserId,
-          objectType: objectTypeFromSchema(toasts),
+          type: "toast",
           objectId: toast.id,
           userId: toUserId,
           createdAt: toast.createdAt,

@@ -9,7 +9,6 @@ import {
   tastings,
   toasts,
 } from "../db/schema";
-import { objectTypeFromSchema } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -46,7 +45,7 @@ export default {
         .delete(notifications)
         .where(
           and(
-            eq(notifications.objectType, objectTypeFromSchema(toasts)),
+            eq(notifications.type, "toast"),
             inArray(
               notifications.objectId,
               sql`(SELECT ${toasts.id} FROM ${toasts} WHERE ${toasts.tastingId} = ${tasting.id})`,

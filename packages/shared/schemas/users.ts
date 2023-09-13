@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FollowStatusEnum } from "./shared";
+import { FriendStatusEnum } from "./shared";
 
 export const UserSchema = z.object({
   id: z.number(),
@@ -12,7 +12,7 @@ export const UserSchema = z.object({
   admin: z.boolean().optional(),
   mod: z.boolean().optional(),
   createdAt: z.string().datetime().optional(),
-  followStatus: FollowStatusEnum.optional(),
+  friendStatus: FriendStatusEnum.optional(),
 });
 
 export const UserInputSchema = z.object({

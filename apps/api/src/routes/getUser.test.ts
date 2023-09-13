@@ -23,7 +23,7 @@ test("get user by id", async () => {
   expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
   expect(data.id).toEqual(user.id);
-  expect(data.followStatus).toBe("none");
+  expect(data.friendStatus).toBe("none");
 });
 
 test("get user:me", async () => {
@@ -50,7 +50,7 @@ test("get user by username", async () => {
   expect(data.id).toBe(DefaultFixtures.user.id);
 });
 
-test("get user w/ followStatus", async () => {
+test("get user w/ friendStatus", async () => {
   const user = await Fixtures.User();
   await Fixtures.Follow({
     fromUserId: DefaultFixtures.user.id,
@@ -66,5 +66,5 @@ test("get user w/ followStatus", async () => {
   expect(response).toRespondWith(200);
   const data = JSON.parse(response.payload);
   expect(data.id).toBe(user.id);
-  expect(data.followStatus).toBe("following");
+  expect(data.friendStatus).toBe("friends");
 });
