@@ -1,12 +1,33 @@
 import { program } from "commander";
-import { eq, ne, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 
 import { db } from "../db";
-import type { Entity } from "../db/schema";
+import type { Bottle, Entity, Store } from "../db/schema";
 import { bottles, stores, tastings, users } from "../db/schema";
 import { createNotification } from "../lib/notifications";
-import { choose, random } from "../lib/rand";
+import { random } from "../lib/rand";
 import * as Fixtures from "../lib/test/fixtures";
+
+const loadDefaultStores = async () => {
+  const store1 =
+    (await db.query.stores.findFirst({
+      where: eq(stores.type, "totalwines"),
+    })) ||
+    (await Fixtures.Store({
+      name: "Total Wine",
+      type: "totalwines",
+    }));
+  const store2 =
+    (await db.query.stores.findFirst({
+      where: eq(stores.type, "woodencork"),
+    })) ||
+    (await Fixtures.Store({
+      name: "Wooden Cork",
+      type: "woodencork",
+    }));
+
+  return [store1, store2];
+};
 
 const loadDefaultEntities = async () => {
   const mocks: Pick<Entity, "name" | "country" | "region" | "type">[] = [
@@ -49,17 +70,88 @@ const loadDefaultEntities = async () => {
   return results;
 };
 
+const loadDefaultBottles = async (brandList: Entity[], storeList: Store[]) => {
+  const mocks: Pick<Bottle, "name" | "statedAge" | "brandId">[] = [];
+
+  brandList.forEach((brand) => {
+    mocks.push(
+      {
+        name: "12-year-old",
+        statedAge: 12,
+        brandId: brand.id,
+      },
+      {
+        name: "18-year-old",
+        statedAge: 18,
+        brandId: brand.id,
+      },
+      {
+        name: "25-year-old",
+        statedAge: 25,
+        brandId: brand.id,
+      },
+    );
+  });
+
+  const dates: Date[] = [];
+  const tDate = new Date();
+  for (let i = 0; i < 30; i++) {
+    tDate.setDate(tDate.getDate() - 1);
+    dates.push(new Date(tDate.getTime()));
+  }
+
+  const results: Bottle[] = [];
+
+  let bottle: Bottle;
+  for (const data of mocks) {
+    bottle =
+      (await db.query.bottles.findFirst({
+        where: (bottles, { eq, and }) =>
+          and(eq(bottles.name, data.name), eq(bottles.brandId, data.brandId)),
+      })) || (await Fixtures.Bottle(data));
+    results.push(bottle);
+
+    for (const store of storeList) {
+      const price =
+        (await db.query.storePrices.findFirst({
+          where: (storePrices, { eq, and }) =>
+            and(
+              eq(storePrices.storeId, store.id),
+              eq(storePrices.bottleId, bottle.id),
+            ),
+        })) ||
+        (await Fixtures.StorePrice({
+          storeId: store.id,
+          bottleId: bottle.id,
+        }));
+
+      for (let i = 0; i < dates.length; i++) {
+        (await db.query.storePriceHistories.findFirst({
+          where: (storePriceHistories, { eq }) =>
+            and(
+              eq(storePriceHistories.priceId, price.id),
+              eq(storePriceHistories.date, dates[i].toDateString()),
+            ),
+        })) ||
+          (await Fixtures.StorePriceHistory({
+            priceId: price.id,
+            price:
+              price.price +
+              (random(0, 1) === 0 ? -1 : 1 * random(100, price.price / 2)),
+            volume: price.volume,
+            date: dates[i].toDateString(),
+          }));
+      }
+    }
+    console.log(`Bottle ${bottle.fullName} created.`);
+  }
+};
+
 program.name("mocks").description("CLI for assisting with Drizzle");
 
 program
   .command("load-all")
   .argument("[email]", "define a user to receive new follows")
-  .option(
-    "--bottles <number>",
-    "number of bottles",
-    (v: string) => parseInt(v, 10),
-    5,
-  )
   .option(
     "--tastings <number>",
     "number of tastings",
@@ -68,46 +160,9 @@ program
   )
   .action(async (email, options) => {
     // load some realistic entities
-
-    const store =
-      (await db.query.stores.findFirst({
-        where: eq(stores.name, "Gimmicky Whiskeys"),
-      })) ||
-      (await Fixtures.Store({
-        name: "Gimmicky Whiskeys",
-      }));
-
-    const brands = await loadDefaultEntities();
-
-    const dates = [];
-    const tDate = new Date();
-    for (let i = 0; i < 30; i++) {
-      tDate.setDate(tDate.getDate() - 1);
-      dates.push(new Date(tDate.getTime()));
-    }
-
-    for (let i = 0; i < options.bottles; i++) {
-      const bottle = await Fixtures.Bottle({
-        brandId: choose(brands).id,
-      });
-      const price = await Fixtures.StorePrice({
-        storeId: store.id,
-        bottleId: bottle.id,
-      });
-
-      for (let i = 0; i < dates.length; i++) {
-        await Fixtures.StorePriceHistory({
-          priceId: price.id,
-          price:
-            price.price +
-            (random(0, 1) === 0 ? -1 : 1 * random(100, price.price / 2)),
-          volume: price.volume,
-          date: dates[i].toDateString(),
-        });
-      }
-
-      console.log(`bottle ${bottle.name} created.`);
-    }
+    const brandList = await loadDefaultEntities();
+    const storeList = await loadDefaultStores();
+    const bottleList = await loadDefaultBottles(brandList, storeList);
 
     for (let i = 0; i < options.tastings; i++) {
       const tasting = await Fixtures.Tasting({
