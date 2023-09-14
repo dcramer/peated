@@ -1,9 +1,14 @@
-import type { V2_MetaFunction } from "@remix-run/node";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { Link, Outlet } from "@remix-run/react";
 
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
+import { redirectToAuth } from "~/lib/auth.server";
+
+export async function loader({ context, request }: LoaderArgs) {
+  if (!context.user) return redirectToAuth({ request });
+}
 
 export const meta: V2_MetaFunction = () => {
   return [

@@ -7,9 +7,12 @@ import Layout from "~/components/layout";
 import NotificationList from "~/components/notifications/list";
 import Tabs from "~/components/tabs";
 import useApi from "~/hooks/useApi";
+import { redirectToAuth } from "~/lib/auth.server";
 import { fetchNotifications } from "~/queries/notifications";
 
 export async function loader({ context, request }: LoaderArgs) {
+  if (!context.user) return redirectToAuth({ request });
+
   const location = new URL(request.url);
   const filter = location.searchParams.get("filter") || "unread";
 
