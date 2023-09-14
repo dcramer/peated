@@ -4,34 +4,34 @@ import type { DataPoint } from "./types";
 type Props = {
   active: boolean;
   width: number;
+  unitHeight: number;
   x: number;
   data: DataPoint;
   previousData?: DataPoint;
   pixelFor: (value: number) => number;
 };
 
-export default function Candle({
+export default function Bar({
   active,
   data,
   previousData,
   x,
-  width: candleWidth,
+  width,
+  unitHeight,
   pixelFor,
 }: Props) {
   const up = !previousData || previousData.avg > data.avg;
   const down = previousData && previousData.avg < data.avg;
-  const barTop = pixelFor(data.avg);
-  const barBottom = pixelFor(data.avg);
-  const barHeight = 5;
-  const wickTop = pixelFor(data.high);
-  const wickBottom = pixelFor(data.low);
+  const barTop = pixelFor(data.high);
+  const barBottom = pixelFor(data.low);
+  const barHeight = Math.max(barTop - barBottom, 1) * unitHeight;
 
   return (
     <>
       <rect
-        x={x - candleWidth / 2}
+        x={x - width / 2}
         y={barTop}
-        width={candleWidth}
+        width={width}
         height={barHeight}
         className={classNames(
           "stroke-1",
@@ -42,26 +42,6 @@ export default function Candle({
             ? "fill-red-400 stroke-red-400"
             : "fill-light stroke-light",
         )}
-      />
-      <line
-        className={classNames(
-          "top stroke-2",
-          up ? "stroke-green-400" : down ? "stroke-red-400" : "stroke-light",
-        )}
-        x1={x}
-        y1={barTop}
-        x2={x}
-        y2={wickTop}
-      />
-      <line
-        className={classNames(
-          "bottom stroke-2",
-          up ? "stroke-green-400" : down ? "stroke-red-400" : "stroke-light",
-        )}
-        x1={x}
-        y1={barBottom}
-        x2={x}
-        y2={wickBottom}
       />
     </>
   );

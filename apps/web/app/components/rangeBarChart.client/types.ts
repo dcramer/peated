@@ -11,4 +11,5 @@ export type ChartDimensions = {
   high: number;
   low: number;
   delta: number;
+  unitHeight: number;
 };

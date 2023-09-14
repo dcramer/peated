@@ -1,7 +1,7 @@
-import * as d3 from "d3";
+import { max, min } from "d3";
 import { useState } from "react";
 
-import Candle from "./candle";
+import Bar from "./bar";
 import type { ChartDimensions, DataPoint } from "./types";
 
 type Props = {
@@ -20,8 +20,8 @@ export default function Chart({
     y: 0,
   });
 
-  const high = (d3.max(data.map((bar) => bar.high)) ?? 0) * 1.25;
-  const low = (d3.min(data.map((bar) => bar.low)) ?? 0) * 0.75;
+  const high = (max(data.map((bar) => bar.high)) ?? 0) * 1.25;
+  const low = (min(data.map((bar) => bar.low)) ?? 0) * 0.5;
 
   const chartDims: ChartDimensions = {
     width: chartWidth,
@@ -29,13 +29,11 @@ export default function Chart({
     high,
     low,
     delta: high - low,
+    unitHeight: chartHeight / (high - low),
   };
 
   const pixelFor = (value: number) => {
-    return Math.abs(
-      ((value - chartDims.low) / chartDims.delta) * chartDims.height -
-        chartDims.height,
-    );
+    return (chartDims.high - value) * chartDims.unitHeight;
   };
 
   const onMouseLeave = () => {
@@ -57,38 +55,39 @@ export default function Chart({
   };
 
   // calculate the candle width
-  const candleWidth = Math.floor((chartWidth / data.length) * 0.7);
+  const itemWidth = Math.floor((chartWidth / data.length) * 0.7);
 
-  const activeCandleIdx =
+  const activeItemIdx =
     Math.round(mouseCoords.x / (chartWidth / (data.length - 1))) - 1;
-  const activeCandle = data[activeCandleIdx];
+  const activeItem = data[activeItemIdx];
 
   return (
     <svg
       width={chartWidth}
       height={chartHeight}
-      className="bg-slate-900 text-white"
+      className="bg-slate-900 p-2 text-white"
       onMouseMove={onMouseMoveInside}
       onMouseLeave={onMouseLeave}
     >
       {data.map((bar, i) => {
-        const candleX = (chartWidth / (data.length + 1)) * (i + 1);
+        const itemX = (chartWidth / (data.length + 1)) * (i + 1);
         return (
-          <Candle
-            active={activeCandleIdx === i}
+          <Bar
+            active={activeItemIdx === i}
             key={i}
             data={bar}
             previousData={data[i - 1]}
-            x={candleX}
-            width={candleWidth}
+            x={itemX}
+            width={itemWidth}
+            unitHeight={chartDims.unitHeight}
             pixelFor={pixelFor}
           />
         );
       })}
-      {activeCandle && (
+      {activeItem && (
         <text x="5" y="16" className="fill-light text-xs">
           <tspan x="5" y="16">
-            ${(activeCandle.avg / 100).toFixed(2)} per mL
+            ${(activeItem.avg / 100).toFixed(2)} per mL
           </tspan>
         </text>
       )}

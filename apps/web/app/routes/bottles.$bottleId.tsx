@@ -15,12 +15,12 @@ import type { Bottle } from "@peated/shared/types";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
-import { CandleStickChart } from "~/components/candleStickChart.client";
 import { ClientOnly } from "~/components/clientOnly";
 import ConfirmationButton from "~/components/confirmationButton";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
+import { RangeBarChart } from "~/components/rangeBarChart.client";
 import SkeletonButton from "~/components/skeletonButton";
 import Tabs from "~/components/tabs";
 import TimeSince from "~/components/timeSince";
@@ -334,7 +334,7 @@ function BottlePriceHistory({ bottleId }: { bottleId: number }) {
     return { time: idx, high: r.maxPrice, low: r.minPrice, avg: r.avgPrice };
   });
 
-  return <CandleStickChart data={points} width={200} height={100} />;
+  return <RangeBarChart data={points} width={200} height={100} />;
 }
 
 function BottlePrices({ bottleId }: { bottleId: number }) {
