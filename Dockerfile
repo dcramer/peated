@@ -1,54 +1,49 @@
-FROM node:18-alpine as base
-
+FROM node:18-slim as base
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
+ENV PNPM_HOME "/pnpm"
+ENV PATH "$PNPM_HOME:$PATH"
+RUN corepack enable
+RUN apt update -y && apt install -y libc-dev fftw-dev gcc g++ make libc6
+RUN npm install -g -f pnpm
 
-RUN apk update && apk add vips vips-dev libc-dev fftw-dev gcc g++ make libc6-compat
-
-RUN npm install -g pnpm
-
-FROM base as build
-
+FROM base as base-env
 WORKDIR /app
-
+ARG VERSION
+ENV VERSION $VERSION
+ARG SENTRY_DSN
+ENV SENTRY_DSN $SENTRY_DSN
+ARG SENTRY_ORG
+ENV SENTRY_ORG $SENTRY_ORG
+ARG SENTRY_PROJECT
+ENV SENTRY_PROJECT $SENTRY_PROJECT
+ARG API_SERVER
+ENV API_SERVER $API_SERVER
+ARG GOOGLE_CLIENT_ID
+ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
 ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
 ADD packages ./packages
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/api/package.json ./apps/api/package.json
 ADD apps/scraper/package.json ./apps/scraper/package.json
-RUN pnpm install
 
-ARG VERSION
-ENV VERSION $VERSION
+FROM base-env as prod-deps
+WORKDIR /app
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-ARG SENTRY_DSN
-ENV SENTRY_DSN $SENTRY_DSN
-
-ARG SENTRY_ORG
-ENV SENTRY_ORG $SENTRY_ORG
-
-ARG SENTRY_PROJECT
-ENV SENTRY_PROJECT $SENTRY_PROJECT
-
-ARG API_SERVER
-ENV API_SERVER $API_SERVER
-
-ARG GOOGLE_CLIENT_ID
-ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
-
+FROM base-env AS build
+WORKDIR /app
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 ADD . .
-
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
     pnpm build
 
 # web service
-FROM build as web
-
+FROM base-env as web
 WORKDIR /app
-
+COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ ./
-
 ARG VERSION
 ENV VERSION $VERSION
 
@@ -64,38 +59,24 @@ WORKDIR /app/apps/web
 CMD ["pnpm", "start"]
 
 # scraper service
-FROM build as scraper
-
+FROM base-env as scraper
 WORKDIR /app
-
+ADD . .
+COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ ./
-
-ARG VERSION
-ENV VERSION $VERSION
-
 RUN echo $VERSION > VERSION
-
 WORKDIR /app/apps/scraper
-
 CMD ["pnpm", "start"]
 
 # api service
-FROM build as api
-
+FROM base-env as api
 WORKDIR /app
-
+ADD . .
+COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ ./
-
-ARG VERSION
-ENV VERSION $VERSION
-
 RUN echo $VERSION > VERSION
-
 ENV HOST 0.0.0.0
 ENV PORT 4000
-
 EXPOSE 4000
-
 WORKDIR /app/apps/api
-
 CMD ["pnpm", "start"]
