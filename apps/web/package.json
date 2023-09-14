@@ -56,7 +56,6 @@
     "autoprefixer": "^10.4.15",
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
-    "d3": "^7.8.5",
     "dayjs": "^1.11.9",
     "dotenv": "^16.3.1",
     "esbuild": "^0.18.20",

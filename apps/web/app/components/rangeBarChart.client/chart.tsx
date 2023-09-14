@@ -1,4 +1,3 @@
-import { max, min } from "d3";
 import { useState } from "react";
 
 import Bar from "./bar";
@@ -20,8 +19,8 @@ export default function Chart({
     y: 0,
   });
 
-  const high = (max(data.map((bar) => bar.high)) ?? 0) * 1.25;
-  const low = (min(data.map((bar) => bar.low)) ?? 0) * 0.5;
+  const high = (Math.max(...data.map((bar) => bar.high)) ?? 0) * 1.25;
+  const low = (Math.min(...data.map((bar) => bar.low)) ?? 0) * 0.5;
 
   const chartDims: ChartDimensions = {
     width: chartWidth,
@@ -54,7 +53,6 @@ export default function Chart({
     });
   };
 
-  // calculate the candle width
   const itemWidth = Math.floor((chartWidth / data.length) * 0.7);
 
   const activeItemIdx =
