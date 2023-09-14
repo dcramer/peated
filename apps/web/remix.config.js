@@ -12,7 +12,7 @@ module.exports = {
   appDirectory: "app",
   assetsBuildDirectory: "public/build",
   serverBuildPath: "build/index.js",
-  serverDependenciesToBundle: [/^@peated\/.*/, "d3", /^d3-*/],
+  serverDependenciesToBundle: [/^@peated\/.*/],
   serverModuleFormat: "cjs",
   publicPath: "/build/",
   postcss: true,
