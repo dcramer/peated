@@ -19,6 +19,9 @@
 **/.env.development.local
 **/.env.test.local
 **/.env.production.local
+**/.vscode
+**/.github
+**/.cache
 
 **/npm-debug.log*
 **/yarn-debug.log*
@@ -26,9 +29,11 @@
 
 **/.nyc-output
 
+.git
+.gitignore
 .env
 postgres-data
 
-# flyctl launch added from scraper/.gitignore
-scraper/**/.cache
-fly.toml
+*.md
+
+fly.*.toml
