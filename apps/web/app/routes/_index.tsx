@@ -189,31 +189,27 @@ function PriceChanges() {
         <ul className="mt-4 space-y-2 text-sm">
           {data.results.map((price) => {
             return (
-              <li key={price.id}>
+              <li key={price.id} className="flex space-x-2">
                 <Link
-                  to={`/bottles/${price.bottle?.id}`}
-                  className="hover:underline"
+                  to={`/bottles/${price.bottle.id}`}
+                  className="flex-1 truncate hover:underline"
                 >
-                  {price.bottle?.fullName}
+                  {price.bottle.fullName}
                 </Link>
-                <div className="text-light flex items-center text-xs">
-                  <a href={price.url} className="flex-1 hover:underline">
-                    ${(price.price / 100).toFixed(2)}
-                  </a>
-                  {price.previous && (
-                    <span
-                      className={classNames(
-                        price.previous.price > price.price
-                          ? "text-green-500"
-                          : "text-red-500",
-                      )}
-                    >
-                      <PriceDelta
-                        price={price.price}
-                        previous={price.previous.price}
-                      />
-                    </span>
-                  )}
+                <div className="text-light flex flex-col items-end text-xs">
+                  <span>${(price.price / 100).toFixed(2)}</span>
+                  <span
+                    className={classNames(
+                      price.previousPrice > price.price
+                        ? "text-green-500"
+                        : "text-red-500",
+                    )}
+                  >
+                    <PriceDelta
+                      price={price.price}
+                      previous={price.previousPrice}
+                    />
+                  </span>
                 </div>
               </li>
             );

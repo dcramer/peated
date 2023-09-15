@@ -1,13 +1,9 @@
-import type {
-  Bottle,
-  Store,
-  StorePrice,
-  StorePriceHistory,
-  User,
-} from "../../db/schema";
+import type { Store, StorePrice, User } from "../../db/schema";
 
+import type { BottlePriceChangeSchema } from "@peated/shared/schemas";
+import type { z } from "zod";
+import { db } from "~/db";
 import { serialize, type Serializer } from ".";
-import { notEmpty } from "../filter";
 import { BottleSerializer } from "./bottle";
 import { StoreSerializer } from "./store";
 
@@ -70,68 +66,51 @@ export const StorePriceWithStoreSerializer: Serializer<
   },
 };
 
-export const PriceChangeSerializer: Serializer<StorePrice & { store: Store }> =
-  {
-    attrs: async (
-      itemList: (StorePrice & { store: Store; bottle: Bottle })[],
-      currentUser?: User,
-    ) => {
-      const storesByRef = Object.fromEntries(
-        (
-          await serialize(
-            StoreSerializer,
-            itemList.map((r) => r.store),
-            currentUser,
-          )
-        ).map((data, index) => [itemList[index].id, data]),
-      );
-      const bottlesByRef = Object.fromEntries(
-        (
-          await serialize(
-            BottleSerializer,
-            itemList.map((r) => r.bottle).filter(notEmpty),
-            currentUser,
-          )
-        ).map((data, index) => [itemList[index].id, data]),
-      );
+export type BottlePriceChange = {
+  // bottle ID
+  id: number;
+  price: number;
+  previousPrice: number;
+  bottleId: number;
+};
 
-      return Object.fromEntries(
-        itemList.map((item) => {
-          return [
-            item.id,
-            {
-              store: storesByRef[item.id] || null,
-              bottle: bottlesByRef[item.id] || null,
-            },
-          ];
-        }),
-      );
-    },
+export const BottlePriceChangeSerializer: Serializer<BottlePriceChange> = {
+  attrs: async (itemList: BottlePriceChange[], currentUser?: User) => {
+    const bottleList = await db.query.bottles.findMany({
+      where: (bottles, { inArray }) =>
+        inArray(
+          bottles.id,
+          itemList.map((b) => b.id),
+        ),
+    });
+    const bottlesById = Object.fromEntries(
+      (await serialize(BottleSerializer, bottleList, currentUser)).map(
+        (data, index) => [bottleList[index].id, data],
+      ),
+    );
 
-    item: (
-      item: StorePrice & {
-        store: Store;
-        previous?: StorePriceHistory;
-        bottle: Bottle;
-      },
-      attrs: Record<string, any>,
-      currentUser?: User,
-    ) => {
-      return {
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        volume: item.volume,
-        url: item.url,
-        store: attrs.store,
-        bottle: attrs.bottle,
-        previous: item.previous
-          ? {
-              price: item.previous.price,
-              date: item.previous.date,
-            }
-          : null,
-        updatedAt: item.updatedAt,
-      };
-    },
-  };
+    return Object.fromEntries(
+      itemList.map((item) => {
+        return [
+          item.id,
+          {
+            bottle: bottlesById[item.id],
+          },
+        ];
+      }),
+    );
+  },
+
+  item: (
+    item: BottlePriceChange,
+    attrs: Record<string, any>,
+    currentUser?: User,
+  ): z.infer<typeof BottlePriceChangeSchema> => {
+    return {
+      id: item.id,
+      price: item.price,
+      previousPrice: item.previousPrice,
+      bottle: attrs.bottle,
+    };
+  },
+};

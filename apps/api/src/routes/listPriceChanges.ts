@@ -1,18 +1,19 @@
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
+import { and, eq, ilike, isNotNull, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
-import { db } from "../db";
 import {
-  bottles,
-  storePriceHistories,
-  storePrices,
-  stores,
-} from "../db/schema";
+  BottlePriceChangeSchema,
+  PaginatedSchema,
+} from "@peated/shared/schemas";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
+import { db } from "../db";
+import { storePriceHistories, storePrices } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
-import { PriceChangeSerializer } from "../lib/serializers/storePrice";
+import { BottlePriceChangeSerializer } from "../lib/serializers/storePrice";
 
 export default {
   method: "GET",
@@ -25,6 +26,13 @@ export default {
         page: { type: "number" },
       },
     },
+    response: {
+      200: zodToJsonSchema(
+        PaginatedSchema.extend({
+          results: z.array(BottlePriceChangeSchema),
+        }),
+      ),
+    },
   },
   handler: async (req, res) => {
     const page = req.query.page || 1;
@@ -33,9 +41,11 @@ export default {
     const limit = 100;
     const offset = (page - 1) * limit;
 
+    const minChange = 500; // $5
+
     const where: SQL[] = [
+      isNotNull(storePrices.bottleId),
       sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
-      sql`${storePrices.price} != ${storePriceHistories.price}`,
       sql`${storePriceHistories.date} < DATE(${storePrices.updatedAt})`,
       sql`${storePriceHistories.date} > NOW() - interval '4 week'`,
     ];
@@ -44,33 +54,30 @@ export default {
     }
 
     const results = await db
-      .selectDistinctOn([storePrices.id], {
-        ...getTableColumns(storePrices),
-        store: stores,
-        bottle: bottles,
-        previous: storePriceHistories,
+      .select({
+        id: sql<number>`${storePrices.bottleId}`,
+        price: sql`AVG(${storePrices.price})`,
+        previousPrice: sql`AVG(${storePriceHistories.price})`,
       })
       .from(storePrices)
-      .innerJoin(bottles, eq(bottles.id, storePrices.bottleId))
-      .innerJoin(stores, eq(stores.id, storePrices.storeId))
       .innerJoin(
         storePriceHistories,
         eq(storePriceHistories.priceId, storePrices.id),
       )
-      .where(where ? and(...where) : undefined)
-      .limit(limit + 1)
-      .offset(offset)
+      .where(and(...where))
+      .groupBy(storePrices.bottleId)
+      .having(
+        sql`ABS(AVG(${storePriceHistories.price}) - AVG(${storePrices.price})) > ${minChange}`,
+      )
       .orderBy(
-        asc(storePrices.id),
-        desc(storePriceHistories.date),
-        sql`ABS(${storePriceHistories.price} - ${storePrices.price}) DESC`,
-      );
-
-    // console.log(results.toSQL().sql);
+        sql`ABS(AVG(${storePriceHistories.price}) - AVG(${storePrices.price})) DESC`,
+      )
+      .limit(limit + 1)
+      .offset(offset);
 
     res.send({
       results: await serialize(
-        PriceChangeSerializer,
+        BottlePriceChangeSerializer,
         results.slice(0, limit),
         req.user,
       ),

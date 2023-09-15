@@ -28,14 +28,16 @@ export const StorePriceSchema = z.object({
   updatedAt: z.string().datetime(),
 });
 
-export const StorePriceChangeSchema = StorePriceSchema.extend({
-  previous: StorePriceSchema.nullable(),
-  bottle: BottleSchema,
-});
-
 export const StorePriceInputSchema = z.object({
   name: z.string(),
   price: z.number(),
   volume: z.number(),
   url: z.string(),
+});
+
+export const BottlePriceChangeSchema = z.object({
+  id: z.number(),
+  price: z.number(),
+  previousPrice: z.number(),
+  bottle: BottleSchema,
 });
