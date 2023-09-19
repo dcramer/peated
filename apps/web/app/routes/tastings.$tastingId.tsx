@@ -200,10 +200,10 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({ tasting });
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: V2_MetaFunction = ({ data }) => {
   return [
     {
-      title: "Tasting Details",
+      title: `${data.tasting.bottle.fullName} - Tasting Details`,
     },
   ];
 };
