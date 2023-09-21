@@ -101,7 +101,7 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
               to={`/tastings/${notification.ref.id}`}
               className="mx-1 font-semibold"
             >
-              {notification.ref.bottle.brand.fullName}
+              {notification.ref.bottle.fullName}
             </Link>
           ) : (
             "unknown tasting"
@@ -117,7 +117,7 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
               to={`/tastings/${notification.ref.id}`}
               className="mx-1 font-semibold"
             >
-              {notification.ref.bottle.brand.fullName}
+              {notification.ref.bottle.fullName}
             </Link>
           ) : (
             "unknown tasting"
