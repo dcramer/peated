@@ -17,11 +17,11 @@
   ],
   "dependencies": {
     "@peated/tsconfig": "workspace:*",
-    "@vitest/coverage-v8": "^0.34.4",
+    "@vitest/coverage-v8": "^0.34.5",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.2.2",
     "vite-tsconfig-paths": "^4.2.1",
-    "vitest": "^0.34.4",
+    "vitest": "^0.34.5",
     "zod": "^3.22.2"
   }
 }

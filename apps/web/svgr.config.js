@@ -1,4 +1,4 @@
 module.exports = {
-  plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx", "@svgr/plugin-prettier"],
+  plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx"],
   typescript: true,
 };
