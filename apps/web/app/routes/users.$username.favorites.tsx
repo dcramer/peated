@@ -11,7 +11,7 @@ export default function ProfileCollections() {
   const { user } = useOutletContext<{ user: User }>();
 
   const { data } = useQuery({
-    queryKey: ["collections", "user", user.id],
+    queryKey: ["collections", "user", user.id, "default"],
     queryFn: () => fetchBottlesInCollection(api, user.id, "default"),
   });
 

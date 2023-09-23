@@ -6,6 +6,7 @@ import {
   InboxIcon,
   InformationCircleIcon,
   MagnifyingGlassIcon,
+  StarIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "@remix-run/react";
@@ -54,6 +55,13 @@ export default function Sidebar() {
                     active={location.pathname.startsWith("/search")}
                   >
                     Search
+                  </SidebarLink>
+                  <SidebarLink
+                    to="/favorites"
+                    icon={StarIcon}
+                    active={location.pathname.startsWith("/favorites")}
+                  >
+                    Favorites
                   </SidebarLink>
                   <SidebarLink
                     to="/notifications"
