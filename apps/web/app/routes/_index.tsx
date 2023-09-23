@@ -8,6 +8,7 @@ import type { Paginated } from "@peated/shared/types";
 
 import type { Tasting } from "@peated/shared/types";
 import Glyph from "~/components/assets/Glyph";
+import BetaNotice from "~/components/betaNotice";
 import { ClientOnly } from "~/components/clientOnly";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
@@ -184,9 +185,10 @@ function PriceChanges() {
   if (!data) return null;
 
   return (
-    <div>
+    <div className="mt-4">
+      <BetaNotice>This is a work in progress.</BetaNotice>
       {data.results.length ? (
-        <ul className="mt-4 space-y-2 text-sm">
+        <ul className="space-y-2 text-sm">
           {data.results.map((price) => {
             return (
               <li key={price.id} className="flex space-x-2">

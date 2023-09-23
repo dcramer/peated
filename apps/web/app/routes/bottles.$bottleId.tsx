@@ -13,6 +13,7 @@ import invariant from "tiny-invariant";
 
 import type { Bottle } from "@peated/shared/types";
 import BottleIcon from "~/components/assets/Bottle";
+import BetaNotice from "~/components/betaNotice";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
 import { ClientOnly } from "~/components/clientOnly";
@@ -350,29 +351,34 @@ function BottlePrices({ bottleId }: { bottleId: number }) {
         <Tabs.Item active>Prices</Tabs.Item>
       </Tabs>
 
-      <ClientOnly fallback={<div className="h-6 animate-pulse" />}>
-        {() => <BottlePriceHistory bottleId={bottleId} />}
-      </ClientOnly>
+      <div className="mt-4">
+        <BetaNotice>This is a work in progress.</BetaNotice>
 
-      {data.results.length ? (
-        <ul className="mt-4 space-y-2 text-sm">
-          {data.results.map((price) => {
-            return (
-              <li key={price.id}>
-                <a href={price.url} className="flex hover:underline">
-                  <span className="flex-1">{price.store?.name}</span>
-                  <span>${(price.price / 100).toFixed(2)}</span>
-                </a>
-                <span className="text-light text-xs">
-                  {price.volume}mL &mdash; <TimeSince date={price.updatedAt} />
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      ) : (
-        <p className="mt-4 text-center text-sm">No sellers found.</p>
-      )}
+        <ClientOnly fallback={<div className="h-6 animate-pulse" />}>
+          {() => <BottlePriceHistory bottleId={bottleId} />}
+        </ClientOnly>
+
+        {data.results.length ? (
+          <ul className="mt-4 space-y-2 text-sm">
+            {data.results.map((price) => {
+              return (
+                <li key={price.id}>
+                  <a href={price.url} className="flex hover:underline">
+                    <span className="flex-1">{price.store?.name}</span>
+                    <span>${(price.price / 100).toFixed(2)}</span>
+                  </a>
+                  <span className="text-light text-xs">
+                    {price.volume}mL &mdash;{" "}
+                    <TimeSince date={price.updatedAt} />
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="mt-4 text-center text-sm">No sellers found.</p>
+        )}
+      </div>
     </div>
   );
 }
