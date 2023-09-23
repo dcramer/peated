@@ -8,6 +8,8 @@ import { redirectToAuth } from "~/lib/auth.server";
 
 export async function loader({ context, request }: LoaderArgs) {
   if (!context.user) return redirectToAuth({ request });
+
+  return null;
 }
 
 export const meta: V2_MetaFunction = () => {
