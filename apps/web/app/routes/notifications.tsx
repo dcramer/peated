@@ -44,7 +44,7 @@ export default function Notifications() {
 
   return (
     <Layout>
-      <Tabs>
+      <Tabs fullWidth>
         <Tabs.Item
           as={Link}
           active={filter === "unread"}

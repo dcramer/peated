@@ -2,10 +2,8 @@ import type { ReactNode } from "react";
 
 export default function SimpleHeader({ children }: { children?: ReactNode }) {
   return (
-    <div className="p-3 sm:py-0">
-      <h1 className="mb-4 truncate text-center text-3xl font-semibold leading-7 sm:text-left">
-        {children}
-      </h1>
-    </div>
+    <h1 className="text-highlight border-highlight flex whitespace-nowrap border-b-4 px-1 py-4 text-sm font-medium">
+      {children}
+    </h1>
   );
 }

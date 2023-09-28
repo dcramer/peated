@@ -1,8 +1,5 @@
-import {
-  BuildingOfficeIcon,
-  GlobeAmericasIcon,
-  UserGroupIcon,
-} from "@heroicons/react/20/solid";
+import { GlobeAmericasIcon, UserGroupIcon } from "@heroicons/react/20/solid";
+import { StarIcon } from "@heroicons/react/24/outline";
 import PeatedGlyph from "./assets/Glyph";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
@@ -13,8 +10,8 @@ export function AppFooter() {
       <NavLink to="/">
         <GlobeAmericasIcon className="h-8 w-8 sm:h-9 sm:w-9" />
       </NavLink>
-      <NavLink to="/entities">
-        <BuildingOfficeIcon className="h-8 w-8 sm:h-9 sm:w-9" />
+      <NavLink to="/favorites">
+        <StarIcon className="h-8 w-8 sm:h-9 sm:w-9" />
       </NavLink>
 
       <NavLink
