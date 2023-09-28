@@ -148,9 +148,8 @@ export const Bottle = async ({
       for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
         await tx.insert(bottlesToDistillers).values({
           bottleId: bottle.id,
-          distillerId: (
-            await Entity({ type: ["distiller"], totalBottles: 1 })
-          ).id,
+          distillerId: (await Entity({ type: ["distiller"], totalBottles: 1 }))
+            .id,
         });
       }
     } else {

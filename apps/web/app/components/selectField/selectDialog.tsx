@@ -6,7 +6,7 @@ import { toTitleCase } from "@peated/shared/lib/strings";
 
 import useApi from "~/hooks/useApi";
 import config from "../../config";
-import type { ApiRequestOptions} from "../../lib/api";
+import type { ApiRequestOptions } from "../../lib/api";
 import { debounce } from "../../lib/api";
 import classNames from "../../lib/classNames";
 import Header from "../header";

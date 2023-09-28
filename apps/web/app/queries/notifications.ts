@@ -1,5 +1,4 @@
-import type { Paginated } from "@peated/shared/types";
-import type { Notification } from "@peated/shared/types";
+import type { Notification, Paginated } from "@peated/shared/types";
 import type { ApiClient } from "~/lib/api";
 
 export async function fetchNotifications(

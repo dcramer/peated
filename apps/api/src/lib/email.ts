@@ -109,26 +109,27 @@ export function buildCommentHtml(comment: CommentWithRelations): string {
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td style="vertical-align:top"><img src="${config.URL_PREFIX}${
-    comment.createdBy.pictureUrl || `/img/placeholder-avatar.png`
-  }" width="36" height="36" style="border-radius:36px;display:block;" /></td>
+            comment.createdBy.pictureUrl || `/img/placeholder-avatar.png`
+          }" width="36" height="36" style="border-radius:36px;display:block;" /></td>
           <td style="padding-left:15px">
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td><b style="color:${
                   theme.colors.highlight.DEFAULT
                 };">${escapeHtml(
-    comment.createdBy.displayName || comment.createdBy.email.split("@")[0],
-  )}</b></td>
+                  comment.createdBy.displayName ||
+                    comment.createdBy.email.split("@")[0],
+                )}</b></td>
               </tr>
               <tr>
               <td style="color:${theme.colors.light};">${escapeHtml(
-    comment.comment,
-  )}</td>
+                comment.comment,
+              )}</td>
             </tr>
             <tr>
               <td style="padding-top:15px;"><a href="${commentUrl}" style="color:${
-    theme.colors.highlight.DEFAULT
-  };">View this Comment</a></td>
+                theme.colors.highlight.DEFAULT
+              };">View this Comment</a></td>
             </tr>
             </table>
         </tr>
