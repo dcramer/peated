@@ -1,14 +1,13 @@
-import { Menu } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { Comment, User } from "@peated/shared/types";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import Button from "~/components/button";
+import CommentEntry from "~/components/commentEntry";
 import EmbeddedLogin from "~/components/embeddedLogin";
 import Fieldset from "~/components/fieldset";
 import FormField from "~/components/formField";
@@ -16,7 +15,6 @@ import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import TastingListItem from "~/components/tastingListItem";
 import TextArea from "~/components/textArea";
-import TimeSince from "~/components/timeSince";
 import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
@@ -130,65 +128,28 @@ const CommentList = ({
   if (!data) return;
 
   return (
-    <ul className="my-4 space-y-4 px-3 sm:px-2">
-      <AnimatePresence>
-        {[...data.results, ...newValues].map((c) => {
-          if (deleted.indexOf(c.id) !== -1) return null;
-          const isAuthor = user?.id === c.createdBy.id;
-          return (
-            <motion.li
-              layout
-              key={c.id}
-              className="relative flex items-start space-x-2 text-white"
-            >
-              <div className="h-10 w-10 py-2 sm:h-12 sm:w-12 ">
-                <UserAvatar size={32} user={c.createdBy} />
-              </div>
-              <div className="min-w-0 flex-1 rounded bg-slate-900 px-3 py-2">
-                <div className="flex flex-row">
-                  <div className="flex-1">
-                    <div className="text-sm">
-                      <Link
-                        to={`/users/${c.createdBy.username}`}
-                        className="font-medium hover:underline"
-                      >
-                        {c.createdBy.displayName}
-                      </Link>
-                    </div>
-                    <div className="text-light text-sm">
-                      <TimeSince date={c.createdAt} />
-                    </div>
-                  </div>
-                  <div>
-                    <Menu as="div" className="menu">
-                      <Menu.Button as={Button} size="small" color="primary">
-                        <EllipsisVerticalIcon className="h-5 w-5" />
-                      </Menu.Button>
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded">
-                        {(user?.admin || isAuthor) && (
-                          <Menu.Item
-                            as="button"
-                            onClick={async () => {
-                              await api.delete(`/comments/${c.id}`);
-                              setDeleted((a) => [...a, c.id]);
-                            }}
-                          >
-                            Delete Comment
-                          </Menu.Item>
-                        )}
-                      </Menu.Items>
-                    </Menu>
-                  </div>
-                </div>
-                <div className="mt-4 text-sm">
-                  <p>{c.comment}</p>
-                </div>
-              </div>
-            </motion.li>
-          );
-        })}
-      </AnimatePresence>
-    </ul>
+    <AnimatePresence>
+      {[...data.results, ...newValues].map((c) => {
+        if (deleted.indexOf(c.id) !== -1) return null;
+        const isAuthor = user?.id === c.createdBy.id;
+        return (
+          <CommentEntry
+            as={motion.li}
+            layout
+            key={c.id}
+            className="relative flex items-start space-x-2 text-white"
+            createdAt={c.createdAt}
+            createdBy={c.createdBy}
+            text={c.comment}
+            canDelete={user?.admin || isAuthor}
+            onDelete={async () => {
+              await api.delete(`/comments/${c.id}`);
+              setDeleted((a) => [...a, c.id]);
+            }}
+          />
+        );
+      })}
+    </AnimatePresence>
   );
 };
 
@@ -221,7 +182,8 @@ export default function TastingDetails() {
         <ul className="mb-4">
           <TastingListItem
             tasting={tasting}
-            noComment
+            noCommentAction
+            hideNotes
             onDelete={() => {
               navigate("/");
             }}
@@ -239,13 +201,24 @@ export default function TastingDetails() {
       ) : (
         <EmbeddedLogin />
       )}
-      <QueryBoundary>
-        <CommentList
-          user={user}
-          tastingId={tasting.id}
-          newValues={newComments}
-        />
-      </QueryBoundary>
+
+      <ul className="my-4 space-y-4 px-3 sm:px-2">
+        {!!tasting.notes && (
+          <CommentEntry
+            className="relative flex items-start space-x-2 text-white"
+            createdAt={tasting.createdAt}
+            createdBy={tasting.createdBy}
+            text={tasting.notes}
+          />
+        )}
+        <QueryBoundary>
+          <CommentList
+            user={user}
+            tastingId={tasting.id}
+            newValues={newComments}
+          />
+        </QueryBoundary>
+      </ul>
     </Layout>
   );
 }

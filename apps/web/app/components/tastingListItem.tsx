@@ -24,13 +24,15 @@ export default function TastingListItem({
   noBottle,
   onDelete,
   onToast,
-  noComment = false,
+  hideNotes = false,
+  noCommentAction = false,
 }: {
   tasting: Tasting;
   noBottle?: boolean;
   onDelete?: (tasting: Tasting) => void;
   onToast?: (tasting: Tasting) => void;
-  noComment?: boolean;
+  hideNotes?: boolean;
+  noCommentAction?: boolean;
 }) {
   const api = useApi();
   const { bottle } = tasting;
@@ -85,7 +87,7 @@ export default function TastingListItem({
             />
           </div>
         )}
-        {!!tasting.notes && (
+        {!hideNotes && !!tasting.notes && (
           <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
             {tasting.notes}
           </p>
@@ -117,7 +119,7 @@ export default function TastingListItem({
               {totalToasts.toLocaleString()}
             </Button>
           )}
-          {user && !noComment && (
+          {user && !noCommentAction && (
             <Button
               icon={
                 <ChatBubbleLeftRightIcon
