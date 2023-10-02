@@ -3,6 +3,7 @@ import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import {
   ChatBubbleLeftRightIcon,
   HandThumbUpIcon,
+  ShareIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "@remix-run/react";
 import { useState } from "react";
@@ -132,6 +133,20 @@ export default function TastingListItem({
               {tasting.comments.toLocaleString()}
             </Button>
           )}
+          <Button
+            icon={<ShareIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />}
+            onClick={() => {
+              if (navigator.share) {
+                navigator
+                  .share({
+                    title: `${tasting.bottle.fullName} - Tasting Details`,
+                    text: `Notes and review by ${tasting.createdBy.username}`,
+                    url: `/tastings/${tasting.id}`,
+                  })
+                  .catch((error) => console.error("Error sharing", error));
+              }
+            }}
+          />
           {(user?.admin || isTaster) && (
             <Menu as="div" className="menu">
               <Menu.Button as={Button}>
