@@ -24,7 +24,7 @@ export default ({ mobileOnly = false, children, color = "default" }: Props) => {
         )}
       >
         <div className="flex h-14 w-full max-w-6xl lg:h-16 lg:pl-64">
-          <div className="justify-betwee flex flex-1 items-center px-3 lg:px-8">
+          <div className="flex flex-1 items-center justify-between px-3 lg:px-8">
             {children}
           </div>
         </div>

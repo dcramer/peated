@@ -2,6 +2,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { Link, useSubmit } from "@remix-run/react";
 import { Fragment, useRef } from "react";
 import useAuth from "~/hooks/useAuth";
+import classNames from "~/lib/classNames";
 import UserAvatar from "./userAvatar";
 
 export function ProfileDropdown() {
@@ -40,7 +41,12 @@ export function ProfileDropdown() {
         <>
           <Menu.Button
             ref={buttonRef}
-            className="focus:ring-highlight relative flex max-w-xs items-center rounded p-2 text-sm text-slate-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring"
+            className={classNames(
+              "relative flex max-w-xs items-center p-2 text-sm hover:bg-slate-800 hover:text-white focus:outline-none",
+              open
+                ? "rounded-b-none rounded-t bg-slate-800 text-white"
+                : "rounded text-slate-500",
+            )}
             onClick={openMenu}
             as={Link}
             to={`/users/${user.username}`}
@@ -66,7 +72,7 @@ export function ProfileDropdown() {
               onMouseEnter={() => onMouseEnter()}
               onMouseLeave={() => onMouseLeave(open)}
               static
-              className="absolute right-0 z-10 mt-2 w-48 origin-top-right divide-y divide-slate-700"
+              className="absolute right-0 z-10 mt-0 w-48 origin-top-right divide-y divide-slate-700"
             >
               <div>
                 <Menu.Item>
@@ -80,20 +86,6 @@ export function ProfileDropdown() {
                   >
                     Sign out
                   </button>
-                </Menu.Item>
-              </div>
-              <div>
-                <Menu.Item>
-                  <Link to={`/friends`}>Friends</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link to={`/bottles`}>Bottles</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link to={`/entities`}>Brands & Distillers</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link to={`/about`}>About</Link>
                 </Menu.Item>
               </div>
               {user.admin && (

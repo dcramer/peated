@@ -32,7 +32,7 @@ export default function SearchHeader({
       <div className="flex text-white hover:text-white">
         <button
           onClick={() => (onClose ? onClose() : navigate(-1))}
-          className={`-m-1.5 p-1.5 ${blockStyles} pr-3 outline-0 sm:pr-6`}
+          className={`-m-1.5 p-1.5 ${blockStyles} pr-4 outline-0 sm:pr-6`}
         >
           <span className="sr-only">Back</span>
           <span className="h-10 w-10">{closeIcon}</span>
@@ -56,7 +56,7 @@ export default function SearchHeader({
             setValue(e.target.value);
             if (onChange) onChange(e.target.value);
           }}
-          className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-500 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
+          className="w-full transform rounded border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-2"
         />
       </form>
       {onDone && (

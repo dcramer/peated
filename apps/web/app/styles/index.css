@@ -107,7 +107,15 @@
   }
 
   .menu div[role="menu"] {
-    @apply rounded bg-slate-800 py-1 text-sm text-white shadow-lg focus:outline-none;
+    @apply bg-slate-800 py-1 text-sm text-white shadow-lg focus:outline-none;
+  }
+
+  .menu div[role="menu"].origin-top-right {
+    @apply rounded-b rounded-tl;
+  }
+
+  .menu div[role="menu"].origin-bottom-right {
+    @apply rounded;
   }
 
   .menu div[role="menu"] a,

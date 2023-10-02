@@ -38,7 +38,7 @@ export default function Layout({
       {header !== undefined ? (
         header
       ) : (
-        <Header mobileOnly>
+        <Header>
           <AppHeader />
         </Header>
       )}

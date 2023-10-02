@@ -3,23 +3,17 @@ import {
   CodeBracketSquareIcon,
   Cog6ToothIcon,
   HomeIcon,
-  InboxIcon,
   InformationCircleIcon,
-  MagnifyingGlassIcon,
   StarIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import { Link, useLocation } from "@remix-run/react";
-import { Fragment } from "react";
+import { useLocation } from "@remix-run/react";
 import config from "~/config";
 import useAuth from "~/hooks/useAuth";
 import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
 import Button from "./button";
 import HeaderLogo from "./headerLogo";
-import { NotificationCount } from "./notificationCount";
-import QueryBoundary from "./queryBoundary";
 import SidebarLink from "./sidebarLink";
-import UserAvatar from "./userAvatar";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -50,28 +44,11 @@ export default function Sidebar() {
                     Activity
                   </SidebarLink>
                   <SidebarLink
-                    to="/search"
-                    icon={MagnifyingGlassIcon}
-                    active={location.pathname.startsWith("/search")}
-                  >
-                    Search
-                  </SidebarLink>
-                  <SidebarLink
                     to="/favorites"
                     icon={StarIcon}
                     active={location.pathname.startsWith("/favorites")}
                   >
                     Favorites
-                  </SidebarLink>
-                  <SidebarLink
-                    to="/notifications"
-                    icon={InboxIcon}
-                    active={location.pathname.startsWith("/notifications")}
-                  >
-                    Notifications
-                    <QueryBoundary fallback={() => null} loading={<Fragment />}>
-                      <NotificationCount />
-                    </QueryBoundary>
                   </SidebarLink>
                   <SidebarLink
                     to="/friends"
@@ -178,26 +155,6 @@ export default function Sidebar() {
                   </ul>
                 </li>
               )}
-              <li className="-mx-6 mt-auto">
-                {user ? (
-                  <Link
-                    to={`/users/${user.username}`}
-                    className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-slate-500 hover:bg-slate-800 hover:text-slate-300"
-                  >
-                    <UserAvatar size={32} user={user} />
-                    <span className="sr-only">Your profile</span>
-                    <span aria-hidden="true">{user.username}</span>
-                  </Link>
-                ) : (
-                  <Link
-                    to="/login"
-                    className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-slate-500 hover:bg-slate-800 hover:text-slate-300"
-                  >
-                    <UserAvatar size={32} />
-                    Log in
-                  </Link>
-                )}
-              </li>
             </ul>
           </nav>
         </div>

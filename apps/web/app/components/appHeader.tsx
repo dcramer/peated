@@ -19,9 +19,9 @@ export default function AppHeader() {
   const [searchFocused, setSearchFocused] = useState(false);
 
   return (
-    <>
+    <div className="flex flex-1 items-center gap-x-2 sm:gap-x-4">
       <form
-        className={`ml-4 flex flex-1 justify-end sm:ml-8`}
+        className={`flex-1`}
         onSubmit={(e) => {
           e.preventDefault();
           navigate(`/search?q=${encodeURIComponent(query)}`);
@@ -29,9 +29,9 @@ export default function AppHeader() {
       >
         <input
           name="q"
-          placeholder="Search for anything"
+          placeholder="Search for bottles, brands, and people"
           autoComplete="off"
-          className="w-full transform rounded bg-slate-900 px-2 py-1.5 text-white placeholder:text-slate-500 focus:outline focus:outline-slate-700 sm:px-3 sm:py-2"
+          className="w-full transform rounded border-0 border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-2"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -64,7 +64,7 @@ export default function AppHeader() {
         </Dialog>
       </form>
       {user ? (
-        <div className="ml-4 flex items-center gap-x-2 sm:ml-8">
+        <div className="flex items-center gap-x-2">
           <div className="hidden sm:block">
             <NotificationsPanel />
           </div>
@@ -78,7 +78,7 @@ export default function AppHeader() {
           <ProfileDropdown />
         </div>
       ) : (
-        <div className="ml-4 flex items-center gap-x-2 sm:ml-8">
+        <div className="mflex items-center gap-x-2">
           <NavLink
             to={`/login?redirectTo=${encodeURIComponent(location.pathname)}`}
           >
@@ -88,6 +88,6 @@ export default function AppHeader() {
           </NavLink>
         </div>
       )}
-    </>
+    </div>
   );
 }
