@@ -6,7 +6,7 @@ import useAuth from "~/hooks/useAuth";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 import { ProfileDropdown } from "./profileDropdown";
-import SearchPanel from "./searchPanel";
+import { SearchPanel } from "./search";
 import UserAvatar from "./userAvatar";
 
 export default function AppHeader() {

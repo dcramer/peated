@@ -1,4 +1,4 @@
-import { AtSymbolIcon, PlusIcon } from "@heroicons/react/20/solid";
+import { PlusIcon } from "@heroicons/react/20/solid";
 import { Link, useLocation, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
@@ -7,180 +7,14 @@ import { toTitleCase } from "@peated/shared/lib/strings";
 import type { Bottle, Entity, User } from "@peated/shared/types";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { debounce } from "../lib/api";
-import { formatCategoryName } from "../lib/strings";
-import BottleIcon from "./assets/Bottle";
-import EntityIcon from "./assets/Entity";
-import Chip from "./chip";
-import Header from "./header";
-import Layout from "./layout";
-import ListItem from "./listItem";
-import SearchHeader from "./searchHeader";
-import UserAvatar from "./userAvatar";
-
-const SkeletonItem = () => {
-  return (
-    <ListItem noHover>
-      <div className="h-full w-full">
-        <div className="hidden h-12 w-12 flex-none p-2 sm:visible" />
-
-        <div className="min-w-0 flex-auto animate-pulse">
-          <div className="overflow-hidden rounded bg-slate-800 -indent-96 font-semibold leading-6">
-            Title
-          </div>
-          <div className="mt-2 flex w-32 overflow-hidden truncate rounded bg-slate-800 -indent-96 text-xs leading-5">
-            Subtext
-          </div>
-        </div>
-      </div>
-    </ListItem>
-  );
-};
-
-type BottleResult = {
-  type: "bottle";
-  ref: Bottle;
-};
-
-type UserResult = {
-  type: "user";
-  ref: User;
-};
-
-type EntityResult = {
-  type: "entity";
-  ref: Entity;
-};
-
-type Result = BottleResult | UserResult | EntityResult;
-
-const ResultRow = ({
-  result,
-  directToTasting = false,
-}: {
-  result: Result;
-  directToTasting: boolean;
-}) => {
-  switch (result.type) {
-    case "bottle":
-      return (
-        <BottleResultRow result={result} directToTasting={directToTasting} />
-      );
-    case "entity":
-      return <EntityResultRow result={result} />;
-    case "user":
-      return <UserResultRow result={result} />;
-    default:
-      return null;
-  }
-};
-
-const BottleResultRow = ({
-  result: { ref: bottle },
-  directToTasting = false,
-}: {
-  result: BottleResult;
-  directToTasting: boolean;
-}) => {
-  return (
-    <>
-      <BottleIcon className="m-2 hidden h-10 w-auto sm:block" />
-
-      <div className="min-w-0 flex-auto">
-        <div className="font-semibold leading-6">
-          <Link
-            to={
-              directToTasting
-                ? `/bottles/${bottle.id}/addTasting`
-                : `/bottles/${bottle.id}`
-            }
-          >
-            <span className="absolute inset-x-0 -top-px bottom-0" />
-            {bottle.name}
-          </Link>
-        </div>
-        <div className="text-light mt-1 flex truncate text-sm leading-5">
-          {bottle.brand.name}
-        </div>
-      </div>
-      <div className="flex items-center gap-x-4">
-        <div className="hidden sm:flex sm:flex-col sm:items-end">
-          <div className="leading-6 text-slate-500">
-            {bottle.category && formatCategoryName(bottle.category)}
-          </div>
-          <div className="mt-1 text-sm leading-5 text-slate-500">
-            {bottle.statedAge ? `${bottle.statedAge} years` : null}
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-const EntityResultRow = ({
-  result: { ref: entity },
-}: {
-  result: EntityResult;
-}) => {
-  return (
-    <>
-      <EntityIcon className="m-2 hidden h-10 w-auto sm:block" />
-
-      <div className="flex min-w-0 flex-auto">
-        <div className="flex-1 font-semibold leading-6">
-          <Link to={`/entities/${entity.id}`}>
-            <span className="absolute inset-x-0 -top-px bottom-0" />
-            {entity.name}
-          </Link>
-        </div>
-        <div className="flex gap-x-2">
-          {entity.type.map((t) => (
-            <Chip key={t} size="small" color="highlight">
-              {t}
-            </Chip>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-};
-
-const UserResultRow = ({ result: { ref: user } }: { result: UserResult }) => {
-  return (
-    <>
-      <div className="hidden h-12 w-12 flex-none p-2 sm:block">
-        <UserAvatar user={user} />
-      </div>
-
-      <div className="flex min-w-0 flex-auto">
-        <div className="flex-1">
-          <Link
-            to={`/users/${user.username}`}
-            className="font-semibold leading-6"
-          >
-            <span className="absolute inset-x-0 -top-px bottom-0" />
-            {user.displayName}
-          </Link>
-          <div className="text-light flex items-center text-sm">
-            <AtSymbolIcon className="inline h-3 w-3" />
-            {user.username}
-          </div>
-        </div>
-        <div className="flex gap-x-2">
-          {user.admin ? (
-            <Chip size="small" color="highlight">
-              Admin
-            </Chip>
-          ) : user.mod ? (
-            <Chip size="small" color="highlight">
-              Moderator
-            </Chip>
-          ) : null}
-        </div>
-      </div>
-    </>
-  );
-};
+import { debounce } from "~/lib/api";
+import Header from "../header";
+import Layout from "../layout";
+import ListItem from "../listItem";
+import SearchHeader from "../searchHeader";
+import type { Result } from "./result";
+import ResultRow from "./result";
+import { SkeletonItem } from "./skeletonItem";
 
 export type Props = {
   onClose?: () => void;
