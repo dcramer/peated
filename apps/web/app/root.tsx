@@ -214,7 +214,7 @@ function Document({
         {data?.sentryBaggage && (
           <meta name="baggage" content={data.sentryBaggage} />
         )}
-        {title ? <title>{title}</title> : null}
+        {title ? <title>{title}</title> : <title>Peated</title>}
         <Links />
       </head>
       <body className="h-full">
