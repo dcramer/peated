@@ -1,6 +1,7 @@
 import type { Comment, User } from "@peated/shared/types";
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import type { MetaFunction} from "@remix-run/react";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
@@ -161,12 +162,23 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({ tasting });
 }
 
-export const meta: V2_MetaFunction = ({ data }) => {
-  return [
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data) return [];
+
+  const meta: Record<string, any>[] = [
     {
       title: `${data.tasting.bottle.fullName} - Tasting Details`,
     },
   ];
+
+  if (data.tasting.imageUrl) {
+    meta.push({
+      property: "og:image",
+      content: data.tasting.imageUrl,
+    });
+  }
+
+  return meta;
 };
 
 export default function TastingDetails() {
