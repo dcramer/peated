@@ -165,21 +165,29 @@ export async function loader({ params, context }: LoaderArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) return [];
 
+  const title = `${data.tasting.bottle.fullName} - Tasting Details`;
+
   const meta: Record<string, any>[] = [
     {
-      title: `${data.tasting.bottle.fullName} - Tasting Details`,
+      title,
     },
     {
       property: "og:title",
-      content: `${data.tasting.bottle.fullName} - Tasting Details`,
+      content: title,
     },
   ];
 
   if (data.tasting.imageUrl) {
-    meta.push({
-      property: "og:image",
-      content: data.tasting.imageUrl,
-    });
+    meta.push(
+      {
+        property: "og:image",
+        content: data.tasting.imageUrl,
+      },
+      {
+        property: "twitter:card",
+        content: "summary_large_image",
+      },
+    );
   }
 
   return meta;
