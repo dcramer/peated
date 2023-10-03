@@ -1,7 +1,7 @@
 import type { Comment, User } from "@peated/shared/types";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import type { MetaFunction} from "@remix-run/react";
+import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
@@ -168,6 +168,10 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const meta: Record<string, any>[] = [
     {
       title: `${data.tasting.bottle.fullName} - Tasting Details`,
+    },
+    {
+      property: "og:title",
+      content: `${data.tasting.bottle.fullName} - Tasting Details`,
     },
   ];
 

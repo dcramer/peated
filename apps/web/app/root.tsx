@@ -206,6 +206,7 @@ function Document({
             <meta name="twitter:description" content={config.DESCRIPTION} />
             <meta name="msapplication-TileColor" content={config.THEME_COLOR} />
             <meta name="theme-color" content={config.THEME_COLOR} />
+            <meta name="og:site_name" content="Peated" />
           </>
         )}
         {data?.sentryTrace && (
