@@ -307,6 +307,23 @@ export default function BottleDetails() {
                   <div className="prose prose-invert -mt-5 max-w-none flex-1">
                     <Markdown content={bottle.description} />
                   </div>
+                  {bottle.tastingNotes && (
+                    <>
+                      <h3 className="text-highlight text-lg font-bold">
+                        Tasting Notes
+                      </h3>
+                      <div className="prose prose-invert max-w-none flex-1">
+                        <dl>
+                          <dt>Nose</dt>
+                          <dd>{bottle.tastingNotes.nose}</dd>
+                          <dt>Palate</dt>
+                          <dd>{bottle.tastingNotes.palate}</dd>
+                          <dt>Finish</dt>
+                          <dd>{bottle.tastingNotes.finish}</dd>
+                        </dl>
+                      </div>
+                    </>
+                  )}
                 </Collapsable>
 
                 <img src={RobotImage} className="hidden h-40 w-40 sm:block" />

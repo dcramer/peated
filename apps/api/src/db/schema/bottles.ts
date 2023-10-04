@@ -4,6 +4,7 @@ import {
   bigserial,
   doublePrecision,
   integer,
+  jsonb,
   pgTable,
   primaryKey,
   smallint,
@@ -16,6 +17,12 @@ import {
 import { entities } from "./entities";
 import { categoryEnum } from "./enums";
 import { users } from "./users";
+
+type TastingNotes = {
+  nose: string;
+  palate: string;
+  finish: string;
+};
 
 export const bottles = pgTable(
   "bottle",
@@ -33,6 +40,7 @@ export const bottles = pgTable(
     statedAge: smallint("stated_age"),
 
     description: text("description"),
+    tastingNotes: jsonb("config").$type<TastingNotes>(),
 
     avgRating: doublePrecision("avg_rating"),
     totalTastings: bigint("total_tastings", { mode: "number" })

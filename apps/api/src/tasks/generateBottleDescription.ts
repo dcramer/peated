@@ -12,28 +12,41 @@ const MODEL = "gpt-3.5-turbo";
 
 function generatePrompt(bottleName: string) {
   return `
-We want to learn more about the whiskey "${bottleName}".
+Pretend to be an expert in whiskey distillation.
 
-If you do not know about the bottle of whiskey, or are not certain its real, respond with only the text "${UNKNOWN_BOTTLE_MARKER}" and nothing else, with no formatting.
+Given the whiskey below, create a valid JSON object.
 
-First, write a 100 word description. Focus on the history & origin and production technique unique to the whiskey. Do not include tasting notes. Do not format with a heading.
+An example of the output we desire:
+{"description": "a description about the whiskey, with no more than 100 words",
+ "tastingNotes": {
+  "nose": "tasting notes about the nose",
+  "palate": "tasting notes about the palate",
+  "finish": "tasting notes about the finish"},
+  "confidence": "a floating point number ranging from 0 to 1 describing your confidence rating"}
 
-Second, describe the tasting notes, including the nose, palate, and finish. Be concise and and focus on the smell and taste.
+The description should focus on what is unique about this whiskey. It should not include the tasting notes.
+The tasting notes should be concise, and focus on the smell and taste.
 
-With all output, apply the following rules:
+If the whiskey is made in Scotland, it is always spelled "whisky".
 
-- Be entirely truthful and use only facts.
-- Do not use the name of the whiskey in the description or tasting notes.
-- Format all text with markdown, and do not use any headings.
-- Format the tasting notes into three sections using bullet points, with each segment being in bold.
-- If the bottle is from Scotland, spell Whiskey as "Whisky".
-- Most importantly, Present the information without opinion, clearly, and concise.
+The whiskey:
+${bottleName}
 `;
 }
 
+type Response = {
+  description: string;
+  tastingNotes: {
+    nose: string;
+    palate: string;
+    finish: string;
+  };
+  confidence: number;
+};
+
 export default async function generateBottleDescription(
   bottleName: string,
-): Promise<string | null> {
+): Promise<Response | null> {
   if (!config.OPENAI_API_KEY) return null;
 
   const openai = new OpenAI({
@@ -51,7 +64,14 @@ export default async function generateBottleDescription(
     temperature: 0.6,
   });
 
-  const result = completion.choices[0].message.content;
-  if (result === UNKNOWN_BOTTLE_MARKER) return null;
+  const message = completion.choices[0].message.content;
+  if (!message) return null;
+
+  const result: Response = JSON.parse(message);
+
+  if (result.confidence < 0.75)
+    // idk
+    return null;
+
   return result;
 }

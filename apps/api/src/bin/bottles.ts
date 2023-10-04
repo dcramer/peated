@@ -30,11 +30,12 @@ program
       console.log(
         `Generating description for Bottle ${bottle.id} (${bottle.fullName}).`,
       );
-      const description = await generateBottleDescription(bottle.fullName);
+      const result = await generateBottleDescription(bottle.fullName);
       await db
         .update(bottles)
         .set({
-          description,
+          description: result?.description || null,
+          tastingNotes: result?.tastingNotes || null,
         })
         .where(eq(bottles.id, bottle.id));
     }

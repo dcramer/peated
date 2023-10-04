@@ -10,6 +10,14 @@ export const BottleSchema = z.object({
   name: z.string().trim().min(1, "Required"),
   fullName: z.string(),
   description: z.string().nullable().optional(),
+  tastingNotes: z
+    .object({
+      nose: z.string(),
+      palate: z.string(),
+      finish: z.string(),
+    })
+    .nullable()
+    .optional(),
   brand: EntitySchema,
   distillers: z.array(EntitySchema),
   bottler: EntitySchema.nullable(),
