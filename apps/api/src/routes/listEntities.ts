@@ -1,7 +1,7 @@
 import { ENTITY_TYPE_LIST } from "@peated/shared/constants";
 import { EntitySchema, PaginatedSchema } from "@peated/shared/schemas";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, getTableColumns, ilike, sql } from "drizzle-orm";
+import { and, asc, desc, getTableColumns, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
@@ -52,9 +52,14 @@ export default {
     const limit = 100;
     const offset = (page - 1) * limit;
 
-    const where: SQL<unknown>[] = [];
+    const where: (SQL<unknown> | undefined)[] = [];
     if (query) {
-      where.push(ilike(entities.name, `%${query}%`));
+      where.push(
+        or(
+          ilike(entities.name, `%${query}%`),
+          ilike(entities.name, `%The ${query}%`),
+        ),
+      );
     }
     if (req.query.type) {
       where.push(sql`${req.query.type} = ANY(${entities.type})`);

@@ -68,9 +68,11 @@ export default {
 
     if (query) {
       const likeQuery = `%${query}%`;
+      const otherLikeQuery = `%The ${query}%`;
       where.push(
         or(
-          ilike(bottles.name, likeQuery),
+          ilike(bottles.fullName, likeQuery),
+          ilike(bottles.fullName, otherLikeQuery),
           sql`EXISTS(
             SELECT 1
             FROM ${entities} e
@@ -78,7 +80,6 @@ export default {
             ON e.id = b.distiller_id AND b.bottle_id = ${bottles.id}
             WHERE e.name ILIKE ${likeQuery}
           )`,
-          sql`${bottles.fullName} ILIKE ${likeQuery}`,
           // lol welcome to search
           sql`EXISTS(
             SELECT 1
@@ -86,7 +87,7 @@ export default {
             WHERE e.id = ${bottles.brandId}
               AND (
                 e.name ILIKE ${likeQuery}
-                OR e.name || ' ' || ${bottles.name} ILIKE ${likeQuery}
+                OR e.name ILIKE ${otherLikeQuery}
               )
           )`,
         ),
