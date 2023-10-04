@@ -80,6 +80,7 @@ export default {
         .where(eq(bottles.id, tasting.bottleId));
 
       // TODO: update badge qualifiers
+      // TODO: update entities.totalTastings
     });
     res.status(204).send();
   },
