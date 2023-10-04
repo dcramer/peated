@@ -20,6 +20,7 @@ import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
+import { summarize } from "~/lib/markdown";
 import { formatCategoryName } from "~/lib/strings";
 import { getEntityUrl } from "~/lib/urls";
 import { getEntity } from "~/queries/entities";
@@ -45,7 +46,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     },
     {
       property: "og:description",
-      content: data.entity.description || "",
+      content: summarize(data.entity.description || "", 200),
     },
     {
       property: "twitter:card",

@@ -28,6 +28,7 @@ import Tabs from "~/components/tabs";
 import TimeSince from "~/components/timeSince";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
+import { summarize } from "~/lib/markdown";
 import { formatCategoryName } from "~/lib/strings";
 import {
   fetchBottlePriceHistory,
@@ -139,7 +140,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     },
     {
       property: "og:description",
-      content: data.bottle.description || "",
+      content: summarize(data.bottle.description || "", 200),
     },
     {
       property: "twitter:card",
