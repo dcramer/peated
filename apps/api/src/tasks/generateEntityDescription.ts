@@ -10,19 +10,20 @@ const UNKNOWN_ENTITY_MARKER = "UNKNOWN_ENTITY_MARKER";
 
 const MODEL = "gpt-3.5-turbo";
 
+// TODO: we can just pass in the information on if its a distillery or brand, and adjust the prompt accordingly?
 function generatePrompt(entityName: string) {
   return `
-We want to learn more about the an entity known as "${entityName}", which may be whiskey distillery, bottler, or brand.
+We want to learn more about the "${entityName}", which may be whiskey distillery, a whiskey bottler, or brand of whiskey.
 
-If you do not know about the entity, or are not certain its real, respond with only the text "${UNKNOWN_ENTITY_MARKER}" and nothing else, with no formatting.
+If you cannot identify the subject, or are not certain it is real, respond with only the text "${UNKNOWN_ENTITY_MARKER}" and nothing else. Do not format the text in this case..
 
 Write a 200 word description. Focus on the history & origin, when it was founded, and include some interesting facts.
 
 With all output, apply the following rules:
 
-- Describe the entity as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as an entity.
+- Describe the subject as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as a "subject".
 - Be entirely truthful and use only facts.
-- Do not use the name of the entity in the description.
+- Do not use the name of the subject in the description.
 - Format all text with markdown, and not use any headings.
 `;
 }
