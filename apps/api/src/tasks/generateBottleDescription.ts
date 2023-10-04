@@ -67,8 +67,13 @@ export default async function generateBottleDescription(
   const message = completion.choices[0].message.content;
   if (!message) return null;
 
-  const result: Response = JSON.parse(message);
-
+  let result: Response;
+  try {
+    result = JSON.parse(message);
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
   if (result.confidence < 0.75)
     // idk
     return null;
