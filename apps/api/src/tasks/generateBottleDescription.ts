@@ -6,19 +6,26 @@ if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
+const UNKNOWN_BOTTLE_MARKER = "UNKOWN_BOTTLE";
+
 const MODEL = "gpt-3.5-turbo";
 
 function generatePrompt(bottleName: string) {
   return `
-Write a 100 word description for the whiskey "${bottleName}". Focus on its history & origin and production technique. Do not include tasting notes.
+We want to learn more about the whiskey "${bottleName}".
 
-If you do not know about the bottle of whiskey, or are not certain its real, respond with only the text "UNKNOWN_BOTTLE" and nothing else, with no formatting.
+First, write a 100 word description. Focus on the history & origin and production technique unique to the whiskey. Do not include tasting notes.
 
-Write an additional description for it's tasting notes, including the nose, palate, and finish. 
+Second, describe the tasting notes, including the nose, palate, and finish. Be concise and and focus on the smell and taste.
 
-Format all text with markdown, and not use headings.
-Do not use the name of the whiskey in tasting notes.
-Format the tasting notes into three sections using bullet points, with each segment being in bold.
+With all output, apply the following rules:
+
+- If you do not know about the bottle of whiskey, or are not certain its real, respond with only the text "${UNKNOWN_BOTTLE_MARKER}" and nothing else, with no formatting.
+- Be entirely truthful.
+- Do not use the name of the whiskey in the description or tasting notes.
+- Format all text with markdown, and not use any headings.
+- Format the tasting notes into three sections using bullet points, with each segment being in bold.
+
 `;
 }
 
@@ -43,6 +50,6 @@ export default async function generateBottleDescription(
   });
 
   const result = completion.choices[0].message.content;
-  if (result === "UNKNOWN_BOTTLE") return null;
+  if (result === UNKNOWN_BOTTLE_MARKER) return null;
   return result;
 }
