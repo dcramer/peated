@@ -1,10 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type {
-  LinksFunction,
-  LoaderArgs,
-  V2_MetaFunction,
-} from "@remix-run/node";
+import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
@@ -35,10 +31,24 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({ entity });
 }
 
-export const meta: V2_MetaFunction = ({ data: { entity } }) => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data) return [];
+
   return [
     {
-      title: entity.name,
+      title: data.entity.name,
+    },
+    {
+      property: "og:title",
+      content: data.entity.name,
+    },
+    {
+      property: "og:description",
+      content: data.entity.description || "",
+    },
+    {
+      property: "twitter:card",
+      content: "product",
     },
   ];
 };

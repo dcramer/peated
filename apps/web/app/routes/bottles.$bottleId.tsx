@@ -4,7 +4,7 @@ import {
   StarIcon as StarIconFilled,
 } from "@heroicons/react/20/solid";
 import { StarIcon } from "@heroicons/react/24/outline";
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type { LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -126,11 +126,24 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({ bottle });
 }
 
-export const meta: V2_MetaFunction = ({ data: { bottle } }) => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data) return [];
+
   return [
     {
-      title: bottle.fullName,
-      "twitter:card": "product",
+      title: data.bottle.fullName,
+    },
+    {
+      property: "og:title",
+      content: data.bottle.fullName,
+    },
+    {
+      property: "og:description",
+      content: data.bottle.description || "",
+    },
+    {
+      property: "twitter:card",
+      content: "product",
     },
   ];
 };
