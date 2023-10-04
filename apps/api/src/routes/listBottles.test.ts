@@ -43,6 +43,26 @@ test("lists bottles with query", async () => {
   expect(results[0].id).toBe(bottle1.id);
 });
 
+test("lists bottles with 'The' prefix", async () => {
+  const brand = await Fixtures.Entity({ name: "The Macallan" });
+  const bottle1 = await Fixtures.Bottle({
+    name: "Delicious Wood",
+    brandId: brand.id,
+  });
+  const response = await app.inject({
+    method: "GET",
+    url: "/bottles",
+    query: {
+      query: "Macallan",
+    },
+  });
+
+  expect(response).toRespondWith(200);
+  const { results } = JSON.parse(response.payload);
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
+
 test("lists bottles with distiller", async () => {
   const distiller1 = await Fixtures.Entity();
   const bottle1 = await Fixtures.Bottle({
