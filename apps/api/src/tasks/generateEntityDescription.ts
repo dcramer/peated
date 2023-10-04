@@ -13,11 +13,11 @@ const MODEL = "gpt-3.5-turbo";
 // TODO: we can just pass in the information on if its a distillery or brand, and adjust the prompt accordingly?
 function generatePrompt(entityName: string) {
   return `
-We want to learn more about the "${entityName}", which may be whiskey distillery, a whiskey bottler, or brand of whiskey.
+We want to learn more about the subject "${entityName}", which may be whiskey distillery, a whiskey bottler, or brand of whiskey.
 
 If you cannot identify the subject, or are not certain it is real, respond with only the text "${UNKNOWN_ENTITY_MARKER}" and nothing else. Do not format the text in this case..
 
-Write a 200 word description. Focus on the history & origin, when it was founded, and include some interesting facts.
+Write a 200 word description. Focus on the history & origin, when it was founded, and what makes it different than its competitors. Try to call out one unique fact.
 
 With all output, apply the following rules:
 
@@ -25,6 +25,9 @@ With all output, apply the following rules:
 - Be entirely truthful and use only facts.
 - Do not use the name of the subject in the description.
 - Format all text with markdown, and not use any headings.
+- Keep the tone of the description somewhat formal, and without opinion.
+- Do not format the subjects name using quotation marks.
+- If the subject is from Scotland, spell Whiskey as "Whisky".
 `;
 }
 
