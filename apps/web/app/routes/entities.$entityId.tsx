@@ -8,10 +8,13 @@ import type { LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
 
 import type { Entity, Paginated } from "@peated/shared/types";
+import RobotImage from "~/assets/robot.png";
 import EntityIcon from "~/components/assets/Entity";
+import BetaNotice from "~/components/betaNotice";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
 import { ClientOnly } from "~/components/clientOnly";
+import Collapsable from "~/components/collapsable";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
 import { Map } from "~/components/map.client";
@@ -181,14 +184,27 @@ export default function EntityDetails() {
       </div>
 
       {entity.description && (
-        <>
-          <Tabs fullWidth border>
-            <Tabs.Item active>About</Tabs.Item>
-          </Tabs>
-          <div className="prose prose-invert max-w-none">
-            <Markdown content={entity.description} />
+        <div className="flex">
+          <div className="flex-1">
+            <Tabs fullWidth border>
+              <Tabs.Item active>Details from Ryebot</Tabs.Item>
+            </Tabs>
+            <div className="my-6">
+              <BetaNotice>
+                Ryebot is still getting his bearings. Pardon our dust!
+              </BetaNotice>
+              <div className="mt-5 flex space-x-4">
+                <Collapsable>
+                  <div className="prose prose-invert -mt-5 max-w-none flex-1">
+                    <Markdown content={entity.description} />
+                  </div>
+                </Collapsable>
+
+                <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
+              </div>
+            </div>
           </div>
-        </>
+        </div>
       )}
 
       <Tabs fullWidth>

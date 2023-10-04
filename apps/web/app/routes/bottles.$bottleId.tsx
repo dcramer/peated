@@ -12,11 +12,13 @@ import { Fragment } from "react";
 import invariant from "tiny-invariant";
 
 import type { Bottle } from "@peated/shared/types";
+import RobotImage from "~/assets/robot.png";
 import BottleIcon from "~/components/assets/Bottle";
 import BetaNotice from "~/components/betaNotice";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
 import { ClientOnly } from "~/components/clientOnly";
+import Collapsable from "~/components/collapsable";
 import ConfirmationButton from "~/components/confirmationButton";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
@@ -294,10 +296,21 @@ export default function BottleDetails() {
         <div className="flex">
           <div className="flex-1">
             <Tabs fullWidth border>
-              <Tabs.Item active>About</Tabs.Item>
+              <Tabs.Item active>Details from Ryebot</Tabs.Item>
             </Tabs>
-            <div className="prose prose-invert max-w-none">
-              <Markdown content={bottle.description} />
+            <div className="my-6">
+              <BetaNotice>
+                Ryebot is still getting his bearings. Pardon our dust!
+              </BetaNotice>
+              <div className="mt-5 flex space-x-4">
+                <Collapsable>
+                  <div className="prose prose-invert -mt-5 max-w-none flex-1">
+                    <Markdown content={bottle.description} />
+                  </div>
+                </Collapsable>
+
+                <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
+              </div>
             </div>
           </div>
         </div>
