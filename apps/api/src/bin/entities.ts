@@ -1,5 +1,5 @@
 import { program } from "commander";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { bottles, bottlesToDistillers, entities } from "~/db/schema";
 import generateEntityDescription from "~/tasks/generateEntityDescription";
 import { db } from "../db";
@@ -57,6 +57,12 @@ program
       `Merging entities ${entityIds.join(", ")} into ${rootEntityId}.`,
     );
 
+    const totalBottles = query.reduce((acc, ent) => acc + ent.totalBottles, 0);
+    const totalTastings = query.reduce(
+      (acc, ent) => acc + ent.totalTastings,
+      0,
+    );
+
     // TODO: this doesnt handle duplicate bottles
     await db.transaction(async (tx) => {
       await tx
@@ -80,7 +86,13 @@ program
         })
         .where(inArray(bottlesToDistillers.distillerId, entityIds));
 
-      // TODO: update entities.totalTastings
+      await tx
+        .update(entities)
+        .set({
+          totalBottles: sql`${entities.totalBottles} + ${totalBottles}`,
+          totalTastings: sql`${entities.totalTastings} + ${totalTastings}`,
+        })
+        .where(eq(entities.id, rootEntityId));
 
       await tx.delete(entities).where(inArray(entities.id, entityIds));
     });
