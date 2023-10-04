@@ -36,9 +36,15 @@ export async function loader({ params, context }: LoaderArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) return [];
 
+  const description = summarize(data.entity.description || "", 200);
+
   return [
     {
       title: data.entity.name,
+    },
+    {
+      name: "description",
+      content: description,
     },
     {
       property: "og:title",
@@ -46,7 +52,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     },
     {
       property: "og:description",
-      content: summarize(data.entity.description || "", 200),
+      content: description,
     },
     {
       property: "twitter:card",
