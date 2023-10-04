@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
 
+import { ShareIcon } from "@heroicons/react/24/outline";
 import type { Entity, Paginated } from "@peated/shared/types";
 import RobotImage from "~/assets/robot.png";
 import EntityIcon from "~/components/assets/Entity";
@@ -149,6 +150,22 @@ export default function EntityDetails() {
             >
               Add a Bottle
             </Button>
+
+            <Button
+              icon={
+                <ShareIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+              }
+              onClick={() => {
+                if (navigator.share) {
+                  navigator
+                    .share({
+                      title: entity.name,
+                      url: `/entities/${entity.id}`,
+                    })
+                    .catch((error) => console.error("Error sharing", error));
+                }
+              }}
+            />
 
             {user?.mod && (
               <Menu as="div" className="menu">

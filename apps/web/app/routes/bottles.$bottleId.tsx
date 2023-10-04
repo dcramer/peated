@@ -3,7 +3,7 @@ import {
   EllipsisVerticalIcon,
   StarIcon as StarIconFilled,
 } from "@heroicons/react/20/solid";
-import { StarIcon } from "@heroicons/react/24/outline";
+import { ShareIcon, StarIcon } from "@heroicons/react/24/outline";
 import type { LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
@@ -234,6 +234,20 @@ export default function BottleDetails() {
           <Button to={`/bottles/${bottle.id}/addTasting`} color="primary">
             Record a Tasting
           </Button>
+
+          <Button
+            icon={<ShareIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />}
+            onClick={() => {
+              if (navigator.share) {
+                navigator
+                  .share({
+                    title: bottle.fullName,
+                    url: `/bottles/${bottle.id}`,
+                  })
+                  .catch((error) => console.error("Error sharing", error));
+              }
+            }}
+          />
 
           {user?.mod && (
             <Menu as="div" className="menu">
