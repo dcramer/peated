@@ -25,9 +25,9 @@ With all output, apply the following rules:
 - Be entirely truthful and use only facts.
 - Do not use the name of the entity in the description.
 - Format all text with markdown, and not use any headings.
-- Keep the tone of the description somewhat formal, and without opinion.
 - Do not format the entity name using quotation marks.
 - If the entity is from Scotland, spell Whiskey as "Whisky".
+- Most importantly, Present the information without opinion, clearly, and concise.
 `;
 }
 
