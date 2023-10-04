@@ -8,6 +8,7 @@ import { useLocation } from "@remix-run/react";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
 
 import BottleTable from "~/components/bottleTable";
+import Button from "~/components/button";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
@@ -106,6 +107,11 @@ function FilterSidebar() {
   return (
     <div className="flex-coloverflow-y-auto mt-8 flex bg-slate-950 px-6 py-4">
       <ul role="list" className="flex flex-1 flex-col gap-y-7">
+        <li>
+          <Button to="/addBottle" fullWidth color="highlight">
+            Add Bottle
+          </Button>
+        </li>
         <li>
           <div className="text-sm font-semibold text-slate-200">Category</div>
           <ul role="list" className="-mx-3 mt-2 space-y-1">

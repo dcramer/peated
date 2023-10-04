@@ -7,6 +7,7 @@ import {
   pgTable,
   primaryKey,
   smallint,
+  text,
   timestamp,
   uniqueIndex,
   varchar,
@@ -30,6 +31,8 @@ export const bottles = pgTable(
       () => entities.id,
     ),
     statedAge: smallint("stated_age"),
+
+    description: text("description"),
 
     avgRating: doublePrecision("avg_rating"),
     totalTastings: bigint("total_tastings", { mode: "number" })

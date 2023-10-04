@@ -9,6 +9,7 @@ export const BottleSchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
   fullName: z.string(),
+  description: z.string().nullable().optional(),
   brand: EntitySchema,
   distillers: z.array(EntitySchema),
   bottler: EntitySchema.nullable(),

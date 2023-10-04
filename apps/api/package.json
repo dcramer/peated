@@ -2,6 +2,7 @@
   "private": true,
   "name": "api",
   "scripts": {
+    "bottles": "ts-node --require dotenv/config ./src/bin/bottles.ts",
     "build": "tsc",
     "dev": "nodemon --exec ts-node --require dotenv/config ./src/server.ts",
     "db": "ts-node --require dotenv/config ./src/bin/db.ts",
@@ -52,6 +53,7 @@
     "mime-types": "^2.1.35",
     "nodemailer": "^6.9.5",
     "nodemon": "^2.0.22",
+    "openai": "^4.11.1",
     "pg": "^8.11.3",
     "pino-pretty": "^10.2.0",
     "regenerator-runtime": "^0.13.11",

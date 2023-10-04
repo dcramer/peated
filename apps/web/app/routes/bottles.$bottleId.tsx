@@ -20,6 +20,7 @@ import { ClientOnly } from "~/components/clientOnly";
 import ConfirmationButton from "~/components/confirmationButton";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
+import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
 import { RangeBarChart } from "~/components/rangeBarChart.client";
 import SkeletonButton from "~/components/skeletonButton";
@@ -268,6 +269,19 @@ export default function BottleDetails() {
           ))}
         </div>
       </div>
+
+      {bottle.description && (
+        <div className="flex">
+          <div className="flex-1">
+            <Tabs fullWidth border>
+              <Tabs.Item active>About</Tabs.Item>
+            </Tabs>
+            <div className="prose prose-invert max-w-none">
+              <Markdown content={bottle.description} />
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex">
         <div className="flex-1">

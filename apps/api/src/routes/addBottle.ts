@@ -7,6 +7,7 @@ import zodToJsonSchema from "zod-to-json-schema";
 import { normalizeBottleName } from "@peated/shared/lib/normalize";
 import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
 
+import generateBottleDescription from "~/tasks/generateBottleDescription";
 import { db } from "../db";
 import type { Bottle, Entity } from "../db/schema";
 import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
@@ -77,13 +78,19 @@ export default {
         }
       }
 
+      const fullName = [brand.name, name].filter(Boolean).join(" ");
+
+      // TODO: dont do this in a transaction you dumb dumb
+      const description = await generateBottleDescription(fullName);
+
       let bottle: Bottle | undefined;
       try {
         [bottle] = await tx
           .insert(bottles)
           .values({
             name,
-            fullName: [brand.name, name].filter(Boolean).join(" "),
+            fullName,
+            description,
             statedAge: body.statedAge || null,
             category: body.category || null,
             brandId: brand.id,

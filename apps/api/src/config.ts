@@ -32,4 +32,6 @@ export default {
   GCP_CREDENTIALS: process.env.GCP_CREDENTIALS
     ? JSON.parse(process.env.GCP_CREDENTIALS)
     : null,
+
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
 };

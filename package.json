@@ -13,6 +13,7 @@
     "db": "dotenv -e .env.local -- pnpm --filter='./apps/api' db",
     "db:migrate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:migrate",
     "db:generate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:generate",
+    "bottles": "dotenv -e .env.local -- pnpm --filter='./apps/api' bottles",
     "mocks": "dotenv -e .env.local -- pnpm --filter='./apps/api' mocks",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/api' user",
     "scraper": "pnpm --filter './apps/scraper' scraper",

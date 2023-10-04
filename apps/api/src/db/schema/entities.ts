@@ -32,6 +32,8 @@ export const entities = pgTable(
     region: text("region"),
     type: entityTypeEnum("type").array().notNull(),
 
+    description: text("description"),
+
     location: geography("location"),
 
     totalBottles: bigint("total_bottles", { mode: "number" })

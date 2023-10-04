@@ -372,6 +372,20 @@
       "when": 1694612169557,
       "tag": "0052_jittery_turbo",
       "breakpoints": false
+    },
+    {
+      "idx": 53,
+      "version": "5",
+      "when": 1696381243533,
+      "tag": "0053_unknown_vulture",
+      "breakpoints": false
+    },
+    {
+      "idx": 54,
+      "version": "5",
+      "when": 1696381743762,
+      "tag": "0054_icy_mentor",
+      "breakpoints": false
     }
   ]
 }
