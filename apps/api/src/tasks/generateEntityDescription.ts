@@ -17,7 +17,7 @@ We want to learn more about the subject "${entityName}", which may be whiskey di
 
 If you cannot identify the subject, or are not certain it is real, respond with only the text "${UNKNOWN_ENTITY_MARKER}" and nothing else. Do not format the text in this case..
 
-Write a 200 word description. Focus on the history & origin, when it was founded, and what makes it different than its competitors. Try to call out one unique fact.
+Write a 200 word description. Focus on the history & origin, when it was founded, and what makes it different than its competitors.
 
 With all output, apply the following rules:
 
