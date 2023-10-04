@@ -22,7 +22,7 @@ An example of the output we desire:
   "nose": "tasting notes about the nose",
   "palate": "tasting notes about the palate",
   "finish": "tasting notes about the finish"},
-  "confidence": "a floating point number ranging from 0 to 1 describing your confidence rating"}
+  "confidence": "a floating point number ranging from 0 to 1 describing your confidence in accuracy of this information"}
 
 The description should focus on what is unique about this whiskey. It should not include the tasting notes.
 The tasting notes should be concise, and focus on the smell and taste.
