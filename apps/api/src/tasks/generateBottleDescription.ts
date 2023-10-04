@@ -26,7 +26,6 @@ With all output, apply the following rules:
 - Do not use the name of the whiskey in the description or tasting notes.
 - Format all text with markdown, and not use any headings.
 - Format the tasting notes into three sections using bullet points, with each segment being in bold.
-
 `;
 }
 
