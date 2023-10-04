@@ -23,7 +23,6 @@ With all output, apply the following rules:
 
 - Describe the entity as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as a "entity".
 - Be entirely truthful and use only facts.
-- Do not use the name of the entity in the description.
 - Format all text with markdown, and not use any headings.
 - Do not format the entity name using quotation marks.
 - If the entity is from Scotland, spell Whiskey as "Whisky".
