@@ -33,6 +33,7 @@ program
     }
   });
 
+// TODO: move logic to utility + tests
 program
   .command("merge")
   .description("Merge two or more entities together")
@@ -80,6 +81,8 @@ program
         .where(inArray(bottlesToDistillers.distillerId, entityIds));
 
       // TODO: update entities.totalTastings
+
+      await tx.delete(entities).where(inArray(entities.id, entityIds));
     });
   });
 
