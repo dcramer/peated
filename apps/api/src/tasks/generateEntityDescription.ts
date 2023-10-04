@@ -16,7 +16,7 @@ We want to learn more about the an entity known as "${entityName}", which may be
 
 If you do not know about the entity, or are not certain its real, respond with only the text "${UNKNOWN_ENTITY_MARKER}" and nothing else, with no formatting.
 
-Write a 100 word description. Focus on the history & origin, when it was founded, and include some interesting facts.
+Write a 200 word description. Focus on the history & origin, when it was founded, and include some interesting facts.
 
 With all output, apply the following rules:
 
