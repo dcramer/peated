@@ -11,7 +11,8 @@ jobs:
       deployments: write
     steps:
       - uses: actions/checkout@v3
-      - id: vars
+      - name: Record Version
+        id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       # - uses: chrnorm/deployment-action@v2
       #   name: Create GitHub deployment
@@ -21,7 +22,8 @@ jobs:
       #     environment-url: https://peated.app
       #     environment: production
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: |
+      - name: Deploy API
+        run: |
           flyctl deploy \
             --remote-only \
             --config fly.api.toml \
@@ -29,7 +31,8 @@ jobs:
             --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_TOKEN_API }}
-      - run: |
+      - name: Deploy Scraper
+        run: |
           flyctl deploy \
             --remote-only \
             --config fly.scraper.toml \
@@ -37,7 +40,8 @@ jobs:
             --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_TOKEN_SCRAPER }}
-      - run: |
+      - name: Deploy Web
+        run: |
           flyctl deploy \
             --remote-only \
             --config fly.web.toml \
