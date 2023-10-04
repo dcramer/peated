@@ -20,7 +20,7 @@ Write a 100 word description. Focus on the history & origin, when it was founded
 
 With all output, apply the following rules:
 
-- Describe the entity as a distiller, bottler, or brand, whichever one it primarily is.
+- Describe the entity as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as an entity.
 - Be entirely truthful and use only facts.
 - Do not use the name of the entity in the description.
 - Format all text with markdown, and not use any headings.
