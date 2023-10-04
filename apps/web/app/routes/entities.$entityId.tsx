@@ -15,6 +15,7 @@ import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
 import { Map } from "~/components/map.client";
+import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
 import useApi from "~/hooks/useApi";
@@ -171,6 +172,18 @@ export default function EntityDetails() {
         </div>
         <EntityMap position={entity.location} />
       </div>
+
+      {entity.description && (
+        <>
+          <Tabs fullWidth border>
+            <Tabs.Item active>About</Tabs.Item>
+          </Tabs>
+          <div className="prose prose-invert max-w-none">
+            <Markdown content={entity.description} />
+          </div>
+        </>
+      )}
+
       <Tabs fullWidth>
         <Tabs.Item as={Link} to={baseUrl} controlled>
           Activity

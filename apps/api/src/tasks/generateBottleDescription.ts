@@ -6,7 +6,7 @@ if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-const UNKNOWN_BOTTLE_MARKER = "UNKOWN_BOTTLE";
+const UNKNOWN_BOTTLE_MARKER = "UNKNOWN_BOTTLE_MARKER";
 
 const MODEL = "gpt-3.5-turbo";
 
