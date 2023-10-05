@@ -63,6 +63,11 @@ export default function FlightDetails() {
           <h1 className="mb-2 truncate text-center text-3xl font-semibold leading-7 sm:text-left">
             {flight.name}
           </h1>
+          {flight.description && (
+            <div className="truncate text-center text-slate-500 sm:text-left">
+              {flight.description}
+            </div>
+          )}
         </div>
       </div>
       {bottles.results.map((b) => (
