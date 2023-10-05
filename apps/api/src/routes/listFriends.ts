@@ -20,7 +20,7 @@ export default {
       properties: {
         query: { type: "string" },
         page: { type: "number" },
-        filter: { type: "string", enum: ["pending"] },
+        filter: { type: "string", enum: ["pending", "active"] },
       },
     },
     response: {
@@ -45,6 +45,8 @@ export default {
     ];
     if (req.query.filter === "pending") {
       where.push(eq(follows.status, "pending"));
+    } else if (req.query.filter === "active") {
+      where.push(eq(follows.status, "following"));
     }
 
     const results = await db
@@ -82,7 +84,7 @@ export default {
   {
     Querystring: {
       page?: number;
-      filter?: "pending";
+      filter?: "pending" | "active";
     };
   }
 >;

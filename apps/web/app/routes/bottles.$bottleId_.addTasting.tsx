@@ -231,9 +231,9 @@ export default function AddTasting() {
               <SelectField
                 {...field}
                 endpoint={{
-                  path: "/following",
+                  path: "/friends",
                   query: {
-                    status: "following",
+                    status: "active",
                   },
                 }}
                 onResults={(data) => {
