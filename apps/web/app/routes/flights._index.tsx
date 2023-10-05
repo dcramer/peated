@@ -63,6 +63,11 @@ export default function Friends() {
                       {flight.name}
                     </Link>
                   </div>
+                  {flight.description && (
+                    <div className="text-light text-sm">
+                      {flight.description}
+                    </div>
+                  )}
                 </div>
               </ListItem>
             );
