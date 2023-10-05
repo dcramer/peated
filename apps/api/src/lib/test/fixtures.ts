@@ -4,7 +4,9 @@ import path from "path";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
+import { CATEGORY_LIST } from "@peated/shared/constants";
 import { eq, sql } from "drizzle-orm";
+import { generatePublicId } from "~/lib/publicId";
 import { db } from "../../db";
 import type {
   Entity as EntityType,
@@ -12,6 +14,7 @@ import type {
   NewBottle,
   NewComment,
   NewEntity,
+  NewFlight,
   NewFollow,
   NewStore,
   NewStorePrice,
@@ -29,6 +32,7 @@ import {
   changes,
   comments,
   entities,
+  flights,
   follows,
   storePriceHistories,
   storePrices,
@@ -41,7 +45,6 @@ import { createAccessToken } from "../auth";
 import { choose, random, sample } from "../rand";
 import { defaultTags } from "../tags";
 
-import { CATEGORY_LIST } from "@peated/shared/constants";
 export const User = async ({ ...data }: Partial<NewUser> = {}) => {
   return (
     await db
@@ -230,6 +233,20 @@ export const Comment = async ({ ...data }: Partial<NewComment> = {}) => {
         createdById: data.createdById || (await User()).id,
         tastingId: data.tastingId || (await Tasting()).id,
         comment: faker.lorem.sentences(random(2, 5)),
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const Flight = async ({ ...data }: Partial<NewFlight> = {}) => {
+  return (
+    await db
+      .insert(flights)
+      .values({
+        publicId: generatePublicId(),
+        name: faker.word.noun(),
+        createdById: data.createdById || (await User()).id,
         ...data,
       })
       .returning()

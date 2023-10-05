@@ -11,6 +11,7 @@ type BottleQueryParams = {
   bottler?: string | number;
   entity?: string | number;
   tag?: string;
+  flight?: string;
   page?: string | number;
   sort?: string;
 };

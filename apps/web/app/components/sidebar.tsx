@@ -2,6 +2,7 @@ import {
   ChatBubbleLeftIcon,
   CodeBracketSquareIcon,
   Cog6ToothIcon,
+  GiftTopIcon,
   HomeIcon,
   InformationCircleIcon,
   StarIcon,
@@ -56,6 +57,17 @@ export default function Sidebar() {
                     active={location.pathname.startsWith("/friends")}
                   >
                     Friends
+                  </SidebarLink>
+                </ul>
+              </li>
+              <li>
+                <ul role="list" className="-mx-2 space-y-1">
+                  <SidebarLink
+                    to="/flights"
+                    icon={GiftTopIcon}
+                    active={location.pathname.startsWith("/flights")}
+                  >
+                    Flights
                   </SidebarLink>
                 </ul>
               </li>

@@ -8,7 +8,14 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { db } from "../db";
-import { bottles, bottlesToDistillers, entities, tastings } from "../db/schema";
+import {
+  bottles,
+  bottlesToDistillers,
+  entities,
+  flightBottles,
+  flights,
+  tastings,
+} from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
@@ -42,6 +49,7 @@ export default {
         bottler: { type: "number" },
         entity: { type: "number" },
         tag: { type: "string" },
+        flight: { type: "string" },
         category: {
           type: "string",
           enum: CATEGORY_LIST,
@@ -124,6 +132,26 @@ export default {
         sql`EXISTS(SELECT 1 FROM ${tastings} WHERE ${req.query.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
       );
     }
+    if (req.query.flight) {
+      const [flight] = await db
+        .select()
+        .from(flights)
+        .where(eq(flights.publicId, req.query.flight));
+      if (!flight) {
+        return res.send({
+          results: [],
+          rel: {
+            nextPage: null,
+            prevPage: null,
+            next: null,
+            prev: null,
+          },
+        });
+      }
+      where.push(
+        sql`EXISTS(SELECT FROM ${flightBottles} WHERE ${flightBottles.flightId} = ${flight.id} AND ${flightBottles.bottleId} = ${bottles.id})`,
+      );
+    }
 
     let orderBy: SQL<unknown>;
     switch (req.query.sort) {
@@ -197,6 +225,7 @@ export default {
       category?: Category;
       age?: number;
       tag?: string;
+      flight?: string;
       sort?: (typeof SORT_OPTIONS)[number];
     };
   }

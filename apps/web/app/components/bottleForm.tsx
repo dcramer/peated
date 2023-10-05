@@ -7,8 +7,6 @@ import type { z } from "zod";
 import { CATEGORY_LIST } from "@peated/shared/constants";
 import { BottleInputSchema } from "@peated/shared/schemas";
 import type { Bottle, Entity } from "@peated/shared/types";
-import type { LoaderArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
 import { PreviewBottleCard } from "~/components/bottleCard";
 import EntityField from "~/components/entityField";
 import Fieldset from "~/components/fieldset";
@@ -38,14 +36,6 @@ const entityToOption = (entity: Entity): Option => {
 };
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
-
-export function loader({ context, request }: LoaderArgs) {
-  if (!context.user) {
-    return redirect(
-      `/login?redirectTo=${encodeURIComponent(new URL(request.url).pathname)}`,
-    );
-  }
-}
 
 export default function BottleForm({
   onSubmit,

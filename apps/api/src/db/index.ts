@@ -3,7 +3,6 @@ import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import { Pool } from "pg";
-import config from "../config";
 import * as schema from "./schema";
 
 declare global {
@@ -20,7 +19,7 @@ export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-export const db = drizzle(pool, { logger: config.DEBUG, schema });
+export const db = drizzle(pool, { schema });
 
 export type DatabaseType = typeof db;
 

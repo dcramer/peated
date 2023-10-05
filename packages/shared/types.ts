@@ -15,6 +15,7 @@ import type {
   CommentSchema,
   EntitySchema,
   EntityTypeEnum,
+  FlightSchema,
   FollowSchema,
   FollowStatusEnum,
   FriendSchema,
@@ -47,6 +48,7 @@ export type Collection = z.infer<typeof CollectionSchema>;
 export type CollectionBottle = z.infer<typeof CollectionBottleSchema>;
 export type Comment = z.infer<typeof CommentSchema>;
 export type Entity = z.infer<typeof EntitySchema>;
+export type Flight = z.infer<typeof FlightSchema>;
 export type Follow = z.infer<typeof FollowSchema>;
 export type Friend = z.infer<typeof FriendSchema>;
 export type Notification = z.infer<typeof NotificationSchema>;

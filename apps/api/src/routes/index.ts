@@ -5,6 +5,7 @@ import addBadge from "./addBadge";
 import addBottle from "./addBottle";
 import addCollectionBottle from "./addCollectionBottle";
 import addEntity from "./addEntity";
+import addFlight from "./addFlight";
 import { default as addFriend } from "./addFriend";
 import addStore from "./addStore";
 import addStorePrices from "./addStorePrices";
@@ -27,6 +28,7 @@ import deleteTastingImage from "./deleteTastingImage";
 import getBottle from "./getBottle";
 import getBottlePriceHistory from "./getBottlePriceHistory";
 import getEntity from "./getEntity";
+import getFlight from "./getFlight";
 import getStats from "./getStats";
 import getStore from "./getStore";
 import getTasting from "./getTasting";
@@ -40,6 +42,7 @@ import listChanges from "./listChanges";
 import listComments from "./listComments";
 import listEntities from "./listEntities";
 import listEntityCategories from "./listEntityCategories";
+import listFlights from "./listFlights";
 import listFriends from "./listFriends";
 import listNotifications from "./listNotifications";
 import listPriceChanges from "./listPriceChanges";
@@ -151,6 +154,10 @@ export const router: FastifyPluginCallback = (
 
   fastify.route(listBadges);
   fastify.route(addBadge);
+
+  fastify.route(listFlights);
+  fastify.route(addFlight);
+  fastify.route(getFlight);
 
   if (config.ENV === "development") {
     registerDebugRoutes(fastify);
