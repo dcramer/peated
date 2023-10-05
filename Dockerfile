@@ -9,18 +9,15 @@ RUN npm install -g -f pnpm
 
 FROM base as base-env
 WORKDIR /app
-ARG VERSION
-ENV VERSION $VERSION
 ARG SENTRY_DSN
 ENV SENTRY_DSN $SENTRY_DSN
-ARG SENTRY_ORG
-ENV SENTRY_ORG $SENTRY_ORG
 ARG SENTRY_PROJECT
 ENV SENTRY_PROJECT $SENTRY_PROJECT
 ARG API_SERVER
 ENV API_SERVER $API_SERVER
 ARG GOOGLE_CLIENT_ID
 ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
+
 ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
 ADD packages ./packages
 ADD apps/web/package.json ./apps/web/package.json
@@ -39,15 +36,16 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
     pnpm build
 
+ARG VERSION
+ENV VERSION $VERSION
+
+RUN echo $VERSION > VERSION
+
 # web service
 FROM base-env as web
 WORKDIR /app
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ ./
-ARG VERSION
-ENV VERSION $VERSION
-
-RUN echo $VERSION > VERSION
 
 ENV HOST 0.0.0.0
 ENV PORT 3000
@@ -61,22 +59,24 @@ CMD ["pnpm", "start"]
 # scraper service
 FROM base-env as scraper
 WORKDIR /app
-ADD . .
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ ./
-RUN echo $VERSION > VERSION
+
 WORKDIR /app/apps/scraper
+
 CMD ["pnpm", "start"]
 
 # api service
 FROM base-env as api
 WORKDIR /app
-ADD . .
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ ./
-RUN echo $VERSION > VERSION
+
 ENV HOST 0.0.0.0
 ENV PORT 4000
+
 EXPOSE 4000
+
 WORKDIR /app/apps/api
+
 CMD ["pnpm", "start"]
