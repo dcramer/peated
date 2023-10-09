@@ -61,6 +61,9 @@ import updateUser from "./updateUser";
 import updateUserAvatar from "./updateUserAvatar";
 import getUpload from "./uploads";
 
+const ROBOTS = `User-agent: *
+Disallow: /`;
+
 export const router: FastifyPluginCallback = (
   fastify: FastifyInstance,
   _opts,
@@ -78,6 +81,14 @@ export const router: FastifyPluginCallback = (
     url: "/health",
     handler: (_, res) => {
       res.status(200).send();
+    },
+  });
+
+  fastify.route({
+    method: "GET",
+    url: "/robots.txt",
+    handler: (_, res) => {
+      res.status(200).type("text/plain").send(ROBOTS);
     },
   });
 
