@@ -1,4 +1,8 @@
-import type { ActionArgs, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
 import {
   json,
   redirect,
@@ -25,7 +29,7 @@ import { ApiError } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
 import { logError } from "~/lib/log";
 
-export async function action({ context, request, params }: ActionArgs) {
+export async function action({ context, request, params }: ActionFunctionArgs) {
   invariant(params.tastingId);
 
   const uploadHandler = unstable_createMemoryUploadHandler({
@@ -62,7 +66,7 @@ export async function action({ context, request, params }: ActionArgs) {
   return redirect(`/tastings/${params.tastingId}`);
 }
 
-export async function loader({ params, context }: LoaderArgs) {
+export async function loader({ params, context }: LoaderFunctionArgs) {
   invariant(params.tastingId);
 
   const tasting: Tasting = await context.api.get(
@@ -72,7 +76,7 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({ tasting });
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Edit Tasting Image",

@@ -1,5 +1,5 @@
 import type { Comment, User } from "@peated/shared/types";
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData, useNavigate } from "@remix-run/react";
@@ -154,7 +154,7 @@ const CommentList = ({
   );
 };
 
-export async function loader({ params, context }: LoaderArgs) {
+export async function loader({ params, context }: LoaderFunctionArgs) {
   invariant(params.tastingId);
 
   const tasting = await getTasting(context.api, params.tastingId);

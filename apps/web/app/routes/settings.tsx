@@ -4,7 +4,7 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/shared/schemas";
 import type { User } from "@peated/shared/types";
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -25,7 +25,7 @@ import { toBlob } from "~/lib/blobs";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 
-export async function loader({ context, request }: LoaderArgs) {
+export async function loader({ context, request }: LoaderFunctionArgs) {
   const user: User = await context.api.get("/users/me");
 
   if (!user) {
@@ -41,7 +41,7 @@ export async function loader({ context, request }: LoaderArgs) {
   return json({ user });
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Settings",

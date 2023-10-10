@@ -1,15 +1,20 @@
 import { useLocation, useNavigate } from "@remix-run/react";
 import { useQueries } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import type { SitemapFunction } from "remix-sitemap";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
 import type { Entity } from "@peated/shared/types";
-import { type LoaderFunction, type V2_MetaFunction } from "@remix-run/node";
+import { type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import BottleForm from "~/components/bottleForm";
 import Spinner from "~/components/spinner";
 import useApi from "~/hooks/useApi";
 import { redirectToAuth } from "~/lib/auth.server";
+
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
 
 export const loader: LoaderFunction = ({ request, context }) => {
   if (!context.user) return redirectToAuth({ request });
@@ -17,7 +22,7 @@ export const loader: LoaderFunction = ({ request, context }) => {
   return null;
 };
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Add Bottle",

@@ -1,5 +1,5 @@
 import type { Change, Paginated } from "@peated/shared/types";
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
@@ -33,7 +33,7 @@ const UpdatesContent = () => {
   );
 };
 
-export async function loader({ context }: LoaderArgs) {
+export async function loader({ context }: LoaderFunctionArgs) {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(
@@ -44,7 +44,7 @@ export async function loader({ context }: LoaderArgs) {
   return json({ dehydratedState: dehydrate(queryClient) });
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Updates",

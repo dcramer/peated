@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
@@ -9,7 +9,10 @@ import TastingList from "~/components/tastingList";
 import useApi from "~/hooks/useApi";
 import { fetchTastings } from "~/queries/tastings";
 
-export async function loader({ params: { bottleId }, context }: LoaderArgs) {
+export async function loader({
+  params: { bottleId },
+  context,
+}: LoaderFunctionArgs) {
   invariant(bottleId);
 
   const queryClient = new QueryClient();

@@ -1,9 +1,14 @@
 import { json, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import type { SitemapFunction } from "remix-sitemap";
 import BadgeTable from "~/components/admin/badgeTable";
 import { Breadcrumbs } from "~/components/breadcrumbs";
 import Button from "~/components/button";
 import EmptyActivity from "~/components/emptyActivity";
+
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url);

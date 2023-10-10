@@ -1,9 +1,5 @@
 import { CATEGORY_LIST } from "@peated/shared/constants";
-import {
-  json,
-  type LoaderFunction,
-  type V2_MetaFunction,
-} from "@remix-run/node";
+import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
 
@@ -77,7 +73,7 @@ const Content = () => {
   );
 };
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Bottles",

@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLocation, useOutletContext } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
@@ -27,7 +27,7 @@ export function buildQuery(
   };
 }
 
-export async function loader({ request, context, params }: LoaderArgs) {
+export async function loader({ request, context, params }: LoaderFunctionArgs) {
   invariant(params.entityId);
   const { searchParams } = new URL(request.url);
 

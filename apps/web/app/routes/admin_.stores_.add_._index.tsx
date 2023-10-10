@@ -2,10 +2,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { STORE_TYPE_LIST } from "@peated/shared/constants";
 import { StoreInputSchema } from "@peated/shared/schemas";
 import type { ActionFunction } from "@remix-run/node";
-import { json, redirect, type V2_MetaFunction } from "@remix-run/node";
+import { json, redirect, type MetaFunction } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { Controller } from "react-hook-form";
 import { getValidatedFormData, useRemixForm } from "remix-hook-form";
+import type { SitemapFunction } from "remix-sitemap";
 import type { z } from "zod";
 
 import CountryField from "~/components/countryField";
@@ -19,6 +20,10 @@ import Spinner from "~/components/spinner";
 import TextField from "~/components/textField";
 import { ApiError } from "~/lib/api";
 import { logError } from "~/lib/log";
+
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
 
 type FormSchemaType = z.infer<typeof StoreInputSchema>;
 
@@ -49,7 +54,7 @@ export const action: ActionFunction = async ({ context, request }) => {
   return redirect(`/admin/stores`);
 };
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Add Store",

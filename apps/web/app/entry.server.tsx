@@ -8,6 +8,8 @@ import { RemixServer } from "@remix-run/react";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 
+import { createSitemapGenerator } from "remix-sitemap";
+
 const ABORT_DELAY = 5_000;
 
 // XXX: This is in server.ts
@@ -19,12 +21,24 @@ const ABORT_DELAY = 5_000;
 //   // tracePropagationTargets: ["localhost", "api.peated.app", "peated.app"],
 // });
 
-export default function handleRequest(
+// TODO: cache this via Redis
+// https://github.com/fedeya/remix-sitemap#caching
+const { isSitemapUrl, sitemap } = createSitemapGenerator({
+  siteUrl: "https://peated.app",
+  headers: {
+    "Cache-Control": "max-age=3600",
+  },
+  // generateRobotsTxt: true,
+});
+
+export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
 ) {
+  if (isSitemapUrl(request)) return await sitemap(request, remixContext);
+
   return isbot(request.headers.get("user-agent"))
     ? handleBotRequest(
         request,

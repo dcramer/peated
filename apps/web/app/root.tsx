@@ -1,7 +1,7 @@
 import FontStyles from "@fontsource/raleway/index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction, LoaderArgs } from "@remix-run/node";
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   Links,
@@ -96,7 +96,7 @@ export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
-export async function loader({ context }: LoaderArgs) {
+export async function loader({ context }: LoaderFunctionArgs) {
   return json({
     accessToken: context.accessToken,
     user: context.user,

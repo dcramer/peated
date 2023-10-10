@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useState } from "react";
@@ -46,7 +46,7 @@ const servingStyleList = SERVING_STYLE_LIST.map((c) => ({
   name: formatServingStyle(c),
 }));
 
-export async function loader({ request, params, context }: LoaderArgs) {
+export async function loader({ request, params, context }: LoaderFunctionArgs) {
   if (!context.user) return redirectToAuth({ request });
 
   invariant(params.bottleId);
@@ -59,7 +59,7 @@ export async function loader({ request, params, context }: LoaderArgs) {
   return json({ bottle, suggestedTags });
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Record Tasting",

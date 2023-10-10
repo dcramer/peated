@@ -1,4 +1,4 @@
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 
 import Layout from "~/components/layout";
 import { redirectToAuth } from "~/lib/auth.server";
@@ -16,7 +16,7 @@ import useApi from "~/hooks/useApi";
 import { fetchFlights } from "~/queries/flights";
 import { fetchFriends } from "~/queries/friends";
 
-export async function loader({ context }: LoaderArgs) {
+export async function loader({ context }: LoaderFunctionArgs) {
   if (!context.user) return redirectToAuth({ request });
 
   const queryClient = new QueryClient();
@@ -25,7 +25,7 @@ export async function loader({ context }: LoaderArgs) {
   return json({ dehydratedState: dehydrate(queryClient) });
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Flights",

@@ -1,8 +1,13 @@
 import { useGoogleLogin } from "@react-oauth/google";
-import type { ActionArgs, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, useActionData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
+import { type SitemapFunction } from "remix-sitemap";
 
 import Alert from "~/components/alert";
 import PeatedLogo from "~/components/assets/Logo";
@@ -13,7 +18,11 @@ import config from "~/config";
 import { authenticator } from "~/services/auth.server";
 import { createSession } from "~/services/session.server";
 
-export async function action({ request }: ActionArgs) {
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
+
+export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
   const redirectTo = url.searchParams.get("redirectTo");
 
@@ -34,13 +43,13 @@ export async function action({ request }: ActionArgs) {
   }
 }
 
-export const loader = ({ request }: LoaderArgs) => {
+export const loader = ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const redirectTo = url.searchParams.get("redirectTo");
   return json({ redirectTo });
 };
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Login",

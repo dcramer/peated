@@ -1,6 +1,10 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
+import type {
+  LinksFunction,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
@@ -29,7 +33,7 @@ import { formatCategoryName } from "~/lib/strings";
 import { getEntityUrl } from "~/lib/urls";
 import { getEntity } from "~/queries/entities";
 
-export async function loader({ params, context }: LoaderArgs) {
+export async function loader({ params, context }: LoaderFunctionArgs) {
   invariant(params.entityId);
 
   const entity: Entity = await getEntity(context.api, params.entityId);

@@ -1,7 +1,8 @@
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLocation } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
+import { type SitemapFunction } from "remix-sitemap";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
 import NotificationList from "~/components/notifications/list";
@@ -10,7 +11,11 @@ import useApi from "~/hooks/useApi";
 import { redirectToAuth } from "~/lib/auth.server";
 import { fetchNotifications } from "~/queries/notifications";
 
-export async function loader({ context, request }: LoaderArgs) {
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
+
+export async function loader({ context, request }: LoaderFunctionArgs) {
   if (!context.user) return redirectToAuth({ request });
 
   const location = new URL(request.url);
@@ -24,7 +29,7 @@ export async function loader({ context, request }: LoaderArgs) {
   return json({ dehydratedState: dehydrate(queryClient) });
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Notifications",

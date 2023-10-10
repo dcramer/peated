@@ -1,8 +1,13 @@
 import { json, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
 import StorePriceTable from "~/components/admin/storePriceTable";
 import EmptyActivity from "~/components/emptyActivity";
+
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   invariant(params.storeId);

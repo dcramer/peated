@@ -1,5 +1,5 @@
 import type { Entity } from "@peated/shared/types";
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useOutletContext } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
@@ -9,7 +9,10 @@ import TastingList from "~/components/tastingList";
 import useApi from "~/hooks/useApi";
 import { fetchTastings } from "~/queries/tastings";
 
-export async function loader({ params: { entityId }, context }: LoaderArgs) {
+export async function loader({
+  params: { entityId },
+  context,
+}: LoaderFunctionArgs) {
   invariant(entityId);
 
   const queryClient = new QueryClient();

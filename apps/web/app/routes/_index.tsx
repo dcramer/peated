@@ -1,4 +1,4 @@
-import type { V2_MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { Link, useLocation } from "@remix-run/react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
@@ -95,7 +95,7 @@ const ActivityContent = ({ filter }: { filter: string }) => {
   );
 };
 
-// export async function loader({ context, request }: LoaderArgs) {
+// export async function loader({ context, request }: LoaderFunctionArgs) {
 //   const url = new URL(request.url);
 //   const filterParam = mapFilterParam(url.searchParams.get("view"));
 //   const queryClient = new QueryClient();
@@ -109,7 +109,7 @@ const ActivityContent = ({ filter }: { filter: string }) => {
 //   return json({ dehydratedState: dehydrate(queryClient) });
 // }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Activity",

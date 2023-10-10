@@ -1,5 +1,5 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { json, type V2_MetaFunction } from "@remix-run/node";
+import { json, type MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
 
@@ -16,7 +16,7 @@ import type { ApiClient } from "~/lib/api";
 import { buildQueryString } from "~/lib/urls";
 import { fetchEntities } from "~/queries/entities";
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Brands, Bottler, and Distillers",

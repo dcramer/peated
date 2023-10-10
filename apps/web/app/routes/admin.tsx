@@ -1,8 +1,14 @@
-import type { V2_MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 import Layout from "~/components/layout";
 
-export const meta: V2_MetaFunction = () => {
+import type { SitemapFunction } from "remix-sitemap";
+
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
+
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Admin",

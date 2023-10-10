@@ -1,11 +1,12 @@
-import {
-  json,
-  type LoaderFunction,
-  type V2_MetaFunction,
-} from "@remix-run/node";
+import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
+import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
 import { Breadcrumbs } from "~/components/breadcrumbs";
+
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   invariant(params.storeId);
@@ -15,7 +16,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   return json({ store });
 };
 
-export const meta: V2_MetaFunction = ({ data }) => {
+export const meta: MetaFunction = ({ data }) => {
   return [
     {
       title: data.store.name,

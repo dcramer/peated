@@ -4,7 +4,7 @@ import {
   StarIcon as StarIconFilled,
 } from "@heroicons/react/20/solid";
 import { ShareIcon, StarIcon } from "@heroicons/react/24/outline";
-import type { LoaderArgs, MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -121,7 +121,7 @@ const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
   );
 };
 
-export async function loader({ params, context }: LoaderArgs) {
+export async function loader({ params, context }: LoaderFunctionArgs) {
   invariant(params.bottleId);
 
   const bottle = await getBottle(context.api, params.bottleId);

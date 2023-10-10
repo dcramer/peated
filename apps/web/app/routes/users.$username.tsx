@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useSubmit } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
@@ -43,7 +43,7 @@ const UserTagDistribution = ({ userId }: { userId: number }) => {
   );
 };
 
-export async function loader({ params, context }: LoaderArgs) {
+export async function loader({ params, context }: LoaderFunctionArgs) {
   invariant(params.username);
 
   const user = await getUser(context.api, params.username);
@@ -51,7 +51,7 @@ export async function loader({ params, context }: LoaderArgs) {
   return json({ user });
 }
 
-export const meta: V2_MetaFunction = ({ data: { user } }) => {
+export const meta: MetaFunction = ({ data: { user } }) => {
   return [
     {
       title: `@${user.username}`,

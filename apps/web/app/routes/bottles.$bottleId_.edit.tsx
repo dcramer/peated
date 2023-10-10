@@ -1,5 +1,5 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { json, type V2_MetaFunction } from "@remix-run/node";
+import { json, type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { z } from "zod";
@@ -13,7 +13,7 @@ import useApi from "~/hooks/useApi";
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Edit Bottle",

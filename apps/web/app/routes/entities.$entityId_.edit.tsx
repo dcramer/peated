@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { LoaderFunction } from "@remix-run/node";
-import { json, type V2_MetaFunction } from "@remix-run/node";
+import { json, type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SubmitHandler } from "react-hook-form";
@@ -30,7 +30,7 @@ const entityTypes = [
 
 type FormSchemaType = z.infer<typeof EntityInputSchema>;
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Edit Entity",

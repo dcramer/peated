@@ -1,5 +1,10 @@
-import { json, type LoaderArgs, type V2_MetaFunction } from "@remix-run/node";
+import {
+  json,
+  type LoaderFunctionArgs,
+  type MetaFunction,
+} from "@remix-run/node";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
+import { type SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
 import BottleTable from "~/components/bottleTable";
 import EmptyActivity from "~/components/emptyActivity";
@@ -11,7 +16,11 @@ import useAuth from "~/hooks/useAuth";
 import { redirectToAuth } from "~/lib/auth.server";
 import { fetchBottlesInCollection } from "~/queries/collections";
 
-export async function loader({ context, request }: LoaderArgs) {
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
+
+export async function loader({ context, request }: LoaderFunctionArgs) {
   if (!context.user) return redirectToAuth({ request });
 
   const queryClient = new QueryClient();
@@ -23,7 +32,7 @@ export async function loader({ context, request }: LoaderArgs) {
   return json({ dehydratedState: dehydrate(queryClient) });
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Favorites",
