@@ -48,6 +48,10 @@ resource "google_cloud_run_v2_service" "api" {
         value = "uploads"
       }
 
+      ports {
+        container_port = 4000
+      }
+
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"

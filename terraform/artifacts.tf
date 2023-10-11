@@ -60,3 +60,22 @@ resource "google_artifact_registry_repository_iam_binding" "peated" {
     "serviceAccount:service-${data.google_project.project.number}@serverless-robot-prod.iam.gserviceaccount.com"
   ]
 }
+
+resource "google_project_iam_binding" "cloud-run-developer-iam" {
+  project = data.google_project.project.project_id
+  role    = "roles/run.developer"
+  members = ["serviceAccount:${google_service_account.github.email}"]
+}
+
+resource "google_project_iam_binding" "cloud-run-service-agent-iam" {
+  project = data.google_project.project.project_id
+  role    = "roles/run.serviceAgent"
+  members = ["serviceAccount:${google_service_account.github.email}", "serviceAccount:service-${data.google_project.project.number}@serverless-robot-prod.iam.gserviceaccount.com"]
+}
+
+
+resource "google_project_iam_binding" "service-account-user-iam" {
+  project = data.google_project.project.project_id
+  role    = "roles/iam.serviceAccountUser"
+  members = ["serviceAccount:service-${data.google_project.project.number}@serverless-robot-prod.iam.gserviceaccount.com"]
+}

@@ -10,6 +10,10 @@ resource "google_cloud_run_v2_service" "web" {
 
     containers {
       image = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/peated-web"
+
+      ports {
+        container_port = 3000
+      }
     }
   }
 
