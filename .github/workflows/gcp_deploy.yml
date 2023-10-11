@@ -9,6 +9,15 @@ jobs:
   build:
     name: 🚀 Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+    env:
+      GAR_LOCATION: us-central1
+      PROJECT_ID: cask-382601
+      SENTRY_DSN:
+      GOOGLE_CLIENT_ID:
+      API_SERVER: https://api.peated.app
     steps:
       - name: 🛑 Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.11.0
@@ -20,9 +29,16 @@ jobs:
         id: "auth"
         uses: "google-github-actions/auth@v1"
         with:
-          workload_identity_provider: "${{ secrets.WIF_PROVIDER }}"
-          service_account: "${{ secrets.WIF_SERVICE_ACCOUNT }}"
-
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_RESOURCE_NAME }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+          access_token_lifetime: 300s
+      # - name: Login to Artifact Registry
+      #   uses: docker/login-action@v1
+      #   with:
+      #     registry: us-central-docker.pkg.dev
+      #     username: oauth2accesstoken
+      #     password: ${{ steps.auth.outputs.access_token }}
       - name: "Set up Cloud SDK"
         uses: "google-github-actions/setup-gcloud@v1"
         with:
