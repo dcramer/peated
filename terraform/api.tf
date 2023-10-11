@@ -1,5 +1,5 @@
 resource "google_cloud_run_v2_service" "api" {
-  name     = "peated-api"
+  name     = "api"
   location = var.region
   ingress  = "INGRESS_TRAFFIC_ALL"
 
@@ -16,7 +16,7 @@ resource "google_cloud_run_v2_service" "api" {
     }
 
     containers {
-      image = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/peated-api"
+      image = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/api"
 
       env {
         name  = "GOOGLE_CLIENT_ID"
@@ -67,6 +67,14 @@ resource "google_cloud_run_v2_service" "api" {
   depends_on = [
     google_sql_database_instance.main
   ]
+
+  timeouts {}
+
+  lifecycle {
+    ignore_changes = [
+      launch_stage,
+    ]
+  }
 }
 
 
