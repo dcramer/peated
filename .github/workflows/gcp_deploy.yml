@@ -111,6 +111,9 @@ jobs:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
     needs: [build]
+    permissions:
+      contents: "read"
+      id-token: "write"
     env:
       GAR_LOCATION: us-central1
       PROJECT_ID: cask-382601
