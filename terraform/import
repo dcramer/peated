@@ -1,0 +1,17 @@
+#!/bin/bash
+
+RESOURCE_ID=$1
+RESOURCE_TYPE=$2
+RESOURCE_NAME=$3
+
+# Check if the resource exists
+# gcp RESOURCE_TYPE describe RESOURCE_ID --region us-west-2 > /dev/null 2>&1
+
+if [ true ]
+then
+    # If the resource exists, import it
+    terraform import $RESOURCE_TYPE.$RESOURCE_NAME $RESOURCE_ID
+else
+    # If the resource doesn't exist, skip the import
+    echo "Resource does not exist, skipping import"
+fi
