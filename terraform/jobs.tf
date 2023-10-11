@@ -6,6 +6,7 @@ resource "google_cloud_run_v2_job" "migrate_database" {
     template {
       volumes {
         name = "cloudsql"
+
         cloud_sql_instance {
           instances = [google_sql_database_instance.main.connection_name]
         }
@@ -13,6 +14,13 @@ resource "google_cloud_run_v2_job" "migrate_database" {
 
       containers {
         image = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/api"
+
+        resources {
+          limits = {
+            cpu    = "1000m"
+            memory = "1Gi"
+          }
+        }
 
         volume_mounts {
           name       = "cloudsql"

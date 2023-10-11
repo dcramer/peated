@@ -52,6 +52,13 @@ resource "google_cloud_run_v2_service" "api" {
         container_port = 4000
       }
 
+      resources {
+        limits = {
+          cpu    = "1000m"
+          memory = "1Gi"
+        }
+      }
+
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"
