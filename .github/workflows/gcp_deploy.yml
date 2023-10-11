@@ -1,10 +1,13 @@
 name: GCP Deploy
 on:
-  # push:
-  #   branches:
-  #     - main
   # TODO: dont ship w/ this!
   pull_request:
+  # workflow_run:
+  #   branches:
+  #     - main
+  #   workflows: ["Test"]
+  #   types:
+  #     - completed
 jobs:
   build:
     name: 🚀 Build
@@ -137,6 +140,18 @@ jobs:
         uses: "google-github-actions/setup-gcloud@v1"
         with:
           project_id: "${{ env.PROJECT_ID }}"
+
+      - name: "Deploy API"
+        uses: "google-github-actions/deploy-cloudrun@v1"
+        with:
+          service: "peated-api"
+          image: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/peated-api:${{ github.sha }}"
+
+      - name: "Deploy Web"
+        uses: "google-github-actions/deploy-cloudrun@v1"
+        with:
+          service: "peated-web"
+          image: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/peated-web:${{ github.sha }}"
 
       - name: Discord notification (success)
         if: success()
