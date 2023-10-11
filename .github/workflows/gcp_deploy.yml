@@ -15,8 +15,8 @@ jobs:
     env:
       GAR_LOCATION: us-central1
       PROJECT_ID: cask-382601
-      SENTRY_DSN:
-      GOOGLE_CLIENT_ID:
+      GOOGLE_CLIENT_ID: "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
+      SENTRY_DSN: "https://883a3e8bec6a4c4bae25f967d792b492@o172566.ingest.sentry.io/4505138086019073"
       API_SERVER: https://api.peated.app
     steps:
       - name: 🛑 Cancel Previous Runs
@@ -33,16 +33,21 @@ jobs:
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_RESOURCE_NAME }}
           service_account: ${{ secrets.SERVICE_ACCOUNT }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
           access_token_lifetime: 300s
+
       # - name: Login to Artifact Registry
       #   uses: docker/login-action@v1
       #   with:
       #     registry: us-central-docker.pkg.dev
       #     username: oauth2accesstoken
       #     password: ${{ steps.auth.outputs.access_token }}
+
       - name: "Set up Cloud SDK"
         uses: "google-github-actions/setup-gcloud@v1"
         with:
           project_id: "${{ env.PROJECT_ID }}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: "Docker auth"
         run: |-
@@ -52,17 +57,56 @@ jobs:
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: "Build and push container"
-        run: |-
-          docker build \
-            --build-arg API_SERVER=${{ env.API_SERVER }} \
-            --build-arg SENTRY_PROJECT="peated-web" \
-            --build-arg GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }} \
-            --build-arg SENTRY_DSN=${{ env.SENTRY_DSN }} \
-            --target web
-            -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/peated-web:${{ github.sha }}" \
-            .
-          docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/peated-web:${{ github.sha }}"
+      # - name: "Build Web"
+      #   run: |-
+      #     docker build \
+      #       --cache-from type=gha \
+      #       --cache-to type=gha,mode=max \
+      #       --build-arg API_SERVER=${{ env.API_SERVER }} \
+      #       --build-arg SENTRY_PROJECT="peated-web" \
+      #       --build-arg GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }} \
+      #       --build-arg SENTRY_DSN=${{ env.SENTRY_DSN }} \
+      #       --target web \
+      #       -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/peated-web:${{ github.sha }}" \
+      #       .
+      # - name: "Build API"
+      #   run: |-
+      #     docker build \
+      #       --cache-from type=gha \
+      #       --cache-to type=gha,mode=max \
+      #       --build-arg API_SERVER=${{ env.API_SERVER }} \
+      #       --build-arg SENTRY_PROJECT="peated-api" \
+      #       --build-arg GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }} \
+      #       --build-arg SENTRY_DSN=${{ env.SENTRY_DSN }} \
+      #       --target api \
+      #       -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/peated-api:${{ github.sha }}" \
+      #       .
+      - name: Build Web
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          target: web
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          secrets: |
+            "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
+          tags: |
+            ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/peated-web:${{ github.sha }}
+
+      - name: Build API
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          target: api
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          secrets: |
+            "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
+          tags: |
+            ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/peated-api:${{ github.sha }}
+
   deploy:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
