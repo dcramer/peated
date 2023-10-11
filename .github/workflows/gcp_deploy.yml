@@ -1,8 +1,10 @@
 name: GCP Deploy
-# on:
-#   push:
-#     branches:
-#       - main
+on:
+  # push:
+  #   branches:
+  #     - main
+  # TODO: dont ship w/ this!
+  pull_request:
 jobs:
   build:
     name: 🚀 Build
