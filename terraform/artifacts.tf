@@ -48,3 +48,15 @@ resource "google_project_iam_binding" "read-write-registry-iam" {
   role    = "roles/artifactregistry.writer"
   members = ["serviceAccount:${google_service_account.github.email}"]
 }
+
+
+resource "google_artifact_registry_repository_iam_binding" "peated" {
+  repository = google_artifact_registry_repository.peated.name
+  location   = var.region
+  role       = "roles/artifactregistry.writer"
+  project    = var.project_id
+
+  members = [
+    "serviceAccount:service-${data.google_project.project.number}@serverless-robot-prod.iam.gserviceaccount.com"
+  ]
+}

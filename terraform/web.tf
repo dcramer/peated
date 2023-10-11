@@ -9,7 +9,7 @@ resource "google_cloud_run_v2_service" "web" {
     }
 
     containers {
-      image = "gcr.io/${var.project_id}/peated-web"
+      image = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/peated-web"
     }
   }
 

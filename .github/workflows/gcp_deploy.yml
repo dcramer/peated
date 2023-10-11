@@ -122,8 +122,10 @@ jobs:
         id: "auth"
         uses: "google-github-actions/auth@v1"
         with:
-          workload_identity_provider: "${{ secrets.WIF_PROVIDER }}"
-          service_account: "${{ secrets.WIF_SERVICE_ACCOUNT }}"
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_RESOURCE_NAME }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+          access_token_lifetime: 300s
 
       - name: "Set up Cloud SDK"
         uses: "google-github-actions/setup-gcloud@v1"
