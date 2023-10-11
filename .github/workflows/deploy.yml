@@ -88,6 +88,20 @@ jobs:
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:latest
 
+      - name: Build Scraper
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          target: api
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          secrets: |
+            "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:${{ github.sha }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:latest
+
   deploy:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
@@ -134,6 +148,12 @@ jobs:
         with:
           service: "web"
           image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
+
+      - name: "Deploy Scraper"
+        uses: "google-github-actions/deploy-cloudrun@v1"
+        with:
+          service: "scraper"
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:${{ github.sha }}"
 
       - name: Discord notification (success)
         if: success()

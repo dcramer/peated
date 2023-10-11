@@ -5,9 +5,10 @@ resource "google_artifact_registry_repository" "peated" {
   description   = ""
   format        = "DOCKER"
 
-  docker_config {
-    immutable_tags = true
-  }
+  # Would prefer this but not sure how to address the default image in GCR...
+  # docker_config {
+  #   immutable_tags = true
+  # }
 }
 
 resource "google_service_account_iam_binding" "peated-repository-iam" {
