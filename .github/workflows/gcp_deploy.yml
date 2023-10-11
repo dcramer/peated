@@ -111,6 +111,9 @@ jobs:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
     needs: [build]
+    env:
+      GAR_LOCATION: us-central1
+      PROJECT_ID: cask-382601
     steps:
       - name: 🛑 Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.11.0
