@@ -84,4 +84,11 @@ resource "google_cloud_run_v2_service" "api" {
   }
 }
 
-
+resource "google_cloud_run_service_iam_binding" "api" {
+  location = google_cloud_run_v2_service.api.location
+  service  = google_cloud_run_v2_service.api.name
+  role     = "roles/run.invoker"
+  members = [
+    "allUsers"
+  ]
+}

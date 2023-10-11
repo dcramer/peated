@@ -30,3 +30,13 @@ resource "google_cloud_run_v2_service" "web" {
     ]
   }
 }
+
+
+resource "google_cloud_run_service_iam_binding" "web" {
+  location = google_cloud_run_v2_service.web.location
+  service  = google_cloud_run_v2_service.web.name
+  role     = "roles/run.invoker"
+  members = [
+    "allUsers"
+  ]
+}
