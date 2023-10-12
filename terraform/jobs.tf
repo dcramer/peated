@@ -17,7 +17,7 @@ resource "google_cloud_run_v2_job" "migrate_database" {
 
       containers {
         image   = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/api"
-        command = "npm run db:migrate"
+        command = ["npm run db:migrate"]
 
         resources {
           limits = {
