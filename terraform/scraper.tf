@@ -14,6 +14,13 @@ resource "google_cloud_run_v2_service" "scraper" {
         name  = "GOOGLE_CLIENT_ID"
         value = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
       }
+
+      resources {
+        limits = {
+          cpu    = "1000m"
+          memory = "1Gi"
+        }
+      }
     }
   }
 
