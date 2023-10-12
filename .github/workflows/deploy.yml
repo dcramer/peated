@@ -115,24 +115,24 @@ jobs:
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:latest
 
-      - name: Build Scraper
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          cache-from: type=gha,scope=prod
-          push: true
-          target: scraper
-          build-args: |
-            VERSION=${{ github.sha }}
-            API_SERVER={{ env.API_SERVER }}
-            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
-            SENTRY_DSN=${{ env.SENTRY_DSN }}
-            SENTRY_WEB_PROJECT=${{ env.SENTRY_WEB_PROJECT }}
-          secrets: |
-            "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
-          tags: |
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:${{ github.sha }}
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:latest
+      # - name: Build Scraper
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     cache-from: type=gha,scope=prod
+      #     push: true
+      #     target: scraper
+      #     build-args: |
+      #       VERSION=${{ github.sha }}
+      #       API_SERVER={{ env.API_SERVER }}
+      #       GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+      #       SENTRY_DSN=${{ env.SENTRY_DSN }}
+      #       SENTRY_WEB_PROJECT=${{ env.SENTRY_WEB_PROJECT }}
+      #     secrets: |
+      #       "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
+      #     tags: |
+      #       ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:${{ github.sha }}
+      #       ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:latest
 
   deploy:
     name: 🚀 Deploy
@@ -183,11 +183,11 @@ jobs:
           service: "web"
           image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
 
-      - name: "Deploy Scraper"
-        uses: "google-github-actions/deploy-cloudrun@v1"
-        with:
-          service: "scraper"
-          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:${{ github.sha }}"
+      # - name: "Update Scraper"
+      #   run: |-
+      #     gcloud run jobs update scraper \
+      #       --region ${{ env.REGION }} \
+      #       --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:${{ github.sha }}"
 
       - name: Discord notification (success)
         if: success()
