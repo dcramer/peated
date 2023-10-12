@@ -136,7 +136,6 @@ jobs:
       - name: Run Migrations
         run: |-
           gcloud run jobs execute migrate-database --region ${{ env.REGION }} --wait
-        timeout-minute: 5
 
       - name: "Deploy API"
         uses: "google-github-actions/deploy-cloudrun@v1"
