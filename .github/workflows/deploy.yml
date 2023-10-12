@@ -13,6 +13,7 @@ env:
   PROJECT_ID: cask-382601
   GOOGLE_CLIENT_ID: "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
   SENTRY_DSN: "https://883a3e8bec6a4c4bae25f967d792b492@o172566.ingest.sentry.io/4505138086019073"
+  SENTRY_WEB_PROJECT: "peated-web"
   API_SERVER: https://api.peated.app
 jobs:
   build:
@@ -73,6 +74,7 @@ jobs:
             SENTRY_PROJECT="peated-web"
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_WEB_PROJECT=${{ env.SENTRY_WEB_PROJECT }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
 
