@@ -133,11 +133,16 @@ jobs:
         with:
           project_id: "${{ env.PROJECT_ID }}"
 
+      - name: "Deploy API"
+        uses: "google-github-actions/deploy-cloudrun@v1"
+        with:
+          service: "migrate-database"
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
+
       - name: Run Migrations
         run: |-
           gcloud run jobs execute migrate-database \
             --region ${{ env.REGION }} \
-            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}" \
             --wait
 
       - name: "Deploy API"
