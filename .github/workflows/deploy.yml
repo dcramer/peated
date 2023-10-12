@@ -76,6 +76,9 @@ jobs:
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
 
+      - name: "debug"
+        run: "ls -la"
+
       - name: Build Web
         uses: docker/build-push-action@v5
         with:
@@ -94,6 +97,9 @@ jobs:
           tags: |
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:latest
+
+      - name: "debug"
+        run: "ls -la"
 
       - name: Build API
         uses: docker/build-push-action@v5
@@ -164,6 +170,7 @@ jobs:
       - name: Run Migrations
         run: |-
           gcloud run jobs update migrate-database \
+            --region ${{ env.REGION }} \
             --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
           gcloud run jobs execute migrate-database \
             --region ${{ env.REGION }} \
