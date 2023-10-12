@@ -19,7 +19,17 @@ resource "google_cloud_run_v2_service" "api" {
       image = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/api"
 
       env {
+        name  = "INSTANCE_UNIX_SOCKET"
+        value = "/cloudsql/${google_sql_database_instance.main.connection_name}"
+      }
+
+      env {
         name  = "DATABASE_USER"
+        value = "peated"
+      }
+
+      env {
+        name  = "DATABASE_PASSWORD"
         value = "peated"
       }
 

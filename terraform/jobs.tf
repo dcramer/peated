@@ -20,7 +20,17 @@ resource "google_cloud_run_v2_job" "migrate_database" {
         command = ["npm", "run", "db:migrate"]
 
         env {
+          name  = "INSTANCE_UNIX_SOCKET"
+          value = "/cloudsql/${google_sql_database_instance.main.connection_name}"
+        }
+
+        env {
           name  = "DATABASE_USER"
+          value = "peated"
+        }
+
+        env {
+          name  = "DATABASE_PASSWORD"
           value = "peated"
         }
 
