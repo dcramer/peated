@@ -31,7 +31,6 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-l
 
 FROM base-env AS build
 WORKDIR /app
-COPY --from=base-env /app/node_modules/ /app/node_modules/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 ADD . .
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
