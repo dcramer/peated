@@ -1,4 +1,3 @@
-import type { MetaFunction } from "@remix-run/node";
 import { Link, useLocation } from "@remix-run/react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
@@ -108,14 +107,6 @@ const ActivityContent = ({ filter }: { filter: string }) => {
 
 //   return json({ dehydratedState: dehydrate(queryClient) });
 // }
-
-export const meta: MetaFunction = () => {
-  return [
-    {
-      title: "Activity",
-    },
-  ];
-};
 
 export default function Activity() {
   const { user } = useAuth();
