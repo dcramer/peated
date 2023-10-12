@@ -43,7 +43,7 @@ RUN echo $VERSION > VERSION
 # web service
 FROM base-env as web
 COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ /app/
+COPY --from=build /app /
 
 ENV HOST=0.0.0.0 \
     PORT=3000
@@ -57,7 +57,7 @@ CMD ["pnpm", "start"]
 # scraper service
 FROM base-env as scraper
 COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ /app/
+COPY --from=build /app /
 
 WORKDIR /app/apps/scraper
 
@@ -66,7 +66,7 @@ CMD ["pnpm", "start"]
 # api service
 FROM base-env as api
 COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ /app/
+COPY --from=build /app /
 
 ENV HOST=0.0.0.0 \
     PORT=4000
