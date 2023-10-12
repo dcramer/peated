@@ -71,7 +71,6 @@ jobs:
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
-            SENTRY_PROJECT="peated-web"
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_WEB_PROJECT=${{ env.SENTRY_WEB_PROJECT }}
@@ -88,7 +87,6 @@ jobs:
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
-            SENTRY_PROJECT="peated-web"
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
           secrets: |
@@ -107,7 +105,6 @@ jobs:
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
-            SENTRY_PROJECT="peated-api"
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
           secrets: |
@@ -126,7 +123,6 @@ jobs:
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
-            SENTRY_PROJECT="peated-scraper"
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
           secrets: |
