@@ -68,6 +68,12 @@ jobs:
           target: web
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ github.sha }}
+            API_SERVER={{ env.API_SERVER }}
+            SENTRY_PROJECT="peated-web"
+            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+            SENTRY_DSN=${{ env.SENTRY_DSN }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
           tags: |
@@ -82,6 +88,12 @@ jobs:
           target: api
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ github.sha }}
+            API_SERVER={{ env.API_SERVER }}
+            SENTRY_PROJECT="peated-api"
+            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+            SENTRY_DSN=${{ env.SENTRY_DSN }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
           tags: |
@@ -96,6 +108,12 @@ jobs:
           target: api
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ github.sha }}
+            API_SERVER={{ env.API_SERVER }}
+            SENTRY_PROJECT="peated-scraper"
+            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+            SENTRY_DSN=${{ env.SENTRY_DSN }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
           tags: |
@@ -136,7 +154,7 @@ jobs:
       - name: Run Migrations
         run: |-
           gcloud run jobs update migrate-database \
-            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
+            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}" \
           gcloud run jobs execute migrate-database \
             --region ${{ env.REGION }} \
             --wait
