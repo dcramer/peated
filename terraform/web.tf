@@ -14,6 +14,16 @@ resource "google_cloud_run_v2_service" "web" {
       ports {
         container_port = 3000
       }
+
+      env {
+        name = "SESSION_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.session_secret.secret_id
+            version = "latest"
+          }
+        }
+      }
     }
   }
 
