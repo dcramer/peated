@@ -19,6 +19,16 @@ resource "google_cloud_run_v2_service" "api" {
       image = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/api"
 
       env {
+        name  = "DATABASE_USER"
+        value = "peated"
+      }
+
+      env {
+        name  = "DATABASE_NAME"
+        value = "peated"
+      }
+
+      env {
         name  = "GOOGLE_CLIENT_ID"
         value = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
       }
@@ -71,10 +81,6 @@ resource "google_cloud_run_v2_service" "api" {
     percent = 100
   }
 
-  depends_on = [
-    google_sql_database_instance.main
-  ]
-
   timeouts {}
 
   lifecycle {
@@ -82,7 +88,10 @@ resource "google_cloud_run_v2_service" "api" {
       launch_stage,
     ]
   }
+
+  depends_on = [google_sql_database_instance.main]
 }
+
 
 resource "google_cloud_run_service_iam_binding" "api" {
   location = google_cloud_run_v2_service.api.location

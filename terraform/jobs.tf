@@ -19,6 +19,16 @@ resource "google_cloud_run_v2_job" "migrate_database" {
         image   = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/api:latest"
         command = ["npm", "run", "db:migrate"]
 
+        env {
+          name  = "DATABASE_USER"
+          value = "peated"
+        }
+
+        env {
+          name  = "DATABASE_NAME"
+          value = "peated"
+        }
+
         resources {
           limits = {
             cpu    = "1000m"
@@ -39,4 +49,6 @@ resource "google_cloud_run_v2_job" "migrate_database" {
       launch_stage,
     ]
   }
+
+  depends_on = [google_sql_database_instance.main]
 }

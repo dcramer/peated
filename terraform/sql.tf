@@ -9,3 +9,18 @@ resource "google_sql_database_instance" "main" {
 
   deletion_protection = "true"
 }
+
+resource "google_sql_database" "peated" {
+  name     = "peated"
+  instance = google_sql_database_instance.main.name
+}
+
+resource "google_sql_user" "peated" {
+  name     = "peated"
+  instance = google_sql_database_instance.main.name
+  password = "peated"
+}
+
+output "sql_instance_name" {
+  value = google_sql_database_instance.main.connection_name
+}
