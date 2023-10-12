@@ -65,8 +65,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=prod
+          cache-to: type=gha,mode=max,scope=prod
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
@@ -80,6 +80,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          cache-from: type=gha,scope=prod
           push: true
           target: web
           build-args: |
@@ -98,6 +99,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          cache-from: type=gha,scope=prod
           push: true
           target: api
           build-args: |
@@ -116,8 +118,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          cache-from: type=gha,scope=prod
           push: true
-          target: api
+          target: scraper
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
