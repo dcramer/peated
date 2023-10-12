@@ -1,8 +1,8 @@
 FROM node:18-slim as base
 # set for base and all layer that inherit from it
-ENV NODE_ENV production
-ENV PNPM_HOME "/pnpm"
-ENV PATH "$PNPM_HOME:$PATH"
+ENV NODE_ENV=production \
+    PNPM_HOME="/pnpm" \
+    PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 RUN apt update -y && apt install -y libc-dev fftw-dev gcc g++ make libc6
 RUN npm install -g -f pnpm
@@ -10,16 +10,15 @@ RUN npm install -g -f pnpm
 FROM base as base-env
 WORKDIR /app
 ARG SENTRY_DSN
-ENV SENTRY_DSN $SENTRY_DSN
 ARG SENTRY_PROJECT
-ENV SENTRY_PROJECT $SENTRY_PROJECT
 ARG API_SERVER
-ENV API_SERVER $API_SERVER
 ARG GOOGLE_CLIENT_ID
-ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
+ENV SENTRY_DSN=$SENTRY_DSN \
+    SENTRY_PROJECT=$SENTRY_PROJECT \
+    API_SERVER=$API_SERVER \
+    GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
 
-ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
-ADD packages ./packages
+ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/api/package.json ./apps/api/package.json
 ADD apps/scraper/package.json ./apps/scraper/package.json
@@ -45,8 +44,8 @@ RUN echo $VERSION > VERSION
 FROM prod-deps as web
 COPY --from=build /app/ /app/
 
-ENV HOST 0.0.0.0
-ENV PORT 3000
+ENV HOST=0.0.0.0 \
+    PORT=3000
 
 EXPOSE 3000
 
@@ -66,8 +65,8 @@ CMD ["pnpm", "start"]
 FROM prod-deps as api
 COPY --from=build /app/ /app/
 
-ENV HOST 0.0.0.0
-ENV PORT 4000
+ENV HOST=0.0.0.0 \
+    PORT=4000
 
 EXPOSE 4000
 
