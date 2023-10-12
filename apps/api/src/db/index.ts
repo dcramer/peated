@@ -16,15 +16,15 @@ BigInt.prototype.toJSON = function (): string {
 };
 
 export const pool = new Pool(
-  process.env.DATABASE_URL
+  process.env.INSTANCE_UNIX_SOCKET
     ? {
-        connectionString: process.env.DATABASE_URL,
-      }
-    : {
         host: process.env.INSTANCE_UNIX_SOCKET,
         user: process.env.DATABASE_USER,
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
+      }
+    : {
+        connectionString: process.env.DATABASE_URL,
       },
 );
 
