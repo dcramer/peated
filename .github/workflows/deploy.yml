@@ -1,4 +1,4 @@
-name: GCP Deploy
+name: Build & Deploy
 on:
   # TODO: dont ship w/ this!
   pull_request:
@@ -8,6 +8,12 @@ on:
   #   workflows: ["Test"]
   #   types:
   #     - completed
+env:
+  REGION: us-central1
+  PROJECT_ID: cask-382601
+  GOOGLE_CLIENT_ID: "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
+  SENTRY_DSN: "https://883a3e8bec6a4c4bae25f967d792b492@o172566.ingest.sentry.io/4505138086019073"
+  API_SERVER: https://api.peated.app
 jobs:
   build:
     name: 🚀 Build
@@ -18,12 +24,6 @@ jobs:
     permissions:
       contents: "read"
       id-token: "write"
-    env:
-      REGION: us-central1
-      PROJECT_ID: cask-382601
-      GOOGLE_CLIENT_ID: "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
-      SENTRY_DSN: "https://883a3e8bec6a4c4bae25f967d792b492@o172566.ingest.sentry.io/4505138086019073"
-      API_SERVER: https://api.peated.app
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v3
@@ -65,7 +65,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -141,9 +140,6 @@ jobs:
     permissions:
       contents: "read"
       id-token: "write"
-    env:
-      REGION: us-central1
-      PROJECT_ID: cask-382601
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v3
