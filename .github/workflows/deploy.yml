@@ -60,14 +60,29 @@ jobs:
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      # optimize cache by building all stages
+      - name: Build All Stages
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ github.sha }}
+            API_SERVER={{ env.API_SERVER }}
+            SENTRY_PROJECT="peated-web"
+            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+            SENTRY_DSN=${{ env.SENTRY_DSN }}
+          secrets: |
+            "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
+
       - name: Build Web
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           target: web
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
@@ -86,8 +101,6 @@ jobs:
           context: .
           push: true
           target: api
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
@@ -106,8 +119,6 @@ jobs:
           context: .
           push: true
           target: api
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
