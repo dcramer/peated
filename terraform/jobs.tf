@@ -4,7 +4,8 @@ resource "google_cloud_run_v2_job" "migrate_database" {
 
   template {
     template {
-      timeout = "300s"
+      timeout     = "300s"
+      max_retries = 1
 
       volumes {
         name = "cloudsql"
