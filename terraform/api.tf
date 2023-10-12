@@ -92,3 +92,11 @@ resource "google_cloud_run_service_iam_binding" "api" {
     "allUsers"
   ]
 }
+
+module "api-lb" {
+  source            = "./modules/load-balancer"
+  name              = "api"
+  region            = var.region
+  cloud_run_service = google_cloud_run_v2_service.api.name
+  domain            = "api.peated.app"
+}
