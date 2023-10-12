@@ -10,7 +10,7 @@ RUN npm install -g -f pnpm
 FROM base as base-env
 WORKDIR /app
 # these are used for sourcemap publishing, and to prevent cache busting
-# on docker layers
+# on docker layers - they SHOULD NOT CHANGE between targets
 ARG SENTRY_DSN
 ARG SENTRY_WEB_PROJECT
 ARG API_SERVER
@@ -24,6 +24,8 @@ ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/api/package.json ./apps/api/package.json
 ADD apps/scraper/package.json ./apps/scraper/package.json
+ADD packages/shared/package.json ./packages/shared/package.json
+ADD packages/design/package.json ./packages/design/package.json
 
 FROM base-env as prod-deps
 WORKDIR /app
