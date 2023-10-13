@@ -8,7 +8,6 @@ resource "google_compute_global_address" "ip_address" {
   address_type = "EXTERNAL"
 }
 
-
 resource "google_compute_managed_ssl_certificate" "default" {
   provider = google-beta
   name     = "${var.name}-cert"
@@ -18,11 +17,13 @@ resource "google_compute_managed_ssl_certificate" "default" {
   }
 }
 
+# https://github.com/hashicorp/terraform-provider-kubernetes/issues/446#issuecomment-496905302
 resource "kubernetes_ingress_v1" "default" {
   metadata {
     name = var.name
 
     annotations = {
+      "ingress.gcp.kubernetes.io/pre-shared-cert"   = google_compute_managed_ssl_certificate.default.name
       "kubernetes.io/ingress.global-static-ip-name" = google_compute_global_address.ip_address.name
     }
 
