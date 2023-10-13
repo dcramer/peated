@@ -7,38 +7,39 @@ module "dns-private-zone" {
   domain     = "peated.app."
 
   recordsets = [
-    {
-      name = ""
-      type = "A"
-      ttl  = 300
-      records = [
-        "66.241.124.159",
-      ]
-    },
-    {
-      name = ""
-      type = "AAAA"
-      ttl  = 300
-      records = [
-        "2a09:8280:1::1c:172b",
-      ]
-    },
-    {
-      name = "api"
-      type = "A"
-      ttl  = 300
-      records = [
-        "66.241.124.195",
-      ]
-    },
-    {
-      name = "api"
-      type = "AAAA"
-      ttl  = 300
-      records = [
-        "2a09:8280:1::42:17c8",
-      ]
-    },
+    # FLY
+    # {
+    #   name = ""
+    #   type = "A"
+    #   ttl  = 300
+    #   records = [
+    #     "66.241.124.159",
+    #   ]
+    # },
+    # {
+    #   name = ""
+    #   type = "AAAA"
+    #   ttl  = 300
+    #   records = [
+    #     "2a09:8280:1::1c:172b",
+    #   ]
+    # },
+    # {
+    #   name = "api"
+    #   type = "A"
+    #   ttl  = 300
+    #   records = [
+    #     "66.241.124.195",
+    #   ]
+    # },
+    # {
+    #   name = "api"
+    #   type = "AAAA"
+    #   ttl  = 300
+    #   records = [
+    #     "2a09:8280:1::42:17c8",
+    #   ]
+    # },
     {
       name = "www"
       type = "CNAME"
@@ -47,7 +48,22 @@ module "dns-private-zone" {
         "peated.app.",
       ]
     },
-
+    {
+      name = "api"
+      type = "A"
+      ttl  = 300
+      records = [
+        module.api-service.public_ip,
+      ]
+    },
+    {
+      name = ""
+      type = "A"
+      ttl  = 300
+      records = [
+        module.web-service.public_ip,
+      ]
+    },
     {
       name = "api.staging"
       type = "A"
