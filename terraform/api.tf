@@ -22,6 +22,7 @@ module "api-service" {
     USE_GCS_STORAGE  = "1"
     GCS_BUCKET_NAME  = google_storage_bucket.peated.name
     GCS_BUCKET_PATH  = "uploads"
+    NODE_NO_WARNINGS = "1"
   }
 
   depends_on = [module.db-main]
