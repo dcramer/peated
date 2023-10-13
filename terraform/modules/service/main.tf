@@ -41,10 +41,6 @@ resource "kubernetes_ingress_v1" "default" {
         }
       }
     }
-    tls {
-      hosts       = var.domains
-      secret_name = google_compute_managed_ssl_certificate.default.name
-    }
   }
 
   depends_on = [kubernetes_service_v1.default]
