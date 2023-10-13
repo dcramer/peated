@@ -1,28 +1,31 @@
 FROM node:18-slim as base
 # set for base and all layer that inherit from it
-ENV NODE_ENV production
-ENV PNPM_HOME "/pnpm"
-ENV PATH "$PNPM_HOME:$PATH"
+ENV NODE_ENV="production" \
+    PNPM_HOME="/pnpm" \
+    PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 RUN apt update -y && apt install -y libc-dev fftw-dev gcc g++ make libc6
 RUN npm install -g -f pnpm
 
 FROM base as base-env
 WORKDIR /app
+# these are used for sourcemap publishing, and to prevent cache busting
+# on docker layers - they SHOULD NOT CHANGE between targets
 ARG SENTRY_DSN
-ENV SENTRY_DSN $SENTRY_DSN
-ARG SENTRY_PROJECT
-ENV SENTRY_PROJECT $SENTRY_PROJECT
+ARG SENTRY_WEB_PROJECT
 ARG API_SERVER
-ENV API_SERVER $API_SERVER
 ARG GOOGLE_CLIENT_ID
-ENV GOOGLE_CLIENT_ID $GOOGLE_CLIENT_ID
+ENV SENTRY_DSN=$SENTRY_DSN \
+    SENTRY_WEB_PROJECT=$SENTRY_WEB_PROJECT \
+    API_SERVER=$API_SERVER \
+    GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
 
-ADD package.json pnpm-lock.yaml pnpm-workspace.yaml .
-ADD packages ./packages
+ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/api/package.json ./apps/api/package.json
 ADD apps/scraper/package.json ./apps/scraper/package.json
+ADD packages/shared/package.json ./packages/shared/package.json
+ADD packages/design/package.json ./packages/design/package.json
 
 FROM base-env as prod-deps
 WORKDIR /app
@@ -43,12 +46,11 @@ RUN echo $VERSION > VERSION
 
 # web service
 FROM base-env as web
-WORKDIR /app
 COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ ./
+COPY --from=build /app/ /app/
 
-ENV HOST 0.0.0.0
-ENV PORT 3000
+ENV HOST=0.0.0.0 \
+    PORT=3000
 
 EXPOSE 3000
 
@@ -58,9 +60,8 @@ CMD ["pnpm", "start"]
 
 # scraper service
 FROM base-env as scraper
-WORKDIR /app
 COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ ./
+COPY --from=build /app/ /app/
 
 WORKDIR /app/apps/scraper
 
@@ -68,12 +69,11 @@ CMD ["pnpm", "start"]
 
 # api service
 FROM base-env as api
-WORKDIR /app
 COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ ./
+COPY --from=build /app/ /app/
 
-ENV HOST 0.0.0.0
-ENV PORT 4000
+ENV HOST=0.0.0.0 \
+    PORT=4000
 
 EXPOSE 4000
 

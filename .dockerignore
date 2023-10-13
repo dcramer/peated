@@ -32,8 +32,10 @@
 .git
 .gitignore
 .env
+.env.*
 postgres-data
 
 *.md
 
 fly.*.toml
+/terraform

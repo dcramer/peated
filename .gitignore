@@ -33,3 +33,9 @@ yarn-error.log*
 .cache/
 
 /postgres-data
+
+.terraform
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+kubeconfig
