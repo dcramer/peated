@@ -68,7 +68,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=prod
           build-args: |
             VERSION=${{ github.sha }}
-            API_SERVER={{ env.API_SERVER }}
+            API_SERVER=${{ env.API_SERVER }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_WEB_PROJECT=${{ env.SENTRY_WEB_PROJECT }}
@@ -84,7 +84,7 @@ jobs:
           target: web
           build-args: |
             VERSION=${{ github.sha }}
-            API_SERVER={{ env.API_SERVER }}
+            API_SERVER=${{ env.API_SERVER }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_WEB_PROJECT=${{ env.SENTRY_WEB_PROJECT }}
@@ -103,7 +103,7 @@ jobs:
           target: api
           build-args: |
             VERSION=${{ github.sha }}
-            API_SERVER={{ env.API_SERVER }}
+            API_SERVER=${{ env.API_SERVER }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_WEB_PROJECT=${{ env.SENTRY_WEB_PROJECT }}
