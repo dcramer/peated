@@ -24,14 +24,24 @@ resource "google_secret_manager_secret" "session_secret" {
   }
 }
 
-# resource "google_secret_manager_secret_version" "session_secret" {
-#   secret      = google_secret_manager_secret.session_secret.name
-#   secret_data = "secret-data"
-# }
-
 resource "google_secret_manager_secret_iam_member" "session_secret" {
   secret_id  = google_secret_manager_secret.session_secret.id
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.session_secret]
+}
+
+
+resource "google_secret_manager_secret" "openai_api_key" {
+  secret_id = "openai_api_key"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "openai_api_key" {
+  secret_id  = google_secret_manager_secret.openai_api_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.openai_api_key]
 }

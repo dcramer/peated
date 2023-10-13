@@ -1,3 +1,9 @@
+data "google_secret_manager_secret_version" "openai_api_key" {
+  provider = google-beta
+
+  secret = google_secret_manager_secret.openai_api_key.id
+}
+
 module "api-service" {
   source = "./modules/service"
   name   = "api"
@@ -23,6 +29,9 @@ module "api-service" {
     GCS_BUCKET_NAME  = google_storage_bucket.peated.name
     GCS_BUCKET_PATH  = "uploads"
     NODE_NO_WARNINGS = "1"
+    # this is prob a bad idea
+    OPENAI_API_KEY = data.google_secret_manager_secret_version.openai_api_key.secret_data
+
   }
 
   depends_on = [module.db-main]
