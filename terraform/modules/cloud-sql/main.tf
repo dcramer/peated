@@ -4,11 +4,14 @@ resource "google_sql_database_instance" "instance" {
   database_version = "POSTGRES_15"
 
   settings {
-    tier            = var.tier
-    disk_autoresize = true
+    tier                        = var.tier
+    disk_autoresize             = true
+    availability_type           = "ZONAL"
+    deletion_protection_enabled = true
 
     backup_configuration {
       enabled = true
+      # point_in_time_recovery_enabled  = true
     }
 
     maintenance_window {

@@ -86,3 +86,9 @@ resource "google_project_iam_binding" "cloud-sql-client-iam" {
   members = ["serviceAccount:${module.gke.service_account}"]
 }
 
+resource "google_project_iam_binding" "storage-object-user-iam" {
+  project = data.google_project.project.project_id
+  role    = "roles/storage.objectUser"
+  members = ["serviceAccount:${module.gke.service_account}"]
+}
+

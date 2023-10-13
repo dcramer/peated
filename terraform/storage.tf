@@ -12,3 +12,9 @@ resource "google_storage_bucket" "peated" {
 
   timeouts {}
 }
+
+resource "google_storage_bucket" "peated-backups" {
+  name                        = "peated-backups"
+  location                    = "US"
+  uniform_bucket_level_access = true
+}
