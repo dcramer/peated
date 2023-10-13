@@ -184,7 +184,7 @@ jobs:
 
       - name: "Deploy Web"
         run: |-
-          kubectl set image deployment.v1.apps/api api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
+          kubectl set image deployment.v1.apps/web web="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
           kubectl rollout status deployment/web
 
       - name: Discord notification (success)
