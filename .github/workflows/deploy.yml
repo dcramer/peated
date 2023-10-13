@@ -167,6 +167,10 @@ jobs:
           cluster_name: default
           location: ${{ env.REGION }}
 
+      - name: Record Version
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Run Migrations
         run: |-
           gcloud run jobs update migrate-database \
