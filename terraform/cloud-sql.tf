@@ -7,5 +7,4 @@ module "db-main" {
   users     = [{ name = "peated", password = "peated" }]
 
   # network_id = module.gke.
-
 }

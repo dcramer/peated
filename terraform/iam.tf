@@ -78,3 +78,11 @@ resource "google_project_iam_binding" "container-developer-iam" {
   role    = "roles/container.developer"
   members = ["serviceAccount:${google_service_account.github.email}"]
 }
+
+
+resource "google_project_iam_binding" "cloud-sql-client-iam" {
+  project = data.google_project.project.project_id
+  role    = "roles/cloudsql.client"
+  members = ["serviceAccount:${module.gke.service_account}"]
+}
+

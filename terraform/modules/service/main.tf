@@ -90,7 +90,7 @@ resource "kubernetes_deployment_v1" "default" {
       type = "RollingUpdate"
       rolling_update {
         max_surge       = 4
-        max_unavailable = 1
+        max_unavailable = "25%"
       }
     }
 
