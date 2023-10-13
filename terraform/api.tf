@@ -16,7 +16,8 @@ module "api-service" {
 
   env = {
     DATABASE_URL         = "postgresql://peated:peated@127.0.0.1/peated"
-    GOOGLE_CLIENT_ID     = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
+    GOOGLE_CLIENT_ID     = var.google_client_id
+    SENTRY_DSN           = var.sentry_dsn
     GOOGLE_CLIENT_SECRET = data.google_secret_manager_secret_version.google_client_secret.secret_data
     CORS_HOST            = "https://peated.app"
     URL_PREFIX           = "https://api.peated.app"
@@ -26,7 +27,7 @@ module "api-service" {
     NODE_NO_WARNINGS     = "1"
     # this is prob a bad idea
     OPENAI_API_KEY = data.google_secret_manager_secret_version.openai_api_key.secret_data
-
+    JWT_SECRET     = data.google_secret_manager_secret_version.jwt_secret.secret_data
   }
 
   depends_on = [module.db-main]

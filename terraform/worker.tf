@@ -10,9 +10,9 @@ module "worker-service" {
   k8s_service_account = module.gke_workload_identity.k8s_service_account_name
 
   env = {
-    GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
-    CORS_HOST        = "https://peated.app"
-    URL_PREFIX       = "https://api.peated.app"
+    GOOGLE_CLIENT_ID = var.google_client_id
+    SENTRY_DSN       = var.sentry_dsn
+    API_SERVER       = "https://api.peated.app"
     NODE_NO_WARNINGS = "1"
     # this is prob a bad idea
     OPENAI_API_KEY = data.google_secret_manager_secret_version.openai_api_key.secret_data

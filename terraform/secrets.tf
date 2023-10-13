@@ -77,3 +77,23 @@ data "google_secret_manager_secret_version" "google_client_secret" {
 
   secret = google_secret_manager_secret.google_client_secret.id
 }
+
+resource "google_secret_manager_secret" "jwt_secret" {
+  secret_id = "jwt_secret"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "jwt_secret" {
+  secret_id  = google_secret_manager_secret.jwt_secret.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.jwt_secret]
+}
+
+data "google_secret_manager_secret_version" "jwt_secret" {
+  provider = google-beta
+
+  secret = google_secret_manager_secret.jwt_secret.id
+}

@@ -15,9 +15,9 @@ module "web-service" {
   cloud_sql_instance = module.db-main.connection_name
 
   env = {
-    GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
-    # this is prob a bad idea
-    SESSION_SECRET = data.google_secret_manager_secret_version.session_secret.secret_data
+    GOOGLE_CLIENT_ID = var.google_client_id
+    SENTRY_DSN       = var.sentry_dsn
+    SESSION_SECRET   = data.google_secret_manager_secret_version.session_secret.secret_data
   }
 
   depends_on = [module.db-main]
