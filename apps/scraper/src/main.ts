@@ -34,37 +34,38 @@ function job(schedule: string, name: string, cb: () => Promise<void>) {
       },
     );
 
-    const transaction = Sentry.startTransaction({
-      op: "job",
-      name: name,
-    });
-
     Sentry.configureScope(function (scope) {
       scope.setContext("monitor", {
         slug: name,
       });
     });
 
-    console.log(`Running job: ${name}`);
+    await Sentry.startSpan(
+      {
+        op: "job",
+        name: name,
+      },
+      async () => {
+        console.log(`Running job: ${name}`);
 
-    try {
-      await cb();
+        try {
+          await cb();
 
-      Sentry.captureCheckIn({
-        checkInId,
-        monitorSlug: name,
-        status: "ok",
-      });
-    } catch (e) {
-      Sentry.captureException(e);
-      Sentry.captureCheckIn({
-        checkInId,
-        monitorSlug: name,
-        status: "error",
-      });
-    } finally {
-      transaction.finish();
-    }
+          Sentry.captureCheckIn({
+            checkInId,
+            monitorSlug: name,
+            status: "ok",
+          });
+        } catch (e) {
+          Sentry.captureException(e);
+          Sentry.captureCheckIn({
+            checkInId,
+            monitorSlug: name,
+            status: "error",
+          });
+        }
+      },
+    );
   });
   const job = new CronJob(
     {

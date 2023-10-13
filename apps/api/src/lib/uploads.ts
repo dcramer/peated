@@ -55,15 +55,16 @@ export const storeFile = async ({
 
   return await startSpan(
     {
-      name: "peated.store-file",
-      description: data.filename,
-      data: {
+      op: "peated.store-file",
+      name: data.filename,
+    },
+    async (span) => {
+      span?.setAttributes({
         filename: data.filename,
         namespace,
         onProcess: Boolean(onProcess),
-      },
-    },
-    async () => {
+      });
+
       if (process.env.USE_GCS_STORAGE) {
         const bucketName = config.GCS_BUCKET_NAME as string;
         const bucketPath = config.GCS_BUCKET_PATH
@@ -76,19 +77,21 @@ export const storeFile = async ({
 
         await startSpan(
           {
-            name: "gcs.file",
-            description: newFilename,
-            data: { bucketName },
+            op: "gcs.file",
+            name: newFilename,
           },
-          async () => {
+          async (span) => {
+            span?.setAttributes({
+              bucketName,
+            });
             const file = cloudStorage
               .bucket(bucketName)
               .file(`${bucketPath}${newFilename}`);
 
             await startSpan(
               {
-                name: "gcs.file.write-stream",
-                description: newFilename,
+                op: "gcs.file.write-stream",
+                name: newFilename,
               },
               async () => {
                 const writeStream = file.createWriteStream();
@@ -102,8 +105,8 @@ export const storeFile = async ({
 
         await startSpan(
           {
-            name: "file.write-stream",
-            description: newFilename,
+            op: "file.write-stream",
+            name: newFilename,
           },
           async () => {
             const writeStream = createWriteStream(uploadPath);
