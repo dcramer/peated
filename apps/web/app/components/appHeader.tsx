@@ -49,6 +49,7 @@ export default function AppHeader() {
           open={searchOpen}
           as="div"
           className="dialog"
+          key={location.pathname}
           onClose={setSearchOpen}
         >
           <Dialog.Overlay className="fixed inset-0" />
