@@ -73,8 +73,8 @@ resource "google_project_iam_binding" "service-account-user-iam" {
   members = ["serviceAccount:service-${data.google_project.project.number}@serverless-robot-prod.iam.gserviceaccount.com"]
 }
 
-resource "google_project_iam_binding" "cluster-admin-iam" {
+resource "google_project_iam_binding" "container-developer-iam" {
   project = data.google_project.project.project_id
-  role    = "roles/container.clusterViewer"
+  role    = "roles/container.developer"
   members = ["serviceAccount:${google_service_account.github.email}"]
 }
