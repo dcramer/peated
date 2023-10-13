@@ -176,8 +176,14 @@ jobs:
         uses: tj-actions/changed-files@v39
         with:
           files_yaml: |
+            api:
+              - apps/api/**
+            web:
+              - apps/web/**
+            shared:
+              - packages/**
             migrations:
-              - apis/api/migrations/**.sql
+              - apps/api/migrations/**.sql
 
       - name: Run Migrations
         if: steps.changed-files-yaml.outputs.migrations_any_changed == 'true'
@@ -190,11 +196,13 @@ jobs:
             --wait
 
       - name: "Deploy API"
+        if: ${{ steps.changed-files-yaml.outputs.api_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/api api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
           kubectl rollout status deployment/api
 
       - name: "Deploy Web"
+        if: ${{ steps.changed-files-yaml.outputs.web_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/web web="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
           kubectl rollout status deployment/web
