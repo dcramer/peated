@@ -12,7 +12,7 @@
     "@peated/tsconfig": "workspace:*",
     "@tailwindcss/forms": "^0.5.6",
     "@tailwindcss/typography": "^0.5.10",
-    "prettier-plugin-tailwindcss": "^0.5.5",
+    "prettier-plugin-tailwindcss": "^0.5.6",
     "tailwindcss": "^3.3.3",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
