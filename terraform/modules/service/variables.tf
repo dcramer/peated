@@ -4,6 +4,8 @@ variable "name" {
 
 variable "domains" {
   type = list(string)
+
+  default = []
 }
 
 variable "image" {
@@ -12,6 +14,8 @@ variable "image" {
 
 variable "port" {
   type = number
+
+  default = 0
 }
 
 variable "env" {

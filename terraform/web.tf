@@ -1,10 +1,3 @@
-# https://stackoverflow.com/questions/68941378/terraform-create-k8s-secret-from-gcp-secret
-data "google_secret_manager_secret_version" "session_secret" {
-  provider = google-beta
-
-  secret = google_secret_manager_secret.session_secret.id
-}
-
 module "web-service" {
   source = "./modules/service"
   name   = "web"

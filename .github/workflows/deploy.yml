@@ -93,7 +93,6 @@ jobs:
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
           tags: |
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:latest
 
       - name: Build API
         uses: docker/build-push-action@v5
@@ -112,26 +111,24 @@ jobs:
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
           tags: |
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:latest
 
-      # - name: Build Scraper
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: .
-      #     cache-from: type=gha,scope=prod
-      #     push: true
-      #     target: scraper
-      #     build-args: |
-      #       VERSION=${{ github.sha }}
-      #       API_SERVER={{ env.API_SERVER }}
-      #       GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
-      #       SENTRY_DSN=${{ env.SENTRY_DSN }}
-      #       SENTRY_WEB_PROJECT=${{ env.SENTRY_WEB_PROJECT }}
-      #     secrets: |
-      #       "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
-      #     tags: |
-      #       ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:${{ github.sha }}
-      #       ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:latest
+      - name: Build Worker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          cache-from: type=gha,scope=prod
+          push: true
+          target: worker
+          build-args: |
+            VERSION=${{ github.sha }}
+            API_SERVER={{ env.API_SERVER }}
+            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+            SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_WEB_PROJECT=${{ env.SENTRY_WEB_PROJECT }}
+          secrets: |
+            "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}
 
   deploy:
     name: 🚀 Deploy
@@ -180,6 +177,8 @@ jobs:
               - apps/api/**
             web:
               - apps/web/**
+            worker:
+              - apps/worker/**
             shared:
               - packages/**
             migrations:
@@ -206,6 +205,12 @@ jobs:
         run: |-
           kubectl set image deployment.v1.apps/web web="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
           kubectl rollout status deployment/web
+
+      - name: "Deploy Worker"
+        if: ${{ steps.changed-files-yaml.outputs.worker_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
+        run: |-
+          kubectl set image deployment.v1.apps/worker worker="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}"
+          kubectl rollout status deployment/worker
 
       - name: Discord notification (success)
         if: success()

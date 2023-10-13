@@ -23,7 +23,7 @@ ENV SENTRY_DSN=$SENTRY_DSN \
 ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/api/package.json ./apps/api/package.json
-ADD apps/scraper/package.json ./apps/scraper/package.json
+ADD apps/worker/package.json ./apps/worker/package.json
 ADD packages/shared/package.json ./packages/shared/package.json
 ADD packages/design/package.json ./packages/design/package.json
 
@@ -58,12 +58,12 @@ WORKDIR /app/apps/web
 
 CMD ["pnpm", "start"]
 
-# scraper service
-FROM base-env as scraper
+# worker service
+FROM base-env as worker
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ /app/
 
-WORKDIR /app/apps/scraper
+WORKDIR /app/apps/worker
 
 CMD ["pnpm", "start"]
 

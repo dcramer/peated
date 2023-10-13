@@ -1,9 +1,3 @@
-data "google_secret_manager_secret_version" "openai_api_key" {
-  provider = google-beta
-
-  secret = google_secret_manager_secret.openai_api_key.id
-}
-
 module "api-service" {
   source = "./modules/service"
   name   = "api"

@@ -31,6 +31,12 @@ resource "google_secret_manager_secret_iam_member" "session_secret" {
   depends_on = [google_secret_manager_secret.session_secret]
 }
 
+# https://stackoverflow.com/questions/68941378/terraform-create-k8s-secret-from-gcp-secret
+data "google_secret_manager_secret_version" "session_secret" {
+  provider = google-beta
+
+  secret = google_secret_manager_secret.session_secret.id
+}
 
 resource "google_secret_manager_secret" "openai_api_key" {
   secret_id = "openai_api_key"
@@ -44,4 +50,10 @@ resource "google_secret_manager_secret_iam_member" "openai_api_key" {
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.openai_api_key]
+}
+
+data "google_secret_manager_secret_version" "openai_api_key" {
+  provider = google-beta
+
+  secret = google_secret_manager_secret.openai_api_key.id
 }

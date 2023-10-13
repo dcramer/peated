@@ -3,12 +3,16 @@ locals {
 }
 
 resource "google_compute_global_address" "ip_address" {
+  count = length(var.domains) != 0 ? 1 : 0
+
   name         = "${var.name}-ip"
   description  = "IP Address for ${var.name} service"
   address_type = "EXTERNAL"
 }
 
 resource "google_compute_managed_ssl_certificate" "default" {
+  count = length(var.domains) != 0 ? 1 : 0
+
   provider = google-beta
   name     = "${var.name}-cert"
 
@@ -19,12 +23,14 @@ resource "google_compute_managed_ssl_certificate" "default" {
 
 # https://github.com/hashicorp/terraform-provider-kubernetes/issues/446#issuecomment-496905302
 resource "kubernetes_ingress_v1" "default" {
+  count = length(var.domains) != 0 ? 1 : 0
+
   metadata {
     name = var.name
 
     annotations = {
-      "ingress.gcp.kubernetes.io/pre-shared-cert"   = google_compute_managed_ssl_certificate.default.name
-      "kubernetes.io/ingress.global-static-ip-name" = google_compute_global_address.ip_address.name
+      "ingress.gcp.kubernetes.io/pre-shared-cert"   = google_compute_managed_ssl_certificate.default[0].name
+      "kubernetes.io/ingress.global-static-ip-name" = google_compute_global_address.ip_address[0].name
     }
 
     labels = {
@@ -47,6 +53,8 @@ resource "kubernetes_ingress_v1" "default" {
 }
 
 resource "kubernetes_service_v1" "default" {
+  count = var.port != 0 ? 1 : 0
+
   metadata {
     name = var.name
 
@@ -125,10 +133,12 @@ resource "kubernetes_deployment_v1" "default" {
             }
           }
 
-          port {
-            container_port = var.port
+          dynamic "port" {
+            for_each = var.port != 0 ? [var.port] : []
+            content {
+              container_port = port.value
+            }
           }
-
           resources {
             limits = {
               cpu    = "1"
@@ -150,28 +160,34 @@ resource "kubernetes_deployment_v1" "default" {
             }
           }
 
-          liveness_probe {
-            http_get {
-              path = var.healthcheck.path
-              port = var.port
+          dynamic "liveness_probe" {
+            for_each = var.port != 0 ? [var.port] : []
+            content {
+              http_get {
+                path = var.healthcheck.path
+                port = var.port
+              }
+              initial_delay_seconds = 30
+              period_seconds        = 10
+              timeout_seconds       = 5
+              failure_threshold     = 6
+              success_threshold     = 1
             }
-            initial_delay_seconds = 30
-            period_seconds        = 10
-            timeout_seconds       = 5
-            failure_threshold     = 6
-            success_threshold     = 1
           }
 
-          readiness_probe {
-            http_get {
-              path = var.healthcheck.path
-              port = var.port
+          dynamic "readiness_probe" {
+            for_each = var.port != 0 ? [var.port] : []
+            content {
+              http_get {
+                path = var.healthcheck.path
+                port = var.port
+              }
+              initial_delay_seconds = 10
+              period_seconds        = 10
+              timeout_seconds       = 5
+              failure_threshold     = 6
+              success_threshold     = 1
             }
-            initial_delay_seconds = 10
-            period_seconds        = 10
-            timeout_seconds       = 5
-            failure_threshold     = 6
-            success_threshold     = 1
           }
 
           #   volume_mount {

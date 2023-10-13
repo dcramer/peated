@@ -5,8 +5,7 @@ resource "google_artifact_registry_repository" "peated" {
   description   = ""
   format        = "DOCKER"
 
-  # Would prefer this but not sure how to address the default image in GCR...
-  # docker_config {
-  #   immutable_tags = true
-  # }
+  docker_config {
+    immutable_tags = true
+  }
 }

@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@peated/scraper",
+  "name": "@peated/worker",
   "scripts": {
     "build": "tsc",
     "bottles:whiskybase": "ts-node --require dotenv/config ./src/bottle-scraper/whiskybase.ts",
