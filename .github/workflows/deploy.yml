@@ -3,7 +3,8 @@ on:
   workflow_run:
     branches:
       - main
-    workflows: ["Test"]
+    workflows:
+      - Test
     types:
       - completed
 env:
