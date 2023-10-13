@@ -3,8 +3,8 @@ import { and, asc, eq, ilike, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
-import { db } from "../db";
-import { storePrices, stores } from "../db/schema";
+import { db } from "@peated/shared/db";
+import { storePrices, stores } from "@peated/shared/db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { StorePriceSerializer } from "../lib/serializers/storePrice";

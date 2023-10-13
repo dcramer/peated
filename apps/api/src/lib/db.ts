@@ -1,7 +1,7 @@
+import type { DatabaseType, TransactionType } from "@peated/shared/db";
+import type { Entity, EntityType } from "@peated/shared/db/schema";
+import { changes, collections, entities } from "@peated/shared/db/schema";
 import { eq } from "drizzle-orm";
-import type { DatabaseType, TransactionType } from "../db";
-import type { Entity, EntityType } from "../db/schema";
-import { changes, collections, entities } from "../db/schema";
 
 export type EntityInput =
   | number

@@ -1,5 +1,4 @@
-import { program } from "commander";
-import { eq, inArray, sql } from "drizzle-orm";
+import { db } from "@peated/shared/db";
 import {
   bottleTags,
   bottles,
@@ -7,9 +6,10 @@ import {
   collectionBottles,
   storePrices,
   tastings,
-} from "~/db/schema";
+} from "@peated/shared/db/schema";
+import { program } from "commander";
+import { eq, inArray, sql } from "drizzle-orm";
 import generateBottleDescription from "~/tasks/generateBottleDescription";
-import { db } from "../db";
 
 program.name("bottles").description("CLI for assisting with bottle admin");
 

@@ -1,9 +1,9 @@
+import { db } from "@peated/shared/db";
+import type { Comment, User } from "@peated/shared/db/schema";
+import { users } from "@peated/shared/db/schema";
 import { inArray } from "drizzle-orm";
 import type { Serializer } from ".";
 import { serialize } from ".";
-import { db } from "../../db";
-import type { Comment, User } from "../../db/schema";
-import { users } from "../../db/schema";
 import { UserSerializer } from "./user";
 
 export const CommentSerializer: Serializer<Comment> = {

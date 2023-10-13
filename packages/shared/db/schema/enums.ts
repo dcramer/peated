@@ -1,6 +1,6 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
-import { CATEGORY_LIST } from "@peated/shared/constants";
+import { CATEGORY_LIST } from "../../constants";
 
 export const categoryEnum = pgEnum("category", CATEGORY_LIST);
 

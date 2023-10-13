@@ -4,8 +4,8 @@ import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { db } from "../db";
-import { stores } from "../db/schema";
+import { db } from "@peated/shared/db";
+import { stores } from "@peated/shared/db/schema";
 import { serialize } from "../lib/serializers";
 import { StoreSerializer } from "../lib/serializers/store";
 

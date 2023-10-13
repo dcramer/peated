@@ -1,15 +1,15 @@
-import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
-import type { Serializer } from ".";
-import { serialize } from ".";
-import { db } from "../../db";
-import type { Bottle, User } from "../../db/schema";
+import { db } from "@peated/shared/db";
+import type { Bottle, User } from "@peated/shared/db/schema";
 import {
   bottlesToDistillers,
   collectionBottles,
   collections,
   entities,
   tastings,
-} from "../../db/schema";
+} from "@peated/shared/db/schema";
+import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
+import type { Serializer } from ".";
+import { serialize } from ".";
 import { notEmpty } from "../filter";
 import { EntitySerializer } from "./entity";
 

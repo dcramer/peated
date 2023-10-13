@@ -1,9 +1,9 @@
 import { program } from "commander";
 import { and, eq, ne, sql } from "drizzle-orm";
 
-import { db } from "../db";
-import type { Bottle, Entity, Store } from "../db/schema";
-import { bottles, stores, tastings, users } from "../db/schema";
+import { db } from "@peated/shared/db";
+import type { Bottle, Entity, Store } from "@peated/shared/db/schema";
+import { bottles, stores, tastings, users } from "@peated/shared/db/schema";
 import { createNotification } from "../lib/notifications";
 import { random } from "../lib/rand";
 import * as Fixtures from "../lib/test/fixtures";

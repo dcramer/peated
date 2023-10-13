@@ -1,8 +1,8 @@
+import type { Bottle, Comment, Tasting, User } from "@peated/shared/db/schema";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import config from "~/config";
-import type { Bottle, Comment, Tasting, User } from "~/db/schema";
 import { escapeHtml } from "./html";
 import { logError } from "./log";
 

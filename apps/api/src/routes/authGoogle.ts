@@ -6,9 +6,9 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { AuthSchema } from "@peated/shared/schemas";
 
+import { db } from "@peated/shared/db";
+import { identities, users } from "@peated/shared/db/schema";
 import config from "../config";
-import { db } from "../db";
-import { identities, users } from "../db/schema";
 import { createAccessToken, createUser } from "../lib/auth";
 import { serialize } from "../lib/serializers";
 import { UserSerializer } from "../lib/serializers/user";

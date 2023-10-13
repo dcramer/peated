@@ -1,10 +1,10 @@
-import type { Change, User } from "../../db/schema";
-import { users } from "../../db/schema";
+import type { Change, User } from "@peated/shared/db/schema";
+import { users } from "@peated/shared/db/schema";
 
+import { db } from "@peated/shared/db";
 import { inArray } from "drizzle-orm";
 import type { Serializer } from ".";
 import { serialize } from ".";
-import { db } from "../../db";
 import { logError } from "../log";
 import { UserSerializer } from "./user";
 

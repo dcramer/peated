@@ -12,8 +12,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { SERVING_STYLE_LIST } from "@peated/shared/constants";
-
+import { SERVING_STYLE_LIST } from "../../constants";
 import { bottles } from "./bottles";
 import { users } from "./users";
 

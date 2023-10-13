@@ -7,9 +7,14 @@ import zodToJsonSchema from "zod-to-json-schema";
 import { normalizeBottleName } from "@peated/shared/lib/normalize";
 import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
 
-import { db } from "../db";
-import type { Bottle, Entity } from "../db/schema";
-import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
+import { db } from "@peated/shared/db";
+import type { Bottle, Entity } from "@peated/shared/db/schema";
+import {
+  bottles,
+  bottlesToDistillers,
+  changes,
+  entities,
+} from "@peated/shared/db/schema";
 import { upsertEntity } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { serialize } from "../lib/serializers";

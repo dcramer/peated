@@ -5,8 +5,8 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import * as Fixtures from "~/lib/test/fixtures";
 
+import type { Bottle, Comment, Tasting, User } from "@peated/shared/db/schema";
 import config from "~/config";
-import type { Bottle, Comment, Tasting, User } from "~/db/schema";
 import { notifyComment } from "./email";
 
 let transport: Transporter<SMTPTransport.SentMessageInfo>;

@@ -3,14 +3,14 @@ import { and, eq, ilike, isNotNull, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
+import { db } from "@peated/shared/db";
+import { storePriceHistories, storePrices } from "@peated/shared/db/schema";
 import {
   BottlePriceChangeSchema,
   PaginatedSchema,
 } from "@peated/shared/schemas";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db } from "../db";
-import { storePriceHistories, storePrices } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BottlePriceChangeSerializer } from "../lib/serializers/storePrice";

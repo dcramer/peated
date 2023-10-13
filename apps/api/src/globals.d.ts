@@ -1,7 +1,7 @@
 import type { OAuth2Namespace } from "@fastify/oauth2";
+import type { User } from "@peated/shared/db/schema";
 import "fastify";
 import "vitest";
-import type { User } from "./db/schema";
 
 declare namespace NodeJS {
   export interface ProcessEnv {

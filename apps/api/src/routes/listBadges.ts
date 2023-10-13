@@ -7,8 +7,8 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { BadgeSchema, PaginatedSchema } from "@peated/shared/schemas";
 
-import { db } from "../db";
-import { badges } from "../db/schema";
+import { db } from "@peated/shared/db";
+import { badges } from "@peated/shared/db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BadgeSerializer } from "../lib/serializers/badge";

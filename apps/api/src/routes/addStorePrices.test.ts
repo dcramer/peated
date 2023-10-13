@@ -1,8 +1,8 @@
+import { db } from "@peated/shared/db";
+import { storePrices } from "@peated/shared/db/schema";
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
-import { storePrices } from "~/db/schema";
 import buildFastify from "../app";
-import { db } from "../db";
 import * as Fixtures from "../lib/test/fixtures";
 import { findBottle } from "./addStorePrices";
 

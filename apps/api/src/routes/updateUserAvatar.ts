@@ -5,9 +5,9 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { MAX_FILESIZE } from "@peated/shared/constants";
 import { humanizeBytes } from "@peated/shared/lib/strings";
 
+import { db } from "@peated/shared/db";
+import { users } from "@peated/shared/db/schema";
 import config from "../config";
-import { db } from "../db";
-import { users } from "../db/schema";
 import { compressAndResizeImage, storeFile } from "../lib/uploads";
 import { requireAuth } from "../middleware/auth";
 

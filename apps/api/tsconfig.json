@@ -7,6 +7,6 @@
       "~/*": ["src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "../../packages/shared/db"],
   "exclude": ["src/test/setup-test-env.ts"]
 }

@@ -5,14 +5,14 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { StorePriceInputSchema } from "@peated/shared/schemas";
 
-import { eq, ilike, sql } from "drizzle-orm";
-import { db } from "../db";
+import { db } from "@peated/shared/db";
 import {
   bottles,
   storePriceHistories,
   storePrices,
   stores,
-} from "../db/schema";
+} from "@peated/shared/db/schema";
+import { eq, ilike, sql } from "drizzle-orm";
 import { requireAdmin } from "../middleware/auth";
 
 export async function findBottle(name: string): Promise<{ id: number } | null> {

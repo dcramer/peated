@@ -1,8 +1,8 @@
+import { db } from "@peated/shared/db";
+import { users } from "@peated/shared/db/schema";
 import { setUser } from "@sentry/node-experimental";
 import { eq } from "drizzle-orm";
 import type { onRequestHookHandler } from "fastify";
-import { db } from "../db";
-import { users } from "../db/schema";
 import { verifyToken } from "../lib/auth";
 import { logError } from "../lib/log";
 

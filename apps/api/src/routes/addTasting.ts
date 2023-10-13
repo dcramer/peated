@@ -7,9 +7,8 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import { TastingInputSchema, TastingSchema } from "@peated/shared/schemas";
 
 import { XP_PER_LEVEL } from "@peated/shared/constants";
-import { notEmpty } from "~/lib/filter";
-import { db } from "../db";
-import type { NewTasting, Tasting } from "../db/schema";
+import { db } from "@peated/shared/db";
+import type { NewTasting, Tasting } from "@peated/shared/db/schema";
 import {
   badgeAwards,
   bottleTags,
@@ -17,7 +16,8 @@ import {
   entities,
   follows,
   tastings,
-} from "../db/schema";
+} from "@peated/shared/db/schema";
+import { notEmpty } from "~/lib/filter";
 import { checkBadges } from "../lib/badges";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { serialize } from "../lib/serializers";

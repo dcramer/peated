@@ -6,9 +6,9 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 
-import { db } from "../db";
-import type { NewEntity } from "../db/schema";
-import { changes, entities } from "../db/schema";
+import { db } from "@peated/shared/db";
+import type { NewEntity } from "@peated/shared/db/schema";
+import { changes, entities } from "@peated/shared/db/schema";
 import { serialize } from "../lib/serializers";
 import { EntitySerializer } from "../lib/serializers/entity";
 import { requireAuth } from "../middleware/auth";

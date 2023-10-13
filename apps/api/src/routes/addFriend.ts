@@ -2,9 +2,9 @@ import { and, eq, inArray } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
+import { db } from "@peated/shared/db";
+import { follows, users } from "@peated/shared/db/schema";
 import type { FriendStatus } from "@peated/shared/types";
-import { db } from "../db";
-import { follows, users } from "../db/schema";
 import { createNotification } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 

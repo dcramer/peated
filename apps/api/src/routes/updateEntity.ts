@@ -6,9 +6,9 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 
 import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 
-import { db } from "../db";
-import type { Entity } from "../db/schema";
-import { changes, entities } from "../db/schema";
+import { db } from "@peated/shared/db";
+import type { Entity } from "@peated/shared/db/schema";
+import { changes, entities } from "@peated/shared/db/schema";
 import { requireMod } from "../middleware/auth";
 
 function arraysEqual<T>(one: T[], two: T[]) {

@@ -1,4 +1,3 @@
-import { BADGE_TYPE_LIST } from "@peated/shared/constants";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -11,6 +10,7 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
+import { BADGE_TYPE_LIST } from "../../constants";
 import { users } from "./users";
 
 export const badgeTypeEnum = pgEnum("badge_type", BADGE_TYPE_LIST);

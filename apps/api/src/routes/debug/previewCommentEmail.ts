@@ -1,6 +1,6 @@
+import { db } from "@peated/shared/db";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
-import { db } from "~/db";
 import { buildCommentHtml } from "~/lib/email";
 
 export default {

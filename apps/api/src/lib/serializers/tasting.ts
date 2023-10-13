@@ -1,10 +1,10 @@
+import { db } from "@peated/shared/db";
+import type { Tasting, User } from "@peated/shared/db/schema";
+import { bottles, tastings, toasts, users } from "@peated/shared/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import type { Serializer } from ".";
 import { serialize } from ".";
 import config from "../../config";
-import { db } from "../../db";
-import type { Tasting, User } from "../../db/schema";
-import { bottles, tastings, toasts, users } from "../../db/schema";
 import { notEmpty } from "../filter";
 import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";

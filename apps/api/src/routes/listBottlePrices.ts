@@ -5,8 +5,8 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { db } from "../db";
-import { bottles, storePrices, stores } from "../db/schema";
+import { db } from "@peated/shared/db";
+import { bottles, storePrices, stores } from "@peated/shared/db/schema";
 import { serialize } from "../lib/serializers";
 import { StorePriceWithStoreSerializer } from "../lib/serializers/storePrice";
 

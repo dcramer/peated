@@ -1,4 +1,4 @@
-import type { Bottle, CollectionBottle, User } from "../../db/schema";
+import type { Bottle, CollectionBottle, User } from "@peated/shared/db/schema";
 
 import type { Serializer } from ".";
 import { serialize } from ".";

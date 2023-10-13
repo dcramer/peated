@@ -1,3 +1,5 @@
+import { db } from "@peated/shared/db";
+import { flights } from "@peated/shared/db/schema";
 import { FlightSchema, PaginatedSchema } from "@peated/shared/schemas";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, or } from "drizzle-orm";
@@ -6,8 +8,6 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { FlightSerializer } from "~/lib/serializers/flight";
-import { db } from "../db";
-import { flights } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 

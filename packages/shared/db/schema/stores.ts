@@ -11,9 +11,8 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-import { STORE_TYPE_LIST } from "@peated/shared/constants";
+import { STORE_TYPE_LIST } from "../../constants";
 import { bottles } from "./bottles";
-
 export const priceScraperTypeEnum = pgEnum(
   "price_scraper_type",
   STORE_TYPE_LIST,

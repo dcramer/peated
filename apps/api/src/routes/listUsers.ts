@@ -4,10 +4,10 @@ import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 
+import { db } from "@peated/shared/db";
+import { users } from "@peated/shared/db/schema";
 import { PaginatedSchema, UserSchema } from "@peated/shared/schemas";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db } from "../db";
-import { users } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { UserSerializer } from "../lib/serializers/user";

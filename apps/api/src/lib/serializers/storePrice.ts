@@ -1,8 +1,8 @@
-import type { Store, StorePrice, User } from "../../db/schema";
+import type { Store, StorePrice, User } from "@peated/shared/db/schema";
 
+import { db } from "@peated/shared/db";
 import type { BottlePriceChangeSchema } from "@peated/shared/schemas";
 import type { z } from "zod";
-import { db } from "~/db";
 import { serialize, type Serializer } from ".";
 import { BottleSerializer } from "./bottle";
 import { StoreSerializer } from "./store";

@@ -5,9 +5,7 @@ import path from "path";
 import { toTitleCase } from "@peated/shared/lib/strings";
 
 import { CATEGORY_LIST } from "@peated/shared/constants";
-import { eq, sql } from "drizzle-orm";
-import { generatePublicId } from "~/lib/publicId";
-import { db } from "../../db";
+import { db } from "@peated/shared/db";
 import type {
   Entity as EntityType,
   NewBadge,
@@ -23,7 +21,7 @@ import type {
   NewToast,
   NewUser,
   User as UserType,
-} from "../../db/schema";
+} from "@peated/shared/db/schema";
 import {
   badges,
   bottleTags,
@@ -40,7 +38,9 @@ import {
   tastings,
   toasts,
   users,
-} from "../../db/schema";
+} from "@peated/shared/db/schema";
+import { eq, sql } from "drizzle-orm";
+import { generatePublicId } from "~/lib/publicId";
 import { createAccessToken } from "../auth";
 import { choose, random, sample } from "../rand";
 import { defaultTags } from "../tags";

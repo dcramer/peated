@@ -12,7 +12,7 @@
     "dev:api": "PORT=4000 dotenv -e .env.local -- pnpm --filter='./apps/api' dev",
     "db": "dotenv -e .env.local -- pnpm --filter='./apps/api' db",
     "db:migrate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:migrate",
-    "db:generate": "dotenv -e .env.local -- pnpm --filter='./apps/api' db:generate",
+    "db:generate": "dotenv -e .env.local -- pnpm --filter='./packages/shared' exec drizzle-kit generate:pg",
     "bottles": "dotenv -e .env.local -- pnpm --filter='./apps/api' bottles",
     "entities": "dotenv -e .env.local -- pnpm --filter='./apps/api' entities",
     "mocks": "dotenv -e .env.local -- pnpm --filter='./apps/api' mocks",

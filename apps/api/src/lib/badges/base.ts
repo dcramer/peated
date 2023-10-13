@@ -3,7 +3,7 @@ import type {
   BottlesToDistillers,
   Entity,
   Tasting,
-} from "../../db/schema";
+} from "@peated/shared/db/schema";
 
 export type BadgeConfig = Record<string, any>;
 
