@@ -93,6 +93,20 @@ resource "kubernetes_stateful_set_v1" "faktory" {
             name       = "configs"
             mount_path = "/conf"
           }
+
+          security_context {
+            allow_privilege_escalation = false
+            privileged                 = false
+            read_only_root_filesystem  = false
+            run_as_non_root            = false
+
+            capabilities {
+              add = []
+              drop = [
+                "NET_RAW"
+              ]
+            }
+          }
         }
 
         container {
@@ -129,6 +143,9 @@ resource "kubernetes_stateful_set_v1" "faktory" {
           security_context {
             capabilities {
               add = ["SYS_PTRACE"]
+              drop = [
+                "NET_RAW"
+              ]
             }
           }
 
@@ -174,7 +191,9 @@ resource "kubernetes_stateful_set_v1" "faktory" {
 
         volume {
           name = "data"
-          persistent_volume_claim {}
+          persistent_volume_claim {
+            read_only = false
+          }
         }
       }
     }
@@ -195,6 +214,17 @@ resource "kubernetes_stateful_set_v1" "faktory" {
         }
       }
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      spec[0].template[0].spec[0].container[0].image,
+      spec[0].template[0].spec[0].container[0].resources[0].limits["ephemeral-storage"],
+      spec[0].template[0].spec[0].security_context,
+      spec[0].template[0].spec[0].toleration,
+      metadata[0].annotations["autopilot.gke.io/resource-adjustment"],
+      metadata[0].annotations["autopilot.gke.io/warden-version"],
+    ]
   }
 }
 

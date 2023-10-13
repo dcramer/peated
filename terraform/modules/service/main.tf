@@ -128,6 +128,20 @@ resource "kubernetes_deployment_v1" "default" {
             }
           }
 
+          security_context {
+            allow_privilege_escalation = false
+            privileged                 = false
+            read_only_root_filesystem  = false
+            run_as_non_root            = false
+
+            capabilities {
+              add = []
+              drop = [
+                "NET_RAW"
+              ]
+            }
+          }
+
           liveness_probe {
             http_get {
               path = var.healthcheck.path
@@ -150,7 +164,17 @@ resource "kubernetes_deployment_v1" "default" {
             args  = ["--structured-logs", "--port=5432", container.value]
 
             security_context {
-              run_as_non_root = true
+              allow_privilege_escalation = true
+              privileged                 = false
+              read_only_root_filesystem  = false
+              run_as_non_root            = true
+
+              capabilities {
+                add = []
+                drop = [
+                  "NET_RAW"
+                ]
+              }
             }
           }
         }
@@ -159,5 +183,16 @@ resource "kubernetes_deployment_v1" "default" {
 
       }
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      spec[0].template[0].spec[0].container[0].image,
+      spec[0].template[0].spec[0].container[0].resources[0].limits["ephemeral-storage"],
+      spec[0].template[0].spec[0].security_context,
+      spec[0].template[0].spec[0].toleration,
+      metadata[0].annotations["autopilot.gke.io/resource-adjustment"],
+      metadata[0].annotations["autopilot.gke.io/warden-version"],
+    ]
   }
 }

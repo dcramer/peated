@@ -15,11 +15,7 @@ module "api-service" {
   cloud_sql_instance = module.db-main.connection_name
 
   env = {
-    INSTANCE_UNIX_SOCKET = "/cloudsql/${module.db-main.connection_name}"
-    DATABASE_USER        = "peated"
-    DATABASE_PASSWORD    = "peated"
-    DATABASE_NAME        = "peated"
-
+    DATABASE_URL     = "postgresql://peated:peated@127.0.0.1/peated"
     GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
     CORS_HOST        = "https://peated.app"
     URL_PREFIX       = "https://api.peated.app"
@@ -29,24 +25,6 @@ module "api-service" {
   }
 
   depends_on = [module.db-main]
-
-  # resources {
-  #   limits = {
-  #     cpu    = "1000m"
-  #     memory = "1Gi"
-  #   }
-  # }
-
-  # liveness_probe {
-  #   http_get {
-  #     path = "/health"
-  #   }
-  # }
-
-  # volume_mount {
-  #   name       = "cloudsql"
-  #   mount_path = "/cloudsql"
-  # }
 }
 
 # resource "google_cloud_run_v2_service" "api" {

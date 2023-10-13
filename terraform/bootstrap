@@ -1,8 +1,0 @@
-#!/bin/bash -ex
-
-./import peated google_storage_bucket peated
-./import peated-tfstate google_storage_bucket peated-tfstate
-./import peated-main google_sql_database_instance main
-./import us-central1/web google_cloud_run_v2_service web
-./import us-central1/api google_cloud_run_v2_service api
-./import peated google_artifact_registry_repository peated

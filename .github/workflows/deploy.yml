@@ -181,19 +181,11 @@ jobs:
         run: |-
           kubectl set image deployment.v1.apps/api api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
           kubectl rollout status deployment/api
-          kubectl get services -o wide
 
       - name: "Deploy Web"
-        uses: "google-github-actions/deploy-cloudrun@v1"
-        with:
-          service: "web"
-          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
-
-      # - name: "Update Scraper"
-      #   run: |-
-      #     gcloud run jobs update scraper \
-      #       --region ${{ env.REGION }} \
-      #       --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/scraper:${{ github.sha }}"
+        run: |-
+          kubectl set image deployment.v1.apps/api api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
+          kubectl rollout status deployment/web
 
       - name: Discord notification (success)
         if: success()
