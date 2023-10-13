@@ -147,6 +147,23 @@ resource "kubernetes_deployment_v1" "default" {
               path = var.healthcheck.path
               port = var.port
             }
+            initial_delay_seconds = 30
+            period_seconds        = 10
+            timeout_seconds       = 5
+            failure_threshold     = 6
+            success_threshold     = 1
+          }
+
+          readiness_probe {
+            http_get {
+              path = var.healthcheck.path
+              port = var.port
+            }
+            initial_delay_seconds = 10
+            period_seconds        = 10
+            timeout_seconds       = 5
+            failure_threshold     = 6
+            success_threshold     = 1
           }
 
           #   volume_mount {
