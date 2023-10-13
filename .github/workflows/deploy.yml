@@ -1,13 +1,11 @@
 name: Build & Deploy
 on:
-  # TODO: dont ship w/ this!
-  pull_request:
-  # workflow_run:
-  #   branches:
-  #     - main
-  #   workflows: ["Test"]
-  #   types:
-  #     - completed
+  workflow_run:
+    branches:
+      - main
+    workflows: ["Test"]
+    types:
+      - completed
 env:
   REGION: us-central1
   PROJECT_ID: cask-382601
