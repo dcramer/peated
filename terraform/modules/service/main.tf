@@ -2,18 +2,29 @@ locals {
   cloud_sql_instance = var.cloud_sql_instance != "" ? [var.cloud_sql_instance] : []
 }
 
+resource "google_compute_global_address" "ip_address" {
+  name         = "${var.name}-ip"
+  description  = "IP Address for ${var.name} service"
+  address_type = "EXTERNAL"
+}
+
+
 resource "google_compute_managed_ssl_certificate" "default" {
   provider = google-beta
   name     = "${var.name}-cert"
 
   managed {
-    domains = [var.domain]
+    domains = var.domains
   }
 }
 
 resource "kubernetes_ingress_v1" "default" {
   metadata {
     name = var.name
+
+    annotations = {
+      "kubernetes.io/ingress.global-static-ip-name" = google_compute_global_address.ip_address.name
+    }
 
     labels = {
       "app.kubernetes.io/name" = var.name
@@ -30,7 +41,7 @@ resource "kubernetes_ingress_v1" "default" {
       }
     }
     tls {
-      hosts       = [var.domain]
+      hosts       = var.domains
       secret_name = google_compute_managed_ssl_certificate.default.name
     }
   }

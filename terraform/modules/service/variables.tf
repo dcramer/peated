@@ -2,8 +2,8 @@ variable "name" {
   type = string
 }
 
-variable "domain" {
-  type = string
+variable "domains" {
+  type = list(string)
 }
 
 variable "image" {

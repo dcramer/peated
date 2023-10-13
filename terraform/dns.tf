@@ -47,5 +47,22 @@ module "dns-private-zone" {
         "peated.app.",
       ]
     },
+
+    {
+      name = "api.staging"
+      type = "A"
+      ttl  = 300
+      records = [
+        module.api-service.public_ip,
+      ]
+    },
+    {
+      name = "staging"
+      type = "A"
+      ttl  = 300
+      records = [
+        module.web-service.public_ip,
+      ]
+    },
   ]
 }

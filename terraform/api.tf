@@ -3,8 +3,8 @@ module "api-service" {
   name   = "api"
   image  = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/api"
 
-  domain = "api.peated.app"
-  port   = 4000
+  domains = ["api.peated.app", "api.staging.peated.app"]
+  port    = 4000
 
   healthcheck = {
     path = "/health"
