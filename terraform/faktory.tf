@@ -1,4 +1,4 @@
-resource "kubernetes_service" "faktory" {
+resource "kubernetes_service_v1" "faktory" {
   metadata {
     name = "faktory"
 
@@ -21,7 +21,7 @@ resource "kubernetes_service" "faktory" {
   }
 }
 
-resource "kubernetes_stateful_set" "faktory" {
+resource "kubernetes_stateful_set_v1" "faktory" {
   metadata {
     name = "faktory"
 
@@ -29,6 +29,8 @@ resource "kubernetes_stateful_set" "faktory" {
       "app.kubernetes.io/name" = "faktory"
     }
   }
+
+  wait_for_rollout = false
 
   spec {
     replicas               = 1
@@ -41,7 +43,7 @@ resource "kubernetes_stateful_set" "faktory" {
 
     selector {
       match_labels = {
-        "app.kubernetes.io/name" : "faktory",
+        "app.kubernetes.io/name" = "faktory",
       }
     }
 
@@ -196,7 +198,7 @@ resource "kubernetes_stateful_set" "faktory" {
   }
 }
 
-resource "kubernetes_config_map" "faktory" {
+resource "kubernetes_config_map_v1" "faktory" {
   metadata {
     name = "faktory"
 

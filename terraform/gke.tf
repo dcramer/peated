@@ -33,6 +33,25 @@ module "gke" {
   ]
 }
 
+
+module "gke_workload_identity" {
+  source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
+  version             = "~> 28.0.0"
+  use_existing_gcp_sa = true
+  use_existing_k8s_sa = true
+  k8s_sa_name         = var.cluster_name
+  cluster_name        = var.cluster_name
+  location            = var.region
+  gcp_sa_name         = module.gke.service_account
+  name                = var.cluster_name
+  project_id          = var.project_id
+
+  # wait for the custom GSA to be created to force module data source read during apply
+  # https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/issues/1059
+  depends_on = [module.gke]
+}
+
+
 module "gke_auth" {
   source               = "terraform-google-modules/kubernetes-engine/google//modules/auth"
   version              = "~> 28.0.0"
@@ -46,6 +65,10 @@ module "gke_auth" {
 resource "local_file" "kubeconfig" {
   content  = module.gke_auth.kubeconfig_raw
   filename = "kubeconfig"
+}
+
+output "service_account" {
+  value = module.gke.service_account
 }
 
 # output "cluster_id" {

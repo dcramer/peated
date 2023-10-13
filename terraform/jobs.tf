@@ -11,7 +11,7 @@ resource "google_cloud_run_v2_job" "migrate_database" {
         name = "cloudsql"
 
         cloud_sql_instance {
-          instances = [google_sql_database_instance.main.connection_name]
+          instances = [module.db-main.connection_name]
         }
       }
 
@@ -21,7 +21,7 @@ resource "google_cloud_run_v2_job" "migrate_database" {
 
         env {
           name  = "INSTANCE_UNIX_SOCKET"
-          value = "/cloudsql/${google_sql_database_instance.main.connection_name}"
+          value = "/cloudsql/${module.db-main.connection_name}"
         }
 
         env {
@@ -60,7 +60,7 @@ resource "google_cloud_run_v2_job" "migrate_database" {
     ]
   }
 
-  depends_on = [google_sql_database_instance.main]
+  depends_on = [module.db-main]
 }
 
 # TODO: this is really complicated on CloudRun so lets just move this to Faktory ASAP
