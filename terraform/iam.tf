@@ -75,6 +75,6 @@ resource "google_project_iam_binding" "service-account-user-iam" {
 
 resource "google_project_iam_binding" "cluster-admin-iam" {
   project = data.google_project.project.project_id
-  role    = "roles/container.clusterAdmin"
+  role    = "roles/container.clusterViewer"
   members = ["serviceAccount:${google_service_account.github.email}"]
 }

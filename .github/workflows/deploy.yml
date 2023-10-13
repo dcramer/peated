@@ -166,7 +166,7 @@ jobs:
         uses: google-github-actions/get-gke-credentials@v1
         with:
           cluster_name: default
-          location: us-central1-b
+          location: ${{ env.REGION }}
 
       - name: Run Migrations
         run: |-
