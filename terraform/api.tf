@@ -15,14 +15,15 @@ module "api-service" {
   cloud_sql_instance = module.db-main.connection_name
 
   env = {
-    DATABASE_URL     = "postgresql://peated:peated@127.0.0.1/peated"
-    GOOGLE_CLIENT_ID = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
-    CORS_HOST        = "https://peated.app"
-    URL_PREFIX       = "https://api.peated.app"
-    USE_GCS_STORAGE  = "1"
-    GCS_BUCKET_NAME  = google_storage_bucket.peated.name
-    GCS_BUCKET_PATH  = "uploads"
-    NODE_NO_WARNINGS = "1"
+    DATABASE_URL         = "postgresql://peated:peated@127.0.0.1/peated"
+    GOOGLE_CLIENT_ID     = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
+    GOOGLE_CLIENT_SECRET = data.google_secret_manager_secret_version.google_client_secret.secret_data
+    CORS_HOST            = "https://peated.app"
+    URL_PREFIX           = "https://api.peated.app"
+    USE_GCS_STORAGE      = "1"
+    GCS_BUCKET_NAME      = google_storage_bucket.peated.name
+    GCS_BUCKET_PATH      = "uploads"
+    NODE_NO_WARNINGS     = "1"
     # this is prob a bad idea
     OPENAI_API_KEY = data.google_secret_manager_secret_version.openai_api_key.secret_data
 
