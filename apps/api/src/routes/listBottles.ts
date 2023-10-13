@@ -1,4 +1,13 @@
 import { CATEGORY_LIST } from "@peated/shared/constants";
+import { db } from "@peated/shared/db";
+import {
+  bottles,
+  bottlesToDistillers,
+  entities,
+  flightBottles,
+  flights,
+  tastings,
+} from "@peated/shared/db/schema";
 import { BottleSchema, PaginatedSchema } from "@peated/shared/schemas";
 import type { Category } from "@peated/shared/types";
 import type { SQL } from "drizzle-orm";
@@ -7,15 +16,6 @@ import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db } from "../db";
-import {
-  bottles,
-  bottlesToDistillers,
-  entities,
-  flightBottles,
-  flights,
-  tastings,
-} from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";

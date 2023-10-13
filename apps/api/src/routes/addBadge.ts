@@ -5,8 +5,8 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { BadgeInputSchema, BadgeSchema } from "@peated/shared/schemas";
 
-import { db } from "../db";
-import { badges } from "../db/schema";
+import { db } from "@peated/shared/db";
+import { badges } from "@peated/shared/db/schema";
 import { checkBadgeConfig } from "../lib/badges";
 import { logError } from "../lib/log";
 import { serialize } from "../lib/serializers";

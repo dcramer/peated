@@ -5,10 +5,10 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { CommentInputSchema, CommentSchema } from "@peated/shared/schemas";
 
+import { db } from "@peated/shared/db";
+import type { Comment, NewComment } from "@peated/shared/db/schema";
+import { comments, tastings } from "@peated/shared/db/schema";
 import { notifyComment } from "~/lib/email";
-import { db } from "../db";
-import type { Comment, NewComment } from "../db/schema";
-import { comments, tastings } from "../db/schema";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { createNotification } from "../lib/notifications";
 import { serialize } from "../lib/serializers";

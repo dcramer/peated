@@ -1,8 +1,8 @@
+import { db } from "@peated/shared/db";
+import { follows, notifications } from "@peated/shared/db/schema";
 import { and, eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
-import { db } from "../db";
-import { follows, notifications } from "../db/schema";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;

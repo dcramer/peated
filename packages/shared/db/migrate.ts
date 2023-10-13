@@ -5,7 +5,7 @@ import type { DatabaseType } from ".";
 export const migrate = async function ({
   db,
   fake = false,
-  migrationsFolder = "./migrations",
+  migrationsFolder = __dirname + "/../migrations",
 }: {
   db: DatabaseType;
   fake?: boolean;

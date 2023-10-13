@@ -1,8 +1,8 @@
+import { db } from "@peated/shared/db";
+import { users } from "@peated/shared/db/schema";
 import { hashSync } from "bcrypt";
 import { program } from "commander";
 import { eq } from "drizzle-orm";
-import { db } from "../db";
-import { users } from "../db/schema";
 import { createAccessToken, createUser } from "../lib/auth";
 
 program.name("user").description("CLI for assisting with user management");

@@ -1,4 +1,4 @@
-import { db } from "../db";
+import { db } from "@peated/shared/db";
 import * as Fixtures from "../lib/test/fixtures";
 import { createUser } from "./auth";
 

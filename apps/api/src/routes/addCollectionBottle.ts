@@ -6,8 +6,12 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { CollectionBottleInputSchema } from "@peated/shared/schemas";
 
-import { db } from "../db";
-import { bottles, collectionBottles, collections } from "../db/schema";
+import { db } from "@peated/shared/db";
+import {
+  bottles,
+  collectionBottles,
+  collections,
+} from "@peated/shared/db/schema";
 import { getUserFromId } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
 import { requireAuth } from "../middleware/auth";

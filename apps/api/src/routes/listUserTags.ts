@@ -1,10 +1,10 @@
+import { db } from "@peated/shared/db";
+import { tastings } from "@peated/shared/db/schema";
 import { sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db } from "../db";
-import { tastings } from "../db/schema";
 import { getUserFromId, profileVisible } from "../lib/api";
 
 export default {

@@ -1,8 +1,12 @@
+import { db } from "@peated/shared/db";
+import {
+  bottles,
+  bottlesToDistillers,
+  entities,
+} from "@peated/shared/db/schema";
 import { program } from "commander";
 import { eq, inArray, sql } from "drizzle-orm";
-import { bottles, bottlesToDistillers, entities } from "~/db/schema";
 import generateEntityDescription from "~/tasks/generateEntityDescription";
-import { db } from "../db";
 
 program.name("entities").description("CLI for assisting with entity admin");
 

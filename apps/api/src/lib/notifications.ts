@@ -1,7 +1,5 @@
-import { and, eq } from "drizzle-orm";
-import type { AnyPgTable } from "drizzle-orm/pg-core";
-import type { DatabaseType, TransactionType } from "../db";
-import type { NewNotification, Notification } from "../db/schema";
+import type { DatabaseType, TransactionType } from "@peated/shared/db";
+import type { NewNotification, Notification } from "@peated/shared/db/schema";
 import {
   bottles,
   comments,
@@ -10,7 +8,9 @@ import {
   notifications,
   tastings,
   toasts,
-} from "../db/schema";
+} from "@peated/shared/db/schema";
+import { and, eq } from "drizzle-orm";
+import type { AnyPgTable } from "drizzle-orm/pg-core";
 
 export const objectTypeFromSchema = (schema: AnyPgTable) => {
   switch (schema) {

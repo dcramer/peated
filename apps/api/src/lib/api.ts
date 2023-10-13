@@ -1,7 +1,7 @@
+import type { DatabaseType, TransactionType } from "@peated/shared/db";
+import type { User } from "@peated/shared/db/schema";
+import { follows, users } from "@peated/shared/db/schema";
 import { and, eq } from "drizzle-orm";
-import type { DatabaseType, TransactionType } from "../db";
-import type { User } from "../db/schema";
-import { follows, users } from "../db/schema";
 
 // export async function getUserFromId(
 //   db: DatabaseType | TransactionType,

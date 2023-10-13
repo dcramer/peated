@@ -1,4 +1,4 @@
-import type { Store, User } from "../../db/schema";
+import type { Store, User } from "@peated/shared/db/schema";
 
 import type { Serializer } from ".";
 

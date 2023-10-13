@@ -1,6 +1,6 @@
+import { db } from "@peated/shared/db";
+import { migrate } from "@peated/shared/db/migrate";
 import { program } from "commander";
-import { db } from "../db";
-import { migrate } from "../db/migrate";
 
 program.name("db").description("CLI for assisting with Drizzle");
 

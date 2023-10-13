@@ -1,10 +1,10 @@
+import { db } from "@peated/shared/db";
+import { bottleTags, bottles } from "@peated/shared/db/schema";
 import { desc, eq, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db } from "../db";
-import { bottleTags, bottles } from "../db/schema";
 import { shuffle } from "../lib/rand";
 import { defaultTags } from "../lib/tags";
 

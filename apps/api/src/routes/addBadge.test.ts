@@ -1,8 +1,8 @@
+import { db } from "@peated/shared/db";
+import { badges } from "@peated/shared/db/schema";
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
-import { badges } from "~/db/schema";
 import buildFastify from "../app";
-import { db } from "../db";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;

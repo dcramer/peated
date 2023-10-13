@@ -1,3 +1,5 @@
+import { db } from "@peated/shared/db";
+import { changes } from "@peated/shared/db/schema";
 import { ChangeSchema, PaginatedSchema } from "@peated/shared/schemas";
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq } from "drizzle-orm";
@@ -5,8 +7,6 @@ import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db } from "../db";
-import { changes } from "../db/schema";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";
 import { ChangeSerializer } from "../lib/serializers/change";

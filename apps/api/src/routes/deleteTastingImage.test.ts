@@ -1,6 +1,6 @@
+import { db } from "@peated/shared/db";
 import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
-import { db } from "../db";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;

@@ -1,11 +1,11 @@
+import { db } from "@peated/shared/db";
+import { collectionBottles, collections } from "@peated/shared/db/schema";
 import { CollectionSchema, PaginatedSchema } from "@peated/shared/schemas";
 import { and, asc, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db } from "../db";
-import { collectionBottles, collections } from "../db/schema";
 import { getUserFromId, profileVisible } from "../lib/api";
 import { buildPageLink } from "../lib/paging";
 import { serialize } from "../lib/serializers";

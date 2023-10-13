@@ -1,8 +1,8 @@
+import { db } from "@peated/shared/db";
+import { tastings } from "@peated/shared/db/schema";
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
-import { db } from "../db";
-import { tastings } from "../db/schema";
 import { requireAuth } from "../middleware/auth";
 
 export default {

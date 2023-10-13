@@ -2,8 +2,8 @@ import { eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
-import { db } from "../db";
-import { tastings, toasts } from "../db/schema";
+import { db } from "@peated/shared/db";
+import { tastings, toasts } from "@peated/shared/db/schema";
 import { createNotification } from "../lib/notifications";
 import { requireAuth } from "../middleware/auth";
 

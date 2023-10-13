@@ -1,8 +1,8 @@
+import { db } from "@peated/shared/db";
+import { bottles } from "@peated/shared/db/schema";
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
-import { db } from "../db";
-import { bottles } from "../db/schema";
 import { omit } from "../lib/filter";
 import * as Fixtures from "../lib/test/fixtures";
 

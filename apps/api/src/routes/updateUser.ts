@@ -4,9 +4,9 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
+import { db } from "@peated/shared/db";
+import { users } from "@peated/shared/db/schema";
 import { UserInputSchema, UserSchema } from "@peated/shared/schemas";
-import { db } from "../db";
-import { users } from "../db/schema";
 import { serialize } from "../lib/serializers";
 import { UserSerializer } from "../lib/serializers/user";
 import { requireAuth } from "../middleware/auth";

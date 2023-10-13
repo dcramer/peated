@@ -1,10 +1,10 @@
+import type { User } from "@peated/shared/db/schema";
+import { follows } from "@peated/shared/db/schema";
 import config from "../../config";
-import type { User } from "../../db/schema";
-import { follows } from "../../db/schema";
 
+import { db } from "@peated/shared/db";
 import { and, eq, inArray } from "drizzle-orm";
 import type { Serializer } from ".";
-import { db } from "../../db";
 
 export const UserSerializer: Serializer<User> = {
   attrs: async (itemList: User[], currentUser?: User) => {

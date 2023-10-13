@@ -1,3 +1,5 @@
+import { db } from "@peated/shared/db";
+import { bottles, collectionBottles, entities } from "@peated/shared/db/schema";
 import {
   CollectionBottleSchema,
   PaginatedSchema,
@@ -8,8 +10,6 @@ import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { db } from "../db";
-import { bottles, collectionBottles, entities } from "../db/schema";
 import { getUserFromId, profileVisible } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
 import { buildPageLink } from "../lib/paging";

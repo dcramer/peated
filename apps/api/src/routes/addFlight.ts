@@ -5,11 +5,11 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 import { FlightInputSchema, FlightSchema } from "@peated/shared/schemas";
 
+import { db } from "@peated/shared/db";
+import type { NewFlight } from "@peated/shared/db/schema";
+import { flightBottles, flights } from "@peated/shared/db/schema";
 import { generatePublicId } from "~/lib/publicId";
 import { FlightSerializer } from "~/lib/serializers/flight";
-import { db } from "../db";
-import type { NewFlight } from "../db/schema";
-import { flightBottles, flights } from "../db/schema";
 import { serialize } from "../lib/serializers";
 import { requireAuth } from "../middleware/auth";
 

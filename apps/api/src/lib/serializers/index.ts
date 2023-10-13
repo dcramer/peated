@@ -1,4 +1,4 @@
-import type { User } from "../../db/schema";
+import type { User } from "@peated/shared/db/schema";
 
 export type Result = Record<string, any>;
 

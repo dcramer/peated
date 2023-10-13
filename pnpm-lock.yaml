@@ -178,7 +178,7 @@ importers:
         version: 0.32.6
       ts-node:
         specifier: ^10.9.1
-        version: 10.9.1(@types/node@18.18.5)(typescript@5.2.2)
+        version: 10.9.1(@swc/core@1.3.93)(@types/node@18.18.5)(typescript@5.2.2)
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -454,7 +454,7 @@ importers:
         version: 3.0.0
       ts-node:
         specifier: ^10.9.1
-        version: 10.9.1(@swc/core@1.3.93)(@types/node@20.8.5)(typescript@5.2.2)
+        version: 10.9.1(@swc/core@1.3.93)(@types/node@18.18.5)(typescript@5.2.2)
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -487,7 +487,7 @@ importers:
         version: 3.3.3(ts-node@10.9.1)
       ts-node:
         specifier: ^10.9.1
-        version: 10.9.1(@swc/core@1.3.93)(@types/node@20.8.5)(typescript@5.2.2)
+        version: 10.9.1(@swc/core@1.3.93)(@types/node@18.18.5)(typescript@5.2.2)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -500,9 +500,21 @@ importers:
       '@peated/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
+      '@types/pg':
+        specifier: ^8.10.5
+        version: 8.10.5
       '@vitest/coverage-v8':
         specifier: ^0.34.6
         version: 0.34.6(vitest@0.34.6)
+      drizzle-kit:
+        specifier: ^0.19.13
+        version: 0.19.13
+      drizzle-orm:
+        specifier: ^0.28.6
+        version: 0.28.6(@opentelemetry/api@1.6.0)(@types/pg@8.10.5)(pg@8.11.3)
+      pg:
+        specifier: ^8.11.3
+        version: 8.11.3
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -523,7 +535,7 @@ importers:
     dependencies:
       ts-node:
         specifier: ^10.9.1
-        version: 10.9.1(@swc/core@1.3.93)(@types/node@20.8.5)(typescript@5.2.2)
+        version: 10.9.1(@swc/core@1.3.93)(@types/node@18.18.5)(typescript@5.2.2)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -3415,7 +3427,7 @@ packages:
     resolution: {integrity: sha512-oyl4jvAfTGX9Bt6Or4H9ni1Z447/tQuxnZsytsCaExKlmJiU8sFgnIBRzJUpKwB5eWn9HuBYlUlVA74q/yN0eQ==}
     dependencies:
       '@types/connect': 3.4.36
-      '@types/node': 20.8.5
+      '@types/node': 18.18.5
     dev: false
 
   /@types/chai-subset@1.3.3:
@@ -3443,7 +3455,7 @@ packages:
   /@types/connect@3.4.36:
     resolution: {integrity: sha512-P63Zd/JUGq+PdrM1lv0Wv5SBYeA2+CORvbrXbngriYY0jzLUWfQMQQxOhjONEz/wlHOAxOdY7CY65rgQdTjq2w==}
     dependencies:
-      '@types/node': 20.8.5
+      '@types/node': 18.18.5
     dev: false
 
   /@types/cookie@0.4.1:
@@ -3475,7 +3487,7 @@ packages:
   /@types/express-serve-static-core@4.17.37:
     resolution: {integrity: sha512-ZohaCYTgGFcOP7u6aJOhY9uIZQgZ2vxC2yWoArY+FeDXlqeH66ZVBjgvg+RLVAS/DWNq4Ap9ZXu1+SUQiiWYMg==}
     dependencies:
-      '@types/node': 20.8.5
+      '@types/node': 18.18.5
       '@types/qs': 6.9.8
       '@types/range-parser': 1.2.5
       '@types/send': 0.17.2
@@ -3693,7 +3705,7 @@ packages:
     resolution: {integrity: sha512-aAG6yRf6r0wQ29bkS+x97BIs64ZLxeE/ARwyS6wrldMm3C1MdKwCcnnEwMC1slI8wuxJOpiUH9MioC0A0i+GJw==}
     dependencies:
       '@types/mime': 1.3.3
-      '@types/node': 20.8.5
+      '@types/node': 18.18.5
     dev: false
 
   /@types/serve-static@1.15.3:
@@ -3701,7 +3713,7 @@ packages:
     dependencies:
       '@types/http-errors': 2.0.2
       '@types/mime': 3.0.2
-      '@types/node': 20.8.5
+      '@types/node': 18.18.5
     dev: false
 
   /@types/shimmer@1.0.3:
@@ -3884,7 +3896,7 @@ packages:
       lodash: 4.17.21
       mlly: 1.4.2
       outdent: 0.8.0
-      vite: 4.4.11(@types/node@20.8.5)
+      vite: 4.4.11(@types/node@18.18.5)
       vite-node: 0.28.5
     transitivePeerDependencies:
       - '@types/node'
@@ -6461,7 +6473,7 @@ packages:
     resolution: {integrity: sha512-EzV94NYKoO09GLXGjXj9JIlXijVck4ONSr5wiCWDvhsvj5jxSrzTmRU/9C1DyB6uToszLs8aifA6NQ7lEQdvFw==}
     engines: {node: '>= 0.8'}
     dependencies:
-      '@types/node': 20.8.5
+      '@types/node': 18.18.5
       require-like: 0.1.2
     dev: false
 
@@ -10004,7 +10016,7 @@ packages:
     dependencies:
       lilconfig: 2.1.0
       postcss: 8.4.31
-      ts-node: 10.9.1(@swc/core@1.3.93)(@types/node@20.8.5)(typescript@5.2.2)
+      ts-node: 10.9.1(@swc/core@1.3.93)(@types/node@18.18.5)(typescript@5.2.2)
       yaml: 2.3.2
     dev: false
 
@@ -11776,7 +11788,7 @@ packages:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
     dev: false
 
-  /ts-node@10.9.1(@swc/core@1.3.93)(@types/node@20.8.5)(typescript@5.2.2):
+  /ts-node@10.9.1(@swc/core@1.3.93)(@types/node@18.18.5)(typescript@5.2.2):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -11792,37 +11804,6 @@ packages:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@swc/core': 1.3.93
-      '@tsconfig/node10': 1.0.9
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 20.8.5
-      acorn: 8.10.0
-      acorn-walk: 8.2.0
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.2.2
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    dev: false
-
-  /ts-node@10.9.1(@types/node@18.18.5)(typescript@5.2.2):
-    resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
-    hasBin: true
-    peerDependencies:
-      '@swc/core': '>=1.2.50'
-      '@swc/wasm': '>=1.2.50'
-      '@types/node': '*'
-      typescript: '>=2.7'
-    peerDependenciesMeta:
-      '@swc/core':
-        optional: true
-      '@swc/wasm':
-        optional: true
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.9
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
@@ -12256,7 +12237,7 @@ packages:
       picocolors: 1.0.0
       source-map: 0.6.1
       source-map-support: 0.5.21
-      vite: 4.4.11(@types/node@20.8.5)
+      vite: 4.4.11(@types/node@18.18.5)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -12306,7 +12287,7 @@ packages:
       - typescript
     dev: false
 
-  /vite@3.2.7(@types/node@20.8.5):
+  /vite@3.2.7(@types/node@18.18.5):
     resolution: {integrity: sha512-29pdXjk49xAP0QBr0xXqu2s5jiQIXNvE/xwd0vUizYT2Hzqe4BksNNoWllFVXJf4eLZ+UlVQmXfB4lWrc+t18g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -12331,7 +12312,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.8.5
+      '@types/node': 18.18.5
       esbuild: 0.15.18
       postcss: 8.4.31
       resolve: 1.22.8
@@ -12369,42 +12350,6 @@ packages:
         optional: true
     dependencies:
       '@types/node': 18.18.5
-      esbuild: 0.18.20
-      postcss: 8.4.31
-      rollup: 3.29.4
-    optionalDependencies:
-      fsevents: 2.3.3
-    dev: false
-
-  /vite@4.4.11(@types/node@20.8.5):
-    resolution: {integrity: sha512-ksNZJlkcU9b0lBwAGZGGaZHCMqHsc8OpgtoYhsQ4/I2v5cnpmmmqe5pM4nv/4Hn6G/2GhTdj0DhZh2e+Er1q5A==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      '@types/node': 20.8.5
       esbuild: 0.18.20
       postcss: 8.4.31
       rollup: 3.29.4
@@ -12455,7 +12400,7 @@ packages:
     dependencies:
       '@types/chai': 4.3.8
       '@types/chai-subset': 1.3.3
-      '@types/node': 20.8.5
+      '@types/node': 18.18.5
       chai: 4.3.10
       debug: 4.3.4
       local-pkg: 0.4.3
@@ -12463,7 +12408,7 @@ packages:
       tinybench: 2.5.1
       tinypool: 0.3.1
       tinyspy: 1.1.1
-      vite: 3.2.7(@types/node@20.8.5)
+      vite: 3.2.7(@types/node@18.18.5)
     transitivePeerDependencies:
       - less
       - sass

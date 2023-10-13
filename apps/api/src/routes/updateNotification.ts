@@ -1,3 +1,5 @@
+import { db } from "@peated/shared/db";
+import { notifications } from "@peated/shared/db/schema";
 import {
   NotificationInputSchema,
   NotificationSchema,
@@ -9,8 +11,6 @@ import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { serialize } from "~/lib/serializers";
 import { NotificationSerializer } from "~/lib/serializers/notification";
-import { db } from "../db";
-import { notifications } from "../db/schema";
 import { requireAuth } from "../middleware/auth";
 
 export default {

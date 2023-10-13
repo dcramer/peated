@@ -1,10 +1,16 @@
-import type { Follow, Notification, User } from "../../db/schema";
-import { comments, follows, tastings, toasts, users } from "../../db/schema";
+import type { Follow, Notification, User } from "@peated/shared/db/schema";
+import {
+  comments,
+  follows,
+  tastings,
+  toasts,
+  users,
+} from "@peated/shared/db/schema";
 
+import { db } from "@peated/shared/db";
 import { eq, inArray } from "drizzle-orm";
 import type { Serializer } from ".";
 import { serialize } from ".";
-import { db } from "../../db";
 import { logError } from "../log";
 import { TastingSerializer } from "./tasting";
 import { UserSerializer } from "./user";

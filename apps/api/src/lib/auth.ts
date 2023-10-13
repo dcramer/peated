@@ -1,8 +1,8 @@
+import type { DatabaseType, TransactionType } from "@peated/shared/db";
+import type { NewUser, User } from "@peated/shared/db/schema";
+import { users } from "@peated/shared/db/schema";
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
-import type { DatabaseType, TransactionType } from "../db";
-import type { NewUser, User } from "../db/schema";
-import { users } from "../db/schema";
 import { random } from "./rand";
 import { serialize } from "./serializers";
 import { UserSerializer } from "./serializers/user";

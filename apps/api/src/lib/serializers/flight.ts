@@ -1,4 +1,4 @@
-import type { Flight, User } from "../../db/schema";
+import type { Flight, User } from "@peated/shared/db/schema";
 
 import type { Serializer } from ".";
 
