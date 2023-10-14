@@ -40,13 +40,13 @@ If there are any issues, are you are not confident in the accuracy, please also 
 }
 
 const OpenAIBottleDetailsSchema = z.object({
-  description: z.string().nullable(),
-  yearEstablished: z.number().nullable(),
-  country: CountryEnum.nullable(),
-  region: z.string().nullable(),
-  confidence: z.number(),
-  type: z.array(EntityTypeEnum),
-  aiNotes: z.string().nullable(),
+  description: z.string().nullable().optional(),
+  yearEstablished: z.number().nullable().optional(),
+  country: CountryEnum.nullable().optional(),
+  region: z.string().nullable().optional(),
+  confidence: z.number().default(0).optional(),
+  type: z.array(EntityTypeEnum).optional(),
+  aiNotes: z.string().nullable().optional(),
 });
 
 type Response = z.infer<typeof OpenAIBottleDetailsSchema>;

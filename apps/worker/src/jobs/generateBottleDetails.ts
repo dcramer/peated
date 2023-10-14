@@ -39,19 +39,20 @@ If there are any issues, are you are not confident in the accuracy, please also 
 const DefaultTagEnum = z.enum(DEFAULT_TAGS);
 
 const OpenAIBottleDetailsSchema = z.object({
-  description: z.string().nullable(),
+  description: z.string().nullable().optional(),
   tastingNotes: z
     .object({
       nose: z.string(),
       palate: z.string(),
       finish: z.string(),
     })
-    .nullable(),
-  category: CategoryEnum.nullable(),
-  statedAge: z.number().nullable(),
-  suggestedTags: z.array(DefaultTagEnum),
-  confidence: z.number(),
-  aiNotes: z.string().nullable(),
+    .nullable()
+    .optional(),
+  category: CategoryEnum.nullable().optional(),
+  statedAge: z.number().nullable().optional(),
+  suggestedTags: z.array(DefaultTagEnum).optional(),
+  confidence: z.number().default(0).optional(),
+  aiNotes: z.string().nullable().optional(),
 });
 
 type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
