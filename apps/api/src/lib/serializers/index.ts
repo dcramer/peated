@@ -28,16 +28,19 @@ export async function serialize<T extends Item>(
   serializer: Serializer<T>,
   item: T,
   currentUser?: User | null,
+  excludeFields?: string[],
 ): Promise<Result>;
 export async function serialize<T extends Item>(
   serializer: Serializer<T>,
   itemList: T[],
   currentUser?: User | null,
+  excludeFields?: string[],
 ): Promise<Result[]>;
 export async function serialize<T extends Item>(
   serializer: Serializer<T>,
   itemList: T | T[],
   currentUser?: User | null,
+  excludeFields: string[] = [],
 ): Promise<Result | Result[]> {
   if (Array.isArray(itemList) && !itemList.length) return [];
 
@@ -47,8 +50,21 @@ export async function serialize<T extends Item>(
   );
 
   const results = (Array.isArray(itemList) ? itemList : [itemList]).map(
-    (i: T) => serializer.item(i, attrs[i.id] || {}, currentUser),
+    (i: T) =>
+      removeAttributes(
+        serializer.item(i, attrs[i.id] || {}, currentUser),
+        excludeFields,
+      ),
   );
 
   return Array.isArray(itemList) ? results : results[0];
+}
+
+function removeAttributes(object: Record<string, any>, names: string[]) {
+  const nameSet = new Set(names);
+  return {
+    ...Object.fromEntries(
+      Object.entries(object).filter(([key]) => !nameSet.has(key)),
+    ),
+  };
 }
