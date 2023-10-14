@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { type ZodSchema } from "zod";
+import { type z, type ZodSchema } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import config from "~/config";
 
@@ -7,12 +7,11 @@ const DEFAULT_MODEL = "gpt-4";
 
 type Model = "gpt-3.5-turbo" | "gpt-4";
 
-// TODO: fix the return type here
 export async function getStructuredResponse<T extends ZodSchema<any>>(
   prompt: string,
   zodSchema: T,
   model: Model = DEFAULT_MODEL,
-): Promise<any | null> {
+): Promise<z.infer<T> | null> {
   const openai = new OpenAI({
     apiKey: config.OPENAI_API_KEY,
   });
