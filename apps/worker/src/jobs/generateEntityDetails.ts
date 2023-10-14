@@ -35,8 +35,8 @@ The confidence rating should be 1 if you are absolutely certain this information
 }
 
 const OpenAIBottleDetailsSchema = z.object({
-  description: z.string(),
-  yearEstablished: z.number(),
+  description: z.string().nullable(),
+  yearEstablished: z.number().nullable(),
   confidence: z.number(),
   type: z.array(EntityTypeEnum),
 });

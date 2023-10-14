@@ -34,13 +34,15 @@ ${DEFAULT_TAGS.join("\n")}
 }
 
 const OpenAIBottleDetailsSchema = z.object({
-  description: z.string(),
-  tastingNotes: z.object({
-    nose: z.string(),
-    palate: z.string(),
-    finish: z.string(),
-  }),
-  suggestedTags: z.array(z.string()),
+  description: z.string().nullable(),
+  tastingNotes: z
+    .object({
+      nose: z.string(),
+      palate: z.string(),
+      finish: z.string(),
+    })
+    .nullable(),
+  suggestedTags: z.array(z.string()).nullable(),
   confidence: z.number(),
 });
 
