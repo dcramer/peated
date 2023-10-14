@@ -188,7 +188,7 @@ jobs:
             shared:
               - packages/**
             migrations:
-              - apps/api/migrations/**.sql
+              - **/migrations/**.sql
 
       - name: Run Migrations
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.migrations_any_changed == 'true' }}
