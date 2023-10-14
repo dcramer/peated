@@ -310,14 +310,11 @@ export default function BottleDetails() {
         <div className="flex">
           <div className="flex-1">
             <Tabs fullWidth border>
-              <Tabs.Item active>Details from Ryebot</Tabs.Item>
+              <Tabs.Item active>About</Tabs.Item>
             </Tabs>
             <div className="my-6">
-              <BetaNotice>
-                Ryebot is still getting his bearings. Pardon our dust!
-              </BetaNotice>
               <div className="mt-5 flex space-x-4">
-                <Collapsable>
+                <Collapsable mobileOnly>
                   <div className="prose prose-invert -mt-5 max-w-none flex-1">
                     <Markdown content={bottle.description} />
                   </div>

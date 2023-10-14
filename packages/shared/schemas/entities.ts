@@ -18,6 +18,11 @@ export const EntitySchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
   description: z.string().nullable().optional(),
+  yearEstablished: z
+    .number()
+    .gte(1500)
+    .lte(new Date().getFullYear())
+    .nullable(),
   country: z.string().trim().nullable(),
   region: z.string().trim().nullable(),
   type: z.array(EntityTypeEnum),

@@ -1,6 +1,7 @@
-import { DEFAULT_TAGS } from "@peated/shared/constants";
+import { DEFAULT_CREATED_BY_ID, DEFAULT_TAGS } from "@peated/shared/constants";
 import { db } from "@peated/shared/db";
-import { bottles } from "@peated/shared/db/schema";
+import { bottles, changes } from "@peated/shared/db/schema";
+import { arraysEqual, objectsShallowEqual } from "@peated/shared/lib/equals";
 import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import config from "~/config";
@@ -25,10 +26,15 @@ An example of the output we desire:
   "finish": "tasting notes about the finish",
  },
  "suggestedTags": ["one", "two", "three", "four", "five"],
- "confidence": "a floating point number ranging from 0 to 1 describing your confidence in accuracy of this information"}
+ "confidence": "a floating point number ranging from 0.0 to 1.0 describing your confidence in accuracy of this information"}
 
 The description should focus on what is unique about this whiskey. It should not include the tasting notes.
+
 The tasting notes should be concise, and focus on the smell and taste.
+
+The confidence rating should be 0 if you do believe this is not a real entity.
+The confidence rating should be 1 if you are absolutely certain this information is factual.
+
 The suggested tags should be five items that reflect the flavor of this whiskey the best, and should come from the following list:
 
 ${DEFAULT_TAGS.join("\n")}
@@ -68,7 +74,7 @@ async function generateBottleDetails(
         content: generatePrompt(bottleName),
       },
     ],
-    temperature: 0.6,
+    temperature: 0,
   });
 
   const message = completion.choices[0].message.content;
@@ -94,12 +100,39 @@ export default async function ({ bottleId }: { bottleId: number }) {
   });
   if (!bottle) throw new Error("Unknown bottle");
   const result = await generateBottleDetails(bottle.fullName);
-  await db
-    .update(bottles)
-    .set({
-      description: result?.description || null,
-      tastingNotes: result?.tastingNotes || null,
-      suggestedTags: result?.suggestedTags || [],
-    })
-    .where(eq(bottles.id, bottle.id));
+
+  if (!result) return;
+
+  const data: Record<string, any> = {};
+  if (result.description && result.description !== bottle.description)
+    data.description = result.description;
+
+  if (
+    result.tastingNotes &&
+    !objectsShallowEqual(result.tastingNotes, bottle.tastingNotes)
+  )
+    data.tastingNotes = result.tastingNotes;
+
+  if (
+    result.suggestedTags.length &&
+    !arraysEqual(result.suggestedTags, bottle.suggestedTags)
+  )
+    data.suggestedTags = result.suggestedTags;
+
+  if (Object.keys(data).length === 0) return;
+
+  await db.transaction(async (tx) => {
+    await db.update(bottles).set(data).where(eq(bottles.id, bottle.id));
+
+    await tx.insert(changes).values({
+      objectType: "bottle",
+      objectId: bottle.id,
+      displayName: bottle.fullName,
+      createdById: DEFAULT_CREATED_BY_ID,
+      type: "update",
+      data: JSON.stringify({
+        ...data,
+      }),
+    });
+  });
 }
