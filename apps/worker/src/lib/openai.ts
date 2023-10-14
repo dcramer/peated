@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { type z, type ZodSchema } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import config from "~/config";
+import { logError } from "./log";
 
 type Model = "gpt-3.5-turbo" | "gpt-4";
 
@@ -41,12 +42,20 @@ export async function getStructuredResponse<T extends ZodSchema<any>>(
   });
 
   // TODO: handle errors and bubble useful context to Sentry
-  const structuredResponse = JSON.parse(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    completion.choices[0].message!.function_call!.arguments!,
-  );
-  const result = zodSchema.parse(structuredResponse);
+  try {
+    const structuredResponse = JSON.parse(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      completion.choices[0].message!.function_call!.arguments!,
+    );
+    return zodSchema.parse(structuredResponse);
+  } catch (err) {
+    logError(err, {
+      openai: {
+        usage: completion.usage,
+        prompt,
+      },
+    });
 
-  console.log({ result });
-  return result;
+    return null;
+  }
 }
