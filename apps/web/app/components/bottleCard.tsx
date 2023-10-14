@@ -61,7 +61,7 @@ export default function BottleCard({
             className="block max-w-[260px] truncate font-semibold hover:underline sm:max-w-[480px]"
             title={bottle.fullName}
           >
-            {bottle.name}
+            {bottle.fullName}
           </Link>
           {bottle.isFavorite && (
             <StarIcon className="h-4 w-4" aria-hidden="true" />
