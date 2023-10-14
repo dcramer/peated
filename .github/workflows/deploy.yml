@@ -7,7 +7,7 @@ on:
       - Test
     types:
       - completed
-  workflow_call:
+  workflow_dispatch:
     inputs:
       force:
         description: "Force deploy to all services"
