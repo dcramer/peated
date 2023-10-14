@@ -9,6 +9,7 @@ import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 import { db } from "@peated/shared/db";
 import type { NewEntity } from "@peated/shared/db/schema";
 import { changes, entities } from "@peated/shared/db/schema";
+import pushJob from "@peated/shared/jobs";
 import { serialize } from "../lib/serializers";
 import { EntitySerializer } from "../lib/serializers/entity";
 import { requireAuth } from "../middleware/auth";
@@ -79,6 +80,8 @@ export default {
     if (!entity) {
       return res.status(500).send({ error: "Failed to create entity" });
     }
+
+    await pushJob("GenerateEntityDetails", { entityId: entity.id });
 
     res.status(201).send(await serialize(EntitySerializer, entity, req.user));
   },

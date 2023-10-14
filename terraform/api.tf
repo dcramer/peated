@@ -25,10 +25,9 @@ module "api-service" {
     GCS_BUCKET_NAME      = google_storage_bucket.peated.name
     GCS_BUCKET_PATH      = "uploads"
     NODE_NO_WARNINGS     = "1"
-    # this is prob a bad idea
-    OPENAI_API_KEY = data.google_secret_manager_secret_version.openai_api_key.secret_data
-    JWT_SECRET     = data.google_secret_manager_secret_version.jwt_secret.secret_data
+    JWT_SECRET           = data.google_secret_manager_secret_version.jwt_secret.secret_data
+    FAKTORY_URL          = "tcp://:${data.google_secret_manager_secret_version.faktory_password.secret_data}@${var.faktory_host}:7419"
   }
 
-  depends_on = [module.db-main]
+  depends_on = [module.db-main, module.faktory]
 }

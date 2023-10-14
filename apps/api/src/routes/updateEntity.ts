@@ -9,6 +9,7 @@ import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 import { db } from "@peated/shared/db";
 import type { Entity } from "@peated/shared/db/schema";
 import { changes, entities } from "@peated/shared/db/schema";
+import pushJob from "@peated/shared/jobs";
 import { requireMod } from "../middleware/auth";
 
 function arraysEqual<T>(one: T[], two: T[]) {
@@ -103,6 +104,9 @@ export default {
     if (!newEntity) {
       return res.status(500).send({ error: "Failed to update entity" });
     }
+
+    if (newEntity.name !== entity.name)
+      await pushJob("GenerateEntityDetails", { entityId: entity.id });
 
     res.status(200).send(newEntity);
   },

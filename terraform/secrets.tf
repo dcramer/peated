@@ -97,3 +97,23 @@ data "google_secret_manager_secret_version" "jwt_secret" {
 
   secret = google_secret_manager_secret.jwt_secret.id
 }
+
+resource "google_secret_manager_secret" "faktory_password" {
+  secret_id = "faktory_password"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "faktory_password" {
+  secret_id  = google_secret_manager_secret.faktory_password.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.faktory_password]
+}
+
+data "google_secret_manager_secret_version" "faktory_password" {
+  provider = google-beta
+
+  secret = google_secret_manager_secret.faktory_password.id
+}

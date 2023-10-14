@@ -15,6 +15,7 @@ import {
   changes,
   entities,
 } from "@peated/shared/db/schema";
+import pushJob from "@peated/shared/jobs";
 import { upsertEntity } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { serialize } from "../lib/serializers";
@@ -168,6 +169,8 @@ export default {
     if (!bottle) {
       return res.status(500).send({ error: "Failed to create bottle" });
     }
+
+    await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
 
     res.status(201).send(await serialize(BottleSerializer, bottle, req.user));
   },

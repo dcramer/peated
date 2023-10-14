@@ -4,9 +4,9 @@ import {
   bottlesToDistillers,
   entities,
 } from "@peated/shared/db/schema";
+import pushJob, { shutdownClient } from "@peated/shared/jobs";
 import { program } from "commander";
 import { eq, inArray, sql } from "drizzle-orm";
-import generateEntityDescription from "~/tasks/generateEntityDescription";
 
 program.name("entities").description("CLI for assisting with entity admin");
 
@@ -27,14 +27,10 @@ program
       console.log(
         `Generating description for Entity ${entity.id} (${entity.name}).`,
       );
-      const description = await generateEntityDescription(entity.name);
-      await db
-        .update(entities)
-        .set({
-          description,
-        })
-        .where(eq(entities.id, entity.id));
+      await pushJob("GenerateEntityDetails", { entityId: entity.id });
     }
+
+    await shutdownClient();
   });
 
 // TODO: move logic to utility + tests

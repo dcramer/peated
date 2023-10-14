@@ -1,9 +1,12 @@
 import * as Sentry from "@sentry/node-experimental";
 import { ProfilingIntegration } from "@sentry/profiling-node";
+import faktory from "faktory-worker";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 
 const scheduler = new ToadScheduler();
 
+import generateBottleDetails from "./jobs/generateBottleDetails";
+import generateEntityDetails from "./jobs/generateEntityDetails";
 import { main as astorwines } from "./price-scraper/astorwines";
 import { main as healthyspirits } from "./price-scraper/healthyspirits";
 import { main as totalwine } from "./price-scraper/totalwine";
@@ -79,34 +82,53 @@ function job(schedule: string, name: string, cb: () => Promise<void>) {
   scheduler.addCronJob(job);
 }
 
-function main() {
-  job("*/60 * * * *", "scrape-wooden-cork", async () => {
-    console.log("Scraping Wooden Cork");
-    await woodencork();
+async function main() {
+  // dont run the scraper in dev
+  if (process.env.NODE_ENV === "production") {
+    job("*/60 * * * *", "scrape-wooden-cork", async () => {
+      console.log("Scraping Wooden Cork");
+      await woodencork();
+    });
+
+    job("*/60 * * * *", "scrape-total-wine", async () => {
+      console.log("Scraping Total Wine");
+      await totalwine();
+    });
+
+    job("*/60 * * * *", "scrape-astor-wines", async () => {
+      console.log("Scraping Astor Wines");
+      await astorwines();
+    });
+
+    job("*/60 * * * *", "scrape-healthy-spirits", async () => {
+      console.log("Scraping Healthy Spirits");
+      await healthyspirits();
+    });
+  }
+
+  const worker = await faktory.work().catch((error) => {
+    console.error(`worker failed to start: ${error}`);
+    process.exit(1);
   });
 
-  job("*/60 * * * *", "scrape-total-wine", async () => {
-    console.log("Scraping Total Wine");
-    await totalwine();
-  });
-
-  job("*/60 * * * *", "scrape-astor-wines", async () => {
-    console.log("Scraping Astor Wines");
-    await astorwines();
-  });
-
-  job("*/60 * * * *", "scrape-healthy-spirits", async () => {
-    console.log("Scraping Healthy Spirits");
-    await healthyspirits();
+  worker.on("fail", ({ job, error }) => {
+    Sentry.captureException(error, {
+      extra: {
+        job: job.jid,
+      },
+    });
   });
 
   console.log("Scheduler Running...");
 }
+
+faktory.register("GenerateBottleDetails", generateBottleDetails);
+faktory.register("GenerateEntityDetails", generateEntityDetails);
 
 process.on("SIGINT", function () {
   scheduler.stop();
 });
 
 if (typeof require !== "undefined" && require.main === module) {
-  main();
+  main().catch((e) => console.error(e));
 }

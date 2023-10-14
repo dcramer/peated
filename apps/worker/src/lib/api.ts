@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const API_SERVER = process.env.API_SERVER || "http://localhost:4000";
+import config from "~/config";
 
 export async function submitBottle(data: any) {
   const headers = {
@@ -9,7 +8,7 @@ export async function submitBottle(data: any) {
   };
 
   try {
-    await axios.post(`${API_SERVER}/bottles`, data, {
+    await axios.post(`${config.API_SERVER}/bottles`, data, {
       headers,
     });
   } catch (err: any) {
@@ -35,7 +34,7 @@ export async function submitEntity(data: any) {
   };
 
   try {
-    await axios.post(`${API_SERVER}/entities`, data, {
+    await axios.post(`${config.API_SERVER}/entities`, data, {
       headers,
     });
   } catch (err: any) {
@@ -69,7 +68,7 @@ export async function submitStorePrices(storeId: number, data: StorePrice[]) {
   };
 
   try {
-    await axios.post(`${API_SERVER}/stores/${storeId}/prices`, data, {
+    await axios.post(`${config.API_SERVER}/stores/${storeId}/prices`, data, {
       headers,
     });
   } catch (err: any) {

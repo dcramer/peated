@@ -10,6 +10,7 @@ import config from "./config";
 import { router } from "./routes";
 
 import { MAX_FILESIZE } from "@peated/shared/constants";
+import { shutdownClient } from "@peated/shared/jobs";
 import { injectAuth } from "./middleware/auth";
 import FastifySentry from "./sentryPlugin";
 
@@ -65,6 +66,9 @@ export default async function buildFastify(options = {}) {
   app.register(FastifySentry);
 
   app.addHook("preHandler", injectAuth);
+  app.addHook("onClose", async () => {
+    await shutdownClient();
+  });
 
   app.setErrorHandler(function (error, request, reply) {
     const { validation, validationContext } = error;

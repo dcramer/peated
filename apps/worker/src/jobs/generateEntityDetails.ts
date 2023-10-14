@@ -1,3 +1,6 @@
+import { db } from "@peated/shared/db";
+import { entities } from "@peated/shared/db/schema";
+import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 
 import config from "~/config";
@@ -30,7 +33,7 @@ With all output, apply the following rules:
 `;
 }
 
-export default async function generateEntityDescription(
+async function generateEntityDescription(
   entityName: string,
 ): Promise<string | null> {
   if (!config.OPENAI_API_KEY) return null;
@@ -54,3 +57,17 @@ export default async function generateEntityDescription(
   if (result === UNKNOWN_ENTITY_MARKER) return null;
   return result;
 }
+
+export default async ({ entityId }: { entityId: number }) => {
+  const entity = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, entityId),
+  });
+  if (!entity) throw new Error("Unknown entity");
+  const description = await generateEntityDescription(entity.name);
+  await db
+    .update(entities)
+    .set({
+      description,
+    })
+    .where(eq(entities.id, entity.id));
+};

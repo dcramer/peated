@@ -7,9 +7,9 @@ import {
   storePrices,
   tastings,
 } from "@peated/shared/db/schema";
+import pushJob, { shutdownClient } from "@peated/shared/jobs";
 import { program } from "commander";
 import { eq, inArray, sql } from "drizzle-orm";
-import generateBottleDescription from "~/tasks/generateBottleDescription";
 
 program.name("bottles").description("CLI for assisting with bottle admin");
 
@@ -30,15 +30,10 @@ program
       console.log(
         `Generating description for Bottle ${bottle.id} (${bottle.fullName}).`,
       );
-      const result = await generateBottleDescription(bottle.fullName);
-      await db
-        .update(bottles)
-        .set({
-          description: result?.description || null,
-          tastingNotes: result?.tastingNotes || null,
-        })
-        .where(eq(bottles.id, bottle.id));
+      await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
     }
+
+    await shutdownClient();
   });
 
 // TODO: move logic to utility + tests

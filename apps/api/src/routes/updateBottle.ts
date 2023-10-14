@@ -20,6 +20,7 @@ import { serialize } from "../lib/serializers";
 import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireMod } from "../middleware/auth";
 
+import pushJob from "@peated/shared/jobs";
 import { normalizeBottleName } from "@peated/shared/lib/normalize";
 export default {
   method: "PUT",
@@ -273,6 +274,9 @@ export default {
     if (!newBottle) {
       return res.status(500).send({ error: "Failed to update bottle" });
     }
+
+    if (newBottle.fullName !== bottle.fullName)
+      await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
 
     res
       .status(200)

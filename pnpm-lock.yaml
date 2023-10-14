@@ -128,6 +128,9 @@ importers:
       drizzle-orm:
         specifier: ^0.28.6
         version: 0.28.6(@opentelemetry/api@1.6.0)(@types/pg@8.10.5)(pg@8.11.3)
+      faktory-worker:
+        specifier: ^4.5.1
+        version: 4.5.1
       fastify:
         specifier: ^4.24.1
         version: 4.24.1
@@ -161,9 +164,6 @@ importers:
       nodemon:
         specifier: ^2.0.22
         version: 2.0.22
-      openai:
-        specifier: ^4.12.1
-        version: 4.12.1
       pg:
         specifier: ^8.11.3
         version: 8.11.3
@@ -446,9 +446,21 @@ importers:
       croner:
         specifier: ^7.0.2
         version: 7.0.2
+      drizzle-orm:
+        specifier: ^0.28.6
+        version: 0.28.6(@opentelemetry/api@1.6.0)(@types/pg@8.10.5)(pg@8.11.3)
+      faktory-worker:
+        specifier: ^4.5.1
+        version: 4.5.1
+      nodemon:
+        specifier: ^2.0.22
+        version: 2.0.22
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
+      openai:
+        specifier: ^4.12.1
+        version: 4.12.1
       toad-scheduler:
         specifier: ^3.0.0
         version: 3.0.0
@@ -512,6 +524,9 @@ importers:
       drizzle-orm:
         specifier: ^0.28.6
         version: 0.28.6(@opentelemetry/api@1.6.0)(@types/pg@8.10.5)(pg@8.11.3)
+      faktory-worker:
+        specifier: ^4.5.1
+        version: 4.5.1
       pg:
         specifier: ^8.11.3
         version: 8.11.3
@@ -6595,6 +6610,21 @@ packages:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
     dev: false
 
+  /faktory-worker@4.5.1:
+    resolution: {integrity: sha512-4uiYa9psxVZ8rrqB8CGvGWqVVLEmgEwO+lN1c5X5xvvVfGJzXUdn26oEx+NI2eqbcZNPiC5unSPChzsxv7N3aQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dependencies:
+      commander: 9.5.0
+      debug: 4.3.4
+      generic-pool: 3.7.8
+      koa-compose: 4.1.0
+      redis-parser: 3.0.0
+      uuid: 8.3.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /fast-content-type-parse@1.1.0:
     resolution: {integrity: sha512-fBHHqSTFLVnR61C+gltJuE5GkVQMV0S2nqUO8TJ+5Z3qAKG8vAx4FKai1s5jq/inV1+sREynIWSuQ6HgoSXpDQ==}
     dev: false
@@ -6995,6 +7025,11 @@ packages:
     resolution: {integrity: sha512-ySFolZQfw9FoDb3ed9d80Cm9f0+r7qj+HJkWjeD9RBfpxEVTlVhol+gvaQB/78WbwYfbnNh8nWHHBSlg072y6A==}
     dependencies:
       loader-utils: 3.2.1
+    dev: false
+
+  /generic-pool@3.7.8:
+    resolution: {integrity: sha512-Pz93INFSbhjEROVbM91rurD05G+Kx8833rG+lVU57mznEBpzkc1f5/g+d511a1Yf8dbAEsm7DDA3QLytMFbiGA==}
+    engines: {node: '>= 4'}
     dev: false
 
   /gensync@1.0.0-beta.2:
@@ -8117,6 +8152,10 @@ packages:
   /kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
+    dev: false
+
+  /koa-compose@4.1.0:
+    resolution: {integrity: sha512-8ODW8TrDuMYvXRwra/Kh7/rJo9BtOfPc6qO8eAfC80CnCvSjSl0bkRM24X6/XBBEyj0v1nRUQ1LyOy3dbqOWXw==}
     dev: false
 
   /language-subtag-registry@0.3.22:
@@ -10617,6 +10656,18 @@ packages:
   /real-require@0.2.0:
     resolution: {integrity: sha512-57frrGM/OCTLqLOAh0mhVA9VBMHd+9U7Zb2THMGdBUoZVOtGbJzjxsYGDJ3A9AYYCP4hn6y1TVbaOfzWtm5GFg==}
     engines: {node: '>= 12.13.0'}
+    dev: false
+
+  /redis-errors@1.2.0:
+    resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
+    engines: {node: '>=4'}
+    dev: false
+
+  /redis-parser@3.0.0:
+    resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
+    engines: {node: '>=4'}
+    dependencies:
+      redis-errors: 1.2.0
     dev: false
 
   /reflect.getprototypeof@1.0.4:
