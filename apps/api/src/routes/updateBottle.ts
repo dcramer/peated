@@ -275,7 +275,11 @@ export default {
       return res.status(500).send({ error: "Failed to update bottle" });
     }
 
-    if (newBottle.fullName !== bottle.fullName)
+    if (
+      newBottle.fullName !== bottle.fullName ||
+      !newBottle.description ||
+      !newBottle.tastingNotes
+    )
       await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
 
     res

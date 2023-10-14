@@ -105,7 +105,7 @@ export default {
       return res.status(500).send({ error: "Failed to update entity" });
     }
 
-    if (newEntity.name !== entity.name)
+    if (newEntity.name !== entity.name || !newEntity.description)
       await pushJob("GenerateEntityDetails", { entityId: entity.id });
 
     res.status(200).send(newEntity);
