@@ -1,85 +1,58 @@
 import { DEFAULT_CREATED_BY_ID } from "@peated/shared/constants";
 import { db } from "@peated/shared/db";
-import { changes, entities, type EntityType } from "@peated/shared/db/schema";
+import { changes, entities } from "@peated/shared/db/schema";
 import { arraysEqual } from "@peated/shared/lib/equals";
+import { EntityTypeEnum } from "@peated/shared/schemas";
 import { eq } from "drizzle-orm";
-import OpenAI from "openai";
+import { z } from "zod";
 
 import config from "~/config";
+import { getStructuredResponse } from "~/lib/openai";
 
 if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-const UNKNOWN_ENTITY_MARKER = "UNKNOWN_ENTITY_MARKER";
-
-const MODEL = "gpt-4";
-
 function generatePrompt(entityName: string) {
   return `
-Pretend to be an expert in whiskey distillation.
+Pretend to be an expert in whiskey distillation. Tell me about the following entity:
 
-Given the entity below, create a valid JSON object.
-
-An example of the output we desire:
-{"description": "a description about the entity, with no more than 200 words",
- "type": ["bottler", "distiller", "brand"],
- "yearEstablished": "a number indicating the year established, or null if unknown",
- "confidence": "a floating point number ranging from 0 to 1 describing your confidence in accuracy of this information"}
+${entityName}
+  
+If the entity is located in Scotland, spell wihskey as "whisky".
 
 Describe the entity as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as a "entity".
 
-The description should focus on the history & origin, and what makes it different from competitors
+The description should focus on the history & origin, and what makes it different from competitors, and be no more than 200 words.
+
+The yearEstablished should be the year in which the entity was established.
 
 The type should describe if the entity is a distiller, a bottler or brand. It can be all three, but it must be at least one. If you are unsure lower your confidence rating.
 
 The confidence rating should be 0 if you do believe this is not a real entity.
 The confidence rating should be 1 if you are absolutely certain this information is factual.
-
-If the entity is located in Scotland, spell wihskey as "whisky".
-
-The entity:
-${entityName}
 `;
 }
 
-type Response = {
-  description: string;
-  yearEstablished: number;
-  confidence: number;
-  type: EntityType[];
-};
+const OpenAIBottleDetailsSchema = z.object({
+  description: z.string(),
+  yearEstablished: z.number(),
+  confidence: z.number(),
+  type: z.array(EntityTypeEnum),
+});
 
-async function generateEntityDescription(
+type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
+
+async function generateEntityDetails(
   entityName: string,
 ): Promise<Response | null> {
   if (!config.OPENAI_API_KEY) return null;
 
-  const openai = new OpenAI({
-    apiKey: config.OPENAI_API_KEY,
-  });
+  const result = await getStructuredResponse(
+    generatePrompt(entityName),
+    OpenAIBottleDetailsSchema,
+  );
 
-  const completion = await openai.chat.completions.create({
-    model: MODEL,
-    messages: [
-      {
-        role: "user",
-        content: generatePrompt(entityName),
-      },
-    ],
-    temperature: 0,
-  });
-
-  const message = completion.choices[0].message.content;
-  if (!message) return null;
-
-  let result: Response;
-  try {
-    result = JSON.parse(message);
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
   if (result.confidence < 0.75)
     // idk
     return null;
@@ -92,7 +65,7 @@ export default async ({ entityId }: { entityId: number }) => {
     where: (entities, { eq }) => eq(entities.id, entityId),
   });
   if (!entity) throw new Error("Unknown entity");
-  const result = await generateEntityDescription(entity.name);
+  const result = await generateEntityDetails(entity.name);
 
   if (!result) return;
 

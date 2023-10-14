@@ -3,90 +3,59 @@ import { db } from "@peated/shared/db";
 import { bottles, changes } from "@peated/shared/db/schema";
 import { arraysEqual, objectsShallowEqual } from "@peated/shared/lib/equals";
 import { eq } from "drizzle-orm";
-import OpenAI from "openai";
+import { z } from "zod";
 import config from "~/config";
+import { getStructuredResponse } from "~/lib/openai";
 
 if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-const MODEL = "gpt-3.5-turbo";
-
 function generatePrompt(bottleName: string) {
   return `
-Pretend to be an expert in whiskey distillation.
+Pretend to be an expert in whiskey distillation. Tell me about the following whiskey:
 
-Given the whiskey below, create a valid JSON object.
+${bottleName}
 
-An example of the output we desire:
-{"description": "a description about the whiskey, with no more than 100 words",
- "tastingNotes": {
-  "nose": "tasting notes about the nose",
-  "palate": "tasting notes about the palate",
-  "finish": "tasting notes about the finish",
- },
- "suggestedTags": ["one", "two", "three", "four", "five"],
- "confidence": "a floating point number ranging from 0.0 to 1.0 describing your confidence in accuracy of this information"}
+If the whiskey is made in Scotland, it is always spelled "whisky".
 
-The description should focus on what is unique about this whiskey. It should not include the tasting notes.
+The description should focus on what is unique about this whiskey. It should not include the tasting notes. It should be less than 200 words.
 
-The tasting notes should be concise, and focus on the smell and taste.
+The tastingNotes should be concise, and focus on the smell and taste.
 
 The confidence rating should be 0 if you do believe this is not a real entity.
 The confidence rating should be 1 if you are absolutely certain this information is factual.
 
-The suggested tags should be five items that reflect the flavor of this whiskey the best, and should come from the following list:
+The suggestedTags should be five items that reflect the flavor of this whiskey the best, and should come from the following list:
 
 ${DEFAULT_TAGS.join("\n")}
 
-If the whiskey is made in Scotland, it is always spelled "whisky".
-
-The whiskey:
-${bottleName}
 `;
 }
 
-type Response = {
-  description: string;
-  tastingNotes: {
-    nose: string;
-    palate: string;
-    finish: string;
-  };
-  suggestedTags: string[];
-  confidence: number;
-};
+const OpenAIBottleDetailsSchema = z.object({
+  description: z.string(),
+  tastingNotes: z.object({
+    nose: z.string(),
+    palate: z.string(),
+    finish: z.string(),
+  }),
+  suggestedTags: z.array(z.string()),
+  confidence: z.number(),
+});
+
+type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
 
 async function generateBottleDetails(
   bottleName: string,
 ): Promise<Response | null> {
   if (!config.OPENAI_API_KEY) return null;
 
-  const openai = new OpenAI({
-    apiKey: config.OPENAI_API_KEY,
-  });
+  const result = await getStructuredResponse(
+    generatePrompt(bottleName),
+    OpenAIBottleDetailsSchema,
+  );
 
-  const completion = await openai.chat.completions.create({
-    model: MODEL,
-    messages: [
-      {
-        role: "user",
-        content: generatePrompt(bottleName),
-      },
-    ],
-    temperature: 0,
-  });
-
-  const message = completion.choices[0].message.content;
-  if (!message) return null;
-
-  let result: Response;
-  try {
-    result = JSON.parse(message);
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
   if (result.confidence < 0.75)
     // idk
     return null;
@@ -109,7 +78,8 @@ export default async function ({ bottleId }: { bottleId: number }) {
 
   if (
     result.tastingNotes &&
-    !objectsShallowEqual(result.tastingNotes, bottle.tastingNotes)
+    (!bottle.tastingNotes ||
+      !objectsShallowEqual(result.tastingNotes, bottle.tastingNotes))
   )
     data.tastingNotes = result.tastingNotes;
 

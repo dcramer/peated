@@ -38,6 +38,8 @@
     "typescript": "^5.2.2",
     "vite-tsconfig-paths": "^4.2.1",
     "vitest": "^0.34.6",
-    "vitest-mock-axios": "^0.1.0"
+    "vitest-mock-axios": "^0.1.0",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.21.4"
   }
 }
