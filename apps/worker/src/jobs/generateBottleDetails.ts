@@ -68,7 +68,7 @@ async function generateBottleDetails(
     OpenAIBottleDetailsSchema,
   );
 
-  if (result.confidence < 0.75)
+  if (!result || result.confidence < 0.75)
     // idk
     return null;
 
