@@ -7,7 +7,6 @@ on:
       - Test
     types:
       - completed
-on:
   workflow_call:
     outputs:
       force:
