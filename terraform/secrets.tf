@@ -117,3 +117,23 @@ data "google_secret_manager_secret_version" "faktory_password" {
 
   secret = google_secret_manager_secret.faktory_password.id
 }
+
+resource "google_secret_manager_secret" "api_access_token" {
+  secret_id = "api_access_token"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "api_access_token" {
+  secret_id  = google_secret_manager_secret.api_access_token.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.api_access_token]
+}
+
+data "google_secret_manager_secret_version" "api_access_token" {
+  provider = google-beta
+
+  secret = google_secret_manager_secret.api_access_token.id
+}

@@ -19,6 +19,7 @@ module "worker-service" {
     NODE_NO_WARNINGS = "1"
     # this is prob a bad idea
     OPENAI_API_KEY = data.google_secret_manager_secret_version.openai_api_key.secret_data
+    ACCESS_TOKEN   = data.google_secret_manager_secret_version.api_access_token.secret_data
     FAKTORY_URL    = "tcp://:${data.google_secret_manager_secret_version.faktory_password.secret_data}@${var.faktory_host}:7419"
   }
 
