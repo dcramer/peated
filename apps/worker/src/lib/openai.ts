@@ -49,12 +49,17 @@ export async function getStructuredResponse<T extends ZodSchema<any>>(
     );
     return zodSchema.parse(structuredResponse);
   } catch (err) {
-    logError(err, {
-      openai: {
-        usage: completion.usage,
-        prompt,
+    logError(
+      err,
+      {
+        openai: {
+          usage: completion.usage,
+        },
       },
-    });
+      {
+        "prompt.txt": prompt,
+      },
+    );
 
     return null;
   }
