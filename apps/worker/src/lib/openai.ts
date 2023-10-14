@@ -3,9 +3,9 @@ import { type z, type ZodSchema } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import config from "~/config";
 
-const DEFAULT_MODEL = "gpt-4";
-
 type Model = "gpt-3.5-turbo" | "gpt-4";
+
+const DEFAULT_MODEL: Model = "gpt-3.5-turbo";
 
 export async function getStructuredResponse<T extends ZodSchema<any>>(
   prompt: string,
