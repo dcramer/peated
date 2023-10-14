@@ -8,9 +8,11 @@ on:
     types:
       - completed
   workflow_call:
-    outputs:
+    inputs:
       force:
-        value: ${{ jobs.deploy.outputs.force }}
+        description: "Force deploy to all services"
+        default: true
+        type: boolean
 env:
   REGION: us-central1
   PROJECT_ID: cask-382601
@@ -189,7 +191,7 @@ jobs:
               - apps/api/migrations/**.sql
 
       - name: Run Migrations
-        if: ${{ jobs.deploy.outputs.force || steps.changed-files-yaml.outputs.migrations_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.migrations_any_changed == 'true' }}
         run: |-
           gcloud run jobs update migrate-database \
             --region ${{ env.REGION }} \
@@ -199,19 +201,19 @@ jobs:
             --wait
 
       - name: "Deploy API"
-        if: ${{ jobs.deploy.outputs.force || steps.changed-files-yaml.outputs.api_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.api_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/api api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
           kubectl rollout status deployment/api
 
       - name: "Deploy Web"
-        if: ${{ jobs.deploy.outputs.force || steps.changed-files-yaml.outputs.web_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.web_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/web web="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
           kubectl rollout status deployment/web
 
       - name: "Deploy Worker"
-        if: ${{ jobs.deploy.outputs.force || steps.changed-files-yaml.outputs.worker_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.worker_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/worker worker="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}"
           kubectl rollout status deployment/worker
