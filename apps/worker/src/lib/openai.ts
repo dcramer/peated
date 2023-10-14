@@ -52,8 +52,8 @@ export async function getStructuredResponse<T extends ZodSchema<any>>(
     logError(
       err,
       {
-        openai: {
-          usage: completion.usage,
+        openAiUsage: {
+          ...completion.usage,
         },
       },
       {
