@@ -53,6 +53,7 @@ import listUserCollectionBottles from "./listUserCollectionBottles";
 import listUserCollections from "./listUserCollections";
 import listUserTags from "./listUserTags";
 import listUsers from "./listUsers";
+import mergeEntity from "./mergeEntity";
 import updateBottle from "./updateBottle";
 import updateEntity from "./updateEntity";
 import updateNotification from "./updateNotification";
@@ -114,6 +115,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(addEntity);
   fastify.route(getEntity);
   fastify.route(updateEntity);
+  fastify.route(mergeEntity);
 
   fastify.route(listEntityCategories);
 

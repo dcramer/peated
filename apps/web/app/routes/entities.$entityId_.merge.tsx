@@ -8,33 +8,27 @@ import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
 
-import { toTitleCase } from "@peated/shared/lib/strings";
-import { EntityInputSchema } from "@peated/shared/schemas";
-import CountryField from "~/components/countryField";
+import { EntityMergeSchema } from "@peated/shared/schemas";
+import type { Entity } from "@peated/shared/types";
+import { useState } from "react";
+import ChoiceField from "~/components/choiceField";
+import EntityField from "~/components/entityField";
 import Fieldset from "~/components/fieldset";
 import Form from "~/components/form";
 import FormError from "~/components/formError";
 import FormHeader from "~/components/formHeader";
 import Header from "~/components/header";
 import Layout from "~/components/layout";
-import SelectField from "~/components/selectField";
 import Spinner from "~/components/spinner";
-import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
 import { getEntity } from "~/queries/entities";
 
-const entityTypes = [
-  { id: "brand", name: "Brand" },
-  { id: "distiller", name: "Distiller" },
-  { id: "bottler", name: "Bottler" },
-];
-
-type FormSchemaType = z.infer<typeof EntityInputSchema>;
+type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Edit Entity",
+      title: "Merge Entity",
     },
   ];
 };
@@ -53,36 +47,39 @@ export default function EditEntity() {
   const { entity } = useLoaderData<typeof loader>();
   const { entityId } = useParams();
 
+  const [otherEntityName, setOtherEntityName] = useState<string>("Other");
+
   // TODO: move to queries
-  const saveEntity = useMutation({
-    mutationFn: async (data: FormSchemaType) => {
-      return await api.put(`/entities/${entityId}`, {
+  const mergeEntity = useMutation({
+    mutationFn: async (
+      data: FormSchemaType,
+    ): Promise<[FormSchemaType, Entity]> => {
+      const newEntity = await api.post(`/entities/${entityId}/merge`, {
         data,
       });
+      return [data, newEntity];
     },
-    onSuccess: (newEntity) => {
-      queryClient.setQueryData(["entities", entityId], newEntity);
+    onSuccess: ([data, newEntity]) => {
+      queryClient.invalidateQueries(["entities", data.entityId]);
+      queryClient.invalidateQueries(["entities", entityId]);
+      queryClient.setQueryData(["entities", newEntity.id], newEntity);
     },
   });
 
   const {
     control,
-    register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(EntityInputSchema),
+    resolver: zodResolver(EntityMergeSchema),
     defaultValues: {
-      name: entity.name,
-      country: entity.country,
-      region: entity.region,
-      type: entity.type,
+      direction: "mergeInto",
     },
   });
 
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    await saveEntity.mutateAsync(data, {
-      onSuccess: () => navigate(`/entities/${entityId}`),
+    await mergeEntity.mutateAsync(data, {
+      onSuccess: ([_, newEntity]) => navigate(`/entities/${newEntity.id}`),
     });
   };
 
@@ -91,9 +88,10 @@ export default function EditEntity() {
       header={
         <Header>
           <FormHeader
-            title="Edit Entity"
+            title="Merge Entity"
             saveDisabled={isSubmitting}
             onSave={handleSubmit(onSubmit)}
+            saveLabel="Continue"
           />
         </Header>
       }
@@ -107,54 +105,48 @@ export default function EditEntity() {
       )}
 
       <Form onSubmit={handleSubmit(onSubmit)}>
-        {saveEntity.isError && (
-          <FormError values={[(saveEntity.error as Error).message]} />
+        {mergeEntity.isError && (
+          <FormError values={[(mergeEntity.error as Error).message]} />
         )}
 
         <Fieldset>
-          <TextField
-            {...register("name")}
-            error={errors.name}
-            autoFocus
-            label="Name"
-            type="text"
-            placeholder="e.g. Macallan"
-            required
-            autoComplete="off"
-          />
-          <CountryField
-            control={control}
-            name="country"
-            error={errors.country}
-            label="Country"
-            placeholder="e.g. Scotland, United States of America"
-            required
-          />
-          <TextField
-            {...register("region")}
-            error={errors.region}
-            label="Region"
-            type="text"
-            placeholder="e.g. Islay, Kentucky"
-            autoComplete="off"
-          />
           <Controller
-            name="type"
+            name="entityId"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
+              <EntityField
                 {...field}
-                label="Type"
-                onChange={(value) => onChange(value.map((t: any) => t.id))}
-                value={value?.map((t) => ({
-                  id: t,
-                  name: toTitleCase(t),
-                }))}
-                options={entityTypes}
-                simple
-                multiple
+                error={errors.entityId}
+                label="Other Entity"
+                helpText="The brand, or main label of the bottle."
+                placeholder="e.g. Angel's Envy, Hibiki"
+                required
+                onChange={(value) => {
+                  onChange(value?.id);
+                  setOtherEntityName(value?.name || "Other");
+                }}
+                onResults={(results) => {
+                  return results.filter((r) => r.id !== entity.id);
+                }}
               />
             )}
+          />
+          <ChoiceField
+            control={control}
+            name="direction"
+            label="Direction"
+            required
+            choices={[
+              {
+                id: "mergeInto",
+                name: `Merge "${otherEntityName}" into "${entity.name}"`,
+              },
+              {
+                id: "mergeFrom",
+                name: `Merge "${entity.name}" into "${otherEntityName}"`,
+              },
+            ]}
+            error={errors.direction}
           />
         </Fieldset>
       </Form>

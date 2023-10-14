@@ -13,27 +13,13 @@ import Header from "../header";
 import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";
 import CreateOptionDialog from "./createOptionDialog";
+import { filterDupes } from "./helpers";
 import type { CreateOptionForm, EndpointOptions, OnResults } from "./types";
 
 export type Option = {
   id?: string | number | null;
   name: string;
   [key: string]: any;
-};
-
-const filterDupes = (firstList: Option[], ...moreLists: Option[][]) => {
-  const results: Option[] = [...firstList];
-  const matches = new Set(firstList.map((i) => `${i.id}-${i.name}`));
-
-  moreLists.forEach((options) => {
-    options.forEach((i) => {
-      if (!matches.has(`${i.id}-${i.name}`)) {
-        results.push(i);
-        matches.add(`${i.id}-${i.name}`);
-      }
-    });
-  });
-  return results;
 };
 
 export default ({

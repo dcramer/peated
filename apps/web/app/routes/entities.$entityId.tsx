@@ -180,6 +180,9 @@ export default function EntityDetails() {
                   <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
                     Edit Entity
                   </Menu.Item>
+                  <Menu.Item as={Link} to={`/entities/${entity.id}/merge`}>
+                    Merge Entity
+                  </Menu.Item>
                 </Menu.Items>
               </Menu>
             )}

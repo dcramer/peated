@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import Chip from "../chip";
 import FormField from "../formField";
+import { filterDupes } from "./helpers";
 import SelectDialog from "./selectDialog";
 import type {
   CreateOptionForm,
@@ -11,21 +12,6 @@ import type {
   OnResults,
   Option,
 } from "./types";
-
-const filterDupes = (firstList: Option[], ...moreLists: Option[][]) => {
-  const results: Option[] = [...firstList];
-  const matches = new Set(firstList.map((i) => `${i.id}-${i.name}`));
-
-  moreLists.forEach((options) => {
-    options.forEach((i) => {
-      if (!matches.has(`${i.id}-${i.name}`)) {
-        results.push(i);
-        matches.add(`${i.id}-${i.name}`);
-      }
-    });
-  });
-  return results;
-};
 
 type BaseProps = {
   name?: string;
