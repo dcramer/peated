@@ -66,7 +66,7 @@ export default {
       ).map((t) => [t.tag, t.total]),
     );
 
-    const results = shuffle([...DEFAULT_TAGS])
+    const results = shuffle(DEFAULT_TAGS)
       .map((t) => ({
         tag: t,
         count: usedTags[t] || 0,

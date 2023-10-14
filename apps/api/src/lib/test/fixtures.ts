@@ -184,7 +184,7 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
       .values({
         notes: faker.lorem.sentence(),
         rating: faker.number.float({ min: 1, max: 5 }),
-        tags: sample([...DEFAULT_TAGS], random(1, 5)),
+        tags: sample(DEFAULT_TAGS, random(1, 5)),
         ...data,
         bottleId: data.bottleId || (await Bottle()).id,
         createdById: data.createdById || (await User()).id,

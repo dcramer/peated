@@ -7,7 +7,7 @@ export function choose<T>(choices: T[]): T {
   return choices[index];
 }
 
-export function sample<T>(choices: T[], num: number): T[] {
+export function sample<T>(choices: T[] | readonly T[], num: number): T[] {
   const samples = [...choices];
   const length = choices.length;
   num = Math.max(Math.min(num, length), 0);
@@ -21,7 +21,7 @@ export function sample<T>(choices: T[], num: number): T[] {
   return samples.slice(0, num);
 }
 
-export function shuffle<T>(choices: T[]): T[] {
+export function shuffle<T>(choices: T[] | readonly T[]): T[] {
   const value = [...choices];
   let currentIndex = choices.length,
     randomIndex;
