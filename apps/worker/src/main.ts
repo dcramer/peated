@@ -108,10 +108,12 @@ async function main() {
 
   const worker = await faktory.work().catch((error) => {
     console.error(`worker failed to start: ${error}`);
+    Sentry.captureException(error);
     process.exit(1);
   });
 
   worker.on("fail", ({ job, error }) => {
+    console.error(error);
     Sentry.captureException(error, {
       extra: {
         job: job.jid,

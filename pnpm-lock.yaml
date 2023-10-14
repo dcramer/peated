@@ -479,6 +479,12 @@ importers:
       vitest-mock-axios:
         specifier: ^0.1.0
         version: 0.1.0
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+      zod-to-json-schema:
+        specifier: ^3.21.4
+        version: 3.21.4(zod@3.22.4)
 
   packages/design:
     dependencies:
