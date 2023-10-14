@@ -97,56 +97,56 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
         termination_grace_period_seconds = 10
         share_process_namespace          = true
 
-        container {
-          name              = "config-watcher"
-          image             = "busybox"
-          image_pull_policy = "IfNotPresent"
-          command = [
-            "sh",
-            "-c",
-            <<EOT
-            sum() {
-                current=$(find /conf -type f -exec md5sum {} \; | sort -k 2 | md5sum)
-              }
-              sum
-              last=\"$current\"
-              while true; do
-                sum
-                if [ \"$current\" != \"$last\" ]; then
-                  pid=$(pidof faktory)
-                  echo \"$(date -Iseconds) [conf.d] changes detected - signaling Faktory with pid=$pid\"
-                  kill -HUP \"$pid\"
-                  last=\"$current\"
-                fi
-                sleep 1
-              done
-            EOT
-          ]
+        # container {
+        #   name              = "config-watcher"
+        #   image             = "busybox"
+        #   image_pull_policy = "IfNotPresent"
+        #   command = [
+        #     "sh",
+        #     "-c",
+        #     <<EOT
+        #     sum() {
+        #         current=$(find /conf -type f -exec md5sum {} \; | sort -k 2 | md5sum)
+        #       }
+        #       sum
+        #       last=\"$current\"
+        #       while true; do
+        #         sum
+        #         if [ \"$current\" != \"$last\" ]; then
+        #           pid=$(pidof faktory)
+        #           echo \"$(date -Iseconds) [conf.d] changes detected - signaling Faktory with pid=$pid\"
+        #           kill -HUP \"$pid\"
+        #           last=\"$current\"
+        #         fi
+        #         sleep 1
+        #       done
+        #     EOT
+        #   ]
 
-          args = [
-            "--volume-dir=/etc/config",
-            "--webhook-url=http://localhost:9090/-/reload",
-          ]
+        #   args = [
+        #     "--volume-dir=/etc/config",
+        #     "--webhook-url=http://localhost:9090/-/reload",
+        #   ]
 
-          volume_mount {
-            name       = "configs"
-            mount_path = "/conf"
-          }
+        #   volume_mount {
+        #     name       = "configs"
+        #     mount_path = "/conf"
+        #   }
 
-          security_context {
-            allow_privilege_escalation = false
-            privileged                 = false
-            read_only_root_filesystem  = false
-            run_as_non_root            = false
+        #   security_context {
+        #     allow_privilege_escalation = false
+        #     privileged                 = false
+        #     read_only_root_filesystem  = false
+        #     run_as_non_root            = false
 
-            capabilities {
-              add = []
-              drop = [
-                "NET_RAW"
-              ]
-            }
-          }
-        }
+        #     capabilities {
+        #       add = []
+        #       drop = [
+        #         "NET_RAW"
+        #       ]
+        #     }
+        #   }
+        # }
 
         container {
           name              = "server"
