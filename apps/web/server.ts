@@ -20,7 +20,6 @@ import * as Sentry from "@sentry/remix";
 Sentry.init({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
-  debug: config.DEBUG,
   tracesSampleRate: 1.0,
   integrations: [
     new Sentry.Integrations.Http({ tracing: true }),

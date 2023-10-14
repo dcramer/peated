@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import BooleanField from "~/components/booleanField";
 import Fieldset from "~/components/fieldset";
+import Form from "~/components/form";
 import FormError from "~/components/formError";
 import FormHeader from "~/components/formHeader";
 import Header from "~/components/header";
@@ -114,10 +115,7 @@ export default function Settings() {
         </Header>
       }
     >
-      <form
-        className="self-center bg-slate-950 pb-6 sm:mx-16 sm:my-6"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <Form onSubmit={handleSubmit(onSubmit)}>
         {saveUser.isError && (
           <FormError values={[(saveUser.error as Error).message]} />
         )}
@@ -149,7 +147,7 @@ export default function Settings() {
             defaultValue={user.private}
           />
         </Fieldset>
-      </form>
+      </Form>
     </Layout>
   );
 }

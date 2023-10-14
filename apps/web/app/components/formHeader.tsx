@@ -10,11 +10,13 @@ export default function FormHeader({
   subtitle,
   icon,
   saveDisabled = false,
+  saveLabel = "Save",
 }: {
   title: string;
   subtitle?: string | undefined | null;
   icon?: ReactNode;
   saveDisabled?: boolean;
+  saveLabel?: string;
   onClose?: () => void;
   onSave: (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => void;
 }) {
@@ -62,7 +64,7 @@ export default function FormHeader({
                 : "group-hover:text-highlight focus-visible:outline-peatedt bg-slate-950 text-white",
             )}
           >
-            Save
+            {saveLabel}
           </span>
         </button>
       </div>

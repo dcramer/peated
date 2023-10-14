@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
+import { type ComponentPropsWithoutRef } from "react";
 
-export default ({ children }: { children: ReactNode }) => {
-  return <div className="relative space-y-1">{children}</div>;
-};
+export default (props: ComponentPropsWithoutRef<"fieldset">) => (
+  <fieldset className="relative space-y-1" {...props} />
+);

@@ -1,9 +1,11 @@
+import * as Sentry from "@sentry/node-experimental";
+import { ProfilingIntegration } from "@sentry/profiling-node";
 import config from "./config";
 
-import { initSentry } from "./instruments";
-
-initSentry({
+Sentry.init({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
-  debug: config.DEBUG,
+  tracesSampleRate: 1.0,
+  profilesSampleRate: 1.0,
+  integrations: [new ProfilingIntegration()],
 });

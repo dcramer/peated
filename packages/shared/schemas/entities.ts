@@ -29,3 +29,8 @@ export const EntitySchema = z.object({
   createdAt: z.string().datetime().optional(),
   createdBy: UserSchema.optional(),
 });
+
+export const EntityMergeSchema = z.object({
+  entityId: z.number(),
+  direction: z.enum(["mergeInto", "mergeFrom"]),
+});

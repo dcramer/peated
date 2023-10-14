@@ -20,6 +20,7 @@ import config from "~/config";
 import { ApiError } from "~/lib/api";
 import { logError } from "~/lib/log";
 import { formatCategoryName } from "~/lib/strings";
+import Form from "./form";
 import Header from "./header";
 import Spinner from "./spinner";
 
@@ -111,10 +112,7 @@ export default function BottleForm({
         </div>
       )}
 
-      <form
-        className="self-center bg-slate-950 pb-6 sm:mx-16 sm:my-6"
-        onSubmit={handleSubmit(onSubmitHandler)}
-      >
+      <Form onSubmit={handleSubmit(onSubmitHandler)}>
         {error && <FormError values={[error]} />}
 
         <div className="border border-slate-700 p-3 sm:my-4 sm:p-4">
@@ -261,7 +259,7 @@ export default function BottleForm({
             )}
           />
         </Fieldset>
-      </form>
+      </Form>
     </Layout>
   );
 }
