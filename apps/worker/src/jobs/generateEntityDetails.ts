@@ -23,7 +23,7 @@ If the entity is located in Scotland, spell wihskey as "whisky".
 
 Describe the entity as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as a "entity".
 
-The description should focus on the history & origin, and what makes it different from competitors, and be no more than 200 words.
+The description should focus on the history & origin, and what makes it different from competitors. It should be less than 200 words, and structured as paragraphs with prose.
 
 The yearEstablished should be the year in which the entity was established.
 
@@ -32,8 +32,7 @@ The region should be the region of the country where the entity is located, if k
 
 The type should describe if the entity is a distiller, a bottler or brand. It can be all three, but it must be at least one. If you are unsure lower your confidence rating. If the entity is a distiller and not a brand, identify an example brand and put it in the aiNotes field.
 
-The confidence rating should be 0 if you do believe this is not a real entity.
-The confidence rating should be 1 if you are absolutely certain this information is factual.
+The confidence rating should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set. 
 
 If there are any issues, are you are not confident in the accuracy, please also put that information in aiNotes. Do not fill in any field you are not very confient in.
 `;

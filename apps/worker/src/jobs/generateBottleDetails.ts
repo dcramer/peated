@@ -20,16 +20,17 @@ ${bottleName}
 
 If the whiskey is made in Scotland, it is always spelled "whisky".
 
-The description should focus on what is unique about this whiskey. It should not include the tasting notes. It should be less than 200 words.
+The description should focus on what is unique about this whiskey. It should not include the tasting notes. It should be less than 200 words, and structured as paragraphs with prose.
 
 The tastingNotes should be concise, and focus on the smell and taste.
 
 The statedAge should be the number of years the whiskey has been aged in barrels, if applicable.
 
-The confidence rating should be 0 if you do believe this is not a real entity.
-The confidence rating should be 1 if you are absolutely certain this information is factual.
+The confidence rating should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set. 
 
-The suggestedTags should be up to five items that reflect the flavor of this whiskey the best. Any value in suggestedTags MUST be already present in the values of the json schema.
+The suggestedTags should be up to five items that reflect the flavor of this whiskey the best. Suggested tags should only use values from the following:
+
+${DEFAULT_TAGS.join("\n")}
 
 If there are any issues, are you are not confident in the accuracy, please also put that information in aiNotes. Do not fill in any field you are not very confient in.
 
@@ -50,7 +51,7 @@ const OpenAIBottleDetailsSchema = z.object({
     .optional(),
   category: CategoryEnum.nullable().optional(),
   statedAge: z.number().nullable().optional(),
-  suggestedTags: z.array(DefaultTagEnum).optional(),
+  suggestedTags: z.array(z.string()).optional(),
   confidence: z.number().default(0).optional(),
   aiNotes: z.string().nullable().optional(),
 });
