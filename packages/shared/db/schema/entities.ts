@@ -4,6 +4,7 @@ import {
   bigserial,
   pgEnum,
   pgTable,
+  smallint,
   text,
   timestamp,
   uniqueIndex,
@@ -33,6 +34,7 @@ export const entities = pgTable(
     type: entityTypeEnum("type").array().notNull(),
 
     description: text("description"),
+    yearEstablished: smallint("year_established"),
 
     location: geography("location"),
 

@@ -414,6 +414,13 @@
       "when": 1697249122134,
       "tag": "0058_slimy_dracula",
       "breakpoints": false
+    },
+    {
+      "idx": 59,
+      "version": "5",
+      "when": 1697304544091,
+      "tag": "0059_living_wiccan",
+      "breakpoints": false
     }
   ]
 }

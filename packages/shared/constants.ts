@@ -1,3 +1,5 @@
+export const DEFAULT_CREATED_BY_ID = 1;
+
 export const MAX_FILESIZE = 1048576 * 20;
 
 export const XP_PER_LEVEL = 5;

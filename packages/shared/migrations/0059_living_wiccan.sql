@@ -1,0 +1,1 @@
+ALTER TABLE "entity" ADD COLUMN "year_established" smallint;

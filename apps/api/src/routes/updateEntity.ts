@@ -4,21 +4,13 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
-import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
-
 import { db } from "@peated/shared/db";
 import type { Entity } from "@peated/shared/db/schema";
 import { changes, entities } from "@peated/shared/db/schema";
 import pushJob from "@peated/shared/jobs";
+import { arraysEqual } from "@peated/shared/lib/equals";
+import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
 import { requireMod } from "../middleware/auth";
-
-function arraysEqual<T>(one: T[], two: T[]) {
-  if (one.length !== two.length) return false;
-  for (let i = 0; i < one.length; i++) {
-    if (one[i] !== two[i]) return false;
-  }
-  return true;
-}
 
 export default {
   method: "PUT",
