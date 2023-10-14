@@ -88,7 +88,6 @@
     "usehooks-ts": "^2.9.1",
     "zod": "^3.22.4"
   },
-  "proxy": "http://localhost:4000",
   "watch": {
     "assets": {
       "patterns": [

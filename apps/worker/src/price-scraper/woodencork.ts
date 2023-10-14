@@ -5,8 +5,8 @@ import {
   normalizeBottleName,
   normalizeVolume,
 } from "@peated/shared/lib/normalize";
-import type { StorePrice } from "../api";
-import { submitStorePrices } from "../api";
+import type { StorePrice } from "../lib/api";
+import { submitStorePrices } from "../lib/api";
 import { absoluteUrl, chunked, parsePrice } from "./utils";
 
 function extractVolume(name: string) {

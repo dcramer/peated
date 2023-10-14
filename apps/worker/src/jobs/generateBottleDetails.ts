@@ -1,12 +1,12 @@
+import { db } from "@peated/shared/db";
+import { bottles } from "@peated/shared/db/schema";
+import { eq } from "drizzle-orm";
 import OpenAI from "openai";
-
 import config from "~/config";
 
 if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
-
-const UNKNOWN_BOTTLE_MARKER = "UNKNOWN_BOTTLE_MARKER";
 
 const MODEL = "gpt-3.5-turbo";
 
@@ -44,7 +44,7 @@ type Response = {
   confidence: number;
 };
 
-export default async function generateBottleDescription(
+async function generateBottleDetails(
   bottleName: string,
 ): Promise<Response | null> {
   if (!config.OPENAI_API_KEY) return null;
@@ -79,4 +79,19 @@ export default async function generateBottleDescription(
     return null;
 
   return result;
+}
+
+export default async function ({ bottleId }: { bottleId: number }) {
+  const bottle = await db.query.bottles.findFirst({
+    where: (bottles, { eq }) => eq(bottles.id, bottleId),
+  });
+  if (!bottle) throw new Error("Unknown bottle");
+  const result = await generateBottleDetails(bottle.fullName);
+  await db
+    .update(bottles)
+    .set({
+      description: result?.description || null,
+      tastingNotes: result?.tastingNotes || null,
+    })
+    .where(eq(bottles.id, bottle.id));
 }

@@ -1,5 +1,5 @@
 import { open } from "fs/promises";
-import { submitBottle, submitEntity } from "./api";
+import { submitBottle, submitEntity } from "../lib/api";
 
 const importJson = async (
   filename: string,
