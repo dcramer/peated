@@ -39,6 +39,17 @@ export default function About() {
             <a href={config.DISCORD_LINK}>Discord server</a> is available if you
             want to contribute.
           </p>
+
+          <p>
+            Peated is running version{" "}
+            {config.VERSION ? (
+              <a href={`${config.GITHUB_REPO}/commit/${config.VERSION}`}>
+                {config.VERSION}
+              </a>
+            ) : (
+              <em>an unknown version</em>
+            )}
+          </p>
         </div>
         <div className="hidden w-3/12 sm:block">
           <div className="prose py-6 text-center">
