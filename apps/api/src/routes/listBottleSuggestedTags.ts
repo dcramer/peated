@@ -1,3 +1,4 @@
+import { DEFAULT_TAGS } from "@peated/shared/constants";
 import { db } from "@peated/shared/db";
 import { bottleTags, bottles } from "@peated/shared/db/schema";
 import { desc, eq, or, sql } from "drizzle-orm";
@@ -6,7 +7,6 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { shuffle } from "../lib/rand";
-import { defaultTags } from "../lib/tags";
 
 export default {
   method: "GET",
@@ -66,7 +66,7 @@ export default {
       ).map((t) => [t.tag, t.total]),
     );
 
-    const results = shuffle(defaultTags)
+    const results = shuffle(DEFAULT_TAGS)
       .map((t) => ({
         tag: t,
         count: usedTags[t] || 0,

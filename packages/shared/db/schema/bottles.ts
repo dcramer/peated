@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
@@ -40,7 +40,11 @@ export const bottles = pgTable(
     statedAge: smallint("stated_age"),
 
     description: text("description"),
-    tastingNotes: jsonb("config").$type<TastingNotes>(),
+    tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
+    suggestedTags: varchar("suggested_tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
 
     avgRating: doublePrecision("avg_rating"),
     totalTastings: bigint("total_tastings", { mode: "number" })

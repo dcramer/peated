@@ -4,7 +4,7 @@ import path from "path";
 
 import { toTitleCase } from "@peated/shared/lib/strings";
 
-import { CATEGORY_LIST } from "@peated/shared/constants";
+import { CATEGORY_LIST, DEFAULT_TAGS } from "@peated/shared/constants";
 import { db } from "@peated/shared/db";
 import type {
   Entity as EntityType,
@@ -43,7 +43,6 @@ import { eq, sql } from "drizzle-orm";
 import { generatePublicId } from "~/lib/publicId";
 import { createAccessToken } from "../auth";
 import { choose, random, sample } from "../rand";
-import { defaultTags } from "../tags";
 
 export const User = async ({ ...data }: Partial<NewUser> = {}) => {
   return (
@@ -185,7 +184,7 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
       .values({
         notes: faker.lorem.sentence(),
         rating: faker.number.float({ min: 1, max: 5 }),
-        tags: sample(defaultTags, random(1, 5)),
+        tags: sample(DEFAULT_TAGS, random(1, 5)),
         ...data,
         bottleId: data.bottleId || (await Bottle()).id,
         createdById: data.createdById || (await User()).id,

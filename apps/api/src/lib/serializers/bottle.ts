@@ -121,6 +121,7 @@ export const BottleSerializer: Serializer<Bottle> = {
       bottler: attrs.bottler,
       avgRating: item.avgRating,
       totalTastings: item.totalTastings,
+      suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,
       hasTasted: attrs.hasTasted,
     };

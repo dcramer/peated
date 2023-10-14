@@ -1,3 +1,4 @@
+import { DEFAULT_TAGS } from "@peated/shared/constants";
 import { db } from "@peated/shared/db";
 import { bottles } from "@peated/shared/db/schema";
 import { eq } from "drizzle-orm";
@@ -21,11 +22,16 @@ An example of the output we desire:
  "tastingNotes": {
   "nose": "tasting notes about the nose",
   "palate": "tasting notes about the palate",
-  "finish": "tasting notes about the finish"},
-  "confidence": "a floating point number ranging from 0 to 1 describing your confidence in accuracy of this information"}
+  "finish": "tasting notes about the finish",
+ },
+ "suggestedTags": ["one", "two", "three", "four", "five"],
+ "confidence": "a floating point number ranging from 0 to 1 describing your confidence in accuracy of this information"}
 
 The description should focus on what is unique about this whiskey. It should not include the tasting notes.
 The tasting notes should be concise, and focus on the smell and taste.
+The suggested tags should be five items that reflect the flavor of this whiskey the best, and should come from the following list:
+
+${DEFAULT_TAGS.join("\n")}
 
 If the whiskey is made in Scotland, it is always spelled "whisky".
 
@@ -41,6 +47,7 @@ type Response = {
     palate: string;
     finish: string;
   };
+  suggestedTags: string[];
   confidence: number;
 };
 
@@ -92,6 +99,7 @@ export default async function ({ bottleId }: { bottleId: number }) {
     .set({
       description: result?.description || null,
       tastingNotes: result?.tastingNotes || null,
+      suggestedTags: result?.suggestedTags || [],
     })
     .where(eq(bottles.id, bottle.id));
 }

@@ -278,7 +278,8 @@ export default {
     if (
       newBottle.fullName !== bottle.fullName ||
       !newBottle.description ||
-      !newBottle.tastingNotes
+      !newBottle.tastingNotes ||
+      newBottle.suggestedTags.length === 0
     )
       await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
 

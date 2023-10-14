@@ -18,6 +18,7 @@ export const BottleSchema = z.object({
     })
     .nullable()
     .optional(),
+  suggestedTags: z.array(z.string()).optional(),
   brand: EntitySchema,
   distillers: z.array(EntitySchema),
   bottler: EntitySchema.nullable(),
