@@ -40,9 +40,11 @@ export const BottleSerializer: Serializer<Bottle> = {
       .from(entities)
       .where(inArray(entities.id, entityIds));
     const entitiesById = Object.fromEntries(
-      (await serialize(EntitySerializer, entityList, currentUser)).map(
-        (data, index) => [entityList[index].id, data],
-      ),
+      (
+        await serialize(EntitySerializer, entityList, currentUser, [
+          "description",
+        ])
+      ).map((data, index) => [entityList[index].id, data]),
     );
 
     const distillersByBottleId: {

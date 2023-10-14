@@ -195,6 +195,7 @@ export default {
         BottleSerializer,
         results.slice(0, limit).map((r) => r.bottles),
         req.user,
+        ["description", "tastingNotes"],
       ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
