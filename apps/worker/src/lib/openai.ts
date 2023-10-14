@@ -5,7 +5,7 @@ import config from "~/config";
 
 type Model = "gpt-3.5-turbo" | "gpt-4";
 
-const DEFAULT_MODEL: Model = "gpt-3.5-turbo";
+const DEFAULT_MODEL: Model = "gpt-4";
 
 export async function getStructuredResponse<T extends ZodSchema<any>>(
   prompt: string,
@@ -40,9 +40,13 @@ export async function getStructuredResponse<T extends ZodSchema<any>>(
     temperature: 0,
   });
 
+  // TODO: handle errors and bubble useful context to Sentry
   const structuredResponse = JSON.parse(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     completion.choices[0].message!.function_call!.arguments!,
   );
-  return zodSchema.parse(structuredResponse);
+  const result = zodSchema.parse(structuredResponse);
+
+  console.log({ result });
+  return result;
 }

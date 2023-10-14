@@ -2,7 +2,7 @@ import { DEFAULT_CREATED_BY_ID } from "@peated/shared/constants";
 import { db } from "@peated/shared/db";
 import { changes, entities } from "@peated/shared/db/schema";
 import { arraysEqual } from "@peated/shared/lib/equals";
-import { EntityTypeEnum } from "@peated/shared/schemas";
+import { CountryEnum, EntityTypeEnum } from "@peated/shared/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -27,18 +27,26 @@ The description should focus on the history & origin, and what makes it differen
 
 The yearEstablished should be the year in which the entity was established.
 
-The type should describe if the entity is a distiller, a bottler or brand. It can be all three, but it must be at least one. If you are unsure lower your confidence rating.
+The country should be where the entity is located, if known.
+The region should be the region of the country where the entity is located, if known. Examples of regions might be "Speyside" or "Islay".
+
+The type should describe if the entity is a distiller, a bottler or brand. It can be all three, but it must be at least one. If you are unsure lower your confidence rating. If the entity is a distiller and not a brand, identify an example brand and put it in the aiNotes field.
 
 The confidence rating should be 0 if you do believe this is not a real entity.
 The confidence rating should be 1 if you are absolutely certain this information is factual.
+
+If there are any issues, are you are not confident in the accuracy, please also put that information in aiNotes. Do not fill in any field you are not very confient in.
 `;
 }
 
 const OpenAIBottleDetailsSchema = z.object({
   description: z.string().nullable(),
   yearEstablished: z.number().nullable(),
+  country: CountryEnum.nullable(),
+  region: z.string().nullable(),
   confidence: z.number(),
   type: z.array(EntityTypeEnum),
+  aiNotes: z.string().nullable(),
 });
 
 type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
@@ -84,6 +92,12 @@ export default async ({ entityId }: { entityId: number }) => {
     !arraysEqual(result.type.sort(), entity.type.sort())
   )
     data.type = result.type;
+
+  if (result.country && result.country !== entity.country)
+    data.country = result.country;
+
+  if (result.region && result.region !== entity.region)
+    data.region = result.region;
 
   if (Object.keys(data).length === 0) return;
 
