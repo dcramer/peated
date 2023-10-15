@@ -21,7 +21,6 @@ jobs:
     name: 🚀 Build
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     runs-on: ubuntu-latest
     permissions:
       contents: "read"
@@ -136,7 +135,6 @@ jobs:
     name: 🚀 Deploy
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     runs-on: ubuntu-latest
     needs: [build]
     permissions:
