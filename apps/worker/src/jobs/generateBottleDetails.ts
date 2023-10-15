@@ -34,11 +34,11 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 
 'category' should be one of the following:
 
-${CATEGORY_LIST.join("\n")}
+- ${CATEGORY_LIST.join("\n- ")}
 
-'suggestedTags' should be up to five items that reflect the flavor of this whiskey the best. Suggested tags should only use values from the following:
+'suggestedTags' should be up to five items that reflect the flavor of this whiskey the best. The following are valid values for 'suggestedTags':
 
-${DEFAULT_TAGS.join("\n")}
+- ${DEFAULT_TAGS.join("\n- ")}
 
 If there are any issues, are you are not confident in the accuracy, please also put that information in aiNotes. Do not fill in any field you are not very confient in.`;
 }
