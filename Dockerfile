@@ -35,12 +35,14 @@ FROM base-env AS build
 WORKDIR /app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 ADD . .
+
+# needs bound before build
+ARG VERSION
+ENV VERSION $VERSION
+
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
     pnpm build
-
-ARG VERSION
-ENV VERSION $VERSION
 
 RUN echo $VERSION > VERSION
 
