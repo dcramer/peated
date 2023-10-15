@@ -5,7 +5,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest --single-thread",
-    "test:ci": "vitest --no-threads --coverage"
+    "test:ci": "vitest --no-threads --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
   },
   "files": [
     "db",
