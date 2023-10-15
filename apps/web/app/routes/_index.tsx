@@ -1,11 +1,17 @@
 import { Link, useLocation } from "@remix-run/react";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import {
+  dehydrate,
+  QueryClient,
+  useInfiniteQuery,
+  useQuery,
+} from "@tanstack/react-query";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 
 import type { Paginated } from "@peated/shared/types";
 
 import type { Tasting } from "@peated/shared/types";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import Glyph from "~/components/assets/Glyph";
 import BetaNotice from "~/components/betaNotice";
 import { ClientOnly } from "~/components/clientOnly";
@@ -49,13 +55,12 @@ const ActivityContent = ({ filter }: { filter: string }) => {
   const api = useApi();
 
   const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
-    useInfiniteQuery(
-      ["tastings", { filter }],
-      ({ pageParam }) => getTastings({ pageParam, api }),
-      {
-        getNextPageParam: (lastPage) => lastPage.rel?.nextPage,
-      },
-    );
+    useInfiniteQuery({
+      queryKey: ["tastings", filter],
+      queryFn: ({ pageParam }) =>
+        getTastings({ filterParam: filter, pageParam, api }),
+      getNextPageParam: (lastPage) => lastPage.rel?.nextPage,
+    });
 
   const onScroll = () => {
     if (!hasNextPage) return;
@@ -94,19 +99,28 @@ const ActivityContent = ({ filter }: { filter: string }) => {
   );
 };
 
-// export async function loader({ context, request }: LoaderFunctionArgs) {
-//   const url = new URL(request.url);
-//   const filterParam = mapFilterParam(url.searchParams.get("view"));
-//   const queryClient = new QueryClient();
+export async function loader({ context, request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const filter = mapFilterParam(url.searchParams.get("view"));
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: Infinity,
+      },
+    },
+  });
 
-//   await queryClient.prefetchInfiniteQuery(
-//     ["tastings", { filter: filterParam }],
-//     async () =>
-//       await getTastings({ filterParam: filterParam, api: context.api }),
-//   );
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: ["tastings", filter],
+    queryFn: () =>
+      getTastings({
+        filterParam: filter,
+        api: context.api,
+      }),
+  });
 
-//   return json({ dehydratedState: dehydrate(queryClient) });
-// }
+  return json({ dehydratedState: dehydrate(queryClient) });
+}
 
 export default function Activity() {
   const { user } = useAuth();
@@ -138,13 +152,7 @@ export default function Activity() {
               Updates
             </Tabs.Item>
           </Tabs>
-          <ClientOnly>
-            {() => (
-              <QueryBoundary>
-                <ActivityContent filter={filterParam} />
-              </QueryBoundary>
-            )}
-          </ClientOnly>
+          <ActivityContent filter={filterParam} />
         </div>
         <div className="ml-4 hidden w-[200px] sm:block">
           <Tabs fullWidth>
