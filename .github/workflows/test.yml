@@ -11,6 +11,8 @@ jobs:
       cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     name: "Run tests"
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
     steps:
       - uses: actions/checkout@v3
         with:
