@@ -205,9 +205,9 @@ export default {
         }
 
         // find existing distillers which should no longer exist and remove them
-        const removedDistillers = currentDistillers.filter((d) => {
-          distillerIds.indexOf(d.id) === -1;
-        });
+        const removedDistillers = currentDistillers.filter(
+          (d) => distillerIds.indexOf(d.id) === -1,
+        );
         for (const distiller of removedDistillers) {
           removedDistillerIds.push(distiller.id);
           await tx

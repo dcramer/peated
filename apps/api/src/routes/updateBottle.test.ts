@@ -1,5 +1,5 @@
 import { db } from "@peated/shared/db";
-import { bottles } from "@peated/shared/db/schema";
+import { bottles, bottlesToDistillers } from "@peated/shared/db/schema";
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
@@ -178,4 +178,31 @@ test("changes brand", async () => {
     where: (entities, { eq }) => eq(entities.id, bottle.brandId),
   });
   expect(oldBrand?.totalBottles).toBe(0);
+});
+
+test("removes distiller", async () => {
+  const distillerA = await Fixtures.Entity();
+  const distillerB = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle({
+    distillerIds: [distillerA.id, distillerB.id],
+  });
+  const response = await app.inject({
+    method: "PUT",
+    url: `/bottles/${bottle.id}`,
+    payload: {
+      distillers: [distillerA.id],
+    },
+    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  });
+
+  expect(response).toRespondWith(200);
+  const results = await db
+    .select({
+      distillerId: bottlesToDistillers.distillerId,
+    })
+    .from(bottlesToDistillers)
+    .where(eq(bottlesToDistillers.bottleId, bottle.id));
+
+  expect(results.length).toEqual(1);
+  expect(results[0].distillerId).toEqual(distillerA.id);
 });
