@@ -8,11 +8,30 @@ type Model = "gpt-3.5-turbo" | "gpt-4";
 
 const DEFAULT_MODEL: Model = "gpt-3.5-turbo";
 
-export async function getStructuredResponse<T extends ZodSchema<any>>(
+export async function getStructuredResponse<Schema extends ZodSchema<any>>(
   prompt: string,
-  zodSchema: T,
+  schema: Schema,
+  fullSchema?: undefined | null,
+  model?: Model,
+): Promise<z.infer<Schema> | null>;
+export async function getStructuredResponse<
+  Schema extends ZodSchema<any>,
+  FullSchema extends ZodSchema<any>,
+>(
+  prompt: string,
+  schema: Schema,
+  fullSchema: FullSchema,
+  model?: Model,
+): Promise<z.infer<FullSchema> | null>;
+export async function getStructuredResponse<
+  Schema extends ZodSchema<any>,
+  FullSchema extends ZodSchema<any>,
+>(
+  prompt: string,
+  schema: Schema,
+  fullSchema: FullSchema | null = undefined,
   model: Model = DEFAULT_MODEL,
-): Promise<z.infer<T> | null> {
+): Promise<z.infer<FullSchema> | null> {
   const openai = new OpenAI({
     apiKey: config.OPENAI_API_KEY,
   });
@@ -35,7 +54,7 @@ export async function getStructuredResponse<T extends ZodSchema<any>>(
         name: "out",
         description:
           "This is the function that returns the result of the agent",
-        parameters: zodToJsonSchema(zodSchema),
+        parameters: zodToJsonSchema(schema),
       },
     ],
     temperature: 0,
@@ -47,7 +66,7 @@ export async function getStructuredResponse<T extends ZodSchema<any>>(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       completion.choices[0].message!.function_call!.arguments!,
     );
-    return zodSchema.parse(structuredResponse);
+    return (fullSchema || schema).parse(structuredResponse);
   } catch (err) {
     logError(
       err,

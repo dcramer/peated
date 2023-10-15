@@ -33,7 +33,7 @@ Describe the entity as a distiller, bottler, or brand, whichever one it primaril
 
 'region' should be the region of the country where the entity is located, if known. Examples of regions might be "Speyside" or "Islay".
 
-The 'type' field should contain every value which is accurate for this entity, describing if the entity operates as brand, a distiller, and/or a bottler.
+The 'type' field must contain every value which is accurate for this entity, describing if the entity operates as brand, a distiller, and/or a bottler.
 If the entity is a distiller, include 'distiller' in the 'type' field.
 If the entity is a brand, include 'brand' in the 'type' field.
 If the entity is a bottler, include 'bottler' in the 'type' field'.
@@ -46,6 +46,16 @@ If there are any issues, or you are not confident in the accuracy, please also p
 }
 
 const OpenAIBottleDetailsSchema = z.object({
+  description: z.string().nullable().optional(),
+  yearEstablished: z.number().nullable().optional(),
+  country: z.string().nullable().optional(),
+  region: z.string().nullable().optional(),
+  confidence: z.number().default(0).optional(),
+  type: z.array(z.string()).optional(),
+  aiNotes: z.string().nullable().optional(),
+});
+
+const OpenAIBottleDetailsValidationSchema = z.object({
   description: z.string().nullable().optional(),
   yearEstablished: z.number().nullable().optional(),
   country: CountryEnum.nullable().optional(),
@@ -65,6 +75,7 @@ async function generateEntityDetails(
   const result = await getStructuredResponse(
     generatePrompt(entityName),
     OpenAIBottleDetailsSchema,
+    OpenAIBottleDetailsValidationSchema,
   );
 
   if (!result || result.confidence < 0.75)

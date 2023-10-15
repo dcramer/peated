@@ -36,7 +36,7 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 
 - ${CATEGORY_LIST.join("\n- ")}
 
-'suggestedTags' should be up to five items that reflect the flavor of this whiskey the best. The following are valid values for 'suggestedTags':
+'suggestedTags' should be up to five items that reflect the flavor of this whiskey the best. Values MUST be from the following list:
 
 - ${DEFAULT_TAGS.join("\n- ")}
 
@@ -48,6 +48,24 @@ If there are any issues, or you are not confident in the accuracy, please also p
 const DefaultTagEnum = z.enum(DEFAULT_TAGS);
 
 const OpenAIBottleDetailsSchema = z.object({
+  description: z.string().nullable().optional(),
+  tastingNotes: z
+    .object({
+      nose: z.string(),
+      palate: z.string(),
+      finish: z.string(),
+    })
+    .nullable()
+    .optional(),
+  category: z.string().nullable().optional(),
+  statedAge: z.number().nullable().optional(),
+  suggestedTags: z.array(z.string()).optional(),
+  confidence: z.number().default(0).optional(),
+  aiNotes: z.string().nullable().optional(),
+});
+
+// we dont send enums to openai as they dont get used
+const OpenAIBottleDetailsValidationSchema = z.object({
   description: z.string().nullable().optional(),
   tastingNotes: z
     .object({
@@ -74,12 +92,12 @@ async function generateBottleDetails(
   const result = await getStructuredResponse(
     generatePrompt(bottleName),
     OpenAIBottleDetailsSchema,
+    OpenAIBottleDetailsValidationSchema,
   );
 
   if (!result || result.confidence < 0.75)
     // idk
     return null;
-
   return result;
 }
 
