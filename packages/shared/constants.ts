@@ -271,6 +271,7 @@ export const CATEGORY_LIST = [
   "rye",
   "single_grain",
   "single_malt",
+  "single_pot_still",
   "spirit",
 ] as const;
 
