@@ -58,6 +58,8 @@ EXPOSE 3000
 
 WORKDIR /app/apps/web
 
+RUN export VERSION=$(cat /app/VERSION)
+
 CMD ["pnpm", "start"]
 
 # worker service
@@ -66,6 +68,8 @@ COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ /app/
 
 WORKDIR /app/apps/worker
+
+RUN export VERSION=$(cat /app/VERSION)
 
 CMD ["pnpm", "start"]
 
@@ -80,5 +84,7 @@ ENV HOST=0.0.0.0 \
 EXPOSE 4000
 
 WORKDIR /app/apps/api
+
+RUN export VERSION=$(cat /app/VERSION)
 
 CMD ["pnpm", "start"]
