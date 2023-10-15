@@ -1,4 +1,4 @@
-import { DEFAULT_CREATED_BY_ID } from "@peated/shared/constants";
+import { COUNTRY_LIST, DEFAULT_CREATED_BY_ID } from "@peated/shared/constants";
 import { db } from "@peated/shared/db";
 import { changes, entities } from "@peated/shared/db/schema";
 import { arraysEqual } from "@peated/shared/lib/equals";
@@ -23,18 +23,25 @@ If the entity is located in Scotland, spell wihskey as "whisky".
 
 Describe the entity as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as a "entity".
 
-'description' should focus on the history & origin, and what makes it different from competitors. It should be less than 200 words, and structured as paragraphs with prose.
+'description' should include two paragraphs formatted using markdown: the first should focus on its history & origin, the second should describe its unique approach, what styles it produces, and any interesting related facts. The description should be at least 100 words, and no more than 200.
 
 'yearEstablished' should be the year in which the entity was established.
 
-'country' should be where the entity is located, if known.
+'country' should be where the entity is located, if known. Country should be one of the following values:
+
+- ${COUNTRY_LIST.join("\n- ")}
+
 'region' should be the region of the country where the entity is located, if known. Examples of regions might be "Speyside" or "Islay".
 
-'type' should describe if the entity is a 'distiller', a 'bottler' or 'brand'. It can be all three, but it must be at least one. If you are unsure lower your confidence rating. If the entity is a distiller and not a brand, identify an example brand and put it in the aiNotes field.
+The 'type' field should contain every value which is accurate for this entity, describing if the entity operates as brand, a distiller, and/or a bottler.
+If the entity is a distiller, include 'distiller' in the 'type' field.
+If the entity is a brand, include 'brand' in the 'type' field.
+If the entity is a bottler, include 'bottler' in the 'type' field'.
+Its valid to include all three values in 'type' if they are accurate, but at least one must be included.
 
 'confidence' should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set. 
 
-If there are any issues, are you are not confident in the accuracy, please also put that information in aiNotes. Do not fill in any field you are not very confient in.
+If there are any issues, or you are not confident in the accuracy, please also put that information in 'aiNotes'. Do not fill in any field you are not very confident in.
 `;
 }
 

@@ -40,7 +40,8 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 
 - ${DEFAULT_TAGS.join("\n- ")}
 
-If there are any issues, are you are not confident in the accuracy, please also put that information in aiNotes. Do not fill in any field you are not very confient in.`;
+If there are any issues, or you are not confident in the accuracy, please also put that information in 'aiNotes'. Do not fill in any field you are not very confident in.
+`;
 }
 
 // XXX: enums dont work with GPT currently (it ignores them)
