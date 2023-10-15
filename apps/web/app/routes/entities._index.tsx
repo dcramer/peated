@@ -206,7 +206,7 @@ function FilterSidebar() {
                 }}
                 size="small"
               >
-                Any Flavors
+                Any Region
               </SidebarLink>
               <SidebarLink
                 active={qs.get("region") === region}
