@@ -78,6 +78,13 @@ resource "kubernetes_service_v1" "default" {
   }
 
   depends_on = [kubernetes_deployment_v1.default]
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations["cloud.google.com/neg"],
+      metadata[0].annotations["cloud.google.com/neg-status"],
+    ]
+  }
 }
 
 resource "kubernetes_deployment_v1" "default" {

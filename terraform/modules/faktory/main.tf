@@ -26,6 +26,7 @@ resource "kubernetes_service_v1" "ui" {
   lifecycle {
     ignore_changes = [
       metadata[0].annotations["cloud.google.com/neg"],
+      metadata[0].annotations["cloud.google.com/neg-status"],
     ]
   }
 }
@@ -56,6 +57,7 @@ resource "kubernetes_service_v1" "service" {
   lifecycle {
     ignore_changes = [
       metadata[0].annotations["cloud.google.com/neg"],
+      metadata[0].annotations["cloud.google.com/neg-status"],
     ]
   }
 }
