@@ -60,12 +60,29 @@ export async function getStructuredResponse<
     temperature: 0,
   });
 
-  // TODO: handle errors and bubble useful context to Sentry
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const output = completion.choices[0].message!.function_call!.arguments!;
+
+  let structuredResponse: any;
   try {
-    const structuredResponse = JSON.parse(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      completion.choices[0].message!.function_call!.arguments!,
+    structuredResponse = JSON.parse(output);
+  } catch (err) {
+    // likely a json parse error - so assume malformed
+    logError(
+      err,
+      {
+        openAiUsage: {
+          ...completion.usage,
+        },
+      },
+      {
+        "prompt.txt": prompt,
+        "output.txt": output,
+      },
     );
+  }
+
+  try {
     return (fullSchema || schema).parse(structuredResponse);
   } catch (err) {
     logError(
@@ -77,10 +94,7 @@ export async function getStructuredResponse<
       },
       {
         "prompt.txt": prompt,
-        "output.txt": `${
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          completion.choices[0].message!.function_call!.arguments
-        }`,
+        "output.json": output,
       },
     );
 
