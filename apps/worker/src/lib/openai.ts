@@ -71,7 +71,8 @@ export async function getStructuredResponse<
     logError(
       err,
       {
-        openAiUsage: {
+        openai: {
+          completionId: completion.id,
           ...completion.usage,
         },
       },
@@ -88,7 +89,8 @@ export async function getStructuredResponse<
     logError(
       err,
       {
-        openAiUsage: {
+        openai: {
+          completionId: completion.id,
           ...completion.usage,
         },
       },
