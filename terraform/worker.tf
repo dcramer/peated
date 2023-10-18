@@ -1,6 +1,6 @@
 module "worker-service" {
   source = "./modules/service"
-  name   = "worker"
+  name   = "peated-worker"
   image  = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/worker"
 
   healthcheck = {
