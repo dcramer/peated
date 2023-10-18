@@ -61,9 +61,37 @@ jobs:
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Verify Web
+        id: verify_web
+        run: |
+          if gcloud artifacts docker images describe "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"; then
+            echo "image_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "image_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify API
+        id: verify_api
+        run: |
+          if gcloud artifacts docker images describe "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"; then
+            echo "image_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "image_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify Worker
+        id: verify_worker
+        run: |
+          if gcloud artifacts docker images describe "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}"; then
+            echo "image_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "image_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # optimize cache by building all stages
       - name: Build All Stages
         uses: docker/build-push-action@v5
+        if: steps.verify_web.outputs.image_exists == 'false' || steps.verify_api.outputs.image_exists == 'false' || steps.verify_worker.outputs.image_exists == 'false'
         with:
           context: .
           cache-from: type=gha,scope=prod
@@ -79,6 +107,7 @@ jobs:
 
       - name: Build Web
         uses: docker/build-push-action@v5
+        if: steps.verify_web.outputs.image_exists == 'false'
         with:
           context: .
           cache-from: type=gha,scope=prod
@@ -97,6 +126,7 @@ jobs:
 
       - name: Build API
         uses: docker/build-push-action@v5
+        if: steps.verify_api.outputs.image_exists == 'false'
         with:
           context: .
           cache-from: type=gha,scope=prod
@@ -115,6 +145,7 @@ jobs:
 
       - name: Build Worker
         uses: docker/build-push-action@v5
+        if: steps.verify_worker.outputs.image_exists == 'false'
         with:
           context: .
           cache-from: type=gha,scope=prod
@@ -134,7 +165,7 @@ jobs:
   deploy:
     name: 🚀 Deploy
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}
     runs-on: ubuntu-latest
     needs: [build]
     permissions:
@@ -198,19 +229,19 @@ jobs:
       - name: "Deploy API"
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.api_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
-          kubectl set image deployment.v1.apps/peated-api api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
+          kubectl set image deployment.v1.apps/peated-api peated-api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
           kubectl rollout status deployment/api
 
       - name: "Deploy Web"
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.web_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
-          kubectl set image deployment.v1.apps/peated-web web="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
+          kubectl set image deployment.v1.apps/peated-web peated-web="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
           kubectl rollout status deployment/web
 
       - name: "Deploy Worker"
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.worker_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
-          kubectl set image deployment.v1.apps/peated-worker worker="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}"
+          kubectl set image deployment.v1.apps/peated-worker peated-worker="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}"
           kubectl rollout status deployment/worker
 
       - name: Discord notification (success)
