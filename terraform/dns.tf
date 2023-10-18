@@ -53,7 +53,7 @@ module "dns-private-zone" {
       type = "A"
       ttl  = 300
       records = [
-        module.api-service.public_ip,
+        module.peated-api-service.public_ip,
       ]
     },
     {
@@ -61,7 +61,7 @@ module "dns-private-zone" {
       type = "A"
       ttl  = 300
       records = [
-        module.web-service.public_ip,
+        module.peated-web-service.public_ip,
       ]
     },
     {
@@ -69,7 +69,7 @@ module "dns-private-zone" {
       type = "A"
       ttl  = 300
       records = [
-        module.api-service.public_ip,
+        module.peated-api-service.public_ip,
       ]
     },
     {
@@ -77,7 +77,7 @@ module "dns-private-zone" {
       type = "A"
       ttl  = 300
       records = [
-        module.web-service.public_ip,
+        module.peated-web-service.public_ip,
       ]
     },
   ]
@@ -106,7 +106,7 @@ module "peated-com-dns" {
       type = "A"
       ttl  = 300
       records = [
-        module.api-service.public_ip,
+        module.peated-api-service.public_ip,
       ]
     },
     {
@@ -114,7 +114,7 @@ module "peated-com-dns" {
       type = "A"
       ttl  = 300
       records = [
-        module.web-service.public_ip,
+        module.peated-web-service.public_ip,
       ]
     },
     {
@@ -122,7 +122,7 @@ module "peated-com-dns" {
       type = "A"
       ttl  = 300
       records = [
-        module.api-service.public_ip,
+        module.peated-api-service.public_ip,
       ]
     },
     {
@@ -130,7 +130,7 @@ module "peated-com-dns" {
       type = "A"
       ttl  = 300
       records = [
-        module.web-service.public_ip,
+        module.peated-web-service.public_ip,
       ]
     },
   ]

@@ -1,8 +1,8 @@
 # Peated
 
-The application that powers peated.app.
+The application that powers peated.com.
 
-For more details, take a look at https://peated.app/about
+For more details, take a look at https://peated.com/about
 
 A Discord is available if you want to contribute: https://discord.gg/d7GFPfy88Z
 
