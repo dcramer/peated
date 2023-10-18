@@ -15,7 +15,7 @@ module "worker-service" {
     DATABASE_URL     = "postgresql://peated:peated@127.0.0.1/peated"
     GOOGLE_CLIENT_ID = var.google_client_id
     SENTRY_DSN       = var.sentry_dsn
-    API_SERVER       = "https://api.peated.app"
+    API_SERVER       = "https://api.peated.com"
     NODE_NO_WARNINGS = "1"
     # this is prob a bad idea
     OPENAI_API_KEY = data.google_secret_manager_secret_version.openai_api_key.secret_data

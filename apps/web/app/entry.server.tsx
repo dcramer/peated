@@ -24,7 +24,7 @@ const ABORT_DELAY = 5_000;
 // TODO: cache this via Redis
 // https://github.com/fedeya/remix-sitemap#caching
 const { isSitemapUrl, sitemap } = createSitemapGenerator({
-  siteUrl: "https://peated.app",
+  siteUrl: "https://peated.com",
   headers: {
     "Cache-Control": "max-age=3600",
   },
