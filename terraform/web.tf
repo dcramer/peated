@@ -28,7 +28,7 @@ module "peated-web-service" {
   name   = "peated-web"
   image  = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/web"
 
-  domains = ["peated.app", "staging.peated.app", "peated.com", "staging.peated.com", "www.peated.com"]
+  domains = ["peated.com", "staging.peated.com", "www.peated.com", "peated.app", "staging.peated.app"]
   port    = 3000
 
   healthcheck = {

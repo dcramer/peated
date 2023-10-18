@@ -37,7 +37,7 @@ module "peated-api-service" {
   name   = "peated-api"
   image  = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/api"
 
-  domains = ["api.peated.app", "api.staging.peated.app", "api.peated.com", "api.staging.peated.com"]
+  domains = ["api.peated.com", "api.staging.peated.com", "api.peated.app", "api.staging.peated.app"]
   port    = 4000
 
   healthcheck = {
@@ -53,8 +53,8 @@ module "peated-api-service" {
     GOOGLE_CLIENT_ID     = var.google_client_id
     SENTRY_DSN           = var.sentry_dsn
     GOOGLE_CLIENT_SECRET = data.google_secret_manager_secret_version.google_client_secret.secret_data
-    CORS_HOST            = "https://peated.app"
-    URL_PREFIX           = "https://api.peated.app"
+    CORS_HOST            = "https://peated.com"
+    URL_PREFIX           = "https://api.peated.com"
     USE_GCS_STORAGE      = "1"
     GCS_BUCKET_NAME      = google_storage_bucket.peated.name
     GCS_BUCKET_PATH      = "uploads"

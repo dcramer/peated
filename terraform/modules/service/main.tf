@@ -29,6 +29,7 @@ resource "kubernetes_ingress_v1" "default" {
     name = var.name
 
     annotations = {
+      "kubernetes.io/ingress.allow-http" = "false",
       "ingress.gcp.kubernetes.io/pre-shared-cert"   = google_compute_managed_ssl_certificate.default[0].name
       "kubernetes.io/ingress.global-static-ip-name" = google_compute_global_address.ip_address[0].name
     }
