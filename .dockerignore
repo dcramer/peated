@@ -37,5 +37,4 @@ postgres-data
 
 *.md
 
-fly.*.toml
 /terraform
