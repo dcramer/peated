@@ -14,4 +14,8 @@ const start = async () => {
   }
 };
 
+process.on("uncaughtException", (err) => {
+  console.error(`uncaughtException received: ${err}`, err);
+});
+
 start();
