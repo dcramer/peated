@@ -37,6 +37,13 @@ resource "google_project_iam_binding" "read-write-registry-iam" {
   members = ["serviceAccount:${google_service_account.github.email}"]
 }
 
+# needed for describe image
+resource "google_project_iam_binding" "container-analysis-admin" {
+  project = data.google_project.project.project_id
+  role    = "roles/serviceusage.serviceUsageConsumer"
+  members = ["serviceAccount:${google_service_account.github.email}"]
+}
+
 resource "google_project_iam_binding" "read-registry-iam" {
   project = data.google_project.project.project_id
   role    = "roles/artifactregistry.reader"
