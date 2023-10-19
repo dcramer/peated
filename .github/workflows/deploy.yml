@@ -94,7 +94,6 @@ jobs:
         if: steps.verify_web.outputs.image_exists == 'false' || steps.verify_api.outputs.image_exists == 'false' || steps.verify_worker.outputs.image_exists == 'false'
         with:
           context: .
-          cache-from: type=gha,scope=prod
           cache-to: type=gha,mode=max,scope=prod
           build-args: |
             VERSION=${{ github.sha }}
@@ -110,7 +109,6 @@ jobs:
         if: steps.verify_web.outputs.image_exists == 'false'
         with:
           context: .
-          cache-from: type=gha,scope=prod
           push: true
           target: web
           build-args: |
@@ -129,7 +127,6 @@ jobs:
         if: steps.verify_api.outputs.image_exists == 'false'
         with:
           context: .
-          cache-from: type=gha,scope=prod
           push: true
           target: api
           build-args: |
@@ -148,7 +145,6 @@ jobs:
         if: steps.verify_worker.outputs.image_exists == 'false'
         with:
           context: .
-          cache-from: type=gha,scope=prod
           push: true
           target: worker
           build-args: |
