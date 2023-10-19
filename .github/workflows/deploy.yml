@@ -230,19 +230,19 @@ jobs:
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.api_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/peated-api peated-api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
-          kubectl rollout status deployment/api
+          kubectl rollout status deployment/peated-api
 
       - name: "Deploy Web"
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.web_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/peated-web peated-web="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
-          kubectl rollout status deployment/web
+          kubectl rollout status deployment/peated-web
 
       - name: "Deploy Worker"
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.worker_any_changed == 'true' || steps.changed-files-yaml.outputs.shared_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/peated-worker peated-worker="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}"
-          kubectl rollout status deployment/worker
+          kubectl rollout status deployment/peated-worker
 
       - name: Discord notification (success)
         if: success()
