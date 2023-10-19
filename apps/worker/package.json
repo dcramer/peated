@@ -31,7 +31,7 @@
     "croner": "^7.0.3",
     "drizzle-orm": "^0.28.6",
     "faktory-worker": "^4.5.1",
-    "nodemon": "^2.0.22",
+    "nodemon": "^3.0.1",
     "npm-run-all": "^4.1.5",
     "openai": "^4.12.4",
     "toad-scheduler": "^3.0.0",
