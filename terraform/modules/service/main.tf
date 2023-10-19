@@ -199,7 +199,6 @@ resource "kubernetes_deployment_v1" "default" {
           }
         }
 
-        # TODO: make this an arg
         dynamic "container" {
           for_each = local.cloud_sql_instance
           content {
