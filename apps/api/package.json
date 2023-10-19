@@ -2,7 +2,7 @@
   "private": true,
   "name": "api",
   "scripts": {
-    "build": "rm -rf build && tsx esbuild.ts",
+    "build": "",
     "dev": "tsx --require dotenv/config watch ./src/server.ts",
     "db": "tsx --require dotenv/config ./src/bin/db.ts",
     "db:migrate": "tsx --require dotenv/config ./src/bin/db.ts migrate",
