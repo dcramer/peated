@@ -53,6 +53,24 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  // redirect old domain to new
+  if (req.hostname.indexOf("peated.app") === 0)
+    return res.redirect(301, `https://peated.com/${req.url}`);
+
+  // helpful headers:
+  res.set("Strict-Transport-Security", `max-age=${60 * 60 * 24 * 365 * 100}`);
+
+  // /clean-urls/ -> /clean-urls
+  if (req.path.endsWith("/") && req.path.length > 1) {
+    const query = req.url.slice(req.path.length);
+    const safepath = req.path.slice(0, -1).replace(/\/+/g, "/");
+    res.redirect(301, safepath + query);
+    return;
+  }
+  next();
+});
+
 app.use(compression());
 
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
