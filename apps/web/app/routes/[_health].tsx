@@ -1,6 +1,7 @@
 // learn more: https://fly.io/docs/reference/configuration/#services-http_checks
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import type { SitemapFunction } from "remix-sitemap";
+import { logError } from "~/lib/log";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
@@ -21,7 +22,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     ]);
     return new Response("OK");
   } catch (error: unknown) {
-    console.log("healthcheck ❌", { error });
+    logError(error);
     return new Response("ERROR", { status: 500 });
   }
 };
