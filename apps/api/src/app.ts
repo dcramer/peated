@@ -24,7 +24,7 @@ const envToLogger: {
     },
   },
   production: {
-    level: "info",
+    level: "warn",
   },
   test: {
     level: "error",
