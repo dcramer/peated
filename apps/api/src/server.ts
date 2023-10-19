@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node-experimental";
 import buildFastify from "./app";
 import config from "./config";
 
@@ -7,7 +8,8 @@ const start = async () => {
     console.info(`API exposed at http://${config.HOST}:${config.PORT}/`);
     await fastify.listen({ port: config.PORT as number, host: config.HOST });
   } catch (err) {
-    console.error(err);
+    Sentry.captureException(err);
+    console.error(`Fastify process received an error: ${err}`, err);
     process.exit(1);
   }
 };
