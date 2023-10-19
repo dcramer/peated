@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   // redirect old domain to new
   if (req.hostname.indexOf("peated.app") === 0)
-    return res.redirect(301, `https://peated.com/${req.url}`);
+    return res.redirect(301, `https://peated.com${req.url}`);
 
   // helpful headers:
   res.set("Strict-Transport-Security", `max-age=${60 * 60 * 24 * 365 * 100}`);
