@@ -14,22 +14,22 @@ declare module "fastify" {
 export default fastifyPlugin(async (fastify, options) => {
   fastify.decorateRequest("_sentryContext", null);
 
-  const hub = Sentry.getCurrentHub();
+  // const hub = Sentry.getCurrentHub();
 
-  fastify.addHook("preHandler", (request) => {
-    Sentry.configureScope((scope) =>
-      scope.addEventProcessor((event) => {
-        event.request = {
-          method: request.method,
-          url: request.url,
-          // headers: request.headers,
-          query_string: request.query as Record<string, any>,
-        };
+  // fastify.addHook("preHandler", (request) => {
+  //   Sentry.configureScope((scope) =>
+  //     scope.addEventProcessor((event) => {
+  //       event.request = {
+  //         method: request.method,
+  //         url: request.url,
+  //         // headers: request.headers,
+  //         query_string: request.query as Record<string, any>,
+  //       };
 
-        return event;
-      }),
-    );
-  });
+  //       return event;
+  //     }),
+  //   );
+  // });
 
   fastify.addHook("onError", async (_request, _reply, error) => {
     Sentry.captureException(error);
