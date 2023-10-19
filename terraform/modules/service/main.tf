@@ -100,13 +100,13 @@ resource "kubernetes_deployment_v1" "default" {
   wait_for_rollout = false
 
   spec {
-    replicas = 1
+    replicas = "1"
 
     strategy {
       type = "RollingUpdate"
       rolling_update {
-        # max_surge       = 2
-        max_unavailable = "25%"
+        max_surge       = "1"
+        max_unavailable = "1"
       }
     }
 
