@@ -100,5 +100,11 @@ module "peated-com-dns" {
         module.peated-web-service.public_ip,
       ]
     },
+    {
+      name    = ""
+      type    = "TXT"
+      ttl     = 300
+      records = ["google-site-verification=bRxlC-JuhxpEKARMO_ZNjL9K33sldCsa--KZQrOOEFg"]
+    }
   ]
 }
