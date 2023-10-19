@@ -79,7 +79,7 @@ export const router: FastifyPluginCallback = (
 
   fastify.route({
     method: "GET",
-    url: "/health",
+    url: "/_health",
     handler: (_, res) => {
       res.status(200).send();
     },

@@ -7,7 +7,7 @@ module "peated-web-service" {
   port    = 3000
 
   healthcheck = {
-    path = "/healthcheck"
+    path = "/_health"
   }
 
   k8s_service_account = module.gke_workload_identity.k8s_service_account_name
