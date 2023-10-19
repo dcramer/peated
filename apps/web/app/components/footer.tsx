@@ -11,7 +11,7 @@ export default function Footer({
   return (
     <footer
       className={classNames(
-        "footer h-24 flex-shrink-0 overflow-hidden",
+        "h-24 flex-shrink-0 overflow-hidden text-white",
         mobileOnly ? "block sm:hidden" : "",
       )}
     >

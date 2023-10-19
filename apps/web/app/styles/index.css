@@ -91,10 +91,6 @@
     backdrop-filter: blur(4px);
   }
 
-  .footer {
-    @apply text-white;
-  }
-
   .card {
     @apply overflow-hidden bg-slate-950;
   }
