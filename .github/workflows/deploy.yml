@@ -9,6 +9,10 @@ on:
         description: "Force deploy to all services"
         default: true
         type: boolean
+      nocache:
+        description: "Do not rely on existing layer cache"
+        default: false
+        type: boolean
 env:
   REGION: us-central1
   PROJECT_ID: cask-382601
@@ -94,7 +98,7 @@ jobs:
         if: steps.verify_web.outputs.image_exists == 'false' || steps.verify_api.outputs.image_exists == 'false' || steps.verify_worker.outputs.image_exists == 'false'
         with:
           context: .
-          cache-from: type=gha,scope=prod
+          cache-from: ${{ inputs.nocache == 'false' && 'type=gha,scope=prod' || ''}}
           cache-to: type=gha,mode=max,scope=prod
           build-args: |
             VERSION=${{ github.sha }}
