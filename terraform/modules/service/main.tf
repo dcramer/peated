@@ -176,7 +176,7 @@ resource "kubernetes_deployment_v1" "default" {
                 port = var.port
               }
               initial_delay_seconds = 30
-              period_seconds        = 10
+              period_seconds        = 5
               timeout_seconds       = 5
               failure_threshold     = 6
               success_threshold     = 1
@@ -191,7 +191,7 @@ resource "kubernetes_deployment_v1" "default" {
                 port = var.port
               }
               initial_delay_seconds = 10
-              period_seconds        = 10
+              period_seconds        = 5
               timeout_seconds       = 5
               failure_threshold     = 6
               success_threshold     = 1
