@@ -93,32 +93,6 @@ export default function Sidebar() {
                   >
                     Distillers
                   </SidebarLink>
-                  <SidebarLink
-                    to={{
-                      pathname: "/entities",
-                      search: "?type=brand",
-                    }}
-                    icon={EntityIcon}
-                    active={
-                      location.pathname === "/entities" &&
-                      queryString.get("type") === "brand"
-                    }
-                  >
-                    Brands
-                  </SidebarLink>
-                  <SidebarLink
-                    to={{
-                      pathname: "/entities",
-                      search: "?type=bottler",
-                    }}
-                    icon={EntityIcon}
-                    active={
-                      location.pathname === "/entities" &&
-                      queryString.get("type") === "bottler"
-                    }
-                  >
-                    Bottlers
-                  </SidebarLink>
                 </ul>
               </li>
               <li>
