@@ -165,7 +165,7 @@ export async function loader({ params, context }: LoaderFunctionArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) return [];
 
-  const title = `${data.tasting.bottle.fullName} - Tasting Details`;
+  const title = `${data.tasting.bottle.fullName} - Tasting Notes by ${data.tasting.createdBy.username}`;
 
   const meta: Record<string, any>[] = [
     {

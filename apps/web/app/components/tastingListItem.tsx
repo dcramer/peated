@@ -139,7 +139,7 @@ export default function TastingListItem({
               if (navigator.share) {
                 navigator
                   .share({
-                    title: `${tasting.bottle.fullName} - Tasting Details`,
+                    title: `${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`,
                     text: `Notes and review by ${tasting.createdBy.username}`,
                     url: `/tastings/${tasting.id}`,
                   })
