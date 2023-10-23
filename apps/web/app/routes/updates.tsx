@@ -9,7 +9,6 @@ import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
 import useApi from "~/hooks/useApi";
-import useAuth from "~/hooks/useAuth";
 
 const UpdatesContent = () => {
   const api = useApi();
@@ -53,20 +52,10 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Updates() {
-  const { user } = useAuth();
-
   return (
     <Layout>
       <>
         <Tabs fullWidth>
-          {user && (
-            <Tabs.Item as={Link} to="/?view=friends">
-              Friends
-            </Tabs.Item>
-          )}
-          <Tabs.Item as={Link} to="/">
-            Global
-          </Tabs.Item>
           <Tabs.Item as={Link} to="/updates" controlled>
             Updates
           </Tabs.Item>

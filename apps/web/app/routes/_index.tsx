@@ -14,6 +14,7 @@ import type { Tasting } from "@peated/shared/types";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import Glyph from "~/components/assets/Glyph";
 import BetaNotice from "~/components/betaNotice";
+import Button from "~/components/button";
 import { ClientOnly } from "~/components/clientOnly";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
@@ -148,13 +149,21 @@ export default function Activity() {
             {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
           Local
         </Tabs.Item> */}
-            <Tabs.Item as={Link} to="/updates" controlled>
-              Updates
-            </Tabs.Item>
           </Tabs>
           <ActivityContent filter={filterParam} />
         </div>
         <div className="ml-4 hidden w-[200px] sm:block">
+          {!user && (
+            <div className="hidden flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800 sm:flex">
+              <p className="text-light mb-4 text-sm">
+                Create a profile to record tastings, track your favorite
+                bottles, and more.
+              </p>
+              <Button color="primary" to="/login" size="small">
+                Sign Up or Login
+              </Button>
+            </div>
+          )}
           <Tabs fullWidth>
             <Tabs.Item active>Market Prices</Tabs.Item>
           </Tabs>
