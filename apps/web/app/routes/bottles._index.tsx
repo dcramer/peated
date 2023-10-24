@@ -2,6 +2,7 @@ import { CATEGORY_LIST } from "@peated/shared/constants";
 import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
+import { type SitemapFunction } from "remix-sitemap";
 
 import BottleTable from "~/components/bottleTable";
 import Button from "~/components/button";
@@ -14,6 +15,10 @@ import type { ApiClient } from "~/lib/api";
 import { formatCategoryName } from "~/lib/strings";
 import { buildQueryString } from "~/lib/urls";
 import { fetchBottles } from "~/queries/bottles";
+
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
 
 function buildQuery(api: ApiClient, queryString: URLSearchParams) {
   const page = queryString.get("page") || "1";

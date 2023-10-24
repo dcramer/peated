@@ -10,6 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { type SitemapFunction } from "remix-sitemap";
 import type { z } from "zod";
 import BooleanField from "~/components/booleanField";
 import Fieldset from "~/components/fieldset";
@@ -25,6 +26,10 @@ import useAuth from "~/hooks/useAuth";
 import { toBlob } from "~/lib/blobs";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
+
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   const user: User = await context.api.get("/users/me");

@@ -4,10 +4,11 @@
   "scripts": {
     "assets": "npx @svgr/cli --out-dir app/components/assets -- app/assets",
     "assets:watch": "npm-watch assets",
-    "build": "npm run build:remix && npm run build:server && npm run build:assets",
+    "build": "npm run build:remix && npm run build:server && npm run build:assets && npm run build:sitemap",
     "build:remix": "cross-env NODE_ENV=production remix build --sourcemap",
     "build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle",
     "build:assets": "npm run assets",
+    "build:sitemap": "remix-sitemap",
     "dev": "concurrently \"npm:dev:*\"",
     "dev:remix": "cross-env NODE_ENV=development remix watch",
     "dev:server": "cross-env NODE_ENV=development nodemon --exec 'esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle && node --require dotenv/config ./build/server.js' --watch ./server.ts",

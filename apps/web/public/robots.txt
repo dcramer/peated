@@ -3,3 +3,5 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /_health
+Disallow: /settings
+Disallow: /search

@@ -18,7 +18,7 @@ type BottleQueryParams = {
 
 export async function fetchBottles(
   api: ApiClient,
-  params: BottleQueryParams,
+  params: BottleQueryParams = {},
 ): Promise<Paginated<Bottle>> {
   return api.get(`/bottles`, {
     query: params,

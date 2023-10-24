@@ -6,6 +6,7 @@ import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
 import { ENTITY_TYPE_LIST, MAJOR_COUNTRIES } from "@peated/shared/constants";
 import { toTitleCase } from "@peated/shared/lib/strings";
 import type { EntityType } from "@peated/shared/types";
+import { type SitemapFunction } from "remix-sitemap";
 import EmptyActivity from "~/components/emptyActivity";
 import EntityTable from "~/components/entityTable";
 import Layout from "~/components/layout";
@@ -15,6 +16,10 @@ import useApi from "~/hooks/useApi";
 import type { ApiClient } from "~/lib/api";
 import { buildQueryString } from "~/lib/urls";
 import { fetchEntities } from "~/queries/entities";
+
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
 
 export const meta: MetaFunction = () => {
   return [
