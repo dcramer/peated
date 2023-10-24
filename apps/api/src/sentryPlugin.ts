@@ -3,7 +3,7 @@ import { isString, normalize } from "@sentry/utils";
 import fastifyPlugin from "fastify-plugin";
 
 export default fastifyPlugin(async (fastify, options) => {
-  fastify.addHook("preHandler", async (request) => {
+  fastify.addHook("preValidation", async (request) => {
     Sentry.configureScope((scope) =>
       scope.addEventProcessor((event) => {
         try {
