@@ -6,5 +6,6 @@ Disallow: /admin
 Disallow: /settings
 Disallow: /search
 Disallow: /flights
+Disallow: /friends
 Disallow: /addBottle
 Disallow: /addFlight
