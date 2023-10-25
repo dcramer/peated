@@ -165,6 +165,14 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
             "production"
           ]
 
+          resources {
+            limits = {
+              memory            = "512m"
+              cpu               = "300m"
+              ephemeral-storage = "1Gi"
+            }
+          }
+
           env {
             name  = "FAKTORY_PASSWORD"
             value = var.password
@@ -237,6 +245,7 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
           }
         }
       }
+
     }
 
     volume_claim_template {
@@ -250,7 +259,7 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
 
         resources {
           requests = {
-            storage = "8Gi"
+            storage = "1Gi"
           }
         }
       }
