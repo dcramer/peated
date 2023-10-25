@@ -2,6 +2,11 @@ locals {
   cloud_sql_instance   = var.cloud_sql_instance != "" ? [var.cloud_sql_instance] : []
   cloud_sql_http_port  = 9801
   cloud_sql_admin_port = 9092
+  # memory should scale based on pg pool size
+  cloud_sql_memory = "1Gi"
+  # cant seem to adjust this to less than 1
+  cloud_sql_cpu     = "1"
+  cloud_sql_storage = "1Gi"
 }
 
 resource "google_compute_global_address" "ip_address" {
@@ -154,13 +159,13 @@ resource "kubernetes_deployment_v1" "default" {
             requests = {
               cpu               = var.cpu
               memory            = var.memory
-              ephemeral-storage = "1Gi"
+              ephemeral-storage = var.ephemeral_storage
             }
 
             limits = {
               cpu               = var.cpu
               memory            = var.memory
-              ephemeral-storage = "1Gi"
+              ephemeral-storage = var.ephemeral_storage
             }
           }
 
@@ -335,17 +340,15 @@ resource "kubernetes_deployment_v1" "default" {
 
             resources {
               requests = {
-                # cant seem to adjust this to less than 1
-                cpu = "1"
-                # memory should scale based on pg pool size
-                memory            = "1Gi"
-                ephemeral-storage = "1Gi"
+                cpu               = local.cloud_sql_cpu
+                memory            = local.cloud_sql_memory
+                ephemeral-storage = local.cloud_sql_storage
               }
 
               limits = {
-                cpu               = "1"
-                memory            = "1Gi"
-                ephemeral-storage = "1Gi"
+                cpu               = local.cloud_sql_cpu
+                memory            = local.cloud_sql_memory
+                ephemeral-storage = local.cloud_sql_storage
               }
             }
 

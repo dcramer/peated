@@ -51,3 +51,8 @@ variable "cpu" {
   type    = string
   default = "500m"
 }
+
+variable "ephemeral_storage" {
+  type    = string
+  default = "1Gi"
+}

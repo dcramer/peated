@@ -166,14 +166,15 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
           ]
 
           resources {
+            # TODO: put these into vars since they need synced
             requests = {
-              cpu               = "200m"
+              cpu               = "250m"
               memory            = "256m"
               ephemeral-storage = "1Gi"
             }
 
             limits = {
-              cpu               = "200m"
+              cpu               = "250m"
               memory            = "256m"
               ephemeral-storage = "1Gi"
             }
