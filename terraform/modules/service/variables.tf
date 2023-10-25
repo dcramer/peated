@@ -41,3 +41,13 @@ variable "cloud_sql_instance" {
 variable "k8s_service_account" {
   type = string
 }
+
+variable "memory" {
+  type    = string
+  default = "1Gi"
+}
+
+variable "cpu" {
+  type    = string
+  default = "500m"
+}

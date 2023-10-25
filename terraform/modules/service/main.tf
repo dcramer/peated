@@ -149,14 +149,14 @@ resource "kubernetes_deployment_v1" "default" {
           }
           resources {
             requests = {
-              cpu               = "300m"
-              memory            = "512m"
+              cpu               = var.cpu
+              memory            = var.memory
               ephemeral-storage = "1Gi"
             }
 
             limits = {
               cpu               = "1"
-              memory            = "1Gi"
+              memory            = "2Gi"
               ephemeral-storage = "1Gi"
             }
           }
