@@ -155,8 +155,8 @@ resource "kubernetes_deployment_v1" "default" {
             }
 
             limits = {
-              cpu               = "1"
-              memory            = "2Gi"
+              cpu               = var.cpu
+              memory            = var.memory
               ephemeral-storage = "1Gi"
             }
           }
