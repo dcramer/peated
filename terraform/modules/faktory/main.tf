@@ -267,6 +267,9 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
           requests = {
             storage = "1Gi"
           }
+          limits = {
+            storage = "1Gi"
+          }
         }
       }
     }
