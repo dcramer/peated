@@ -37,8 +37,6 @@ export const sitemap: SitemapFunction = async ({
     );
 
     page = rel?.nextPage || null;
-
-    break;
   }
   return output;
 };
