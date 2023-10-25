@@ -14,6 +14,7 @@ Sentry.init({
         "localhost",
         /^\//,
         /^https:\/\/api\.peated\.app/,
+        /^https:\/\/api\.peated\.com/,
       ],
       routingInstrumentation: Sentry.remixRouterInstrumentation(
         useEffect,
