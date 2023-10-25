@@ -147,6 +147,7 @@ resource "kubernetes_deployment_v1" "default" {
               container_port = port.value
             }
           }
+
           resources {
             requests = {
               cpu               = var.cpu
@@ -226,6 +227,23 @@ resource "kubernetes_deployment_v1" "default" {
                 ]
               }
             }
+
+            resources {
+              requests = {
+                # cant seem to adjust this to less than 1
+                cpu = "1"
+                # memory should scale based on pg pool size
+                memory            = "512m"
+                ephemeral-storage = "1Gi"
+              }
+
+              limits = {
+                cpu               = "1"
+                memory            = "512m"
+                ephemeral-storage = "1Gi"
+              }
+            }
+
           }
         }
 
