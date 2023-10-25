@@ -166,9 +166,15 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
           ]
 
           resources {
+            requests = {
+              cpu               = "100m"
+              memory            = "256m"
+              ephemeral-storage = "1Gi"
+            }
+
             limits = {
               memory            = "512m"
-              cpu               = "300m"
+              cpu               = "500m"
               ephemeral-storage = "1Gi"
             }
           }
