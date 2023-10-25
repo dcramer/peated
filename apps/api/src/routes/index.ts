@@ -54,6 +54,7 @@ import listUserCollections from "./listUserCollections";
 import listUserTags from "./listUserTags";
 import listUsers from "./listUsers";
 import mergeEntity from "./mergeEntity";
+import root from "./root";
 import updateBottle from "./updateBottle";
 import updateEntity from "./updateEntity";
 import updateNotification from "./updateNotification";
@@ -92,6 +93,8 @@ export const router: FastifyPluginCallback = (
       res.status(200).type("text/plain").send(ROBOTS);
     },
   });
+
+  fastify.route(root);
 
   fastify.route(getStats);
 
