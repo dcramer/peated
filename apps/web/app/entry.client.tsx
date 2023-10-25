@@ -13,6 +13,8 @@ Sentry.init({
       tracePropagationTargets: [
         "localhost",
         /^\//,
+        // IDK maybe its right
+        config.API_SERVER,
         /^https:\/\/api\.peated\.app/,
         /^https:\/\/api\.peated\.com/,
       ],
