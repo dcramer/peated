@@ -2,6 +2,14 @@ import * as Sentry from "@sentry/node-experimental";
 import { isString, normalize } from "@sentry/utils";
 import fastifyPlugin from "fastify-plugin";
 
+function filterScaries(env: NodeJS.ProcessEnv) {
+  return Object.fromEntries(
+    Object.entries(env).filter(([k, v]) => {
+      return k.match(/password|secret|auth|key|token/i);
+    }),
+  );
+}
+
 export default fastifyPlugin(async (fastify, options) => {
   fastify.addHook("preValidation", async (request) => {
     Sentry.configureScope((scope) =>
@@ -11,6 +19,8 @@ export default fastifyPlugin(async (fastify, options) => {
           event.transaction_info = {
             source: "url",
           };
+          if (!event.contexts) event.contexts = {};
+          event.contexts.environment = filterScaries(process.env);
           event.request = {
             method: request.method,
             url: `${request.protocol}://${request.hostname}${request.url}`,
