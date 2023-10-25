@@ -2,18 +2,18 @@ import { db } from "@peated/shared/db";
 import { users } from "@peated/shared/db/schema";
 import { setUser } from "@sentry/node-experimental";
 import { eq } from "drizzle-orm";
-import type { onRequestHookHandler } from "fastify";
+import type { FastifyRequest, onRequestHookHandler } from "fastify";
 import { verifyToken } from "../lib/auth";
 import { logError } from "../lib/log";
 
-const getUser = async (req: any) => {
+const getUser = async (req: FastifyRequest) => {
   const auth = req.headers["authorization"];
   const token = auth?.replace("Bearer ", "");
   if (!token) return null;
 
   const { id } = await verifyToken(token);
   if (!id) {
-    logError("Invalid token");
+    console.warn(`Invalid Bearer token from ${req.ip}`);
     return null;
   }
   const [user] = await db.select().from(users).where(eq(users.id, id));
