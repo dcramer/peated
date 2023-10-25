@@ -1,9 +1,15 @@
 import type { MetaFunction } from "@remix-run/node";
 import { useQuery } from "@tanstack/react-query";
+import { type SitemapFunction } from "remix-sitemap";
 import Layout from "~/components/layout";
 import config from "~/config";
 import useApi from "~/hooks/useApi";
 import { fetchStats } from "~/queries/stats";
+
+export const sitemap: SitemapFunction = () => ({
+  priority: 0.3,
+  changefreq: "monthly",
+});
 
 export const meta: MetaFunction = () => {
   return [

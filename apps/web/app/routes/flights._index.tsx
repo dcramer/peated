@@ -7,6 +7,7 @@ import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 
+import { type SitemapFunction } from "remix-sitemap";
 import Button from "~/components/button";
 import EmptyActivity from "~/components/emptyActivity";
 import ListItem from "~/components/listItem";
@@ -16,7 +17,11 @@ import useApi from "~/hooks/useApi";
 import { fetchFlights } from "~/queries/flights";
 import { fetchFriends } from "~/queries/friends";
 
-export async function loader({ context }: LoaderFunctionArgs) {
+export const sitemap: SitemapFunction = () => ({
+  exclude: true,
+});
+
+export async function loader({ request, context }: LoaderFunctionArgs) {
   if (!context.user) return redirectToAuth({ request });
 
   const queryClient = new QueryClient();
