@@ -1,5 +1,7 @@
 locals {
-  cloud_sql_instance = var.cloud_sql_instance != "" ? [var.cloud_sql_instance] : []
+  cloud_sql_instance   = var.cloud_sql_instance != "" ? [var.cloud_sql_instance] : []
+  cloud_sql_http_port  = 9801
+  cloud_sql_admin_port = 9092
 }
 
 resource "google_compute_global_address" "ip_address" {
@@ -207,12 +209,115 @@ resource "kubernetes_deployment_v1" "default" {
           }
         }
 
+        # https://github.com/GoogleCloudPlatform/cloud-sql-proxy/blob/main/examples/k8s-health-check/proxy_with_http_health_check.yaml
         dynamic "container" {
           for_each = local.cloud_sql_instance
           content {
             name  = "cloud-sql-proxy"
-            image = "gcr.io/cloud-sql-connectors/cloud-sql-proxy"
-            args  = ["--structured-logs", "--port=5432", container.value]
+            image = "gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.6.0"
+            args  = [container.value]
+
+            env {
+              name  = "CSQL_PROXY_PORT"
+              value = "5432"
+            }
+
+            # Enable HTTP healthchecks on port 9801. This enables /liveness,
+            # /readiness and /startup health check endpoints. Allow connections
+            # listen for connections on any interface (0.0.0.0) so that the
+            # k8s management components can reach these endpoints.
+            env {
+              name  = "CSQL_PROXY_HEALTH_CHECK"
+              value = "true"
+            }
+            env {
+              name  = "CSQL_PROXY_HTTP_PORT"
+              value = local.cloud_sql_http_port
+            }
+            env {
+              name  = "CSQL_PROXY_HTTP_ADDRESS"
+              value = "0.0.0.0"
+            }
+
+            # Configure the proxy to exit gracefully when sent a k8s configuration
+            # file.
+            env {
+              name  = "CSQL_PROXY_EXIT_ZERO_ON_SIGTERM"
+              value = "true"
+            }
+
+            # Enable the admin api server (which only listens for local connections)
+            # and enable the /quitquitquit endpoint. This allows other pods
+            # to shut down the proxy gracefully when they are ready to exit.
+            env {
+              name  = "CSQL_PROXY_QUITQUITQUIT"
+              value = "true"
+            }
+            env {
+              name  = "CSQL_PROXY_ADMIN_PORT"
+              value = local.cloud_sql_admin_port
+            }
+
+            # Enable structured logging with LogEntry format
+            env {
+              name  = "CSQL_PROXY_STRUCTURED_LOGS"
+              value = "true"
+            }
+
+            port {
+              container_port = local.cloud_sql_http_port
+              protocol       = "TCP"
+            }
+
+            # Configure kubernetes to call the /quitquitquit endpoint on the
+            # admin server before sending SIGTERM to the proxy before stopping
+            # the pod. This will give the proxy more time to gracefully exit.
+            lifecycle {
+              pre_stop {
+                http_get {
+                  path   = "/quitquitquit"
+                  port   = local.cloud_sql_admin_port
+                  scheme = "HTTP"
+                }
+              }
+            }
+
+            startup_probe {
+              failure_threshold = 60
+              http_get {
+                path   = "/startup"
+                port   = local.cloud_sql_http_port
+                scheme = "HTTP"
+              }
+              period_seconds    = 1
+              success_threshold = 1
+              timeout_seconds   = 10
+            }
+
+            liveness_probe {
+              failure_threshold = 3
+              http_get {
+                path   = "/liveness"
+                port   = local.cloud_sql_http_port
+                scheme = "HTTP"
+              }
+              period_seconds    = 10
+              success_threshold = 1
+              timeout_seconds   = 10
+            }
+
+            readiness_probe {
+              http_get {
+                path   = "/readiness"
+                port   = local.cloud_sql_http_port
+                scheme = "HTTP"
+              }
+              initial_delay_seconds = 10
+              period_seconds        = 10
+              timeout_seconds       = 10
+              success_threshold     = 1
+              failure_threshold     = 6
+            }
 
             security_context {
               allow_privilege_escalation = true
@@ -233,13 +338,13 @@ resource "kubernetes_deployment_v1" "default" {
                 # cant seem to adjust this to less than 1
                 cpu = "1"
                 # memory should scale based on pg pool size
-                memory            = "512m"
+                memory            = "1Gi"
                 ephemeral-storage = "1Gi"
               }
 
               limits = {
                 cpu               = "1"
-                memory            = "512m"
+                memory            = "1Gi"
                 ephemeral-storage = "1Gi"
               }
             }
