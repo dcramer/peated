@@ -5,7 +5,7 @@ import fastifyPlugin from "fastify-plugin";
 function filterScaries(env: NodeJS.ProcessEnv) {
   return Object.fromEntries(
     Object.entries(env).filter(([k, v]) => {
-      return k.match(/password|secret|auth|key|token/i);
+      return !k.match(/password|secret|auth|key|token/i);
     }),
   );
 }
