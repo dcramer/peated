@@ -36,9 +36,10 @@ export default fastifyPlugin(async (fastify, options) => {
 
   fastify.addHook("preValidation", async (request) => {
     Sentry.addGlobalEventProcessor((event) => {
+      if (!event.request) return event;
       try {
         // upgrade the request w/ body
-        event.request!.data =
+        event.request.data =
           request.body !== undefined
             ? isString(request.body)
               ? request.body
@@ -47,8 +48,6 @@ export default fastifyPlugin(async (fastify, options) => {
       } catch (err) {
         console.error(err);
       }
-
-      console.log(event);
 
       return event;
     });
