@@ -12,45 +12,49 @@ function filterScaries(env: NodeJS.ProcessEnv) {
 
 export default fastifyPlugin(async (fastify, options) => {
   fastify.addHook("onRequest", async (request) => {
-    Sentry.addGlobalEventProcessor((event) => {
-      try {
-        event.transaction = `${request.method} ${request.routeOptions.url}`;
-        event.transaction_info = {
-          source: "url",
-        };
-        if (!event.contexts) event.contexts = {};
-        event.contexts.environment = filterScaries(process.env);
-        event.request = {
-          method: request.method,
-          url: `${request.protocol}://${request.hostname}${request.url}`,
-          headers: request.headers as Record<string, string>, // idgaf
-          query_string: request.query as Record<string, any>,
-        };
-      } catch (err) {
-        console.error(err);
-      }
+    Sentry.configureScope((scope) =>
+      scope.addEventProcessor((event) => {
+        try {
+          event.transaction = `${request.method} ${request.routeOptions.url}`;
+          event.transaction_info = {
+            source: "url",
+          };
+          if (!event.contexts) event.contexts = {};
+          event.contexts.environment = filterScaries(process.env);
+          event.request = {
+            method: request.method,
+            url: `${request.protocol}://${request.hostname}${request.url}`,
+            headers: request.headers as Record<string, string>, // idgaf
+            query_string: request.query as Record<string, any>,
+          };
+        } catch (err) {
+          console.error(err);
+        }
 
-      return event;
-    });
+        return event;
+      }),
+    );
   });
 
   fastify.addHook("preValidation", async (request) => {
-    Sentry.addGlobalEventProcessor((event) => {
-      if (!event.request) return event;
-      try {
-        // upgrade the request w/ body
-        event.request.data =
-          request.body !== undefined
-            ? isString(request.body)
-              ? request.body
-              : JSON.stringify(normalize(request.body))
-            : undefined;
-      } catch (err) {
-        console.error(err);
-      }
+    Sentry.configureScope((scope) =>
+      scope.addEventProcessor((event) => {
+        if (!event.request) return event;
+        try {
+          // upgrade the request w/ body
+          event.request!.data =
+            request.body !== undefined
+              ? isString(request.body)
+                ? request.body
+                : JSON.stringify(normalize(request.body))
+              : undefined;
+        } catch (err) {
+          console.error(err);
+        }
 
-      return event;
-    });
+        return event;
+      }),
+    );
   });
 
   fastify.addHook("onError", async (_request, _reply, error) => {

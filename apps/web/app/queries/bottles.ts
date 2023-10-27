@@ -13,7 +13,6 @@ type BottleQueryParams = {
   tag?: string;
   flight?: string;
   page?: string | number;
-  limit?: string | number;
   sort?: string;
 };
 

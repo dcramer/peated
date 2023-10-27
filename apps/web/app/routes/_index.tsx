@@ -26,7 +26,6 @@ import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import type { ApiClient } from "~/lib/api";
 import classNames from "~/lib/classNames";
-import { fetchBottles } from "~/queries/bottles";
 import { fetchPriceChanges } from "~/queries/stores";
 
 const defaultViewParam = "global";
@@ -112,15 +111,6 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
     },
   });
 
-  await queryClient.prefetchQuery({
-    queryKey: ["bottles", "random"],
-    queryFn: () =>
-      fetchBottles(context.api, {
-        limit: 1,
-        sort: "-tastings",
-      }),
-  });
-
   await queryClient.prefetchInfiniteQuery({
     queryKey: ["tastings", filter],
     queryFn: () =>
@@ -138,17 +128,6 @@ export default function Activity() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const filterParam = mapFilterParam(qs.get("view"));
-  const api = useApi();
-
-  const { data } = useQuery({
-    queryKey: ["bottles", "random"],
-    queryFn: () =>
-      fetchBottles(api, {
-        limit: 1,
-        sort: "-tastings",
-      }),
-  });
-  const discoverBottle = data?.results[0];
 
   return (
     <Layout>
@@ -173,7 +152,7 @@ export default function Activity() {
           </Tabs>
           <ActivityContent filter={filterParam} />
         </div>
-        <div className="ml-4 hidden w-[300px] sm:block">
+        <div className="ml-4 hidden w-[200px] sm:block">
           {!user && (
             <div className="hidden flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800 sm:flex">
               <p className="text-light mb-4 text-sm">
@@ -184,24 +163,6 @@ export default function Activity() {
                 Sign Up or Login
               </Button>
             </div>
-          )}
-          {discoverBottle && (
-            <>
-              <Tabs fullWidth>
-                <Tabs.Item active>Discover</Tabs.Item>
-              </Tabs>
-              <div className="my-4 flex flex-col items-center gap-y-4">
-                <h3 className="truncate">
-                  <Link
-                    to={`/bottles/${discoverBottle.id}`}
-                    className="hover:underline"
-                  >
-                    {discoverBottle.fullName}
-                  </Link>
-                </h3>
-                <Button to="/bottles">Discover More Bottles</Button>
-              </div>
-            </>
           )}
           <Tabs fullWidth>
             <Tabs.Item active>Market Prices</Tabs.Item>
