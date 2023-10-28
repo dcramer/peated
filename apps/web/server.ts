@@ -25,7 +25,7 @@ Sentry.init({
     new Sentry.Integrations.Http({ tracing: true }),
     ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
   ],
-  // tracePropagationTargets: ["localhost", "api.peated.app", "peated.app"],
+  // tracePropagationTargets: ["localhost", "peated.com", config.API_SERVER],
 });
 
 const app = express();
