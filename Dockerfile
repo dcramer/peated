@@ -44,8 +44,6 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
     pnpm build
 
-RUN echo $VERSION > VERSION
-
 # web service
 FROM base-env as web
 COPY --from=prod-deps /app/node_modules /app/node_modules
@@ -58,7 +56,8 @@ EXPOSE 3000
 
 WORKDIR /app/apps/web
 
-RUN export VERSION=$(cat /app/VERSION)
+ARG VERSION
+ENV VERSION $VERSION
 
 CMD ["pnpm", "start"]
 
@@ -69,7 +68,8 @@ COPY --from=build /app/ /app/
 
 WORKDIR /app/apps/worker
 
-RUN export VERSION=$(cat /app/VERSION)
+ARG VERSION
+ENV VERSION $VERSION
 
 CMD ["pnpm", "start"]
 
@@ -85,6 +85,7 @@ EXPOSE 4000
 
 WORKDIR /app/apps/api
 
-RUN export VERSION=$(cat /app/VERSION)
+ARG VERSION
+ENV VERSION $VERSION
 
 CMD ["pnpm", "start"]
