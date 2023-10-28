@@ -1,5 +1,7 @@
 import { PassThrough } from "stream";
 
+import type {
+  DataFunctionArgs} from "@remix-run/node";
 import {
   createReadableStreamFromReadable,
   type EntryContext,
@@ -8,6 +10,7 @@ import { RemixServer } from "@remix-run/react";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 
+import * as Sentry from "@sentry/remix";
 import { createSitemapGenerator } from "remix-sitemap";
 
 const ABORT_DELAY = 5_000;
@@ -138,4 +141,15 @@ function handleBrowserRequest(
 
     setTimeout(abort, ABORT_DELAY);
   });
+}
+
+export function handleError(
+  error: unknown,
+  { request }: DataFunctionArgs,
+): void {
+  if (error instanceof Error) {
+    Sentry.captureRemixServerException(error, "remix.server", request);
+  } else {
+    Sentry.captureException(error);
+  }
 }
