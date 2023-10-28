@@ -6,7 +6,7 @@ import type {
 import {
   json,
   redirect,
-  unstable_createMemoryUploadHandler,
+  unstable_createFileUploadHandler,
   unstable_parseMultipartFormData,
 } from "@remix-run/node";
 import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
@@ -32,7 +32,7 @@ import { logError } from "~/lib/log";
 export async function action({ context, request, params }: ActionFunctionArgs) {
   invariant(params.tastingId);
 
-  const uploadHandler = unstable_createMemoryUploadHandler({
+  const uploadHandler = unstable_createFileUploadHandler({
     maxPartSize: MAX_FILESIZE,
   });
 
