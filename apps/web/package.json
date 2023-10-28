@@ -6,7 +6,7 @@
     "assets:watch": "npm-watch assets",
     "build": "npm run build:remix && npm run build:server && npm run build:assets && npm run build:sitemap",
     "build:remix": "cross-env NODE_ENV=production remix build --sourcemap",
-    "build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle",
+    "build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle --sourcemap",
     "build:assets": "npm run assets",
     "build:sitemap": "remix-sitemap",
     "dev": "concurrently \"npm:dev:*\"",
