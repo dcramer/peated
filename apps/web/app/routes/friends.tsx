@@ -30,7 +30,7 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({ context }: LoaderFunctionArgs) {
+export async function loader({ context, request }: LoaderFunctionArgs) {
   if (!context.user) return redirectToAuth({ request });
 
   const queryClient = new QueryClient();
