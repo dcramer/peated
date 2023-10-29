@@ -18,6 +18,7 @@ env:
   PROJECT_ID: cask-382601
   GOOGLE_CLIENT_ID: "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"
   SENTRY_DSN: "https://883a3e8bec6a4c4bae25f967d792b492@o172566.ingest.sentry.io/4505138086019073"
+  SENTRY_ORG: "peated"
   SENTRY_PROJECT: "peated"
   API_SERVER: https://api.peated.com
 jobs:
@@ -106,6 +107,7 @@ jobs:
             API_SERVER=${{ env.API_SERVER }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_ORG=${{ env.SENTRY_ORG }}
             SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
@@ -124,6 +126,7 @@ jobs:
             API_SERVER=${{ env.API_SERVER }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_ORG=${{ env.SENTRY_ORG }}
             SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
@@ -144,6 +147,7 @@ jobs:
             API_SERVER=${{ env.API_SERVER }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_ORG=${{ env.SENTRY_ORG }}
             SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
@@ -164,6 +168,7 @@ jobs:
             API_SERVER={{ env.API_SERVER }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_ORG=${{ env.SENTRY_ORG }}
             SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
