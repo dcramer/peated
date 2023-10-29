@@ -9,7 +9,7 @@ import {
   unstable_createFileUploadHandler,
   unstable_parseMultipartFormData,
 } from "@remix-run/node";
-import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigate } from "@remix-run/react";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -18,13 +18,16 @@ import invariant from "tiny-invariant";
 import { MAX_FILESIZE } from "@peated/shared/constants";
 
 import type { Tasting } from "@peated/shared/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Fieldset from "~/components/fieldset";
+import Form from "~/components/form";
 import FormError from "~/components/formError";
 import FormHeader from "~/components/formHeader";
 import Header from "~/components/header";
 import ImageField from "~/components/imageField";
 import Layout from "~/components/layout";
 import Spinner from "~/components/spinner";
+import useApi from "~/hooks/useApi";
 import { ApiError } from "~/lib/api";
 import { toBlob } from "~/lib/blobs";
 import { logError } from "~/lib/log";
@@ -87,8 +90,37 @@ export const meta: MetaFunction = () => {
 export default function EditTastingImage() {
   const { error } = useActionData<typeof action>() || {};
   const { tasting } = useLoaderData<typeof loader>();
+  const api = useApi();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
-  const submit = useSubmit();
+  const saveTastingImage = useMutation({
+    mutationFn: async () => {
+      if (!image) {
+        await api.delete(`/tastings/${tasting.id}/image`);
+      } else {
+        const blob = await toBlob(image, 0.8);
+        try {
+          await api.post(`/tastings/${tasting.id}/image`, {
+            data: {
+              image: blob,
+            },
+          });
+        } catch (err) {
+          if (err instanceof ApiError) {
+            return json({ error: err.message });
+          } else {
+            logError(err);
+            return json({ error: "Unknown error" });
+          }
+        }
+      }
+      return image;
+    },
+    onSuccess: (newUser) => {
+      queryClient.invalidateQueries(["tastings", tasting.id]);
+    },
+  });
 
   const [image, setImage] = useState<HTMLCanvasElement | null>(null);
 
@@ -98,12 +130,9 @@ export default function EditTastingImage() {
   } = useForm<Record<string, never>>({});
 
   const onSubmit: SubmitHandler<Record<string, never>> = async () => {
-    const data = new FormData();
-    if (image) {
-      const blob = await toBlob(image, 0.8);
-      if (blob) data.append("image", blob);
-    }
-    submit(data, { method: "POST", encType: "multipart/form-data" });
+    await saveTastingImage.mutateAsync(undefined, {
+      onSuccess: () => navigate(`/tastings/${tasting.id}`),
+    });
   };
 
   return (
@@ -125,7 +154,7 @@ export default function EditTastingImage() {
           <Spinner />
         </div>
       )}
-      <form
+      <Form
         className="w-full max-w-xl self-center bg-slate-950 pb-6 sm:my-6"
         onSubmit={handleSubmit(onSubmit)}
       >
@@ -141,7 +170,7 @@ export default function EditTastingImage() {
             imageHeight={768 / 2}
           />
         </Fieldset>
-      </form>
+      </Form>
     </Layout>
   );
 }
