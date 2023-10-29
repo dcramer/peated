@@ -12,11 +12,9 @@ WORKDIR /app
 # these are used for sourcemap publishing, and to prevent cache busting
 # on docker layers - they SHOULD NOT CHANGE between targets
 ARG SENTRY_DSN
-ARG SENTRY_WEB_PROJECT
 ARG API_SERVER
 ARG GOOGLE_CLIENT_ID
 ENV SENTRY_DSN=$SENTRY_DSN \
-    SENTRY_WEB_PROJECT=$SENTRY_WEB_PROJECT \
     API_SERVER=$API_SERVER \
     GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
 
@@ -38,7 +36,9 @@ ADD . .
 
 # needs bound before build
 ARG VERSION
-ENV VERSION $VERSION
+ARG SENTRY_PROJECT
+ENV VERSION=$VERSION \
+    SENTRY_PROJECT=$SENTRY_PROJECT
 
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
