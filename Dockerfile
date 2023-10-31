@@ -4,7 +4,7 @@ ENV NODE_ENV="production" \
     PNPM_HOME="/pnpm" \
     PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-RUN apt update -y && apt install -y libc-dev fftw-dev gcc g++ make libc6
+RUN apt update -y && apt install -y libc-dev fftw-dev gcc g++ make libc6 ca-certificates
 RUN npm install -g -f pnpm
 
 FROM base as base-env
