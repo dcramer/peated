@@ -225,6 +225,8 @@ jobs:
               - apps/worker/**
             shared:
               - packages/**
+              - Dockerfile
+              - package.json
             migrations:
               - apps/**/migrations/*.sql
               - packages/**/migrations/*.sql
