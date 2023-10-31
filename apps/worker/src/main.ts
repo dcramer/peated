@@ -12,6 +12,8 @@ import { main as healthyspirits } from "./price-scraper/healthyspirits";
 import { main as totalwine } from "./price-scraper/totalwine";
 import { main as woodencork } from "./price-scraper/woodencork";
 
+import packageData from "../package.json";
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   release: process.env.VERSION,
@@ -21,6 +23,8 @@ Sentry.init({
   profilesSampleRate: 1.0,
   integrations: [new ProfilingIntegration()],
 });
+
+Sentry.setTag("service", packageData.name);
 
 function job(schedule: string, name: string, cb: () => Promise<void>) {
   const task = new AsyncTask(name, async () => {

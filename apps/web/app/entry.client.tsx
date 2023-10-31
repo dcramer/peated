@@ -4,6 +4,8 @@ import { startTransition, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
 import config from "./config";
 
+import packageData from "../package.json";
+
 Sentry.init({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
@@ -34,6 +36,8 @@ Sentry.init({
   replaysSessionSampleRate: 0.01,
   replaysOnErrorSampleRate: 1.0,
 });
+
+Sentry.setTag("service", packageData.name);
 
 startTransition(() => {
   hydrateRoot(document, <RemixBrowser />);

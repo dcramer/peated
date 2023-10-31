@@ -17,6 +17,8 @@ import {
 
 import * as Sentry from "@sentry/remix";
 
+import packageData from "./package.json";
+
 Sentry.init({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
@@ -27,6 +29,8 @@ Sentry.init({
   ],
   // tracePropagationTargets: ["localhost", "peated.com", config.API_SERVER],
 });
+
+Sentry.setTag("service", packageData.name);
 
 const app = express();
 const metricsApp = express();
