@@ -5,7 +5,7 @@
     "assets": "npx @svgr/cli --out-dir app/components/assets -- app/assets",
     "assets:watch": "npm-watch assets",
     "build": "npm run build:remix && npm run build:server && npm run build:assets && npm run build:sitemap",
-    "build:remix": "cross-env NODE_ENV=production remix build --sourcemap && node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js --release $SENTRY_RELEASE && find ./public/build -type f -name '*.map' -delete && find ./build -type f -name '*.map' -delete",
+    "build:remix": "cross-env NODE_ENV=production remix build --sourcemap && npm run sentry:upload-sourcemaps && find ./public/build -type f -name '*.map' -delete && find ./build -type f -name '*.map' -delete",
     "build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle --sourcemap",
     "build:assets": "npm run assets",
     "build:sitemap": "remix-sitemap",
@@ -13,6 +13,7 @@
     "dev:remix": "cross-env NODE_ENV=development remix watch",
     "dev:server": "cross-env NODE_ENV=development nodemon --exec 'esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle && node --require dotenv/config ./build/server.js' --watch ./server.ts",
     "dev:assets": "npm run assets && npm run assets:watch",
+    "sentry:upload-sourcemaps": "if test \"$NODE_ENV\" = \"production\"; then node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js --release $SENTRY_RELEASE; fi",
     "start": "cross-env NODE_ENV=production node ./build/server.js",
     "typecheck": "tsc --noEmit"
   },
