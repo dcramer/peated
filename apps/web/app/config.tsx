@@ -6,6 +6,7 @@ const config = {
   GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID || "",
   SENTRY_DSN: env.SENTRY_DSN,
   API_SERVER: env.API_SERVER || "http://localhost:4000",
+  FATHOM_SITE_ID: env.FATHOM_SITE_ID,
 
   VERSION: env.VERSION,
   GITHUB_REPO: "https://github.com/dcramer/peated",

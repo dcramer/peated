@@ -14,9 +14,11 @@ WORKDIR /app
 ARG SENTRY_DSN
 ARG API_SERVER
 ARG GOOGLE_CLIENT_ID
+ARG FATHOM_SITE_ID
 ENV SENTRY_DSN=$SENTRY_DSN \
     API_SERVER=$API_SERVER \
-    GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+    GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+    FATHOM_SITE_ID=$FATHOM_SITE_ID
 
 ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
 ADD apps/web/package.json ./apps/web/package.json

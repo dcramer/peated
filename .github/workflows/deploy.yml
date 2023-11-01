@@ -21,6 +21,7 @@ env:
   SENTRY_ORG: "peated"
   SENTRY_PROJECT: "peated"
   API_SERVER: https://api.peated.com
+  FATHOM_SITE_ID: "OGNPFEUC"
 jobs:
   build:
     name: 🚀 Build
@@ -109,6 +110,7 @@ jobs:
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_ORG=${{ env.SENTRY_ORG }}
             SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
+            FATHOM_SITE_ID=${{ env.FATHOM_SITE_ID }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
 
@@ -128,6 +130,7 @@ jobs:
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_ORG=${{ env.SENTRY_ORG }}
             SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
+            FATHOM_SITE_ID=${{ env.FATHOM_SITE_ID }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
           tags: |
@@ -149,6 +152,7 @@ jobs:
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_ORG=${{ env.SENTRY_ORG }}
             SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
+            FATHOM_SITE_ID=${{ env.FATHOM_SITE_ID }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
           tags: |
@@ -170,6 +174,7 @@ jobs:
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_ORG=${{ env.SENTRY_ORG }}
             SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
+            FATHOM_SITE_ID=${{ env.FATHOM_SITE_ID }}
           secrets: |
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
           tags: |

@@ -217,6 +217,13 @@ function Document({
         )}
         {title ? <title>{title}</title> : <title>Peated</title>}
         <Links />
+        {config?.FATHOM_SITE_ID && (
+          <script
+            src="https://cdn.usefathom.com/script.js"
+            data-site={config.FATHOM_SITE_ID}
+            defer
+          ></script>
+        )}
       </head>
       <body className="h-full">
         <LoadingIndicator />
