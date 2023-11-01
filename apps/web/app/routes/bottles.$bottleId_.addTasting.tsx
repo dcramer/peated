@@ -76,6 +76,10 @@ export default function AddTasting() {
   const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
   const [friendsValue, setFriendsValue] = useState<Option[]>([]);
 
+  // capture this on initial load as its utilized to prevent
+  // duplicate tasting submissions
+  const createdAt = new Date().toISOString();
+
   const {
     control,
     register,
@@ -94,7 +98,7 @@ export default function AddTasting() {
       tasting = await api.post("/tastings", {
         data: {
           ...data,
-          createdAt: new Date().toISOString(),
+          createdAt,
         },
       });
     } catch (err) {
