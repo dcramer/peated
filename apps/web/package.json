@@ -5,12 +5,12 @@
     "assets": "npx @svgr/cli --out-dir app/components/assets -- app/assets",
     "assets:watch": "npm-watch assets",
     "build": "npm run build:remix && npm run build:server && npm run build:assets && npm run build:sitemap",
-    "build:remix": "cross-env NODE_ENV=production remix build --sourcemap && npm run sentry:upload-sourcemaps && find ./public/build -type f -name '*.map' -delete && find ./build -type f -name '*.map' -delete",
+    "build:remix": "cross-env NODE_ENV=production vite build --sourcemap && vite build --ssr --sourcemap && npm run sentry:upload-sourcemaps && find ./public/build -type f -name '*.map' -delete && find ./build -type f -name '*.map' -delete",
     "build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle --sourcemap",
     "build:assets": "npm run assets",
     "build:sitemap": "remix-sitemap",
     "dev": "concurrently \"npm:dev:*\"",
-    "dev:remix": "cross-env NODE_ENV=development remix watch",
+    "dev:remix": "cross-env NODE_ENV=development vite dev",
     "dev:server": "cross-env NODE_ENV=development nodemon --exec 'esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle && node --require dotenv/config ./build/server.js' --watch ./server.ts",
     "dev:assets": "npm run assets && npm run assets:watch",
     "sentry:upload-sourcemaps": "if test \"$NODE_ENV\" = \"production\"; then node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js --release $SENTRY_RELEASE; fi",
@@ -27,7 +27,6 @@
     "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",
     "@react-oauth/google": "^0.11.1",
-    "@remix-run/css-bundle": "^2.7.2",
     "@remix-run/dev": "^2.7.2",
     "@remix-run/eslint-config": "^2.7.2",
     "@remix-run/express": "^2.7.2",
@@ -94,6 +93,7 @@
     "typescript": "^5.3.3",
     "use-dehydrated-state": "^0.1.0",
     "usehooks-ts": "^2.9.1",
+    "vite": "^4.5.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -110,5 +110,8 @@
       "extensions": "svg",
       "quiet": false
     }
+  },
+  "devDependencies": {
+    "vite-tsconfig-paths": "^4.2.1"
   }
 }

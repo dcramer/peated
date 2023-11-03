@@ -1,7 +1,6 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import type {
-  Flight} from "@peated/server/db/schema";
+import type { Flight } from "@peated/server/db/schema";
 import {
   bottles,
   bottlesToDistillers,
