@@ -1,4 +1,3 @@
-import FontStyles from "@fontsource/raleway/index.css";
 import { sentryLink } from "@peated/server/src/lib/trpc";
 import type { User } from "@peated/server/types";
 import glyphUrl from "@peated/web/assets/glyph.png";
@@ -6,13 +5,12 @@ import logo192Url from "@peated/web/assets/logo192.png";
 import ErrorPage from "@peated/web/components/error-page";
 import { AuthProvider } from "@peated/web/hooks/useAuth";
 import { OnlineStatusProvider } from "@peated/web/hooks/useOnlineStatus";
-import stylesheetUrl from "@peated/web/styles/index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   Links,
+  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -38,6 +36,9 @@ import { ApiProvider } from "./hooks/useApi";
 import { ApiUnauthorized } from "./lib/api";
 import { logError } from "./lib/log";
 import { trpc } from "./lib/trpc";
+
+import "@fontsource/raleway/index.css";
+import "~/styles/index.css";
 
 function initMobileControls() {
   if (typeof document === "undefined") return;
@@ -79,8 +80,6 @@ unregisterServiceWorkers();
 
 export const links: LinksFunction = () => [
   { rel: "manifest", href: "/resources/manifest.webmanifest" },
-  { rel: "stylesheet", href: stylesheetUrl },
-  { rel: "stylesheet", href: stylesheetUrl },
   { rel: "icon", type: "image/png", href: glyphUrl },
   {
     rel: "mask-icon",
@@ -94,9 +93,6 @@ export const links: LinksFunction = () => [
     href: logo192Url,
     color: config.THEME_COLOR,
   },
-
-  { rel: "stylesheet", href: FontStyles },
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
 export async function loader({ context }: LoaderFunctionArgs) {
@@ -293,8 +289,8 @@ function Document({
             })};`,
           }}
         />
+        <LiveReload />
         <Scripts />
-        {/* <LiveReload /> */}
       </body>
     </html>
   );
