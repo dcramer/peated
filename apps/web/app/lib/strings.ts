@@ -5,5 +5,5 @@ export function formatCategoryName(
   value: Category | string | undefined | null,
 ) {
   if (!value) return "";
-  return toTitleCase(`${value}`.replace("_", " "));
+  return toTitleCase(`${value}`.replace(/_/g, " "));
 }
