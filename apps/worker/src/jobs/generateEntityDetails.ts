@@ -1,5 +1,6 @@
 import { COUNTRY_LIST, DEFAULT_CREATED_BY_ID } from "@peated/shared/constants";
 import { db } from "@peated/shared/db";
+import type { Entity} from "@peated/shared/db/schema";
 import { changes, entities } from "@peated/shared/db/schema";
 import { arraysEqual } from "@peated/shared/lib/equals";
 import { CountryEnum, EntityTypeEnum } from "@peated/shared/schemas";
@@ -65,15 +66,20 @@ const OpenAIBottleDetailsValidationSchema = OpenAIBottleDetailsSchema.extend({
 
 type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
 
-async function generateEntityDetails(
-  entityName: string,
-): Promise<Response | null> {
+async function generateEntityDetails(entity: Entity): Promise<Response | null> {
   if (!config.OPENAI_API_KEY) return null;
 
   const result = await getStructuredResponse(
-    generatePrompt(entityName),
+    generatePrompt(entity.name),
     OpenAIBottleDetailsSchema,
     OpenAIBottleDetailsValidationSchema,
+    undefined,
+    {
+      entity: {
+        id: entity.id,
+        name: entity.name,
+      },
+    },
   );
 
   if (!result || result.confidence < 0.75)
@@ -88,7 +94,7 @@ export default async ({ entityId }: { entityId: number }) => {
     where: (entities, { eq }) => eq(entities.id, entityId),
   });
   if (!entity) throw new Error("Unknown entity");
-  const result = await generateEntityDetails(entity.name);
+  const result = await generateEntityDetails(entity);
 
   if (!result) return;
 

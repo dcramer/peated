@@ -13,6 +13,7 @@ export async function getStructuredResponse<Schema extends ZodSchema<any>>(
   schema: Schema,
   fullSchema?: undefined | null,
   model?: Model,
+  logContext?: Record<string, Record<string, any>>,
 ): Promise<z.infer<Schema> | null>;
 export async function getStructuredResponse<
   Schema extends ZodSchema<any>,
@@ -22,6 +23,7 @@ export async function getStructuredResponse<
   schema: Schema,
   fullSchema: FullSchema,
   model?: Model,
+  logContext?: Record<string, Record<string, any>>,
 ): Promise<z.infer<FullSchema> | null>;
 export async function getStructuredResponse<
   Schema extends ZodSchema<any>,
@@ -31,6 +33,7 @@ export async function getStructuredResponse<
   schema: Schema,
   fullSchema: FullSchema | null = undefined,
   model: Model = DEFAULT_MODEL,
+  logContext?: Record<string, Record<string, any>>,
 ): Promise<z.infer<FullSchema> | null> {
   const openai = new OpenAI({
     apiKey: config.OPENAI_API_KEY,
@@ -71,6 +74,7 @@ export async function getStructuredResponse<
     logError(
       err,
       {
+        ...logContext,
         openai: {
           completionId: completion.id,
           ...completion.usage,
@@ -89,6 +93,7 @@ export async function getStructuredResponse<
     logError(
       err,
       {
+        ...logContext,
         openai: {
           completionId: completion.id,
           ...completion.usage,
