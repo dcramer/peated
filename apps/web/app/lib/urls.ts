@@ -14,3 +14,9 @@ export function buildQueryString(
   }
   return qs.toString();
 }
+
+export function parseDomain(url: string) {
+  const domain = url.split("://", 2)[1].split("/", 2)[0];
+  if (domain.indexOf("www.") === 0) return domain.substring(4);
+  return domain;
+}

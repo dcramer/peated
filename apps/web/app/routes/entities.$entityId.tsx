@@ -29,7 +29,7 @@ import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { summarize } from "~/lib/markdown";
 import { formatCategoryName } from "~/lib/strings";
-import { getEntityUrl } from "~/lib/urls";
+import { getEntityUrl, parseDomain } from "~/lib/urls";
 import { getEntity } from "~/queries/entities";
 
 export async function loader({ params, context }: LoaderFunctionArgs) {
@@ -228,7 +228,7 @@ export default function EntityDetails() {
                   <dd>
                     {entity.website ? (
                       <a href={entity.website} className="hover:underline">
-                        {entity.website.split("://", 2)[1]}
+                        {parseDomain(entity.website)}
                       </a>
                     ) : (
                       <em>n/a</em>
