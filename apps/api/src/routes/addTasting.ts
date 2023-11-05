@@ -180,7 +180,8 @@ export default {
       return res.status(500).send({ error: "Unable to create tasting" });
     }
 
-    await pushJob("NotifyDiscordOnTasting", { tastingId: tasting.id });
+    if (!req.user.private)
+      await pushJob("NotifyDiscordOnTasting", { tastingId: tasting.id });
 
     res.status(201).send(await serialize(TastingSerializer, tasting, req.user));
   },
