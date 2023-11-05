@@ -12,6 +12,7 @@ import type { Paginated } from "@peated/shared/types";
 
 import type { Tasting } from "@peated/shared/types";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import Alert from "~/components/alert";
 import Glyph from "~/components/assets/Glyph";
 import BetaNotice from "~/components/betaNotice";
 import Button from "~/components/button";
@@ -55,13 +56,19 @@ const getTastings = async ({
 const ActivityContent = ({ filter }: { filter: string }) => {
   const api = useApi();
 
-  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ["tastings", filter],
-      queryFn: ({ pageParam }) =>
-        getTastings({ filterParam: filter, pageParam, api }),
-      getNextPageParam: (lastPage) => lastPage.rel?.nextPage,
-    });
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["tastings", filter],
+    queryFn: ({ pageParam }) =>
+      getTastings({ filterParam: filter, pageParam, api }),
+    getNextPageParam: (lastPage) => lastPage.rel?.nextPage,
+  });
 
   const onScroll = () => {
     if (!hasNextPage) return;
@@ -74,6 +81,17 @@ const ActivityContent = ({ filter }: { filter: string }) => {
   };
 
   useEventListener("scroll", onScroll);
+
+  if (error) {
+    return (
+      <EmptyActivity>
+        <Alert noMargin>
+          Looks like we hit an error trying to load activity. Have a dram and
+          try again later?
+        </Alert>
+      </EmptyActivity>
+    );
+  }
 
   if (!data) return null;
 
