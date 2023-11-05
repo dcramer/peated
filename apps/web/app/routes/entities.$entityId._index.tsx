@@ -79,7 +79,7 @@ export default function EntityDetailsOverview() {
 
       {entity.description && (
         <div className="my-6">
-          <div className="mt-5 flex space-x-4">
+          <div className="flex space-x-4">
             <div className="prose prose-invert -mt-5 max-w-none flex-1">
               <Markdown content={entity.description} />
             </div>
