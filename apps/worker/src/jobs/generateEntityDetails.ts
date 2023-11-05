@@ -28,7 +28,7 @@ Describe the entity as a distiller, bottler, or brand, whichever one it primaril
 
 'yearEstablished' should be the year in which the entity was established.
 
-'website' should be the URL to the official website, if one exists.
+'website' should be the URL to the official website, if one exists. Include the HTTPS protocol in the website value.
 
 'country' should be where the entity is located, if known. Country should be one of the following values:
 
