@@ -13,6 +13,7 @@ import { main as totalwine } from "./price-scraper/totalwine";
 import { main as woodencork } from "./price-scraper/woodencork";
 
 import packageData from "../package.json";
+import notifyDiscordOnTasting from "./jobs/notifyDiscordOnTasting";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -130,6 +131,7 @@ async function main() {
 
 faktory.register("GenerateBottleDetails", generateBottleDetails);
 faktory.register("GenerateEntityDetails", generateEntityDetails);
+faktory.register("NotifyDiscordOnTasting", notifyDiscordOnTasting);
 
 process.on("SIGINT", function () {
   scheduler.stop();

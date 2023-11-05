@@ -16,6 +16,7 @@
     "db:generate": "dotenv -e .env.local -- pnpm --filter='./packages/shared' exec drizzle-kit generate:pg",
     "bottles": "dotenv -e .env.local -- pnpm --filter='./apps/api' bottles",
     "entities": "dotenv -e .env.local -- pnpm --filter='./apps/api' entities",
+    "tastings": "dotenv -e .env.local -- pnpm --filter='./apps/api' tastings",
     "mocks": "dotenv -e .env.local -- pnpm --filter='./apps/api' mocks",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/api' user",
     "scraper": "pnpm --filter './apps/worker' scraper",

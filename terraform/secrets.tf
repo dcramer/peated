@@ -137,3 +137,23 @@ data "google_secret_manager_secret_version" "api_access_token" {
 
   secret = google_secret_manager_secret.api_access_token.id
 }
+
+resource "google_secret_manager_secret" "discord_webhook" {
+  secret_id = "discord_webhook"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "discord_webhook" {
+  secret_id  = google_secret_manager_secret.discord_webhook.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.discord_webhook]
+}
+
+data "google_secret_manager_secret_version" "discord_webhook" {
+  provider = google-beta
+
+  secret = google_secret_manager_secret.discord_webhook.id
+}

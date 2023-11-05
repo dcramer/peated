@@ -26,7 +26,10 @@ export async function shutdownClient() {
   client = null;
 }
 
-export type JobName = "GenerateBottleDetails" | "GenerateEntityDetails";
+export type JobName =
+  | "GenerateBottleDetails"
+  | "GenerateEntityDetails"
+  | "NotifyDiscordOnTasting";
 
 export default async function pushJob(jobName: JobName, args: any) {
   const client = await getClient();

@@ -17,6 +17,7 @@ import {
   follows,
   tastings,
 } from "@peated/shared/db/schema";
+import pushJob from "@peated/shared/jobs";
 import { notEmpty } from "~/lib/filter";
 import { checkBadges } from "../lib/badges";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
@@ -178,6 +179,9 @@ export default {
     if (!tasting) {
       return res.status(500).send({ error: "Unable to create tasting" });
     }
+
+    await pushJob("NotifyDiscordOnTasting", { tastingId: tasting.id });
+
     res.status(201).send(await serialize(TastingSerializer, tasting, req.user));
   },
 } as RouteOptions<
