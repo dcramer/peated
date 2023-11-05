@@ -8,21 +8,16 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Fragment } from "react";
 import invariant from "tiny-invariant";
 
 import type { Bottle } from "@peated/shared/types";
-import RobotImage from "~/assets/robot.png";
 import BottleIcon from "~/components/assets/Bottle";
-import BetaNotice from "~/components/betaNotice";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
 import { ClientOnly } from "~/components/clientOnly";
-import Collapsable from "~/components/collapsable";
 import ConfirmationButton from "~/components/confirmationButton";
 import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
-import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
 import { RangeBarChart } from "~/components/rangeBarChart.client";
 import SkeletonButton from "~/components/skeletonButton";
@@ -34,7 +29,6 @@ import { summarize } from "~/lib/markdown";
 import { formatCategoryName } from "~/lib/strings";
 import {
   fetchBottlePriceHistory,
-  fetchBottlePrices,
   fetchBottleTags,
   getBottle,
 } from "~/queries/bottles";
@@ -157,6 +151,24 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ];
 };
 
+function BottlePriceHistory({ bottleId }: { bottleId: number }) {
+  const api = useApi();
+  const { data, isLoading } = useQuery(
+    ["bottles", bottleId, "priceHistory"],
+    () => fetchBottlePriceHistory(api, bottleId),
+  );
+
+  if (isLoading) return <div className="h-[45px] animate-pulse" />;
+
+  if (!data) return <div className="h-[45px] animate-pulse" />;
+
+  const points = data.results.reverse().map((r, idx) => {
+    return { time: idx, high: r.maxPrice, low: r.minPrice, avg: r.avgPrice };
+  });
+
+  return <RangeBarChart data={points} width={200} height={45} />;
+}
+
 export default function BottleDetails() {
   const { user } = useAuth();
   const api = useApi();
@@ -178,6 +190,8 @@ export default function BottleDetails() {
     await api.delete(`/bottles/${bottle.id}`);
     navigate("/");
   };
+
+  const baseUrl = `/bottles/${bottle.id}`;
 
   return (
     <Layout>
@@ -271,30 +285,7 @@ export default function BottleDetails() {
           )}
         </div>
 
-        <ClientOnly
-          fallback={
-            <div
-              className="mb-4 animate-pulse bg-slate-800"
-              style={{ height: 200 }}
-            />
-          }
-        >
-          {() => (
-            <QueryBoundary
-              fallback={
-                <div
-                  className="mb-4 animate-pulse bg-slate-800"
-                  style={{ height: 200 }}
-                />
-              }
-              loading={<Fragment />}
-            >
-              <BottleTagDistribution bottleId={bottle.id} />
-            </QueryBoundary>
-          )}
-        </ClientOnly>
-
-        <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:text-left">
+        <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:grid-cols-4 sm:text-left">
           {stats.map((stat) => (
             <div key={stat.name}>
               <div className="text-light leading-7">{stat.name}</div>
@@ -303,157 +294,43 @@ export default function BottleDetails() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {bottle.description && (
-        <div className="flex">
-          <div className="flex-1">
-            <Tabs fullWidth border>
-              <Tabs.Item active>About</Tabs.Item>
-            </Tabs>
-            <div className="my-6">
-              <div className="mt-5 flex space-x-4">
-                <Collapsable mobileOnly>
-                  <div className="prose prose-invert -mt-5 max-w-none flex-1">
-                    <Markdown content={bottle.description} />
-                  </div>
-                  {bottle.tastingNotes && (
-                    <>
-                      <h3 className="text-highlight text-lg font-bold">
-                        Tasting Notes
-                      </h3>
-                      <div className="prose prose-invert max-w-none flex-1">
-                        <dl>
-                          <dt>Nose</dt>
-                          <dd>{bottle.tastingNotes.nose}</dd>
-                          <dt>Palate</dt>
-                          <dd>{bottle.tastingNotes.palate}</dd>
-                          <dt>Finish</dt>
-                          <dd>{bottle.tastingNotes.finish}</dd>
-                        </dl>
-                      </div>
-                    </>
-                  )}
-                </Collapsable>
-
-                <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
-              </div>
+          <div className="hidden sm:block">
+            <div className="text-light leading-7">Price</div>
+            <div className="flex items-center">
+              <ClientOnly fallback={<div className="h-[45px] animate-pulse" />}>
+                {() => <BottlePriceHistory bottleId={bottle.id} />}
+              </ClientOnly>
             </div>
           </div>
         </div>
+      </div>
+
+      <Tabs fullWidth border>
+        <Tabs.Item as={Link} to={baseUrl} controlled>
+          Overview
+        </Tabs.Item>
+        <Tabs.Item as={Link} to={`${baseUrl}/tastings`} controlled>
+          Tastings ({bottle.totalTastings.toLocaleString()})
+        </Tabs.Item>
+        <Tabs.Item as={Link} to={`${baseUrl}/prices`} controlled>
+          Prices
+        </Tabs.Item>
+      </Tabs>
+
+      <Outlet context={{ bottle }} />
+
+      {bottle.createdBy && (
+        <div className="mt-8 text-center text-sm text-slate-500 sm:text-left">
+          This bottle was first added by{" "}
+          <Link
+            to={`/users/${bottle.createdBy.username}`}
+            className="font-medium hover:underline"
+          >
+            {bottle.createdBy.displayName}
+          </Link>{" "}
+          {bottle.createdAt && <TimeSince date={bottle.createdAt} />}
+        </div>
       )}
-
-      <div className="flex">
-        <div className="flex-1">
-          <Tabs fullWidth border>
-            <Tabs.Item as={Link} to={`/bottles/${bottle.id}`} controlled>
-              Activity
-            </Tabs.Item>
-          </Tabs>
-
-          <Outlet context={{ bottle }} />
-
-          {bottle.createdBy && (
-            <div className="mt-8 text-center text-sm text-slate-500 sm:text-left">
-              This bottle was first added by{" "}
-              <Link
-                to={`/users/${bottle.createdBy.username}`}
-                className="font-medium hover:underline"
-              >
-                {bottle.createdBy.displayName}
-              </Link>{" "}
-              {bottle.createdAt && <TimeSince date={bottle.createdAt} />}
-            </div>
-          )}
-        </div>
-        <div className="ml-4 hidden w-[200px] sm:block">
-          <ClientOnly fallback={<BottlePricesSkeleton />}>
-            {() => (
-              <QueryBoundary loading={<BottlePricesSkeleton />}>
-                <BottlePrices bottleId={bottle.id} />
-              </QueryBoundary>
-            )}
-          </ClientOnly>
-        </div>
-      </div>
     </Layout>
-  );
-}
-
-function BottlePricesSkeleton() {
-  return (
-    <div>
-      <Tabs fullWidth>
-        <Tabs.Item active>Prices</Tabs.Item>
-      </Tabs>
-      <div
-        className="mt-4 animate-pulse bg-slate-800"
-        style={{ height: 200 }}
-      />
-    </div>
-  );
-}
-
-function BottlePriceHistory({ bottleId }: { bottleId: number }) {
-  const api = useApi();
-  const { data, isLoading } = useQuery(
-    ["bottles", bottleId, "priceHistory"],
-    () => fetchBottlePriceHistory(api, bottleId),
-  );
-
-  if (isLoading) return <div className="h-6 animate-pulse" />;
-
-  if (!data) return null;
-
-  const points = data.results.reverse().map((r, idx) => {
-    return { time: idx, high: r.maxPrice, low: r.minPrice, avg: r.avgPrice };
-  });
-
-  return <RangeBarChart data={points} width={200} height={100} />;
-}
-
-function BottlePrices({ bottleId }: { bottleId: number }) {
-  const api = useApi();
-  const { data } = useQuery(["bottles", bottleId, "prices"], () =>
-    fetchBottlePrices(api, bottleId),
-  );
-
-  if (!data) return null;
-  return (
-    <div>
-      <Tabs fullWidth>
-        <Tabs.Item active>Prices</Tabs.Item>
-      </Tabs>
-
-      <div className="mt-4">
-        <BetaNotice>This is a work in progress.</BetaNotice>
-
-        <ClientOnly fallback={<div className="h-6 animate-pulse" />}>
-          {() => <BottlePriceHistory bottleId={bottleId} />}
-        </ClientOnly>
-
-        {data.results.length ? (
-          <ul className="mt-4 space-y-2 text-sm">
-            {data.results.map((price) => {
-              return (
-                <li key={price.id}>
-                  <a href={price.url} className="flex hover:underline">
-                    <span className="flex-1">{price.store?.name}</span>
-                    <span>${(price.price / 100).toFixed(2)}</span>
-                  </a>
-                  <span className="text-light text-xs">
-                    {price.volume}mL &mdash;{" "}
-                    <TimeSince date={price.updatedAt} />
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="mt-4 text-center text-sm">No sellers found.</p>
-        )}
-      </div>
-    </div>
   );
 }

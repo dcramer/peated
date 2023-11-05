@@ -7,7 +7,6 @@ import { type LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
 import RobotImage from "~/assets/robot.png";
 import { ClientOnly } from "~/components/clientOnly";
-import Collapsable from "~/components/collapsable";
 import { DistributionChart } from "~/components/distributionChart";
 import { Map } from "~/components/map.client";
 import Markdown from "~/components/markdown";
@@ -53,7 +52,7 @@ export default function EntityDetailsOverview() {
           <ClientOnly
             fallback={
               <div
-                className="mb-4 animate-pulse rounded bg-slate-800"
+                className="animate-pulse rounded bg-slate-800"
                 style={{ height: 20 }}
               />
             }
@@ -63,7 +62,7 @@ export default function EntityDetailsOverview() {
                 <QueryBoundary
                   loading={
                     <div
-                      className="mb-4 animate-pulse rounded bg-slate-800"
+                      className="animate-pulse rounded bg-slate-800"
                       style={{ height: 20 }}
                     />
                   }
@@ -81,11 +80,9 @@ export default function EntityDetailsOverview() {
       {entity.description && (
         <div className="my-6">
           <div className="mt-5 flex space-x-4">
-            <Collapsable mobileOnly>
-              <div className="prose prose-invert -mt-5 max-w-none flex-1">
-                <Markdown content={entity.description} />
-              </div>
-            </Collapsable>
+            <div className="prose prose-invert -mt-5 max-w-none flex-1">
+              <Markdown content={entity.description} />
+            </div>
 
             <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
           </div>

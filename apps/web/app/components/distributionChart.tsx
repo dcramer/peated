@@ -42,7 +42,7 @@ export function DistributionChart({
   ].sort((a, b) => b.count - a.count);
 
   return (
-    <div className="relative mb-4 flex flex-col space-y-1 text-xs font-bold">
+    <div className="relative flex flex-col space-y-1 text-xs font-bold">
       {results.map((item, index) => {
         const pct = (item.count / totalCount) * 100;
         const itemTo = to && to(item);
