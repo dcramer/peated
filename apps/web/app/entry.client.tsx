@@ -53,6 +53,7 @@ Sentry.init({
       // showEmail: false,
       themeLight: feedbackTheme,
       themeDark: feedbackTheme,
+      autoInject: false,
     }),
   ],
 

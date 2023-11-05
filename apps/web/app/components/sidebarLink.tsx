@@ -1,24 +1,35 @@
 import { Link } from "@remix-run/react";
-import { type ElementType, type PropsWithChildren } from "react";
+import { forwardRef, type ElementType } from "react";
 import classNames from "~/lib/classNames";
+import { type PolymorphicProps, type PolymorphicRef } from "~/types";
 
-export default function SidebarLink({
-  to,
-  active = false,
-  icon,
-  children,
-  size = "default",
-}: PropsWithChildren<{
-  to: string | Record<string, any>;
+type Props = {
   active?: boolean;
   icon?: ElementType;
   size?: "small" | "default";
-}>) {
+};
+
+const defaultElement = Link;
+
+export default forwardRef(function SidebarLink<
+  E extends ElementType = typeof defaultElement,
+>(
+  {
+    children,
+    active,
+    icon,
+    size = "default",
+    as,
+    ...props
+  }: PolymorphicProps<E, Props>,
+  ref: PolymorphicRef<E>,
+) {
+  const Component = as ?? defaultElement;
+
   const Icon = icon;
   return (
     <li>
-      <Link
-        to={to}
+      <Component
         className={classNames(
           active
             ? "text-highlight border-highlight"
@@ -27,6 +38,8 @@ export default function SidebarLink({
           "group flex gap-x-3 text-sm font-semibold leading-6",
           size === "default" ? "p-2" : "px-2",
         )}
+        ref={ref}
+        {...props}
       >
         {Icon && (
           <Icon
@@ -40,7 +53,7 @@ export default function SidebarLink({
           />
         )}
         {children}
-      </Link>
+      </Component>
     </li>
   );
-}
+});

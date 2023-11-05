@@ -1,4 +1,5 @@
 import type {
+  ComponentPropsWithRef,
   ComponentPropsWithoutRef,
   ElementType,
   PropsWithChildren,
@@ -38,6 +39,16 @@ export type PolymorphicAsProp<E extends ElementType> = {
   as?: E;
 };
 
-export type PolymorphicProps<E extends ElementType> = PropsWithChildren<
-  ComponentPropsWithoutRef<E> & PolymorphicAsProp<E>
+type PropsToOmit<E extends ElementType, P> = keyof (PolymorphicAsProp<E> & P);
+
+export type PolymorphicProps<
+  E extends ElementType,
+  Props = Record<string, never>,
+> = PropsWithChildren<
+  Props &
+    Omit<ComponentPropsWithoutRef<E>, PropsToOmit<E, Props>> &
+    PolymorphicAsProp<E>
 >;
+
+export type PolymorphicRef<E extends ElementType> =
+  ComponentPropsWithRef<E>["ref"];
