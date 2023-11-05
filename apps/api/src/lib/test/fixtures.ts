@@ -140,7 +140,7 @@ export const Bottle = async ({
         statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
         ...data,
         name,
-        fullName: `${brand.name} ${name}`,
+        fullName: `${brand.name} ${name} #${faker.number.int(100)}`,
         brandId: brand.id,
         createdById: data.createdById || (await User()).id,
       })
