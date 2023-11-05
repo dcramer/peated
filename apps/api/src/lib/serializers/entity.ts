@@ -15,6 +15,7 @@ export const EntitySerializer: Serializer<Entity> = {
       name: item.name,
       description: item.description,
       yearEstablished: item.yearEstablished,
+      website: item.website,
       country: item.country,
       region: item.region,
       type: item.type,

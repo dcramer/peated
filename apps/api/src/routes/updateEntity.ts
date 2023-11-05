@@ -56,7 +56,15 @@ export default {
     if (body.type !== undefined && !arraysEqual(body.type, entity.type)) {
       data.type = body.type;
     }
-
+    if (
+      body.yearEstablished !== undefined &&
+      body.yearEstablished !== entity.yearEstablished
+    ) {
+      data.yearEstablished = body.yearEstablished;
+    }
+    if (body.website !== undefined && body.website !== entity.website) {
+      data.website = body.website;
+    }
     if (Object.values(data).length === 0) {
       return res.status(200).send(entity);
     }

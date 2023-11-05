@@ -224,6 +224,16 @@ export default function EntityDetails() {
               </div>
               <div className="prose prose-invert max-w-none flex-1">
                 <dl>
+                  <dt>Website</dt>
+                  <dd>
+                    {entity.website ? (
+                      <a href={entity.website} className="hover:underline">
+                        {entity.website.split("://", 2)[1]}
+                      </a>
+                    ) : (
+                      <em>n/a</em>
+                    )}
+                  </dd>
                   <dt>Year Established</dt>
                   <dd>{entity.yearEstablished ?? <em>n/a</em>}</dd>
                 </dl>

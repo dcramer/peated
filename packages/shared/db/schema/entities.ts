@@ -8,6 +8,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  varchar,
 } from "drizzle-orm/pg-core";
 
 import { geography } from "../columns";
@@ -35,6 +36,7 @@ export const entities = pgTable(
 
     description: text("description"),
     yearEstablished: smallint("year_established"),
+    website: varchar("website", { length: 255 }),
 
     location: geography("location"),
 

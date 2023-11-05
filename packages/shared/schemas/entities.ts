@@ -10,6 +10,12 @@ export const EntityInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
   country: z.string().trim().nullable().optional(),
   region: z.string().trim().nullable().optional(),
+  yearEstablished: z
+    .number()
+    .lte(new Date().getFullYear())
+    .nullable()
+    .optional(),
+  website: z.string().url().nullable().optional(),
   type: z.array(EntityTypeEnum).optional(),
   location: PointSchema.nullable().optional(),
 });
@@ -19,6 +25,7 @@ export const EntitySchema = z.object({
   name: z.string().trim().min(1, "Required"),
   description: z.string().nullable().optional(),
   yearEstablished: z.number().lte(new Date().getFullYear()).nullable(),
+  website: z.string().url().nullable(),
   country: z.string().trim().nullable(),
   region: z.string().trim().nullable(),
   type: z.array(EntityTypeEnum),
