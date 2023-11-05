@@ -29,3 +29,19 @@ export async function getEntity(
 > {
   return api.get(`/entities/${entityId}`);
 }
+
+type EntityCategory = {
+  category: string;
+  count: number;
+};
+
+export async function fetchEntityCategories(
+  api: ApiClient,
+  entityId: number | string,
+): Promise<
+  Paginated<EntityCategory> & {
+    totalCount: number;
+  }
+> {
+  return api.get(`/entities/${entityId}/categories`);
+}
