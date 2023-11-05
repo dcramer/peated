@@ -27,6 +27,8 @@ Describe the entity as a distiller, bottler, or brand, whichever one it primaril
 
 'yearEstablished' should be the year in which the entity was established.
 
+'website' should be the URL to the official website, if one exists.
+
 'country' should be where the entity is located, if known. Country should be one of the following values:
 
 - ${COUNTRY_LIST.join("\n- ")}
@@ -48,6 +50,7 @@ If there are any issues, or you are not confident in the accuracy, please also p
 const OpenAIBottleDetailsSchema = z.object({
   description: z.string().nullable().optional(),
   yearEstablished: z.number().nullable().optional(),
+  website: z.string().nullable().optional(),
   country: z.string().nullable().optional(),
   region: z.string().nullable().optional(),
   confidence: z.number().default(0).optional(),
@@ -55,14 +58,9 @@ const OpenAIBottleDetailsSchema = z.object({
   aiNotes: z.string().nullable().optional(),
 });
 
-const OpenAIBottleDetailsValidationSchema = z.object({
-  description: z.string().nullable().optional(),
-  yearEstablished: z.number().nullable().optional(),
+const OpenAIBottleDetailsValidationSchema = OpenAIBottleDetailsSchema.extend({
   country: CountryEnum.nullable().optional(),
-  region: z.string().nullable().optional(),
-  confidence: z.number().default(0).optional(),
   type: z.array(EntityTypeEnum).optional(),
-  aiNotes: z.string().nullable().optional(),
 });
 
 type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
@@ -103,6 +101,9 @@ export default async ({ entityId }: { entityId: number }) => {
     result.yearEstablished !== entity.yearEstablished
   )
     data.yearEstablished = result.yearEstablished;
+
+  if (result.website && result.website !== entity.website)
+    data.website = result.website;
 
   if (
     result.type.length &&

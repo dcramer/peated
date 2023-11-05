@@ -77,6 +77,8 @@ export default function EditEntity() {
       country: entity.country,
       region: entity.region,
       type: entity.type,
+      yearEstablished: entity.yearEstablished,
+      website: entity.website,
     },
   });
 
@@ -155,6 +157,28 @@ export default function EditEntity() {
                 multiple
               />
             )}
+          />
+          <TextField
+            {...register("website", {
+              setValueAs: (v) => (v === "" || !v ? undefined : v),
+            })}
+            error={errors.website}
+            autoFocus
+            label="Website"
+            type="text"
+            placeholder="e.g. https://example.com"
+            autoComplete="off"
+          />
+          <TextField
+            {...register("yearEstablished", {
+              setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
+            })}
+            error={errors.yearEstablished}
+            autoFocus
+            label="Year Established"
+            type="number"
+            placeholder="e.g. 1969"
+            autoComplete="off"
           />
         </Fieldset>
       </Form>

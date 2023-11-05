@@ -428,6 +428,13 @@
       "when": 1697332096842,
       "tag": "0060_woozy_screwball",
       "breakpoints": false
+    },
+    {
+      "idx": 61,
+      "version": "5",
+      "when": 1699209841415,
+      "tag": "0061_sturdy_quasimodo",
+      "breakpoints": false
     }
   ]
 }
