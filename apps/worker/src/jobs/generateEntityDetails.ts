@@ -1,6 +1,6 @@
 import { COUNTRY_LIST, DEFAULT_CREATED_BY_ID } from "@peated/shared/constants";
 import { db } from "@peated/shared/db";
-import type { Entity} from "@peated/shared/db/schema";
+import type { Entity } from "@peated/shared/db/schema";
 import { changes, entities } from "@peated/shared/db/schema";
 import { arraysEqual } from "@peated/shared/lib/equals";
 import { CountryEnum, EntityTypeEnum } from "@peated/shared/schemas";
@@ -51,7 +51,7 @@ If there are any issues, or you are not confident in the accuracy, please also p
 const OpenAIBottleDetailsSchema = z.object({
   description: z.string().nullable().optional(),
   yearEstablished: z.number().nullable().optional(),
-  website: z.string().nullable().optional(),
+  website: z.string().url().nullable().optional(),
   country: z.string().nullable().optional(),
   region: z.string().nullable().optional(),
   confidence: z.number().default(0).optional(),
