@@ -7,9 +7,9 @@ import type {
   Entity,
   PagingRel,
 } from "@peated/shared/types";
-import { buildQueryString } from "~/lib/urls";
 import { formatCategoryName } from "../lib/strings";
 import Button from "./button";
+import SortParam from "./sortParam";
 
 type Grouper = undefined | null | Entity;
 
@@ -18,14 +18,16 @@ export default ({
   groupBy,
   groupTo,
   rel,
+  sort: initialSort,
 }: {
   bottleList: (Bottle | CollectionBottle)[];
   groupBy?: (bottle: Bottle) => Grouper;
   groupTo?: (group: Entity) => string;
   rel?: PagingRel;
+  sort?: string;
 }) => {
   const location = useLocation();
-  const sort = new URLSearchParams(location.search).get("sort");
+  const sort = initialSort ?? new URLSearchParams(location.search).get("sort");
 
   let lastGroup: Grouper;
   return (
@@ -40,65 +42,25 @@ export default ({
         <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-header-group">
           <tr>
             <th scope="col" className="py-3.5 pl-4 pr-3 text-left sm:pl-3">
-              <Link
-                to={{
-                  pathname: location.pathname,
-                  search: buildQueryString(location.search, {
-                    sort: sort === "name" ? "-name" : "name",
-                  }),
-                }}
-                className="hover:underline"
-              >
-                Bottle
-              </Link>
+              <SortParam name="name" label="Bottle" sort={sort} />
             </th>
             <th
               scope="col"
               className="hidden px-3 py-3.5 text-center sm:table-cell"
             >
-              <Link
-                to={{
-                  pathname: location.pathname,
-                  search: buildQueryString(location.search, {
-                    sort: sort === "-tastings" ? "tastings" : "-tastings",
-                  }),
-                }}
-                className="hover:underline"
-              >
-                Tastings
-              </Link>
+              <SortParam name="tastings" sort={sort} defaultOrder="desc" />
             </th>
             <th
               scope="col"
               className="hidden px-3 py-3.5 text-center sm:table-cell"
             >
-              <Link
-                to={{
-                  pathname: location.pathname,
-                  search: buildQueryString(location.search, {
-                    sort: sort === "-rating" ? "rating" : "-rating",
-                  }),
-                }}
-                className="hover:underline"
-              >
-                Rating
-              </Link>
+              <SortParam name="rating" sort={sort} defaultOrder="desc" />
             </th>
             <th
               scope="col"
               className="hidden py-3.5 pl-3 pr-4 text-right sm:table-cell sm:pr-3"
             >
-              <Link
-                to={{
-                  pathname: location.pathname,
-                  search: buildQueryString(location.search, {
-                    sort: sort === "-age" ? "age" : "-age",
-                  }),
-                }}
-                className="hover:underline"
-              >
-                Age
-              </Link>
+              <SortParam name="age" sort={sort} defaultOrder="desc" />
             </th>
           </tr>
         </thead>

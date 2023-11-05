@@ -15,9 +15,11 @@ import { EntitySerializer } from "../lib/serializers/entity";
 
 const SORT_OPTIONS = [
   "name",
+  "created",
   "tastings",
   "bottles",
   "-name",
+  "-created",
   "-tastings",
   "-bottles",
 ] as const;
@@ -78,6 +80,12 @@ export default {
         break;
       case "-name":
         orderBy = desc(entities.name);
+        break;
+      case "-created":
+        orderBy = desc(entities.createdAt);
+        break;
+      case "created":
+        orderBy = asc(entities.createdAt);
         break;
       case "bottles":
         orderBy = asc(entities.totalBottles);

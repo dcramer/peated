@@ -16,6 +16,8 @@ import { formatCategoryName } from "~/lib/strings";
 import { buildQueryString } from "~/lib/urls";
 import { fetchBottles } from "~/queries/bottles";
 
+const DEFAULT_SORT = "-tastings";
+
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
@@ -26,7 +28,7 @@ function buildQuery(api: ApiClient, queryString: URLSearchParams) {
   const age = queryString.get("age") || undefined;
   const tag = queryString.get("tag") || undefined;
   const entity = queryString.get("entity") || undefined;
-  const sort = queryString.get("sort") || "name";
+  const sort = queryString.get("sort") || DEFAULT_SORT;
 
   return {
     queryKey: [
@@ -62,13 +64,14 @@ const Content = () => {
   const api = useApi();
   const query = buildQuery(api, qs);
   const { data } = useQuery(query);
+  const sort = qs.get("sort") || DEFAULT_SORT;
 
   if (!data) return null;
 
   return (
     <>
       {data.results.length > 0 ? (
-        <BottleTable bottleList={data.results} rel={data.rel} />
+        <BottleTable bottleList={data.results} rel={data.rel} sort={sort} />
       ) : (
         <EmptyActivity>
           Looks like there's nothing in the database yet. Weird.

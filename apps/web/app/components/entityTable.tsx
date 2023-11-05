@@ -1,56 +1,52 @@
 import { Link, useLocation } from "@remix-run/react";
 
 import type { Entity, PagingRel } from "@peated/shared/types";
-import { buildQueryString } from "~/lib/urls";
+import classNames from "~/lib/classNames";
 import Button from "./button";
 import Chip from "./chip";
+import SortParam from "./sortParam";
 
 export default ({
   entityList,
   rel,
+  withTastings = false,
+  sort: initialSort,
 }: {
   entityList: Entity[];
+  withTastings?: boolean;
   rel?: PagingRel;
+  sort?: string;
 }) => {
   const location = useLocation();
-  const sort = new URLSearchParams(location.search).get("sort");
+  const sort = initialSort ?? new URLSearchParams(location.search).get("sort");
 
   return (
     <>
       <table className="min-w-full">
         <colgroup>
-          <col className="min-w-full sm:w-3/5" />
+          <col
+            className={classNames(
+              "min-w-full",
+              withTastings ? "sm:w-1/2" : "sm:w-3/5",
+            )}
+          />
           <col className="sm:w-1/10" />
+          {withTastings && <col className="sm:w-1/10" />}
           <col className="sm:w-3/10" />
         </colgroup>
         <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left">
-              <Link
-                to={{
-                  pathname: location.pathname,
-                  search: buildQueryString(location.search, {
-                    sort: sort === "name" ? "-name" : "name",
-                  }),
-                }}
-                className="hover:underline"
-              >
-                Entity
-              </Link>
+              <SortParam name="name" label="Entity" sort={sort} />
             </th>
             <th scope="col" className="px-3 py-2.5 text-center sm:table-cell">
-              <Link
-                to={{
-                  pathname: location.pathname,
-                  search: buildQueryString(location.search, {
-                    sort: sort === "bottles" ? "-bottles" : "bottles",
-                  }),
-                }}
-                className="hover:underline"
-              >
-                Bottles
-              </Link>
+              <SortParam name="bottles" sort={sort} defaultOrder="desc" />
             </th>
+            {withTastings && (
+              <th scope="col" className="px-3 py-2.5 text-center sm:table-cell">
+                <SortParam name="tastings" sort={sort} defaultOrder="desc" />
+              </th>
+            )}
             <th
               scope="col"
               className="hidden px-3 py-2.5 text-right sm:table-cell"
@@ -86,6 +82,11 @@ export default ({
                 <td className="hidden px-3 py-3 text-center sm:table-cell">
                   {entity.totalBottles.toLocaleString()}
                 </td>
+                {withTastings && (
+                  <td className="hidden px-3 py-3 text-center sm:table-cell">
+                    {entity.totalTastings.toLocaleString()}
+                  </td>
+                )}
                 <td className="hidden space-y-2 px-3 py-3 text-right sm:table-cell">
                   {!!entity.country && (
                     <div>

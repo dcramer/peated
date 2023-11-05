@@ -17,6 +17,8 @@ import type { ApiClient } from "~/lib/api";
 import { buildQueryString } from "~/lib/urls";
 import { fetchEntities } from "~/queries/entities";
 
+const DEFAULT_SORT = "-tastings";
+
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
@@ -55,7 +57,7 @@ export function buildQuery(api: ApiClient, queryString: URLSearchParams) {
   const type = queryString.get("type") || undefined;
   const country = queryString.get("country") || undefined;
   const region = queryString.get("region") || undefined;
-  const sort = queryString.get("sort") || "name";
+  const sort = queryString.get("sort") || DEFAULT_SORT;
 
   return {
     queryKey: [
@@ -88,13 +90,19 @@ const Content = () => {
   const api = useApi();
   const query = buildQuery(api, qs);
   const { data } = useQuery(query);
+  const sort = qs.get("sort") || DEFAULT_SORT;
 
   if (!data) return null;
 
   return (
     <>
       {data.results.length > 0 ? (
-        <EntityTable entityList={data.results} rel={data.rel} />
+        <EntityTable
+          entityList={data.results}
+          rel={data.rel}
+          sort={sort}
+          withTastings
+        />
       ) : (
         <EmptyActivity>
           Looks like there's nothing in the database yet. Weird.
