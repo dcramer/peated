@@ -127,12 +127,13 @@ export const Bottle = async ({
     ) as EntityType;
     const name =
       data.name ??
-      toTitleCase(
+      `${toTitleCase(
         choose([
           faker.company.buzzNoun(),
           `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
         ]),
-      );
+      )} #${faker.number.int(100)}`;
+
     const [bottle] = await tx
       .insert(bottles)
       .values({
@@ -140,7 +141,7 @@ export const Bottle = async ({
         statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
         ...data,
         name,
-        fullName: `${brand.name} ${name} #${faker.number.int(100)}`,
+        fullName: `${brand.name} ${name}`,
         brandId: brand.id,
         createdById: data.createdById || (await User()).id,
       })
