@@ -22,7 +22,7 @@ const Tabs = ({ fullWidth, border, ...props }: Props) => {
   );
 };
 
-type ItemProps<E extends ElementType> = PolymorphicProps<E> & {
+type ItemProps = {
   active?: boolean;
   count?: number;
   controlled?: boolean;
@@ -37,7 +37,7 @@ Tabs.Item = function TabItem<E extends ElementType = typeof defaultElement>({
   children,
   controlled,
   ...props
-}: ItemProps<E>) {
+}: PolymorphicProps<E, ItemProps>) {
   const Component = as ?? defaultElement;
 
   const location = useLocation();

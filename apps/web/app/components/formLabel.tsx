@@ -1,7 +1,7 @@
 import type { ElementType, ReactNode } from "react";
 import type { PolymorphicProps } from "~/types";
 
-type Props<E extends ElementType> = PolymorphicProps<E> & {
+type Props = {
   required?: boolean;
   labelNote?: ReactNode;
 } & React.ComponentPropsWithoutRef<"label">;
@@ -10,7 +10,14 @@ const defaultElement = "label";
 
 export default function FormLabel<
   E extends ElementType = typeof defaultElement,
->({ className, as, required, labelNote, children, ...props }: Props<E>) {
+>({
+  className,
+  as,
+  required,
+  labelNote,
+  children,
+  ...props
+}: PolymorphicProps<E, Props>) {
   const Component = as ?? defaultElement;
 
   return (

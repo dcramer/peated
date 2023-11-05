@@ -7,7 +7,7 @@ type ChipSize = "small" | "base";
 
 type ChipColor = "default" | "highlight";
 
-type Props<E extends ElementType> = PolymorphicProps<E> & {
+type Props = {
   active?: boolean;
   color?: ChipColor;
   size?: ChipSize;
@@ -23,7 +23,7 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
   color = "default",
   as,
   ...props
-}: Props<E>) {
+}: PolymorphicProps<E, Props>) {
   const Component = as ?? defaultElement;
 
   let colorClass = "";

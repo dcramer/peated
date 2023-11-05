@@ -13,6 +13,8 @@ import config from "~/config";
 import useAuth from "~/hooks/useAuth";
 import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
 import Button from "./button";
+import { ClientOnly } from "./clientOnly";
+import { FeedbackSidebarLink } from "./feedbackSidebarLink.client";
 import HeaderLogo from "./headerLogo";
 import SidebarLink from "./sidebarLink";
 
@@ -116,6 +118,7 @@ export default function Sidebar() {
                   >
                     About
                   </SidebarLink>
+                  <ClientOnly>{() => <FeedbackSidebarLink />}</ClientOnly>
                 </ul>
               </li>
               {user?.admin && (
