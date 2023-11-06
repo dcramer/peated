@@ -1,13 +1,8 @@
-import type { Serializer } from ".";
-import { serialize } from ".";
+import { serialize, serializer } from ".";
 import type { Bottle, CollectionBottle, User } from "../db/schema";
 import { BottleSerializer } from "./bottle";
 
-export const CollectionBottleSerializer: Serializer<
-  CollectionBottle & {
-    bottle: Bottle;
-  }
-> = {
+export const CollectionBottleSerializer = serializer({
   attrs: async (
     itemList: (CollectionBottle & {
       bottle: Bottle;
@@ -44,4 +39,4 @@ export const CollectionBottleSerializer: Serializer<
       bottle: attrs.bottle,
     };
   },
-};
+});

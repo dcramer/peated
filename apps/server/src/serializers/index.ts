@@ -6,13 +6,16 @@ type Item = {
 
 export type Attrs = Record<number, Record<string, any>>;
 
-export interface Serializer<T extends Item> {
+export interface Serializer<
+  T extends Item = Item,
+  R extends Record<string, any> = Record<string, any>,
+> {
   attrs?(itemList: T[], currentUser?: User | null): Promise<Attrs>;
   item(
     item: T,
     attrs: Record<string, Record<string, any>>,
     currentUser?: User | null,
-  ): Record<string, any>;
+  ): R;
 }
 
 export async function DefaultAttrs<T extends Item>(
@@ -24,24 +27,24 @@ export async function DefaultAttrs<T extends Item>(
 
 type SerializedResult<T extends Item> = ReturnType<Serializer<T>["item"]>;
 
-export async function serialize<T extends Item>(
-  serializer: Serializer<T>,
+export async function serialize<T extends Item, R extends Record<string, any>>(
+  serializer: Serializer<T, R>,
   item: T,
   currentUser?: User | null,
   excludeFields?: string[],
-): Promise<SerializedResult<T>>;
-export async function serialize<T extends Item>(
-  serializer: Serializer<T>,
+): Promise<R>;
+export async function serialize<T extends Item, R extends Record<string, any>>(
+  serializer: Serializer<T, R>,
   itemList: T[],
   currentUser?: User | null,
   excludeFields?: string[],
-): Promise<SerializedResult<T>[]>;
-export async function serialize<T extends Item>(
-  serializer: Serializer<T>,
+): Promise<R[]>;
+export async function serialize<T extends Item, R extends Record<string, any>>(
+  serializer: Serializer<T, R>,
   itemList: T | T[],
   currentUser?: User | null,
   excludeFields: string[] = [],
-): Promise<SerializedResult<T>[] | SerializedResult<T>> {
+): Promise<R[] | R> {
   if (Array.isArray(itemList) && !itemList.length) return [];
 
   const attrs = await (serializer.attrs || DefaultAttrs<T>)(
@@ -58,6 +61,12 @@ export async function serialize<T extends Item>(
   );
 
   return Array.isArray(itemList) ? results : results[0];
+}
+
+export function serializer<T extends Item, R extends Record<string, any>>(
+  v: Serializer<T, R>,
+) {
+  return v;
 }
 
 function removeAttributes(object: Record<string, any>, names: string[]) {

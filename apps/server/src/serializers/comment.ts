@@ -1,12 +1,11 @@
 import { inArray } from "drizzle-orm";
-import type { Serializer } from ".";
-import { serialize } from ".";
+import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Comment, User } from "../db/schema";
 import { users } from "../db/schema";
 import { UserSerializer } from "./user";
 
-export const CommentSerializer: Serializer<Comment> = {
+export const CommentSerializer = serializer({
   attrs: async (itemList: Comment[], currentUser?: User) => {
     const userList = await db
       .select()
@@ -43,4 +42,4 @@ export const CommentSerializer: Serializer<Comment> = {
       createdBy: attrs.createdBy,
     };
   },
-};
+});

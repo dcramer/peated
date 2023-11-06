@@ -1,13 +1,12 @@
 import { inArray } from "drizzle-orm";
-import type { Serializer } from ".";
-import { serialize } from ".";
+import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Change, User } from "../db/schema";
 import { users } from "../db/schema";
 import { logError } from "../lib/log";
 import { UserSerializer } from "./user";
 
-export const ChangeSerializer: Serializer<Change> = {
+export const ChangeSerializer = serializer({
   attrs: async (itemList: Change[], currentUser: User) => {
     const createdByIds = Array.from(
       new Set(
@@ -55,4 +54,4 @@ export const ChangeSerializer: Serializer<Change> = {
       data: item.data,
     };
   },
-};
+});

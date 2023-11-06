@@ -1,7 +1,7 @@
-import type { Serializer } from ".";
+import { serializer } from ".";
 import type { Collection, User } from "../db/schema";
 
-export const CollectionSerializer: Serializer<Collection> = {
+export const CollectionSerializer = serializer({
   item: (item: Collection, attrs: Record<string, any>, currentUser?: User) => {
     return {
       id: item.id,
@@ -10,4 +10,4 @@ export const CollectionSerializer: Serializer<Collection> = {
       createdAt: item.createdAt,
     };
   },
-};
+});

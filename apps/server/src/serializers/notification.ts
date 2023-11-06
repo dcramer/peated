@@ -1,6 +1,5 @@
 import { eq, inArray } from "drizzle-orm";
-import type { Serializer } from ".";
-import { serialize } from ".";
+import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Follow, Notification, User } from "../db/schema";
 import { comments, follows, tastings, toasts, users } from "../db/schema";
@@ -8,7 +7,7 @@ import { logError } from "../lib/log";
 import { TastingSerializer } from "./tasting";
 import { UserSerializer } from "./user";
 
-export const NotificationSerializer: Serializer<Notification> = {
+export const NotificationSerializer = serializer({
   attrs: async (itemList: Notification[], currentUser: User) => {
     const fromUserIds = Array.from(
       new Set(
@@ -134,9 +133,9 @@ export const NotificationSerializer: Serializer<Notification> = {
       read: item.read,
     };
   },
-};
+});
 
-export const FriendRequestReceipientSerializer: Serializer<Follow> = {
+export const FriendRequestReceipientSerializer = serializer({
   attrs: async (itemList: Follow[], currentUser?: User) => {
     const userList = await db
       .select()
@@ -172,4 +171,4 @@ export const FriendRequestReceipientSerializer: Serializer<Follow> = {
       user: attrs.user,
     };
   },
-};
+});

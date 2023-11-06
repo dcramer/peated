@@ -1,8 +1,8 @@
 import type { Badge, User } from "../db/schema";
 
-import type { Serializer } from ".";
+import { serializer } from ".";
 
-export const BadgeSerializer: Serializer<Badge> = {
+export const BadgeSerializer = serializer({
   item: (item: Badge, attrs: Record<string, any>, currentUser?: User) => {
     return {
       id: item.id,
@@ -11,4 +11,4 @@ export const BadgeSerializer: Serializer<Badge> = {
       config: item.config,
     };
   },
-};
+});

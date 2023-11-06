@@ -26,8 +26,6 @@ export default publicProcedure.input(z.number()).query(async function ({
     .from(tastings)
     .where(eq(tastings.bottleId, bottle.id));
 
-  const z = serialize(BottleSerializer, bottle, ctx.user);
-
   return {
     ...(await serialize(BottleSerializer, bottle, ctx.user)),
     people: totalPeople,

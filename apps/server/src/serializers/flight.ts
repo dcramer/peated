@@ -1,7 +1,7 @@
-import type { Serializer } from ".";
+import { serializer } from ".";
 import type { Flight, User } from "../db/schema";
 
-export const FlightSerializer: Serializer<Flight> = {
+export const FlightSerializer = serializer({
   item: (item: Flight, attrs: Record<string, any>, currentUser?: User) => {
     return {
       id: item.publicId,
@@ -11,4 +11,4 @@ export const FlightSerializer: Serializer<Flight> = {
       createdAt: item.createdAt,
     };
   },
-};
+});

@@ -1,6 +1,5 @@
 import { and, eq, inArray } from "drizzle-orm";
-import type { Serializer } from ".";
-import { serialize } from ".";
+import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { Tasting, User } from "../db/schema";
@@ -9,7 +8,7 @@ import { notEmpty } from "../lib/filter";
 import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
 
-export const TastingSerializer: Serializer<Tasting> = {
+export const TastingSerializer = serializer({
   attrs: async (itemList: Tasting[], currentUser?: User) => {
     const itemIds = itemList.map((t) => t.id);
     const results = await db
@@ -108,4 +107,4 @@ export const TastingSerializer: Serializer<Tasting> = {
       hasToasted: attrs.hasToasted,
     };
   },
-};
+});

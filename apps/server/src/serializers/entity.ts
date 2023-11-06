@@ -1,7 +1,7 @@
-import type { Serializer } from ".";
+import { serializer } from ".";
 import type { Entity, User } from "../db/schema";
 
-export const EntitySerializer: Serializer<Entity> = {
+export const EntitySerializer = serializer({
   item: (
     item: Entity & {
       location: string;
@@ -25,4 +25,4 @@ export const EntitySerializer: Serializer<Entity> = {
       totalBottles: item.totalBottles,
     };
   },
-};
+});

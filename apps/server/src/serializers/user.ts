@@ -1,11 +1,11 @@
 import { and, eq, inArray } from "drizzle-orm";
-import type { Serializer } from ".";
+import { serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { User } from "../db/schema";
 import { follows } from "../db/schema";
 
-export const UserSerializer: Serializer<User> = {
+export const UserSerializer = serializer({
   attrs: async (itemList: User[], currentUser?: User) => {
     const followsByRef = currentUser
       ? Object.fromEntries(
@@ -64,4 +64,4 @@ export const UserSerializer: Serializer<User> = {
     }
     return data;
   },
-};
+});

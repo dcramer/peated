@@ -1,12 +1,12 @@
 import type { z } from "zod";
-import { serialize, type Serializer } from ".";
+import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Store, StorePrice, User } from "../db/schema";
 import type { BottlePriceChangeSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
 import { StoreSerializer } from "./store";
 
-export const StorePriceSerializer: Serializer<StorePrice> = {
+export const StorePriceSerializer = serializer({
   item: (item: StorePrice, attrs: Record<string, any>, currentUser?: User) => {
     return {
       id: item.id,
@@ -17,11 +17,9 @@ export const StorePriceSerializer: Serializer<StorePrice> = {
       updatedAt: attrs.updatedAt,
     };
   },
-};
+});
 
-export const StorePriceWithStoreSerializer: Serializer<
-  StorePrice & { store: Store }
-> = {
+export const StorePriceWithStoreSerializer = serializer({
   attrs: async (
     itemList: (StorePrice & { store: Store })[],
     currentUser?: User,
@@ -63,7 +61,7 @@ export const StorePriceWithStoreSerializer: Serializer<
       updatedAt: item.updatedAt,
     };
   },
-};
+});
 
 export type BottlePriceChange = {
   // bottle ID
@@ -73,7 +71,7 @@ export type BottlePriceChange = {
   bottleId: number;
 };
 
-export const BottlePriceChangeSerializer: Serializer<BottlePriceChange> = {
+export const BottlePriceChangeSerializer = serializer({
   attrs: async (itemList: BottlePriceChange[], currentUser?: User) => {
     const bottleList = await db.query.bottles.findMany({
       where: (bottles, { inArray }) =>
@@ -112,4 +110,4 @@ export const BottlePriceChangeSerializer: Serializer<BottlePriceChange> = {
       bottle: attrs.bottle,
     };
   },
-};
+});

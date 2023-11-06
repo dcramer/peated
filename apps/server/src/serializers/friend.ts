@@ -1,12 +1,11 @@
 import { inArray } from "drizzle-orm";
-import type { Serializer } from ".";
-import { serialize } from ".";
+import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Follow, User } from "../db/schema";
 import { users } from "../db/schema";
 import { UserSerializer } from "./user";
 
-export const FriendSerializer: Serializer<Follow> = {
+export const FriendSerializer = serializer({
   attrs: async (itemList: Follow[], currentUser?: User) => {
     const userList = await db
       .select()
@@ -42,4 +41,4 @@ export const FriendSerializer: Serializer<Follow> = {
       user: attrs.user,
     };
   },
-};
+});
