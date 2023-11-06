@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { bottles } from "../../db/schema";
 import * as Fixtures from "../../lib/test/fixtures";
-
 import { appRouter } from "../router";
 
 test("deletes bottle", async () => {

@@ -3,9 +3,12 @@ import auth from "./routes/auth";
 import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
 import badgeCreate from "./routes/badgeCreate";
+import badgeList from "./routes/badgeList";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
+import bottleList from "./routes/bottleList";
+import bottlePricesList from "./routes/bottlePricesList";
 import entityById from "./routes/entityById";
 import entityCreate from "./routes/entityCreate";
 import flightById from "./routes/flightById";
@@ -27,9 +30,12 @@ export const appRouter = router({
   authBasic,
   authGoogle,
   badgeCreate,
+  badgeList,
   bottleById,
   bottleDelete,
   bottleCreate,
+  bottleList,
+  bottlePricesList,
   entityById,
   entityCreate,
   flightById,
