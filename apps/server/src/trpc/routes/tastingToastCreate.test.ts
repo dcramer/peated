@@ -1,41 +1,38 @@
 import { db } from "@peated/server/db";
 import { tastings, toasts } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    await app.close();
-  };
+test("requires auth", async () => {
+  const caller = appRouter.createCaller({
+    user: null,
+  });
+  expect(() => caller.tastingToastCreate(1)).rejects.toThrowError(
+    /UNAUTHORIZED/,
+  );
 });
 
 test("cannot toast self", async () => {
   const tasting = await Fixtures.Tasting({
     createdById: DefaultFixtures.user.id,
   });
-  const response = await app.inject({
-    method: "POST",
-    url: `/tastings/${tasting.id}/toasts`,
-    headers: DefaultFixtures.authHeaders,
-  });
 
-  expect(response).toRespondWith(400);
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  expect(() => caller.tastingToastCreate(tasting.id)).rejects.toThrowError(
+    /BAD_REQUEST/,
+  );
 });
 
 test("new toast", async () => {
   const tasting = await Fixtures.Tasting();
-  const response = await app.inject({
-    method: "POST",
-    url: `/tastings/${tasting.id}/toasts`,
-    headers: DefaultFixtures.authHeaders,
-  });
 
-  expect(response).toRespondWith(200);
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  await caller.tastingToastCreate(tasting.id);
 
   const toastList = await db
     .select()
@@ -58,13 +55,11 @@ test("already toasted", async () => {
     tastingId: tasting.id,
     createdById: DefaultFixtures.user.id,
   });
-  const response = await app.inject({
-    method: "POST",
-    url: `/tastings/${tasting.id}/toasts`,
-    headers: DefaultFixtures.authHeaders,
-  });
 
-  expect(response).toRespondWith(200);
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  await caller.tastingToastCreate(tasting.id);
 
   const toastList = await db
     .select()

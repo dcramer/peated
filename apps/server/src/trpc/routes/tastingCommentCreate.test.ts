@@ -1,33 +1,34 @@
 import { db } from "@peated/server/db";
 import { comments, tastings } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    await app.close();
-  };
+test("requires auth", async () => {
+  const caller = appRouter.createCaller({
+    user: null,
+  });
+  expect(() =>
+    caller.tastingCommentCreate({
+      tasting: 1,
+      comment: "Hello world!",
+      createdAt: new Date().toISOString(),
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("new comment", async () => {
   const tasting = await Fixtures.Tasting();
-  const response = await app.inject({
-    method: "POST",
-    url: `/tastings/${tasting.id}/comments`,
-    payload: {
-      comment: "Hello world!",
-      createdAt: new Date().toISOString(),
-    },
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  const data = await caller.tastingCommentCreate({
+    tasting: tasting.id,
+    comment: "Hello world!",
+    createdAt: new Date().toISOString(),
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
   expect(data.comment).toBe("Hello world!");
 

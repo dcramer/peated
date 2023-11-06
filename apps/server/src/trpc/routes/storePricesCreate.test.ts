@@ -1,29 +1,17 @@
-import buildFastify from "@peated/server/app";
 import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
+import { appRouter } from "../router";
 import { findBottle } from "./storePricesCreate";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    await app.close();
-  };
-});
-
 test("requires admin", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: "/stores/1/prices",
-    payload: [],
-    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
   });
-
-  expect(response).toRespondWith(403);
+  expect(() =>
+    caller.storePricesCreate({ store: 1, prices: [] }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("processes new price", async () => {
@@ -34,10 +22,12 @@ test("processes new price", async () => {
   });
   expect(bottle.fullName).toBe("Ardbeg 10-year-old");
 
-  const response = await app.inject({
-    method: "POST",
-    url: `/stores/${store.id}/prices`,
-    payload: [
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ admin: true }),
+  });
+  await caller.storePricesCreate({
+    store: store.id,
+    prices: [
       {
         name: "Ardbeg 10-year-old",
         price: 9999,
@@ -45,10 +35,7 @@ test("processes new price", async () => {
         url: "http://example.com",
       },
     ],
-    headers: await Fixtures.AuthenticatedHeaders({ admin: true }),
   });
-
-  expect(response).toRespondWith(201);
 
   const prices = await db
     .select()
@@ -74,10 +61,12 @@ test("processes existing price", async () => {
   });
   expect(existingPrice.name).toBe(bottle.fullName);
 
-  const response = await app.inject({
-    method: "POST",
-    url: `/stores/${store.id}/prices`,
-    payload: [
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ admin: true }),
+  });
+  await caller.storePricesCreate({
+    store: store.id,
+    prices: [
       {
         name: "Ardbeg 10-year-old",
         price: 2999,
@@ -85,10 +74,7 @@ test("processes existing price", async () => {
         url: "http://example.com",
       },
     ],
-    headers: await Fixtures.AuthenticatedHeaders({ admin: true }),
   });
-
-  expect(response).toRespondWith(201);
 
   const prices = await db
     .select()
@@ -106,10 +92,12 @@ test("processes existing price", async () => {
 test("processes new price without bottle", async () => {
   const store = await Fixtures.Store({ type: "totalwines" });
 
-  const response = await app.inject({
-    method: "POST",
-    url: `/stores/${store.id}/prices`,
-    payload: [
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ admin: true }),
+  });
+  await caller.storePricesCreate({
+    store: store.id,
+    prices: [
       {
         name: "Ardbeg 10-year-old",
         price: 2999,
@@ -117,10 +105,7 @@ test("processes new price without bottle", async () => {
         url: "http://example.com",
       },
     ],
-    headers: await Fixtures.AuthenticatedHeaders({ admin: true }),
   });
-
-  expect(response).toRespondWith(201);
 
   const prices = await db
     .select()

@@ -1,17 +1,16 @@
+import { db } from "@peated/server/db";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import { db } from "../db";
-import { bottles, entities, tastings } from "../db/schema";
-import * as Fixtures from "../lib/test/fixtures";
+import { bottles, entities, tastings } from "../../db/schema";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    await app.close();
-  };
+test("requires auth", async () => {
+  const caller = appRouter.createCaller({
+    user: null,
+  });
+  expect(() => caller.tastingCreate({ bottle: 1 })).rejects.toThrowError(
+    /UNAUTHORIZED/,
+  );
 });
 
 test("creates a new tasting with minimal params", async () => {
@@ -20,18 +19,15 @@ test("creates a new tasting with minimal params", async () => {
     brandId: entity.id,
     distillerIds: [entity.id],
   });
-  const response = await app.inject({
-    method: "POST",
-    url: "/tastings",
-    payload: {
-      bottle: bottle.id,
-      rating: 3.5,
-    },
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    rating: 3.5,
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [tasting] = await db
@@ -59,19 +55,16 @@ test("creates a new tasting with minimal params", async () => {
 
 test("creates a new tasting with tags", async () => {
   const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "POST",
-    url: "/tastings",
-    payload: {
-      bottle: bottle.id,
-      rating: 3.5,
-      tags: ["cherry", "PEAT"],
-    },
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    rating: 3.5,
+    tags: ["cherry", "PEAT"],
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [tasting] = await db
@@ -96,19 +89,16 @@ test("creates a new tasting with tags", async () => {
 
 test("creates a new tasting with notes", async () => {
   const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "POST",
-    url: "/tastings",
-    payload: {
-      bottle: bottle.id,
-      rating: 3.5,
-      notes: "hello world",
-    },
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    rating: 3.5,
+    notes: "hello world",
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [tasting] = await db
@@ -121,17 +111,14 @@ test("creates a new tasting with notes", async () => {
 
 test("creates a new tasting with empty rating", async () => {
   const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "POST",
-    url: "/tastings",
-    payload: {
-      bottle: bottle.id,
-    },
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [tasting] = await db
@@ -146,18 +133,15 @@ test("creates a new tasting with empty rating", async () => {
 
 test("creates a new tasting with empty friends", async () => {
   const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "POST",
-    url: "/tastings",
-    payload: {
-      bottle: bottle.id,
-      friends: [],
-    },
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    friends: [],
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [tasting] = await db
@@ -172,18 +156,15 @@ test("creates a new tasting with empty friends", async () => {
 
 test("creates a new tasting with zero rating", async () => {
   const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "POST",
-    url: "/tastings",
-    payload: {
-      bottle: bottle.id,
-      rating: 0,
-    },
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    rating: 0,
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [tasting] = await db

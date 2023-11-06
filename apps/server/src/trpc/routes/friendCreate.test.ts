@@ -1,41 +1,30 @@
+import { db } from "@peated/server/db";
 import { and, eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import { db } from "../db";
-import { follows, notifications } from "../db/schema";
-import * as Fixtures from "../lib/test/fixtures";
+import { follows, notifications } from "../../db/schema";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    await app.close();
-  };
+test("requires authentication", async () => {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.friendCreate(DefaultFixtures.user.id),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("cannot follow self", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: `/friends/${DefaultFixtures.user.id}`,
-    headers: DefaultFixtures.authHeaders,
-  });
-
-  expect(response).toRespondWith(400);
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.friendCreate(DefaultFixtures.user.id),
+  ).rejects.toThrowError(/BAD_REQUEST/);
 });
 
 test("can follow new link", async () => {
   const otherUser = await Fixtures.User();
 
-  const response = await app.inject({
-    method: "POST",
-    url: `/friends/${otherUser.id}`,
-    headers: DefaultFixtures.authHeaders,
-  });
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.friendCreate(otherUser.id);
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.status).toBe("pending");
+  expect(data.status).toEqual("pending");
 
   const [follow] = await db
     .select()
@@ -60,8 +49,8 @@ test("can follow new link", async () => {
     );
 
   expect(notif).toBeDefined();
-  expect(notif.fromUserId).toBe(follow.fromUserId);
-  expect(notif.userId).toBe(follow.toUserId);
+  expect(notif.fromUserId).toEqual(follow.fromUserId);
+  expect(notif.userId).toEqual(follow.toUserId);
 });
 
 test("can follow existing link", async () => {
@@ -73,15 +62,10 @@ test("can follow existing link", async () => {
     status: "following",
   });
 
-  const response = await app.inject({
-    method: "POST",
-    url: `/friends/${otherUser.id}`,
-    headers: DefaultFixtures.authHeaders,
-  });
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.friendCreate(otherUser.id);
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.status).toBe("friends");
+  expect(data.status).toEqual("friends");
 
   const [newFollow] = await db
     .select()
@@ -93,7 +77,7 @@ test("can follow existing link", async () => {
       ),
     );
   expect(newFollow).toBeDefined();
-  expect(newFollow.status).toBe(follow.status);
+  expect(newFollow.status).toEqual(follow.status);
 });
 
 test("approves when mutual", async () => {
@@ -104,15 +88,10 @@ test("approves when mutual", async () => {
     status: "pending",
   });
 
-  const response = await app.inject({
-    method: "POST",
-    url: `/friends/${otherUser.id}`,
-    headers: DefaultFixtures.authHeaders,
-  });
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.friendCreate(otherUser.id);
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
-  expect(data.status).toBe("friends");
+  expect(data.status).toEqual("friends");
 
   const [follow] = await db
     .select()
@@ -124,7 +103,7 @@ test("approves when mutual", async () => {
       ),
     );
   expect(follow).toBeDefined();
-  expect(follow.status).toBe("following");
+  expect(follow.status).toEqual("following");
 
   const [notif] = await db
     .select()
