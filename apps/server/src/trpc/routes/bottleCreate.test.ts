@@ -1,46 +1,32 @@
+import { db } from "@peated/server/db";
+import {
+  bottles,
+  bottlesToDistillers,
+  changes,
+  entities,
+} from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import { db } from "../db";
-import { bottles, bottlesToDistillers, changes, entities } from "../db/schema";
-import * as Fixtures from "../lib/test/fixtures";
-
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    await app.close();
-  };
-});
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
 test("requires authentication", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.bottleCreate({
       name: "Delicious Wood",
       brand: 1,
-    },
-  });
-
-  expect(response).toRespondWith(401);
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("creates a new bottle with minimal params", async () => {
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
   const brand = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
-      name: "Delicious Wood",
-      brand: brand.id,
-    },
-    headers: await Fixtures.AuthenticatedHeaders(),
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood",
+    brand: brand.id,
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [bottle] = await db
@@ -65,21 +51,16 @@ test("creates a new bottle with minimal params", async () => {
 test("creates a new bottle with all params", async () => {
   const brand = await Fixtures.Entity();
   const distiller = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
-      name: "Delicious Wood 12-year-old",
-      brand: brand.id,
-      bottler: distiller.id,
-      distillers: [distiller.id],
-      statedAge: 12,
-    },
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood 12-year-old",
+    brand: brand.id,
+    bottler: distiller.id,
+    distillers: [distiller.id],
+    statedAge: 12,
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [bottle] = await db
@@ -117,17 +98,13 @@ test("creates a new bottle with all params", async () => {
 });
 
 test("does not create a new bottle with invalid brandId", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.bottleCreate({
       name: "Delicious Wood",
       brand: 5,
-    },
-    headers: await Fixtures.AuthenticatedHeaders(),
-  });
-
-  expect(response).toRespondWith(400);
+    }),
+  ).rejects.toThrowError(/BAD_REQUEST/);
 });
 
 // test("creates a new bottle with existing brand name", async () => {
@@ -281,24 +258,19 @@ test("does not create a new bottle with invalid distillerId", async () => {
 
 test("creates a new bottle with new distiller name", async () => {
   const brand = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
-      name: "Delicious Wood",
-      brand: brand.id,
-      distillers: [
-        {
-          name: "Hard Knox",
-          country: "Scotland",
-        },
-      ],
-    },
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood",
+    brand: brand.id,
+    distillers: [
+      {
+        name: "Hard Knox",
+        country: "Scotland",
+      },
+    ],
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [bottle] = await db
@@ -344,27 +316,21 @@ test("creates a new bottle with new distiller name", async () => {
 });
 
 test("creates a new bottle with new distiller name and brand name", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
-      name: "Delicious Wood",
-      brand: {
-        name: "Rip Van",
-        region: "Kentucky",
-      },
-      distillers: [
-        {
-          name: "Hard Knox",
-          country: "Scotland",
-        },
-      ],
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood",
+    brand: {
+      name: "Rip Van",
+      region: "Kentucky",
     },
-    headers: DefaultFixtures.authHeaders,
+    distillers: [
+      {
+        name: "Hard Knox",
+        country: "Scotland",
+      },
+    ],
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [bottle] = await db
@@ -412,27 +378,21 @@ test("creates a new bottle with new distiller name and brand name", async () => 
 });
 
 test("creates a new bottle with new distiller name which is duplicated as brand name", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
-      name: "Delicious Wood",
-      brand: {
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood",
+    brand: {
+      name: "Hard Knox",
+      country: "Scotland",
+    },
+    distillers: [
+      {
         name: "Hard Knox",
         country: "Scotland",
       },
-      distillers: [
-        {
-          name: "Hard Knox",
-          country: "Scotland",
-        },
-      ],
-    },
-    headers: DefaultFixtures.authHeaders,
+    ],
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [bottle] = await db
@@ -475,34 +435,26 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
 test("refuses bottle w/ age signal", async () => {
   const brand = await Fixtures.Entity();
   const distiller = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
+
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+
+  expect(() =>
+    caller.bottleCreate({
       name: "Delicious Wood 12-year-old",
       brand: brand.id,
       distillers: [distiller.id],
-    },
-    headers: DefaultFixtures.authHeaders,
-  });
-
-  expect(response).toRespondWith(400);
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("removes duplicated brand name", async () => {
   const brand = await Fixtures.Entity({ name: "Delicious Wood" });
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
-      name: "Delicious Wood Yum Yum",
-      brand: brand.id,
-    },
-    headers: DefaultFixtures.authHeaders,
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood Yum Yum",
+    brand: brand.id,
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [bottle] = await db

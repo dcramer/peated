@@ -2,6 +2,7 @@ import { router } from ".";
 import auth from "./routes/auth";
 import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
+import badgeCreate from "./routes/badgeCreate";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
@@ -25,6 +26,7 @@ export const appRouter = router({
   auth,
   authBasic,
   authGoogle,
+  badgeCreate,
   bottleById,
   bottleDelete,
   bottleCreate,
