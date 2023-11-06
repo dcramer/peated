@@ -1,5 +1,3 @@
-import { eq, inArray, sql } from "drizzle-orm";
-
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
@@ -8,7 +6,10 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import pushJob from "@peated/server/jobs";
+import { serialize } from "@peated/server/serializers";
+import { EntitySerializer } from "@peated/server/serializers/entity";
 import { TRPCError } from "@trpc/server";
+import { eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 
@@ -117,5 +118,5 @@ export default modProcedure
     const newEntity = await mergeEntitiesInto(toEntity, fromEntity);
     await pushJob("GenerateEntityDetails", { entityId: toEntity.id });
 
-    return newEntity;
+    return await serialize(EntitySerializer, newEntity, ctx.user);
   });

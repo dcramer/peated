@@ -24,6 +24,7 @@ import entityCategoryList from "./routes/entityCategoryList";
 import entityCreate from "./routes/entityCreate";
 import entityList from "./routes/entityList";
 import entityMerge from "./routes/entityMerge";
+import entityUpdate from "./routes/entityUpdate";
 import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
 import flightList from "./routes/flightList";
@@ -73,6 +74,7 @@ export const appRouter = router({
   entityCreate,
   entityList,
   entityMerge,
+  entityUpdate,
   flightById,
   flightCreate,
   flightList,
