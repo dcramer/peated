@@ -9,7 +9,7 @@ test("requires auth", async () => {
     user: null,
   });
   expect(() =>
-    caller.tastingCommentCreate({
+    caller.commentCreate({
       tasting: 1,
       comment: "Hello world!",
       createdAt: new Date().toISOString(),
@@ -23,7 +23,7 @@ test("new comment", async () => {
   const caller = appRouter.createCaller({
     user: DefaultFixtures.user,
   });
-  const data = await caller.tastingCommentCreate({
+  const data = await caller.commentCreate({
     tasting: tasting.id,
     comment: "Hello world!",
     createdAt: new Date().toISOString(),

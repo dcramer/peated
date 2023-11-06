@@ -1,17 +1,15 @@
 import { ENTITY_TYPE_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import type { EntityType } from "@peated/server/db/schema";
 import { entities } from "@peated/server/db/schema";
-import { EntitySchema, PaginatedSchema } from "@peated/server/schemas";
+import { CountryEnum } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, getTableColumns, ilike, or, sql } from "drizzle-orm";
-import type { RouteOptions } from "fastify";
-import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
-import zodToJsonSchema from "zod-to-json-schema";
-import { buildPageLink } from "../lib/paging";
+import { publicProcedure } from "..";
+
+const DEFAULT_SORT = "-tastings";
 
 const SORT_OPTIONS = [
   "name",
@@ -24,34 +22,30 @@ const SORT_OPTIONS = [
   "-bottles",
 ] as const;
 
-export default {
-  method: "GET",
-  url: "/entities",
-  schema: {
-    querystring: {
-      type: "object",
-      properties: {
-        query: { type: "string" },
-        page: { type: "number" },
-        sort: { type: "string", enum: SORT_OPTIONS },
-        country: { type: "string" },
-        region: { type: "string" },
-        type: { type: "string", enum: ENTITY_TYPE_LIST },
-      },
-    },
-    response: {
-      200: zodToJsonSchema(
-        PaginatedSchema.extend({
-          results: z.array(EntitySchema),
-        }),
-      ),
-    },
-  },
-  handler: async (req, res) => {
-    const page = req.query.page || 1;
-    const query = req.query.query || "";
+export default publicProcedure
+  .input(
+    z
+      .object({
+        query: z.string().default(""),
+        country: CountryEnum.optional(),
+        region: z.string().optional(),
+        type: z.enum(ENTITY_TYPE_LIST).optional(),
+        sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
+        page: z.number().default(1),
+        limit: z.number().lte(100).default(100),
+      })
+      .default({
+        query: "",
+        sort: DEFAULT_SORT,
+        page: 1,
+        limit: 100,
+      }),
+  )
+  .query(async function ({ input, ctx }) {
+    const page = input.page;
+    const query = input.query;
 
-    const limit = 100;
+    const limit = input.limit;
     const offset = (page - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
@@ -63,18 +57,18 @@ export default {
         ),
       );
     }
-    if (req.query.type) {
-      where.push(sql`${req.query.type} = ANY(${entities.type})`);
+    if (input.type) {
+      where.push(sql`${input.type} = ANY(${entities.type})`);
     }
-    if (req.query.country) {
-      where.push(ilike(entities.country, req.query.country));
+    if (input.country) {
+      where.push(ilike(entities.country, input.country));
     }
-    if (req.query.region) {
-      where.push(ilike(entities.region, req.query.region));
+    if (input.region) {
+      where.push(ilike(entities.region, input.region));
     }
 
     let orderBy: SQL<unknown>;
-    switch (req.query.sort) {
+    switch (input.sort) {
       case "name":
         orderBy = asc(entities.name);
         break;
@@ -104,6 +98,7 @@ export default {
     const results = await db
       .select({
         ...getTableColumns(entities),
+        // TODO: type this
         location: sql`ST_AsGeoJSON(${entities.location}) as location`,
       })
       .from(entities)
@@ -112,38 +107,15 @@ export default {
       .offset(offset)
       .orderBy(orderBy);
 
-    res.send({
+    return {
       results: await serialize(
         EntitySerializer,
         results.slice(0, limit),
-        req.user,
+        ctx.user,
       ),
       rel: {
         nextPage: results.length > limit ? page + 1 : null,
         prevPage: page > 1 ? page - 1 : null,
-        next:
-          results.length > limit
-            ? buildPageLink(req.routeOptions.url, req.query, page + 1)
-            : null,
-        prev:
-          page > 1
-            ? buildPageLink(req.routeOptions.url, req.query, page - 1)
-            : null,
       },
-    });
-  },
-} as RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Querystring: {
-      query?: string;
-      page?: number;
-      sort?: (typeof SORT_OPTIONS)[number];
-      type?: EntityType;
-      country?: string;
-      region?: string;
     };
-  }
->;
+  });

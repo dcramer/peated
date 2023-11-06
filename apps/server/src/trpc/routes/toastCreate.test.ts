@@ -8,9 +8,7 @@ test("requires auth", async () => {
   const caller = appRouter.createCaller({
     user: null,
   });
-  expect(() => caller.tastingToastCreate(1)).rejects.toThrowError(
-    /UNAUTHORIZED/,
-  );
+  expect(() => caller.toastCreate(1)).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("cannot toast self", async () => {
@@ -21,7 +19,7 @@ test("cannot toast self", async () => {
   const caller = appRouter.createCaller({
     user: DefaultFixtures.user,
   });
-  expect(() => caller.tastingToastCreate(tasting.id)).rejects.toThrowError(
+  expect(() => caller.toastCreate(tasting.id)).rejects.toThrowError(
     /BAD_REQUEST/,
   );
 });
@@ -32,7 +30,7 @@ test("new toast", async () => {
   const caller = appRouter.createCaller({
     user: DefaultFixtures.user,
   });
-  await caller.tastingToastCreate(tasting.id);
+  await caller.toastCreate(tasting.id);
 
   const toastList = await db
     .select()
@@ -59,7 +57,7 @@ test("already toasted", async () => {
   const caller = appRouter.createCaller({
     user: DefaultFixtures.user,
   });
-  await caller.tastingToastCreate(tasting.id);
+  await caller.toastCreate(tasting.id);
 
   const toastList = await db
     .select()

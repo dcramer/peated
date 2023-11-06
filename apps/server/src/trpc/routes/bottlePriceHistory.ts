@@ -1,34 +1,31 @@
-import { and, desc, eq, sql } from "drizzle-orm";
-import type { RouteOptions } from "fastify";
-import type { IncomingMessage, Server, ServerResponse } from "http";
-
 import { db } from "@peated/server/db";
 import {
   bottles,
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
+import { TRPCError } from "@trpc/server";
+import { and, desc, eq, sql } from "drizzle-orm";
+import { z } from "zod";
+import { publicProcedure } from "..";
 
-export default {
-  method: "GET",
-  url: "/bottles/:bottleId/priceHistory",
-  schema: {
-    params: {
-      type: "object",
-      required: ["bottleId"],
-      properties: {
-        bottleId: { type: "number" },
-      },
-    },
-  },
-  handler: async (req, res) => {
+export default publicProcedure
+  .input(
+    z.object({
+      bottle: z.number(),
+    }),
+  )
+  .query(async function ({ input, ctx }) {
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, req.params.bottleId));
+      .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
-      return res.status(404).send({ error: "Not found" });
+      throw new TRPCError({
+        message: "Bottle not found",
+        code: "NOT_FOUND",
+      });
     }
 
     const results = await db
@@ -49,22 +46,12 @@ export default {
       .groupBy(storePriceHistories.date)
       .orderBy(desc(storePriceHistories.date));
 
-    res.send({
+    return {
       results: results.map((r) => ({
         date: r.date,
         avgPrice: parseInt(r.avgPrice, 10),
         minPrice: parseInt(r.minPrice, 10),
         maxPrice: parseInt(r.maxPrice, 10),
       })),
-    });
-  },
-} as RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Params: {
-      bottleId: number;
     };
-  }
->;
+  });

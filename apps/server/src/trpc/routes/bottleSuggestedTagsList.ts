@@ -2,44 +2,28 @@ import { DEFAULT_TAGS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { bottleTags, bottles } from "@peated/server/db/schema";
 import { shuffle } from "@peated/server/lib/rand";
+import { TRPCError } from "@trpc/server";
 import { desc, eq, or, sql } from "drizzle-orm";
-import type { RouteOptions } from "fastify";
-import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
-import zodToJsonSchema from "zod-to-json-schema";
+import { publicProcedure } from "..";
 
-export default {
-  method: "GET",
-  url: "/bottles/:bottleId/suggestedTags",
-  schema: {
-    params: {
-      type: "object",
-      required: ["bottleId"],
-      properties: {
-        bottleId: { type: "number" },
-      },
-    },
-    response: {
-      200: zodToJsonSchema(
-        z.object({
-          results: z.array(
-            z.object({
-              tag: z.string(),
-              count: z.number(),
-            }),
-          ),
-        }),
-      ),
-    },
-  },
-  handler: async (req, res) => {
+export default publicProcedure
+  .input(
+    z.object({
+      bottle: z.number(),
+    }),
+  )
+  .query(async function ({ input }) {
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, req.params.bottleId));
+      .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
-      return res.status(404).send({ error: "Not found" });
+      throw new TRPCError({
+        message: "Bottle not found",
+        code: "NOT_FOUND",
+      });
     }
 
     // TODO: change the logic to be weighted:
@@ -73,17 +57,7 @@ export default {
       }))
       .sort((a, b) => b.count - a.count);
 
-    res.send({
+    return {
       results,
-    });
-  },
-} as RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Params: {
-      bottleId: number;
     };
-  }
->;
+  });

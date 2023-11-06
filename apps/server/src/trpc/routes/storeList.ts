@@ -1,10 +1,11 @@
-import { db } from "@peated/server/db";
-import { badges } from "@peated/server/db/schema";
-import { serialize } from "@peated/server/serializers";
-import { BadgeSerializer } from "@peated/server/serializers/badge";
 import type { SQL } from "drizzle-orm";
-import { and, asc, ilike } from "drizzle-orm";
+import { and, asc, desc, ilike } from "drizzle-orm";
 import { z } from "zod";
+
+import { db } from "@peated/server/db";
+import { stores } from "@peated/server/db/schema";
+import { serialize } from "@peated/server/serializers";
+import { StoreSerializer } from "@peated/server/serializers/store";
 import { publicProcedure } from "..";
 
 export default publicProcedure
@@ -12,7 +13,7 @@ export default publicProcedure
     z
       .object({
         query: z.string().default(""),
-        sort: z.enum(["name"]).default("name"),
+        sort: z.enum(["name", "-name"]).default("name"),
         page: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(100),
       })
@@ -23,24 +24,27 @@ export default publicProcedure
         limit: 100,
       }),
   )
-  .query(async function ({ input: { query, page, limit, ...input }, ctx }) {
+  .query(async function ({ input: { page, sort, limit, query }, ctx }) {
     const offset = (page - 1) * limit;
 
     const where: SQL<unknown>[] = [];
     if (query) {
-      where.push(ilike(badges.name, `%${query}%`));
+      where.push(ilike(stores.name, `%${query}%`));
     }
 
     let orderBy: SQL<unknown>;
-    switch (input.sort) {
+    switch (sort) {
+      case "-name":
+        orderBy = desc(stores.name);
+        break;
       default:
-        orderBy = asc(badges.name);
+        orderBy = asc(stores.name);
         break;
     }
 
     const results = await db
       .select()
-      .from(badges)
+      .from(stores)
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
@@ -48,7 +52,7 @@ export default publicProcedure
 
     return {
       results: await serialize(
-        BadgeSerializer,
+        StoreSerializer,
         results.slice(0, limit),
         ctx.user,
       ),

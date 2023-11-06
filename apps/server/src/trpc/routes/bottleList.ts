@@ -33,8 +33,6 @@ export default publicProcedure
     z
       .object({
         query: z.string().default(""),
-        page: z.number().default(1),
-        sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
         brand: z.number().optional(),
         distiller: z.number().optional(),
         bottler: z.number().optional(),
@@ -43,18 +41,18 @@ export default publicProcedure
         flight: z.string().optional(),
         category: z.enum(CATEGORY_LIST).optional(),
         age: z.number().optional(),
+        page: z.number().gte(1).default(1),
+        limit: z.number().gte(1).lte(100).default(100),
+        sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
       })
       .default({
         query: "",
         page: 1,
+        limit: 100,
         sort: DEFAULT_SORT,
       }),
   )
-  .query(async function ({ input, ctx }) {
-    const page = input.page || 1;
-    const query = input.query || "";
-
-    const limit = 100;
+  .query(async function ({ input: { query, page, limit, ...input }, ctx }) {
     const offset = (page - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
