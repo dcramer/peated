@@ -32,6 +32,7 @@ import friendCreate from "./routes/friendCreate";
 import friendList from "./routes/friendList";
 import notificationCount from "./routes/notificationCount";
 import notificationList from "./routes/notificationList";
+import notificationUpdate from "./routes/notificationUpdate";
 import priceChangeList from "./routes/priceChangeList";
 import stats from "./routes/stats";
 import storeById from "./routes/storeById";
@@ -46,6 +47,7 @@ import toastCreate from "./routes/toastCreate";
 import userById from "./routes/userById";
 import userList from "./routes/userList";
 import userTagList from "./routes/userTagList";
+import userUpdate from "./routes/userUpdate";
 import version from "./routes/version";
 
 export const appRouter = router({
@@ -82,6 +84,7 @@ export const appRouter = router({
   friendList,
   notificationCount,
   notificationList,
+  notificationUpdate,
   priceChangeList,
   stats,
   storeById,
@@ -96,6 +99,7 @@ export const appRouter = router({
   userById,
   userList,
   userTagList,
+  userUpdate,
   version,
 });
 
