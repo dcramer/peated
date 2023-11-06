@@ -6,38 +6,35 @@ import {
   tastings,
   toasts,
 } from "@peated/server/db/schema";
+import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, sql } from "drizzle-orm";
-import type { RouteOptions } from "fastify";
-import type { IncomingMessage, Server, ServerResponse } from "http";
-import { requireAuth } from "../middleware/auth";
+import { z } from "zod";
+import { authedProcedure } from "..";
 
-export default {
-  method: "DELETE",
-  url: "/tastings/:tastingId",
-  schema: {
-    params: {
-      type: "object",
-      required: ["tastingId"],
-      properties: {
-        tastingId: { type: "number" },
-      },
-    },
-  },
-  preHandler: [requireAuth],
-  handler: async (req, res) => {
-    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
-
+export default authedProcedure
+  .input(
+    z.object({
+      tasting: z.number(),
+    }),
+  )
+  .mutation(async function ({ input, ctx }) {
     const [tasting] = await db
       .select()
       .from(tastings)
-      .where(eq(tastings.id, req.params.tastingId))
+      .where(eq(tastings.id, input.tasting))
       .limit(1);
     if (!tasting) {
-      return res.status(404).send({ error: "Not found" });
+      throw new TRPCError({
+        message: "Tasting not found",
+        code: "NOT_FOUND",
+      });
     }
 
-    if (tasting.createdById !== req.user.id && !req.user.admin) {
-      return res.status(403).send({ error: "Forbidden" });
+    if (tasting.createdById !== ctx.user.id && !ctx.user.admin) {
+      throw new TRPCError({
+        message: "Cannot delete another persons tasting",
+        code: "FORBIDDEN",
+      });
     }
 
     await db.transaction(async (tx) => {
@@ -82,15 +79,6 @@ export default {
       // TODO: update badge qualifiers
       // TODO: update entities.totalTastings
     });
-    res.status(204).send();
-  },
-} as RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Params: {
-      tastingId: number;
-    };
-  }
->;
+
+    return {};
+  });

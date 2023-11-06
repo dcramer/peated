@@ -15,9 +15,11 @@ import bottleTagList from "./routes/bottleTagList";
 import bottleUpdate from "./routes/bottleUpdate";
 import changeList from "./routes/changeList";
 import collectionBottleCreate from "./routes/collectionBottleCreate";
+import collectionBottleDelete from "./routes/collectionBottleDelete";
 import collectionBottleList from "./routes/collectionBottleList";
 import collectionList from "./routes/collectionList";
 import commentCreate from "./routes/commentCreate";
+import commentDelete from "./routes/commentDelete";
 import commentList from "./routes/commentList";
 import entityById from "./routes/entityById";
 import entityCategoryList from "./routes/entityCategoryList";
@@ -29,8 +31,10 @@ import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
 import flightList from "./routes/flightList";
 import friendCreate from "./routes/friendCreate";
+import friendDelete from "./routes/friendDelete";
 import friendList from "./routes/friendList";
 import notificationCount from "./routes/notificationCount";
+import notificationDelete from "./routes/notificationDelete";
 import notificationList from "./routes/notificationList";
 import notificationUpdate from "./routes/notificationUpdate";
 import priceChangeList from "./routes/priceChangeList";
@@ -42,6 +46,9 @@ import storePriceCreateBatch from "./routes/storePriceCreateBatch";
 import storePriceList from "./routes/storePriceList";
 import tastingById from "./routes/tastingById";
 import tastingCreate from "./routes/tastingCreate";
+import tastingDelete from "./routes/tastingDelete";
+import tastingImageDelete from "./routes/tastingImageDelete";
+import tastingImageUpdate from "./routes/tastingImageUpdate";
 import tastingList from "./routes/tastingList";
 import toastCreate from "./routes/toastCreate";
 import userById from "./routes/userById";
@@ -67,9 +74,11 @@ export const appRouter = router({
   bottleUpdate,
   changeList,
   collectionBottleCreate,
+  collectionBottleDelete,
   collectionBottleList,
   collectionList,
   commentCreate,
+  commentDelete,
   commentList,
   entityById,
   entityCategoryList,
@@ -81,8 +90,10 @@ export const appRouter = router({
   flightCreate,
   flightList,
   friendCreate,
+  friendDelete,
   friendList,
   notificationCount,
+  notificationDelete,
   notificationList,
   notificationUpdate,
   priceChangeList,
@@ -94,7 +105,10 @@ export const appRouter = router({
   storePriceCreateBatch,
   tastingById,
   tastingCreate,
+  tastingDelete,
   tastingList,
+  tastingImageUpdate,
+  tastingImageDelete,
   toastCreate,
   userById,
   userList,

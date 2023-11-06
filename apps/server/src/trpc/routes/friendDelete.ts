@@ -1,41 +1,38 @@
 import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
+import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
-import type { RouteOptions } from "fastify";
-import type { IncomingMessage, Server, ServerResponse } from "http";
-import { deleteNotification } from "../lib/notifications";
-import { requireAuth } from "../middleware/auth";
+import { z } from "zod";
+import { authedProcedure } from "..";
+import { deleteNotification } from "../../lib/notifications";
 
-export default {
-  method: "DELETE",
-  url: "/friends/:userId",
-  schema: {
-    params: {
-      type: "object",
-      required: ["userId"],
-      properties: {
-        userId: { type: "number" },
-      },
-    },
-  },
-  preHandler: [requireAuth],
-  handler: async (req, res) => {
-    if (!req.user) return res.status(401);
-
-    if (req.user.id === req.params.userId) {
-      return res.status(400).send({ error: "Cannot unfriend yourself" });
+export default authedProcedure
+  .input(
+    z.object({
+      user: z.number(),
+    }),
+  )
+  .mutation(async function ({ input, ctx }) {
+    if (ctx.user.id === input.user) {
+      throw new TRPCError({
+        message: "User not found",
+        code: "NOT_FOUND",
+      });
     }
 
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, req.params.userId));
+      .where(eq(users.id, input.user));
 
     if (!user) {
-      return res.status(404).send({ error: "Not found" });
+      throw new TRPCError({
+        message: "User not found",
+        code: "NOT_FOUND",
+      });
     }
 
-    const currentUser = req.user;
+    const currentUser = ctx.user;
     await db.transaction(async (tx) => {
       const [follow] = await tx
         .update(follows)
@@ -70,17 +67,7 @@ export default {
         });
     });
 
-    res.status(200).send({
+    return {
       status: "none",
-    });
-  },
-} as RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Params: {
-      userId: number;
     };
-  }
->;
+  });
