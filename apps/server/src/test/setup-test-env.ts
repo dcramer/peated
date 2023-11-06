@@ -3,9 +3,9 @@ import { SQL, StringChunk, eq } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 
-import { db, pool } from "@peated/server/db";
-import { migrate } from "@peated/server/db/migrate";
 import { Client } from "pg";
+import { db, pool } from "../db";
+import { migrate } from "../db/migrate";
 import "../lib/test/expects";
 import { AuthenticatedHeaders, User } from "../lib/test/fixtures";
 
