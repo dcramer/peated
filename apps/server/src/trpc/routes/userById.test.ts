@@ -36,3 +36,8 @@ test("get user w/ friendStatus", async () => {
   expect(data.id).toBe(user.id);
   expect(data.friendStatus).toBe("friends");
 });
+
+test("errors on invalid username", async () => {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() => caller.userById("notauser")).rejects.toThrowError(/NOT_FOUND/);
+});
