@@ -8,9 +8,9 @@ import {
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 
-import type { Paginated } from "@peated/shared/types";
+import type { Paginated } from "@peated/core/types";
 
-import type { Tasting } from "@peated/shared/types";
+import type { Tasting } from "@peated/core/types";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import Alert from "~/components/alert";
 import Glyph from "~/components/assets/Glyph";

@@ -1,12 +1,12 @@
-import { db } from "@peated/shared/db";
-import { entities } from "@peated/shared/db/schema";
-import { EntitySchema } from "@peated/shared/schemas";
+import { db } from "@peated/core/db";
+import { entities } from "@peated/core/db/schema";
+import { EntitySchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { EntitySerializer } from "@peated/core/serializers/entity";
 import { eq, getTableColumns, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
-import { serialize } from "../lib/serializers";
-import { EntitySerializer } from "../lib/serializers/entity";
 
 export default {
   method: "GET",

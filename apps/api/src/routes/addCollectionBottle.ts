@@ -4,14 +4,14 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { CollectionBottleInputSchema } from "@peated/shared/schemas";
+import { CollectionBottleInputSchema } from "@peated/core/schemas";
 
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
 import {
   bottles,
   collectionBottles,
   collections,
-} from "@peated/shared/db/schema";
+} from "@peated/core/db/schema";
 import { getUserFromId } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
 import { requireAuth } from "../middleware/auth";

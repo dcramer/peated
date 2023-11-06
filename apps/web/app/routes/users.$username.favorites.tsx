@@ -1,4 +1,4 @@
-import type { User } from "@peated/shared/types";
+import type { User } from "@peated/core/types";
 import { useOutletContext } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import BottleTable from "~/components/bottleTable";

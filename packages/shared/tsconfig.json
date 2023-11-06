@@ -1,11 +1,11 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
   "compilerOptions": {
-    "types": ["vitest/globals"],
-    "baseUrl": "./",
-    "paths": {
-      "~/*": ["./*"]
-    }
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "outDir": "dist",
+    "types": ["vitest/globals", "globals.d.ts"],
+    "baseUrl": "./"
   },
-  "include": ["./"]
+  "include": ["."],
+  "exclude": ["dist", "node_modules"]
 }

@@ -1,11 +1,11 @@
 import { program } from "commander";
 import { and, eq, ne, sql } from "drizzle-orm";
 
-import { db } from "@peated/shared/db";
-import type { Bottle, Entity, Store } from "@peated/shared/db/schema";
-import { bottles, stores, tastings, users } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import type { Bottle, Entity, Store } from "@peated/core/db/schema";
+import { bottles, stores, tastings, users } from "@peated/core/db/schema";
+import { random } from "@peated/core/lib/rand";
 import { createNotification } from "../lib/notifications";
-import { random } from "../lib/rand";
 import * as Fixtures from "../lib/test/fixtures";
 
 const loadDefaultStores = async () => {

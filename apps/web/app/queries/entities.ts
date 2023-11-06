@@ -1,4 +1,4 @@
-import type { Entity, EntityType, Paginated } from "@peated/shared/types";
+import type { Entity, EntityType, Paginated } from "@peated/core/types";
 import type { ApiClient } from "~/lib/api";
 
 type EntityQueryParams = {

@@ -1,4 +1,4 @@
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
 import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
 import { createNotification } from "../lib/notifications";

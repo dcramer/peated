@@ -2,10 +2,10 @@ import { faker } from "@faker-js/faker";
 import { readFile } from "fs/promises";
 import path from "path";
 
-import { toTitleCase } from "@peated/shared/lib/strings";
+import { toTitleCase } from "@peated/core/lib/strings";
 
-import { CATEGORY_LIST, DEFAULT_TAGS } from "@peated/shared/constants";
-import { db } from "@peated/shared/db";
+import { CATEGORY_LIST, DEFAULT_TAGS } from "@peated/core/constants";
+import { db } from "@peated/core/db";
 import type {
   Entity as EntityType,
   NewBadge,
@@ -21,7 +21,7 @@ import type {
   NewToast,
   NewUser,
   User as UserType,
-} from "@peated/shared/db/schema";
+} from "@peated/core/db/schema";
 import {
   badges,
   bottleTags,
@@ -38,11 +38,11 @@ import {
   tastings,
   toasts,
   users,
-} from "@peated/shared/db/schema";
+} from "@peated/core/db/schema";
+import { choose, random, sample } from "@peated/core/lib/rand";
 import { eq, sql } from "drizzle-orm";
 import { generatePublicId } from "~/lib/publicId";
 import { createAccessToken } from "../auth";
-import { choose, random, sample } from "../rand";
 
 export const User = async ({ ...data }: Partial<NewUser> = {}) => {
   return (

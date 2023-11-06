@@ -3,15 +3,15 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { StorePriceInputSchema } from "@peated/shared/schemas";
+import { StorePriceInputSchema } from "@peated/core/schemas";
 
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
 import {
   bottles,
   storePriceHistories,
   storePrices,
   stores,
-} from "@peated/shared/db/schema";
+} from "@peated/core/db/schema";
 import { eq, ilike, sql } from "drizzle-orm";
 import { requireAdmin } from "../middleware/auth";
 

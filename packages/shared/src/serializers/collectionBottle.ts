@@ -1,7 +1,6 @@
-import type { Bottle, CollectionBottle, User } from "@peated/shared/db/schema";
-
 import type { Serializer } from ".";
 import { serialize } from ".";
+import type { Bottle, CollectionBottle, User } from "../db/schema";
 import { BottleSerializer } from "./bottle";
 
 export const CollectionBottleSerializer: Serializer<

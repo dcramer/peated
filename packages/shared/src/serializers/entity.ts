@@ -1,6 +1,5 @@
-import type { Entity, User } from "@peated/shared/db/schema";
-
 import type { Serializer } from ".";
+import type { Entity, User } from "../db/schema";
 
 export const EntitySerializer: Serializer<Entity> = {
   item: (

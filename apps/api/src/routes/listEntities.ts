@@ -1,8 +1,10 @@
-import { ENTITY_TYPE_LIST } from "@peated/shared/constants";
-import { db } from "@peated/shared/db";
-import type { EntityType } from "@peated/shared/db/schema";
-import { entities } from "@peated/shared/db/schema";
-import { EntitySchema, PaginatedSchema } from "@peated/shared/schemas";
+import { ENTITY_TYPE_LIST } from "@peated/core/constants";
+import { db } from "@peated/core/db";
+import type { EntityType } from "@peated/core/db/schema";
+import { entities } from "@peated/core/db/schema";
+import { EntitySchema, PaginatedSchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { EntitySerializer } from "@peated/core/serializers/entity";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, getTableColumns, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
@@ -10,8 +12,6 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
-import { EntitySerializer } from "../lib/serializers/entity";
 
 const SORT_OPTIONS = [
   "name",

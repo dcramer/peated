@@ -1,43 +1,7 @@
-import type { DatabaseType, TransactionType } from "@peated/shared/db";
-import type { NewUser, User } from "@peated/shared/db/schema";
-import { users } from "@peated/shared/db/schema";
-import { sign, verify } from "jsonwebtoken";
-import config from "../config";
-import { random } from "./rand";
-import { serialize } from "./serializers";
-import { UserSerializer } from "./serializers/user";
-
-export const createAccessToken = async (
-  user: User,
-): Promise<string | undefined> => {
-  const payload = await serialize(UserSerializer, user, user);
-  return new Promise<string | undefined>((res, rej) => {
-    sign(payload, config.JWT_SECRET, {}, (err, token) => {
-      if (err) rej(err);
-      res(token);
-    });
-  });
-};
-
-export const verifyToken = (token: string | undefined): Promise<any> => {
-  return new Promise((res, rej) => {
-    if (!token) {
-      rej("invalid token");
-      return;
-    }
-
-    verify(token, config.JWT_SECRET, {}, (err, decoded) => {
-      if (err) {
-        rej("invalid token");
-        return;
-      }
-      if (!decoded || typeof decoded === "string") {
-        rej("invalid token");
-      }
-      res(decoded);
-    });
-  });
-};
+import type { DatabaseType, TransactionType } from "@peated/core/db";
+import type { NewUser, User } from "@peated/core/db/schema";
+import { users } from "@peated/core/db/schema";
+import { random } from "@peated/core/lib/rand";
 
 export const createUser = async (
   db: DatabaseType | TransactionType,

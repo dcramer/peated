@@ -1,5 +1,5 @@
-import { db } from "@peated/shared/db";
-import { collectionBottles } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import { collectionBottles } from "@peated/core/db/schema";
 import { and, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";

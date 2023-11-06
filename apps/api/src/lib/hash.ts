@@ -1,6 +1,5 @@
+import { notEmpty } from "@peated/core/lib/filter";
 import { createHash } from "crypto";
-
-import { notEmpty } from "./filter";
 
 export function sha1(...value: (string | number | null | undefined)[]) {
   const sum = createHash("sha1");

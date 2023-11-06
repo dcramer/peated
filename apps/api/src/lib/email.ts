@@ -1,10 +1,10 @@
-import type { Bottle, Comment, Tasting, User } from "@peated/shared/db/schema";
+import type { Bottle, Comment, Tasting, User } from "@peated/core/db/schema";
+import { logError } from "@peated/core/lib/log";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import config from "~/config";
 import { escapeHtml } from "./html";
-import { logError } from "./log";
 
 import theme from "@peated/design";
 

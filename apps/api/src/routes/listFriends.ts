@@ -1,14 +1,14 @@
-import { db } from "@peated/shared/db";
-import { follows } from "@peated/shared/db/schema";
-import { FriendSchema, PaginatedSchema } from "@peated/shared/schemas";
+import { db } from "@peated/core/db";
+import { follows } from "@peated/core/db/schema";
+import { FriendSchema, PaginatedSchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { FriendSerializer } from "@peated/core/serializers/friend";
 import { and, asc, desc, eq, not } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { FriendSerializer } from "~/lib/serializers/friend";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
 import { requireAuth } from "../middleware/auth";
 
 export default {

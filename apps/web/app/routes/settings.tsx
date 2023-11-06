@@ -2,8 +2,8 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserInputSchema } from "@peated/shared/schemas";
-import type { User } from "@peated/shared/types";
+import { UserInputSchema } from "@peated/core/schemas";
+import type { User } from "@peated/core/types";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

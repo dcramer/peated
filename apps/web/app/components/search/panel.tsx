@@ -2,9 +2,9 @@ import { PlusIcon } from "@heroicons/react/20/solid";
 import { Link, useLocation, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
-import { toTitleCase } from "@peated/shared/lib/strings";
+import { toTitleCase } from "@peated/core/lib/strings";
 
-import type { Bottle, Entity, User } from "@peated/shared/types";
+import type { Bottle, Entity, User } from "@peated/core/types";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { debounce } from "~/lib/api";

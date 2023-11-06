@@ -3,9 +3,9 @@ import { json, type MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
 
-import { ENTITY_TYPE_LIST, MAJOR_COUNTRIES } from "@peated/shared/constants";
-import { toTitleCase } from "@peated/shared/lib/strings";
-import type { EntityType } from "@peated/shared/types";
+import { ENTITY_TYPE_LIST, MAJOR_COUNTRIES } from "@peated/core/constants";
+import { toTitleCase } from "@peated/core/lib/strings";
+import type { EntityType } from "@peated/core/types";
 import { type SitemapFunction } from "remix-sitemap";
 import EmptyActivity from "~/components/emptyActivity";
 import EntityTable from "~/components/entityTable";

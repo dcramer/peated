@@ -4,13 +4,13 @@ import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { AuthSchema } from "@peated/shared/schemas";
+import { AuthSchema } from "@peated/core/schemas";
 
-import { db } from "@peated/shared/db";
-import { users } from "@peated/shared/db/schema";
-import { createAccessToken } from "../lib/auth";
-import { serialize } from "../lib/serializers";
-import { UserSerializer } from "../lib/serializers/user";
+import { db } from "@peated/core/db";
+import { users } from "@peated/core/db/schema";
+import { createAccessToken } from "@peated/core/lib/auth";
+import { serialize } from "@peated/core/serializers";
+import { UserSerializer } from "@peated/core/serializers/user";
 
 export default {
   method: "POST",

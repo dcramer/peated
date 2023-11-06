@@ -1,47 +1,47 @@
-import type { User } from "@peated/shared/db/schema";
-
-export type Result = Record<string, any>;
+import type { User } from "../db/schema";
 
 type Item = {
   id: number;
 };
 
-export type Attrs<T extends Item> = Record<number, Record<string, any>>;
+export type Attrs = Record<number, Record<string, any>>;
 
 export interface Serializer<T extends Item> {
-  attrs?(itemList: T[], currentUser?: User | null): Promise<Attrs<T>>;
+  attrs?(itemList: T[], currentUser?: User | null): Promise<Attrs>;
   item(
     item: T,
     attrs: Record<string, Record<string, any>>,
     currentUser?: User | null,
-  ): Result;
+  ): Record<string, any>;
 }
 
 export async function DefaultAttrs<T extends Item>(
   itemList: T[],
   currentUser?: User | null,
-): Promise<Attrs<T>> {
-  return Object.fromEntries(itemList.map((i) => [i, {}]));
+): Promise<Attrs> {
+  return Object.fromEntries(itemList.map((i) => [i.id, {}]));
 }
+
+type SerializedResult<T extends Item> = ReturnType<Serializer<T>["item"]>;
 
 export async function serialize<T extends Item>(
   serializer: Serializer<T>,
   item: T,
   currentUser?: User | null,
   excludeFields?: string[],
-): Promise<Result>;
+): Promise<SerializedResult<T>>;
 export async function serialize<T extends Item>(
   serializer: Serializer<T>,
   itemList: T[],
   currentUser?: User | null,
   excludeFields?: string[],
-): Promise<Result[]>;
+): Promise<SerializedResult<T>[]>;
 export async function serialize<T extends Item>(
   serializer: Serializer<T>,
   itemList: T | T[],
   currentUser?: User | null,
   excludeFields: string[] = [],
-): Promise<Result | Result[]> {
+): Promise<SerializedResult<T>[] | SerializedResult<T>> {
   if (Array.isArray(itemList) && !itemList.length) return [];
 
   const attrs = await (serializer.attrs || DefaultAttrs<T>)(

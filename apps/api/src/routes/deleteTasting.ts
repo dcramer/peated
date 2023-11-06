@@ -1,11 +1,11 @@
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
 import {
   bottleTags,
   bottles,
   notifications,
   tastings,
   toasts,
-} from "@peated/shared/db/schema";
+} from "@peated/core/db/schema";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";

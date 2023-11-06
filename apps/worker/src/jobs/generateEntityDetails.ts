@@ -1,9 +1,9 @@
-import { COUNTRY_LIST, DEFAULT_CREATED_BY_ID } from "@peated/shared/constants";
-import { db } from "@peated/shared/db";
-import type { Entity } from "@peated/shared/db/schema";
-import { changes, entities } from "@peated/shared/db/schema";
-import { arraysEqual } from "@peated/shared/lib/equals";
-import { CountryEnum, EntityTypeEnum } from "@peated/shared/schemas";
+import { COUNTRY_LIST, DEFAULT_CREATED_BY_ID } from "@peated/core/constants";
+import { db } from "@peated/core/db";
+import type { Entity } from "@peated/core/db/schema";
+import { changes, entities } from "@peated/core/db/schema";
+import { arraysEqual } from "@peated/core/lib/equals";
+import { CountryEnum, EntityTypeEnum } from "@peated/core/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 

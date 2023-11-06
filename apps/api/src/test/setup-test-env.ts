@@ -3,8 +3,8 @@ import { SQL, StringChunk, eq } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 
-import { db, pool } from "@peated/shared/db";
-import { migrate } from "@peated/shared/db/migrate";
+import { db, pool } from "@peated/core/db";
+import { migrate } from "@peated/core/db/migrate";
 import { Client } from "pg";
 import "../lib/test/expects";
 import { AuthenticatedHeaders, User } from "../lib/test/fixtures";

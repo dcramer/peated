@@ -2,11 +2,11 @@ import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
-import { MAX_FILESIZE } from "@peated/shared/constants";
-import { humanizeBytes } from "@peated/shared/lib/strings";
+import { MAX_FILESIZE } from "@peated/core/constants";
+import { humanizeBytes } from "@peated/core/lib/strings";
 
-import { db } from "@peated/shared/db";
-import { tastings } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import { tastings } from "@peated/core/db/schema";
 import config from "../config";
 import { compressAndResizeImage, storeFile } from "../lib/uploads";
 import { requireAuth } from "../middleware/auth";

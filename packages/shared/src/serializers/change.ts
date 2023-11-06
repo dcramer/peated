@@ -1,11 +1,10 @@
-import type { Change, User } from "@peated/shared/db/schema";
-import { users } from "@peated/shared/db/schema";
-
-import { db } from "@peated/shared/db";
 import { inArray } from "drizzle-orm";
 import type { Serializer } from ".";
 import { serialize } from ".";
-import { logError } from "../log";
+import { db } from "../db";
+import type { Change, User } from "../db/schema";
+import { users } from "../db/schema";
+import { logError } from "../lib/log";
 import { UserSerializer } from "./user";
 
 export const ChangeSerializer: Serializer<Change> = {
@@ -27,9 +26,7 @@ export const ChangeSerializer: Serializer<Change> = {
       ),
     );
     if (createdByIds.length !== createdByList.length) {
-      logError("Failed to fetch all createdBy relations for changes", {
-        userId: currentUser.id,
-      });
+      logError("Failed to fetch all createdBy relations for changes");
     }
 
     return Object.fromEntries(

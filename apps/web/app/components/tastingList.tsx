@@ -1,4 +1,4 @@
-import type { Tasting } from "@peated/shared/types";
+import type { Tasting } from "@peated/core/types";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import TastingListItem from "./tastingListItem";

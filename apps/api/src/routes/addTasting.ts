@@ -4,11 +4,11 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
-import { TastingInputSchema, TastingSchema } from "@peated/shared/schemas";
+import { TastingInputSchema, TastingSchema } from "@peated/core/schemas";
 
-import { XP_PER_LEVEL } from "@peated/shared/constants";
-import { db } from "@peated/shared/db";
-import type { NewTasting, Tasting } from "@peated/shared/db/schema";
+import { XP_PER_LEVEL } from "@peated/core/constants";
+import { db } from "@peated/core/db";
+import type { NewTasting, Tasting } from "@peated/core/db/schema";
 import {
   badgeAwards,
   bottleTags,
@@ -16,13 +16,13 @@ import {
   entities,
   follows,
   tastings,
-} from "@peated/shared/db/schema";
-import pushJob from "@peated/shared/jobs";
-import { notEmpty } from "~/lib/filter";
+} from "@peated/core/db/schema";
+import pushJob from "@peated/core/jobs";
+import { notEmpty } from "@peated/core/lib/filter";
+import { serialize } from "@peated/core/serializers";
+import { TastingSerializer } from "@peated/core/serializers/tasting";
 import { checkBadges } from "../lib/badges";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
-import { serialize } from "../lib/serializers";
-import { TastingSerializer } from "../lib/serializers/tasting";
 import { requireAuth } from "../middleware/auth";
 
 export default {

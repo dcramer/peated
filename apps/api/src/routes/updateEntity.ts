@@ -4,12 +4,12 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
-import { db } from "@peated/shared/db";
-import type { Entity } from "@peated/shared/db/schema";
-import { changes, entities } from "@peated/shared/db/schema";
-import pushJob from "@peated/shared/jobs";
-import { arraysEqual } from "@peated/shared/lib/equals";
-import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
+import { db } from "@peated/core/db";
+import type { Entity } from "@peated/core/db/schema";
+import { changes, entities } from "@peated/core/db/schema";
+import pushJob from "@peated/core/jobs";
+import { arraysEqual } from "@peated/core/lib/equals";
+import { EntityInputSchema, EntitySchema } from "@peated/core/schemas";
 import { requireMod } from "../middleware/auth";
 
 export default {

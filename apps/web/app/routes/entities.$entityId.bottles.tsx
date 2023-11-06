@@ -4,7 +4,7 @@ import { useLocation, useOutletContext } from "@remix-run/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
 
-import type { Entity } from "@peated/shared/types";
+import type { Entity } from "@peated/core/types";
 import BottleTable from "~/components/bottleTable";
 import QueryBoundary from "~/components/queryBoundary";
 import useApi from "~/hooks/useApi";

@@ -1,7 +1,7 @@
-import type { BadgeType } from "@peated/shared/types";
+import type { BadgeType } from "@peated/core/types";
 
-import type { DatabaseType, TransactionType } from "@peated/shared/db";
-import type { Badge } from "@peated/shared/db/schema";
+import type { DatabaseType, TransactionType } from "@peated/core/db";
+import type { Badge } from "@peated/core/db/schema";
 import type { TastingWithRelations } from "./base";
 import { BottleBadge } from "./bottleBadge";
 import { CategoryBadge } from "./categoryBadge";

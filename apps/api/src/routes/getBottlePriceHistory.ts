@@ -2,12 +2,12 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
 import {
   bottles,
   storePriceHistories,
   storePrices,
-} from "@peated/shared/db/schema";
+} from "@peated/core/db/schema";
 
 export default {
   method: "GET",

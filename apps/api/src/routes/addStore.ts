@@ -3,12 +3,12 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { StoreInputSchema, StoreSchema } from "@peated/shared/schemas";
+import { StoreInputSchema, StoreSchema } from "@peated/core/schemas";
 
-import { db } from "@peated/shared/db";
-import { stores } from "@peated/shared/db/schema";
-import { serialize } from "../lib/serializers";
-import { StoreSerializer } from "../lib/serializers/store";
+import { db } from "@peated/core/db";
+import { stores } from "@peated/core/db/schema";
+import { serialize } from "@peated/core/serializers";
+import { StoreSerializer } from "@peated/core/serializers/store";
 import { requireAdmin } from "../middleware/auth";
 
 export default {

@@ -1,6 +1,6 @@
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
+import { logError } from "@peated/core/lib/log";
 import config from "~/config";
-import { logError } from "~/lib/log";
 
 function absoluteUri(url: string, host: string) {
   if (url.indexOf("https://") === 0 || url.indexOf("http://") === 0) return url;

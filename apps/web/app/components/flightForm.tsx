@@ -4,8 +4,8 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
-import { FlightInputSchema } from "@peated/shared/schemas";
-import type { Bottle } from "@peated/shared/types";
+import { FlightInputSchema } from "@peated/core/schemas";
+import type { Bottle } from "@peated/core/types";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
 import FormHeader from "~/components/formHeader";

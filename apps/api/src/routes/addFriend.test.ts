@@ -1,5 +1,5 @@
-import { db } from "@peated/shared/db";
-import { follows, notifications } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import { follows, notifications } from "@peated/core/db/schema";
 import { and, eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";

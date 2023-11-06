@@ -1,4 +1,4 @@
-import type { Badge, User } from "@peated/shared/db/schema";
+import type { Badge, User } from "../db/schema";
 
 import type { Serializer } from ".";
 

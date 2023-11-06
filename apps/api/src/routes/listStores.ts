@@ -1,4 +1,4 @@
-import { PaginatedSchema, StoreSchema } from "@peated/shared/schemas";
+import { PaginatedSchema, StoreSchema } from "@peated/core/schemas";
 import type { SQL } from "drizzle-orm";
 import { and, asc, ilike } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
@@ -6,11 +6,11 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { db } from "@peated/shared/db";
-import { stores } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import { stores } from "@peated/core/db/schema";
+import { serialize } from "@peated/core/serializers";
+import { StoreSerializer } from "@peated/core/serializers/store";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
-import { StoreSerializer } from "../lib/serializers/store";
 
 export default {
   method: "GET",

@@ -15,6 +15,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "incremental": true,
+    "declaration": true,
+    "forceConsistentCasingInFileNames": true,
 
     /* Linting */
     "strict": true,

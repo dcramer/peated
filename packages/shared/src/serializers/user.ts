@@ -1,10 +1,9 @@
-import type { User } from "@peated/shared/db/schema";
-import { follows } from "@peated/shared/db/schema";
-import config from "../../config";
-
-import { db } from "@peated/shared/db";
 import { and, eq, inArray } from "drizzle-orm";
 import type { Serializer } from ".";
+import config from "../config";
+import { db } from "../db";
+import type { User } from "../db/schema";
+import { follows } from "../db/schema";
 
 export const UserSerializer: Serializer<User> = {
   attrs: async (itemList: User[], currentUser?: User) => {
@@ -44,7 +43,7 @@ export const UserSerializer: Serializer<User> = {
       displayName: item.displayName,
       username: item.username,
       pictureUrl: item.pictureUrl
-        ? `${config.URL_PREFIX}${item.pictureUrl}`
+        ? `${config.API_SERVER}${item.pictureUrl}`
         : null,
       friendStatus:
         attrs.friendStatus === "following" ? "friends" : attrs.friendStatus,

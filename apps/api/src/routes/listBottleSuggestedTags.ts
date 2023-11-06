@@ -1,12 +1,12 @@
-import { DEFAULT_TAGS } from "@peated/shared/constants";
-import { db } from "@peated/shared/db";
-import { bottleTags, bottles } from "@peated/shared/db/schema";
+import { DEFAULT_TAGS } from "@peated/core/constants";
+import { db } from "@peated/core/db";
+import { bottleTags, bottles } from "@peated/core/db/schema";
+import { shuffle } from "@peated/core/lib/rand";
 import { desc, eq, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { shuffle } from "../lib/rand";
 
 export default {
   method: "GET",

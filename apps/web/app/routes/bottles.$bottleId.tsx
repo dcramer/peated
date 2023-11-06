@@ -10,13 +10,12 @@ import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
 
-import type { Bottle } from "@peated/shared/types";
+import type { Bottle } from "@peated/core/types";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
 import { ClientOnly } from "~/components/clientOnly";
 import ConfirmationButton from "~/components/confirmationButton";
-import { DistributionChart } from "~/components/distributionChart";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import { RangeBarChart } from "~/components/rangeBarChart.client";
@@ -27,98 +26,20 @@ import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { summarize } from "~/lib/markdown";
 import { formatCategoryName } from "~/lib/strings";
-import {
-  fetchBottlePriceHistory,
-  fetchBottleTags,
-  getBottle,
-} from "~/queries/bottles";
+import { fetchBottlePriceHistory } from "~/queries/bottles";
 import {
   favoriteBottle,
   fetchCollections,
   unfavoriteBottle,
 } from "~/queries/collections";
 
-const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
-  const api = useApi();
-
-  const { data: isCollected, isLoading } = useQuery(
-    ["bottles", bottle.id, "isCollected"],
-    async () => {
-      const res = await fetchCollections(api, "me", {
-        bottle: bottle.id,
-      });
-      return res.results.length > 0;
-    },
-  );
-
-  const queryClient = useQueryClient();
-  const collectBottle = useMutation({
-    mutationFn: async (collect: boolean) => {
-      if (!collect) {
-        return await unfavoriteBottle(api, bottle.id);
-      } else {
-        return await favoriteBottle(api, bottle.id);
-      }
-    },
-    onSuccess: (newData) => {
-      queryClient.setQueryData(["bottles", bottle.id, "isCollected"], newData);
-    },
-  });
-
-  if (isCollected === undefined) return null;
-
-  return (
-    <>
-      <Button
-        onClick={async () => {
-          await collectBottle.mutateAsync(!isCollected);
-        }}
-        disabled={isLoading}
-        color="primary"
-      >
-        {isCollected ? (
-          <StarIconFilled
-            className="text-highlight h-4 w-4"
-            aria-hidden="true"
-          />
-        ) : (
-          <StarIcon className="h-4 w-4" aria-hidden="true" />
-        )}
-      </Button>
-    </>
-  );
-};
-
-const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
-  const api = useApi();
-
-  const { data } = useQuery(["bottles", bottleId, "tags"], () =>
-    fetchBottleTags(api, bottleId),
-  );
-
-  if (!data) return null;
-
-  const { results, totalCount } = data;
-
-  if (!results.length) return null;
-
-  return (
-    <DistributionChart
-      items={results.map((t) => ({
-        name: t.tag,
-        count: t.count,
-        tag: t.tag,
-      }))}
-      totalCount={totalCount}
-      to={(item) => `/bottles?tag=${encodeURIComponent(item.name)}`}
-    />
-  );
-};
-
-export async function loader({ params, context }: LoaderFunctionArgs) {
+export async function loader({
+  params,
+  context: { trpc },
+}: LoaderFunctionArgs) {
   invariant(params.bottleId);
 
-  const bottle = await getBottle(context.api, params.bottleId);
+  const bottle = await trpc.bottleById.query(parseInt(params.bottleId, 10));
 
   return json({ bottle });
 }
@@ -150,24 +71,6 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     },
   ];
 };
-
-function BottlePriceHistory({ bottleId }: { bottleId: number }) {
-  const api = useApi();
-  const { data, isLoading } = useQuery(
-    ["bottles", bottleId, "priceHistory"],
-    () => fetchBottlePriceHistory(api, bottleId),
-  );
-
-  if (isLoading) return <div className="h-[45px] animate-pulse" />;
-
-  if (!data) return <div className="h-[45px] animate-pulse" />;
-
-  const points = data.results.reverse().map((r, idx) => {
-    return { time: idx, high: r.maxPrice, low: r.minPrice, avg: r.avgPrice };
-  });
-
-  return <RangeBarChart data={points} width={200} height={45} />;
-}
 
 export default function BottleDetails() {
   const { user } = useAuth();
@@ -334,3 +237,72 @@ export default function BottleDetails() {
     </Layout>
   );
 }
+
+function BottlePriceHistory({ bottleId }: { bottleId: number }) {
+  const api = useApi();
+  const { data, isLoading } = useQuery(
+    ["bottles", bottleId, "priceHistory"],
+    () => fetchBottlePriceHistory(api, bottleId),
+  );
+
+  if (isLoading) return <div className="h-[45px] animate-pulse" />;
+
+  if (!data) return <div className="h-[45px] animate-pulse" />;
+
+  const points = data.results.reverse().map((r, idx) => {
+    return { time: idx, high: r.maxPrice, low: r.minPrice, avg: r.avgPrice };
+  });
+
+  return <RangeBarChart data={points} width={200} height={45} />;
+}
+
+const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
+  const api = useApi();
+
+  const { data: isCollected, isLoading } = useQuery(
+    ["bottles", bottle.id, "isCollected"],
+    async () => {
+      const res = await fetchCollections(api, "me", {
+        bottle: bottle.id,
+      });
+      return res.results.length > 0;
+    },
+  );
+
+  const queryClient = useQueryClient();
+  const collectBottle = useMutation({
+    mutationFn: async (collect: boolean) => {
+      if (!collect) {
+        return await unfavoriteBottle(api, bottle.id);
+      } else {
+        return await favoriteBottle(api, bottle.id);
+      }
+    },
+    onSuccess: (newData) => {
+      queryClient.setQueryData(["bottles", bottle.id, "isCollected"], newData);
+    },
+  });
+
+  if (isCollected === undefined) return null;
+
+  return (
+    <>
+      <Button
+        onClick={async () => {
+          await collectBottle.mutateAsync(!isCollected);
+        }}
+        disabled={isLoading}
+        color="primary"
+      >
+        {isCollected ? (
+          <StarIconFilled
+            className="text-highlight h-4 w-4"
+            aria-hidden="true"
+          />
+        ) : (
+          <StarIcon className="h-4 w-4" aria-hidden="true" />
+        )}
+      </Button>
+    </>
+  );
+};

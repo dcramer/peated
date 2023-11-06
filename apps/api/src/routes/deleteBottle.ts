@@ -2,15 +2,15 @@ import { eq, inArray, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
 import {
   bottleTags,
   bottles,
   bottlesToDistillers,
   changes,
   entities,
-} from "@peated/shared/db/schema";
-import { notEmpty } from "../lib/filter";
+} from "@peated/core/db/schema";
+import { notEmpty } from "@peated/core/lib/filter";
 import { requireAdmin } from "../middleware/auth";
 
 export default {

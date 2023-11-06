@@ -1,17 +1,10 @@
-import type { Follow, Notification, User } from "@peated/shared/db/schema";
-import {
-  comments,
-  follows,
-  tastings,
-  toasts,
-  users,
-} from "@peated/shared/db/schema";
-
-import { db } from "@peated/shared/db";
 import { eq, inArray } from "drizzle-orm";
 import type { Serializer } from ".";
 import { serialize } from ".";
-import { logError } from "../log";
+import { db } from "../db";
+import type { Follow, Notification, User } from "../db/schema";
+import { comments, follows, tastings, toasts, users } from "../db/schema";
+import { logError } from "../lib/log";
 import { TastingSerializer } from "./tasting";
 import { UserSerializer } from "./user";
 
@@ -34,9 +27,7 @@ export const NotificationSerializer: Serializer<Notification> = {
       ),
     );
     if (fromUserIds.length !== fromUserList.length) {
-      logError("Failed to fetch all fromUser relations for notifications", {
-        userId: currentUser.id,
-      });
+      logError("Failed to fetch all fromUser relations for notifications");
     }
 
     const followIdList = itemList
@@ -55,9 +46,7 @@ export const NotificationSerializer: Serializer<Notification> = {
       ).map((data, index) => [followList[index].id, data]),
     );
     if (followIdList.length !== followList.length) {
-      logError("Failed to fetch all follow relations for notifications", {
-        userId: currentUser.id,
-      });
+      logError("Failed to fetch all follow relations for notifications");
     }
 
     const toastIdList = itemList

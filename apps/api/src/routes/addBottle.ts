@@ -4,22 +4,22 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { normalizeBottleName } from "@peated/shared/lib/normalize";
-import { BottleInputSchema, BottleSchema } from "@peated/shared/schemas";
+import { normalizeBottleName } from "@peated/core/lib/normalize";
+import { BottleInputSchema, BottleSchema } from "@peated/core/schemas";
 
-import { db } from "@peated/shared/db";
-import type { Bottle, Entity } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import type { Bottle, Entity } from "@peated/core/db/schema";
 import {
   bottles,
   bottlesToDistillers,
   changes,
   entities,
-} from "@peated/shared/db/schema";
-import pushJob from "@peated/shared/jobs";
+} from "@peated/core/db/schema";
+import pushJob from "@peated/core/jobs";
+import { notEmpty } from "@peated/core/lib/filter";
+import { serialize } from "@peated/core/serializers";
+import { BottleSerializer } from "@peated/core/serializers/bottle";
 import { upsertEntity } from "../lib/db";
-import { notEmpty } from "../lib/filter";
-import { serialize } from "../lib/serializers";
-import { BottleSerializer } from "../lib/serializers/bottle";
 import { requireAuth } from "../middleware/auth";
 
 export default {

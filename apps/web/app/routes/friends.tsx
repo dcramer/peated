@@ -15,7 +15,7 @@ import {
 } from "@tanstack/react-query";
 import { useState } from "react";
 
-import type { FriendStatus } from "@peated/shared/types";
+import type { FriendStatus } from "@peated/core/types";
 import type { SitemapFunction } from "remix-sitemap";
 import Button from "~/components/button";
 import EmptyActivity from "~/components/emptyActivity";

@@ -1,12 +1,12 @@
-import { db } from "@peated/shared/db";
-import { notifications } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import { notifications } from "@peated/core/db/schema";
+import { serialize } from "@peated/core/serializers";
+import { NotificationSerializer } from "@peated/core/serializers/notification";
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
-import { NotificationSerializer } from "../lib/serializers/notification";
 import { requireAuth } from "../middleware/auth";
 
 export default {

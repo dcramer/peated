@@ -1,5 +1,5 @@
-import type { CommentSchema } from "@peated/shared/schemas";
-import type { Paginated } from "@peated/shared/types";
+import type { CommentSchema } from "@peated/core/schemas";
+import type { Paginated } from "@peated/core/types";
 import type { z } from "zod";
 import type { ApiClient } from "~/lib/api";
 

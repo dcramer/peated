@@ -1,7 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
 
-import { toTitleCase } from "@peated/shared/lib/strings";
+import { toTitleCase } from "@peated/core/lib/strings";
 
 import type { CreateOptionForm, Option } from "./types";
 

@@ -6,7 +6,7 @@ import type {
   CollectionBottle,
   Entity,
   PagingRel,
-} from "@peated/shared/types";
+} from "@peated/core/types";
 import { formatCategoryName } from "../lib/strings";
 import Button from "./button";
 import SortParam from "./sortParam";

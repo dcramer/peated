@@ -1,12 +1,12 @@
-import { db } from "@peated/shared/db";
-import { tastings } from "@peated/shared/db/schema";
-import { TastingSchema } from "@peated/shared/schemas";
+import { db } from "@peated/core/db";
+import { tastings } from "@peated/core/db/schema";
+import { TastingSchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { TastingSerializer } from "@peated/core/serializers/tasting";
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
-import { serialize } from "../lib/serializers";
-import { TastingSerializer } from "../lib/serializers/tasting";
 
 export default {
   method: "GET",

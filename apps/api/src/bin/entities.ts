@@ -1,5 +1,5 @@
-import { db } from "@peated/shared/db";
-import pushJob, { shutdownClient } from "@peated/shared/jobs";
+import { db } from "@peated/core/db";
+import pushJob, { shutdownClient } from "@peated/core/jobs";
 import { program } from "commander";
 
 program.name("entities").description("CLI for assisting with entity admin");

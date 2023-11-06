@@ -1,5 +1,5 @@
-import { db } from "@peated/shared/db";
-import { notifications } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import { notifications } from "@peated/core/db/schema";
 import type { SQL } from "drizzle-orm";
 import { and, eq, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";

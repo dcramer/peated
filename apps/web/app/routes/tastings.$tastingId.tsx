@@ -1,4 +1,4 @@
-import type { Comment, User } from "@peated/shared/types";
+import type { Comment, User } from "@peated/core/types";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { MetaFunction } from "@remix-run/react";

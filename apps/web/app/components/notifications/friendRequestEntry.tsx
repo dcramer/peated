@@ -1,4 +1,4 @@
-import type { FriendStatus } from "@peated/shared/types";
+import type { FriendStatus } from "@peated/core/types";
 import useApi from "~/hooks/useApi";
 import type { FriendRequestNotification } from "../../types";
 import Button from "../button";

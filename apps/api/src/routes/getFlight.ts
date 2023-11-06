@@ -1,12 +1,12 @@
-import { db } from "@peated/shared/db";
-import { flights } from "@peated/shared/db/schema";
-import { FlightSchema } from "@peated/shared/schemas";
+import { db } from "@peated/core/db";
+import { flights } from "@peated/core/db/schema";
+import { FlightSchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { FlightSerializer } from "@peated/core/serializers/flight";
 import { eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
-import { FlightSerializer } from "~/lib/serializers/flight";
-import { serialize } from "../lib/serializers";
 
 export default {
   method: "GET",

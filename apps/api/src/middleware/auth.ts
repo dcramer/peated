@@ -1,50 +1,15 @@
-import { db } from "@peated/shared/db";
-import { users } from "@peated/shared/db/schema";
-import { setUser } from "@sentry/node-experimental";
-import { eq } from "drizzle-orm";
-import type { FastifyRequest, onRequestHookHandler } from "fastify";
-import { verifyToken } from "../lib/auth";
-import { logError } from "../lib/log";
-
-const getUser = async (req: FastifyRequest) => {
-  const auth = req.headers["authorization"];
-  const token = auth?.replace("Bearer ", "");
-  if (!token) return null;
-
-  const { id } = await verifyToken(token);
-  if (!id) {
-    console.warn(`Invalid Bearer token from ${req.ip}`);
-    return null;
-  }
-  const [user] = await db.select().from(users).where(eq(users.id, id));
-  if (!user) {
-    logError("User not found", { userId: id });
-    return null;
-  }
-
-  if (!user.active) {
-    // this code path is expected, no need to log
-    return null;
-  }
-
-  setUser({
-    id: `${user.id}`,
-    username: user.username,
-    email: user.email,
-  });
-
-  return user;
-};
+import { getUserFromHeader } from "@peated/core/lib/auth";
+import type { onRequestHookHandler } from "fastify";
 
 // XXX: this happens globally at the app level
 export const injectAuth: onRequestHookHandler = async (req, res) => {
-  const user = await getUser(req);
+  const user = await getUserFromHeader(req.headers["authorization"]);
   req.user = user;
 };
 
 export const requireAuth: onRequestHookHandler = async (req, res) => {
   if (req.user === undefined) {
-    const user = await getUser(req);
+    const user = await getUserFromHeader(req.headers["authorization"]);
     req.user = user;
   }
   if (!req.user) {
@@ -59,7 +24,7 @@ export const requireAuth: onRequestHookHandler = async (req, res) => {
 };
 export const requireAdmin: onRequestHookHandler = async (req, res) => {
   if (req.user === undefined) {
-    const user = await getUser(req);
+    const user = await getUserFromHeader(req.headers["authorization"]);
     req.user = user;
   }
   if (!req.user) {
@@ -77,7 +42,7 @@ export const requireAdmin: onRequestHookHandler = async (req, res) => {
 
 export const requireMod: onRequestHookHandler = async (req, res) => {
   if (req.user === undefined) {
-    const user = await getUser(req);
+    const user = await getUserFromHeader(req.headers["authorization"]);
     req.user = user;
   }
   if (!req.user) {

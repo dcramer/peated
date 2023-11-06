@@ -1,4 +1,5 @@
 import FontStyles from "@fontsource/raleway/index.css";
+import type { User } from "@peated/core/types";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
@@ -20,11 +21,10 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { httpBatchLink } from "@trpc/client";
 import type { PropsWithChildren } from "react";
 import { useState } from "react";
 import { useDehydratedState } from "use-dehydrated-state";
-
-import type { User } from "@peated/shared/types";
 import glyphUrl from "~/assets/glyph.png";
 import logo192Url from "~/assets/logo192.png";
 import ErrorPage from "~/components/error-page";
@@ -36,6 +36,7 @@ import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
 import { ApiUnauthorized } from "./lib/api";
 import { logError } from "./lib/log";
+import { trpc } from "./lib/trpc";
 
 function initMobileControls() {
   if (typeof document === "undefined") return;
@@ -138,26 +139,42 @@ export default withSentry(function App() {
         },
       }),
   );
-
+  const [trpcClient] = useState(() =>
+    trpc.createClient({
+      links: [
+        httpBatchLink({
+          url: `${config.API_SERVER}/trpc`,
+          // You can pass any HTTP headers you wish here
+          async headers() {
+            return {
+              authorization: accessToken ? `Bearer ${accessToken}` : "",
+            };
+          },
+        }),
+      ],
+    }),
+  );
   const dehydratedState = useDehydratedState();
 
   return (
     <Document config={config} data={data}>
       <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
-        <QueryClientProvider client={queryClient}>
-          <Hydrate state={dehydratedState}>
-            <OnlineStatusProvider>
-              <AuthProvider user={user}>
-                <ApiProvider
-                  accessToken={accessToken}
-                  server={config.API_SERVER}
-                >
-                  <Outlet />
-                </ApiProvider>
-              </AuthProvider>
-            </OnlineStatusProvider>
-          </Hydrate>
-        </QueryClientProvider>
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+          <QueryClientProvider client={queryClient}>
+            <Hydrate state={dehydratedState}>
+              <OnlineStatusProvider>
+                <AuthProvider user={user}>
+                  <ApiProvider
+                    accessToken={accessToken}
+                    server={config.API_SERVER}
+                  >
+                    <Outlet />
+                  </ApiProvider>
+                </AuthProvider>
+              </OnlineStatusProvider>
+            </Hydrate>
+          </QueryClientProvider>
+        </trpc.Provider>
       </GoogleOAuthProvider>
     </Document>
   );

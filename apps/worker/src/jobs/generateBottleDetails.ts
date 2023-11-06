@@ -2,16 +2,16 @@ import {
   CATEGORY_LIST,
   DEFAULT_CREATED_BY_ID,
   DEFAULT_TAGS,
-} from "@peated/shared/constants";
-import { db } from "@peated/shared/db";
-import type { Bottle} from "@peated/shared/db/schema";
-import { bottles, changes } from "@peated/shared/db/schema";
-import { arraysEqual, objectsShallowEqual } from "@peated/shared/lib/equals";
-import { CategoryEnum } from "@peated/shared/schemas";
+} from "@peated/core/constants";
+import { db } from "@peated/core/db";
+import type { Bottle } from "@peated/core/db/schema";
+import { bottles, changes } from "@peated/core/db/schema";
+import { arraysEqual, objectsShallowEqual } from "@peated/core/lib/equals";
+import { logError } from "@peated/core/lib/log";
+import { CategoryEnum } from "@peated/core/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import config from "~/config";
-import { logError } from "~/lib/log";
 import { getStructuredResponse } from "~/lib/openai";
 
 if (!config.OPENAI_API_KEY) {

@@ -3,14 +3,14 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { BadgeInputSchema, BadgeSchema } from "@peated/shared/schemas";
+import { BadgeInputSchema, BadgeSchema } from "@peated/core/schemas";
 
-import { db } from "@peated/shared/db";
-import { badges } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import { badges } from "@peated/core/db/schema";
+import { logError } from "@peated/core/lib/log";
+import { serialize } from "@peated/core/serializers";
+import { BadgeSerializer } from "@peated/core/serializers/badge";
 import { checkBadgeConfig } from "../lib/badges";
-import { logError } from "../lib/log";
-import { serialize } from "../lib/serializers";
-import { BadgeSerializer } from "../lib/serializers/badge";
 import { requireAdmin } from "../middleware/auth";
 
 export default {

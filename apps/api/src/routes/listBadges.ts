@@ -5,13 +5,13 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { BadgeSchema, PaginatedSchema } from "@peated/shared/schemas";
+import { BadgeSchema, PaginatedSchema } from "@peated/core/schemas";
 
-import { db } from "@peated/shared/db";
-import { badges } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import { badges } from "@peated/core/db/schema";
+import { serialize } from "@peated/core/serializers";
+import { BadgeSerializer } from "@peated/core/serializers/badge";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
-import { BadgeSerializer } from "../lib/serializers/badge";
 
 export default {
   method: "GET",

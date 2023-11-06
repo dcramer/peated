@@ -1,6 +1,6 @@
 import { Link } from "@remix-run/react";
 
-import type { Badge, PagingRel } from "@peated/shared/types";
+import type { Badge, PagingRel } from "@peated/core/types";
 import Button from "../button";
 
 export default ({

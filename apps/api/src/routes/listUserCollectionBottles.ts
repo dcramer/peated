@@ -1,9 +1,8 @@
-import { db } from "@peated/shared/db";
-import { bottles, collectionBottles, entities } from "@peated/shared/db/schema";
-import {
-  CollectionBottleSchema,
-  PaginatedSchema,
-} from "@peated/shared/schemas";
+import { db } from "@peated/core/db";
+import { bottles, collectionBottles, entities } from "@peated/core/db/schema";
+import { CollectionBottleSchema, PaginatedSchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { CollectionBottleSerializer } from "@peated/core/serializers/collectionBottle";
 import type { SQL } from "drizzle-orm";
 import { and, asc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
@@ -13,8 +12,6 @@ import zodToJsonSchema from "zod-to-json-schema";
 import { getUserFromId, profileVisible } from "../lib/api";
 import { getDefaultCollection } from "../lib/db";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
-import { CollectionBottleSerializer } from "../lib/serializers/collectionBottle";
 
 export default {
   method: "GET",

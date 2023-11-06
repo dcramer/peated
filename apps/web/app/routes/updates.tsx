@@ -1,4 +1,4 @@
-import type { Change, Paginated } from "@peated/shared/types";
+import type { Change, Paginated } from "@peated/core/types";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";

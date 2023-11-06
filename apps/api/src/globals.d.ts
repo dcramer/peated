@@ -1,5 +1,5 @@
 import type { OAuth2Namespace } from "@fastify/oauth2";
-import type { User } from "@peated/shared/db/schema";
+import type { User } from "@peated/core/db/schema";
 import "fastify";
 import "vitest";
 

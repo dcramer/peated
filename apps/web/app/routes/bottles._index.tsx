@@ -1,4 +1,4 @@
-import { CATEGORY_LIST } from "@peated/shared/constants";
+import { CATEGORY_LIST } from "@peated/core/constants";
 import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";

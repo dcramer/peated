@@ -1,12 +1,14 @@
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
 import {
   bottles,
   bottlesToDistillers,
   follows,
   tastings,
   users,
-} from "@peated/shared/db/schema";
-import { PaginatedSchema, TastingSchema } from "@peated/shared/schemas";
+} from "@peated/core/db/schema";
+import { PaginatedSchema, TastingSchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { TastingSerializer } from "@peated/core/serializers/tasting";
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
@@ -14,8 +16,6 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
-import { TastingSerializer } from "../lib/serializers/tasting";
 
 export default {
   method: "GET",

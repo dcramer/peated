@@ -1,5 +1,5 @@
-import { CATEGORY_LIST } from "@peated/shared/constants";
-import { db } from "@peated/shared/db";
+import { CATEGORY_LIST } from "@peated/core/constants";
+import { db } from "@peated/core/db";
 import {
   bottles,
   bottlesToDistillers,
@@ -7,9 +7,11 @@ import {
   flightBottles,
   flights,
   tastings,
-} from "@peated/shared/db/schema";
-import { BottleSchema, PaginatedSchema } from "@peated/shared/schemas";
-import type { Category } from "@peated/shared/types";
+} from "@peated/core/db/schema";
+import { BottleSchema, PaginatedSchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { BottleSerializer } from "@peated/core/serializers/bottle";
+import type { Category } from "@peated/core/types";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
@@ -17,8 +19,6 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
-import { BottleSerializer } from "../lib/serializers/bottle";
 
 const SORT_OPTIONS = [
   "name",

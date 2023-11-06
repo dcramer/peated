@@ -1,5 +1,5 @@
-import type { DatabaseType, TransactionType } from "@peated/shared/db";
-import type { NewNotification, Notification } from "@peated/shared/db/schema";
+import type { DatabaseType, TransactionType } from "@peated/core/db";
+import type { NewNotification, Notification } from "@peated/core/db/schema";
 import {
   bottles,
   comments,
@@ -8,7 +8,7 @@ import {
   notifications,
   tastings,
   toasts,
-} from "@peated/shared/db/schema";
+} from "@peated/core/db/schema";
 import { and, eq } from "drizzle-orm";
 import type { AnyPgTable } from "drizzle-orm/pg-core";
 

@@ -1,9 +1,9 @@
-import { db } from "@peated/shared/db";
-import { entities } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import { entities } from "@peated/core/db/schema";
+import { omit } from "@peated/core/lib/filter";
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";
-import { omit } from "../lib/filter";
 import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;

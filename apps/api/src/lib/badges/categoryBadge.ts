@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { CategoryEnum } from "@peated/shared/schemas";
+import { CategoryEnum } from "@peated/core/schemas";
 
 import type { IBadge, TastingWithRelations } from "./base";
 

@@ -29,7 +29,6 @@ import getBottle from "./getBottle";
 import getBottlePriceHistory from "./getBottlePriceHistory";
 import getEntity from "./getEntity";
 import getFlight from "./getFlight";
-import getStats from "./getStats";
 import getStore from "./getStore";
 import getTasting from "./getTasting";
 import getUser from "./getUser";
@@ -95,8 +94,6 @@ export const router: FastifyPluginCallback = (
   });
 
   fastify.route(root);
-
-  fastify.route(getStats);
 
   fastify.route(authDetails);
   fastify.route(authBasic);

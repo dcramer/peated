@@ -3,16 +3,16 @@ import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { CommentInputSchema, CommentSchema } from "@peated/shared/schemas";
+import { CommentInputSchema, CommentSchema } from "@peated/core/schemas";
 
-import { db } from "@peated/shared/db";
-import type { Comment, NewComment } from "@peated/shared/db/schema";
-import { comments, tastings } from "@peated/shared/db/schema";
+import { db } from "@peated/core/db";
+import type { Comment, NewComment } from "@peated/core/db/schema";
+import { comments, tastings } from "@peated/core/db/schema";
+import { serialize } from "@peated/core/serializers";
+import { CommentSerializer } from "@peated/core/serializers/comment";
 import { notifyComment } from "~/lib/email";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 import { createNotification } from "../lib/notifications";
-import { serialize } from "../lib/serializers";
-import { CommentSerializer } from "../lib/serializers/comment";
 import { requireAuth } from "../middleware/auth";
 
 export default {

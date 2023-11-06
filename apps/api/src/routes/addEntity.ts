@@ -4,14 +4,14 @@ import type { IncomingMessage, Server, ServerResponse } from "http";
 import type { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-import { EntityInputSchema, EntitySchema } from "@peated/shared/schemas";
+import { EntityInputSchema, EntitySchema } from "@peated/core/schemas";
 
-import { db } from "@peated/shared/db";
-import type { NewEntity } from "@peated/shared/db/schema";
-import { changes, entities } from "@peated/shared/db/schema";
-import pushJob from "@peated/shared/jobs";
-import { serialize } from "../lib/serializers";
-import { EntitySerializer } from "../lib/serializers/entity";
+import { db } from "@peated/core/db";
+import type { NewEntity } from "@peated/core/db/schema";
+import { changes, entities } from "@peated/core/db/schema";
+import pushJob from "@peated/core/jobs";
+import { serialize } from "@peated/core/serializers";
+import { EntitySerializer } from "@peated/core/serializers/entity";
 import { requireAuth } from "../middleware/auth";
 
 export default {

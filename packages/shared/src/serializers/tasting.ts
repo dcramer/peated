@@ -1,11 +1,11 @@
-import { db } from "@peated/shared/db";
-import type { Tasting, User } from "@peated/shared/db/schema";
-import { bottles, tastings, toasts, users } from "@peated/shared/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import type { Serializer } from ".";
 import { serialize } from ".";
-import config from "../../config";
-import { notEmpty } from "../filter";
+import config from "../config";
+import { db } from "../db";
+import type { Tasting, User } from "../db/schema";
+import { bottles, tastings, toasts, users } from "../db/schema";
+import { notEmpty } from "../lib/filter";
 import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
 
@@ -91,7 +91,7 @@ export const TastingSerializer: Serializer<Tasting> = {
   item: (item: Tasting, attrs: Record<string, any>, currentUser?: User) => {
     return {
       id: item.id,
-      imageUrl: item.imageUrl ? `${config.URL_PREFIX}${item.imageUrl}` : null,
+      imageUrl: item.imageUrl ? `${config.API_SERVER}${item.imageUrl}` : null,
       notes: item.notes,
       tags: item.tags || [],
       rating: item.rating,

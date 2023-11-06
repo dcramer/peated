@@ -5,7 +5,7 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import * as Fixtures from "~/lib/test/fixtures";
 
-import type { Bottle, Comment, Tasting, User } from "@peated/shared/db/schema";
+import type { Bottle, Comment, Tasting, User } from "@peated/core/db/schema";
 import config from "~/config";
 import { notifyComment } from "./email";
 

@@ -1,15 +1,15 @@
-import { db } from "@peated/shared/db";
-import { flights } from "@peated/shared/db/schema";
-import { FlightSchema, PaginatedSchema } from "@peated/shared/schemas";
+import { db } from "@peated/core/db";
+import { flights } from "@peated/core/db/schema";
+import { FlightSchema, PaginatedSchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { FlightSerializer } from "@peated/core/serializers/flight";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, or } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { FlightSerializer } from "~/lib/serializers/flight";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
 
 const SORT_OPTIONS = ["name", "-name"] as const;
 

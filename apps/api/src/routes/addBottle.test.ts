@@ -1,10 +1,10 @@
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
 import {
   bottles,
   bottlesToDistillers,
   changes,
   entities,
-} from "@peated/shared/db/schema";
+} from "@peated/core/db/schema";
 import { and, eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import buildFastify from "../app";

@@ -2,15 +2,20 @@
 import "./sentry";
 
 import FastifyCors from "@fastify/cors";
+import FastifyExpress from "@fastify/express";
 import FastifyHelmet from "@fastify/helmet";
 import FastifyMultipart from "@fastify/multipart";
+import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { fastify } from "fastify";
+import { expressHandler } from "trpc-playground/handlers/express";
 
 import config from "./config";
 import { router } from "./routes";
 
-import { MAX_FILESIZE } from "@peated/shared/constants";
-import { shutdownClient } from "@peated/shared/jobs";
+import { MAX_FILESIZE } from "@peated/core/constants";
+import { shutdownClient } from "@peated/core/jobs";
+import { createContext } from "@peated/core/trpc/context";
+import { appRouter } from "@peated/core/trpc/router";
 import { injectAuth } from "./middleware/auth";
 import FastifySentry from "./sentryPlugin";
 
@@ -37,12 +42,18 @@ const envToLogger: {
 export default async function buildFastify(options = {}) {
   const app = fastify({
     logger: envToLogger[config.ENV] ?? true,
+    maxParamLength: 5000,
     ajv: {
       customOptions: {
         allErrors: process.env.NODE_ENV === "test",
       },
     },
     ...options,
+  });
+
+  app.register(fastifyTRPCPlugin, {
+    prefix: "/trpc",
+    trpcOptions: { router: appRouter, createContext },
   });
 
   app.register(FastifyMultipart, {
@@ -59,6 +70,7 @@ export default async function buildFastify(options = {}) {
     crossOriginResourcePolicy: {
       policy: "same-site",
     },
+    contentSecurityPolicy: false,
   });
   app.register(FastifyCors, { credentials: true, origin: config.CORS_HOST });
 
@@ -69,6 +81,19 @@ export default async function buildFastify(options = {}) {
   app.addHook("onClose", async () => {
     await shutdownClient();
   });
+
+  await app.register(FastifyExpress);
+  app.express.disabled("x-powered-by"); // true
+
+  if (config.ENV !== "production")
+    app.use(
+      "/_playground",
+      await expressHandler({
+        trpcApiEndpoint: "/trpc",
+        playgroundEndpoint: "/_playground",
+        router: appRouter,
+      }),
+    );
 
   app.setErrorHandler(function (error, request, reply) {
     const { validation, validationContext } = error;

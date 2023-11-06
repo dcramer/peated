@@ -1,6 +1,5 @@
-import type { Flight, User } from "@peated/shared/db/schema";
-
 import type { Serializer } from ".";
+import type { Flight, User } from "../db/schema";
 
 export const FlightSerializer: Serializer<Flight> = {
   item: (item: Flight, attrs: Record<string, any>, currentUser?: User) => {

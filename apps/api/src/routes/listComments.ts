@@ -1,14 +1,14 @@
-import { db } from "@peated/shared/db";
-import { comments } from "@peated/shared/db/schema";
-import { CommentSchema, PaginatedSchema } from "@peated/shared/schemas";
+import { db } from "@peated/core/db";
+import { comments } from "@peated/core/db/schema";
+import { CommentSchema, PaginatedSchema } from "@peated/core/schemas";
+import { serialize } from "@peated/core/serializers";
+import { CommentSerializer } from "@peated/core/serializers/comment";
 import { and, asc, eq } from "drizzle-orm";
 import type { RouteOptions } from "fastify";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { buildPageLink } from "../lib/paging";
-import { serialize } from "../lib/serializers";
-import { CommentSerializer } from "../lib/serializers/comment";
 
 export default {
   method: "GET",

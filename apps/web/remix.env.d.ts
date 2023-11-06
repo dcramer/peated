@@ -1,8 +1,10 @@
 /// <reference types="@remix-run/dev" />
-/// <reference types="@remix-run/node" />
+/// <reference types="@remix-run/express" />
 
-import type { User } from "@peated/shared/types";
+import type { AppRouter } from "@peated/core/trpc/router";
+import type { User } from "@peated/core/types";
 import "@remix-run/server-runtime";
+import type { CreateTRPCProxyClient } from "@trpc/client";
 import "express-serve-static-core";
 import type { ApiClient } from "~/lib/api";
 
@@ -10,17 +12,16 @@ interface Context {
   user: User | null;
   accessToken: string | null;
   api: ApiClient;
+  trpc: CreateTRPCProxyClient<AppRouter>;
 }
 
-declare global {
-  namespace Express {
-    interface Request extends Context {}
-  }
+declare module "@express-serve-static-core" {
+  export interface Request extends Context {}
 }
 
 // XXX: this is still not working correctly
 declare module "@remix-run/server-runtime" {
-  interface AppLoadContext extends Context {}
+  export interface AppLoadContext extends Context {}
 }
 
 interface Config {

@@ -1,4 +1,4 @@
-import { db } from "@peated/shared/db";
+import { db } from "@peated/core/db";
 import {
   bottleTags,
   bottles,
@@ -6,8 +6,8 @@ import {
   collectionBottles,
   storePrices,
   tastings,
-} from "@peated/shared/db/schema";
-import pushJob, { shutdownClient } from "@peated/shared/jobs";
+} from "@peated/core/db/schema";
+import pushJob, { shutdownClient } from "@peated/core/jobs";
 import { program } from "commander";
 import { eq, inArray, sql } from "drizzle-orm";
 
