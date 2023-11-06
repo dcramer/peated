@@ -10,7 +10,7 @@ import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
 
-import type { Bottle } from "@peated/core/types";
+import type { Bottle } from "@peated/server/types";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
@@ -26,6 +26,7 @@ import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { summarize } from "~/lib/markdown";
 import { formatCategoryName } from "~/lib/strings";
+import { trpc } from "~/lib/trpc";
 import { fetchBottlePriceHistory } from "~/queries/bottles";
 import {
   favoriteBottle,
@@ -74,7 +75,6 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export default function BottleDetails() {
   const { user } = useAuth();
-  const api = useApi();
   const navigate = useNavigate();
 
   const { bottle } = useLoaderData<typeof loader>();
@@ -88,9 +88,10 @@ export default function BottleDetails() {
     { name: "People", value: bottle.people.toLocaleString() },
   ];
 
+  const deleteBottleMutation = trpc.bottleDelete.useMutation();
   const deleteBottle = async () => {
     // TODO: show confirmation message
-    await api.delete(`/bottles/${bottle.id}`);
+    await deleteBottleMutation.mutateAsync(bottle.id);
     navigate("/");
   };
 
@@ -179,7 +180,11 @@ export default function BottleDetails() {
                   Edit Bottle
                 </Menu.Item>
                 {user.admin && (
-                  <Menu.Item as={ConfirmationButton} onContinue={deleteBottle}>
+                  <Menu.Item
+                    as={ConfirmationButton}
+                    onContinue={deleteBottle}
+                    disabled={deleteBottleMutation.isLoading}
+                  >
                     Delete Bottle
                   </Menu.Item>
                 )}

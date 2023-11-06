@@ -2,13 +2,13 @@ import {
   CATEGORY_LIST,
   DEFAULT_CREATED_BY_ID,
   DEFAULT_TAGS,
-} from "@peated/core/constants";
-import { db } from "@peated/core/db";
-import type { Bottle } from "@peated/core/db/schema";
-import { bottles, changes } from "@peated/core/db/schema";
-import { arraysEqual, objectsShallowEqual } from "@peated/core/lib/equals";
-import { logError } from "@peated/core/lib/log";
-import { CategoryEnum } from "@peated/core/schemas";
+} from "@peated/server/constants";
+import { db } from "@peated/server/db";
+import type { Bottle } from "@peated/server/db/schema";
+import { bottles, changes } from "@peated/server/db/schema";
+import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
+import { logError } from "@peated/server/lib/log";
+import { CategoryEnum } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import config from "~/config";
@@ -32,7 +32,7 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 
 'statedAge' should be the number of years the whiskey has been aged in barrels, if applicable.
 
-'confidence' should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set. 
+'confidence' should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set.
 
 'category' should be one of the following:
 

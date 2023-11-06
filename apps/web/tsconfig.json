@@ -6,7 +6,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
-      "@peated/core/*": ["../../packages/shared/src/*"]
+      "@peated/server/*": ["../../apps/server/src/*"]
     },
     // Remix takes care of building everything in `remix build`.
     "noEmit": true

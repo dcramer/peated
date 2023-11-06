@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "web",
+  "name": "@peated/web",
   "scripts": {
     "assets": "npx @svgr/cli --out-dir app/components/assets -- app/assets",
     "assets:watch": "npm-watch assets",
@@ -24,7 +24,7 @@
     "@hookform/resolvers": "^3.3.2",
     "@isaacs/express-prometheus-middleware": "^1.2.1",
     "@peated/design": "workspace:*",
-    "@peated/core": "workspace:*",
+    "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",
     "@react-oauth/google": "^0.11.1",
     "@remix-run/css-bundle": "^2.2.0",

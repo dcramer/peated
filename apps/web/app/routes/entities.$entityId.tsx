@@ -10,7 +10,7 @@ import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { ShareIcon } from "@heroicons/react/24/outline";
-import type { Entity } from "@peated/core/types";
+import type { Entity } from "@peated/server/types";
 import EntityIcon from "~/components/assets/Entity";
 import Button from "~/components/button";
 import Chip from "~/components/chip";

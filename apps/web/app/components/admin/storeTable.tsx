@@ -1,6 +1,6 @@
 import { Link } from "@remix-run/react";
 
-import type { PagingRel, Store } from "@peated/core/types";
+import type { PagingRel, Store } from "@peated/server/types";
 import Button from "../button";
 import TimeSince from "../timeSince";
 

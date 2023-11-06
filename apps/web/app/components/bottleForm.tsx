@@ -4,9 +4,9 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
-import { CATEGORY_LIST } from "@peated/core/constants";
-import { BottleInputSchema } from "@peated/core/schemas";
-import type { Bottle, Entity } from "@peated/core/types";
+import { CATEGORY_LIST } from "@peated/server/constants";
+import { BottleInputSchema } from "@peated/server/schemas";
+import type { Bottle, Entity } from "@peated/server/types";
 import { PreviewBottleCard } from "~/components/bottleCard";
 import EntityField from "~/components/entityField";
 import Fieldset from "~/components/fieldset";

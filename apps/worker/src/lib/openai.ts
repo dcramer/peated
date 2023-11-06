@@ -1,4 +1,4 @@
-import { logError } from "@peated/core/lib/log";
+import { logError } from "@peated/server/lib/log";
 import OpenAI from "openai";
 import { type z, type ZodSchema } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";

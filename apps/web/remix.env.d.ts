@@ -1,8 +1,8 @@
 /// <reference types="@remix-run/dev" />
 /// <reference types="@remix-run/express" />
 
-import type { AppRouter } from "@peated/core/trpc/router";
-import type { User } from "@peated/core/types";
+import type { AppRouter } from "@peated/server/trpc/router";
+import type { User } from "@peated/server/types";
 import "@remix-run/server-runtime";
 import type { CreateTRPCProxyClient } from "@trpc/client";
 import "express-serve-static-core";

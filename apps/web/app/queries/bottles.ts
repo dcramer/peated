@@ -1,5 +1,5 @@
-import type { StorePriceSchema } from "@peated/core/schemas";
-import type { Bottle, Paginated, Tag } from "@peated/core/types";
+import type { StorePriceSchema } from "@peated/server/schemas";
+import type { Bottle, Paginated, Tag } from "@peated/server/types";
 import type { z } from "zod";
 import type { ApiClient } from "~/lib/api";
 

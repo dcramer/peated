@@ -1,4 +1,4 @@
-import type { User } from "@peated/core/types";
+import type { User } from "@peated/server/types";
 import { useOutletContext } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import EmptyActivity from "~/components/emptyActivity";

@@ -1,5 +1,5 @@
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid";
-import { toTitleCase } from "@peated/core/lib/strings";
+import { toTitleCase } from "@peated/server/lib/strings";
 import { Link } from "@remix-run/react";
 import { useLocation } from "react-router-dom";
 import { buildQueryString } from "~/lib/urls";

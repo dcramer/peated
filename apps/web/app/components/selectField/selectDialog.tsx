@@ -2,7 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { useEffect, useState } from "react";
 
-import { toTitleCase } from "@peated/core/lib/strings";
+import { toTitleCase } from "@peated/server/lib/strings";
 
 import useApi from "~/hooks/useApi";
 import config from "../../config";

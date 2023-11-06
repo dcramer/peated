@@ -2,7 +2,7 @@ import type {
   Collection,
   CollectionBottle,
   Paginated,
-} from "@peated/core/types";
+} from "@peated/server/types";
 import type { ApiClient } from "~/lib/api";
 
 type CollectionQueryParams = {

@@ -8,8 +8,8 @@ import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
 
-import { EntityMergeSchema } from "@peated/core/schemas";
-import type { Entity } from "@peated/core/types";
+import { EntityMergeSchema } from "@peated/server/schemas";
+import type { Entity } from "@peated/server/types";
 import { useState } from "react";
 import ChoiceField from "~/components/choiceField";
 import EntityField from "~/components/entityField";

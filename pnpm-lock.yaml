@@ -48,7 +48,7 @@ importers:
         specifier: ^2.9.0
         version: 2.9.0
 
-  apps/api:
+  apps/server:
     dependencies:
       '@faker-js/faker':
         specifier: ^8.2.0
@@ -77,9 +77,6 @@ importers:
       '@peated/design':
         specifier: workspace:*
         version: link:../../packages/design
-      '@peated/core':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@peated/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -91,7 +88,7 @@ importers:
         version: 1.2.1
       '@sentry/utils':
         specifier: ^7.76.0
-        version: 7.76.0
+        version: 7.77.0
       '@trpc/client':
         specifier: ^10.43.1
         version: 10.43.1(@trpc/server@10.43.1)
@@ -242,9 +239,9 @@ importers:
       '@peated/design':
         specifier: workspace:*
         version: link:../../packages/design
-      '@peated/core':
+      '@peated/server':
         specifier: workspace:*
-        version: link:../../packages/shared
+        version: link:../server
       '@peated/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -458,9 +455,9 @@ importers:
 
   apps/worker:
     dependencies:
-      '@peated/core':
+      '@peated/server':
         specifier: workspace:*
-        version: link:../../packages/shared
+        version: link:../server
       '@peated/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -566,63 +563,6 @@ importers:
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
-
-  packages/shared:
-    dependencies:
-      '@faker-js/faker':
-        specifier: ^8.2.0
-        version: 8.2.0
-      '@peated/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-      '@sentry/node-experimental':
-        specifier: ^7.76.0
-        version: 7.76.0
-      '@trpc/server':
-        specifier: ^10.43.1
-        version: 10.43.1
-      '@types/jsonwebtoken':
-        specifier: ^9.0.4
-        version: 9.0.4
-      '@types/pg':
-        specifier: ^8.10.7
-        version: 8.10.7
-      '@vitest/coverage-v8':
-        specifier: ^0.34.6
-        version: 0.34.6(vitest@0.34.6)
-      drizzle-kit:
-        specifier: ^0.19.13
-        version: 0.19.13
-      drizzle-orm:
-        specifier: ^0.28.6
-        version: 0.28.6(@opentelemetry/api@1.6.0)(@types/pg@8.10.7)(pg@8.11.3)
-      faktory-worker:
-        specifier: ^4.5.1
-        version: 4.5.1
-      jsonwebtoken:
-        specifier: ^9.0.2
-        version: 9.0.2
-      nanoid:
-        specifier: ^3.3.6
-        version: 3.3.6
-      pg:
-        specifier: ^8.11.3
-        version: 8.11.3
-      tsconfig-paths:
-        specifier: ^4.2.0
-        version: 4.2.0
-      typescript:
-        specifier: ^5.2.2
-        version: 5.2.2
-      vite-tsconfig-paths:
-        specifier: ^4.2.1
-        version: 4.2.1(typescript@5.2.2)
-      vitest:
-        specifier: ^0.34.6
-        version: 0.34.6
-      zod:
-        specifier: ^3.22.4
-        version: 3.22.4
 
   packages/tsconfig:
     dependencies:
@@ -3258,11 +3198,11 @@ packages:
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@sentry/core': 7.76.0
+      '@sentry/core': 7.77.0
       '@sentry/hub': 7.76.0
-      '@sentry/node': 7.76.0
-      '@sentry/types': 7.76.0
-      '@sentry/utils': 7.76.0
+      '@sentry/node': 7.77.0
+      '@sentry/types': 7.77.0
+      '@sentry/utils': 7.77.0
       detect-libc: 2.0.2
       node-abi: 3.51.0
       node-gyp: 9.4.1
@@ -3844,7 +3784,7 @@ packages:
   /@types/cheerio@0.22.33:
     resolution: {integrity: sha512-XUlu2BK4q3xJsccRLK69m/cABZd7m60o+cDEPUTG6jTpuG2vqN35UioeF99MQ/HoSOEPq0Bgil8g3jtzE0oH9A==}
     dependencies:
-      '@types/node': 20.8.9
+      '@types/node': 18.18.7
     dev: false
 
   /@types/compression@1.7.4:
@@ -3979,7 +3919,7 @@ packages:
   /@types/morgan@1.9.7:
     resolution: {integrity: sha512-4sJFBUBrIZkP5EvMm1L6VCXp3SQe8dnXqlVpe1jsmTjS1JQVmSjnpMNs8DosQd6omBi/K7BSKJ6z/Mc3ki0K9g==}
     dependencies:
-      '@types/node': 20.8.10
+      '@types/node': 18.18.7
     dev: false
 
   /@types/ms@0.7.33:
@@ -4002,23 +3942,11 @@ packages:
   /@types/node-schedule@2.1.2:
     resolution: {integrity: sha512-pNf6vCw14EYbqo0Y1eLGhkyv9RhgvphrxpPk4bd1CqwsWbHCrLSVYpO+9NmKOCUSYwxG6eRaWDR3Y6C+4gtzow==}
     dependencies:
-      '@types/node': 20.8.9
+      '@types/node': 18.18.7
     dev: false
 
   /@types/node@18.18.7:
     resolution: {integrity: sha512-bw+lEsxis6eqJYW8Ql6+yTqkE6RuFtsQPSe5JxXbqYRFQEER5aJA9a5UH9igqDWm3X4iLHIKOHlnAXLM4mi7uQ==}
-    dependencies:
-      undici-types: 5.26.5
-    dev: false
-
-  /@types/node@20.8.10:
-    resolution: {integrity: sha512-TlgT8JntpcbmKUFzjhsyhGfP2fsiz1Mv56im6enJ905xG1DAYesxJaeSbGqQmAw8OWPdhyJGhGSQGKRNJ45u9w==}
-    dependencies:
-      undici-types: 5.26.5
-    dev: false
-
-  /@types/node@20.8.9:
-    resolution: {integrity: sha512-UzykFsT3FhHb1h7yD4CA4YhBHq545JC0YnEz41xkipN88eKQtL6rSgocL5tbAP6Ola9Izm/Aw4Ora8He4x0BHg==}
     dependencies:
       undici-types: 5.26.5
     dev: false

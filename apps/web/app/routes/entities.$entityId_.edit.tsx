@@ -8,8 +8,8 @@ import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
 
-import { toTitleCase } from "@peated/core/lib/strings";
-import { EntityInputSchema } from "@peated/core/schemas";
+import { toTitleCase } from "@peated/server/lib/strings";
+import { EntityInputSchema } from "@peated/server/schemas";
 import CountryField from "~/components/countryField";
 import Fieldset from "~/components/fieldset";
 import Form from "~/components/form";

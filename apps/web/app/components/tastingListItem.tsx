@@ -8,7 +8,7 @@ import {
 import { Link } from "@remix-run/react";
 import { useState } from "react";
 
-import type { Tasting } from "@peated/core/types";
+import type { Tasting } from "@peated/server/types";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import classNames from "~/lib/classNames";

@@ -4,8 +4,8 @@ import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { z } from "zod";
 
-import type { BottleInputSchema } from "@peated/core/schemas";
-import type { Bottle } from "@peated/core/types";
+import type { BottleInputSchema } from "@peated/server/schemas";
+import type { Bottle } from "@peated/server/types";
 import invariant from "tiny-invariant";
 import BottleForm from "~/components/bottleForm";
 import Spinner from "~/components/spinner";

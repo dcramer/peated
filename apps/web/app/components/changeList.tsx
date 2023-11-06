@@ -1,4 +1,4 @@
-import type { Change, PagingRel, User } from "@peated/core/types";
+import type { Change, PagingRel, User } from "@peated/server/types";
 import { Link } from "@remix-run/react";
 import { AnimatePresence } from "framer-motion";
 import Button from "./button";

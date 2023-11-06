@@ -2,7 +2,7 @@ import { useOutletContext } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
 
-import type { Bottle } from "@peated/core/types";
+import type { Bottle } from "@peated/server/types";
 import RobotImage from "~/assets/robot.png";
 import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";

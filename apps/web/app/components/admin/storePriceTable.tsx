@@ -1,6 +1,6 @@
 import { Link } from "@remix-run/react";
 
-import type { Bottle, PagingRel, StorePrice } from "@peated/core/types";
+import type { Bottle, PagingRel, StorePrice } from "@peated/server/types";
 import Button from "../button";
 
 export default ({

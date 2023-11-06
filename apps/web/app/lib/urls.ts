@@ -1,4 +1,4 @@
-import type { Entity } from "@peated/core/types";
+import type { Entity } from "@peated/server/types";
 
 export function getEntityUrl(entity: Entity) {
   return `/entities/${entity.id}`;

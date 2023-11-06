@@ -1,5 +1,5 @@
-import { db } from "@peated/core/db";
-import { logError } from "@peated/core/lib/log";
+import { db } from "@peated/server/db";
+import { logError } from "@peated/server/lib/log";
 import config from "~/config";
 
 function absoluteUri(url: string, host: string) {

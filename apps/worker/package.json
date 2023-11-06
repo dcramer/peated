@@ -17,7 +17,7 @@
     "test:ci": "dotenv -e .env.test -- vitest --no-threads --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
   },
   "dependencies": {
-    "@peated/core": "workspace:*",
+    "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",
     "@sentry/node-experimental": "^7.76.0",
     "@sentry/profiling-node": "^1.2.1",

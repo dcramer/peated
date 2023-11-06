@@ -4,7 +4,7 @@ import { getUrl } from "../scraper";
 import {
   normalizeBottleName,
   normalizeVolume,
-} from "@peated/core/lib/normalize";
+} from "@peated/server/lib/normalize";
 
 import type { StorePrice } from "../lib/api";
 import { submitStorePrices } from "../lib/api";

@@ -15,9 +15,9 @@ import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 
-import { MAX_FILESIZE } from "@peated/core/constants";
+import { MAX_FILESIZE } from "@peated/server/constants";
 
-import type { Tasting } from "@peated/core/types";
+import type { Tasting } from "@peated/server/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Fieldset from "~/components/fieldset";
 import Form from "~/components/form";

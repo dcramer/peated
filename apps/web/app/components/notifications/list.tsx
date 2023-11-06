@@ -1,4 +1,4 @@
-import type { Notification } from "@peated/core/types";
+import type { Notification } from "@peated/server/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import useApi from "~/hooks/useApi";

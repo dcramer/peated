@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EntityInputSchema } from "@peated/core/schemas";
+import { EntityInputSchema } from "@peated/server/schemas";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import Button from "./button";

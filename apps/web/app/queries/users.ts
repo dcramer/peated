@@ -1,4 +1,4 @@
-import type { Paginated, Tag, User } from "@peated/core/types";
+import type { Paginated, Tag, User } from "@peated/server/types";
 import type { ApiClient } from "~/lib/api";
 
 type UserQueryParams = {

@@ -1,4 +1,4 @@
-import type { Entity } from "@peated/core/types";
+import type { Entity } from "@peated/server/types";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useOutletContext } from "@remix-run/react";

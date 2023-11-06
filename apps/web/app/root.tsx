@@ -1,5 +1,5 @@
 import FontStyles from "@fontsource/raleway/index.css";
-import type { User } from "@peated/core/types";
+import type { User } from "@peated/server/types";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";

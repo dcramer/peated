@@ -1,5 +1,5 @@
 import prom from "@isaacs/express-prometheus-middleware";
-import { type AppRouter } from "@peated/core/trpc/router";
+import { type AppRouter } from "@peated/server/trpc/router";
 import { createRequestHandler } from "@remix-run/express";
 import { type AppLoadContext } from "@remix-run/server-runtime";
 import { wrapExpressCreateRequestHandler } from "@sentry/remix";

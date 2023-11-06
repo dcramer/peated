@@ -3,9 +3,9 @@ import { useQueries } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import type { SitemapFunction } from "remix-sitemap";
 
-import { toTitleCase } from "@peated/core/lib/strings";
+import { toTitleCase } from "@peated/server/lib/strings";
 
-import type { Entity } from "@peated/core/types";
+import type { Entity } from "@peated/server/types";
 import { type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import BottleForm from "~/components/bottleForm";
 import Spinner from "~/components/spinner";
