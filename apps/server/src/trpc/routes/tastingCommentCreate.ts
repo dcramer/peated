@@ -1,40 +1,26 @@
 import { db } from "@peated/server/db";
 import type { Comment, NewComment } from "@peated/server/db/schema";
 import { comments, tastings } from "@peated/server/db/schema";
+import { isDistantFuture, isDistantPast } from "@peated/server/lib/dates";
 import { notifyComment } from "@peated/server/lib/email";
-import { CommentInputSchema, CommentSchema } from "@peated/server/schemas";
+import { createNotification } from "@peated/server/lib/notifications";
+import { CommentInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CommentSerializer } from "@peated/server/serializers/comment";
+import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
-import type { RouteOptions } from "fastify";
-import type { IncomingMessage, Server, ServerResponse } from "http";
-import zodToJsonSchema from "zod-to-json-schema";
-import { isDistantFuture, isDistantPast } from "../lib/dates";
-import { createNotification } from "../lib/notifications";
-import { requireAuth } from "../middleware/auth";
+import { z } from "zod";
+import { authedProcedure } from "..";
 
-export default {
-  method: "POST",
-  url: "/tastings/:tastingId/comments",
-  schema: {
-    params: {
-      type: "object",
-      required: ["tastingId"],
-      properties: {
-        tastingId: { type: "number" },
-      },
-    },
-    body: zodToJsonSchema(CommentInputSchema),
-    response: {
-      201: zodToJsonSchema(CommentSchema),
-    },
-  },
-  preHandler: [requireAuth],
-  handler: async (req, res) => {
-    if (!req.user) return res.status(401).send({ error: "Unauthorized" });
-
+export default authedProcedure
+  .input(
+    CommentInputSchema.extend({
+      tasting: z.number(),
+    }),
+  )
+  .query(async function ({ input, ctx }) {
     const tasting = await db.query.tastings.findFirst({
-      where: (tastings, { eq }) => eq(tastings.id, req.params.tastingId),
+      where: (tastings, { eq }) => eq(tastings.id, input.tasting),
       with: {
         createdBy: true,
         bottle: true,
@@ -42,25 +28,34 @@ export default {
     });
 
     if (!tasting) {
-      return res.status(404).send({ error: "Not found" });
+      throw new TRPCError({
+        message: "Tasting not found",
+        code: "NOT_FOUND",
+      });
     }
 
     const data: NewComment = {
-      comment: req.body.comment,
+      comment: input.comment,
       tastingId: tasting.id,
-      createdById: req.user.id,
+      createdById: ctx.user.id,
     };
-    if (req.body.createdAt) {
-      data.createdAt = new Date(req.body.createdAt);
+    if (input.createdAt) {
+      data.createdAt = new Date(input.createdAt);
       if (isDistantFuture(data.createdAt, 60 * 5)) {
-        return res.status(400).send({ error: "createdAt too far in future" });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "createdAt too far in future",
+        });
       }
       if (isDistantPast(data.createdAt, 60 * 60 * 24 * 7)) {
-        return res.status(400).send({ error: "createdAt too far in past" });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "createdAt too far in past",
+        });
       }
     }
 
-    const user = req.user;
+    const user = ctx.user;
     const comment = await db.transaction(async (tx) => {
       let comment: Comment | undefined;
       try {
@@ -105,22 +100,11 @@ export default {
     });
 
     if (!comment) {
-      return res.status(500).send({ error: "Unable to create comment" });
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Unable to create comment",
+      });
     }
 
-    res.status(200).send(await serialize(CommentSerializer, comment, req.user));
-  },
-} as RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Params: {
-      tastingId: number;
-    };
-    Body: {
-      comment: string;
-      createdAt?: string;
-    };
-  }
->;
+    return await serialize(CommentSerializer, comment, ctx.user);
+  });

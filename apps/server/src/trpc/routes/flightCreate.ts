@@ -8,38 +8,37 @@ import { FlightSerializer } from "@peated/server/serializers/flight";
 import { TRPCError } from "@trpc/server";
 import { authedProcedure } from "..";
 
-export default authedProcedure.input(FlightInputSchema).query(async function ({
-  input,
-  ctx,
-}) {
-  const data: NewFlight = {
-    ...input,
-    publicId: generatePublicId(),
-    createdById: ctx.user.id,
-  };
+export default authedProcedure
+  .input(FlightInputSchema)
+  .mutation(async function ({ input, ctx }) {
+    const data: NewFlight = {
+      ...input,
+      publicId: generatePublicId(),
+      createdById: ctx.user.id,
+    };
 
-  const user = ctx.user;
-  const flight = await db.transaction(async (tx) => {
-    const [flight] = await tx.insert(flights).values(data).returning();
+    const user = ctx.user;
+    const flight = await db.transaction(async (tx) => {
+      const [flight] = await tx.insert(flights).values(data).returning();
 
-    if (input.bottles) {
-      for (const bottle of input.bottles) {
-        await tx.insert(flightBottles).values({
-          flightId: flight.id,
-          bottleId: bottle,
-        });
+      if (input.bottles) {
+        for (const bottle of input.bottles) {
+          await tx.insert(flightBottles).values({
+            flightId: flight.id,
+            bottleId: bottle,
+          });
+        }
       }
+
+      return flight;
+    });
+
+    if (!flight) {
+      throw new TRPCError({
+        message: "Failed to create flight",
+        code: "INTERNAL_SERVER_ERROR",
+      });
     }
 
-    return flight;
+    return await serialize(FlightSerializer, flight, ctx.user);
   });
-
-  if (!flight) {
-    throw new TRPCError({
-      message: "Failed to create flight",
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  }
-
-  return await serialize(FlightSerializer, flight, ctx.user);
-});

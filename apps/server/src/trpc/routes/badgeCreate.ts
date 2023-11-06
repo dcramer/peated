@@ -8,7 +8,7 @@ import { BadgeSerializer } from "@peated/server/serializers/badge";
 import { TRPCError } from "@trpc/server";
 import { adminProcedure } from "..";
 
-export default adminProcedure.input(BadgeInputSchema).query(async function ({
+export default adminProcedure.input(BadgeInputSchema).mutation(async function ({
   input,
   ctx,
 }) {

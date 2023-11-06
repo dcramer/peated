@@ -1,10 +1,10 @@
+import buildFastify from "@peated/server/app";
+import { db } from "@peated/server/db";
+import { storePrices } from "@peated/server/db/schema";
+import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import { db } from "../db";
-import { storePrices } from "../db/schema";
-import * as Fixtures from "../lib/test/fixtures";
-import { findBottle } from "./addStorePrices";
+import { findBottle } from "./storePricesCreate";
 
 let app: FastifyInstance;
 beforeAll(async () => {

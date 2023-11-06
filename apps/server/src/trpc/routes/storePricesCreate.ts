@@ -53,7 +53,7 @@ export default adminProcedure
       prices: z.array(StorePriceInputSchema),
     }),
   )
-  .query(async function ({ input, ctx }) {
+  .mutation(async function ({ input }) {
     const store = await db.query.stores.findFirst({
       where: eq(stores.id, input.store),
     });

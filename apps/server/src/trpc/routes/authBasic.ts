@@ -1,69 +1,56 @@
-import { compareSync } from "bcrypt";
-import { eq } from "drizzle-orm";
-import type { RouteOptions } from "fastify";
-import type { IncomingMessage, Server, ServerResponse } from "http";
-import zodToJsonSchema from "zod-to-json-schema";
-
-import { AuthSchema } from "@peated/server/schemas";
-
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { createAccessToken } from "@peated/server/lib/auth";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
+import { TRPCError } from "@trpc/server";
+import { compareSync } from "bcrypt";
+import { eq } from "drizzle-orm";
+import { z } from "zod";
+import { publicProcedure } from "..";
 
-export default {
-  method: "POST",
-  url: "/auth/basic",
-  schema: {
-    body: {
-      type: "object",
-      required: ["email", "password"],
-      properties: {
-        email: { type: "string" },
-        password: { type: "string" },
-      },
-    },
-    response: {
-      200: zodToJsonSchema(AuthSchema),
-    },
-  },
-  handler: async function (req, res) {
-    const { email, password } = req.body;
-
+export default publicProcedure
+  .input(
+    z.object({
+      email: z.string(),
+      password: z.string(),
+    }),
+  )
+  .mutation(async function ({ input: { email, password } }) {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     if (!user) {
       console.log("user not found");
-      return res.status(401).send({ error: "Invalid credentials" });
+      throw new TRPCError({
+        message: "Invalid credentials",
+        code: "UNAUTHORIZED",
+      });
     }
 
     if (!user.passwordHash) {
       console.log("user has no password set");
-      return res.status(401).send({ error: "Invalid credentials" });
+      throw new TRPCError({
+        message: "Invalid credentials",
+        code: "UNAUTHORIZED",
+      });
     }
 
     if (!compareSync(password, user.passwordHash)) {
       console.log("invalid password");
-      return res.status(401).send({ error: "Invalid credentials" });
+      throw new TRPCError({
+        message: "Invalid credentials",
+        code: "UNAUTHORIZED",
+      });
     }
 
     if (!user.active) {
-      return res.status(401).send({ error: "Inactive account" });
+      throw new TRPCError({
+        message: "Invalid credentials",
+        code: "UNAUTHORIZED",
+      });
     }
 
-    return res.send({
+    return {
       user: await serialize(UserSerializer, user, user),
       accessToken: await createAccessToken(user),
-    });
-  },
-} as RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Body: {
-      email: string;
-      password: string;
     };
-  }
->;
+  });

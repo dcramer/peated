@@ -6,7 +6,7 @@ import { StoreSerializer } from "@peated/server/serializers/store";
 import { TRPCError } from "@trpc/server";
 import { adminProcedure } from "..";
 
-export default adminProcedure.input(StoreInputSchema).query(async function ({
+export default adminProcedure.input(StoreInputSchema).mutation(async function ({
   input,
   ctx,
 }) {

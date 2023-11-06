@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
+import { publicProcedure } from "..";
 import { db } from "../../db";
 import { bottles, entities, tastings } from "../../db/schema";
-import { publicProcedure } from "../../trpc";
 
 export default publicProcedure.query(async function () {
   const [{ totalTastings }] = await db

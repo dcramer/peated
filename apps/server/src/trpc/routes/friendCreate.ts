@@ -7,7 +7,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 
-export default authedProcedure.input(z.number()).query(async function ({
+export default authedProcedure.input(z.number()).mutation(async function ({
   input,
   ctx,
 }) {

@@ -1,37 +1,23 @@
 import { and, eq } from "drizzle-orm";
-import type { RouteOptions } from "fastify";
 import { OAuth2Client } from "google-auth-library";
-import type { IncomingMessage, Server, ServerResponse } from "http";
-import zodToJsonSchema from "zod-to-json-schema";
 
-import { AuthSchema } from "@peated/server/schemas";
-
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { identities, users } from "@peated/server/db/schema";
-import { createAccessToken } from "@peated/server/lib/auth";
+import { createAccessToken, createUser } from "@peated/server/lib/auth";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import config from "../config";
-import { createUser } from "../lib/auth";
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { publicProcedure } from "..";
 
-export default {
-  method: "POST",
-  url: "/auth/google",
-  schema: {
-    body: {
-      type: "object",
-      required: ["code"],
-      properties: {
-        code: { type: "string" },
-      },
-    },
-    response: {
-      200: zodToJsonSchema(AuthSchema),
-    },
-  },
-  handler: async function (req, res) {
-    const { code } = req.body;
-
+export default publicProcedure
+  .input(
+    z.object({
+      code: z.string(),
+    }),
+  )
+  .mutation(async function ({ input: { code } }) {
     // https://stackoverflow.com/questions/74132586/authentication-using-node-js-oauthclient-auth-code-flow
     const client = new OAuth2Client(
       config.GOOGLE_CLIENT_ID,
@@ -43,7 +29,10 @@ export default {
     // client.setCredentials(tokens);
 
     if (!tokens.id_token) {
-      return res.status(401).send({ error: "Unable to validate credentials" });
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unable to validate credentials",
+      });
     }
 
     const ticket = await client.verifyIdToken({
@@ -53,7 +42,10 @@ export default {
 
     const payload = ticket.getPayload();
     if (!payload || !payload.email) {
-      return res.status(401).send({ error: "Unable to validate credentials" });
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unable to validate credentials",
+      });
     }
 
     const [result] = await db
@@ -87,7 +79,6 @@ export default {
 
         // create new account
       } else {
-        console.log("Creating new user");
         const userData = {
           displayName: payload.given_name,
           username: payload.email.split("@", 1)[0],
@@ -109,21 +100,14 @@ export default {
     }
 
     if (!user.active) {
-      return res.status(401).send({ error: "Inactive account" });
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unable to validate credentials",
+      });
     }
 
-    return res.send({
+    return {
       user: await serialize(UserSerializer, user, user),
       accessToken: await createAccessToken(user),
-    });
-  },
-} as RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Body: {
-      code: string;
     };
-  }
->;
+  });

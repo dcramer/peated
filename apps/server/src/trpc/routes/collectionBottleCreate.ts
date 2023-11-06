@@ -9,12 +9,18 @@ import { getDefaultCollection } from "@peated/server/lib/db";
 import { CollectionBottleInputSchema } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
+import { z } from "zod";
 import { authedProcedure } from "..";
 
 export default authedProcedure
-  .input(CollectionBottleInputSchema)
-  .query(async function ({ input, ctx }) {
-    const user = await getUserFromId(db, input.userId, ctx.user);
+  .input(
+    CollectionBottleInputSchema.extend({
+      collection: z.union([z.number(), z.literal("default")]),
+      user: z.number(),
+    }),
+  )
+  .mutation(async function ({ input, ctx }) {
+    const user = await getUserFromId(db, input.user, ctx.user);
     if (!user) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -29,11 +35,11 @@ export default authedProcedure
     }
 
     const collection =
-      input.collectionId === "default"
+      input.collection === "default"
         ? await getDefaultCollection(db, user.id)
         : await db.query.collections.findFirst({
             where: (collections, { eq }) =>
-              eq(collections.id, input.collectionId),
+              eq(collections.id, input.collection as number),
           });
 
     if (!collection) {
