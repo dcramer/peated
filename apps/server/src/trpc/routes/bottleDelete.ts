@@ -38,7 +38,6 @@ export default adminProcedure.input(z.number()).mutation(async function ({
       .where(eq(bottlesToDistillers.bottleId, bottle.id))
   ).map(({ id }) => id);
 
-  const user = ctx.user;
   await db.transaction(async (tx) => {
     await tx.insert(changes).values({
       objectType: "bottle",
