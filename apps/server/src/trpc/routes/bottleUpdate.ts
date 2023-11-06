@@ -1,11 +1,3 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
-import type { RouteOptions } from "fastify";
-import type { IncomingMessage, Server, ServerResponse } from "http";
-import type { z } from "zod";
-import zodToJsonSchema from "zod-to-json-schema";
-
-import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
-
 import { db } from "@peated/server/db";
 import type { Bottle, Entity } from "@peated/server/db/schema";
 import {
@@ -14,36 +6,27 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
+import pushJob from "@peated/server/jobs";
 import { notEmpty } from "@peated/server/lib/filter";
+import { normalizeBottleName } from "@peated/server/lib/normalize";
+import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { upsertEntity } from "../lib/db";
-import { requireMod } from "../middleware/auth";
+import { TRPCError } from "@trpc/server";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { z } from "zod";
+import { modProcedure } from "..";
+import { upsertEntity } from "../../lib/db";
 
-import pushJob from "@peated/server/jobs";
-import { normalizeBottleName } from "@peated/server/lib/normalize";
-export default {
-  method: "PUT",
-  url: "/bottles/:bottleId",
-  schema: {
-    params: {
-      type: "object",
-      required: ["bottleId"],
-      properties: {
-        bottleId: { type: "number" },
-      },
-    },
-    body: zodToJsonSchema(BottleInputSchema.partial()),
-    response: {
-      200: zodToJsonSchema(BottleSchema),
-    },
-  },
-  preHandler: [requireMod],
-  handler: async (req, res) => {
-    if (!req.user) return res.status(401);
-
+export default modProcedure
+  .input(
+    BottleInputSchema.partial().extend({
+      bottle: z.number(),
+    }),
+  )
+  .mutation(async function ({ input, ctx }) {
     const bottle = await db.query.bottles.findFirst({
-      where: (bottles, { eq }) => eq(bottles.id, req.params.bottleId),
+      where: (bottles, { eq }) => eq(bottles.id, input.bottle),
       with: {
         brand: true,
         bottler: true,
@@ -55,56 +38,61 @@ export default {
       },
     });
     if (!bottle) {
-      return res.status(404).send({ error: "Not found" });
+      throw new TRPCError({
+        message: "Bottle not found",
+        code: "NOT_FOUND",
+      });
     }
 
-    const body = req.body;
     const bottleData: { [name: string]: any } = {};
 
-    if (body.statedAge !== undefined && body.statedAge !== bottle.statedAge) {
-      bottleData.statedAge = body.statedAge;
+    if (input.statedAge !== undefined && input.statedAge !== bottle.statedAge) {
+      bottleData.statedAge = input.statedAge;
     }
     if (
-      (body.name && body.name !== bottle.name) ||
-      (body.statedAge !== undefined && body.statedAge !== bottle.statedAge)
+      (input.name && input.name !== bottle.name) ||
+      (input.statedAge !== undefined && input.statedAge !== bottle.statedAge)
     ) {
       bottleData.statedAge = bottleData.statedAge ?? bottle.statedAge;
       bottleData.name = normalizeBottleName(
-        body.name || bottle.name,
+        input.name || bottle.name,
         bottleData.statedAge,
       );
       if (
         bottleData.name.indexOf("-year-old") !== -1 &&
         !bottleData.statedAge
       ) {
-        res
-          .status(400)
-          .send({ error: "You should include the Stated Age of the bottle" });
-        return;
+        throw new TRPCError({
+          message: "You should include the Stated Age of the bottle",
+          code: "BAD_REQUEST",
+        });
       }
     }
 
-    if (body.category !== undefined && body.category !== bottle.category) {
-      bottleData.category = body.category;
+    if (input.category !== undefined && input.category !== bottle.category) {
+      bottleData.category = input.category;
     }
 
-    const user = req.user;
+    const user = ctx.user;
     const newBottle = await db.transaction(async (tx) => {
       let brand: Entity | null = null;
-      if (body.brand) {
+      if (input.brand) {
         if (
-          typeof body.brand === "number"
-            ? body.brand !== bottle.brand.id
-            : body.brand.name !== bottle.brand.name
+          typeof input.brand === "number"
+            ? input.brand !== bottle.brand.id
+            : input.brand.name !== bottle.brand.name
         ) {
           const brandUpsert = await upsertEntity({
             db: tx,
-            data: body.brand,
+            data: input.brand,
             userId: user.id,
             type: "brand",
           });
           if (!brandUpsert)
-            throw new Error(`Unable to find entity: ${body.brand}`);
+            throw new TRPCError({
+              message: `Unable to find entity: ${input.brand}`,
+              code: "INTERNAL_SERVER_ERROR",
+            });
           if (brandUpsert.id !== bottle.brandId) {
             bottleData.brandId = brandUpsert.id;
           }
@@ -112,20 +100,24 @@ export default {
         }
       }
 
-      if (body.bottler) {
+      if (input.bottler) {
         if (
-          typeof body.bottler === "number"
-            ? body.bottler !== bottle.bottler?.id
-            : body.bottler.name !== bottle.bottler?.name
+          typeof input.bottler === "number"
+            ? input.bottler !== bottle.bottler?.id
+            : input.bottler.name !== bottle.bottler?.name
         ) {
           const bottlerUpsert = await upsertEntity({
             db: tx,
-            data: body.bottler,
+            data: input.bottler,
             userId: user.id,
             type: "bottler",
           });
-          if (!bottlerUpsert)
-            throw new Error(`Unable to find entity: ${body.bottler}`);
+          if (!bottlerUpsert) {
+            throw new TRPCError({
+              message: `Unable to find entity: ${input.bottler}`,
+              code: "INTERNAL_SERVER_ERROR",
+            });
+          }
           if (bottlerUpsert.id !== bottle.bottlerId) {
             bottleData.bottlerId = bottlerUpsert.id;
           }
@@ -156,10 +148,10 @@ export default {
           : bottle;
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
-          res
-            .status(409)
-            .send({ error: "Bottle with name already exists under brand" });
-          return;
+          throw new TRPCError({
+            message: "Bottle with name already exists under brand",
+            code: "CONFLICT",
+          });
         }
         throw err;
       }
@@ -174,8 +166,8 @@ export default {
       );
 
       // find newly added distillers and connect them
-      if (body.distillers) {
-        for (const distData of body.distillers) {
+      if (input.distillers) {
+        for (const distData of input.distillers) {
           const distiller = currentDistillers.find((d2) =>
             typeof distData === "number"
               ? distData === d2.id
@@ -272,7 +264,10 @@ export default {
     });
 
     if (!newBottle) {
-      return res.status(500).send({ error: "Failed to update bottle" });
+      throw new TRPCError({
+        message: "Failed to update bottle",
+        code: "INTERNAL_SERVER_ERROR",
+      });
     }
 
     if (
@@ -283,18 +278,5 @@ export default {
     )
       await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
 
-    res
-      .status(200)
-      .send(await serialize(BottleSerializer, newBottle, req.user));
-  },
-} as RouteOptions<
-  Server,
-  IncomingMessage,
-  ServerResponse,
-  {
-    Params: {
-      bottleId: number;
-    };
-    Body: Partial<z.infer<typeof BottleInputSchema>>;
-  }
->;
+    return await serialize(BottleSerializer, newBottle, ctx.user);
+  });

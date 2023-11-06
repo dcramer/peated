@@ -12,6 +12,7 @@ import bottlePriceHistory from "./routes/bottlePriceHistory";
 import bottlePriceList from "./routes/bottlePriceList";
 import bottleSuggestedTagList from "./routes/bottleSuggestedTagList";
 import bottleTagList from "./routes/bottleTagList";
+import bottleUpdate from "./routes/bottleUpdate";
 import changeList from "./routes/changeList";
 import collectionBottleCreate from "./routes/collectionBottleCreate";
 import collectionBottleList from "./routes/collectionBottleList";
@@ -44,6 +45,7 @@ import toastCreate from "./routes/toastCreate";
 import userById from "./routes/userById";
 import userList from "./routes/userList";
 import userTagList from "./routes/userTagList";
+import version from "./routes/version";
 
 export const appRouter = router({
   auth,
@@ -59,6 +61,7 @@ export const appRouter = router({
   bottleSuggestedTagList,
   bottleTagList,
   bottlePriceList,
+  bottleUpdate,
   changeList,
   collectionBottleCreate,
   collectionBottleList,
@@ -91,6 +94,7 @@ export const appRouter = router({
   userById,
   userList,
   userTagList,
+  version,
 });
 
 export type AppRouter = typeof appRouter;
