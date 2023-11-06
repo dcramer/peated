@@ -8,7 +8,7 @@ test("lists prices", async () => {
   });
 
   const caller = appRouter.createCaller({ user: null });
-  const data = await caller.bottlePricesList({
+  const data = await caller.bottlePriceList({
     bottle: bottle.id,
   });
 

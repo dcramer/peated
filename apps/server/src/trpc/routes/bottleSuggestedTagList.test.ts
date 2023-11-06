@@ -23,7 +23,7 @@ test("lists tags", async () => {
   });
 
   const caller = appRouter.createCaller({ user: null });
-  const { results } = await caller.bottleSuggestedTagsList({
+  const { results } = await caller.bottleSuggestedTagList({
     bottle: bottle.id,
   });
 

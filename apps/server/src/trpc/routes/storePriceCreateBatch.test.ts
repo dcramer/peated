@@ -3,7 +3,7 @@ import { storePrices } from "@peated/server/db/schema";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { eq } from "drizzle-orm";
 import { appRouter } from "../router";
-import { findBottle } from "./storePricesCreate";
+import { findBottle } from "./storePriceCreateBatch";
 
 test("requires admin", async () => {
   const caller = appRouter.createCaller({
