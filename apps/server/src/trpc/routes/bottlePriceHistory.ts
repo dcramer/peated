@@ -23,7 +23,7 @@ export default publicProcedure
 
     if (!bottle) {
       throw new TRPCError({
-        message: "Bottle not found",
+        message: "Bottle not found.",
         code: "NOT_FOUND",
       });
     }

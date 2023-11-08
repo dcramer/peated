@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { badges } from "../../db/schema";
+import * as Fixtures from "../../lib/test/fixtures";
 import { appRouter } from "../router";
 
 test("requires admin", async () => {
@@ -15,7 +16,9 @@ test("requires admin", async () => {
 });
 
 test("validates config for category", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ admin: true }),
+  });
 
   expect(() =>
     caller.badgeCreate({
@@ -23,11 +26,13 @@ test("validates config for category", async () => {
       name: "Single Malts",
       config: { bottle: [1] },
     }),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  ).rejects.toThrowError(/Failed to validate badge config/);
 });
 
 test("creates badge", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ admin: true }),
+  });
 
   const data = await caller.badgeCreate({
     type: "category",

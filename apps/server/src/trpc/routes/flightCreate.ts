@@ -17,7 +17,6 @@ export default authedProcedure
       createdById: ctx.user.id,
     };
 
-    const user = ctx.user;
     const flight = await db.transaction(async (tx) => {
       const [flight] = await tx.insert(flights).values(data).returning();
 
@@ -35,7 +34,7 @@ export default authedProcedure
 
     if (!flight) {
       throw new TRPCError({
-        message: "Failed to create flight",
+        message: "Failed to create flight.",
         code: "INTERNAL_SERVER_ERROR",
       });
     }

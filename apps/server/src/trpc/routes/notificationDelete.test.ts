@@ -63,5 +63,5 @@ test("cannot delete others notification", async () => {
     caller.notificationDelete({
       notification: notification.id,
     }),
-  ).rejects.toThrowError(/Cannot delete another person's notification/);
+  ).rejects.toThrowError(/FORBIDDEN/);
 });

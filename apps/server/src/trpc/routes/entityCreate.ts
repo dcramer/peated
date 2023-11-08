@@ -63,7 +63,7 @@ export default authedProcedure
 
     if (!entity) {
       throw new TRPCError({
-        message: "Failed to create entity",
+        message: "Failed to create entity.",
         code: "INTERNAL_SERVER_ERROR",
       });
     }

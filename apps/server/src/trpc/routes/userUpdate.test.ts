@@ -22,7 +22,7 @@ test("cannot update another person", async () => {
     caller.userUpdate({
       user: otherUser.id,
     }),
-  ).rejects.toThrowError(/FORBIDDEN/);
+  ).rejects.toThrowError(/Cannot edit another person/);
 });
 
 test("can change displayName", async () => {
@@ -55,4 +55,66 @@ test("can change username", async () => {
     .from(users)
     .where(eq(users.id, DefaultFixtures.user.id));
   expect(user.username).toEqual("joeblow");
+});
+
+test("can change mod as admin", async () => {
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ admin: true }),
+  });
+  const data = await caller.userUpdate({
+    user: DefaultFixtures.user.id,
+    mod: true,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, DefaultFixtures.user.id));
+  expect(user.mod).toEqual(true);
+});
+
+test("can change admin as admin", async () => {
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ admin: true }),
+  });
+  const data = await caller.userUpdate({
+    user: DefaultFixtures.user.id,
+    admin: true,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, DefaultFixtures.user.id));
+  expect(user.admin).toEqual(true);
+});
+
+test("cannot change mod as mod", async () => {
+  const user = await Fixtures.User({ mod: true });
+  const caller = appRouter.createCaller({
+    user,
+  });
+  expect(() =>
+    caller.userUpdate({
+      user: user.id,
+      mod: true,
+    }),
+  ).rejects.toThrowError(/FORBIDDEN/);
+});
+
+test("cannot change admin as mod", async () => {
+  const user = await Fixtures.User({ mod: true });
+  const caller = appRouter.createCaller({
+    user,
+  });
+  expect(() =>
+    caller.userUpdate({
+      user: user.id,
+      admin: true,
+    }),
+  ).rejects.toThrowError(/FORBIDDEN/);
 });

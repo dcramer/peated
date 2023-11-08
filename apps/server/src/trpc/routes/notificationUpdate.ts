@@ -22,14 +22,14 @@ export default authedProcedure
 
     if (!notification) {
       throw new TRPCError({
-        message: "Notifcation not found",
+        message: "Notifcation not found.",
         code: "NOT_FOUND",
       });
     }
 
     if (notification.userId !== ctx.user.id) {
       throw new TRPCError({
-        message: "Cannot edit another person's notificatio",
+        message: "Cannot edit another person's notification.",
         code: "FORBIDDEN",
       });
     }

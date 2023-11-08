@@ -1,51 +1,42 @@
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
+test("requires authentication", async () => {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.entityMerge({
+      root: 1,
+      other: 2,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("must be mod", async () => {
-  const entity = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "POST",
-    url: `/entities/${entity.id}/merge`,
-    payload: {
-      entityId: entity.id,
-      direction: "mergeInto",
-    },
-    headers: await Fixtures.AuthenticatedHeaders(),
-  });
-
-  expect(response).toRespondWith(403);
+test("requires mod", async () => {
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.entityMerge({
+      root: 1,
+      other: 2,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("merge A into B", async () => {
   const entityA = await Fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
   const entityB = await Fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
-  const response = await app.inject({
-    method: "POST",
-    url: `/entities/${entityA.id}/merge`,
-    payload: {
-      entityId: entityB.id,
-      direction: "mergeInto",
-    },
-    headers: await Fixtures.AuthenticatedHeaders({
-      mod: true,
-    }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityMerge({
+    root: entityA.id,
+    other: entityB.id,
+    direction: "mergeInto",
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toEqual(entityB.id);
 
   const [newEntityA] = await db
@@ -66,20 +57,16 @@ test("merge A into B", async () => {
 test("merge A from B", async () => {
   const entityA = await Fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
   const entityB = await Fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
-  const response = await app.inject({
-    method: "POST",
-    url: `/entities/${entityA.id}/merge`,
-    payload: {
-      entityId: entityB.id,
-      direction: "mergeFrom",
-    },
-    headers: await Fixtures.AuthenticatedHeaders({
-      mod: true,
-    }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityMerge({
+    root: entityA.id,
+    other: entityB.id,
+    direction: "mergeFrom",
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toEqual(entityA.id);
 
   const [newEntityA] = await db

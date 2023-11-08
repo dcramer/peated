@@ -25,17 +25,14 @@ test("requires mod", async () => {
 
 test("no changes", async () => {
   const entity = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/entities/${entity.id}`,
-    payload: {},
-    headers: await Fixtures.AuthenticatedHeaders({
-      mod: true,
-    }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [newEntity] = await db
@@ -48,19 +45,15 @@ test("no changes", async () => {
 
 test("can change name", async () => {
   const entity = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/entities/${entity.id}`,
-    payload: {
-      name: "Delicious Wood",
-    },
-    headers: await Fixtures.AuthenticatedHeaders({
-      mod: true,
-    }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    name: "Delicious Wood",
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [newEntity] = await db
@@ -74,19 +67,15 @@ test("can change name", async () => {
 
 test("can change country", async () => {
   const entity = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/entities/${entity.id}`,
-    payload: {
-      country: "Scotland",
-    },
-    headers: await Fixtures.AuthenticatedHeaders({
-      mod: true,
-    }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    country: "Scotland",
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [newEntity] = await db
@@ -100,19 +89,15 @@ test("can change country", async () => {
 
 test("can change region", async () => {
   const entity = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/entities/${entity.id}`,
-    payload: {
-      region: "Islay",
-    },
-    headers: await Fixtures.AuthenticatedHeaders({
-      mod: true,
-    }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    region: "Islay",
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [newEntity] = await db
@@ -126,19 +111,15 @@ test("can change region", async () => {
 
 test("can change type", async () => {
   const entity = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/entities/${entity.id}`,
-    payload: {
-      type: ["distiller"],
-    },
-    headers: await Fixtures.AuthenticatedHeaders({
-      mod: true,
-    }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    type: ["distiller"],
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [newEntity] = await db

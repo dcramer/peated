@@ -23,7 +23,7 @@ export default adminProcedure
     let name = normalizeBottleName(input.name, input.statedAge);
     if (name.indexOf("-year-old") !== -1 && !input.statedAge) {
       throw new TRPCError({
-        message: "You should include the Stated Age of the bottle",
+        message: "You should include the Stated Age of the bottle.",
         code: "BAD_REQUEST",
       });
     }
@@ -39,7 +39,7 @@ export default adminProcedure
 
       if (!brandUpsert) {
         throw new TRPCError({
-          message: "Could not identify brand",
+          message: "Could not identify brand.",
           code: "BAD_REQUEST",
         });
       }
@@ -64,7 +64,7 @@ export default adminProcedure
           bottler = bottlerUpsert.result;
         } else {
           throw new TRPCError({
-            message: "Could not identify bottler",
+            message: "Could not identify bottler.",
             code: "BAD_REQUEST",
           });
         }
@@ -93,7 +93,7 @@ export default adminProcedure
             err?.constraint === "bottle_name_unq")
         ) {
           throw new TRPCError({
-            message: "Bottle with name already exists under brand",
+            message: "Bottle with name already exists under brand.",
             code: "CONFLICT",
           });
         }
@@ -114,7 +114,7 @@ export default adminProcedure
           });
           if (!distUpsert) {
             throw new TRPCError({
-              message: "Could not identify distiller",
+              message: "Could not identify distiller.",
               code: "BAD_REQUEST",
             });
           }
@@ -156,7 +156,7 @@ export default adminProcedure
 
     if (!bottle) {
       throw new TRPCError({
-        message: "Failed to create bottle",
+        message: "Failed to create bottle.",
         code: "INTERNAL_SERVER_ERROR",
       });
     }

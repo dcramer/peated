@@ -23,14 +23,15 @@ export default authedProcedure
     const user = await getUserFromId(db, input.user, ctx.user);
     if (!user) {
       throw new TRPCError({
+        message: "User not found.",
         code: "NOT_FOUND",
       });
     }
 
     if (user.id !== ctx.user.id) {
       throw new TRPCError({
-        message: "Cannot modify another person's collection",
-        code: "UNAUTHORIZED",
+        message: "Cannot modify another person's collection.",
+        code: "UNAUTHORIZED.",
       });
     }
 
@@ -50,7 +51,7 @@ export default authedProcedure
 
     if (ctx.user.id !== collection.createdById) {
       throw new TRPCError({
-        message: "Cannot modify another person's collection",
+        message: "Cannot modify another person's collection.",
         code: "UNAUTHORIZED",
       });
     }
@@ -61,7 +62,7 @@ export default authedProcedure
       .where(eq(bottles.id, input.bottle));
     if (!bottle) {
       throw new TRPCError({
-        message: "Cannot find bottle",
+        message: "Cannot find bottle.",
         code: "NOT_FOUND",
       });
     }

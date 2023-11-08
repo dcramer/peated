@@ -23,7 +23,7 @@ export default publicProcedure
 
     if (!entity) {
       throw new TRPCError({
-        message: "Entity not found",
+        message: "Entity not found.",
         code: "NOT_FOUND",
       });
     }

@@ -15,6 +15,7 @@ export default publicProcedure.input(z.number()).query(async function ({
 
   if (!bottle) {
     throw new TRPCError({
+      message: "Bottle not found.",
       code: "NOT_FOUND",
     });
   }

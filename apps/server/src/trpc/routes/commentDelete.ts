@@ -20,14 +20,14 @@ export default authedProcedure
       .limit(1);
     if (!comment) {
       throw new TRPCError({
-        message: "Comment not found",
+        message: "Comment not found.",
         code: "NOT_FOUND",
       });
     }
 
     if (comment.createdById !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
-        message: "Cannot delete another person's comment",
+        message: "Cannot delete another person's comment.",
         code: "FORBIDDEN",
       });
     }

@@ -18,7 +18,7 @@ export default adminProcedure.input(BadgeInputSchema).mutation(async function ({
   } catch (err) {
     logError(err);
     throw new TRPCError({
-      message: "Failed to validate badge config",
+      message: "Failed to validate badge config.",
       code: "BAD_REQUEST",
     });
   }
@@ -34,7 +34,7 @@ export default adminProcedure.input(BadgeInputSchema).mutation(async function ({
 
   if (!badge) {
     throw new TRPCError({
-      message: "Failed to create badge",
+      message: "Failed to create badge.",
       code: "INTERNAL_SERVER_ERROR",
     });
   }

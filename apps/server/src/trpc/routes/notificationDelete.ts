@@ -19,15 +19,15 @@ export default authedProcedure
 
     if (!notification) {
       throw new TRPCError({
+        message: "Notification not found.",
         code: "NOT_FOUND",
-        message: "Notification not found",
       });
     }
 
-    if (notification.userId !== ctx.user.id) {
+    if (notification.userId !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
+        message: "Cannot delete another person's notification.",
         code: "FORBIDDEN",
-        message: "Cannot delete another person's notification",
       });
     }
 

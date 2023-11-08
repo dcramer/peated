@@ -81,7 +81,7 @@ export default modProcedure
   .mutation(async function ({ input, ctx }) {
     if (input.root === input.other) {
       throw new TRPCError({
-        message: "Cannot merge an entity into itself",
+        message: "Cannot merge an entity into itself.",
         code: "BAD_REQUEST",
       });
     }
@@ -93,7 +93,7 @@ export default modProcedure
 
     if (!rootEntity) {
       throw new TRPCError({
-        message: "toEntity not found",
+        message: "toEntity not found.",
         code: "NOT_FOUND",
       });
     }
@@ -105,7 +105,7 @@ export default modProcedure
 
     if (!otherEntity) {
       throw new TRPCError({
-        message: "fromEntity not found",
+        message: "fromEntity not found.",
         code: "NOT_FOUND",
       });
     }

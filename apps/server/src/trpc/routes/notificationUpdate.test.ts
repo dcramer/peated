@@ -58,5 +58,5 @@ test("cannot update others notification", async () => {
       notification: notification.id,
       read: true,
     }),
-  ).rejects.toThrowError(/FORBIDDEN/);
+  ).rejects.toThrowError(/Cannot edit another person's notification/);
 });

@@ -20,14 +20,14 @@ export default authedProcedure
 
     if (!user) {
       throw new TRPCError({
-        message: "User not found",
+        message: "User not found.",
         code: "NOT_FOUND",
       });
     }
 
     if (user.id !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
-        message: "Cannot update another person",
+        message: "Cannot edit another person.",
         code: "FORBIDDEN",
       });
     }
@@ -44,7 +44,7 @@ export default authedProcedure
       data.username = input.username.toLowerCase();
       if (data.username === "me") {
         throw new TRPCError({
-          message: "Invalid username",
+          message: "Invalid username.",
           code: "BAD_REQUEST",
         });
       }
@@ -57,7 +57,6 @@ export default authedProcedure
     if (input.admin !== undefined && input.admin !== user.admin) {
       if (!ctx.user.admin) {
         throw new TRPCError({
-          message: "Cannot set admin flag on user",
           code: "FORBIDDEN",
         });
       }
@@ -67,7 +66,7 @@ export default authedProcedure
     if (input.mod !== undefined && input.mod !== user.mod) {
       if (!ctx.user.admin) {
         throw new TRPCError({
-          message: "Cannot set mod flag on user",
+          message: "Cannot set mod flag on user.",
           code: "FORBIDDEN",
         });
       }
@@ -89,7 +88,7 @@ export default authedProcedure
     } catch (err: any) {
       if (err?.code === "23505" && err?.constraint === "user_username_unq") {
         throw new TRPCError({
-          message: "Username in use",
+          message: "Username in use.",
           code: "CONFLICT",
         });
       } else {

@@ -23,14 +23,14 @@ export default authedProcedure
     const user = await getUserFromId(db, input.user, ctx.user);
     if (!user) {
       throw new TRPCError({
-        message: "User not found",
+        message: "User not found.",
         code: "NOT_FOUND",
       });
     }
 
     if (!(await profileVisible(db, user, ctx.user))) {
       throw new TRPCError({
-        message: "User's profile is private",
+        message: "User's profile is private.",
         code: "BAD_REQUEST",
       });
     }
@@ -48,7 +48,7 @@ export default authedProcedure
 
     if (!collection) {
       throw new TRPCError({
-        message: "Collection not found",
+        message: "Collection not found.",
         code: "NOT_FOUND",
       });
     }

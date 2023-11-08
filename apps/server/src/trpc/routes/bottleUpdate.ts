@@ -39,7 +39,7 @@ export default modProcedure
     });
     if (!bottle) {
       throw new TRPCError({
-        message: "Bottle not found",
+        message: "Bottle not found.",
         code: "NOT_FOUND",
       });
     }
@@ -63,7 +63,7 @@ export default modProcedure
         !bottleData.statedAge
       ) {
         throw new TRPCError({
-          message: "You should include the Stated Age of the bottle",
+          message: "You should include the Stated Age of the bottle.",
           code: "BAD_REQUEST",
         });
       }
@@ -90,7 +90,7 @@ export default modProcedure
           });
           if (!brandUpsert)
             throw new TRPCError({
-              message: `Unable to find entity: ${input.brand}`,
+              message: `Unable to find entity: ${input.brand}.`,
               code: "INTERNAL_SERVER_ERROR",
             });
           if (brandUpsert.id !== bottle.brandId) {
@@ -114,7 +114,7 @@ export default modProcedure
           });
           if (!bottlerUpsert) {
             throw new TRPCError({
-              message: `Unable to find entity: ${input.bottler}`,
+              message: `Unable to find entity: ${input.bottler}.`,
               code: "INTERNAL_SERVER_ERROR",
             });
           }
@@ -149,7 +149,7 @@ export default modProcedure
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
           throw new TRPCError({
-            message: "Bottle with name already exists under brand",
+            message: "Bottle with name already exists under brand.",
             code: "CONFLICT",
           });
         }
@@ -181,8 +181,12 @@ export default modProcedure
               userId: user.id,
               type: "distiller",
             });
-            if (!distUpsert)
-              throw new Error(`Unable to find entity: ${distData}`);
+            if (!distUpsert) {
+              throw new TRPCError({
+                message: `Unable to find entity: ${distData}.`,
+                code: "INTERNAL_SERVER_ERROR",
+              });
+            }
 
             await tx.insert(bottlesToDistillers).values({
               bottleId: bottle.id,
@@ -265,7 +269,7 @@ export default modProcedure
 
     if (!newBottle) {
       throw new TRPCError({
-        message: "Failed to update bottle",
+        message: "Failed to update bottle.",
         code: "INTERNAL_SERVER_ERROR",
       });
     }

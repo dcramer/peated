@@ -19,14 +19,14 @@ export default authedProcedure
       .limit(1);
     if (!tasting) {
       throw new TRPCError({
-        message: "Tasting not found",
+        message: "Tasting not found.",
         code: "NOT_FOUND",
       });
     }
 
     if (tasting.createdById !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
-        message: "Cannot delete another person's tasting image",
+        message: "Cannot delete another person's tasting image.",
         code: "FORBIDDEN",
       });
     }

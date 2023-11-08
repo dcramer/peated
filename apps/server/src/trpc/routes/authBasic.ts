@@ -21,7 +21,7 @@ export default publicProcedure
     if (!user) {
       console.log("user not found");
       throw new TRPCError({
-        message: "Invalid credentials",
+        message: "Invalid credentials.",
         code: "UNAUTHORIZED",
       });
     }
@@ -29,7 +29,7 @@ export default publicProcedure
     if (!user.passwordHash) {
       console.log("user has no password set");
       throw new TRPCError({
-        message: "Invalid credentials",
+        message: "Invalid credentials.",
         code: "UNAUTHORIZED",
       });
     }
@@ -37,14 +37,14 @@ export default publicProcedure
     if (!compareSync(password, user.passwordHash)) {
       console.log("invalid password");
       throw new TRPCError({
-        message: "Invalid credentials",
+        message: "Invalid credentials.",
         code: "UNAUTHORIZED",
       });
     }
 
     if (!user.active) {
       throw new TRPCError({
-        message: "Invalid credentials",
+        message: "Invalid credentials.",
         code: "UNAUTHORIZED",
       });
     }

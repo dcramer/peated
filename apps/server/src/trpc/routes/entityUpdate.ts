@@ -25,7 +25,7 @@ export default modProcedure
 
     if (!entity) {
       throw new TRPCError({
-        message: "Entity not found",
+        message: "Entity not found.",
         code: "NOT_FOUND",
       });
     }
@@ -69,7 +69,7 @@ export default modProcedure
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "entity_name_unq") {
           throw new TRPCError({
-            message: "Entity with name already exists",
+            message: "Entity with name already exists.",
             code: "CONFLICT",
           });
         }
@@ -93,7 +93,7 @@ export default modProcedure
 
     if (!newEntity) {
       throw new TRPCError({
-        message: "Failed to update entity",
+        message: "Failed to update entity.",
         code: "INTERNAL_SERVER_ERROR",
       });
     }

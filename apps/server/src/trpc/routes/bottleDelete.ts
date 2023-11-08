@@ -23,6 +23,7 @@ export default adminProcedure.input(z.number()).mutation(async function ({
     .limit(1);
   if (!bottle) {
     throw new TRPCError({
+      message: "Bottle not found.",
       code: "NOT_FOUND",
     });
   }

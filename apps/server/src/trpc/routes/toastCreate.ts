@@ -17,14 +17,14 @@ export default authedProcedure.input(z.number()).mutation(async function ({
   if (!tasting) {
     throw new TRPCError({
       code: "NOT_FOUND",
-      message: "Tasting not found",
+      message: "Tasting not found.",
     });
   }
 
   if (ctx.user.id === tasting.createdById) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Cannot toast your own tasting",
+      message: "Cannot toast your own tasting.",
     });
   }
 

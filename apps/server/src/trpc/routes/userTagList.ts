@@ -16,14 +16,14 @@ export default publicProcedure
     const user = await getUserFromId(db, input.user, ctx.user);
     if (!user) {
       throw new TRPCError({
-        message: "User not found",
+        message: "User not found.",
         code: "NOT_FOUND",
       });
     }
 
     if (!(await profileVisible(db, user, ctx.user))) {
       throw new TRPCError({
-        message: "User's profile not public",
+        message: "User's profile not public.",
         code: "BAD_REQUEST",
       });
     }

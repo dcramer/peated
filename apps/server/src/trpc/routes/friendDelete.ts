@@ -15,7 +15,7 @@ export default authedProcedure
   .mutation(async function ({ input, ctx }) {
     if (ctx.user.id === input.user) {
       throw new TRPCError({
-        message: "User not found",
+        message: "Cannot unfriend yourself.",
         code: "NOT_FOUND",
       });
     }
@@ -27,7 +27,7 @@ export default authedProcedure
 
     if (!user) {
       throw new TRPCError({
-        message: "User not found",
+        message: "User not found.",
         code: "NOT_FOUND",
       });
     }

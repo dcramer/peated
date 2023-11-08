@@ -37,7 +37,7 @@ export default authedProcedure
     });
     if (!bottle) {
       throw new TRPCError({
-        message: "Cannot identity bottle",
+        message: "Cannot identity bottle.",
         code: "BAD_REQUEST",
       });
     }
@@ -55,13 +55,13 @@ export default authedProcedure
       data.createdAt = new Date(input.createdAt);
       if (isDistantFuture(data.createdAt, 60 * 5)) {
         throw new TRPCError({
-          message: "createdAt too far in future",
+          message: "createdAt too far in future.",
           code: "BAD_REQUEST",
         });
       }
       if (isDistantPast(data.createdAt, 60 * 60 * 24 * 7)) {
         throw new TRPCError({
-          message: "createdAt too far in the past",
+          message: "createdAt too far in the past.",
           code: "BAD_REQUEST",
         });
       }
@@ -81,7 +81,7 @@ export default authedProcedure
         );
       if (matches.length != friendUserIds.length) {
         throw new TRPCError({
-          message: "Friends must all be active relationships",
+          message: "Friends must all be active relationships.",
           code: "BAD_REQUEST",
         });
       }
@@ -95,7 +95,7 @@ export default authedProcedure
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "tasting_unq") {
           throw new TRPCError({
-            message: "Tasting already exists",
+            message: "Tasting already exists.",
             code: "CONFLICT",
           });
         }
@@ -173,7 +173,7 @@ export default authedProcedure
 
     if (!tasting) {
       throw new TRPCError({
-        message: "Unable to create tasting",
+        message: "Unable to create tasting.",
         code: "INTERNAL_SERVER_ERROR",
       });
     }

@@ -19,14 +19,14 @@ export default authedProcedure
     const user = await getUserFromId(db, input.user, ctx.user);
     if (!user) {
       throw new TRPCError({
-        message: "User not found",
+        message: "User not found.",
         code: "NOT_FOUND",
       });
     }
 
     if (user.id !== ctx.user.id) {
       throw new TRPCError({
-        message: "Cannot modify another person's collection",
+        message: "Cannot modify another person's collection.",
         code: "FORBIDDEN",
       });
     }
@@ -41,14 +41,14 @@ export default authedProcedure
 
     if (!collection) {
       throw new TRPCError({
-        message: "Collection not found",
+        message: "Collection not found.",
         code: "NOT_FOUND",
       });
     }
 
     if (ctx.user.id !== collection.createdById) {
       throw new TRPCError({
-        message: "Cannot modify another person's collection",
+        message: "Cannot modify another person's collection.",
         code: "FORBIDDEN",
       });
     }

@@ -19,7 +19,7 @@ test("cannot unfriend self", async () => {
     caller.friendDelete({
       user: DefaultFixtures.user.id,
     }),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  ).rejects.toThrowError(/Cannot unfriend yourself/);
 });
 
 test("can unfriend new link", async () => {

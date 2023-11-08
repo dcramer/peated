@@ -29,7 +29,7 @@ export default authedProcedure
 
     if (!tasting) {
       throw new TRPCError({
-        message: "Tasting not found",
+        message: "Tasting not found.",
         code: "NOT_FOUND",
       });
     }
@@ -44,13 +44,13 @@ export default authedProcedure
       if (isDistantFuture(data.createdAt, 60 * 5)) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "createdAt too far in future",
+          message: "createdAt too far in future.",
         });
       }
       if (isDistantPast(data.createdAt, 60 * 60 * 24 * 7)) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "createdAt too far in past",
+          message: "createdAt too far in past.",
         });
       }
     }
@@ -66,7 +66,7 @@ export default authedProcedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "comment_unq") {
-          res.status(409).send({ error: "Comment already exists" });
+          res.status(409).send({ error: "Comment already exists." });
           return;
         }
         throw err;
@@ -102,7 +102,7 @@ export default authedProcedure
     if (!comment) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Unable to create comment",
+        message: "Unable to create comment.",
       });
     }
 

@@ -17,7 +17,7 @@ export default adminProcedure.input(StoreInputSchema).mutation(async function ({
     } catch (err: any) {
       if (err?.code === "23505" && err?.constraint === "store_type") {
         throw new TRPCError({
-          message: "Store with aggregator type already exists",
+          message: "Store with aggregator type already exists.",
           code: "CONFLICT",
         });
       }
@@ -27,7 +27,7 @@ export default adminProcedure.input(StoreInputSchema).mutation(async function ({
 
   if (!store) {
     throw new TRPCError({
-      message: "Failed to create store",
+      message: "Failed to create store.",
       code: "INTERNAL_SERVER_ERROR",
     });
   }

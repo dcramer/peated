@@ -13,7 +13,7 @@ export default authedProcedure.input(z.number()).mutation(async function ({
 }) {
   if (ctx.user.id === input) {
     throw new TRPCError({
-      message: "Cannot friend yourself",
+      message: "Cannot friend yourself.",
       code: "BAD_REQUEST",
     });
   }
@@ -22,7 +22,7 @@ export default authedProcedure.input(z.number()).mutation(async function ({
 
   if (!user) {
     throw new TRPCError({
-      message: "User not found",
+      message: "User not found.",
       code: "NOT_FOUND",
     });
   }
@@ -114,7 +114,7 @@ export default authedProcedure.input(z.number()).mutation(async function ({
 
   if (!myFollow) {
     throw new TRPCError({
-      message: "Failed to create friend relationship",
+      message: "Failed to create friend relationship.",
       code: "INTERNAL_SERVER_ERROR",
     });
   }

@@ -31,7 +31,7 @@ export default publicProcedure
     if (!tokens.id_token) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
-        message: "Unable to validate credentials",
+        message: "Unable to validate credentials.",
       });
     }
 
@@ -44,7 +44,7 @@ export default publicProcedure
     if (!payload || !payload.email) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
-        message: "Unable to validate credentials",
+        message: "Unable to validate credentials.",
       });
     }
 
@@ -102,7 +102,7 @@ export default publicProcedure
     if (!user.active) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
-        message: "Unable to validate credentials",
+        message: "Unable to validate credentials.",
       });
     }
 

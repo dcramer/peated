@@ -21,7 +21,7 @@ test("cannot delete another person's image", async () => {
     caller.tastingImageDelete({
       tasting: tasting.id,
     }),
-  ).rejects.toThrowError(/FORBIDDEN/);
+  ).rejects.toThrowError(/Cannot delete another person's tasting image/);
 });
 
 test("deletes existing image", async () => {

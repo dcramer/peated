@@ -43,7 +43,7 @@ test("cannot list private without friend", async () => {
     caller.userTagList({
       user: otherUser.id,
     }),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  ).rejects.toThrowError(/User's profile is not public/);
 });
 
 test("can list private with friend", async () => {
