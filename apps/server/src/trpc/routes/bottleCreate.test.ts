@@ -104,7 +104,7 @@ test("does not create a new bottle with invalid brandId", async () => {
       name: "Delicious Wood",
       brand: 5,
     }),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  ).rejects.toThrowError(/Could not identify brand/);
 });
 
 // test("creates a new bottle with existing brand name", async () => {
@@ -143,21 +143,15 @@ test("does not create a new bottle with invalid brandId", async () => {
 // });
 
 test("creates a new bottle with new brand name", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
-      name: "Delicious Wood",
-      brand: {
-        name: "Hard Knox",
-        country: "Scotland",
-      },
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood",
+    brand: {
+      name: "Hard Knox",
+      country: "Scotland",
     },
-    headers: DefaultFixtures.authHeaders,
   });
 
-  expect(response).toRespondWith(201);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [{ bottle, brand }] = await db
@@ -203,7 +197,7 @@ test("does not create a new bottle with invalid distillerId", async () => {
       },
       distillers: [500000],
     }),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  ).rejects.toThrowError(/Could not identify distiller/);
 });
 
 // test("creates a new bottle with existing distiller name", async () => {
@@ -440,7 +434,7 @@ test("refuses bottle w/ age signal", async () => {
       brand: brand.id,
       distillers: [distiller.id],
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  ).rejects.toThrowError(/You should include the Stated Age of the bottle/);
 });
 
 test("removes duplicated brand name", async () => {

@@ -11,14 +11,14 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("cannot follow self", async () => {
+test("cannot friend self", async () => {
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.friendCreate(DefaultFixtures.user.id),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  ).rejects.toThrowError(/Cannot friend yourself/);
 });
 
-test("can follow new link", async () => {
+test("can friend new link", async () => {
   const otherUser = await Fixtures.User();
 
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
@@ -53,7 +53,7 @@ test("can follow new link", async () => {
   expect(notif.userId).toEqual(follow.toUserId);
 });
 
-test("can follow existing link", async () => {
+test("can friend existing link", async () => {
   const otherUser = await Fixtures.User();
 
   const follow = await Fixtures.Follow({

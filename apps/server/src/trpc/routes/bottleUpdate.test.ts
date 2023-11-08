@@ -102,7 +102,7 @@ test("requires age with matching name", async () => {
       bottle: bottle.id,
       name: "Delicious 10-year-old",
     }),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  ).rejects.toThrowError(/You should include the Stated Age of the bottle/);
 });
 
 test("manipulates name to conform with age", async () => {

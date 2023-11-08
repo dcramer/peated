@@ -20,7 +20,7 @@ test("cannot list private without friend", async () => {
       user: otherUser.id,
       collection: "default",
     }),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  ).rejects.toThrowError(/User's profile is private/);
 });
 
 test("can list private with friend", async () => {

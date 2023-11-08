@@ -50,5 +50,5 @@ test("cannot delete others tasting", async () => {
     caller.tastingDelete({
       tasting: tasting.id,
     }),
-  ).rejects.toThrowError(/FORBIDDEN/);
+  ).rejects.toThrowError(/Cannot delete another user's tasting/);
 });

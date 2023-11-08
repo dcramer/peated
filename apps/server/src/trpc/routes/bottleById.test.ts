@@ -12,5 +12,5 @@ test("gets bottle", async () => {
 
 test("errors on invalid bottle", async () => {
   const caller = appRouter.createCaller({ user: null });
-  expect(() => caller.bottleById(1)).rejects.toThrowError(/NOT_FOUND/);
+  expect(() => caller.bottleById(1)).rejects.toThrowError(/Bottle not found/);
 });

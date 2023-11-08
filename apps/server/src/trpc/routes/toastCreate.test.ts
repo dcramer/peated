@@ -20,7 +20,7 @@ test("cannot toast self", async () => {
     user: DefaultFixtures.user,
   });
   expect(() => caller.toastCreate(tasting.id)).rejects.toThrowError(
-    /BAD_REQUEST/,
+    /Cannot toast your own tasting/,
   );
 });
 

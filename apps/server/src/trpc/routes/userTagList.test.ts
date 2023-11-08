@@ -25,10 +25,11 @@ test("lists tags", async () => {
   });
 
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
-  const { results } = await caller.userTagList({
+  const { results, totalCount } = await caller.userTagList({
     user: "me",
   });
 
+  expect(totalCount).toEqual(2);
   expect(results).toEqual([
     { tag: "caramel", count: 2 },
     { tag: "solvent", count: 1 },

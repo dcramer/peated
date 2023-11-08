@@ -35,7 +35,7 @@ export default publicProcedure
         await db
           .select({
             tag: bottleTags.tag,
-            total: sql<number>`SUM(${bottleTags.count})`.as("total"),
+            total: sql<string>`SUM(${bottleTags.count})`.as("total"),
           })
           .from(bottleTags)
           .innerJoin(bottles, eq(bottles.id, bottleTags.bottleId))
@@ -53,7 +53,7 @@ export default publicProcedure
     const results = shuffle(DEFAULT_TAGS)
       .map((t) => ({
         tag: t,
-        count: usedTags[t] || 0,
+        count: parseInt(usedTags[t] || "0", 10),
       }))
       .sort((a, b) => b.count - a.count);
 

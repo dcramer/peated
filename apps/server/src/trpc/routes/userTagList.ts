@@ -28,8 +28,8 @@ export default publicProcedure
       });
     }
 
-    const results = await db.execute(
-      sql<{ tag: string; count: number }>`SELECT tag, COUNT(tag) as count
+    const results = await db.execute<{ tag: string; count: string }>(
+      sql<{ tag: string; count: string }>`SELECT tag, COUNT(tag) as count
     FROM (
       SELECT unnest(${tastings.tags}) as tag
       FROM ${tastings}
@@ -40,18 +40,24 @@ export default publicProcedure
     LIMIT 25`,
     );
 
-    const totalCount = (
-      await db.execute(
-        sql<{ count: number }>`SELECT COUNT(*) as count
+    const totalCount = parseInt(
+      (
+        await db.execute<{ count: string }>(
+          sql<{ count: number }>`SELECT COUNT(*) as count
         FROM ${tastings}
         WHERE ${tastings.createdById} = ${user.id}
         AND array_length(${tastings.tags}, 1) > 0
       `,
-      )
-    ).rows[0].count;
+        )
+      ).rows[0].count,
+      10,
+    );
 
     return {
-      results: results.rows,
+      results: results.rows.map(({ tag, count }) => ({
+        tag,
+        count: parseInt(count, 10),
+      })),
       totalCount,
     };
   });

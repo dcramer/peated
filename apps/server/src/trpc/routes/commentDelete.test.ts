@@ -41,5 +41,5 @@ test("cannot delete others", async () => {
     caller.commentDelete({
       comment: comment.id,
     }),
-  ).rejects.toThrowError(/FORBIDDEN/);
+  ).rejects.toThrowError(/Cannot delete another user's comment/);
 });
