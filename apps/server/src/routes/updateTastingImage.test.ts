@@ -17,7 +17,7 @@ beforeAll(async () => {
   };
 });
 
-test("cannot update another person's tasting", async () => {
+test("cannot update another user's tasting", async () => {
   const user = await Fixtures.User();
   const otherUser = await Fixtures.User();
   const tasting = await Fixtures.Tasting({ createdById: otherUser.id });

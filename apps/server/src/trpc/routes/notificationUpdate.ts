@@ -29,7 +29,7 @@ export default authedProcedure
 
     if (notification.userId !== ctx.user.id) {
       throw new TRPCError({
-        message: "Cannot edit another person's notification.",
+        message: "Cannot edit another user's notification.",
         code: "FORBIDDEN",
       });
     }

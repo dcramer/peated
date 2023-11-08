@@ -19,7 +19,7 @@ test("invalid notification", async () => {
     caller.notificationDelete({
       notification: 1,
     }),
-  ).rejects.toThrowError(/NOT_FOUND/);
+  ).rejects.toThrowError(/Notification not found/);
 });
 
 test("delete own notification", async () => {
@@ -63,5 +63,5 @@ test("cannot delete others notification", async () => {
     caller.notificationDelete({
       notification: notification.id,
     }),
-  ).rejects.toThrowError(/FORBIDDEN/);
+  ).rejects.toThrowError(/Cannot delete another user's notification/);
 });

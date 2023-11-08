@@ -15,9 +15,9 @@ import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { TRPCError } from "@trpc/server";
 import { inArray, sql } from "drizzle-orm";
-import { adminProcedure } from "..";
+import { authedProcedure } from "..";
 
-export default adminProcedure
+export default authedProcedure
   .input(BottleInputSchema)
   .mutation(async function ({ input, ctx }) {
     let name = normalizeBottleName(input.name, input.statedAge);

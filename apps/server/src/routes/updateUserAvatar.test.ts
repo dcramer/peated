@@ -17,7 +17,7 @@ beforeAll(async () => {
   };
 });
 
-test("cannot update another person's avatar", async () => {
+test("cannot update another user's avatar", async () => {
   const user = await Fixtures.User();
   const otherUser = await Fixtures.User();
 

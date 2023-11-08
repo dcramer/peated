@@ -23,7 +23,7 @@ export default publicProcedure
 
     if (!(await profileVisible(db, user, ctx.user))) {
       throw new TRPCError({
-        message: "User's profile not public.",
+        message: "User's profile is not public.",
         code: "BAD_REQUEST",
       });
     }

@@ -13,7 +13,7 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("cannot update another person", async () => {
+test("cannot update another user", async () => {
   const user = await Fixtures.User();
   const otherUser = await Fixtures.User();
 
@@ -22,7 +22,7 @@ test("cannot update another person", async () => {
     caller.userUpdate({
       user: otherUser.id,
     }),
-  ).rejects.toThrowError(/Cannot edit another person/);
+  ).rejects.toThrowError(/Cannot edit another user/);
 });
 
 test("can change displayName", async () => {
@@ -93,27 +93,25 @@ test("can change admin as admin", async () => {
   expect(user.admin).toEqual(true);
 });
 
-test("cannot change mod as mod", async () => {
-  const user = await Fixtures.User({ mod: true });
+test("cannot change mod as user", async () => {
   const caller = appRouter.createCaller({
-    user,
+    user: DefaultFixtures.user,
   });
   expect(() =>
     caller.userUpdate({
-      user: user.id,
+      user: DefaultFixtures.user.id,
       mod: true,
     }),
   ).rejects.toThrowError(/FORBIDDEN/);
 });
 
-test("cannot change admin as mod", async () => {
-  const user = await Fixtures.User({ mod: true });
+test("cannot change admin as user", async () => {
   const caller = appRouter.createCaller({
-    user,
+    user: DefaultFixtures.user,
   });
   expect(() =>
     caller.userUpdate({
-      user: user.id,
+      user: DefaultFixtures.user.id,
       admin: true,
     }),
   ).rejects.toThrowError(/FORBIDDEN/);

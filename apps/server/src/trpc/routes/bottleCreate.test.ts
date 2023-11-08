@@ -193,21 +193,17 @@ test("creates a new bottle with new brand name", async () => {
 });
 
 test("does not create a new bottle with invalid distillerId", async () => {
-  const response = await app.inject({
-    method: "POST",
-    url: "/bottles",
-    payload: {
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.bottleCreate({
       name: "Delicious Wood",
       brand: {
         name: "Hard Knox",
         country: "Scotland",
       },
       distillers: [500000],
-    },
-    headers: await Fixtures.AuthenticatedHeaders(),
-  });
-
-  expect(response).toRespondWith(400);
+    }),
+  ).rejects.toThrowError(/BAD_REQUEST/);
 });
 
 // test("creates a new bottle with existing distiller name", async () => {

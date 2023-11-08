@@ -27,7 +27,7 @@ export default authedProcedure
 
     if (comment.createdById !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
-        message: "Cannot delete another person's comment.",
+        message: "Cannot delete another user's comment.",
         code: "FORBIDDEN",
       });
     }

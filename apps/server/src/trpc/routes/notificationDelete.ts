@@ -26,7 +26,7 @@ export default authedProcedure
 
     if (notification.userId !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
-        message: "Cannot delete another person's notification.",
+        message: "Cannot delete another user's notification.",
         code: "FORBIDDEN",
       });
     }

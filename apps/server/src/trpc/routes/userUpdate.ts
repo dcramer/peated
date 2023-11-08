@@ -27,7 +27,7 @@ export default authedProcedure
 
     if (user.id !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
-        message: "Cannot edit another person.",
+        message: "Cannot edit another user.",
         code: "FORBIDDEN",
       });
     }
@@ -66,7 +66,6 @@ export default authedProcedure
     if (input.mod !== undefined && input.mod !== user.mod) {
       if (!ctx.user.admin) {
         throw new TRPCError({
-          message: "Cannot set mod flag on user.",
           code: "FORBIDDEN",
         });
       }

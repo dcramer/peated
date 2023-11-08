@@ -30,7 +30,7 @@ export default authedProcedure
 
     if (user.id !== ctx.user.id) {
       throw new TRPCError({
-        message: "Cannot modify another person's collection.",
+        message: "Cannot modify another user's collection.",
         code: "UNAUTHORIZED.",
       });
     }
@@ -51,7 +51,7 @@ export default authedProcedure
 
     if (ctx.user.id !== collection.createdById) {
       throw new TRPCError({
-        message: "Cannot modify another person's collection.",
+        message: "Cannot modify another user's collection.",
         code: "UNAUTHORIZED",
       });
     }

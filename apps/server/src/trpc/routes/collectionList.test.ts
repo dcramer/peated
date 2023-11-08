@@ -19,7 +19,7 @@ test("cannot list private without friend", async () => {
     caller.collectionList({
       user: otherUser.id,
     }),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  ).rejects.toThrowError(/User's profile is private/);
 });
 
 test("can list private with friend", async () => {
