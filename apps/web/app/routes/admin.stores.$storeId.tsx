@@ -11,7 +11,9 @@ export const sitemap: SitemapFunction = () => ({
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   invariant(params.storeId);
 
-  const store = await context.api.get(`/stores/${params.storeId}`);
+  const store = await context.trpc.storeById.query(
+    parseInt(params.storeId as string, 10),
+  );
 
   return json({ store });
 };

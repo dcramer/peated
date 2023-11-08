@@ -12,12 +12,10 @@ export const sitemap: SitemapFunction = () => ({
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url);
-  const page = url.searchParams.get("page") || 1;
-  const storeList = await context.api.get("/stores", {
-    query: {
-      page,
-      sort: "name",
-    },
+  const page = parseInt(url.searchParams.get("page") || "1", 10);
+  const storeList = await context.trpc.storeList.query({
+    page,
+    sort: "name",
   });
 
   return json({ storeList });

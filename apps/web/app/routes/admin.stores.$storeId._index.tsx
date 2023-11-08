@@ -13,13 +13,10 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   invariant(params.storeId);
 
   const url = new URL(request.url);
-  const page = url.searchParams.get("page") || 1;
-
-  const priceList = await context.api.get(`/stores/${params.storeId}/prices`, {
-    query: {
-      page,
-      sort: "name",
-    },
+  const page = parseInt(url.searchParams.get("page") || "1", 10);
+  const priceList = await context.trpc.storePriceList.query({
+    store: parseInt(params.storeId as string, 10),
+    page,
   });
 
   return json({ priceList });
