@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { STORE_TYPE_LIST } from "@peated/server/constants";
 import { StoreInputSchema } from "@peated/server/schemas";
-import type { ActionFunction } from "@remix-run/node";
-import { json, redirect, type MetaFunction } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
-import { Controller } from "react-hook-form";
-import { getValidatedFormData, useRemixForm } from "remix-hook-form";
+import { type MetaFunction } from "@remix-run/node";
+import { useNavigate } from "@remix-run/react";
+import { useState } from "react";
+import type { SubmitHandler} from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import type { SitemapFunction } from "remix-sitemap";
 import type { z } from "zod";
 
@@ -18,8 +18,8 @@ import Layout from "~/components/layout";
 import SelectField from "~/components/selectField";
 import Spinner from "~/components/spinner";
 import TextField from "~/components/textField";
-import { ApiError } from "~/lib/api";
 import { logError } from "~/lib/log";
+import { trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
@@ -31,29 +31,6 @@ const STORE_TYPES = STORE_TYPE_LIST.map((t) => ({ id: t, name: t }));
 
 const resolver = zodResolver(StoreInputSchema);
 
-export const action: ActionFunction = async ({ context, request }) => {
-  const { errors, data } = await getValidatedFormData<FormData>(
-    request,
-    resolver,
-  );
-  if (errors) {
-    return json(errors);
-  }
-  try {
-    await context.api.post(`/stores`, {
-      data,
-    });
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return json({ error: err.message });
-    } else {
-      logError(err);
-      return json({ error: "Unknown error" });
-    }
-  }
-  return redirect(`/admin/stores`);
-};
-
 export const meta: MetaFunction = () => {
   return [
     {
@@ -63,14 +40,26 @@ export const meta: MetaFunction = () => {
 };
 
 export default function AdminStoresAdd() {
-  const { error } = useActionData<typeof action>() || {};
+  const navigate = useNavigate();
+  const storeCreateMutation = trpc.storeCreate.useMutation();
+  const [error, setError] = useState<string | undefined>();
+
+  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
+    try {
+      const newFlight = await storeCreateMutation.mutateAsync(data);
+      navigate(`/admin/stores`);
+    } catch (err) {
+      setError(`${err}`);
+      logError(err);
+    }
+  };
 
   const {
     control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useRemixForm<FormSchemaType>({
+  } = useForm<FormSchemaType>({
     mode: "onSubmit",
     resolver,
   });
@@ -82,7 +71,7 @@ export default function AdminStoresAdd() {
           <FormHeader
             title="Add Store"
             saveDisabled={isSubmitting}
-            onSave={handleSubmit}
+            onSave={handleSubmit(onSubmitHandler)}
           />
         </Header>
       }
@@ -95,7 +84,7 @@ export default function AdminStoresAdd() {
         </div>
       )}
 
-      <Form className="sm:mx-16" onSubmit={handleSubmit}>
+      <form className="sm:mx-16" onSubmit={handleSubmit(onSubmitHandler)}>
         {error && <FormError values={[error]} />}
 
         <Fieldset>
@@ -131,7 +120,7 @@ export default function AdminStoresAdd() {
             error={errors.country}
           />
         </Fieldset>
-      </Form>
+      </form>
     </Layout>
   );
 }

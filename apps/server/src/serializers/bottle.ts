@@ -47,7 +47,7 @@ export const BottleSerializer = serializer({
     );
 
     const distillersByBottleId: {
-      [bottleId: number]: ReturnType<(typeof EntitySerializer)["item"]>;
+      [bottleId: number]: ReturnType<(typeof EntitySerializer)["item"]>[];
     } = {};
     distillerList.forEach((d) => {
       if (!distillersByBottleId[d.bottleId])

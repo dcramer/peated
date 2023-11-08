@@ -11,6 +11,7 @@ import BottleForm from "~/components/bottleForm";
 import Spinner from "~/components/spinner";
 import useApi from "~/hooks/useApi";
 import { redirectToAuth } from "~/lib/auth.server";
+import { trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
@@ -103,6 +104,8 @@ export default function AddBottle() {
     }
   }, [initialQueries.find((q) => q.isLoading)]);
 
+  const bottleCreateMutation = trpc.bottleCreate.useMutation();
+
   if (loading) {
     return <Spinner />;
   }
@@ -110,7 +113,7 @@ export default function AddBottle() {
   return (
     <BottleForm
       onSubmit={async (data) => {
-        const newBottle = await api.post(`/bottles`, { data });
+        const newBottle = await bottleCreateMutation.mutateAsync(data);
         navigate(`/bottles/${newBottle.id}/addTasting`, {
           replace: true,
         });

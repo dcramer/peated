@@ -44,7 +44,7 @@ export async function serialize<T extends Item, R extends Record<string, any>>(
   itemList: T | T[],
   currentUser?: User | null,
   excludeFields: string[] = [],
-): Promise<R[] | R> {
+): Promise<R | R[]> {
   if (Array.isArray(itemList) && !itemList.length) return [];
 
   const attrs = await (serializer.attrs || DefaultAttrs<T>)(
@@ -58,7 +58,7 @@ export async function serialize<T extends Item, R extends Record<string, any>>(
         serializer.item(i, attrs[i.id] || {}, currentUser),
         excludeFields,
       ),
-  );
+  ) as R[];
 
   return Array.isArray(itemList) ? results : results[0];
 }

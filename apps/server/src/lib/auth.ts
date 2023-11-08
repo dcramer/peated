@@ -55,13 +55,12 @@ export const getUserFromHeader = async (
   return user;
 };
 
-export const createAccessToken = async (
-  user: User,
-): Promise<string | undefined> => {
+export const createAccessToken = async (user: User): Promise<string> => {
   const payload = await serialize(UserSerializer, user, user);
-  return new Promise<string | undefined>((res, rej) => {
+  return new Promise<string>((res, rej) => {
     sign(payload, config.JWT_SECRET, {}, (err, token) => {
       if (err) rej(err);
+      if (!token) throw new Error("Unknown error signing token.");
       res(token);
     });
   });

@@ -66,8 +66,10 @@ export default authedProcedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "comment_unq") {
-          res.status(409).send({ error: "Comment already exists." });
-          return;
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Comment already exists.",
+          });
         }
         throw err;
       }

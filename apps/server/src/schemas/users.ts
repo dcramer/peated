@@ -3,9 +3,9 @@ import { FriendStatusEnum } from "./shared";
 
 export const UserSchema = z.object({
   id: z.number(),
-  displayName: z.string().trim().min(1, "Required"),
+  displayName: z.string().trim().min(1, "Required").nullable(),
   username: z.string().trim().min(1, "Required"),
-  pictureUrl: z.string(),
+  pictureUrl: z.string().nullable(),
   private: z.boolean(),
 
   email: z.string().email().optional(),
