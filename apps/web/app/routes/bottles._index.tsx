@@ -1,5 +1,10 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
-import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
+import {
+  json,
+  type LoaderFunction,
+  type MetaFunction,
+  type SerializeFrom,
+} from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
 
@@ -30,9 +35,10 @@ export const loader: LoaderFunction = async ({ context, request }) => {
   const url = new URL(request.url);
 
   return json({
-    bottleList: await context.trpc.bottleList.query(
-      Object.fromEntries(url.searchParams.entries()),
-    ),
+    bottleList: await context.trpc.bottleList.query({
+      ...Object.fromEntries(url.searchParams.entries()),
+      page: parseInt(url.searchParams.get("page") || "1", 10),
+    }),
   });
 };
 
@@ -48,13 +54,16 @@ export default function BottleList() {
   );
 }
 
-function Content({ bottleList }: { bottleList: any }) {
+function Content({
+  bottleList,
+}: {
+  // TODO: this is probably wrong
+  bottleList: SerializeFrom<typeof loader>["bottleList"];
+}) {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
 
   const sort = qs.get("sort") || DEFAULT_SORT;
-
-  console.log(bottleList);
 
   if (!bottleList) return null;
 

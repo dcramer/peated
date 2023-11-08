@@ -1,21 +1,16 @@
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderFunction, SerializeFrom } from "@remix-run/node";
 import { json, type MetaFunction } from "@remix-run/node";
-import { useLocation } from "@remix-run/react";
-import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
+import { useLoaderData, useLocation } from "@remix-run/react";
 
 import { ENTITY_TYPE_LIST, MAJOR_COUNTRIES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { EntityType } from "@peated/server/types";
 import { type SitemapFunction } from "remix-sitemap";
 import EmptyActivity from "~/components/emptyActivity";
 import EntityTable from "~/components/entityTable";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import SidebarLink from "~/components/sidebarLink";
-import useApi from "~/hooks/useApi";
-import type { ApiClient } from "~/lib/api";
 import { buildQueryString } from "~/lib/urls";
-import { fetchEntities } from "~/queries/entities";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -32,74 +27,44 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader: LoaderFunction = async ({ context, request }) => {
-  const queryClient = new QueryClient();
-
   const url = new URL(request.url);
-  const query = buildQuery(context.api, url.searchParams);
-
-  await queryClient.prefetchQuery(query);
-
-  return json({ dehydratedState: dehydrate(queryClient) });
+  return json({
+    entityList: await context.trpc.entityList.query({
+      ...Object.fromEntries(url.searchParams.entries()),
+      page: parseInt(url.searchParams.get("page") || "1", 10),
+    }),
+  });
 };
 
 export default function Entities() {
+  const { entityList } = useLoaderData<typeof loader>();
   return (
     <Layout rightSidebar={<FilterSidebar />}>
       <QueryBoundary>
-        <Content />
+        <Content entityList={entityList} />
       </QueryBoundary>
     </Layout>
   );
 }
 
-export function buildQuery(api: ApiClient, queryString: URLSearchParams) {
-  const page = queryString.get("page") || "1";
-  const type = queryString.get("type") || undefined;
-  const country = queryString.get("country") || undefined;
-  const region = queryString.get("region") || undefined;
-  const sort = queryString.get("sort") || DEFAULT_SORT;
-
-  return {
-    queryKey: [
-      "entities",
-      page,
-      "type",
-      type,
-      "country",
-      country,
-      "region",
-      region,
-      "sort",
-      sort,
-    ],
-    queryFn: () =>
-      fetchEntities(api, {
-        type: type as EntityType,
-        country,
-        region,
-        sort,
-        page,
-      }),
-  };
-}
-
-const Content = () => {
+function Content({
+  entityList,
+}: {
+  // TODO: this is probably wrong
+  entityList: SerializeFrom<typeof loader>["entityList"];
+}) {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
-
-  const api = useApi();
-  const query = buildQuery(api, qs);
-  const { data } = useQuery(query);
   const sort = qs.get("sort") || DEFAULT_SORT;
 
-  if (!data) return null;
+  if (!entityList) return null;
 
   return (
     <>
-      {data.results.length > 0 ? (
+      {entityList.results.length > 0 ? (
         <EntityTable
-          entityList={data.results}
-          rel={data.rel}
+          entityList={entityList.results}
+          rel={entityList.rel}
           sort={sort}
           withTastings
         />
@@ -110,7 +75,7 @@ const Content = () => {
       )}
     </>
   );
-};
+}
 
 function FilterSidebar() {
   const location = useLocation();
