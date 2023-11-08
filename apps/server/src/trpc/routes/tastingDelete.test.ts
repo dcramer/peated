@@ -1,17 +1,16 @@
 import { db } from "@peated/server/db";
 import { bottleTags, tastings } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
+test("requires authentication", async () => {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.tastingDelete({
+      tasting: 1,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("delete own tasting", async () => {
@@ -20,13 +19,10 @@ test("delete own tasting", async () => {
     tags: ["spiced", "caramel"],
   });
 
-  const response = await app.inject({
-    method: "DELETE",
-    url: `/tastings/${tasting.id}`,
-    headers: DefaultFixtures.authHeaders,
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  await caller.tastingDelete({
+    tasting: tasting.id,
   });
-
-  expect(response).toRespondWith(204);
 
   const [newTasting] = await db
     .select()
@@ -49,11 +45,10 @@ test("cannot delete others tasting", async () => {
   const user = await Fixtures.User();
   const tasting = await Fixtures.Tasting({ createdById: user.id });
 
-  const response = await app.inject({
-    method: "DELETE",
-    url: `/tastings/${tasting.id}`,
-    headers: DefaultFixtures.authHeaders,
-  });
-
-  expect(response).toRespondWith(403);
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.tastingDelete({
+      tasting: tasting.id,
+    }),
+  ).rejects.toThrowError(/FORBIDDEN/);
 });

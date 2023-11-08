@@ -1,17 +1,16 @@
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
+test("requires authentication", async () => {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.notificationDelete({
+      notification: 1,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("delete own notification", async () => {
@@ -26,13 +25,10 @@ test("delete own notification", async () => {
     })
     .returning();
 
-  const response = await app.inject({
-    method: "DELETE",
-    url: `/notifications/${notification.id}`,
-    headers: DefaultFixtures.authHeaders,
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  await caller.notificationDelete({
+    notification: notification.id,
   });
-
-  expect(response).toRespondWith(204);
 
   const [newNotification] = await db
     .select()
@@ -53,11 +49,10 @@ test("cannot delete others notification", async () => {
     })
     .returning();
 
-  const response = await app.inject({
-    method: "DELETE",
-    url: `/notifications/${notification.id}`,
-    headers: DefaultFixtures.authHeaders,
-  });
-
-  expect(response).toRespondWith(403);
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.notificationDelete({
+      notification: notification.id,
+    }),
+  ).rejects.toThrowError(/FORBIDDEN/);
 });

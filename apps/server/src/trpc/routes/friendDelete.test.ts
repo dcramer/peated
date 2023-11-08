@@ -1,40 +1,34 @@
 import { db } from "@peated/server/db";
 import { follows } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    await app.close();
-  };
+test("requires authentication", async () => {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.friendDelete({
+      user: 1,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("cannot unfriend self", async () => {
-  const response = await app.inject({
-    method: "DELETE",
-    url: `/friends/${DefaultFixtures.user.id}`,
-    headers: DefaultFixtures.authHeaders,
-  });
-
-  expect(response).toRespondWith(400);
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.friendDelete({
+      user: DefaultFixtures.user.id,
+    }),
+  ).rejects.toThrowError(/BAD_REQUEST/);
 });
 
 test("can unfriend new link", async () => {
   const otherUser = await Fixtures.User();
 
-  const response = await app.inject({
-    method: "DELETE",
-    url: `/friends/${otherUser.id}`,
-    headers: DefaultFixtures.authHeaders,
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.friendDelete({
+    user: DefaultFixtures.user.id,
   });
-
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.status).toBe("none");
 
   const [follow] = await db
@@ -57,14 +51,10 @@ test("can unfriend existing link", async () => {
     toUserId: otherUser.id,
   });
 
-  const response = await app.inject({
-    method: "DELETE",
-    url: `/friends/${otherUser.id}`,
-    headers: DefaultFixtures.authHeaders,
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.friendDelete({
+    user: otherUser.id,
   });
-
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.status).toBe("none");
 
   const [follow] = await db
