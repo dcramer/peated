@@ -11,7 +11,7 @@ import { authedProcedure } from "..";
 
 export default authedProcedure
   .input(
-    UserInputSchema.extend({
+    UserInputSchema.partial().extend({
       user: z.union([z.literal("me"), z.number(), z.string()]),
     }),
   )

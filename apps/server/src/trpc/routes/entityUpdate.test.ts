@@ -2,31 +2,25 @@ import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
+test("requires authentication", async () => {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.entityUpdate({
+      entity: 1,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("must be mod", async () => {
-  const entity = await Fixtures.Entity();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/entities/${entity.id}`,
-    payload: {
-      name: "Delicious Wood",
-    },
-    headers: await Fixtures.AuthenticatedHeaders(),
-  });
-
-  expect(response).toRespondWith(403);
+test("requires mod", async () => {
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.entityUpdate({
+      entity: 1,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("no changes", async () => {

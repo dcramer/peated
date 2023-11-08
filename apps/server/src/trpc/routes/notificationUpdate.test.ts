@@ -1,17 +1,16 @@
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
+test("requires authentication", async () => {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.notificationUpdate({
+      notification: 1,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("mark own notification as read", async () => {
@@ -26,17 +25,12 @@ test("mark own notification as read", async () => {
     })
     .returning();
 
-  const response = await app.inject({
-    method: "PUT",
-    url: `/notifications/${notification.id}`,
-    payload: {
-      read: true,
-    },
-    headers: DefaultFixtures.authHeaders,
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const data = await caller.notificationUpdate({
+    notification: notification.id,
+    read: true,
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.read).toBe(true);
 
   const [newNotification] = await db
@@ -58,14 +52,11 @@ test("cannot update others notification", async () => {
     })
     .returning();
 
-  const response = await app.inject({
-    method: "PUT",
-    url: `/notifications/${notification.id}`,
-    payload: {
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.notificationUpdate({
+      notification: notification.id,
       read: true,
-    },
-    headers: DefaultFixtures.authHeaders,
-  });
-
-  expect(response).toRespondWith(403);
+    }),
+  ).rejects.toThrowError(/FORBIDDEN/);
 });

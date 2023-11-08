@@ -2,46 +2,37 @@ import { db } from "@peated/server/db";
 import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
+test("requires authentication", async () => {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.bottleUpdate({
+      bottle: 1,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("must be mod", async () => {
-  const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/bottles/${bottle.id}`,
-    payload: {
-      name: "Delicious Wood",
-    },
-    headers: await Fixtures.AuthenticatedHeaders(),
-  });
-
-  expect(response).toRespondWith(403);
+test("requires mod", async () => {
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.bottleUpdate({
+      bottle: 1,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("no changes", async () => {
   const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/bottles/${bottle.id}`,
-    payload: {},
-    headers: await Fixtures.AuthenticatedHeaders({
-      mod: true,
-    }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [newBottle] = await db
@@ -55,17 +46,15 @@ test("no changes", async () => {
 test("edits a new bottle with new name param", async () => {
   const brand = await Fixtures.Entity();
   const bottle = await Fixtures.Bottle({ brandId: brand.id });
-  const response = await app.inject({
-    method: "PUT",
-    url: `/bottles/${bottle.id}`,
-    payload: {
-      name: "Delicious Wood",
-    },
-    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
+    name: "Delicious Wood",
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [bottle2] = await db
@@ -82,17 +71,15 @@ test("edits a new bottle with new name param", async () => {
 
 test("clears category", async () => {
   const bottle = await Fixtures.Bottle({ category: "single_malt" });
-  const response = await app.inject({
-    method: "PUT",
-    url: `/bottles/${bottle.id}`,
-    payload: {
-      category: null,
-    },
-    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
+    category: null,
   });
 
-  expect(response).toRespondWith(200);
-  const data = JSON.parse(response.payload);
   expect(data.id).toBeDefined();
 
   const [bottle2] = await db
@@ -106,32 +93,31 @@ test("clears category", async () => {
 
 test("requires age with matching name", async () => {
   const bottle = await Fixtures.Bottle({ statedAge: null });
-  const response = await app.inject({
-    method: "PUT",
-    url: `/bottles/${bottle.id}`,
-    payload: {
-      name: "Delicious 10-year-old",
-    },
-    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
-  });
 
-  expect(response).toRespondWith(400);
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  expect(() =>
+    caller.bottleUpdate({
+      bottle: bottle.id,
+      name: "Delicious 10-year-old",
+    }),
+  ).rejects.toThrowError(/BAD_REQUEST/);
 });
 
 test("manipulates name to conform with age", async () => {
   const brand = await Fixtures.Entity();
   const bottle = await Fixtures.Bottle({ brandId: brand.id });
-  const response = await app.inject({
-    method: "PUT",
-    url: `/bottles/${bottle.id}`,
-    payload: {
-      name: "Delicious 10",
-      statedAge: 10,
-    },
-    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
+    name: "Delicious 10",
+    statedAge: 10,
   });
 
-  expect(response).toRespondWith(200);
   const [bottle2] = await db
     .select()
     .from(bottles)
@@ -148,16 +134,15 @@ test("manipulates name to conform with age", async () => {
 test("changes brand", async () => {
   const newBrand = await Fixtures.Entity();
   const bottle = await Fixtures.Bottle();
-  const response = await app.inject({
-    method: "PUT",
-    url: `/bottles/${bottle.id}`,
-    payload: {
-      brand: newBrand.id,
-    },
-    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
+    brand: newBrand.id,
   });
 
-  expect(response).toRespondWith(200);
   const [bottle2] = await db
     .select()
     .from(bottles)
@@ -186,16 +171,15 @@ test("removes distiller", async () => {
   const bottle = await Fixtures.Bottle({
     distillerIds: [distillerA.id, distillerB.id],
   });
-  const response = await app.inject({
-    method: "PUT",
-    url: `/bottles/${bottle.id}`,
-    payload: {
-      distillers: [distillerA.id],
-    },
-    headers: await Fixtures.AuthenticatedHeaders({ mod: true }),
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
+    distillers: [distillerA.id],
   });
 
-  expect(response).toRespondWith(200);
   const results = await db
     .select({
       distillerId: bottlesToDistillers.distillerId,
