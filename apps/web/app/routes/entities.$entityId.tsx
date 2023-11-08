@@ -10,7 +10,6 @@ import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { ShareIcon } from "@heroicons/react/24/outline";
-import type { Entity } from "@peated/server/types";
 import EntityIcon from "~/components/assets/Entity";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
@@ -19,12 +18,14 @@ import Tabs from "~/components/tabs";
 import useAuth from "~/hooks/useAuth";
 import { summarize } from "~/lib/markdown";
 import { getEntityUrl } from "~/lib/urls";
-import { getEntity } from "~/queries/entities";
 
-export async function loader({ params, context }: LoaderFunctionArgs) {
+export async function loader({
+  params,
+  context: { trpc },
+}: LoaderFunctionArgs) {
   invariant(params.entityId);
 
-  const entity: Entity = await getEntity(context.api, params.entityId);
+  const entity = await trpc.entityById.query(parseInt(params.entityId, 10));
 
   return json({ entity });
 }

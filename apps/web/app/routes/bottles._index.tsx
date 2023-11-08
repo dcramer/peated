@@ -1,13 +1,13 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
+import type {
+  LoaderFunctionArgs} from "@remix-run/node";
 import {
   json,
-  type LoaderFunction,
   type MetaFunction,
   type SerializeFrom,
 } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
-
 import BottleTable from "~/components/bottleTable";
 import Button from "~/components/button";
 import EmptyActivity from "~/components/emptyActivity";
@@ -31,16 +31,19 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader: LoaderFunction = async ({ context, request }) => {
+export async function loader({
+  request,
+  context: { trpc },
+}: LoaderFunctionArgs) {
   const url = new URL(request.url);
 
   return json({
-    bottleList: await context.trpc.bottleList.query({
+    bottleList: await trpc.bottleList.query({
       ...Object.fromEntries(url.searchParams.entries()),
       page: parseInt(url.searchParams.get("page") || "1", 10),
     }),
   });
-};
+}
 
 export default function BottleList() {
   const { bottleList } = useLoaderData<typeof loader>();

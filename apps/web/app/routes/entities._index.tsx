@@ -1,9 +1,8 @@
-import type { LoaderFunction, SerializeFrom } from "@remix-run/node";
-import { json, type MetaFunction } from "@remix-run/node";
-import { useLoaderData, useLocation } from "@remix-run/react";
-
 import { ENTITY_TYPE_LIST, MAJOR_COUNTRIES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
+import type { LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
+import { json, type MetaFunction } from "@remix-run/node";
+import { useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
 import EmptyActivity from "~/components/emptyActivity";
 import EntityTable from "~/components/entityTable";
@@ -26,15 +25,18 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader: LoaderFunction = async ({ context, request }) => {
+export async function loader({
+  request,
+  context: { trpc },
+}: LoaderFunctionArgs) {
   const url = new URL(request.url);
   return json({
-    entityList: await context.trpc.entityList.query({
+    entityList: await trpc.entityList.query({
       ...Object.fromEntries(url.searchParams.entries()),
       page: parseInt(url.searchParams.get("page") || "1", 10),
     }),
   });
-};
+}
 
 export default function Entities() {
   const { entityList } = useLoaderData<typeof loader>();
