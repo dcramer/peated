@@ -26,7 +26,7 @@ export default authedProcedure
 
     if (tasting.createdById !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
-        message: "Cannot delete another persons tasting image",
+        message: "Cannot delete another person's tasting image",
         code: "FORBIDDEN",
       });
     }

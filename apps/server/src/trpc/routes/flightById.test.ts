@@ -11,5 +11,5 @@ test("get flight by id", async () => {
 
 test("errors on invalid flight", async () => {
   const caller = appRouter.createCaller({ user: null });
-  expect(() => caller.flightById(1)).rejects.toThrowError(/NOT_FOUND/);
+  expect(() => caller.flightById("123")).rejects.toThrowError(/NOT_FOUND/);
 });

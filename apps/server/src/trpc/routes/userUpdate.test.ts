@@ -13,7 +13,7 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("cannot update another user", async () => {
+test("cannot update another person", async () => {
   const user = await Fixtures.User();
   const otherUser = await Fixtures.User();
 

@@ -13,6 +13,15 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
+test("invalid notification", async () => {
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.notificationDelete({
+      notification: 1,
+    }),
+  ).rejects.toThrowError(/NOT_FOUND/);
+});
+
 test("delete own notification", async () => {
   const [notification] = await db
     .insert(notifications)
@@ -54,5 +63,5 @@ test("cannot delete others notification", async () => {
     caller.notificationDelete({
       notification: notification.id,
     }),
-  ).rejects.toThrowError(/FORBIDDEN/);
+  ).rejects.toThrowError(/Cannot delete another person's notification/);
 });

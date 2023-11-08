@@ -27,7 +27,7 @@ export default authedProcedure
 
     if (user.id !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
-        message: "Cannot update another user",
+        message: "Cannot update another person",
         code: "FORBIDDEN",
       });
     }

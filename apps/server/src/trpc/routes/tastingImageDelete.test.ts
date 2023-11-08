@@ -11,7 +11,7 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("cannot delete another users image", async () => {
+test("cannot delete another person's image", async () => {
   const user = await Fixtures.User();
   const otherUser = await Fixtures.User();
   const tasting = await Fixtures.Tasting({ createdById: otherUser.id });

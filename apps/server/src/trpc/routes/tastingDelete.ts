@@ -32,7 +32,7 @@ export default authedProcedure
 
     if (tasting.createdById !== ctx.user.id && !ctx.user.admin) {
       throw new TRPCError({
-        message: "Cannot delete another persons tasting",
+        message: "Cannot delete another person's tasting",
         code: "FORBIDDEN",
       });
     }
