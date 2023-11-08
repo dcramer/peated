@@ -1,15 +1,5 @@
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
-
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
-});
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
 test("lists tags", async () => {
   const bottle = await Fixtures.Bottle();
@@ -32,13 +22,11 @@ test("lists tags", async () => {
     rating: 5,
   });
 
-  const response = await app.inject({
-    method: "GET",
-    url: `/bottles/${bottle.id}/tags`,
+  const caller = appRouter.createCaller({ user: null });
+  const { results } = await caller.bottleTagList({
+    bottle: bottle.id,
   });
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results).toEqual([
     { tag: "caramel", count: 2 },
     { tag: "solvent", count: 1 },

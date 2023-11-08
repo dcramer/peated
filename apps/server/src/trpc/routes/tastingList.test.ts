@@ -1,27 +1,13 @@
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
-
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
-});
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
 test("lists tastings", async () => {
   await Fixtures.Tasting();
   await Fixtures.Tasting();
 
-  const response = await app.inject({
-    method: "GET",
-    url: "/tastings",
-  });
+  const caller = appRouter.createCaller({ user: null });
+  const { results } = await caller.tastingList();
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(2);
 });
 
@@ -30,16 +16,11 @@ test("lists tastings with bottle", async () => {
   const tasting = await Fixtures.Tasting({ bottleId: bottle.id });
   await Fixtures.Tasting();
 
-  const response = await app.inject({
-    method: "GET",
-    url: "/tastings",
-    query: {
-      bottle: `${bottle.id}`,
-    },
+  const caller = appRouter.createCaller({ user: null });
+  const { results } = await caller.tastingList({
+    bottle: bottle.id,
   });
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(tasting.id);
 });
@@ -50,16 +31,11 @@ test("lists tastings with user", async () => {
   });
   await Fixtures.Tasting();
 
-  const response = await app.inject({
-    method: "GET",
-    url: "/tastings",
-    query: {
-      user: `${DefaultFixtures.user.id}`,
-    },
+  const caller = appRouter.createCaller({ user: null });
+  const { results } = await caller.tastingList({
+    user: DefaultFixtures.user.id,
   });
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(tasting.id);
 });
@@ -68,15 +44,12 @@ test("lists tastings filter friends unauthenticated", async () => {
   await Fixtures.Tasting();
   await Fixtures.Tasting();
 
-  const response = await app.inject({
-    method: "GET",
-    url: "/tastings",
-    query: {
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.tastingList({
       filter: "friends",
-    },
-  });
-
-  expect(response).toRespondWith(401);
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("lists tastings filter friends", async () => {
@@ -91,17 +64,11 @@ test("lists tastings filter friends", async () => {
   });
   const lastTasting = await Fixtures.Tasting({ createdById: otherUser.id });
 
-  const response = await app.inject({
-    method: "GET",
-    url: "/tastings",
-    query: {
-      filter: "friends",
-    },
-    headers: DefaultFixtures.authHeaders,
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const { results } = await caller.tastingList({
+    filter: "friends",
   });
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(lastTasting.id);
 });
@@ -121,14 +88,9 @@ test("lists tastings hides private while authenticated", async () => {
   // should show tasting from friend
   const tasting = await Fixtures.Tasting({ createdById: friend.id });
 
-  const response = await app.inject({
-    method: "GET",
-    url: "/tastings",
-    headers: DefaultFixtures.authHeaders,
-  });
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const { results } = await caller.tastingList();
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(tasting.id);
 });
@@ -138,13 +100,10 @@ test("lists tastings hides private while anonymous", async () => {
   await Fixtures.Tasting({
     createdById: (await Fixtures.User({ private: true })).id,
   });
-  const response = await app.inject({
-    method: "GET",
-    url: "/tastings",
-  });
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
+  const caller = appRouter.createCaller({ user: null });
+  const { results } = await caller.tastingList();
+
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(tasting.id);
 });

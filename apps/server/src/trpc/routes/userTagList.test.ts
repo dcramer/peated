@@ -1,15 +1,5 @@
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import * as Fixtures from "../lib/test/fixtures";
-
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
-});
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
 test("lists tags", async () => {
   const bottle = await Fixtures.Bottle();
@@ -34,14 +24,11 @@ test("lists tags", async () => {
     rating: 5,
   });
 
-  const response = await app.inject({
-    method: "GET",
-    url: `/users/me/tags`,
-    headers: DefaultFixtures.authHeaders,
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const { results } = await caller.userTagList({
+    user: "me",
   });
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results).toEqual([
     { tag: "caramel", count: 2 },
     { tag: "solvent", count: 1 },
@@ -50,13 +37,13 @@ test("lists tags", async () => {
 
 test("cannot list private without friend", async () => {
   const otherUser = await Fixtures.User({ private: true });
-  const response = await app.inject({
-    method: "GET",
-    url: `/users/${otherUser.id}/tags`,
-    headers: DefaultFixtures.authHeaders,
-  });
 
-  expect(response).toRespondWith(400);
+  const caller = appRouter.createCaller({ user: null });
+  expect(() =>
+    caller.userTagList({
+      user: otherUser.id,
+    }),
+  ).rejects.toThrowError(/BAD_REQUEST/);
 });
 
 test("can list private with friend", async () => {
@@ -66,22 +53,22 @@ test("can list private with friend", async () => {
     toUserId: otherUser.id,
     status: "following",
   });
-  const response = await app.inject({
-    method: "GET",
-    url: `/users/${otherUser.id}/tags`,
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const { results } = await caller.userTagList({
+    user: otherUser.id,
   });
 
-  expect(response).toRespondWith(200);
+  expect(results.length).toEqual(0);
 });
 
 test("can list public without friend", async () => {
   const otherUser = await Fixtures.User({ private: false });
-  const response = await app.inject({
-    method: "GET",
-    url: `/users/${otherUser.id}/tags`,
-    headers: DefaultFixtures.authHeaders,
+
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const { results } = await caller.userTagList({
+    user: otherUser.id,
   });
 
-  expect(response).toRespondWith(200);
+  expect(results.length).toEqual(0);
 });

@@ -1,17 +1,7 @@
 import { db } from "@peated/server/db";
-import type { FastifyInstance } from "fastify";
-import buildFastify from "../app";
-import { createNotification } from "../lib/notifications";
-import * as Fixtures from "../lib/test/fixtures";
-
-let app: FastifyInstance;
-beforeAll(async () => {
-  app = await buildFastify();
-
-  return async () => {
-    app.close();
-  };
-});
+import { createNotification } from "../../lib/notifications";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
 
 test("lists notifications w/ toast", async () => {
   const tasting = await Fixtures.Tasting({
@@ -26,14 +16,9 @@ test("lists notifications w/ toast", async () => {
     createdAt: toast.createdAt,
   });
 
-  const response = await app.inject({
-    method: "GET",
-    url: "/notifications",
-    headers: DefaultFixtures.authHeaders,
-  });
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const { results } = await caller.notificationList();
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(notification.id);
   expect(results[0].type).toEqual("toast");
@@ -54,14 +39,9 @@ test("lists notifications w/ comment", async () => {
     createdAt: comment.createdAt,
   });
 
-  const response = await app.inject({
-    method: "GET",
-    url: "/notifications",
-    headers: DefaultFixtures.authHeaders,
-  });
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const { results } = await caller.notificationList();
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(notification.id);
   expect(results[0].type).toEqual("comment");
@@ -79,14 +59,9 @@ test("lists notifications w/ friend_request", async () => {
     createdAt: follow.createdAt,
   });
 
-  const response = await app.inject({
-    method: "GET",
-    url: "/notifications",
-    headers: DefaultFixtures.authHeaders,
-  });
+  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const { results } = await caller.notificationList();
 
-  expect(response).toRespondWith(200);
-  const { results } = JSON.parse(response.payload);
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(notification.id);
   expect(results[0].type).toEqual("friend_request");
