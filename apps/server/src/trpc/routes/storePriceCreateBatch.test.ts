@@ -10,7 +10,7 @@ test("requires admin", async () => {
     user: await Fixtures.User({ mod: true }),
   });
   expect(() =>
-    caller.storePricesCreate({ store: 1, prices: [] }),
+    caller.storePriceCreateBatch({ store: 1, prices: [] }),
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
@@ -25,7 +25,7 @@ test("processes new price", async () => {
   const caller = appRouter.createCaller({
     user: await Fixtures.User({ admin: true }),
   });
-  await caller.storePricesCreate({
+  await caller.storePriceCreateBatch({
     store: store.id,
     prices: [
       {
@@ -64,7 +64,7 @@ test("processes existing price", async () => {
   const caller = appRouter.createCaller({
     user: await Fixtures.User({ admin: true }),
   });
-  await caller.storePricesCreate({
+  await caller.storePriceCreateBatch({
     store: store.id,
     prices: [
       {
@@ -95,7 +95,7 @@ test("processes new price without bottle", async () => {
   const caller = appRouter.createCaller({
     user: await Fixtures.User({ admin: true }),
   });
-  await caller.storePricesCreate({
+  await caller.storePriceCreateBatch({
     store: store.id,
     prices: [
       {

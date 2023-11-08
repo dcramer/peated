@@ -23,10 +23,11 @@ test("lists tags", async () => {
   });
 
   const caller = appRouter.createCaller({ user: null });
-  const { results } = await caller.bottleTagList({
+  const { results, totalCount } = await caller.bottleTagList({
     bottle: bottle.id,
   });
 
+  expect(totalCount).toEqual(2);
   expect(results).toEqual([
     { tag: "caramel", count: 2 },
     { tag: "solvent", count: 1 },

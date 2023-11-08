@@ -27,7 +27,7 @@ test("can unfriend new link", async () => {
 
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
   const data = await caller.friendDelete({
-    user: DefaultFixtures.user.id,
+    user: otherUser.id,
   });
   expect(data.status).toBe("none");
 

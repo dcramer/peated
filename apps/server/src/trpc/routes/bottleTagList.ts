@@ -33,8 +33,8 @@ export default publicProcedure
 
     // TODO: denormalize this into (num)tastings or similar in the tags table
     const totalCount = (
-      await db.execute(
-        sql<{ count: number }>`SELECT COUNT(*) as count
+      await db.execute<{ count: string }>(
+        sql`SELECT COUNT(*) as count
         FROM ${tastings}
         WHERE ${tastings.bottleId} = ${bottle.id}
         AND array_length(${tastings.tags}, 1) > 0
@@ -43,7 +43,7 @@ export default publicProcedure
     ).rows[0].count;
 
     return {
-      results,
-      totalCount,
+      results: results.map(({ tag, count }) => ({ tag, count })),
+      totalCount: parseInt(totalCount, 10),
     };
   });

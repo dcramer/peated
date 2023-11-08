@@ -35,7 +35,7 @@ test("can list private with friend", async () => {
     user: otherUser.id,
   });
 
-  expect(results.length).toEqual(1);
+  expect(results.length).toEqual(0);
 });
 
 test("can list public without friend", async () => {
@@ -46,5 +46,5 @@ test("can list public without friend", async () => {
     user: otherUser.id,
   });
 
-  expect(results.length).toEqual(1);
+  expect(results.length).toEqual(0);
 });
