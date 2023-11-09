@@ -1,5 +1,4 @@
 import { useOutletContext } from "@remix-run/react";
-import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
 
 import type { Bottle } from "@peated/server/types";
@@ -8,15 +7,12 @@ import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
-import useApi from "~/hooks/useApi";
-import { fetchBottleTags } from "~/queries/bottles";
+import { trpc } from "~/lib/trpc";
 
 const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
-  const api = useApi();
-
-  const { data } = useQuery(["bottles", bottleId, "tags"], () =>
-    fetchBottleTags(api, bottleId),
-  );
+  const { data } = trpc.bottleTagList.useQuery({
+    bottle: bottleId,
+  });
 
   if (!data) return null;
 

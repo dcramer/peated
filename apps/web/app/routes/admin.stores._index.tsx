@@ -1,4 +1,4 @@
-import { json, type LoaderFunction } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import StoreTable from "~/components/admin/storeTable";
@@ -10,16 +10,19 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export const loader: LoaderFunction = async ({ request, context }) => {
+export async function loader({
+  request,
+  context: { trpc },
+}: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1", 10);
-  const storeList = await context.trpc.storeList.query({
+  const page = Number(url.searchParams.get("page") || 1);
+  const storeList = await trpc.storeList.query({
     page,
     sort: "name",
   });
 
   return json({ storeList });
-};
+}
 
 export default function AdminStores() {
   const { storeList } = useLoaderData<typeof loader>();

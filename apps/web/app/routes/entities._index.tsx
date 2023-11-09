@@ -33,7 +33,7 @@ export async function loader({
   return json({
     entityList: await trpc.entityList.query({
       ...Object.fromEntries(url.searchParams.entries()),
-      page: parseInt(url.searchParams.get("page") || "1", 10),
+      page: Number(url.searchParams.get("page") || 1),
     }),
   });
 }

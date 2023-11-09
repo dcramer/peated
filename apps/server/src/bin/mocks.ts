@@ -155,7 +155,7 @@ program
   .option(
     "--tastings <number>",
     "number of tastings",
-    (v: string) => parseInt(v, 10),
+    (v: string) => Number(v),
     5,
   )
   .action(async (email, options) => {

@@ -20,12 +20,12 @@ import { summarize } from "~/lib/markdown";
 import { getEntityUrl } from "~/lib/urls";
 
 export async function loader({
-  params,
+  params: { entityId },
   context: { trpc },
 }: LoaderFunctionArgs) {
-  invariant(params.entityId);
+  invariant(entityId);
 
-  const entity = await trpc.entityById.query(parseInt(params.entityId, 10));
+  const entity = await trpc.entityById.query(Number(entityId));
 
   return json({ entity });
 }

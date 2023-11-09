@@ -16,7 +16,7 @@ export default authedProcedure
   .input(
     CollectionBottleInputSchema.extend({
       collection: z.union([z.number(), z.literal("default")]),
-      user: z.number(),
+      user: z.union([z.literal("me"), z.number(), z.string()]),
     }),
   )
   .mutation(async function ({ input, ctx }) {

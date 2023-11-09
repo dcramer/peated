@@ -160,7 +160,7 @@ export default function AddTasting() {
           <RangeField
             {...register("rating", {
               valueAsNumber: true,
-              setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+              setValueAs: (v) => (v === "" ? undefined : Number(v)),
             })}
             error={errors.rating}
             label="Rating"

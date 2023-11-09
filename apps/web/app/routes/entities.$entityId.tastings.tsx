@@ -13,7 +13,7 @@ export async function loader({
 
   return json({
     tastingList: await trpc.tastingList.query({
-      entity: parseInt(entityId, 10),
+      entity: Number(entityId),
     }),
   });
 }

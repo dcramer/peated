@@ -1,11 +1,6 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
-import type {
-  LoaderFunctionArgs} from "@remix-run/node";
-import {
-  json,
-  type MetaFunction,
-  type SerializeFrom,
-} from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json, type MetaFunction, type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
 import BottleTable from "~/components/bottleTable";
@@ -40,7 +35,7 @@ export async function loader({
   return json({
     bottleList: await trpc.bottleList.query({
       ...Object.fromEntries(url.searchParams.entries()),
-      page: parseInt(url.searchParams.get("page") || "1", 10),
+      page: Number(url.searchParams.get("page") || 1),
     }),
   });
 }

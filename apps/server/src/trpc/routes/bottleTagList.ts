@@ -44,6 +44,6 @@ export default publicProcedure
 
     return {
       results: results.map(({ tag, count }) => ({ tag, count })),
-      totalCount: parseInt(totalCount, 10),
+      totalCount: Number(totalCount),
     };
   });

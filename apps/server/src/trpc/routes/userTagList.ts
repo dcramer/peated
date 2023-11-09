@@ -40,7 +40,7 @@ export default publicProcedure
     LIMIT 25`,
     );
 
-    const totalCount = parseInt(
+    const totalCount = Number(
       (
         await db.execute<{ count: string }>(
           sql<{ count: number }>`SELECT COUNT(*) as count
@@ -50,13 +50,12 @@ export default publicProcedure
       `,
         )
       ).rows[0].count,
-      10,
     );
 
     return {
       results: results.rows.map(({ tag, count }) => ({
         tag,
-        count: parseInt(count, 10),
+        count: Number(count),
       })),
       totalCount,
     };

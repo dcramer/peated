@@ -53,7 +53,7 @@ export default publicProcedure
     const results = shuffle(DEFAULT_TAGS)
       .map((t) => ({
         tag: t,
-        count: parseInt(usedTags[t] || "0", 10),
+        count: Number(usedTags[t] || 0),
       }))
       .sort((a, b) => b.count - a.count);
 

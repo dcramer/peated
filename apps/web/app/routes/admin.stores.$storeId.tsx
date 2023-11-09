@@ -1,4 +1,8 @@
-import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
+import {
+  json,
+  type LoaderFunctionArgs,
+  type MetaFunction,
+} from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
@@ -8,17 +12,20 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  invariant(params.storeId);
+export async function loader({
+  params: { storeId },
+  context: { trpc },
+}: LoaderFunctionArgs) {
+  invariant(storeId);
 
-  const store = await context.trpc.storeById.query(
-    parseInt(params.storeId as string, 10),
-  );
+  const store = await trpc.storeById.query(Number(storeId));
 
   return json({ store });
-};
+}
 
-export const meta: MetaFunction = ({ data }) => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data) return [];
+
   return [
     {
       title: data.store.name,

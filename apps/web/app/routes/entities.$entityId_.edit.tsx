@@ -171,7 +171,7 @@ export default function EditEntity() {
           />
           <TextField
             {...register("yearEstablished", {
-              setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
+              setValueAs: (v) => (v === "" || !v ? undefined : Number(v)),
             })}
             error={errors.yearEstablished}
             autoFocus

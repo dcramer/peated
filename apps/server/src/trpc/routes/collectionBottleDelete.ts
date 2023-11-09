@@ -11,7 +11,7 @@ export default authedProcedure
   .input(
     z.object({
       collection: z.union([z.number(), z.literal("default")]),
-      user: z.number(),
+      user: z.union([z.literal("me"), z.number(), z.string()]),
       bottle: z.number(),
     }),
   )

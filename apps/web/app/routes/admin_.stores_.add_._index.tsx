@@ -31,7 +31,10 @@ const STORE_TYPES = STORE_TYPE_LIST.map((t) => ({ id: t, name: t }));
 
 const resolver = zodResolver(StoreInputSchema);
 
-export const action: ActionFunction = async ({ context, request }) => {
+export const action: ActionFunction = async ({
+  context: { trpc },
+  request,
+}) => {
   const { errors, data } = await getValidatedFormData<FormSchemaType>(
     request,
     resolver,
@@ -41,7 +44,7 @@ export const action: ActionFunction = async ({ context, request }) => {
   }
 
   try {
-    await context.trpc.storeCreate.mutate(data);
+    await trpc.storeCreate.mutate(data);
   } catch (err) {
     if (err instanceof ApiError) {
       return json({ error: err.message });
