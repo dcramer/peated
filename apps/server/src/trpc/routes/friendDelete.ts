@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
+import type { FriendStatus } from "@peated/server/types";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -63,5 +64,7 @@ export default authedProcedure.input(z.number()).mutation(async function ({
 
   return {
     status: "none",
+  } satisfies {
+    status: FriendStatus;
   };
 });

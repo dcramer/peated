@@ -44,7 +44,11 @@ export default function NotificationEntry({
                 {notification.fromUser && (
                   <Link
                     to={`/users/${notification.fromUser.username}`}
-                    className="mr-1 font-semibold"
+                    className="mr-1 font-semibold hover:underline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/users/${notification.fromUser?.username}`);
+                    }}
                   >
                     {notification.fromUser.displayName}
                   </Link>
@@ -78,7 +82,7 @@ export default function NotificationEntry({
 const getLink = ({ notification }: { notification: Notification }) => {
   switch (notification.type) {
     case "friend_request":
-      return `/users/${notification.objectId}`;
+      return `/users/${notification.fromUser?.username}`;
     case "comment":
     case "toast":
       if (notification.ref) return `/tastings/${notification.ref.id}`;

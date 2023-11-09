@@ -1,14 +1,27 @@
 import { eq, inArray } from "drizzle-orm";
+import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Follow, Notification, User } from "../db/schema";
 import { comments, follows, tastings, toasts, users } from "../db/schema";
 import { logError } from "../lib/log";
+import { type NotificationSchema } from "../schemas";
 import { TastingSerializer } from "./tasting";
 import { UserSerializer } from "./user";
 
+type NotificationAttrs = {
+  fromUser: ReturnType<(typeof UserSerializer)["item"]> | null;
+  ref:
+    | ReturnType<(typeof TastingSerializer)["item"]>
+    | ReturnType<(typeof FriendRequestReceipientSerializer)["item"]>
+    | null;
+};
+
 export const NotificationSerializer = serializer({
-  attrs: async (itemList: Notification[], currentUser: User) => {
+  attrs: async (
+    itemList: Notification[],
+    currentUser: User,
+  ): Promise<Record<number, NotificationAttrs>> => {
     const fromUserIds = Array.from(
       new Set(
         itemList
@@ -112,9 +125,7 @@ export const NotificationSerializer = serializer({
         return [
           item.id,
           {
-            fromUser: item.fromUserId
-              ? fromUserById[item.fromUserId]
-              : undefined,
+            fromUser: item.fromUserId ? fromUserById[item.fromUserId] : null,
             ref: getRef(item) || null,
           },
         ];
@@ -122,12 +133,16 @@ export const NotificationSerializer = serializer({
     );
   },
 
-  item: (item: Notification, attrs: Record<string, any>, currentUser: User) => {
+  item: (
+    item: Notification,
+    attrs: NotificationAttrs,
+    currentUser: User,
+  ): z.infer<typeof NotificationSchema> => {
     return {
       id: item.id,
       type: item.type,
       objectId: item.objectId,
-      createdAt: item.createdAt,
+      createdAt: item.createdAt.toISOString(),
       fromUser: attrs.fromUser,
       ref: attrs.ref,
       read: item.read,
@@ -167,7 +182,7 @@ export const FriendRequestReceipientSerializer = serializer({
     return {
       id: attrs.user.id,
       status: item.status === "following" ? "friends" : item.status,
-      createdAt: item.createdAt,
+      createdAt: item.createdAt.toISOString(),
       user: attrs.user,
     };
   },

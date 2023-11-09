@@ -31,15 +31,15 @@ export default publicProcedure
 
     const [{ totalBottles, totalTastings }] = await db
       .select({
-        totalBottles: sql`COUNT(DISTINCT ${tastings.bottleId})`,
-        totalTastings: sql`COUNT(${tastings.bottleId})`,
+        totalBottles: sql<string>`COUNT(DISTINCT ${tastings.bottleId})`,
+        totalTastings: sql<string>`COUNT(${tastings.bottleId})`,
       })
       .from(tastings)
       .where(eq(tastings.createdById, user.id));
 
     const [{ collectedBottles }] = await db
       .select({
-        collectedBottles: sql`COUNT(DISTINCT ${collectionBottles.bottleId})`,
+        collectedBottles: sql<string>`COUNT(DISTINCT ${collectionBottles.bottleId})`,
       })
       .from(collections)
       .innerJoin(
@@ -50,7 +50,7 @@ export default publicProcedure
 
     const [{ totalContributions }] = await db
       .select({
-        totalContributions: sql`COUNT(${changes.createdById})`,
+        totalContributions: sql<string>`COUNT(${changes.createdById})`,
       })
       .from(changes)
       .where(eq(changes.createdById, user.id));

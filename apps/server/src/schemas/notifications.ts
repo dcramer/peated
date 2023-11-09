@@ -11,10 +11,10 @@ export const NotificationSchema = z.object({
   id: z.number(),
   objectId: z.number(),
   type: NotificationTypeEnum,
-  fromUser: UserSchema.optional(),
+  fromUser: UserSchema.nullable(),
   createdAt: z.string().datetime(),
   read: z.boolean(),
-  ref: z.any(),
+  ref: z.any().nullable(),
   // ref: z.union([TastingSchema, FriendSchema, z.null()]),
 });
 
