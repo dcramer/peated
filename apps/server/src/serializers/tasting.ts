@@ -1,15 +1,27 @@
 import { and, eq, inArray } from "drizzle-orm";
+import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { Tasting, User } from "../db/schema";
 import { bottles, tastings, toasts, users } from "../db/schema";
 import { notEmpty } from "../lib/filter";
+import { type TastingSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
 
+type TastingAttrs = {
+  hasToasted: boolean;
+  createdBy: ReturnType<(typeof UserSerializer)["item"]>;
+  bottle: ReturnType<(typeof BottleSerializer)["item"]>;
+  friends: ReturnType<(typeof UserSerializer)["item"]>[];
+};
+
 export const TastingSerializer = serializer({
-  attrs: async (itemList: Tasting[], currentUser?: User) => {
+  attrs: async (
+    itemList: Tasting[],
+    currentUser?: User,
+  ): Promise<Record<string, TastingAttrs>> => {
     const itemIds = itemList.map((t) => t.id);
     const results = await db
       .select({
@@ -78,8 +90,8 @@ export const TastingSerializer = serializer({
           item.id,
           {
             hasToasted: userToastsList.indexOf(item.id) !== -1,
-            createdBy: usersByRef[item.id] || null,
-            bottle: bottlesByRef[item.id] || null,
+            createdBy: usersByRef[item.id],
+            bottle: bottlesByRef[item.id],
             friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
           },
         ];
@@ -87,7 +99,11 @@ export const TastingSerializer = serializer({
     );
   },
 
-  item: (item: Tasting, attrs: Record<string, any>, currentUser?: User) => {
+  item: (
+    item: Tasting,
+    attrs: TastingAttrs,
+    currentUser?: User,
+  ): z.infer<typeof TastingSchema> => {
     return {
       id: item.id,
       imageUrl: item.imageUrl ? `${config.API_SERVER}${item.imageUrl}` : null,
@@ -97,7 +113,7 @@ export const TastingSerializer = serializer({
       servingStyle: item.servingStyle,
       friends: attrs.friends,
 
-      createdAt: item.createdAt,
+      createdAt: item.createdAt.toISOString(),
 
       comments: item.comments,
       toasts: item.toasts,

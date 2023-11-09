@@ -1,5 +1,7 @@
+import { type z } from "zod";
 import { serializer } from ".";
 import type { Entity, User } from "../db/schema";
+import { type EntitySchema } from "../schemas";
 
 export const EntitySerializer = serializer({
   item: (
@@ -8,7 +10,7 @@ export const EntitySerializer = serializer({
     },
     attrs: Record<string, any>,
     currentUser?: User,
-  ) => {
+  ): z.infer<typeof EntitySchema> => {
     return {
       id: item.id,
       name: item.name,
@@ -19,7 +21,7 @@ export const EntitySerializer = serializer({
       region: item.region,
       type: item.type,
       location: item.location ? JSON.parse(item.location).coordinates : null,
-      createdAt: item.createdAt,
+      createdAt: item.createdAt.toISOString(),
 
       totalTastings: item.totalTastings,
       totalBottles: item.totalBottles,

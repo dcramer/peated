@@ -1,4 +1,5 @@
 import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
+import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Bottle, User } from "../db/schema";
@@ -10,10 +11,22 @@ import {
   tastings,
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
+import { type BottleSchema } from "../schemas";
 import { EntitySerializer } from "./entity";
 
+type TastingAttrs = {
+  isFavorite: boolean;
+  hasTasted: boolean;
+  brand: ReturnType<(typeof EntitySerializer)["item"]>;
+  distillers: ReturnType<(typeof EntitySerializer)["item"]>[];
+  bottler: ReturnType<(typeof EntitySerializer)["item"]> | null;
+};
+
 export const BottleSerializer = serializer({
-  attrs: async (itemList: Bottle[], currentUser?: User) => {
+  attrs: async (
+    itemList: Bottle[],
+    currentUser?: User,
+  ): Promise<Record<number, TastingAttrs>> => {
     const itemIds = itemList.map((t) => t.id);
 
     const distillerList = await db
@@ -108,7 +121,11 @@ export const BottleSerializer = serializer({
     );
   },
 
-  item: (item: Bottle, attrs: Record<string, any>, currentUser?: User) => {
+  item: (
+    item: Bottle,
+    attrs: TastingAttrs,
+    currentUser?: User,
+  ): z.infer<typeof BottleSchema> => {
     return {
       id: item.id,
       name: item.name,

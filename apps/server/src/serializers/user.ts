@@ -1,12 +1,14 @@
 import { and, eq, inArray } from "drizzle-orm";
+import { type z } from "zod";
 import { serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { User } from "../db/schema";
 import { follows } from "../db/schema";
+import { type UserSchema } from "../schemas";
 
 export const UserSerializer = serializer({
-  attrs: async (itemList: User[], currentUser?: User) => {
+  attrs: async (itemList: User[], currentUser) => {
     const followsByRef = currentUser
       ? Object.fromEntries(
           (
@@ -37,7 +39,7 @@ export const UserSerializer = serializer({
       }),
     );
   },
-  item: (item: User, attrs: Record<string, any>, currentUser?: User) => {
+  item: (item: User, attrs, currentUser): z.infer<typeof UserSchema> => {
     const data = {
       id: item.id,
       displayName: item.displayName,
@@ -57,7 +59,7 @@ export const UserSerializer = serializer({
       return {
         ...data,
         email: item.email,
-        createdAt: item.createdAt,
+        createdAt: item.createdAt.toISOString(),
         admin: item.admin,
         mod: item.admin || item.mod,
       };
