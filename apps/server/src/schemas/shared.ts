@@ -13,6 +13,7 @@ export const ObjectTypeEnum = z.enum([
   "comment",
   "bottle",
   "entity",
+  "tasting",
 ]);
 
 export const CountryEnum = z.enum(COUNTRY_LIST);

@@ -30,11 +30,6 @@ import { toBlob } from "~/lib/blobs";
 import { logError } from "~/lib/log";
 import { trpc } from "~/lib/trpc";
 
-type Tag = {
-  tag: string;
-  count: number;
-};
-
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
 
 function formatServingStyle(style: ServingStyle) {

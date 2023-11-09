@@ -10,7 +10,7 @@ export const ChangeSchema = z.object({
   objectType: ObjectTypeEnum,
   displayName: z.string().nullable(),
   type: ChangeTypeEnum,
-  createdBy: UserSchema.optional(),
+  createdBy: UserSchema.nullable(),
   createdAt: z.string().datetime(),
   data: z.record(z.any()),
 });

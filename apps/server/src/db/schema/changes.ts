@@ -21,7 +21,7 @@ export const changes = pgTable("change", {
   objectType: objectTypeEnum("object_type").notNull(),
   type: changeTypeEnum("type").default("add").notNull(),
   displayName: text("display_name"),
-  data: jsonb("data").default({}).notNull(),
+  data: jsonb("data").default({}).notNull().$type<Record<string, any>>(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   createdById: bigint("created_by_id", { mode: "number" })

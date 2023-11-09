@@ -18,7 +18,7 @@ export default authedProcedure
       tasting: z.number(),
     }),
   )
-  .query(async function ({ input, ctx }) {
+  .mutation(async function ({ input, ctx }) {
     const tasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) => eq(tastings.id, input.tasting),
       with: {

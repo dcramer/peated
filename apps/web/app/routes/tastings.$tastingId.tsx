@@ -3,7 +3,6 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import invariant from "tiny-invariant";
@@ -17,9 +16,8 @@ import QueryBoundary from "~/components/queryBoundary";
 import TastingListItem from "~/components/tastingListItem";
 import TextArea from "~/components/textArea";
 import UserAvatar from "~/components/userAvatar";
-import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import { fetchComments } from "~/queries/comments";
+import { trpc } from "~/lib/trpc";
 
 export async function loader({
   params: { tastingId },
@@ -124,7 +122,7 @@ const CommentForm = ({
   user: User;
   onComment: (comment: Comment) => void;
 }) => {
-  const api = useApi();
+  const commentCreateMutation = trpc.commentCreate.useMutation();
 
   const [formData, setFormData] = useState({
     comment: "",
@@ -144,12 +142,11 @@ const CommentForm = ({
             if (saving) return;
             setSaving(true);
 
-            const newComment = await api.post(
-              `/tastings/${tastingId}/comments`,
-              {
-                data: { ...formData, createdAt: new Date().toISOString() },
-              },
-            );
+            const newComment = await commentCreateMutation.mutateAsync({
+              ...formData,
+              tasting: tastingId,
+              createdAt: new Date().toISOString(),
+            });
 
             onComment({
               ...newComment,
@@ -211,11 +208,14 @@ const CommentList = ({
   tastingId: number;
   newValues?: Comment[];
 }) => {
-  const api = useApi();
-
-  const { data } = useQuery(["comments", tastingId], () =>
-    fetchComments(api, tastingId),
-  );
+  const { data } = trpc.commentList.useQuery({
+    tasting: tastingId,
+  });
+  const commentDeleteMutation = trpc.commentDelete.useMutation({
+    onSuccess: (_data, input) => {
+      setDeleted((a) => [...a, input]);
+    },
+  });
 
   const [deleted, setDeleted] = useState<number[]>([]);
 
@@ -236,10 +236,7 @@ const CommentList = ({
             createdBy={c.createdBy}
             text={c.comment}
             canDelete={user?.admin || isAuthor}
-            onDelete={async () => {
-              await api.delete(`/comments/${c.id}`);
-              setDeleted((a) => [...a, c.id]);
-            }}
+            onDelete={() => commentDeleteMutation.mutate(c.id)}
           />
         );
       })}
