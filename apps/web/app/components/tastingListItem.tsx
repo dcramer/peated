@@ -9,9 +9,9 @@ import { Link } from "@remix-run/react";
 import { useState } from "react";
 
 import type { Tasting } from "@peated/server/types";
-import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import classNames from "~/lib/classNames";
+import { trpc } from "~/lib/trpc";
 import BottleCard from "./bottleCard";
 import Button from "./button";
 import { ImageModal } from "./imageModal";
@@ -35,9 +35,11 @@ export default function TastingListItem({
   hideNotes?: boolean;
   noCommentAction?: boolean;
 }) {
-  const api = useApi();
   const { bottle } = tasting;
   const { user } = useAuth();
+
+  const tastingDeleteMutation = trpc.tastingDelete.useMutation();
+  const toastCreateMutation = trpc.toastCreate.useMutation();
 
   const [imageOpen, setImageOpen] = useState(false);
 
@@ -104,7 +106,7 @@ export default function TastingListItem({
                 />
               }
               onClick={async () => {
-                await api.post(`/tastings/${tasting.id}/toasts`);
+                await toastCreateMutation.mutateAsync(tasting.id);
                 setHasToasted(true);
                 onToast && onToast(tasting);
               }}
@@ -164,7 +166,7 @@ export default function TastingListItem({
                     <Menu.Item
                       as="button"
                       onClick={async () => {
-                        await api.delete(`/tastings/${tasting.id}`);
+                        await tastingDeleteMutation.mutateAsync(tasting.id);
                         if (onDelete) onDelete(tasting);
                         else location.reload();
                       }}

@@ -1,7 +1,7 @@
 import type { Notification } from "@peated/server/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import useApi from "~/hooks/useApi";
+import { trpc } from "~/lib/trpc";
 import NotificationEntry from "./entry";
 
 export default function NotificationList({
@@ -12,14 +12,9 @@ export default function NotificationList({
   const [archiveList, setArchiveList] = useState<number[]>([]);
   const [readList, setReadList] = useState<number[]>([]);
 
-  const api = useApi();
-
   const queryClient = useQueryClient();
 
-  const deleteNotification = useMutation({
-    mutationFn: async (notification: Notification) => {
-      await api.delete(`/notifications/${notification.id}`);
-    },
+  const deleteNotification = trpc.notificationDelete.useMutation({
     onSuccess: () => {
       queryClient.invalidateQueries(["notifications", "count", "unread"]);
       queryClient.invalidateQueries(["notifications", "unread"]);
@@ -27,12 +22,7 @@ export default function NotificationList({
     },
   });
 
-  const markNotificationRead = useMutation({
-    mutationFn: async (notification: Notification) => {
-      await api.put(`/notifications/${notification.id}`, {
-        data: { read: true },
-      });
-    },
+  const updateNotification = trpc.notificationUpdate.useMutation({
     onSuccess: () => {
       queryClient.invalidateQueries(["notifications", "count", "unread"]);
       queryClient.invalidateQueries(["notifications", "unread"]);
@@ -54,11 +44,14 @@ export default function NotificationList({
                 read: readList.indexOf(n.id) !== -1 || n.read,
               }}
               onMarkRead={() => {
-                markNotificationRead.mutate(n);
+                updateNotification.mutate({
+                  notification: n.id,
+                  read: true,
+                });
                 setReadList((results) => [...results, n.id]);
               }}
               onArchive={() => {
-                deleteNotification.mutate(n);
+                deleteNotification.mutate(n.id);
                 setArchiveList((results) => [...results, n.id]);
               }}
             />
