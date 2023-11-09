@@ -20,7 +20,100 @@ import UserAvatar from "~/components/userAvatar";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { fetchComments } from "~/queries/comments";
-import { getTasting } from "~/queries/tastings";
+
+export async function loader({
+  params: { tastingId },
+  context: { trpc },
+}: LoaderFunctionArgs) {
+  invariant(tastingId);
+
+  return json({ tasting: await trpc.tastingById.query(Number(tastingId)) });
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data) return [];
+
+  const title = `${data.tasting.bottle.fullName} - Tasting Notes by ${data.tasting.createdBy.username}`;
+
+  const meta: Record<string, any>[] = [
+    {
+      title,
+    },
+    {
+      property: "og:title",
+      content: title,
+    },
+  ];
+
+  if (data.tasting.imageUrl) {
+    meta.push(
+      {
+        property: "og:image",
+        content: data.tasting.imageUrl,
+      },
+      {
+        property: "twitter:card",
+        content: "summary_large_image",
+      },
+    );
+  }
+
+  return meta;
+};
+
+export default function TastingDetails() {
+  const { tasting } = useLoaderData<typeof loader>();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const [newComments, setNewComments] = useState<Comment[]>([]);
+
+  return (
+    <Layout>
+      <QueryBoundary>
+        <ul className="mb-4">
+          <TastingListItem
+            tasting={tasting}
+            noCommentAction
+            hideNotes
+            onDelete={() => {
+              navigate("/");
+            }}
+          />
+        </ul>
+      </QueryBoundary>
+      {user ? (
+        <CommentForm
+          tastingId={tasting.id}
+          user={user}
+          onComment={(comment) => {
+            setNewComments((comments) => [...comments, comment]);
+          }}
+        />
+      ) : (
+        <EmbeddedLogin />
+      )}
+
+      <ul className="my-4 space-y-4 px-3 sm:px-2">
+        {!!tasting.notes && (
+          <CommentEntry
+            className="relative flex items-start space-x-2 text-white"
+            createdAt={tasting.createdAt}
+            createdBy={tasting.createdBy}
+            text={tasting.notes}
+          />
+        )}
+        <QueryBoundary>
+          <CommentList
+            user={user}
+            tastingId={tasting.id}
+            newValues={newComments}
+          />
+        </QueryBoundary>
+      </ul>
+    </Layout>
+  );
+}
 
 const CommentForm = ({
   tastingId,
@@ -153,96 +246,3 @@ const CommentList = ({
     </AnimatePresence>
   );
 };
-
-export async function loader({ params, context }: LoaderFunctionArgs) {
-  invariant(params.tastingId);
-
-  const tasting = await getTasting(context.api, params.tastingId);
-
-  return json({ tasting });
-}
-
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data) return [];
-
-  const title = `${data.tasting.bottle.fullName} - Tasting Notes by ${data.tasting.createdBy.username}`;
-
-  const meta: Record<string, any>[] = [
-    {
-      title,
-    },
-    {
-      property: "og:title",
-      content: title,
-    },
-  ];
-
-  if (data.tasting.imageUrl) {
-    meta.push(
-      {
-        property: "og:image",
-        content: data.tasting.imageUrl,
-      },
-      {
-        property: "twitter:card",
-        content: "summary_large_image",
-      },
-    );
-  }
-
-  return meta;
-};
-
-export default function TastingDetails() {
-  const { tasting } = useLoaderData<typeof loader>();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  const [newComments, setNewComments] = useState<Comment[]>([]);
-
-  return (
-    <Layout>
-      <QueryBoundary>
-        <ul className="mb-4">
-          <TastingListItem
-            tasting={tasting}
-            noCommentAction
-            hideNotes
-            onDelete={() => {
-              navigate("/");
-            }}
-          />
-        </ul>
-      </QueryBoundary>
-      {user ? (
-        <CommentForm
-          tastingId={tasting.id}
-          user={user}
-          onComment={(comment) => {
-            setNewComments((comments) => [...comments, comment]);
-          }}
-        />
-      ) : (
-        <EmbeddedLogin />
-      )}
-
-      <ul className="my-4 space-y-4 px-3 sm:px-2">
-        {!!tasting.notes && (
-          <CommentEntry
-            className="relative flex items-start space-x-2 text-white"
-            createdAt={tasting.createdAt}
-            createdBy={tasting.createdBy}
-            text={tasting.notes}
-          />
-        )}
-        <QueryBoundary>
-          <CommentList
-            user={user}
-            tastingId={tasting.id}
-            newValues={newComments}
-          />
-        </QueryBoundary>
-      </ul>
-    </Layout>
-  );
-}

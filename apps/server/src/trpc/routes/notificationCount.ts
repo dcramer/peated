@@ -8,16 +8,10 @@ import { authedProcedure } from "..";
 export default authedProcedure
   .input(
     z.object({
-      page: z.number(),
       filter: z.enum(["unread", "all"]),
     }),
   )
   .query(async function ({ input, ctx }) {
-    const page = input.page || 1;
-
-    const limit = 100;
-    const offset = (page - 1) * limit;
-
     const where: (SQL<unknown> | undefined)[] = [
       eq(notifications.userId, ctx.user.id),
     ];

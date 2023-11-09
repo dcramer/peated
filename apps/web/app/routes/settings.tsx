@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/server/schemas";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { getQueryKey } from "@trpc/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -21,6 +21,7 @@ import Header from "~/components/header";
 import ImageField from "~/components/imageField";
 import Layout from "~/components/layout";
 import TextField from "~/components/textField";
+import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { redirectToAuth } from "~/lib/auth.server";
 import { toBlob } from "~/lib/blobs";
@@ -60,21 +61,11 @@ export default function Settings() {
   const navigate = useNavigate();
   const { user } = useLoaderData<typeof loader>();
   const { setUser } = useAuth();
+  const api = useApi();
 
   const queryClient = useQueryClient();
   const userUpdateMutation = trpc.userUpdate.useMutation({
-    onSuccess: (newUser) => {
-      queryClient.invalidateQueries(
-        getQueryKey(trpc.userById, newUser.id, "query"),
-      );
-    },
-  });
-
-  const saveUser = useMutation({
-    mutationFn: async (data: FormSchemaType) => {
-      const newUser = await api.put("/users/me", {
-        data,
-      });
+    onSuccess: async (newUser) => {
       let newAvatar: any;
       if (picture) {
         const blob = await toBlob(picture, 0.8);
@@ -90,10 +81,11 @@ export default function Settings() {
         ...newUser,
         ...newAvatar,
       });
-      return newUser;
-    },
-    onSuccess: (newUser) => {
-      queryClient.invalidateQueries(["users", newUser.username]);
+
+      queryClient.invalidateQueries(
+        getQueryKey(trpc.userById, newUser.id, "query"),
+      );
+      queryClient.invalidateQueries(getQueryKey(trpc.userById, "me", "query"));
     },
   });
 
@@ -112,9 +104,12 @@ export default function Settings() {
   });
 
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    await saveUser.mutateAsync(data, {
-      onSuccess: (newUser) => navigate(`/users/${newUser.username}`),
-    });
+    await userUpdateMutation.mutateAsync(
+      { ...data, user: "me" },
+      {
+        onSuccess: (newUser) => navigate(`/users/${newUser.username}`),
+      },
+    );
   };
 
   return (
@@ -132,8 +127,8 @@ export default function Settings() {
       }
     >
       <Form onSubmit={handleSubmit(onSubmit)}>
-        {saveUser.isError && (
-          <FormError values={[(saveUser.error as Error).message]} />
+        {userUpdateMutation.isError && (
+          <FormError values={[(userUpdateMutation.error as Error).message]} />
         )}
 
         <Fieldset>
