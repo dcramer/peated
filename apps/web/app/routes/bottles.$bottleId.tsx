@@ -8,6 +8,8 @@ import type { Bottle } from "@peated/server/types";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
+import { useQueryClient } from "@tanstack/react-query";
+import { getQueryKey } from "@trpc/react-query";
 import invariant from "tiny-invariant";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
@@ -260,29 +262,31 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
       user: "me",
     },
     {
-      select: (data) => {
-        return data.results.length > 0;
-      },
+      select: (data) => data.results.length > 0,
     },
   );
 
-  // todo: bust cache
-  const favoriteBottleMutation = trpc.collectionBottleCreate.useMutation();
-  const unfavoriteBottleMutation = trpc.collectionBottleDelete.useMutation();
-
-  // const queryClient = useQueryClient();
-  // const collectBottle = useMutation({
-  //   mutationFn: async (collect: boolean) => {
-  //     if (!collect) {
-  //       return await unfavoriteBottle(api, bottle.id);
-  //     } else {
-  //       return await favoriteBottle(api, bottle.id);
-  //     }
-  //   },
-  //   onSuccess: (newData) => {
-  //     queryClient.setQueryData(["bottles", bottle.id, "isCollected"], newData);
-  //   },
-  // });
+  const queryClient = useQueryClient();
+  // TODO: this is inefficient, and we'd rather it just re-set the cache
+  const favoriteMutateOptions = {
+    onSuccess: () => {
+      const queryKey = getQueryKey(
+        trpc.collectionList,
+        {
+          bottle: bottle.id,
+          user: "me",
+        },
+        "query",
+      );
+      queryClient.invalidateQueries(queryKey);
+    },
+  };
+  const favoriteBottleMutation = trpc.collectionBottleCreate.useMutation(
+    favoriteMutateOptions,
+  );
+  const unfavoriteBottleMutation = trpc.collectionBottleDelete.useMutation(
+    favoriteMutateOptions,
+  );
 
   if (isCollected === undefined) return null;
 

@@ -1,15 +1,11 @@
-import { useLocation, useNavigate } from "@remix-run/react";
-import { useQueries } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import type { SitemapFunction } from "remix-sitemap";
-
 import { toTitleCase } from "@peated/server/lib/strings";
-
 import type { Entity } from "@peated/server/types";
 import { type LoaderFunction, type MetaFunction } from "@remix-run/node";
+import { useLocation, useNavigate } from "@remix-run/react";
+import { useEffect, useState } from "react";
+import type { SitemapFunction } from "remix-sitemap";
 import BottleForm from "~/components/bottleForm";
 import Spinner from "~/components/spinner";
-import useApi from "~/hooks/useApi";
 import { redirectToAuth } from "~/lib/auth.server";
 import { trpc } from "~/lib/trpc";
 
@@ -32,7 +28,6 @@ export const meta: MetaFunction = () => {
 };
 
 export default function AddBottle() {
-  const api = useApi();
   const navigate = useNavigate();
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
@@ -49,38 +44,22 @@ export default function AddBottle() {
     name,
   });
 
-  const queries = [];
   const queryOrder: string[] = [];
-  if (distiller) {
-    queryOrder.push("distiller");
-    queries.push({
-      queryKey: ["entity", distiller],
-      queryFn: async (): Promise<Entity> => {
-        return await api.get(`/entities/${distiller}`);
-      },
-    });
-  }
-  if (brand) {
-    queryOrder.push("brand");
-    queries.push({
-      queryKey: ["entity", brand],
-      queryFn: async (): Promise<Entity> => {
-        return await api.get(`/entities/${brand}`);
-      },
-    });
-  }
-  if (bottler) {
-    queryOrder.push("bottler");
-    queries.push({
-      queryKey: ["entity", bottler],
-      queryFn: async (): Promise<Entity> => {
-        return await api.get(`/entities/${bottler}`);
-      },
-    });
-  }
-
-  const initialQueries = useQueries({
-    queries: queries,
+  const initialQueries = trpc.useQueries((t) => {
+    const rv = [];
+    if (distiller) {
+      queryOrder.push("distiller");
+      rv.push(t.entityById(Number(distiller)));
+    }
+    if (brand) {
+      queryOrder.push("brand");
+      rv.push(t.entityById(Number(brand)));
+    }
+    if (bottler) {
+      queryOrder.push("bottler");
+      rv.push(t.entityById(Number(bottler)));
+    }
+    return rv;
   });
 
   const getQueryResult = (name: string): Entity | undefined => {

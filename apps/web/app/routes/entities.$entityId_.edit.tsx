@@ -1,8 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { LoaderFunction } from "@remix-run/node";
-import { json, type MetaFunction } from "@remix-run/node";
+import {
+  json,
+  type LoaderFunctionArgs,
+  type MetaFunction,
+} from "@remix-run/node";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
@@ -10,6 +13,7 @@ import type { z } from "zod";
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityInputSchema } from "@peated/server/schemas";
+import { getQueryKey } from "@trpc/react-query";
 import CountryField from "~/components/countryField";
 import Fieldset from "~/components/fieldset";
 import Form from "~/components/form";
@@ -20,8 +24,7 @@ import Layout from "~/components/layout";
 import SelectField from "~/components/selectField";
 import Spinner from "~/components/spinner";
 import TextField from "~/components/textField";
-import useApi from "~/hooks/useApi";
-import { getEntity } from "~/queries/entities";
+import { trpc } from "~/lib/trpc";
 
 const entityTypes = [
   { id: "brand", name: "Brand" },
@@ -39,29 +42,26 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader: LoaderFunction = async ({ params, context }) => {
-  invariant(params.entityId);
-  const entity = await getEntity(context.api, params.entityId);
+export async function loader({
+  params: { entityId },
+  context: { trpc },
+}: LoaderFunctionArgs) {
+  invariant(entityId);
+  const entity = await trpc.entityById.query(Number(entityId));
 
   return json({ entity });
-};
+}
 
 export default function EditEntity() {
-  const api = useApi();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { entity } = useLoaderData<typeof loader>();
   const { entityId } = useParams();
 
-  // TODO: move to queries
-  const saveEntity = useMutation({
-    mutationFn: async (data: FormSchemaType) => {
-      return await api.put(`/entities/${entityId}`, {
-        data,
-      });
-    },
+  const entityUpdateMutation = trpc.entityUpdate.useMutation({
     onSuccess: (newEntity) => {
-      queryClient.setQueryData(["entities", entityId], newEntity);
+      const queryKey = getQueryKey(trpc.entityById, entity.id, "query");
+      queryClient.setQueryData(queryKey, newEntity);
     },
   });
 
@@ -83,9 +83,15 @@ export default function EditEntity() {
   });
 
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    await saveEntity.mutateAsync(data, {
-      onSuccess: () => navigate(`/entities/${entityId}`),
-    });
+    await entityUpdateMutation.mutateAsync(
+      {
+        ...data,
+        entity: entity.id,
+      },
+      {
+        onSuccess: () => navigate(`/entities/${entityId}`),
+      },
+    );
   };
 
   return (

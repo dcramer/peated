@@ -1,17 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { SERVING_STYLE_LIST } from "@peated/server/constants";
+import { toTitleCase } from "@peated/server/lib/strings";
+import { TastingInputSchema } from "@peated/server/schemas";
+import type { ServingStyle } from "@peated/server/types";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
+import { TRPCClientError } from "@trpc/client";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
-
-import { SERVING_STYLE_LIST } from "@peated/server/constants";
-import { toTitleCase } from "@peated/server/lib/strings";
-import { TastingInputSchema } from "@peated/server/schemas";
-import type { Bottle, Paginated, ServingStyle } from "@peated/server/types";
 import BottleCard from "~/components/bottleCard";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
@@ -25,10 +25,10 @@ import SelectField from "~/components/selectField";
 import Spinner from "~/components/spinner";
 import TextAreaField from "~/components/textAreaField";
 import useApi from "~/hooks/useApi";
-import { ApiError } from "~/lib/api";
 import { redirectToAuth } from "~/lib/auth.server";
 import { toBlob } from "~/lib/blobs";
 import { logError } from "~/lib/log";
+import { trpc } from "~/lib/trpc";
 
 type Tag = {
   tag: string;
@@ -46,15 +46,19 @@ const servingStyleList = SERVING_STYLE_LIST.map((c) => ({
   name: formatServingStyle(c),
 }));
 
-export async function loader({ request, params, context }: LoaderFunctionArgs) {
-  if (!context.user) return redirectToAuth({ request });
+export async function loader({
+  request,
+  params: { bottleId },
+  context: { trpc, user },
+}: LoaderFunctionArgs) {
+  invariant(bottleId);
 
-  invariant(params.bottleId);
-  const bottle: Bottle = await context.api.get(`/bottles/${params.bottleId}`);
+  if (!user) return redirectToAuth({ request });
 
-  const suggestedTags: Paginated<Tag> = await context.api.get(
-    `/bottles/${params.bottleId}/suggestedTags`,
-  );
+  const bottle = await trpc.bottleById.query(Number(bottleId));
+  const suggestedTags = await trpc.bottleSuggestedTagList.query({
+    bottle: Number(bottleId),
+  });
 
   return json({ bottle, suggestedTags });
 }
@@ -68,7 +72,6 @@ export const meta: MetaFunction = () => {
 };
 
 export default function AddTasting() {
-  const api = useApi();
   const { bottle, suggestedTags } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
@@ -92,17 +95,18 @@ export default function AddTasting() {
     },
   });
 
+  const tastingCreateMutation = trpc.tastingCreate.useMutation();
+  const api = useApi();
+
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
     let tasting;
     try {
-      tasting = await api.post("/tastings", {
-        data: {
-          ...data,
-          createdAt,
-        },
+      tasting = await tastingCreateMutation.mutateAsync({
+        ...data,
+        createdAt,
       });
     } catch (err) {
-      if (err instanceof ApiError) {
+      if (err instanceof TRPCClientError) {
         setError(err.message);
       } else {
         logError(err);
@@ -110,9 +114,14 @@ export default function AddTasting() {
       }
     }
 
-    if (picture) {
+    if (!tasting) {
+      setError("Internal error");
+    }
+
+    if (picture && tasting) {
       const blob = await toBlob(picture);
       try {
+        // TODO: switch to fetch maybe?
         await api.post(`/tastings/${tasting.id}/image`, {
           data: {
             image: blob,

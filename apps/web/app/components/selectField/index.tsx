@@ -6,12 +6,7 @@ import Chip from "../chip";
 import FormField from "../formField";
 import { filterDupes } from "./helpers";
 import SelectDialog from "./selectDialog";
-import type {
-  CreateOptionForm,
-  EndpointOptions,
-  OnResults,
-  Option,
-} from "./types";
+import type { CreateOptionForm, OnQuery, OnResults, Option } from "./types";
 
 type BaseProps = {
   name?: string;
@@ -41,7 +36,7 @@ type MultiProps =
 
 type OptionProps = {
   // options are gathered either via dynamic query
-  endpoint?: EndpointOptions;
+  onQuery?: OnQuery;
   // coerce results to Options
   onResults?: OnResults;
   // or fixed value
@@ -75,7 +70,7 @@ export default ({
   canCreate,
   createForm,
   placeholder,
-  endpoint,
+  onQuery,
   onResults,
   options = [],
   onChange,
@@ -195,7 +190,7 @@ export default ({
         createForm={createForm}
         selectedValues={value}
         searchPlaceholder="Search"
-        endpoint={endpoint}
+        onQuery={onQuery}
         onResults={onResults}
         options={options}
       />

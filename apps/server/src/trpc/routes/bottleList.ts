@@ -126,8 +126,6 @@ export default publicProcedure
           rel: {
             nextPage: null,
             prevPage: null,
-            next: null,
-            prev: null,
           },
         };
       }

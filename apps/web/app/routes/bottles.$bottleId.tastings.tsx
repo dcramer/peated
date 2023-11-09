@@ -1,13 +1,10 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useParams } from "@remix-run/react";
-import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
+import { useLoaderData, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import EmptyActivity from "~/components/emptyActivity";
 import TastingList from "~/components/tastingList";
-import useApi from "~/hooks/useApi";
-import { fetchTastings } from "~/queries/tastings";
 
 import type { SitemapFunction } from "remix-sitemap";
 import config from "~/config";
@@ -43,27 +40,22 @@ export const sitemap: SitemapFunction = async ({
 
 export async function loader({
   params: { bottleId },
-  context,
+  context: { trpc },
 }: LoaderFunctionArgs) {
   invariant(bottleId);
 
-  const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(["bottle", bottleId, "tastings"], () =>
-    fetchTastings(context.api, { bottle: bottleId }),
-  );
+  const tastingList = await trpc.tastingList.query({
+    bottle: Number(bottleId),
+  });
 
-  return json({ dehydratedState: dehydrate(queryClient) });
+  return json({ tastingList });
 }
 
 export default function BottleActivity() {
-  const api = useApi();
-
   const { bottleId } = useParams<"bottleId">();
-  invariant(bottleId);
+  const { tastingList } = useLoaderData<typeof loader>();
 
-  const { data: tastingList } = useQuery(["bottle", bottleId, "tastings"], () =>
-    fetchTastings(api, { bottle: bottleId }),
-  );
+  invariant(bottleId);
 
   if (!tastingList) return null;
 

@@ -30,12 +30,12 @@ export async function loader({
   request,
   context: { trpc },
 }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
+  const { searchParams } = new URL(request.url);
 
   return json({
     bottleList: await trpc.bottleList.query({
-      ...Object.fromEntries(url.searchParams.entries()),
-      page: Number(url.searchParams.get("page") || 1),
+      ...Object.fromEntries(searchParams.entries()),
+      page: Number(searchParams.get("page") || 1),
     }),
   });
 }

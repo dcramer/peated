@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
+import { trpc } from "~/lib/trpc";
 import Button from "./button";
 import CountryField from "./countryField";
 import Fieldset from "./fieldset";
@@ -16,9 +17,13 @@ export default ({
 }: React.ComponentProps<typeof SelectField> & {
   createDialogHelpText?: string;
 }) => {
+  const trpcUtils = trpc.useUtils();
   return (
     <SelectField
-      endpoint="/entities"
+      onQuery={async (query) => {
+        const { results } = await trpcUtils.entityList.fetch({ query });
+        return results;
+      }}
       createForm={({ data, onFieldChange, onSubmit, onClose }) => {
         const {
           control,

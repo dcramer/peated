@@ -15,6 +15,7 @@ export const CollectionInputSchema = z.object({
 });
 
 export const CollectionBottleSchema = z.object({
+  id: z.number(),
   bottle: BottleSchema,
 });
 

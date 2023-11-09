@@ -30,11 +30,11 @@ export default publicProcedure
 
     // TODO: denormalize this into (num)tastings or similar in the tags table
     const results = (
-      await db.execute(
-        sql<{
-          count: number;
-          category: string | null;
-        }>`SELECT COUNT(*) as count, category
+      await db.execute<{
+        count: string;
+        category: string | null;
+      }>(
+        sql`SELECT COUNT(*) as count, category
               FROM ${bottles}
               WHERE ${bottles.brandId} = ${entity.id}
                  OR ${bottles.bottlerId} = ${entity.id}
@@ -44,7 +44,10 @@ export default publicProcedure
     ).rows;
 
     return {
-      results,
+      results: results.map(({ count, category }) => ({
+        count: Number(count),
+        category,
+      })),
       totalCount: entity.totalBottles,
     };
   });

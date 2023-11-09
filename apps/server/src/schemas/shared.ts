@@ -15,18 +15,4 @@ export const ObjectTypeEnum = z.enum([
   "entity",
 ]);
 
-export const PagingRelSchema = z.object({
-  nextPage: z.number().nullable(),
-  next: z.string().nullable(),
-
-  prevPage: z.number().nullable(),
-  prev: z.string().nullable(),
-});
-
-export const PaginatedSchema = z.object({
-  results: z.array(z.any()),
-
-  rel: PagingRelSchema.optional(),
-});
-
 export const CountryEnum = z.enum(COUNTRY_LIST);

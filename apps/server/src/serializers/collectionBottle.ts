@@ -1,6 +1,12 @@
+import { type z } from "zod";
 import { serialize, serializer } from ".";
 import type { Bottle, CollectionBottle, User } from "../db/schema";
+import { type CollectionBottleSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
+
+type CollectionBottleAttrs = {
+  bottle: ReturnType<(typeof BottleSerializer)["item"]>;
+};
 
 export const CollectionBottleSerializer = serializer({
   attrs: async (
@@ -8,7 +14,7 @@ export const CollectionBottleSerializer = serializer({
       bottle: Bottle;
     })[],
     currentUser?: User,
-  ) => {
+  ): Promise<Record<number, CollectionBottleAttrs>> => {
     const bottleList = itemList.map((i) => i.bottle);
     const bottlesById = Object.fromEntries(
       (await serialize(BottleSerializer, bottleList, currentUser)).map(
@@ -31,9 +37,9 @@ export const CollectionBottleSerializer = serializer({
     item: CollectionBottle & {
       bottle: Bottle;
     },
-    attrs: Record<string, any>,
+    attrs: CollectionBottleAttrs,
     currentUser?: User,
-  ) => {
+  ): z.infer<typeof CollectionBottleSchema> => {
     return {
       id: item.id,
       bottle: attrs.bottle,

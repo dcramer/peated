@@ -1,7 +1,6 @@
 import type { Entity } from "@peated/server/types";
 import type { LinksFunction } from "@remix-run/node";
 import { useOutletContext, useParams } from "@remix-run/react";
-import { useQuery } from "@tanstack/react-query";
 import { type LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
 import RobotImage from "~/assets/robot.png";
@@ -10,10 +9,9 @@ import { DistributionChart } from "~/components/distributionChart";
 import { Map } from "~/components/map.client";
 import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
-import useApi from "~/hooks/useApi";
 import { formatCategoryName } from "~/lib/strings";
+import { trpc } from "~/lib/trpc";
 import { parseDomain } from "~/lib/urls";
-import { fetchEntityCategories } from "~/queries/entities";
 
 export const links: LinksFunction = () => [
   {
@@ -91,11 +89,9 @@ export default function EntityDetailsOverview() {
 }
 
 const EntitySpiritDistribution = ({ entityId }: { entityId: number }) => {
-  const api = useApi();
-
-  const { data } = useQuery(["entities", entityId, "categories"], () =>
-    fetchEntityCategories(api, entityId),
-  );
+  const { data } = trpc.entityCategoryList.useQuery({
+    entity: entityId,
+  });
 
   if (!data) return null;
 
