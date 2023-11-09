@@ -1,33 +1,27 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-
-import Layout from "~/components/layout";
-import { redirectToAuth } from "~/lib/auth.server";
-
 import { json } from "@remix-run/node";
-import { Link } from "@remix-run/react";
-import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
-
+import { Link, useLoaderData } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
 import Button from "~/components/button";
 import EmptyActivity from "~/components/emptyActivity";
+import Layout from "~/components/layout";
 import ListItem from "~/components/listItem";
-import LoadingIndicator from "~/components/loadingIndicator";
 import SimpleHeader from "~/components/simpleHeader";
-import useApi from "~/hooks/useApi";
-import { fetchFlights } from "~/queries/flights";
-import { fetchFriends } from "~/queries/friends";
+import { redirectToAuth } from "~/lib/auth.server";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({ request, context }: LoaderFunctionArgs) {
-  if (!context.user) return redirectToAuth({ request });
+export async function loader({
+  request,
+  context: { user, trpc },
+}: LoaderFunctionArgs) {
+  if (!user) return redirectToAuth({ request });
 
-  const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(["friends"], () => fetchFriends(context.api));
-
-  return json({ dehydratedState: dehydrate(queryClient) });
+  return json({
+    flightList: await trpc.flightList.query(),
+  });
 }
 
 export const meta: MetaFunction = () => {
@@ -38,18 +32,12 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Friends() {
-  const api = useApi();
+export default function Flights() {
+  const { flightList } = useLoaderData<typeof loader>();
 
-  const { data, isLoading } = useQuery(["flights"], () => fetchFlights(api), {
-    staleTime: 5 * 60 * 1000,
-  });
+  if (!flightList) return <div>Error</div>;
 
-  if (isLoading) return <LoadingIndicator />;
-
-  if (!data) return <div>Error</div>;
-
-  const { results, rel } = data;
+  const { results, rel } = flightList;
 
   return (
     <Layout>

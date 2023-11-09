@@ -2,41 +2,8 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
-
 import EmptyActivity from "~/components/emptyActivity";
 import TastingList from "~/components/tastingList";
-
-import type { SitemapFunction } from "remix-sitemap";
-import config from "~/config";
-import { ApiClient } from "~/lib/api";
-import { fetchBottles } from "~/queries/bottles";
-
-export const sitemap: SitemapFunction = async ({
-  config: sitemapConfig,
-  request,
-}) => {
-  const api = new ApiClient({
-    server: config.API_SERVER,
-  });
-
-  let page: number | null = 1;
-  const output = [];
-  while (page) {
-    const { results, rel } = await fetchBottles(api, {
-      page,
-    });
-
-    output.push(
-      ...results.map((bottle) => ({
-        loc: `/bottles/${bottle.id}`,
-        lastmod: bottle.createdAt, // not correct
-      })),
-    );
-
-    page = rel?.nextPage || null;
-  }
-  return output;
-};
 
 export async function loader({
   params: { bottleId },

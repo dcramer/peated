@@ -1,32 +1,31 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, useLocation } from "@remix-run/react";
-import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
+import { Link, useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
 import NotificationList from "~/components/notifications/list";
 import Tabs from "~/components/tabs";
-import useApi from "~/hooks/useApi";
 import { redirectToAuth } from "~/lib/auth.server";
-import { fetchNotifications } from "~/queries/notifications";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
-  if (!context.user) return redirectToAuth({ request });
+export async function loader({
+  context: { trpc, user },
+  request,
+}: LoaderFunctionArgs) {
+  if (!user) return redirectToAuth({ request });
 
-  const location = new URL(request.url);
-  const filter = location.searchParams.get("filter") || "unread";
+  const { searchParams } = new URL(request.url);
 
-  const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(["notifications", filter], () =>
-    fetchNotifications(context.api, filter),
-  );
-
-  return json({ dehydratedState: dehydrate(queryClient) });
+  return json({
+    notificationList: await trpc.notificationList.query({
+      filter: "unread",
+      ...Object.fromEntries(searchParams.entries()),
+    }),
+  });
 }
 
 export const meta: MetaFunction = () => {
@@ -41,11 +40,7 @@ export default function Notifications() {
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const filter = qs.get("filter") || "unread";
-
-  const api = useApi();
-  const { data } = useQuery(["notifications", filter], () =>
-    fetchNotifications(api, filter),
-  );
+  const { notificationList } = useLoaderData<typeof loader>();
 
   return (
     <Layout>
@@ -71,8 +66,8 @@ export default function Notifications() {
         </Tabs.Item>
       </Tabs>
 
-      {data && data.results.length ? (
-        <NotificationList values={data.results} />
+      {notificationList && notificationList.results.length ? (
+        <NotificationList values={notificationList.results} />
       ) : (
         <EmptyActivity>You don't have any unread notifications.</EmptyActivity>
       )}

@@ -1,11 +1,10 @@
-import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
 import glyphUrl from "~/assets/glyph.png";
 import logo192Url from "~/assets/logo192.png";
 import config from "~/config";
 
-export const loader: LoaderFunction = async () => {
+export async function loader() {
   return json(
     {
       short_name: "Peated",
@@ -54,4 +53,4 @@ export const loader: LoaderFunction = async () => {
       },
     },
   );
-};
+}

@@ -1,4 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toTitleCase } from "@peated/server/lib/strings";
+import { EntityInputSchema } from "@peated/server/schemas";
 import {
   json,
   type LoaderFunctionArgs,
@@ -6,14 +8,11 @@ import {
 } from "@remix-run/node";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { useQueryClient } from "@tanstack/react-query";
+import { getQueryKey } from "@trpc/react-query";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
-
-import { toTitleCase } from "@peated/server/lib/strings";
-import { EntityInputSchema } from "@peated/server/schemas";
-import { getQueryKey } from "@trpc/react-query";
 import CountryField from "~/components/countryField";
 import Fieldset from "~/components/fieldset";
 import Form from "~/components/form";

@@ -1,13 +1,40 @@
+import type { Bottle } from "@peated/server/types";
 import { useOutletContext } from "@remix-run/react";
 import { Fragment } from "react";
-
-import type { Bottle } from "@peated/server/types";
+import { type SitemapFunction } from "remix-sitemap";
 import RobotImage from "~/assets/robot.png";
 import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
 import { trpc } from "~/lib/trpc";
+
+export const sitemap: SitemapFunction = async ({
+  config: sitemapConfig,
+  request,
+}) => {
+  const api = new ApiClient({
+    server: config.API_SERVER,
+  });
+
+  let page: number | null = 1;
+  const output = [];
+  while (page) {
+    const { results, rel } = await fetchBottles(api, {
+      page,
+    });
+
+    output.push(
+      ...results.map((bottle) => ({
+        loc: `/bottles/${bottle.id}`,
+        lastmod: bottle.createdAt, // not correct
+      })),
+    );
+
+    page = rel?.nextPage || null;
+  }
+  return output;
+};
 
 const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
   const { data } = trpc.bottleTagList.useQuery({

@@ -8,7 +8,6 @@ import { type SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
 import BottleTable from "~/components/bottleTable";
 import EmptyActivity from "~/components/emptyActivity";
-
 import Layout from "~/components/layout";
 import SimpleHeader from "~/components/simpleHeader";
 import useAuth from "~/hooks/useAuth";

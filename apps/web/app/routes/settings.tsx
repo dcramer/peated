@@ -3,10 +3,10 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/server/schemas";
-import type { User } from "@peated/server/types";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { getQueryKey } from "@trpc/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -21,9 +21,10 @@ import Header from "~/components/header";
 import ImageField from "~/components/imageField";
 import Layout from "~/components/layout";
 import TextField from "~/components/textField";
-import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
+import { redirectToAuth } from "~/lib/auth.server";
 import { toBlob } from "~/lib/blobs";
+import { trpc } from "~/lib/trpc";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 
@@ -31,20 +32,20 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
-  const user: User = await context.api.get("/users/me");
+export async function loader({
+  context: { user, trpc },
+  request,
+}: LoaderFunctionArgs) {
+  if (!user) return redirectToAuth({ request });
 
-  if (!user) {
-    if (!context.user) {
-      return redirect(
-        `/login?redirectTo=${encodeURIComponent(
-          new URL(request.url).pathname,
-        )}`,
-      );
-    }
+  const userDetails = await trpc.userById.query("me");
+  if (!userDetails) {
+    return redirect(
+      `/login?redirectTo=${encodeURIComponent(new URL(request.url).pathname)}`,
+    );
   }
 
-  return json({ user });
+  return json({ user: userDetails });
 }
 
 export const meta: MetaFunction = () => {
@@ -56,12 +57,19 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Settings() {
-  const api = useApi();
   const navigate = useNavigate();
   const { user } = useLoaderData<typeof loader>();
   const { setUser } = useAuth();
 
   const queryClient = useQueryClient();
+  const userUpdateMutation = trpc.userUpdate.useMutation({
+    onSuccess: (newUser) => {
+      queryClient.invalidateQueries(
+        getQueryKey(trpc.userById, newUser.id, "query"),
+      );
+    },
+  });
+
   const saveUser = useMutation({
     mutationFn: async (data: FormSchemaType) => {
       const newUser = await api.put("/users/me", {
@@ -97,7 +105,10 @@ export default function Settings() {
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(UserInputSchema),
-    defaultValues: user,
+    defaultValues: {
+      ...user,
+      displayName: user.displayName ?? user.username,
+    },
   });
 
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {

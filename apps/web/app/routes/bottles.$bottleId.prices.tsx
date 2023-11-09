@@ -1,7 +1,6 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-
 import BetaNotice from "~/components/betaNotice";
 import TimeSince from "~/components/timeSince";
 

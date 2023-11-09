@@ -1,9 +1,8 @@
+import type { Entity } from "@peated/server/types";
 import type { LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useLocation, useOutletContext } from "@remix-run/react";
 import invariant from "tiny-invariant";
-
-import type { Entity } from "@peated/server/types";
 import BottleTable from "~/components/bottleTable";
 import QueryBoundary from "~/components/queryBoundary";
 import type { ApiClient } from "~/lib/api";

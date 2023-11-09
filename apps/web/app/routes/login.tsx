@@ -8,7 +8,6 @@ import { json } from "@remix-run/node";
 import { Form, Link, useActionData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 import { type SitemapFunction } from "remix-sitemap";
-
 import Alert from "~/components/alert";
 import PeatedLogo from "~/components/assets/Logo";
 import Button from "~/components/button";

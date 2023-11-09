@@ -1,5 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { ShareIcon } from "@heroicons/react/24/outline";
 import type {
   LinksFunction,
   LoaderFunctionArgs,
@@ -8,8 +9,6 @@ import type {
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
-
-import { ShareIcon } from "@heroicons/react/24/outline";
 import EntityIcon from "~/components/assets/Entity";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
