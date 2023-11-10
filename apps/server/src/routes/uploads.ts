@@ -7,7 +7,7 @@ import { format } from "path";
 import { type Readable } from "stream";
 import config from "../config";
 
-const MAX_AGE = 60 * 60 ** 24;
+const MAX_AGE = 60 * 60 * 24;
 
 export default {
   method: "GET",
