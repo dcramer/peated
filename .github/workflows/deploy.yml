@@ -21,6 +21,7 @@ env:
   SENTRY_ORG: "peated"
   SENTRY_PROJECT: "peated"
   API_SERVER: https://api.peated.com
+  URL_PREFIX: https://peated.com
   FATHOM_SITE_ID: "OGNPFEUC"
 jobs:
   build:
@@ -106,6 +107,7 @@ jobs:
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER=${{ env.API_SERVER }}
+            URL_PREFIX=${{ env.URL_PREFIX }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_ORG=${{ env.SENTRY_ORG }}
@@ -126,6 +128,7 @@ jobs:
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER=${{ env.API_SERVER }}
+            URL_PREFIX=${{ env.URL_PREFIX }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_ORG=${{ env.SENTRY_ORG }}
@@ -148,6 +151,7 @@ jobs:
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER=${{ env.API_SERVER }}
+            URL_PREFIX=${{ env.URL_PREFIX }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_ORG=${{ env.SENTRY_ORG }}
@@ -170,6 +174,7 @@ jobs:
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER={{ env.API_SERVER }}
+            URL_PREFIX=${{ env.URL_PREFIX }}
             GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_ORG=${{ env.SENTRY_ORG }}

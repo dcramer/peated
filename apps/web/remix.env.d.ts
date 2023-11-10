@@ -28,6 +28,7 @@ interface Config {
   GOOGLE_CLIENT_ID?: string;
   DEBUG?: string;
   API_SERVER?: string;
+  FATHOM_SITE_ID?: string;
   SENTRY_DSN?: string;
   VERSION?: string;
   NODE_ENV: "development" | "production";
