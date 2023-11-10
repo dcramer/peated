@@ -153,9 +153,9 @@ export default async function ({ bottleId }: { bottleId: number }) {
       displayName: bottle.fullName,
       createdById: DEFAULT_CREATED_BY_ID,
       type: "update",
-      data: JSON.stringify({
+      data: {
         ...data,
-      }),
+      },
     });
   });
 }

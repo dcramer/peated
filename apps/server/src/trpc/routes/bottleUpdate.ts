@@ -258,10 +258,10 @@ export default modProcedure
         createdById: user.id,
         displayName: newBottle.fullName,
         type: "update",
-        data: JSON.stringify({
+        data: {
           ...bottleData,
           distillerIds: newDistillerIds,
-        }),
+        },
       });
 
       return newBottle;

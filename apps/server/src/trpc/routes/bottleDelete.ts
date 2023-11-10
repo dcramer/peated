@@ -47,10 +47,10 @@ export default adminProcedure.input(z.number()).mutation(async function ({
       createdById: ctx.user.id,
       displayName: bottle.fullName,
       type: "delete",
-      data: JSON.stringify({
+      data: {
         ...bottle,
         distillerIds,
-      }),
+      },
     });
 
     await tx

@@ -6,11 +6,7 @@ import { appRouter } from "../router";
 
 test("requires authentication", async () => {
   const caller = appRouter.createCaller({ user: null });
-  expect(() =>
-    caller.commentDelete({
-      comment: 1,
-    }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  expect(() => caller.commentDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("delete own", async () => {
@@ -19,9 +15,7 @@ test("delete own", async () => {
   });
 
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
-  await caller.commentDelete({
-    comment: comment.id,
-  });
+  await caller.commentDelete(comment.id);
 
   const [newComment] = await db
     .select()
@@ -37,9 +31,7 @@ test("cannot delete others", async () => {
   });
 
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
-  expect(() =>
-    caller.commentDelete({
-      comment: comment.id,
-    }),
-  ).rejects.toThrowError(/Cannot delete another user's comment/);
+  expect(() => caller.commentDelete(comment.id)).rejects.toThrowError(
+    /Cannot delete another user's comment/,
+  );
 });

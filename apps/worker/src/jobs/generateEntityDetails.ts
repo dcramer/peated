@@ -134,9 +134,9 @@ export default async ({ entityId }: { entityId: number }) => {
       displayName: entity.name,
       createdById: DEFAULT_CREATED_BY_ID,
       type: "update",
-      data: JSON.stringify({
+      data: {
         ...data,
-      }),
+      },
     });
   });
 };

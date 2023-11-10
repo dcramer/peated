@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
-import { entities } from "@peated/server/db/schema";
+import { changes, entities } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
 import { appRouter } from "../router";
 
@@ -63,6 +63,15 @@ test("can change name", async () => {
 
   expect(omit(entity, "name")).toEqual(omit(newEntity, "name"));
   expect(newEntity.name).toBe("Delicious Wood");
+
+  const [change] = await db
+    .select()
+    .from(changes)
+    .where(eq(changes.objectId, newEntity.id))
+    .orderBy(desc(changes.createdAt))
+    .limit(1);
+
+  expect(change.data).toEqual({ name: "Delicious Wood" });
 });
 
 test("can change country", async () => {

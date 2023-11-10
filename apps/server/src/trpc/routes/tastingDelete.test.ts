@@ -6,11 +6,7 @@ import { appRouter } from "../router";
 
 test("requires authentication", async () => {
   const caller = appRouter.createCaller({ user: null });
-  expect(() =>
-    caller.tastingDelete({
-      tasting: 1,
-    }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  expect(() => caller.tastingDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("delete own tasting", async () => {
@@ -20,9 +16,7 @@ test("delete own tasting", async () => {
   });
 
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
-  await caller.tastingDelete({
-    tasting: tasting.id,
-  });
+  await caller.tastingDelete(tasting.id);
 
   const [newTasting] = await db
     .select()
@@ -46,9 +40,7 @@ test("cannot delete others tasting", async () => {
   const tasting = await Fixtures.Tasting({ createdById: user.id });
 
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
-  expect(() =>
-    caller.tastingDelete({
-      tasting: tasting.id,
-    }),
-  ).rejects.toThrowError(/Cannot delete another user's tasting/);
+  expect(() => caller.tastingDelete(tasting.id)).rejects.toThrowError(
+    /Cannot delete another user's tasting/,
+  );
 });

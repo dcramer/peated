@@ -83,9 +83,9 @@ export default modProcedure
         displayName: newEntity.name,
         createdById: user.id,
         type: "update",
-        data: JSON.stringify({
+        data: {
           ...data,
-        }),
+        },
       });
 
       return newEntity;

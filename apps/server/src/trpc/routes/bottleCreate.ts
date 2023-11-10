@@ -133,10 +133,10 @@ export default authedProcedure
         createdById: user.id,
         displayName: bottle.fullName,
         type: "add",
-        data: JSON.stringify({
+        data: {
           ...bottle,
           distillerIds,
-        }),
+        },
       });
 
       await tx

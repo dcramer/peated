@@ -67,7 +67,7 @@ export const upsertEntity = async ({
       objectId: result.id,
       displayName: result.name,
       type: "add",
-      data: JSON.stringify(result),
+      data: result,
       createdById: userId,
       createdAt: result.createdAt,
     });

@@ -55,7 +55,7 @@ export default authedProcedure
         type: "add",
         createdAt: entity.createdAt,
         createdById: user.id,
-        data: JSON.stringify(data),
+        data: data,
       });
 
       return entity;

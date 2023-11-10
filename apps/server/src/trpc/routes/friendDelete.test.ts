@@ -6,19 +6,13 @@ import { appRouter } from "../router";
 
 test("requires authentication", async () => {
   const caller = appRouter.createCaller({ user: null });
-  expect(() =>
-    caller.friendDelete({
-      user: 1,
-    }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  expect(() => caller.friendDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("cannot unfriend self", async () => {
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
   expect(() =>
-    caller.friendDelete({
-      user: DefaultFixtures.user.id,
-    }),
+    caller.friendDelete(DefaultFixtures.user.id),
   ).rejects.toThrowError(/Cannot unfriend yourself/);
 });
 
@@ -26,9 +20,7 @@ test("can unfriend new link", async () => {
   const otherUser = await Fixtures.User();
 
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
-  const data = await caller.friendDelete({
-    user: otherUser.id,
-  });
+  const data = await caller.friendDelete(otherUser.id);
   expect(data.status).toBe("none");
 
   const [follow] = await db
@@ -52,9 +44,7 @@ test("can unfriend existing link", async () => {
   });
 
   const caller = appRouter.createCaller({ user: DefaultFixtures.user });
-  const data = await caller.friendDelete({
-    user: otherUser.id,
-  });
+  const data = await caller.friendDelete(otherUser.id);
   expect(data.status).toBe("none");
 
   const [follow] = await db
