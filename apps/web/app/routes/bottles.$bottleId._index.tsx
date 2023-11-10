@@ -7,20 +7,18 @@ import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
-import { trpc } from "~/lib/trpc";
+import { makeTRPCClient, trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = async ({
   config: sitemapConfig,
   request,
 }) => {
-  const api = new ApiClient({
-    server: config.API_SERVER,
-  });
+  const trpcClient = makeTRPCClient();
 
   let page: number | null = 1;
   const output = [];
   while (page) {
-    const { results, rel } = await fetchBottles(api, {
+    const { results, rel } = await trpcClient.bottleList.query({
       page,
     });
 

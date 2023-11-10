@@ -3,8 +3,6 @@ import { EntityMergeSchema } from "@peated/server/schemas";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { useQueryClient } from "@tanstack/react-query";
-import { getQueryKey } from "@trpc/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -43,21 +41,19 @@ export async function loader({
 
 export default function EditEntity() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { entity } = useLoaderData<typeof loader>();
+  const trpcUtils = trpc.useUtils();
 
   const [otherEntityName, setOtherEntityName] = useState<string>("Other");
 
   // TODO: move to queries
   const entityMergeMutation = trpc.entityMerge.useMutation({
     onSuccess: (newEntity) => {
-      queryClient.invalidateQueries(
-        getQueryKey(trpc.entityById, entity.id, "query"),
-      );
-      queryClient.setQueryData(
-        getQueryKey(trpc.entityById, newEntity.id, "query"),
-        newEntity,
-      );
+      const previous = trpcUtils.entityById.getData(newEntity.id);
+      trpcUtils.entityById.setData(newEntity.id, {
+        ...previous,
+        ...newEntity,
+      });
     },
   });
 

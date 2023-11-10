@@ -144,7 +144,6 @@ export default withSentry(function App() {
       links: [
         httpBatchLink({
           url: `${config.API_SERVER}/trpc`,
-          // You can pass any HTTP headers you wish here
           async headers() {
             return {
               authorization: accessToken ? `Bearer ${accessToken}` : "",

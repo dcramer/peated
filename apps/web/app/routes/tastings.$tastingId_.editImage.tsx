@@ -18,7 +18,6 @@ import invariant from "tiny-invariant";
 import { MAX_FILESIZE } from "@peated/server/constants";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getQueryKey } from "@trpc/react-query";
 import Fieldset from "~/components/fieldset";
 import Form from "~/components/form";
 import FormError from "~/components/formError";
@@ -32,7 +31,6 @@ import { ApiError } from "~/lib/api";
 import { redirectToAuth } from "~/lib/auth.server";
 import { toBlob } from "~/lib/blobs";
 import { logError } from "~/lib/log";
-import { trpc } from "~/lib/trpc";
 
 export async function action({ context, request, params }: ActionFunctionArgs) {
   invariant(params.tastingId);
@@ -119,11 +117,6 @@ export default function EditTastingImage() {
         }
       }
       return image;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(
-        getQueryKey(trpc.tastingById, tasting.id, "query"),
-      );
     },
   });
 

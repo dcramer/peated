@@ -5,24 +5,6 @@ import { useLoaderData, useLocation, useOutletContext } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import BottleTable from "~/components/bottleTable";
 import QueryBoundary from "~/components/queryBoundary";
-import type { ApiClient } from "~/lib/api";
-import { fetchBottles } from "~/queries/bottles";
-
-export function buildQuery(
-  api: ApiClient,
-  entityId: string,
-  queryParams: URLSearchParams,
-) {
-  return {
-    queryKey: ["entity", entityId, "bottles"],
-    queryFn: () =>
-      fetchBottles(api, {
-        ...Object.fromEntries(queryParams.entries()),
-        entity: entityId,
-      }),
-    cacheTime: 0,
-  };
-}
 
 export async function loader({
   request,

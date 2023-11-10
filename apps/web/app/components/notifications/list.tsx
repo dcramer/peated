@@ -1,5 +1,4 @@
 import type { Notification } from "@peated/server/types";
-import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { trpc } from "~/lib/trpc";
 import NotificationEntry from "./entry";
@@ -12,23 +11,8 @@ export default function NotificationList({
   const [archiveList, setArchiveList] = useState<number[]>([]);
   const [readList, setReadList] = useState<number[]>([]);
 
-  const queryClient = useQueryClient();
-
-  const deleteNotification = trpc.notificationDelete.useMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries(["notifications", "count", "unread"]);
-      queryClient.invalidateQueries(["notifications", "unread"]);
-      queryClient.invalidateQueries(["notifications", "all"]);
-    },
-  });
-
-  const updateNotification = trpc.notificationUpdate.useMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries(["notifications", "count", "unread"]);
-      queryClient.invalidateQueries(["notifications", "unread"]);
-      queryClient.invalidateQueries(["notifications", "all"]);
-    },
-  });
+  const deleteNotification = trpc.notificationDelete.useMutation();
+  const updateNotification = trpc.notificationUpdate.useMutation();
 
   const activeValues = values.filter((n) => archiveList.indexOf(n.id) === -1);
 

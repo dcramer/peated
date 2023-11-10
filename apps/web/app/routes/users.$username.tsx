@@ -3,8 +3,6 @@ import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useSubmit } from "@remix-run/react";
-import { useQueryClient } from "@tanstack/react-query";
-import { getQueryKey } from "@trpc/react-query";
 import invariant from "tiny-invariant";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
@@ -67,8 +65,7 @@ export default function Profile() {
   const { user: currentUser } = useAuth();
   const submit = useSubmit();
   const { user: initialUserData } = useLoaderData<typeof loader>();
-
-  const queryClient = useQueryClient();
+  const trpcUtils = trpc.useUtils();
 
   const { data: user } = trpc.userById.useQuery(initialUserData.id, {
     initialData: initialUserData,
@@ -76,41 +73,38 @@ export default function Profile() {
 
   const friendCreateMutation = trpc.friendCreate.useMutation({
     onSuccess: (data, toUserId) => {
-      queryClient.invalidateQueries(
-        getQueryKey(trpc.friendList, undefined, "query"),
-      );
-      const newUser = { ...user, friendStatus: data.status };
-      queryClient.setQueryData(
-        getQueryKey(trpc.userById, toUserId, "query"),
-        newUser,
-      );
+      const previous = trpcUtils.userById.getData(toUserId);
+      if (previous) {
+        trpcUtils.userById.setData(toUserId, {
+          ...previous,
+          friendStatus: data.status,
+        });
+      }
     },
   });
   const friendDeleteMutation = trpc.friendDelete.useMutation({
     onSuccess: (data, toUserId) => {
-      queryClient.invalidateQueries(
-        getQueryKey(trpc.friendList, undefined, "query"),
-      );
-      const newUser = { ...user, friendStatus: data.status };
-      queryClient.setQueryData(
-        getQueryKey(trpc.userById, toUserId, "query"),
-        newUser,
-      );
+      const previous = trpcUtils.userById.getData(toUserId);
+      if (previous) {
+        trpcUtils.userById.setData(toUserId, {
+          ...previous,
+          friendStatus: data.status,
+        });
+      }
     },
   });
   const userUpdateMutation = trpc.userUpdate.useMutation({
     onSuccess: (data, input) => {
-      const newUser = { ...user, ...data };
-      if (data.id === currentUser?.id) {
-        queryClient.setQueryData(
-          getQueryKey(trpc.userById, "me", "query"),
-          newUser,
-        );
+      const previous = trpcUtils.userById.getData(input.user);
+      if (previous) {
+        const newUser = {
+          ...previous,
+          ...data,
+        };
+        trpcUtils.userById.setData(input.user, newUser);
+        if (data.id === currentUser?.id)
+          trpcUtils.userById.setData("me", newUser);
       }
-      queryClient.setQueryData(
-        getQueryKey(trpc.userById, data.id, "query"),
-        newUser,
-      );
     },
   });
 

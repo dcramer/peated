@@ -9,7 +9,6 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { getQueryKey } from "@trpc/react-query";
 import invariant from "tiny-invariant";
 import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
@@ -267,26 +266,8 @@ const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
   );
 
   const queryClient = useQueryClient();
-  // TODO: this is inefficient, and we'd rather it just re-set the cache
-  const favoriteMutateOptions = {
-    onSuccess: () => {
-      const queryKey = getQueryKey(
-        trpc.collectionList,
-        {
-          bottle: bottle.id,
-          user: "me",
-        },
-        "query",
-      );
-      queryClient.invalidateQueries(queryKey);
-    },
-  };
-  const favoriteBottleMutation = trpc.collectionBottleCreate.useMutation(
-    favoriteMutateOptions,
-  );
-  const unfavoriteBottleMutation = trpc.collectionBottleDelete.useMutation(
-    favoriteMutateOptions,
-  );
+  const favoriteBottleMutation = trpc.collectionBottleCreate.useMutation();
+  const unfavoriteBottleMutation = trpc.collectionBottleDelete.useMutation();
 
   if (isCollected === undefined) return null;
 

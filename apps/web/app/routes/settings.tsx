@@ -5,8 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/server/schemas";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useQueryClient } from "@tanstack/react-query";
-import { getQueryKey } from "@trpc/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -63,7 +61,6 @@ export default function Settings() {
   const { setUser } = useAuth();
   const api = useApi();
 
-  const queryClient = useQueryClient();
   const userUpdateMutation = trpc.userUpdate.useMutation({
     onSuccess: async (newUser) => {
       let newAvatar: any;
@@ -81,11 +78,6 @@ export default function Settings() {
         ...newUser,
         ...newAvatar,
       });
-
-      queryClient.invalidateQueries(
-        getQueryKey(trpc.userById, newUser.id, "query"),
-      );
-      queryClient.invalidateQueries(getQueryKey(trpc.userById, "me", "query"));
     },
   });
 

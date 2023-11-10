@@ -3,8 +3,6 @@ import type { FriendStatus } from "@peated/server/types";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { useQueryClient } from "@tanstack/react-query";
-import { getQueryKey } from "@trpc/react-query";
 import { useState } from "react";
 import type { SitemapFunction } from "remix-sitemap";
 import Button from "~/components/button";
@@ -50,14 +48,8 @@ export default function Friends() {
     ),
   );
 
-  const queryClient = useQueryClient();
-
   const friendCreateMutation = trpc.friendCreate.useMutation({
     onSuccess: (status, toUserId) => {
-      queryClient.invalidateQueries(
-        getQueryKey(trpc.friendList, undefined, "query"),
-      );
-
       setFriendStatus((state) => ({
         ...state,
         [toUserId]: status,
@@ -66,10 +58,6 @@ export default function Friends() {
   });
   const friendDeleteMutation = trpc.friendDelete.useMutation({
     onSuccess: (status, toUserId) => {
-      queryClient.invalidateQueries(
-        getQueryKey(trpc.friendList, undefined, "query"),
-      );
-
       setFriendStatus((state) => ({
         ...state,
         [toUserId]: status,
