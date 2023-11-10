@@ -33,13 +33,13 @@ export default function NotificationEntry({
           : undefined
       }
     >
-      <div className="flex flex-1 items-start">
+      <div className="flex flex-auto items-start">
         <div className="flex-shrink-0 self-center">
           <UserAvatar user={notification.fromUser} size={32} />
         </div>
-        <div className="ml-3 flex w-0 flex-1 flex-col">
-          <div className="flex flex-1">
-            <div className="flex flex-1 flex-col justify-center">
+        <div className="ml-3 flex w-0 flex-auto flex-col">
+          <div className="flex flex-auto">
+            <div className="flex flex-auto flex-col justify-center">
               <div className="text-sm">
                 {notification.fromUser && (
                   <Link

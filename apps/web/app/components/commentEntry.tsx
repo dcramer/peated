@@ -38,9 +38,9 @@ export default function CommentEntry<
       <div className="h-10 w-10 py-2 sm:h-12 sm:w-12 ">
         <UserAvatar size={32} user={createdBy} />
       </div>
-      <div className="min-w-0 flex-1 rounded bg-slate-900 px-3 py-2">
+      <div className="min-w-0 flex-auto rounded bg-slate-900 px-3 py-2">
         <div className="flex flex-row">
-          <div className="flex-1">
+          <div className="flex-auto">
             <div className="text-sm">
               <Link
                 to={`/users/${createdBy.username}`}

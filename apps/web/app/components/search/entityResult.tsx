@@ -18,7 +18,7 @@ export default function EntityResultRow({
       <EntityIcon className="m-2 hidden h-10 w-auto sm:block" />
 
       <div className="flex min-w-0 flex-auto">
-        <div className="flex-1 font-semibold leading-6">
+        <div className="flex-auto font-semibold leading-6">
           <Link to={`/entities/${entity.id}`}>
             <span className="absolute inset-x-0 -top-px bottom-0" />
             {entity.name}

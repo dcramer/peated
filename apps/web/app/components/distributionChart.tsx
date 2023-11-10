@@ -42,14 +42,14 @@ export function DistributionChart({
   ].sort((a, b) => b.count - a.count);
 
   return (
-    <div className="relative flex flex-col space-y-1 text-xs font-bold">
+    <div className="relative flex flex-col space-y-1 truncate text-xs font-bold">
       {results.map((item, index) => {
         const pct = (item.count / totalCount) * 100;
         const itemTo = to && to(item);
         return itemTo ? (
           <Link
             key={item.name}
-            className={`${colorNames[index]} flex h-6 items-center justify-end rounded-r`}
+            className={`${colorNames[index]} flex h-6 items-center justify-end sm:rounded-r`}
             style={{ width: `${pct}%` }}
             to={itemTo}
           >
@@ -58,7 +58,7 @@ export function DistributionChart({
         ) : (
           <div
             key={item.name}
-            className={`${colorNames[index]} flex h-6 items-center justify-end rounded-r`}
+            className={`${colorNames[index]} flex h-6 items-center justify-end sm:rounded-r`}
             style={{ width: `${pct}%` }}
           >
             <span className="truncate px-2">{item.name}</span>

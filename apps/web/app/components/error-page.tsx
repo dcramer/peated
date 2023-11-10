@@ -36,7 +36,7 @@ export default function ErrorPage() {
 
   return (
     <main className="mx-auto flex h-screen max-w-xl items-center justify-center p-4 lg:p-8">
-      <div className="flex-1">
+      <div className="flex-auto">
         <main className="self-justify-center inline self-center p-3">
           <div className="text-center">
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">

@@ -17,7 +17,7 @@ export default forwardRef<HTMLInputElement, Props>(function TextInput(
       <div className={`flex ${baseStyles}`}>
         <input
           className={classNames(
-            "block flex-1 border-0 bg-transparent p-0",
+            "block flex-auto border-0 bg-transparent p-0",
             inputStyles,
             className || "",
           )}

@@ -133,7 +133,7 @@ const CommentForm = ({
       <div className="h-8 w-8 flex-shrink-0">
         <UserAvatar size={32} user={user} />
       </div>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-auto">
         <form
           className="relative"
           onSubmit={async (e) => {

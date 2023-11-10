@@ -79,7 +79,7 @@ export default function ImageEditorModal({
             </Footer>
           }
         >
-          <div className=" flex flex-1 items-center justify-center">
+          <div className=" flex flex-auto items-center justify-center">
             <AvatarEditor
               ref={ref}
               image={image}

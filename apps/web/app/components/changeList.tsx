@@ -105,7 +105,7 @@ export default ({ values, rel }: { values: Change[]; rel?: PagingRel }) => {
           className="flex items-center justify-between py-3"
           aria-label="Pagination"
         >
-          <div className="flex flex-1 justify-between gap-x-2 sm:justify-end">
+          <div className="flex flex-auto justify-between gap-x-2 sm:justify-end">
             <Button
               to={rel.prevPage ? `?page=${rel.prevPage}` : undefined}
               disabled={!rel.prevPage}

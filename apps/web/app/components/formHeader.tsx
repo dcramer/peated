@@ -38,7 +38,7 @@ export default function FormHeader({
         </button>
       </div>
       <div
-        className={`flex flex-1 flex-row justify-center gap-x-2 ${blockStyles}`}
+        className={`flex flex-auto flex-row justify-center gap-x-2 ${blockStyles}`}
       >
         <h1 className="text-lg">{title}</h1>
         {subtitle && (

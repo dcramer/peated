@@ -12,7 +12,7 @@ export default function Footer({
     <footer
       className={classNames(
         "h-24 flex-shrink-0 overflow-hidden text-white",
-        mobileOnly ? "block sm:hidden" : "",
+        mobileOnly ? "block lg:hidden" : "",
       )}
     >
       <div className="fixed bottom-0 left-0 right-0 z-10 border-t border-t-slate-700 bg-slate-950 pb-2 sm:pb-0">

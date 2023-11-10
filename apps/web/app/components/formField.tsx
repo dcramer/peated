@@ -52,7 +52,7 @@ export default ({
           htmlFor={htmlFor}
           required={required}
           labelNote={labelNote}
-          className="flex flex-1 cursor-pointer items-center"
+          className="flex flex-auto cursor-pointer items-center"
         >
           {label}
           {labelAction && (

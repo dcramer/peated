@@ -39,7 +39,7 @@ export default function SearchHeader({
         </button>
       </div>
       <form
-        className={`flex-1`}
+        className={`flex-auto`}
         onSubmit={(e) => {
           e.preventDefault();
 

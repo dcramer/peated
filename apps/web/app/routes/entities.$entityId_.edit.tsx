@@ -114,8 +114,8 @@ export default function EditEntity() {
       )}
 
       <Form onSubmit={handleSubmit(onSubmit)}>
-        {saveEntity.isError && (
-          <FormError values={[(saveEntity.error as Error).message]} />
+        {entityUpdateMutation.isError && (
+          <FormError values={[(entityUpdateMutation.error as Error).message]} />
         )}
 
         <Fieldset>

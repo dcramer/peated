@@ -18,7 +18,7 @@ type Props = {
 export default ({ data, ...props }: Props) => {
   return (
     <div {...props}>
-      <div className="inline-flex flex-col items-center space-x-1 sm:flex-row sm:items-start">
+      <div className="inline-flex flex-col items-center space-x-1 truncate sm:flex-row sm:items-start">
         <Brand data={data} />
         {!!data.distillers?.length && (
           <span className="hidden sm:inline-block">&middot;</span>
@@ -33,8 +33,8 @@ const Brand = ({ data: { brand } }: Props) => {
   const brandName = brand?.name || "Unknown";
 
   return (
-    <div className="inline-block space-x-1">
-      <Link to={`/entities/${brand.id}`} className="hover:underline">
+    <div className="max-w-[200px] space-x-1 truncate">
+      <Link to={`/entities/${brand.id}`} className="hover:underline ">
         {brandName}
       </Link>
     </div>
@@ -56,12 +56,12 @@ const Distillers = ({ data: { distillers } }: Props) => {
 
   const d = distillers[0];
   return (
-    <div className="inline-block space-x-1">
+    <div className="space-x-1">
       <span>Distilled at</span>
       <Link
         key={d.id}
         to={`/entities/${d.id}`}
-        className="inline-block align-bottom hover:underline"
+        className="inline-block max-w-[200px] truncate align-bottom hover:underline"
       >
         {d.name}
       </Link>

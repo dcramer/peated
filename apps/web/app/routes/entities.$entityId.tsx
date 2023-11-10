@@ -9,7 +9,6 @@ import type {
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import EntityIcon from "~/components/assets/Entity";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
 import Layout from "~/components/layout";
@@ -75,105 +74,112 @@ export default function EntityDetails() {
 
   return (
     <Layout>
-      <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
-        <EntityIcon className="hidden h-14 w-auto sm:inline-block" />
-
-        <div className="w-full flex-1 flex-col items-center space-y-1 sm:w-auto sm:items-start">
-          <h1 className="mb-2 truncate text-center text-3xl font-semibold leading-7 sm:text-left">
-            {entity.name}
-          </h1>
-          <div className="truncate text-center text-slate-500 sm:text-left">
-            {!!entity.country && (
-              <>
-                Located in{" "}
-                <Link
-                  to={`/entities?country=${encodeURIComponent(entity.country)}`}
-                  className="hover:underline"
-                >
-                  {entity.country}
-                </Link>
-              </>
-            )}
-            {!!entity.region && (
-              <span>
-                {" "}
-                &middot;{" "}
-                <Link
-                  to={`/entities?region=${encodeURIComponent(entity.region)}`}
-                  className="hover:underline"
-                >
-                  {entity.region}
-                </Link>
-              </span>
-            )}
+      <div className="w-full p-3 lg:py-0">
+        <div className="my-4 flex w-full flex-wrap justify-center gap-x-3 gap-y-4 lg:flex-nowrap lg:justify-start">
+          <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
+            <h1
+              className="max-w-full truncate text-center text-3xl font-semibold lg:mx-0 lg:text-left"
+              title={entity.name}
+            >
+              {entity.name}
+            </h1>
+            <div className="max-w-full text-center text-slate-500 lg:text-left">
+              {!!entity.country && (
+                <>
+                  Located in{" "}
+                  <Link
+                    to={`/entities?country=${encodeURIComponent(
+                      entity.country,
+                    )}`}
+                    className="truncate hover:underline"
+                  >
+                    {entity.country}
+                  </Link>
+                </>
+              )}
+              {!!entity.region && (
+                <span>
+                  {" "}
+                  &middot;{" "}
+                  <Link
+                    to={`/entities?region=${encodeURIComponent(entity.region)}`}
+                    className="truncate hover:underline"
+                  >
+                    {entity.region}
+                  </Link>
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="lg:justify-left mb-4 flex w-full justify-center space-x-2 lg:min-w-[200px]">
+            {entity.type.sort().map((t) => (
+              <Chip
+                key={t}
+                size="small"
+                color="highlight"
+                as={Link}
+                to={`/entities?type=${encodeURIComponent(t)}`}
+              >
+                {t}
+              </Chip>
+            ))}
           </div>
         </div>
-        <div className="sm:justify-left mb-4 flex w-full justify-center space-x-2 sm:w-auto">
-          {entity.type.sort().map((t) => (
-            <Chip
-              key={t}
-              size="small"
-              color="highlight"
-              as={Link}
-              to={`/entities?type=${encodeURIComponent(t)}`}
-            >
-              {t}
-            </Chip>
-          ))}
-        </div>
-      </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="flex-1">
-          <div className="my-8 flex justify-center gap-4 sm:justify-start">
-            <Button
-              to={`/addBottle?${
-                entity.type.indexOf("brand") !== -1 ? `brand=${entity.id}&` : ""
-              }${
-                entity.type.indexOf("distiller") !== -1
-                  ? `distiller=${entity.id}&`
-                  : ""
-              }${
-                entity.type.indexOf("bottler") !== -1
-                  ? `bottler=${entity.id}&`
-                  : ""
-              }`}
-              color="primary"
-            >
-              Add a Bottle
-            </Button>
+        <div className="flex flex-col gap-4 lg:flex-row">
+          <div className="flex-auto">
+            <div className="my-8 flex justify-center gap-4 lg:justify-start">
+              <Button
+                to={`/addBottle?${
+                  entity.type.indexOf("brand") !== -1
+                    ? `brand=${entity.id}&`
+                    : ""
+                }${
+                  entity.type.indexOf("distiller") !== -1
+                    ? `distiller=${entity.id}&`
+                    : ""
+                }${
+                  entity.type.indexOf("bottler") !== -1
+                    ? `bottler=${entity.id}&`
+                    : ""
+                }`}
+                color="primary"
+              >
+                Add a Bottle
+              </Button>
 
-            <Button
-              icon={
-                <ShareIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-              }
-              onClick={() => {
-                if (navigator.share) {
-                  navigator
-                    .share({
-                      title: entity.name,
-                      url: `/entities/${entity.id}`,
-                    })
-                    .catch((error) => console.error("Error sharing", error));
+              <Button
+                icon={
+                  <ShareIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                 }
-              }}
-            />
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator
+                      .share({
+                        title: entity.name,
+                        url: `/entities/${entity.id}`,
+                      })
+                      .catch((error) => console.error("Error sharing", error));
+                  }
+                }}
+              />
 
-            {user?.mod && (
-              <Menu as="div" className="menu">
-                <Menu.Button as={Button}>
-                  <EllipsisVerticalIcon className="h-5 w-5" />
-                </Menu.Button>
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right lg:left-0 lg:origin-top-left">
-                  <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
-                    Edit Entity
-                  </Menu.Item>
-                  <Menu.Item as={Link} to={`/entities/${entity.id}/merge`}>
-                    Merge Entity
-                  </Menu.Item>
-                </Menu.Items>
-              </Menu>
-            )}
+              {user?.mod && (
+                <Menu as="div" className="menu">
+                  <Menu.Button as={Button}>
+                    <EllipsisVerticalIcon className="h-5 w-5" />
+                  </Menu.Button>
+                  <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right lg:left-0 lg:origin-top-left">
+                    <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
+                      Edit Entity
+                    </Menu.Item>
+                    <Menu.Item as={Link} to={`/entities/${entity.id}/merge`}>
+                      Merge Entity
+                    </Menu.Item>
+                  </Menu.Items>
+                </Menu>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -48,8 +48,8 @@ export default function Activity() {
 
   return (
     <Layout>
-      <div className="flex">
-        <div className="max-w-[100vw] flex-1">
+      <div className="flex w-full">
+        <div className="flex-1 overflow-hidden">
           <Tabs fullWidth border>
             {user && (
               <Tabs.Item
@@ -69,9 +69,9 @@ export default function Activity() {
           </Tabs>
           <ActivityContent tastingList={tastingList} filter={filterParam} />
         </div>
-        <div className="ml-4 hidden w-[200px] sm:block">
+        <div className="ml-4 hidden min-w-[200px] lg:block">
           {!user && (
-            <div className="hidden flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800 sm:flex">
+            <div className="hidden flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800 lg:flex">
               <p className="text-light mb-4 text-sm">
                 Create a profile to record tastings, track your favorite
                 bottles, and more.
@@ -194,7 +194,7 @@ function PriceChanges() {
               <li key={price.id} className="flex space-x-2">
                 <Link
                   to={`/bottles/${price.bottle.id}`}
-                  className="flex-1 truncate hover:underline"
+                  className="flex-auto truncate hover:underline"
                 >
                   {price.bottle.fullName}
                 </Link>

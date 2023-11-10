@@ -13,6 +13,51 @@ type BottleFormData = {
   category?: string | null | undefined;
 };
 
+function BottleScaffold({
+  name,
+  category,
+  brand,
+  statedAge,
+  color = "default",
+  noGutter = false,
+}: {
+  name: any;
+  category: any;
+  brand: any;
+  statedAge: any;
+
+  color?: "default" | "highlight";
+  noGutter?: boolean;
+}) {
+  return (
+    <div
+      className={classNames(
+        "flex items-center space-x-2 overflow-hidden sm:space-x-3",
+        color === "highlight"
+          ? "bg-highlight text-black"
+          : "bg-slate-950 text-white",
+        noGutter ? "" : "p-3 sm:px-5 sm:py-4",
+      )}
+    >
+      <div className="flex-auto space-y-1 overflow-hidden">
+        <h4 className="items-center truncate font-semibold leading-6">
+          {name}
+        </h4>
+        <div>{category}</div>
+      </div>
+      <div
+        className={classNames(
+          color === "highlight" ? "" : "text-light",
+          "hidden w-[200px] flex-col items-end space-y-1 whitespace-nowrap text-sm sm:flex",
+        )}
+      >
+        <div className="w-full truncate">{brand}</div>
+        <div>{statedAge}</div>
+      </div>
+    </div>
+  );
+}
+
 export const PreviewBottleCard = ({
   data,
 }: {
@@ -20,16 +65,13 @@ export const PreviewBottleCard = ({
 }) => {
   const { brand } = data;
   return (
-    <div className="bg-highlight items-center space-x-4 p-3 text-black sm:px-5 sm:py-4">
-      <div className="flex-1 space-y-1">
-        <h4 className="block truncate font-semibold leading-6">{data.name}</h4>
-        <div>{data.category ? formatCategoryName(data.category) : null}</div>
-      </div>
-      <div className="w-22 hidden flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6 sm:flex">
-        <div className="text-sm">{brand ? brand.name : "Unknown Bottle"}</div>
-        <div>{data.statedAge ? `Aged ${data.statedAge} years` : null}</div>
-      </div>
-    </div>
+    <BottleScaffold
+      name={data.name}
+      category={data.category ? formatCategoryName(data.category) : null}
+      brand={brand ? brand.name : "Unknown Bottle"}
+      statedAge={data.statedAge ? `Aged ${data.statedAge} years` : null}
+      color="highlight"
+    />
   );
 };
 
@@ -43,17 +85,9 @@ export default function BottleCard({
   color?: "highlight" | "default";
 }) {
   return (
-    <div
-      className={classNames(
-        "flex items-center space-x-2 sm:space-x-3",
-        color === "highlight"
-          ? "bg-highlight text-black"
-          : "bg-slate-950 text-white",
-        noGutter ? "" : "p-3 sm:px-5 sm:py-4",
-      )}
-    >
-      <div className="flex-1 space-y-1">
-        <h4 className="flex items-center space-x-1">
+    <BottleScaffold
+      name={
+        <>
           <Link
             to={`/bottles/${bottle.id}`}
             className="block truncate font-semibold hover:underline sm:max-w-[480px]"
@@ -67,7 +101,9 @@ export default function BottleCard({
           {bottle.hasTasted && (
             <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
           )}
-        </h4>
+        </>
+      }
+      category={
         <div>
           {bottle.category && (
             <Link
@@ -78,27 +114,15 @@ export default function BottleCard({
             </Link>
           )}
         </div>
-      </div>
-      <div
-        className={classNames(
-          color === "highlight" ? "" : "text-light",
-          "hidden flex-col items-end space-y-1 whitespace-nowrap text-sm sm:flex",
-        )}
-      >
-        <div
-          className={classNames(
-            "text-sm",
-            color === "highlight" ? "" : "text-light",
-          )}
-        >
-          <span className="hidden sm:inline"></span>
-          <Link to={`/entities/${bottle.brand.id}`} className="hover:underline">
-            {bottle.brand.name}
-          </Link>
-        </div>
-
-        <div>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</div>
-      </div>
-    </div>
+      }
+      brand={
+        <Link to={`/entities/${bottle.brand.id}`} className="hover:underline">
+          {bottle.brand.name}
+        </Link>
+      }
+      statedAge={bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
+      color={color}
+      noGutter={noGutter}
+    />
   );
 }

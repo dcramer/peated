@@ -28,7 +28,7 @@ export default function Layout({
   if (splash) {
     return (
       <main className="mx-auto flex h-screen max-w-xl items-center justify-center p-4 lg:p-8">
-        <div className="flex-1">{children}</div>
+        <div className="flex-auto">{children}</div>
       </main>
     );
   }
@@ -46,7 +46,7 @@ export default function Layout({
       <Sidebar />
 
       <div className="flex">
-        <main className="max-w-6xl flex-auto lg:pl-64">
+        <main className="w-full max-w-6xl flex-auto lg:pl-64">
           <div className="mx-auto lg:p-8">{children}</div>
         </main>
 

@@ -10,7 +10,6 @@ import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useQueryClient } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
-import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
 import { ClientOnly } from "~/components/clientOnly";
@@ -94,24 +93,23 @@ export default function BottleDetails() {
 
   return (
     <Layout>
-      <div className="p-3 sm:py-0">
-        <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 sm:flex-nowrap">
-          <BottleIcon className="hidden h-14 w-auto sm:inline-block" />
-          <div className="w-full flex-1 flex-col items-center sm:w-auto sm:items-start">
+      <div className="w-full p-3 lg:py-0">
+        <div className="my-4 flex w-full flex-wrap justify-center gap-x-3 gap-y-4 lg:flex-nowrap lg:justify-start">
+          <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
             <h1
-              className="mx-auto truncate text-center text-3xl font-semibold sm:mx-0 sm:text-left"
+              className="max-w-full truncate text-center text-3xl font-semibold lg:mx-0 lg:text-left"
               title={bottle.fullName}
             >
               {bottle.fullName}
             </h1>
             <BottleMetadata
               data={bottle}
-              className="text-center text-sm text-slate-500 sm:text-left"
+              className="w-full truncate text-center text-slate-500 lg:text-left"
             />
           </div>
 
           {(bottle.category || bottle.statedAge) && (
-            <div className="flex w-full flex-col items-center justify-center gap-x-1 text-sm text-slate-500 sm:w-auto sm:items-end">
+            <div className="flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 text-slate-500 lg:w-auto lg:items-end">
               <div>
                 {bottle.category && (
                   <Link
@@ -130,7 +128,7 @@ export default function BottleDetails() {
           )}
         </div>
 
-        <div className="my-8 flex justify-center gap-4 sm:justify-start">
+        <div className="my-8 flex justify-center gap-4 lg:justify-start">
           {user && (
             <ClientOnly fallback={<SkeletonButton className="w-10" />}>
               {() => (
@@ -188,16 +186,16 @@ export default function BottleDetails() {
           )}
         </div>
 
-        <div className="my-6 grid grid-cols-3 items-center gap-3 text-center sm:grid-cols-4 sm:text-left">
+        <div className="my-6 grid grid-cols-3 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">
           {stats.map((stat) => (
             <div key={stat.name}>
               <div className="text-light leading-7">{stat.name}</div>
-              <div className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-                {stat.value}
+              <div className="order-first text-3xl font-semibold tracking-tight lg:text-5xl">
+                {stat.value || "-"}
               </div>
             </div>
           ))}
-          <div className="hidden sm:block">
+          <div className="hidden lg:block">
             <div className="text-light leading-7">Price</div>
             <div className="flex items-center">
               <ClientOnly fallback={<div className="h-[45px] animate-pulse" />}>

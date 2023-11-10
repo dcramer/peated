@@ -28,7 +28,7 @@ export default function EntityDetailsOverview() {
   return (
     <>
       <div className="my-6 flex flex-col gap-4 sm:flex-row">
-        <div className="flex-1">
+        <div className="flex-auto">
           <ClientOnly
             fallback={
               <div
@@ -60,13 +60,13 @@ export default function EntityDetailsOverview() {
       {entity.description && (
         <div className="my-6">
           <div className="flex space-x-4">
-            <div className="prose prose-invert -mt-5 max-w-none flex-1">
+            <div className="prose prose-invert -mt-5 max-w-none flex-auto">
               <Markdown content={entity.description} />
             </div>
 
             <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
           </div>
-          <div className="prose prose-invert max-w-none flex-1">
+          <div className="prose prose-invert max-w-none flex-auto">
             <dl>
               <dt>Website</dt>
               <dd>

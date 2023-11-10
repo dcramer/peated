@@ -71,7 +71,7 @@ export default function ChoiceField<T extends FieldValues>({
                         )}
                       />
                     </div>
-                    <div className="flex flex-1 items-center">
+                    <div className="flex flex-auto items-center">
                       <div className="text-sm">
                         <RadioGroup.Label
                           as="p"

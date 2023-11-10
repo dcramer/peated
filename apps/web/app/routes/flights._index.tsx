@@ -47,8 +47,8 @@ export default function Flights() {
           results.map((flight) => {
             return (
               <ListItem key={flight.id}>
-                <div className="flex flex-1 items-center space-x-4">
-                  <div className="flex-1 space-y-1 font-medium">
+                <div className="flex flex-auto items-center space-x-4">
+                  <div className="flex-auto space-y-1 font-medium">
                     <Link
                       to={`/flights/${flight.id}`}
                       className="hover:underline"
@@ -81,7 +81,7 @@ export default function Flights() {
           className="flex items-center justify-between py-3"
           aria-label="Pagination"
         >
-          <div className="flex flex-1 justify-between gap-x-2 sm:justify-end">
+          <div className="flex flex-auto justify-between gap-x-2 sm:justify-end">
             <Button
               to={rel.prevPage ? `?page=${rel.prevPage}` : undefined}
               disabled={!rel.prevPage}

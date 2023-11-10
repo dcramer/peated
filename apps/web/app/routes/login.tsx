@@ -146,7 +146,7 @@ export default function Login() {
         </Link>
       </div>
 
-      <div className="min-w-sm mt-8 flex-1">
+      <div className="min-w-sm mt-8 flex-auto">
         {error ? <Alert>{error}</Alert> : null}
         {config.GOOGLE_CLIENT_ID && (
           <>

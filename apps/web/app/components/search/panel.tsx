@@ -200,7 +200,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
                 <ListItem color="highlight">
                   <PlusIcon className="hidden h-12 w-12 flex-none rounded-full p-2 sm:block" />
 
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-auto">
                     <div className="font-semibold leading-6">
                       <Link to={`/addBottle`}>
                         <span className="absolute inset-x-0 -top-px bottom-0" />
