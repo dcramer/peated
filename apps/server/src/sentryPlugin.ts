@@ -42,7 +42,7 @@ export default fastifyPlugin(async (fastify, options) => {
         if (!event.request) return event;
         try {
           // upgrade the request w/ body
-          event.request!.data =
+          event.request.data =
             request.body !== undefined
               ? isString(request.body)
                 ? request.body
