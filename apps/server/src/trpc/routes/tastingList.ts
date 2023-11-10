@@ -22,17 +22,17 @@ export default publicProcedure
         entity: z.number().optional(),
         user: z.union([z.number(), z.literal("me")]).optional(),
         filter: z.enum(["global", "friends", "local"]).default("global"),
-        page: z.number().gte(1).default(1),
+        cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(25),
       })
       .default({
         filter: "global",
-        page: 1,
+        cursor: 1,
         limit: 25,
       }),
   )
-  .query(async function ({ input: { page, limit, ...input }, ctx }) {
-    const offset = (page - 1) * limit;
+  .query(async function ({ input: { cursor, limit, ...input }, ctx }) {
+    const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
     if (input.bottle) {
@@ -112,8 +112,9 @@ export default publicProcedure
         ctx.user,
       ),
       rel: {
-        nextPage: results.length > limit ? page + 1 : null,
-        prevPage: page > 1 ? page - 1 : null,
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        nextPage: results.length > limit ? cursor + 1 : null,
+        prevPage: cursor > 1 ? cursor - 1 : null,
       },
     };
   });
