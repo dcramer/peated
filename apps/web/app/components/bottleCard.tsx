@@ -1,4 +1,4 @@
-import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
+import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import type { Bottle } from "@peated/server/types";
 import { Link } from "@remix-run/react";
 import classNames from "../lib/classNames";
@@ -39,8 +39,10 @@ function BottleScaffold({
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
       )}
     >
-      <div className="flex-auto overflow-hidden">
-        <h4 className="flex items-center truncate font-semibold">{name}</h4>
+      <div className="flex-1 overflow-hidden">
+        <div className="flex w-full items-center space-x-1 truncate font-semibold">
+          {name}
+        </div>
         <div
           className={classNames(
             "text-sm",
@@ -93,18 +95,24 @@ export default function BottleCard({
     <BottleScaffold
       name={
         <>
-          <Link
-            to={`/bottles/${bottle.id}`}
-            className="block truncate font-semibold hover:underline sm:max-w-[480px]"
-            title={bottle.fullName}
-          >
-            {bottle.fullName}
-          </Link>
+          <h4 className="truncate font-semibold">
+            <Link
+              to={`/bottles/${bottle.id}`}
+              className="hover:underline"
+              title={bottle.fullName}
+            >
+              {bottle.fullName}
+            </Link>
+          </h4>
           {bottle.isFavorite && (
-            <StarIcon className="h-auto w-4 lg:w-8" aria-hidden="true" />
+            <div className="w-4">
+              <StarIcon className="w-4" aria-hidden="true" />
+            </div>
           )}
           {bottle.hasTasted && (
-            <CheckBadgeIcon className="h-auto w-4 lg:w-8" aria-hidden="true" />
+            <div className="w-4">
+              <CheckBadgeIcon className="w-4" aria-hidden="true" />
+            </div>
           )}
         </>
       }
