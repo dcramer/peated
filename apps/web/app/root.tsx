@@ -1,4 +1,5 @@
 import FontStyles from "@fontsource/raleway/index.css";
+import type { AppRouter } from "@peated/server/src/trpc/router";
 import type { User } from "@peated/server/types";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { cssBundleHref } from "@remix-run/css-bundle";
@@ -36,7 +37,7 @@ import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
 import { ApiUnauthorized } from "./lib/api";
 import { logError } from "./lib/log";
-import { trpc } from "./lib/trpc";
+import { sentryLink, trpc } from "./lib/trpc";
 
 function initMobileControls() {
   if (typeof document === "undefined") return;
@@ -142,6 +143,7 @@ export default withSentry(function App() {
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
+        sentryLink<AppRouter>(),
         httpBatchLink({
           url: `${config.API_SERVER}/trpc`,
           async headers() {
