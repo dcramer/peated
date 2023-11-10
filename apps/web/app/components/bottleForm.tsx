@@ -4,9 +4,9 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
-import { CATEGORY_LIST } from "@peated/shared/constants";
-import { BottleInputSchema } from "@peated/shared/schemas";
-import type { Bottle, Entity } from "@peated/shared/types";
+import { CATEGORY_LIST } from "@peated/server/constants";
+import { BottleInputSchema } from "@peated/server/schemas";
+import type { Bottle, Entity } from "@peated/server/types";
 import { PreviewBottleCard } from "~/components/bottleCard";
 import EntityField from "~/components/entityField";
 import Fieldset from "~/components/fieldset";
@@ -182,7 +182,7 @@ export default function BottleForm({
 
           <TextField
             {...register("statedAge", {
-              setValueAs: (v) => (v === "" || !v ? undefined : parseInt(v, 10)),
+              setValueAs: (v) => (v === "" || !v ? undefined : Number(v)),
             })}
             error={errors.statedAge}
             type="number"

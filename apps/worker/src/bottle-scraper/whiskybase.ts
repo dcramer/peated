@@ -1,7 +1,7 @@
 import { load as cheerio } from "cheerio";
 import { open } from "fs/promises";
 
-import { normalizeBottleName } from "@peated/shared/lib/normalize";
+import { normalizeBottleName } from "@peated/server/lib/normalize";
 
 import { getUrl } from "../scraper";
 

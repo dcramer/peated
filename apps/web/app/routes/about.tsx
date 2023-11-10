@@ -1,10 +1,8 @@
 import type { MetaFunction } from "@remix-run/node";
-import { useQuery } from "@tanstack/react-query";
 import { type SitemapFunction } from "remix-sitemap";
 import Layout from "~/components/layout";
 import config from "~/config";
-import useApi from "~/hooks/useApi";
-import { fetchStats } from "~/queries/stats";
+import { trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = () => ({
   priority: 0.3,
@@ -90,8 +88,7 @@ function SkeletonStat({ name }: { name: string }) {
 }
 
 const Stats = () => {
-  const api = useApi();
-  const { data, isLoading } = useQuery(["stats"], () => fetchStats(api));
+  const { data, isLoading } = trpc.stats.useQuery();
 
   if (!data) {
     if (isLoading) {

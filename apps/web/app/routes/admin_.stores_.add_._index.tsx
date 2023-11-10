@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { STORE_TYPE_LIST } from "@peated/shared/constants";
-import { StoreInputSchema } from "@peated/shared/schemas";
+import { STORE_TYPE_LIST } from "@peated/server/constants";
+import { StoreInputSchema } from "@peated/server/schemas";
 import type { ActionFunction } from "@remix-run/node";
 import { json, redirect, type MetaFunction } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
@@ -31,18 +31,20 @@ const STORE_TYPES = STORE_TYPE_LIST.map((t) => ({ id: t, name: t }));
 
 const resolver = zodResolver(StoreInputSchema);
 
-export const action: ActionFunction = async ({ context, request }) => {
-  const { errors, data } = await getValidatedFormData<FormData>(
+export const action: ActionFunction = async ({
+  context: { trpc },
+  request,
+}) => {
+  const { errors, data } = await getValidatedFormData<FormSchemaType>(
     request,
     resolver,
   );
   if (errors) {
     return json(errors);
   }
+
   try {
-    await context.api.post(`/stores`, {
-      data,
-    });
+    await trpc.storeCreate.mutate(data);
   } catch (err) {
     if (err instanceof ApiError) {
       return json({ error: err.message });

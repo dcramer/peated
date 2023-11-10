@@ -1,24 +1,23 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import BottleCard from "~/components/bottleCard";
-
 import Layout from "~/components/layout";
-import useAuth from "~/hooks/useAuth";
 import { summarize } from "~/lib/markdown";
-import { fetchBottles } from "~/queries/bottles";
-import { getFlight } from "~/queries/flights";
 
-export async function loader({ params, context }: LoaderFunctionArgs) {
-  invariant(params.flightId);
+export async function loader({
+  params: { flightId },
+  context: { trpc },
+}: LoaderFunctionArgs) {
+  invariant(flightId);
 
-  const flight = await getFlight(context.api, params.flightId);
-  const bottles = await fetchBottles(context.api, {
-    flight: params.flightId,
+  return json({
+    flight: await trpc.flightById.query(flightId),
+    bottles: await trpc.bottleList.query({
+      flight: flightId,
+    }),
   });
-
-  return json({ flight, bottles });
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -51,10 +50,6 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export default function FlightDetails() {
   const { flight, bottles } = useLoaderData<typeof loader>();
-  const params = useParams();
-  invariant(params.flightId);
-
-  const { user } = useAuth();
 
   return (
     <Layout>

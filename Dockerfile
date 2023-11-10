@@ -22,9 +22,9 @@ ENV SENTRY_DSN=$SENTRY_DSN \
 
 ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
 ADD apps/web/package.json ./apps/web/package.json
-ADD apps/api/package.json ./apps/api/package.json
+ADD apps/server/package.json ./apps/server/package.json
 ADD apps/worker/package.json ./apps/worker/package.json
-ADD packages/shared/package.json ./packages/shared/package.json
+ADD packages/tsconfig/package.json ./packages/tsconfig/package.json
 ADD packages/design/package.json ./packages/design/package.json
 
 FROM base-env as prod-deps
@@ -88,7 +88,7 @@ ENV HOST=0.0.0.0 \
 
 EXPOSE 4000
 
-WORKDIR /app/apps/api
+WORKDIR /app/apps/server
 
 ARG VERSION
 ENV VERSION $VERSION

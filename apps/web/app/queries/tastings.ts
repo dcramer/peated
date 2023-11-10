@@ -1,4 +1,4 @@
-import type { Paginated, Tasting } from "@peated/shared/types";
+import type { Paginated, Tasting } from "@peated/server/types";
 import type { ApiClient } from "~/lib/api";
 
 type TastingQueryParams = {

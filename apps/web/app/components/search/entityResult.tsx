@@ -1,4 +1,4 @@
-import type { Entity } from "@peated/shared/types";
+import type { Entity } from "@peated/server/types";
 import { Link } from "@remix-run/react";
 import EntityIcon from "~/components/assets/Entity";
 import Chip from "../chip";

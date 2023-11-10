@@ -1,5 +1,5 @@
-import type { FriendStatus } from "@peated/shared/types";
-import useApi from "~/hooks/useApi";
+import type { FriendStatus } from "@peated/server/types";
+import { trpc } from "~/lib/trpc";
 import type { FriendRequestNotification } from "../../types";
 import Button from "../button";
 
@@ -12,13 +12,9 @@ export default ({
   onArchive: () => void;
   onMarkRead: () => void;
 }) => {
-  const api = useApi();
-
-  const acceptRequest = (toUserId: number) => {
-    // fire and forget
-    api.post(`/friends/${toUserId}`);
-    onArchive();
-  };
+  const friendCreateMutation = trpc.friendCreate.useMutation({
+    onSuccess: () => onArchive(),
+  });
 
   const actionLabel = (status: FriendStatus) => {
     switch (status) {
@@ -38,7 +34,7 @@ export default ({
         size="small"
         onClick={(e) => {
           e.stopPropagation();
-          acceptRequest(ref.user.id);
+          friendCreateMutation.mutate(ref.user.id);
         }}
       >
         {actionLabel(ref.status)}

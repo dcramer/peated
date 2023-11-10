@@ -1,4 +1,4 @@
-import { json, type LoaderFunction } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import BadgeTable from "~/components/admin/badgeTable";
@@ -10,18 +10,19 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export const loader: LoaderFunction = async ({ request, context }) => {
+export async function loader({
+  request,
+  context: { trpc },
+}: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const page = url.searchParams.get("page") || 1;
-  const badgeList = await context.api.get("/badges", {
-    query: {
-      page,
-      sort: "name",
-    },
+  const page = Number(url.searchParams.get("page") || 1);
+  const badgeList = await trpc.badgeList.query({
+    page,
+    sort: "name",
   });
 
   return json({ badgeList });
-};
+}
 
 export default function AdminBadges() {
   const { badgeList } = useLoaderData<typeof loader>();

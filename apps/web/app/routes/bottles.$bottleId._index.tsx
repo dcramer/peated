@@ -1,22 +1,45 @@
+import type { Bottle } from "@peated/server/types";
 import { useOutletContext } from "@remix-run/react";
-import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
-
-import type { Bottle } from "@peated/shared/types";
+import { type SitemapFunction } from "remix-sitemap";
 import RobotImage from "~/assets/robot.png";
 import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
-import useApi from "~/hooks/useApi";
-import { fetchBottleTags } from "~/queries/bottles";
+import { trpc } from "~/lib/trpc";
+
+export const sitemap: SitemapFunction = async ({
+  config: sitemapConfig,
+  request,
+}) => {
+  const api = new ApiClient({
+    server: config.API_SERVER,
+  });
+
+  let page: number | null = 1;
+  const output = [];
+  while (page) {
+    const { results, rel } = await fetchBottles(api, {
+      page,
+    });
+
+    output.push(
+      ...results.map((bottle) => ({
+        loc: `/bottles/${bottle.id}`,
+        lastmod: bottle.createdAt, // not correct
+      })),
+    );
+
+    page = rel?.nextPage || null;
+  }
+  return output;
+};
 
 const BottleTagDistribution = ({ bottleId }: { bottleId: number }) => {
-  const api = useApi();
-
-  const { data } = useQuery(["bottles", bottleId, "tags"], () =>
-    fetchBottleTags(api, bottleId),
-  );
+  const { data } = trpc.bottleTagList.useQuery({
+    bottle: bottleId,
+  });
 
   if (!data) return null;
 

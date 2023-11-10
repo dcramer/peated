@@ -1,8 +1,6 @@
-import type { Entity } from "@peated/shared/types";
-import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { Entity } from "@peated/server/types";
+import type { LinksFunction } from "@remix-run/node";
 import { useOutletContext, useParams } from "@remix-run/react";
-import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import { type LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
 import RobotImage from "~/assets/robot.png";
@@ -11,27 +9,9 @@ import { DistributionChart } from "~/components/distributionChart";
 import { Map } from "~/components/map.client";
 import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
-import useApi from "~/hooks/useApi";
 import { formatCategoryName } from "~/lib/strings";
+import { trpc } from "~/lib/trpc";
 import { parseDomain } from "~/lib/urls";
-import { fetchEntityCategories } from "~/queries/entities";
-import { fetchTastings } from "~/queries/tastings";
-
-export async function loader({
-  params: { entityId },
-  context,
-}: LoaderFunctionArgs) {
-  invariant(entityId);
-
-  const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(["entity", entityId, "tastings"], () =>
-    fetchTastings(context.api, {
-      entity: entityId,
-    }),
-  );
-
-  return json({ dehydratedState: dehydrate(queryClient) });
-}
 
 export const links: LinksFunction = () => [
   {
@@ -109,11 +89,9 @@ export default function EntityDetailsOverview() {
 }
 
 const EntitySpiritDistribution = ({ entityId }: { entityId: number }) => {
-  const api = useApi();
-
-  const { data } = useQuery(["entities", entityId, "categories"], () =>
-    fetchEntityCategories(api, entityId),
-  );
+  const { data } = trpc.entityCategoryList.useQuery({
+    entity: entityId,
+  });
 
   if (!data) return null;
 

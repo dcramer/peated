@@ -1,5 +1,5 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
-import type { Bottle } from "@peated/shared/types";
+import type { Bottle } from "@peated/server/types";
 import { Link } from "@remix-run/react";
 import classNames from "../lib/classNames";
 import { formatCategoryName } from "../lib/strings";

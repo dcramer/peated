@@ -1,85 +1,22 @@
-import { CATEGORY_LIST } from "@peated/shared/constants";
-import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
-import { useLocation } from "@remix-run/react";
-import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
+import { CATEGORY_LIST } from "@peated/server/constants";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json, type MetaFunction, type SerializeFrom } from "@remix-run/node";
+import { useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
-
 import BottleTable from "~/components/bottleTable";
 import Button from "~/components/button";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import SidebarLink from "~/components/sidebarLink";
-import useApi from "~/hooks/useApi";
-import type { ApiClient } from "~/lib/api";
 import { formatCategoryName } from "~/lib/strings";
 import { buildQueryString } from "~/lib/urls";
-import { fetchBottles } from "~/queries/bottles";
 
 const DEFAULT_SORT = "-tastings";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
-
-function buildQuery(api: ApiClient, queryString: URLSearchParams) {
-  const page = queryString.get("page") || "1";
-  const category = queryString.get("category") || undefined;
-  const age = queryString.get("age") || undefined;
-  const tag = queryString.get("tag") || undefined;
-  const entity = queryString.get("entity") || undefined;
-  const sort = queryString.get("sort") || DEFAULT_SORT;
-
-  return {
-    queryKey: [
-      "bottles",
-      page,
-      "category",
-      category,
-      "age",
-      age,
-      "tag",
-      tag,
-      "entity",
-      entity,
-      "sort",
-      sort,
-    ],
-    queryFn: () =>
-      fetchBottles(api, {
-        category,
-        age,
-        tag,
-        entity,
-        page,
-        sort,
-      }),
-  };
-}
-
-const Content = () => {
-  const location = useLocation();
-  const qs = new URLSearchParams(location.search);
-
-  const api = useApi();
-  const query = buildQuery(api, qs);
-  const { data } = useQuery(query);
-  const sort = qs.get("sort") || DEFAULT_SORT;
-
-  if (!data) return null;
-
-  return (
-    <>
-      {data.results.length > 0 ? (
-        <BottleTable bottleList={data.results} rel={data.rel} sort={sort} />
-      ) : (
-        <EmptyActivity>
-          Looks like there's nothing in the database yet. Weird.
-        </EmptyActivity>
-      )}
-    </>
-  );
-};
 
 export const meta: MetaFunction = () => {
   return [
@@ -89,16 +26,61 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader: LoaderFunction = async ({ context, request }) => {
-  const queryClient = new QueryClient();
+export async function loader({
+  request,
+  context: { trpc },
+}: LoaderFunctionArgs) {
+  const { searchParams } = new URL(request.url);
 
-  const url = new URL(request.url);
-  const query = buildQuery(context.api, url.searchParams);
+  return json({
+    bottleList: await trpc.bottleList.query({
+      ...Object.fromEntries(searchParams.entries()),
+      page: Number(searchParams.get("page") || 1),
+    }),
+  });
+}
 
-  await queryClient.prefetchQuery(query);
+export default function BottleList() {
+  const { bottleList } = useLoaderData<typeof loader>();
 
-  return json({ dehydratedState: dehydrate(queryClient) });
-};
+  return (
+    <Layout rightSidebar={<FilterSidebar />}>
+      <QueryBoundary>
+        <Content bottleList={bottleList} />
+      </QueryBoundary>
+    </Layout>
+  );
+}
+
+function Content({
+  bottleList,
+}: {
+  // TODO: this is probably wrong
+  bottleList: SerializeFrom<typeof loader>["bottleList"];
+}) {
+  const location = useLocation();
+  const qs = new URLSearchParams(location.search);
+
+  const sort = qs.get("sort") || DEFAULT_SORT;
+
+  if (!bottleList) return null;
+
+  return (
+    <>
+      {bottleList.results.length > 0 ? (
+        <BottleTable
+          bottleList={bottleList.results}
+          rel={bottleList.rel}
+          sort={sort}
+        />
+      ) : (
+        <EmptyActivity>
+          Looks like there's nothing in the database yet. Weird.
+        </EmptyActivity>
+      )}
+    </>
+  );
+}
 
 function FilterSidebar() {
   const location = useLocation();
@@ -249,15 +231,5 @@ function FilterSidebar() {
         )}
       </ul>
     </div>
-  );
-}
-
-export default function BottleList() {
-  return (
-    <Layout rightSidebar={<FilterSidebar />}>
-      <QueryBoundary>
-        <Content />
-      </QueryBoundary>
-    </Layout>
   );
 }

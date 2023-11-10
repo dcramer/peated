@@ -1,33 +1,32 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-
 import BetaNotice from "~/components/betaNotice";
 import TimeSince from "~/components/timeSince";
-import { fetchBottlePrices } from "~/queries/bottles";
 
 export async function loader({
   params: { bottleId },
-  context,
+  context: { trpc },
 }: LoaderFunctionArgs) {
   invariant(bottleId);
-  const data = await fetchBottlePrices(context.api, bottleId);
-
-  return json({ data });
+  const priceList = await trpc.bottlePriceList.query({
+    bottle: Number(bottleId),
+  });
+  return json({ priceList });
 }
 
 export default function BottlePrices() {
-  const { data } = useLoaderData<typeof loader>();
+  const { priceList } = useLoaderData<typeof loader>();
 
-  if (!data) return null;
+  if (!priceList) return null;
 
   return (
     <div className="mt-6">
       <BetaNotice>This is a work in progress.</BetaNotice>
 
-      {data.results.length ? (
+      {priceList.results.length ? (
         <ul className="mt-4 space-y-2 text-sm">
-          {data.results.map((price) => {
+          {priceList.results.map((price) => {
             return (
               <li key={price.id}>
                 <a href={price.url} className="flex hover:underline">

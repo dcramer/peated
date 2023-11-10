@@ -2,11 +2,11 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserInputSchema } from "@peated/shared/schemas";
-import type { User } from "@peated/shared/types";
+import { UserInputSchema } from "@peated/server/schemas";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { getQueryKey } from "@trpc/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -23,7 +23,9 @@ import Layout from "~/components/layout";
 import TextField from "~/components/textField";
 import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
+import { redirectToAuth } from "~/lib/auth.server";
 import { toBlob } from "~/lib/blobs";
+import { trpc } from "~/lib/trpc";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 
@@ -31,20 +33,20 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
-  const user: User = await context.api.get("/users/me");
+export async function loader({
+  context: { user, trpc },
+  request,
+}: LoaderFunctionArgs) {
+  if (!user) return redirectToAuth({ request });
 
-  if (!user) {
-    if (!context.user) {
-      return redirect(
-        `/login?redirectTo=${encodeURIComponent(
-          new URL(request.url).pathname,
-        )}`,
-      );
-    }
+  const userDetails = await trpc.userById.query("me");
+  if (!userDetails) {
+    return redirect(
+      `/login?redirectTo=${encodeURIComponent(new URL(request.url).pathname)}`,
+    );
   }
 
-  return json({ user });
+  return json({ user: userDetails });
 }
 
 export const meta: MetaFunction = () => {
@@ -56,17 +58,14 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Settings() {
-  const api = useApi();
   const navigate = useNavigate();
   const { user } = useLoaderData<typeof loader>();
   const { setUser } = useAuth();
+  const api = useApi();
 
   const queryClient = useQueryClient();
-  const saveUser = useMutation({
-    mutationFn: async (data: FormSchemaType) => {
-      const newUser = await api.put("/users/me", {
-        data,
-      });
+  const userUpdateMutation = trpc.userUpdate.useMutation({
+    onSuccess: async (newUser) => {
       let newAvatar: any;
       if (picture) {
         const blob = await toBlob(picture, 0.8);
@@ -82,10 +81,11 @@ export default function Settings() {
         ...newUser,
         ...newAvatar,
       });
-      return newUser;
-    },
-    onSuccess: (newUser) => {
-      queryClient.invalidateQueries(["users", newUser.username]);
+
+      queryClient.invalidateQueries(
+        getQueryKey(trpc.userById, newUser.id, "query"),
+      );
+      queryClient.invalidateQueries(getQueryKey(trpc.userById, "me", "query"));
     },
   });
 
@@ -97,13 +97,19 @@ export default function Settings() {
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(UserInputSchema),
-    defaultValues: user,
+    defaultValues: {
+      ...user,
+      displayName: user.displayName ?? user.username,
+    },
   });
 
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    await saveUser.mutateAsync(data, {
-      onSuccess: (newUser) => navigate(`/users/${newUser.username}`),
-    });
+    await userUpdateMutation.mutateAsync(
+      { ...data, user: "me" },
+      {
+        onSuccess: (newUser) => navigate(`/users/${newUser.username}`),
+      },
+    );
   };
 
   return (
@@ -121,8 +127,8 @@ export default function Settings() {
       }
     >
       <Form onSubmit={handleSubmit(onSubmit)}>
-        {saveUser.isError && (
-          <FormError values={[(saveUser.error as Error).message]} />
+        {userUpdateMutation.isError && (
+          <FormError values={[(userUpdateMutation.error as Error).message]} />
         )}
 
         <Fieldset>

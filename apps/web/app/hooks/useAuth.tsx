@@ -1,4 +1,4 @@
-import type { User } from "@peated/shared/types";
+import type { User } from "@peated/server/types";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Auth = {

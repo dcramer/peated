@@ -5,8 +5,8 @@ import type {
   PropsWithChildren,
 } from "react";
 
-import type { FriendSchema, TastingSchema } from "@peated/shared/schemas";
-import type { Notification, User } from "@peated/shared/types";
+import type { FriendSchema, TastingSchema } from "@peated/server/schemas";
+import type { Notification, User } from "@peated/server/types";
 import type { z } from "zod";
 
 export type FriendRequestNotification = Notification & {

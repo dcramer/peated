@@ -1,5 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { ShareIcon } from "@heroicons/react/24/outline";
 import type {
   LinksFunction,
   LoaderFunctionArgs,
@@ -8,9 +9,6 @@ import type {
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
-
-import { ShareIcon } from "@heroicons/react/24/outline";
-import type { Entity } from "@peated/shared/types";
 import EntityIcon from "~/components/assets/Entity";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
@@ -19,12 +17,14 @@ import Tabs from "~/components/tabs";
 import useAuth from "~/hooks/useAuth";
 import { summarize } from "~/lib/markdown";
 import { getEntityUrl } from "~/lib/urls";
-import { getEntity } from "~/queries/entities";
 
-export async function loader({ params, context }: LoaderFunctionArgs) {
-  invariant(params.entityId);
+export async function loader({
+  params: { entityId },
+  context: { trpc },
+}: LoaderFunctionArgs) {
+  invariant(entityId);
 
-  const entity: Entity = await getEntity(context.api, params.entityId);
+  const entity = await trpc.entityById.query(Number(entityId));
 
   return json({ entity });
 }

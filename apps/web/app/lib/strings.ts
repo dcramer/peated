@@ -1,5 +1,5 @@
-import { toTitleCase } from "@peated/shared/lib/strings";
-import type { Category } from "@peated/shared/types";
+import { toTitleCase } from "@peated/server/lib/strings";
+import type { Category } from "@peated/server/types";
 
 export function formatCategoryName(
   value: Category | string | undefined | null,

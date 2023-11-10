@@ -4,8 +4,8 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
-import { FlightInputSchema } from "@peated/shared/schemas";
-import type { Bottle } from "@peated/shared/types";
+import { FlightInputSchema } from "@peated/server/schemas";
+import type { Bottle } from "@peated/server/types";
 import Fieldset from "~/components/fieldset";
 import FormError from "~/components/formError";
 import FormHeader from "~/components/formHeader";
@@ -13,6 +13,7 @@ import Layout from "~/components/layout";
 import TextField from "~/components/textField";
 import { ApiError } from "~/lib/api";
 import { logError } from "~/lib/log";
+import { trpc } from "~/lib/trpc";
 import Header from "./header";
 import SelectField, { type Option } from "./selectField";
 import Spinner from "./spinner";
@@ -68,6 +69,8 @@ export default function FlightForm({
       }
     }
   };
+
+  const trpcUtils = trpc.useUtils();
 
   const [bottlesValue, setBottlesValue] = useState<Option[]>(
     initialData.bottles ? initialData.bottles.map(bottleToOption) : [],
@@ -126,7 +129,12 @@ export default function FlightForm({
                 label="Bottles"
                 {...field}
                 error={errors.bottles}
-                endpoint="/bottles"
+                onQuery={async (query) => {
+                  const { results } = await trpcUtils.bottleList.fetch({
+                    query,
+                  });
+                  return results;
+                }}
                 onResults={(results) =>
                   results.map((r) => ({ id: r.id, name: r.fullName }))
                 }

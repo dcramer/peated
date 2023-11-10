@@ -3,33 +3,32 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/node";
-import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
+import { useLoaderData } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
 import BottleTable from "~/components/bottleTable";
 import EmptyActivity from "~/components/emptyActivity";
-
 import Layout from "~/components/layout";
 import SimpleHeader from "~/components/simpleHeader";
-import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { redirectToAuth } from "~/lib/auth.server";
-import { fetchBottlesInCollection } from "~/queries/collections";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
-  if (!context.user) return redirectToAuth({ request });
+export async function loader({
+  context: { trpc, user },
+  request,
+}: LoaderFunctionArgs) {
+  if (!user) return redirectToAuth({ request });
 
-  const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(
-    ["collections", "user", context.user.id, "default"],
-    () => fetchBottlesInCollection(context.api, "me", "default"),
-  );
-
-  return json({ dehydratedState: dehydrate(queryClient) });
+  return json({
+    favoriteList: await trpc.collectionBottleList.query({
+      user: "me",
+      collection: "default",
+    }),
+  });
 }
 
 export const meta: MetaFunction = () => {
@@ -41,20 +40,16 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Favorites() {
-  const api = useApi();
   const { user } = useAuth();
+  const { favoriteList } = useLoaderData<typeof loader>();
 
   invariant(user);
-
-  const { data } = useQuery(["collections", "user", user.id, "default"], () =>
-    fetchBottlesInCollection(api, "me", "default"),
-  );
 
   return (
     <Layout>
       <SimpleHeader>Favorites</SimpleHeader>
-      {data && data.results.length ? (
-        <BottleTable bottleList={data.results} rel={data.rel} />
+      {favoriteList && favoriteList.results.length ? (
+        <BottleTable bottleList={favoriteList.results} rel={favoriteList.rel} />
       ) : (
         <EmptyActivity>No favorites recorded yet.</EmptyActivity>
       )}

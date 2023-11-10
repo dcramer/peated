@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { COUNTRY_LIST, MAJOR_COUNTRIES } from "@peated/shared/constants";
+import { COUNTRY_LIST, MAJOR_COUNTRIES } from "@peated/server/constants";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { useController } from "react-hook-form";
 import SelectField from "./selectField";

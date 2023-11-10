@@ -2,16 +2,16 @@ import {
   CATEGORY_LIST,
   DEFAULT_CREATED_BY_ID,
   DEFAULT_TAGS,
-} from "@peated/shared/constants";
-import { db } from "@peated/shared/db";
-import type { Bottle} from "@peated/shared/db/schema";
-import { bottles, changes } from "@peated/shared/db/schema";
-import { arraysEqual, objectsShallowEqual } from "@peated/shared/lib/equals";
-import { CategoryEnum } from "@peated/shared/schemas";
+} from "@peated/server/constants";
+import { db } from "@peated/server/db";
+import type { Bottle } from "@peated/server/db/schema";
+import { bottles, changes } from "@peated/server/db/schema";
+import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
+import { logError } from "@peated/server/lib/log";
+import { CategoryEnum } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import config from "~/config";
-import { logError } from "~/lib/log";
 import { getStructuredResponse } from "~/lib/openai";
 
 if (!config.OPENAI_API_KEY) {
@@ -32,7 +32,7 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 
 'statedAge' should be the number of years the whiskey has been aged in barrels, if applicable.
 
-'confidence' should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set. 
+'confidence' should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set.
 
 'category' should be one of the following:
 
@@ -153,9 +153,9 @@ export default async function ({ bottleId }: { bottleId: number }) {
       displayName: bottle.fullName,
       createdById: DEFAULT_CREATED_BY_ID,
       type: "update",
-      data: JSON.stringify({
+      data: {
         ...data,
-      }),
+      },
     });
   });
 }

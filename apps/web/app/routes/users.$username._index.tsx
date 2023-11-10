@@ -1,22 +1,14 @@
-import type { User } from "@peated/shared/types";
+import type { User } from "@peated/server/types";
 import { useOutletContext } from "@remix-run/react";
-import { useQuery } from "@tanstack/react-query";
 import EmptyActivity from "~/components/emptyActivity";
 import QueryBoundary from "~/components/queryBoundary";
 import TastingList from "~/components/tastingList";
-import useApi from "~/hooks/useApi";
-import { fetchTastings } from "~/queries/tastings";
+import { trpc } from "~/lib/trpc";
 
 export default function ProfileActivity() {
-  const api = useApi();
   const { user } = useOutletContext<{ user: User }>();
-
-  const { data } = useQuery({
-    queryKey: ["tastings", "user", user.id],
-    queryFn: () =>
-      fetchTastings(api, {
-        user: user.id,
-      }),
+  const { data } = trpc.tastingList.useQuery({
+    user: user.id,
   });
 
   return (

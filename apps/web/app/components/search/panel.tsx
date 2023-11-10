@@ -1,13 +1,11 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
+import { toTitleCase } from "@peated/server/lib/strings";
+import type { Bottle, Entity, User } from "@peated/server/types";
 import { Link, useLocation, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
-
-import { toTitleCase } from "@peated/shared/lib/strings";
-
-import type { Bottle, Entity, User } from "@peated/shared/types";
-import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
 import { debounce } from "~/lib/api";
+import { trpc } from "~/lib/trpc";
 import Header from "../header";
 import Layout from "../layout";
 import ListItem from "../listItem";
@@ -23,7 +21,6 @@ export type Props = {
 
 export default function SearchPanel({ onClose, onQueryChange }: Props) {
   const { user } = useAuth();
-  const api = useApi();
   const navigate = useNavigate();
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
@@ -40,6 +37,8 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
   const [entityResults, setEntityResults] = useState<readonly Entity[]>([]);
   const isUserQuery = query.indexOf("@") !== -1;
 
+  const client = trpc.useUtils();
+
   // TODO: handle errors
   const fetch = debounce(async (query: string) => {
     // union results from various apis
@@ -48,12 +47,16 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
     // - bottles
     // - entities
     // (but prioritize exact matches)
+    // trpc.useQueries(t => {
+
+    // })
     if (directToTasting) {
       setUserResults([]);
       setEntityResults([]);
-      await api
-        .get("/bottles", {
-          query: { query, limit: maxResults },
+      await client.bottleList
+        .fetch({
+          query,
+          limit: maxResults,
         })
         .then(({ results }: { results: readonly Bottle[] }) => {
           setBottleResults(results);
@@ -63,9 +66,10 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
       setBottleResults([]);
       setEntityResults([]);
       if (user) {
-        await api
-          .get("/users", {
-            query: { query, limit: maxResults },
+        await client.userList
+          .fetch({
+            query,
+            limit: maxResults,
           })
           .then(({ results }: { results: readonly User[] }) => {
             setUserResults(results);
@@ -78,27 +82,21 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
     } else {
       setUserResults([]);
       if (user && query) {
-        await api
-          .get("/users", {
-            query: { query, limit: maxResults },
-          })
+        await client.userList
+          .fetch({ query, limit: maxResults })
           .then(({ results }: { results: readonly User[] }) => {
             setUserResults(results);
             if (state !== "ready") setState("ready");
           });
       }
-      await api
-        .get("/bottles", {
-          query: { query, limit: maxResults },
-        })
+      await client.bottleList
+        .fetch({ query, limit: maxResults })
         .then(({ results }: { results: readonly Bottle[] }) => {
           setBottleResults(results);
           if (state !== "ready") setState("ready");
         });
-      await api
-        .get("/entities", {
-          query: { query, limit: maxResults },
-        })
+      await client.entityList
+        .fetch({ query, limit: maxResults })
         .then(({ results }: { results: readonly Entity[] }) => {
           setEntityResults(results);
           if (state !== "ready") setState("ready");
@@ -133,7 +131,10 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
           exactMatches.push(index);
         }
       } else {
-        if (value.ref.displayName.toLowerCase() === lowerQuery) {
+        if (
+          value.ref.displayName?.toLowerCase() === lowerQuery ||
+          value.ref.username.toLowerCase() === lowerQuery
+        ) {
           exactMatches.push(index);
         }
       }

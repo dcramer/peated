@@ -1,17 +1,12 @@
-import { Link, useLocation } from "@remix-run/react";
-import {
-  dehydrate,
-  QueryClient,
-  useInfiniteQuery,
-  useQuery,
-} from "@tanstack/react-query";
+import { Link, useLoaderData, useLocation } from "@remix-run/react";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 
-import type { Paginated } from "@peated/shared/types";
-
-import type { Tasting } from "@peated/shared/types";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  json,
+  type LoaderFunctionArgs,
+  type SerializeFrom,
+} from "@remix-run/node";
 import Alert from "~/components/alert";
 import Glyph from "~/components/assets/Glyph";
 import BetaNotice from "~/components/betaNotice";
@@ -23,39 +18,97 @@ import QueryBoundary from "~/components/queryBoundary";
 import Spinner from "~/components/spinner";
 import Tabs from "~/components/tabs";
 import TastingList from "~/components/tastingList";
-import useApi from "~/hooks/useApi";
 import useAuth from "~/hooks/useAuth";
-import type { ApiClient } from "~/lib/api";
 import classNames from "~/lib/classNames";
-import { fetchPriceChanges } from "~/queries/stores";
+import { trpc } from "~/lib/trpc";
 
 const defaultViewParam = "global";
+
+export async function loader({
+  context: { trpc },
+  request,
+}: LoaderFunctionArgs) {
+  const { searchParams } = new URL(request.url);
+  const filter = mapFilterParam(searchParams.get("view"));
+
+  return json({
+    tastingList: await trpc.tastingList.query({
+      filter,
+      limit: 10,
+    }),
+  });
+}
+
+export default function Activity() {
+  const { user } = useAuth();
+  const { tastingList } = useLoaderData<typeof loader>();
+  const location = useLocation();
+  const qs = new URLSearchParams(location.search);
+  const filterParam = mapFilterParam(qs.get("view"));
+
+  return (
+    <Layout>
+      <div className="flex">
+        <div className="flex-1">
+          <Tabs fullWidth border>
+            {user && (
+              <Tabs.Item
+                as={Link}
+                to="?view=friends"
+                active={filterParam == "friends"}
+              >
+                Friends
+              </Tabs.Item>
+            )}
+            <Tabs.Item as={Link} to="./" active={filterParam === "global"}>
+              Global
+            </Tabs.Item>
+            {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
+          Local
+        </Tabs.Item> */}
+          </Tabs>
+          <ActivityContent tastingList={tastingList} filter={filterParam} />
+        </div>
+        <div className="ml-4 hidden w-[200px] sm:block">
+          {!user && (
+            <div className="hidden flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800 sm:flex">
+              <p className="text-light mb-4 text-sm">
+                Create a profile to record tastings, track your favorite
+                bottles, and more.
+              </p>
+              <Button color="primary" to="/login" size="small">
+                Sign Up or Login
+              </Button>
+            </div>
+          )}
+          <Tabs fullWidth>
+            <Tabs.Item active>Market Prices</Tabs.Item>
+          </Tabs>
+          <ClientOnly fallback={<PricesSkeleton />}>
+            {() => (
+              <QueryBoundary loading={<PricesSkeleton />}>
+                <PriceChanges />
+              </QueryBoundary>
+            )}
+          </ClientOnly>
+        </div>
+      </div>
+    </Layout>
+  );
+}
 
 const mapFilterParam = (value: string | null) => {
   if (value === "friends" || value === "local") return value;
   return defaultViewParam;
 };
 
-const getTastings = async ({
-  api,
-  filterParam,
-  pageParam = 0,
+const ActivityContent = ({
+  tastingList,
+  filter,
 }: {
-  api: ApiClient;
-  filterParam?: string;
-  pageParam?: number;
-}): Promise<Paginated<Tasting>> => {
-  return await api.get("/tastings", {
-    query: {
-      page: pageParam || 1,
-      filter: filterParam,
-    },
-  });
-};
-
-const ActivityContent = ({ filter }: { filter: string }) => {
-  const api = useApi();
-
+  tastingList: SerializeFrom<typeof loader>["tastingList"];
+  filter: string;
+}) => {
   const {
     data,
     error,
@@ -63,12 +116,14 @@ const ActivityContent = ({ filter }: { filter: string }) => {
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["tastings", filter],
-    queryFn: ({ pageParam }) =>
-      getTastings({ filterParam: filter, pageParam, api }),
-    getNextPageParam: (lastPage) => lastPage.rel?.nextPage,
-  });
+  } = trpc.tastingList.useInfiniteQuery(
+    { filter, limit: 10 },
+    {
+      staleTime: Infinity,
+      initialData: { pages: [tastingList], pageParams: [null] },
+      getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,
+    },
+  );
 
   const onScroll = () => {
     if (!hasNextPage) return;
@@ -118,86 +173,6 @@ const ActivityContent = ({ filter }: { filter: string }) => {
   );
 };
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const filter = mapFilterParam(url.searchParams.get("view"));
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: Infinity,
-      },
-    },
-  });
-
-  await queryClient.prefetchInfiniteQuery({
-    queryKey: ["tastings", filter],
-    queryFn: () =>
-      getTastings({
-        filterParam: filter,
-        api: context.api,
-      }),
-  });
-
-  return json({ dehydratedState: dehydrate(queryClient) });
-}
-
-export default function Activity() {
-  const { user } = useAuth();
-  const location = useLocation();
-  const qs = new URLSearchParams(location.search);
-  const filterParam = mapFilterParam(qs.get("view"));
-
-  return (
-    <Layout>
-      <div className="flex">
-        <div className="flex-1">
-          <Tabs fullWidth border>
-            {user && (
-              <Tabs.Item
-                as={Link}
-                to="?view=friends"
-                active={filterParam == "friends"}
-              >
-                Friends
-              </Tabs.Item>
-            )}
-            <Tabs.Item as={Link} to="./" active={filterParam === "global"}>
-              Global
-            </Tabs.Item>
-            {/* <Tabs.Item to="?view=local" active={filterQ === "local"}>
-          Local
-        </Tabs.Item> */}
-          </Tabs>
-          <ActivityContent filter={filterParam} />
-        </div>
-        <div className="ml-4 hidden w-[200px] sm:block">
-          {!user && (
-            <div className="hidden flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800 sm:flex">
-              <p className="text-light mb-4 text-sm">
-                Create a profile to record tastings, track your favorite
-                bottles, and more.
-              </p>
-              <Button color="primary" to="/login" size="small">
-                Sign Up or Login
-              </Button>
-            </div>
-          )}
-          <Tabs fullWidth>
-            <Tabs.Item active>Market Prices</Tabs.Item>
-          </Tabs>
-          <ClientOnly fallback={<PricesSkeleton />}>
-            {() => (
-              <QueryBoundary loading={<PricesSkeleton />}>
-                <PriceChanges />
-              </QueryBoundary>
-            )}
-          </ClientOnly>
-        </div>
-      </div>
-    </Layout>
-  );
-}
-
 function PricesSkeleton() {
   return (
     <div className="mt-4 animate-pulse bg-slate-800" style={{ height: 200 }} />
@@ -205,8 +180,7 @@ function PricesSkeleton() {
 }
 
 function PriceChanges() {
-  const api = useApi();
-  const { data } = useQuery(["price-changes"], () => fetchPriceChanges(api));
+  const { data } = trpc.priceChangeList.useQuery();
 
   if (!data) return null;
 

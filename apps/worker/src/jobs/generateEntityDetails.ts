@@ -1,9 +1,9 @@
-import { COUNTRY_LIST, DEFAULT_CREATED_BY_ID } from "@peated/shared/constants";
-import { db } from "@peated/shared/db";
-import type { Entity } from "@peated/shared/db/schema";
-import { changes, entities } from "@peated/shared/db/schema";
-import { arraysEqual } from "@peated/shared/lib/equals";
-import { CountryEnum, EntityTypeEnum } from "@peated/shared/schemas";
+import { COUNTRY_LIST, DEFAULT_CREATED_BY_ID } from "@peated/server/constants";
+import { db } from "@peated/server/db";
+import type { Entity } from "@peated/server/db/schema";
+import { changes, entities } from "@peated/server/db/schema";
+import { arraysEqual } from "@peated/server/lib/equals";
+import { CountryEnum, EntityTypeEnum } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -19,7 +19,7 @@ function generatePrompt(entityName: string) {
 Pretend to be an expert in whiskey distillation. Tell me about the following entity:
 
 ${entityName}
-  
+
 If the entity is located in Scotland, spell wihskey as "whisky".
 
 Describe the entity as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as a "entity".
@@ -42,7 +42,7 @@ If the entity is a brand, include 'brand' in the 'type' field.
 If the entity is a bottler, include 'bottler' in the 'type' field'.
 Its valid to include all three values in 'type' if they are accurate, but at least one must be included.
 
-'confidence' should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set. 
+'confidence' should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set.
 
 If there are any issues, or you are not confident in the accuracy, please also put that information in 'aiNotes'. Do not fill in any field you are not very confident in.
 `;
@@ -134,9 +134,9 @@ export default async ({ entityId }: { entityId: number }) => {
       displayName: entity.name,
       createdById: DEFAULT_CREATED_BY_ID,
       type: "update",
-      data: JSON.stringify({
+      data: {
         ...data,
-      }),
+      },
     });
   });
 };

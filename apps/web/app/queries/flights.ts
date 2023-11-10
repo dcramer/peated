@@ -1,4 +1,4 @@
-import type { Flight, Paginated } from "@peated/shared/types";
+import type { Flight, Paginated } from "@peated/server/types";
 import type { ApiClient } from "~/lib/api";
 
 export async function fetchFlights(api: ApiClient): Promise<Paginated<Flight>> {

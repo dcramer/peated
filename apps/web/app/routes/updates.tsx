@@ -1,46 +1,13 @@
-import type { Change, Paginated } from "@peated/shared/types";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link } from "@remix-run/react";
-import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
+import { Link, useLoaderData } from "@remix-run/react";
 import ChangeList from "~/components/changeList";
 import EmptyActivity from "~/components/emptyActivity";
 import Layout from "~/components/layout";
-import QueryBoundary from "~/components/queryBoundary";
 import Tabs from "~/components/tabs";
-import useApi from "~/hooks/useApi";
 
-const UpdatesContent = () => {
-  const api = useApi();
-  const { data } = useQuery({
-    queryKey: ["changes"],
-    queryFn: (): Promise<Paginated<Change>> => api.get("/changes"),
-  });
-
-  if (!data) return null;
-
-  return (
-    <>
-      {data.results.length > 0 ? (
-        <ChangeList values={data.results} rel={data.rel} />
-      ) : (
-        <EmptyActivity>
-          Looks like theres no updates in the system. That's odd.
-        </EmptyActivity>
-      )}
-    </>
-  );
-};
-
-export async function loader({ context }: LoaderFunctionArgs) {
-  const queryClient = new QueryClient();
-
-  await queryClient.prefetchQuery(
-    ["changes"],
-    (): Promise<Paginated<Change>> => context.api.get("/changes"),
-  );
-
-  return json({ dehydratedState: dehydrate(queryClient) });
+export async function loader({ context: { trpc } }: LoaderFunctionArgs) {
+  return json({ changeList: await trpc.changeList.query() });
 }
 
 export const meta: MetaFunction = () => {
@@ -52,6 +19,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Updates() {
+  const { changeList } = useLoaderData<typeof loader>();
+
   return (
     <Layout>
       <>
@@ -60,9 +29,13 @@ export default function Updates() {
             Updates
           </Tabs.Item>
         </Tabs>
-        <QueryBoundary>
-          <UpdatesContent />
-        </QueryBoundary>
+        {changeList.results.length > 0 ? (
+          <ChangeList values={changeList.results} rel={changeList.rel} />
+        ) : (
+          <EmptyActivity>
+            Looks like theres no updates in the system. That's odd.
+          </EmptyActivity>
+        )}
       </>
     </Layout>
   );

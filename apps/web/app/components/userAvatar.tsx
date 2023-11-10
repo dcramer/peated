@@ -1,4 +1,4 @@
-import type { User } from "@peated/shared/types";
+import type { User } from "@peated/server/types";
 
 export default function UserAvatar({
   user,

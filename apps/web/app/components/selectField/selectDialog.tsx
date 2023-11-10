@@ -2,11 +2,9 @@ import { Dialog } from "@headlessui/react";
 import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { useEffect, useState } from "react";
 
-import { toTitleCase } from "@peated/shared/lib/strings";
+import { toTitleCase } from "@peated/server/lib/strings";
 
-import useApi from "~/hooks/useApi";
 import config from "../../config";
-import type { ApiRequestOptions } from "../../lib/api";
 import { debounce } from "../../lib/api";
 import classNames from "../../lib/classNames";
 import Header from "../header";
@@ -14,7 +12,12 @@ import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";
 import CreateOptionDialog from "./createOptionDialog";
 import { filterDupes } from "./helpers";
-import type { CreateOptionForm, EndpointOptions, OnResults } from "./types";
+import type {
+  CreateOptionForm,
+  EndpointOptions,
+  OnQuery,
+  OnResults,
+} from "./types";
 
 export type Option = {
   id?: string | number | null;
@@ -32,6 +35,7 @@ export default ({
   createForm,
   multiple = false,
   endpoint,
+  onQuery,
   onResults,
   options,
 }: {
@@ -43,11 +47,11 @@ export default ({
   canCreate?: boolean;
   multiple?: boolean;
   createForm?: CreateOptionForm;
+  onQuery?: OnQuery;
   endpoint?: EndpointOptions;
   onResults?: OnResults;
   options?: Option[];
 }) => {
-  const api = useApi();
   const [query, setQuery] = useState("");
   const [optionList, setOptionList] = useState<Option[]>([...selectedValues]);
   const [results, setResults] = useState<Option[]>([]);
@@ -57,30 +61,13 @@ export default ({
 
   const [createOpen, setCreateOpen] = useState(false);
 
-  const apiPath = endpoint
-    ? typeof endpoint === "string"
-      ? endpoint
-      : endpoint.path
-    : null;
-  const apiOptions: ApiRequestOptions = endpoint
-    ? typeof endpoint === "string"
-      ? {}
-      : endpoint
-    : {};
-
-  if (!apiOptions.query) apiOptions.query = {};
-  apiOptions.query.query = query;
-
   const fetch = debounce(async (query = "") => {
-    const results = apiPath
-      ? (
-          await api.get(apiPath, {
-            ...apiOptions,
-          })
-        ).results
+    const results = onQuery
+      ? await onQuery(query)
       : options?.filter(
           (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1,
         );
+    if (results === undefined) throw new Error("Invalid results returned");
     setResults(onResults ? onResults(results) : results);
   }, 300);
 

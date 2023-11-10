@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import type { User } from "@peated/shared/types";
+import type { User } from "@peated/server/types";
 import { Link } from "@remix-run/react";
 import type { ElementType } from "react";
 import type { PolymorphicProps } from "~/types";

@@ -1,16 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { LoaderFunction } from "@remix-run/node";
+import { EntityMergeSchema } from "@peated/server/schemas";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, type MetaFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useQueryClient } from "@tanstack/react-query";
+import { getQueryKey } from "@trpc/react-query";
+import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
-
-import { EntityMergeSchema } from "@peated/shared/schemas";
-import type { Entity } from "@peated/shared/types";
-import { useState } from "react";
 import ChoiceField from "~/components/choiceField";
 import EntityField from "~/components/entityField";
 import Fieldset from "~/components/fieldset";
@@ -20,8 +19,7 @@ import FormHeader from "~/components/formHeader";
 import Header from "~/components/header";
 import Layout from "~/components/layout";
 import Spinner from "~/components/spinner";
-import useApi from "~/hooks/useApi";
-import { getEntity } from "~/queries/entities";
+import { trpc } from "~/lib/trpc";
 
 type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 
@@ -33,36 +31,33 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader: LoaderFunction = async ({ params, context }) => {
-  invariant(params.entityId);
-  const entity = await getEntity(context.api, params.entityId);
+export async function loader({
+  params: { entityId },
+  context: { trpc },
+}: LoaderFunctionArgs) {
+  invariant(entityId);
+  const entity = await trpc.entityById.query(Number(entityId));
 
   return json({ entity });
-};
+}
 
 export default function EditEntity() {
-  const api = useApi();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { entity } = useLoaderData<typeof loader>();
-  const { entityId } = useParams();
 
   const [otherEntityName, setOtherEntityName] = useState<string>("Other");
 
   // TODO: move to queries
-  const mergeEntity = useMutation({
-    mutationFn: async (
-      data: FormSchemaType,
-    ): Promise<[FormSchemaType, Entity]> => {
-      const newEntity = await api.post(`/entities/${entityId}/merge`, {
-        data,
-      });
-      return [data, newEntity];
-    },
-    onSuccess: ([data, newEntity]) => {
-      queryClient.invalidateQueries(["entities", data.entityId]);
-      queryClient.invalidateQueries(["entities", entityId]);
-      queryClient.setQueryData(["entities", newEntity.id], newEntity);
+  const entityMergeMutation = trpc.entityMerge.useMutation({
+    onSuccess: (newEntity) => {
+      queryClient.invalidateQueries(
+        getQueryKey(trpc.entityById, entity.id, "query"),
+      );
+      queryClient.setQueryData(
+        getQueryKey(trpc.entityById, newEntity.id, "query"),
+        newEntity,
+      );
     },
   });
 
@@ -78,9 +73,16 @@ export default function EditEntity() {
   });
 
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    await mergeEntity.mutateAsync(data, {
-      onSuccess: ([_, newEntity]) => navigate(`/entities/${newEntity.id}`),
-    });
+    await entityMergeMutation.mutateAsync(
+      {
+        root: entity.id,
+        other: data.entityId,
+        direction: data.direction,
+      },
+      {
+        onSuccess: (newEntity) => navigate(`/entities/${newEntity.id}`),
+      },
+    );
   };
 
   return (
