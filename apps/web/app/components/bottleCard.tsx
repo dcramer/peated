@@ -39,11 +39,18 @@ function BottleScaffold({
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
       )}
     >
-      <div className="flex-auto space-y-1 overflow-hidden">
-        <h4 className="items-center truncate font-semibold leading-6">
+      <div className="flex-auto overflow-hidden">
+        <h4 className="flex items-center truncate font-semibold leading-6">
           {name}
         </h4>
-        <div>{category}</div>
+        <div
+          className={classNames(
+            "text-sm",
+            color === "highlight" ? "" : "text-light",
+          )}
+        >
+          {category}
+        </div>
       </div>
       <div
         className={classNames(
@@ -51,7 +58,7 @@ function BottleScaffold({
           "hidden w-[200px] flex-col items-end space-y-1 whitespace-nowrap text-sm sm:flex",
         )}
       >
-        <div className="w-full truncate">{brand}</div>
+        <div className="max-w-full truncate">{brand}</div>
         <div>{statedAge}</div>
       </div>
     </div>
@@ -96,10 +103,13 @@ export default function BottleCard({
             {bottle.fullName}
           </Link>
           {bottle.isFavorite && (
-            <StarIcon className="h-4 w-4" aria-hidden="true" />
+            <StarIcon className="h-4 w-4 lg:h-8 lg:w-8" aria-hidden="true" />
           )}
           {bottle.hasTasted && (
-            <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
+            <CheckBadgeIcon
+              className="h-4 w-4 lg:h-8 lg:w-8"
+              aria-hidden="true"
+            />
           )}
         </>
       }
