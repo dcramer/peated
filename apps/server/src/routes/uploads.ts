@@ -1,9 +1,10 @@
+import { Storage } from "@google-cloud/storage";
 import type { RouteOptions } from "fastify";
 import { open } from "fs/promises";
 import type { IncomingMessage, Server, ServerResponse } from "http";
-
 import { contentType } from "mime-types";
 import { format } from "path";
+import { type Readable } from "stream";
 import config from "../config";
 
 const MAX_AGE = 60 * 60 ** 24;
@@ -23,21 +24,23 @@ export default {
   handler: async (req, res) => {
     const { filename } = req.params;
 
-    let stream: any;
+    let stream: Readable;
     if (process.env.USE_GCS_STORAGE) {
       const bucketName = process.env.GCS_BUCKET_NAME as string;
       const bucketPath = process.env.GCS_BUCKET_PATH
         ? `${process.env.GCS_BUCKET_PATH}/`
         : "";
 
-      // const cloudStorage = new Storage();
+      const cloudStorage = new Storage({
+        credentials: config.GCP_CREDENTIALS,
+      });
+      const fd = cloudStorage
+        .bucket(bucketName)
+        .file(`${bucketPath}${filename}`);
 
-      // const file = cloudStorage
-      //   .bucket(bucketName)
-      //   .file(`${bucketPath}${params.filename}`);
-      // stream = file.createReadStream();
-      const url = `https://storage.googleapis.com/${bucketName}/${bucketPath}${filename}`;
-      res.redirect(url);
+      stream = fd.createReadStream();
+      // const url = `https://storage.googleapis.com/${bucketName}/${bucketPath}${filename}`;
+      // res.redirect(url);
     } else {
       const filepath = format({
         dir: config.UPLOAD_PATH,
@@ -46,11 +49,11 @@ export default {
       const fd = await open(filepath, "r");
 
       stream = fd.createReadStream();
-      res.header("Cache-Control", `max-age=${MAX_AGE}, s-maxage=${MAX_AGE}`);
-      res.header("Content-Type", contentType(filename));
-
-      await res.send(stream);
     }
+    res.header("Cache-Control", `max-age=${MAX_AGE}, s-maxage=${MAX_AGE}`);
+    res.header("Content-Type", contentType(filename));
+
+    await res.send(stream);
   },
 } as RouteOptions<
   Server,
