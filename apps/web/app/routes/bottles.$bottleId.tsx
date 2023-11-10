@@ -10,6 +10,7 @@ import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useQueryClient } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
+import BottleIcon from "~/components/assets/Bottle";
 import BottleMetadata from "~/components/bottleMetadata";
 import Button from "~/components/button";
 import { ClientOnly } from "~/components/clientOnly";
@@ -96,6 +97,10 @@ export default function BottleDetails() {
     <Layout>
       <div className="w-full p-3 lg:py-0">
         <div className="my-4 flex w-full flex-wrap justify-center gap-x-3 gap-y-4 lg:flex-nowrap lg:justify-start">
+          <div className="hidden w-14 lg:block">
+            <BottleIcon className="w-14" />
+          </div>
+
           <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
             <h1
               className="max-w-full truncate text-center text-3xl font-semibold lg:mx-0 lg:text-left"
