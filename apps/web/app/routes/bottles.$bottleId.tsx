@@ -3,7 +3,7 @@ import {
   EllipsisVerticalIcon,
   StarIcon as StarIconFilled,
 } from "@heroicons/react/20/solid";
-import { ShareIcon, StarIcon } from "@heroicons/react/24/outline";
+import { StarIcon } from "@heroicons/react/24/outline";
 import type { Bottle } from "@peated/server/types";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -17,6 +17,7 @@ import ConfirmationButton from "~/components/confirmationButton";
 import Layout from "~/components/layout";
 import QueryBoundary from "~/components/queryBoundary";
 import { RangeBarChart } from "~/components/rangeBarChart.client";
+import ShareButton from "~/components/shareButton";
 import SkeletonButton from "~/components/skeletonButton";
 import Tabs from "~/components/tabs";
 import TimeSince from "~/components/timeSince";
@@ -146,19 +147,7 @@ export default function BottleDetails() {
             Record a Tasting
           </Button>
 
-          <Button
-            icon={<ShareIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />}
-            onClick={() => {
-              if (navigator.share) {
-                navigator
-                  .share({
-                    title: bottle.fullName,
-                    url: `/bottles/${bottle.id}`,
-                  })
-                  .catch((error) => console.error("Error sharing", error));
-              }
-            }}
-          />
+          <ShareButton title={bottle.fullName} url={`/bottles/${bottle.id}`} />
 
           {user?.mod && (
             <Menu as="div" className="menu">

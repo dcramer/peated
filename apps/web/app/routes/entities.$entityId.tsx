@@ -1,6 +1,5 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { ShareIcon } from "@heroicons/react/24/outline";
 import type {
   LinksFunction,
   LoaderFunctionArgs,
@@ -12,6 +11,7 @@ import invariant from "tiny-invariant";
 import Button from "~/components/button";
 import Chip from "~/components/chip";
 import Layout from "~/components/layout";
+import ShareButton from "~/components/shareButton";
 import Tabs from "~/components/tabs";
 import useAuth from "~/hooks/useAuth";
 import { summarize } from "~/lib/markdown";
@@ -148,21 +148,7 @@ export default function EntityDetails() {
                 Add a Bottle
               </Button>
 
-              <Button
-                icon={
-                  <ShareIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-                }
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator
-                      .share({
-                        title: entity.name,
-                        url: `/entities/${entity.id}`,
-                      })
-                      .catch((error) => console.error("Error sharing", error));
-                  }
-                }}
-              />
+              <ShareButton title={entity.name} url={`/entities/${entity.id}`} />
 
               {user?.mod && (
                 <Menu as="div" className="menu">
