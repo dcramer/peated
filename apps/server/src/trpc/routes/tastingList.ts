@@ -113,8 +113,7 @@ export default publicProcedure
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,
-        nextPage: results.length > limit ? cursor + 1 : null,
-        prevPage: cursor > 1 ? cursor - 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
       },
     };
   });
