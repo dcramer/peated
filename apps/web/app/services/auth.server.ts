@@ -38,8 +38,6 @@ authenticator.use(
             password,
           });
 
-      console.log(session);
-
       return session;
     } catch (err) {
       if (err instanceof TRPCClientError && err.data.code === "UNAUTHORIZED") {
