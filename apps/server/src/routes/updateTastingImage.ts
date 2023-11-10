@@ -52,12 +52,14 @@ export default {
     }
 
     if (!req.isMultipart()) {
-      return res.status(400).send({ error: "Bad request" });
+      return res
+        .status(400)
+        .send({ error: "Bad request", code: "invalid_content_type" });
     }
 
     const fileData = await req.file();
     if (!fileData) {
-      return res.status(400).send({ error: "Bad request" });
+      return res.status(400).send({ error: "Bad request", code: "no_file" });
     }
 
     let imageUrl: string;

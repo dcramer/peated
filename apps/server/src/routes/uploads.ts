@@ -23,10 +23,8 @@ export default {
   handler: async (req, res) => {
     const { filename } = req.params;
 
-    const useGcs = !!process.env.USE_GCS_STORAGE;
-
     let stream: any;
-    if (useGcs) {
+    if (process.env.USE_GCS_STORAGE) {
       const bucketName = process.env.GCS_BUCKET_NAME as string;
       const bucketPath = process.env.GCS_BUCKET_PATH
         ? `${process.env.GCS_BUCKET_PATH}/`

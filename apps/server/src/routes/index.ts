@@ -5,6 +5,7 @@ import triggerSentry from "./debug/triggerSentry";
 import root from "./root";
 import updateTastingImage from "./updateTastingImage";
 import updateUserAvatar from "./updateUserAvatar";
+import uploads from "./uploads";
 
 const ROBOTS = `User-agent: *
 Disallow: /`;
@@ -40,6 +41,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(root);
   fastify.route(updateTastingImage);
   fastify.route(updateUserAvatar);
+  fastify.route(uploads);
 
   if (config.ENV === "development") {
     registerDebugRoutes(fastify);
