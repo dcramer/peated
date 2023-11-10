@@ -99,7 +99,7 @@ export default function BottleDetails() {
           <BottleIcon className="hidden h-14 w-auto sm:inline-block" />
           <div className="w-full flex-1 flex-col items-center sm:w-auto sm:items-start">
             <h1
-              className="mx-auto max-w-[260px] truncate text-center text-3xl font-semibold sm:mx-0 sm:max-w-[480px] sm:text-left"
+              className="mx-auto truncate text-center text-3xl font-semibold sm:mx-0 sm:text-left"
               title={bottle.fullName}
             >
               {bottle.fullName}

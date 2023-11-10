@@ -19,9 +19,9 @@ export default function AppHeader() {
   const [searchFocused, setSearchFocused] = useState(false);
 
   return (
-    <div className="flex flex-1 items-center gap-x-2 sm:gap-x-4">
+    <div className="flex flex-auto items-center gap-x-2 sm:gap-x-4">
       <form
-        className={`flex-1`}
+        className="flex-auto"
         onSubmit={(e) => {
           e.preventDefault();
           navigate(`/search?q=${encodeURIComponent(query)}`);

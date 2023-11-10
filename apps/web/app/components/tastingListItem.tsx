@@ -10,7 +10,6 @@ import { useState } from "react";
 
 import type { Tasting } from "@peated/server/types";
 import useAuth from "~/hooks/useAuth";
-import classNames from "~/lib/classNames";
 import { trpc } from "~/lib/trpc";
 import BottleCard from "./bottleCard";
 import Button from "./button";
@@ -49,10 +48,10 @@ export default function TastingListItem({
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
 
   return (
-    <li className={classNames("card p-2 ring-1 ring-inset ring-slate-800")}>
+    <li className="card p-2 ring-1 ring-inset ring-slate-800">
       <div className="card-header p-3 sm:px-5 sm:py-4">
         <UserAvatar size={48} user={tasting.createdBy} />
-        <div className="flex-1 space-y-1 font-semibold">
+        <div className="flex-auto space-y-1 font-semibold">
           <Link
             to={`/users/${tasting.createdBy.username}`}
             className="truncate hover:underline"

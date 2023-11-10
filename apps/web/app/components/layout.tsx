@@ -46,7 +46,7 @@ export default function Layout({
       <Sidebar />
 
       <div className="flex">
-        <main className="max-w-6xl flex-1 lg:pl-64">
+        <main className="max-w-6xl flex-auto lg:pl-64">
           <div className="mx-auto lg:p-8">{children}</div>
         </main>
 

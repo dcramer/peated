@@ -49,7 +49,7 @@ export default function Activity() {
   return (
     <Layout>
       <div className="flex">
-        <div className="flex-1">
+        <div className="max-w-[100vw] flex-1">
           <Tabs fullWidth border>
             {user && (
               <Tabs.Item

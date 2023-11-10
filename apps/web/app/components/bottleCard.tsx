@@ -20,15 +20,13 @@ export const PreviewBottleCard = ({
 }) => {
   const { brand } = data;
   return (
-    <div className="bg-highlight flex items-center space-x-4 p-3 text-black sm:px-5 sm:py-4">
+    <div className="bg-highlight items-center space-x-4 p-3 text-black sm:px-5 sm:py-4">
       <div className="flex-1 space-y-1">
-        <h4 className="block max-w-[250px] truncate font-semibold leading-6 sm:max-w-[480px]">
-          {data.name}
-        </h4>
-        <div className="text-sm">{brand ? brand.name : "Unknown Bottle"}</div>
-      </div>
-      <div className="w-22 flex flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6">
+        <h4 className="block truncate font-semibold leading-6">{data.name}</h4>
         <div>{data.category ? formatCategoryName(data.category) : null}</div>
+      </div>
+      <div className="w-22 hidden flex-col items-end space-y-1 whitespace-nowrap text-sm leading-6 sm:flex">
+        <div className="text-sm">{brand ? brand.name : "Unknown Bottle"}</div>
         <div>{data.statedAge ? `Aged ${data.statedAge} years` : null}</div>
       </div>
     </div>
@@ -58,7 +56,7 @@ export default function BottleCard({
         <h4 className="flex items-center space-x-1">
           <Link
             to={`/bottles/${bottle.id}`}
-            className="block max-w-[260px] truncate font-semibold hover:underline sm:max-w-[480px]"
+            className="block truncate font-semibold hover:underline sm:max-w-[480px]"
             title={bottle.fullName}
           >
             {bottle.fullName}
@@ -70,6 +68,23 @@ export default function BottleCard({
             <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
           )}
         </h4>
+        <div>
+          {bottle.category && (
+            <Link
+              to={`/bottles?category=${bottle.category}`}
+              className="hover:underline"
+            >
+              {formatCategoryName(bottle.category)}
+            </Link>
+          )}
+        </div>
+      </div>
+      <div
+        className={classNames(
+          color === "highlight" ? "" : "text-light",
+          "hidden flex-col items-end space-y-1 whitespace-nowrap text-sm sm:flex",
+        )}
+      >
         <div
           className={classNames(
             "text-sm",
@@ -81,23 +96,7 @@ export default function BottleCard({
             {bottle.brand.name}
           </Link>
         </div>
-      </div>
-      <div
-        className={classNames(
-          color === "highlight" ? "" : "text-light",
-          "flex flex-col items-end space-y-1 whitespace-nowrap text-sm",
-        )}
-      >
-        <div>
-          {bottle.category && (
-            <Link
-              to={`/bottles?category=${bottle.category}`}
-              className="hover:underline"
-            >
-              {formatCategoryName(bottle.category)}
-            </Link>
-          )}
-        </div>
+
         <div>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</div>
       </div>
     </div>
