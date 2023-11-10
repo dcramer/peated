@@ -1,12 +1,11 @@
-import { Link, useLocation } from "@remix-run/react";
-
-import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
+import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import type {
   Bottle,
   CollectionBottle,
   Entity,
   PagingRel,
 } from "@peated/server/types";
+import { Link, useLocation } from "@remix-run/react";
 import { formatCategoryName } from "../lib/strings";
 import Button from "./button";
 import SortParam from "./sortParam";
