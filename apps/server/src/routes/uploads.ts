@@ -50,10 +50,10 @@ export default {
 
       stream = fd.createReadStream();
     }
-    res.header("Cache-Control", `max-age=${MAX_AGE}, s-maxage=${MAX_AGE}`);
-    res.header("Content-Type", contentType(filename));
-
-    await res.send(stream);
+    await res
+      .header("Cache-Control", `max-age=${MAX_AGE}, s-maxage=${MAX_AGE}`)
+      .header("Content-Type", contentType(filename))
+      .send(stream);
   },
 } as RouteOptions<
   Server,
