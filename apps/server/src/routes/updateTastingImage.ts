@@ -36,7 +36,7 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
-    if (!req.user) return res.status(401);
+    if (!req.user) return res.status(401).send();
 
     const [tasting] = await db
       .select()
@@ -56,12 +56,12 @@ export default {
         .status(400)
         .send({ error: "Bad request", code: "invalid_content_type" });
     }
-
     const fileData = await req.file();
     if (!fileData) {
       return res.status(400).send({ error: "Bad request", code: "no_file" });
     }
 
+    console.error("we here");
     let imageUrl: string;
     try {
       imageUrl = await storeFile({

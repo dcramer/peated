@@ -36,7 +36,7 @@ export default {
   },
   preHandler: [requireAuth],
   handler: async (req, res) => {
-    if (!req.user) return res.status(401);
+    if (!req.user) return res.status(401).send();
 
     const userId = req.params.userId === "me" ? req.user.id : req.params.userId;
 
@@ -73,6 +73,7 @@ export default {
         urlPrefix: "/uploads",
         onProcess: (...args) => compressAndResizeImage(...args, 500, 500),
       });
+      console.error("stored");
     } catch (err) {
       if (fileData.file.truncated) {
         // TODO: delete the file

@@ -2,12 +2,10 @@
 import "./sentry";
 
 import FastifyCors from "@fastify/cors";
-import FastifyExpress from "@fastify/express";
 import FastifyHelmet from "@fastify/helmet";
 import FastifyMultipart from "@fastify/multipart";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { fastify } from "fastify";
-import { expressHandler } from "trpc-playground/handlers/express";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
 import { shutdownClient } from "./jobs";
@@ -79,19 +77,6 @@ export default async function buildFastify(options = {}) {
   app.addHook("onClose", async () => {
     await shutdownClient();
   });
-
-  await app.register(FastifyExpress);
-  app.express.disabled("x-powered-by"); // true
-
-  if (config.ENV !== "production")
-    app.use(
-      "/_playground",
-      await expressHandler({
-        trpcApiEndpoint: "/trpc",
-        playgroundEndpoint: "/_playground",
-        router: appRouter,
-      }),
-    );
 
   app.setErrorHandler(function (error, request, reply) {
     const { validation, validationContext } = error;
