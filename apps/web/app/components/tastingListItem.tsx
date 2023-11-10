@@ -142,7 +142,6 @@ export default function TastingListItem({
                 navigator
                   .share({
                     title: `${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`,
-                    text: `Notes and review by ${tasting.createdBy.username}`,
                     url: `/tastings/${tasting.id}`,
                   })
                   .catch((error) => console.error("Error sharing", error));
