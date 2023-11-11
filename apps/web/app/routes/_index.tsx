@@ -69,9 +69,9 @@ export default function Activity() {
           </Tabs>
           <ActivityContent tastingList={tastingList} filter={filterParam} />
         </div>
-        <div className="ml-4 hidden min-w-[200px] lg:block">
+        <div className="ml-4 hidden w-3/12 lg:block">
           {!user && (
-            <div className="hidden flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800 lg:flex">
+            <div className="flex flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800">
               <p className="text-light mb-4 text-sm">
                 Create a profile to record tastings, track your favorite
                 bottles, and more.
@@ -81,16 +81,18 @@ export default function Activity() {
               </Button>
             </div>
           )}
-          <Tabs fullWidth>
-            <Tabs.Item active>Market Prices</Tabs.Item>
-          </Tabs>
-          <ClientOnly fallback={<PricesSkeleton />}>
-            {() => (
-              <QueryBoundary loading={<PricesSkeleton />}>
-                <PriceChanges />
-              </QueryBoundary>
-            )}
-          </ClientOnly>
+          <div>
+            <Tabs fullWidth>
+              <Tabs.Item active>Market Prices</Tabs.Item>
+            </Tabs>
+            <ClientOnly fallback={<PricesSkeleton />}>
+              {() => (
+                <QueryBoundary loading={<PricesSkeleton />}>
+                  <PriceChanges />
+                </QueryBoundary>
+              )}
+            </ClientOnly>
+          </div>
         </div>
       </div>
     </Layout>
