@@ -22,7 +22,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
-import type { PropsWithChildren } from "react";
+import type { ComponentProps, PropsWithChildren } from "react";
 import { useState } from "react";
 import { useDehydratedState } from "use-dehydrated-state";
 import glyphUrl from "~/assets/glyph.png";
@@ -139,6 +139,40 @@ export default withSentry(function App() {
         },
       }),
   );
+
+  const dehydratedState = useDehydratedState();
+
+  return (
+    <Document config={config} data={data}>
+      <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
+        <TRPCProvider queryClient={queryClient} key={accessToken}>
+          <QueryClientProvider client={queryClient}>
+            <Hydrate state={dehydratedState}>
+              <OnlineStatusProvider>
+                <AuthProvider user={user}>
+                  <ApiProvider
+                    accessToken={accessToken}
+                    server={config.API_SERVER}
+                  >
+                    <Outlet />
+                  </ApiProvider>
+                </AuthProvider>
+              </OnlineStatusProvider>
+            </Hydrate>
+          </QueryClientProvider>
+        </TRPCProvider>
+      </GoogleOAuthProvider>
+    </Document>
+  );
+});
+
+function TRPCProvider({
+  accessToken,
+  ...props
+}: { accessToken?: string } & Omit<
+  ComponentProps<typeof trpc.Provider>,
+  "client"
+>) {
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
@@ -154,31 +188,8 @@ export default withSentry(function App() {
       ],
     }),
   );
-  const dehydratedState = useDehydratedState();
-
-  return (
-    <Document config={config} data={data}>
-      <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
-        <trpc.Provider client={trpcClient} queryClient={queryClient}>
-          <QueryClientProvider client={queryClient}>
-            <Hydrate state={dehydratedState}>
-              <OnlineStatusProvider>
-                <AuthProvider user={user}>
-                  <ApiProvider
-                    accessToken={accessToken}
-                    server={config.API_SERVER}
-                  >
-                    <Outlet />
-                  </ApiProvider>
-                </AuthProvider>
-              </OnlineStatusProvider>
-            </Hydrate>
-          </QueryClientProvider>
-        </trpc.Provider>
-      </GoogleOAuthProvider>
-    </Document>
-  );
-});
+  return <trpc.Provider client={trpcClient} {...props} />;
+}
 
 export function ErrorBoundary() {
   const error = useRouteError();
