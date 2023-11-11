@@ -7,11 +7,8 @@ const scheduler = new ToadScheduler();
 
 import generateBottleDetails from "./jobs/generateBottleDetails";
 import generateEntityDetails from "./jobs/generateEntityDetails";
-import { main as astorwines } from "./price-scraper/astorwines";
-import { main as healthyspirits } from "./price-scraper/healthyspirits";
-import { main as totalwine } from "./price-scraper/totalwine";
-import { main as woodencork } from "./price-scraper/woodencork";
 
+import pushJob from "../../server/src/jobs";
 import packageData from "../package.json";
 import notifyDiscordOnTasting from "./jobs/notifyDiscordOnTasting";
 
@@ -92,22 +89,22 @@ async function main() {
   if (process.env.NODE_ENV === "production") {
     job("*/60 * * * *", "scrape-wooden-cork", async () => {
       console.log("Scraping Wooden Cork");
-      await woodencork();
+      await pushJob("ScrapeWoodenCork");
     });
 
     job("*/60 * * * *", "scrape-total-wine", async () => {
       console.log("Scraping Total Wine");
-      await totalwine();
+      await pushJob("ScrapeTotalWine");
     });
 
     job("*/60 * * * *", "scrape-astor-wines", async () => {
       console.log("Scraping Astor Wines");
-      await astorwines();
+      await pushJob("ScrapeAstorWines");
     });
 
     job("*/60 * * * *", "scrape-healthy-spirits", async () => {
       console.log("Scraping Healthy Spirits");
-      await healthyspirits();
+      await pushJob("ScrapeHealthySpirits");
     });
   }
 

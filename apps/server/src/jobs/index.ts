@@ -29,9 +29,13 @@ export async function shutdownClient() {
 export type JobName =
   | "GenerateBottleDetails"
   | "GenerateEntityDetails"
-  | "NotifyDiscordOnTasting";
+  | "NotifyDiscordOnTasting"
+  | "ScrapeAstorWines"
+  | "ScrapeHealthySpirits"
+  | "ScrapeTotalWine"
+  | "ScrapeWoodenCork";
 
-export default async function pushJob(jobName: JobName, args: any) {
+export default async function pushJob(jobName: JobName, args?: any) {
   const client = await getClient();
   await client.job(jobName, args).push();
 }
