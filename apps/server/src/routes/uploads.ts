@@ -51,7 +51,7 @@ export default {
       stream = fd.createReadStream();
     }
     await res
-      .header("Cache-Control", `max-age=${MAX_AGE}, s-maxage=${MAX_AGE}`)
+      .header("Cache-Control", `public, max-age=${MAX_AGE}`)
       .header("Content-Type", contentType(filename))
       .send(stream);
   },

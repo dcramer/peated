@@ -1,7 +1,6 @@
 import { PassThrough } from "stream";
 
-import type {
-  DataFunctionArgs} from "@remix-run/node";
+import type { DataFunctionArgs } from "@remix-run/node";
 import {
   createReadableStreamFromReadable,
   type EntryContext,
@@ -29,7 +28,7 @@ const ABORT_DELAY = 5_000;
 const { isSitemapUrl, sitemap } = createSitemapGenerator({
   siteUrl: "https://peated.com",
   headers: {
-    "Cache-Control": "max-age=3600",
+    "Cache-Control": "public, max-age=3600",
   },
   // generateRobotsTxt: true,
 });
