@@ -1,16 +1,28 @@
-import axios from "axios";
+import { type AppRouter } from "@peated/server/trpc/router";
+import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import config from "~/config";
 
-export async function submitBottle(data: any) {
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-  };
+export function makeTRPCClient(accessToken?: string | null | undefined) {
+  return createTRPCProxyClient<AppRouter>({
+    transformer: undefined,
+    links: [
+      httpBatchLink({
+        url: `${config.API_SERVER}/trpc`,
+        async headers() {
+          return {
+            authorization: accessToken ? `Bearer ${accessToken}` : "",
+          };
+        },
+      }),
+    ],
+  });
+}
 
+const trpcClient = makeTRPCClient(process.env.ACCESS_TOKEN);
+
+export async function submitBottle(data: any) {
   try {
-    await axios.post(`${config.API_SERVER}/bottles`, data, {
-      headers,
-    });
+    await trpcClient.bottleCreate.mutate(data);
   } catch (err: any) {
     const data = err?.response?.data;
     if (!data) {
@@ -28,15 +40,8 @@ export async function submitBottle(data: any) {
 }
 
 export async function submitEntity(data: any) {
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-  };
-
   try {
-    await axios.post(`${config.API_SERVER}/entities`, data, {
-      headers,
-    });
+    await trpcClient.entityCreate.mutate(data);
   } catch (err: any) {
     const data = err?.response?.data;
     if (!data) {
@@ -62,14 +67,10 @@ export type StorePrice = {
 };
 
 export async function submitStorePrices(storeId: number, data: StorePrice[]) {
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-  };
-
   try {
-    await axios.post(`${config.API_SERVER}/stores/${storeId}/prices`, data, {
-      headers,
+    await trpcClient.storePriceCreateBatch.mutate({
+      store: storeId,
+      prices: data,
     });
   } catch (err: any) {
     const data = err?.response?.data;
