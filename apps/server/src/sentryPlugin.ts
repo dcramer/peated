@@ -39,7 +39,14 @@ export default fastifyPlugin(async (fastify, options) => {
   fastify.addHook("preValidation", async (request) => {
     Sentry.configureScope((scope) =>
       scope.addEventProcessor((event) => {
-        if (!event.request) return event;
+        if (!event.request) {
+          event.request = {
+            method: request.method,
+            url: `${request.protocol}://${request.hostname}${request.url}`,
+            headers: request.headers as Record<string, string>, // idgaf
+            query_string: request.query as Record<string, any>,
+          };
+        }
         try {
           // upgrade the request w/ body
           event.request.data =
