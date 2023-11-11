@@ -11,6 +11,10 @@ import generateEntityDetails from "./jobs/generateEntityDetails";
 import pushJob from "../../server/src/jobs";
 import packageData from "../package.json";
 import notifyDiscordOnTasting from "./jobs/notifyDiscordOnTasting";
+import scrapeAstorWines from "./jobs/scrapeAstorWines";
+import scrapeHealthySpirits from "./jobs/scrapeHealthySpirits";
+import scrapeTotalWine from "./jobs/scrapeTotalWine";
+import scrapeWoodenCork from "./jobs/scrapeWoodenCork";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -129,6 +133,10 @@ async function main() {
 faktory.register("GenerateBottleDetails", generateBottleDetails);
 faktory.register("GenerateEntityDetails", generateEntityDetails);
 faktory.register("NotifyDiscordOnTasting", notifyDiscordOnTasting);
+faktory.register("ScrapeAstorWines", scrapeAstorWines);
+faktory.register("ScrapeHealthySpirits", scrapeHealthySpirits);
+faktory.register("ScrapeTotalWine", scrapeTotalWine);
+faktory.register("ScrapeWoodenCork", scrapeWoodenCork);
 
 process.on("SIGINT", function () {
   scheduler.stop();
