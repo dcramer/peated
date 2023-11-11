@@ -2,14 +2,10 @@ import * as Sentry from "@sentry/node-experimental";
 import { ProfilingIntegration } from "@sentry/profiling-node";
 import faktory from "faktory-worker";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
-
-const scheduler = new ToadScheduler();
-
-import generateBottleDetails from "./jobs/generateBottleDetails";
-import generateEntityDetails from "./jobs/generateEntityDetails";
-
 import pushJob from "../../server/src/jobs";
 import packageData from "../package.json";
+import generateBottleDetails from "./jobs/generateBottleDetails";
+import generateEntityDetails from "./jobs/generateEntityDetails";
 import notifyDiscordOnTasting from "./jobs/notifyDiscordOnTasting";
 import scrapeAstorWines from "./jobs/scrapeAstorWines";
 import scrapeHealthySpirits from "./jobs/scrapeHealthySpirits";
@@ -27,6 +23,8 @@ Sentry.init({
 });
 
 Sentry.setTag("service", packageData.name);
+
+const scheduler = new ToadScheduler();
 
 function job(schedule: string, name: string, cb: () => Promise<void>) {
   const task = new AsyncTask(name, async () => {
