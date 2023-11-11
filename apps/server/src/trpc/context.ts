@@ -11,8 +11,11 @@ export async function createContext({ req, res }: CreateFastifyContextOptions) {
         id: `${user.id}`,
         username: user.username,
         email: user.email,
+        ip_address: req.ip,
       })
-    : setUser(null);
+    : setUser({
+        ip_address: req.ip,
+      });
 
   return { user };
 }

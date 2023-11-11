@@ -100,11 +100,18 @@ app.all("*", async (req, res, next) => {
   const user = await getUser(session);
   const accessToken = await getAccessToken(session);
 
-  Sentry.setUser({
-    id: `${user?.id}`,
-    username: user?.username,
-    email: user?.email,
-  });
+  Sentry.setUser(
+    user
+      ? {
+          id: `${user?.id}`,
+          username: user?.username,
+          email: user?.email,
+          ip_address: req.ip,
+        }
+      : {
+          ip_address: req.ip,
+        },
+  );
 
   req.user = user || null;
   req.accessToken = accessToken || null;
