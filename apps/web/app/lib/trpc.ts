@@ -34,7 +34,7 @@ export const trpc = createTRPCReact<AppRouter>({
 export function makeTRPCClient(accessToken?: string | null | undefined) {
   return createTRPCProxyClient<AppRouter>({
     links: [
-      sentryLink<AppRouter>(),
+      // sentryLink<AppRouter>(),
       httpBatchLink({
         url: `${config.API_SERVER}/trpc`,
         async headers() {

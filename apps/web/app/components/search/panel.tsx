@@ -37,7 +37,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
   const [entityResults, setEntityResults] = useState<readonly Entity[]>([]);
   const isUserQuery = query.indexOf("@") !== -1;
 
-  const client = trpc.useUtils();
+  const trpcUtils = trpc.useUtils();
 
   // TODO: handle errors
   const fetch = debounce(async (query: string) => {
@@ -50,31 +50,36 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
     // trpc.useQueries(t => {
 
     // })
+    const promises = [];
     if (directToTasting) {
       setUserResults([]);
       setEntityResults([]);
-      await client.bottleList
-        .fetch({
-          query,
-          limit: maxResults,
-        })
-        .then(({ results }: { results: readonly Bottle[] }) => {
-          setBottleResults(results);
-          if (state !== "ready") setState("ready");
-        });
-    } else if (isUserQuery) {
-      setBottleResults([]);
-      setEntityResults([]);
-      if (user) {
-        await client.userList
+      promises.push(
+        trpcUtils.bottleList
           .fetch({
             query,
             limit: maxResults,
           })
-          .then(({ results }: { results: readonly User[] }) => {
-            setUserResults(results);
+          .then(({ results }) => {
+            setBottleResults(results);
             if (state !== "ready") setState("ready");
-          });
+          }),
+      );
+    } else if (isUserQuery) {
+      setBottleResults([]);
+      setEntityResults([]);
+      if (user) {
+        promises.push(
+          trpcUtils.userList
+            .fetch({
+              query,
+              limit: maxResults,
+            })
+            .then(({ results }) => {
+              setUserResults(results);
+              if (state !== "ready") setState("ready");
+            }),
+        );
       } else {
         setUserResults([]);
         setState("ready");
@@ -82,25 +87,32 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
     } else {
       setUserResults([]);
       if (user && query) {
-        await client.userList
-          .fetch({ query, limit: maxResults })
-          .then(({ results }: { results: readonly User[] }) => {
-            setUserResults(results);
-            if (state !== "ready") setState("ready");
-          });
+        promises.push(
+          trpcUtils.userList
+            .fetch({ query, limit: maxResults })
+            .then(({ results }) => {
+              setUserResults(results);
+              if (state !== "ready") setState("ready");
+            }),
+        );
       }
-      await client.bottleList
-        .fetch({ query, limit: maxResults })
-        .then(({ results }: { results: readonly Bottle[] }) => {
-          setBottleResults(results);
-          if (state !== "ready") setState("ready");
-        });
-      await client.entityList
-        .fetch({ query, limit: maxResults })
-        .then(({ results }: { results: readonly Entity[] }) => {
-          setEntityResults(results);
-          if (state !== "ready") setState("ready");
-        });
+      promises.push(
+        trpcUtils.bottleList
+          .fetch({ query, limit: maxResults })
+          .then(({ results }) => {
+            setBottleResults(results);
+            if (state !== "ready") setState("ready");
+          }),
+      );
+      promises.push(
+        trpcUtils.entityList
+          .fetch({ query, limit: maxResults })
+          .then(({ results }) => {
+            setEntityResults(results);
+            if (state !== "ready") setState("ready");
+          }),
+      );
+      await Promise.all(promises);
     }
   }, 300);
 
