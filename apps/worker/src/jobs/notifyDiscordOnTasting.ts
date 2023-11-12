@@ -10,6 +10,7 @@ function absoluteUri(url: string, host: string) {
 export default async function ({ tastingId }: { tastingId: number }) {
   if (!config.DISCORD_WEBHOOK) {
     logError("DISCORD_WEBHOOK is not configured");
+    return;
   }
 
   const tasting = await db.query.tastings.findFirst({

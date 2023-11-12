@@ -33,7 +33,8 @@ export const verifyToken = (token: string | undefined): Promise<any> => {
 export const getUserFromHeader = async (
   authorizationHeader: string | undefined,
 ) => {
-  const token = authorizationHeader?.replace("Bearer ", "");
+  const token = authorizationHeader?.replace(/^Bearer /i, "");
+  console.log({ token });
   if (!token) return null;
 
   const { id } = await verifyToken(token);
@@ -48,6 +49,7 @@ export const getUserFromHeader = async (
   }
 
   if (!user.active) {
+    console.warn(`Inactive user found for token`);
     // this code path is expected, no need to log
     return null;
   }

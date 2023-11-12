@@ -30,12 +30,15 @@ export async function loader({
   context: { trpc },
 }: LoaderFunctionArgs) {
   const { searchParams } = new URL(request.url);
-
+  const numericFields = new Set(["cursor", "limit"]);
   return json({
-    entityList: await trpc.entityList.query({
-      ...Object.fromEntries(searchParams.entries()),
-      page: Number(searchParams.get("page") || 1),
-    }),
+    entityList: await trpc.entityList.query(
+      Object.fromEntries(
+        [...searchParams.entries()].map(([k, v]) =>
+          numericFields.has(k) ? [k, Number(v)] : [k, v],
+        ),
+      ),
+    ),
   });
 }
 
@@ -99,7 +102,7 @@ function FilterSidebar() {
                 pathname: location.pathname,
                 search: buildQueryString(location.search, {
                   type: "",
-                  page: 1,
+                  cursor: null,
                 }),
               }}
               size="small"
@@ -114,7 +117,7 @@ function FilterSidebar() {
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
                     type,
-                    page: 1,
+                    cursor: null,
                   }),
                 }}
                 size="small"
@@ -145,7 +148,7 @@ function FilterSidebar() {
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
                     country,
-                    page: "1",
+                    cursor: null,
                   }),
                 }}
                 size="small"
@@ -162,7 +165,7 @@ function FilterSidebar() {
                     pathname: location.pathname,
                     search: buildQueryString(location.search, {
                       country,
-                      page: "1",
+                      cursor: null,
                     }),
                   }}
                   size="small"
@@ -182,7 +185,7 @@ function FilterSidebar() {
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
                     region: "",
-                    page: "1",
+                    cursor: null,
                   }),
                 }}
                 size="small"
@@ -195,7 +198,7 @@ function FilterSidebar() {
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
                     region,
-                    page: "1",
+                    cursor: null,
                   }),
                 }}
                 size="small"

@@ -13,24 +13,24 @@ export default publicProcedure
       .object({
         user: z.union([z.literal("me"), z.number()]).optional(),
         tasting: z.number().optional(),
-        page: z.number().gte(1).default(1),
+        cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(100),
       })
       .default({
-        page: 1,
+        cursor: 1,
         limit: 100,
       }),
   )
-  .query(async function ({ input: { page, limit, ...input }, ctx }) {
-    const offset = (page - 1) * limit;
+  .query(async function ({ input: { cursor, limit, ...input }, ctx }) {
+    const offset = (cursor - 1) * limit;
 
     // have to specify at least one so folks dont scrape all comments
     if (!ctx.user?.admin && !input.tasting && !input.user) {
       return {
         results: [],
         rel: {
-          nextPage: null,
-          prevPage: null,
+          nextCursor: null,
+          prevCursor: null,
         },
       };
     }
@@ -69,8 +69,8 @@ export default publicProcedure
         ctx.user,
       ),
       rel: {
-        nextPage: results.length > limit ? page + 1 : null,
-        prevPage: page > 1 ? page - 1 : null,
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
       },
     };
   });

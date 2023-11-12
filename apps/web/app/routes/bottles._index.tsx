@@ -31,12 +31,23 @@ export async function loader({
   context: { trpc },
 }: LoaderFunctionArgs) {
   const { searchParams } = new URL(request.url);
-
+  const numericFields = new Set([
+    "cursor",
+    "limit",
+    "age",
+    "entity",
+    "distiller",
+    "bottler",
+    "entity",
+  ]);
   return json({
-    bottleList: await trpc.bottleList.query({
-      ...Object.fromEntries(searchParams.entries()),
-      page: Number(searchParams.get("page") || 1),
-    }),
+    bottleList: await trpc.bottleList.query(
+      Object.fromEntries(
+        [...searchParams.entries()].map(([k, v]) =>
+          numericFields.has(k) ? [k, Number(v)] : [k, v],
+        ),
+      ),
+    ),
   });
 }
 
@@ -107,7 +118,7 @@ function FilterSidebar() {
                 pathname: location.pathname,
                 search: buildQueryString(location.search, {
                   category: "",
-                  page: 1,
+                  cursor: null,
                 }),
               }}
               size="small"
@@ -122,7 +133,7 @@ function FilterSidebar() {
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
                     category,
-                    page: 1,
+                    cursor: null,
                   }),
                 }}
                 size="small"
@@ -144,7 +155,7 @@ function FilterSidebar() {
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
                     entity: "",
-                    page: 1,
+                    cursor: null,
                   }),
                 }}
                 size="small"
@@ -157,7 +168,7 @@ function FilterSidebar() {
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
                     entity,
-                    page: 1,
+                    cursor: null,
                   }),
                 }}
                 size="small"
@@ -177,7 +188,7 @@ function FilterSidebar() {
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
                     age: "",
-                    page: 1,
+                    cursor: null,
                   }),
                 }}
                 size="small"
@@ -188,7 +199,10 @@ function FilterSidebar() {
                 active={qs.get("age") === age}
                 to={{
                   pathname: location.pathname,
-                  search: buildQueryString(location.search, { age, page: 1 }),
+                  search: buildQueryString(location.search, {
+                    age,
+                    cursor: null,
+                  }),
                 }}
                 size="small"
               >
@@ -209,7 +223,7 @@ function FilterSidebar() {
                   pathname: location.pathname,
                   search: buildQueryString(location.search, {
                     tag: "",
-                    page: 1,
+                    cursor: null,
                   }),
                 }}
                 size="small"
@@ -220,7 +234,10 @@ function FilterSidebar() {
                 active={qs.get("tag") === tag}
                 to={{
                   pathname: location.pathname,
-                  search: buildQueryString(location.search, { tag, page: 1 }),
+                  search: buildQueryString(location.search, {
+                    tag,
+                    cursor: null,
+                  }),
                 }}
                 size="small"
               >

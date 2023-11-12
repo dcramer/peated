@@ -82,7 +82,7 @@ async function generateEntityDetails(entity: Entity): Promise<Response | null> {
     },
   );
 
-  if (!result || result.confidence < 0.75)
+  if (!result || !result.confidence || result.confidence < 0.75)
     // idk
     return null;
 
@@ -112,7 +112,7 @@ export default async ({ entityId }: { entityId: number }) => {
     data.website = result.website;
 
   if (
-    result.type.length &&
+    result.type?.length &&
     !arraysEqual(result.type.sort(), entity.type.sort())
   )
     data.type = result.type;

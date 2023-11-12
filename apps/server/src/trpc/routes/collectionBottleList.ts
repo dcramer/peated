@@ -15,11 +15,11 @@ export default authedProcedure
     z.object({
       collection: z.union([z.literal("default"), z.number()]),
       user: z.union([z.literal("me"), z.string(), z.number()]),
-      page: z.number().gte(1).default(1),
+      cursor: z.number().gte(1).default(1),
       limit: z.number().gte(1).lte(100).default(25),
     }),
   )
-  .query(async function ({ input: { page, limit, ...input }, ctx }) {
+  .query(async function ({ input: { cursor, limit, ...input }, ctx }) {
     const user = await getUserFromId(db, input.user, ctx.user);
     if (!user) {
       throw new TRPCError({
@@ -53,7 +53,7 @@ export default authedProcedure
       });
     }
 
-    const offset = (page - 1) * limit;
+    const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [
       eq(collectionBottles.collectionId, collection.id),
@@ -79,8 +79,8 @@ export default authedProcedure
         ctx.user,
       ),
       rel: {
-        nextPage: results.length > limit ? page + 1 : null,
-        prevPage: page > 1 ? page - 1 : null,
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
       },
     };
   });

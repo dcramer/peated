@@ -29,7 +29,7 @@ export const sitemap: SitemapFunction = async ({
       })),
     );
 
-    page = rel?.nextPage || null;
+    page = rel?.nextCursor || null;
   }
   return output;
 };

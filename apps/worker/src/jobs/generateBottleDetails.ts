@@ -91,7 +91,7 @@ async function generateBottleDetails(bottle: Bottle): Promise<Response | null> {
     },
   );
 
-  if (!result || result.confidence < 0.75)
+  if (!result || !result.confidence || result.confidence < 0.75)
     // idk
     return null;
   return result;
@@ -118,7 +118,7 @@ export default async function ({ bottleId }: { bottleId: number }) {
     data.tastingNotes = result.tastingNotes;
 
   if (
-    result.suggestedTags.length &&
+    result.suggestedTags?.length &&
     !arraysEqual(result.suggestedTags, bottle.suggestedTags)
   ) {
     const firstInvalidTag = result.suggestedTags.find(

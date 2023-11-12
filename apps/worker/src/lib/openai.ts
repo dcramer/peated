@@ -31,7 +31,7 @@ export async function getStructuredResponse<
 >(
   prompt: string,
   schema: Schema,
-  fullSchema: FullSchema | null = undefined,
+  fullSchema: FullSchema | null = null,
   model: Model = DEFAULT_MODEL,
   logContext?: Record<string, Record<string, any>>,
 ): Promise<z.infer<FullSchema> | null> {

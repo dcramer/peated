@@ -41,19 +41,19 @@ export default publicProcedure
         flight: z.string().optional(),
         category: z.enum(CATEGORY_LIST).optional(),
         age: z.number().optional(),
-        page: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
+        cursor: z.number().gte(1).default(1),
+        limit: z.number().gte(1).lte(100).default(25),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
       })
       .default({
         query: "",
-        page: 1,
+        cursor: 1,
         limit: 100,
         sort: DEFAULT_SORT,
       }),
   )
-  .query(async function ({ input: { query, page, limit, ...input }, ctx }) {
-    const offset = (page - 1) * limit;
+  .query(async function ({ input: { query, cursor, limit, ...input }, ctx }) {
+    const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
 
@@ -124,8 +124,8 @@ export default publicProcedure
         return {
           results: [],
           rel: {
-            nextPage: null,
-            prevPage: null,
+            nextCursor: null,
+            prevCursor: null,
           },
         };
       }
@@ -179,8 +179,8 @@ export default publicProcedure
         ["description", "tastingNotes"],
       ),
       rel: {
-        nextPage: results.length > limit ? page + 1 : null,
-        prevPage: page > 1 ? page - 1 : null,
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
       },
     };
   });

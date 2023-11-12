@@ -13,17 +13,17 @@ export default publicProcedure
     z
       .object({
         query: z.string().default(""),
-        page: z.number().gte(1).default(1),
+        cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(100),
       })
       .default({
         query: "",
-        page: 1,
+        cursor: 1,
         limit: 100,
       }),
   )
-  .query(async function ({ input: { query, page, limit, ...input }, ctx }) {
-    const offset = (page - 1) * limit;
+  .query(async function ({ input: { query, cursor, limit, ...input }, ctx }) {
+    const offset = (cursor - 1) * limit;
 
     const minChange = 500; // $5
 
@@ -66,8 +66,8 @@ export default publicProcedure
         ctx.user,
       ),
       rel: {
-        nextPage: results.length > limit ? page + 1 : null,
-        prevPage: page > 1 ? page - 1 : null,
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
       },
     };
   });

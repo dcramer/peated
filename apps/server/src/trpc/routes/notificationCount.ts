@@ -7,9 +7,11 @@ import { authedProcedure } from "..";
 
 export default authedProcedure
   .input(
-    z.object({
-      filter: z.enum(["unread", "all"]),
-    }),
+    z
+      .object({
+        filter: z.enum(["unread", "all"]).nullish(),
+      })
+      .default({}),
   )
   .query(async function ({ input, ctx }) {
     const where: (SQL<unknown> | undefined)[] = [

@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/node-experimental";
 import { ProfilingIntegration } from "@sentry/profiling-node";
+import type { JobFunction } from "faktory-worker";
 import faktory from "faktory-worker";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 import pushJob from "../../server/src/jobs";
@@ -128,9 +129,13 @@ async function main() {
   console.log("Scheduler Running...");
 }
 
-faktory.register("GenerateBottleDetails", generateBottleDetails);
-faktory.register("GenerateEntityDetails", generateEntityDetails);
-faktory.register("NotifyDiscordOnTasting", notifyDiscordOnTasting);
+// faktory does not have correct types
+faktory.register("GenerateBottleDetails", generateBottleDetails as JobFunction);
+faktory.register("GenerateEntityDetails", generateEntityDetails as JobFunction);
+faktory.register(
+  "NotifyDiscordOnTasting",
+  notifyDiscordOnTasting as JobFunction,
+);
 faktory.register("ScrapeAstorWines", scrapeAstorWines);
 faktory.register("ScrapeHealthySpirits", scrapeHealthySpirits);
 faktory.register("ScrapeTotalWine", scrapeTotalWine);

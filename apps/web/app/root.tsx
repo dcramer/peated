@@ -145,7 +145,11 @@ export default withSentry(function App() {
   return (
     <Document config={config} data={data}>
       <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
-        <TRPCProvider queryClient={queryClient} key={accessToken}>
+        <TRPCProvider
+          queryClient={queryClient}
+          accessToken={accessToken}
+          key={accessToken}
+        >
           <QueryClientProvider client={queryClient}>
             <Hydrate state={dehydratedState}>
               <OnlineStatusProvider>

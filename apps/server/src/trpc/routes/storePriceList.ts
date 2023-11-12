@@ -14,11 +14,11 @@ export default adminProcedure
     z.object({
       store: z.number(),
       query: z.string().default(""),
-      page: z.number().gte(1).default(1),
+      cursor: z.number().gte(1).default(1),
       limit: z.number().gte(1).lte(100).default(100),
     }),
   )
-  .query(async function ({ input: { page, query, limit, ...input }, ctx }) {
+  .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
     const store = await db.query.stores.findFirst({
       where: eq(stores.id, input.store),
     });
@@ -30,7 +30,7 @@ export default adminProcedure
       });
     }
 
-    const offset = (page - 1) * limit;
+    const offset = (cursor - 1) * limit;
 
     const where: SQL[] = [
       eq(storePrices.storeId, store.id),
@@ -55,8 +55,8 @@ export default adminProcedure
         ctx.user,
       ),
       rel: {
-        nextPage: results.length > limit ? page + 1 : null,
-        prevPage: page > 1 ? page - 1 : null,
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
       },
     };
   });

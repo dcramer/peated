@@ -101,7 +101,7 @@ export async function main() {
   while (hasProducts) {
     hasProducts = false;
     await scrapeProducts(
-      `https://woodencork.com/collections/whiskey?page=${page}`,
+      `https://woodencork.com/collections/whiskey?cursor=${page}`,
       async (product) => {
         products.push(product);
         hasProducts = true;

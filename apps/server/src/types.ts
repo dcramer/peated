@@ -61,18 +61,18 @@ export type Tag = { tag: string; count: number };
 
 type NextPagingRel =
   | {
-      nextPage: number;
+      nextCursor: number;
     }
   | {
-      nextPage: null;
+      nextCursor: null;
     };
 
 type PrevPagingRel =
   | {
-      prevPage: number;
+      prevCursor: number;
     }
   | {
-      prevPage: null;
+      prevCursor: null;
     };
 
 export type PagingRel = NextPagingRel & PrevPagingRel;

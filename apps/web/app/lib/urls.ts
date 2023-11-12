@@ -10,7 +10,8 @@ export function buildQueryString(
 ): string {
   const qs = new URLSearchParams(search);
   for (const [key, value] of Object.entries(newParams)) {
-    qs.set(key, value);
+    if (value === undefined || value === null) qs.delete(key);
+    else qs.set(key, value);
   }
   return qs.toString();
 }

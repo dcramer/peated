@@ -13,12 +13,24 @@ export async function loader({
 }: LoaderFunctionArgs) {
   invariant(entityId);
   const { searchParams } = new URL(request.url);
+  const numericFields = new Set([
+    "cursor",
+    "limit",
+    "age",
+    "entity",
+    "distiller",
+    "bottler",
+    "entity",
+  ]);
 
   return json({
     bottleList: await trpc.bottleList.query({
-      ...Object.fromEntries(searchParams.entries()),
+      ...Object.fromEntries(
+        [...searchParams.entries()].map(([k, v]) =>
+          numericFields.has(k) ? [k, Number(v)] : [k, v],
+        ),
+      ),
       entity: Number(entityId),
-      page: Number(searchParams.get("page") || 1),
     }),
   });
 }

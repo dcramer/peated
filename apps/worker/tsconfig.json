@@ -3,7 +3,6 @@
   "include": ["src"],
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "strict": false,
     "types": ["vitest/globals"],
     "baseUrl": ".",
     "paths": {

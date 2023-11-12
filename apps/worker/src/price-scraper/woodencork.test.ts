@@ -5,7 +5,7 @@ import { scrapeProducts } from "./woodencork";
 process.env.DISABLE_HTTP_CACHE = "1";
 
 test("simple", async () => {
-  const url = "https://woodencork.com/collections/whiskey?page=2";
+  const url = "https://woodencork.com/collections/whiskey?cursor=2";
   const result = await loadFixture("woodencork", "bottle-list.html");
 
   const items: any[] = [];
