@@ -27,7 +27,7 @@ export default function EntityDetailsOverview() {
 
   return (
     <>
-      <div className="my-6 flex flex-col gap-4 sm:flex-row">
+      <div className="my-6 flex flex-col gap-4 px-3 sm:flex-row md:px-0">
         <div className="flex-auto">
           <ClientOnly
             fallback={
@@ -58,7 +58,7 @@ export default function EntityDetailsOverview() {
       </div>
 
       {entity.description && (
-        <div className="my-6">
+        <div className="my-6 px-3 md:px-0">
           <div className="flex space-x-4">
             <div className="prose prose-invert -mt-5 max-w-none flex-auto">
               <Markdown content={entity.description} />

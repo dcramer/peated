@@ -49,7 +49,7 @@ export function DistributionChart({
         return itemTo ? (
           <Link
             key={item.name}
-            className={`${colorNames[index]} flex h-6 items-center justify-end sm:rounded-r`}
+            className={`${colorNames[index]} flex h-6 items-center justify-end rounded-r`}
             style={{ width: `${pct}%` }}
             to={itemTo}
           >
@@ -58,7 +58,7 @@ export function DistributionChart({
         ) : (
           <div
             key={item.name}
-            className={`${colorNames[index]} flex h-6 items-center justify-end sm:rounded-r`}
+            className={`${colorNames[index]} flex h-6 items-center justify-end rounded-r`}
             style={{ width: `${pct}%` }}
           >
             <span className="truncate px-2">{item.name}</span>

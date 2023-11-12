@@ -66,7 +66,7 @@ export default function BottleDetails() {
 
   return (
     <>
-      <div className="my-6">
+      <div className="my-6 px-3 md:px-0">
         <ClientOnly
           fallback={
             <div
@@ -92,7 +92,7 @@ export default function BottleDetails() {
       </div>
 
       {bottle.description && (
-        <div className="my-6">
+        <div className="my-6 px-3 md:px-0">
           <div className="flex space-x-4">
             <div className="prose prose-invert -mt-5 max-w-none flex-auto">
               <Markdown content={bottle.description} />
