@@ -36,7 +36,7 @@ export default function ErrorPage() {
 
   return (
     <main className="mx-auto flex h-screen max-w-xl items-center justify-center p-4 lg:p-8">
-      <div className="flex-auto">
+      <div className="h-full flex-auto">
         <main className="self-justify-center inline self-center p-3">
           <div className="text-center">
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
@@ -56,7 +56,7 @@ export default function ErrorPage() {
             {error.remoteStack && (
               <div className="prose mx-auto mb-4">
                 <h3 className="text-white">Remote Stack</h3>
-                <pre className="whitespace-pre-wrap break-all text-left">
+                <pre className="max-h-full overflow-y-auto whitespace-pre-wrap break-all text-left">
                   {error.remoteStack}
                 </pre>
               </div>
@@ -64,7 +64,7 @@ export default function ErrorPage() {
             {error.stack && (
               <div className="prose mx-auto mb-4">
                 <h3 className="text-white">Local Stack</h3>
-                <pre className="whitespace-pre-wrap break-all text-left">
+                <pre className="max-h-full overflow-y-auto whitespace-pre-wrap break-all text-left">
                   {error.stack}
                 </pre>
               </div>
