@@ -23,6 +23,9 @@ const SORT_OPTIONS = [
 ] as const;
 
 export default publicProcedure
+  .meta({
+    openapi: { method: "GET", path: "/entities" },
+  })
   .input(
     z
       .object({

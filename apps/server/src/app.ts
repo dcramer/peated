@@ -6,6 +6,7 @@ import FastifyHelmet from "@fastify/helmet";
 import FastifyMultipart from "@fastify/multipart";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { fastify } from "fastify";
+import { fastifyTRPCOpenApiPlugin } from "trpc-openapi";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
 import { shutdownClient } from "./jobs";
@@ -47,12 +48,7 @@ export default async function buildFastify(options = {}) {
     ...options,
   });
 
-  app.register(fastifyTRPCPlugin, {
-    prefix: "/trpc",
-    trpcOptions: { router: appRouter, createContext },
-  });
-
-  app.register(FastifyMultipart, {
+  await app.register(FastifyMultipart, {
     limits: {
       fieldNameSize: 100, // Max field name size in bytes
       fieldSize: 100, // Max field value size in bytes
@@ -62,16 +58,27 @@ export default async function buildFastify(options = {}) {
       headerPairs: 2000, // Max number of header key=>value pairs
     },
   });
-  app.register(FastifyHelmet, {
+  await app.register(FastifyHelmet, {
     crossOriginResourcePolicy: {
       policy: "same-site",
     },
     contentSecurityPolicy: false,
   });
-  app.register(FastifyCors, { credentials: true, origin: config.CORS_HOST });
+  await app.register(FastifyCors, {
+    credentials: true,
+    origin: config.CORS_HOST,
+  });
+  await app.register(FastifySentry);
 
-  app.register(router);
-  app.register(FastifySentry);
+  await app.register(fastifyTRPCPlugin, {
+    prefix: "/trpc",
+    trpcOptions: { router: appRouter, createContext },
+  });
+  await app.register(fastifyTRPCOpenApiPlugin, {
+    prefix: "/api",
+    router: appRouter,
+  });
+  await app.register(router);
 
   app.addHook("preHandler", injectAuth);
   app.addHook("onClose", async () => {

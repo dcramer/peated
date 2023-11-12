@@ -8,6 +8,7 @@ import {
   flights,
   tastings,
 } from "@peated/server/db/schema";
+import { BottleSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { SQL } from "drizzle-orm";
@@ -29,6 +30,9 @@ const SORT_OPTIONS = [
 ] as const;
 
 export default publicProcedure
+  .meta({
+    openapi: { method: "GET", path: "/bottles" },
+  })
   .input(
     z
       .object({
@@ -51,6 +55,15 @@ export default publicProcedure
         limit: 100,
         sort: DEFAULT_SORT,
       }),
+  )
+  .output(
+    z.object({
+      results: z.array(BottleSchema),
+      rel: z.object({
+        prevCursor: z.number().nullable(),
+        nextCursor: z.number().nullable(),
+      }),
+    }),
   )
   .query(async function ({ input: { query, cursor, limit, ...input }, ctx }) {
     const offset = (cursor - 1) * limit;

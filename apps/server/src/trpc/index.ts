@@ -1,7 +1,8 @@
 import { TRPCError, initTRPC } from "@trpc/server";
+import { type OpenApiMeta } from "trpc-openapi";
 import { type Context } from "./context";
 
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 
 const isAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.user) {
