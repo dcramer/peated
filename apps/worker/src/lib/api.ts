@@ -1,24 +1,12 @@
-import { type AppRouter } from "@peated/server/trpc/router";
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+import { makeTRPCClient } from "@peated/server/lib/trpc";
+import { captureException } from "@sentry/node-experimental";
 import config from "~/config";
 
-export function makeTRPCClient(accessToken?: string | null | undefined) {
-  return createTRPCProxyClient<AppRouter>({
-    transformer: undefined,
-    links: [
-      httpBatchLink({
-        url: `${config.API_SERVER}/trpc`,
-        async headers() {
-          return {
-            authorization: accessToken ? `Bearer ${accessToken}` : "",
-          };
-        },
-      }),
-    ],
-  });
-}
-
-const trpcClient = makeTRPCClient(process.env.ACCESS_TOKEN);
+const trpcClient = makeTRPCClient(
+  config.API_SERVER,
+  process.env.ACCESS_TOKEN,
+  captureException,
+);
 
 export async function submitBottle(data: any) {
   try {

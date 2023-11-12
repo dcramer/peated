@@ -1,12 +1,6 @@
-import type { AppRouter } from "@peated/server/src/trpc/router";
-import {
-  createTRPCProxyClient,
-  httpBatchLink,
-  TRPCClientError,
-} from "@trpc/client";
+import { TRPCClientError } from "@trpc/client";
 import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
-import config from "~/config";
 import { sessionStorage } from "~/services/session.server";
 import type { SessionPayload } from "~/types";
 
@@ -14,16 +8,10 @@ export const authenticator = new Authenticator<SessionPayload | null>(
   sessionStorage,
 );
 
-const trpc = createTRPCProxyClient<AppRouter>({
-  links: [
-    httpBatchLink({
-      url: `${config.API_SERVER}/trpc`,
-    }),
-  ],
-});
-
 authenticator.use(
-  new FormStrategy(async ({ form }) => {
+  new FormStrategy(async ({ form, context }) => {
+    if (!context) throw new Error("Where da context?");
+    const { trpc } = context;
     const email = form.get("email") as string;
     const password = form.get("password") as string;
     const code = form.get("code") as string;

@@ -1,4 +1,5 @@
 import FontStyles from "@fontsource/raleway/index.css";
+import { sentryLink } from "@peated/server/src/lib/trpc";
 import type { User } from "@peated/server/types";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { cssBundleHref } from "@remix-run/css-bundle";
@@ -180,7 +181,7 @@ function TRPCProvider({
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
-        // sentryLink<AppRouter>(),
+        sentryLink(Sentry.captureException),
         httpBatchLink({
           url: `${config.API_SERVER}/trpc`,
           async headers() {

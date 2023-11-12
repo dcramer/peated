@@ -20,6 +20,7 @@ import {
 
 import * as Sentry from "@sentry/remix";
 
+import { sentryLink } from "@peated/server/src/lib/trpc";
 import packageData from "./package.json";
 
 Sentry.init({
@@ -130,6 +131,7 @@ app.all("*", async (req, res, next) => {
 function getLoadContext(req: Request): AppLoadContext {
   const trpc = createTRPCProxyClient<AppRouter>({
     links: [
+      sentryLink(Sentry.captureException),
       httpBatchLink({
         url: `${config.API_SERVER}/trpc`,
         async headers() {

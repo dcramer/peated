@@ -1,5 +1,7 @@
+import { makeTRPCClient } from "@peated/server/lib/trpc";
 import type { Bottle } from "@peated/server/types";
 import { useOutletContext } from "@remix-run/react";
+import { captureException } from "@sentry/remix";
 import { Fragment } from "react";
 import { type SitemapFunction } from "remix-sitemap";
 import RobotImage from "~/assets/robot.png";
@@ -7,19 +9,20 @@ import { ClientOnly } from "~/components/clientOnly";
 import { DistributionChart } from "~/components/distributionChart";
 import Markdown from "~/components/markdown";
 import QueryBoundary from "~/components/queryBoundary";
-import { makeTRPCClient, trpc } from "~/lib/trpc";
+import config from "~/config";
+import { trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = async ({
   config: sitemapConfig,
   request,
 }) => {
-  const trpcClient = makeTRPCClient();
+  const trpcClient = makeTRPCClient(config.API_SERVER, null, captureException);
 
-  let page: number | null = 1;
+  let cursor: number | null = 1;
   const output = [];
-  while (page) {
+  while (cursor) {
     const { results, rel } = await trpcClient.bottleList.query({
-      page,
+      cursor,
     });
 
     output.push(
@@ -29,7 +32,7 @@ export const sitemap: SitemapFunction = async ({
       })),
     );
 
-    page = rel?.nextCursor || null;
+    cursor = rel?.nextCursor || null;
   }
   return output;
 };
