@@ -21,12 +21,14 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request, context }: ActionFunctionArgs) {
   const url = new URL(request.url);
   const redirectTo = url.searchParams.get("redirectTo");
 
   try {
-    const session = await authenticator.authenticate("default", request, {});
+    const session = await authenticator.authenticate("default", request, {
+      context,
+    });
 
     if (!session) {
       return json({ error: "Invalid credentials" });
