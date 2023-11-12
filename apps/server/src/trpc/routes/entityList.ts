@@ -27,9 +27,9 @@ export default publicProcedure
     z
       .object({
         query: z.string().default(""),
-        country: CountryEnum.optional(),
-        region: z.string().optional(),
-        type: z.enum(ENTITY_TYPE_LIST).optional(),
+        country: CountryEnum.nullish(),
+        region: z.string().nullish(),
+        type: z.enum(ENTITY_TYPE_LIST).nullish(),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
         cursor: z.number().gte(1).default(1),
         limit: z.number().lte(100).default(100),

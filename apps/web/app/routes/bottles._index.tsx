@@ -44,7 +44,7 @@ export async function loader({
     bottleList: await trpc.bottleList.query(
       Object.fromEntries(
         [...searchParams.entries()].map(([k, v]) =>
-          numericFields.has(k) ? [k, Number(v)] : [k, v],
+          numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
         ),
       ),
     ),
