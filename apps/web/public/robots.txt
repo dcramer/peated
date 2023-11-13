@@ -1,4 +1,7 @@
 # https://www.robotstxt.org/robotstxt.html
+User-Agent: SemrushBot
+Disallow: /
+
 User-agent: *
 Allow: /
 Disallow: /_health
