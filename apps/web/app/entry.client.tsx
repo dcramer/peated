@@ -67,3 +67,11 @@ Sentry.setTag("service", packageData.name);
 startTransition(() => {
   hydrateRoot(document, <RemixBrowser />);
 });
+
+import * as Spotlight from "@spotlightjs/core";
+
+if (config.ENV !== "production") {
+  Spotlight.init({
+    integrations: [Spotlight.sentry()],
+  });
+}
