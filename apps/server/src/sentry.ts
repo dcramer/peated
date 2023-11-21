@@ -1,8 +1,7 @@
 import * as Sentry from "@sentry/node-experimental";
 import { ProfilingIntegration } from "@sentry/profiling-node";
-import config from "./config";
-
 import packageData from "../package.json";
+import config from "./config";
 
 Sentry.init({
   dsn: config.SENTRY_DSN,
@@ -10,6 +9,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
   integrations: [new ProfilingIntegration()],
+  spotlight: config.ENV === "development",
 });
 
 Sentry.setTag("service", packageData.name);

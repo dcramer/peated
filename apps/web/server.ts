@@ -1,7 +1,9 @@
 import prom from "@isaacs/express-prometheus-middleware";
+import { sentryLink } from "@peated/server/src/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
 import { createRequestHandler } from "@remix-run/express";
 import { type AppLoadContext } from "@remix-run/server-runtime";
+import * as Sentry from "@sentry/remix";
 import { wrapExpressCreateRequestHandler } from "@sentry/remix";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import compression from "compression";
@@ -17,10 +19,6 @@ import {
   getUser,
   logout,
 } from "~/services/session.server";
-
-import * as Sentry from "@sentry/remix";
-
-import { sentryLink } from "@peated/server/src/lib/trpc";
 import packageData from "./package.json";
 
 Sentry.init({
@@ -31,6 +29,7 @@ Sentry.init({
     new Sentry.Integrations.Http({ tracing: true }),
     ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
   ],
+  spotlight: config.ENV === "development",
   // tracePropagationTargets: ["localhost", "peated.com", config.API_SERVER],
 });
 
