@@ -33,6 +33,7 @@
   "author": "David Cramer",
   "license": "Apache-2.0",
   "dependencies": {
+    "@spotlightjs/sidecar": "^0.0.8",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "dotenv": "^16.3.1",
