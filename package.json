@@ -67,6 +67,6 @@
     ]
   },
   "devDependencies": {
-    "@spotlightjs/sidecar": "^0.0.8"
+    "@spotlightjs/sidecar": "^0.0.12"
   }
 }

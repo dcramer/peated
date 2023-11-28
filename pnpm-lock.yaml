@@ -49,8 +49,8 @@ importers:
         version: 2.9.0
     devDependencies:
       '@spotlightjs/sidecar':
-        specifier: ^0.0.8
-        version: 0.0.8
+        specifier: ^0.0.12
+        version: 0.0.12
 
   apps/server:
     dependencies:
@@ -194,7 +194,7 @@ importers:
         version: 0.32.6
       ts-node:
         specifier: ^10.9.1
-        version: 10.9.1(@types/node@18.18.9)(typescript@5.2.2)
+        version: 10.9.1(@swc/core@1.3.96)(@types/node@18.18.9)(typescript@5.2.2)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -513,7 +513,7 @@ importers:
         version: 3.0.0
       ts-node:
         specifier: ^10.9.1
-        version: 10.9.1(@swc/core@1.3.96)(@types/node@20.10.0)(typescript@5.2.2)
+        version: 10.9.1(@swc/core@1.3.96)(@types/node@18.18.9)(typescript@5.2.2)
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -552,7 +552,7 @@ importers:
         version: 3.3.5(ts-node@10.9.1)
       ts-node:
         specifier: ^10.9.1
-        version: 10.9.1(@swc/core@1.3.96)(@types/node@20.10.0)(typescript@5.2.2)
+        version: 10.9.1(@swc/core@1.3.96)(@types/node@18.18.9)(typescript@5.2.2)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -3523,8 +3523,8 @@ packages:
       - ts-node
     dev: true
 
-  /@spotlightjs/sidecar@0.0.8:
-    resolution: {integrity: sha512-yX8qdrJcsBgztjMb4X4sxlFQPFT3Gzw01LHUhqSQg1oOAhFN1LmV1/crWV0OBLlHEbi3beoOcyWml4yVITdi6Q==}
+  /@spotlightjs/sidecar@0.0.12:
+    resolution: {integrity: sha512-iBZ+GslkcoPRS8yokkZLcx69DCZYJlSCOqXPdqsxlYGsz5IWxm+5/CPw2aAh9CsLmshV2ub1ALQwCZk/bRZPTg==}
     hasBin: true
     dependencies:
       kleur: 4.1.5
@@ -4151,11 +4151,6 @@ packages:
 
   /@types/node@18.18.9:
     resolution: {integrity: sha512-0f5klcuImLnG4Qreu9hPj/rEfFq6YRc5n2mAjSsH+ec/mJL+3voBH0+8T7o8RpFjH7ovc+TRsL/c7OYIQsPTfQ==}
-    dependencies:
-      undici-types: 5.26.5
-
-  /@types/node@20.10.0:
-    resolution: {integrity: sha512-D0WfRmU9TQ8I9PFx9Yc+EBHw+vSpIub4IDvQivcp26PtPrdMGAq5SDcpXEo/epqa/DXotVpekHiLNTg3iaKXBQ==}
     dependencies:
       undici-types: 5.26.5
 
@@ -10926,7 +10921,7 @@ packages:
     dependencies:
       lilconfig: 2.1.0
       postcss: 8.4.31
-      ts-node: 10.9.1(@swc/core@1.3.96)(@types/node@20.10.0)(typescript@5.2.2)
+      ts-node: 10.9.1(@swc/core@1.3.96)(@types/node@18.18.9)(typescript@5.2.2)
       yaml: 2.3.4
 
   /postcss-modules-extract-imports@3.0.0(postcss@8.4.31):
@@ -12847,69 +12842,6 @@ packages:
       typescript: 5.2.2
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
-    dev: false
-
-  /ts-node@10.9.1(@swc/core@1.3.96)(@types/node@20.10.0)(typescript@5.2.2):
-    resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
-    hasBin: true
-    peerDependencies:
-      '@swc/core': '>=1.2.50'
-      '@swc/wasm': '>=1.2.50'
-      '@types/node': '*'
-      typescript: '>=2.7'
-    peerDependenciesMeta:
-      '@swc/core':
-        optional: true
-      '@swc/wasm':
-        optional: true
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@swc/core': 1.3.96
-      '@tsconfig/node10': 1.0.9
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 20.10.0
-      acorn: 8.11.2
-      acorn-walk: 8.3.0
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.2.2
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-
-  /ts-node@10.9.1(@types/node@18.18.9)(typescript@5.2.2):
-    resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
-    hasBin: true
-    peerDependencies:
-      '@swc/core': '>=1.2.50'
-      '@swc/wasm': '>=1.2.50'
-      '@types/node': '*'
-      typescript: '>=2.7'
-    peerDependenciesMeta:
-      '@swc/core':
-        optional: true
-      '@swc/wasm':
-        optional: true
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.9
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 18.18.9
-      acorn: 8.11.2
-      acorn-walk: 8.3.0
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.2.2
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    dev: false
 
   /tsconfck@2.1.2(typescript@5.2.2):
     resolution: {integrity: sha512-ghqN1b0puy3MhhviwO2kGF8SeMDNhEbnKxjK7h6+fvY9JAxqvXi8y5NAHSQv687OVboS2uZIByzGd45/YxrRHg==}
