@@ -21,8 +21,8 @@ Sentry.init({
   tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
   integrations: [new ProfilingIntegration()],
+  spotlight: process.env.NODE_ENV === "development",
 });
-
 Sentry.setTag("service", packageData.name);
 
 const scheduler = new ToadScheduler();
