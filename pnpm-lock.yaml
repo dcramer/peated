@@ -412,8 +412,8 @@ importers:
         specifier: ^4.2.1
         version: 4.2.1(leaflet@1.9.4)(react-dom@18.2.0)(react@18.2.0)
       react-router-dom:
-        specifier: ^6.18.0
-        version: 6.18.0(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^6.20.0
+        version: 6.20.0(react-dom@18.2.0)(react@18.2.0)
       remix-auth:
         specifier: ^3.6.0
         version: 3.6.0(@remix-run/react@2.3.1)(@remix-run/server-runtime@2.3.1)
@@ -421,11 +421,11 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0(@remix-run/server-runtime@2.3.1)(remix-auth@3.6.0)
       remix-hook-form:
-        specifier: ^3.0.4
-        version: 3.0.4(@remix-run/react@2.3.1)(react-dom@18.2.0)(react-hook-form@7.48.2)(react@18.2.0)
+        specifier: ^3.2.1
+        version: 3.2.1(@remix-run/react@2.3.1)(react-dom@18.2.0)(react-hook-form@7.48.2)(react@18.2.0)
       remix-sitemap:
-        specifier: ^3.1.0
-        version: 3.1.0(@remix-run/server-runtime@2.3.1)(typescript@5.2.2)
+        specifier: ^3.2.0
+        version: 3.2.0(@remix-run/server-runtime@2.3.1)(typescript@5.2.2)
       tailwindcss:
         specifier: ^3.3.5
         version: 3.3.5(ts-node@10.9.1)
@@ -3023,14 +3023,9 @@ packages:
       typescript: 5.2.2
     dev: false
 
-  /@remix-run/router@1.11.0:
-    resolution: {integrity: sha512-BHdhcWgeiudl91HvVa2wxqZjSHbheSgIiDvxrF1VjFzBzpTtuDPkOdOi3Iqvc08kXtFkLjhbS+ML9aM8mJS+wQ==}
-    engines: {node: '>=14.0.0'}
-
   /@remix-run/router@1.13.0:
     resolution: {integrity: sha512-5dMOnVnefRsl4uRnAdoWjtVTdh8e6aZqgM4puy9nmEADH72ck+uXwzpJLEKE9Q6F8ZljNewLgmTfkxUrBdv4WA==}
     engines: {node: '>=14.0.0'}
-    dev: false
 
   /@remix-run/serve@2.3.1(typescript@5.2.2):
     resolution: {integrity: sha512-jlV0zL2XoF/4DBcFkOfydvf+bdLhS0oIELu0SQJXiWWCrV2SNkBImLpCCtTl5roYlGphhaq3zsu9mzCE2+DsiQ==}
@@ -3520,7 +3515,7 @@ packages:
       postcss: 8.4.31
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      react-router-dom: 6.18.0(react-dom@18.2.0)(react@18.2.0)
+      react-router-dom: 6.20.0(react-dom@18.2.0)(react@18.2.0)
       sql-formatter: 12.2.4
       tailwindcss: 3.3.5(ts-node@10.9.1)
       usehooks-ts: 2.9.1(react-dom@18.2.0)(react@18.2.0)
@@ -11508,18 +11503,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /react-router-dom@6.18.0(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Ubrue4+Ercc/BoDkFQfc6og5zRQ4A8YxSO3Knsne+eRbZ+IepAsK249XBH/XaFuOYOYr3L3r13CXTLvYt5JDjw==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      react: '>=16.8'
-      react-dom: '>=16.8'
-    dependencies:
-      '@remix-run/router': 1.11.0
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      react-router: 6.18.0(react@18.2.0)
-
   /react-router-dom@6.20.0(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-CbcKjEyiSVpA6UtCHOIYLUYn/UJfwzp55va4yEfpk7JBN3GPqWfHrdLkAvNCcpXr8QoihcDMuk0dzWZxtlB/mQ==}
     engines: {node: '>=14.0.0'}
@@ -11531,16 +11514,6 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-router: 6.20.0(react@18.2.0)
-    dev: false
-
-  /react-router@6.18.0(react@18.2.0):
-    resolution: {integrity: sha512-vk2y7Dsy8wI02eRRaRmOs9g2o+aE72YCx5q9VasT1N9v+lrdB79tIqrjMfByHiY5+6aYkH2rUa5X839nwWGPDg==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      react: '>=16.8'
-    dependencies:
-      '@remix-run/router': 1.11.0
-      react: 18.2.0
 
   /react-router@6.20.0(react@18.2.0):
     resolution: {integrity: sha512-pVvzsSsgUxxtuNfTHC4IxjATs10UaAtvLGVSA1tbUE4GDaOSU1Esu2xF5nWLz7KPiMuW8BJWuPFdlGYJ7/rW0w==}
@@ -11550,7 +11523,6 @@ packages:
     dependencies:
       '@remix-run/router': 1.13.0
       react: 18.2.0
-    dev: false
 
   /react@18.2.0:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
@@ -11725,13 +11697,13 @@ packages:
       uuid: 8.3.2
     dev: false
 
-  /remix-hook-form@3.0.4(@remix-run/react@2.3.1)(react-dom@18.2.0)(react-hook-form@7.48.2)(react@18.2.0):
-    resolution: {integrity: sha512-PkU/66h+pq49QVU5hAMzcz4hoMdbettYBCrz3FEJzu0LxEqE3qiKc1AG32TySGVfiKuynLrnc1gJXTzp/2GJOw==}
+  /remix-hook-form@3.2.1(@remix-run/react@2.3.1)(react-dom@18.2.0)(react-hook-form@7.48.2)(react@18.2.0):
+    resolution: {integrity: sha512-ymKog+wsuPdzpgD0jT3pdVwL8Oohwo7P1agsnAV1yCBKg8bUGsj4RBgCnPK85XfiZ7G/5yL31jpp0Tx1xkT4Yg==}
     peerDependencies:
       '@remix-run/react': ^2.0.0
       react: ^18.2.0
       react-dom: ^18.2.0
-      react-hook-form: ^7.43.9
+      react-hook-form: ^7.48.2
     dependencies:
       '@remix-run/react': 2.3.1(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)
       react: 18.2.0
@@ -11739,8 +11711,8 @@ packages:
       react-hook-form: 7.48.2(react@18.2.0)
     dev: false
 
-  /remix-sitemap@3.1.0(@remix-run/server-runtime@2.3.1)(typescript@5.2.2):
-    resolution: {integrity: sha512-MY6/HxuqQsztX1osi5ycky4x5a+pUNdTcqRULE/t9bmAt1dHFZO7TOQ5Q8TIikkTUe1HeOUkaV5EMmP/KONoag==}
+  /remix-sitemap@3.2.0(@remix-run/server-runtime@2.3.1)(typescript@5.2.2):
+    resolution: {integrity: sha512-eyn8QHUegaNzCu+eVnxYqx1FtF61wdIUh/LecG+bXKdOJgp0YBRd4VNtrJj8vC08SFZ0O29MA746hs00hRLQCw==}
     hasBin: true
     peerDependencies:
       '@remix-run/server-runtime': ^2.0.0
