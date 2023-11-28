@@ -40,6 +40,7 @@
     "@sentry/react": "^7.83.0",
     "@sentry/remix": "^7.83.0",
     "@sentry/vite-plugin": "^2.10.2",
+    "@spotlightjs/overlay": "^0.0.17",
     "@svgr/cli": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
     "@svgr/plugin-svgo": "^8.1.0",
@@ -103,8 +104,5 @@
       "extensions": "svg",
       "quiet": false
     }
-  },
-  "devDependencies": {
-    "@spotlightjs/overlay": "^0.0.17"
   }
 }
