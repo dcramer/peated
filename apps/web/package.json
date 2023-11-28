@@ -36,7 +36,7 @@
     "@remix-run/serve": "^2.3.1",
     "@remix-run/server-runtime": "^2.3.1",
     "@rollup/plugin-replace": "^5.0.5",
-    "@sentry-internal/feedback": "0.0.1-alpha.9",
+    "@sentry-internal/feedback": "0.0.1-alpha.15",
     "@sentry/react": "^7.83.0",
     "@sentry/remix": "^7.83.0",
     "@sentry/vite-plugin": "^2.10.2",
