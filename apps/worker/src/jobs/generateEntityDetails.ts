@@ -3,10 +3,10 @@ import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
+import { logError } from "@peated/server/lib/log";
 import { CountryEnum, EntityTypeEnum } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-
 import config from "~/config";
 import { getStructuredResponse } from "~/lib/openai";
 
@@ -93,7 +93,10 @@ export default async ({ entityId }: { entityId: number }) => {
   const entity = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.id, entityId),
   });
-  if (!entity) throw new Error("Unknown entity");
+  if (!entity) {
+    logError(`Unknown entity: ${entityId}`);
+    return;
+  }
   const result = await generateEntityDetails(entity);
 
   if (!result) return;

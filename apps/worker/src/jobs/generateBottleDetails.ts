@@ -101,7 +101,10 @@ export default async function ({ bottleId }: { bottleId: number }) {
   const bottle = await db.query.bottles.findFirst({
     where: (bottles, { eq }) => eq(bottles.id, bottleId),
   });
-  if (!bottle) throw new Error("Unknown bottle");
+  if (!bottle) {
+    logError(`Unknown bottle: ${bottleId}`);
+    return;
+  }
   const result = await generateBottleDetails(bottle);
 
   if (!result) return;

@@ -20,8 +20,10 @@ export default async function ({ tastingId }: { tastingId: number }) {
       bottle: true,
     },
   });
-  if (!tasting) throw new Error("Unknown tasting");
-
+  if (!tasting) {
+    logError(`Unknown tasting: ${tastingId}`);
+    return;
+  }
   const fields = [];
   if (tasting.rating !== null)
     fields.push({
