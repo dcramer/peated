@@ -70,7 +70,7 @@ startTransition(() => {
 
 import * as Spotlight from "@spotlightjs/overlay";
 
-if (config.ENV !== "production") {
+if (process.env.NODE_ENV !== "production") {
   Spotlight.init({
     integrations: [Spotlight.sentry()],
   });
