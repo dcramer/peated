@@ -38,7 +38,7 @@ import { logError } from "./lib/log";
 import { trpc } from "./lib/trpc";
 
 import "@fontsource/raleway/index.css";
-import "~/styles/index.css";
+import "@peated/web/styles/index.css";
 
 function initMobileControls() {
   if (typeof document === "undefined") return;

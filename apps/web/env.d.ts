@@ -1,5 +1,5 @@
 /// <reference types="@remix-run/dev" />
-/// <reference types="@remix-run/express" />
+/// <reference types="@remix-run/node" />
 /// <reference types="vite/client" />
 
 import type { AppRouter } from "@peated/server/trpc/router";

@@ -9,7 +9,9 @@ import {
   getUser,
   logout,
 } from "@peated/web/services/session.server";
+
 import { createRequestHandler } from "@remix-run/express";
+import { installGlobals } from "@remix-run/node";
 import { type AppLoadContext } from "@remix-run/server-runtime";
 import * as Sentry from "@sentry/remix";
 import { wrapExpressCreateRequestHandler } from "@sentry/remix";
@@ -19,6 +21,8 @@ import type { Request } from "express";
 import express from "express";
 import morgan from "morgan";
 import path from "path";
+
+installGlobals();
 
 Sentry.init({
   dsn: config.SENTRY_DSN,
@@ -33,6 +37,15 @@ Sentry.init({
 });
 
 Sentry.setTag("service", "@peated/web");
+
+const viteDevServer =
+  process.env.NODE_ENV === "production"
+    ? undefined
+    : await import("vite").then((vite) =>
+        vite.createServer({
+          server: { middlewareMode: true },
+        })
+      );
 
 const app = express();
 const metricsApp = express();
@@ -83,10 +96,14 @@ app.use(compression());
 app.disable("x-powered-by");
 
 // Remix fingerprints its assets so we can cache forever.
-app.use(
-  "/build",
-  express.static("public/build", { immutable: true, maxAge: "1y" }),
-);
+if (viteDevServer) {
+  app.use(viteDevServer.middlewares);
+} else {
+  app.use(
+    "/build",
+    express.static("public/build", { immutable: true, maxAge: "1y" }),
+  );
+}
 
 // Everything else (like favicon.ico) is cached for an hour. You may want to be
 // more aggressive with this caching.
@@ -158,7 +175,12 @@ const createSentryRequestHandler =
 app.all(
   "*",
   MODE === "production"
-    ? createSentryRequestHandler({ build: require(BUILD_DIR), getLoadContext })
+    ? createSentryRequestHandler({
+      build: viteDevServer
+        ? () => viteDevServer.ssrLoadModule("virtual:remix/server-build")
+        : await import(BUILD_DIR),
+        getLoadContext,
+    })
     : (...args) => {
         purgeRequireCache();
         const requestHandler = createSentryRequestHandler({
