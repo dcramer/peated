@@ -68,10 +68,8 @@ startTransition(() => {
   hydrateRoot(document, <RemixBrowser />);
 });
 
-import * as Spotlight from "@spotlightjs/overlay";
-
-if (process.env.NODE_ENV !== "production") {
-  Spotlight.init({
-    integrations: [Spotlight.sentry()],
-  });
+if (process.env.NODE_ENV === "development") {
+  import("@spotlightjs/spotlight").then((Spotlight) =>
+    Spotlight.init({ injectImmediately: true }),
+  );
 }
