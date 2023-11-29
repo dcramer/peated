@@ -67,6 +67,6 @@
     ]
   },
   "devDependencies": {
-    "@spotlightjs/spotlight": "^0.0.1"
+    "@spotlightjs/spotlight": "^0.0.2"
   }
 }
