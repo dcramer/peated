@@ -4,6 +4,7 @@ import {
   StarIcon as StarIconFilled,
 } from "@heroicons/react/20/solid";
 import { StarIcon } from "@heroicons/react/24/outline";
+import { makeTRPCClient } from "@peated/server/src/lib/trpc";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/components/assets/Bottle";
 import BottleMetadata from "@peated/web/components/bottleMetadata";
@@ -17,13 +18,16 @@ import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import Tabs from "@peated/web/components/tabs";
 import TimeSince from "@peated/web/components/timeSince";
+import config from "@peated/web/config";
 import useAuth from "@peated/web/hooks/useAuth";
 import { summarize } from "@peated/web/lib/markdown";
 import { formatCategoryName } from "@peated/web/lib/strings";
 import { trpc } from "@peated/web/lib/trpc";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
+import { captureException } from "@sentry/remix";
 import { useQueryClient } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
 
@@ -36,6 +40,16 @@ export async function loader({
   const bottle = await trpc.bottleById.query(Number(params.bottleId));
 
   return json({ bottle });
+}
+
+export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+  invariant(params.bottleId);
+
+  const trpcClient = makeTRPCClient(config.API_SERVER, null, captureException);
+
+  const bottle = await trpcClient.bottleById.query(Number(params.bottleId));
+
+  return { bottle };
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
