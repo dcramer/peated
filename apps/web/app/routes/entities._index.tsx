@@ -6,10 +6,11 @@ import Layout from "@peated/web/components/layout";
 import QueryBoundary from "@peated/web/components/queryBoundary";
 import SidebarLink from "@peated/web/components/sidebarLink";
 import { buildQueryString } from "@peated/web/lib/urls";
-import type { LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
-import { json, type MetaFunction } from "@remix-run/node";
+import type { SerializeFrom } from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -25,22 +26,21 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({
-  request,
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  const { searchParams } = new URL(request.url);
-  const numericFields = new Set(["cursor", "limit"]);
-  return json({
-    entityList: await trpc.entityList.query(
-      Object.fromEntries(
-        [...searchParams.entries()].map(([k, v]) =>
-          numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { trpc } }) => {
+    const { searchParams } = new URL(request.url);
+    const numericFields = new Set(["cursor", "limit"]);
+    return {
+      entityList: await trpc.entityList.query(
+        Object.fromEntries(
+          [...searchParams.entries()].map(([k, v]) =>
+            numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
+          ),
         ),
       ),
-    ),
-  });
-}
+    };
+  },
+);
 
 export default function Entities() {
   const { entityList } = useLoaderData<typeof loader>();
