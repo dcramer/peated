@@ -1,10 +1,10 @@
 import type { Entity } from "@peated/server/types";
+import BottleTable from "@peated/web/components/bottleTable";
+import QueryBoundary from "@peated/web/components/queryBoundary";
 import type { LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useLocation, useOutletContext } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import BottleTable from "~/components/bottleTable";
-import QueryBoundary from "~/components/queryBoundary";
 
 export async function loader({
   request,

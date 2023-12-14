@@ -8,9 +8,9 @@ import {
   StarIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
+import config from "@peated/web/config";
+import useAuth from "@peated/web/hooks/useAuth";
 import { useLocation } from "@remix-run/react";
-import config from "~/config";
-import useAuth from "~/hooks/useAuth";
 import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
 import Button from "./button";
 import { ClientOnly } from "./clientOnly";

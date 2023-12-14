@@ -1,13 +1,13 @@
+import Button from "@peated/web/components/button";
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
+import ListItem from "@peated/web/components/listItem";
+import SimpleHeader from "@peated/web/components/simpleHeader";
+import { redirectToAuth } from "@peated/web/lib/auth.server";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
-import Button from "~/components/button";
-import EmptyActivity from "~/components/emptyActivity";
-import Layout from "~/components/layout";
-import ListItem from "~/components/listItem";
-import SimpleHeader from "~/components/simpleHeader";
-import { redirectToAuth } from "~/lib/auth.server";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

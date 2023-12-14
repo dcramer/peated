@@ -1,6 +1,14 @@
 import prom from "@isaacs/express-prometheus-middleware";
 import { sentryLink } from "@peated/server/src/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
+import config from "@peated/web/config";
+import { ApiClient } from "@peated/web/lib/api";
+import {
+  getAccessToken,
+  getSession,
+  getUser,
+  logout,
+} from "@peated/web/services/session.server";
 import { createRequestHandler } from "@remix-run/express";
 import { type AppLoadContext } from "@remix-run/server-runtime";
 import * as Sentry from "@sentry/remix";
@@ -11,14 +19,6 @@ import type { Request } from "express";
 import express from "express";
 import morgan from "morgan";
 import path from "path";
-import config from "~/config";
-import { ApiClient } from "~/lib/api";
-import {
-  getAccessToken,
-  getSession,
-  getUser,
-  logout,
-} from "~/services/session.server";
 import packageData from "./package.json";
 
 Sentry.init({

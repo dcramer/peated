@@ -1,3 +1,9 @@
+import BottleTable from "@peated/web/components/bottleTable";
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
+import SimpleHeader from "@peated/web/components/simpleHeader";
+import useAuth from "@peated/web/hooks/useAuth";
+import { redirectToAuth } from "@peated/web/lib/auth.server";
 import {
   json,
   type LoaderFunctionArgs,
@@ -6,12 +12,6 @@ import {
 import { useLoaderData } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
-import BottleTable from "~/components/bottleTable";
-import EmptyActivity from "~/components/emptyActivity";
-import Layout from "~/components/layout";
-import SimpleHeader from "~/components/simpleHeader";
-import useAuth from "~/hooks/useAuth";
-import { redirectToAuth } from "~/lib/auth.server";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

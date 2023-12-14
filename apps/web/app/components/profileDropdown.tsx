@@ -1,8 +1,8 @@
 import { Menu, Transition } from "@headlessui/react";
+import useAuth from "@peated/web/hooks/useAuth";
+import classNames from "@peated/web/lib/classNames";
 import { Link, useSubmit } from "@remix-run/react";
 import { Fragment, useRef } from "react";
-import useAuth from "~/hooks/useAuth";
-import classNames from "~/lib/classNames";
 import UserAvatar from "./userAvatar";
 
 export function ProfileDropdown() {

@@ -1,15 +1,15 @@
 import { ENTITY_TYPE_LIST, MAJOR_COUNTRIES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import EntityTable from "@peated/web/components/entityTable";
+import Layout from "@peated/web/components/layout";
+import QueryBoundary from "@peated/web/components/queryBoundary";
+import SidebarLink from "@peated/web/components/sidebarLink";
+import { buildQueryString } from "@peated/web/lib/urls";
 import type { LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
 import { json, type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
-import EmptyActivity from "~/components/emptyActivity";
-import EntityTable from "~/components/entityTable";
-import Layout from "~/components/layout";
-import QueryBoundary from "~/components/queryBoundary";
-import SidebarLink from "~/components/sidebarLink";
-import { buildQueryString } from "~/lib/urls";
 
 const DEFAULT_SORT = "-tastings";
 

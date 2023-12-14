@@ -1,6 +1,6 @@
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/20/solid";
+import classNames from "@peated/web/lib/classNames";
 import { Link } from "@remix-run/react";
-import classNames from "~/lib/classNames";
 
 type Page = {
   name: string;

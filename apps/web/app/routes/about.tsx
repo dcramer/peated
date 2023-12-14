@@ -1,8 +1,8 @@
+import Layout from "@peated/web/components/layout";
+import config from "@peated/web/config";
+import { trpc } from "@peated/web/lib/trpc";
 import type { MetaFunction } from "@remix-run/node";
 import { type SitemapFunction } from "remix-sitemap";
-import Layout from "~/components/layout";
-import config from "~/config";
-import { trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = () => ({
   priority: 0.3,

@@ -1,6 +1,6 @@
+import config from "@peated/web/config";
+import { ApiClient } from "@peated/web/lib/api";
 import { createContext, useContext } from "react";
-import config from "~/config";
-import { ApiClient } from "~/lib/api";
 
 const ApiContext = createContext<ApiClient>(
   new ApiClient({ server: config.API_SERVER }),

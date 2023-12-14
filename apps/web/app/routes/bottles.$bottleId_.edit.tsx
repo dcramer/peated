@@ -1,10 +1,10 @@
+import BottleForm from "@peated/web/components/bottleForm";
+import Spinner from "@peated/web/components/spinner";
+import { trpc } from "@peated/web/lib/trpc";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import BottleForm from "~/components/bottleForm";
-import Spinner from "~/components/spinner";
-import { trpc } from "~/lib/trpc";
 
 export const meta: MetaFunction = () => {
   return [

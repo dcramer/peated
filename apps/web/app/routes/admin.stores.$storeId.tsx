@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import {
   json,
   type LoaderFunctionArgs,
@@ -6,7 +7,6 @@ import {
 import { Outlet, useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
-import { Breadcrumbs } from "~/components/breadcrumbs";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

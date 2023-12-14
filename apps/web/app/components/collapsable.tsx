@@ -1,5 +1,5 @@
+import classNames from "@peated/web/lib/classNames";
 import { useState, type ReactNode } from "react";
-import classNames from "~/lib/classNames";
 import Button from "./button";
 
 export default ({

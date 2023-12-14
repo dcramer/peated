@@ -3,10 +3,10 @@
 
 import type { AppRouter } from "@peated/server/trpc/router";
 import type { User } from "@peated/server/types";
+import type { ApiClient } from "@peated/web/lib/api";
 import "@remix-run/server-runtime";
 import type { CreateTRPCProxyClient } from "@trpc/client";
 import "express-serve-static-core";
-import type { ApiClient } from "~/lib/api";
 
 interface Context {
   user: User | null;

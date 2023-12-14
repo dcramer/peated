@@ -2,7 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { useLocation, useNavigate } from "@remix-run/react";
 import { useState } from "react";
 
-import useAuth from "~/hooks/useAuth";
+import useAuth from "@peated/web/hooks/useAuth";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 import { ProfileDropdown } from "./profileDropdown";

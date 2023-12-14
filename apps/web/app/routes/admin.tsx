@@ -1,6 +1,6 @@
+import Layout from "@peated/web/components/layout";
 import type { MetaFunction } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
-import Layout from "~/components/layout";
 
 import type { SitemapFunction } from "remix-sitemap";
 

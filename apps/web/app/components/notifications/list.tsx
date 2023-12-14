@@ -1,6 +1,6 @@
 import type { Notification } from "@peated/server/types";
+import { trpc } from "@peated/web/lib/trpc";
 import { useState } from "react";
-import { trpc } from "~/lib/trpc";
 import NotificationEntry from "./entry";
 
 export default function NotificationList({

@@ -1,8 +1,8 @@
+import { sessionStorage } from "@peated/web/services/session.server";
+import type { SessionPayload } from "@peated/web/types";
 import { TRPCClientError } from "@trpc/client";
 import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
-import { sessionStorage } from "~/services/session.server";
-import type { SessionPayload } from "~/types";
 
 export const authenticator = new Authenticator<SessionPayload | null>(
   sessionStorage,

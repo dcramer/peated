@@ -1,10 +1,10 @@
+import BottleCard from "@peated/web/components/bottleCard";
+import Layout from "@peated/web/components/layout";
+import { summarize } from "@peated/web/lib/markdown";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import BottleCard from "~/components/bottleCard";
-import Layout from "~/components/layout";
-import { summarize } from "~/lib/markdown";
 
 export async function loader({
   params: { flightId },

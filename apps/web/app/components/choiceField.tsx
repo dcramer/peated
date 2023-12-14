@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 
 import { RadioGroup } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/24/outline";
+import classNames from "@peated/web/lib/classNames";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { useController } from "react-hook-form";
-import classNames from "~/lib/classNames";
 import FormField from "./formField";
 
 type Choice = {

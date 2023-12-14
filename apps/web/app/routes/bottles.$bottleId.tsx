@@ -5,27 +5,27 @@ import {
 } from "@heroicons/react/20/solid";
 import { StarIcon } from "@heroicons/react/24/outline";
 import type { Bottle } from "@peated/server/types";
+import BottleIcon from "@peated/web/components/assets/Bottle";
+import BottleMetadata from "@peated/web/components/bottleMetadata";
+import Button from "@peated/web/components/button";
+import { ClientOnly } from "@peated/web/components/clientOnly";
+import ConfirmationButton from "@peated/web/components/confirmationButton";
+import Layout from "@peated/web/components/layout";
+import QueryBoundary from "@peated/web/components/queryBoundary";
+import { RangeBarChart } from "@peated/web/components/rangeBarChart.client";
+import ShareButton from "@peated/web/components/shareButton";
+import SkeletonButton from "@peated/web/components/skeletonButton";
+import Tabs from "@peated/web/components/tabs";
+import TimeSince from "@peated/web/components/timeSince";
+import useAuth from "@peated/web/hooks/useAuth";
+import { summarize } from "@peated/web/lib/markdown";
+import { formatCategoryName } from "@peated/web/lib/strings";
+import { trpc } from "@peated/web/lib/trpc";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useQueryClient } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
-import BottleIcon from "~/components/assets/Bottle";
-import BottleMetadata from "~/components/bottleMetadata";
-import Button from "~/components/button";
-import { ClientOnly } from "~/components/clientOnly";
-import ConfirmationButton from "~/components/confirmationButton";
-import Layout from "~/components/layout";
-import QueryBoundary from "~/components/queryBoundary";
-import { RangeBarChart } from "~/components/rangeBarChart.client";
-import ShareButton from "~/components/shareButton";
-import SkeletonButton from "~/components/skeletonButton";
-import Tabs from "~/components/tabs";
-import TimeSince from "~/components/timeSince";
-import useAuth from "~/hooks/useAuth";
-import { summarize } from "~/lib/markdown";
-import { formatCategoryName } from "~/lib/strings";
-import { trpc } from "~/lib/trpc";
 
 export async function loader({
   params,

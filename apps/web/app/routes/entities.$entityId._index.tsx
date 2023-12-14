@@ -1,17 +1,17 @@
 import type { Entity } from "@peated/server/types";
+import RobotImage from "@peated/web/assets/robot.png";
+import { ClientOnly } from "@peated/web/components/clientOnly";
+import { DistributionChart } from "@peated/web/components/distributionChart";
+import { Map } from "@peated/web/components/map.client";
+import Markdown from "@peated/web/components/markdown";
+import QueryBoundary from "@peated/web/components/queryBoundary";
+import { formatCategoryName } from "@peated/web/lib/strings";
+import { trpc } from "@peated/web/lib/trpc";
+import { parseDomain } from "@peated/web/lib/urls";
 import type { LinksFunction } from "@remix-run/node";
 import { useOutletContext, useParams } from "@remix-run/react";
 import { type LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
-import RobotImage from "~/assets/robot.png";
-import { ClientOnly } from "~/components/clientOnly";
-import { DistributionChart } from "~/components/distributionChart";
-import { Map } from "~/components/map.client";
-import Markdown from "~/components/markdown";
-import QueryBoundary from "~/components/queryBoundary";
-import { formatCategoryName } from "~/lib/strings";
-import { trpc } from "~/lib/trpc";
-import { parseDomain } from "~/lib/urls";
 
 export const links: LinksFunction = () => [
   {

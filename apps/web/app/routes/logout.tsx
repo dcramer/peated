@@ -1,6 +1,6 @@
+import { authenticator } from "@peated/web/services/auth.server";
 import { type ActionFunctionArgs } from "@remix-run/node";
 import { type SitemapFunction } from "remix-sitemap";
-import { authenticator } from "~/services/auth.server";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

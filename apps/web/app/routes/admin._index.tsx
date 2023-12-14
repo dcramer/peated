@@ -1,6 +1,6 @@
+import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import { Link } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
-import { Breadcrumbs } from "~/components/breadcrumbs";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

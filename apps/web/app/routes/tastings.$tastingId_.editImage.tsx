@@ -17,20 +17,20 @@ import invariant from "tiny-invariant";
 
 import { MAX_FILESIZE } from "@peated/server/constants";
 
+import Fieldset from "@peated/web/components/fieldset";
+import Form from "@peated/web/components/form";
+import FormError from "@peated/web/components/formError";
+import FormHeader from "@peated/web/components/formHeader";
+import Header from "@peated/web/components/header";
+import ImageField from "@peated/web/components/imageField";
+import Layout from "@peated/web/components/layout";
+import Spinner from "@peated/web/components/spinner";
+import useApi from "@peated/web/hooks/useApi";
+import { ApiError } from "@peated/web/lib/api";
+import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { toBlob } from "@peated/web/lib/blobs";
+import { logError } from "@peated/web/lib/log";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Fieldset from "~/components/fieldset";
-import Form from "~/components/form";
-import FormError from "~/components/formError";
-import FormHeader from "~/components/formHeader";
-import Header from "~/components/header";
-import ImageField from "~/components/imageField";
-import Layout from "~/components/layout";
-import Spinner from "~/components/spinner";
-import useApi from "~/hooks/useApi";
-import { ApiError } from "~/lib/api";
-import { redirectToAuth } from "~/lib/auth.server";
-import { toBlob } from "~/lib/blobs";
-import { logError } from "~/lib/log";
 
 export async function action({ context, request, params }: ActionFunctionArgs) {
   invariant(params.tastingId);

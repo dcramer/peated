@@ -1,16 +1,16 @@
 import { makeTRPCClient } from "@peated/server/lib/trpc";
 import type { Bottle } from "@peated/server/types";
+import RobotImage from "@peated/web/assets/robot.png";
+import { ClientOnly } from "@peated/web/components/clientOnly";
+import { DistributionChart } from "@peated/web/components/distributionChart";
+import Markdown from "@peated/web/components/markdown";
+import QueryBoundary from "@peated/web/components/queryBoundary";
+import config from "@peated/web/config";
+import { trpc } from "@peated/web/lib/trpc";
 import { useOutletContext } from "@remix-run/react";
 import { captureException } from "@sentry/remix";
 import { Fragment } from "react";
 import { type SitemapFunction } from "remix-sitemap";
-import RobotImage from "~/assets/robot.png";
-import { ClientOnly } from "~/components/clientOnly";
-import { DistributionChart } from "~/components/distributionChart";
-import Markdown from "~/components/markdown";
-import QueryBoundary from "~/components/queryBoundary";
-import config from "~/config";
-import { trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = async ({
   config: sitemapConfig,

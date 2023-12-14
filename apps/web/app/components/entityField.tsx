@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityInputSchema } from "@peated/server/schemas";
+import { trpc } from "@peated/web/lib/trpc";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
-import { trpc } from "~/lib/trpc";
 import Button from "./button";
 import CountryField from "./countryField";
 import Fieldset from "./fieldset";

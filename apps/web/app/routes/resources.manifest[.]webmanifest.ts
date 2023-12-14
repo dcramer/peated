@@ -1,8 +1,8 @@
 import { json } from "@remix-run/node";
 
-import glyphUrl from "~/assets/glyph.png";
-import logo192Url from "~/assets/logo192.png";
-import config from "~/config";
+import glyphUrl from "@peated/web/assets/glyph.png";
+import logo192Url from "@peated/web/assets/logo192.png";
+import config from "@peated/web/config";
 
 export async function loader() {
   return json(

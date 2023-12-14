@@ -1,4 +1,16 @@
 import type { Comment, User } from "@peated/server/types";
+import Button from "@peated/web/components/button";
+import CommentEntry from "@peated/web/components/commentEntry";
+import EmbeddedLogin from "@peated/web/components/embeddedLogin";
+import Fieldset from "@peated/web/components/fieldset";
+import FormField from "@peated/web/components/formField";
+import Layout from "@peated/web/components/layout";
+import QueryBoundary from "@peated/web/components/queryBoundary";
+import TastingListItem from "@peated/web/components/tastingListItem";
+import TextArea from "@peated/web/components/textArea";
+import UserAvatar from "@peated/web/components/userAvatar";
+import useAuth from "@peated/web/hooks/useAuth";
+import { trpc } from "@peated/web/lib/trpc";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { MetaFunction } from "@remix-run/react";
@@ -6,18 +18,6 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import invariant from "tiny-invariant";
-import Button from "~/components/button";
-import CommentEntry from "~/components/commentEntry";
-import EmbeddedLogin from "~/components/embeddedLogin";
-import Fieldset from "~/components/fieldset";
-import FormField from "~/components/formField";
-import Layout from "~/components/layout";
-import QueryBoundary from "~/components/queryBoundary";
-import TastingListItem from "~/components/tastingListItem";
-import TextArea from "~/components/textArea";
-import UserAvatar from "~/components/userAvatar";
-import useAuth from "~/hooks/useAuth";
-import { trpc } from "~/lib/trpc";
 
 export async function loader({
   params: { tastingId },

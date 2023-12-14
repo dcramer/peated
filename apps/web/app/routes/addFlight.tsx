@@ -1,10 +1,10 @@
 import { useNavigate } from "@remix-run/react";
 
+import FlightForm from "@peated/web/components/flightForm";
+import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { trpc } from "@peated/web/lib/trpc";
 import { type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import type { SitemapFunction } from "remix-sitemap";
-import FlightForm from "~/components/flightForm";
-import { redirectToAuth } from "~/lib/auth.server";
-import { trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

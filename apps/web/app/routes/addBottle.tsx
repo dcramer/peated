@@ -1,13 +1,13 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity } from "@peated/server/types";
+import BottleForm from "@peated/web/components/bottleForm";
+import Spinner from "@peated/web/components/spinner";
+import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { trpc } from "@peated/web/lib/trpc";
 import { type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import { useLocation, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { SitemapFunction } from "remix-sitemap";
-import BottleForm from "~/components/bottleForm";
-import Spinner from "~/components/spinner";
-import { redirectToAuth } from "~/lib/auth.server";
-import { trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

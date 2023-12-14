@@ -1,11 +1,11 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Bottle, Entity, User } from "@peated/server/types";
+import useAuth from "@peated/web/hooks/useAuth";
+import { debounce } from "@peated/web/lib/api";
+import { trpc } from "@peated/web/lib/trpc";
 import { Link, useLocation, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import useAuth from "~/hooks/useAuth";
-import { debounce } from "~/lib/api";
-import { trpc } from "~/lib/trpc";
 import Header from "../header";
 import Layout from "../layout";
 import ListItem from "../listItem";

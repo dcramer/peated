@@ -1,6 +1,6 @@
+import { SearchPanel } from "@peated/web/components/search";
 import type { MetaFunction } from "@remix-run/node";
 import type { SitemapFunction } from "remix-sitemap";
-import { SearchPanel } from "~/components/search";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

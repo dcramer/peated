@@ -1,4 +1,4 @@
-import classNames from "~/lib/classNames";
+import classNames from "@peated/web/lib/classNames";
 import type { DataPoint } from "./types";
 
 type Props = {

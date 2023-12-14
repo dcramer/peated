@@ -1,5 +1,5 @@
+import type { PolymorphicProps } from "@peated/web/types";
 import type { ElementType, ReactNode } from "react";
-import type { PolymorphicProps } from "~/types";
 
 type Props = {
   required?: boolean;

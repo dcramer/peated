@@ -1,8 +1,8 @@
+import type { SessionPayload } from "@peated/web/types";
 import type { Session } from "@remix-run/node";
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import type { Request as ExpressRequest } from "express";
 import invariant from "tiny-invariant";
-import type { SessionPayload } from "~/types";
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 

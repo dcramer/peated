@@ -1,10 +1,10 @@
+import StoreTable from "@peated/web/components/admin/storeTable";
+import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
+import Button from "@peated/web/components/button";
+import EmptyActivity from "@peated/web/components/emptyActivity";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
-import StoreTable from "~/components/admin/storeTable";
-import { Breadcrumbs } from "~/components/breadcrumbs";
-import Button from "~/components/button";
-import EmptyActivity from "~/components/emptyActivity";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

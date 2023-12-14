@@ -1,7 +1,7 @@
 import { Link, useLocation } from "@remix-run/react";
 
 import type { Entity, PagingRel } from "@peated/server/types";
-import classNames from "~/lib/classNames";
+import classNames from "@peated/web/lib/classNames";
 import Button from "./button";
 import Chip from "./chip";
 import SortParam from "./sortParam";

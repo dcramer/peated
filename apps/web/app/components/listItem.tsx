@@ -1,6 +1,6 @@
+import type { PolymorphicProps } from "@peated/web/types";
 import { motion } from "framer-motion";
 import type { ElementType } from "react";
-import type { PolymorphicProps } from "~/types";
 import classNames from "../lib/classNames";
 
 type Props = {

@@ -1,7 +1,7 @@
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import type { Notification } from "@peated/server/types";
+import type { FriendRequestNotification } from "@peated/web/types";
 import { Link, useNavigate } from "@remix-run/react";
-import type { FriendRequestNotification } from "~/types";
 import classNames from "../../lib/classNames";
 import UserAvatar from "../userAvatar";
 import FriendRequestEntry from "./friendRequestEntry";

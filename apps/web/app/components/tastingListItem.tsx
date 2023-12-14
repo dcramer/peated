@@ -8,8 +8,8 @@ import { Link } from "@remix-run/react";
 import { useState } from "react";
 
 import type { Tasting } from "@peated/server/types";
-import useAuth from "~/hooks/useAuth";
-import { trpc } from "~/lib/trpc";
+import useAuth from "@peated/web/hooks/useAuth";
+import { trpc } from "@peated/web/lib/trpc";
 import BottleCard from "./bottleCard";
 import Button from "./button";
 import { ImageModal } from "./imageModal";

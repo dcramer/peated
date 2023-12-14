@@ -1,3 +1,11 @@
+import Alert from "@peated/web/components/alert";
+import PeatedLogo from "@peated/web/components/assets/Logo";
+import Button from "@peated/web/components/button";
+import Layout from "@peated/web/components/layout";
+import TextField from "@peated/web/components/textField";
+import config from "@peated/web/config";
+import { authenticator } from "@peated/web/services/auth.server";
+import { createSession } from "@peated/web/services/session.server";
 import { useGoogleLogin } from "@react-oauth/google";
 import type {
   ActionFunctionArgs,
@@ -8,14 +16,6 @@ import { json } from "@remix-run/node";
 import { Form, Link, useActionData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 import { type SitemapFunction } from "remix-sitemap";
-import Alert from "~/components/alert";
-import PeatedLogo from "~/components/assets/Logo";
-import Button from "~/components/button";
-import Layout from "~/components/layout";
-import TextField from "~/components/textField";
-import config from "~/config";
-import { authenticator } from "~/services/auth.server";
-import { createSession } from "~/services/session.server";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

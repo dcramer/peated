@@ -5,7 +5,7 @@
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"],
+      "@peated/web/*": ["./app/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     },
     // Remix takes care of building everything in `remix build`.

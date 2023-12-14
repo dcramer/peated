@@ -1,6 +1,6 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import classNames from "@peated/web/lib/classNames";
 import type { ReactNode } from "react";
-import classNames from "~/lib/classNames";
 
 export default ({
   children,

@@ -1,18 +1,18 @@
 import { AtSymbolIcon } from "@heroicons/react/20/solid";
 import type { FriendStatus } from "@peated/server/types";
+import Button from "@peated/web/components/button";
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
+import ListItem from "@peated/web/components/listItem";
+import SimpleHeader from "@peated/web/components/simpleHeader";
+import UserAvatar from "@peated/web/components/userAvatar";
+import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { trpc } from "@peated/web/lib/trpc";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import type { SitemapFunction } from "remix-sitemap";
-import Button from "~/components/button";
-import EmptyActivity from "~/components/emptyActivity";
-import Layout from "~/components/layout";
-import ListItem from "~/components/listItem";
-import SimpleHeader from "~/components/simpleHeader";
-import UserAvatar from "~/components/userAvatar";
-import { redirectToAuth } from "~/lib/auth.server";
-import { trpc } from "~/lib/trpc";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,

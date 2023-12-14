@@ -2,25 +2,25 @@ import { Link, useLoaderData, useLocation } from "@remix-run/react";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 
+import Alert from "@peated/web/components/alert";
+import Glyph from "@peated/web/components/assets/Glyph";
+import BetaNotice from "@peated/web/components/betaNotice";
+import Button from "@peated/web/components/button";
+import { ClientOnly } from "@peated/web/components/clientOnly";
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
+import QueryBoundary from "@peated/web/components/queryBoundary";
+import Spinner from "@peated/web/components/spinner";
+import Tabs from "@peated/web/components/tabs";
+import TastingList from "@peated/web/components/tastingList";
+import useAuth from "@peated/web/hooks/useAuth";
+import classNames from "@peated/web/lib/classNames";
+import { trpc } from "@peated/web/lib/trpc";
 import {
   json,
   type LoaderFunctionArgs,
   type SerializeFrom,
 } from "@remix-run/node";
-import Alert from "~/components/alert";
-import Glyph from "~/components/assets/Glyph";
-import BetaNotice from "~/components/betaNotice";
-import Button from "~/components/button";
-import { ClientOnly } from "~/components/clientOnly";
-import EmptyActivity from "~/components/emptyActivity";
-import Layout from "~/components/layout";
-import QueryBoundary from "~/components/queryBoundary";
-import Spinner from "~/components/spinner";
-import Tabs from "~/components/tabs";
-import TastingList from "~/components/tastingList";
-import useAuth from "~/hooks/useAuth";
-import classNames from "~/lib/classNames";
-import { trpc } from "~/lib/trpc";
 
 const defaultViewParam = "global";
 

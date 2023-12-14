@@ -1,7 +1,7 @@
+import classNames from "@peated/web/lib/classNames";
+import { type PolymorphicProps, type PolymorphicRef } from "@peated/web/types";
 import { Link } from "@remix-run/react";
 import { forwardRef, type ElementType } from "react";
-import classNames from "~/lib/classNames";
-import { type PolymorphicProps, type PolymorphicRef } from "~/types";
 
 type Props = {
   active?: boolean;

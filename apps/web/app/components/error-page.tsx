@@ -1,9 +1,9 @@
 import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 
-import Button from "~/components/button";
-import config from "~/config";
-import { useOnlineStatus } from "~/hooks/useOnlineStatus";
-import { ApiError, ApiUnauthorized, ApiUnavailable } from "~/lib/api";
+import Button from "@peated/web/components/button";
+import config from "@peated/web/config";
+import { useOnlineStatus } from "@peated/web/hooks/useOnlineStatus";
+import { ApiError, ApiUnauthorized, ApiUnavailable } from "@peated/web/lib/api";
 
 export default function ErrorPage() {
   const error = useRouteError();

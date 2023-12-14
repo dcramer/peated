@@ -1,6 +1,6 @@
 import type { Entity } from "@peated/server/types";
+import EntityIcon from "@peated/web/components/assets/Entity";
 import { Link } from "@remix-run/react";
-import EntityIcon from "~/components/assets/Entity";
 import Chip from "../chip";
 
 export type EntityResult = {

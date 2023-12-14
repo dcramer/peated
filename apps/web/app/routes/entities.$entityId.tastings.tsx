@@ -1,9 +1,9 @@
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import TastingList from "@peated/web/components/tastingList";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import EmptyActivity from "~/components/emptyActivity";
-import TastingList from "~/components/tastingList";
 
 export async function loader({
   params: { entityId },

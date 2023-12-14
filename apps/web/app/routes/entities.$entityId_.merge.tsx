@@ -1,5 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityMergeSchema } from "@peated/server/schemas";
+import ChoiceField from "@peated/web/components/choiceField";
+import EntityField from "@peated/web/components/entityField";
+import Fieldset from "@peated/web/components/fieldset";
+import Form from "@peated/web/components/form";
+import FormError from "@peated/web/components/formError";
+import FormHeader from "@peated/web/components/formHeader";
+import Header from "@peated/web/components/header";
+import Layout from "@peated/web/components/layout";
+import Spinner from "@peated/web/components/spinner";
+import { trpc } from "@peated/web/lib/trpc";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
@@ -8,16 +18,6 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
-import ChoiceField from "~/components/choiceField";
-import EntityField from "~/components/entityField";
-import Fieldset from "~/components/fieldset";
-import Form from "~/components/form";
-import FormError from "~/components/formError";
-import FormHeader from "~/components/formHeader";
-import Header from "~/components/header";
-import Layout from "~/components/layout";
-import Spinner from "~/components/spinner";
-import { trpc } from "~/lib/trpc";
 
 type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 

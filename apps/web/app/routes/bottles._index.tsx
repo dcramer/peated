@@ -1,16 +1,16 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
+import BottleTable from "@peated/web/components/bottleTable";
+import Button from "@peated/web/components/button";
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
+import QueryBoundary from "@peated/web/components/queryBoundary";
+import SidebarLink from "@peated/web/components/sidebarLink";
+import { formatCategoryName } from "@peated/web/lib/strings";
+import { buildQueryString } from "@peated/web/lib/urls";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, type MetaFunction, type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
-import BottleTable from "~/components/bottleTable";
-import Button from "~/components/button";
-import EmptyActivity from "~/components/emptyActivity";
-import Layout from "~/components/layout";
-import QueryBoundary from "~/components/queryBoundary";
-import SidebarLink from "~/components/sidebarLink";
-import { formatCategoryName } from "~/lib/strings";
-import { buildQueryString } from "~/lib/urls";
 
 const DEFAULT_SORT = "-tastings";
 

@@ -1,5 +1,5 @@
-import useAuth from "~/hooks/useAuth";
-import { trpc } from "~/lib/trpc";
+import useAuth from "@peated/web/hooks/useAuth";
+import { trpc } from "@peated/web/lib/trpc";
 import { ClientOnly } from "./clientOnly";
 
 function NotificationCountContent() {

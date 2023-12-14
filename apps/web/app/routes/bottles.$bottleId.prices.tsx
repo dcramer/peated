@@ -1,8 +1,8 @@
+import BetaNotice from "@peated/web/components/betaNotice";
+import TimeSince from "@peated/web/components/timeSince";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import BetaNotice from "~/components/betaNotice";
-import TimeSince from "~/components/timeSince";
 
 export async function loader({
   params: { bottleId },

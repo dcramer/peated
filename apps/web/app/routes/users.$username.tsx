@@ -1,19 +1,19 @@
 import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import Button from "@peated/web/components/button";
+import Chip from "@peated/web/components/chip";
+import { DistributionChart } from "@peated/web/components/distributionChart";
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
+import QueryBoundary from "@peated/web/components/queryBoundary";
+import Tabs from "@peated/web/components/tabs";
+import UserAvatar from "@peated/web/components/userAvatar";
+import useAuth from "@peated/web/hooks/useAuth";
+import { trpc } from "@peated/web/lib/trpc";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useSubmit } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import Button from "~/components/button";
-import Chip from "~/components/chip";
-import { DistributionChart } from "~/components/distributionChart";
-import EmptyActivity from "~/components/emptyActivity";
-import Layout from "~/components/layout";
-import QueryBoundary from "~/components/queryBoundary";
-import Tabs from "~/components/tabs";
-import UserAvatar from "~/components/userAvatar";
-import useAuth from "~/hooks/useAuth";
-import { trpc } from "~/lib/trpc";
 
 const UserTagDistribution = ({ userId }: { userId: number }) => {
   const { data } = trpc.userTagList.useQuery({

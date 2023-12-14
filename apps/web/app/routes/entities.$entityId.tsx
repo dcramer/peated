@@ -1,5 +1,14 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import EntityIcon from "@peated/web/components/assets/Entity";
+import Button from "@peated/web/components/button";
+import Chip from "@peated/web/components/chip";
+import Layout from "@peated/web/components/layout";
+import ShareButton from "@peated/web/components/shareButton";
+import Tabs from "@peated/web/components/tabs";
+import useAuth from "@peated/web/hooks/useAuth";
+import { summarize } from "@peated/web/lib/markdown";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import type {
   LinksFunction,
   LoaderFunctionArgs,
@@ -8,15 +17,6 @@ import type {
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import EntityIcon from "~/components/assets/Entity";
-import Button from "~/components/button";
-import Chip from "~/components/chip";
-import Layout from "~/components/layout";
-import ShareButton from "~/components/shareButton";
-import Tabs from "~/components/tabs";
-import useAuth from "~/hooks/useAuth";
-import { summarize } from "~/lib/markdown";
-import { getEntityUrl } from "~/lib/urls";
 
 export async function loader({
   params: { entityId },

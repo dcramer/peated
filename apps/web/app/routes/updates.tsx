@@ -1,10 +1,10 @@
+import ChangeList from "@peated/web/components/changeList";
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
+import Tabs from "@peated/web/components/tabs";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import ChangeList from "~/components/changeList";
-import EmptyActivity from "~/components/emptyActivity";
-import Layout from "~/components/layout";
-import Tabs from "~/components/tabs";
 
 export async function loader({ context: { trpc } }: LoaderFunctionArgs) {
   return json({ changeList: await trpc.changeList.query() });
