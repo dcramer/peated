@@ -44,5 +44,6 @@ declare global {
 
   interface Window {
     CONFIG: Config;
+    ACCESS_TOKEN: string | null;
   }
 }
