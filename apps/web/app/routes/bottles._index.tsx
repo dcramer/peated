@@ -7,10 +7,10 @@ import QueryBoundary from "@peated/web/components/queryBoundary";
 import SidebarLink from "@peated/web/components/sidebarLink";
 import { formatCategoryName } from "@peated/web/lib/strings";
 import { buildQueryString } from "@peated/web/lib/urls";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, type MetaFunction, type SerializeFrom } from "@remix-run/node";
+import { type MetaFunction, type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -26,30 +26,29 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({
-  request,
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  const { searchParams } = new URL(request.url);
-  const numericFields = new Set([
-    "cursor",
-    "limit",
-    "age",
-    "entity",
-    "distiller",
-    "bottler",
-    "entity",
-  ]);
-  return json({
-    bottleList: await trpc.bottleList.query(
-      Object.fromEntries(
-        [...searchParams.entries()].map(([k, v]) =>
-          numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { trpc } }) => {
+    const { searchParams } = new URL(request.url);
+    const numericFields = new Set([
+      "cursor",
+      "limit",
+      "age",
+      "entity",
+      "distiller",
+      "bottler",
+      "entity",
+    ]);
+    return {
+      bottleList: await trpc.bottleList.query(
+        Object.fromEntries(
+          [...searchParams.entries()].map(([k, v]) =>
+            numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
+          ),
         ),
       ),
-    ),
-  });
-}
+    };
+  },
+);
 
 export default function BottleList() {
   const { bottleList } = useLoaderData<typeof loader>();

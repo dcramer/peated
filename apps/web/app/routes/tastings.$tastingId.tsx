@@ -11,22 +11,20 @@ import TextArea from "@peated/web/components/textArea";
 import UserAvatar from "@peated/web/components/userAvatar";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import invariant from "tiny-invariant";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
-export async function loader({
-  params: { tastingId },
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  invariant(tastingId);
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ params: { tastingId }, context: { trpc } }) => {
+    invariant(tastingId);
 
-  return json({ tasting: await trpc.tastingById.query(Number(tastingId)) });
-}
+    return { tasting: await trpc.tastingById.query(Number(tastingId)) };
+  },
+);
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) return [];
