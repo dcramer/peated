@@ -9,12 +9,12 @@ export function FeedbackSidebarLink() {
 
   const ref = useRef<"button">();
 
-  if (!feedback) return null;
-
   useEffect(() => {
     if (!ref.current) return;
-    feedback.attachTo(ref.current, {});
+    if (feedback) feedback.attachTo(ref.current, {});
   }, [ref]);
+
+  if (!feedback) return null;
 
   return (
     <SidebarLink as="button" ref={ref} icon={BugAntIcon}>
