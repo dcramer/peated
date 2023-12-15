@@ -3,26 +3,26 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import Layout from "@peated/web/components/layout";
 import ListItem from "@peated/web/components/listItem";
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import { redirectToAuth } from "@peated/web/lib/auth.server";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
+import { getAuthRedirect } from "../lib/auth";
+import { Redirect } from "../lib/errors";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({
-  request,
-  context: { user, trpc },
-}: LoaderFunctionArgs) {
-  if (!user) return redirectToAuth({ request });
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { trpc, user } }) => {
+    if (!user) throw new Redirect(getAuthRedirect({ request }));
 
-  return json({
-    flightList: await trpc.flightList.query(),
-  });
-}
+    return {
+      flightList: await trpc.flightList.query(),
+    };
+  },
+);
 
 export const meta: MetaFunction = () => {
   return [

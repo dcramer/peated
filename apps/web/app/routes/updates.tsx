@@ -2,13 +2,15 @@ import ChangeList from "@peated/web/components/changeList";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Layout from "@peated/web/components/layout";
 import Tabs from "@peated/web/components/tabs";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
-export async function loader({ context: { trpc } }: LoaderFunctionArgs) {
-  return json({ changeList: await trpc.changeList.query() });
-}
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ context: { trpc } }) => {
+    return { changeList: await trpc.changeList.query() };
+  },
+);
 
 export const meta: MetaFunction = () => {
   return [

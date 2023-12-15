@@ -1,22 +1,20 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
-export async function loader({
-  params: { entityId },
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  invariant(entityId);
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ params: { entityId }, context: { trpc } }) => {
+    invariant(entityId);
 
-  return json({
-    tastingList: await trpc.tastingList.query({
-      entity: Number(entityId),
-    }),
-  });
-}
+    return {
+      tastingList: await trpc.tastingList.query({
+        entity: Number(entityId),
+      }),
+    };
+  },
+);
 
 export default function EntityActivity() {
   const { tastingList } = useLoaderData<typeof loader>();

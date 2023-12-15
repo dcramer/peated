@@ -1,19 +1,20 @@
 import BetaNotice from "@peated/web/components/betaNotice";
 import TimeSince from "@peated/web/components/timeSince";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
-export async function loader({
-  params: { bottleId },
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  invariant(bottleId);
-  const priceList = await trpc.bottlePriceList.query({
-    bottle: Number(bottleId),
-  });
-  return json({ priceList });
-}
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ params: { bottleId }, context: { trpc } }) => {
+    invariant(bottleId);
+
+    const priceList = await trpc.bottlePriceList.query({
+      bottle: Number(bottleId),
+    });
+
+    return { priceList };
+  },
+);
 
 export default function BottlePrices() {
   const { priceList } = useLoaderData<typeof loader>();

@@ -16,28 +16,24 @@ import TastingList from "@peated/web/components/tastingList";
 import useAuth from "@peated/web/hooks/useAuth";
 import classNames from "@peated/web/lib/classNames";
 import { trpc } from "@peated/web/lib/trpc";
-import {
-  json,
-  type LoaderFunctionArgs,
-  type SerializeFrom,
-} from "@remix-run/node";
+import { type SerializeFrom } from "@remix-run/node";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 const defaultViewParam = "global";
 
-export async function loader({
-  context: { trpc },
-  request,
-}: LoaderFunctionArgs) {
-  const { searchParams } = new URL(request.url);
-  const filter = mapFilterParam(searchParams.get("view"));
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { trpc } }) => {
+    const { searchParams } = new URL(request.url);
+    const filter = mapFilterParam(searchParams.get("view"));
 
-  return json({
-    tastingList: await trpc.tastingList.query({
-      filter,
-      limit: 10,
-    }),
-  });
-}
+    return {
+      tastingList: await trpc.tastingList.query({
+        filter,
+        limit: 10,
+      }),
+    };
+  },
+);
 
 export default function Activity() {
   const { user } = useAuth();
