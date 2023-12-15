@@ -47,7 +47,6 @@ export function makeIsomorphicLoader<T>(callback: DataCallback<T>) {
       request,
       params,
     }: ClientLoaderFunctionArgs) {
-      console.log(request);
       const trpcClient = makeTRPCClient(
         config.API_SERVER,
         window.REMIX_CONTEXT.accessToken,
