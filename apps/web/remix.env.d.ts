@@ -44,6 +44,9 @@ declare global {
 
   interface Window {
     CONFIG: Config;
-    ACCESS_TOKEN: string | null;
+    REMIX_CONTEXT: {
+      accessToken: string | null;
+      user: User | null;
+    };
   }
 }

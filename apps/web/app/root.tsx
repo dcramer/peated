@@ -144,7 +144,7 @@ export default withSentry(function App() {
   const dehydratedState = useDehydratedState();
 
   return (
-    <Document config={config} data={data} accessToken={accessToken}>
+    <Document config={config} data={data} accessToken={accessToken} user={user}>
       <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
         <TRPCProvider
           queryClient={queryClient}
@@ -220,11 +220,13 @@ function Document({
   config,
   data,
   accessToken,
+  user,
 }: PropsWithChildren<{
   title?: string;
   config?: Record<string, any>;
   data?: Record<string, any>;
   accessToken?: string;
+  user?: User | null;
 }>) {
   return (
     <html lang="en" className="h-full">
@@ -273,9 +275,10 @@ function Document({
         {!!accessToken && (
           <script
             dangerouslySetInnerHTML={{
-              __html: `window.ACCESS_TOKEN = ${JSON.stringify(
-                accessToken || null,
-              )};`,
+              __html: `window.REMIX_CONTEXT = ${JSON.stringify({
+                accessToken: accessToken || null,
+                user: user || null,
+              })};`,
             }}
           />
         )}

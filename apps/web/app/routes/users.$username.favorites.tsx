@@ -1,20 +1,29 @@
-import type { User } from "@peated/server/types";
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { trpc } from "@peated/web/lib/trpc";
-import { useOutletContext } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
+import invariant from "tiny-invariant";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
+
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ params: { username }, context: { trpc } }) => {
+    invariant(username);
+
+    return {
+      favoriteList: await trpc.collectionBottleList.query({
+        user: username,
+        collection: "default",
+      }),
+    };
+  },
+);
 
 export default function ProfileCollections() {
-  const { user } = useOutletContext<{ user: User }>();
-  const { data } = trpc.collectionBottleList.useQuery({
-    user: user.id,
-    collection: "default",
-  });
+  const { favoriteList } = useLoaderData<typeof loader>();
 
   return (
     <>
-      {data && data.results.length ? (
-        <BottleTable bottleList={data.results} rel={data.rel} />
+      {favoriteList && favoriteList.results.length ? (
+        <BottleTable bottleList={favoriteList.results} rel={favoriteList.rel} />
       ) : (
         <EmptyActivity>No favorites recorded yet.</EmptyActivity>
       )}

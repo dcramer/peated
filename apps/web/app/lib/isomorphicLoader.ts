@@ -1,4 +1,5 @@
-import { makeTRPCClient } from "@peated/server/src/lib/trpc";
+import { makeTRPCClient } from "@peated/server/lib/trpc";
+import { type User } from "@peated/server/types";
 import config from "@peated/web/config";
 import { type ClientLoaderFunctionArgs } from "@remix-run/react";
 import { json, type LoaderFunctionArgs } from "@remix-run/server-runtime";
@@ -9,6 +10,7 @@ export type IsomorphicContext = {
   params: LoaderFunctionArgs["params"] | ClientLoaderFunctionArgs["params"];
   context: {
     trpc: ReturnType<typeof makeTRPCClient>;
+    user: User | null;
   };
 };
 
@@ -31,12 +33,12 @@ export function makeIsomorphicLoader<T>(callback: DataCallback<T>) {
     loader: async function loader({
       request,
       params,
-      context: { trpc },
+      context: { trpc, user },
     }: LoaderFunctionArgs) {
       const context: IsomorphicContext = {
         request,
         params,
-        context: { trpc },
+        context: { trpc, user },
       };
       const payload = await callback(context);
       return json(payload);
@@ -48,14 +50,14 @@ export function makeIsomorphicLoader<T>(callback: DataCallback<T>) {
       console.log(request);
       const trpcClient = makeTRPCClient(
         config.API_SERVER,
-        window.ACCESS_TOKEN,
+        window.REMIX_CONTEXT.accessToken,
         captureException,
       );
 
       const context: IsomorphicContext = {
         request,
         params,
-        context: { trpc: trpcClient },
+        context: { trpc: trpcClient, user: window.REMIX_CONTEXT.user },
       };
       const payload = await callback(context);
       return payload;
