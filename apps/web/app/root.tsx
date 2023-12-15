@@ -272,16 +272,14 @@ function Document({
             __html: `window.CONFIG = ${JSON.stringify(config || {})};`,
           }}
         />
-        {!!accessToken && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `window.REMIX_CONTEXT = ${JSON.stringify({
-                accessToken: accessToken || null,
-                user: user || null,
-              })};`,
-            }}
-          />
-        )}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.REMIX_CONTEXT = ${JSON.stringify({
+              accessToken: accessToken || null,
+              user: user || null,
+            })};`,
+          }}
+        />
         <Scripts />
         {/* <LiveReload /> */}
       </body>
