@@ -12,6 +12,7 @@ export type IsomorphicContext = {
     trpc: ReturnType<typeof makeTRPCClient>;
     user: User | null;
   };
+  isServer: boolean;
 };
 
 type DataCallback<T> = (context: IsomorphicContext) => Promise<T>;
@@ -39,6 +40,7 @@ export function makeIsomorphicLoader<T>(callback: DataCallback<T>) {
         request,
         params,
         context: { trpc, user },
+        isServer: true,
       };
       const payload = await callback(context);
       return json(payload);
@@ -57,6 +59,7 @@ export function makeIsomorphicLoader<T>(callback: DataCallback<T>) {
         request,
         params,
         context: { trpc: trpcClient, user: window.REMIX_CONTEXT.user },
+        isServer: false,
       };
       const payload = await callback(context);
       return payload;

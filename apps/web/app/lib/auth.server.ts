@@ -1,9 +1,6 @@
 import { redirect } from "@remix-run/node";
+import { getAuthRedirect } from "./auth";
 
 export function redirectToAuth({ request }: { request: Request }) {
-  const location = new URL(request.url);
-
-  const redirectTo = location.pathname;
-
-  return redirect(`/login?redirectTo=${encodeURIComponent(redirectTo)}`);
+  return redirect(getAuthRedirect({ request }));
 }

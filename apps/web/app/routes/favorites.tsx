@@ -3,11 +3,12 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import Layout from "@peated/web/components/layout";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import useAuth from "@peated/web/hooks/useAuth";
-import { redirectToAuth } from "@peated/web/lib/auth.server";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
+import { getAuthRedirect } from "../lib/auth";
+import { Redirect } from "../lib/errors";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
@@ -16,7 +17,7 @@ export const sitemap: SitemapFunction = () => ({
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ request, context: { trpc, user } }) => {
-    if (!user) return redirectToAuth({ request });
+    if (!user) throw new Redirect(getAuthRedirect({ request }));
 
     return {
       favoriteList: await trpc.collectionBottleList.query({
