@@ -10,5 +10,8 @@
   "files": [
     "tsconfig.json",
     "tsconfig.node.json"
-  ]
+  ],
+  "volta": {
+    "extends": "../../package.json"
+  }
 }

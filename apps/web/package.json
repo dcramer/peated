@@ -98,6 +98,9 @@
   "devDependencies": {
     "@spotlightjs/spotlight": "^0.0.2"
   },
+  "volta": {
+    "extends": "../../package.json"
+  },
   "watch": {
     "assets": {
       "patterns": [
