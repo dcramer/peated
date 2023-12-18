@@ -49,8 +49,8 @@ importers:
         version: 2.9.0
     devDependencies:
       '@spotlightjs/spotlight':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^1.2.3
+        version: 1.2.3
 
   apps/server:
     dependencies:
@@ -194,7 +194,7 @@ importers:
         version: 0.32.6
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@18.19.3)(typescript@5.3.3)
+        version: 10.9.2(@swc/core@1.3.100)(@types/node@18.19.3)(typescript@5.3.3)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -446,8 +446,8 @@ importers:
         version: 3.22.4
     devDependencies:
       '@spotlightjs/spotlight':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^1.2.3
+        version: 1.2.3
 
   apps/worker:
     dependencies:
@@ -513,7 +513,7 @@ importers:
         version: 3.0.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.3.100)(@types/node@20.10.4)(typescript@5.3.3)
+        version: 10.9.2(@swc/core@1.3.100)(@types/node@18.19.3)(typescript@5.3.3)
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -552,7 +552,7 @@ importers:
         version: 3.3.6(ts-node@10.9.2)
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.3.100)(@types/node@20.10.4)(typescript@5.3.3)
+        version: 10.9.2(@swc/core@1.3.100)(@types/node@18.19.3)(typescript@5.3.3)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -564,7 +564,7 @@ importers:
     dependencies:
       ts-node:
         specifier: '*'
-        version: 10.9.2(@swc/core@1.3.100)(@types/node@20.10.4)(typescript@5.3.3)
+        version: 10.9.2(@swc/core@1.3.100)(@types/node@18.19.3)(typescript@5.3.3)
       tsconfig-paths:
         specifier: '*'
         version: 3.15.0
@@ -3527,21 +3527,21 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: false
 
-  /@spotlightjs/overlay@0.0.19:
-    resolution: {integrity: sha512-Fl6GvOzQk/ofXicMq8P7LjDUVQTnVuP/JVn96hNrIjzCh1VPyq1Bkwfc/kDuvZkxpWfv2Da7YvfzStlwVxgp8w==}
+  /@spotlightjs/overlay@1.2.0:
+    resolution: {integrity: sha512-DyhvMgtVjWi3L577gq6X3MPDWeZ2DvTWxxhub5IEC8CZ7NagjokHwH1aaLRhHj37LitQP8RmD5Ru5wCbmMW2hQ==}
     dev: true
 
-  /@spotlightjs/sidecar@0.0.14:
-    resolution: {integrity: sha512-OJWn7OH24NnPta04Nm+m7SIAeRxPVFwPU+F5LQdPcaCXPP78arcaTWDqonnFkPHLC2aAZJDLMD7G7RRI7wJlGQ==}
+  /@spotlightjs/sidecar@1.3.1:
+    resolution: {integrity: sha512-tYIlldNJFE69GHGLebC8SM91c3SQZbxLxwq7Z2VFr6BhkmGA6xBQ4OONHrJTcK5MoQXAtiTs5UzceY6jdZkwNA==}
     hasBin: true
     dev: true
 
-  /@spotlightjs/spotlight@0.0.2:
-    resolution: {integrity: sha512-cZnCpmREQw4zYb0UJi/lpBZzmEJLTl/rgGiyrFiTSzsCp5z/qIR0PkoiM8DtWhbytQOo7ljMiovEMLIOV/AFYw==}
+  /@spotlightjs/spotlight@1.2.3:
+    resolution: {integrity: sha512-C6Vb/AmB2Dk2YlQVeTziL2i2l4FXmnMZ9RDwFXytqjWqtmzANK9NXPL9YKydz0L1cXFZwoVYnKkFiYUn/rF+0g==}
     hasBin: true
     dependencies:
-      '@spotlightjs/overlay': 0.0.19
-      '@spotlightjs/sidecar': 0.0.14
+      '@spotlightjs/overlay': 1.2.0
+      '@spotlightjs/sidecar': 1.3.1
     dev: true
 
   /@svgr/babel-plugin-add-jsx-attribute@8.0.0(@babel/core@7.23.6):
@@ -10644,7 +10644,7 @@ packages:
     dependencies:
       lilconfig: 3.0.0
       postcss: 8.4.32
-      ts-node: 10.9.2(@swc/core@1.3.100)(@types/node@20.10.4)(typescript@5.3.3)
+      ts-node: 10.9.2(@swc/core@1.3.100)(@types/node@18.19.3)(typescript@5.3.3)
       yaml: 2.3.4
     dev: false
 
@@ -12463,7 +12463,7 @@ packages:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
     dev: false
 
-  /ts-node@10.9.2(@swc/core@1.3.100)(@types/node@20.10.4)(typescript@5.3.3):
+  /ts-node@10.9.2(@swc/core@1.3.100)(@types/node@18.19.3)(typescript@5.3.3):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -12479,37 +12479,6 @@ packages:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@swc/core': 1.3.100
-      '@tsconfig/node10': 1.0.9
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 20.10.4
-      acorn: 8.11.2
-      acorn-walk: 8.3.1
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.3.3
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    dev: false
-
-  /ts-node@10.9.2(@types/node@18.19.3)(typescript@5.3.3):
-    resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
-    hasBin: true
-    peerDependencies:
-      '@swc/core': '>=1.2.50'
-      '@swc/wasm': '>=1.2.50'
-      '@types/node': '*'
-      typescript: '>=2.7'
-    peerDependenciesMeta:
-      '@swc/core':
-        optional: true
-      '@swc/wasm':
-        optional: true
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.9
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
