@@ -23,8 +23,8 @@ program
       where: bottleId
         ? (bottles, { eq }) => eq(bottles.id, bottleId)
         : options.onlyMissing
-        ? (bottles, { isNull }) => isNull(bottles.description)
-        : undefined,
+          ? (bottles, { isNull }) => isNull(bottles.description)
+          : undefined,
     });
     for (const bottle of bottleQuery) {
       console.log(

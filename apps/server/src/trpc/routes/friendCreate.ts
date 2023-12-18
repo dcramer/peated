@@ -75,8 +75,8 @@ export default authedProcedure.input(z.number()).mutation(async function ({
           status: isAccepting
             ? "following"
             : currentStatus === "none"
-            ? "pending"
-            : currentStatus,
+              ? "pending"
+              : currentStatus,
         },
       })
       .returning();

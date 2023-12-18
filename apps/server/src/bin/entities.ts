@@ -14,8 +14,8 @@ program
       where: entityId
         ? (entities, { eq }) => eq(entities.id, entityId)
         : options.onlyMissing
-        ? (entities, { isNull }) => isNull(entities.description)
-        : undefined,
+          ? (entities, { isNull }) => isNull(entities.description)
+          : undefined,
     });
     for (const entity of query) {
       console.log(
