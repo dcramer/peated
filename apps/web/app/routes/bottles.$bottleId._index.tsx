@@ -91,14 +91,16 @@ export default function BottleDetails() {
         </ClientOnly>
       </div>
 
-      {bottle.description && (
+      {(bottle.description || bottle.tastingNotes) && (
         <div className="my-6 px-3 md:px-0">
-          <div className="flex space-x-4">
-            <div className="prose prose-invert -mt-5 max-w-none flex-auto">
-              <Markdown content={bottle.description} />
+          {bottle.description && (
+            <div className="flex space-x-4">
+              <div className="prose prose-invert -mt-5 max-w-none flex-auto">
+                <Markdown content={bottle.description} />
+              </div>
+              <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
             </div>
-            <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
-          </div>
+          )}
           {bottle.tastingNotes && (
             <>
               <h3 className="text-highlight text-lg font-bold">

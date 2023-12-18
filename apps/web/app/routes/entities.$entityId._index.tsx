@@ -57,8 +57,8 @@ export default function EntityDetailsOverview() {
         <EntityMap position={entity.location} />
       </div>
 
-      {entity.description && (
-        <div className="my-6 px-3 md:px-0">
+      <div className="my-6 px-3 md:px-0">
+        {entity.description && (
           <div className="flex space-x-4">
             <div className="prose prose-invert -mt-5 max-w-none flex-auto">
               <Markdown content={entity.description} />
@@ -66,24 +66,24 @@ export default function EntityDetailsOverview() {
 
             <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
           </div>
-          <div className="prose prose-invert max-w-none flex-auto">
-            <dl>
-              <dt>Website</dt>
-              <dd>
-                {entity.website ? (
-                  <a href={entity.website} className="hover:underline">
-                    {parseDomain(entity.website)}
-                  </a>
-                ) : (
-                  <em>n/a</em>
-                )}
-              </dd>
-              <dt>Year Established</dt>
-              <dd>{entity.yearEstablished ?? <em>n/a</em>}</dd>
-            </dl>
-          </div>
+        )}
+        <div className="prose prose-invert max-w-none flex-auto">
+          <dl>
+            <dt>Website</dt>
+            <dd>
+              {entity.website ? (
+                <a href={entity.website} className="hover:underline">
+                  {parseDomain(entity.website)}
+                </a>
+              ) : (
+                <em>n/a</em>
+              )}
+            </dd>
+            <dt>Year Established</dt>
+            <dd>{entity.yearEstablished ?? <em>n/a</em>}</dd>
+          </dl>
         </div>
-      )}
+      </div>
     </>
   );
 }
