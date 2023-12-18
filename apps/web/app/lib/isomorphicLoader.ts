@@ -3,7 +3,6 @@ import { type User } from "@peated/server/types";
 import config from "@peated/web/config";
 import { type ClientLoaderFunctionArgs } from "@remix-run/react";
 import { json, type LoaderFunctionArgs } from "@remix-run/server-runtime";
-import { isResponse } from "@remix-run/server-runtime/dist/responses";
 import { captureException } from "@sentry/remix";
 
 export type IsomorphicContext = {
@@ -16,7 +15,11 @@ export type IsomorphicContext = {
   isServer: boolean;
 };
 
-type DataCallback<T> = (context: IsomorphicContext) => Promise<T>;
+type DataFunctionValue = Response | NonNullable<unknown> | null;
+
+type DataCallback<T extends DataFunctionValue> = (
+  context: IsomorphicContext,
+) => Promise<T>;
 
 /**
  * Builds a loader which gives access to a uniform context object, using DI to inject
@@ -30,7 +33,9 @@ type DataCallback<T> = (context: IsomorphicContext) => Promise<T>;
  * });
  * ```
  */
-export function makeIsomorphicLoader<T>(callback: DataCallback<T>) {
+export function makeIsomorphicLoader<T extends DataFunctionValue>(
+  callback: DataCallback<T>,
+) {
   return {
     loader: async function loader({
       request,
@@ -44,7 +49,7 @@ export function makeIsomorphicLoader<T>(callback: DataCallback<T>) {
         isServer: true,
       };
       const payload = await callback(context);
-      if (isResponse(payload)) return payload;
+      if (payload instanceof Response) return payload;
       return json(payload);
     },
     clientLoader: async function clientLoader({
