@@ -80,8 +80,8 @@ export default ({
   const initialValue = Array.isArray(props.value)
     ? props.value
     : props.value
-    ? [props.value]
-    : [];
+      ? [props.value]
+      : [];
 
   if (simple) {
     targetOptions = options.length;
@@ -91,8 +91,8 @@ export default ({
     const newValue = Array.isArray(props.value)
       ? props.value
       : props.value
-      ? [props.value]
-      : [];
+        ? [props.value]
+        : [];
     setValue(newValue);
   }, [JSON.stringify(props.value)]);
 

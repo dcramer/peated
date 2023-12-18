@@ -7,8 +7,7 @@ import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
-import { getAuthRedirect } from "../lib/auth";
-import { Redirect } from "../lib/errors";
+import { redirectToAuth } from "../lib/auth";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
@@ -17,7 +16,7 @@ export const sitemap: SitemapFunction = () => ({
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ request, context: { trpc, user } }) => {
-    if (!user) throw new Redirect(getAuthRedirect({ request }));
+    if (!user) return redirectToAuth({ request });
 
     return {
       favoriteList: await trpc.collectionBottleList.query({

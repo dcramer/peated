@@ -39,8 +39,8 @@ export default function Bar({
           up
             ? "fill-green-400 stroke-green-400"
             : down
-            ? "fill-red-400 stroke-red-400"
-            : "fill-light stroke-light",
+              ? "fill-red-400 stroke-red-400"
+              : "fill-light stroke-light",
         )}
       />
     </>

@@ -6,28 +6,27 @@ import Layout from "@peated/web/components/layout";
 import ListItem from "@peated/web/components/listItem";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import UserAvatar from "@peated/web/components/userAvatar";
-import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { redirectToAuth } from "@peated/web/lib/auth";
 import { trpc } from "@peated/web/lib/trpc";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import type { SitemapFunction } from "remix-sitemap";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({
-  request,
-  context: { user, trpc },
-}: LoaderFunctionArgs) {
-  if (!user) return redirectToAuth({ request });
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { trpc, user } }) => {
+    if (!user) return redirectToAuth({ request });
 
-  return json({
-    friendList: await trpc.friendList.query(),
-  });
-}
+    return {
+      friendList: await trpc.friendList.query(),
+    };
+  },
+);
 
 export const meta: MetaFunction = () => {
   return [

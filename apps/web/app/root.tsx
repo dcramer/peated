@@ -36,7 +36,6 @@ import LoadingIndicator from "./components/loadingIndicator";
 import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
 import { ApiUnauthorized } from "./lib/api";
-import { Redirect } from "./lib/errors";
 import { logError } from "./lib/log";
 import { trpc } from "./lib/trpc";
 
@@ -200,11 +199,6 @@ function TRPCProvider({
 export function ErrorBoundary() {
   const error = useRouteError();
   if (!isRouteErrorResponse(error)) logError(error);
-
-  if (error instanceof Redirect) {
-    location.href = error.path;
-    return null;
-  }
 
   if (error instanceof ApiUnauthorized && error.data.name === "invalid_token") {
     // need middleware!

@@ -2,7 +2,7 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import Layout from "@peated/web/components/layout";
 import NotificationList from "@peated/web/components/notifications/list";
 import Tabs from "@peated/web/components/tabs";
-import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { redirectToAuth } from "@peated/web/lib/auth";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";

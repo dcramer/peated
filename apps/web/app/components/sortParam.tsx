@@ -26,10 +26,10 @@ export default function SortParam({
             sort === name
               ? invertSort
               : sort === invertSort
-              ? name
-              : defaultOrder === "asc"
-              ? name
-              : invertSort,
+                ? name
+                : defaultOrder === "asc"
+                  ? name
+                  : invertSort,
         }),
       }}
       className="gap-x inline-flex items-center hover:underline"

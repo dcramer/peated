@@ -14,7 +14,7 @@ import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import useApi from "@peated/web/hooks/useApi";
 import useAuth from "@peated/web/hooks/useAuth";
-import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { redirectToAuth } from "@peated/web/lib/auth";
 import { toBlob } from "@peated/web/lib/blobs";
 import { trpc } from "@peated/web/lib/trpc";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";

@@ -27,7 +27,7 @@ import Layout from "@peated/web/components/layout";
 import Spinner from "@peated/web/components/spinner";
 import useApi from "@peated/web/hooks/useApi";
 import { ApiError } from "@peated/web/lib/api";
-import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { redirectToAuth } from "@peated/web/lib/auth";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

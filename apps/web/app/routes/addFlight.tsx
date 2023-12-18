@@ -1,7 +1,7 @@
 import { useNavigate } from "@remix-run/react";
 
 import FlightForm from "@peated/web/components/flightForm";
-import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { redirectToAuth } from "@peated/web/lib/auth";
 import { trpc } from "@peated/web/lib/trpc";
 import { type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import type { SitemapFunction } from "remix-sitemap";

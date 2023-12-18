@@ -2,7 +2,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity } from "@peated/server/types";
 import BottleForm from "@peated/web/components/bottleForm";
 import Spinner from "@peated/web/components/spinner";
-import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { redirectToAuth } from "@peated/web/lib/auth";
 import { trpc } from "@peated/web/lib/trpc";
 import { type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import { useLocation, useNavigate } from "@remix-run/react";

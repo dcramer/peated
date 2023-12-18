@@ -6,8 +6,7 @@ import SimpleHeader from "@peated/web/components/simpleHeader";
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { type SitemapFunction } from "remix-sitemap";
-import { getAuthRedirect } from "../lib/auth";
-import { Redirect } from "../lib/errors";
+import { redirectToAuth } from "../lib/auth";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
@@ -16,7 +15,7 @@ export const sitemap: SitemapFunction = () => ({
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ request, context: { trpc, user } }) => {
-    if (!user) throw new Redirect(getAuthRedirect({ request }));
+    if (!user) return redirectToAuth({ request });
 
     return {
       flightList: await trpc.flightList.query(),

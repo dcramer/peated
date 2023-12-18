@@ -16,7 +16,7 @@ import SelectField from "@peated/web/components/selectField";
 import Spinner from "@peated/web/components/spinner";
 import TextAreaField from "@peated/web/components/textAreaField";
 import useApi from "@peated/web/hooks/useApi";
-import { redirectToAuth } from "@peated/web/lib/auth.server";
+import { redirectToAuth } from "@peated/web/lib/auth";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc";
