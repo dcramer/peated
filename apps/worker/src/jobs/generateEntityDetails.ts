@@ -14,13 +14,37 @@ if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-function generatePrompt(entityName: string) {
+function generatePrompt(entity: Entity) {
+  const infoLines = [];
+  if (entity.country && entity.region) {
+    infoLines.push(`Origin: ${entity.region}, ${entity.country}`);
+  } else if (entity.country) {
+    infoLines.push(`Origin: ${entity.country}`);
+  }
+  if (entity.yearEstablished) {
+    infoLines.push(`Year Established: ${entity.yearEstablished}`);
+  }
+  if (entity.website) {
+    infoLines.push(`Website: ${entity.website}`);
+  }
+  if (entity.type) {
+    infoLines.push(`Entity Types: ${entity.type.join(", ")}`);
+  }
+
   return `
-Pretend to be an expert in whiskey distillation. Tell me about the following entity:
+You are an expert in whiskey. Your job is to accurately describe information about the whiskey industry.
 
-${entityName}
+Tell me about the following whiskey brand:
 
-If the entity is located in Scotland, spell wihskey as "whisky".
+${entity.name}
+${
+  infoLines.length
+    ? `\nOther information we already know about this entity:\n- ${infoLines.join(
+        "\n- ",
+      )}\n`
+    : ""
+}
+If the entity is located in Scotland, spell whiskey as "whisky".
 
 Describe the entity as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as a "entity".
 
@@ -70,7 +94,7 @@ async function generateEntityDetails(entity: Entity): Promise<Response | null> {
   if (!config.OPENAI_API_KEY) return null;
 
   const result = await getStructuredResponse(
-    generatePrompt(entity.name),
+    generatePrompt(entity),
     OpenAIBottleDetailsSchema,
     OpenAIBottleDetailsValidationSchema,
     undefined,

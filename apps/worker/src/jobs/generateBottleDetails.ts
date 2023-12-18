@@ -18,12 +18,28 @@ if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-function generatePrompt(bottleName: string) {
+function generatePrompt(bottle: Bottle) {
+  const infoLines = [];
+  if (bottle.category) {
+    infoLines.push(`Category: ${bottle.category}`);
+  }
+  if (bottle.statedAge) {
+    infoLines.push(`Stated Age: ${bottle.statedAge}`);
+  }
+
   return `
-Pretend to be an expert in whiskey distillation. Tell me about the following whiskey:
+You are an expert in whiskey. Your job is to accurately describe information about the whiskey industry.
 
-${bottleName}
+Tell me about the following bottle of whiskey:
 
+${bottle.fullName}
+${
+  infoLines.length
+    ? `\nOther information we already know about this bottle:\n- ${infoLines.join(
+        "\n- ",
+      )}\n`
+    : ""
+}
 If the whiskey is made in Scotland, it is always spelled "whisky".
 
 'description' should focus on what is unique about this whiskey. It should not include the tasting notes. It should be less than 200 words, and structured as paragraphs with prose.
@@ -79,7 +95,7 @@ async function generateBottleDetails(bottle: Bottle): Promise<Response | null> {
   if (!config.OPENAI_API_KEY) return null;
 
   const result = await getStructuredResponse(
-    generatePrompt(bottle.fullName),
+    generatePrompt(bottle),
     OpenAIBottleDetailsSchema,
     OpenAIBottleDetailsValidationSchema,
     undefined,
