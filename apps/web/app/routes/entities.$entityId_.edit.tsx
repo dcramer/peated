@@ -12,18 +12,16 @@ import SelectField from "@peated/web/components/selectField";
 import Spinner from "@peated/web/components/spinner";
 import TextField from "@peated/web/components/textField";
 import { trpc } from "@peated/web/lib/trpc";
-import {
-  json,
-  type LoaderFunctionArgs,
-  type MetaFunction,
-} from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { useQueryClient } from "@tanstack/react-query";
 import { getQueryKey } from "@trpc/react-query";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 const entityTypes = [
   { id: "brand", name: "Brand" },
@@ -41,15 +39,15 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({
-  params: { entityId },
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  invariant(entityId);
-  const entity = await trpc.entityById.query(Number(entityId));
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ params: { entityId }, context: { trpc } }) => {
+    invariant(entityId);
 
-  return json({ entity });
-}
+    const entity = await trpc.entityById.query(Number(entityId));
+
+    return json({ entity });
+  },
+);
 
 export default function EditEntity() {
   const navigate = useNavigate();

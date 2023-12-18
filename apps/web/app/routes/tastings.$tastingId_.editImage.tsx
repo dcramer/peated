@@ -1,22 +1,4 @@
-import type {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  MetaFunction,
-} from "@remix-run/node";
-import {
-  json,
-  redirect,
-  unstable_createFileUploadHandler,
-  unstable_parseMultipartFormData,
-} from "@remix-run/node";
-import { useActionData, useLoaderData, useNavigate } from "@remix-run/react";
-import { useState } from "react";
-import type { SubmitHandler } from "react-hook-form";
-import { useForm } from "react-hook-form";
-import invariant from "tiny-invariant";
-
 import { MAX_FILESIZE } from "@peated/server/constants";
-
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import FormError from "@peated/web/components/formError";
@@ -30,7 +12,19 @@ import { ApiError } from "@peated/web/lib/api";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
+import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import {
+  unstable_createFileUploadHandler,
+  unstable_parseMultipartFormData,
+} from "@remix-run/node";
+import { useActionData, useLoaderData, useNavigate } from "@remix-run/react";
+import { json, redirect } from "@remix-run/server-runtime";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import type { SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import invariant from "tiny-invariant";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export async function action({ context, request, params }: ActionFunctionArgs) {
   invariant(params.tastingId);
@@ -69,16 +63,14 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
   return redirect(`/tastings/${params.tastingId}`);
 }
 
-export async function loader({
-  request,
-  params: { tastingId },
-  context: { trpc, user },
-}: LoaderFunctionArgs) {
-  invariant(tastingId);
-  if (!user) return redirectToAuth({ request });
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, params: { tastingId }, context: { trpc, user } }) => {
+    invariant(tastingId);
+    if (!user) return redirectToAuth({ request });
 
-  return json({ tasting: await trpc.tastingById.query(Number(tastingId)) });
-}
+    return json({ tasting: await trpc.tastingById.query(Number(tastingId)) });
+  },
+);
 
 export const meta: MetaFunction = () => {
   return [

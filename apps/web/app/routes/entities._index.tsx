@@ -6,9 +6,9 @@ import Layout from "@peated/web/components/layout";
 import QueryBoundary from "@peated/web/components/queryBoundary";
 import SidebarLink from "@peated/web/components/sidebarLink";
 import { buildQueryString } from "@peated/web/lib/urls";
-import type { SerializeFrom } from "@remix-run/node";
-import { type MetaFunction } from "@remix-run/node";
+import { type MetaFunction, type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -30,7 +30,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ request, context: { trpc } }) => {
     const { searchParams } = new URL(request.url);
     const numericFields = new Set(["cursor", "limit"]);
-    return {
+    return json({
       entityList: await trpc.entityList.query(
         Object.fromEntries(
           [...searchParams.entries()].map(([k, v]) =>
@@ -38,7 +38,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
           ),
         ),
       ),
-    };
+    });
   },
 );
 

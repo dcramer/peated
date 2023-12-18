@@ -3,8 +3,9 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import Layout from "@peated/web/components/layout";
 import ListItem from "@peated/web/components/listItem";
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import type { MetaFunction } from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
 import { redirectToAuth } from "../lib/auth";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
@@ -17,9 +18,9 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ request, context: { trpc, user } }) => {
     if (!user) return redirectToAuth({ request });
 
-    return {
+    return json({
       flightList: await trpc.flightList.query(),
-    };
+    });
   },
 );
 

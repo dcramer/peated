@@ -1,7 +1,3 @@
-import { Link, useLoaderData, useLocation } from "@remix-run/react";
-import { Fragment } from "react";
-import { useEventListener } from "usehooks-ts";
-
 import Alert from "@peated/web/components/alert";
 import Glyph from "@peated/web/components/assets/Glyph";
 import BetaNotice from "@peated/web/components/betaNotice";
@@ -17,6 +13,10 @@ import useAuth from "@peated/web/hooks/useAuth";
 import classNames from "@peated/web/lib/classNames";
 import { trpc } from "@peated/web/lib/trpc";
 import { type SerializeFrom } from "@remix-run/node";
+import { Link, useLoaderData, useLocation } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
+import { Fragment } from "react";
+import { useEventListener } from "usehooks-ts";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 const defaultViewParam = "global";
@@ -26,12 +26,12 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
     const { searchParams } = new URL(request.url);
     const filter = mapFilterParam(searchParams.get("view"));
 
-    return {
+    return json({
       tastingList: await trpc.tastingList.query({
         filter,
         limit: 10,
       }),
-    };
+    });
   },
 );
 

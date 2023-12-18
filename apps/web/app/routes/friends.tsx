@@ -8,8 +8,9 @@ import SimpleHeader from "@peated/web/components/simpleHeader";
 import UserAvatar from "@peated/web/components/userAvatar";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { trpc } from "@peated/web/lib/trpc";
-import type { MetaFunction } from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { useState } from "react";
 import type { SitemapFunction } from "remix-sitemap";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
@@ -22,9 +23,9 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ request, context: { trpc, user } }) => {
     if (!user) return redirectToAuth({ request });
 
-    return {
+    return json({
       friendList: await trpc.friendList.query(),
-    };
+    });
   },
 );
 

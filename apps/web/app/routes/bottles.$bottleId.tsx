@@ -21,8 +21,9 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { summarize } from "@peated/web/lib/markdown";
 import { formatCategoryName } from "@peated/web/lib/strings";
 import { trpc } from "@peated/web/lib/trpc";
-import type { MetaFunction } from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { useQueryClient } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
@@ -33,7 +34,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
 
     const bottle = await trpc.bottleById.query(Number(params.bottleId));
 
-    return { bottle };
+    return json({ bottle });
   },
 );
 

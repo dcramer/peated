@@ -10,14 +10,15 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import Spinner from "@peated/web/components/spinner";
 import { trpc } from "@peated/web/lib/trpc";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, type MetaFunction } from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 
@@ -29,15 +30,15 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({
-  params: { entityId },
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  invariant(entityId);
-  const entity = await trpc.entityById.query(Number(entityId));
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ params: { entityId }, context: { trpc } }) => {
+    invariant(entityId);
 
-  return json({ entity });
-}
+    const entity = await trpc.entityById.query(Number(entityId));
+
+    return json({ entity });
+  },
+);
 
 export default function EditEntity() {
   const navigate = useNavigate();

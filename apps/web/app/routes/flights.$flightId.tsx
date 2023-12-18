@@ -1,24 +1,24 @@
 import BottleCard from "@peated/web/components/bottleCard";
 import Layout from "@peated/web/components/layout";
 import { summarize } from "@peated/web/lib/markdown";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
-export async function loader({
-  params: { flightId },
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  invariant(flightId);
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ params: { flightId }, context: { trpc } }) => {
+    invariant(flightId);
 
-  return json({
-    flight: await trpc.flightById.query(flightId),
-    bottles: await trpc.bottleList.query({
-      flight: flightId,
-    }),
-  });
-}
+    return json({
+      flight: await trpc.flightById.query(flightId),
+      bottles: await trpc.bottleList.query({
+        flight: flightId,
+      }),
+    });
+  },
+);
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) return [];

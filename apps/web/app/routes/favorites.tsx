@@ -5,6 +5,7 @@ import SimpleHeader from "@peated/web/components/simpleHeader";
 import useAuth from "@peated/web/hooks/useAuth";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
 import { redirectToAuth } from "../lib/auth";
@@ -18,12 +19,12 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ request, context: { trpc, user } }) => {
     if (!user) return redirectToAuth({ request });
 
-    return {
+    return json({
       favoriteList: await trpc.collectionBottleList.query({
         user: "me",
         collection: "default",
       }),
-    };
+    });
   },
 );
 

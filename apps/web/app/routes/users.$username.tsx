@@ -10,8 +10,9 @@ import Tabs from "@peated/web/components/tabs";
 import UserAvatar from "@peated/web/components/userAvatar";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
-import type { MetaFunction } from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useSubmit } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -43,7 +44,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ params: { username }, context: { trpc } }) => {
     invariant(username);
 
-    return { user: await trpc.userById.query(username as string) };
+    return json({ user: await trpc.userById.query(username as string) });
   },
 );
 

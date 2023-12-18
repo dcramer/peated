@@ -9,25 +9,21 @@ import Tabs from "@peated/web/components/tabs";
 import useAuth from "@peated/web/hooks/useAuth";
 import { summarize } from "@peated/web/lib/markdown";
 import { getEntityUrl } from "@peated/web/lib/urls";
-import type {
-  LinksFunction,
-  LoaderFunctionArgs,
-  MetaFunction,
-} from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
-export async function loader({
-  params: { entityId },
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  invariant(entityId);
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ params: { entityId }, context: { trpc } }) => {
+    invariant(entityId);
 
-  const entity = await trpc.entityById.query(Number(entityId));
+    const entity = await trpc.entityById.query(Number(entityId));
 
-  return json({ entity });
-}
+    return json({ entity });
+  },
+);
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) return [];

@@ -20,15 +20,16 @@ import { redirectToAuth } from "@peated/web/lib/auth";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { TRPCClientError } from "@trpc/client";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import invariant from "tiny-invariant";
 import type { z } from "zod";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
 
@@ -41,22 +42,20 @@ const servingStyleList = SERVING_STYLE_LIST.map((c) => ({
   name: formatServingStyle(c),
 }));
 
-export async function loader({
-  request,
-  params: { bottleId },
-  context: { trpc, user },
-}: LoaderFunctionArgs) {
-  invariant(bottleId);
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, params: { bottleId }, context: { trpc, user } }) => {
+    invariant(bottleId);
 
-  if (!user) return redirectToAuth({ request });
+    if (!user) return redirectToAuth({ request });
 
-  const bottle = await trpc.bottleById.query(Number(bottleId));
-  const suggestedTags = await trpc.bottleSuggestedTagList.query({
-    bottle: Number(bottleId),
-  });
+    const bottle = await trpc.bottleById.query(Number(bottleId));
+    const suggestedTags = await trpc.bottleSuggestedTagList.query({
+      bottle: Number(bottleId),
+    });
 
-  return json({ bottle, suggestedTags });
-}
+    return json({ bottle, suggestedTags });
+  },
+);
 
 export const meta: MetaFunction = () => {
   return [

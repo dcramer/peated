@@ -1,6 +1,7 @@
 import type { SessionPayload } from "@peated/web/types";
 import type { Session } from "@remix-run/node";
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { createCookieSessionStorage } from "@remix-run/node";
+import { redirect } from "@remix-run/server-runtime";
 import type { Request as ExpressRequest } from "express";
 import invariant from "tiny-invariant";
 

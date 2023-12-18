@@ -1,5 +1,3 @@
-import { useLoaderData, useNavigate } from "@remix-run/react";
-
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserInputSchema } from "@peated/server/schemas";
@@ -17,13 +15,15 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { toBlob } from "@peated/web/lib/blobs";
 import { trpc } from "@peated/web/lib/trpc";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
+import { useLoaderData, useNavigate } from "@remix-run/react";
+import { json, redirect } from "@remix-run/server-runtime";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { type SitemapFunction } from "remix-sitemap";
 import type { z } from "zod";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 
@@ -31,21 +31,22 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({
-  context: { user, trpc },
-  request,
-}: LoaderFunctionArgs) {
-  if (!user) return redirectToAuth({ request });
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ context: { user, trpc }, request }) => {
+    if (!user) return redirectToAuth({ request });
 
-  const userDetails = await trpc.userById.query("me");
-  if (!userDetails) {
-    return redirect(
-      `/login?redirectTo=${encodeURIComponent(new URL(request.url).pathname)}`,
-    );
-  }
+    const userDetails = await trpc.userById.query("me");
+    if (!userDetails) {
+      return redirect(
+        `/login?redirectTo=${encodeURIComponent(
+          new URL(request.url).pathname,
+        )}`,
+      );
+    }
 
-  return json({ user: userDetails });
-}
+    return json({ user: userDetails });
+  },
+);
 
 export const meta: MetaFunction = () => {
   return [

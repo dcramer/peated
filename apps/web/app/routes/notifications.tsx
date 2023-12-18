@@ -3,30 +3,29 @@ import Layout from "@peated/web/components/layout";
 import NotificationList from "@peated/web/components/notifications/list";
 import Tabs from "@peated/web/components/tabs";
 import { redirectToAuth } from "@peated/web/lib/auth";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ context: { trpc, user }, request }) => {
+    if (!user) return redirectToAuth({ request });
 
-export async function loader({
-  context: { trpc, user },
-  request,
-}: LoaderFunctionArgs) {
-  if (!user) return redirectToAuth({ request });
+    const { searchParams } = new URL(request.url);
 
-  const { searchParams } = new URL(request.url);
-
-  return json({
-    notificationList: await trpc.notificationList.query({
-      filter: "unread",
-      ...Object.fromEntries(searchParams.entries()),
-    }),
-  });
-}
+    return json({
+      notificationList: await trpc.notificationList.query({
+        filter: "unread",
+        ...Object.fromEntries(searchParams.entries()),
+      }),
+    });
+  },
+);
 
 export const meta: MetaFunction = () => {
   return [

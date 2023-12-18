@@ -9,6 +9,7 @@ import { formatCategoryName } from "@peated/web/lib/strings";
 import { buildQueryString } from "@peated/web/lib/urls";
 import { type MetaFunction, type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -38,7 +39,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
       "bottler",
       "entity",
     ]);
-    return {
+    return json({
       bottleList: await trpc.bottleList.query(
         Object.fromEntries(
           [...searchParams.entries()].map(([k, v]) =>
@@ -46,7 +47,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
           ),
         ),
       ),
-    };
+    });
   },
 );
 

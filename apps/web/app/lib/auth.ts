@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/node";
+import { redirect } from "@remix-run/server-runtime";
 
 export function redirectToAuth({ request }: { request: Request }) {
   return redirect(getAuthRedirect({ request }));

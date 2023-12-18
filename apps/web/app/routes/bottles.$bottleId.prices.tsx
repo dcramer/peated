@@ -1,6 +1,7 @@
 import BetaNotice from "@peated/web/components/betaNotice";
 import TimeSince from "@peated/web/components/timeSince";
 import { useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -12,7 +13,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
       bottle: Number(bottleId),
     });
 
-    return { priceList };
+    return json({ priceList });
   },
 );
 

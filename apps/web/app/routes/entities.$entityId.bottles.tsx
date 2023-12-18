@@ -1,8 +1,9 @@
 import type { Entity } from "@peated/server/types";
 import BottleTable from "@peated/web/components/bottleTable";
 import QueryBoundary from "@peated/web/components/queryBoundary";
-import type { SerializeFrom } from "@remix-run/node";
+import { type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation, useOutletContext } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -20,7 +21,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
       "entity",
     ]);
 
-    return {
+    return json({
       bottleList: await trpc.bottleList.query({
         ...Object.fromEntries(
           [...searchParams.entries()].map(([k, v]) =>
@@ -29,7 +30,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
         ),
         entity: Number(entityId),
       }),
-    };
+    });
   },
 );
 
