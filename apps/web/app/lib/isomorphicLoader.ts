@@ -2,11 +2,7 @@ import { makeTRPCClient } from "@peated/server/lib/trpc";
 import { type User } from "@peated/server/types";
 import config from "@peated/web/config";
 import { type ClientLoaderFunctionArgs } from "@remix-run/react";
-import {
-  json,
-  type LoaderFunction,
-  type LoaderFunctionArgs,
-} from "@remix-run/server-runtime";
+import { json, type LoaderFunctionArgs } from "@remix-run/server-runtime";
 import { isResponse } from "@remix-run/server-runtime/dist/responses";
 import { captureException } from "@sentry/remix";
 
@@ -20,9 +16,7 @@ export type IsomorphicContext = {
   isServer: boolean;
 };
 
-type DataCallback<T extends ReturnType<LoaderFunction>> = (
-  context: IsomorphicContext,
-) => Promise<T>;
+type DataCallback<T> = (context: IsomorphicContext) => Promise<T>;
 
 /**
  * Builds a loader which gives access to a uniform context object, using DI to inject
