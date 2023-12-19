@@ -12,7 +12,7 @@ export const FlightSchema = z.object({
 });
 
 export const FlightInputSchema = z.object({
-  name: z.string(),
+  name: z.string().trim().min(1, "Required"),
   description: z.string().nullable().optional(),
   public: z.boolean().default(false).optional(),
   bottles: z.array(z.number()).optional(),
