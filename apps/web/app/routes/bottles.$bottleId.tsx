@@ -19,14 +19,15 @@ import Tabs from "@peated/web/components/tabs";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { summarize } from "@peated/web/lib/markdown";
-import { formatCategoryName } from "@peated/web/lib/strings";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { useQueryClient } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
+import PageHeader from "../components/pageHeader";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
+import { formatCategoryName } from "../lib/strings";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ params, context: { trpc } }) => {
@@ -96,43 +97,36 @@ export default function BottleDetails() {
   return (
     <Layout>
       <div className="w-full p-3 lg:py-0">
-        <div className="my-4 flex w-full flex-wrap justify-center gap-x-3 gap-y-4 lg:flex-nowrap lg:justify-start">
-          <div className="hidden w-14 lg:block">
-            <BottleIcon className="w-14" />
-          </div>
-
-          <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
-            <h1
-              className="max-w-full truncate text-center text-3xl font-semibold lg:mx-0 lg:text-left"
-              title={bottle.fullName}
-            >
-              {bottle.fullName}
-            </h1>
+        <PageHeader
+          icon={BottleIcon}
+          title={bottle.fullName}
+          titleExtra={
             <BottleMetadata
               data={bottle}
               className="w-full truncate text-center text-slate-500 lg:text-left"
             />
-          </div>
-
-          {(bottle.category || bottle.statedAge) && (
-            <div className="flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 text-slate-500 lg:w-auto lg:items-end">
-              <div>
-                {bottle.category && (
-                  <Link
-                    to={`/bottles?category=${encodeURIComponent(
-                      bottle.category,
-                    )}`}
-                  >
-                    {formatCategoryName(bottle.category)}
-                  </Link>
-                )}
+          }
+          metadata={
+            (bottle.category || bottle.statedAge) && (
+              <div className="flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 text-slate-500 lg:w-auto lg:items-end">
+                <div>
+                  {bottle.category && (
+                    <Link
+                      to={`/bottles?category=${encodeURIComponent(
+                        bottle.category,
+                      )}`}
+                    >
+                      {formatCategoryName(bottle.category)}
+                    </Link>
+                  )}
+                </div>
+                <div>
+                  {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
+                </div>
               </div>
-              <div>
-                {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
-              </div>
-            </div>
-          )}
-        </div>
+            )
+          }
+        />
 
         <div className="my-8 flex justify-center gap-4 lg:justify-start">
           {user && (

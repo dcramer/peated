@@ -13,6 +13,7 @@ import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
+import PageHeader from "../components/pageHeader";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
@@ -72,18 +73,10 @@ export default function EntityDetails() {
   return (
     <Layout>
       <div className="w-full p-3 lg:py-0">
-        <div className="my-4 flex w-full flex-wrap justify-center gap-x-3 gap-y-4 lg:flex-nowrap lg:justify-start">
-          <div className="hidden w-14 lg:block">
-            <EntityIcon className="h-14 w-auto" />
-          </div>
-
-          <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
-            <h1
-              className="max-w-full truncate text-center text-3xl font-semibold lg:mx-0 lg:text-left"
-              title={entity.name}
-            >
-              {entity.name}
-            </h1>
+        <PageHeader
+          icon={EntityIcon}
+          title={entity.name}
+          titleExtra={
             <div className="max-w-full text-center text-slate-500 lg:text-left">
               {!!entity.country && (
                 <>
@@ -111,22 +104,23 @@ export default function EntityDetails() {
                 </span>
               )}
             </div>
-          </div>
-          <div className="lg:justify-left mb-4 flex w-full justify-center space-x-2 lg:min-w-[200px]">
-            {entity.type.sort().map((t) => (
-              <Chip
-                key={t}
-                size="small"
-                color="highlight"
-                as={Link}
-                to={`/entities?type=${encodeURIComponent(t)}`}
-              >
-                {t}
-              </Chip>
-            ))}
-          </div>
-        </div>
-
+          }
+          metadata={
+            <div className="flex gap-x-1">
+              {entity.type.sort().map((t) => (
+                <Chip
+                  key={t}
+                  size="small"
+                  color="highlight"
+                  as={Link}
+                  to={`/entities?type=${encodeURIComponent(t)}`}
+                >
+                  {t}
+                </Chip>
+              ))}
+            </div>
+          }
+        />
         <div className="flex flex-col gap-4 lg:flex-row">
           <div className="flex-auto">
             <div className="my-8 flex justify-center gap-4 lg:justify-start">
