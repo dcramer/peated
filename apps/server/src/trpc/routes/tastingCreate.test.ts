@@ -176,3 +176,27 @@ test("creates a new tasting with zero rating", async () => {
   expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
   expect(tasting.rating).toBeNull();
 });
+
+test("creates a new tasting with flight", async () => {
+  const bottle = await Fixtures.Bottle();
+  const flight = await Fixtures.Flight();
+
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    flight: flight.publicId,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.id));
+
+  expect(tasting.bottleId).toEqual(bottle.id);
+  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.flightId).toEqual(flight.id);
+});

@@ -20,14 +20,15 @@ function BottleScaffold({
   statedAge,
   color = "default",
   noGutter = false,
+  onClick,
 }: {
   name: any;
   category: any;
   brand: any;
   statedAge: any;
-
   color?: "default" | "highlight";
   noGutter?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <div
@@ -37,7 +38,14 @@ function BottleScaffold({
           ? "bg-highlight text-black"
           : "bg-slate-950 text-white",
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
+        onClick
+          ? color === "highlight"
+            ? "hover:bg-highlight-dark"
+            : "hover:bg-slate-900"
+          : "",
+        onClick ? "cursor-pointer" : "",
       )}
+      onClick={onClick}
     >
       <div className="flex-1 overflow-hidden">
         <div className="flex w-full items-center space-x-1 truncate font-semibold">
@@ -86,13 +94,16 @@ export default function BottleCard({
   bottle,
   noGutter,
   color,
+  onClick,
 }: {
   bottle: Bottle;
   noGutter?: boolean;
   color?: "highlight" | "default";
+  onClick?: (bottle: Bottle) => void;
 }) {
   return (
     <BottleScaffold
+      onClick={onClick ? () => onClick(bottle) : undefined}
       name={
         <>
           <h4 className="truncate font-semibold">

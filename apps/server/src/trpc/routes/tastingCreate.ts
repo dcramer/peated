@@ -1,11 +1,13 @@
 import { XP_PER_LEVEL } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import type { NewTasting, Tasting } from "@peated/server/db/schema";
+import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
 import {
   badgeAwards,
   bottleTags,
   bottles,
   entities,
+  flightBottles,
+  flights,
   follows,
   tastings,
 } from "@peated/server/db/schema";
@@ -42,10 +44,33 @@ export default authedProcedure
       });
     }
 
+    let flight: Flight | null = null;
+    if (input.flight) {
+      const flightResults = await db
+        .select()
+        .from(flights)
+        .innerJoin(flightBottles, eq(flightBottles.flightId, flights.id))
+        .where(
+          and(
+            eq(flights.publicId, input.flight),
+            eq(flightBottles.bottleId, bottle.id),
+          ),
+        )
+        .limit(1);
+      if (flightResults.length !== 1) {
+        throw new TRPCError({
+          message: "Cannot identity flight.",
+          code: "BAD_REQUEST",
+        });
+      }
+      flight = flightResults[0].flight;
+    }
+
     const data: NewTasting = {
       bottleId: bottle.id,
       notes: input.notes || null,
       rating: input.rating || null,
+      flightId: flight ? flight.id : null,
       tags: input.tags
         ? Array.from(new Set(input.tags.map((t) => t.toLowerCase())))
         : [],
