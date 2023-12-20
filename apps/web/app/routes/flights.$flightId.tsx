@@ -121,6 +121,7 @@ export default function FlightDetails() {
         <BottlePanel
           tastingPath={`/bottles/${activeBottle.id}/addTasting?flight=${flight.id}`}
           bottle={activeBottle}
+          open={!!activeBottle}
           onClose={() => {
             setActiveBottle(null);
           }}

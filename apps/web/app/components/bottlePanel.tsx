@@ -1,6 +1,7 @@
 import { type Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/components/assets/Bottle";
 import { Link } from "@remix-run/react";
+import { type ComponentPropsWithoutRef } from "react";
 import { formatCategoryName } from "../lib/strings";
 import BottleMetadata from "./bottleMetadata";
 import Button from "./button";
@@ -9,15 +10,14 @@ import SidePanel, { SidePanelHeader } from "./sidePanel";
 
 export default function BottlePanel({
   bottle,
-  onClose,
   tastingPath,
+  ...props
 }: {
   bottle: Bottle;
   tastingPath?: string;
-  onClose: () => void;
-}) {
+} & ComponentPropsWithoutRef<typeof SidePanel>) {
   return (
-    <SidePanel onClose={onClose}>
+    <SidePanel {...props}>
       <SidePanelHeader>
         <PageHeader
           icon={BottleIcon}

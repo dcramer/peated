@@ -1,11 +1,5 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  type ComponentPropsWithoutRef,
-  type ReactNode,
-} from "react";
+import { Dialog } from "@headlessui/react";
+import { createContext, useContext, type ReactNode } from "react";
 
 const SidePanelContext = createContext<{
   onClose?: (() => void) | undefined | null;
@@ -31,40 +25,30 @@ export function SidePanelHeader({ children }: { children: ReactNode }) {
 
 export default function SidePanel({
   onClose,
+  open = false,
   children,
   ...props
-}: Omit<ComponentPropsWithoutRef<"div">, "className"> & {
+}: {
+  children: ReactNode;
+  open: boolean;
   onClose?: () => void;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const clickHandler = function (e: MouseEvent) {
-      if (!onClose) return;
-      if (!ref.current) return;
-      if (!ref.current.contains(e.target as any)) {
-        // TODO: not handling correctling yet - fires on open vs only after open
-        // onClose();
-      }
-    };
-    window.addEventListener("click", clickHandler);
-    return () => {
-      window.removeEventListener("click", clickHandler);
-    };
-  }, [onClose]);
-
   const context = {
     onClose,
   };
 
   return (
-    <div
-      ref={ref}
+    <Dialog
+      open={open}
+      onClose={() => {
+        onClose && onClose();
+      }}
       className="absolute bottom-0 left-0 right-0 top-0 z-20 h-full overflow-auto border-l border-l-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 to-20% px-6 py-4 lg:fixed lg:left-1/3"
       {...props}
     >
       <SidePanelContext.Provider value={context}>
-        {children}
+        <Dialog.Panel>{children}</Dialog.Panel>
       </SidePanelContext.Provider>
-    </div>
+    </Dialog>
   );
 }
