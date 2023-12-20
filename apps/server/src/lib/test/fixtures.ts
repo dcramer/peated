@@ -38,8 +38,7 @@ import {
   tastings,
   toasts,
   users,
-
-  Bottle} from "../../db/schema";
+} from "../../db/schema";
 import { createAccessToken } from "../auth";
 import { choose, random, sample } from "../rand";
 import { toTitleCase } from "../strings";
