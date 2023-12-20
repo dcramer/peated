@@ -46,15 +46,10 @@ export default function Flights() {
         {results.length ? (
           results.map((flight) => {
             return (
-              <ListItem key={flight.id}>
+              <ListItem key={flight.id} as={Link} to={`/flights/${flight.id}`}>
                 <div className="flex flex-auto items-center space-x-4">
-                  <div className="flex-auto space-y-1 font-medium">
-                    <Link
-                      to={`/flights/${flight.id}`}
-                      className="hover:underline"
-                    >
-                      {flight.name}
-                    </Link>
+                  <div className="flex-auto space-y-1 font-medium group-hover:underline">
+                    {flight.name}
                   </div>
                   {flight.description && (
                     <div className="text-light text-sm">
