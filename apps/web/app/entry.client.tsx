@@ -24,7 +24,7 @@ Sentry.init({
   dsn: config.SENTRY_DSN,
   release: config.VERSION,
 
-  debug: true,
+  debug: false,
   integrations: [
     new Sentry.BrowserTracing({
       tracePropagationTargets: [
