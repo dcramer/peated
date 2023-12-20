@@ -177,9 +177,25 @@ test("creates a new tasting with zero rating", async () => {
   expect(tasting.rating).toBeNull();
 });
 
-test("creates a new tasting with flight", async () => {
+test("flight requires valid bottle", async () => {
   const bottle = await Fixtures.Bottle();
   const flight = await Fixtures.Flight();
+
+  const caller = appRouter.createCaller({
+    user: DefaultFixtures.user,
+  });
+
+  expect(() =>
+    caller.tastingCreate({
+      bottle: bottle.id,
+      flight: flight.publicId,
+    }),
+  ).rejects.toThrowError(/Cannot identify flight/);
+});
+
+test("creates a new tasting with flight", async () => {
+  const bottle = await Fixtures.Bottle();
+  const flight = await Fixtures.Flight({ bottles: [bottle.id] });
 
   const caller = appRouter.createCaller({
     user: DefaultFixtures.user,

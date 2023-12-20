@@ -39,7 +39,7 @@ export default authedProcedure
     });
     if (!bottle) {
       throw new TRPCError({
-        message: "Cannot identity bottle.",
+        message: "Cannot identify bottle.",
         code: "BAD_REQUEST",
       });
     }
@@ -59,7 +59,7 @@ export default authedProcedure
         .limit(1);
       if (flightResults.length !== 1) {
         throw new TRPCError({
-          message: "Cannot identity flight.",
+          message: "Cannot identify flight.",
           code: "BAD_REQUEST",
         });
       }
