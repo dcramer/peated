@@ -18,7 +18,7 @@ export default function BottlePanel({
 }) {
   return (
     <SidePanel onClose={onClose}>
-      <SidePanelHeader onClose={onClose}>
+      <SidePanelHeader>
         <PageHeader
           icon={BottleIcon}
           title={bottle.fullName}
