@@ -130,7 +130,13 @@ export default function AddTasting() {
         // TODO show some kind of alert, ask them to reusubmit image
       }
     }
-    if (tasting) navigate(`/tastings/${tasting.id}`);
+    if (tasting) {
+      if (flight) {
+        navigate(`/flights/${flight}`);
+      } else {
+        navigate(`/tastings/${tasting.id}`);
+      }
+    }
   };
 
   return (
