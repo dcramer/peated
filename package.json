@@ -13,7 +13,7 @@
     "dev:worker": "dotenv -e .env.local -- pnpm --filter='./apps/worker' dev",
     "db": "dotenv -e .env.local -- pnpm --filter='./apps/server' db",
     "db:migrate": "dotenv -e .env.local -- pnpm --filter='./apps/server' db:migrate",
-    "db:generate": "dotenv -e .env.local -- pnpm --filter='./packages/server' exec drizzle-kit generate:pg",
+    "db:generate": "dotenv -e .env.local -- pnpm --filter='./apps/server' exec drizzle-kit generate:pg",
     "bottles": "dotenv -e .env.local -- pnpm --filter='./apps/server' bottles",
     "entities": "dotenv -e .env.local -- pnpm --filter='./apps/server' entities",
     "tastings": "dotenv -e .env.local -- pnpm --filter='./apps/server' tastings",

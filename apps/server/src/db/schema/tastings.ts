@@ -14,6 +14,7 @@ import {
 
 import { SERVING_STYLE_LIST } from "../../constants";
 import { bottles } from "./bottles";
+import { flights } from "./flights";
 import { users } from "./users";
 
 export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
@@ -38,6 +39,9 @@ export const tastings = pgTable(
       .array()
       .default(sql`array[]::bigint[]`)
       .notNull(),
+    flightId: bigint("flight_id", { mode: "number" }).references(
+      () => flights.id,
+    ),
 
     comments: integer("comments").default(0).notNull(),
     toasts: integer("toasts").default(0).notNull(),

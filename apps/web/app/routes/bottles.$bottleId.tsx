@@ -1,10 +1,5 @@
 import { Menu } from "@headlessui/react";
-import {
-  EllipsisVerticalIcon,
-  StarIcon as StarIconFilled,
-} from "@heroicons/react/20/solid";
-import { StarIcon } from "@heroicons/react/24/outline";
-import type { Bottle } from "@peated/server/types";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import BottleIcon from "@peated/web/components/assets/Bottle";
 import BottleMetadata from "@peated/web/components/bottleMetadata";
 import Button from "@peated/web/components/button";
@@ -12,7 +7,6 @@ import { ClientOnly } from "@peated/web/components/clientOnly";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Layout from "@peated/web/components/layout";
 import QueryBoundary from "@peated/web/components/queryBoundary";
-import { RangeBarChart } from "@peated/web/components/rangeBarChart.client";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import Tabs from "@peated/web/components/tabs";
@@ -23,8 +17,9 @@ import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
-import { useQueryClient } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
+import BottlePriceHistory from "../components/bottlePriceHistory";
+import CollectionAction from "../components/collectionAction";
 import PageHeader from "../components/pageHeader";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 import { formatCategoryName } from "../lib/strings";
@@ -223,68 +218,3 @@ export default function BottleDetails() {
     </Layout>
   );
 }
-
-function BottlePriceHistory({ bottleId }: { bottleId: number }) {
-  const { data, isLoading } = trpc.bottlePriceHistory.useQuery({
-    bottle: bottleId,
-  });
-
-  if (isLoading) return <div className="h-[45px] animate-pulse" />;
-
-  if (!data) return <div className="h-[45px] animate-pulse" />;
-
-  const points = data.results.reverse().map((r, idx) => {
-    return { time: idx, high: r.maxPrice, low: r.minPrice, avg: r.avgPrice };
-  });
-
-  return <RangeBarChart data={points} width={200} height={45} />;
-}
-
-const CollectionAction = ({ bottle }: { bottle: Bottle }) => {
-  const { data: isCollected, isLoading } = trpc.collectionList.useQuery(
-    {
-      bottle: bottle.id,
-      user: "me",
-    },
-    {
-      select: (data) => data.results.length > 0,
-    },
-  );
-
-  const queryClient = useQueryClient();
-  const favoriteBottleMutation = trpc.collectionBottleCreate.useMutation();
-  const unfavoriteBottleMutation = trpc.collectionBottleDelete.useMutation();
-
-  if (isCollected === undefined) return null;
-
-  return (
-    <>
-      <Button
-        onClick={async () => {
-          isCollected
-            ? unfavoriteBottleMutation.mutateAsync({
-                bottle: bottle.id,
-                user: "me",
-                collection: "default",
-              })
-            : favoriteBottleMutation.mutateAsync({
-                bottle: bottle.id,
-                user: "me",
-                collection: "default",
-              });
-        }}
-        disabled={isLoading}
-        color="primary"
-      >
-        {isCollected ? (
-          <StarIconFilled
-            className="text-highlight h-4 w-4"
-            aria-hidden="true"
-          />
-        ) : (
-          <StarIcon className="h-4 w-4" aria-hidden="true" />
-        )}
-      </Button>
-    </>
-  );
-};

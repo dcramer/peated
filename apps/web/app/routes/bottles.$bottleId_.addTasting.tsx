@@ -21,7 +21,7 @@ import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { TRPCClientError } from "@trpc/client";
 import { useState } from "react";
@@ -68,6 +68,9 @@ export const meta: MetaFunction = () => {
 export default function AddTasting() {
   const { bottle, suggestedTags } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const qs = new URLSearchParams(location.search);
+  const flight = qs.get("flight") || null;
 
   const [error, setError] = useState<string | undefined>();
   const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
@@ -86,6 +89,7 @@ export default function AddTasting() {
     resolver: zodResolver(TastingInputSchema),
     defaultValues: {
       bottle: bottle.id,
+      flight,
     },
   });
 
@@ -126,7 +130,13 @@ export default function AddTasting() {
         // TODO show some kind of alert, ask them to reusubmit image
       }
     }
-    if (tasting) navigate(`/tastings/${tasting.id}`);
+    if (tasting) {
+      if (flight) {
+        navigate(`/flights/${flight}`);
+      } else {
+        navigate(`/tastings/${tasting.id}`);
+      }
+    }
   };
 
   return (

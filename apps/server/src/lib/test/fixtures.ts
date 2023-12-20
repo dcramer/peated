@@ -29,6 +29,7 @@ import {
   changes,
   comments,
   entities,
+  flightBottles,
   flights,
   follows,
   storePriceHistories,
@@ -237,9 +238,16 @@ export const Comment = async ({ ...data }: Partial<NewComment> = {}) => {
   )[0];
 };
 
-export const Flight = async ({ ...data }: Partial<NewFlight> = {}) => {
-  return (
-    await db
+export const Flight = async ({
+  bottles,
+  ...data
+}: Partial<
+  NewFlight & {
+    bottles: number[];
+  }
+> = {}) => {
+  return await db.transaction(async (tx) => {
+    const [flight] = await tx
       .insert(flights)
       .values({
         publicId: generatePublicId(),
@@ -247,8 +255,17 @@ export const Flight = async ({ ...data }: Partial<NewFlight> = {}) => {
         createdById: data.createdById || (await User()).id,
         ...data,
       })
-      .returning()
-  )[0];
+      .returning();
+    if (bottles) {
+      for (const bottleId of bottles) {
+        await tx.insert(flightBottles).values({
+          flightId: flight.id,
+          bottleId: bottleId,
+        });
+      }
+    }
+    return flight;
+  });
 };
 
 export const Badge = async ({ ...data }: Partial<NewBadge> = {}) => {

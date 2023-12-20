@@ -29,6 +29,7 @@ export const TastingInputSchema = z.object({
   tags: z.array(z.string()).nullable().optional(),
   servingStyle: ServiceStyleEnum.nullable().optional(),
   friends: z.array(z.number()).optional(),
+  flight: z.string().nullable().optional(),
 
   createdAt: z.string().datetime().optional(),
 });
