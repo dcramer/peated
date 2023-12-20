@@ -1,15 +1,14 @@
 import { type Bottle } from "@peated/server/types";
-import BottleIcon from "@peated/web/components/assets/Bottle";
-import { Link } from "@remix-run/react";
 import { type ComponentPropsWithoutRef } from "react";
 import useAuth from "../hooks/useAuth";
-import { formatCategoryName } from "../lib/strings";
-import BottleMetadata from "./bottleMetadata";
-import BottlePriceHistory from "./bottlePriceHistory";
+import { trpc } from "../lib/trpc";
+import BottleHeader from "./bottleHeader";
+import BottleOverview from "./bottleOverview";
+import BottlePriceHistory from "./bottlePriceHistory.client";
 import Button from "./button";
 import { ClientOnly } from "./clientOnly";
 import CollectionAction from "./collectionAction";
-import PageHeader from "./pageHeader";
+import LoadingIndicator from "./loadingIndicator";
 import QueryBoundary from "./queryBoundary";
 import ShareButton from "./shareButton";
 import SidePanel, { SidePanelHeader } from "./sidePanel";
@@ -25,6 +24,8 @@ export default function BottlePanel({
 } & Omit<ComponentPropsWithoutRef<typeof SidePanel>, "children">) {
   const { user } = useAuth();
 
+  const { data, isLoading } = trpc.bottleById.useQuery(bottle.id);
+
   const stats = [
     {
       name: "Avg Rating",
@@ -39,36 +40,7 @@ export default function BottlePanel({
   return (
     <SidePanel {...props}>
       <SidePanelHeader>
-        <PageHeader
-          icon={BottleIcon}
-          title={bottle.fullName}
-          titleExtra={
-            <BottleMetadata
-              data={bottle}
-              className="w-full truncate text-center text-slate-500 lg:text-left"
-            />
-          }
-          metadata={
-            (bottle.category || bottle.statedAge) && (
-              <div className="flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 text-slate-500 lg:w-auto lg:items-end">
-                <div>
-                  {bottle.category && (
-                    <Link
-                      to={`/bottles?category=${encodeURIComponent(
-                        bottle.category,
-                      )}`}
-                    >
-                      {formatCategoryName(bottle.category)}
-                    </Link>
-                  )}
-                </div>
-                <div>
-                  {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
-                </div>
-              </div>
-            )
-          }
-        />
+        <BottleHeader bottle={bottle} />
       </SidePanelHeader>
 
       <div className="my-8 flex justify-center gap-4 lg:justify-start">
@@ -109,6 +81,12 @@ export default function BottlePanel({
           </div>
         </div>
       </div>
+
+      {isLoading ? (
+        <LoadingIndicator />
+      ) : data ? (
+        <BottleOverview bottle={data} />
+      ) : null}
     </SidePanel>
   );
 }

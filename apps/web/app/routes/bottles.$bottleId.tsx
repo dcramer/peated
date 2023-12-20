@@ -1,7 +1,5 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import BottleIcon from "@peated/web/components/assets/Bottle";
-import BottleMetadata from "@peated/web/components/bottleMetadata";
 import Button from "@peated/web/components/button";
 import { ClientOnly } from "@peated/web/components/clientOnly";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
@@ -18,11 +16,10 @@ import { type MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
-import BottlePriceHistory from "../components/bottlePriceHistory";
+import BottleHeader from "../components/bottleHeader";
+import BottlePriceHistory from "../components/bottlePriceHistory.client";
 import CollectionAction from "../components/collectionAction";
-import PageHeader from "../components/pageHeader";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
-import { formatCategoryName } from "../lib/strings";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ params, context: { trpc } }) => {
@@ -92,36 +89,7 @@ export default function BottleDetails() {
   return (
     <Layout>
       <div className="w-full p-3 lg:py-0">
-        <PageHeader
-          icon={BottleIcon}
-          title={bottle.fullName}
-          titleExtra={
-            <BottleMetadata
-              data={bottle}
-              className="w-full truncate text-center text-slate-500 lg:text-left"
-            />
-          }
-          metadata={
-            (bottle.category || bottle.statedAge) && (
-              <div className="flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 text-slate-500 lg:w-auto lg:items-end">
-                <div>
-                  {bottle.category && (
-                    <Link
-                      to={`/bottles?category=${encodeURIComponent(
-                        bottle.category,
-                      )}`}
-                    >
-                      {formatCategoryName(bottle.category)}
-                    </Link>
-                  )}
-                </div>
-                <div>
-                  {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
-                </div>
-              </div>
-            )
-          }
-        />
+        <BottleHeader bottle={bottle} />
 
         <div className="my-8 flex justify-center gap-4 lg:justify-start">
           {user && (
