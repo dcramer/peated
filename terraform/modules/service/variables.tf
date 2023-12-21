@@ -54,5 +54,5 @@ variable "cpu" {
 
 variable "ephemeral_storage" {
   type    = string
-  default = "1Gi"
+  default = "256m"
 }
