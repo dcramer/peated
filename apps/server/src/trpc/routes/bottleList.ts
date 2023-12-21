@@ -1,5 +1,7 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
+import type {
+  Flight} from "@peated/server/db/schema";
 import {
   bottles,
   bottlesToDistillers,
@@ -115,8 +117,10 @@ export default publicProcedure
         sql`EXISTS(SELECT 1 FROM ${tastings} WHERE ${input.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
       );
     }
+
+    let flight: Flight | null = null;
     if (input.flight) {
-      const [flight] = await db
+      [flight] = await db
         .select()
         .from(flights)
         .where(eq(flights.publicId, input.flight));
@@ -177,6 +181,9 @@ export default publicProcedure
         results.slice(0, limit).map((r) => r.bottles),
         ctx.user,
         ["description", "tastingNotes"],
+        {
+          flight,
+        },
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

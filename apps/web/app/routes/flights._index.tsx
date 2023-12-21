@@ -2,11 +2,11 @@ import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Layout from "@peated/web/components/layout";
 import ListItem from "@peated/web/components/listItem";
-import SimpleHeader from "@peated/web/components/simpleHeader";
 import { type MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
+import PageHeader from "../components/pageHeader";
 import { redirectToAuth } from "../lib/auth";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -41,7 +41,14 @@ export default function Flights() {
 
   return (
     <Layout>
-      <SimpleHeader>Flights</SimpleHeader>
+      <PageHeader
+        title="Flights"
+        metadata={
+          <Button color="primary" to="/addFlight">
+            Add Flight
+          </Button>
+        }
+      />
       <ul className="divide-y divide-slate-800 sm:rounded">
         {results.length ? (
           results.map((flight) => {
@@ -49,7 +56,7 @@ export default function Flights() {
               <ListItem key={flight.id} as={Link} to={`/flights/${flight.id}`}>
                 <div className="flex flex-auto items-center space-x-4">
                   <div className="flex-auto space-y-1 font-medium group-hover:underline">
-                    {flight.name}
+                    {flight.name || <em>unknown flight</em>}
                   </div>
                   {flight.description && (
                     <div className="text-light text-sm">

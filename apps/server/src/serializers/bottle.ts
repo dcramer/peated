@@ -2,7 +2,7 @@ import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import type { Bottle, User } from "../db/schema";
+import type { Bottle, Flight, User } from "../db/schema";
 import {
   bottlesToDistillers,
   collectionBottles,
@@ -14,7 +14,7 @@ import { notEmpty } from "../lib/filter";
 import { type BottleSchema } from "../schemas";
 import { EntitySerializer } from "./entity";
 
-type TastingAttrs = {
+type Attrs = {
   isFavorite: boolean;
   hasTasted: boolean;
   brand: ReturnType<(typeof EntitySerializer)["item"]>;
@@ -22,11 +22,18 @@ type TastingAttrs = {
   bottler: ReturnType<(typeof EntitySerializer)["item"]> | null;
 };
 
+type Context =
+  | {
+      flight?: Flight | null;
+    }
+  | undefined;
+
 export const BottleSerializer = serializer({
   attrs: async (
     itemList: Bottle[],
     currentUser?: User,
-  ): Promise<Record<number, TastingAttrs>> => {
+    context?: Context,
+  ): Promise<Record<number, Attrs>> => {
     const itemIds = itemList.map((t) => t.id);
 
     const distillerList = await db
@@ -89,18 +96,32 @@ export const BottleSerializer = serializer({
         )
       : new Set();
 
+    // identify bottles which have a tasting recorded for the current user
+    // note: this is contextual based on the query - if they're asking for a flight,
+    // said flight should be available in the context and this will reflect
+    // if they've recorded a tasting _in that context_
     const tastedSet = currentUser
       ? new Set(
-          (
-            await db
-              .selectDistinct({ id: tastings.bottleId })
-              .from(tastings)
-              .where(
-                and(
-                  inArray(tastings.bottleId, itemIds),
-                  eq(tastings.createdById, currentUser.id),
-                ),
-              )
+          (context?.flight
+            ? await db
+                .selectDistinct({ id: tastings.bottleId })
+                .from(tastings)
+                .where(
+                  and(
+                    inArray(tastings.bottleId, itemIds),
+                    eq(tastings.flightId, context.flight.id),
+                    eq(tastings.createdById, currentUser.id),
+                  ),
+                )
+            : await db
+                .selectDistinct({ id: tastings.bottleId })
+                .from(tastings)
+                .where(
+                  and(
+                    inArray(tastings.bottleId, itemIds),
+                    eq(tastings.createdById, currentUser.id),
+                  ),
+                )
           ).map((r) => r.id),
         )
       : new Set();
@@ -123,8 +144,9 @@ export const BottleSerializer = serializer({
 
   item: (
     item: Bottle,
-    attrs: TastingAttrs,
+    attrs: Attrs,
     currentUser?: User,
+    context?: Context,
   ): z.infer<typeof BottleSchema> => {
     return {
       id: item.id,

@@ -1,15 +1,15 @@
 import type { ElementType, ReactNode } from "react";
 
 export default function PageHeader({
-  metadata,
-  icon: Icon,
   title,
   titleExtra,
+  metadata,
+  icon: Icon,
 }: {
-  metadata?: ReactNode;
-  icon?: ElementType;
   title: string;
   titleExtra?: ReactNode;
+  metadata?: ReactNode;
+  icon?: ElementType;
 }) {
   return (
     <div className="my-4 flex w-full flex-wrap justify-center gap-x-3 gap-y-4 lg:flex-nowrap lg:justify-start">

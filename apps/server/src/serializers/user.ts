@@ -40,7 +40,7 @@ export const UserSerializer = serializer({
     );
   },
   item: (item: User, attrs, currentUser): z.infer<typeof UserSchema> => {
-    const data = {
+    return {
       id: item.id,
       displayName: item.displayName,
       username: item.username,
@@ -50,20 +50,15 @@ export const UserSerializer = serializer({
       friendStatus:
         attrs.friendStatus === "following" ? "friends" : attrs.friendStatus,
       private: item.private,
-    };
-
-    if (
-      currentUser &&
+      ...(currentUser &&
       (currentUser.admin || currentUser.mod || currentUser.id === item.id)
-    ) {
-      return {
-        ...data,
-        email: item.email,
-        createdAt: item.createdAt.toISOString(),
-        admin: item.admin,
-        mod: item.admin || item.mod,
-      };
-    }
-    return data;
+        ? {
+            email: item.email,
+            createdAt: item.createdAt.toISOString(),
+            admin: item.admin,
+            mod: item.admin || item.mod,
+          }
+        : {}),
+    };
   },
 });

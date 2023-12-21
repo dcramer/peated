@@ -105,7 +105,7 @@ export default function FlightDetails() {
                 </td>
                 <td className="py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
                   <Button
-                    color="highlight"
+                    color={bottle.hasTasted ? "default" : "highlight"}
                     size="small"
                     to={`/bottles/${bottle.id}/addTasting?flight=${flight.id}`}
                   >

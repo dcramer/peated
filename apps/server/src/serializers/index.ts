@@ -9,10 +9,15 @@ export type Attrs = Record<number, Record<string, any>>;
 export interface Serializer<
   T extends Item = Item,
   R extends Record<string, any> = Record<string, any>,
+  C extends Record<string, any> = Record<string, any>,
   A extends Record<string, any> = Record<string, any>,
 > {
-  attrs?(itemList: T[], currentUser?: User | null): Promise<Record<number, A>>;
-  item(item: T, attrs: A, currentUser?: User | null): R;
+  attrs?(
+    itemList: T[],
+    currentUser?: User | null,
+    context?: C,
+  ): Promise<Record<number, A>>;
+  item(item: T, attrs: A, currentUser?: User | null, context?: C): R;
 }
 
 export async function DefaultAttrs<T extends Item>(
@@ -22,35 +27,51 @@ export async function DefaultAttrs<T extends Item>(
   return Object.fromEntries(itemList.map((i) => [i.id, {}]));
 }
 
-export async function serialize<T extends Item, R extends Record<string, any>>(
-  serializer: Serializer<T, R>,
+export async function serialize<
+  T extends Item,
+  R extends Record<string, any>,
+  C extends Record<string, any>,
+>(
+  serializer: Serializer<T, R, C>,
   item: T,
   currentUser?: User | null,
   excludeFields?: string[],
+  context?: C,
 ): Promise<R>;
-export async function serialize<T extends Item, R extends Record<string, any>>(
-  serializer: Serializer<T, R>,
+export async function serialize<
+  T extends Item,
+  R extends Record<string, any>,
+  C extends Record<string, any>,
+>(
+  serializer: Serializer<T, R, C>,
   itemList: T[],
   currentUser?: User | null,
   excludeFields?: string[],
+  context?: C,
 ): Promise<R[]>;
-export async function serialize<T extends Item, R extends Record<string, any>>(
-  serializer: Serializer<T, R>,
+export async function serialize<
+  T extends Item,
+  R extends Record<string, any>,
+  C extends Record<string, any>,
+>(
+  serializer: Serializer<T, R, C>,
   itemList: T | T[],
   currentUser?: User | null,
   excludeFields: string[] = [],
+  context?: C,
 ): Promise<R | R[]> {
   if (Array.isArray(itemList) && !itemList.length) return [];
 
   const attrs = await (serializer.attrs || DefaultAttrs<T>)(
     Array.isArray(itemList) ? itemList : [itemList],
     currentUser,
+    context,
   );
 
   const results = (Array.isArray(itemList) ? itemList : [itemList]).map(
     (i: T) =>
       removeAttributes(
-        serializer.item(i, attrs[i.id] || {}, currentUser),
+        serializer.item(i, attrs[i.id] || {}, currentUser, context),
         excludeFields,
       ),
   ) as R[];
@@ -58,9 +79,12 @@ export async function serialize<T extends Item, R extends Record<string, any>>(
   return Array.isArray(itemList) ? results : results[0];
 }
 
-export function serializer<T extends Item, R extends Record<string, any>>(
-  v: Serializer<T, R>,
-) {
+export function serializer<
+  T extends Item,
+  R extends Record<string, any>,
+  C extends Record<string, any>,
+  A extends Record<string, any> = Record<string, any>,
+>(v: Serializer<T, R, C, A>) {
   return v;
 }
 
