@@ -16,6 +16,7 @@ module "gke" {
   http_load_balancing             = true
   horizontal_pod_autoscaling      = true
   enable_vertical_pod_autoscaling = true
+  enable_cost_allocation          = true
   create_service_account          = true
   # enable_private_endpoint         = true
   # enable_private_nodes            = true
@@ -33,7 +34,6 @@ module "gke" {
   ]
 }
 
-
 module "gke_workload_identity" {
   source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
   version             = "~> 28.0.0"
@@ -50,7 +50,6 @@ module "gke_workload_identity" {
   # https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/issues/1059
   depends_on = [module.gke]
 }
-
 
 module "gke_auth" {
   source               = "terraform-google-modules/kubernetes-engine/google//modules/auth"
