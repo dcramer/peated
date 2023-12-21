@@ -6,7 +6,7 @@ module "peated-api-service" {
   domains = ["api.peated.com", "api.staging.peated.com", "api.peated.app", "api.staging.peated.app"]
   port    = 4000
 
-  memory = "1Gi"
+  memory = "500m"
 
   healthcheck = {
     path = "/_health"
