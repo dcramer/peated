@@ -44,12 +44,6 @@ resource "google_project_iam_binding" "container-analysis-admin" {
   members = ["serviceAccount:${google_service_account.github.email}"]
 }
 
-resource "google_project_iam_binding" "read-registry-iam" {
-  project = data.google_project.project.project_id
-  role    = "roles/artifactregistry.reader"
-  members = ["serviceAccount:${module.gke.service_account}"]
-}
-
 resource "google_artifact_registry_repository_iam_binding" "peated" {
   repository = google_artifact_registry_repository.peated.name
   location   = var.region
@@ -85,17 +79,3 @@ resource "google_project_iam_binding" "container-developer-iam" {
   role    = "roles/container.developer"
   members = ["serviceAccount:${google_service_account.github.email}"]
 }
-
-
-resource "google_project_iam_binding" "cloud-sql-client-iam" {
-  project = data.google_project.project.project_id
-  role    = "roles/cloudsql.client"
-  members = ["serviceAccount:${module.gke.service_account}"]
-}
-
-resource "google_project_iam_binding" "storage-object-user-iam" {
-  project = data.google_project.project.project_id
-  role    = "roles/storage.objectUser"
-  members = ["serviceAccount:${module.gke.service_account}"]
-}
-

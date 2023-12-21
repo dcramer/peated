@@ -44,15 +44,15 @@ variable "k8s_service_account" {
 
 variable "memory" {
   type    = string
-  default = "1Gi"
+  default = "500m"
 }
 
 variable "cpu" {
   type    = string
-  default = "500m"
+  default = "250m"
 }
 
 variable "ephemeral_storage" {
   type    = string
-  default = "256m"
+  default = "250m"
 }

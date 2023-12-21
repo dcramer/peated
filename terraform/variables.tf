@@ -47,7 +47,7 @@ variable "ip_range_services_name" {
 
 variable "zones" {
   type    = list(string)
-  default = ["us-central1-a", "us-central1-b"]
+  default = ["us-central1-a"]
 }
 
 variable "google_client_id" {

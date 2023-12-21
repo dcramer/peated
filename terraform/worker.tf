@@ -3,6 +3,7 @@ module "peated-worker-service" {
   name   = "peated-worker"
   image  = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/worker"
 
+  cpu = "500m"
   memory = "500m"
 
   k8s_service_account = module.gke_workload_identity.k8s_service_account_name

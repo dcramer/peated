@@ -17,3 +17,18 @@ variable "ui_port" {
   type    = number
   default = 7420
 }
+
+variable "memory" {
+  type    = string
+  default = "500m"
+}
+
+variable "cpu" {
+  type    = string
+  default = "250m"
+}
+
+variable "ephemeral_storage" {
+  type    = string
+  default = "250m"
+}
