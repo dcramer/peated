@@ -50,7 +50,7 @@ module "gke" {
     {
       name                      = "default-node-pool"
       machine_type              = "e2-highcpu-2"
-      node_locations            = "us-central1-b,us-central1-c"
+      node_locations            = join(", ", var.zones)
       min_count                 = 1
       max_count                 = 2
       local_ssd_count           = 0
