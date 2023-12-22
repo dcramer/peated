@@ -80,6 +80,7 @@ unregisterServiceWorkers();
 export const links: LinksFunction = () => [
   { rel: "manifest", href: "/resources/manifest.webmanifest" },
   { rel: "stylesheet", href: stylesheetUrl },
+  { rel: "stylesheet", href: stylesheetUrl },
   { rel: "icon", type: "image/png", href: glyphUrl },
   {
     rel: "mask-icon",
@@ -261,6 +262,11 @@ function Document({
             defer
           ></script>
         )}
+        <script
+          async
+          src="https://unpkg.com/pwacompat"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body className="h-full">
         <LoadingIndicator />
