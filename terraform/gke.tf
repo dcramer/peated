@@ -48,15 +48,15 @@ module "gke" {
 
   node_pools = [
     {
-      name                      = "default-node-pool"
-      machine_type              = "e2-highcpu-2"
+      name                      = "default-pool"
+      machine_type              = "e2-standard-2"
       node_locations            = join(", ", var.zones)
       min_count                 = 1
-      max_count                 = 2
+      max_count                 = 4
       local_ssd_count           = 0
       spot                      = false
       local_ssd_ephemeral_count = 0
-      disk_size_gb              = 10
+      disk_size_gb              = 100
       disk_type                 = "pd-standard"
       image_type                = "COS_CONTAINERD"
       enable_gcfs               = false
@@ -64,47 +64,10 @@ module "gke" {
       logging_variant           = "DEFAULT"
       auto_repair               = true
       auto_upgrade              = true
-      # service_account           = "gke-node-sa@${data.google_project.project.number}.iam.gserviceaccount.com"
       preemptible               = false
       initial_node_count        = 1
     },
   ]
-
-  node_pools_labels = {
-    all = {}
-
-    default-node-pool = {
-      default-node-pool = true
-    }
-  }
-
-  node_pools_metadata = {
-    all = {}
-
-    default-node-pool = {
-      node-pool-metadata-custom-value = "default-node-pool"
-    }
-  }
-
-  node_pools_taints = {
-    all = []
-
-    default-node-pool = [
-      {
-        key    = "default-node-pool"
-        value  = true
-        effect = "PREFER_NO_SCHEDULE"
-      },
-    ]
-  }
-
-  node_pools_tags = {
-    all = []
-
-    default-node-pool = [
-      "default-node-pool",
-    ]
-  }
 
   depends_on = [
     module.gcp-network,

@@ -4,7 +4,7 @@ module "peated-web-service" {
   image  = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/web"
 
   cpu = "250m"
-  memory = "500m"
+  memory = "512Mi"
 
   domains = ["peated.com", "staging.peated.com", "www.peated.com", "peated.app", "staging.peated.app"]
   port    = 3000

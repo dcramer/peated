@@ -3,7 +3,7 @@ locals {
   cloud_sql_http_port  = 9801
   cloud_sql_admin_port = 9092
   # memory should scale based on pg pool size
-  cloud_sql_memory = "1Gi"
+  cloud_sql_memory = "512Mi"
   # cant seem to adjust this to less than 1
   cloud_sql_cpu     = "1"
   cloud_sql_storage = "1Gi"
@@ -213,6 +213,60 @@ resource "kubernetes_deployment_v1" "default" {
             }
           }
         }
+
+        # dynamic "container" {
+        #   for_each = var.containers
+          
+        #   content {
+        #     name  = container.name
+        #     image = container.image
+
+
+        #     dynamic "env" {
+        #       for_each = var.env
+        #       content {
+        #         name  = env.key
+        #         value = env.value
+        #       }
+        #     }
+
+        #     dynamic "port" {
+        #       for_each = container.value.port != 0 ? [container.value.port] : []
+        #       content {
+        #         container_port = port.value
+        #       }
+        #     }
+
+        #     resources {
+        #       requests = {
+        #         cpu               = container.value.cpu
+        #         memory            = container.memory
+        #         ephemeral-storage = container.ephemeral_storage
+        #       }
+
+        #       limits = {
+        #         cpu               = container.cpu
+        #         memory            = container.memory
+        #         ephemeral-storage = container.ephemeral_storage
+        #       }
+        #     }
+
+        #     security_context {
+        #       allow_privilege_escalation = false
+        #       privileged                 = false
+        #       read_only_root_filesystem  = false
+        #       run_as_non_root            = false
+
+        #       capabilities {
+        #         add = []
+        #         drop = [
+        #           "NET_RAW"
+        #         ]
+        #       }
+        #     }
+        #   }
+        # }
+
 
         # https://github.com/GoogleCloudPlatform/cloud-sql-proxy/blob/main/examples/k8s-health-check/proxy_with_http_health_check.yaml
         dynamic "container" {

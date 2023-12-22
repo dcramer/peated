@@ -1,5 +1,6 @@
-region           = "us-central1"
 project_id       = "cask-382601"
+region           = "us-central1"
+zones            = ["us-central1-a"]
 project_number   = "721909483682"
 cluster_name     = "default"
 google_client_id = "721909483682-uk3befic1j1krv3drig2puu30v1i4v48.apps.googleusercontent.com"

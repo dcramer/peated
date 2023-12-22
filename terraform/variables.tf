@@ -11,6 +11,11 @@ variable "region" {
   description = "GCP region"
 }
 
+variable "zones" {
+  type    = list(string)
+  default = ["us-central1-a"]
+}
+
 variable "cluster_name" {
   type        = string
   description = "The name for the GKE cluster"
@@ -43,11 +48,6 @@ variable "ip_range_services_name" {
   type        = string
   description = "The secondary ip range to use for services"
   default     = "ip-range-services"
-}
-
-variable "zones" {
-  type    = list(string)
-  default = ["us-central1-a"]
 }
 
 variable "google_client_id" {

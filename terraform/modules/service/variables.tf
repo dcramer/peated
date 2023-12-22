@@ -44,15 +44,29 @@ variable "k8s_service_account" {
 
 variable "memory" {
   type    = string
-  default = "500m"
+  default = "256Mi"
 }
 
 variable "cpu" {
   type    = string
-  default = "250m"
+  default = "100m"
 }
 
 variable "ephemeral_storage" {
   type    = string
-  default = "250m"
+  default = "1Gi"
 }
+
+
+# variable "containers" {
+#   type = list(object({
+#     name = string
+#     image = string
+#     port = number
+#     cpu = string
+#     memory = string
+#     storage = string
+#   }))
+
+#   default = []
+# }
