@@ -38,11 +38,11 @@ export async function loader() {
           type: "image/png",
           density: "4.0",
         },
-        // {
-        //   src: "logo512.png",
-        //   type: "image/png",
-        //   sizes: "512x512",
-        // },
+        {
+          src: "/logo512.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
       ],
     },
     {
