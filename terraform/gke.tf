@@ -49,10 +49,10 @@ module "gke" {
   node_pools = [
     {
       name                      = "default-pool"
-      machine_type              = "e2-standard-2"
+      machine_type              = "e2-standard-4"
       node_locations            = join(", ", var.zones)
       min_count                 = 1
-      max_count                 = 4
+      max_count                 = 3
       local_ssd_count           = 0
       spot                      = false
       local_ssd_ephemeral_count = 0
@@ -65,7 +65,7 @@ module "gke" {
       auto_repair               = true
       auto_upgrade              = true
       preemptible               = false
-      initial_node_count        = 1
+      initial_node_count        = 2
     },
   ]
 

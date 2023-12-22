@@ -2,14 +2,14 @@ locals {
   cloud_sql_http_port  = 9801
   cloud_sql_admin_port = 9092
   # memory should scale based on pg pool size
-  cloud_sql_memory = "512Mi"
+  cloud_sql_memory = "256Mi"
   # cant seem to adjust this to less than 1
   cloud_sql_cpu     = "1"
   cloud_sql_storage = "1Gi"
   cloud_sql_port = 25432
 
   pgbouncer_image = "edoburu/pgbouncer"
-  pgbouncer_memory = "512Mi"
+  pgbouncer_memory = "256Mi"
   pgbouncer_cpu = "250m"
 
   pgbouncer_port = 5432
@@ -173,13 +173,13 @@ resource "kubernetes_deployment_v1" "default" {
             period_seconds = 5
           }
 
-          # lifecycle {
-          #   pre_stop {
-          #     exec {
-          #       command = ["sh", "-c", "sleep 180"]
-          #     }
-          #   }
-          # }
+          lifecycle {
+            pre_stop {
+              exec {
+                command = ["sh", "-c", "killall -INT pgbouncer && sleep 120"]
+              }
+            }
+          }
 
           # security_context {
           #   allow_privilege_escalation = true

@@ -1,5 +1,3 @@
-
-
 resource "kubernetes_service_v1" "ui" {
   metadata {
     name = "${var.name}-ui"
@@ -152,7 +150,7 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
 
         container {
           name              = "server"
-          image             = "contribsys/faktory"
+          image             = "contribsys/faktory:1.8.0"
           image_pull_policy = "IfNotPresent"
 
           command = [
@@ -166,13 +164,6 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
           ]
 
           resources {
-            # TODO: put these into vars since they need synced
-            requests = {
-              cpu               = var.cpu
-              memory            = var.memory
-              ephemeral-storage = var.ephemeral_storage
-            }
-
             limits = {
               cpu               = var.cpu
               memory            = var.memory
@@ -232,18 +223,18 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
             mount_path = "/var/lib/faktory"
           }
 
-          volume_mount {
-            name       = "configs"
-            mount_path = "/etc/faktory/conf.d"
-          }
+          # volume_mount {
+          #   name       = "configs"
+          #   mount_path = "/etc/faktory/conf.d"
+          # }
         }
 
-        volume {
-          name = "configs"
-          config_map {
-            name = var.name
-          }
-        }
+        # volume {
+        #   name = "configs"
+        #   config_map {
+        #     name = var.name
+        #   }
+        # }
 
         volume {
           name = "data"
@@ -268,9 +259,6 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
           requests = {
             storage = "1Gi"
           }
-          limits = {
-            storage = "1Gi"
-          }
         }
       }
     }
@@ -288,16 +276,16 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
   }
 }
 
-resource "kubernetes_config_map_v1" "config_map" {
-  metadata {
-    name = var.name
+# resource "kubernetes_config_map_v1" "config_map" {
+#   metadata {
+#     name = var.name
 
-    labels = {
-      "app.kubernetes.io/name" = var.name
-    }
-  }
+#     labels = {
+#       "app.kubernetes.io/name" = var.name
+#     }
+#   }
 
-  data = {
+#   data = {
 
-  }
-}
+#   }
+# }
