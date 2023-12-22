@@ -69,6 +69,14 @@ module "gke" {
     },
   ]
 
+  node_pools_oauth_scopes = {
+    all = [
+      # "https://www.googleapis.com/auth/logging.write",
+      # "https://www.googleapis.com/auth/monitoring",
+      "https://www.googleapis.com/auth/cloud-platform",
+    ]
+  }
+
   depends_on = [
     module.gcp-network,
   ]

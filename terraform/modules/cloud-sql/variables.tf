@@ -2,10 +2,17 @@ variable "name" {
   type = string
 }
 
+variable "project_id" {
+  type = string
+}
+
 variable "region" {
   type = string
 }
 
+variable "k8s_service_account" {
+  type = string
+}
 
 variable "tier" {
   type    = string

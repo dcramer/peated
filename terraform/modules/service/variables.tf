@@ -32,12 +32,6 @@ variable "healthcheck" {
   default = { path = "" }
 }
 
-variable "cloud_sql_instance" {
-  type = string
-
-  default = ""
-}
-
 variable "k8s_service_account" {
   type = string
 }
@@ -56,17 +50,3 @@ variable "ephemeral_storage" {
   type    = string
   default = "1Gi"
 }
-
-
-# variable "containers" {
-#   type = list(object({
-#     name = string
-#     image = string
-#     port = number
-#     cpu = string
-#     memory = string
-#     storage = string
-#   }))
-
-#   default = []
-# }

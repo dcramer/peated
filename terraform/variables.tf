@@ -57,7 +57,3 @@ variable "google_client_id" {
 variable "sentry_dsn" {
   type = string
 }
-
-variable "faktory_host" {
-  type = string
-}
