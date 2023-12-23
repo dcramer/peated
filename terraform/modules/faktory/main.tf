@@ -203,8 +203,6 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
 
   lifecycle {
     ignore_changes = [
-      spec[0].template[0].spec[0].container[0].image,
-      spec[0].template[0].spec[0].security_context,
       spec[0].template[0].spec[0].toleration,
       metadata[0].annotations["autopilot.gke.io/resource-adjustment"],
       metadata[0].annotations["autopilot.gke.io/warden-version"],
