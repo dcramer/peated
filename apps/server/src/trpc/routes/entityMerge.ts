@@ -6,6 +6,7 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import pushJob from "@peated/server/jobs";
+import { logError } from "@peated/server/lib/log";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { TRPCError } from "@trpc/server";
@@ -116,7 +117,15 @@ export default modProcedure
     const toEntity = input.direction === "mergeInto" ? otherEntity : rootEntity;
 
     const newEntity = await mergeEntitiesInto(toEntity, fromEntity);
-    await pushJob("GenerateEntityDetails", { entityId: toEntity.id });
+    try {
+      await pushJob("GenerateEntityDetails", { entityId: toEntity.id });
+    } catch (err) {
+      logError(err, {
+        entity: {
+          id: toEntity.id,
+        },
+      });
+    }
 
     return await serialize(EntitySerializer, newEntity, ctx.user);
   });

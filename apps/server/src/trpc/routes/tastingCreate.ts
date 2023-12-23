@@ -15,6 +15,7 @@ import pushJob from "@peated/server/jobs";
 import { checkBadges } from "@peated/server/lib/badges";
 import { isDistantFuture, isDistantPast } from "@peated/server/lib/dates";
 import { notEmpty } from "@peated/server/lib/filter";
+import { logError } from "@peated/server/lib/log";
 import { TastingInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
@@ -203,8 +204,17 @@ export default authedProcedure
       });
     }
 
-    if (!ctx.user.private)
-      await pushJob("NotifyDiscordOnTasting", { tastingId: tasting.id });
+    if (!ctx.user.private) {
+      try {
+        await pushJob("NotifyDiscordOnTasting", { tastingId: tasting.id });
+      } catch (err) {
+        logError(err, {
+          tasting: {
+            id: tasting.id,
+          },
+        });
+      }
+    }
 
     return await serialize(TastingSerializer, tasting, ctx.user);
   });

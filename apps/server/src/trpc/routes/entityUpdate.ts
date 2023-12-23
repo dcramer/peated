@@ -3,6 +3,7 @@ import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
 import pushJob from "@peated/server/jobs";
 import { arraysEqual } from "@peated/server/lib/equals";
+import { logError } from "@peated/server/lib/log";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
@@ -98,8 +99,17 @@ export default modProcedure
       });
     }
 
-    if (newEntity.name !== entity.name || !newEntity.description)
-      await pushJob("GenerateEntityDetails", { entityId: entity.id });
+    if (newEntity.name !== entity.name || !newEntity.description) {
+      try {
+        await pushJob("GenerateEntityDetails", { entityId: entity.id });
+      } catch (err) {
+        logError(err, {
+          entity: {
+            id: entity.id,
+          },
+        });
+      }
+    }
 
     return await serialize(EntitySerializer, newEntity, ctx.user);
   });

@@ -9,6 +9,7 @@ import {
 import pushJob from "@peated/server/jobs";
 import { upsertEntity } from "@peated/server/lib/db";
 import { notEmpty } from "@peated/server/lib/filter";
+import { logError } from "@peated/server/lib/log";
 import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -161,7 +162,15 @@ export default authedProcedure
       });
     }
 
-    await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
+    try {
+      await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
+    } catch (err) {
+      logError(err, {
+        bottle: {
+          id: bottle.id,
+        },
+      });
+    }
 
     return await serialize(BottleSerializer, bottle, ctx.user);
   });

@@ -8,6 +8,7 @@ import {
 } from "@peated/server/db/schema";
 import pushJob from "@peated/server/jobs";
 import { notEmpty } from "@peated/server/lib/filter";
+import { logError } from "@peated/server/lib/log";
 import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -279,8 +280,17 @@ export default modProcedure
       !newBottle.description ||
       !newBottle.tastingNotes ||
       newBottle.suggestedTags.length === 0
-    )
-      await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
+    ) {
+      try {
+        await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
+      } catch (err) {
+        logError(err, {
+          bottle: {
+            id: bottle.id,
+          },
+        });
+      }
+    }
 
     return await serialize(BottleSerializer, newBottle, ctx.user);
   });
