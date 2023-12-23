@@ -30,7 +30,7 @@ import {
 } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import type { ComponentProps, PropsWithChildren } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDehydratedState } from "use-dehydrated-state";
 import LoadingIndicator from "./components/loadingIndicator";
 import { default as config } from "./config";
@@ -143,6 +143,13 @@ export default withSentry(function App() {
   );
 
   const dehydratedState = useDehydratedState();
+
+  useEffect(() => {
+    window.REMIX_CONTEXT = {
+      accessToken: accessToken || null,
+      user: user || null,
+    };
+  });
 
   return (
     <Document config={config} data={data} accessToken={accessToken} user={user}>
