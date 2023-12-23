@@ -95,58 +95,7 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
 
       spec {
         termination_grace_period_seconds = 10
-        share_process_namespace          = true
-
-        # container {
-        #   name              = "config-watcher"
-        #   image             = "busybox"
-        #   image_pull_policy = "IfNotPresent"
-        #   command = [
-        #     "sh",
-        #     "-c",
-        #     <<EOT
-        #     sum() {
-        #         current=$(find /conf -type f -exec md5sum {} \; | sort -k 2 | md5sum)
-        #       }
-        #       sum
-        #       last=\"$current\"
-        #       while true; do
-        #         sum
-        #         if [ \"$current\" != \"$last\" ]; then
-        #           pid=$(pidof faktory)
-        #           echo \"$(date -Iseconds) [conf.d] changes detected - signaling Faktory with pid=$pid\"
-        #           kill -HUP \"$pid\"
-        #           last=\"$current\"
-        #         fi
-        #         sleep 1
-        #       done
-        #     EOT
-        #   ]
-
-        #   args = [
-        #     "--volume-dir=/etc/config",
-        #     "--webhook-url=http://localhost:9090/-/reload",
-        #   ]
-
-        #   volume_mount {
-        #     name       = "configs"
-        #     mount_path = "/conf"
-        #   }
-
-        #   security_context {
-        #     allow_privilege_escalation = false
-        #     privileged                 = false
-        #     read_only_root_filesystem  = false
-        #     run_as_non_root            = false
-
-        #     capabilities {
-        #       add = []
-        #       drop = [
-        #         "NET_RAW"
-        #       ]
-        #     }
-        #   }
-        # }
+        # share_process_namespace          = true
 
         container {
           name              = "server"
@@ -222,19 +171,7 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
             name       = "data"
             mount_path = "/var/lib/faktory"
           }
-
-          # volume_mount {
-          #   name       = "configs"
-          #   mount_path = "/etc/faktory/conf.d"
-          # }
         }
-
-        # volume {
-        #   name = "configs"
-        #   config_map {
-        #     name = var.name
-        #   }
-        # }
 
         volume {
           name = "data"
@@ -267,7 +204,6 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
   lifecycle {
     ignore_changes = [
       spec[0].template[0].spec[0].container[0].image,
-      spec[0].template[0].spec[0].container[0].resources[0].limits["ephemeral-storage"],
       spec[0].template[0].spec[0].security_context,
       spec[0].template[0].spec[0].toleration,
       metadata[0].annotations["autopilot.gke.io/resource-adjustment"],
@@ -275,17 +211,3 @@ resource "kubernetes_stateful_set_v1" "stateful_set" {
     ]
   }
 }
-
-# resource "kubernetes_config_map_v1" "config_map" {
-#   metadata {
-#     name = var.name
-
-#     labels = {
-#       "app.kubernetes.io/name" = var.name
-#     }
-#   }
-
-#   data = {
-
-#   }
-# }

@@ -147,12 +147,6 @@ resource "kubernetes_deployment_v1" "default" {
           }
 
           resources {
-            requests = {
-              cpu               = var.cpu
-              memory            = var.memory
-              ephemeral-storage = var.ephemeral_storage
-            }
-
             limits = {
               cpu               = var.cpu
               memory            = var.memory
@@ -211,7 +205,6 @@ resource "kubernetes_deployment_v1" "default" {
   lifecycle {
     ignore_changes = [
       spec[0].template[0].spec[0].container[0].image,
-      spec[0].template[0].spec[0].container[0].resources[0].limits["ephemeral-storage"],
       spec[0].template[0].spec[0].security_context,
       spec[0].template[0].spec[0].toleration,
       metadata[0].annotations["autopilot.gke.io/resource-adjustment"],

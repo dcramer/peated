@@ -3,14 +3,13 @@ locals {
   cloud_sql_admin_port = 9092
   # memory should scale based on pg pool size
   cloud_sql_memory = "256Mi"
-  # cant seem to adjust this to less than 1
-  cloud_sql_cpu     = "1"
+  cloud_sql_cpu     = "100m"
   cloud_sql_storage = "1Gi"
   cloud_sql_port = 25432
 
   pgbouncer_image = "edoburu/pgbouncer"
   pgbouncer_memory = "256Mi"
-  pgbouncer_cpu = "250m"
+  pgbouncer_cpu = "100m"
 
   pgbouncer_port = 5432
   pgbouncer_default_pool_size  = 20
@@ -154,6 +153,7 @@ resource "kubernetes_deployment_v1" "default" {
             limits = {
               cpu               = local.pgbouncer_cpu
               memory            = local.pgbouncer_memory
+              ephemeral-storage = local.cloud_sql_storage
             }
           }
 
@@ -333,7 +333,6 @@ resource "kubernetes_deployment_v1" "default" {
   lifecycle {
     ignore_changes = [
       spec[0].template[0].spec[0].container[0].image,
-      spec[0].template[0].spec[0].container[0].resources[0].limits["ephemeral-storage"],
       spec[0].template[0].spec[0].security_context,
       spec[0].template[0].spec[0].toleration,
       metadata[0].annotations["autopilot.gke.io/resource-adjustment"],
