@@ -49,7 +49,7 @@ export default function Flights() {
           </Button>
         }
       />
-      <ul className="divide-y divide-slate-800 sm:rounded">
+      <div className="divide-y divide-slate-800 sm:rounded">
         {results.length ? (
           results.map((flight) => {
             return (
@@ -77,7 +77,7 @@ export default function Flights() {
             <Button color="highlight">Create a Flight</Button>
           </EmptyActivity>
         )}
-      </ul>
+      </div>
       {rel && (
         <nav
           className="flex items-center justify-between py-3"
