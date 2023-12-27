@@ -20,7 +20,7 @@ variable "ui_port" {
 
 variable "memory" {
   type    = string
-  default = "500m"
+  default = "512Mi"
 }
 
 variable "cpu" {
