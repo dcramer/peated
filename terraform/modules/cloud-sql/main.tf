@@ -2,16 +2,16 @@ locals {
   cloud_sql_http_port  = 9801
   cloud_sql_admin_port = 9092
   # memory should scale based on pg pool size
-  cloud_sql_memory = "256Mi"
+  cloud_sql_memory  = "256Mi"
   cloud_sql_cpu     = "100m"
   cloud_sql_storage = "1Gi"
-  cloud_sql_port = 25432
+  cloud_sql_port    = 25432
 
-  pgbouncer_image = "edoburu/pgbouncer"
+  pgbouncer_image  = "edoburu/pgbouncer"
   pgbouncer_memory = "256Mi"
-  pgbouncer_cpu = "100m"
+  pgbouncer_cpu    = "100m"
 
-  pgbouncer_port = 5432
+  pgbouncer_port               = 5432
   pgbouncer_default_pool_size  = 20
   pgbouncer_max_db_connections = 0
   pgbouncer_max_client_conn    = 100
@@ -95,7 +95,7 @@ resource "kubernetes_deployment_v1" "default" {
     labels = {
       "app.kubernetes.io/name" = "${var.name}-pgbouncer"
     }
-    
+
     // HACK: redeploy on config changes
     // https://github.com/hashicorp/terraform-provider-kubernetes/issues/737
     annotations = {
@@ -146,7 +146,7 @@ resource "kubernetes_deployment_v1" "default" {
           volume_mount {
             name       = "${var.name}-pgbouncer"
             mount_path = "/etc/pgbouncer/"
-            read_only = true
+            read_only  = true
           }
 
           resources {
@@ -162,7 +162,7 @@ resource "kubernetes_deployment_v1" "default" {
               port = local.pgbouncer_port
             }
             initial_delay_seconds = 10
-            period_seconds = 5
+            period_seconds        = 5
           }
 
           liveness_probe {
@@ -170,7 +170,7 @@ resource "kubernetes_deployment_v1" "default" {
               port = local.pgbouncer_port
             }
             initial_delay_seconds = 20
-            period_seconds = 5
+            period_seconds        = 5
           }
 
           lifecycle {
@@ -335,8 +335,6 @@ resource "kubernetes_deployment_v1" "default" {
       spec[0].template[0].spec[0].container[0].image,
       spec[0].template[0].spec[0].security_context,
       spec[0].template[0].spec[0].toleration,
-      metadata[0].annotations["autopilot.gke.io/resource-adjustment"],
-      metadata[0].annotations["autopilot.gke.io/warden-version"],
     ]
   }
 }
@@ -352,11 +350,11 @@ resource "kubernetes_config_map_v1" "default" {
   }
 
   data = {
-    "userlist.txt": templatefile("${path.module}/templates/userlist.txt.tmpl", { users = var.users })
-    "pgbouncer.ini": templatefile(
+    "userlist.txt" : templatefile("${path.module}/templates/userlist.txt.tmpl", { users = var.users })
+    "pgbouncer.ini" : templatefile(
       "${path.module}/templates/pgbouncer.ini.tmpl",
       {
-        port = local.pgbouncer_port
+        port               = local.pgbouncer_port
         default_pool_size  = local.pgbouncer_default_pool_size
         max_db_connections = local.pgbouncer_max_db_connections
         max_client_conn    = local.pgbouncer_max_client_conn

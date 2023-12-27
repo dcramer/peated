@@ -125,7 +125,7 @@ resource "kubernetes_deployment_v1" "default" {
       }
       spec {
         service_account_name = var.k8s_service_account
-        
+
         container {
           name  = var.name
           image = var.image
@@ -207,8 +207,6 @@ resource "kubernetes_deployment_v1" "default" {
       spec[0].template[0].spec[0].container[0].image,
       spec[0].template[0].spec[0].security_context,
       spec[0].template[0].spec[0].toleration,
-      metadata[0].annotations["autopilot.gke.io/resource-adjustment"],
-      metadata[0].annotations["autopilot.gke.io/warden-version"],
     ]
   }
 }

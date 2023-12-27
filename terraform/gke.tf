@@ -8,11 +8,11 @@ module "gke_workload_identity" {
   gcp_sa_name         = "gke-${var.cluster_name}"
   use_existing_k8s_sa = true
   # use_existing_gcp_sa = true
-  cluster_name        = var.cluster_name
-  location            = var.region
-  name                = var.cluster_name
-  project_id          = var.project_id
-  roles               = ["roles/container.nodeServiceAccount", "roles/storage.objectUser", "roles/artifactregistry.reader", "roles/cloudsql.client"]
+  cluster_name = var.cluster_name
+  location     = var.region
+  name         = var.cluster_name
+  project_id   = var.project_id
+  roles        = ["roles/container.nodeServiceAccount", "roles/storage.objectUser", "roles/artifactregistry.reader", "roles/cloudsql.client"]
 }
 
 module "gke" {
@@ -49,7 +49,7 @@ module "gke" {
   node_pools = [
     {
       name                      = "default-pool"
-      machine_type              = "e2-standard-4"
+      machine_type              = "e2-standard-2"
       node_locations            = join(", ", var.zones)
       min_count                 = 1
       max_count                 = 3
@@ -65,7 +65,7 @@ module "gke" {
       auto_repair               = true
       auto_upgrade              = true
       preemptible               = false
-      initial_node_count        = 2
+      initial_node_count        = 1
     },
   ]
 
