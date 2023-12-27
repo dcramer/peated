@@ -20,12 +20,12 @@ variable "ui_port" {
 
 variable "memory" {
   type    = string
-  default = "512Mi"
+  default = "256Mi"
 }
 
 variable "cpu" {
   type    = string
-  default = "250m"
+  default = "100m"
 }
 
 variable "ephemeral_storage" {

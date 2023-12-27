@@ -2,13 +2,13 @@ locals {
   cloud_sql_http_port  = 9801
   cloud_sql_admin_port = 9092
   # memory should scale based on pg pool size
-  cloud_sql_memory  = "256Mi"
+  cloud_sql_memory  = "128Mi"
   cloud_sql_cpu     = "100m"
   cloud_sql_storage = "1Gi"
   cloud_sql_port    = 25432
 
   pgbouncer_image  = "edoburu/pgbouncer"
-  pgbouncer_memory = "256Mi"
+  pgbouncer_memory = "128Mi"
   pgbouncer_cpu    = "100m"
 
   pgbouncer_port               = 5432
