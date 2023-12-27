@@ -3,6 +3,7 @@ import type { Bottle } from "@peated/server/types";
 import { Link } from "@remix-run/react";
 import classNames from "../lib/classNames";
 import { formatCategoryName } from "../lib/strings";
+import BottleLink from "./bottleLink";
 import type { Option } from "./selectField";
 
 type BottleFormData = {
@@ -48,9 +49,9 @@ function BottleScaffold({
       onClick={onClick}
     >
       <div className="flex-1 overflow-hidden">
-        <div className="flex w-full items-center space-x-1 truncate font-semibold">
+        <h4 className="flex w-full items-center space-x-1 truncate font-bold">
           {name}
-        </div>
+        </h4>
         <div
           className={classNames(
             "text-sm",
@@ -106,14 +107,11 @@ export default function BottleCard({
       onClick={onClick ? () => onClick(bottle) : undefined}
       name={
         <>
-          <h4 className="truncate font-semibold">
-            <Link
-              to={`/bottles/${bottle.id}`}
-              className="hover:underline"
-              title={bottle.fullName}
-            >
+          <h4 className="truncate font-bold">
+            <BottleLink bottle={bottle} className="hover:underline">
+              {" "}
               {bottle.fullName}
-            </Link>
+            </BottleLink>
           </h4>
           {bottle.isFavorite && (
             <div className="w-4">
