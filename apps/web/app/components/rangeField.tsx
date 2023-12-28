@@ -10,7 +10,7 @@ type Props = {
   required?: boolean;
   children?: ReactNode;
   className?: string;
-  value?: number;
+  value?: number | null;
   min?: string | number;
   max?: string | number;
   step?: string | number;
@@ -42,7 +42,7 @@ export default forwardRef<HTMLInputElement, Props>(
     },
     ref,
   ) => {
-    const [value, setValue] = useState<number>(initialValue || 0);
+    const [value, setValue] = useState<number>(initialValue ?? 0);
     return (
       <FormField
         label={label}

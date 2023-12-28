@@ -1,7 +1,3 @@
-import { SERVING_STYLE_LIST } from "@peated/server/constants";
-import { toTitleCase } from "@peated/server/lib/strings";
-import type { TastingInputSchema } from "@peated/server/schemas";
-import type { ServingStyle } from "@peated/server/types";
 import useApi from "@peated/web/hooks/useApi";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { toBlob } from "@peated/web/lib/blobs";
@@ -11,20 +7,8 @@ import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
-import type { z } from "zod";
 import TastingForm from "../components/tastingForm";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
-
-type FormSchemaType = z.infer<typeof TastingInputSchema>;
-
-function formatServingStyle(style: ServingStyle) {
-  return toTitleCase(style);
-}
-
-const servingStyleList = SERVING_STYLE_LIST.map((c) => ({
-  id: c,
-  name: formatServingStyle(c),
-}));
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ request, params: { tastingId }, context: { trpc, user } }) => {

@@ -129,13 +129,20 @@ export default function TastingForm({
         </div>
 
         <Fieldset>
-          <RangeField
-            {...register("rating", {
-              valueAsNumber: true,
-              setValueAs: (v) => (v === "" ? undefined : Number(v)),
-            })}
-            error={errors.rating}
-            label="Rating"
+          <Controller
+            name="rating"
+            control={control}
+            render={({ field: { ref, ...field } }) => (
+              <RangeField
+                // {...register("rating", {
+                //   valueAsNumber: true,
+                //   setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                // })}
+                {...field}
+                error={errors.rating}
+                label="Rating"
+              />
+            )}
           />
 
           <Controller
