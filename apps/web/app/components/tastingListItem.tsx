@@ -148,6 +148,11 @@ export default function TastingListItem({
               <Menu.Items className="absolute inset-x-0 bottom-10 right-0 z-10 w-44 origin-bottom-right">
                 {(user?.admin || isTaster) && (
                   <>
+                    {isTaster && (
+                      <Menu.Item as={Link} to={`/tastings/${tasting.id}/edit`}>
+                        Edit Tasting
+                      </Menu.Item>
+                    )}
                     <Menu.Item
                       as={Link}
                       to={`/tastings/${tasting.id}/editImage`}

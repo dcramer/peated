@@ -49,6 +49,7 @@ import tastingCreate from "./routes/tastingCreate";
 import tastingDelete from "./routes/tastingDelete";
 import tastingImageDelete from "./routes/tastingImageDelete";
 import tastingList from "./routes/tastingList";
+import tastingUpdate from "./routes/tastingUpdate";
 import toastCreate from "./routes/toastCreate";
 import userById from "./routes/userById";
 import userList from "./routes/userList";
@@ -107,6 +108,7 @@ export const appRouter = router({
   tastingDelete,
   tastingList,
   tastingImageDelete,
+  tastingUpdate,
   toastCreate,
   userById,
   userList,

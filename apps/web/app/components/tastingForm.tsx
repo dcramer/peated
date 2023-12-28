@@ -7,6 +7,7 @@ import type {
   ServingStyle,
   Tag,
   Tasting,
+  User,
 } from "@peated/server/types";
 import BottleCard from "@peated/web/components/bottleCard";
 import Fieldset from "@peated/web/components/fieldset";
@@ -40,6 +41,13 @@ const servingStyleList = SERVING_STYLE_LIST.map((c) => ({
   name: formatServingStyle(c),
 }));
 
+const userToOption = (user: User): Option => {
+  return {
+    id: user.id,
+    name: user.username,
+  };
+};
+
 export default function TastingForm({
   onSubmit,
   initialData,
@@ -55,10 +63,6 @@ export default function TastingForm({
   title: string;
   suggestedTags: Paginated<Tag>;
 }) {
-  const [error, setError] = useState<string | undefined>();
-  const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
-  const [friendsValue, setFriendsValue] = useState<Option[]>([]);
-
   const {
     control,
     register,
@@ -70,8 +74,17 @@ export default function TastingForm({
       bottle: initialData.bottle.id,
       rating: initialData.rating,
       notes: initialData.notes,
+      tags: initialData.tags,
+      servingStyle: initialData.servingStyle,
+      friends: initialData.friends ? initialData.friends.map((d) => d.id) : [],
     },
   });
+
+  const [error, setError] = useState<string | undefined>();
+  const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
+  const [friendsValue, setFriendsValue] = useState<Option[]>(
+    initialData.friends ? initialData.friends.map(userToOption) : [],
+  );
 
   const trpcUtils = trpc.useUtils();
 

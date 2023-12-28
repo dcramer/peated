@@ -72,6 +72,7 @@ export default authedProcedure
       notes: input.notes || null,
       rating: input.rating || null,
       flightId: flight ? flight.id : null,
+      servingStyle: input.servingStyle || null,
       tags: input.tags
         ? Array.from(new Set(input.tags.map((t) => t.toLowerCase())))
         : [],
