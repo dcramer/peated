@@ -5,11 +5,25 @@ import { formatCategoryName } from "../lib/strings";
 import BottleMetadata from "./bottleMetadata";
 import PageHeader from "./pageHeader";
 
-export default function BottleHeader({ bottle }: { bottle: Bottle }) {
+export default function BottleHeader({
+  bottle,
+  to,
+}: {
+  bottle: Bottle;
+  to?: string;
+}) {
   return (
     <PageHeader
       icon={BottleIcon}
-      title={bottle.fullName}
+      title={
+        to ? (
+          <Link to={to} className="hover:underline">
+            {bottle.fullName}
+          </Link>
+        ) : (
+          bottle.fullName
+        )
+      }
       titleExtra={
         <BottleMetadata
           data={bottle}

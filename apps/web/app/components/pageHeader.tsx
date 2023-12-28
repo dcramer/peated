@@ -6,7 +6,7 @@ export default function PageHeader({
   metadata,
   icon: Icon,
 }: {
-  title: string;
+  title: string | ReactNode;
   titleExtra?: ReactNode;
   metadata?: ReactNode;
   icon?: ElementType;
@@ -20,10 +20,7 @@ export default function PageHeader({
       )}
 
       <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
-        <h1
-          className="max-w-full truncate text-center text-3xl font-semibold lg:mx-0 lg:text-left"
-          title={title}
-        >
+        <h1 className="max-w-full truncate text-center text-3xl font-semibold lg:mx-0 lg:text-left">
           {title}
         </h1>
         {titleExtra}

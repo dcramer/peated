@@ -40,7 +40,7 @@ export default function BottlePanel({
   return (
     <SidePanel {...props}>
       <SidePanelHeader>
-        <BottleHeader bottle={bottle} />
+        <BottleHeader bottle={bottle} to={`/bottles/${bottle.id}`} />
       </SidePanelHeader>
 
       <div className="my-8 flex justify-center gap-4 lg:justify-start">
