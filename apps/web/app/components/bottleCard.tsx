@@ -49,9 +49,9 @@ function BottleScaffold({
       onClick={onClick}
     >
       <div className="flex-1 overflow-hidden">
-        <h4 className="flex w-full items-center space-x-1 truncate font-bold">
+        <div className="flex w-full items-center space-x-1 truncate font-bold">
           {name}
-        </h4>
+        </div>
         <div
           className={classNames(
             "text-sm",
