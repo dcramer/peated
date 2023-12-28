@@ -48,10 +48,12 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
 
     if (!user) return redirectToAuth({ request });
 
-    const bottle = await trpc.bottleById.query(Number(bottleId));
-    const suggestedTags = await trpc.bottleSuggestedTagList.query({
-      bottle: Number(bottleId),
-    });
+    const [bottle, suggestedTags] = await Promise.all([
+      trpc.bottleById.query(Number(bottleId)),
+      trpc.bottleSuggestedTagList.query({
+        bottle: Number(bottleId),
+      }),
+    ]);
 
     return json({ bottle, suggestedTags });
   },
