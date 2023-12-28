@@ -39,7 +39,7 @@ export default function BottlePanel({
 
   return (
     <SidePanel {...props}>
-      <SidePanelHeader>
+      <SidePanelHeader title="Bottle Details">
         <BottleHeader bottle={bottle} to={`/bottles/${bottle.id}`} />
       </SidePanelHeader>
 

@@ -1,5 +1,7 @@
 import { Dialog } from "@headlessui/react";
+import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { createContext, useContext, type ReactNode } from "react";
+import Header from "./header";
 
 const SidePanelContext = createContext<{
   onClose?: (() => void) | undefined | null;
@@ -7,19 +9,52 @@ const SidePanelContext = createContext<{
   onClose: null,
 });
 
-export function SidePanelHeader({ children }: { children: ReactNode }) {
+export function SidePanelHeader({
+  children,
+  title,
+}: {
+  children: ReactNode;
+  title: string;
+}) {
   const { onClose } = useContext(SidePanelContext);
+  const blockStyles = `px-0 py-1 sm:py-3`;
 
   return (
-    <div className="mb-4 flex items-center space-x-4 border-b border-b-slate-800 pb-4 text-white">
-      {children}
-      <button
-        className="hover:bg-highlight flex cursor-pointer items-center justify-center rounded px-6 py-6 font-mono text-2xl hover:text-black"
-        onClick={onClose ?? undefined}
-      >
-        {"✕"}
-      </button>
-    </div>
+    <>
+      <Header mobileOnly>
+        <nav className="flex min-w-full items-center justify-between text-white lg:hidden">
+          {!!onClose && (
+            <div className="absolute left-2 flex text-white hover:text-white">
+              <button
+                onClick={onClose ?? undefined}
+                className={`-m-1.5 p-1.5 ${blockStyles} pr-3 sm:pr-6`}
+              >
+                <span className="sr-only">Back</span>
+                <div className="h-10 w-10">
+                  <ChevronLeftIcon className="h-10 w-10" />
+                </div>
+              </button>
+            </div>
+          )}
+          <div
+            className={`flex flex-auto flex-row justify-center gap-x-2 ${blockStyles}`}
+          >
+            <h1 className="text-lg">{title}</h1>
+          </div>
+        </nav>
+      </Header>
+      <div className="flex flex-col items-center space-x-4 border-b border-b-slate-800 text-white lg:mb-4 lg:flex-row lg:pb-4">
+        {children}
+        {!!onClose && (
+          <button
+            className="hover:bg-highlight hidden cursor-pointer items-center justify-center rounded px-6 py-6 font-mono text-2xl hover:text-black lg:flex"
+            onClick={onClose ?? undefined}
+          >
+            {"✕"}
+          </button>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -43,7 +78,7 @@ export default function SidePanel({
       onClose={() => {
         onClose && onClose();
       }}
-      className="absolute bottom-0 left-0 right-0 top-0 z-20 h-full overflow-auto border-l border-l-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 to-20% px-6 py-4 lg:fixed lg:left-1/3"
+      className="absolute bottom-0 left-0 right-0 top-0 z-20 h-full overflow-auto border-l border-l-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 to-20% lg:fixed lg:left-1/3 lg:px-6 lg:py-4"
       {...props}
     >
       <SidePanelContext.Provider value={context}>
