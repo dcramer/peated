@@ -152,7 +152,7 @@ export const bottleAliases = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    name: varchar("full_name", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
   },
   (bottleAliases) => {
     return {

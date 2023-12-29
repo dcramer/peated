@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "bottle_alias" (
 	"bottle_id" bigint NOT NULL,
-	"full_name" varchar(255) NOT NULL,
-	CONSTRAINT bottle_alias_bottle_id_full_name PRIMARY KEY("bottle_id","full_name")
+	"name" varchar(255) NOT NULL,
+	CONSTRAINT bottle_alias_bottle_id_full_name PRIMARY KEY("bottle_id","name")
 );
 
 DO $$ BEGIN
