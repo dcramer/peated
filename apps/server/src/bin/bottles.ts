@@ -3,6 +3,7 @@ import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "../db";
 import {
   bottleTags,
+  bottleTombstones,
   bottles,
   bottlesToDistillers,
   collectionBottles,
@@ -42,7 +43,7 @@ program
   .description("Merge two or more bottles together")
   .argument("<rootBottleId>")
   .argument("<bottleIds...>")
-  .action(async (rootBottleId, bottleIds, options) => {
+  .action(async (rootBottleId, bottleIds: number[], options) => {
     const rootEntity = await db.query.bottles.findFirst({
       where: (bottles, { eq }) => eq(bottles.id, rootBottleId),
     });
@@ -114,6 +115,13 @@ program
       await tx
         .delete(bottlesToDistillers)
         .where(inArray(bottlesToDistillers.bottleId, bottleIds));
+
+      for (const id of bottleIds) {
+        await tx.insert(bottleTombstones).values({
+          bottleId: id,
+          newBottleId: rootBottleId,
+        });
+      }
       await tx.delete(bottles).where(inArray(bottles.id, bottleIds));
     });
   });

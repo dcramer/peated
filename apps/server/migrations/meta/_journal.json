@@ -463,6 +463,13 @@
       "when": 1703888939623,
       "tag": "0065_red_zaladane",
       "breakpoints": false
+    },
+    {
+      "idx": 66,
+      "version": "5",
+      "when": 1703894112863,
+      "tag": "0066_harsh_loners",
+      "breakpoints": false
     }
   ]
 }

@@ -170,3 +170,25 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
 
 export type BottleAlias = typeof bottleAliases.$inferSelect;
 export type NewBottleAlias = typeof bottleAliases.$inferInsert;
+
+export const bottleTombstones = pgTable("bottle_tombstone", {
+  bottleId: bigint("bottle_id", { mode: "number" }).primaryKey(),
+  newBottleId: bigint("new_bottle_id", { mode: "number" }),
+});
+
+export const bottleTombstonesRelations = relations(
+  bottleTombstones,
+  ({ one }) => ({
+    bottle: one(bottles, {
+      fields: [bottleTombstones.bottleId],
+      references: [bottles.id],
+    }),
+    newBottle: one(bottles, {
+      fields: [bottleTombstones.newBottleId],
+      references: [bottles.id],
+    }),
+  }),
+);
+
+export type BottleTombstone = typeof bottleTombstones.$inferSelect;
+export type NewBottleTombstone = typeof bottleTombstones.$inferInsert;

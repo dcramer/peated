@@ -6,6 +6,7 @@ import { db } from "../../db";
 import {
   bottleAliases,
   bottleTags,
+  bottleTombstones,
   bottles,
   bottlesToDistillers,
   changes,
@@ -72,6 +73,9 @@ export default adminProcedure.input(z.number()).mutation(async function ({
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     await tx.delete(bottleAliases).where(eq(bottleAliases.bottleId, bottle.id));
     await tx.delete(bottles).where(eq(bottles.id, bottle.id));
+    await tx.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+    });
   });
 
   return {};
