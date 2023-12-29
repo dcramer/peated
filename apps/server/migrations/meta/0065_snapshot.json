@@ -142,8 +142,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "full_name": {
-          "name": "full_name",
+        "name": {
+          "name": "name",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
@@ -167,10 +167,10 @@
       },
       "compositePrimaryKeys": {
         "bottle_alias_bottle_id_full_name": {
-          "name": "bottle_alias_bottle_id_full_name",
+          "name": "bottle_alias_bottle_id_name",
           "columns": [
             "bottle_id",
-            "full_name"
+            "name"
           ]
         }
       },
