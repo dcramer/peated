@@ -4,6 +4,7 @@ import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
 import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
+import bottleAliasList from "./routes/bottleAliasList";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
@@ -71,6 +72,7 @@ export const appRouter = router({
   bottleDelete,
   bottleCreate,
   bottleList,
+  bottleAliasList,
   bottlePriceHistory,
   bottleSuggestedTagList,
   bottleTagList,
