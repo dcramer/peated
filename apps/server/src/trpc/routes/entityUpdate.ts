@@ -1,6 +1,11 @@
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
-import { changes, entities } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottles,
+  changes,
+  entities,
+} from "@peated/server/db/schema";
 import pushJob from "@peated/server/jobs";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
@@ -8,7 +13,7 @@ import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 
@@ -77,6 +82,22 @@ export default modProcedure
         throw err;
       }
       if (!newEntity) return;
+
+      if (data.name) {
+        await tx
+          .update(bottles)
+          .set({
+            fullName: sql`${newEntity.name} || ' ' || ${bottles.name}`,
+          })
+          .where(eq(bottles.brandId, newEntity.id));
+        await tx.execute(sql`
+          UPDATE ${bottleAliases}
+          SET "name" = ${bottles.fullName}
+          FROM ${bottles}
+          WHERE ${bottles.id} = ${bottleAliases.bottleId}
+            AND ${bottles.brandId} = ${newEntity.id}
+            AND ${bottleAliases.name} = ${entity.name} || ' ' || ${bottles.name}`);
+      }
 
       await tx.insert(changes).values({
         objectType: "entity",

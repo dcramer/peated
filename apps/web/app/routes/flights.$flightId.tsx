@@ -1,4 +1,5 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
+import { formatCategoryName } from "@peated/server/lib/format";
 import Layout from "@peated/web/components/layout";
 import { summarize } from "@peated/web/lib/markdown";
 import type { MetaFunction } from "@remix-run/node";
@@ -8,7 +9,6 @@ import invariant from "tiny-invariant";
 import BottleLink from "../components/bottleLink";
 import Button from "../components/button";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
-import { formatCategoryName } from "../lib/strings";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ params: { flightId }, context: { trpc } }) => {

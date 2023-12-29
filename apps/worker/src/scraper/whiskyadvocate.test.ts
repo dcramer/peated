@@ -1,32 +1,44 @@
+import { loadFixture } from "@peated/worker/lib/test";
 import mockAxios from "vitest-mock-axios";
-import { loadFixture } from "~/lib/test";
-import scrapeWhiskyAdvocate from "./scrapeWhiskyAdvocate";
+import { scrapeIssueList, scrapeReviews } from "./whiskyadvocate";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
-test("simple", async () => {
+test("review list", async () => {
   const url =
     "https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=Winter+2023&order_by=published_desc";
   const result = await loadFixture("whiskyadvocate", "bottle-list.html");
 
   const items: any[] = [];
 
-  const fn = scrapeWhiskyAdvocate(url, async (item) => {
+  const fn = scrapeReviews(url, async (item) => {
     items.push(item);
   });
-
-  expect(mockAxios.get).toHaveBeenCalledOnce();
 
   mockAxios.mockResponseFor({ url }, { data: result });
 
   await fn;
 
-  expect(items.length).toBe(12);
+  expect(items.length).toBe(166);
   expect(items[0]).toEqual({
-    name: "Aberfeldy 12-year-old Single Malt Scotch Whisky",
-    price: 4496,
-    priceUnit: "USD",
-    volume: 750,
-    url: "https://www.astorwines.com/item/16747",
+    name: "Angel's Envy Cask Strength Sauternes and Toasted Oak Barrel Finished (Batch RC1)",
+    category: "rye",
+    rating: 94,
+    issue: "Winter 2023",
+    url: "https://whiskyadvocate.com/Angel-s-Envy-Cask-Strength-Sauternes-and-Toasted-Oak-Barrel-Finished-Batch-RC1-57-2",
   });
+});
+
+test("issue list", async () => {
+  const url = "https://whiskyadvocate.com/ratings-reviews";
+  const result = await loadFixture("whiskyadvocate", "empty-search.html");
+
+  const fn = scrapeIssueList(url);
+
+  mockAxios.mockResponseFor({ url }, { data: result });
+
+  const items = await fn;
+
+  expect(items.length).toBe(106);
+  expect(items[0]).toEqual("Winter 2023");
 });

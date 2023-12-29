@@ -1,5 +1,6 @@
 import { CATEGORY_LIST } from "../constants";
 import { type Category } from "../types";
+import { formatCategoryName } from "./format";
 
 const ageSuffix = "-year-old";
 
@@ -8,6 +9,11 @@ export const normalizeCategory = (name: string): Category | null => {
   if (CATEGORY_LIST.indexOf(nameLower as Category) !== -1)
     return nameLower as Category;
   if (nameLower.startsWith("single malt")) return "single_malt";
+  for (const category of CATEGORY_LIST) {
+    if (nameLower.startsWith(formatCategoryName(category))) {
+      return category as Category;
+    }
+  }
   return null;
 };
 
@@ -36,7 +42,7 @@ export const normalizeBottleName = (
   if (name.endsWith(` ${age}`)) {
     name = `${name}${ageSuffix}`;
   }
-  return name.replace(` ${age} `, ` ${age}${ageSuffix} `);
+  return normalizeString(name.replace(` ${age} `, ` ${age}${ageSuffix} `));
 };
 
 /* Normalize volume to milliliters */
@@ -54,4 +60,9 @@ export function normalizeVolume(volume: string): number | null {
     default:
       return null;
   }
+}
+
+export function normalizeString(value: string): string {
+  // remove smart quotes
+  return value.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
 }

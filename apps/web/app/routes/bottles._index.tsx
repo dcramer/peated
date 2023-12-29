@@ -1,11 +1,11 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
+import { formatCategoryName } from "@peated/server/lib/format";
 import BottleTable from "@peated/web/components/bottleTable";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Layout from "@peated/web/components/layout";
 import QueryBoundary from "@peated/web/components/queryBoundary";
 import SidebarLink from "@peated/web/components/sidebarLink";
-import { formatCategoryName } from "@peated/web/lib/strings";
 import { buildQueryString } from "@peated/web/lib/urls";
 import { type MetaFunction, type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";

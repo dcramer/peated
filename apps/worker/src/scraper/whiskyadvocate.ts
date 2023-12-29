@@ -56,7 +56,7 @@ export async function scrapeIssueList(
     .find("option")
     .each((_, el) => {
       const value = $(el).text().trim();
-      if (!value || value === "") return;
+      if (el.attribs.value === "" || !value) return;
       results.push(value);
     });
   return results;

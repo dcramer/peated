@@ -1,3 +1,4 @@
+import { formatCategoryName } from "@peated/server/lib/format";
 import type { Entity } from "@peated/server/types";
 import RobotImage from "@peated/web/assets/robot.png";
 import { ClientOnly } from "@peated/web/components/clientOnly";
@@ -5,7 +6,6 @@ import { DistributionChart } from "@peated/web/components/distributionChart";
 import { Map } from "@peated/web/components/map.client";
 import Markdown from "@peated/web/components/markdown";
 import QueryBoundary from "@peated/web/components/queryBoundary";
-import { formatCategoryName } from "@peated/web/lib/strings";
 import { trpc } from "@peated/web/lib/trpc";
 import { parseDomain } from "@peated/web/lib/urls";
 import type { LinksFunction } from "@remix-run/node";
