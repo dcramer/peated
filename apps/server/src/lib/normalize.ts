@@ -10,7 +10,7 @@ export const normalizeCategory = (name: string): Category | null => {
     return nameLower as Category;
   if (nameLower.startsWith("single malt")) return "single_malt";
   for (const category of CATEGORY_LIST) {
-    if (nameLower.startsWith(formatCategoryName(category))) {
+    if (nameLower.startsWith(formatCategoryName(category).toLowerCase())) {
       return category as Category;
     }
   }
