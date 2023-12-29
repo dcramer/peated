@@ -5,10 +5,10 @@ import { changes, entities } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
 import { CountryEnum, EntityTypeEnum } from "@peated/server/schemas";
+import config from "@peated/worker/config";
+import { getStructuredResponse } from "@peated/worker/lib/openai";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import config from "~/config";
-import { getStructuredResponse } from "~/lib/openai";
 
 if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");

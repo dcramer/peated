@@ -1,4 +1,5 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
+import { formatCategoryName } from "@peated/server/lib/format";
 import type {
   Bottle,
   CollectionBottle,
@@ -6,7 +7,6 @@ import type {
   PagingRel,
 } from "@peated/server/types";
 import { Link, useLocation } from "@remix-run/react";
-import { formatCategoryName } from "../lib/strings";
 import Button from "./button";
 import SortParam from "./sortParam";
 

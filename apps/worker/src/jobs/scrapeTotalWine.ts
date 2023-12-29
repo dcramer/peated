@@ -1,4 +1,4 @@
-import { main } from "../price-scraper/totalwine";
+import main from "../scraper/totalwine";
 
 export default async function scrapeTotalWine() {
   await main();

@@ -11,6 +11,7 @@ import notifyDiscordOnTasting from "./jobs/notifyDiscordOnTasting";
 import scrapeAstorWines from "./jobs/scrapeAstorWines";
 import scrapeHealthySpirits from "./jobs/scrapeHealthySpirits";
 import scrapeTotalWine from "./jobs/scrapeTotalWine";
+import scrapeWhiskeyAdvocate from "./jobs/scrapeWhiskyAdvocate";
 import scrapeWoodenCork from "./jobs/scrapeWoodenCork";
 
 Sentry.init({
@@ -109,6 +110,11 @@ async function main() {
       console.log("Scraping Healthy Spirits");
       await pushJob("ScrapeHealthySpirits");
     });
+
+    job("0 4 1 * *", "scrape-whisky-advocate", async () => {
+      console.log("Scraping Whisky Advocate");
+      await pushJob("ScrapeWhiskyAdvocate");
+    });
   }
 
   const worker = await faktory.work().catch((error) => {
@@ -140,6 +146,7 @@ faktory.register("ScrapeAstorWines", scrapeAstorWines);
 faktory.register("ScrapeHealthySpirits", scrapeHealthySpirits);
 faktory.register("ScrapeTotalWine", scrapeTotalWine);
 faktory.register("ScrapeWoodenCork", scrapeWoodenCork);
+faktory.register("ScrapeWhiskyAdvocate", scrapeWhiskeyAdvocate);
 
 process.on("SIGINT", function () {
   scheduler.stop();

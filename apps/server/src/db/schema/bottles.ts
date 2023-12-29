@@ -144,4 +144,29 @@ export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
 }));
 
 export type BottleTag = typeof bottleTags.$inferSelect;
-export type NewBottleTags = typeof bottleTags.$inferInsert;
+export type NewBottleTag = typeof bottleTags.$inferInsert;
+
+export const bottleAliases = pgTable(
+  "bottle_alias",
+  {
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+  },
+  (bottleAliases) => {
+    return {
+      pk: primaryKey(bottleAliases.bottleId, bottleAliases.name),
+    };
+  },
+);
+
+export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [bottleAliases.bottleId],
+    references: [bottles.id],
+  }),
+}));
+
+export type BottleAlias = typeof bottleAliases.$inferSelect;
+export type NewBottleAlias = typeof bottleAliases.$inferInsert;

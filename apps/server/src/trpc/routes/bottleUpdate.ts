@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import type { Bottle, Entity } from "@peated/server/db/schema";
 import {
+  bottleAliases,
   bottles,
   bottlesToDistillers,
   changes,
@@ -158,6 +159,20 @@ export default modProcedure
       }
 
       if (!newBottle) return;
+
+      if (bottleData.name) {
+        await tx
+          .update(bottleAliases)
+          .set({
+            name: newBottle.fullName,
+          })
+          .where(
+            and(
+              eq(bottleAliases.bottleId, newBottle.id),
+              eq(bottleAliases.name, bottle.fullName),
+            ),
+          );
+      }
 
       const distillerIds: number[] = [];
       const newDistillerIds: number[] = [];

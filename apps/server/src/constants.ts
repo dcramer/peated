@@ -284,6 +284,11 @@ export const STORE_TYPE_LIST = [
   "woodencork",
 ] as const;
 
+export const EXTERNAL_SITE_TYPE_LIST = [
+  ...STORE_TYPE_LIST,
+  "whiskyadvocate",
+] as const;
+
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
 
 export const BADGE_TYPE_LIST = ["bottle", "region", "category"] as const;

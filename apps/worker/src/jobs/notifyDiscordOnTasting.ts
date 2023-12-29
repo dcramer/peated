@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { logError } from "@peated/server/lib/log";
-import config from "~/config";
+import config from "@peated/worker/config";
 
 function absoluteUri(url: string, host: string) {
   if (url.indexOf("https://") === 0 || url.indexOf("http://") === 0) return url;

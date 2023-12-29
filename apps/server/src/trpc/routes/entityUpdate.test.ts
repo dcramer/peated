@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { changes, entities } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottles,
+  changes,
+  entities,
+} from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import { desc, eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
@@ -138,4 +143,59 @@ test("can change type", async () => {
 
   expect(omit(entity, "type")).toEqual(omit(newEntity, "type"));
   expect(newEntity.type).toEqual(["distiller"]);
+});
+
+test("name change updates bottles if brand", async () => {
+  const entity = await Fixtures.Entity({
+    name: "Foo",
+    type: ["brand", "distiller"],
+  });
+  const bottle = await Fixtures.Bottle({
+    brandId: entity.id,
+    name: "Bar",
+  });
+  expect(bottle.fullName).toEqual("Foo Bar");
+
+  const otherBottle = await Fixtures.Bottle({
+    distillerIds: [entity.id],
+  });
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    name: "Bar",
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(omit(entity, "name")).toEqual(omit(newEntity, "name"));
+  expect(newEntity.name).toBe("Bar");
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(newBottle.name).toEqual(bottle.name);
+  expect(newBottle.fullName).toEqual("Bar Bar");
+
+  const [newAlias] = await db
+    .select()
+    .from(bottleAliases)
+    .where(eq(bottleAliases.bottleId, bottle.id));
+  expect(newAlias.name).toEqual(newBottle.fullName);
+
+  const [newOtherBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, otherBottle.id));
+
+  expect(newOtherBottle.fullName).toEqual(otherBottle.fullName);
 });

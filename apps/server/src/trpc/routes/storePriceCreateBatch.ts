@@ -1,50 +1,16 @@
 import { db } from "@peated/server/db";
 import {
-  bottles,
+  bottleAliases,
   storePriceHistories,
   storePrices,
   stores,
 } from "@peated/server/db/schema";
+import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { StorePriceInputSchema } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
-import { eq, ilike, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { adminProcedure } from "..";
-
-export async function findBottle(name: string): Promise<{ id: number } | null> {
-  let bottle: { id: number } | null | undefined;
-
-  // exact match
-  [bottle] = await db
-    .select({ id: bottles.id })
-    .from(bottles)
-    .where(ilike(bottles.fullName, name))
-    .limit(1);
-  if (bottle) return bottle;
-
-  // match the store's listing as a prefix
-  // name: Aberfeldy 18-year-old Single Malt Scotch Whisky
-  // bottle.fullName: Aberfeldy 18-year-old
-  [bottle] = await db
-    .select({ id: bottles.id })
-    .from(bottles)
-    .where(sql`${name} ILIKE '%' || ${bottles.fullName} || '%'`)
-    .orderBy(bottles.fullName)
-    .limit(1);
-  if (bottle) return bottle;
-
-  // match our names are prefix as a last resort (this isnt often correct)
-  // name: Aberfeldy 18-year-old
-  // bottle.fullName: Aberfeldy 18-year-old Super Series
-  [bottle] = await db
-    .select({ id: bottles.id })
-    .from(bottles)
-    .where(ilike(bottles.fullName, `${name} %`))
-    .orderBy(bottles.fullName)
-    .limit(1);
-
-  return bottle;
-}
 
 export default adminProcedure
   .input(
@@ -66,13 +32,13 @@ export default adminProcedure
     }
 
     for (const sp of input.prices) {
-      const bottle = await findBottle(sp.name);
+      const bottleId = await findBottleId(sp.name);
       await db.transaction(async (tx) => {
         // XXX: maybe we should constrain on URL?
         const [{ priceId }] = await tx
           .insert(storePrices)
           .values({
-            bottleId: bottle ? bottle.id : null,
+            bottleId,
             storeId: store.id,
             name: sp.name,
             price: sp.price,
@@ -82,7 +48,7 @@ export default adminProcedure
           .onConflictDoUpdate({
             target: [storePrices.storeId, storePrices.name, storePrices.volume],
             set: {
-              bottleId: bottle ? bottle.id : null,
+              bottleId,
               price: sp.price,
               url: sp.url,
               volume: sp.volume,
@@ -100,6 +66,16 @@ export default adminProcedure
             date: sql`CURRENT_DATE`,
           })
           .onConflictDoNothing();
+
+        if (bottleId) {
+          await tx
+            .insert(bottleAliases)
+            .values({
+              bottleId,
+              name: sp.name,
+            })
+            .onConflictDoNothing();
+        }
       });
     }
 

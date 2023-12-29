@@ -1,5 +1,5 @@
+import { loadFixture } from "@peated/worker/lib/test";
 import mockAxios from "vitest-mock-axios";
-import { loadFixture } from "~/lib/test";
 import { scrapeProducts } from "./totalwine";
 
 process.env.DISABLE_HTTP_CACHE = "1";

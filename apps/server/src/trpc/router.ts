@@ -4,6 +4,7 @@ import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
 import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
+import bottleAliasList from "./routes/bottleAliasList";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
@@ -27,6 +28,9 @@ import entityCreate from "./routes/entityCreate";
 import entityList from "./routes/entityList";
 import entityMerge from "./routes/entityMerge";
 import entityUpdate from "./routes/entityUpdate";
+import externalSiteByType from "./routes/externalSiteByType";
+import externalSiteCreate from "./routes/externalSiteCreate";
+import externalSiteList from "./routes/externalSiteList";
 import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
 import flightList from "./routes/flightList";
@@ -38,6 +42,7 @@ import notificationDelete from "./routes/notificationDelete";
 import notificationList from "./routes/notificationList";
 import notificationUpdate from "./routes/notificationUpdate";
 import priceChangeList from "./routes/priceChangeList";
+import reviewCreate from "./routes/reviewCreate";
 import stats from "./routes/stats";
 import storeById from "./routes/storeById";
 import storeCreate from "./routes/storeCreate";
@@ -67,6 +72,7 @@ export const appRouter = router({
   bottleDelete,
   bottleCreate,
   bottleList,
+  bottleAliasList,
   bottlePriceHistory,
   bottleSuggestedTagList,
   bottleTagList,
@@ -86,6 +92,9 @@ export const appRouter = router({
   entityList,
   entityMerge,
   entityUpdate,
+  externalSiteCreate,
+  externalSiteByType,
+  externalSiteList,
   flightById,
   flightCreate,
   flightList,
@@ -97,6 +106,7 @@ export const appRouter = router({
   notificationList,
   notificationUpdate,
   priceChangeList,
+  reviewCreate,
   stats,
   storeById,
   storeCreate,

@@ -1,8 +1,8 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
+import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import { Link } from "@remix-run/react";
 import classNames from "../lib/classNames";
-import { formatCategoryName } from "../lib/strings";
 import BottleLink from "./bottleLink";
 import type { Option } from "./selectField";
 

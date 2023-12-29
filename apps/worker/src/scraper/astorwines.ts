@@ -1,13 +1,11 @@
-import { load as cheerio } from "cheerio";
-import { getUrl } from "../scraper";
-
 import {
   normalizeBottleName,
   normalizeVolume,
 } from "@peated/server/lib/normalize";
-
-import type { StorePrice } from "../lib/api";
+import type { StorePrice } from "@peated/worker/types";
+import { load as cheerio } from "cheerio";
 import { submitStorePrices } from "../lib/api";
+import { getUrl } from "../scraper";
 import { absoluteUrl, chunked, parsePrice } from "./utils";
 
 export async function scrapeProducts(
@@ -53,7 +51,7 @@ export async function scrapeProducts(
   });
 }
 
-export async function main() {
+export default async function main() {
   // TODO: support pagination
   const products: StorePrice[] = [];
 

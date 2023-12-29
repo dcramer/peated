@@ -26,6 +26,7 @@ export async function shutdownClient() {
   client = null;
 }
 
+// TODO: how can we automate registration here without importing the job code?
 export type JobName =
   | "GenerateBottleDetails"
   | "GenerateEntityDetails"
@@ -33,7 +34,8 @@ export type JobName =
   | "ScrapeAstorWines"
   | "ScrapeHealthySpirits"
   | "ScrapeTotalWine"
-  | "ScrapeWoodenCork";
+  | "ScrapeWoodenCork"
+  | "ScrapeWhiskyAdvocate";
 
 export default async function pushJob(jobName: JobName, args?: any) {
   const client = await getClient();

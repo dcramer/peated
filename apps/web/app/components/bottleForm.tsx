@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
 import { CATEGORY_LIST } from "@peated/server/constants";
+import { formatCategoryName } from "@peated/server/lib/format";
 import { BottleInputSchema } from "@peated/server/schemas";
 import type { Bottle, Entity } from "@peated/server/types";
 import { PreviewBottleCard } from "@peated/web/components/bottleCard";
@@ -19,7 +20,6 @@ import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { ApiError } from "@peated/web/lib/api";
 import { logError } from "@peated/web/lib/log";
-import { formatCategoryName } from "@peated/web/lib/strings";
 import Form from "./form";
 import Header from "./header";
 import Spinner from "./spinner";

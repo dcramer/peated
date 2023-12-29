@@ -1,10 +1,9 @@
 import { Link } from "@remix-run/react";
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
+import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/components/assets/Bottle";
-import { formatCategoryName } from "@peated/web/lib/strings";
-
 export type BottleResult = {
   type: "bottle";
   ref: Bottle;

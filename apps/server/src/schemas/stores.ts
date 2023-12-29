@@ -14,7 +14,7 @@ export const StoreSchema = z.object({
 
 export const StoreInputSchema = z.object({
   type: StoreTypeEnum,
-  name: z.string(),
+  name: z.string().trim().min(1, "Required"),
   country: z.string().nullable().optional(),
 });
 
@@ -29,10 +29,10 @@ export const StorePriceSchema = z.object({
 });
 
 export const StorePriceInputSchema = z.object({
-  name: z.string(),
+  name: z.string().trim().min(1, "Required"),
   price: z.number(),
   volume: z.number(),
-  url: z.string(),
+  url: z.string().trim().min(1, "Required"),
 });
 
 export const BottlePriceChangeSchema = z.object({

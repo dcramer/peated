@@ -3,14 +3,20 @@ import { generatePublicId } from "@peated/server/lib/publicId";
 import { eq, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
-import { CATEGORY_LIST, DEFAULT_TAGS } from "../../constants";
+import {
+  CATEGORY_LIST,
+  DEFAULT_TAGS,
+  EXTERNAL_SITE_TYPE_LIST,
+} from "../../constants";
 import { db } from "../../db";
 import type {
   Entity as EntityType,
   NewBadge,
   NewBottle,
+  NewBottleAlias,
   NewComment,
   NewEntity,
+  NewExternalSite,
   NewFlight,
   NewFollow,
   NewStore,
@@ -23,12 +29,14 @@ import type {
 } from "../../db/schema";
 import {
   badges,
+  bottleAliases,
   bottleTags,
   bottles,
   bottlesToDistillers,
   changes,
   comments,
   entities,
+  externalSites,
   flightBottles,
   flights,
   follows,
@@ -163,6 +171,11 @@ export const Bottle = async ({
       }
     }
 
+    await tx.insert(bottleAliases).values({
+      bottleId: bottle.id,
+      name: bottle.fullName,
+    });
+
     await tx.insert(changes).values({
       objectId: bottle.id,
       objectType: "bottle",
@@ -175,6 +188,26 @@ export const Bottle = async ({
 
     return bottle;
   });
+};
+
+export const BottleAlias = async ({
+  ...data
+}: Partial<NewBottleAlias> = {}) => {
+  return (
+    await db
+      .insert(bottleAliases)
+      .values({
+        bottleId: data.bottleId || (await Bottle()).id,
+        name: `${toTitleCase(
+          choose([
+            faker.company.buzzNoun(),
+            `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
+          ]),
+        )} #${faker.number.int(100)}`,
+        ...data,
+      })
+      .returning()
+  )[0];
 };
 
 export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
@@ -278,6 +311,21 @@ export const Badge = async ({ ...data }: Partial<NewBadge> = {}) => {
         config: {
           category: "single_malt",
         },
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const ExternalSite = async ({
+  ...data
+}: Partial<NewExternalSite> = {}) => {
+  return (
+    await db
+      .insert(externalSites)
+      .values({
+        name: faker.company.name(),
+        type: choose([...EXTERNAL_SITE_TYPE_LIST]),
         ...data,
       })
       .returning()
