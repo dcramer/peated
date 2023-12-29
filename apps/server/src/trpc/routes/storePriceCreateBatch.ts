@@ -1,10 +1,11 @@
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
   storePriceHistories,
   storePrices,
   stores,
 } from "@peated/server/db/schema";
-import { findBottle } from "@peated/server/lib/bottleFinder";
+import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { StorePriceInputSchema } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
@@ -31,13 +32,13 @@ export default adminProcedure
     }
 
     for (const sp of input.prices) {
-      const bottle = await findBottle(sp.name);
+      const bottleId = await findBottleId(sp.name);
       await db.transaction(async (tx) => {
         // XXX: maybe we should constrain on URL?
         const [{ priceId }] = await tx
           .insert(storePrices)
           .values({
-            bottleId: bottle ? bottle.id : null,
+            bottleId,
             storeId: store.id,
             name: sp.name,
             price: sp.price,
@@ -47,7 +48,7 @@ export default adminProcedure
           .onConflictDoUpdate({
             target: [storePrices.storeId, storePrices.name, storePrices.volume],
             set: {
-              bottleId: bottle ? bottle.id : null,
+              bottleId,
               price: sp.price,
               url: sp.url,
               volume: sp.volume,
@@ -65,6 +66,16 @@ export default adminProcedure
             date: sql`CURRENT_DATE`,
           })
           .onConflictDoNothing();
+
+        if (bottleId) {
+          await tx
+            .insert(bottleAliases)
+            .values({
+              bottleId,
+              name: sp.name,
+            })
+            .onConflictDoNothing();
+        }
       });
     }
 

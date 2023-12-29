@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import type { Bottle, Entity } from "@peated/server/db/schema";
 import {
+  bottleAliases,
   bottles,
   bottlesToDistillers,
   changes,
@@ -103,6 +104,11 @@ export default authedProcedure
       if (!bottle) {
         return;
       }
+
+      await tx.insert(bottleAliases).values({
+        bottleId: bottle.id,
+        name: fullName,
+      });
 
       const distillerIds: number[] = [];
       if (input.distillers)

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { adminProcedure } from "..";
 import { db } from "../../db";
 import {
+  bottleAliases,
   bottleTags,
   bottles,
   bottlesToDistillers,
@@ -69,6 +70,7 @@ export default adminProcedure.input(z.number()).mutation(async function ({
     await tx
       .delete(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
+    await tx.delete(bottleAliases).where(eq(bottleAliases.bottleId, bottle.id));
     await tx.delete(bottles).where(eq(bottles.id, bottle.id));
   });
 

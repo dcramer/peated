@@ -9,6 +9,7 @@ import type {
   Entity as EntityType,
   NewBadge,
   NewBottle,
+  NewBottleAlias,
   NewComment,
   NewEntity,
   NewFlight,
@@ -23,6 +24,7 @@ import type {
 } from "../../db/schema";
 import {
   badges,
+  bottleAliases,
   bottleTags,
   bottles,
   bottlesToDistillers,
@@ -163,6 +165,11 @@ export const Bottle = async ({
       }
     }
 
+    await tx.insert(bottleAliases).values({
+      bottleId: bottle.id,
+      name: bottle.fullName,
+    });
+
     await tx.insert(changes).values({
       objectId: bottle.id,
       objectType: "bottle",
@@ -175,6 +182,26 @@ export const Bottle = async ({
 
     return bottle;
   });
+};
+
+export const BottleAlias = async ({
+  ...data
+}: Partial<NewBottleAlias> = {}) => {
+  return (
+    await db
+      .insert(bottleAliases)
+      .values({
+        bottleId: data.bottleId || (await Bottle()).id,
+        name: `${toTitleCase(
+          choose([
+            faker.company.buzzNoun(),
+            `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
+          ]),
+        )} #${faker.number.int(100)}`,
+        ...data,
+      })
+      .returning()
+  )[0];
 };
 
 export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {

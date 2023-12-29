@@ -1,6 +1,10 @@
 import { db } from "@peated/server/db";
-import { externalSites, reviews } from "@peated/server/db/schema";
-import { findBottle } from "@peated/server/lib/bottleFinder";
+import {
+  bottleAliases,
+  externalSites,
+  reviews,
+} from "@peated/server/db/schema";
+import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { ReviewInputSchema } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
@@ -20,13 +24,13 @@ export default adminProcedure
       });
     }
 
-    const bottle = await findBottle(input.name);
+    const bottleId = await findBottleId(input.name);
     await db.transaction(async (tx) => {
       // XXX: maybe we should constrain on URL?
       const [review] = await tx
         .insert(reviews)
         .values({
-          bottleId: bottle ? bottle.id : null,
+          bottleId,
           externalSiteId: site.id,
           name: input.name,
           issue: input.issue,
@@ -36,7 +40,7 @@ export default adminProcedure
         .onConflictDoUpdate({
           target: [reviews.externalSiteId, reviews.name, reviews.rating],
           set: {
-            bottleId: bottle ? bottle.id : null,
+            bottleId,
             rating: input.rating,
             url: input.url,
             issue: input.issue,
@@ -44,6 +48,16 @@ export default adminProcedure
           },
         })
         .returning();
+
+      if (bottleId) {
+        await tx
+          .insert(bottleAliases)
+          .values({
+            bottleId,
+            name: input.name,
+          })
+          .onConflictDoNothing();
+      }
     });
 
     await db
