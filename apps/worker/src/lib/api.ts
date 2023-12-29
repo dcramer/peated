@@ -3,7 +3,7 @@ import config from "@peated/worker/config";
 import { type StorePrice } from "@peated/worker/types";
 import { captureException } from "@sentry/node-experimental";
 
-const trpcClient = makeTRPCClient(
+export const trpcClient = makeTRPCClient(
   config.API_SERVER,
   process.env.ACCESS_TOKEN,
   captureException,

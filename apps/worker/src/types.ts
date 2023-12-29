@@ -13,6 +13,6 @@ export type BottleReview = {
   category: Category | null;
   rating: number;
   url: string;
-  issue?: string;
+  issue: string;
   publishedAt?: Date;
 };

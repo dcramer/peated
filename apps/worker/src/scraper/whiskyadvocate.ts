@@ -5,6 +5,7 @@ import {
 import { getUrl } from "@peated/worker/scraper";
 import { type BottleReview } from "@peated/worker/types";
 import { load as cheerio } from "cheerio";
+import { trpcClient } from "../lib/api";
 import { absoluteUrl } from "./utils";
 
 export default async function main() {
@@ -31,8 +32,12 @@ export default async function main() {
 
   if (process.env.ACCESS_TOKEN) {
     console.log("Pushing new price data to API");
-    return false;
-    // chunked(products, 100, async (items) => await submitStorePrices(3, items));
+    for (const item of reviewList) {
+      await trpcClient.reviewCreate.mutate({
+        site: "whiskyadvocate",
+        ...item,
+      });
+    }
   } else {
     console.log(`Dry Run Complete - ${reviewList.length} products found`);
   }
