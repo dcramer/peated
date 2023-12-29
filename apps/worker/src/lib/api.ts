@@ -1,6 +1,7 @@
 import { makeTRPCClient } from "@peated/server/lib/trpc";
+import config from "@peated/worker/config";
+import { type StorePrice } from "@peated/worker/types";
 import { captureException } from "@sentry/node-experimental";
-import config from "~/config";
 
 const trpcClient = makeTRPCClient(
   config.API_SERVER,
@@ -45,14 +46,6 @@ export async function submitEntity(data: any) {
     }
   }
 }
-
-export type StorePrice = {
-  name: string;
-  price: number;
-  priceUnit: string;
-  url: string;
-  volume: number;
-};
 
 export async function submitStorePrices(storeId: number, data: StorePrice[]) {
   try {

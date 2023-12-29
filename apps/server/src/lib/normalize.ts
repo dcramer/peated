@@ -1,4 +1,15 @@
+import { CATEGORY_LIST } from "../constants";
+import { type Category } from "../types";
+
 const ageSuffix = "-year-old";
+
+export const normalizeCategory = (name: string): Category | null => {
+  const nameLower = name.toLowerCase();
+  if (CATEGORY_LIST.indexOf(nameLower as Category) !== -1)
+    return nameLower as Category;
+  if (nameLower.startsWith("single malt")) return "single_malt";
+  return null;
+};
 
 export const normalizeBottleName = (
   name: string,
