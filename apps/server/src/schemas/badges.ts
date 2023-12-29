@@ -13,6 +13,6 @@ export const BadgeSchema = z.object({
 
 export const BadgeInputSchema = z.object({
   type: BadgeTypeEnum,
-  name: z.string(),
+  name: z.string().trim().min(1, "Required"),
   config: z.record(z.any()),
 });

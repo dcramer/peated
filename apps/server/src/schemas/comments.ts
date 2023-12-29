@@ -3,7 +3,7 @@ import { UserSchema } from "./users";
 
 export const CommentSchema = z.object({
   id: z.number(),
-  comment: z.string().min(1, "Required"),
+  comment: z.string(),
   createdAt: z.string().datetime(),
   createdBy: UserSchema,
 });
