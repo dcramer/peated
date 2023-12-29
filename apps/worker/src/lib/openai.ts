@@ -1,8 +1,8 @@
 import { logError } from "@peated/server/lib/log";
+import config from "@peated/worker/config";
 import OpenAI from "openai";
 import { type z, type ZodSchema } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import config from "~/config";
 
 type Model = "gpt-3.5-turbo" | "gpt-4";
 
