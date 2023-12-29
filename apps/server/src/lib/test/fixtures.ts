@@ -3,7 +3,11 @@ import { generatePublicId } from "@peated/server/lib/publicId";
 import { eq, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
-import { CATEGORY_LIST, DEFAULT_TAGS } from "../../constants";
+import {
+  CATEGORY_LIST,
+  DEFAULT_TAGS,
+  EXTERNAL_SITE_TYPE_LIST,
+} from "../../constants";
 import { db } from "../../db";
 import type {
   Entity as EntityType,
@@ -12,6 +16,7 @@ import type {
   NewBottleAlias,
   NewComment,
   NewEntity,
+  NewExternalSite,
   NewFlight,
   NewFollow,
   NewStore,
@@ -31,6 +36,7 @@ import {
   changes,
   comments,
   entities,
+  externalSites,
   flightBottles,
   flights,
   follows,
@@ -305,6 +311,21 @@ export const Badge = async ({ ...data }: Partial<NewBadge> = {}) => {
         config: {
           category: "single_malt",
         },
+        ...data,
+      })
+      .returning()
+  )[0];
+};
+
+export const ExternalSite = async ({
+  ...data
+}: Partial<NewExternalSite> = {}) => {
+  return (
+    await db
+      .insert(externalSites)
+      .values({
+        name: faker.company.name(),
+        type: choose([...EXTERNAL_SITE_TYPE_LIST]),
         ...data,
       })
       .returning()

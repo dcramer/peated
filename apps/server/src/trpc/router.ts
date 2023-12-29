@@ -27,7 +27,9 @@ import entityCreate from "./routes/entityCreate";
 import entityList from "./routes/entityList";
 import entityMerge from "./routes/entityMerge";
 import entityUpdate from "./routes/entityUpdate";
+import externalSiteByType from "./routes/externalSiteByType";
 import externalSiteCreate from "./routes/externalSiteCreate";
+import externalSiteList from "./routes/externalSiteList";
 import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
 import flightList from "./routes/flightList";
@@ -89,6 +91,8 @@ export const appRouter = router({
   entityMerge,
   entityUpdate,
   externalSiteCreate,
+  externalSiteByType,
+  externalSiteList,
   flightById,
   flightCreate,
   flightList,
