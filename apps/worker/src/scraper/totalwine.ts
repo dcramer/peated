@@ -8,7 +8,7 @@ import { submitStorePrices } from "../lib/api";
 import { getUrl } from "../scraper";
 import { absoluteUrl, chunked, parsePrice } from "./utils";
 
-export default async function scrapeProducts(
+export async function scrapeProducts(
   url: string,
   cb: (product: StorePrice) => Promise<void>,
 ) {
@@ -51,7 +51,7 @@ export default async function scrapeProducts(
   });
 }
 
-export async function main() {
+export default async function main() {
   const products: StorePrice[] = [];
   await scrapeProducts(
     "https://www.totalwine.com/spirits/scotch/c/000887?viewall=true&pageSize=120&aty=0,0,0,0",
