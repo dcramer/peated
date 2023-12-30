@@ -1,6 +1,6 @@
 import { type JobFunction } from "faktory-worker";
 import { vi } from "vitest";
-import type * as jobs from "../jobs";
+import * as jobs from "../jobs";
 
 export const getClient: typeof jobs.getClient = vi.fn();
 
@@ -15,3 +15,5 @@ export const pushJob: typeof jobs.pushJob = vi.fn(
 export const registerJob: typeof jobs.registerJob = vi.fn(
   async (jobName: jobs.JobName, jobFn: JobFunction) => undefined,
 );
+
+export const getJobForSite = jobs.getJobForSite;

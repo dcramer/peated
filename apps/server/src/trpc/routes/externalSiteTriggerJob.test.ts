@@ -1,0 +1,27 @@
+import * as mockJobs from "@peated/server/__mocks__/jobs";
+import * as Fixtures from "../../lib/test/fixtures";
+import { appRouter } from "../router";
+
+test("requires admin", async () => {
+  const site = await Fixtures.ExternalSite({ type: "whiskyadvocate" });
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  expect(() => caller.externalSiteTriggerJob(site.type)).rejects.toThrowError(
+    /UNAUTHORIZED/,
+  );
+});
+
+test("triggers job", async () => {
+  const site = await Fixtures.ExternalSite({ type: "whiskyadvocate" });
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ admin: true }),
+  });
+  const newSite = await caller.externalSiteTriggerJob(site.type);
+  expect(newSite.lastRunAt).toBeTruthy();
+  expect(new Date(newSite.lastRunAt || "").getTime()).toBeGreaterThan(
+    new Date().getTime() - 5000,
+  );
+
+  expect(mockJobs.pushJob).toHaveBeenCalledOnce();
+});
