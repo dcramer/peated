@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { entities } from "@peated/server/db/schema";
+import { entities, entityTombstones } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
 import { appRouter } from "../router";
@@ -52,6 +52,12 @@ test("merge A into B", async () => {
   expect(newEntityB).toBeDefined();
   expect(newEntityB.totalTastings).toEqual(4);
   expect(newEntityB.totalBottles).toEqual(3);
+
+  const [tombstone] = await db
+    .select()
+    .from(entityTombstones)
+    .where(eq(entities.id, entityA.id));
+  expect(tombstone.newEntityId).toEqual(newEntityB.id);
 });
 
 test("merge A from B", async () => {
@@ -82,4 +88,10 @@ test("merge A from B", async () => {
     .from(entities)
     .where(eq(entities.id, entityB.id));
   expect(newEntityB).toBeUndefined();
+
+  const [tombstone] = await db
+    .select()
+    .from(entityTombstones)
+    .where(eq(entities.id, entityB.id));
+  expect(tombstone.newEntityId).toEqual(newEntityA.id);
 });

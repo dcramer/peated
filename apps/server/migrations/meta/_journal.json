@@ -470,6 +470,13 @@
       "when": 1703894112863,
       "tag": "0066_harsh_loners",
       "breakpoints": false
+    },
+    {
+      "idx": 67,
+      "version": "5",
+      "when": 1703895335531,
+      "tag": "0067_sudden_black_queen",
+      "breakpoints": false
     }
   ]
 }

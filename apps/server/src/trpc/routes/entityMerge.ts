@@ -4,6 +4,7 @@ import {
   bottles,
   bottlesToDistillers,
   entities,
+  entityTombstones,
 } from "@peated/server/db/schema";
 import pushJob from "@peated/server/jobs";
 import { logError } from "@peated/server/lib/log";
@@ -55,6 +56,13 @@ async function mergeEntitiesInto(
         distillerId: toEntity.id,
       })
       .where(inArray(bottlesToDistillers.distillerId, fromEntityIds));
+
+    for (const id of fromEntityIds) {
+      await tx.insert(entityTombstones).values({
+        entityId: id,
+        newEntityId: toEntity.id,
+      });
+    }
 
     const [entity] = await tx
       .update(entities)

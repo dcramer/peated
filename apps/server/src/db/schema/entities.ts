@@ -70,3 +70,25 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
 
 export type Entity = typeof entities.$inferSelect;
 export type NewEntity = typeof entities.$inferInsert;
+
+export const entityTombstones = pgTable("entity_tombstone", {
+  entityId: bigint("entity_id", { mode: "number" }).primaryKey(),
+  newEntityId: bigint("new_entity_id", { mode: "number" }),
+});
+
+export const entityTombstonesRelations = relations(
+  entityTombstones,
+  ({ one }) => ({
+    entity: one(entities, {
+      fields: [entityTombstones.entityId],
+      references: [entities.id],
+    }),
+    newEntity: one(entities, {
+      fields: [entityTombstones.newEntityId],
+      references: [entities.id],
+    }),
+  }),
+);
+
+export type EntityTombstone = typeof entityTombstones.$inferSelect;
+export type NewEntityTombstone = typeof entityTombstones.$inferInsert;

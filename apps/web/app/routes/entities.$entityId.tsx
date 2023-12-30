@@ -11,16 +11,27 @@ import { summarize } from "@peated/web/lib/markdown";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
+import { json, redirect } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import PageHeader from "../components/pageHeader";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { entityId }, context: { trpc } }) => {
-    invariant(entityId);
+  async ({ request, params, context: { trpc } }) => {
+    invariant(params.entityId);
 
-    const entity = await trpc.entityById.query(Number(entityId));
+    const entityId = Number(params.entityId);
+
+    const entity = await trpc.entityById.query(entityId);
+    // tombstone path - redirect to the absolute url to ensure search engines dont get mad
+    if (entity.id !== entityId) {
+      const location = new URL(request.url);
+      const newPath = location.pathname.replace(
+        `/entities/${entityId}`,
+        `/entities/${entity.id}`,
+      );
+      return redirect(newPath);
+    }
 
     return json({ entity });
   },
