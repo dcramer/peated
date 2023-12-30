@@ -125,13 +125,6 @@ export default function AdminStoresAdd() {
               />
             )}
           />
-
-          <CountryField
-            name="country"
-            label="Country"
-            control={control}
-            error={errors.country}
-          />
         </Fieldset>
       </Form>
     </Layout>
