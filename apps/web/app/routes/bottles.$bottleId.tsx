@@ -131,6 +131,9 @@ export default function BottleDetails() {
                 className="absolute right-0 z-10 mt-2 w-32 origin-top-right"
                 unmount={false}
               >
+                <Menu.Item as={Link} to={`/bottles/${bottle.id}/aliases`}>
+                  View Aliases
+                </Menu.Item>
                 <Menu.Item as={Link} to={`/bottles/${bottle.id}/edit`}>
                   Edit Bottle
                 </Menu.Item>
