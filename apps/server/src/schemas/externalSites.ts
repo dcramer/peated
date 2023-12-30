@@ -15,6 +15,5 @@ export const ExternalSiteSchema = z.object({
 export const ExternalSiteSchemaInputSchema = z.object({
   type: ExternalSiteTypeEnum,
   name: z.string().trim().min(1, "Required"),
-  country: z.string().nullable().optional(),
-  runEvery: z.number().nullable().optional(),
+  runEvery: z.number().nullable().default(null),
 });
