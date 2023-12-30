@@ -19,27 +19,6 @@ export const priceScraperTypeEnum = pgEnum(
   STORE_TYPE_LIST,
 );
 
-// TODO: migrate this to externalSites
-export const stores = pgTable(
-  "store",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-    type: priceScraperTypeEnum("type").notNull(),
-    name: text("name").notNull(),
-    country: text("country"),
-    lastRunAt: timestamp("last_run_at"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (stores) => {
-    return {
-      type: uniqueIndex("store_type").on(stores.type),
-    };
-  },
-);
-
-export type Store = typeof stores.$inferSelect;
-export type NewStore = typeof stores.$inferInsert;
-
 export const storePrices = pgTable(
   "store_price",
   {
