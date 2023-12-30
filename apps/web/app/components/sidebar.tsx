@@ -1,7 +1,6 @@
 import {
   ChatBubbleLeftIcon,
   CodeBracketSquareIcon,
-  Cog6ToothIcon,
   GiftTopIcon,
   HomeIcon,
   InformationCircleIcon,
@@ -121,29 +120,6 @@ export default function Sidebar() {
                   <ClientOnly>{() => <FeedbackSidebarLink />}</ClientOnly>
                 </ul>
               </li>
-              {user?.admin && (
-                <li>
-                  <div className="text-xs font-semibold leading-6 text-slate-700">
-                    Admin
-                  </div>
-                  <ul role="list" className="-mx-2 space-y-1">
-                    <SidebarLink
-                      to="/admin/sites"
-                      icon={Cog6ToothIcon}
-                      active={location.pathname.startsWith("/admin/sites")}
-                    >
-                      Sites
-                    </SidebarLink>
-                    <SidebarLink
-                      to="/admin/badges"
-                      icon={Cog6ToothIcon}
-                      active={location.pathname.startsWith("/admin/badges")}
-                    >
-                      Badges
-                    </SidebarLink>
-                  </ul>
-                </li>
-              )}
             </ul>
           </nav>
         </div>
