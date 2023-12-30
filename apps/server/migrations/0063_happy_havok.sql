@@ -38,5 +38,3 @@ DO $$ BEGIN
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
-
-ALTER TABLE "store_price" ADD CONSTRAINT "store_price_url_unique" UNIQUE("url");
