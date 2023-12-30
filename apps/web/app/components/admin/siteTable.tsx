@@ -1,14 +1,15 @@
 import { Link } from "@remix-run/react";
 
-import type { PagingRel, Store } from "@peated/server/types";
+import { type ExternalSite } from "@peated/server/db/schema";
+import type { PagingRel } from "@peated/server/types";
 import Button from "../button";
 import TimeSince from "../timeSince";
 
 export default ({
-  storeList,
+  siteList,
   rel,
 }: {
-  storeList: Store[];
+  siteList: ExternalSite[];
   rel?: PagingRel;
 }) => {
   return (
@@ -21,7 +22,7 @@ export default ({
         <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left">
-              Store
+              Site
             </th>
             <th
               scope="col"
@@ -32,21 +33,21 @@ export default ({
           </tr>
         </thead>
         <tbody>
-          {storeList.map((store) => {
+          {siteList.map((site) => {
             return (
-              <tr key={store.id} className="border-b border-slate-800 text-sm">
+              <tr key={site.id} className="border-b border-slate-800 text-sm">
                 <td className="max-w-0 px-3 py-3">
                   <Link
-                    to={`/admin/stores/${store.id}`}
+                    to={`/admin/sites/${site.type}`}
                     className="font-medium hover:underline"
                   >
-                    {store.name}
+                    {site.name}
                   </Link>
-                  <div className="mt-2 space-x-2">{store.type}</div>
+                  <div className="mt-2 space-x-2">{site.type}</div>
                 </td>
                 <td className="hidden px-3 py-3 text-right sm:table-cell">
-                  {store.lastRunAt ? (
-                    <TimeSince date={store.lastRunAt} />
+                  {site.lastRunAt ? (
+                    <TimeSince date={site.lastRunAt} />
                   ) : (
                     <>&mdash;</>
                   )}

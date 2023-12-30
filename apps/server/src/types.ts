@@ -23,8 +23,8 @@ import type {
   NotificationSchema,
   ObjectTypeEnum,
   PointSchema,
+  ReviewSchema,
   StorePriceSchema,
-  StoreSchema,
   TastingSchema,
   UserSchema,
 } from "./schemas";
@@ -52,7 +52,7 @@ export type Flight = z.infer<typeof FlightSchema>;
 export type Follow = z.infer<typeof FollowSchema>;
 export type Friend = z.infer<typeof FriendSchema>;
 export type Notification = z.infer<typeof NotificationSchema>;
-export type Store = z.infer<typeof StoreSchema>;
+export type Review = z.infer<typeof ReviewSchema>;
 export type StorePrice = z.infer<typeof StorePriceSchema>;
 export type Tasting = z.infer<typeof TastingSchema>;
 export type User = z.infer<typeof UserSchema>;

@@ -1,22 +1,6 @@
 import { z } from "zod";
-import { STORE_TYPE_LIST } from "../constants";
 import { BottleSchema } from "./bottles";
-
-export const StoreTypeEnum = z.enum(STORE_TYPE_LIST);
-
-export const StoreSchema = z.object({
-  id: z.number(),
-  type: StoreTypeEnum,
-  name: z.string(),
-  country: z.string().nullable(),
-  lastRunAt: z.string().datetime().nullable(),
-});
-
-export const StoreInputSchema = z.object({
-  type: StoreTypeEnum,
-  name: z.string().trim().min(1, "Required"),
-  country: z.string().nullable().optional(),
-});
+import { ExternalSiteSchema } from "./externalSites";
 
 export const StorePriceSchema = z.object({
   id: z.number(),
@@ -24,7 +8,7 @@ export const StorePriceSchema = z.object({
   price: z.number(),
   url: z.string(),
   volume: z.number(),
-  store: StoreSchema.optional(),
+  site: ExternalSiteSchema.optional(),
   updatedAt: z.string().datetime(),
 });
 

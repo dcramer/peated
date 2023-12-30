@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { STORE_TYPE_LIST } from "@peated/server/constants";
-import { StoreInputSchema } from "@peated/server/schemas";
+import { EXTERNAL_SITE_TYPE_LIST } from "@peated/server/constants";
+import { ExternalSiteSchemaInputSchema } from "@peated/server/schemas";
 import type { ActionFunction } from "@remix-run/node";
 import { json, redirect, type MetaFunction } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
@@ -25,11 +25,11 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-type FormSchemaType = z.infer<typeof StoreInputSchema>;
+type FormSchemaType = z.infer<typeof ExternalSiteSchemaInputSchema>;
 
-const STORE_TYPES = STORE_TYPE_LIST.map((t) => ({ id: t, name: t }));
+const SITE_TYPES = EXTERNAL_SITE_TYPE_LIST.map((t) => ({ id: t, name: t }));
 
-const resolver = zodResolver(StoreInputSchema);
+const resolver = zodResolver(ExternalSiteSchemaInputSchema);
 
 export const action: ActionFunction = async ({
   context: { trpc },
@@ -44,7 +44,7 @@ export const action: ActionFunction = async ({
   }
 
   try {
-    await trpc.storeCreate.mutate(data);
+    await trpc.externalSiteCreate.mutate(data);
   } catch (err) {
     if (err instanceof ApiError) {
       return json({ error: err.message });
@@ -82,7 +82,7 @@ export default function AdminStoresAdd() {
       header={
         <Header>
           <FormHeader
-            title="Add Store"
+            title="Add Site"
             saveDisabled={isSubmitting}
             onSave={handleSubmit}
           />
@@ -116,8 +116,8 @@ export default function AdminStoresAdd() {
                 {...field}
                 label="Aggregator"
                 placeholder="e.g. totalwines"
-                helpText="The internal implementation for this Store to aggregate prices."
-                options={STORE_TYPES}
+                helpText="The internal implementation for this site to aggregate prices."
+                options={SITE_TYPES}
                 simple
                 required
                 onChange={(value) => onChange(value?.id)}
