@@ -156,23 +156,22 @@ function FilterSidebar() {
                 {country}
               </SidebarLink>
             ))}
-            {country &&
-              Object.keys(MAJOR_COUNTRIES).indexOf(country) !== -1 && (
-                <SidebarLink
-                  key={country}
-                  active={qs.get("country") === country}
-                  to={{
-                    pathname: location.pathname,
-                    search: buildQueryString(location.search, {
-                      country,
-                      cursor: null,
-                    }),
-                  }}
-                  size="small"
-                >
-                  {country}
-                </SidebarLink>
-              )}
+            {country && Object.keys(MAJOR_COUNTRIES).includes(country) && (
+              <SidebarLink
+                key={country}
+                active={qs.get("country") === country}
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    country,
+                    cursor: null,
+                  }),
+                }}
+                size="small"
+              >
+                {country}
+              </SidebarLink>
+            )}
           </ul>
         </li>
         {region && (

@@ -8,14 +8,13 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import pushJob from "@peated/server/jobs";
-import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { upsertEntity } from "../../lib/db";
@@ -218,7 +217,7 @@ export default modProcedure
 
         // find existing distillers which should no longer exist and remove them
         const removedDistillers = currentDistillers.filter(
-          (d) => distillerIds.indexOf(d.id) === -1,
+          (d) => !distillerIds.includes(d.id),
         );
         for (const distiller of removedDistillers) {
           removedDistillerIds.push(distiller.id);
@@ -240,33 +239,23 @@ export default modProcedure
         })) as Entity;
       }
 
-      const newEntityIds = Array.from(
-        new Set([
-          bottleData?.brandId,
-          ...newDistillerIds,
-          bottleData?.bottlerId,
-        ]),
-      ).filter(notEmpty);
-      if (newEntityIds.length) {
-        await tx
-          .update(entities)
-          .set({ totalBottles: sql`${entities.totalBottles} + 1` })
-          .where(inArray(entities.id, newEntityIds));
-      }
-
-      const removedEntityIds = Array.from(
-        new Set([
-          bottleData?.brandId ? bottle.brandId : undefined,
-          ...removedDistillerIds,
-          bottleData?.bottlerId ? bottle.bottlerId : undefined,
-        ]),
-      ).filter(notEmpty);
-      if (removedEntityIds.length) {
-        await tx
-          .update(entities)
-          .set({ totalBottles: sql`${entities.totalBottles} - 1` })
-          .where(inArray(entities.id, removedEntityIds));
-      }
+      // XXX: this could be more optimal, but accounting is a pita
+      await tx.update(entities).set({
+        totalBottles: sql<number>`(
+          SELECT COUNT(*)
+          FROM ${bottles}
+          WHERE (
+            ${bottles.brandId} = ${entities.id}
+            OR ${bottles.bottlerId} = ${entities.id}
+            OR EXISTS(
+              SELECT FROM ${bottlesToDistillers}
+              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+              AND ${bottlesToDistillers.distillerId} = ${entities.id}
+            )
+          )
+          AND ${bottles.id} = ${newBottle.id}
+        )`,
+      });
 
       await tx.insert(changes).values({
         objectType: "bottle",

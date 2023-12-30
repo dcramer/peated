@@ -89,7 +89,7 @@ export const TastingSerializer = serializer({
         return [
           item.id,
           {
-            hasToasted: userToastsList.indexOf(item.id) !== -1,
+            hasToasted: userToastsList.includes(item.id),
             createdBy: usersByRef[item.id],
             bottle: bottlesByRef[item.id],
             friends: item.friends.map((f) => usersById[f]).filter(notEmpty),

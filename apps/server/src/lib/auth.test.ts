@@ -30,5 +30,5 @@ test("creates user with username conflict", async () => {
   const user = await createUser(db, data);
   expect(user.id).not.toEqual(existingUser.id);
   expect(user.username).not.toEqual("thebert");
-  expect(user.username.indexOf("thebert-")).toEqual(0);
+  expect(user.username.startsWith("thebert-")).toBe(true);
 });

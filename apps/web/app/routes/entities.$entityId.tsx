@@ -137,17 +137,13 @@ export default function EntityDetails() {
             <div className="my-8 flex justify-center gap-4 lg:justify-start">
               <Button
                 to={`/addBottle?${
-                  entity.type.indexOf("brand") !== -1
-                    ? `brand=${entity.id}&`
-                    : ""
+                  entity.type.includes("brand") ? `brand=${entity.id}&` : ""
                 }${
-                  entity.type.indexOf("distiller") !== -1
+                  entity.type.includes("distiller")
                     ? `distiller=${entity.id}&`
                     : ""
                 }${
-                  entity.type.indexOf("bottler") !== -1
-                    ? `bottler=${entity.id}&`
-                    : ""
+                  entity.type.includes("bottler") ? `bottler=${entity.id}&` : ""
                 }`}
                 color="primary"
               >

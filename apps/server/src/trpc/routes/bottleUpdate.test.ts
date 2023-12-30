@@ -175,7 +175,7 @@ test("removes distiller", async () => {
   const caller = appRouter.createCaller({
     user: await Fixtures.User({ mod: true }),
   });
-  const data = await caller.bottleUpdate({
+  await caller.bottleUpdate({
     bottle: bottle.id,
     distillers: [distillerA.id],
   });
@@ -189,4 +189,92 @@ test("removes distiller", async () => {
 
   expect(results.length).toEqual(1);
   expect(results[0].distillerId).toEqual(distillerA.id);
+
+  const newDistillerB = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, distillerB.id),
+  });
+  expect(newDistillerB?.totalBottles).toBe(0);
+});
+
+test("changes distiller", async () => {
+  const distillerA = await Fixtures.Entity();
+  const distillerB = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle({
+    distillerIds: [distillerA.id],
+  });
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+
+  await caller.bottleUpdate({
+    bottle: bottle.id,
+    distillers: [distillerB.id],
+  });
+
+  const newDistillerA = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, distillerA.id),
+  });
+  expect(newDistillerA?.totalBottles).toBe(0);
+
+  const newDistillerB = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, distillerB.id),
+  });
+  expect(newDistillerB?.totalBottles).toBe(1);
+});
+
+test("changes bottler", async () => {
+  const bottlerA = await Fixtures.Entity();
+  const bottlerB = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle({
+    bottlerId: bottlerA.id,
+  });
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+
+  await caller.bottleUpdate({
+    bottle: bottle.id,
+    bottler: bottlerB.id,
+  });
+
+  const newBottlerA = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, bottlerA.id),
+  });
+  expect(newBottlerA?.totalBottles).toBe(0);
+
+  const newBottlerB = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, bottlerB.id),
+  });
+  expect(newBottlerB?.totalBottles).toBe(1);
+});
+
+test("changes distiller with previous identical brand", async () => {
+  const entityA = await Fixtures.Entity();
+  const entityB = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle({
+    brandId: entityA.id,
+    distillerIds: [entityA.id],
+  });
+
+  const caller = appRouter.createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+
+  await caller.bottleUpdate({
+    bottle: bottle.id,
+    brand: entityA.id,
+    distillers: [entityB.id],
+  });
+
+  const newEntityA = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, entityA.id),
+  });
+  expect(newEntityA?.totalBottles).toBe(1);
+
+  const newEntityB = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, entityB.id),
+  });
+  expect(newEntityB?.totalBottles).toBe(1);
 });

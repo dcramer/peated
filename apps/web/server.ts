@@ -62,7 +62,7 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   // redirect old domain to new
-  if (req.hostname.indexOf("peated.app") === 0)
+  if (req.hostname.startsWith("peated.app"))
     return res.redirect(301, `https://peated.com${req.url}`);
 
   // helpful headers:

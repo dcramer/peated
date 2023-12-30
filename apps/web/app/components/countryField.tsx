@@ -48,8 +48,8 @@ export default function CountryField<T extends FieldValues>({
       helpText={helpText}
       className={className}
       options={options}
-      suggestedOptions={options.filter(
-        ({ id }) => Object.keys(MAJOR_COUNTRIES).indexOf(id) !== -1,
+      suggestedOptions={options.filter(({ id }) =>
+        Object.keys(MAJOR_COUNTRIES).includes(id),
       )}
       error={error}
       onChange={(value) => onChange && onChange(value ? value.name : "")}

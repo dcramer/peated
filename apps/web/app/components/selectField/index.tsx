@@ -152,7 +152,7 @@ export default ({
         {visibleValues.map((option) => (
           <Chip
             key={`${option.id}-${option.name}`}
-            active={value.indexOf(option) !== -1}
+            active={value.includes(option)}
             onClick={(e) => {
               e.stopPropagation();
               toggleOption(option);

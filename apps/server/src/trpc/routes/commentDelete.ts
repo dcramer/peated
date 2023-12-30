@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { comments, tastings } from "@peated/server/db/schema";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 import { deleteNotification } from "../../lib/notifications";
@@ -33,7 +33,7 @@ export default authedProcedure.input(z.number()).mutation(async function ({
     await tx
       .update(tastings)
       .set({ comments: sql`${tastings.comments} - 1` })
-      .where(eq(tastings.id, comment.tastingId));
+      .where(and(eq(tastings.id, comment.tastingId), gt(tastings.comments, 0)));
 
     await deleteNotification(tx, {
       type: "comment",

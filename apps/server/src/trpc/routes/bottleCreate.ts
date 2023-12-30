@@ -50,7 +50,7 @@ export default authedProcedure
 
       // TODO: we need to pull all this name uniform logic into a shared helper, as this
       // is missing from updateBottle
-      if (name.indexOf(brand.name) === 0) {
+      if (name.startsWith(brand.name)) {
         name = name.substring(brand.name.length + 1);
       }
 

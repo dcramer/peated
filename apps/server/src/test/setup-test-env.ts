@@ -38,7 +38,7 @@ const getTableNames = async (exclude = SAFE_TABLES) => {
     .where(eq(pgTables.schemaname, schemaname));
 
   return tnQuery
-    .filter(({ tablename }) => exclude.indexOf(tablename) === -1)
+    .filter(({ tablename }) => !exclude.includes(tablename))
     .map(({ tablename }) => `"${schemaname}"."${tablename}"`)
     .join(", ");
 };

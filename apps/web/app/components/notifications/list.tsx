@@ -14,7 +14,7 @@ export default function NotificationList({
   const deleteNotification = trpc.notificationDelete.useMutation();
   const updateNotification = trpc.notificationUpdate.useMutation();
 
-  const activeValues = values.filter((n) => archiveList.indexOf(n.id) === -1);
+  const activeValues = values.filter((n) => !archiveList.includes(n.id));
 
   return (
     <>
@@ -25,7 +25,7 @@ export default function NotificationList({
               key={n.id}
               notification={{
                 ...n,
-                read: readList.indexOf(n.id) !== -1 || n.read,
+                read: readList.includes(n.id) || n.read,
               }}
               onMarkRead={() => {
                 updateNotification.mutate({

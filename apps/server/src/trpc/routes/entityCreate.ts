@@ -34,7 +34,7 @@ export default authedProcedure
           .from(entities)
           .where(eq(entities.name, data.name));
         const missingTypes = data.type.filter(
-          (x) => existing.type.indexOf(x) === -1,
+          (x) => !existing.type.includes(x),
         );
         if (missingTypes) {
           const [updated] = await tx

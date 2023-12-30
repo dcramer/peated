@@ -7,7 +7,7 @@ import {
   toasts,
 } from "@peated/server/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 
@@ -61,6 +61,7 @@ export default authedProcedure.input(z.number()).mutation(async function ({
           and(
             eq(bottleTags.bottleId, tasting.bottleId),
             eq(bottleTags.tag, tag),
+            gt(bottleTags.count, 0),
           ),
         );
     }

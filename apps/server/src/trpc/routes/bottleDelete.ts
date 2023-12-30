@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { adminProcedure } from "..";
 import { db } from "../../db";
@@ -59,11 +59,14 @@ export default adminProcedure.input(z.number()).mutation(async function ({
       .update(entities)
       .set({ totalBottles: sql`${entities.totalBottles} - 1` })
       .where(
-        inArray(
-          entities.id,
-          Array.from(
-            new Set([bottle.brandId, ...distillerIds, bottle.bottlerId]),
-          ).filter(notEmpty),
+        and(
+          inArray(
+            entities.id,
+            Array.from(
+              new Set([bottle.brandId, ...distillerIds, bottle.bottlerId]),
+            ).filter(notEmpty),
+          ),
+          gt(entities.totalBottles, 0),
         ),
       );
 

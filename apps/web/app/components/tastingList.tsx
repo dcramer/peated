@@ -20,7 +20,7 @@ export default function TastingList({
     <ul className="sm:rounded">
       <AnimatePresence>
         {values
-          .filter((t) => deletedValues.indexOf(t.id) === -1)
+          .filter((t) => !deletedValues.includes(t.id))
           .map((tasting) => (
             <TastingListItem
               key={tasting.id}

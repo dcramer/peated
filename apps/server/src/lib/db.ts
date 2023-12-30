@@ -38,7 +38,7 @@ export const upsertEntity = async ({
       where: (entities, { eq }) => eq(entities.id, data),
     });
 
-    if (result && type && result.type.indexOf(type) === -1) {
+    if (result && type && !result.type.includes(type)) {
       await db
         .update(entities)
         .set({ type: [...result.type, type] })

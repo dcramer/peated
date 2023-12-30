@@ -11,7 +11,7 @@ import { TastingInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 
@@ -128,6 +128,7 @@ export default authedProcedure
               and(
                 eq(bottleTags.bottleId, tasting.bottleId),
                 eq(bottleTags.tag, tag),
+                gt(bottleTags.count, 0),
               ),
             );
         }

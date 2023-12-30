@@ -223,7 +223,7 @@ const CommentList = ({
   return (
     <AnimatePresence>
       {[...data.results, ...newValues].map((c) => {
-        if (deleted.indexOf(c.id) !== -1) return null;
+        if (deleted.includes(c.id)) return null;
         const isAuthor = user?.id === c.createdBy.id;
         return (
           <CommentEntry

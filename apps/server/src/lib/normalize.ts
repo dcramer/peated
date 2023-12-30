@@ -6,7 +6,7 @@ const ageSuffix = "-year-old";
 
 export const normalizeCategory = (name: string): Category | null => {
   const nameLower = name.toLowerCase();
-  if (CATEGORY_LIST.indexOf(nameLower as Category) !== -1)
+  if (CATEGORY_LIST.includes(nameLower as Category))
     return nameLower as Category;
   if (nameLower.startsWith("single malt")) return "single_malt";
   for (const category of CATEGORY_LIST) {
@@ -36,7 +36,7 @@ export const normalizeBottleName = (
     .replace(/(\d+)\s?yrs?\.?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
     .replace(/(\d+)\s?yrs?\.?($|\s)/i, `$1${ageSuffix}$2`);
 
-  if (name.indexOf(`${age} `) === 0) {
+  if (name.startsWith(`${age} `)) {
     name = name.replace(`${age} `, `${age}${ageSuffix} `);
   }
   if (name.endsWith(` ${age}`)) {
