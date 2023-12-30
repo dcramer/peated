@@ -14,7 +14,7 @@ import { summarize } from "@peated/web/lib/markdown";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
+import { json, redirect } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import BottleHeader from "../components/bottleHeader";
 import BottlePriceHistory from "../components/bottlePriceHistory.client";
@@ -22,10 +22,21 @@ import CollectionAction from "../components/collectionAction";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params, context: { trpc } }) => {
+  async ({ request, params, context: { trpc } }) => {
     invariant(params.bottleId);
 
-    const bottle = await trpc.bottleById.query(Number(params.bottleId));
+    const bottleId = Number(params.bottleId);
+
+    const bottle = await trpc.bottleById.query(bottleId);
+    // tombstone path - redirect to the absolute url to ensure search engines dont get mad
+    if (bottle.id !== bottleId) {
+      const location = new URL(request.url);
+      const newPath = location.pathname.replace(
+        `/bottles/${bottleId}`,
+        `/bottles/${bottle.id}`,
+      );
+      return redirect(newPath);
+    }
 
     return json({ bottle });
   },

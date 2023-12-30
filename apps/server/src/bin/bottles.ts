@@ -2,6 +2,7 @@ import { program } from "commander";
 import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "../db";
 import {
+  bottleAliases,
   bottleTags,
   bottleTombstones,
   bottles,
@@ -84,6 +85,21 @@ program
         })
         .where(inArray(collectionBottles.bottleId, bottleIds));
 
+      // TODO: handle conflicts
+      await tx
+        .update(bottleAliases)
+        .set({
+          bottleId: rootBottleId,
+        })
+        .where(inArray(bottleAliases.bottleId, bottleIds));
+
+      for (const id of bottleIds) {
+        await tx.insert(bottleTombstones).values({
+          bottleId: id,
+          newBottleId: rootBottleId,
+        });
+      }
+
       // update materialized stats
       await tx
         .update(bottles)
@@ -115,13 +131,6 @@ program
       await tx
         .delete(bottlesToDistillers)
         .where(inArray(bottlesToDistillers.bottleId, bottleIds));
-
-      for (const id of bottleIds) {
-        await tx.insert(bottleTombstones).values({
-          bottleId: id,
-          newBottleId: rootBottleId,
-        });
-      }
       await tx.delete(bottles).where(inArray(bottles.id, bottleIds));
     });
   });
