@@ -56,7 +56,7 @@ test("merge A into B", async () => {
   const [tombstone] = await db
     .select()
     .from(entityTombstones)
-    .where(eq(entities.id, entityA.id));
+    .where(eq(entityTombstones.entityId, entityA.id));
   expect(tombstone.newEntityId).toEqual(newEntityB.id);
 });
 
@@ -92,6 +92,6 @@ test("merge A from B", async () => {
   const [tombstone] = await db
     .select()
     .from(entityTombstones)
-    .where(eq(entities.id, entityB.id));
+    .where(eq(entityTombstones.entityId, entityB.id));
   expect(tombstone.newEntityId).toEqual(newEntityA.id);
 });
