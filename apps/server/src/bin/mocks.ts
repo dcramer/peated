@@ -2,26 +2,26 @@ import { program } from "commander";
 import { and, eq, ne, sql } from "drizzle-orm";
 
 import { db } from "../db";
-import type { Bottle, Entity, Store } from "../db/schema";
-import { bottles, stores, tastings, users } from "../db/schema";
+import type { Bottle, Entity, ExternalSite } from "../db/schema";
+import { bottles, externalSites, tastings, users } from "../db/schema";
 import { createNotification } from "../lib/notifications";
 import { random } from "../lib/rand";
 import * as Fixtures from "../lib/test/fixtures";
 
-const loadDefaultStores = async () => {
+const loadDefaultSites = async () => {
   const store1 =
-    (await db.query.stores.findFirst({
-      where: eq(stores.type, "totalwines"),
+    (await db.query.externalSites.findFirst({
+      where: eq(externalSites.type, "totalwines"),
     })) ||
-    (await Fixtures.Store({
+    (await Fixtures.ExternalSite({
       name: "Total Wine",
       type: "totalwines",
     }));
   const store2 =
-    (await db.query.stores.findFirst({
-      where: eq(stores.type, "woodencork"),
+    (await db.query.externalSites.findFirst({
+      where: eq(externalSites.type, "woodencork"),
     })) ||
-    (await Fixtures.Store({
+    (await Fixtures.ExternalSite({
       name: "Wooden Cork",
       type: "woodencork",
     }));
@@ -70,7 +70,10 @@ const loadDefaultEntities = async () => {
   return results;
 };
 
-const loadDefaultBottles = async (brandList: Entity[], storeList: Store[]) => {
+const loadDefaultBottles = async (
+  brandList: Entity[],
+  siteList: ExternalSite[],
+) => {
   const mocks: Pick<Bottle, "name" | "statedAge" | "brandId">[] = [];
 
   brandList.forEach((brand) => {
@@ -111,17 +114,17 @@ const loadDefaultBottles = async (brandList: Entity[], storeList: Store[]) => {
       })) || (await Fixtures.Bottle(data));
     results.push(bottle);
 
-    for (const store of storeList) {
+    for (const site of siteList) {
       const price =
         (await db.query.storePrices.findFirst({
           where: (storePrices, { eq, and }) =>
             and(
-              eq(storePrices.storeId, store.id),
+              eq(storePrices.externalSiteId, site.id),
               eq(storePrices.bottleId, bottle.id),
             ),
         })) ||
         (await Fixtures.StorePrice({
-          storeId: store.id,
+          externalSiteId: site.id,
           bottleId: bottle.id,
         }));
 
@@ -161,8 +164,8 @@ program
   .action(async (email, options) => {
     // load some realistic entities
     const brandList = await loadDefaultEntities();
-    const storeList = await loadDefaultStores();
-    const bottleList = await loadDefaultBottles(brandList, storeList);
+    const siteList = await loadDefaultSites();
+    const bottleList = await loadDefaultBottles(brandList, siteList);
 
     for (let i = 0; i < options.tastings; i++) {
       const tasting = await Fixtures.Tasting({

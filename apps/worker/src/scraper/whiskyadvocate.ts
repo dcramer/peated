@@ -18,6 +18,7 @@ export default async function main() {
   const uniqueReviews = new Set();
 
   for (const issueName of issueList) {
+    console.log(`Fetching reviews for ${issueName}`);
     await scrapeReviews(
       `https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=${encodeURIComponent(
         issueName,
@@ -31,12 +32,18 @@ export default async function main() {
   }
 
   if (process.env.ACCESS_TOKEN) {
-    console.log("Pushing new price data to API");
+    console.log("Pushing new data to API");
     for (const item of reviewList) {
-      await trpcClient.reviewCreate.mutate({
-        site: "whiskyadvocate",
-        ...item,
-      });
+      console.log(`Submitting [${item.name}]`);
+      try {
+        await trpcClient.reviewCreate.mutate({
+          site: "whiskyadvocate",
+          ...item,
+        });
+      } catch (err) {
+        console.log("here");
+        console.error(err);
+      }
     }
   } else {
     console.log(`Dry Run Complete - ${reviewList.length} products found`);
@@ -102,8 +109,6 @@ export async function scrapeReviews(
     // TODO: remove price
     const category = normalizeCategory(rawCategory.replace(/<br\s\\>.+$/, ""));
 
-    console.log(`${name} - ${rating}`);
-
     cb({
       name,
       category,
@@ -115,5 +120,5 @@ export async function scrapeReviews(
 }
 
 if (typeof require !== "undefined" && require.main === module) {
-  main();
+  main().catch((err) => console.error(err));
 }

@@ -12,6 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { STORE_TYPE_LIST } from "../../constants";
 import { bottles } from "./bottles";
+import { externalSites } from "./externalSites";
 
 export const priceScraperTypeEnum = pgEnum(
   "price_scraper_type",
@@ -43,8 +44,8 @@ export const storePrices = pgTable(
   "store_price",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    storeId: bigint("store_id", { mode: "number" })
-      .references(() => stores.id)
+    externalSiteId: bigint("external_site_id", { mode: "number" })
+      .references(() => externalSites.id)
       .notNull(),
     name: text("name").notNull(),
     bottleId: bigint("bottle_id", { mode: "number" }).references(
@@ -59,7 +60,7 @@ export const storePrices = pgTable(
   (storePrices) => {
     return {
       storeName: uniqueIndex("store_price_unq_name").on(
-        storePrices.storeId,
+        storePrices.externalSiteId,
         storePrices.name,
         storePrices.volume,
       ),
@@ -72,9 +73,9 @@ export const storePricesRelations = relations(storePrices, ({ one }) => ({
     fields: [storePrices.bottleId],
     references: [bottles.id],
   }),
-  store: one(stores, {
-    fields: [storePrices.storeId],
-    references: [stores.id],
+  externalSite: one(externalSites, {
+    fields: [storePrices.externalSiteId],
+    references: [externalSites.id],
   }),
 }));
 

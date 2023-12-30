@@ -9,11 +9,11 @@ export const sitemap: SitemapFunction = () => ({
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Stores",
+      title: "External Sites",
     },
   ];
 };
 
-export default function AdminStoresLayout() {
+export default function AdminSitesLayout() {
   return <Outlet />;
 }

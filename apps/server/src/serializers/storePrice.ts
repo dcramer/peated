@@ -1,10 +1,10 @@
 import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import type { Store, StorePrice, User } from "../db/schema";
+import type { ExternalSite, StorePrice, User } from "../db/schema";
 import type { BottlePriceChangeSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
-import { StoreSerializer } from "./store";
+import { ExternalSiteSerializer } from "./externalSite";
 
 export const StorePriceSerializer = serializer({
   item: (item: StorePrice, attrs: Record<string, any>, currentUser?: User) => {
@@ -19,16 +19,16 @@ export const StorePriceSerializer = serializer({
   },
 });
 
-export const StorePriceWithStoreSerializer = serializer({
+export const StorePriceWithSiteSerializer = serializer({
   attrs: async (
-    itemList: (StorePrice & { store: Store })[],
+    itemList: (StorePrice & { externalSite: ExternalSite })[],
     currentUser?: User,
   ) => {
-    const storesByRef = Object.fromEntries(
+    const sitesByRef = Object.fromEntries(
       (
         await serialize(
-          StoreSerializer,
-          itemList.map((r) => r.store),
+          ExternalSiteSerializer,
+          itemList.map((r) => r.externalSite),
           currentUser,
         )
       ).map((data, index) => [itemList[index].id, data]),
@@ -39,7 +39,7 @@ export const StorePriceWithStoreSerializer = serializer({
         return [
           item.id,
           {
-            store: storesByRef[item.id] || null,
+            site: sitesByRef[item.id] || null,
           },
         ];
       }),
@@ -47,7 +47,7 @@ export const StorePriceWithStoreSerializer = serializer({
   },
 
   item: (
-    item: StorePrice & { store: Store },
+    item: StorePrice & { externalSite: ExternalSite },
     attrs: Record<string, any>,
     currentUser?: User,
   ) => {
@@ -57,7 +57,7 @@ export const StorePriceWithStoreSerializer = serializer({
       price: item.price,
       volume: item.volume,
       url: item.url,
-      store: attrs.store,
+      site: attrs.site,
       updatedAt: item.updatedAt,
     };
   },

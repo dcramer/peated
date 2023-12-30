@@ -20,7 +20,7 @@ export default function Admin() {
       <div className="prose">
         <ul>
           <li>
-            <Link to="/admin/stores">Stores & Pricing Aggregators</Link>
+            <Link to="/admin/sites">External Site Aggregators</Link>
           </li>
           <li>
             <Link to="/admin/badges">Badges</Link>

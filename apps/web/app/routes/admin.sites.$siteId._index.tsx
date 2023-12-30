@@ -10,19 +10,18 @@ export const sitemap: SitemapFunction = () => ({
 });
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
-  invariant(params.storeId);
+  invariant(params.siteId);
 
-  const url = new URL(request.url);
-  const page = Number(url.searchParams.get("page") || 1);
+  const { searchParams } = new URL(request.url);
   const priceList = await context.trpc.storePriceList.query({
-    store: Number(params.storeId),
-    page,
+    site: params.siteId as any,
+    ...Object.fromEntries(searchParams.entries()),
   });
 
   return json({ priceList });
 };
 
-export default function AdminStoreDetails() {
+export default function AdminSiteDetails() {
   const { priceList } = useLoaderData<typeof loader>();
 
   return (

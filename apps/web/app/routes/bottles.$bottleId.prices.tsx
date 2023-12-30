@@ -32,7 +32,7 @@ export default function BottlePrices() {
             return (
               <li key={price.id}>
                 <a href={price.url} className="flex hover:underline">
-                  <span className="flex-auto">{price.store?.name}</span>
+                  <span className="flex-auto">{price.site?.name}</span>
                   <span>${(price.price / 100).toFixed(2)}</span>
                 </a>
                 <span className="text-light text-xs">

@@ -1,12 +1,15 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  externalSites,
   storePriceHistories,
   storePrices,
-  stores,
 } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
-import { StorePriceInputSchema } from "@peated/server/schemas";
+import {
+  ExternalSiteTypeEnum,
+  StorePriceInputSchema,
+} from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -15,18 +18,18 @@ import { adminProcedure } from "..";
 export default adminProcedure
   .input(
     z.object({
-      store: z.number(),
+      site: ExternalSiteTypeEnum,
       prices: z.array(StorePriceInputSchema),
     }),
   )
   .mutation(async function ({ input }) {
-    const store = await db.query.stores.findFirst({
-      where: eq(stores.id, input.store),
+    const site = await db.query.externalSites.findFirst({
+      where: eq(externalSites.type, input.site),
     });
 
-    if (!store) {
+    if (!site) {
       throw new TRPCError({
-        message: "Store not found",
+        message: "Site not found",
         code: "NOT_FOUND",
       });
     }
@@ -39,14 +42,18 @@ export default adminProcedure
           .insert(storePrices)
           .values({
             bottleId,
-            storeId: store.id,
+            externalSiteId: site.id,
             name: sp.name,
             price: sp.price,
             volume: sp.volume,
             url: sp.url,
           })
           .onConflictDoUpdate({
-            target: [storePrices.storeId, storePrices.name, storePrices.volume],
+            target: [
+              storePrices.externalSiteId,
+              storePrices.name,
+              storePrices.volume,
+            ],
             set: {
               bottleId,
               price: sp.price,
@@ -80,9 +87,9 @@ export default adminProcedure
     }
 
     await db
-      .update(stores)
+      .update(externalSites)
       .set({ lastRunAt: sql`NOW()` })
-      .where(eq(stores.id, store.id));
+      .where(eq(externalSites.id, site.id));
 
     return {};
   });

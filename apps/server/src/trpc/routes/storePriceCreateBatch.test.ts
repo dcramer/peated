@@ -9,12 +9,12 @@ test("requires admin", async () => {
     user: await Fixtures.User({ mod: true }),
   });
   expect(() =>
-    caller.storePriceCreateBatch({ store: 1, prices: [] }),
+    caller.storePriceCreateBatch({ site: "healthyspirits", prices: [] }),
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("processes new price", async () => {
-  const store = await Fixtures.Store({ type: "totalwines" });
+  const site = await Fixtures.ExternalSite({ type: "totalwines" });
   const bottle = await Fixtures.Bottle({
     name: "10-year-old",
     brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
@@ -25,7 +25,7 @@ test("processes new price", async () => {
     user: await Fixtures.User({ admin: true }),
   });
   await caller.storePriceCreateBatch({
-    store: store.id,
+    site: site.type,
     prices: [
       {
         name: "Ardbeg 10-year-old",
@@ -39,7 +39,7 @@ test("processes new price", async () => {
   const prices = await db
     .select()
     .from(storePrices)
-    .where(eq(storePrices.storeId, store.id));
+    .where(eq(storePrices.externalSiteId, site.id));
   expect(prices.length).toBe(1);
   expect(prices[0].bottleId).toBe(bottle.id);
   expect(prices[0].price).toBe(9999);
@@ -48,7 +48,7 @@ test("processes new price", async () => {
 });
 
 test("processes existing price", async () => {
-  const store = await Fixtures.Store({ type: "totalwines" });
+  const site = await Fixtures.ExternalSite({ type: "totalwines" });
   const bottle = await Fixtures.Bottle({
     name: "10-year-old",
     brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
@@ -56,7 +56,7 @@ test("processes existing price", async () => {
   expect(bottle.fullName).toBe("Ardbeg 10-year-old");
   const existingPrice = await Fixtures.StorePrice({
     bottleId: bottle.id,
-    storeId: store.id,
+    externalSiteId: site.id,
   });
   expect(existingPrice.name).toBe(bottle.fullName);
 
@@ -64,7 +64,7 @@ test("processes existing price", async () => {
     user: await Fixtures.User({ admin: true }),
   });
   await caller.storePriceCreateBatch({
-    store: store.id,
+    site: site.type,
     prices: [
       {
         name: "Ardbeg 10-year-old",
@@ -78,7 +78,7 @@ test("processes existing price", async () => {
   const prices = await db
     .select()
     .from(storePrices)
-    .where(eq(storePrices.storeId, store.id));
+    .where(eq(storePrices.externalSiteId, site.id));
 
   expect(prices.length).toBe(1);
   expect(prices[0].id).toBe(existingPrice.id);
@@ -89,13 +89,13 @@ test("processes existing price", async () => {
 });
 
 test("processes new price without bottle", async () => {
-  const store = await Fixtures.Store({ type: "totalwines" });
+  const site = await Fixtures.ExternalSite({ type: "totalwines" });
 
   const caller = appRouter.createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   await caller.storePriceCreateBatch({
-    store: store.id,
+    site: site.type,
     prices: [
       {
         name: "Ardbeg 10-year-old",
@@ -109,7 +109,7 @@ test("processes new price without bottle", async () => {
   const prices = await db
     .select()
     .from(storePrices)
-    .where(eq(storePrices.storeId, store.id));
+    .where(eq(storePrices.externalSiteId, site.id));
   expect(prices.length).toBe(1);
   expect(prices[0].bottleId).toBeNull();
   expect(prices[0].price).toBe(2999);

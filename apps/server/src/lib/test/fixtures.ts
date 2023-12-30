@@ -19,7 +19,6 @@ import type {
   NewExternalSite,
   NewFlight,
   NewFollow,
-  NewStore,
   NewStorePrice,
   NewStorePriceHistory,
   NewTasting,
@@ -42,7 +41,6 @@ import {
   follows,
   storePriceHistories,
   storePrices,
-  stores,
   tastings,
   toasts,
   users,
@@ -332,20 +330,6 @@ export const ExternalSite = async ({
   )[0];
 };
 
-export const Store = async ({ ...data }: Partial<NewStore> = {}) => {
-  return (
-    await db
-      .insert(stores)
-      .values({
-        name: faker.company.name(),
-        country: faker.location.country(),
-        type: "totalwines",
-        ...data,
-      })
-      .returning()
-  )[0];
-};
-
 export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
   if (!data.name) {
     const bottle = data.bottleId
@@ -373,10 +357,14 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
         volume: 750,
         url: "",
         ...data,
-        storeId: data.storeId || (await Store()).id,
+        externalSiteId: data.externalSiteId || (await ExternalSite()).id,
       })
       .onConflictDoUpdate({
-        target: [storePrices.storeId, storePrices.name, storePrices.volume],
+        target: [
+          storePrices.externalSiteId,
+          storePrices.name,
+          storePrices.volume,
+        ],
         set: {
           bottleId: data.bottleId,
           price: data.price,

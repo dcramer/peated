@@ -13,14 +13,14 @@ export const sitemap: SitemapFunction = () => ({
 });
 
 export async function loader({
-  params: { storeId },
+  params: { siteId },
   context: { trpc },
 }: LoaderFunctionArgs) {
-  invariant(storeId);
+  invariant(siteId);
 
-  const store = await trpc.storeById.query(Number(storeId));
+  const site = await trpc.externalSiteByType.query(siteId as any);
 
-  return json({ store });
+  return json({ site });
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -28,13 +28,13 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
   return [
     {
-      title: data.store.name,
+      title: data.site.name,
     },
   ];
 };
 
-export default function AdminStoreDetails() {
-  const { store } = useLoaderData<typeof loader>();
+export default function AdminSiteDetails() {
+  const { site } = useLoaderData<typeof loader>();
 
   return (
     <div>
@@ -45,17 +45,17 @@ export default function AdminStoreDetails() {
             to: "/admin",
           },
           {
-            name: "Stores",
-            to: "/admin/stores",
+            name: "External Sites",
+            to: "/admin/sites",
           },
           {
-            name: store.name,
-            to: `/admin/stores/${store.id}`,
+            name: site.name,
+            to: `/admin/sites/${site.id}`,
             current: true,
           },
         ]}
       />
-      <Outlet context={{ store }} />
+      <Outlet context={{ site }} />
     </div>
   );
 }

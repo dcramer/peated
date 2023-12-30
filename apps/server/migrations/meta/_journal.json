@@ -477,6 +477,20 @@
       "when": 1703895335531,
       "tag": "0067_sudden_black_queen",
       "breakpoints": false
+    },
+    {
+      "idx": 68,
+      "version": "5",
+      "when": 1703897264737,
+      "tag": "0068_white_jasper_sitwell",
+      "breakpoints": false
+    },
+    {
+      "idx": 69,
+      "version": "5",
+      "when": 1703897555861,
+      "tag": "0069_faithful_venom",
+      "breakpoints": false
     }
   ]
 }

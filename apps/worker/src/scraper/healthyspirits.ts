@@ -88,7 +88,11 @@ export default async function main() {
 
   if (process.env.ACCESS_TOKEN) {
     console.log("Pushing new price data to API");
-    chunked(products, 100, async (items) => await submitStorePrices(4, items));
+    chunked(
+      products,
+      100,
+      async (items) => await submitStorePrices("healthyspirits", items),
+    );
   } else {
     console.log(`Dry Run Complete - ${products.length} products found`);
   }

@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
-import { bottles, storePrices, stores } from "@peated/server/db/schema";
+import { bottles, externalSites, storePrices } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
-import { StorePriceWithStoreSerializer } from "@peated/server/serializers/storePrice";
+import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
 import { TRPCError } from "@trpc/server";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -29,10 +29,13 @@ export default publicProcedure
     const results = await db
       .select({
         ...getTableColumns(storePrices),
-        store: stores,
+        externalSite: externalSites,
       })
       .from(storePrices)
-      .innerJoin(stores, eq(storePrices.storeId, stores.id))
+      .innerJoin(
+        externalSites,
+        eq(storePrices.externalSiteId, externalSites.id),
+      )
       .where(
         and(
           eq(storePrices.bottleId, bottle.id),
@@ -41,10 +44,6 @@ export default publicProcedure
       );
 
     return {
-      results: await serialize(
-        StorePriceWithStoreSerializer,
-        results,
-        ctx.user,
-      ),
+      results: await serialize(StorePriceWithSiteSerializer, results, ctx.user),
     };
   });

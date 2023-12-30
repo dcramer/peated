@@ -44,9 +44,6 @@ import notificationUpdate from "./routes/notificationUpdate";
 import priceChangeList from "./routes/priceChangeList";
 import reviewCreate from "./routes/reviewCreate";
 import stats from "./routes/stats";
-import storeById from "./routes/storeById";
-import storeCreate from "./routes/storeCreate";
-import storeList from "./routes/storeList";
 import storePriceCreateBatch from "./routes/storePriceCreateBatch";
 import storePriceList from "./routes/storePriceList";
 import tastingById from "./routes/tastingById";
@@ -108,9 +105,6 @@ export const appRouter = router({
   priceChangeList,
   reviewCreate,
   stats,
-  storeById,
-  storeCreate,
-  storeList,
   storePriceList,
   storePriceCreateBatch,
   tastingById,
