@@ -128,11 +128,11 @@ export default function Sidebar() {
                   </div>
                   <ul role="list" className="-mx-2 space-y-1">
                     <SidebarLink
-                      to="/admin/stores"
+                      to="/admin/sites"
                       icon={Cog6ToothIcon}
-                      active={location.pathname.startsWith("/admin/stores")}
+                      active={location.pathname.startsWith("/admin/sites")}
                     >
-                      Stores
+                      Sites
                     </SidebarLink>
                     <SidebarLink
                       to="/admin/badges"
