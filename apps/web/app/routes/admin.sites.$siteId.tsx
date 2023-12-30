@@ -4,9 +4,11 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
+import QueryBoundary from "../components/queryBoundary";
+import Tabs from "../components/tabs";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
@@ -55,7 +57,22 @@ export default function AdminSiteDetails() {
           },
         ]}
       />
-      <Outlet context={{ site }} />
+
+      <Tabs fullWidth border>
+        <Tabs.Item as={Link} to={`/admin/sites/${site.type}`} controlled>
+          Prices
+        </Tabs.Item>
+        <Tabs.Item
+          as={Link}
+          to={`/admin/sites/${site.type}/reviews`}
+          controlled
+        >
+          Reviews
+        </Tabs.Item>
+      </Tabs>
+      <QueryBoundary>
+        <Outlet context={{ site }} />
+      </QueryBoundary>
     </div>
   );
 }

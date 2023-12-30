@@ -12,34 +12,43 @@ import { adminProcedure } from "..";
 
 export default adminProcedure
   .input(
-    z.object({
-      site: ExternalSiteTypeEnum,
-      query: z.string().default(""),
-      cursor: z.number().gte(1).default(1),
-      limit: z.number().gte(1).lte(100).default(100),
-    }),
+    z
+      .object({
+        site: ExternalSiteTypeEnum.optional(),
+        query: z.string().default(""),
+        cursor: z.number().gte(1).default(1),
+        limit: z.number().gte(1).lte(100).default(100),
+      })
+      .default({
+        query: "",
+        cursor: 1,
+        limit: 100,
+      }),
   )
   .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
-    const site = await db.query.externalSites.findFirst({
-      where: eq(externalSites.type, input.site),
-    });
-
-    if (!site) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Site not found",
-      });
-    }
-
-    const offset = (cursor - 1) * limit;
-
-    const where: SQL[] = [
-      eq(storePrices.externalSiteId, site.id),
+    const where: (SQL<unknown> | undefined)[] = [
       sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
     ];
+
+    if (input.site) {
+      const site = await db.query.externalSites.findFirst({
+        where: eq(externalSites.type, input.site),
+      });
+
+      if (!site) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Site not found",
+        });
+      }
+      where.push(eq(storePrices.externalSiteId, site.id));
+    }
+
     if (query) {
       where.push(ilike(storePrices.name, `%${query}%`));
     }
+
+    const offset = (cursor - 1) * limit;
 
     const results = await db
       .select()

@@ -19,6 +19,7 @@ import type {
   NewExternalSite,
   NewFlight,
   NewFollow,
+  NewReview,
   NewStorePrice,
   NewStorePriceHistory,
   NewTasting,
@@ -39,6 +40,7 @@ import {
   flightBottles,
   flights,
   follows,
+  reviews,
   storePriceHistories,
   storePrices,
   tastings,
@@ -82,6 +84,7 @@ export const Follow = async ({ ...data }: Partial<NewFollow> = {}) => {
 
 export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
   const name = faker.company.name();
+  // XXX(dcramer): not ideal
   const existing = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.name, name),
   });
@@ -318,13 +321,19 @@ export const Badge = async ({ ...data }: Partial<NewBadge> = {}) => {
 export const ExternalSite = async ({
   ...data
 }: Partial<NewExternalSite> = {}) => {
+  if (!data.type) data.type = choose([...EXTERNAL_SITE_TYPE_LIST]);
+  // XXX(dcramer): not ideal
+  const existing = await db.query.externalSites.findFirst({
+    where: (externalSites, { eq }) => eq(externalSites.type, data.type as any),
+  });
+  if (existing) return existing;
+
   return (
     await db
       .insert(externalSites)
       .values({
         name: faker.company.name(),
-        type: choose([...EXTERNAL_SITE_TYPE_LIST]),
-        ...data,
+        ...(data as Omit<NewExternalSite, "name">),
       })
       .returning()
   )[0];
@@ -399,6 +408,34 @@ export const StorePriceHistory = async ({
         volume: 750,
         ...data,
         priceId: data.priceId || (await StorePrice()).id,
+      })
+      .returning()
+  )[0];
+};
+
+export const Review = async ({ ...data }: Partial<NewReview> = {}) => {
+  if (!data.name) {
+    const bottle = data.bottleId
+      ? await db.query.bottles.findFirst({
+          where: eq(bottles.id, data.bottleId),
+          with: { brand: true },
+        })
+      : await Bottle();
+    if (!bottle) throw new Error("Unexpected");
+    data.bottleId = bottle.id;
+    data.name = bottle.fullName;
+  }
+
+  return (
+    await db
+      .insert(reviews)
+      .values({
+        name: "",
+        externalSiteId: data.externalSiteId || (await ExternalSite()).id,
+        rating: faker.number.int({ min: 30, max: 100 }),
+        url: faker.internet.url(),
+        issue: "Default",
+        ...data,
       })
       .returning()
   )[0];

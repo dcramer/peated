@@ -49,7 +49,7 @@ export async function submitEntity(data: any) {
 
 export async function submitStorePrices(site: string, data: StorePrice[]) {
   try {
-    await trpcClient.storePriceCreateBatch.mutate({
+    await trpcClient.priceCreateBatch.mutate({
       // TODO: type this
       site: site as any,
       prices: data,
