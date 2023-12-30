@@ -9,6 +9,8 @@ import { migrate } from "../db/migrate";
 import "../lib/test/expects";
 import { AuthenticatedHeaders, User } from "../lib/test/fixtures";
 
+vi.mock("../jobs");
+
 global.DefaultFixtures = {};
 
 const pgTables = pgTable("pg_tables", {

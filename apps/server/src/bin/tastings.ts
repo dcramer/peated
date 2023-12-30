@@ -1,6 +1,6 @@
 import { program } from "commander";
 import { db } from "../db";
-import pushJob, { shutdownClient } from "../jobs";
+import { pushJob, shutdownClient } from "../jobs";
 
 program.name("tastings").description("CLI for assisting with tasting admin");
 

@@ -277,16 +277,12 @@ export const CATEGORY_LIST = [
 
 export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
-export const STORE_TYPE_LIST = [
+export const EXTERNAL_SITE_TYPE_LIST = [
   "astorwines",
   "healthyspirits",
   // TODO: rename to totalwine
   "totalwines",
   "woodencork",
-] as const;
-
-export const EXTERNAL_SITE_TYPE_LIST = [
-  ...STORE_TYPE_LIST,
   "whiskyadvocate",
 ] as const;
 

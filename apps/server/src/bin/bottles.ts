@@ -11,7 +11,7 @@ import {
   storePrices,
   tastings,
 } from "../db/schema";
-import pushJob, { shutdownClient } from "../jobs";
+import { pushJob, shutdownClient } from "../jobs";
 
 program.name("bottles").description("CLI for assisting with bottle admin");
 

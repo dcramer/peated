@@ -8,6 +8,6 @@
       "@peated/server/*": ["src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "src/jobs.ts"],
   "exclude": ["src/test/setup-test-env.ts"]
 }

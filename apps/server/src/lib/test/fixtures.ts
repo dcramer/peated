@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { generatePublicId } from "@peated/server/lib/publicId";
+import { type ExternalSiteType } from "@peated/server/types";
 import { eq, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
@@ -324,7 +325,8 @@ export const ExternalSite = async ({
   if (!data.type) data.type = choose([...EXTERNAL_SITE_TYPE_LIST]);
   // XXX(dcramer): not ideal
   const existing = await db.query.externalSites.findFirst({
-    where: (externalSites, { eq }) => eq(externalSites.type, data.type as any),
+    where: (externalSites, { eq }) =>
+      eq(externalSites.type, data.type as ExternalSiteType),
   });
   if (existing) return existing;
 

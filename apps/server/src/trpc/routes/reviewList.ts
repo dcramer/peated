@@ -45,7 +45,8 @@ export default publicProcedure
 
     if (input.bottle) {
       where.push(eq(reviews.bottleId, input.bottle));
-    } else if (!ctx.user?.mod) {
+    } else if (!ctx.user?.admin && !ctx.user?.mod) {
+      console.error(`User requested reviewList without mod: ${ctx.user?.id}`);
       throw new TRPCError({
         code: "BAD_REQUEST",
       });

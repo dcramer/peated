@@ -1,5 +1,6 @@
 import {
   bigserial,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -20,6 +21,9 @@ export const externalSites = pgTable(
     type: externalSiteTypeEnum("type").notNull(),
     name: text("name").notNull(),
     lastRunAt: timestamp("last_run_at"),
+    nextRunAt: timestamp("next_run_at"),
+    // minutes
+    runEvery: integer("run_every").default(60),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (externalSites) => {

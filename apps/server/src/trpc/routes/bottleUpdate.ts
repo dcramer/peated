@@ -7,7 +7,7 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
-import pushJob from "@peated/server/jobs";
+import { pushJob } from "@peated/server/jobs";
 import { logError } from "@peated/server/lib/log";
 import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";

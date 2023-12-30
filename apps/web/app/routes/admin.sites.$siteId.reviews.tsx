@@ -1,10 +1,11 @@
+import { type ExternalSiteType } from "@peated/server/types";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import { json, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
-
 import ReviewTable from "../components/admin/reviewTable";
+
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
@@ -14,7 +15,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   const { searchParams } = new URL(request.url);
   const reviewList = await context.trpc.reviewList.query({
-    site: params.siteId as any,
+    site: params.siteId as ExternalSiteType,
     ...Object.fromEntries(searchParams.entries()),
   });
 

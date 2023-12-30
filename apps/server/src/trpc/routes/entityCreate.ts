@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import type { NewEntity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
-import pushJob from "@peated/server/jobs";
+import { pushJob } from "@peated/server/jobs";
 import { logError } from "@peated/server/lib/log";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";

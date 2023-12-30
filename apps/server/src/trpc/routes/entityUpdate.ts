@@ -6,7 +6,7 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
-import pushJob from "@peated/server/jobs";
+import { pushJob } from "@peated/server/jobs";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
 import { EntityInputSchema } from "@peated/server/schemas";

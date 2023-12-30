@@ -498,6 +498,13 @@
       "when": 1703899604084,
       "tag": "0070_sudden_arclight",
       "breakpoints": false
+    },
+    {
+      "idx": 71,
+      "version": "5",
+      "when": 1703960675097,
+      "tag": "0071_powerful_korvac",
+      "breakpoints": false
     }
   ]
 }

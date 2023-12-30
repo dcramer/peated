@@ -4,20 +4,13 @@ import {
   bigserial,
   date,
   integer,
-  pgEnum,
   pgTable,
   text,
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { STORE_TYPE_LIST } from "../../constants";
 import { bottles } from "./bottles";
 import { externalSites } from "./externalSites";
-
-export const priceScraperTypeEnum = pgEnum(
-  "price_scraper_type",
-  STORE_TYPE_LIST,
-);
 
 export const storePrices = pgTable(
   "store_price",

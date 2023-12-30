@@ -3,8 +3,8 @@ import type {
   BADGE_TYPE_LIST,
   CATEGORY_LIST,
   COUNTRY_LIST,
+  EXTERNAL_SITE_TYPE_LIST,
   SERVING_STYLE_LIST,
-  STORE_TYPE_LIST,
 } from "./constants";
 import type {
   BadgeSchema,
@@ -15,6 +15,7 @@ import type {
   CommentSchema,
   EntitySchema,
   EntityTypeEnum,
+  ExternalSiteSchema,
   FlightSchema,
   FollowSchema,
   FollowStatusEnum,
@@ -31,7 +32,7 @@ import type {
 
 export type Category = (typeof CATEGORY_LIST)[number];
 export type ServingStyle = (typeof SERVING_STYLE_LIST)[number];
-export type StoreType = (typeof STORE_TYPE_LIST)[number];
+export type ExternalSiteType = (typeof EXTERNAL_SITE_TYPE_LIST)[number];
 export type Country = (typeof COUNTRY_LIST)[number];
 export type BadgeType = (typeof BADGE_TYPE_LIST)[number];
 
@@ -47,6 +48,7 @@ export type Change = z.infer<typeof ChangeSchema>;
 export type Collection = z.infer<typeof CollectionSchema>;
 export type CollectionBottle = z.infer<typeof CollectionBottleSchema>;
 export type Comment = z.infer<typeof CommentSchema>;
+export type ExternalSite = z.infer<typeof ExternalSiteSchema>;
 export type Entity = z.infer<typeof EntitySchema>;
 export type Flight = z.infer<typeof FlightSchema>;
 export type Follow = z.infer<typeof FollowSchema>;

@@ -1,3 +1,4 @@
+import { type ExternalSiteType } from "@peated/server/src/types";
 import StorePriceTable from "@peated/web/components/admin/storePriceTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import { json, type LoaderFunction } from "@remix-run/node";
@@ -14,7 +15,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   const { searchParams } = new URL(request.url);
   const priceList = await context.trpc.priceList.query({
-    site: params.siteId as any,
+    site: params.siteId as ExternalSiteType,
     ...Object.fromEntries(searchParams.entries()),
   });
 

@@ -1,7 +1,6 @@
 import { Link } from "@remix-run/react";
 
-import { type ExternalSite } from "@peated/server/db/schema";
-import type { PagingRel } from "@peated/server/types";
+import type { ExternalSite, PagingRel } from "@peated/server/types";
 import Button from "../button";
 import TimeSince from "../timeSince";
 

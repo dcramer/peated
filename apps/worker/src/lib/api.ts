@@ -1,4 +1,5 @@
 import { makeTRPCClient } from "@peated/server/lib/trpc";
+import { type ExternalSiteType } from "@peated/server/src/types";
 import config from "@peated/worker/config";
 import { type StorePrice } from "@peated/worker/types";
 import { captureException } from "@sentry/node-experimental";
@@ -51,7 +52,7 @@ export async function submitStorePrices(site: string, data: StorePrice[]) {
   try {
     await trpcClient.priceCreateBatch.mutate({
       // TODO: type this
-      site: site as any,
+      site: site as ExternalSiteType,
       prices: data,
     });
   } catch (err: any) {

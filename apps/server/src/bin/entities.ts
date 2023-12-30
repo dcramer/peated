@@ -1,6 +1,6 @@
 import { program } from "commander";
 import { db } from "../db";
-import pushJob, { shutdownClient } from "../jobs";
+import { pushJob, shutdownClient } from "../jobs";
 
 program.name("entities").description("CLI for assisting with entity admin");
 
