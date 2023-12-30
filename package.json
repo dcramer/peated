@@ -24,6 +24,7 @@
     "typecheck": "pnpm -r --parallel run typecheck",
     "test": "pnpm -r --stream --parallel run test",
     "test:ci": "CI=true pnpm -r run test:ci",
+    "test:watch": "pnpm -r --stream --parallel run test:watch",
     "token": "dotenv -e .env.local -- pnpm --filter='./apps/server' token",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",

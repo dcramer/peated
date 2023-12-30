@@ -14,6 +14,7 @@
     "logos": "ts-node --require dotenv/config ./src/logos.ts",
     "start": "ts-node --require dotenv/config ./src/main.ts",
     "test": "dotenv -e .env.test -- vitest --no-threads",
+    "test:watch": "dotenv -e .env.test -- vitest --no-threads",
     "test:ci": "dotenv -e .env.test -- vitest --no-threads --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
   },
   "dependencies": {
