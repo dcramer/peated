@@ -23,7 +23,7 @@ export default function BottlePrices() {
   if (!priceList) return null;
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 px-3 lg:px-0">
       <BetaNotice>This is a work in progress.</BetaNotice>
 
       {priceList.results.length ? (

@@ -17,7 +17,6 @@ import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { json, redirect } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import BottleHeader from "../components/bottleHeader";
-import BottlePriceHistory from "../components/bottlePriceHistory.client";
 import CollectionAction from "../components/collectionAction";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -75,18 +74,6 @@ export default function BottleDetails() {
   const navigate = useNavigate();
 
   const { bottle } = useLoaderData<typeof loader>();
-
-  const stats = [
-    {
-      name: "Avg Rating",
-      value:
-        bottle.avgRating !== null
-          ? Math.round(bottle.avgRating * 100) / 100
-          : "",
-    },
-    { name: "Tastings", value: bottle.totalTastings.toLocaleString() },
-    { name: "People", value: bottle.people.toLocaleString() },
-  ];
 
   const deleteBottleMutation = trpc.bottleDelete.useMutation();
   const deleteBottle = async () => {
@@ -149,25 +136,6 @@ export default function BottleDetails() {
               </Menu.Items>
             </Menu>
           )}
-        </div>
-
-        <div className="my-6 grid grid-cols-3 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">
-          {stats.map((stat) => (
-            <div key={stat.name}>
-              <div className="text-light leading-7">{stat.name}</div>
-              <div className="order-first text-3xl font-semibold tracking-tight lg:text-5xl">
-                {stat.value || "-"}
-              </div>
-            </div>
-          ))}
-          <div className="hidden lg:block">
-            <div className="text-light leading-7">Price</div>
-            <div className="flex items-center">
-              <ClientOnly fallback={<div className="h-[45px] animate-pulse" />}>
-                {() => <BottlePriceHistory bottleId={bottle.id} />}
-              </ClientOnly>
-            </div>
-          </div>
         </div>
       </div>
 

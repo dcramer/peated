@@ -39,6 +39,7 @@ export default function BottleHeader({
                   to={`/bottles?category=${encodeURIComponent(
                     bottle.category,
                   )}`}
+                  className="hover:underline"
                 >
                   {formatCategoryName(bottle.category)}
                 </Link>
