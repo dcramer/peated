@@ -1,3 +1,4 @@
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { type Bottle } from "@peated/server/types";
 import { type ComponentPropsWithoutRef } from "react";
 import useAuth from "../hooks/useAuth";
@@ -61,6 +62,16 @@ export default function BottlePanel({
         </Button>
 
         <ShareButton title={bottle.fullName} url={`/bottles/${bottle.id}`} />
+
+        <Button
+          to={`/bottles/${bottle.id}`}
+          icon={
+            <ArrowTopRightOnSquareIcon
+              className="-mr-0.5 h-5 w-5"
+              aria-hidden="true"
+            />
+          }
+        />
       </div>
 
       <div className="my-6 grid grid-cols-3 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">

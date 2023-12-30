@@ -19,6 +19,7 @@ type BaseProps = {
   fullWidth?: boolean;
   fullHeight?: boolean;
   className?: string;
+  title?: string;
 };
 
 type ConditionalProps =
@@ -52,7 +53,7 @@ export default forwardRef<null | HTMLButtonElement | typeof Link, Props>(
     ref,
   ) => {
     const defaultClassName =
-      "inline-flex justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
+      "inline-flex spacing-2-x justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
 
     let textColor = "text-white";
     let colorClassName;
