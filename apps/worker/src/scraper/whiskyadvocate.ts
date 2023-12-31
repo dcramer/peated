@@ -20,38 +20,29 @@ export default async function main() {
 
   console.log(`Found ${issueList.length} issues`);
 
-  const reviewList: BottleReview[] = [];
-  const uniqueReviews = new Set();
-
   for (const issueName of issueList) {
     console.log(`Fetching reviews for ${issueName}`);
     await scrapeReviews(
       `https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=${encodeURIComponent(
         issueName,
       )}&order_by=published_desc`,
-      async (bottle) => {
-        if (uniqueReviews.has(bottle.name)) return;
-        reviewList.push(bottle);
-        uniqueReviews.add(bottle.name);
+      async (item) => {
+        if (process.env.ACCESS_TOKEN) {
+          console.log(`Submitting [${item.name}]`);
+
+          try {
+            await trpcClient.reviewCreate.mutate({
+              site: "whiskyadvocate",
+              ...item,
+            });
+          } catch (err) {
+            console.error(err);
+          }
+        } else {
+          console.log(`Dry Run [${item.name}]`);
+        }
       },
     );
-  }
-
-  if (process.env.ACCESS_TOKEN) {
-    console.log("Pushing new data to API");
-    for (const item of reviewList) {
-      console.log(`Submitting [${item.name}]`);
-      try {
-        await trpcClient.reviewCreate.mutate({
-          site: "whiskyadvocate",
-          ...item,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  } else {
-    console.log(`Dry Run Complete - ${reviewList.length} products found`);
   }
 }
 
@@ -111,7 +102,6 @@ export async function scrapeReviews(
 
     // <h6>Single Malt Scotch<br />$116</h6>
     const rawCategory = $(".postsItemContent h6", el).first().text().trim();
-    // TODO: remove price
     const category = normalizeCategory(rawCategory.replace(/<br\s\\>.+$/, ""));
 
     cb({

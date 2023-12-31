@@ -25,6 +25,7 @@ Sentry.init({
   integrations: [new ProfilingIntegration()],
   spotlight: process.env.NODE_ENV === "development",
 });
+
 Sentry.setTag("service", packageData.name);
 
 async function main() {

@@ -29,7 +29,8 @@ export async function getUrl(
     ({ data, status } = await cacheUrl(url, filename));
   } else {
     const fs = await open(filename, "r");
-    ({ data, status } = JSON.parse((await fs.readFile()).toString()));
+    const payload = await fs.readFile();
+    ({ data, status } = JSON.parse(payload.toString("utf8")));
     await fs.close();
   }
 
@@ -58,7 +59,7 @@ export async function cacheUrl(url: string, filename: string) {
   await fs.writeFile(
     JSON.stringify({
       status,
-      data,
+      data: data.toString(),
     }),
   );
   await fs.close();
