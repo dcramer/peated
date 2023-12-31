@@ -1,9 +1,11 @@
+// make sure to import this _before_ all other code
+import "../sentry";
+
 import type { SQLChunk } from "drizzle-orm";
 import { SQL, StringChunk, eq } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
-import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
-
 import { Client } from "pg";
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 import { db, pool } from "../db";
 import { migrate } from "../db/migrate";
 import "../lib/test/expects";

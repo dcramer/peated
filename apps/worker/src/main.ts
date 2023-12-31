@@ -1,9 +1,10 @@
+// make sure to import this _before_ all other code
+import "./sentry";
+
 import { registerJob } from "@peated/server/jobs";
 import * as Sentry from "@sentry/node-experimental";
-import { ProfilingIntegration } from "@sentry/profiling-node";
 import type { JobFunction } from "faktory-worker";
 import faktory from "faktory-worker";
-import packageData from "../package.json";
 import generateBottleDetails from "./jobs/generateBottleDetails";
 import generateEntityDetails from "./jobs/generateEntityDetails";
 import notifyDiscordOnTasting from "./jobs/notifyDiscordOnTasting";
@@ -14,19 +15,6 @@ import scrapeTotalWine from "./jobs/scrapeTotalWine";
 import scrapeWhiskeyAdvocate from "./jobs/scrapeWhiskyAdvocate";
 import scrapeWoodenCork from "./jobs/scrapeWoodenCork";
 import { scheduledJob, scheduler } from "./lib/cron";
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  release: process.env.VERSION,
-  environment:
-    process.env.NODE_ENV === "production" ? "production" : "development",
-  tracesSampleRate: 1.0,
-  profilesSampleRate: 1.0,
-  integrations: [new ProfilingIntegration()],
-  spotlight: process.env.NODE_ENV === "development",
-});
-
-Sentry.setTag("service", packageData.name);
 
 async function main() {
   // dont run the scraper in dev
