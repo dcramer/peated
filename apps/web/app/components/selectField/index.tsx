@@ -162,7 +162,7 @@ export default ({
           </Chip>
         ))}
         {visibleValues.length === 0 && placeholder && (
-          <div className="text-slate-500 sm:leading-6">{placeholder}</div>
+          <div className="text-light sm:leading-6">{placeholder}</div>
         )}
         {visibleValues.length > 0 &&
           value.length < targetOptions &&

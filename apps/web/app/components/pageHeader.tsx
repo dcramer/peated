@@ -27,7 +27,7 @@ export default function PageHeader({
       </div>
 
       {!!metadata && (
-        <div className="flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 text-slate-500 lg:w-auto lg:items-end">
+        <div className="text-light flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 lg:w-auto lg:items-end">
           {metadata}
         </div>
       )}

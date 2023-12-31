@@ -45,10 +45,10 @@ export default function BottleResultRow({
       </div>
       <div className="flex items-center gap-x-4">
         <div className="hidden sm:flex sm:flex-col sm:items-end">
-          <div className="leading-6 text-slate-500">
+          <div className="text-light leading-6">
             {bottle.category && formatCategoryName(bottle.category)}
           </div>
-          <div className="mt-1 text-sm leading-5 text-slate-500">
+          <div className="text-light mt-1 text-sm leading-5">
             {bottle.statedAge ? `${bottle.statedAge} years` : null}
           </div>
         </div>

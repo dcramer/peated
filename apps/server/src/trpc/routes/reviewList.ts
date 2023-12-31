@@ -70,6 +70,7 @@ export default publicProcedure
         ReviewSerializer,
         results.slice(0, limit),
         ctx.user,
+        [...(input.site ? ["site"] : []), ...(input.bottle ? ["bottle"] : [])],
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

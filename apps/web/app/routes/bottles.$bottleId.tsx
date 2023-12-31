@@ -154,7 +154,7 @@ export default function BottleDetails() {
       <Outlet context={{ bottle }} />
 
       {bottle.createdBy && (
-        <div className="mt-8 text-center text-sm text-slate-500 sm:text-left">
+        <div className="text-light mt-8 text-center text-sm sm:text-left">
           This bottle was first added by{" "}
           <Link
             to={`/users/${bottle.createdBy.username}`}

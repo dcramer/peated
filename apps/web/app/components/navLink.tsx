@@ -10,7 +10,7 @@ export default function NavLink(props: ComponentProps<typeof RRNavLink>) {
       className={({ isActive, isPending }) =>
         classNames(
           baseClassNames,
-          isActive ? "text-highlight" : "text-slate-500 hover:text-white",
+          isActive ? "text-highlight" : "text-light hover:text-white",
         )
       }
       {...props}

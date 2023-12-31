@@ -14,7 +14,7 @@ export function Breadcrumbs({ pages }: { pages: Page[] }) {
       <ol role="list" className="flex items-center space-x-2">
         <li className="flex">
           <div className="flex items-center">
-            <Link to="/" className="text-slate-500 hover:text-slate-400">
+            <Link to="/" className="text-light hover:text-slate-400">
               <HomeIcon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
               <span className="sr-only">Home</span>
             </Link>
@@ -29,9 +29,7 @@ export function Breadcrumbs({ pages }: { pages: Page[] }) {
               />
               <Link
                 to={page.to}
-                className={classNames(
-                  "ml-2 text-slate-600 hover:text-slate-500",
-                )}
+                className={classNames("hover:text-light ml-2 text-slate-600")}
                 aria-current={page.current ? "page" : undefined}
               >
                 {page.name}

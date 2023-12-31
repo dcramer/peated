@@ -62,7 +62,7 @@ export default function FlightDetails() {
             {flight.name}
           </h1>
           {flight.description && (
-            <div className="truncate text-center text-slate-500 sm:text-left">
+            <div className="text-light truncate text-center sm:text-left">
               {flight.description}
             </div>
           )}
@@ -92,7 +92,7 @@ export default function FlightDetails() {
                       <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
                     )}
                   </div>
-                  <div className="text-sm text-slate-500">
+                  <div className="text-light text-sm">
                     {formatCategoryName(bottle.category)}
                   </div>
                 </td>

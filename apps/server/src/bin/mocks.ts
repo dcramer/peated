@@ -128,6 +128,11 @@ const loadDefaultBottles = async (
           bottleId: bottle.id,
         }));
 
+      await Fixtures.Review({
+        externalSiteId: site.id,
+        bottleId: bottle.id,
+      });
+
       for (let i = 0; i < dates.length; i++) {
         (await db.query.storePriceHistories.findFirst({
           where: (storePriceHistories, { eq }) =>

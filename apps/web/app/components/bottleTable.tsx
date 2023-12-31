@@ -38,7 +38,7 @@ export default ({
           <col className="sm:w-1/6" />
           <col className="sm:w-1/6" />
         </colgroup>
-        <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-header-group">
+        <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
           <tr>
             <th scope="col" className="py-3.5 pl-4 pr-3 text-left sm:pl-3">
               <SortParam name="name" label="Bottle" sort={sort} />
@@ -102,7 +102,7 @@ export default ({
                       <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
                     )}
                   </div>
-                  <div className="text-sm text-slate-500">
+                  <div className="text-light text-sm">
                     <Link
                       to={`/bottles/?category=${bottle.category}`}
                       className="hover:underline"

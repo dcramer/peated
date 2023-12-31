@@ -118,7 +118,7 @@ export default ({
                         (i) => i.id == option.id && i.name == option.name,
                       )
                         ? "bg-highlight text-black"
-                        : "bg-slate-900 text-slate-500 group-hover:bg-slate-800",
+                        : "text-light bg-slate-900 group-hover:bg-slate-800",
                     )}
                   />
 

@@ -23,7 +23,7 @@ export default function UserAvatar({
 
   return (
     <svg
-      className="h-full w-full rounded bg-slate-900 text-slate-500"
+      className="text-light h-full w-full rounded bg-slate-900"
       fill="currentColor"
       viewBox="0 0 24 24"
       style={{

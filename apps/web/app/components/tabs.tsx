@@ -44,7 +44,7 @@ Tabs.Item = function TabItem<E extends ElementType = typeof defaultElement>({
 
   const activeStyles = "text-highlight border-highlight";
   const inactiveStyles =
-    "border-transparent text-slate-500 hover:border-slate-500 hover:text-slate-400";
+    "border-transparent text-light hover:border-light hover:text-slate-400";
 
   if ("to" in props) {
     if (controlled) active = location.pathname === props.to;
@@ -61,7 +61,7 @@ Tabs.Item = function TabItem<E extends ElementType = typeof defaultElement>({
       {count !== undefined && (
         <span
           className={classNames(
-            "bg-slate-700 text-slate-500",
+            "text-light bg-slate-700",
             "ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block",
           )}
         >

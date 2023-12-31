@@ -88,7 +88,7 @@ export default function EntityDetails() {
           icon={EntityIcon}
           title={entity.name}
           titleExtra={
-            <div className="max-w-full text-center text-slate-500 lg:text-left">
+            <div className="text-light max-w-full text-center lg:text-left">
               {!!entity.country && (
                 <>
                   Located in{" "}

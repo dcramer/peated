@@ -434,7 +434,7 @@ export const Review = async ({ ...data }: Partial<NewReview> = {}) => {
       .values({
         name: "",
         externalSiteId: data.externalSiteId || (await ExternalSite()).id,
-        rating: faker.number.int({ min: 30, max: 100 }),
+        rating: faker.number.int({ min: 59, max: 100 }),
         url: faker.internet.url(),
         issue: "Default",
         ...data,

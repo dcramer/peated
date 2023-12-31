@@ -34,7 +34,7 @@ export default ({
           {withTastings && <col className="sm:w-1/10" />}
           <col className="sm:w-3/10" />
         </colgroup>
-        <thead className="hidden border-b border-slate-800 text-sm font-semibold text-slate-500 sm:table-header-group">
+        <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left">
               <SortParam name="name" label="Entity" sort={sort} />
@@ -106,7 +106,7 @@ export default ({
                         to={`/entities?region=${encodeURIComponent(
                           entity.region,
                         )}`}
-                        className="text-slate-500 hover:underline"
+                        className="text-light hover:underline"
                       >
                         {entity.region}
                       </Link>

@@ -67,7 +67,7 @@ export default function NotificationEntry({
                   e.stopPropagation();
                   onArchive();
                 }}
-                className="block h-full w-full rounded bg-inherit p-2 px-1 text-slate-600 hover:bg-slate-800 hover:text-slate-400 group-hover:text-slate-500"
+                className="group-hover:text-light block h-full w-full rounded bg-inherit p-2 px-1 text-slate-600 hover:bg-slate-800 hover:text-slate-400"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
