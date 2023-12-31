@@ -94,8 +94,7 @@ export default authedProcedure.input(z.number()).mutation(async function ({
           set: {
             status: "following",
           },
-        })
-        .onConflictDoNothing();
+        });
     }
 
     if (!myFollow) return;

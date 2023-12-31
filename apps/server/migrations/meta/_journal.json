@@ -505,6 +505,13 @@
       "when": 1703960675097,
       "tag": "0071_powerful_korvac",
       "breakpoints": false
+    },
+    {
+      "idx": 72,
+      "version": "5",
+      "when": 1703984413418,
+      "tag": "0072_stiff_juggernaut",
+      "breakpoints": false
     }
   ]
 }

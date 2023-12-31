@@ -31,7 +31,7 @@ export const reviews = pgTable(
   },
   (reviews) => {
     return {
-      reviewName: uniqueIndex("store_price_unq_name").on(
+      reviewName: uniqueIndex("review_unq_name").on(
         reviews.externalSiteId,
         reviews.name,
         reviews.issue,

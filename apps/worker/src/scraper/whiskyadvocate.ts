@@ -20,8 +20,24 @@ export default async function main() {
 
   console.log(`Found ${issueList.length} issues`);
 
-  for (const issueName of issueList) {
-    console.log(`Fetching reviews for ${issueName}`);
+  const processedIssues = process.env.ACCESS_TOKEN
+    ? await trpcClient.externalSiteConfigGet.query({
+        site: "whiskyadvocate",
+        key: "processedIssues",
+        default: [],
+      })
+    : [];
+
+  const newIssues = issueList.filter((i) => !processedIssues.includes(i));
+  if (newIssues.length === 0) {
+    console.log("No unprocessed issues found");
+    return;
+  }
+
+  console.log(`Found ${issueList.length} new issues`);
+
+  for (const issueName of newIssues) {
+    console.log(`Fetching reviews for issue [${issueName}]`);
     await scrapeReviews(
       `https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=${encodeURIComponent(
         issueName,
@@ -43,6 +59,17 @@ export default async function main() {
         }
       },
     );
+
+    processedIssues.push(issueName);
+    console.log(`Done processing issue [${issueName}]`);
+
+    if (process.env.ACCESS_TOKEN) {
+      await trpcClient.externalSiteConfigSet.mutate({
+        site: "whiskyadvocate",
+        key: "processedIssues",
+        value: processedIssues,
+      });
+    }
   }
 }
 
@@ -115,5 +142,5 @@ export async function scrapeReviews(
 }
 
 if (typeof require !== "undefined" && require.main === module) {
-  main().catch((err) => console.error(err));
+  main();
 }

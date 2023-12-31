@@ -1,11 +1,15 @@
 import {
+  bigint,
   bigserial,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
+  varchar,
 } from "drizzle-orm/pg-core";
 import { EXTERNAL_SITE_TYPE_LIST } from "../../constants";
 
@@ -35,3 +39,24 @@ export const externalSites = pgTable(
 
 export type ExternalSite = typeof externalSites.$inferSelect;
 export type NewExternalSite = typeof externalSites.$inferInsert;
+
+export const externalSiteConfig = pgTable(
+  "external_site_config",
+  {
+    externalSiteId: bigint("external_site_id", { mode: "number" })
+      .references(() => externalSites.id)
+      .notNull(),
+    key: varchar("key", { length: 255 }).notNull(),
+    value: jsonb("data").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (externalSiteConfig) => {
+    return {
+      pk: primaryKey(externalSiteConfig.externalSiteId, externalSiteConfig.key),
+    };
+  },
+);
+
+export type ExternalSiteConfig = typeof externalSiteConfig.$inferSelect;
+export type NewExternalSiteConfig = typeof externalSiteConfig.$inferInsert;

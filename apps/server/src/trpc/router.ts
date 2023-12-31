@@ -29,6 +29,8 @@ import entityList from "./routes/entityList";
 import entityMerge from "./routes/entityMerge";
 import entityUpdate from "./routes/entityUpdate";
 import externalSiteByType from "./routes/externalSiteByType";
+import externalSiteConfigGet from "./routes/externalSiteConfigGet";
+import externalSiteConfigSet from "./routes/externalSiteConfigSet";
 import externalSiteCreate from "./routes/externalSiteCreate";
 import externalSiteList from "./routes/externalSiteList";
 import externalSiteTriggerJob from "./routes/externalSiteTriggerJob";
@@ -97,6 +99,8 @@ export const appRouter = router({
   externalSiteList,
   externalSiteTriggerJob,
   externalSiteUpdate,
+  externalSiteConfigGet,
+  externalSiteConfigSet,
   flightById,
   flightCreate,
   flightList,

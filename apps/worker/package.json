@@ -32,7 +32,7 @@
     "cheerio": "1.0.0-rc.12",
     "concurrently": "^8.2.2",
     "croner": "^7.0.5",
-    "drizzle-orm": "^0.28.6",
+    "drizzle-orm": "^0.29.2",
     "faktory-worker": "^4.5.1",
     "nodemon": "^3.0.2",
     "npm-run-all": "^4.1.5",
