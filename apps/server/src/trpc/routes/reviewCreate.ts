@@ -6,13 +6,15 @@ import {
 } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { ReviewInputSchema } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { ReviewSerializer } from "@peated/server/serializers/review";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { adminProcedure } from "..";
 
 export default adminProcedure
   .input(ReviewInputSchema)
-  .mutation(async function ({ input }) {
+  .mutation(async function ({ input, ctx }) {
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
@@ -25,7 +27,7 @@ export default adminProcedure
     }
 
     const bottleId = await findBottleId(input.name);
-    await db.transaction(async (tx) => {
+    const review = await db.transaction(async (tx) => {
       // XXX: maybe we should constrain on URL?
       const [review] = await tx
         .insert(reviews)
@@ -57,6 +59,7 @@ export default adminProcedure
           })
           .onConflictDoNothing();
       }
+      return review;
     });
 
     await db
@@ -64,5 +67,5 @@ export default adminProcedure
       .set({ lastRunAt: sql`NOW()` })
       .where(eq(externalSites.id, site.id));
 
-    return {};
+    return await serialize(ReviewSerializer, review, ctx.user);
   });
