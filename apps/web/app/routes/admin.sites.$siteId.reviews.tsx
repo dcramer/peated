@@ -14,9 +14,14 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   invariant(params.siteId);
 
   const { searchParams } = new URL(request.url);
+  const numericFields = new Set(["cursor", "limit"]);
   const reviewList = await context.trpc.reviewList.query({
     site: params.siteId as ExternalSiteType,
-    ...Object.fromEntries(searchParams.entries()),
+    ...Object.fromEntries(
+      [...searchParams.entries()].map(([k, v]) =>
+        numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
+      ),
+    ),
   });
 
   return json({ reviewList });
