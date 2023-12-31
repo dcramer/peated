@@ -35,7 +35,9 @@ const ErrorView = ({ error, resetErrorBoundary }: any) => {
   // }
   return (
     <EmptyActivity>
-      <div>{error ? error.message || error.toString() : "Unknown Error"}</div>
+      <div>
+        {error ? error.message || error.toString() : "Internal server error"}
+      </div>
       <button title="Retry" onClick={resetErrorBoundary} />
     </EmptyActivity>
   );

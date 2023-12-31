@@ -8,15 +8,17 @@ export function logError(message: string, context?: Record<string, any>): void;
 export function logError(
   error: string | Error | unknown,
   context?: Record<string, any>,
-): void {
-  if (typeof error === "string")
-    captureMessage(error, {
-      extra: context || undefined,
-    });
-  else
-    captureException(error, {
-      extra: context || undefined,
-    });
+): string {
+  const eventId =
+    typeof error === "string"
+      ? captureMessage(error, {
+          extra: context || undefined,
+        })
+      : captureException(error, {
+          extra: context || undefined,
+        });
 
   console.error(error);
+
+  return eventId;
 }

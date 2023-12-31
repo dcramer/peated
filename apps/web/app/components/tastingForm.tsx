@@ -22,12 +22,11 @@ import SelectField from "@peated/web/components/selectField";
 import Spinner from "@peated/web/components/spinner";
 import TextAreaField from "@peated/web/components/textAreaField";
 import { logError } from "@peated/web/lib/log";
-import { TRPCClientError } from "@trpc/client";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import { trpc } from "../lib/trpc";
+import { isTRPCClientError, trpc } from "../lib/trpc";
 import Form from "./form";
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
@@ -92,7 +91,7 @@ export default function TastingForm({
     try {
       await onSubmit({ ...data, picture });
     } catch (err) {
-      if (err instanceof TRPCClientError) {
+      if (isTRPCClientError(err)) {
         setError(err.message);
       } else {
         logError(err);

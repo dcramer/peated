@@ -55,8 +55,8 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       if (err instanceof ApiError) {
         return json({ error: err.message });
       } else {
-        logError(err);
-        return json({ error: "Unknown error" });
+        const errorId = logError(err);
+        return json({ error: "Internal server error", errorId });
       }
     }
   }
@@ -103,8 +103,8 @@ export default function EditTastingImage() {
           if (err instanceof ApiError) {
             return json({ error: err.message });
           } else {
-            logError(err);
-            return json({ error: "Unknown error" });
+            const errorId = logError(err);
+            return json({ error: "Internal server error", errorId });
           }
         }
       }

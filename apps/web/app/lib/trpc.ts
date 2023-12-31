@@ -1,5 +1,5 @@
 import { type AppRouter } from "@peated/server/trpc/router";
-import { createTRPCReact } from "@trpc/react-query";
+import { TRPCClientError, createTRPCReact } from "@trpc/react-query";
 
 export const trpc = createTRPCReact<AppRouter>({
   overrides: {
@@ -21,3 +21,11 @@ export const trpc = createTRPCReact<AppRouter>({
     },
   },
 });
+
+export function isTRPCClientError(
+  cause: unknown,
+): cause is TRPCClientError<AppRouter> {
+  return (
+    cause instanceof TRPCClientError || Object.hasOwn(cause as any, "data")
+  );
+}

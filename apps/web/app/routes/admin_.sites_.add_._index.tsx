@@ -1,60 +1,12 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { EXTERNAL_SITE_TYPE_LIST } from "@peated/server/constants";
-import { ExternalSiteSchemaInputSchema } from "@peated/server/schemas";
-import type { ActionFunction } from "@remix-run/node";
-import { json, redirect, type MetaFunction } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
-import { Controller } from "react-hook-form";
-import { getValidatedFormData, useRemixForm } from "remix-hook-form";
+import { type MetaFunction } from "@remix-run/node";
+import { useNavigate } from "react-router-dom";
 import type { SitemapFunction } from "remix-sitemap";
-import type { z } from "zod";
-
-import CountryField from "@peated/web/components/countryField";
-import Fieldset from "@peated/web/components/fieldset";
-import FormError from "@peated/web/components/formError";
-import FormHeader from "@peated/web/components/formHeader";
-import Header from "@peated/web/components/header";
-import Layout from "@peated/web/components/layout";
-import SelectField from "@peated/web/components/selectField";
-import Spinner from "@peated/web/components/spinner";
-import TextField from "@peated/web/components/textField";
-import { ApiError } from "@peated/web/lib/api";
-import { logError } from "@peated/web/lib/log";
+import SiteForm from "../components/admin/siteForm";
+import { trpc } from "../lib/trpc";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
-
-type FormSchemaType = z.infer<typeof ExternalSiteSchemaInputSchema>;
-
-const SITE_TYPES = EXTERNAL_SITE_TYPE_LIST.map((t) => ({ id: t, name: t }));
-
-const resolver = zodResolver(ExternalSiteSchemaInputSchema);
-
-export const action: ActionFunction = async ({
-  context: { trpc },
-  request,
-}) => {
-  const { errors, data } = await getValidatedFormData<FormSchemaType>(
-    request,
-    resolver,
-  );
-  if (errors) {
-    return json(errors);
-  }
-
-  try {
-    await trpc.externalSiteCreate.mutate(data);
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return json({ error: err.message });
-    } else {
-      logError(err);
-      return json({ error: "Unknown error" });
-    }
-  }
-  return redirect(`/admin/stores`);
-};
 
 export const meta: MetaFunction = () => {
   return [
@@ -64,69 +16,18 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function AdminStoresAdd() {
-  const { error } = useActionData<typeof action>() || {};
-
-  const {
-    control,
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useRemixForm<FormSchemaType>({
-    mode: "onSubmit",
-    resolver,
-  });
+export default function AdminSiteesAdd() {
+  const navigate = useNavigate();
+  const siteCreateMutation = trpc.externalSiteCreate.useMutation();
 
   return (
-    <Layout
-      header={
-        <Header>
-          <FormHeader
-            title="Add Site"
-            saveDisabled={isSubmitting}
-            onSave={handleSubmit}
-          />
-        </Header>
-      }
-      footer={null}
-    >
-      {isSubmitting && (
-        <div className="fixed inset-0 z-10">
-          <div className="absolute inset-0 bg-slate-800 opacity-50" />
-          <Spinner />
-        </div>
-      )}
-
-      <Form className="sm:mx-16" onSubmit={handleSubmit}>
-        {error && <FormError values={[error]} />}
-
-        <Fieldset>
-          <TextField
-            {...register("name")}
-            label="Name"
-            placeholder="e.g. Total Wines"
-            error={errors.name}
-          />
-
-          <Controller
-            name="type"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                label="Aggregator"
-                placeholder="e.g. totalwines"
-                helpText="The internal implementation for this site to aggregate prices."
-                options={SITE_TYPES}
-                simple
-                required
-                onChange={(value) => onChange(value?.id)}
-                error={errors.type}
-              />
-            )}
-          />
-        </Fieldset>
-      </Form>
-    </Layout>
+    <SiteForm
+      onSubmit={async (data) => {
+        const site = await siteCreateMutation.mutateAsync({
+          ...data,
+        });
+        navigate(`/admin/sites/${site.type}`);
+      }}
+    />
   );
 }

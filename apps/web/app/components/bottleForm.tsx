@@ -18,8 +18,8 @@ import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
-import { ApiError } from "@peated/web/lib/api";
 import { logError } from "@peated/web/lib/log";
+import { isTRPCClientError } from "../lib/trpc";
 import Form from "./form";
 import Header from "./header";
 import Spinner from "./spinner";
@@ -73,7 +73,7 @@ export default function BottleForm({
     try {
       await onSubmit(data);
     } catch (err) {
-      if (err instanceof ApiError) {
+      if (isTRPCClientError(err)) {
         setError(err.message);
       } else {
         logError(err);

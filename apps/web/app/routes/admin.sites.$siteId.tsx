@@ -60,7 +60,6 @@ function TriggerJobButton({
 
   return (
     <Button
-      color="primary"
       disabled={isLoading}
       loading={isLoading}
       onClick={async () => {
@@ -100,10 +99,10 @@ export default function AdminSiteDetails() {
 
       <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
         <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-auto sm:gap-y-2">
-          <h3 className="self-center text-4xl font-semibold leading-normal text-white sm:self-start">
+          <h3 className="self-center text-4xl font-semibold text-white sm:self-start">
             {site.name}
           </h3>
-          <div className="text-light flex flex-col items-center self-center sm:flex-row sm:self-start">
+          <div className="text-light flex flex-col items-center self-center sm:flex-row sm:self-start lg:mb-8">
             {site.type}
           </div>
           <div className="flex justify-center sm:justify-start">
@@ -137,6 +136,7 @@ export default function AdminSiteDetails() {
         </div>
         <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
           <div className="flex gap-x-2">
+            <Button to={`/admin/sites/${site.type}/edit`}>Edit Site</Button>
             <TriggerJobButton
               siteId={site.type}
               updateSite={(d) => setSite(d)}

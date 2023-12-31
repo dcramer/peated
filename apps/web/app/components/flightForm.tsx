@@ -11,9 +11,8 @@ import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
 import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
-import { ApiError } from "@peated/web/lib/api";
 import { logError } from "@peated/web/lib/log";
-import { trpc } from "@peated/web/lib/trpc";
+import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
 import Header from "./header";
 import SelectField, { type Option } from "./selectField";
 import Spinner from "./spinner";
@@ -61,7 +60,7 @@ export default function FlightForm({
     try {
       await onSubmit(data);
     } catch (err) {
-      if (err instanceof ApiError) {
+      if (isTRPCClientError(err)) {
         setError(err.message);
       } else {
         logError(err);

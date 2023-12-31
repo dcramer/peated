@@ -18,8 +18,8 @@ export function logError(
   error: string | Error | unknown,
   contexts?: Record<string, Record<string, any>>,
   attachments?: Record<string, string | Uint8Array>,
-): void {
-  withScope((scope) => {
+): string {
+  const eventId = withScope((scope) => {
     if (attachments) {
       for (const key in attachments) {
         scope.addAttachment({
@@ -29,15 +29,16 @@ export function logError(
       }
     }
 
-    if (typeof error === "string")
-      captureMessage(error, {
-        contexts,
-      });
-    else
-      captureException(error, {
-        contexts,
-      });
+    return typeof error === "string"
+      ? captureMessage(error, {
+          contexts,
+        })
+      : captureException(error, {
+          contexts,
+        });
   });
 
   console.error(error);
+
+  return eventId;
 }

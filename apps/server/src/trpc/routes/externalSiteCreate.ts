@@ -14,7 +14,7 @@ export default adminProcedure
         const [site] = await tx.insert(externalSites).values(input).returning();
         return site;
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "store_type") {
+        if (err?.code === "23505" && err?.constraint === "external_site_type") {
           throw new TRPCError({
             message: "Site with type already exists.",
             code: "CONFLICT",
