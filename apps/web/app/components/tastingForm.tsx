@@ -131,13 +131,14 @@ export default function TastingForm({
           <Controller
             name="rating"
             control={control}
-            render={({ field: { ref, ...field } }) => (
+            render={({ field: { ref, onChange, ...field } }) => (
               <RangeField
-                // {...register("rating", {
-                //   valueAsNumber: true,
-                //   setValueAs: (v) => (v === "" ? undefined : Number(v)),
-                // })}
                 {...field}
+                onChange={(e) =>
+                  onChange(
+                    e.target.value === "" ? undefined : Number(e.target.value),
+                  )
+                }
                 error={errors.rating}
                 label="Rating"
               />
