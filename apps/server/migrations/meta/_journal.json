@@ -519,6 +519,13 @@
       "when": 1703989610663,
       "tag": "0073_cultured_yellowjacket",
       "breakpoints": false
+    },
+    {
+      "idx": 74,
+      "version": "5",
+      "when": 1703990502564,
+      "tag": "0074_amused_purple_man",
+      "breakpoints": false
     }
   ]
 }
