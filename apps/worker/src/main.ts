@@ -5,6 +5,7 @@ import { registerJob } from "@peated/server/jobs";
 import * as Sentry from "@sentry/node-experimental";
 import type { JobFunction } from "faktory-worker";
 import faktory from "faktory-worker";
+import createMissingBottles from "./jobs/createMissingBottles";
 import generateBottleDetails from "./jobs/generateBottleDetails";
 import generateEntityDetails from "./jobs/generateEntityDetails";
 import notifyDiscordOnTasting from "./jobs/notifyDiscordOnTasting";
@@ -49,6 +50,7 @@ registerJob("ScrapeHealthySpirits", scrapeHealthySpirits);
 registerJob("ScrapeTotalWine", scrapeTotalWine);
 registerJob("ScrapeWoodenCork", scrapeWoodenCork);
 registerJob("ScrapeWhiskyAdvocate", scrapeWhiskeyAdvocate);
+registerJob("CreateMissingBottles", createMissingBottles);
 
 process.on("SIGINT", function () {
   scheduler.stop();

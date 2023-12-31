@@ -38,6 +38,16 @@ program
     await shutdownClient();
   });
 
+program
+  .command("create-missing")
+  .description("Create missing bottles")
+  .action(async (options) => {
+    console.log(`Pushing job [CreateMissingBottles].`);
+    await pushJob("CreateMissingBottles");
+
+    await shutdownClient();
+  });
+
 // TODO: move logic to utility + tests
 program
   .command("merge")

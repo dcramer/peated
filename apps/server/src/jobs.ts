@@ -38,7 +38,8 @@ export type JobName =
   | "ScrapeHealthySpirits"
   | "ScrapeTotalWine"
   | "ScrapeWoodenCork"
-  | "ScrapeWhiskyAdvocate";
+  | "ScrapeWhiskyAdvocate"
+  | "CreateMissingBottles";
 
 export async function pushJob(jobName: JobName, args?: any) {
   const client = await getClient();
