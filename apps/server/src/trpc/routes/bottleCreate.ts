@@ -16,7 +16,7 @@ import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { TRPCError } from "@trpc/server";
-import { inArray, sql } from "drizzle-orm";
+import { inArray, isNull, sql } from "drizzle-orm";
 import { authedProcedure } from "..";
 
 export default authedProcedure
@@ -105,10 +105,19 @@ export default authedProcedure
         return;
       }
 
-      await tx.insert(bottleAliases).values({
-        bottleId: bottle.id,
-        name: fullName,
-      });
+      await tx
+        .insert(bottleAliases)
+        .values({
+          bottleId: bottle.id,
+          name: fullName,
+        })
+        .onConflictDoUpdate({
+          target: [bottleAliases.name],
+          set: {
+            bottleId: bottle.id,
+          },
+          where: isNull(bottleAliases.bottleId),
+        });
 
       const distillerIds: number[] = [];
       if (input.distillers)

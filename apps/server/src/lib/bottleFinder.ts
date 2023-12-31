@@ -3,7 +3,7 @@ import { db } from "../db";
 import { bottleAliases, bottles } from "../db/schema";
 
 export async function findBottleId(name: string): Promise<number | null> {
-  let result: { id: number } | null | undefined;
+  let result: { id: number | null } | null | undefined;
 
   // exact match
   [result] = await db
@@ -11,7 +11,7 @@ export async function findBottleId(name: string): Promise<number | null> {
     .from(bottleAliases)
     .where(ilike(bottleAliases.name, name))
     .limit(1);
-  if (result) return result?.id;
+  if (result?.id) return result?.id;
 
   // match the store's listing as a prefix
   // name: Aberfeldy 18-year-old Single Malt Scotch Whisky

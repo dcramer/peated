@@ -149,14 +149,14 @@ export type NewBottleTag = typeof bottleTags.$inferInsert;
 export const bottleAliases = pgTable(
   "bottle_alias",
   {
-    bottleId: bigint("bottle_id", { mode: "number" })
-      .references(() => bottles.id)
-      .notNull(),
+    bottleId: bigint("bottle_id", { mode: "number" }).references(
+      () => bottles.id,
+    ),
     name: varchar("name", { length: 255 }).notNull(),
   },
   (bottleAliases) => {
     return {
-      pk: primaryKey(bottleAliases.bottleId, bottleAliases.name),
+      pk: primaryKey(bottleAliases.name),
     };
   },
 );

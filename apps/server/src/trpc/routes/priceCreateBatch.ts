@@ -11,7 +11,7 @@ import {
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { adminProcedure } from "..";
 
@@ -79,6 +79,19 @@ export default adminProcedure
             .insert(bottleAliases)
             .values({
               bottleId,
+              name: sp.name,
+            })
+            .onConflictDoUpdate({
+              target: [bottleAliases.name],
+              set: {
+                bottleId,
+              },
+              where: isNull(bottleAliases.bottleId),
+            });
+        } else {
+          await db
+            .insert(bottleAliases)
+            .values({
               name: sp.name,
             })
             .onConflictDoNothing();
