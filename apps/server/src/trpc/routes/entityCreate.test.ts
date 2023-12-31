@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { eq } from "drizzle-orm";
 import { entities } from "../../db/schema";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.entityCreate({
       name: "Delicious Wood",
@@ -14,7 +14,7 @@ test("requires authentication", async () => {
 });
 
 test("creates a new entity", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.entityCreate({
     name: "Macallan",
   });
@@ -33,7 +33,7 @@ test("updates existing entity with new type", async () => {
     type: ["distiller"],
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.entityCreate({
     name: entity.name,
     type: ["brand"],

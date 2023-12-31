@@ -1,11 +1,11 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists reviews", async () => {
   await Fixtures.Review();
   await Fixtures.Review();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const { results } = await caller.reviewList();
@@ -17,7 +17,7 @@ test("lists reviews without mod", async () => {
   await Fixtures.Review();
   await Fixtures.Review();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() => caller.reviewList()).rejects.toThrowError(/BAD_REQUEST/);
 });
 
@@ -28,7 +28,7 @@ test("lists reviews by site", async () => {
   const review = await Fixtures.Review({ externalSiteId: astorwine.id });
   await Fixtures.Review({ externalSiteId: totalwines.id });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const { results } = await caller.reviewList({
@@ -45,7 +45,7 @@ test("lists reviews by site without mod", async () => {
 
   const site = await Fixtures.ExternalSite();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.reviewList({
       site: site.type,

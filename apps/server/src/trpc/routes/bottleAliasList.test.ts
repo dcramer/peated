@@ -1,5 +1,5 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists bottle aliases", async () => {
   const bottle = await Fixtures.Bottle();
@@ -8,7 +8,7 @@ test("lists bottle aliases", async () => {
     name: "Foo Bar",
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: null,
   });
   const { results } = await caller.bottleAliasList({

@@ -8,10 +8,10 @@ import {
 import { omit } from "@peated/server/lib/filter";
 import { desc, eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.entityUpdate({
       entity: 1,
@@ -20,7 +20,7 @@ test("requires authentication", async () => {
 });
 
 test("requires mod", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.entityUpdate({
       entity: 1,
@@ -31,7 +31,7 @@ test("requires mod", async () => {
 test("no changes", async () => {
   const entity = await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
@@ -51,7 +51,7 @@ test("no changes", async () => {
 test("can change name", async () => {
   const entity = await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
@@ -82,7 +82,7 @@ test("can change name", async () => {
 test("can change country", async () => {
   const entity = await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
@@ -104,7 +104,7 @@ test("can change country", async () => {
 test("can change region", async () => {
   const entity = await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
@@ -126,7 +126,7 @@ test("can change region", async () => {
 test("can change type", async () => {
   const entity = await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
@@ -160,7 +160,7 @@ test("name change updates bottles if brand", async () => {
     distillerIds: [entity.id],
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({

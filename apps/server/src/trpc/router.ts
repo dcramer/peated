@@ -1,4 +1,5 @@
-import { router } from ".";
+import { createCallerFactory, router } from ".";
+
 import auth from "./routes/auth";
 import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
@@ -132,3 +133,5 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
+
+export const createCaller = createCallerFactory(appRouter);

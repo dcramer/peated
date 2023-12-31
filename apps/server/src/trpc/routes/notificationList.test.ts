@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { createNotification } from "../../lib/notifications";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists notifications w/ toast", async () => {
   const tasting = await Fixtures.Tasting({
@@ -16,7 +16,7 @@ test("lists notifications w/ toast", async () => {
     createdAt: toast.createdAt,
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.notificationList();
 
   expect(results.length).toBe(1);
@@ -39,7 +39,7 @@ test("lists notifications w/ comment", async () => {
     createdAt: comment.createdAt,
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.notificationList();
 
   expect(results.length).toBe(1);
@@ -59,7 +59,7 @@ test("lists notifications w/ friend_request", async () => {
     createdAt: follow.createdAt,
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.notificationList();
 
   expect(results.length).toBe(1);

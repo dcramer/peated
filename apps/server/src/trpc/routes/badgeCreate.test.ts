@@ -2,10 +2,10 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { badges } from "../../db/schema";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires admin", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.badgeCreate({
       type: "category",
@@ -16,7 +16,7 @@ test("requires admin", async () => {
 });
 
 test("validates config for category", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
 
@@ -30,7 +30,7 @@ test("validates config for category", async () => {
 });
 
 test("creates badge", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
 

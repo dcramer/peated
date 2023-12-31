@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { tastings, toasts } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires auth", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: null,
   });
   expect(() => caller.toastCreate(1)).rejects.toThrowError(/UNAUTHORIZED/);
@@ -16,7 +16,7 @@ test("cannot toast self", async () => {
     createdById: DefaultFixtures.user.id,
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   expect(() => caller.toastCreate(tasting.id)).rejects.toThrowError(
@@ -27,7 +27,7 @@ test("cannot toast self", async () => {
 test("new toast", async () => {
   const tasting = await Fixtures.Tasting();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   await caller.toastCreate(tasting.id);
@@ -54,7 +54,7 @@ test("already toasted", async () => {
     createdById: DefaultFixtures.user.id,
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   await caller.toastCreate(tasting.id);

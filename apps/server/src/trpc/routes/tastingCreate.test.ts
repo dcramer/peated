@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { eq } from "drizzle-orm";
 import { bottles, entities, tastings } from "../../db/schema";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires auth", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: null,
   });
   expect(() => caller.tastingCreate({ bottle: 1 })).rejects.toThrowError(
@@ -20,7 +20,7 @@ test("creates a new tasting with minimal params", async () => {
     distillerIds: [entity.id],
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingCreate({
@@ -56,7 +56,7 @@ test("creates a new tasting with minimal params", async () => {
 test("creates a new tasting with tags", async () => {
   const bottle = await Fixtures.Bottle();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingCreate({
@@ -90,7 +90,7 @@ test("creates a new tasting with tags", async () => {
 test("creates a new tasting with notes", async () => {
   const bottle = await Fixtures.Bottle();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingCreate({
@@ -112,7 +112,7 @@ test("creates a new tasting with notes", async () => {
 test("creates a new tasting with empty rating", async () => {
   const bottle = await Fixtures.Bottle();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingCreate({
@@ -134,7 +134,7 @@ test("creates a new tasting with empty rating", async () => {
 test("creates a new tasting with empty friends", async () => {
   const bottle = await Fixtures.Bottle();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingCreate({
@@ -157,7 +157,7 @@ test("creates a new tasting with empty friends", async () => {
 test("creates a new tasting with zero rating", async () => {
   const bottle = await Fixtures.Bottle();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingCreate({
@@ -181,7 +181,7 @@ test("flight requires valid bottle", async () => {
   const bottle = await Fixtures.Bottle();
   const flight = await Fixtures.Flight();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
 
@@ -197,7 +197,7 @@ test("creates a new tasting with flight", async () => {
   const bottle = await Fixtures.Bottle();
   const flight = await Fixtures.Flight({ bottles: [bottle.id] });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingCreate({

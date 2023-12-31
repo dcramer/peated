@@ -3,10 +3,10 @@ import { bottleTags, bottles, tastings } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import { and, eq, gt } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires auth", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: null,
   });
   expect(() => caller.tastingUpdate({ tasting: 1 })).rejects.toThrowError(
@@ -15,7 +15,7 @@ test("requires auth", async () => {
 });
 
 test("cannot update another users tasting", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const tasting = await Fixtures.Tasting();
@@ -29,7 +29,7 @@ test("no changes", async () => {
     createdById: DefaultFixtures.user.id,
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingUpdate({
@@ -50,7 +50,7 @@ test("updates rating", async () => {
   const tasting = await Fixtures.Tasting({
     createdById: DefaultFixtures.user.id,
   });
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingUpdate({
@@ -79,7 +79,7 @@ test("updates notes", async () => {
   const tasting = await Fixtures.Tasting({
     createdById: DefaultFixtures.user.id,
   });
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingUpdate({
@@ -102,7 +102,7 @@ test("updates tags", async () => {
   const tasting = await Fixtures.Tasting({
     createdById: DefaultFixtures.user.id,
   });
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.tastingUpdate({

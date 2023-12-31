@@ -1,11 +1,11 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists entities", async () => {
   await Fixtures.Entity();
   await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results } = await caller.entityList();
 
   expect(results.length).toBe(2);
@@ -14,7 +14,7 @@ test("lists entities", async () => {
 test("cannot list private without friend", async () => {
   const otherUser = await Fixtures.User({ private: true });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.collectionList({
       user: otherUser.id,
@@ -30,7 +30,7 @@ test("can list private with friend", async () => {
     status: "following",
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.collectionList({
     user: otherUser.id,
   });
@@ -41,7 +41,7 @@ test("can list private with friend", async () => {
 test("can list public without friend", async () => {
   const otherUser = await Fixtures.User({ private: false });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.collectionList({
     user: otherUser.id,
   });

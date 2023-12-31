@@ -1,11 +1,11 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists entities", async () => {
   await Fixtures.Entity();
   await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results } = await caller.entityList();
 
   expect(results.length).toBe(2);
@@ -14,7 +14,7 @@ test("lists entities", async () => {
 test("lists users needs a query", async () => {
   await Fixtures.User();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.userList();
 
   expect(results.length).toBe(0);
@@ -23,7 +23,7 @@ test("lists users needs a query", async () => {
 test("lists users needs a query", async () => {
   const user2 = await Fixtures.User({ displayName: "David George" });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.userList({
     query: "david",
   });
@@ -33,6 +33,6 @@ test("lists users needs a query", async () => {
 });
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() => caller.userList()).rejects.toThrowError(/UNAUTHORIZED/);
 });

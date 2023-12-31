@@ -1,5 +1,5 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists tags", async () => {
   const bottle = await Fixtures.Bottle();
@@ -24,7 +24,7 @@ test("lists tags", async () => {
     rating: 5,
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results, totalCount } = await caller.userTagList({
     user: "me",
   });
@@ -39,7 +39,7 @@ test("lists tags", async () => {
 test("cannot list private without friend", async () => {
   const otherUser = await Fixtures.User({ private: true });
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.userTagList({
       user: otherUser.id,
@@ -55,7 +55,7 @@ test("can list private with friend", async () => {
     status: "following",
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.userTagList({
     user: otherUser.id,
   });
@@ -66,7 +66,7 @@ test("can list private with friend", async () => {
 test("can list public without friend", async () => {
   const otherUser = await Fixtures.User({ private: false });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.userTagList({
     user: otherUser.id,
   });

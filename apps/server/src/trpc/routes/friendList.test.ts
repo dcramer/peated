@@ -1,5 +1,5 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists friends", async () => {
   const follow1 = await Fixtures.Follow({
@@ -7,7 +7,7 @@ test("lists friends", async () => {
   });
   await Fixtures.Follow();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.friendList();
 
   expect(results.length).toBe(1);
@@ -15,6 +15,6 @@ test("lists friends", async () => {
 });
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() => caller.friendList()).rejects.toThrowError(/UNAUTHORIZED/);
 });

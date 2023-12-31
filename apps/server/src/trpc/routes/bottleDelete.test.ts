@@ -2,13 +2,13 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { bottles } from "../../db/schema";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("deletes bottle", async () => {
   const user = await Fixtures.User({ admin: true });
   const bottle = await Fixtures.Bottle();
 
-  const caller = appRouter.createCaller({ user });
+  const caller = createCaller({ user });
   const data = await caller.bottleDelete(bottle.id);
   expect(data).toEqual({});
 
@@ -23,7 +23,7 @@ test("cannot delete without admin", async () => {
   const user = await Fixtures.User({ mod: true });
   const bottle = await Fixtures.Bottle({ createdById: user.id });
 
-  const caller = appRouter.createCaller({ user });
+  const caller = createCaller({ user });
   expect(() => caller.bottleDelete(bottle.id)).rejects.toThrowError(
     /UNAUTHORIZED/,
   );

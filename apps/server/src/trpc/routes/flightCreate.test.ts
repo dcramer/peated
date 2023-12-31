@@ -1,10 +1,10 @@
 import { db } from "@peated/server/db";
 import { eq } from "drizzle-orm";
 import { flights } from "../../db/schema";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.flightCreate({
       name: "Delicious Wood",
@@ -13,7 +13,7 @@ test("requires authentication", async () => {
 });
 
 test("creates a new flight", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.flightCreate({
     name: "Macallan",
   });

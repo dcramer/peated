@@ -2,17 +2,17 @@ import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() => caller.notificationDelete(1)).rejects.toThrowError(
     /UNAUTHORIZED/,
   );
 });
 
 test("invalid notification", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() => caller.notificationDelete(1)).rejects.toThrowError(
     /Notification not found/,
   );
@@ -30,7 +30,7 @@ test("delete own notification", async () => {
     })
     .returning();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   await caller.notificationDelete(notification.id);
 
   const [newNotification] = await db
@@ -52,7 +52,7 @@ test("cannot delete others notification", async () => {
     })
     .returning();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() => caller.notificationDelete(notification.id)).rejects.toThrowError(
     /Cannot delete another user's notification/,
   );

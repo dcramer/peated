@@ -1,11 +1,11 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists bottles", async () => {
   await Fixtures.Bottle({ name: "Delicious Wood" });
   await Fixtures.Bottle({ name: "Something Else" });
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results } = await caller.bottleList();
 
   expect(results.length).toBe(2);
@@ -15,7 +15,7 @@ test("lists bottles with query", async () => {
   const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood" });
   await Fixtures.Bottle({ name: "Something Else" });
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
     query: "wood",
   });
@@ -31,7 +31,7 @@ test("lists bottles with 'The' prefix", async () => {
     brandId: brand.id,
   });
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
     query: "Macallan",
   });
@@ -48,7 +48,7 @@ test("lists bottles with distiller", async () => {
   });
   await Fixtures.Bottle({ name: "Something Else" });
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
     distiller: distiller1.id,
   });
@@ -65,7 +65,7 @@ test("lists bottles with brand", async () => {
   });
   await Fixtures.Bottle({ name: "Something Else" });
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
     brand: brand1.id,
   });
@@ -84,7 +84,7 @@ test("lists bottles with bottler", async () => {
   });
   await Fixtures.Bottle({ name: "Something Else" });
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
     bottler: bottler.id,
   });
@@ -97,7 +97,7 @@ test("lists bottles with query matching brand and name", async () => {
   const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood 10-year-old" });
   await Fixtures.Bottle({ name: "Something Else" });
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
     query: "wood 10",
   });

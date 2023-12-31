@@ -28,7 +28,6 @@ export default adminProcedure
 
     const bottleId = await findBottleId(input.name);
     const review = await db.transaction(async (tx) => {
-      // XXX: maybe we should constrain on URL?
       const [review] = await tx
         .insert(reviews)
         .values({

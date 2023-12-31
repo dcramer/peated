@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { comments } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() => caller.commentDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
@@ -14,7 +14,7 @@ test("delete own", async () => {
     createdById: DefaultFixtures.user.id,
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   await caller.commentDelete(comment.id);
 
   const [newComment] = await db
@@ -30,7 +30,7 @@ test("cannot delete others", async () => {
     createdById: user.id,
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() => caller.commentDelete(comment.id)).rejects.toThrowError(
     /Cannot delete another user's comment/,
   );

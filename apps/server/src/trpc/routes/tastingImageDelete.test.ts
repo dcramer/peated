@@ -1,9 +1,9 @@
 import { db } from "@peated/server/db";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.tastingImageDelete({
       tasting: 1,
@@ -16,7 +16,7 @@ test("cannot delete another user's image", async () => {
   const otherUser = await Fixtures.User();
   const tasting = await Fixtures.Tasting({ createdById: otherUser.id });
 
-  const caller = appRouter.createCaller({ user });
+  const caller = createCaller({ user });
   expect(() =>
     caller.tastingImageDelete({
       tasting: tasting.id,
@@ -30,7 +30,7 @@ test("deletes existing image", async () => {
     imageUrl: "http://example.com/image.png",
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.tastingImageDelete({
     tasting: tasting.id,
   });

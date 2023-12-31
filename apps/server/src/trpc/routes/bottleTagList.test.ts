@@ -1,5 +1,5 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists tags", async () => {
   const bottle = await Fixtures.Bottle();
@@ -22,7 +22,7 @@ test("lists tags", async () => {
     rating: 5,
   });
 
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   const { results, totalCount } = await caller.bottleTagList({
     bottle: bottle.id,
   });

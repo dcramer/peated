@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { entities, entityTombstones } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.entityMerge({
       root: 1,
@@ -15,7 +15,7 @@ test("requires authentication", async () => {
 });
 
 test("requires mod", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.entityMerge({
       root: 1,
@@ -28,7 +28,7 @@ test("merge A into B", async () => {
   const entityA = await Fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
   const entityB = await Fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.entityMerge({
@@ -64,7 +64,7 @@ test("merge A from B", async () => {
   const entityA = await Fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
   const entityB = await Fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.entityMerge({

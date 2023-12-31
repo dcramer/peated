@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { bottleTags, tastings } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() => caller.tastingDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
@@ -15,7 +15,7 @@ test("delete own tasting", async () => {
     tags: ["spiced", "caramel"],
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   await caller.tastingDelete(tasting.id);
 
   const [newTasting] = await db
@@ -39,7 +39,7 @@ test("cannot delete others tasting", async () => {
   const user = await Fixtures.User();
   const tasting = await Fixtures.Tasting({ createdById: user.id });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() => caller.tastingDelete(tasting.id)).rejects.toThrowError(
     /Cannot delete another user's tasting/,
   );

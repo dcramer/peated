@@ -2,11 +2,11 @@ import { db } from "@peated/server/db";
 import { externalSiteConfig } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires admin", async () => {
   const site = await Fixtures.ExternalSite();
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   expect(() =>
@@ -20,7 +20,7 @@ test("requires admin", async () => {
 
 test("set new value", async () => {
   const site = await Fixtures.ExternalSite();
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   const data = await caller.externalSiteConfigSet({
@@ -45,7 +45,7 @@ test("set existing value", async () => {
     value: { foo: "bar" },
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   const data = await caller.externalSiteConfigSet({

@@ -1,5 +1,5 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("lists flights", async () => {
   const flight1 = await Fixtures.Flight({
@@ -7,7 +7,7 @@ test("lists flights", async () => {
   });
   await Fixtures.Flight();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const { results } = await caller.flightList();
 
   expect(results.length).toBe(1);

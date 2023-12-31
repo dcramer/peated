@@ -1,10 +1,10 @@
 import * as mockJobs from "@peated/server/__mocks__/jobs";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires admin", async () => {
   const site = await Fixtures.ExternalSite({ type: "whiskyadvocate" });
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   expect(() => caller.externalSiteTriggerJob(site.type)).rejects.toThrowError(
@@ -14,7 +14,7 @@ test("requires admin", async () => {
 
 test("triggers job", async () => {
   const site = await Fixtures.ExternalSite({ type: "whiskyadvocate" });
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   const newSite = await caller.externalSiteTriggerJob(site.type);

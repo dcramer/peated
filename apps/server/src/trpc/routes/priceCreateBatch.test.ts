@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { eq } from "drizzle-orm";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires admin", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   expect(() =>
@@ -21,7 +21,7 @@ test("processes new price", async () => {
   });
   expect(bottle.fullName).toBe("Ardbeg 10-year-old");
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   await caller.priceCreateBatch({
@@ -60,7 +60,7 @@ test("processes existing price", async () => {
   });
   expect(existingPrice.name).toBe(bottle.fullName);
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   await caller.priceCreateBatch({
@@ -91,7 +91,7 @@ test("processes existing price", async () => {
 test("processes new price without bottle", async () => {
   const site = await Fixtures.ExternalSite({ type: "totalwines" });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   await caller.priceCreateBatch({

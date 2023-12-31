@@ -1,9 +1,9 @@
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires admin", async () => {
   const site = await Fixtures.ExternalSite();
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   expect(() =>
@@ -18,7 +18,7 @@ test("updates site", async () => {
     type: "healthyspirits",
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   const newSite = await caller.externalSiteUpdate({

@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { comments, tastings } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires auth", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: null,
   });
   expect(() =>
@@ -20,7 +20,7 @@ test("requires auth", async () => {
 test("new comment", async () => {
   const tasting = await Fixtures.Tasting();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   const data = await caller.commentCreate({

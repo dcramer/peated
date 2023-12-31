@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.notificationUpdate({
       notification: 1,
@@ -25,7 +25,7 @@ test("mark own notification as read", async () => {
     })
     .returning();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.notificationUpdate({
     notification: notification.id,
     read: true,
@@ -52,7 +52,7 @@ test("cannot update others notification", async () => {
     })
     .returning();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.notificationUpdate({
       notification: notification.id,

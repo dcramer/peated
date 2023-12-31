@@ -2,10 +2,10 @@ import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.userUpdate({
       user: 1,
@@ -17,7 +17,7 @@ test("cannot update another user", async () => {
   const user = await Fixtures.User();
   const otherUser = await Fixtures.User();
 
-  const caller = appRouter.createCaller({ user });
+  const caller = createCaller({ user });
   expect(() =>
     caller.userUpdate({
       user: otherUser.id,
@@ -26,7 +26,7 @@ test("cannot update another user", async () => {
 });
 
 test("can change displayName", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.userUpdate({
     user: DefaultFixtures.user.id,
     displayName: "Joe",
@@ -42,7 +42,7 @@ test("can change displayName", async () => {
 });
 
 test("can change username", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.userUpdate({
     user: DefaultFixtures.user.id,
     username: "JoeBlow",
@@ -58,7 +58,7 @@ test("can change username", async () => {
 });
 
 test("can change mod as admin", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   const data = await caller.userUpdate({
@@ -76,7 +76,7 @@ test("can change mod as admin", async () => {
 });
 
 test("can change admin as admin", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   const data = await caller.userUpdate({
@@ -94,7 +94,7 @@ test("can change admin as admin", async () => {
 });
 
 test("cannot change mod as user", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   expect(() =>
@@ -106,7 +106,7 @@ test("cannot change mod as user", async () => {
 });
 
 test("cannot change admin as user", async () => {
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: DefaultFixtures.user,
   });
   expect(() =>

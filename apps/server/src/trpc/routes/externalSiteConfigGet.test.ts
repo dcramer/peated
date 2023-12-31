@@ -1,11 +1,11 @@
 import { db } from "@peated/server/db";
 import { externalSiteConfig } from "@peated/server/db/schema";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires admin", async () => {
   const site = await Fixtures.ExternalSite();
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   expect(() =>
@@ -19,7 +19,7 @@ test("requires admin", async () => {
 test("get missing value", async () => {
   const site = await Fixtures.ExternalSite();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   const data = await caller.externalSiteConfigGet({
@@ -32,7 +32,7 @@ test("get missing value", async () => {
 test("get missing value with default", async () => {
   const site = await Fixtures.ExternalSite();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   const data = await caller.externalSiteConfigGet({
@@ -51,7 +51,7 @@ test("get present value", async () => {
     value: { foo: "bar" },
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
   const data = await caller.externalSiteConfigGet({

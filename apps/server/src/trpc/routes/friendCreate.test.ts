@@ -2,17 +2,17 @@ import { db } from "@peated/server/db";
 import { and, eq } from "drizzle-orm";
 import { follows, notifications } from "../../db/schema";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.friendCreate(DefaultFixtures.user.id),
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
 test("cannot friend self", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.friendCreate(DefaultFixtures.user.id),
   ).rejects.toThrowError(/Cannot friend yourself/);
@@ -21,7 +21,7 @@ test("cannot friend self", async () => {
 test("can friend new link", async () => {
   const otherUser = await Fixtures.User();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.friendCreate(otherUser.id);
 
   expect(data.status).toEqual("pending");
@@ -62,7 +62,7 @@ test("can friend existing link", async () => {
     status: "following",
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.friendCreate(otherUser.id);
 
   expect(data.status).toEqual("friends");
@@ -88,7 +88,7 @@ test("approves when mutual", async () => {
     status: "pending",
   });
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.friendCreate(otherUser.id);
 
   expect(data.status).toEqual("friends");

@@ -3,10 +3,10 @@ import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import { eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.bottleUpdate({
       bottle: 1,
@@ -15,7 +15,7 @@ test("requires authentication", async () => {
 });
 
 test("requires mod", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.bottleUpdate({
       bottle: 1,
@@ -26,7 +26,7 @@ test("requires mod", async () => {
 test("no changes", async () => {
   const bottle = await Fixtures.Bottle();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.bottleUpdate({
@@ -47,7 +47,7 @@ test("edits a new bottle with new name param", async () => {
   const brand = await Fixtures.Entity();
   const bottle = await Fixtures.Bottle({ brandId: brand.id });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.bottleUpdate({
@@ -72,7 +72,7 @@ test("edits a new bottle with new name param", async () => {
 test("clears category", async () => {
   const bottle = await Fixtures.Bottle({ category: "single_malt" });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.bottleUpdate({
@@ -94,7 +94,7 @@ test("clears category", async () => {
 test("requires age with matching name", async () => {
   const bottle = await Fixtures.Bottle({ statedAge: null });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   expect(() =>
@@ -109,7 +109,7 @@ test("manipulates name to conform with age", async () => {
   const brand = await Fixtures.Entity();
   const bottle = await Fixtures.Bottle({ brandId: brand.id });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.bottleUpdate({
@@ -135,7 +135,7 @@ test("changes brand", async () => {
   const newBrand = await Fixtures.Entity();
   const bottle = await Fixtures.Bottle();
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   const data = await caller.bottleUpdate({
@@ -172,7 +172,7 @@ test("removes distiller", async () => {
     distillerIds: [distillerA.id, distillerB.id],
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
   await caller.bottleUpdate({
@@ -203,7 +203,7 @@ test("changes distiller", async () => {
     distillerIds: [distillerA.id],
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
 
@@ -230,7 +230,7 @@ test("changes bottler", async () => {
     bottlerId: bottlerA.id,
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
 
@@ -258,7 +258,7 @@ test("changes distiller with previous identical brand", async () => {
     distillerIds: [entityA.id],
   });
 
-  const caller = appRouter.createCaller({
+  const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
 

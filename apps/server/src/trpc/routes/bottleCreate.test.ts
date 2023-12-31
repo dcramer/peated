@@ -7,10 +7,10 @@ import {
 } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
 import * as Fixtures from "../../lib/test/fixtures";
-import { appRouter } from "../router";
+import { createCaller } from "../router";
 
 test("requires authentication", async () => {
-  const caller = appRouter.createCaller({ user: null });
+  const caller = createCaller({ user: null });
   expect(() =>
     caller.bottleCreate({
       name: "Delicious Wood",
@@ -20,7 +20,7 @@ test("requires authentication", async () => {
 });
 
 test("creates a new bottle with minimal params", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const brand = await Fixtures.Entity();
   const data = await caller.bottleCreate({
     name: "Delicious Wood",
@@ -52,7 +52,7 @@ test("creates a new bottle with all params", async () => {
   const brand = await Fixtures.Entity();
   const distiller = await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.bottleCreate({
     name: "Delicious Wood 12-year-old",
     brand: brand.id,
@@ -98,7 +98,7 @@ test("creates a new bottle with all params", async () => {
 });
 
 test("does not create a new bottle with invalid brandId", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.bottleCreate({
       name: "Delicious Wood",
@@ -143,7 +143,7 @@ test("does not create a new bottle with invalid brandId", async () => {
 // });
 
 test("creates a new bottle with new brand name", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.bottleCreate({
     name: "Delicious Wood",
     brand: {
@@ -187,7 +187,7 @@ test("creates a new bottle with new brand name", async () => {
 });
 
 test("does not create a new bottle with invalid distillerId", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   expect(() =>
     caller.bottleCreate({
       name: "Delicious Wood",
@@ -249,7 +249,7 @@ test("does not create a new bottle with invalid distillerId", async () => {
 test("creates a new bottle with new distiller name", async () => {
   const brand = await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.bottleCreate({
     name: "Delicious Wood",
     brand: brand.id,
@@ -306,7 +306,7 @@ test("creates a new bottle with new distiller name", async () => {
 });
 
 test("creates a new bottle with new distiller name and brand name", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.bottleCreate({
     name: "Delicious Wood",
     brand: {
@@ -368,7 +368,7 @@ test("creates a new bottle with new distiller name and brand name", async () => 
 });
 
 test("creates a new bottle with new distiller name which is duplicated as brand name", async () => {
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.bottleCreate({
     name: "Delicious Wood",
     brand: {
@@ -426,7 +426,7 @@ test("refuses bottle w/ age signal", async () => {
   const brand = await Fixtures.Entity();
   const distiller = await Fixtures.Entity();
 
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
 
   expect(() =>
     caller.bottleCreate({
@@ -439,7 +439,7 @@ test("refuses bottle w/ age signal", async () => {
 
 test("removes duplicated brand name", async () => {
   const brand = await Fixtures.Entity({ name: "Delicious Wood" });
-  const caller = appRouter.createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.bottleCreate({
     name: "Delicious Wood Yum Yum",
     brand: brand.id,
