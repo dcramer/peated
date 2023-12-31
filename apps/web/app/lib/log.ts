@@ -9,6 +9,8 @@ export function logError(
   error: string | Error | unknown,
   context?: Record<string, any>,
 ): string {
+  console.error(error);
+
   const eventId =
     typeof error === "string"
       ? captureMessage(error, {
@@ -17,8 +19,6 @@ export function logError(
       : captureException(error, {
           extra: context || undefined,
         });
-
-  console.error(error);
 
   return eventId;
 }

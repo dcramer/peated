@@ -19,6 +19,8 @@ export function logError(
   contexts?: Record<string, Record<string, any>>,
   attachments?: Record<string, string | Uint8Array>,
 ): string {
+  console.error(error);
+
   const eventId = withScope((scope) => {
     if (attachments) {
       for (const key in attachments) {
@@ -37,8 +39,6 @@ export function logError(
           contexts,
         });
   });
-
-  console.error(error);
 
   return eventId;
 }
