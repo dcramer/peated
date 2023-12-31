@@ -54,7 +54,7 @@ export default ({
                   </div>
                 </td>
                 <td className="hidden px-3 py-3 text-right sm:table-cell">
-                  ${review.rating}
+                  {review.rating}
                 </td>
               </tr>
             );
