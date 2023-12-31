@@ -2,9 +2,9 @@ import { TrophyIcon } from "@heroicons/react/24/outline";
 import { trpc } from "../lib/trpc";
 
 function RatingIcon({ rating }: { rating: number }) {
-  if (rating > 93) return <TrophyIcon className="text-highlight h-4 w-4" />;
-  if (rating > 87) return <TrophyIcon className="h-4 w-4 text-gray-400" />;
-  if (rating > 83) return <TrophyIcon className="h-4 w-4 text-orange-400" />;
+  if (rating >= 93) return <TrophyIcon className="text-highlight h-4 w-4" />;
+  if (rating >= 87) return <TrophyIcon className="h-4 w-4 text-gray-400" />;
+  if (rating >= 83) return <TrophyIcon className="h-4 w-4 text-orange-400" />;
   return null;
 }
 
