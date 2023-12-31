@@ -8,7 +8,8 @@ export const normalizeCategory = (name: string): Category | null => {
   const nameLower = name.toLowerCase();
   if (CATEGORY_LIST.includes(nameLower as Category))
     return nameLower as Category;
-  if (nameLower.startsWith("single malt")) return "single_malt";
+  if (nameLower.startsWith("single malt") || nameLower.endsWith("single malt"))
+    return "single_malt";
   for (const category of CATEGORY_LIST) {
     if (nameLower.startsWith(formatCategoryName(category).toLowerCase())) {
       return category as Category;
