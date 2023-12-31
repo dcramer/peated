@@ -107,7 +107,10 @@ export async function scrapeReviews(
       return;
     }
     const name = normalizeBottleName(
-      rawName.replaceAll(/\s/gi, "").replace(/,\s[\d.]+%$/, ""),
+      rawName
+        .replaceAll(/\n/gi, "")
+        .trim()
+        .replace(/,\s[\d.]+%$/, ""),
     );
 
     const reviewUrl = $("a.postsItemLink", el).first().attr("href");
