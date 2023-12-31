@@ -1,6 +1,6 @@
 import { ilike, sql } from "drizzle-orm";
 import { db } from "../db";
-import { bottleAliases, bottles } from "../db/schema";
+import { bottleAliases, bottles, entities, type Entity } from "../db/schema";
 
 export async function findBottleId(name: string): Promise<number | null> {
   let result: { id: number | null } | null | undefined;
@@ -35,4 +35,15 @@ export async function findBottleId(name: string): Promise<number | null> {
     .limit(1);
 
   return result?.id || null;
+}
+
+export async function findEntity(fullName: string): Promise<Entity | null> {
+  const [result] = await db
+    .select()
+    .from(entities)
+    .where(sql`${entities.name} ~* ANY (string_to_array(${fullName}, ' '))`)
+    .orderBy(sql`LENGTH(${entities.name})`)
+    .limit(1);
+
+  return result ?? null;
 }

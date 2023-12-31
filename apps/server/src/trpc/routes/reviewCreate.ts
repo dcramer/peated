@@ -4,13 +4,14 @@ import {
   externalSites,
   reviews,
 } from "@peated/server/db/schema";
-import { findBottleId } from "@peated/server/lib/bottleFinder";
+import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
 import { ReviewInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import { TRPCError } from "@trpc/server";
 import { eq, isNull, sql } from "drizzle-orm";
 import { adminProcedure } from "..";
+import { createCaller } from "../router";
 
 export default adminProcedure
   .input(ReviewInputSchema)
@@ -26,7 +27,20 @@ export default adminProcedure
       });
     }
 
-    const bottleId = await findBottleId(input.name);
+    let bottleId = await findBottleId(input.name);
+    if (!bottleId) {
+      const entity = await findEntity(input.name);
+      if (entity) {
+        const caller = createCaller(ctx);
+        const result = await caller.bottleCreate({
+          name: input.name,
+          brand: entity.id,
+          category: input.category,
+        });
+        bottleId = result.id;
+      }
+    }
+
     const review = await db.transaction(async (tx) => {
       const [review] = await tx
         .insert(reviews)
