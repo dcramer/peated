@@ -15,6 +15,7 @@ import Button from "../components/button";
 import QueryBoundary from "../components/queryBoundary";
 import Tabs from "../components/tabs";
 import TimeSince from "../components/timeSince";
+import { formatDuration } from "../lib/format";
 import { trpc } from "../lib/trpc";
 
 export const sitemap: SitemapFunction = () => ({
@@ -128,7 +129,11 @@ export default function AdminSiteDetails() {
             </div>
             <div className="mb-4 px-3 text-center">
               <span className="block text-xl font-bold tracking-wide text-white">
-                {site.runEvery ? `${site.runEvery} mins` : <>&mdash;</>}
+                {site.runEvery ? (
+                  formatDuration(site.runEvery * 60 * 1000)
+                ) : (
+                  <>&mdash;</>
+                )}
               </span>
               <span className="text-light text-sm">Schedule</span>
             </div>
