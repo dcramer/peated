@@ -2,6 +2,7 @@ import {
   normalizeBottleName,
   normalizeCategory,
 } from "@peated/server/lib/normalize";
+import { logError } from "@peated/server/src/lib/log";
 import { getUrl } from "@peated/worker/scraper";
 import { type BottleReview } from "@peated/worker/types";
 import { load as cheerio } from "cheerio";
@@ -12,6 +13,11 @@ export default async function main() {
   const issueList = await scrapeIssueList(
     "https://whiskyadvocate.com/ratings-reviews",
   );
+  if (issueList.length === 0) {
+    logError("No issues found for Whisky Advocate.");
+    return;
+  }
+
   console.log(`Found ${issueList.length} issues`);
 
   const reviewList: BottleReview[] = [];
@@ -41,7 +47,6 @@ export default async function main() {
           ...item,
         });
       } catch (err) {
-        console.log("here");
         console.error(err);
       }
     }
