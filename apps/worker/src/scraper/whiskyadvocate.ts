@@ -1,8 +1,8 @@
+import { logError } from "@peated/server/lib/log";
 import {
   normalizeBottleName,
   normalizeCategory,
 } from "@peated/server/lib/normalize";
-import { logError } from "@peated/server/src/lib/log";
 import { getUrl } from "@peated/worker/scraper";
 import { type BottleReview } from "@peated/worker/types";
 import { load as cheerio } from "cheerio";
