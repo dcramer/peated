@@ -1,17 +1,26 @@
 import { type ExternalSiteType } from "@peated/server/src/types";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { json, type LoaderFunctionArgs } from "@remix-run/server-runtime";
+import { json } from "@remix-run/server-runtime";
 import { useNavigate } from "react-router-dom";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
 import SiteForm from "../components/admin/siteForm";
+import { redirectToAuth } from "../lib/auth";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 import { trpc } from "../lib/trpc";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, context: { user } }) => {
+  async ({ request, params: { siteId }, context: { user, trpc } }) => {
+    invariant(siteId);
+
     if (!user?.admin) return redirectToAuth({ request });
-    return null;
+
+    const site = await trpc.externalSiteByType.query(
+      siteId as ExternalSiteType,
+    );
+
+    return json({ site });
   },
 );
 
@@ -26,17 +35,6 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
-
-export async function loader({
-  params: { siteId },
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  invariant(siteId);
-
-  const site = await trpc.externalSiteByType.query(siteId as ExternalSiteType);
-
-  return json({ site });
-}
 
 export default function AdminSitesEdit() {
   const { site } = useLoaderData<typeof loader>();
