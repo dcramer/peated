@@ -106,7 +106,9 @@ export async function scrapeReviews(
       console.warn("Unable to identify bottle name");
       return;
     }
-    const name = normalizeBottleName(rawName.replace(/,\s[\d.]+%$/, ""));
+    const name = normalizeBottleName(
+      rawName.replaceAll(/\s/gi, "").replace(/,\s[\d.]+%$/, ""),
+    );
 
     const reviewUrl = $("a.postsItemLink", el).first().attr("href");
     if (!reviewUrl)
