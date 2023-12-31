@@ -16,9 +16,8 @@ WHERE bottle_alias.bottle_id IS NULL;
 
 UPDATE review SET bottle_id = (SELECT bottle_id FROM bottle_alias WHERE name = review.name) WHERE bottle_id IS NULL;
 
-
 UPDATE bottle_alias
 SET bottle_id = (
-    SELECT id FROM bottles WHERE full_name = bottle_alias.name
+    SELECT id FROM bottle WHERE full_name = bottle_alias.name
 )
 WHERE bottle_id IS NULL;
