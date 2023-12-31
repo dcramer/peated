@@ -38,12 +38,11 @@ export default adminProcedure
           url: input.url,
         })
         .onConflictDoUpdate({
-          target: [reviews.externalSiteId, reviews.name, reviews.rating],
+          target: [reviews.externalSiteId, reviews.name, reviews.issue],
           set: {
             bottleId,
             rating: input.rating,
             url: input.url,
-            issue: input.issue,
             updatedAt: sql`NOW()`,
           },
         })
