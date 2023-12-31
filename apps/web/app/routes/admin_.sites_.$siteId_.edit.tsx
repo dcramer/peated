@@ -8,6 +8,13 @@ import invariant from "tiny-invariant";
 import SiteForm from "../components/admin/siteForm";
 import { trpc } from "../lib/trpc";
 
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { user } }) => {
+    if (!user?.admin) return redirectToAuth({ request });
+    return null;
+  },
+);
+
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
