@@ -428,13 +428,18 @@ test("updates statedAge bottle w/ age signal", async () => {
 
   const caller = createCaller({ user: DefaultFixtures.user });
 
-  const data = caller.bottleCreate({
+  const data = await caller.bottleCreate({
     name: "Delicious Wood 12-year-old",
     brand: brand.id,
     distillers: [distiller.id],
   });
+  expect(data.id).toBeDefined();
 
-  expect(data.statedAge).toEqual(12);
+  const [bottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+  expect(bottle.statedAge).toEqual(12);
 });
 
 test("removes duplicated brand name", async () => {
