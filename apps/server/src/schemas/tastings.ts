@@ -26,7 +26,7 @@ export const TastingInputSchema = z.object({
   bottle: z.number(),
   notes: z.string().nullable().optional(),
   rating: z.number().gte(0).lte(5).nullable().optional(),
-  tags: z.array(z.string()).nullable().optional(),
+  tags: z.array(z.string()).max(15).nullable().optional(),
   servingStyle: ServiceStyleEnum.nullable().optional(),
   friends: z.array(z.number()).optional(),
   flight: z.string().nullable().optional(),
@@ -37,7 +37,7 @@ export const TastingInputSchema = z.object({
 export const TastingUpdateSchema = z.object({
   notes: z.string().nullable().optional(),
   rating: z.number().gte(0).lte(5).nullable().optional(),
-  tags: z.array(z.string()).nullable().optional(),
+  tags: z.array(z.string()).max(15).nullable().optional(),
   servingStyle: ServiceStyleEnum.nullable().optional(),
   friends: z.array(z.number()).optional(),
   flight: z.string().nullable().optional(),
