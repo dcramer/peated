@@ -422,19 +422,19 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
   expect(changeList.length).toBe(1);
 });
 
-test("refuses bottle w/ age signal", async () => {
+test("updates statedAge bottle w/ age signal", async () => {
   const brand = await Fixtures.Entity();
   const distiller = await Fixtures.Entity();
 
   const caller = createCaller({ user: DefaultFixtures.user });
 
-  expect(() =>
-    caller.bottleCreate({
-      name: "Delicious Wood 12-year-old",
-      brand: brand.id,
-      distillers: [distiller.id],
-    }),
-  ).rejects.toThrowError(/You should include the Stated Age of the bottle/);
+  const data = caller.bottleCreate({
+    name: "Delicious Wood 12-year-old",
+    brand: brand.id,
+    distillers: [distiller.id],
+  });
+
+  expect(data.statedAge).toEqual(12);
 });
 
 test("removes duplicated brand name", async () => {

@@ -23,11 +23,10 @@ export default authedProcedure
   .input(BottleInputSchema)
   .mutation(async function ({ input, ctx }) {
     let name = normalizeBottleName(input.name, input.statedAge);
-    if (name.indexOf("-year-old") !== -1 && !input.statedAge) {
-      throw new TRPCError({
-        message: "You should include the Stated Age of the bottle.",
-        code: "BAD_REQUEST",
-      });
+    const statedAgeMatch = name.match(/(\d+)-year-old/);
+    if (statedAgeMatch && !input.statedAge) {
+      // fill in statedAge for the user
+      input.statedAge = Number(statedAgeMatch[1]);
     }
 
     const user = ctx.user;

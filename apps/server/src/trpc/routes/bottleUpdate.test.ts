@@ -91,20 +91,6 @@ test("clears category", async () => {
   expect(bottle2.category).toBe(null);
 });
 
-test("requires age with matching name", async () => {
-  const bottle = await Fixtures.Bottle({ statedAge: null });
-
-  const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
-  });
-  expect(() =>
-    caller.bottleUpdate({
-      bottle: bottle.id,
-      name: "Delicious 10-year-old",
-    }),
-  ).rejects.toThrowError(/You should include the Stated Age of the bottle/);
-});
-
 test("manipulates name to conform with age", async () => {
   const brand = await Fixtures.Entity();
   const bottle = await Fixtures.Bottle({ brandId: brand.id });
@@ -129,6 +115,29 @@ test("manipulates name to conform with age", async () => {
   expect(bottle2.statedAge).toBe(10);
   expect(bottle2.name).toBe("Delicious 10-year-old");
   expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
+});
+
+test("fills in statedAge", async () => {
+  const brand = await Fixtures.Entity();
+  const bottle = await Fixtures.Bottle({ brandId: brand.id });
+
+  const caller = createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
+    name: "Delicious 10-year-old",
+  });
+
+  const [bottle2] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(omit(bottle, "name", "fullName", "statedAge")).toEqual(
+    omit(bottle2, "name", "fullName", "statedAge"),
+  );
+  expect(bottle2.statedAge).toBe(10);
 });
 
 test("changes brand", async () => {

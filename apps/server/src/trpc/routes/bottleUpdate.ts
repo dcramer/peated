@@ -59,14 +59,11 @@ export default modProcedure
         input.name || bottle.name,
         bottleData.statedAge,
       );
-      if (
-        bottleData.name.indexOf("-year-old") !== -1 &&
-        !bottleData.statedAge
-      ) {
-        throw new TRPCError({
-          message: "You should include the Stated Age of the bottle.",
-          code: "BAD_REQUEST",
-        });
+
+      const statedAgeMatch = bottleData.name.match(/(\d+)-year-old/);
+      if (statedAgeMatch && !input.statedAge) {
+        // fill in statedAge for the user
+        bottleData.statedAge = Number(statedAgeMatch[1]);
       }
     }
 
