@@ -110,7 +110,7 @@ export async function scrapeReviews(
       rawName
         .replaceAll(/\n/gi, "")
         .trim()
-        .replace(/,\s[\d.]+%$/, ""),
+        .replace(/,\s[\d.]+%,?$/, ""),
     );
 
     const reviewUrl = $("a.postsItemLink", el).first().attr("href");
