@@ -14,7 +14,7 @@ import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { TRPCError } from "@trpc/server";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, ilike, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { upsertEntity } from "../../lib/db";
@@ -158,7 +158,7 @@ export default modProcedure
 
       if (bottleData.name) {
         const existingAlias = await tx.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.name, newBottle.fullName),
+          where: ilike(bottleAliases.name, newBottle.fullName),
         });
         // TODO: consider deleting duplicate alias at this point
         if (!existingAlias) {
@@ -183,8 +183,10 @@ export default modProcedure
                 eq(bottleAliases.name, bottle.fullName),
               ),
             );
-        } else if (existingAlias) {
-          throw new Error("Duplicate alias found. Not implemented.");
+        } else {
+          throw new Error(
+            `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
+          );
         }
       }
 
