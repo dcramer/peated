@@ -1,5 +1,5 @@
 import { program } from "commander";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, ne, sql } from "drizzle-orm";
 import { db } from "../db";
 import {
   bottleAliases,
@@ -59,7 +59,13 @@ program
     const results = await db
       .select({ bottle: bottles, review: reviews })
       .from(bottles)
-      .innerJoin(reviews, eq(reviews.bottleId, bottles.id));
+      .innerJoin(
+        reviews,
+        and(
+          eq(reviews.bottleId, bottles.id),
+          ne(reviews.name, bottles.fullName),
+        ),
+      );
 
     const systemUser = await db.query.users.findFirst({
       where: (table, { eq }) => eq(table.username, "dcramer"),
@@ -79,6 +85,9 @@ program
           );
           await caller.bottleDelete(bottle.id);
         } else {
+          // probably mismatched bottle
+          if (bottle.brandId === entity.id) continue;
+
           if (!review.name.startsWith(entity.name)) {
             console.log([review.name, entity.name]);
             throw new Error();
@@ -88,7 +97,7 @@ program
           if (!newName) newName = formatCategoryName(bottle.category);
 
           console.log(
-            `Updating ${bottle.fullName} to ${newName} (from ${entity.name})`,
+            `Updating ${bottle.fullName} to ${entity.name} ${newName} (from ${entity.name})`,
           );
 
           await caller.bottleUpdate({
