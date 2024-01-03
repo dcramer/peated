@@ -4,6 +4,8 @@ import { Fragment } from "react";
 import BottleReviews from "./bottleReviews.client";
 import BottleTagDistribution from "./bottleTagDistribution.client";
 import { ClientOnly } from "./clientOnly";
+import DefinitionList from "./definitionList";
+import Heading from "./heading";
 import Markdown from "./markdown";
 import QueryBoundary from "./queryBoundary";
 
@@ -55,27 +57,29 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
             </ClientOnly>
             {bottle.description && (
               <>
-                <h3 className="text-highlight text-lg font-bold">Summary</h3>
-                <div className="prose prose-invert -mt-5 max-w-none flex-auto">
+                <Heading as="h3">Summary</Heading>
+                <div className="prose prose-invert -mt-1 max-w-none flex-auto">
                   <Markdown content={bottle.description} />
                 </div>
               </>
             )}
             {bottle.tastingNotes && (
               <>
-                <h3 className="text-highlight text-lg font-bold">
-                  Tasting Notes
-                </h3>
-                <div className="prose prose-invert max-w-none flex-auto">
-                  <dl>
-                    <dt>Nose</dt>
-                    <dd>{bottle.tastingNotes.nose}</dd>
-                    <dt>Palate</dt>
-                    <dd>{bottle.tastingNotes.palate}</dd>
-                    <dt>Finish</dt>
-                    <dd>{bottle.tastingNotes.finish}</dd>
-                  </dl>
-                </div>
+                <Heading as="h3">Tasting Notes</Heading>
+                <DefinitionList>
+                  <DefinitionList.Term>Nose</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.tastingNotes.nose}
+                  </DefinitionList.Details>
+                  <DefinitionList.Term>Palate</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.tastingNotes.palate}
+                  </DefinitionList.Details>
+                  <DefinitionList.Term>Finish</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.tastingNotes.finish}
+                  </DefinitionList.Details>
+                </DefinitionList>
               </>
             )}
           </div>

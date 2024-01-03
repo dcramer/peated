@@ -1,5 +1,6 @@
 import { TrophyIcon } from "@heroicons/react/24/outline";
 import { trpc } from "../lib/trpc";
+import Heading from "./heading";
 
 function RatingIcon({ rating }: { rating: number }) {
   if (rating >= 93) return <TrophyIcon className="text-highlight h-4 w-4" />;
@@ -21,7 +22,7 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
 
   return (
     <>
-      <h3 className="text-highlight text-lg font-bold">The Critics</h3>
+      <Heading as="h3">The Critics</Heading>
       <ul className="-mx-2 grid grid-cols-2 sm:w-2/3 md:w-1/2">
         {results.map((r) => {
           return (
