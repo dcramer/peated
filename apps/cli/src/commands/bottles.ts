@@ -1,6 +1,5 @@
-import { program } from "commander";
-import { and, eq, inArray, ne, sql } from "drizzle-orm";
-import { db } from "../db";
+import program from "@peated/cli/program";
+import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleTags,
@@ -11,15 +10,16 @@ import {
   reviews,
   storePrices,
   tastings,
-} from "../db/schema";
-import { pushJob, shutdownClient } from "../jobs";
-import { findEntity } from "../lib/bottleFinder";
-import { formatCategoryName } from "../lib/format";
-import { createCaller } from "../trpc/router";
+} from "@peated/server/db/schema";
+import { pushJob } from "@peated/server/jobs";
+import { findEntity } from "@peated/server/lib/bottleFinder";
+import { formatCategoryName } from "@peated/server/lib/format";
+import { createCaller } from "@peated/server/trpc/router";
+import { and, eq, inArray, ne, sql } from "drizzle-orm";
 
-program.name("bottles").description("CLI for assisting with bottle admin");
+const subcommand = program.command("bottles");
 
-program
+subcommand
   .command("generate-descriptions")
   .description("Generate bottle descriptions")
   .argument("[bottleId]")
@@ -38,21 +38,17 @@ program
       );
       await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
     }
-
-    await shutdownClient();
   });
 
-program
+subcommand
   .command("create-missing")
   .description("Create missing bottles")
   .action(async (options) => {
     console.log(`Pushing job [CreateMissingBottles].`);
     await pushJob("CreateMissingBottles");
-
-    await shutdownClient();
   });
 
-program
+subcommand
   .command("fix-bad-entities")
   .description("Fix bottles with bad entities")
   .action(async (options) => {
@@ -111,7 +107,7 @@ program
   });
 
 // TODO: move logic to utility + tests
-program
+subcommand
   .command("merge")
   .description("Merge two or more bottles together")
   .argument("<rootBottleId>")
@@ -206,5 +202,3 @@ program
       await tx.delete(bottles).where(inArray(bottles.id, bottleIds));
     });
   });
-
-program.parseAsync();

@@ -2,10 +2,11 @@
   "extends": "@peated/tsconfig/tsconfig.json",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "types": ["vitest/globals", "./src/globals.d.ts"],
+    "types": [],
     "baseUrl": "./",
     "paths": {
-      "@peated/server/*": ["src/*"]
+      "@peated/cli/*": ["src/*"],
+      "@peated/server/*": ["../../apps/server/src/*"]
     }
   },
   "include": ["src"],

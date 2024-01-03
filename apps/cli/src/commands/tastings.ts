@@ -1,10 +1,10 @@
-import { program } from "commander";
-import { db } from "../db";
-import { pushJob, shutdownClient } from "../jobs";
+import program from "@peated/cli/program";
+import { db } from "@peated/server/db";
+import { pushJob } from "@peated/server/jobs";
 
-program.name("tastings").description("CLI for assisting with tasting admin");
+const subcommand = program.command("tastings");
 
-program
+subcommand
   .command("notify-discord")
   .description("Manually fire Discord notification")
   .argument("[tastingId]")
@@ -16,8 +16,4 @@ program
       console.log(`Firing notification for tasting ${tasting.id}.`);
       await pushJob("NotifyDiscordOnTasting", { tastingId: tasting.id });
     }
-
-    await shutdownClient();
   });
-
-program.parseAsync();

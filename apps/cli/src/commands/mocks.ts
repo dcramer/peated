@@ -1,12 +1,16 @@
-import { program } from "commander";
+import program from "@peated/cli/program";
+import { db } from "@peated/server/db";
+import type { Bottle, Entity, ExternalSite } from "@peated/server/db/schema";
+import {
+  bottles,
+  externalSites,
+  tastings,
+  users,
+} from "@peated/server/db/schema";
+import { createNotification } from "@peated/server/lib/notifications";
+import { random } from "@peated/server/lib/rand";
+import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { and, eq, ne, sql } from "drizzle-orm";
-
-import { db } from "../db";
-import type { Bottle, Entity, ExternalSite } from "../db/schema";
-import { bottles, externalSites, tastings, users } from "../db/schema";
-import { createNotification } from "../lib/notifications";
-import { random } from "../lib/rand";
-import * as Fixtures from "../lib/test/fixtures";
 
 const loadDefaultSites = async () => {
   const store1 =
@@ -155,9 +159,9 @@ const loadDefaultBottles = async (
   }
 };
 
-program.name("mocks").description("CLI for assisting with Drizzle");
+const subcommand = program.command("mocks");
 
-program
+subcommand
   .command("load-all")
   .argument("[email]", "define a user to receive new follows")
   .option(
@@ -243,5 +247,3 @@ program
       }
     }
   });
-
-program.parseAsync();

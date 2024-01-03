@@ -1,13 +1,13 @@
+import program from "@peated/cli/program";
+import { db } from "@peated/server/db";
+import { users } from "@peated/server/db/schema";
+import { createAccessToken, createUser } from "@peated/server/lib/auth";
 import { hashSync } from "bcrypt";
-import { program } from "commander";
 import { eq } from "drizzle-orm";
-import { db } from "../db";
-import { users } from "../db/schema";
-import { createAccessToken, createUser } from "../lib/auth";
 
-program.name("user").description("CLI for assisting with user management");
+const subcommand = program.command("users");
 
-program
+subcommand
   .command("create")
   .description("Create a user")
   .argument("<email>")
@@ -26,7 +26,7 @@ program
     console.log(`${user.email} created.`);
   });
 
-program
+subcommand
   .command("set-password")
   .description("Set a users password")
   .argument("<email>")
@@ -41,7 +41,7 @@ program
     console.log(`${user.email} password changed`);
   });
 
-program
+subcommand
   .command("make-admin")
   .description("Make a user admin")
   .argument("<email>")
@@ -52,7 +52,7 @@ program
     console.log(`${user.email} updated to be admin.`);
   });
 
-program
+subcommand
   .command("generate-token")
   .description("Generate a bearer token")
   .argument("<email>")
@@ -63,5 +63,3 @@ program
 
     console.log(`ACCESS_TOKEN=${token}`);
   });
-
-program.parseAsync();

@@ -13,7 +13,6 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx",
     "incremental": true,
     "declaration": true,
@@ -23,8 +22,7 @@
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
-    "outDir": "./dist"
+    "noFallthroughCasesInSwitch": true
   },
   "references": [{ "path": "./tsconfig.node.json" }],
   "ts-node": {

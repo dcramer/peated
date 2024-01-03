@@ -1,10 +1,10 @@
-import { program } from "commander";
-import { db } from "../db";
-import { migrate } from "../db/migrate";
+import program from "@peated/cli/program";
+import { db } from "@peated/server/db";
+import { migrate } from "@peated/server/db/migrate";
 
-program.name("db").description("CLI for assisting with Drizzle");
+const subcommand = program.command("db");
 
-program
+subcommand
   .command("migrate")
   .description("Run drizzle-kit database migrations")
   .option("--fake", "fake the migration, only writing metadata to the db")
@@ -14,5 +14,3 @@ program
       fake: options.fake,
     });
   });
-
-program.parseAsync();

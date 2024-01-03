@@ -1,10 +1,10 @@
-import { program } from "commander";
-import { db } from "../db";
-import { pushJob, shutdownClient } from "../jobs";
+import program from "@peated/cli/program";
+import { db } from "@peated/server/db";
+import { pushJob } from "@peated/server/jobs";
 
-program.name("entities").description("CLI for assisting with entity admin");
+const subcommand = program.command("entities");
 
-program
+subcommand
   .command("generate-descriptions")
   .description("Generate entity descriptions")
   .argument("[entityId]")
@@ -23,8 +23,4 @@ program
       );
       await pushJob("GenerateEntityDetails", { entityId: entity.id });
     }
-
-    await shutdownClient();
   });
-
-program.parseAsync();
