@@ -12,10 +12,6 @@
     "users": "ts-node --require dotenv/config ./src/bin/index.ts users",
     "typecheck": "tsc --noEmit"
   },
-  "main": "dist/index.js",
-  "bin": {
-    "peated": "./dist/index.js"
-  },
   "dependencies": {
     "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",
