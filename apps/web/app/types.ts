@@ -43,7 +43,7 @@ type PropsToOmit<E extends ElementType, P> = keyof (PolymorphicAsProp<E> & P);
 
 export type PolymorphicProps<
   E extends ElementType,
-  Props = Record<string, never>,
+  Props = unknown,
 > = PropsWithChildren<
   Props &
     Omit<ComponentPropsWithoutRef<E>, PropsToOmit<E, Props>> &
