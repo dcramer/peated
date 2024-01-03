@@ -1,6 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import { useLocation, useNavigate } from "@remix-run/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import useAuth from "@peated/web/hooks/useAuth";
 import NavLink from "./navLink";
@@ -17,6 +17,10 @@ export default function AppHeader() {
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+
+  useEffect(() => {
+    setSearchOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="flex flex-auto items-center gap-x-2 sm:gap-x-4">
@@ -49,7 +53,6 @@ export default function AppHeader() {
           open={searchOpen}
           as="div"
           className="dialog"
-          key={location.pathname}
           onClose={setSearchOpen}
         >
           <Dialog.Overlay className="fixed inset-0" />
