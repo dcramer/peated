@@ -23,6 +23,7 @@ ENV SENTRY_DSN=$SENTRY_DSN \
     FATHOM_SITE_ID=$FATHOM_SITE_ID
 
 ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
+ADD apps/cli/package.json ./apps/cli/package.json
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/server/package.json ./apps/server/package.json
 ADD apps/worker/package.json ./apps/worker/package.json
