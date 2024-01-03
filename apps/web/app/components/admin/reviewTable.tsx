@@ -40,13 +40,19 @@ export default ({
                 className="border-b border-slate-800 text-sm"
               >
                 <td className="max-w-0 px-3 py-3">
-                  <Link to={review.url} className="font-medium hover:underline">
+                  <Link
+                    to={review.url}
+                    className="font-semibold hover:underline"
+                  >
                     {review.name}
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
                     {review.bottle ? (
-                      <Link to={`/bottles/${review.bottle.id}`}>
-                        Bottle {review.bottle.id}
+                      <Link
+                        to={`/bottles/${review.bottle.id}`}
+                        className="hover:underline"
+                      >
+                        [{review.bottle.id}] ({review.bottle.fullName})
                       </Link>
                     ) : (
                       <em>No Bottle</em>
