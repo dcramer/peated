@@ -174,7 +174,10 @@ export default modProcedure
               ),
             );
           // this should only happen on entity change
-        } else if (existingAlias.bottleId === newBottle.id) {
+        } else if (
+          !existingAlias.bottleId ||
+          existingAlias.bottleId === newBottle.id
+        ) {
           await tx
             .delete(bottleAliases)
             .where(
