@@ -8,10 +8,14 @@ import {
   bottles,
   bottlesToDistillers,
   collectionBottles,
+  reviews,
   storePrices,
   tastings,
 } from "../db/schema";
 import { pushJob, shutdownClient } from "../jobs";
+import { findEntity } from "../lib/bottleFinder";
+import { formatCategoryName } from "../lib/format";
+import { createCaller } from "../trpc/router";
 
 program.name("bottles").description("CLI for assisting with bottle admin");
 
@@ -46,6 +50,55 @@ program
     await pushJob("CreateMissingBottles");
 
     await shutdownClient();
+  });
+
+program
+  .command("fix-bad-entities")
+  .description("Fix bottles with bad entities")
+  .action(async (options) => {
+    const results = await db
+      .select({ bottle: bottles, review: reviews })
+      .from(bottles)
+      .innerJoin(reviews, eq(reviews.bottleId, bottles.id));
+
+    const systemUser = await db.query.users.findFirst({
+      where: (table, { eq }) => eq(table.username, "dcramer"),
+    });
+    if (!systemUser) throw new Error("Unable to identify system user");
+
+    const caller = createCaller({
+      user: systemUser,
+    });
+
+    for (const { bottle, review } of results) {
+      if (bottle.fullName.indexOf(review.name) !== 0) {
+        const entity = await findEntity(review.name);
+        if (!entity) {
+          console.warn(
+            `Removing bottle due to unknown entity: ${bottle.fullName}`,
+          );
+          await caller.bottleDelete(bottle.id);
+        } else {
+          if (!review.name.startsWith(entity.name)) {
+            console.log([review.name, entity.name]);
+            throw new Error();
+          }
+
+          let newName = review.name.slice(entity.name.length + 1);
+          if (!newName) newName = formatCategoryName(bottle.category);
+
+          console.log(
+            `Updating ${bottle.fullName} to ${newName} (from ${entity.name})`,
+          );
+
+          await caller.bottleUpdate({
+            bottle: bottle.id,
+            name: newName,
+            brand: entity.id,
+          });
+        }
+      }
+    }
   });
 
 // TODO: move logic to utility + tests
