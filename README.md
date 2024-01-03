@@ -11,7 +11,7 @@ A Discord is available if you want to contribute: https://discord.gg/d7GFPfy88Z
 Bootstrap the environment:
 
 ```
-docker-compose up -d
+docker compose up -d
 pnpm setup
 ```
 
