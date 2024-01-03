@@ -1,5 +1,5 @@
 import * as Fixtures from "@peated/server/lib/test/fixtures";
-import { findBottleId } from "./bottleFinder";
+import { findBottleId, findEntity } from "./bottleFinder";
 
 test("findBottle matches exact", async () => {
   const bottle = await Fixtures.Bottle();
@@ -37,4 +37,22 @@ test("findBottle matches alias", async () => {
   });
   const result = await findBottleId("Something Silly");
   expect(result).toBe(bottle.id);
+});
+
+test("findEntity matches exact", async () => {
+  const entity = await Fixtures.Entity({ name: "Hibiki" });
+  const result = await findEntity("Hibiki");
+  expect(result?.id).toEqual(entity.id);
+});
+
+test("findEntity matches bottle name prefix", async () => {
+  const entity = await Fixtures.Entity({ name: "Hibiki" });
+  const result = await findEntity("Hibiki 12-year-old");
+  expect(result?.id).toEqual(entity.id);
+});
+
+test("findEntity does not match entity name prefix", async () => {
+  const entity = await Fixtures.Entity({ name: "Hibiki Real" });
+  const result = await findEntity("Hibiki 12-year-old");
+  expect(result).toBeNull();
 });
