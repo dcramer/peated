@@ -11,6 +11,7 @@ import {
   bottlesToDistillers,
   changes,
   entities,
+  reviews,
 } from "../../db/schema";
 import { notEmpty } from "../../lib/filter";
 
@@ -75,10 +76,14 @@ export default adminProcedure.input(z.number()).mutation(async function ({
       .delete(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     await tx.delete(bottleAliases).where(eq(bottleAliases.bottleId, bottle.id));
-    await tx.delete(bottles).where(eq(bottles.id, bottle.id));
+    await tx
+      .update(reviews)
+      .set({ bottleId: null })
+      .where(eq(reviews.bottleId, bottle.id));
     await tx.insert(bottleTombstones).values({
       bottleId: bottle.id,
     });
+    await tx.delete(bottles).where(eq(bottles.id, bottle.id));
   });
 
   return {};
