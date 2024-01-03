@@ -7,6 +7,7 @@ import type {
   PagingRel,
 } from "@peated/server/types";
 import { Link, useLocation } from "@remix-run/react";
+import BottleLink from "./bottleLink";
 import Button from "./button";
 import SortParam from "./sortParam";
 
@@ -89,12 +90,12 @@ export default ({
               <tr key={bottle.id} className="border-b border-slate-800">
                 <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
                   <div className="flex items-center space-x-1">
-                    <Link
-                      to={`/bottles/${bottle.id}`}
+                    <BottleLink
+                      bottle={bottle}
                       className="font-medium hover:underline"
                     >
                       {bottle.fullName}
-                    </Link>
+                    </BottleLink>
                     {bottle.isFavorite && (
                       <StarIcon className="h-4 w-4" aria-hidden="true" />
                     )}
