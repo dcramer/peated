@@ -157,17 +157,35 @@ export default modProcedure
       if (!newBottle) return;
 
       if (bottleData.name) {
-        await tx
-          .update(bottleAliases)
-          .set({
-            name: newBottle.fullName,
-          })
-          .where(
-            and(
-              eq(bottleAliases.bottleId, newBottle.id),
-              eq(bottleAliases.name, bottle.fullName),
-            ),
-          );
+        const existingAlias = await tx.query.bottleAliases.findFirst({
+          where: eq(bottleAliases.name, newBottle.fullName),
+        });
+        // TODO: consider deleting duplicate alias at this point
+        if (!existingAlias) {
+          await tx
+            .update(bottleAliases)
+            .set({
+              name: newBottle.fullName,
+            })
+            .where(
+              and(
+                eq(bottleAliases.bottleId, newBottle.id),
+                eq(bottleAliases.name, bottle.fullName),
+              ),
+            );
+          // this should only happen on entity change
+        } else if (existingAlias.bottleId === newBottle.id) {
+          await tx
+            .delete(bottleAliases)
+            .where(
+              and(
+                eq(bottleAliases.bottleId, newBottle.id),
+                eq(bottleAliases.name, bottle.fullName),
+              ),
+            );
+        } else {
+          throw new Error("Duplicate alias found. Not implemented.");
+        }
       }
 
       const distillerIds: number[] = [];
