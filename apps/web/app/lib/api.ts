@@ -36,15 +36,6 @@ export class ApiUnauthorized extends ApiError {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const debounce = (fn: Function, ms = 300) => {
-  let timeoutId: ReturnType<typeof setTimeout>;
-  return function (this: any, ...args: any[]) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => fn.apply(this, args), ms);
-  };
-};
-
 const withoutUndefined = (obj: object) => {
   return Object.fromEntries(
     Object.entries(obj).filter(([, v]) => v !== undefined),
