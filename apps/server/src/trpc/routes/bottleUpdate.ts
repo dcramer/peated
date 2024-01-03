@@ -183,7 +183,7 @@ export default modProcedure
                 eq(bottleAliases.name, bottle.fullName),
               ),
             );
-        } else {
+        } else if (existingAlias) {
           throw new Error("Duplicate alias found. Not implemented.");
         }
       }
