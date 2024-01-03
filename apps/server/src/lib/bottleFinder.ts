@@ -41,7 +41,7 @@ export async function findEntity(fullName: string): Promise<Entity | null> {
   const [result] = await db
     .select()
     .from(entities)
-    .where(sql`${fullName} ILIKE '%' || ${entities.name} || '%'`)
+    .where(sql`${fullName} ILIKE ${entities.name} || '%'`)
     // .where(sql`${entities.name} ~* ANY (string_to_array(${fullName}, ' '))`)
     .orderBy(sql`LENGTH(${entities.name})`)
     .limit(1);

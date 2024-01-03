@@ -55,4 +55,7 @@ test("findEntity does not match entity name prefix", async () => {
   const entity = await Fixtures.Entity({ name: "Hibiki Real" });
   const result = await findEntity("Hibiki 12-year-old");
   expect(result).toBeNull();
+
+  const result2 = await findEntity("The Hibiki Real 12-year-old");
+  expect(result).toBeNull();
 });
