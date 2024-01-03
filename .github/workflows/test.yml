@@ -49,7 +49,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
       - name: Run docker images
-        run: docker-compose up -d
+        run: docker compose up -d
       - name: Install deps
         run: pnpm install
       - name: Build packages
