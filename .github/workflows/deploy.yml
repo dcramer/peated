@@ -98,12 +98,12 @@ jobs:
       # optimize cache by building all stages
       - name: Build All Stages
         uses: docker/build-push-action@v5
-        if: steps.verify_web.outputs.image_exists == 'false' || steps.verify_api.outputs.image_exists == 'false' || steps.verify_worker.outputs.image_exists == 'false'
+        if: ${{ !steps.verify_web.outputs.image_exists || !steps.verify_api.outputs.image_exists || !steps.verify_worker.outputs.image_exists }}
         with:
           context: .
           cache-from: type=gha,scope=prod
           cache-to: type=gha,mode=max,scope=prod
-          no-cache: ${{ inputs.nocache == 'true' }}
+          no-cache: ${{ inputs.nocache }}
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER=${{ env.API_SERVER }}
@@ -118,11 +118,11 @@ jobs:
 
       - name: Build Web
         uses: docker/build-push-action@v5
-        if: steps.verify_web.outputs.image_exists == 'false'
+        if: ${{ !steps.verify_web.outputs.image_exists }}
         with:
           context: .
           cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache == 'true' }}
+          no-cache: ${{ inputs.nocache }}
           push: true
           target: web
           build-args: |
@@ -141,11 +141,11 @@ jobs:
 
       - name: Build Worker
         uses: docker/build-push-action@v5
-        if: steps.verify_worker.outputs.image_exists == 'false'
+        if: ${{ !steps.verify_worker.outputs.image_exists }}
         with:
           context: .
           cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache == 'true' }}
+          no-cache: ${{ inputs.nocache }}
           push: true
           target: worker
           build-args: |
@@ -164,11 +164,11 @@ jobs:
 
       - name: Build CLI
         uses: docker/build-push-action@v5
-        if: steps.verify_worker.outputs.image_exists == 'false'
+        if: ${{ !steps.verify_worker.outputs.image_exists }}
         with:
           context: .
           cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache == 'true' }}
+          no-cache: ${{ inputs.nocache }}
           push: true
           target: cli
           build-args: |
@@ -280,7 +280,7 @@ jobs:
               - .github/workflows/deploy.yml
 
       - name: Run Migrations
-        if: ${{ inputs.force || steps.changed-files-yaml.outputs.migrations_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.migrations_any_changed }}
         run: |-
           gcloud run jobs update migrate-database \
             --region ${{ env.REGION }} \
@@ -290,19 +290,19 @@ jobs:
             --wait
 
       - name: "Deploy API"
-        if: ${{ inputs.force || steps.changed-files-yaml.outputs.api_any_changed == 'true' || steps.changed-files-yaml.outputs.common_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.api_any_changed || steps.changed-files-yaml.outputs.common_any_changed }}
         run: |-
           kubectl set image deployment.v1.apps/peated-api peated-api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
           kubectl rollout status deployment/peated-api --timeout=5m
 
       - name: "Deploy Web"
-        if: ${{ inputs.force || steps.changed-files-yaml.outputs.web_any_changed == 'true' || steps.changed-files-yaml.outputs.common_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.web_any_changed || steps.changed-files-yaml.outputs.common_any_changed }}
         run: |-
           kubectl set image deployment.v1.apps/peated-web peated-web="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}"
           kubectl rollout status deployment/peated-web --timeout=5m
 
       - name: "Deploy Worker"
-        if: ${{ inputs.force || steps.changed-files-yaml.outputs.worker_any_changed == 'true' || steps.changed-files-yaml.outputs.common_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.worker_any_changed || steps.changed-files-yaml.outputs.common_any_changed }}
         run: |-
           kubectl set image deployment.v1.apps/peated-worker peated-worker="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}"
           kubectl rollout status deployment/peated-worker --timeout=5m
