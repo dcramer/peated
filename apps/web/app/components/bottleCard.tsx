@@ -82,7 +82,7 @@ export const PreviewBottleCard = ({
   const { brand } = data;
   return (
     <BottleScaffold
-      name={brand ? `${brand.name} ${data.name}` : data.name}
+      name={brand ? `${brand.shortName || brand.name} ${data.name}` : data.name}
       category={data.category ? formatCategoryName(data.category) : null}
       brand={brand ? brand.name : "Unknown Bottle"}
       statedAge={data.statedAge ? `Aged ${data.statedAge} years` : null}
@@ -109,7 +109,6 @@ export default function BottleCard({
         <>
           <h4 className="truncate font-bold">
             <BottleLink bottle={bottle} className="hover:underline">
-              {" "}
               {bottle.fullName}
             </BottleLink>
           </h4>
