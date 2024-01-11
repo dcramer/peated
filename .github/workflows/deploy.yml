@@ -218,6 +218,14 @@ jobs:
       contents: "read"
       id-token: "write"
     steps:
+      - uses: chrnorm/deployment-action@v2
+        name: Create GitHub deployment
+        id: deployment
+        with:
+          token: "${{ github.token }}"
+          environment-url: https://peated.app
+          environment: production
+
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v3
 
@@ -314,3 +322,21 @@ jobs:
         with:
           args: |
             "ERROR: Failed to deploy version [${{ steps.vars.outputs.sha_short }}](https://github.com/{{ EVENT_PAYLOAD.repository.full_name }}/commit/${{ github.sha }})."
+
+      - name: Update deployment status (success)
+        if: success()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: "${{ github.token }}"
+          environment-url: ${{ steps.deployment.outputs.environment_url }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: "success"
+
+      - name: Update deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: "${{ github.token }}"
+          environment-url: ${{ steps.deployment.outputs.environment_url }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: "failure"
