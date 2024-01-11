@@ -274,7 +274,7 @@ jobs:
         run: |-
           gcloud run jobs update migrate-database \
             --region ${{ env.REGION }} \
-            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
+            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/cli:${{ github.sha }}"
           gcloud run jobs execute migrate-database \
             --region ${{ env.REGION }} \
             --wait
