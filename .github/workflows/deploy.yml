@@ -139,29 +139,6 @@ jobs:
           tags: |
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/web:${{ github.sha }}
 
-      - name: Build API
-        uses: docker/build-push-action@v5
-        if: steps.verify_api.outputs.image_exists == 'false'
-        with:
-          context: .
-          cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache == 'true' }}
-          push: true
-          target: api
-          build-args: |
-            VERSION=${{ github.sha }}
-            API_SERVER=${{ env.API_SERVER }}
-            URL_PREFIX=${{ env.URL_PREFIX }}
-            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
-            SENTRY_DSN=${{ env.SENTRY_DSN }}
-            SENTRY_ORG=${{ env.SENTRY_ORG }}
-            SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
-            FATHOM_SITE_ID=${{ env.FATHOM_SITE_ID }}
-          secrets: |
-            "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
-          tags: |
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}
-
       - name: Build Worker
         uses: docker/build-push-action@v5
         if: steps.verify_worker.outputs.image_exists == 'false'
@@ -184,6 +161,52 @@ jobs:
             "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
           tags: |
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}
+
+      - name: Build CLI
+        uses: docker/build-push-action@v5
+        if: steps.verify_worker.outputs.image_exists == 'false'
+        with:
+          context: .
+          cache-from: type=gha,scope=prod
+          no-cache: ${{ inputs.nocache == 'true' }}
+          push: true
+          target: cli
+          build-args: |
+            VERSION=${{ github.sha }}
+            API_SERVER={{ env.API_SERVER }}
+            URL_PREFIX=${{ env.URL_PREFIX }}
+            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+            SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_ORG=${{ env.SENTRY_ORG }}
+            SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
+            FATHOM_SITE_ID=${{ env.FATHOM_SITE_ID }}
+          secrets: |
+            "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/cli:${{ github.sha }}
+
+      - name: Build API
+        uses: docker/build-push-action@v5
+        if: steps.verify_api.outputs.image_exists == 'false'
+        with:
+          context: .
+          cache-from: type=gha,scope=prod
+          no-cache: ${{ inputs.nocache == 'true' }}
+          push: true
+          target: api
+          build-args: |
+            VERSION=${{ github.sha }}
+            API_SERVER=${{ env.API_SERVER }}
+            URL_PREFIX=${{ env.URL_PREFIX }}
+            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+            SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_ORG=${{ env.SENTRY_ORG }}
+            SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
+            FATHOM_SITE_ID=${{ env.FATHOM_SITE_ID }}
+          secrets: |
+            "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}
 
   deploy:
     name: 🚀 Deploy
@@ -229,6 +252,8 @@ jobs:
           files_yaml: |
             api:
               - apps/server/**
+            cli:
+              - apps/cli/**
             web:
               - apps/web/**
             worker:
@@ -238,9 +263,11 @@ jobs:
               - apps/server**
               - Dockerfile
               - package.json
+              - .github/workflows/deploy.yml
             migrations:
               - apps/**/migrations/*.sql
               - packages/**/migrations/*.sql
+              - .github/workflows/deploy.yml
 
       - name: Run Migrations
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.migrations_any_changed == 'true' }}

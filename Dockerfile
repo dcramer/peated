@@ -81,6 +81,16 @@ ENV VERSION $VERSION
 
 CMD ["pnpm", "start"]
 
+# cli service
+FROM base-env as cli
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/ /app/
+
+WORKDIR /app/apps/api
+
+ARG VERSION
+ENV VERSION $VERSION
+
 # api service
 FROM base-env as api
 COPY --from=prod-deps /app/node_modules /app/node_modules
