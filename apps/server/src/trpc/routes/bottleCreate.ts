@@ -9,14 +9,13 @@ import {
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs";
 import { upsertEntity } from "@peated/server/lib/db";
-import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { TRPCError } from "@trpc/server";
-import { inArray, isNull, sql } from "drizzle-orm";
+import { isNull, sql } from "drizzle-orm";
 import { authedProcedure } from "..";
 
 export default authedProcedure
@@ -161,17 +160,23 @@ export default authedProcedure
         },
       });
 
-      await tx
-        .update(entities)
-        .set({ totalBottles: sql`${entities.totalBottles} + 1` })
-        .where(
-          inArray(
-            entities.id,
-            Array.from(
-              new Set([brand.id, ...distillerIds, bottler?.id]),
-            ).filter(notEmpty),
-          ),
-        );
+      // XXX: this could be more optimal, but accounting is a pita
+      await tx.update(entities).set({
+        totalBottles: sql<number>`(
+          SELECT COUNT(*)
+          FROM ${bottles}
+          WHERE (
+            ${bottles.brandId} = ${entities.id}
+            OR ${bottles.bottlerId} = ${entities.id}
+            OR EXISTS(
+              SELECT FROM ${bottlesToDistillers}
+              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+              AND ${bottlesToDistillers.distillerId} = ${entities.id}
+            )
+          )
+          AND ${bottles.id} = ${bottle.id}
+        )`,
+      });
 
       return bottle;
     });

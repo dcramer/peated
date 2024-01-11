@@ -184,6 +184,7 @@ test("creates a new bottle with new brand name", async () => {
     .select()
     .from(entities)
     .where(eq(entities.id, brand.id));
+  expect(newBrand.totalBottles).toEqual(1);
 });
 
 test("does not create a new bottle with invalid distillerId", async () => {
