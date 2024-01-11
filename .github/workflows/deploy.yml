@@ -13,6 +13,10 @@ on:
         description: "Do not rely on existing layer cache"
         default: false
         type: boolean
+      deploy:
+        description: "Deploy changes upon successful build"
+        default: true
+        type: boolean
 env:
   REGION: us-central1
   PROJECT_ID: cask-382601
@@ -32,6 +36,7 @@ jobs:
     permissions:
       contents: "read"
       id-token: "write"
+    if: ${{ inputs.deploy }}
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v3
