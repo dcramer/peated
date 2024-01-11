@@ -53,6 +53,13 @@ export default authedProcedure
         name = name.substring(brand.name.length + 1);
       }
 
+      if (!name) {
+        throw new TRPCError({
+          message: "Invalid bottle name.",
+          code: "BAD_REQUEST",
+        });
+      }
+
       let bottler: Entity | null = null;
       if (input.bottler) {
         const bottlerUpsert = await upsertEntity({
@@ -71,7 +78,7 @@ export default authedProcedure
         }
       }
 
-      const fullName = [brand.name, name].filter(Boolean).join(" ");
+      const fullName = `${brand.shortName || brand.name} ${name}`;
 
       let bottle: Bottle | undefined;
       try {

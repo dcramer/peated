@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { type SerializedPoint } from "@peated/server/db/columns";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,
@@ -13,7 +14,7 @@ import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 
@@ -41,6 +42,9 @@ export default modProcedure
     if (input.name && input.name !== entity.name) {
       data.name = input.name;
     }
+    if (input.shortName !== undefined && input.shortName !== entity.shortName) {
+      data.shortName = input.shortName;
+    }
     if (input.country !== undefined && input.country !== entity.country) {
       data.country = input.country;
     }
@@ -60,18 +64,25 @@ export default modProcedure
       data.website = input.website;
     }
     if (Object.values(data).length === 0) {
-      return entity;
+      return await serialize(EntitySerializer, entity, ctx.user);
     }
 
     const user = ctx.user;
     const newEntity = await db.transaction(async (tx) => {
-      let newEntity: Entity | undefined;
+      let newEntity:
+        | (Entity & {
+            location: SerializedPoint;
+          })
+        | undefined;
       try {
         [newEntity] = await tx
           .update(entities)
           .set(data)
           .where(eq(entities.id, entity.id))
-          .returning();
+          .returning({
+            ...getTableColumns(entities),
+            location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
+          });
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "entity_name_unq") {
           throw new TRPCError({
@@ -83,13 +94,25 @@ export default modProcedure
       }
       if (!newEntity) return;
 
-      if (data.name) {
+      if (data.name || data.shortName) {
         await tx
           .update(bottles)
           .set({
-            fullName: sql`${newEntity.name} || ' ' || ${bottles.name}`,
+            fullName: sql`${newEntity.shortName || newEntity.name} || ' ' || ${
+              bottles.name
+            }`,
           })
-          .where(eq(bottles.brandId, newEntity.id));
+          .where(
+            and(
+              eq(bottles.brandId, newEntity.id),
+              ne(
+                bottles.fullName,
+                sql`${newEntity.shortName || newEntity.name} || ' ' || ${
+                  bottles.name
+                }`,
+              ),
+            ),
+          );
         await tx.execute(sql`
           UPDATE ${bottleAliases}
           SET "name" = ${bottles.fullName}

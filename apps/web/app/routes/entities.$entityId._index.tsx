@@ -81,6 +81,12 @@ export default function EntityDetailsOverview() {
             </dd>
             <dt>Year Established</dt>
             <dd>{entity.yearEstablished ?? <em>n/a</em>}</dd>
+            {!!entity.shortName && (
+              <>
+                <dt>Abbreviated As</dt>
+                <dd>{entity.shortName}</dd>
+              </>
+            )}
           </dl>
         </div>
       </div>

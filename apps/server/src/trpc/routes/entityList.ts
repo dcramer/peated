@@ -1,5 +1,6 @@
 import { ENTITY_TYPE_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
+import { type SerializedPoint } from "@peated/server/db/columns";
 import { entities } from "@peated/server/db/schema";
 import { CountryEnum } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -94,8 +95,7 @@ export default publicProcedure
     const results = await db
       .select({
         ...getTableColumns(entities),
-        // TODO: type this
-        location: sql`ST_AsGeoJSON(${entities.location}) as location`,
+        location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
       })
       .from(entities)
       .where(where ? and(...where) : undefined)
