@@ -1,5 +1,13 @@
 import { customType } from "drizzle-orm/pg-core";
 
+// {"type":"Point","coordinates":[1,1]}
+export type SerializedPoint = string;
+
+export type UnserializedPoint = {
+  coordinates: [number, number];
+  type: "Point";
+};
+
 export class Point {
   lat: number;
   lng: number;

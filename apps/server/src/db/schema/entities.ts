@@ -30,6 +30,7 @@ export const entities = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
 
     name: text("name").notNull(),
+    shortName: text("short_name"),
     country: text("country"),
     region: text("region"),
     type: entityTypeEnum("type").array().notNull(),

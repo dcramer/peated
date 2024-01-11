@@ -130,7 +130,9 @@ export default modProcedure
             })) || null;
           if (!brand) throw new Error("Unexpected");
         }
-        bottleData.fullName = `${brand.name} ${bottleData.name ?? bottle.name}`;
+        bottleData.fullName = `${brand.shortName || brand.name} ${
+          bottleData.name ?? bottle.name
+        }`;
       }
 
       let newBottle: Bottle | undefined;

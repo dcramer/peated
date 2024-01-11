@@ -8,6 +8,7 @@ export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
 
 export const EntityInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
+  shortName: z.string().trim().nullable().optional(),
   country: z.string().trim().nullable().optional(),
   region: z.string().trim().nullable().optional(),
   yearEstablished: z
@@ -23,6 +24,7 @@ export const EntityInputSchema = z.object({
 export const EntitySchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
+  shortName: z.string().trim().nullable(),
   description: z.string().nullable().optional(),
   yearEstablished: z.number().lte(new Date().getFullYear()).nullable(),
   website: z.string().url().nullable(),

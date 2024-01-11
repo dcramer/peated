@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { type SerializedPoint } from "@peated/server/db/columns";
 import { entities, entityTombstones } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
@@ -14,7 +15,7 @@ export default publicProcedure.input(z.number()).query(async function ({
   let [entity] = await db
     .select({
       ...getTableColumns(entities),
-      location: sql`ST_AsGeoJSON(${entities.location}) as location`,
+      location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
     })
     .from(entities)
     .where(eq(entities.id, input));
@@ -23,6 +24,7 @@ export default publicProcedure.input(z.number()).query(async function ({
     [entity] = await db
       .select({
         ...getTableColumns(entities),
+        location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
       })
       .from(entityTombstones)
       .innerJoin(entities, eq(entityTombstones.newEntityId, entities.id))
@@ -33,5 +35,6 @@ export default publicProcedure.input(z.number()).query(async function ({
       });
     }
   }
+
   return await serialize(EntitySerializer, entity, ctx.user);
 });
