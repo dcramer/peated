@@ -121,7 +121,7 @@ jobs:
           context: .
           cache-from: type=gha,scope=prod
           cache-to: type=gha,mode=max,scope=prod
-          no-cache: ${{ inputs.nocache }}
+          no-cache: ${{ inputs.nocache || false }}
           build-args: |
             VERSION=${{ github.sha }}
             API_SERVER=${{ env.API_SERVER }}
@@ -140,7 +140,7 @@ jobs:
         with:
           context: .
           cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache }}
+          no-cache: ${{ inputs.nocache || false }}
           push: true
           target: web
           build-args: |
@@ -163,7 +163,7 @@ jobs:
         with:
           context: .
           cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache }}
+          no-cache: ${{ inputs.nocache || false }}
           push: true
           target: worker
           build-args: |
@@ -186,7 +186,7 @@ jobs:
         with:
           context: .
           cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache }}
+          no-cache: ${{ inputs.nocache || false }}
           push: true
           target: cli
           build-args: |
@@ -209,7 +209,7 @@ jobs:
         with:
           context: .
           cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache }}
+          no-cache: ${{ inputs.nocache || false }}
           push: true
           target: api
           build-args: |
