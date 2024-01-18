@@ -73,6 +73,15 @@ jobs:
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Verify CLI
+        id: verify_cli
+        run: |
+          if gcloud artifacts docker images describe "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/cli:${{ github.sha }}"; then
+            echo "image_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "image_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Verify Web
         id: verify_web
         run: |
@@ -103,7 +112,7 @@ jobs:
       # optimize cache by building all stages
       - name: Build All Stages
         uses: docker/build-push-action@v5
-        if: ${{ !steps.verify_web.outputs.image_exists || !steps.verify_api.outputs.image_exists || !steps.verify_worker.outputs.image_exists }}
+        if: ${{ !steps.verify_web.outputs.image_exists || !steps.verify_api.outputs.image_exists || !steps.verify_worker.outputs.image_exists || !steps.verify_cli.outputs.image_exists }}
         with:
           context: .
           cache-from: type=gha,scope=prod
@@ -169,7 +178,7 @@ jobs:
 
       - name: Build CLI
         uses: docker/build-push-action@v5
-        if: ${{ !steps.verify_worker.outputs.image_exists }}
+        if: ${{ !steps.verify_cli.outputs.image_exists }}
         with:
           context: .
           cache-from: type=gha,scope=prod
