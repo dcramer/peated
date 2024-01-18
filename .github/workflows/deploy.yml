@@ -36,7 +36,7 @@ jobs:
     permissions:
       contents: "read"
       id-token: "write"
-    if: ${{ inputs.deploy }}
+    if: ${{ inputs.deploy || github.event_name == 'push' }}
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v3
@@ -192,11 +192,11 @@ jobs:
 
       - name: Build API
         uses: docker/build-push-action@v5
-        if: steps.verify_api.outputs.image_exists == 'false'
+        if: ${{ !steps.verify_api.outputs.image_exists }}
         with:
           context: .
           cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache == 'true' }}
+          no-cache: ${{ inputs.nocache }}
           push: true
           target: api
           build-args: |
