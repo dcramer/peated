@@ -540,6 +540,13 @@
       "when": 1704996915501,
       "tag": "0076_clear_ozymandias",
       "breakpoints": false
+    },
+    {
+      "idx": 77,
+      "version": "5",
+      "when": 1707330421474,
+      "tag": "0077_sleepy_amazoness",
+      "breakpoints": false
     }
   ]
 }
