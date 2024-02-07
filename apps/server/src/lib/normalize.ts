@@ -43,6 +43,12 @@ export const normalizeBottleName = (
   if (name.endsWith(` ${age}`)) {
     name = `${name}${ageSuffix}`;
   }
+
+  // this is primarily targeting Scotch Malt Whiskey Society bottles
+  if (name.startsWith("Cask No. ")) {
+    name = name.substring(9);
+  }
+
   return normalizeString(name.replace(` ${age} `, ` ${age}${ageSuffix} `));
 };
 

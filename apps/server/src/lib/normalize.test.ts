@@ -63,6 +63,11 @@ describe("normalizeBottleName", () => {
     const rv = normalizeBottleName("Delicious 12 Year thing");
     expect(rv).toBe("Delicious 12-year-old thing");
   });
+
+  test("Cask No. 1.285 Hello World", async () => {
+    const rv = normalizeBottleName("Cask No. 1.285 Hello World");
+    expect(rv).toBe("1.285 Hello World");
+  });
 });
 
 describe("normalizeVolume", () => {

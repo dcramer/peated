@@ -79,7 +79,13 @@ export async function scrapeBottles(
     const ageSpec = specList.find(([name]) => name === "Age:");
     const statedAge = ageSpec ? Number(ageSpec[1].split(" ")[0]) : null;
 
-    const distillerMatch = itemType.match(/Cask No\. ([A-Z0-9]+)\.[0-9]+/i);
+    const caskNumberMatch = itemType.match(/Cask No\. ([A-Z0-9]+\.[0-9]+)/i);
+    if (!caskNumberMatch) {
+      throw new Error(`Cannot find cask number: ${itemType}`);
+    }
+    const caskNumber = caskNumberMatch[1];
+
+    const distillerMatch = caskNumber.match(/([A-Z0-9]+)\.[0-9]+/i);
     if (!distillerMatch) {
       throw new Error(`Cannot find distiller: ${itemType}`);
     }
@@ -88,7 +94,7 @@ export async function scrapeBottles(
       throw new Error(`Cannot find distiller: ${itemType}`);
     }
 
-    const rawCategory = getCategoryFromCask(distillerNo);
+    const rawCategory = getCategoryFromCask(caskNumber);
     if (rawCategory && !CATEGORY_LIST.includes(rawCategory as any)) {
       throw new Error(`Unsupporteed spirit: ${rawCategory}`);
     }
@@ -96,7 +102,7 @@ export async function scrapeBottles(
     const category = rawCategory as Category;
 
     cb({
-      name: `${itemType} ${caskName}`,
+      name: `${caskNumber} ${caskName}`,
       category,
       statedAge,
       brand: {
