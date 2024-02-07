@@ -51,15 +51,21 @@ export default modProcedure
     if (input.statedAge !== undefined && input.statedAge !== bottle.statedAge) {
       bottleData.statedAge = input.statedAge;
     }
+
+    const inputName =
+      input.name || input.statedAge !== undefined
+        ? normalizeBottleName(
+            input.name || bottle.name,
+            bottleData.statedAge ?? bottle.statedAge,
+          )
+        : null;
+
     if (
-      (input.name && input.name !== bottle.name) ||
+      (inputName && inputName !== bottle.name) ||
       (input.statedAge !== undefined && input.statedAge !== bottle.statedAge)
     ) {
       bottleData.statedAge = bottleData.statedAge ?? bottle.statedAge;
-      bottleData.name = normalizeBottleName(
-        input.name || bottle.name,
-        bottleData.statedAge,
-      );
+      bottleData.name = inputName;
 
       const statedAgeMatch = bottleData.name.match(/(\d+)-year-old/);
       if (statedAgeMatch && !input.statedAge) {
