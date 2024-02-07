@@ -9,6 +9,7 @@ import {
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs";
 import { upsertEntity } from "@peated/server/lib/db";
+import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";
@@ -160,6 +161,12 @@ export default authedProcedure
         },
       });
 
+      const allEntityIds = [
+        ...distillerIds,
+        bottle.brandId,
+        bottle.bottlerId,
+      ].filter(notEmpty);
+
       // XXX: this could be more optimal, but accounting is a pita
       await tx.update(entities).set({
         totalBottles: sql<number>`(
@@ -174,7 +181,7 @@ export default authedProcedure
               AND ${bottlesToDistillers.distillerId} = ${entities.id}
             )
           )
-          AND ${bottles.id} = ${bottle.id}
+          AND ${entities.id} IN ${allEntityIds}
         )`,
       });
 
