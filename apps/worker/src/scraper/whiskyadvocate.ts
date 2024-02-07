@@ -99,12 +99,12 @@ export async function scrapeReviews(
   const data = await getUrl(url);
   const $ = cheerio(data);
 
-  $("#directoryResults .postsItem").each((_, el) => {
+  for (const el of $("#directoryResults .postsItem")) {
     // <h5>Claxton’s Mannochmore 7 year old Oloroso Hogshead, 50% </h5>
     const rawName = $(".postsItemContent > h5", el).first().text().trim();
     if (!rawName) {
       console.warn("Unable to identify bottle name");
-      return;
+      continue;
     }
     const name = normalizeBottleName(
       rawName
@@ -114,36 +114,38 @@ export async function scrapeReviews(
     );
 
     const reviewUrl = $("a.postsItemLink", el).first().attr("href");
-    if (!reviewUrl)
-      throw new Error(`Unable to identify review URL: ${rawName}`);
+    if (!reviewUrl) {
+      console.warn(`Unable to identify review URL: ${rawName}`);
+      continue;
+    }
 
     const rawRating = $(".postsItemRanking > h2", el).first().text().trim();
     if (!rawRating || Number(rawRating) < 1 || Number(rawRating) > 100) {
       console.warn(
         `Unable to identify valid rating: ${rawName} (${rawRating})`,
       );
-      return;
+      continue;
     }
     const rating = Number(rawRating);
 
     const issue = $(".postsItemIssue", el).first().text().trim();
     if (!issue) {
       console.warn(`Unable to identify issue name: ${rawName}`);
-      return;
+      continue;
     }
 
     // <h6>Single Malt Scotch<br />$116</h6>
     const rawCategory = $(".postsItemContent h6", el).first().text().trim();
     const category = normalizeCategory(rawCategory.replace(/<br\s\\>.+$/, ""));
 
-    cb({
+    await cb({
       name,
       category,
       rating,
       issue,
       url: absoluteUrl(reviewUrl, url),
     });
-  });
+  }
 }
 
 if (typeof require !== "undefined" && require.main === module) {

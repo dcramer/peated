@@ -44,13 +44,13 @@ export async function scrapeBottles(
   const data = await getUrl(url);
   const $ = cheerio(data);
 
-  $(".product-collection-module__grid-item").each((_, el) => {
+  for (const el of $(".product-collection-module__grid-item")) {
     const itemType = $(".product-collection-module__type", el)
       .first()
       .text()
       .trim();
     if (!itemType || !itemType.startsWith("Cask No.")) {
-      return;
+      continue;
     }
 
     const caskName = $(".product-collection-module__title", el)
@@ -83,30 +83,30 @@ export async function scrapeBottles(
     const caskNumberMatch = itemType.match(/Cask No\. ([A-Z0-9]+\.[0-9]+)/i);
     if (!caskNumberMatch) {
       console.warn(`Cannot find cask number: ${itemType}`);
-      return;
+      continue;
     }
     const caskNumber = caskNumberMatch[1];
 
     const distillerMatch = caskNumber.match(/([A-Z0-9]+)\.[0-9]+/i);
     if (!distillerMatch) {
       console.warn(`Cannot find distiller: ${itemType}`);
-      return;
+      continue;
     }
     const distillerNo = distillerMatch[1];
     if (!distillerNo) {
       console.warn(`Cannot find distiller: ${itemType}`);
-      return;
+      continue;
     }
 
     const rawCategory = getCategoryFromCask(caskNumber);
     if (rawCategory && !CATEGORY_LIST.includes(rawCategory as any)) {
       console.warn(`Unsupported spirit: ${rawCategory}`);
-      return;
+      continue;
     }
 
     const category = rawCategory as Category;
 
-    cb({
+    await cb({
       name: `${caskNumber} ${caskName}`,
       category,
       statedAge,
@@ -121,7 +121,7 @@ export async function scrapeBottles(
           ]
         : [],
     });
-  });
+  }
 }
 
 if (typeof require !== "undefined" && require.main === module) {

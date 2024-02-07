@@ -51,7 +51,7 @@ export async function scrapeBottles(
   const body = await getUrl(url);
   const data = JSON.parse(body) as SMWSPayload;
 
-  data.items.forEach((item) => {
+  data.items.forEach(async (item) => {
     const caskName = item.name;
     if (!caskName) {
       console.warn(`Cannot find cask name for product`);
@@ -84,7 +84,7 @@ export async function scrapeBottles(
 
     const category = rawCategory as Category;
 
-    cb({
+    await cb({
       name: `${caskNumber} ${caskName}`,
       category,
       statedAge,
