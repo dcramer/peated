@@ -1,4 +1,6 @@
+import { CATEGORY_LIST } from "@peated/server/constants";
 import { type BottleInputSchema } from "@peated/server/schemas";
+import { type Category } from "@peated/server/types";
 import { getUrl } from "@peated/worker/scraper";
 import { load as cheerio } from "cheerio";
 import { type z } from "zod";
@@ -75,9 +77,7 @@ export async function scrapeBottles(
     });
 
     const ageSpec = specList.find(([name]) => name === "Age:");
-    const statedAge = ageSpec ? Number(ageSpec[1]) : null;
-
-    const category = "single_malt";
+    const statedAge = ageSpec ? Number(ageSpec[1].split(" ")[0]) : null;
 
     const distillerMatch = itemType.match(/Cask No\. ([A-Z0-9]+)\.[0-9]+/i);
     if (!distillerMatch) {
@@ -87,6 +87,13 @@ export async function scrapeBottles(
     if (!distillerNo) {
       throw new Error(`Cannot find distiller: ${itemType}`);
     }
+
+    const rawCategory = getCategoryFromCask(distillerNo);
+    if (rawCategory && !CATEGORY_LIST.includes(rawCategory as any)) {
+      throw new Error(`Unsupporteed spirit: ${rawCategory}`);
+    }
+
+    const category = rawCategory as Category;
 
     cb({
       name: `${itemType} ${caskName}`,
@@ -104,6 +111,31 @@ export async function scrapeBottles(
         : [],
     });
   });
+}
+
+function getCategoryFromCask(caskNumber: string) {
+  if (caskNumber.startsWith("GN")) {
+    return "gin";
+  } else if (caskNumber.startsWith("RW")) {
+    return "rye";
+  } else if (caskNumber.startsWith("CW1")) {
+    // corn - where should it go?
+    return null;
+  } else if (caskNumber.startsWith("B")) {
+    return "bourbon";
+  } else if (caskNumber.startsWith("R")) {
+    return "rum";
+  } else if (caskNumber.startsWith("A")) {
+    return "armagnac";
+  } else if (caskNumber.startsWith("C")) {
+    return "cognac";
+  } else if (caskNumber.startsWith("G")) {
+    return "single_grain";
+  } else if (Number(caskNumber[0]) > 0) {
+    return "single_malt";
+  } else {
+    return null;
+  }
 }
 
 if (typeof require !== "undefined" && require.main === module) {
