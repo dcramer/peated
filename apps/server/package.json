@@ -51,7 +51,7 @@
     "jwks-rsa": "^3.1.0",
     "mime-types": "^2.1.35",
     "nanoid": "^3.3.7",
-    "nodemailer": "^6.9.7",
+    "nodemailer": "^6.9.9",
     "nodemon": "^3.0.2",
     "pg": "^8.11.3",
     "pino-pretty": "^10.3.1",
