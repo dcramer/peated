@@ -48,6 +48,8 @@ export async function cacheUrl(url: string, filename: string) {
     ({ status, data } = await axios.get(url, {
       headers: defaultHeaders(url),
     }));
+    // gross
+    if (typeof data !== "string") data = JSON.stringify(data);
   } catch (err: any) {
     status = err?.response?.status;
     if (status !== 404) {

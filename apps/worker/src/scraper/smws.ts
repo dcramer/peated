@@ -2,7 +2,6 @@ import { CATEGORY_LIST } from "@peated/server/constants";
 import { type BottleInputSchema } from "@peated/server/schemas";
 import { type Category } from "@peated/server/types";
 import { getUrl } from "@peated/worker/scraper";
-import { load as cheerio } from "cheerio";
 import { type z } from "zod";
 import { SMWS_DISTILLERY_CODES } from "../constants";
 import { trpcClient } from "../lib/api";
@@ -10,7 +9,7 @@ import { getCategoryFromCask } from "../lib/smws";
 
 export default async function main() {
   await scrapeBottles(
-    `https://newmake.smwsa.com/collections/all-products`,
+    `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
     async (item) => {
       if (process.env.ACCESS_TOKEN) {
         console.log(`Submitting [${item.name}]`);
@@ -37,64 +36,43 @@ export default async function main() {
   // }
 }
 
+type SMWSPayload = {
+  items: {
+    name: string;
+    age: number | null;
+    cask_no: string;
+  }[];
+};
+
 export async function scrapeBottles(
   url: string,
   cb: (bottle: z.infer<typeof BottleInputSchema>) => Promise<void>,
 ) {
-  const data = await getUrl(url);
-  const $ = cheerio(data);
+  const body = await getUrl(url);
+  const data = JSON.parse(body) as SMWSPayload;
 
-  $(".product-collection-module__grid-item").each((_, el) => {
-    const itemType = $(".product-collection-module__type", el)
-      .first()
-      .text()
-      .trim();
-    if (!itemType || !itemType.startsWith("Cask No.")) {
+  data.items.forEach((item) => {
+    const caskName = item.name;
+    if (!caskName) {
+      console.warn(`Cannot find cask name for product`);
       return;
     }
 
-    const caskName = $(".product-collection-module__title", el)
-      .first()
-      .text()
-      .trim();
-
-    const specList: [string, string][] = [];
-    $(".product-collection-module__specs-list li", el).each((_, specEl) => {
-      const name = $(
-        ".product-collection-module__specs-item-col--title",
-        specEl,
-      )
-        .first()
-        .text()
-        .trim();
-      const value = $(
-        ".product-collection-module__specs-item-col--desc",
-        specEl,
-      )
-        .first()
-        .text()
-        .trim();
-      specList.push([name, value]);
-    });
-
-    const ageSpec = specList.find(([name]) => name === "Age:");
-    const statedAge = ageSpec ? Number(ageSpec[1].split(" ")[0]) : null;
-
-    const caskNumberMatch = itemType.match(/Cask No\. ([A-Z0-9]+\.[0-9]+)/i);
-    if (!caskNumberMatch) {
-      console.warn(`Cannot find cask number: ${itemType}`);
+    const statedAge = item.age;
+    const caskNumber = item.cask_no;
+    if (!caskNumber) {
+      console.warn(`Cannot find cask number: ${caskName}`);
       return;
     }
-    const caskNumber = caskNumberMatch[1];
 
     const distillerMatch = caskNumber.match(/([A-Z0-9]+)\.[0-9]+/i);
     if (!distillerMatch) {
-      console.warn(`Cannot find distiller: ${itemType}`);
+      console.warn(`Cannot find distiller: ${caskName}`);
       return;
     }
     const distillerNo = distillerMatch[1];
     if (!distillerNo) {
-      console.warn(`Cannot find distiller: ${itemType}`);
+      console.warn(`Cannot find distiller: ${caskName}`);
       return;
     }
 

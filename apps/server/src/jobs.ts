@@ -36,6 +36,7 @@ export type JobName =
   | "NotifyDiscordOnTasting"
   | "ScrapeAstorWines"
   | "ScrapeHealthySpirits"
+  | "ScrapeSMWS"
   | "ScrapeSMWSA"
   | "ScrapeTotalWine"
   | "ScrapeWoodenCork"
@@ -112,6 +113,8 @@ export function getJobForSite(site: ExternalSiteType): [JobName, ...unknown[]] {
       return ["ScrapeTotalWine"];
     case "astorwines":
       return ["ScrapeAstorWines"];
+    case "smws":
+      return ["ScrapeSMWS"];
     case "smwsa":
       return ["ScrapeSMWSA"];
     case "whiskyadvocate":
