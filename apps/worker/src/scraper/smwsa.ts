@@ -81,22 +81,26 @@ export async function scrapeBottles(
 
     const caskNumberMatch = itemType.match(/Cask No\. ([A-Z0-9]+\.[0-9]+)/i);
     if (!caskNumberMatch) {
-      throw new Error(`Cannot find cask number: ${itemType}`);
+      console.warn(`Cannot find cask number: ${itemType}`);
+      return;
     }
     const caskNumber = caskNumberMatch[1];
 
     const distillerMatch = caskNumber.match(/([A-Z0-9]+)\.[0-9]+/i);
     if (!distillerMatch) {
-      throw new Error(`Cannot find distiller: ${itemType}`);
+      console.warn(`Cannot find distiller: ${itemType}`);
+      return;
     }
     const distillerNo = distillerMatch[1];
     if (!distillerNo) {
-      throw new Error(`Cannot find distiller: ${itemType}`);
+      console.warn(`Cannot find distiller: ${itemType}`);
+      return;
     }
 
     const rawCategory = getCategoryFromCask(caskNumber);
     if (rawCategory && !CATEGORY_LIST.includes(rawCategory as any)) {
-      throw new Error(`Unsupporteed spirit: ${rawCategory}`);
+      console.warn(`Unsupported spirit: ${rawCategory}`);
+      return;
     }
 
     const category = rawCategory as Category;
