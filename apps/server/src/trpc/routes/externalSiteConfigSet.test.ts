@@ -23,7 +23,7 @@ test("set new value", async () => {
   const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
-  const data = await caller.externalSiteConfigSet({
+  await caller.externalSiteConfigSet({
     site: site.type,
     key: "test",
     value: "bar",
@@ -48,7 +48,7 @@ test("set existing value", async () => {
   const caller = createCaller({
     user: await Fixtures.User({ admin: true }),
   });
-  const data = await caller.externalSiteConfigSet({
+  await caller.externalSiteConfigSet({
     site: site.type,
     key: "test",
     value: "bar",

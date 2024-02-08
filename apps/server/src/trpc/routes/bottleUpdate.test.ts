@@ -98,7 +98,7 @@ test("manipulates name to conform with age", async () => {
   const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
-  const data = await caller.bottleUpdate({
+  await caller.bottleUpdate({
     bottle: bottle.id,
     name: "Delicious 10",
     statedAge: 10,
@@ -124,7 +124,7 @@ test("fills in statedAge", async () => {
   const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
-  const data = await caller.bottleUpdate({
+  await caller.bottleUpdate({
     bottle: bottle.id,
     name: "Delicious 10-year-old",
   });
@@ -147,7 +147,7 @@ test("changes brand", async () => {
   const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
   });
-  const data = await caller.bottleUpdate({
+  await caller.bottleUpdate({
     bottle: bottle.id,
     brand: newBrand.id,
   });

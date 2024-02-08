@@ -24,7 +24,7 @@ test("findBottle matches partial fullName", async () => {
 });
 
 test("findBottle doesnt match random junk", async () => {
-  const bottle = await Fixtures.Bottle();
+  await Fixtures.Bottle();
   const result = await findBottleId("No Chance");
   expect(result).toBe(null);
 });
@@ -52,10 +52,10 @@ test("findEntity matches bottle name prefix", async () => {
 });
 
 test("findEntity does not match entity name prefix", async () => {
-  const entity = await Fixtures.Entity({ name: "Hibiki Real" });
+  await Fixtures.Entity({ name: "Hibiki Real" });
   const result = await findEntity("Hibiki 12-year-old");
   expect(result).toBeNull();
 
-  const result2 = await findEntity("The Hibiki Real 12-year-old");
+  await findEntity("The Hibiki Real 12-year-old");
   expect(result).toBeNull();
 });

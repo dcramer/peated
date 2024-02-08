@@ -11,8 +11,6 @@ test("get user by id", async () => {
 });
 
 test("get user:me", async () => {
-  const user = await DefaultFixtures.user;
-
   const caller = createCaller({ user: DefaultFixtures.user });
   const data = await caller.userById("me");
   expect(data.id).toBe(DefaultFixtures.user.id);

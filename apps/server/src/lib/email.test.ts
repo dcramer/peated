@@ -10,9 +10,9 @@ import { notifyComment } from "./email";
 let transport: Transporter<SMTPTransport.SentMessageInfo>;
 let outbox: Mail.Options[];
 
-const mailConfig = {
-  to: "test@example.com",
-};
+// const mailConfig = {
+//   to: "test@example.com",
+// };
 
 const createEmailTestHarness = () => {
   const outbox: Mail.Options[] = [];
@@ -51,7 +51,7 @@ const createEmailTestHarness = () => {
 
 beforeEach(async () => {
   config.API_SERVER = "http://localhost";
-  config.SMTP_FROM = "vanguard@example.com";
+  config.SMTP_FROM = "example@example.com";
 
   const harness = createEmailTestHarness();
   transport = harness.transport;
