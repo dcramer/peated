@@ -140,13 +140,17 @@ export default async function ({ bottleId }: { bottleId: number }) {
     result.suggestedTags?.length &&
     !arraysEqual(result.suggestedTags, bottle.suggestedTags)
   ) {
-    const firstInvalidTag = result.suggestedTags.find(
-      (t) => !DefaultTagEnum.safeParse(t).success,
-    );
-    if (!firstInvalidTag) {
+    if (
+      !result.suggestedTags.find((t) => !DefaultTagEnum.safeParse(t).success)
+    ) {
       data.suggestedTags = result.suggestedTags;
     } else {
-      logError(`Invalid value for suggestedTags: ${firstInvalidTag}`, {
+      logError(`Invalid value for suggestedTags`, {
+        tag: {
+          values: result.suggestedTags.filter(
+            (t) => !DefaultTagEnum.safeParse(t).success,
+          ),
+        },
         bottle: {
           id: bottle.id,
           fullName: bottle.fullName,
