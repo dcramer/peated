@@ -1,5 +1,6 @@
 import type { Bottle } from "@peated/server/types";
 import RobotImage from "@peated/web/assets/robot.png";
+import { Link } from "@remix-run/react";
 import { Fragment } from "react";
 import BottleReviews from "./bottleReviews.client";
 import BottleTagDistribution from "./bottleTagDistribution.client";
@@ -82,6 +83,41 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                 </DefinitionList>
               </>
             )}
+            <Heading as="h3">Additional Details</Heading>
+            <DefinitionList>
+              <DefinitionList.Term>Distilled At</DefinitionList.Term>
+              <DefinitionList.Details>
+                {bottle.distillers ? (
+                  <div className="flex space-x-2">
+                    {bottle.distillers.map((d) => (
+                      <Link
+                        key={d.id}
+                        to={`/entities/${d.id}`}
+                        className="underline"
+                      >
+                        {d.name}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <em>unknown</em>
+                )}
+              </DefinitionList.Details>
+              <DefinitionList.Term>Bottled By</DefinitionList.Term>
+              <DefinitionList.Details>
+                {bottle.bottler ? (
+                  <Link
+                    key={bottle.bottler.id}
+                    to={`/entities/${bottle.bottler.id}`}
+                    className="underline"
+                  >
+                    {bottle.bottler.name}
+                  </Link>
+                ) : (
+                  <em>unknown</em>
+                )}
+              </DefinitionList.Details>
+            </DefinitionList>
           </div>
           <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
         </div>
