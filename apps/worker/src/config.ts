@@ -24,7 +24,7 @@ export default {
 
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   OPENAI_HOST: process.env.OPENAI_HOST || "https://api.perplexity.ai",
-  OPENAI_MODEL: process.env.OPENAI_MODEL || "mistral-7b-instruct",
+  OPENAI_MODEL: process.env.OPENAI_MODEL || "pplx-7b-online",
 
   DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
 };
