@@ -306,7 +306,7 @@ jobs:
       - name: Run Migrations
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.migrations_any_changed == 'true' }}
         run: |-
-          gcloud run jobs execute migrate-database \
+          gcloud run jobs execute cli \
             --region ${{ env.REGION }} \
             --args npm,run,db,migrate
             --wait
