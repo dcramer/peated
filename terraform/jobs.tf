@@ -16,7 +16,9 @@ resource "google_cloud_run_v2_job" "cli" {
       }
 
       containers {
-        image   = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/cli"
+        # image   = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/cli"
+        # placeholder as we dont know the actual image
+        image   = "busybox"
         command = ["npm", "run"]
 
         env {
@@ -37,6 +39,26 @@ resource "google_cloud_run_v2_job" "cli" {
         env {
           name  = "DATABASE_NAME"
           value = "peated"
+        }
+
+        env {
+          name  = "FAKTORY_URL"
+          value = "tcp://:${data.google_secret_manager_secret_version.faktory_password.secret_data}@${module.faktory.hostname}:7419"
+        }
+
+        env {
+          name  = "API_SERVER"
+          value = "https://api.peated.com"
+        }
+
+        env {
+          name  = "URL_PREFIX"
+          value = "https://peated.com"
+        }
+
+        env {
+          name  = "SENTRY_DSN"
+          value = var.sentry_dsn
         }
 
         resources {
