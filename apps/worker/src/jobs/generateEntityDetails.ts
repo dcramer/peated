@@ -72,9 +72,7 @@ const OpenAIBottleDetailsSchema = z.object({
   website: z.string().url().nullable().optional(),
   country: z.string().nullable().optional(),
   region: z.string().nullable().optional(),
-  confidence: z.number().default(0).optional(),
   type: z.array(z.string()).optional(),
-  aiNotes: z.string().nullable().optional(),
 });
 
 const OpenAIBottleDetailsValidationSchema = OpenAIBottleDetailsSchema.extend({
@@ -100,7 +98,7 @@ async function generateEntityDetails(entity: Entity): Promise<Response | null> {
     },
   );
 
-  if (!result || !result.confidence || result.confidence < 0.75)
+  if (!result)
     // idk
     return null;
 

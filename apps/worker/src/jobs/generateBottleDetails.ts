@@ -46,8 +46,6 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 
 'statedAge' should be the number of years the whiskey has been aged in barrels, if applicable.
 
-'confidence' should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set.
-
 'category' should be one of the following:
 
 - ${CATEGORY_LIST.join("\n- ")}
@@ -74,8 +72,6 @@ const OpenAIBottleDetailsSchema = z.object({
   category: z.string().nullable().optional(),
   statedAge: z.number().nullable().optional(),
   suggestedTags: z.array(z.string()).optional(),
-  confidence: z.number().default(0).optional(),
-  aiNotes: z.string().nullable().optional(),
 });
 
 // we dont send enums to openai as they dont get used
@@ -103,7 +99,7 @@ async function generateBottleDetails(bottle: Bottle): Promise<Response | null> {
     },
   );
 
-  if (!result || !result.confidence || result.confidence < 0.75)
+  if (!result)
     // idk
     return null;
   return result;
