@@ -297,14 +297,18 @@ jobs:
               - packages/**/migrations/*.sql
               - .github/workflows/deploy.yml
 
+      - name: "Deploy CLI"
+        run: |-
+          gcloud run jobs update cli \
+            --region ${{ env.REGION }} \
+            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/cli:${{ github.sha }}"
+
       - name: Run Migrations
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.migrations_any_changed == 'true' }}
         run: |-
-          gcloud run jobs update migrate-database \
-            --region ${{ env.REGION }} \
-            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/cli:${{ github.sha }}"
           gcloud run jobs execute migrate-database \
             --region ${{ env.REGION }} \
+            --args npm,run,db,migrate
             --wait
 
       - name: "Deploy API"

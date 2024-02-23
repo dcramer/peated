@@ -1,5 +1,5 @@
-resource "google_cloud_run_v2_job" "migrate_database" {
-  name     = "migrate-database"
+resource "google_cloud_run_v2_job" "cli" {
+  name     = "cli"
   location = var.region
 
   template {
@@ -17,7 +17,7 @@ resource "google_cloud_run_v2_job" "migrate_database" {
 
       containers {
         image   = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/cli"
-        command = ["npm", "run", "db", "migrate"]
+        command = ["npm", "run"]
 
         env {
           name  = "INSTANCE_UNIX_SOCKET"
