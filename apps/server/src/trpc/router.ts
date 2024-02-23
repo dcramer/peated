@@ -36,6 +36,7 @@ import externalSiteCreate from "./routes/externalSiteCreate";
 import externalSiteList from "./routes/externalSiteList";
 import externalSiteTriggerJob from "./routes/externalSiteTriggerJob";
 import externalSiteUpdate from "./routes/externalSiteUpdate";
+import faktoryInfo from "./routes/faktoryInfo";
 import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
 import flightList from "./routes/flightList";
@@ -102,6 +103,7 @@ export const appRouter = router({
   externalSiteUpdate,
   externalSiteConfigGet,
   externalSiteConfigSet,
+  faktoryInfo,
   flightById,
   flightCreate,
   flightList,
