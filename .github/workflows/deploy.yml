@@ -308,7 +308,7 @@ jobs:
         run: |-
           gcloud run jobs execute cli \
             --region ${{ env.REGION }} \
-            --args npm,run,db,migrate
+            --args npm,run,db,migrate \
             --wait
 
       - name: "Deploy API"
