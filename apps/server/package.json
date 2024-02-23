@@ -17,6 +17,7 @@
     "@fastify/multipart": "^8.0.0",
     "@fastify/one-line-logger": "^1.2.0",
     "@google-cloud/storage": "^6.12.0",
+    "@opentelemetry/api": "^1.7.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@peated/design": "workspace:*",
     "@peated/tsconfig": "workspace:*",
