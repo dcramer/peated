@@ -37,6 +37,7 @@ export async function getStructuredResponse<
 ): Promise<z.infer<FullSchema> | null> {
   const openai = new OpenAI({
     apiKey: config.OPENAI_API_KEY,
+    baseURL: config.OPENAI_HOST,
   });
 
   // https://wundergraph.com/blog/return_json_from_openai

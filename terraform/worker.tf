@@ -16,6 +16,7 @@ module "peated-worker-service" {
     NODE_NO_WARNINGS = "1"
     # this is prob a bad idea
     OPENAI_API_KEY  = data.google_secret_manager_secret_version.openai_api_key.secret_data
+    OPENAI_HOST     = data.google_secret_manager_secret_version.openai_host.secret_data
     ACCESS_TOKEN    = data.google_secret_manager_secret_version.api_access_token.secret_data
     FAKTORY_URL     = "tcp://:${data.google_secret_manager_secret_version.faktory_password.secret_data}@${module.faktory.hostname}:7419"
     DISCORD_WEBHOOK = data.google_secret_manager_secret_version.discord_webhook.secret_data

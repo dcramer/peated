@@ -23,6 +23,7 @@ export default {
   GCS_BUCKET_PATH: process.env.GCS_BUCKET_PATH,
 
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  OPENAI_HOST: process.env.OPENAI_HOST,
 
   DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
 };
