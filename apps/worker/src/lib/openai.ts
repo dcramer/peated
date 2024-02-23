@@ -48,7 +48,7 @@ export async function getStructuredResponse<
         role: "system",
         content: [
           "You are an expert in whiskey. Your job is to accurately describe information about the whiskey industry.",
-          `The output format should implement the following JSON schema:\n${zodToJsonSchema(
+          `The output format should strictly follow JSON schema:\n${zodToJsonSchema(
             schema,
           )}`,
         ].join("\n"),
@@ -92,6 +92,8 @@ export async function getStructuredResponse<
         "output.txt": output,
       },
     );
+
+    return null;
   }
 
   // no idea whats going on here, but robots arent that smart yet
