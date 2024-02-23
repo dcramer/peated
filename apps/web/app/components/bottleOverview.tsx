@@ -87,7 +87,7 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
             <DefinitionList>
               <DefinitionList.Term>Distilled At</DefinitionList.Term>
               <DefinitionList.Details>
-                {bottle.distillers ? (
+                {bottle.distillers.length > 0 ? (
                   <div className="flex space-x-2">
                     {bottle.distillers.map((d) => (
                       <Link
