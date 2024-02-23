@@ -32,8 +32,6 @@ function generatePrompt(entity: Entity) {
   }
 
   return `
-You are an expert in whiskey. Your job is to accurately describe information about the whiskey industry.
-
 Tell me about the following whiskey brand:
 
 ${entity.name}
@@ -65,10 +63,6 @@ If the entity is a distiller, include 'distiller' in the 'type' field.
 If the entity is a brand, include 'brand' in the 'type' field.
 If the entity is a bottler, include 'bottler' in the 'type' field'.
 Its valid to include all three values in 'type' if they are accurate, but at least one must be included.
-
-'confidence' should be 0 if you do believe this is not a real entity, 1 if you are absolutely certain this information is factual, or inbetween 0 and 1 indicating your confidence level. It should always be set.
-
-If there are any issues, or you are not confident in the accuracy, please also put that information in 'aiNotes'. Do not fill in any field you are not very confident in.
 `;
 }
 

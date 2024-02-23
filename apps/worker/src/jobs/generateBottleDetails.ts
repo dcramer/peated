@@ -28,8 +28,6 @@ function generatePrompt(bottle: Bottle) {
   }
 
   return `
-You are an expert in whiskey. Your job is to accurately describe information about the whiskey industry.
-
 Tell me about the following bottle of whiskey:
 
 ${bottle.fullName}
@@ -57,8 +55,6 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 'suggestedTags' should be up to five items that reflect the flavor of this whiskey the best. Values MUST be from the following list:
 
 - ${DEFAULT_TAGS.join("\n- ")}
-
-If there are any issues, or you are not confident in the accuracy, please also put that information in 'aiNotes'. Do not fill in any field you are not very confident in.
 `;
 }
 
