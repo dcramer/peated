@@ -42,7 +42,7 @@ export async function getStructuredResponse<
 
   // https://wundergraph.com/blog/return_json_from_openai
   const completion = await openai.chat.completions.create({
-    model: model,
+    model: config.OPENAI_MODEL,
     messages: [
       {
         role: "user",

@@ -24,6 +24,7 @@ export default {
 
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   OPENAI_HOST: process.env.OPENAI_HOST,
+  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
 
   DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
 };
