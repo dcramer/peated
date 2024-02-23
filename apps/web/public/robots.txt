@@ -2,6 +2,13 @@
 User-Agent: SemrushBot
 Disallow: /
 
+# disallow some LLM indexers
+User-agent: GPTBot
+Disallow: /
+
+User-Agent: PerplexityBot
+Disallow: /
+
 User-agent: *
 Allow: /
 Disallow: /_health
