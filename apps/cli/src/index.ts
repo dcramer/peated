@@ -1,8 +1,9 @@
 #! /usr/bin/env node
 
+import "./sentry";
+
 import "./commands";
 import program from "./program";
-import "./sentry";
 
 export { program };
 
