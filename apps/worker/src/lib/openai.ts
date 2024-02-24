@@ -97,8 +97,14 @@ export async function getStructuredResponse<
   }
 
   // no idea whats going on here, but robots arent that smart yet
+  // this shouldnt live here either but whatever
   if (structuredResponse.description instanceof Array)
     structuredResponse.description = structuredResponse.description.join("");
+  if (
+    structuredResponse.statedAge &&
+    typeof structuredResponse.statedAge !== "number"
+  )
+    structuredResponse.statedAge = null;
 
   try {
     return (fullSchema || schema).parse(structuredResponse);
