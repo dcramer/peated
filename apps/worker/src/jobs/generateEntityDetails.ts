@@ -3,7 +3,6 @@ import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
-import { logError } from "@peated/server/lib/log";
 import { CountryEnum, EntityTypeEnum } from "@peated/server/schemas";
 import config from "@peated/worker/config";
 import { getStructuredResponse } from "@peated/worker/lib/openai";
@@ -110,13 +109,13 @@ export default async ({ entityId }: { entityId: number }) => {
     where: (entities, { eq }) => eq(entities.id, entityId),
   });
   if (!entity) {
-    logError(`Unknown entity: ${entityId}`);
-    return;
+    throw new Error(`Unknown entity: ${entityId}`);
   }
   const result = await generateEntityDetails(entity);
 
-  if (!result) return;
-
+  if (!result) {
+    throw new Error(`Failed to generate details fpr entity: ${entityId}`);
+  }
   const data: Record<string, any> = {};
   if (result.description && result.description !== entity.description)
     data.description = result.description;

@@ -110,12 +110,13 @@ export default async function ({ bottleId }: { bottleId: number }) {
     where: (bottles, { eq }) => eq(bottles.id, bottleId),
   });
   if (!bottle) {
-    logError(`Unknown bottle: ${bottleId}`);
-    return;
+    throw new Error(`Unknown bottle: ${bottleId}`);
   }
   const result = await generateBottleDetails(bottle);
 
-  if (!result) return;
+  if (!result) {
+    throw new Error(`Failed to generate details for bottle: ${bottleId}`);
+  }
 
   const data: Record<string, any> = {};
   if (result.description && result.description !== bottle.description)
