@@ -46,3 +46,23 @@ Run the dev server, which spins up both the `web` and the `api` services:
 ```
 npm run dev
 ```
+
+## Runbooks
+
+### Configure GCP CLI
+
+https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl
+
+```shell
+# bind default project
+gcloud config set project cask-382601
+
+# configure kubectl
+gcloud container clusters get-credentials default --region=us-central1
+```
+
+### Shell on Pod
+
+```shell
+kubectl exec -it deploy/peated-api -- bash
+```
