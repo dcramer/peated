@@ -106,7 +106,7 @@ function instrumentedJob<T>(
         : {},
     );
 
-    context.with(activeContext, async () => {
+    return context.with(activeContext, async () => {
       return Sentry.withScope(async function (scope) {
         scope.setContext("job", {
           name: jobName,
