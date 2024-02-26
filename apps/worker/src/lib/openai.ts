@@ -92,8 +92,7 @@ export async function getStructuredResponse<
         "output.txt": output,
       },
     );
-
-    return null;
+    throw err;
   }
 
   // no idea whats going on here, but robots arent that smart yet
@@ -124,6 +123,6 @@ export async function getStructuredResponse<
       },
     );
 
-    return null;
+    throw err;
   }
 }
