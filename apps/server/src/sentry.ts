@@ -1,6 +1,5 @@
 import * as Sentry from "@sentry/node-experimental";
 import { ProfilingIntegration } from "@sentry/profiling-node";
-import packageData from "../package.json";
 import config from "./config";
 
 Sentry.init({
@@ -12,4 +11,4 @@ Sentry.init({
   spotlight: config.ENV === "development",
 });
 
-Sentry.setTag("service", packageData.name);
+Sentry.setTag("service", "@peated/api");

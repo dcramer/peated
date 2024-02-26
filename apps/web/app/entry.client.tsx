@@ -3,7 +3,6 @@ import { Feedback } from "@sentry-internal/feedback";
 import * as Sentry from "@sentry/remix";
 import { startTransition, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
-import packageData from "../package.json";
 import config from "./config";
 
 const feedbackTheme = {
@@ -62,7 +61,7 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 });
 
-Sentry.setTag("service", packageData.name);
+Sentry.setTag("service", "@peated/web");
 
 startTransition(() => {
   hydrateRoot(document, <RemixBrowser />);

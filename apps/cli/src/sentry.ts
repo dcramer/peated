@@ -1,6 +1,5 @@
 import * as Sentry from "@sentry/node-experimental";
 import { ProfilingIntegration } from "@sentry/profiling-node";
-import packageData from "../package.json";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -13,4 +12,4 @@ Sentry.init({
   spotlight: process.env.NODE_ENV !== "production",
 });
 
-Sentry.setTag("service", packageData.name);
+Sentry.setTag("service", "@peated/cli");

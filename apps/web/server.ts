@@ -19,7 +19,6 @@ import type { Request } from "express";
 import express from "express";
 import morgan from "morgan";
 import path from "path";
-import packageData from "./package.json";
 
 Sentry.init({
   dsn: config.SENTRY_DSN,
@@ -33,7 +32,7 @@ Sentry.init({
   // tracePropagationTargets: ["localhost", "peated.com", config.API_SERVER],
 });
 
-Sentry.setTag("service", packageData.name);
+Sentry.setTag("service", "@peated/web");
 
 const app = express();
 const metricsApp = express();
