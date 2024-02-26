@@ -111,6 +111,7 @@ function instrumentedJob<T>(
         scope.setContext("job", {
           name: jobName,
         });
+        scope.setTransactionName(jobName);
 
         return await Sentry.startSpan(
           {
