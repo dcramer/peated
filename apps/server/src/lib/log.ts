@@ -19,6 +19,8 @@ export function logError(
   contexts?: Record<string, Record<string, any>>,
   attachments?: Record<string, string | Uint8Array>,
 ): string {
+  const level = "error";
+
   console.error(error);
 
   const eventId = withScope((scope) => {
@@ -34,9 +36,11 @@ export function logError(
     return typeof error === "string"
       ? captureMessage(error, {
           contexts,
+          level,
         })
       : captureException(error, {
           contexts,
+          level,
         });
   });
 
