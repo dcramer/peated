@@ -40,7 +40,7 @@ async function main() {
     });
   });
 
-  console.log("Scheduler Running...");
+  console.log("Worker Running...");
 }
 
 // faktory does not have correct types
@@ -61,5 +61,8 @@ process.on("SIGINT", function () {
 });
 
 if (typeof require !== "undefined" && require.main === module) {
-  main().catch((e) => console.error(e));
+  main().catch((e) => {
+    Sentry.captureException(e);
+    console.error("Worker crashed", e);
+  });
 }
