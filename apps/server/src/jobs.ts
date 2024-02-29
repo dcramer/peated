@@ -122,6 +122,8 @@ function instrumentedJob<T>(
             span.setAttribute("messaging.operation", "process");
             span.setAttribute("messaging.system", "faktory");
 
+            console.log(`Running job [${jobName}]`);
+
             try {
               const rv = await jobFn(...args);
               span.setStatus({
