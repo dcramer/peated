@@ -1,3 +1,4 @@
+import { logError } from "@peated/server/src/lib/log";
 import * as Sentry from "@sentry/node-experimental";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 
@@ -48,7 +49,7 @@ export function scheduledJob(
             span.setStatus({
               code: 2, // ERROR
             });
-            Sentry.captureException(e);
+            logError(e);
             Sentry.captureCheckIn({
               checkInId,
               monitorSlug: name,

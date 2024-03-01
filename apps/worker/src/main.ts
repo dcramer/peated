@@ -2,6 +2,7 @@
 import "./sentry";
 
 import { registerJob } from "@peated/server/jobs";
+import { logError } from "@peated/server/src/lib/log";
 import * as Sentry from "@sentry/node-experimental";
 import type { JobFunction } from "faktory-worker";
 import faktory from "faktory-worker";
@@ -33,8 +34,7 @@ async function main() {
   });
 
   worker.on("fail", ({ job, error }) => {
-    console.error(error);
-    Sentry.captureException(error, {
+    logError(error, {
       extra: {
         job: job.jid,
       },
