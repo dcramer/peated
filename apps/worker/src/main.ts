@@ -21,7 +21,7 @@ import { scheduledJob, scheduler } from "./lib/cron";
 
 async function main() {
   // dont run the scraper in dev
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV !== "development") {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
   }
 
