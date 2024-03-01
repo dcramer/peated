@@ -5,6 +5,7 @@ import { registerJob } from "@peated/server/jobs";
 import * as Sentry from "@sentry/node-experimental";
 import type { JobFunction } from "faktory-worker";
 import faktory from "faktory-worker";
+import config from "./config";
 import createMissingBottles from "./jobs/createMissingBottles";
 import generateBottleDetails from "./jobs/generateBottleDetails";
 import generateEntityDetails from "./jobs/generateEntityDetails";
@@ -21,7 +22,7 @@ import { scheduledJob, scheduler } from "./lib/cron";
 
 async function main() {
   // dont run the scraper in dev
-  if (process.env.NODE_ENV !== "development") {
+  if (config.ENV === "production") {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
   }
 
