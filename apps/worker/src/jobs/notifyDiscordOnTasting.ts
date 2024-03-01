@@ -9,8 +9,7 @@ function absoluteUri(url: string, host: string) {
 
 export default async function ({ tastingId }: { tastingId: number }) {
   if (!config.DISCORD_WEBHOOK) {
-    logError("DISCORD_WEBHOOK is not configured");
-    return;
+    throw new Error("DISCORD_WEBHOOK is not configured");
   }
 
   const tasting = await db.query.tastings.findFirst({
@@ -21,9 +20,13 @@ export default async function ({ tastingId }: { tastingId: number }) {
     },
   });
   if (!tasting) {
-    logError(`Unknown tasting: ${tastingId}`);
-    return;
+    throw new Error(`Unknown tasting: ${tastingId}`);
   }
+
+  if (Math.abs(new Date().getTime() - tasting.createdAt.getTime()) > 300) {
+    throw new Error("Tasting is too old; Not notifying");
+  }
+
   const fields = [];
   if (tasting.rating !== null)
     fields.push({
@@ -88,7 +91,6 @@ export default async function ({ tastingId }: { tastingId: number }) {
         "payload.json": body,
       },
     );
-    console.log(body);
     console.error({ error: data });
   }
 }
