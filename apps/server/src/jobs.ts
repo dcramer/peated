@@ -1,3 +1,4 @@
+import cuid2 from "@paralleldrive/cuid2";
 import * as Sentry from "@sentry/node-experimental";
 import type { JobFunction } from "faktory-worker";
 import faktory, { type Client } from "faktory-worker";
@@ -74,9 +75,11 @@ export async function registerJob(jobName: JobName, jobFn: JobFunction) {
 // instrument a job with Sentry
 function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
   return async (...args: unknown[]) => {
+    const jobId = cuid2.createId();
     return Sentry.withScope(async function (scope) {
       scope.setContext("job", {
         name: jobName,
+        id: jobId,
       });
       scope.setTransactionName(jobName);
 
@@ -89,10 +92,12 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
           span.setAttribute("messaging.operation", "process");
           span.setAttribute("messaging.system", "faktory");
 
-          console.log(`Running job [${jobName}]`);
-
+          console.log(`Running job [${jobName} - ${jobId}]`);
+          const start = new Date().getTime();
+          let success = false;
           try {
             await jobFn(...args);
+            success = true;
             span.setStatus({
               code: 1, // OK
             });
@@ -102,6 +107,14 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
               code: 2, // ERROR
             });
           }
+
+          const duration = new Date().getTime() - start;
+
+          console.log(
+            `Job ${
+              success ? "succeeded" : "failed"
+            } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`,
+          );
         },
       );
     });

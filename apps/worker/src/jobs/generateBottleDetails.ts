@@ -84,7 +84,8 @@ const OpenAIBottleDetailsValidationSchema = OpenAIBottleDetailsSchema.extend({
 type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
 
 async function generateBottleDetails(bottle: Bottle): Promise<Response | null> {
-  if (!config.OPENAI_API_KEY) return null;
+  if (!config.OPENAI_API_KEY)
+    throw new Error("OPENAI_API_KEY is not configured");
 
   const result = await getStructuredResponse(
     generatePrompt(bottle),
@@ -99,9 +100,6 @@ async function generateBottleDetails(bottle: Bottle): Promise<Response | null> {
     },
   );
 
-  if (!result)
-    // idk
-    return null;
   return result;
 }
 
