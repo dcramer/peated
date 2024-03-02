@@ -113,6 +113,9 @@ export async function scrapeBottles(
       brand: {
         name: "The Scotch Malt Whisky Society",
       },
+      bottler: {
+        name: "The Scotch Malt Whisky Society",
+      },
       distillers: SMWS_DISTILLERY_CODES[distillerNo]
         ? [
             {
