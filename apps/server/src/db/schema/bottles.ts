@@ -59,7 +59,9 @@ export const bottles = pgTable(
   (bottles) => {
     return {
       unique: uniqueIndex("bottle_brand_unq").on(bottles.name, bottles.brandId),
-      uniqueName: uniqueIndex("bottle_name_unq").on(bottles.fullName),
+      uniqueName: uniqueIndex("bottle_full_name_unq")
+        .on(bottles.fullName)
+        .using(sql`btree (LOWER(full_name))`),
     };
   },
 );
