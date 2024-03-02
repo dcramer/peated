@@ -58,7 +58,6 @@ export async function pushJob(jobName: JobName, args?: any) {
       try {
         await client.job(jobName, args).push();
       } catch (e) {
-        Sentry.captureException(e);
         span.setStatus({
           code: 2, // ERROR
         });
@@ -93,11 +92,10 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
           console.log(`Running job [${jobName}]`);
 
           try {
-            const rv = await jobFn(...args);
+            await jobFn(...args);
             span.setStatus({
               code: 1, // OK
             });
-            return rv;
           } catch (e) {
             logError(e);
             span.setStatus({
