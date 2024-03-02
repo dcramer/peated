@@ -41,33 +41,38 @@ export async function getStructuredResponse<
   });
 
   // https://wundergraph.com/blog/return_json_from_openai
-  const completion = await openai.chat.completions.create({
-    model,
-    messages: [
-      {
-        role: "system",
-        content: [
-          "You are an expert in whiskey. Your job is to accurately describe information about the whiskey industry.",
-          `The output format should strictly follow JSON schema:\n${zodToJsonSchema(
-            schema,
-          )}`,
-        ].join("\n"),
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    // functions: [
-    //   {
-    //     name: "out",
-    //     description:
-    //       "This is the function that returns the result of the agent",
-    //     parameters: zodToJsonSchema(schema),
-    //   },
-    // ],
-    temperature: 0,
-  });
+  const completion = await openai.chat.completions.create(
+    {
+      model,
+      messages: [
+        {
+          role: "system",
+          content: [
+            "You are an expert in whiskey. Your job is to accurately describe information about the whiskey industry.",
+            `The output format should strictly follow JSON schema:\n${zodToJsonSchema(
+              schema,
+            )}`,
+          ].join("\n"),
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      // functions: [
+      //   {
+      //     name: "out",
+      //     description:
+      //       "This is the function that returns the result of the agent",
+      //     parameters: zodToJsonSchema(schema),
+      //   },
+      // ],
+      temperature: 0,
+    },
+    {
+      timeout: 10,
+    },
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const output: string = completion.choices[0].message!.content || "";
