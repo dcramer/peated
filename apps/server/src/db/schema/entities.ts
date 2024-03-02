@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
@@ -55,7 +55,9 @@ export const entities = pgTable(
   },
   (entities) => {
     return {
-      nameIndex: uniqueIndex("entity_name_unq").on(entities.name),
+      nameIndex: uniqueIndex("entity_name_unq")
+        .on(entities.name)
+        .using(sql`btree (LOWER(full_name))`),
     };
   },
 );

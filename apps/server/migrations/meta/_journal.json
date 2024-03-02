@@ -554,6 +554,13 @@
       "when": 1709419369827,
       "tag": "0078_ambitious_starhawk",
       "breakpoints": false
+    },
+    {
+      "idx": 79,
+      "version": "5",
+      "when": 1709419428804,
+      "tag": "0079_rare_warlock",
+      "breakpoints": false
     }
   ]
 }
