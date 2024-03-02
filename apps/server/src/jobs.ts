@@ -145,7 +145,7 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
 
 export function getJobForSite(site: ExternalSiteType): [JobName, ...unknown[]] {
   switch (site) {
-    case "totalwines":
+    case "totalwine":
       return ["ScrapeTotalWine"];
     case "astorwines":
       return ["ScrapeAstorWines"];

@@ -15,11 +15,11 @@ import { and, eq, ne, sql } from "drizzle-orm";
 const loadDefaultSites = async () => {
   const store1 =
     (await db.query.externalSites.findFirst({
-      where: eq(externalSites.type, "totalwines"),
+      where: eq(externalSites.type, "totalwine"),
     })) ||
     (await Fixtures.ExternalSite({
       name: "Total Wine",
-      type: "totalwines",
+      type: "totalwine",
     }));
   const store2 =
     (await db.query.externalSites.findFirst({

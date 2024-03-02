@@ -8,7 +8,7 @@
     "scrape:healthyspirits": "ts-node --require dotenv/config ./src/scraper/healthyspirits.ts",
     "scrape:smws": "ts-node --require dotenv/config ./src/scraper/smws.ts",
     "scrape:smwsa": "ts-node --require dotenv/config ./src/scraper/smwsa.ts",
-    "scrape:totalwines": "ts-node --require dotenv/config ./src/scraper/totalwines.ts",
+    "scrape:totalwine": "ts-node --require dotenv/config ./src/scraper/totalwine.ts",
     "scrape:woodencork": "ts-node --require dotenv/config ./src/scraper/woodencork.ts",
     "scrape:whiskyadvocate": "ts-node --require dotenv/config ./src/scraper/whiskyadvocate.ts",
     "scrape:whiskybase": "ts-node --require dotenv/config ./src/bottle-scraper/whiskybase.ts",

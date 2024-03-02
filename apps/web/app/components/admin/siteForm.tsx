@@ -92,7 +92,7 @@ export default function SiteForm({
                 {...field}
                 label="Aggregator"
                 value={value ? { id: value, name: value } : null}
-                placeholder="e.g. totalwines"
+                placeholder="e.g. totalwine"
                 helpText="The internal implementation for this site to aggregate prices."
                 options={SITE_TYPES}
                 simple

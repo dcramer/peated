@@ -23,10 +23,10 @@ test("lists reviews without mod", async () => {
 
 test("lists reviews by site", async () => {
   const astorwine = await Fixtures.ExternalSite({ type: "astorwines" });
-  const totalwines = await Fixtures.ExternalSite({ type: "totalwines" });
+  const totalwine = await Fixtures.ExternalSite({ type: "totalwine" });
 
   const review = await Fixtures.Review({ externalSiteId: astorwine.id });
-  await Fixtures.Review({ externalSiteId: totalwines.id });
+  await Fixtures.Review({ externalSiteId: totalwine.id });
 
   const caller = createCaller({
     user: await Fixtures.User({ mod: true }),

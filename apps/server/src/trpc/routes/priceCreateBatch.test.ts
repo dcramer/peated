@@ -14,7 +14,7 @@ test("requires admin", async () => {
 });
 
 test("processes new price", async () => {
-  const site = await Fixtures.ExternalSite({ type: "totalwines" });
+  const site = await Fixtures.ExternalSite({ type: "totalwine" });
   const bottle = await Fixtures.Bottle({
     name: "10-year-old",
     brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
@@ -48,7 +48,7 @@ test("processes new price", async () => {
 });
 
 test("processes existing price", async () => {
-  const site = await Fixtures.ExternalSite({ type: "totalwines" });
+  const site = await Fixtures.ExternalSite({ type: "totalwine" });
   const bottle = await Fixtures.Bottle({
     name: "10-year-old",
     brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
@@ -89,7 +89,7 @@ test("processes existing price", async () => {
 });
 
 test("processes new price without bottle", async () => {
-  const site = await Fixtures.ExternalSite({ type: "totalwines" });
+  const site = await Fixtures.ExternalSite({ type: "totalwine" });
 
   const caller = createCaller({
     user: await Fixtures.User({ admin: true }),

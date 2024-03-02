@@ -282,8 +282,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
   "healthyspirits",
   "smws",
   "smwsa",
-  // TODO: rename to totalwine
-  "totalwines",
+  "totalwine",
   "woodencork",
   "whiskyadvocate",
 ] as const;

@@ -561,6 +561,20 @@
       "when": 1709419428804,
       "tag": "0079_rare_warlock",
       "breakpoints": false
+    },
+    {
+      "idx": 80,
+      "version": "5",
+      "when": 1709423848698,
+      "tag": "0080_swift_jackal",
+      "breakpoints": false
+    },
+    {
+      "idx": 81,
+      "version": "5",
+      "when": 1709424053380,
+      "tag": "0081_rare_alex_power",
+      "breakpoints": false
     }
   ]
 }
