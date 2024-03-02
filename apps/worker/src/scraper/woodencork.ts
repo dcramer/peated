@@ -93,7 +93,8 @@ export async function scrapeProducts(
 
 export default async function main() {
   // TODO: support pagination
-  const products: Set<StorePrice> = new Set();
+  const products: Array<StorePrice> = [];
+  const productNames: Set<string> = new Set();
 
   let hasProducts = true;
   let page = 1;
@@ -102,8 +103,9 @@ export default async function main() {
     await scrapeProducts(
       `https://woodencork.com/collections/whiskey?cursor=${page}`,
       async (product) => {
-        if (!products.has(product)) {
-          products.add(product);
+        if (!productNames.has(product.name)) {
+          productNames.add(product.name);
+          products.push(product);
           hasProducts = true;
         }
       },
@@ -116,7 +118,7 @@ export default async function main() {
     console.log("Pushing new price data to API");
 
     chunked(
-      Array.from(products),
+      products,
       100,
       async (items) => await submitStorePrices("woodencork", items),
     );
