@@ -28,7 +28,7 @@ async function main() {
   }
 
   const worker = await faktory.work().catch((error) => {
-    console.error(`worker failed to start: ${error}`);
+    console.error(`worker failed to start`, error);
     Sentry.captureException(error);
     process.exit(1);
   });
@@ -39,6 +39,10 @@ async function main() {
         job: job.jid,
       },
     });
+  });
+
+  worker.on("error", ({ error }) => {
+    logError(error);
   });
 
   console.log("Worker Running...");
