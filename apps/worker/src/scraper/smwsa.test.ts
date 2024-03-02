@@ -24,6 +24,9 @@ test("bottle list", async () => {
     brand: {
       name: "The Scotch Malt Whisky Society",
     },
+    bottler: {
+      name: "The Scotch Malt Whisky Society",
+    },
     category: "single_malt",
     distillers: [
       {
