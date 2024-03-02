@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/node-experimental";
 import type { JobFunction } from "faktory-worker";
 import faktory, { type Client } from "faktory-worker";
+import { logError } from "./lib/log";
 import type { ExternalSiteType } from "./types";
 
 let client: Client | null = null;
@@ -71,21 +72,8 @@ export async function registerJob(jobName: JobName, jobFn: JobFunction) {
   faktory.register(jobName, instrumentedJob(jobName, jobFn));
 }
 
-type JobOptions = {
-  throwOn: (e: unknown) => boolean;
-};
-
-const defaultOptions = {
-  throwOn: () => false,
-};
-
 // instrument a job with Sentry
-function instrumentedJob<T>(
-  jobName: string,
-  jobFn: JobFunction,
-  options: JobOptions = defaultOptions,
-) {
-  const finalOptions = { ...defaultOptions, ...options };
+function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
   return async (...args: unknown[]) => {
     return Sentry.withScope(async function (scope) {
       scope.setContext("job", {
@@ -111,12 +99,10 @@ function instrumentedJob<T>(
             });
             return rv;
           } catch (e) {
-            Sentry.captureException(e);
+            logError(e);
             span.setStatus({
               code: 2, // ERROR
             });
-
-            if (finalOptions.throwOn(e)) throw e;
           }
         },
       );
