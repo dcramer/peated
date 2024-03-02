@@ -69,9 +69,9 @@ export async function getStructuredResponse<
       // ],
       temperature: 0,
     },
-    {
-      timeout: 30,
-    },
+    // {
+    //   timeout: 300,
+    // },
   );
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
