@@ -70,7 +70,7 @@ export async function getStructuredResponse<
       temperature: 0,
     },
     {
-      timeout: 10,
+      timeout: 30,
     },
   );
 
