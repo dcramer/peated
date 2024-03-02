@@ -93,7 +93,7 @@ export async function scrapeProducts(
 
 export default async function main() {
   // TODO: support pagination
-  const products: StorePrice[] = [];
+  const products: Set<StorePrice> = new Set();
 
   let hasProducts = true;
   let page = 1;
@@ -102,10 +102,13 @@ export default async function main() {
     await scrapeProducts(
       `https://woodencork.com/collections/whiskey?cursor=${page}`,
       async (product) => {
-        products.push(product);
-        hasProducts = true;
+        if (!products.has(product)) {
+          products.add(product);
+          hasProducts = true;
+        }
       },
     );
+
     page += 1;
   }
 
@@ -113,12 +116,12 @@ export default async function main() {
     console.log("Pushing new price data to API");
 
     chunked(
-      products,
+      Array.from(products),
       100,
       async (items) => await submitStorePrices("woodencork", items),
     );
   } else {
-    console.log(`Dry Run Complete - ${products.length} products found`);
+    console.log(`Dry Run Complete - ${products.size} products found`);
   }
 }
 
