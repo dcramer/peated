@@ -1,4 +1,3 @@
-import { context, propagation } from "@opentelemetry/api";
 import * as Sentry from "@sentry/node-experimental";
 import type { JobFunction } from "faktory-worker";
 import faktory, { type Client } from "faktory-worker";
@@ -55,12 +54,8 @@ export async function pushJob(jobName: JobName, args?: any) {
       span.setAttribute("messaging.operation", "publish");
       span.setAttribute("messaging.system", "faktory");
 
-      // pull out traceparent to forward to faktory job
-      const activeContext = {};
-      propagation.inject(context.active(), activeContext);
-
       try {
-        await client.job(jobName, args, { traceContext: activeContext }).push();
+        await client.job(jobName, args).push();
       } catch (e) {
         Sentry.captureException(e);
         span.setStatus({
@@ -92,55 +87,39 @@ function instrumentedJob<T>(
 ) {
   const finalOptions = { ...defaultOptions, ...options };
   return async (...args: unknown[]) => {
-    const activeContext = propagation.extract(
-      context.active(),
-      args.length > 1
-        ? (
-            args[1] as {
-              traceContext: {
-                traceId: string;
-                baggage: any;
-              };
-            }
-          ).traceContext
-        : {},
-    );
-
-    return context.with(activeContext, async () => {
-      return Sentry.withScope(async function (scope) {
-        scope.setContext("job", {
-          name: jobName,
-        });
-        scope.setTransactionName(jobName);
-
-        return await Sentry.startSpan(
-          {
-            op: "process",
-            name: `faktory.${jobName.toLowerCase()}`,
-          },
-          async (span) => {
-            span.setAttribute("messaging.operation", "process");
-            span.setAttribute("messaging.system", "faktory");
-
-            console.log(`Running job [${jobName}]`);
-
-            try {
-              const rv = await jobFn(...args);
-              span.setStatus({
-                code: 1, // OK
-              });
-              return rv;
-            } catch (e) {
-              Sentry.captureException(e);
-              span.setStatus({
-                code: 2, // ERROR
-              });
-
-              if (finalOptions.throwOn(e)) throw e;
-            }
-          },
-        );
+    return Sentry.withScope(async function (scope) {
+      scope.setContext("job", {
+        name: jobName,
       });
+      scope.setTransactionName(jobName);
+
+      return await Sentry.startSpan(
+        {
+          op: "process",
+          name: `faktory.${jobName.toLowerCase()}`,
+        },
+        async (span) => {
+          span.setAttribute("messaging.operation", "process");
+          span.setAttribute("messaging.system", "faktory");
+
+          console.log(`Running job [${jobName}]`);
+
+          try {
+            const rv = await jobFn(...args);
+            span.setStatus({
+              code: 1, // OK
+            });
+            return rv;
+          } catch (e) {
+            Sentry.captureException(e);
+            span.setStatus({
+              code: 2, // ERROR
+            });
+
+            if (finalOptions.throwOn(e)) throw e;
+          }
+        },
+      );
     });
   };
 }
