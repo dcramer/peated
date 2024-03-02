@@ -18,14 +18,15 @@ function FaktoryStats() {
   return (
     <>
       <SimpleHeader>Faktory</SimpleHeader>
-      <div className="my-6 grid grid-cols-5 items-center gap-3 text-center">
-        {Object.entries(data.faktory.tasks).map(([name, stats]) => {
+      <div className="my-6 grid grid-cols-4 items-center gap-3 text-center">
+        {Object.entries(data.faktory).map(([name, count]) => {
+          if (!name.startsWith("total_")) return null;
           return (
             <div className="mr-4 pr-3 text-center" key={name}>
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
-                {stats.size.toLocaleString()}
+                {count.toLocaleString()}
               </span>
-              <span className="text-light text-sm">{name}</span>
+              <span className="text-light text-sm">{name.slice(6)}</span>
             </div>
           );
         })}
