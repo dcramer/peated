@@ -123,7 +123,7 @@ export default async function main() {
       async (items) => await submitStorePrices("woodencork", items),
     );
   } else {
-    console.log(`Dry Run Complete - ${products.size} products found`);
+    console.log(`Dry Run Complete - ${products.length} products found`);
   }
 }
 
