@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "change_created_by_idx" ON "change" ("created_by_id");
