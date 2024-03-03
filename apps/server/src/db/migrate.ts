@@ -53,7 +53,7 @@ export const migrate = async function ({
     } to apply)`,
   );
 
-  for await (const migration of migrationsToApply) {
+  for (const migration of migrationsToApply) {
     await db.transaction(async (tx) => {
       if (
         !lastDbMigration ||
