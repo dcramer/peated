@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   date,
+  index,
   integer,
   pgTable,
   text,
@@ -36,6 +37,7 @@ export const storePrices = pgTable(
         storePrices.name,
         storePrices.volume,
       ),
+      bottleIdx: index("store_price_bottle_idx").on(storePrices.bottleId),
     };
   },
 );

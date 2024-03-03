@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "store_price_bottle_idx" ON "store_price" ("bottle_id");

@@ -603,6 +603,13 @@
       "when": 1709481695188,
       "tag": "0085_regular_giant_girl",
       "breakpoints": false
+    },
+    {
+      "idx": 86,
+      "version": "5",
+      "when": 1709481730447,
+      "tag": "0086_colossal_electro",
+      "breakpoints": false
     }
   ]
 }
