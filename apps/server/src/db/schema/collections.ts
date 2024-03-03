@@ -1,8 +1,8 @@
-import type { InferModel } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  index,
   pgTable,
   timestamp,
   uniqueIndex,
@@ -29,6 +29,9 @@ export const collections = pgTable(
     return {
       collectionIndex: uniqueIndex("collection_name_unq").on(
         collections.name,
+        collections.createdById,
+      ),
+      createdByIdx: index("collection_created_by_idx").on(
         collections.createdById,
       ),
     };
@@ -65,6 +68,9 @@ export const collectionBottles = pgTable(
         collectionBottles.collectionId,
         collectionBottles.bottleId,
       ),
+      bottleIdx: index("collection_bottle_bottle_idx").on(
+        collectionBottles.bottleId,
+      ),
     };
   },
 );
@@ -83,8 +89,5 @@ export const collectionBottlesRelations = relations(
   }),
 );
 
-export type CollectionBottle = InferModel<typeof collectionBottles>;
-export type NewCollectionBottle = InferModel<
-  typeof collectionBottles,
-  "insert"
->;
+export type CollectionBottle = typeof collectionBottles.$inferSelect;
+export type NewCollectionBottle = typeof collectionBottles.$inferInsert;
