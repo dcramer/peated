@@ -43,3 +43,8 @@ export const BottleInputSchema = z.object({
   statedAge: z.number().nullable().optional(),
   category: CategoryEnum.nullable().optional(),
 });
+
+export const BottleMergeSchema = z.object({
+  bottleId: z.number(),
+  direction: z.enum(["mergeInto", "mergeFrom"]),
+});

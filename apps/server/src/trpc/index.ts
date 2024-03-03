@@ -30,7 +30,7 @@ const isAdmin = t.middleware(({ ctx, next }) => {
 });
 
 const isMod = t.middleware(({ ctx, next }) => {
-  if (!ctx.user?.mod) {
+  if (!ctx.user?.admin && !ctx.user?.mod) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({

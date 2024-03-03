@@ -1,0 +1,97 @@
+import { db } from "@peated/server/db";
+import { bottleTombstones, bottles } from "@peated/server/db/schema";
+import { eq } from "drizzle-orm";
+import * as Fixtures from "../../lib/test/fixtures";
+import { createCaller } from "../router";
+
+test("requires authentication", async () => {
+  const caller = createCaller({ user: null });
+  expect(() =>
+    caller.bottleMerge({
+      root: 1,
+      other: 2,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
+});
+
+test("requires mod", async () => {
+  const caller = createCaller({ user: DefaultFixtures.user });
+  expect(() =>
+    caller.bottleMerge({
+      root: 1,
+      other: 2,
+    }),
+  ).rejects.toThrowError(/UNAUTHORIZED/);
+});
+
+test("merge A into B", async () => {
+  const bottleA = await Fixtures.Bottle({ totalTastings: 1 });
+  await Fixtures.Tasting({ bottleId: bottleA.id });
+  const bottleB = await Fixtures.Bottle();
+
+  const caller = createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.bottleMerge({
+    root: bottleA.id,
+    other: bottleB.id,
+    direction: "mergeInto",
+  });
+
+  expect(data.id).toEqual(bottleB.id);
+
+  const [newBottleA] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottleA.id));
+  expect(newBottleA).toBeUndefined();
+
+  const [newBottleB] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottleB.id));
+  expect(newBottleB).toBeDefined();
+  expect(newBottleB.totalTastings).toEqual(1);
+
+  const [tombstone] = await db
+    .select()
+    .from(bottleTombstones)
+    .where(eq(bottleTombstones.bottleId, bottleA.id));
+  expect(tombstone.newBottleId).toEqual(newBottleB.id);
+});
+
+test("merge A from B", async () => {
+  const bottleA = await Fixtures.Bottle({ totalTastings: 1 });
+  await Fixtures.Tasting({ bottleId: bottleA.id });
+  const bottleB = await Fixtures.Bottle();
+
+  const caller = createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  const data = await caller.bottleMerge({
+    root: bottleA.id,
+    other: bottleB.id,
+    direction: "mergeFrom",
+  });
+
+  expect(data.id).toEqual(bottleA.id);
+
+  const [newBottleA] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottleA.id));
+  expect(newBottleA).toBeDefined();
+  expect(newBottleA.totalTastings).toEqual(1);
+
+  const [newBottleB] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottleB.id));
+  expect(newBottleB).toBeUndefined();
+
+  const [tombstone] = await db
+    .select()
+    .from(bottleTombstones)
+    .where(eq(bottleTombstones.bottleId, bottleB.id));
+  expect(tombstone.newBottleId).toEqual(newBottleA.id);
+});

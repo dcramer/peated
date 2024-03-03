@@ -124,6 +124,9 @@ export default function BottleDetails() {
                 <Menu.Item as={Link} to={`/bottles/${bottle.id}/edit`}>
                   Edit Bottle
                 </Menu.Item>
+                <Menu.Item as={Link} to={`/bottles/${bottle.id}/merge`}>
+                  Merge Bottle
+                </Menu.Item>
                 {user.admin && (
                   <Menu.Item
                     as={ConfirmationButton}
