@@ -102,7 +102,7 @@ export default modProcedure
 
     if (!rootEntity) {
       throw new TRPCError({
-        message: "toEntity not found.",
+        message: "root not found.",
         code: "NOT_FOUND",
       });
     }
@@ -114,7 +114,7 @@ export default modProcedure
 
     if (!otherEntity) {
       throw new TRPCError({
-        message: "fromEntity not found.",
+        message: "other not found.",
         code: "NOT_FOUND",
       });
     }
