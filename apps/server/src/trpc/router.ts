@@ -10,6 +10,7 @@ import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
 import bottleList from "./routes/bottleList";
+import bottleMerge from "./routes/bottleMerge";
 import bottlePriceHistory from "./routes/bottlePriceHistory";
 import bottlePriceList from "./routes/bottlePriceList";
 import bottleSuggestedTagList from "./routes/bottleSuggestedTagList";
@@ -77,10 +78,11 @@ export const appRouter = router({
   bottleCreate,
   bottleList,
   bottleAliasList,
+  bottleMerge,
   bottlePriceHistory,
+  bottlePriceList,
   bottleSuggestedTagList,
   bottleTagList,
-  bottlePriceList,
   bottleUpdate,
   changeList,
   collectionBottleCreate,
