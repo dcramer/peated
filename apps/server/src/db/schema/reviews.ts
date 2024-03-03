@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  index,
   integer,
   pgTable,
   text,
@@ -36,6 +37,7 @@ export const reviews = pgTable(
         reviews.name,
         reviews.issue,
       ),
+      bottleIdx: index("review_bottle_idx").on(reviews.bottleId),
     };
   },
 );

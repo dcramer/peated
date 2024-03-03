@@ -596,6 +596,13 @@
       "when": 1709481651603,
       "tag": "0084_early_mongu",
       "breakpoints": false
+    },
+    {
+      "idx": 85,
+      "version": "5",
+      "when": 1709481695188,
+      "tag": "0085_regular_giant_girl",
+      "breakpoints": false
     }
   ]
 }
