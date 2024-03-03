@@ -202,3 +202,18 @@ subcommand
       await tx.delete(bottles).where(inArray(bottles.id, bottleIds));
     });
   });
+
+subcommand.command("fix-stats").action(async () => {
+  await db.update(bottles).set({
+    avgRating: sql<number>`(
+        SELECT AVG(rating)
+        FROM ${tastings}
+        WHERE ${tastings.bottleId} = ${bottles.id}
+      )`,
+    totalTastings: sql<number>`(
+        SELECT COUNT(*)
+        FROM ${tastings}
+        WHERE ${tastings.bottleId} = ${bottles.id}
+      )`,
+  });
+});
