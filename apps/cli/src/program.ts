@@ -4,7 +4,7 @@ import { shutdownClient } from "../../server/src/jobs";
 const program = new Command();
 
 program
-  .name("bottles")
+  .name("peated")
   .description("CLI for assisting with Peated")
   .hook("postAction", async () => {
     await shutdownClient();
