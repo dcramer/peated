@@ -40,7 +40,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
   },
 );
 
-export default function EditEntity() {
+export default function MergeEntity() {
   const navigate = useNavigate();
   const { entity } = useLoaderData<typeof loader>();
   const trpcUtils = trpc.useUtils();
@@ -104,8 +104,8 @@ export default function EditEntity() {
       )}
 
       <Form onSubmit={handleSubmit(onSubmit)}>
-        {mergeEntity.isError && (
-          <FormError values={[(mergeEntity.error as Error).message]} />
+        {entityMergeMutation.isError && (
+          <FormError values={[(entityMergeMutation.error as Error).message]} />
         )}
 
         <Fieldset>
