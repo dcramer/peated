@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  index,
   pgEnum,
   pgTable,
   timestamp,
@@ -35,6 +36,7 @@ export const follows = pgTable(
         follows.fromUserId,
         follows.toUserId,
       ),
+      toUserIdx: index("follow_to_user_idx").on(follows.toUserId),
     };
   },
 );
