@@ -15,9 +15,9 @@ module "peated-worker-service" {
     API_SERVER       = "https://api.peated.com"
     NODE_NO_WARNINGS = "1"
     # this is prob a bad idea
-    OPENAI_API_KEY  = data.google_secret_manager_secret_version.openai_api_key.secret_data
-    OPENAI_HOST     = "https://api.openai.com"
-    OPENAI_MODEL    = "gpt-3.5-turbo"
+    OPENAI_API_KEY = data.google_secret_manager_secret_version.openai_api_key.secret_data
+    # OPENAI_HOST     = "https://api.openai.com/v1"
+    # OPENAI_MODEL    = "gpt-3.5-turbo"
     ACCESS_TOKEN    = data.google_secret_manager_secret_version.api_access_token.secret_data
     FAKTORY_URL     = "tcp://:${data.google_secret_manager_secret_version.faktory_password.secret_data}@${module.faktory.hostname}:7419"
     DISCORD_WEBHOOK = data.google_secret_manager_secret_version.discord_webhook.secret_data
