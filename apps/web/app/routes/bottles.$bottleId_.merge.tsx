@@ -137,11 +137,11 @@ export default function MergeBottle() {
             required
             choices={[
               {
-                id: "mergeInto",
+                id: "mergeFrom",
                 name: `Merge "${otherBottleName}" into "${bottle.fullName}"`,
               },
               {
-                id: "mergeFrom",
+                id: "mergeInto",
                 name: `Merge "${bottle.fullName}" into "${otherBottleName}"`,
               },
             ]}

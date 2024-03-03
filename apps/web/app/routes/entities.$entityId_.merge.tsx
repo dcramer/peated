@@ -137,11 +137,11 @@ export default function MergeEntity() {
             required
             choices={[
               {
-                id: "mergeInto",
+                id: "mergeFrom",
                 name: `Merge "${otherEntityName}" into "${entity.name}"`,
               },
               {
-                id: "mergeFrom",
+                id: "mergeInto",
                 name: `Merge "${entity.name}" into "${otherEntityName}"`,
               },
             ]}
