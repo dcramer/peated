@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   doublePrecision,
+  index,
   integer,
   pgEnum,
   pgTable,
@@ -58,6 +59,9 @@ export const tastings = pgTable(
         tastings.createdById,
         tastings.createdAt,
       ),
+      bottleId: index("tasting_bottle_idx").on(tastings.bottleId),
+      flightId: index("tasting_flight_idx").on(tastings.flightId),
+      createdById: index("tasting_created_by_idx").on(tastings.createdById),
     };
   },
 );

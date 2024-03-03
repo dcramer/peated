@@ -575,6 +575,13 @@
       "when": 1709424053380,
       "tag": "0081_rare_alex_power",
       "breakpoints": false
+    },
+    {
+      "idx": 82,
+      "version": "5",
+      "when": 1709481443904,
+      "tag": "0082_green_the_hunter",
+      "breakpoints": false
     }
   ]
 }

@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  index,
   pgEnum,
   pgTable,
   smallint,
@@ -58,6 +59,7 @@ export const entities = pgTable(
       nameIndex: uniqueIndex("entity_name_unq")
         .on(entities.name)
         .using(sql`btree (LOWER(full_name))`),
+      createdById: index("entity_created_by_idx").on(entities.createdById),
     };
   },
 );

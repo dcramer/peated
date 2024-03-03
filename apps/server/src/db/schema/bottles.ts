@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   doublePrecision,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -62,6 +63,9 @@ export const bottles = pgTable(
       uniqueName: uniqueIndex("bottle_full_name_unq")
         .on(bottles.fullName)
         .using(sql`btree (LOWER(full_name))`),
+      brandIdx: index("bottle_brand_idx").on(bottles.brandId),
+      bottlerIdx: index("bottle_bottler_idx").on(bottles.bottlerId),
+      createdById: index("bottle_created_by_idx").on(bottles.createdById),
     };
   },
 );
@@ -159,6 +163,7 @@ export const bottleAliases = pgTable(
   (bottleAliases) => {
     return {
       pk: primaryKey(bottleAliases.name),
+      bottleIdx: index("bottle_alias_bottle_idx").on(bottleAliases.bottleId),
     };
   },
 );
