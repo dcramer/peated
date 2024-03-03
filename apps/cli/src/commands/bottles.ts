@@ -147,6 +147,13 @@ subcommand
         .where(inArray(storePrices.bottleId, bottleIds));
 
       await tx
+        .update(reviews)
+        .set({
+          bottleId: rootBottleId,
+        })
+        .where(inArray(reviews.bottleId, bottleIds));
+
+      await tx
         .update(collectionBottles)
         .set({
           bottleId: rootBottleId,
