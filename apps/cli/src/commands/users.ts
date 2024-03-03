@@ -47,7 +47,10 @@ subcommand
   .argument("<email>")
   .action(async (email) => {
     const [user] = await db.select().from(users).where(eq(users.email, email));
-    await db.update(users).set({ admin: true }).where(eq(users.id, user.id));
+    await db
+      .update(users)
+      .set({ mod: true, admin: true })
+      .where(eq(users.id, user.id));
 
     console.log(`${user.email} updated to be admin.`);
   });
