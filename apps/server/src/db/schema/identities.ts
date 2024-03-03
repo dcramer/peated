@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  index,
   pgEnum,
   pgTable,
   text,
@@ -30,6 +31,7 @@ export const identities = pgTable(
         identities.provider,
         identities.externalId,
       ),
+      userIdx: index("identity_user_idx").on(identities.userId),
     };
   },
 );
