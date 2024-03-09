@@ -124,7 +124,7 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
               {notification.ref.bottle.fullName}
             </Link>
           ) : (
-            "unknown tasting"
+            " an unknown tasting"
           )}
         </>
       );
