@@ -9,7 +9,6 @@ import {
   getUser,
   logout,
 } from "@peated/web/services/session.server";
-
 import { createRequestHandler } from "@remix-run/express";
 import { installGlobals } from "@remix-run/node";
 import { type AppLoadContext } from "@remix-run/server-runtime";
@@ -20,7 +19,6 @@ import compression from "compression";
 import type { Request } from "express";
 import express from "express";
 import morgan from "morgan";
-import path from "path";
 
 installGlobals();
 
@@ -38,14 +36,47 @@ Sentry.init({
 
 Sentry.setTag("service", "@peated/web");
 
+function getLoadContext(req: Request): AppLoadContext {
+  const trpc = createTRPCProxyClient<AppRouter>({
+    links: [
+      sentryLink(Sentry.captureException),
+      httpBatchLink({
+        url: `${config.API_SERVER}/trpc`,
+        async headers() {
+          return {
+            authorization: req.accessToken ? `Bearer ${req.accessToken}` : "",
+          };
+        },
+      }),
+    ],
+  });
+
+  return {
+    api: req.api,
+    user: req.user,
+    accessToken: req.accessToken,
+    trpc,
+  };
+}
+
 const viteDevServer =
   process.env.NODE_ENV === "production"
     ? undefined
     : await import("vite").then((vite) =>
         vite.createServer({
           server: { middlewareMode: true },
-        })
+        }),
       );
+
+const createSentryRequestHandler =
+  wrapExpressCreateRequestHandler(createRequestHandler);
+
+const remixHandler = createSentryRequestHandler({
+  build: viteDevServer
+    ? await viteDevServer.ssrLoadModule("virtual:remix/server-build")
+    : await import("./build/server/index.js"),
+  getLoadContext,
+});
 
 const app = express();
 const metricsApp = express();
@@ -143,79 +174,10 @@ app.all("*", async (req, res, next) => {
   next();
 });
 
-function getLoadContext(req: Request): AppLoadContext {
-  const trpc = createTRPCProxyClient<AppRouter>({
-    links: [
-      sentryLink(Sentry.captureException),
-      httpBatchLink({
-        url: `${config.API_SERVER}/trpc`,
-        async headers() {
-          return {
-            authorization: req.accessToken ? `Bearer ${req.accessToken}` : "",
-          };
-        },
-      }),
-    ],
-  });
-
-  return {
-    api: req.api,
-    user: req.user,
-    accessToken: req.accessToken,
-    trpc,
-  };
-}
-
-const MODE = process.env.NODE_ENV;
-const BUILD_DIR = path.join(process.cwd(), "build");
-
-const createSentryRequestHandler =
-  wrapExpressCreateRequestHandler(createRequestHandler);
-
-app.all(
-  "*",
-  MODE === "production"
-    ? createSentryRequestHandler({
-      build: viteDevServer
-        ? () => viteDevServer.ssrLoadModule("virtual:remix/server-build")
-        : await import(BUILD_DIR),
-        getLoadContext,
-    })
-    : (...args) => {
-        purgeRequireCache();
-        const requestHandler = createSentryRequestHandler({
-          build: require(BUILD_DIR),
-          mode: MODE,
-          getLoadContext,
-        });
-        return requestHandler(...args);
-      },
-);
+app.all("*", remixHandler);
 
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
-  // require the built app so we're ready when the first request comes in
-  require(BUILD_DIR);
   console.log(`✅ app ready: http://localhost:${port}`);
 });
-
-// const metricsPort = process.env.METRICS_PORT || 3001;
-
-// metricsApp.listen(metricsPort, () => {
-//   console.log(`✅ metrics ready: http://localhost:${metricsPort}/metrics`);
-// });
-
-function purgeRequireCache() {
-  // purge require cache on requests for "server side HMR" this won't let
-  // you have in-memory objects between requests in development,
-  // alternatively you can set up nodemon/pm2-dev to restart the server on
-  // file changes, we prefer the DX of this though, so we've included it
-  // for you by default
-  for (const key in require.cache) {
-    if (key.startsWith(BUILD_DIR)) {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete require.cache[key];
-    }
-  }
-}
