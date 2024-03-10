@@ -1,6 +1,7 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
 import { type Category } from "@peated/server/types";
 
+// This needs moved into the database and needs to be editable by the community/mods
 // https://www.whiskysaga.com/smws-codes
 export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   // Single Malt
@@ -197,6 +198,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   RW4: "Peerless Distillery",
   RW5: "MGP",
   RW6: "Kyrö Distillery",
+  RW7: "Journeyman Distillery",
 
   // Corn
   CW1: "Heaven Hill",
@@ -280,8 +282,9 @@ export type SMWSCaskDetails = {
 
 export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
   const caskNumberMatch = name.match(
-    /(Cask No\. )?([A-Z0-9]+\.[0-9]+)(\s.+)?/i,
+    /(Cask No\. )?([A-Z0-9]+\.[0-9]+)\s*(.+)?/i,
   );
+
   if (!caskNumberMatch) {
     return null;
   }

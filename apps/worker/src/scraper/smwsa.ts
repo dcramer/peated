@@ -79,11 +79,11 @@ export async function scrapeBottles(
 
     const details = parseDetailsFromName(`${itemType} ${caskName}`);
     if (!details?.distiller) {
-      console.warn(`Cannot find distiller: ${itemType}`);
+      console.error(`Cannot find distiller: ${itemType}`);
       continue;
     }
     if (!details.category) {
-      console.warn(`Unsupported spirit: ${itemType}`);
+      console.error(`Unsupported spirit: ${itemType}`);
       continue;
     }
 
