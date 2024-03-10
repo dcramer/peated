@@ -98,9 +98,9 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
   useEffect(() => {
     setState("loading");
     fetch.cancel();
+    const currentQuery = query;
     const currentFetch = fetch(query);
     setTimeout(async () => {
-      const currentQuery = query;
       const results = await currentFetch;
       if (currentQuery !== query) return;
       setResults(sortResults(results));
