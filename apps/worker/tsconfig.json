@@ -1,6 +1,6 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
-  "include": ["src"],
+  "include": ["src", "../server/src/lib/smws.ts"],
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "types": ["vitest/globals"],

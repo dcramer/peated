@@ -1,12 +1,9 @@
-import { CATEGORY_LIST } from "@peated/server/constants";
+import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { type BottleInputSchema } from "@peated/server/schemas";
-import { type Category } from "@peated/server/types";
 import { getUrl } from "@peated/worker/scraper";
 import { load as cheerio } from "cheerio";
 import { type z } from "zod";
-import { SMWS_DISTILLERY_CODES } from "../constants";
 import { trpcClient } from "../lib/api";
-import { getCategoryFromCask } from "../lib/smws";
 
 export default async function main() {
   await scrapeBottles(
@@ -80,35 +77,19 @@ export async function scrapeBottles(
     const ageSpec = specList.find(([name]) => name === "Age:");
     const statedAge = ageSpec ? Number(ageSpec[1].split(" ")[0]) : null;
 
-    const caskNumberMatch = itemType.match(/Cask No\. ([A-Z0-9]+\.[0-9]+)/i);
-    if (!caskNumberMatch) {
-      console.warn(`Cannot find cask number: ${itemType}`);
-      continue;
-    }
-    const caskNumber = caskNumberMatch[1];
-
-    const distillerMatch = caskNumber.match(/([A-Z0-9]+)\.[0-9]+/i);
-    if (!distillerMatch) {
+    const details = parseDetailsFromName(`${itemType} ${caskName}`);
+    if (!details?.distiller) {
       console.warn(`Cannot find distiller: ${itemType}`);
       continue;
     }
-    const distillerNo = distillerMatch[1];
-    if (!distillerNo) {
-      console.warn(`Cannot find distiller: ${itemType}`);
+    if (!details.category) {
+      console.warn(`Unsupported spirit: ${itemType}`);
       continue;
     }
-
-    const rawCategory = getCategoryFromCask(caskNumber);
-    if (rawCategory && !CATEGORY_LIST.includes(rawCategory as any)) {
-      console.warn(`Unsupported spirit: ${rawCategory}`);
-      continue;
-    }
-
-    const category = rawCategory as Category;
 
     await cb({
-      name: `${caskNumber} ${caskName}`,
-      category,
+      name: details.name,
+      category: details.category,
       statedAge,
       brand: {
         name: "The Scotch Malt Whisky Society",
@@ -116,13 +97,7 @@ export async function scrapeBottles(
       bottler: {
         name: "The Scotch Malt Whisky Society",
       },
-      distillers: SMWS_DISTILLERY_CODES[distillerNo]
-        ? [
-            {
-              name: SMWS_DISTILLERY_CODES[distillerNo],
-            },
-          ]
-        : [],
+      distillers: [{ name: details.distiller }],
     });
   }
 }

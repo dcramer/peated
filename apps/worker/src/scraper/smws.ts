@@ -1,11 +1,8 @@
-import { CATEGORY_LIST } from "@peated/server/constants";
+import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { type BottleInputSchema } from "@peated/server/schemas";
-import { type Category } from "@peated/server/types";
 import { getUrl } from "@peated/worker/scraper";
 import { type z } from "zod";
-import { SMWS_DISTILLERY_CODES } from "../constants";
 import { trpcClient } from "../lib/api";
-import { getCategoryFromCask } from "../lib/smws";
 
 export default async function main() {
   await scrapeBottles(
@@ -59,34 +56,20 @@ export async function scrapeBottles(
     }
 
     const statedAge = item.age;
-    const caskNumber = item.cask_no;
-    if (!caskNumber) {
-      console.warn(`Cannot find cask number: ${caskName}`);
-      return;
-    }
 
-    const distillerMatch = caskNumber.match(/([A-Z0-9]+)\.[0-9]+/i);
-    if (!distillerMatch) {
-      console.warn(`Cannot find distiller: ${caskName}`);
+    const details = parseDetailsFromName(`${item.cask_no} ${caskName}`);
+    if (!details?.distiller) {
+      console.warn(`Cannot find distiller: ${item.cask_no}`);
       return;
     }
-    const distillerNo = distillerMatch[1];
-    if (!distillerNo) {
-      console.warn(`Cannot find distiller: ${caskName}`);
+    if (!details?.category) {
+      console.warn(`Unsupported spirit: ${item.cask_no}`);
       return;
     }
-
-    const rawCategory = getCategoryFromCask(caskNumber);
-    if (rawCategory && !CATEGORY_LIST.includes(rawCategory as any)) {
-      console.warn(`Unsupported spirit: ${rawCategory}`);
-      return;
-    }
-
-    const category = rawCategory as Category;
 
     await cb({
-      name: `${caskNumber} ${caskName}`,
-      category,
+      name: details.name,
+      category: details.category,
       statedAge,
       brand: {
         name: "The Scotch Malt Whisky Society",
@@ -94,13 +77,11 @@ export async function scrapeBottles(
       bottler: {
         name: "The Scotch Malt Whisky Society",
       },
-      distillers: SMWS_DISTILLERY_CODES[distillerNo]
-        ? [
-            {
-              name: SMWS_DISTILLERY_CODES[distillerNo],
-            },
-          ]
-        : [],
+      distillers: [
+        {
+          name: details.distiller,
+        },
+      ],
     });
   });
 }
