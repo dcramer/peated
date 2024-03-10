@@ -25,6 +25,23 @@ type TastingNotes = {
   finish: string;
 };
 
+import { customType } from "drizzle-orm/pg-core";
+
+// https://github.com/drizzle-team/drizzle-orm/issues/247
+export const tsvector = customType<{
+  data: string;
+  config: { sources: string[] };
+}>({
+  dataType(config) {
+    if (config) {
+      const sources = config.sources.join(" || ' ' || ");
+      return `tsvector generated always as (to_tsvector('english', ${sources})) stored`;
+    } else {
+      return `tsvector`;
+    }
+  },
+});
+
 export const bottles = pgTable(
   "bottle",
   {
@@ -56,6 +73,10 @@ export const bottles = pgTable(
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
+
+    ts: tsvector("ts", {
+      sources: ["fullName"],
+    }),
   },
   (bottles) => {
     return {
@@ -66,6 +87,10 @@ export const bottles = pgTable(
       brandIdx: index("bottle_brand_idx").on(bottles.brandId),
       bottlerIdx: index("bottle_bottler_idx").on(bottles.bottlerId),
       createdById: index("bottle_created_by_idx").on(bottles.createdById),
+      // this is wrong - it should just be on the bottles table itself
+      ts: index("bottle_ts")
+        .on(bottles.ts)
+        .using(sql`gin (${bottles.name})`),
     };
   },
 );
