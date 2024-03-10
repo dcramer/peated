@@ -1,6 +1,7 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
   "include": ["env.d.ts", "**/*.ts", "**/*.tsx", "*.mts"],
+  "exclude": ["**/*.config.js", "**/*.config.ts"],
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "baseUrl": ".",

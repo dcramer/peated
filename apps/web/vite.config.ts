@@ -1,8 +1,18 @@
 import { vitePlugin as remix } from "@remix-run/dev";
+import autoprefixer from "autoprefixer";
+import postcssImport from "postcss-import";
+import tailwind from "tailwindcss";
 import { defineConfig } from "vite";
+import { cjsInterop } from "vite-plugin-cjs-interop";
+import svgr from "vite-plugin-svgr";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  css: {
+    postcss: {
+      plugins: [postcssImport, tailwind, autoprefixer],
+    },
+  },
   plugins: [
     remix({
       // ignoredRouteFiles: ["**/.*"],
@@ -11,6 +21,29 @@ export default defineConfig({
       // serverBuildPath: "build/index.js",
       // serverModuleFormat: "cjs",
       // publicPath: "/build/",
+    }),
+    svgr({
+      svgrOptions: {
+        plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx"],
+        svgoConfig: {
+          plugins: [
+            {
+              name: "preset-default",
+              params: {
+                overrides: {
+                  removeViewBox: false,
+                },
+              },
+            },
+          ],
+        },
+      },
+    }),
+    cjsInterop({
+      dependencies: [
+        "isomorphic-dompurify",
+        // "@some-scope/**",
+      ],
     }),
     tsconfigPaths(),
   ],
