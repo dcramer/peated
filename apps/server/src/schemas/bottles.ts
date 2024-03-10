@@ -51,3 +51,12 @@ export const BottleMergeSchema = z.object({
   bottleId: z.number(),
   direction: z.enum(["mergeInto", "mergeFrom"]),
 });
+
+export const BottleInputSuggestionSchema = z.object({
+  name: z.string().nullable().optional(),
+  brand: z.union([EntityInputSchema, z.number()]).nullable().optional(),
+  distillers: z.array(z.union([EntityInputSchema, z.number()])).optional(),
+  bottler: z.union([EntityInputSchema, z.number()]).nullable().optional(),
+  statedAge: z.number().nullable().optional(),
+  category: CategoryEnum.nullable().optional(),
+});
