@@ -28,6 +28,7 @@ export default publicProcedure
     z
       .object({
         query: z.string().default(""),
+        name: z.string().nullish(),
         country: CountryEnum.nullish(),
         region: z.string().nullish(),
         type: z.enum(ENTITY_TYPE_LIST).nullish(),
@@ -46,13 +47,16 @@ export default publicProcedure
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
-    if (query) {
+    if (query !== "") {
       where.push(
         or(
           ilike(entities.name, `%${query}%`),
           ilike(entities.name, `%The ${query}%`),
         ),
       );
+    }
+    if (input.name) {
+      where.push(sql`${input.name} = LOWER(${entities.name})`);
     }
     if (input.type) {
       where.push(sql`${input.type} = ANY(${entities.type})`);

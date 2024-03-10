@@ -308,7 +308,7 @@ export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
 
   return {
     category,
-    name: `${caskNumber} ${caskName}`,
+    name: `${caskNumber} ${caskName || ""}`,
     distiller: SMWS_DISTILLERY_CODES[distillerNo],
   };
 }
