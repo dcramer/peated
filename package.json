@@ -49,7 +49,7 @@
     "simple-git-hooks": "^2.9.0"
   },
   "engines": {
-    "node": ">=20.0.0 <21.0.0"
+    "node": "20"
   },
   "packageManager": "pnpm@8.14.3+sha256.2d0363bb6c314daa67087ef07743eea1ba2e2d360c835e8fec6b5575e4ed9484",
   "volta": {

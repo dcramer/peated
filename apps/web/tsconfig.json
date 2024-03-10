@@ -6,6 +6,7 @@
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "baseUrl": ".",
     "paths": {
+      "#/*": ["./*"],
       "@peated/web/*": ["./app/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     },

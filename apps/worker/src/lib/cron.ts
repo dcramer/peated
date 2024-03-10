@@ -1,4 +1,4 @@
-import { logError } from "@peated/server/src/lib/log";
+import { logError } from "@peated/server/lib/log";
 import * as Sentry from "@sentry/node-experimental";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 
