@@ -22,7 +22,7 @@
     "@trpc/client": "^10.45.2",
     "@trpc/server": "^10.45.2",
     "@types/bcrypt": "^5.0.2",
-    "@types/node": "^18.19.22",
+    "@types/node": "^20",
     "@types/pg": "^8.11.2",
     "bcrypt": "^5.1.1",
     "commander": "^10.0.1",
@@ -30,8 +30,6 @@
     "dotenv-cli": "^7.4.1",
     "drizzle-kit": "^0.20.14",
     "drizzle-orm": "^0.29.5",
-    "esbuild": "^0.19.12",
-    "esbuild-node-tsc": "^2.0.5",
     "pg": "^8.11.3",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.2"
