@@ -4,7 +4,7 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
 
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "Bundler",
 
     "allowJs": false,
     "skipLibCheck": true,
@@ -23,13 +23,16 @@
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true
-  },
-  "references": [{ "path": "./tsconfig.node.json" }],
-  "ts-node": {
-    "require": ["tsconfig-paths/register"],
-    "compilerOptions": {
-      "module": "commonjs"
+    "noFallthroughCasesInSwitch": true,
+
+    "paths": {
+      "@peated/worker/*": ["../../apps/worker/src/*"],
+      "@peated/server/*": ["../../apps/server/src/*"],
+      "@peated/web/*": ["../../apps/web/app/*"],
+
+      "@peated/design/*": ["../../packages/design/*"],
+      "@peated/tsconfig/*": ["../../packages/tsconfig/*"]
     }
-  }
+  },
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

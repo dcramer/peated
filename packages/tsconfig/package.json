@@ -3,7 +3,7 @@
   "name": "@peated/tsconfig",
   "dependencies": {},
   "peerDependencies": {
-    "ts-node": "*",
+    "tsx": "*",
     "tsconfig-paths": "*",
     "typescript": "*"
   },

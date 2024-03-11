@@ -1,13 +1,9 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
-  "include": ["src", "../server/lib/smws.ts"],
+  "include": ["src"],
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "types": ["vitest/globals"],
-    "baseUrl": ".",
-    "paths": {
-      "@peated/worker/*": ["./src/*"],
-      "@peated/server/*": ["../../apps/server/src/*"]
-    }
+    "baseUrl": "."
   }
 }

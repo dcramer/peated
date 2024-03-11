@@ -1,3 +1,4 @@
+import theme from "@peated/design";
 import config from "@peated/server/config";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
@@ -5,8 +6,6 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import type { Bottle, Comment, Tasting, User } from "../db/schema";
 import { logError } from "../lib/log";
 import { escapeHtml } from "./html";
-
-import theme from "@peated/design";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
 
