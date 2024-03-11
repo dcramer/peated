@@ -1,6 +1,7 @@
 {
   "private": true,
   "name": "@peated/server",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "nodemon --exec ts-node --require dotenv/config ./src/server.ts",
