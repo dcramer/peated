@@ -1,4 +1,4 @@
-import { type Category } from "@peated/server/src/types";
+import { type Category } from "@peated/server/types";
 
 export type StorePrice = {
   name: string;

@@ -1,5 +1,5 @@
 import { makeTRPCClient } from "@peated/server/lib/trpc";
-import { type ExternalSiteType } from "@peated/server/src/types";
+import { type ExternalSiteType } from "@peated/server/types";
 import config from "@peated/worker/config";
 import { type StorePrice } from "@peated/worker/types";
 import { captureException } from "@sentry/node-experimental";
