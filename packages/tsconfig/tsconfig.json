@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ES2022", "WebWorker"],
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
 
-    "module": "ES2022",
+    "module": "ESNext",
     "moduleResolution": "node",
 
     "allowJs": false,
