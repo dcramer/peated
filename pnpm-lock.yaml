@@ -538,6 +538,9 @@ importers:
       vite:
         specifier: ^5.1.5
         version: 5.1.5(@types/node@18.19.3)
+      vite-plugin-cjs-interop:
+        specifier: ^2.1.0
+        version: 2.1.0
       vite-tsconfig-paths:
         specifier: ^4.3.1
         version: 4.3.1(typescript@5.4.2)(vite@5.1.5)
@@ -6836,7 +6839,6 @@ packages:
       acorn: ^8
     dependencies:
       acorn: 8.11.3
-    dev: false
 
   /acorn-jsx@5.3.2(acorn@8.11.3):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -12571,7 +12573,6 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
-    dev: false
 
   /make-dir@2.1.0:
     resolution: {integrity: sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==}
@@ -17192,6 +17193,16 @@ packages:
       - sugarss
       - supports-color
       - terser
+    dev: true
+
+  /vite-plugin-cjs-interop@2.1.0:
+    resolution: {integrity: sha512-qp+54VPRKiiuqKZ4tToiEZz5d5uiZf33PrXOfyH5SInlVsYz4b6YoZMNxCrx+vKdAQVsZu03vDJK71Ri5oKMqg==}
+    dependencies:
+      acorn: 8.11.3
+      acorn-import-assertions: 1.9.0(acorn@8.11.3)
+      estree-walker: 3.0.3
+      magic-string: 0.30.8
+      minimatch: 9.0.3
     dev: true
 
   /vite-plugin-svgr@4.2.0(typescript@5.4.2)(vite@5.1.5):
