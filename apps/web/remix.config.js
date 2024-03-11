@@ -5,7 +5,7 @@ module.exports = {
   assetsBuildDirectory: "public/build",
   serverBuildPath: "build/index.js",
   serverDependenciesToBundle: [/^@peated\/.*/],
-  serverModuleFormat: "cjs",
+  serverModuleFormat: "esm",
   publicPath: "/build/",
   postcss: true,
   tailwind: true,

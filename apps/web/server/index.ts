@@ -1,5 +1,5 @@
 import prom from "@isaacs/express-prometheus-middleware";
-import { sentryLink } from "@peated/server/src/lib/trpc";
+import { sentryLink } from "@peated/server/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
 import config from "@peated/web/config";
 import { ApiClient } from "@peated/web/lib/api";
@@ -177,12 +177,6 @@ app.listen(port, () => {
   require(BUILD_DIR);
   console.log(`✅ app ready: http://localhost:${port}`);
 });
-
-// const metricsPort = process.env.METRICS_PORT || 3001;
-
-// metricsApp.listen(metricsPort, () => {
-//   console.log(`✅ metrics ready: http://localhost:${metricsPort}/metrics`);
-// });
 
 function purgeRequireCache() {
   // purge require cache on requests for "server side HMR" this won't let
