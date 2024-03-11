@@ -47,6 +47,7 @@
     "@types/leaflet": "^1.9.8",
     "@types/morgan": "^1.9.9",
     "@types/pica": "^9.0.4",
+    "@types/postcss-import": "^14.0.3",
     "@types/react": "^18.2.64",
     "@types/react-avatar-editor": "^13.0.2",
     "@types/react-dom": "^18.2.21",
