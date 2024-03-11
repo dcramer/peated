@@ -65,7 +65,7 @@ process.on("SIGINT", function () {
   scheduler.stop();
 });
 
-if (typeof require !== "undefined" && require.main === module) {
+if (import.meta.main) {
   main().catch((e) => {
     Sentry.captureException(e);
     console.error("Worker crashed", e);

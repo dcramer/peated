@@ -4,10 +4,10 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch --require dotenv/config ./src/main.ts",
-    "import": "tsx --require dotenv/config ./src/import.ts",
-    "logos": "tsx --require dotenv/config ./src/logos.ts",
-    "start": "tsx --require dotenv/config ./src/main.ts",
+    "dev": "bun --watch ./src/main.ts",
+    "import": "bun ./src/import.ts",
+    "logos": "bun ./src/logos.ts",
+    "start": "bun ./src/main.ts",
     "test": "dotenv -e .env.test -- vitest --no-threads",
     "test:watch": "dotenv -e .env.test -- vitest --no-threads",
     "test:ci": "dotenv -e .env.test -- vitest --no-threads --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
