@@ -9,7 +9,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   css: {
     postcss: {
-      plugins: [postcssImport, tailwind, autoprefixer],
+      plugins: [postcssImport(), tailwind, autoprefixer],
     },
   },
   plugins: [
