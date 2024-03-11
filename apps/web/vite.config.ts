@@ -3,6 +3,7 @@ import autoprefixer from "autoprefixer";
 import postcssImport from "postcss-import";
 import tailwind from "tailwindcss";
 import { defineConfig } from "vite";
+import { cjsInterop } from "vite-plugin-cjs-interop";
 import svgr from "vite-plugin-svgr";
 import tsconfigPaths from "vite-tsconfig-paths";
 
@@ -37,6 +38,10 @@ export default defineConfig({
           ],
         },
       },
+    }),
+    cjsInterop({
+      // List of CJS dependencies that require interop
+      dependencies: ["isomorphic-dompurify"],
     }),
     tsconfigPaths(),
   ],
