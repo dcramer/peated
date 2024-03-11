@@ -66,9 +66,6 @@ importers:
       '@sentry/node-experimental':
         specifier: ^7.102.1
         version: 7.102.1
-      '@sentry/profiling-node':
-        specifier: ^1.3.2
-        version: 1.3.2(@sentry/node@7.106.1)
       '@sentry/utils':
         specifier: ^7.102.1
         version: 7.102.1
@@ -162,9 +159,6 @@ importers:
       '@sentry/node-experimental':
         specifier: ^7.102.1
         version: 7.102.1
-      '@sentry/profiling-node':
-        specifier: ^1.3.2
-        version: 1.3.2(@sentry/node@7.106.1)
       '@sentry/utils':
         specifier: ^7.102.1
         version: 7.102.1
@@ -201,6 +195,9 @@ importers:
       commander:
         specifier: ^10.0.1
         version: 10.0.1
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1
@@ -273,6 +270,9 @@ importers:
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
+      tsx:
+        specifier: ^4.7.1
+        version: 4.7.1
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -559,9 +559,6 @@ importers:
       '@sentry/node-experimental':
         specifier: ^7.102.1
         version: 7.102.1
-      '@sentry/profiling-node':
-        specifier: ^1.3.2
-        version: 1.3.2(@sentry/node@7.106.1)
       '@swc/core':
         specifier: ^1.3.101
         version: 1.3.101
@@ -5671,19 +5668,6 @@ packages:
       '@sentry/core': 7.102.1
       '@sentry/types': 7.102.1
       '@sentry/utils': 7.102.1
-    dev: false
-
-  /@sentry/profiling-node@1.3.2(@sentry/node@7.106.1):
-    resolution: {integrity: sha512-Dm2FmR0+BYrTm3YSmbCxjeklAsXZecOwWarZQdrCQniPYlxS9GPgWv1P+J78+CrHZ4IpoIvnlRppGPMrJwPXkw==}
-    engines: {node: '>=8.0.0'}
-    hasBin: true
-    requiresBuild: true
-    peerDependencies:
-      '@sentry/node': ^7.44.1
-    dependencies:
-      '@sentry/node': 7.106.1
-      detect-libc: 2.0.2
-      node-abi: 3.52.0
     dev: false
 
   /@sentry/react@7.106.1(react@18.2.0):
@@ -11035,7 +11019,6 @@ packages:
     resolution: {integrity: sha512-ZvkrzoUA0PQZM6fy6+/Hce561s+faD1rsNwhnO5FelNjyy7EMGJ3Rz1AQ8GYDWjhRs/7dBLOEJvhK8MiEJOAFg==}
     dependencies:
       resolve-pkg-maps: 1.0.0
-    dev: true
 
   /getenv@1.0.0:
     resolution: {integrity: sha512-7yetJWqbS9sbn0vIfliPsFgoXMKn/YMF+Wuiog97x+urnSRRRZ7xB+uVkwGKzRgq9CDFfMQnE9ruL5DHv9c6Xg==}
@@ -16941,7 +16924,6 @@ packages:
       get-tsconfig: 4.7.3
     optionalDependencies:
       fsevents: 2.3.3
-    dev: true
 
   /tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
