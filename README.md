@@ -66,3 +66,7 @@ gcloud container clusters get-credentials default --region=us-central1
 ```shell
 kubectl exec -it deploy/peated-api -- bash
 ```
+
+## Credits
+
+- Several structural components inspired by [Epic Stack](https://github.com/epicweb-dev/epic-stack), although we're not relying on it directly.
