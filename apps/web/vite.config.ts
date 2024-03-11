@@ -7,7 +7,15 @@ import { cjsInterop } from "vite-plugin-cjs-interop";
 import svgr from "vite-plugin-svgr";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+const MODE = process.env.NODE_ENV;
+
 export default defineConfig({
+  build: {
+    cssMinify: MODE === "production",
+    rollupOptions: {
+      external: [/node:.*/, "stream", "crypto", "fsevents"],
+    },
+  },
   css: {
     postcss: {
       plugins: [postcssImport(), tailwind, autoprefixer],
@@ -19,7 +27,7 @@ export default defineConfig({
       // appDirectory: "app",
       // assetsBuildDirectory: "public/build",
       // serverBuildPath: "build/index.js",
-      // serverModuleFormat: "cjs",
+      serverModuleFormat: "esm",
       // publicPath: "/build/",
     }),
     svgr({
