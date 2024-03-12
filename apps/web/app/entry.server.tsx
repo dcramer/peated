@@ -1,6 +1,6 @@
 import { PassThrough } from "stream";
 
-import type { DataFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   createReadableStreamFromReadable,
   type EntryContext,
@@ -84,7 +84,7 @@ export default async function handleRequest(
 
 export function handleError(
   error: unknown,
-  { request }: DataFunctionArgs,
+  { request }: LoaderFunctionArgs | ActionFunctionArgs,
 ): void {
   if (error instanceof Error) {
     Sentry.captureRemixServerException(error, "remix.server", request);
