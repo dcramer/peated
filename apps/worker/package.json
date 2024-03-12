@@ -33,7 +33,7 @@
     "openai": "^4.28.4",
     "toad-scheduler": "^3.0.1",
     "esno": "^4.7.0",
-    "typescript": "^5.4.2",
+    "typescript": "~5.3.3",
     "vite-tsconfig-paths": "^4.3.1",
     "vitest": "^0.34.6",
     "vitest-mock-axios": "^0.1.0",

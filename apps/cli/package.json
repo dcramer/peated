@@ -32,7 +32,7 @@
     "drizzle-orm": "^0.29.5",
     "pg": "^8.11.3",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.4.2"
+    "typescript": "~5.3.3"
   },
   "volta": {
     "extends": "../../package.json"
