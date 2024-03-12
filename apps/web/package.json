@@ -12,7 +12,7 @@
     "dev": "cross-env NODE_ENV=development node ./server/dev-server.js",
     "sentry:upload-sourcemaps": "if test \"$NODE_ENV\" = \"production\"; then node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js --release $SENTRY_RELEASE; fi",
     "start": "cross-env NODE_ENV=production node ./build/server/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit --incremental"
   },
   "dependencies": {
     "@fontsource/raleway": "^5.0.17",
@@ -86,7 +86,7 @@
     "@types/morgan": "^1.9.9",
     "@types/pica": "^9.0.4",
     "@types/postcss-import": "^14.0.3",
-    "@types/react": "^18.2.64",
+    "@types/react": "^18.2.65",
     "@types/react-avatar-editor": "^13.0.2",
     "@types/react-dom": "^18.2.21",
     "@types/react-router-dom": "^5.3.3",
