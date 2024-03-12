@@ -30,6 +30,7 @@
     "dotenv-cli": "^7.4.1",
     "drizzle-kit": "^0.20.14",
     "drizzle-orm": "^0.29.5",
+    "esno": "^4.7.0",
     "pg": "^8.11.3",
     "tsconfig-paths": "^4.2.0",
     "typescript": "~5.3.3"
