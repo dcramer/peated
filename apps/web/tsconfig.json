@@ -21,6 +21,7 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
 
     "baseUrl": ".",
 

@@ -38,7 +38,8 @@ import { trpc } from "./lib/trpc";
 
 import "@fontsource/raleway";
 import "@fontsource/raleway/index.css";
-import "@peated/web/styles/index.css";
+
+import stylesheetUrl from "./styles/index.css?url";
 
 function initMobileControls() {
   if (typeof document === "undefined") return;
@@ -79,7 +80,7 @@ function unregisterServiceWorkers() {
 unregisterServiceWorkers();
 
 export const links: LinksFunction = () => [
-  { rel: "manifest", href: "/resources/manifest.webmanifest" },
+  { rel: "preload", href: stylesheetUrl, as: "style" },
   { rel: "icon", type: "image/png", href: glyphUrl },
   {
     rel: "mask-icon",
@@ -93,6 +94,8 @@ export const links: LinksFunction = () => [
     href: logo192Url,
     color: config.THEME_COLOR,
   },
+  { rel: "manifest", href: "/resources/manifest.webmanifest" },
+  { rel: "stylesheet", href: stylesheetUrl },
 ];
 
 export async function loader({ context }: LoaderFunctionArgs) {
