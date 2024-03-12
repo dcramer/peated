@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { sign, verify } from "jsonwebtoken";
+import jsonwebtoken from "jsonwebtoken";
 import config from "../config";
 import type { DatabaseType, TransactionType } from "../db";
 import { db } from "../db";
@@ -9,6 +9,8 @@ import { random } from "../lib/rand";
 import { serialize } from "../serializers";
 import { UserSerializer } from "../serializers/user";
 import { logError } from "./log";
+
+const { sign, verify } = jsonwebtoken;
 
 export const verifyToken = (token: string | undefined): Promise<any> => {
   return new Promise((res, rej) => {
