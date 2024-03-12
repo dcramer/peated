@@ -68,8 +68,8 @@ function getLoadContext(req: Request, res: any): AppLoadContext {
   };
 }
 
-const viteDevServer =
-  process.env.NODE_ENV === "production"
+const vite =
+  MODE === "production"
     ? undefined
     : await import("vite").then((vite) =>
         vite.createServer({
@@ -81,8 +81,8 @@ const createSentryRequestHandler =
   Sentry.wrapExpressCreateRequestHandler(createRequestHandler);
 
 async function getBuild() {
-  const build = viteDevServer
-    ? await viteDevServer.ssrLoadModule("virtual:remix/server-build")
+  const build = vite
+    ? await vite.ssrLoadModule("virtual:remix/server-build")
     : // @ts-ignore this should exist before running the server
       // but it may not exist just yet.
       await import("#build/server/index.js");
@@ -137,10 +137,11 @@ app.disable("x-powered-by");
 
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
+app.use(Sentry.Handlers.errorHandler());
 
 // Remix fingerprints its assets so we can cache forever.
-if (viteDevServer) {
-  app.use(viteDevServer.middlewares);
+if (vite) {
+  app.use(vite.middlewares);
 } else {
   app.use(
     "/build",

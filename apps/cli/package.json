@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "cli": "tsx --require dotenv/config ./src/index.ts",
+    "cli": "esno --require dotenv/config ./src/index.ts",
     "db": "pnpm cli db",
     "bottles": "pnpm cli bottles",
     "entities": "pnpm cli entities",
