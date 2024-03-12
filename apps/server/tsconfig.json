@@ -3,7 +3,8 @@
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "types": ["vitest/globals", "./src/globals.d.ts"],
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "outDir": "dist"
   },
   "include": ["src"],
   "exclude": ["src/test/setup-test-env.ts"]
