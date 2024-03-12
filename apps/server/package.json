@@ -30,7 +30,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/mime-types": "^2.1.4",
-    "@types/node": "^20",
+    "@types/node": "^20.11.26",
     "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.11.2",
     "@vitest/coverage-v8": "^0.34.6",

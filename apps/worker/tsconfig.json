@@ -1,10 +1,13 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
-  "include": ["src"],
+  "include": ["src/**/*.ts"],
   "compilerOptions": {
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "outDir": "dist",
+
+    "moduleResolution": "node",
+
     "types": ["vitest/globals"],
-    "baseUrl": ".",
-    "outDir": "dist"
+
+    "baseUrl": "./"
   }
 }

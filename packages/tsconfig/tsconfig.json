@@ -1,22 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
-
     "module": "ESNext",
+    "target": "ES2022",
     "moduleResolution": "Bundler",
 
-    "allowJs": false,
-    "skipLibCheck": true,
-    // "allowImportingTsExtensions": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "incremental": true,
-    "declaration": true,
     "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
 
     /* Linting */
     "strict": true,
@@ -25,13 +18,13 @@
     "noFallthroughCasesInSwitch": true,
 
     "paths": {
-      "@peated/worker/*": ["../../apps/worker/src/*"],
+      "@peated/cli/*": ["../../apps/cli/src/*"],
       "@peated/server/*": ["../../apps/server/src/*"],
       "@peated/web/*": ["../../apps/web/app/*"],
+      "@peated/worker/*": ["../../apps/worker/src/*"],
 
       "@peated/design/*": ["../../packages/design/*"],
       "@peated/tsconfig/*": ["../../packages/tsconfig/*"]
     }
-  },
-  "references": [{ "path": "./tsconfig.node.json" }]
+  }
 }

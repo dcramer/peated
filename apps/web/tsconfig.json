@@ -1,9 +1,29 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
-  "include": ["env.d.ts", "**/*.ts", "**/*.tsx", "**/*.mts"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/.server/**/*.ts",
+    "**/.server/**/*.tsx",
+    "**/.client/**/*.ts",
+    "**/.client/**/*.tsx"
+  ],
   "compilerOptions": {
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
+
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+
     "baseUrl": ".",
+
     // Remix takes care of building everything in `remix build`.
     "noEmit": true
   }

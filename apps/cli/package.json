@@ -11,7 +11,7 @@
     "tastings": "pnpm clis tastings",
     "mocks": "pnpm cli mocks",
     "users": "pnpm cli users",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit --incremental"
   },
   "dependencies": {
     "@peated/server": "workspace:*",
@@ -22,7 +22,7 @@
     "@trpc/client": "^10.45.2",
     "@trpc/server": "^10.45.2",
     "@types/bcrypt": "^5.0.2",
-    "@types/node": "^20",
+    "@types/node": "^20.11.26",
     "@types/pg": "^8.11.2",
     "bcrypt": "^5.1.1",
     "commander": "^10.0.1",
