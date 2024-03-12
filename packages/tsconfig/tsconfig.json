@@ -4,8 +4,10 @@
     "target": "ES2022",
     "moduleResolution": "Bundler",
 
+    "declaration": false,
+    "declarationMap": false,
+
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
     "allowJs": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

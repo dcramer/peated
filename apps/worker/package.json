@@ -17,7 +17,6 @@
     "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",
     "@sentry/node-experimental": "^7.106.1",
-    "@swc/core": "^1.4.6",
     "@trpc/client": "^10.45.2",
     "@trpc/server": "^10.45.2",
     "@types/cheerio": "^0.22.35",
