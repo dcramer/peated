@@ -53,34 +53,34 @@ import { choose, random, sample } from "../rand";
 import { toTitleCase } from "../strings";
 
 export const User = async ({ ...data }: Partial<NewUser> = {}) => {
-  return (
-    await db
-      .insert(users)
-      .values({
-        displayName: faker.person.firstName(),
-        email: faker.internet.email(),
-        username: faker.internet.userName().toLowerCase(),
-        admin: false,
-        mod: false,
-        active: true,
-        ...data,
-      })
-      .returning()
-  )[0];
+  const [result] = await db
+    .insert(users)
+    .values({
+      displayName: faker.person.firstName(),
+      email: faker.internet.email(),
+      username: faker.internet.userName().toLowerCase(),
+      admin: false,
+      mod: false,
+      active: true,
+      ...data,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const Follow = async ({ ...data }: Partial<NewFollow> = {}) => {
-  return (
-    await db
-      .insert(follows)
-      .values({
-        fromUserId: data.fromUserId || (await User()).id,
-        toUserId: data.toUserId || (await User()).id,
-        status: "following",
-        ...data,
-      })
-      .returning()
-  )[0];
+  const [result] = await db
+    .insert(follows)
+    .values({
+      fromUserId: data.fromUserId || (await User()).id,
+      toUserId: data.toUserId || (await User()).id,
+      status: "following",
+      ...data,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
@@ -102,6 +102,8 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
         createdById: data.createdById || (await User()).id,
       })
       .returning();
+
+    if (!entity) throw new Error("Unable to create fixture");
 
     await tx.insert(changes).values({
       objectId: entity.id,
@@ -134,6 +136,7 @@ export const Bottle = async ({
             totalBottles: 1,
           })
     ) as EntityType;
+
     const name =
       data.name ??
       `${toTitleCase(
@@ -155,6 +158,8 @@ export const Bottle = async ({
         createdById: data.createdById || (await User()).id,
       })
       .returning();
+
+    if (!bottle) throw new Error("Unable to create fixture");
 
     if (!distillerIds.length) {
       for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
@@ -195,21 +200,21 @@ export const Bottle = async ({
 export const BottleAlias = async ({
   ...data
 }: Partial<NewBottleAlias> = {}) => {
-  return (
-    await db
-      .insert(bottleAliases)
-      .values({
-        bottleId: data.bottleId || (await Bottle()).id,
-        name: `${toTitleCase(
-          choose([
-            faker.company.buzzNoun(),
-            `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
-          ]),
-        )} #${faker.number.int(100)}`,
-        ...data,
-      })
-      .returning()
-  )[0];
+  const [result] = await db
+    .insert(bottleAliases)
+    .values({
+      bottleId: data.bottleId || (await Bottle()).id,
+      name: `${toTitleCase(
+        choose([
+          faker.company.buzzNoun(),
+          `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
+        ]),
+      )} #${faker.number.int(100)}`,
+      ...data,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
@@ -225,6 +230,8 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
         createdById: data.createdById || (await User()).id,
       })
       .returning();
+
+    if (!result) throw new Error("Unable to create fixture");
 
     for (const tag of result.tags) {
       await tx
@@ -247,30 +254,30 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
 };
 
 export const Toast = async ({ ...data }: Partial<NewToast> = {}) => {
-  return (
-    await db
-      .insert(toasts)
-      .values({
-        createdById: data.createdById || (await User()).id,
-        tastingId: data.tastingId || (await Tasting()).id,
-        ...data,
-      })
-      .returning()
-  )[0];
+  const [result] = await db
+    .insert(toasts)
+    .values({
+      createdById: data.createdById || (await User()).id,
+      tastingId: data.tastingId || (await Tasting()).id,
+      ...data,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const Comment = async ({ ...data }: Partial<NewComment> = {}) => {
-  return (
-    await db
-      .insert(comments)
-      .values({
-        createdById: data.createdById || (await User()).id,
-        tastingId: data.tastingId || (await Tasting()).id,
-        comment: faker.lorem.sentences(random(2, 5)),
-        ...data,
-      })
-      .returning()
-  )[0];
+  const [result] = await db
+    .insert(comments)
+    .values({
+      createdById: data.createdById || (await User()).id,
+      tastingId: data.tastingId || (await Tasting()).id,
+      comment: faker.lorem.sentences(random(2, 5)),
+      ...data,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const Flight = async ({
@@ -291,6 +298,7 @@ export const Flight = async ({
         ...data,
       })
       .returning();
+    if (!flight) throw new Error("Unable to create fixture");
     if (bottles) {
       for (const bottleId of bottles) {
         await tx.insert(flightBottles).values({
@@ -304,19 +312,19 @@ export const Flight = async ({
 };
 
 export const Badge = async ({ ...data }: Partial<NewBadge> = {}) => {
-  return (
-    await db
-      .insert(badges)
-      .values({
-        name: faker.word.noun(),
-        type: "category",
-        config: {
-          category: "single_malt",
-        },
-        ...data,
-      })
-      .returning()
-  )[0];
+  const [result] = await db
+    .insert(badges)
+    .values({
+      name: faker.word.noun(),
+      type: "category",
+      config: {
+        category: "single_malt",
+      },
+      ...data,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const ExternalSite = async ({
@@ -330,15 +338,15 @@ export const ExternalSite = async ({
   });
   if (existing) return existing;
 
-  return (
-    await db
-      .insert(externalSites)
-      .values({
-        name: faker.company.name(),
-        ...(data as Omit<NewExternalSite, "name">),
-      })
-      .returning()
-  )[0];
+  const [result] = await db
+    .insert(externalSites)
+    .values({
+      name: faker.company.name(),
+      ...(data as Omit<NewExternalSite, "name">),
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
@@ -385,6 +393,8 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
       })
       .returning();
 
+    if (!price) throw new Error("Unable to create fixture");
+
     await tx
       .insert(storePriceHistories)
       .values({
@@ -402,17 +412,17 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
 export const StorePriceHistory = async ({
   ...data
 }: Partial<NewStorePriceHistory> = {}) => {
-  return (
-    await db
-      .insert(storePriceHistories)
-      .values({
-        price: parseInt(faker.finance.amount(50, 200, 0), 10) * 100,
-        volume: 750,
-        ...data,
-        priceId: data.priceId || (await StorePrice()).id,
-      })
-      .returning()
-  )[0];
+  const [result] = await db
+    .insert(storePriceHistories)
+    .values({
+      price: parseInt(faker.finance.amount(50, 200, 0), 10) * 100,
+      volume: 750,
+      ...data,
+      priceId: data.priceId || (await StorePrice()).id,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const Review = async ({ ...data }: Partial<NewReview> = {}) => {
@@ -428,19 +438,19 @@ export const Review = async ({ ...data }: Partial<NewReview> = {}) => {
     data.name = bottle.fullName;
   }
 
-  return (
-    await db
-      .insert(reviews)
-      .values({
-        name: "",
-        externalSiteId: data.externalSiteId || (await ExternalSite()).id,
-        rating: faker.number.int({ min: 59, max: 100 }),
-        url: faker.internet.url(),
-        issue: "Default",
-        ...data,
-      })
-      .returning()
-  )[0];
+  const [result] = await db
+    .insert(reviews)
+    .values({
+      name: "",
+      externalSiteId: data.externalSiteId || (await ExternalSite()).id,
+      rating: faker.number.int({ min: 59, max: 100 }),
+      url: faker.internet.url(),
+      issue: "Default",
+      ...data,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const AuthToken = async ({ user }: { user?: UserType | null } = {}) => {
