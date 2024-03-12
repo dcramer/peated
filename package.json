@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "",
   "main": "main.js",
+  "type": "commonjs",
   "scripts": {
     "build": "pnpm -r --filter='./apps/**' --filter='./packages/**' run build",
     "setup": "pnpm install && npm run db:migrate",
@@ -46,6 +47,7 @@
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.12",
+    "publint": "^0.2.7",
     "simple-git-hooks": "^2.10.0"
   },
   "engines": {
