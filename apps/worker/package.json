@@ -1,7 +1,6 @@
 {
   "private": true,
   "name": "@peated/worker",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "esno watch --require dotenv/config ./src/main.ts",

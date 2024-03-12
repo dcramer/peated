@@ -1,7 +1,6 @@
 {
   "private": true,
   "name": "@peated/design",
-  "type": "module",
   "scripts": {
     "build": "tsc"
   },

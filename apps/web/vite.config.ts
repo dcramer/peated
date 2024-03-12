@@ -27,7 +27,7 @@ export default defineConfig({
       // appDirectory: "app",
       // assetsBuildDirectory: "public/build",
       // serverBuildPath: "build/index.js",
-      serverModuleFormat: "esm",
+      serverModuleFormat: "cjs",
       // publicPath: "/build/",
     }),
     svgr({

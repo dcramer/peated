@@ -5,7 +5,7 @@
   "compilerOptions": {
     "outDir": "dist",
 
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
 
     "types": ["vitest/globals", "./src/globals.d.ts"],
 

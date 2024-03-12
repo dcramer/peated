@@ -1,7 +1,6 @@
 {
   "private": true,
   "name": "@peated/server",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "esno watch --require dotenv/config ./src/server.ts",

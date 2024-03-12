@@ -14,7 +14,7 @@ const globsafe = (s: string) => s.replace(/\\/g, "/");
 
 const allFiles = globSync(globsafe(here("../server/**/*.*")), {
   ignore: [
-    "server/dev-server.js", // for development only
+    "server/dev-server.ts", // for development only
     "**/tsconfig.json",
     "**/eslint*",
     "**/__tests__/**",
@@ -43,7 +43,7 @@ esbuild
     target: [`node${pkg.engines.node}`],
     platform: "node",
     sourcemap: true,
-    format: "esm",
+    format: "cjs",
     logLevel: "info",
   })
   .catch((error: unknown) => {

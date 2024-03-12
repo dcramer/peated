@@ -1,7 +1,6 @@
 {
   "private": true,
   "name": "@peated/cli",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "cli": "esno --require dotenv/config ./src/index.ts",
