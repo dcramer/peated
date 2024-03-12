@@ -36,6 +36,7 @@ import { ApiUnauthorized } from "./lib/api";
 import { logError } from "./lib/log";
 import { trpc } from "./lib/trpc";
 
+import "@fontsource/raleway";
 import "@fontsource/raleway/index.css";
 import "@peated/web/styles/index.css";
 
