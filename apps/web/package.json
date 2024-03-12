@@ -11,7 +11,7 @@
     "predev": "pnpm run build:remix",
     "dev": "cross-env NODE_ENV=development node ./server/dev-server.js",
     "sentry:upload-sourcemaps": "if test \"$NODE_ENV\" = \"production\"; then node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js --release $SENTRY_RELEASE; fi",
-    "start": "cross-env NODE_ENV=production node ./build/server/index.js",
+    "start": "cross-env NODE_ENV=production node ./index.js",
     "typecheck": "tsc --noEmit --incremental"
   },
   "dependencies": {
