@@ -640,9 +640,6 @@ importers:
       tsconfig-paths:
         specifier: '*'
         version: 4.2.0
-      tsx:
-        specifier: '*'
-        version: 4.7.1
       typescript:
         specifier: '*'
         version: 5.4.2
@@ -4962,7 +4959,7 @@ packages:
       '@babel/plugin-syntax-typescript': 7.23.3(@babel/core@7.24.0)
       '@vanilla-extract/babel-plugin-debug-ids': 1.0.5
       '@vanilla-extract/css': 1.14.1
-      esbuild: 0.17.6
+      esbuild: 0.19.12
       eval: 0.1.8
       find-up: 5.0.0
       javascript-stringify: 2.1.0
