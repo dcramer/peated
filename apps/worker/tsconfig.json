@@ -4,6 +4,7 @@
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "types": ["vitest/globals"],
-    "baseUrl": "."
+    "baseUrl": ".",
+    "outDir": "dist"
   }
 }
