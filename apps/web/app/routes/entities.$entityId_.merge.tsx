@@ -105,7 +105,7 @@ export default function MergeEntity() {
 
       <Form onSubmit={handleSubmit(onSubmit)}>
         {entityMergeMutation.isError && (
-          <FormError values={[(entityMergeMutation.error as Error).message]} />
+          <FormError values={[entityMergeMutation.error.message]} />
         )}
 
         <Fieldset>

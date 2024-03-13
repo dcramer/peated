@@ -50,11 +50,12 @@ export default function MergeBottle() {
   // TODO: move to queries
   const bottleMergeMutation = trpc.bottleMerge.useMutation({
     onSuccess: (newBottle) => {
-      const previous = trpcUtils.bottleById.getData(newBottle.id);
-      trpcUtils.bottleById.setData(newBottle.id, {
-        ...previous,
-        ...newBottle,
-      });
+      trpcUtils.bottleById.invalidate();
+      // const previous = trpcUtils.bottleById.getData(newBottle.id);
+      // trpcUtils.bottleById.setData(newBottle.id, {
+      //   ...previous,
+      //   ...newBottle,
+      // });
     },
   });
 
@@ -105,7 +106,7 @@ export default function MergeBottle() {
 
       <Form onSubmit={handleSubmit(onSubmit)}>
         {bottleMergeMutation.isError && (
-          <FormError values={[(bottleMergeMutation.error as Error).message]} />
+          <FormError values={[bottleMergeMutation.error.message]} />
         )}
 
         <Fieldset>

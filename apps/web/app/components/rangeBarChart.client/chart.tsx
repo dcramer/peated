@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 
 import Bar from "./bar";
 import type { ChartDimensions, DataPoint } from "./types";
@@ -42,7 +42,7 @@ export default function Chart({
     });
   };
 
-  const onMouseMoveInside = (e) => {
+  const onMouseMoveInside = (e: MouseEvent<SVGSVGElement>) => {
     setMouseCoords({
       x:
         e.nativeEvent.x -
