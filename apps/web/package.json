@@ -14,6 +14,15 @@
     "start": "cross-env NODE_ENV=production node ./index.js",
     "typecheck": "tsc --noEmit --incremental"
   },
+  "exports": {
+    "./*": [
+      "./app/*",
+      "./app/*.ts",
+      "./app/*.tsx",
+      "./app/*/index.ts",
+      "./app/*/index.tsx"
+    ]
+  },
   "dependencies": {
     "@fontsource/raleway": "^5.0.17",
     "@headlessui/react": "^1.7.18",
@@ -48,6 +57,7 @@
     "dotenv": "^16.4.5",
     "execa": "^8.0.1",
     "express": "^4.18.3",
+    "fast-glob": "^3.3.2",
     "framer-motion": "^10.18.0",
     "get-port": "^7.0.0",
     "isbot": "latest",

@@ -55,7 +55,7 @@
   },
   "packageManager": "pnpm@8.14.3+sha256.2d0363bb6c314daa67087ef07743eea1ba2e2d360c835e8fec6b5575e4ed9484",
   "volta": {
-    "node": "20.11.0",
+    "node": "20.11.1",
     "pnpm": "8.14.3"
   },
   "simple-git-hooks": {

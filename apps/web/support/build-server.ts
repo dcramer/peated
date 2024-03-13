@@ -3,6 +3,7 @@ import fsExtra from "fs-extra";
 import { globSync } from "glob";
 import path from "path";
 import { fileURLToPath } from "url";
+import tsPaths from "./esbuild-tspaths";
 
 const pkg = fsExtra.readJsonSync(
   path.join(process.cwd(), "../../package.json"),
@@ -38,6 +39,7 @@ console.log("building...");
 
 esbuild
   .build({
+    // bundle: true,
     entryPoints: entries,
     outdir: here("../server-build"),
     target: [`node${pkg.engines.node}`],
@@ -45,6 +47,7 @@ esbuild
     sourcemap: true,
     format: "esm",
     logLevel: "info",
+    plugins: [tsPaths(here("../tsconfig.json"))],
   })
   .catch((error: unknown) => {
     console.error(error);

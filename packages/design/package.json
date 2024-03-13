@@ -10,6 +10,13 @@
     "index.ts",
     "tailwind.config.ts"
   ],
+  "exports": {
+    "./*.ts": "./*.ts",
+    "./*": [
+      "./*.ts",
+      "./*/index.ts"
+    ]
+  },
   "dependencies": {
     "@peated/tsconfig": "workspace:*",
     "@tailwindcss/forms": "^0.5.7",

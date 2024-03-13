@@ -13,6 +13,13 @@
     "test:ci": "dotenv -e .env.test -- vitest --no-threads --coverage --reporter=junit --reporter=default --outputFile=junit.xml",
     "typecheck": "tsc --noEmit --incremental"
   },
+  "exports": {
+    "./*.ts": "./src/*.ts",
+    "./*": [
+      "./src/*.ts",
+      "./src/*/index.ts"
+    ]
+  },
   "dependencies": {
     "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",
