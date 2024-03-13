@@ -6,7 +6,7 @@ import ListItem from "./listItem";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
-const ChangeAuthor = ({ user }: { user?: User }) => {
+const ChangeAuthor = ({ user }: { user?: User | null }) => {
   if (!user) return <div>An anonymous wizard</div>;
   return (
     <div className="flex items-center gap-x-2">

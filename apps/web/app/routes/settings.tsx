@@ -121,7 +121,7 @@ export default function Settings() {
     >
       <Form onSubmit={handleSubmit(onSubmit)}>
         {userUpdateMutation.isError && (
-          <FormError values={[(userUpdateMutation.error as Error).message]} />
+          <FormError values={[userUpdateMutation.error.message]} />
         )}
 
         <Fieldset>

@@ -26,7 +26,7 @@ export default function SiteForm({
   initialData = {},
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
-  initialData: Partial<ExternalSite>;
+  initialData?: Partial<ExternalSite>;
 }) {
   const {
     control,

@@ -9,7 +9,7 @@ export const sitemap: SitemapFunction = () => ({
 });
 
 function FaktoryStats() {
-  const { data } = trpc.faktoryInfo.useQuery({
+  const { data } = trpc.faktoryInfo.useQuery(undefined, {
     refetchInterval: 5,
   });
 

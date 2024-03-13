@@ -6,7 +6,7 @@ import { useOnlineStatus } from "@peated/web/hooks/useOnlineStatus";
 import { ApiError, ApiUnauthorized, ApiUnavailable } from "@peated/web/lib/api";
 
 export default function ErrorPage() {
-  const error = useRouteError();
+  const error = useRouteError() as Error | ApiError;
   const isOnline = useOnlineStatus();
 
   let title = "Error";
@@ -53,7 +53,7 @@ export default function ErrorPage() {
           </div>
 
           <div className="mt-12">
-            {error.remoteStack && (
+            {error instanceof ApiError && (
               <div className="prose mx-auto mb-4">
                 <h3 className="text-white">Remote Stack</h3>
                 <pre className="max-h-full overflow-y-auto whitespace-pre-wrap break-all text-left">

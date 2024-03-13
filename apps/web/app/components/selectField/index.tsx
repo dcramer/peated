@@ -1,5 +1,5 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
 
 import Chip from "../chip";
@@ -153,7 +153,7 @@ export default ({
           <Chip
             key={`${option.id}-${option.name}`}
             active={value.includes(option)}
-            onClick={(e) => {
+            onClick={(e: MouseEvent<HTMLElement>) => {
               e.stopPropagation();
               toggleOption(option);
             }}
@@ -169,7 +169,7 @@ export default ({
           (!options.length || visibleValues.length != options.length) &&
           multiple && (
             <Chip
-              onClick={(e) => {
+              onClick={(e: MouseEvent<HTMLElement>) => {
                 e.stopPropagation();
                 setDialogOpen(true);
               }}

@@ -35,7 +35,7 @@ export default function FlightForm({
   initialData?: {
     name?: string;
     description?: string;
-    bottles?: (Bottle | number)[];
+    bottles?: Bottle[];
   };
   title: string;
 }) {

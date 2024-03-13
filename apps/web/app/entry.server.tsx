@@ -39,7 +39,7 @@ export default async function handleRequest(
   responseHeaders: Headers,
   remixContext: EntryContext,
 ) {
-  if (isSitemapUrl(request)) return await sitemap(request, remixContext);
+  if (isSitemapUrl(request)) return await sitemap(request, remixContext as any);
 
   const callbackName = isbot(request.headers.get("user-agent"))
     ? "onAllReady"
