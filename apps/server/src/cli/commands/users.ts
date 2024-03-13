@@ -1,9 +1,9 @@
-import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { createAccessToken, createUser } from "@peated/server/lib/auth";
 import { hashSync } from "bcrypt";
 import { eq } from "drizzle-orm";
+import program from "src/cli/program";
 
 const subcommand = program.command("users");
 

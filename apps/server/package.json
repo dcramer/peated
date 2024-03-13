@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "cli": "esno --require dotenv/config ./src/cli/index.ts",
     "dev": "esno watch --require dotenv/config ./src/server.ts",
     "start": "esno --transpile-only --require dotenv/config ./src/server.ts",
     "typecheck": "tsc --noEmit --incremental",
