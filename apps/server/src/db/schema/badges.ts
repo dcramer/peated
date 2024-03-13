@@ -19,7 +19,7 @@ export const badges = pgTable(
   "badges",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    name: varchar("name", { length: 255 }),
+    name: varchar("name", { length: 255 }).notNull(),
     type: badgeTypeEnum("type").notNull(),
     config: jsonb("config").$type<Record<string, any>>().default({}).notNull(),
   },
