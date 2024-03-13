@@ -29,6 +29,8 @@ export default forwardRef(function SidebarLink<
   const Icon = icon;
   return (
     <li>
+      {/* 
+      // @ts-ignore */}
       <Component
         className={classNames(
           active
