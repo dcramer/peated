@@ -50,7 +50,7 @@ export default function MergeBottle() {
   // TODO: move to queries
   const bottleMergeMutation = trpc.bottleMerge.useMutation({
     onSuccess: (newBottle) => {
-      trpcUtils.bottleById.invalidate();
+      trpcUtils.bottleById.invalidate(newBottle.id);
       // const previous = trpcUtils.bottleById.getData(newBottle.id);
       // trpcUtils.bottleById.setData(newBottle.id, {
       //   ...previous,
