@@ -5,7 +5,6 @@ import config from "@peated/web/config";
 import classNames from "@peated/web/lib/classNames";
 import { useEffect, useState } from "react";
 import { debounce } from "ts-debounce";
-import Header from "../header";
 import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";
 import CreateOptionDialog from "./createOptionDialog";
@@ -93,17 +92,21 @@ export default ({
       <Dialog.Overlay className="fixed inset-0" />
 
       <Dialog.Panel className="dialog-panel">
-        <Header>
-          <SearchHeader
-            onClose={() => setOpen(false)}
-            onChange={(value) => {
-              setQuery(value);
-            }}
-            onDone={multiple ? () => setOpen(false) : undefined}
-            closeIcon={<XMarkIcon className="h-8 w-8" />}
-            placeholder={searchPlaceholder}
-          />
-        </Header>
+        <header className="h-14 flex-shrink-0 overflow-hidden border-b border-b-slate-700 bg-slate-950 lg:h-16">
+          <div className="fixed left-0 right-0 z-10 mx-auto flex h-14 max-w-4xl lg:h-16">
+            <div className="flex flex-1 items-center justify-between px-4">
+              <SearchHeader
+                onClose={() => setOpen(false)}
+                onChange={(value) => {
+                  setQuery(value);
+                }}
+                onDone={multiple ? () => setOpen(false) : undefined}
+                closeIcon={<XMarkIcon className="h-8 w-8" />}
+                placeholder={searchPlaceholder}
+              />
+            </div>
+          </div>
+        </header>
         <main className={"m-h-screen relative mx-auto max-w-4xl"}>
           <ul role="list" className="space-y">
             {optionList.map((option) => {
