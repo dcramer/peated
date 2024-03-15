@@ -111,7 +111,7 @@ export default function TastingListItem({
       {!noBottle && <BottleCard bottle={bottle} />}
       <div>
         {!!tasting.imageUrl && (
-          <div className="flex h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mb-0 sm:mr-4">
+          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mb-0 sm:mr-4">
             <ImageWithSkeleton
               src={tasting.imageUrl}
               className="h-full cursor-pointer"
