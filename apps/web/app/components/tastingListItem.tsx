@@ -27,12 +27,13 @@ function ImageWithSkeleton({
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    if (loaded) return;
     const img = new Image();
     img.onload = () => {
       setLoaded(true);
     };
     img.src = src;
-  });
+  }, [setLoaded, loaded, src]);
 
   if (!loaded) return <ImageSkeleton />;
 
