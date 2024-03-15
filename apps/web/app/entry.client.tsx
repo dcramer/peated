@@ -1,5 +1,5 @@
 import { RemixBrowser, useLocation, useMatches } from "@remix-run/react";
-import { Feedback } from "@sentry-internal/feedback";
+import { feedbackIntegration } from "@sentry-internal/feedback";
 import * as Sentry from "@sentry/remix";
 import { startTransition, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
@@ -25,7 +25,7 @@ Sentry.init({
 
   debug: false,
   integrations: [
-    new Sentry.BrowserTracing({
+    Sentry.browserTracingIntegration({
       tracePropagationTargets: [
         "localhost",
         /^\//,
@@ -34,17 +34,15 @@ Sentry.init({
         /^https:\/\/api\.peated\.app/,
         /^https:\/\/api\.peated\.com/,
       ],
-      routingInstrumentation: Sentry.remixRouterInstrumentation(
-        useEffect,
-        useLocation,
-        useMatches,
-      ),
+      useEffect,
+      useLocation,
+      useMatches,
     }),
-    new Sentry.Replay({
+    Sentry.replayIntegration({
       maskAllText: true,
       blockAllMedia: true,
     }),
-    new Feedback({
+    feedbackIntegration({
       // buttonLabel: "Feedback",
       // submitButtonLabel: "Send Feedback",
       // formTitle: "Feedback 🥔",
