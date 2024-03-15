@@ -5,12 +5,8 @@
   "scripts": {
     "build": "tsc"
   },
-  "main": "dist/index.js",
-  "files": [
-    "index.ts",
-    "tailwind.config.ts"
-  ],
   "exports": {
+    ".": "./index.ts",
     "./*.ts": "./*.ts",
     "./*": [
       "./*.ts",
