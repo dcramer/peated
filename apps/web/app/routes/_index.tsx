@@ -45,7 +45,7 @@ export default function Activity() {
   return (
     <Layout>
       <div className="flex w-full">
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden lg:w-9/12">
           <Tabs fullWidth border>
             {user && (
               <Tabs.Item
