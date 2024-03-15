@@ -33,7 +33,7 @@ function ImageWithSkeleton({
       setLoaded(true);
     };
     img.src = src;
-  }, [setLoaded, loaded, src]);
+  }, [loaded, src]);
 
   if (!loaded) return <ImageSkeleton />;
 
