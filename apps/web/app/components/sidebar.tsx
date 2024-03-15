@@ -12,8 +12,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { useLocation } from "@remix-run/react";
 import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
 import Button from "./button";
-import { ClientOnly } from "./clientOnly";
-import { FeedbackSidebarLink } from "./feedbackSidebarLink.client";
+import FeedbackSidebarLink from "./feedbackSidebarLink";
 import HeaderLogo from "./headerLogo";
 import SidebarLink from "./sidebarLink";
 
@@ -117,7 +116,7 @@ export default function Sidebar() {
                   >
                     About
                   </SidebarLink>
-                  <ClientOnly>{() => <FeedbackSidebarLink />}</ClientOnly>
+                  <FeedbackSidebarLink />
                 </ul>
               </li>
             </ul>

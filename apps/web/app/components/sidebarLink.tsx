@@ -34,7 +34,7 @@ export default forwardRef(function SidebarLink<
           active
             ? "text-highlight border-highlight"
             : "text-light border-transparent hover:border-slate-400 hover:text-slate-400",
-          "relative border-l-4",
+          "relative cursor-pointer border-l-4",
           "group flex gap-x-3 text-sm font-semibold leading-6",
           size === "default" ? "p-2" : "px-2",
         )}
