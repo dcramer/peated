@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
+import { type To } from "react-router-dom";
 import classNames from "../lib/classNames";
 
 type ButtonColor = "primary" | "default" | "highlight" | undefined;
@@ -24,7 +25,7 @@ type BaseProps = {
 
 type ConditionalProps =
   | {
-      to?: string;
+      to?: To;
       onClick?: never;
     }
   | {

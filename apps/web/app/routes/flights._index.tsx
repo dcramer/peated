@@ -7,6 +7,7 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
 import PageHeader from "../components/pageHeader";
+import PaginationButtons from "../components/paginationButtons";
 import { redirectToAuth } from "../lib/auth";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -78,27 +79,7 @@ export default function Flights() {
           </EmptyActivity>
         )}
       </div>
-      {rel && (
-        <nav
-          className="flex items-center justify-between py-3"
-          aria-label="Pagination"
-        >
-          <div className="flex flex-auto justify-between gap-x-2 sm:justify-end">
-            <Button
-              to={rel.prevCursor ? `?cursor=${rel.prevCursor}` : undefined}
-              disabled={!rel.prevCursor}
-            >
-              Previous
-            </Button>
-            <Button
-              to={rel.nextCursor ? `?cursor=${rel.nextCursor}` : undefined}
-              disabled={!rel.nextCursor}
-            >
-              Next
-            </Button>
-          </div>
-        </nav>
-      )}
+      <PaginationButtons rel={rel} />
     </Layout>
   );
 }
