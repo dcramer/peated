@@ -10,6 +10,7 @@ import { useState } from "react";
 import type { Tasting } from "@peated/server/types";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
+import { useEffect, type ComponentPropsWithoutRef } from "react";
 import BottleCard from "./bottleCard";
 import Button from "./button";
 import { ImageModal } from "./imageModal";
@@ -18,6 +19,41 @@ import ShareButton from "./shareButton";
 import Tags from "./tags";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
+
+function ImageWithSkeleton({
+  src,
+  ...props
+}: Omit<ComponentPropsWithoutRef<"img">, "src"> & { src: string }) {
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      setLoaded(true);
+    };
+    img.src = src;
+  });
+
+  if (!loaded) return <ImageSkeleton />;
+
+  return <img src={src} {...props} />;
+}
+
+function ImageSkeleton() {
+  return (
+    <div className="mb-4 flex h-[250px] w-full animate-pulse items-center justify-center rounded">
+      <svg
+        className="h-10 w-10 text-slate-800"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 20 18"
+      >
+        <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
+      </svg>
+    </div>
+  );
+}
 
 export default function TastingListItem({
   tasting,
@@ -75,8 +111,8 @@ export default function TastingListItem({
       {!noBottle && <BottleCard bottle={bottle} />}
       <div>
         {!!tasting.imageUrl && (
-          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-black sm:mb-0 sm:mr-4">
-            <img
+          <div className="flex h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mb-0 sm:mr-4">
+            <ImageWithSkeleton
               src={tasting.imageUrl}
               className="h-full cursor-pointer"
               alt=""
