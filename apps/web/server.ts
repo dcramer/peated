@@ -1,3 +1,13 @@
+import * as Sentry from "@sentry/remix";
+
+Sentry.init({
+  dsn: config.SENTRY_DSN,
+  release: config.VERSION,
+  tracesSampleRate: 1.0,
+  spotlight: config.ENV === "development",
+  // tracePropagationTargets: ["localhost", "peated.com", config.API_SERVER],
+});
+
 import prom from "@isaacs/express-prometheus-middleware";
 import { sentryLink } from "@peated/server/src/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
@@ -11,7 +21,7 @@ import {
 } from "@peated/web/services/session.server";
 import { createRequestHandler } from "@remix-run/express";
 import { type AppLoadContext } from "@remix-run/server-runtime";
-import * as Sentry from "@sentry/remix";
+
 import { wrapExpressCreateRequestHandler } from "@sentry/remix";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import compression from "compression";
@@ -19,18 +29,6 @@ import type { Request } from "express";
 import express from "express";
 import morgan from "morgan";
 import path from "path";
-
-Sentry.init({
-  dsn: config.SENTRY_DSN,
-  release: config.VERSION,
-  tracesSampleRate: 1.0,
-  integrations: [
-    new Sentry.Integrations.Http({ tracing: true }),
-    ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
-  ],
-  spotlight: config.ENV === "development",
-  // tracePropagationTargets: ["localhost", "peated.com", config.API_SERVER],
-});
 
 Sentry.setTag("service", "@peated/web");
 

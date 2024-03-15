@@ -4,7 +4,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { createWriteStream } from "node:fs";
 import sharp from "sharp";
 
-import { startSpan } from "@sentry/node-experimental";
+import { startSpan } from "@sentry/node";
 import type { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import config from "../config";

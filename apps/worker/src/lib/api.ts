@@ -2,7 +2,7 @@ import { makeTRPCClient } from "@peated/server/lib/trpc";
 import { type ExternalSiteType } from "@peated/server/src/types";
 import config from "@peated/worker/config";
 import { type StorePrice } from "@peated/worker/types";
-import { captureException } from "@sentry/node-experimental";
+import { captureException } from "@sentry/node";
 
 export const trpcClient = makeTRPCClient(
   config.API_SERVER,

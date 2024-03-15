@@ -1,4 +1,4 @@
-import { startSpan, withScope } from "@sentry/node-experimental";
+import { startSpan, withScope } from "@sentry/node";
 import { TRPCError, initTRPC } from "@trpc/server";
 import { type Context } from "./context";
 

@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/node-experimental";
+import * as Sentry from "@sentry/node";
 import buildFastify from "./app";
 import config from "./config";
 
