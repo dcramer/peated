@@ -1,6 +1,6 @@
 import { context, propagation } from "@opentelemetry/api";
 import cuid2 from "@paralleldrive/cuid2";
-import * as Sentry from "@sentry/node-experimental";
+import * as Sentry from "@sentry/node";
 import type { JobFunction } from "faktory-worker";
 import faktory, { type Client } from "faktory-worker";
 import { logError } from "./lib/log";
