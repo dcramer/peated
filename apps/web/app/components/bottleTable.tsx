@@ -8,7 +8,7 @@ import type {
 } from "@peated/server/types";
 import { Link, useLocation } from "@remix-run/react";
 import BottleLink from "./bottleLink";
-import Button from "./button";
+import PaginationButtons from "./paginationButtons";
 import SortParam from "./sortParam";
 
 type Grouper = undefined | null | Entity;
@@ -131,27 +131,7 @@ export default ({
           })}
         </tbody>
       </table>
-      {rel && (
-        <nav
-          className="flex items-center justify-between py-3"
-          aria-label="Pagination"
-        >
-          <div className="flex flex-auto justify-between gap-x-2 sm:justify-end">
-            <Button
-              to={rel.prevCursor ? `?cursor=${rel.prevCursor}` : undefined}
-              disabled={!rel.prevCursor}
-            >
-              Previous
-            </Button>
-            <Button
-              to={rel.nextCursor ? `?cursor=${rel.nextCursor}` : undefined}
-              disabled={!rel.nextCursor}
-            >
-              Next
-            </Button>
-          </div>
-        </nav>
-      )}
+      <PaginationButtons rel={rel} />
     </>
   );
 };

@@ -1,8 +1,8 @@
 import type { Change, PagingRel, User } from "@peated/server/types";
 import { Link } from "@remix-run/react";
 import { AnimatePresence } from "framer-motion";
-import Button from "./button";
 import ListItem from "./listItem";
+import PaginationButtons from "./paginationButtons";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
@@ -100,27 +100,7 @@ export default ({ values, rel }: { values: Change[]; rel?: PagingRel }) => {
           ))}
         </AnimatePresence>
       </ul>
-      {rel && (
-        <nav
-          className="flex items-center justify-between py-3"
-          aria-label="Pagination"
-        >
-          <div className="flex flex-auto justify-between gap-x-2 sm:justify-end">
-            <Button
-              to={rel.prevCursor ? `?cursor=${rel.prevCursor}` : undefined}
-              disabled={!rel.prevCursor}
-            >
-              Previous
-            </Button>
-            <Button
-              to={rel.nextCursor ? `?cursor=${rel.nextCursor}` : undefined}
-              disabled={!rel.nextCursor}
-            >
-              Next
-            </Button>
-          </div>
-        </nav>
-      )}
+      <PaginationButtons rel={rel} />
     </>
   );
 };
