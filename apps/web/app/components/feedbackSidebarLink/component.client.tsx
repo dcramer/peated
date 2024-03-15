@@ -14,7 +14,7 @@ export default function FeedbackSidebarLinkClient() {
       feedback.attachTo(node, {});
       setLoaded(true);
     },
-    [feedback],
+    [feedback, loaded],
   );
 
   return (
