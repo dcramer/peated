@@ -6,7 +6,7 @@
     "build": "tsc",
     "cli": "esno --require dotenv/config ./src/cli/index.ts",
     "dev": "esno watch --require dotenv/config ./src/server.ts",
-    "start": "esno --transpile-only --require dotenv/config ./src/server.ts",
+    "start": "esno --require dotenv/config ./src/server.ts",
     "typecheck": "tsc --noEmit --incremental",
     "test": "dotenv -e .env.test -- vitest watch --no-threads",
     "test:watch": "dotenv -e .env.test -- vitest --no-threads",
