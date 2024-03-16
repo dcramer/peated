@@ -13,7 +13,6 @@ import SelectField from "@peated/web/components/selectField";
 import Spinner from "@peated/web/components/spinner";
 import TextField from "@peated/web/components/textField";
 import { isTRPCClientError } from "@peated/web/lib/trpc";
-import { type MetaFunction } from "@remix-run/node";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -28,21 +27,13 @@ const entityTypes = [
 
 type FormSchemaType = z.infer<typeof EntityInputSchema>;
 
-export const meta: MetaFunction = () => {
-  return [
-    {
-      title: "Edit Entity",
-    },
-  ];
-};
-
 export default function EntityForm({
   onSubmit,
-  initialData,
+  initialData = {},
   title,
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
-  initialData: Partial<Entity>;
+  initialData?: Partial<Entity>;
   title: string;
 }) {
   const {
@@ -83,7 +74,7 @@ export default function EntityForm({
       header={
         <Header>
           <FormHeader
-            title="Edit Entity"
+            title={title}
             saveDisabled={isSubmitting}
             onSave={handleSubmit(onSubmitHandler)}
           />

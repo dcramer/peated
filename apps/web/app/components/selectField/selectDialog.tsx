@@ -138,7 +138,7 @@ export default ({
                 </ListItem>
               );
             })}
-            {(results.length === 0 || query !== "") &&
+            {(results.length < 10 || query !== "") &&
               (canCreate && createForm ? (
                 <ListItem>
                   <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
