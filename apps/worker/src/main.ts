@@ -2,7 +2,7 @@
 import "./sentry";
 
 import { registerJob } from "@peated/server/jobs";
-import { logError } from "@peated/server/src/lib/log";
+import { logError } from "@peated/server/lib/log";
 import * as Sentry from "@sentry/node-experimental";
 import type { JobFunction } from "faktory-worker";
 import faktory from "faktory-worker";

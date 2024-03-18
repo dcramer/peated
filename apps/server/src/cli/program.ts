@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { shutdownClient } from "../../server/src/jobs";
+import { shutdownClient } from "../../../server/src/jobs";
 
 const program = new Command();
 

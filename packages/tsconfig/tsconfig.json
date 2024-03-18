@@ -1,35 +1,31 @@
 {
   "compilerOptions": {
+    "module": "ESNext",
     "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ES2022", "WebWorker"],
+    "moduleResolution": "Bundler",
 
-    "module": "ES2022",
-    "moduleResolution": "node",
+    "declaration": false,
+    "declarationMap": false,
 
-    "allowJs": false,
-    "skipLibCheck": true,
-    // "allowImportingTsExtensions": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "incremental": true,
-    "declaration": true,
     "forceConsistentCasingInFileNames": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-  },
-  "references": [{ "path": "./tsconfig.node.json" }],
-  "ts-node": {
-    "require": ["tsconfig-paths/register"],
-    "compilerOptions": {
-      "module": "commonjs"
+
+    "paths": {
+      "@peated/server/*": ["../../apps/server/src/*"],
+      "@peated/web/*": ["../../apps/web/app/*"],
+      "@peated/worker/*": ["../../apps/worker/src/*"],
+
+      "@peated/design/*": ["../../packages/design/*"],
+      "@peated/tsconfig/*": ["../../packages/tsconfig/*"]
     }
   }
 }

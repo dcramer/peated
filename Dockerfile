@@ -23,7 +23,6 @@ ENV SENTRY_DSN=$SENTRY_DSN \
     FATHOM_SITE_ID=$FATHOM_SITE_ID
 
 ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
-ADD apps/cli/package.json ./apps/cli/package.json
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/server/package.json ./apps/server/package.json
 ADD apps/worker/package.json ./apps/worker/package.json
@@ -81,18 +80,8 @@ ENV VERSION $VERSION
 
 CMD ["pnpm", "start"]
 
-# cli service
-FROM base-env as cli
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ /app/
-
-WORKDIR /app/apps/api
-
-ARG VERSION
-ENV VERSION $VERSION
-
-# api service
-FROM base-env as api
+# server service
+FROM base-env as server
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ /app/
 

@@ -1,6 +1,6 @@
-import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { migrate } from "@peated/server/db/migrate";
+import program from "src/cli/program";
 
 const subcommand = program.command("db");
 

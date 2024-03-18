@@ -1,4 +1,4 @@
-@import "rating.css";
+@import "./rating.css";
 
 @tailwind base;
 @tailwind components;

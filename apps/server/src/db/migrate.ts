@@ -1,6 +1,12 @@
 import { sql } from "drizzle-orm";
 import { readMigrationFiles } from "drizzle-orm/migrator";
+import path from "path";
+import { fileURLToPath } from "url";
 import type { DatabaseType } from ".";
+
+const __filename = fileURLToPath(import.meta.url);
+
+const __dirname = path.dirname(__filename);
 
 export const migrate = async function ({
   db,

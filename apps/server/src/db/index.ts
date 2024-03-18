@@ -2,8 +2,10 @@ import type { ExtractTablesWithRelations } from "drizzle-orm";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
-import { Pool } from "pg";
+import pg from "pg";
 import * as schema from "./schema";
+
+const { Pool } = pg;
 
 declare global {
   interface BigInt {

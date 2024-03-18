@@ -1,4 +1,3 @@
-import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { bottles, reviews, tastings } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs";
@@ -6,6 +5,7 @@ import { findEntity } from "@peated/server/lib/bottleFinder";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { createCaller } from "@peated/server/trpc/router";
 import { and, eq, ne, sql } from "drizzle-orm";
+import program from "src/cli/program";
 
 const subcommand = program.command("bottles");
 

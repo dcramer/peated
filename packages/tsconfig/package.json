@@ -3,13 +3,11 @@
   "name": "@peated/tsconfig",
   "dependencies": {},
   "peerDependencies": {
-    "ts-node": "*",
     "tsconfig-paths": "*",
     "typescript": "*"
   },
   "files": [
-    "tsconfig.json",
-    "tsconfig.node.json"
+    "tsconfig.json"
   ],
   "volta": {
     "extends": "../../package.json"

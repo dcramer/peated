@@ -1,12 +1,12 @@
 module "peated-api-service" {
   source = "./modules/service"
   name   = "peated-api"
-  image  = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/api"
+  image  = "us-central1-docker.pkg.dev/${data.google_project.project.project_id}/${google_artifact_registry_repository.peated.name}/server"
 
   domains = ["api.peated.com", "api.staging.peated.com", "api.peated.app", "api.staging.peated.app"]
   port    = 4000
 
-  cpu = "250m"
+  cpu    = "250m"
   memory = "1Gi"
 
   healthcheck = {

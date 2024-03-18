@@ -1,4 +1,3 @@
-import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import {
   bottles,
@@ -8,6 +7,7 @@ import {
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs";
 import { sql } from "drizzle-orm";
+import program from "src/cli/program";
 
 const subcommand = program.command("entities");
 

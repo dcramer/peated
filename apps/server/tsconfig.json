@@ -1,13 +1,14 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/test/setup-test-env.ts"],
   "compilerOptions": {
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "outDir": "dist",
+
+    "moduleResolution": "node",
+
     "types": ["vitest/globals", "./src/globals.d.ts"],
-    "baseUrl": "./",
-    "paths": {
-      "@peated/server/*": ["src/*"]
-    }
-  },
-  "include": ["src"],
-  "exclude": ["src/test/setup-test-env.ts"]
+
+    "baseUrl": "./"
+  }
 }

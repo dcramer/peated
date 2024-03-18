@@ -1,4 +1,4 @@
-import { type ExternalSiteType } from "@peated/server/src/types";
+import { type ExternalSiteType } from "@peated/server/types";
 import StorePriceTable from "@peated/web/components/admin/storePriceTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import { json, type LoaderFunction } from "@remix-run/node";

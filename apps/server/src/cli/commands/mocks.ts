@@ -1,4 +1,3 @@
-import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import type { Bottle, Entity, ExternalSite } from "@peated/server/db/schema";
 import {
@@ -11,6 +10,7 @@ import { createNotification } from "@peated/server/lib/notifications";
 import { random } from "@peated/server/lib/rand";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { and, eq, ne, sql } from "drizzle-orm";
+import program from "src/cli/program";
 
 const loadDefaultSites = async () => {
   const store1 =

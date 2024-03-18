@@ -1,18 +1,31 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/.server/**/*.ts",
+    "**/.server/**/*.tsx",
+    "**/.client/**/*.ts",
+    "**/.client/**/*.tsx"
+  ],
   "compilerOptions": {
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
+
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+
     "baseUrl": ".",
-    "paths": {
-      "@peated/web/*": ["./app/*"],
-      "@peated/server/*": ["../../apps/server/src/*"]
-    },
+
     // Remix takes care of building everything in `remix build`.
     "noEmit": true
-  },
-  "ts-node": {
-    "swc": true,
-    "require": ["vite-tsconfig-paths/register"]
   }
 }
