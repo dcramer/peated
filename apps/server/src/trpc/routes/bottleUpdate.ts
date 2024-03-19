@@ -56,7 +56,9 @@ export default modProcedure
       input.name || input.statedAge !== undefined
         ? normalizeBottleName(
             input.name || bottle.name,
-            bottleData.statedAge ?? bottle.statedAge,
+            bottleData.statedAge !== undefined
+              ? bottleData.statedAge
+              : bottle.statedAge,
           )
         : null;
 
@@ -64,7 +66,10 @@ export default modProcedure
       (inputName && inputName !== bottle.name) ||
       (input.statedAge !== undefined && input.statedAge !== bottle.statedAge)
     ) {
-      bottleData.statedAge = bottleData.statedAge ?? bottle.statedAge;
+      bottleData.statedAge =
+        bottleData.statedAge !== undefined
+          ? bottleData.statedAge
+          : bottle.statedAge;
       bottleData.name = inputName;
 
       const statedAgeMatch = bottleData.name.match(/(\d+)-year-old/);
