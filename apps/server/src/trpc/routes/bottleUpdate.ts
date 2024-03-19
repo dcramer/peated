@@ -290,7 +290,7 @@ export default modProcedure
               AND ${bottlesToDistillers.distillerId} = ${entities.id}
             )
           )
-          AND ${entities.id} IN ${allEntityIds}
+          AND ${bottles.id} = ${bottle.id}
         )`,
       });
 
