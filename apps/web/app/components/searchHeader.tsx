@@ -27,6 +27,11 @@ export default function SearchHeader({
 
   const blockStyles = `px-0 py-1 sm:py-3`;
 
+  // we store the onChange event here as setState is async
+  // and if you type a value and quickly hit enter (to submit)
+  // it will not capture the last character
+  let _lastValue = value;
+
   return (
     <nav className="flex min-w-full items-center justify-between text-white">
       <div className="flex text-white hover:text-white">
@@ -43,8 +48,8 @@ export default function SearchHeader({
         onSubmit={(e) => {
           e.preventDefault();
 
-          if (onSubmit) onSubmit(value);
-          else if (onChange) onChange(value);
+          if (onSubmit) onSubmit(_lastValue);
+          else if (onChange) onChange(_lastValue);
         }}
       >
         <input
@@ -53,6 +58,7 @@ export default function SearchHeader({
           value={value}
           placeholder={placeholder}
           onChange={(e) => {
+            _lastValue = e.target.value;
             setValue(e.target.value);
             if (onChange) onChange(e.target.value);
           }}
