@@ -236,6 +236,29 @@ function Document({
   accessToken?: string;
   user?: User | null;
 }>) {
+  // https://github.com/dcramer/peated/issues/143
+  const [remixContext, setRemixContext] = useState(
+    JSON.stringify({
+      accessToken: accessToken || null,
+      user: user || null,
+    }),
+  );
+
+  useEffect(() => {
+    const context = JSON.stringify({
+      accessToken: accessToken || null,
+      user: user || null,
+    });
+    if (context !== remixContext) {
+      setRemixContext(context);
+      if (window.location.pathname === "/login") {
+        window.location.href = "/";
+      } else {
+        window.location.reload();
+      }
+    }
+  }, [accessToken, user?.id]);
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -287,10 +310,7 @@ function Document({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.REMIX_CONTEXT = ${JSON.stringify({
-              accessToken: accessToken || null,
-              user: user || null,
-            })};`,
+            __html: `window.REMIX_CONTEXT = ${remixContext};`,
           }}
         />
         <Scripts />
