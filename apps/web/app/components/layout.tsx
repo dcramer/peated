@@ -51,7 +51,7 @@ export default function Layout({
         </main>
 
         {rightSidebar ? (
-          <div className="hidden lg:z-50 lg:w-64 lg:flex-col xl:flex">
+          <div className="hidden lg:z-20 lg:w-64 lg:flex-col xl:flex">
             {rightSidebar}
           </div>
         ) : null}
