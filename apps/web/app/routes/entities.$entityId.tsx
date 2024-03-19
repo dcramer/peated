@@ -10,11 +10,19 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { summarize } from "@peated/web/lib/markdown";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useParams } from "@remix-run/react";
+import {
+  Link,
+  Outlet,
+  useLoaderData,
+  useNavigate,
+  useParams,
+} from "@remix-run/react";
 import { json, redirect } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
+import confirmationButton from "../components/confirmationButton";
 import PageHeader from "../components/pageHeader";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
+import { trpc } from "../lib/trpc";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ request, params, context: { trpc } }) => {
@@ -78,8 +86,16 @@ export default function EntityDetails() {
   invariant(params.entityId);
 
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const baseUrl = getEntityUrl(entity);
+
+  const deleteEntityMutation = trpc.entityDelete.useMutation();
+  const deleteEntity = async () => {
+    // TODO: show confirmation message
+    await deleteEntityMutation.mutateAsync(entity.id);
+    navigate("/");
+  };
 
   return (
     <Layout>
@@ -164,6 +180,15 @@ export default function EntityDetails() {
                     <Menu.Item as={Link} to={`/entities/${entity.id}/merge`}>
                       Merge Entity
                     </Menu.Item>
+                    {user.admin && (
+                      <Menu.Item
+                        as={confirmationButton}
+                        onContinue={deleteEntity}
+                        disabled={deleteEntityMutation.isLoading}
+                      >
+                        Delete Entity
+                      </Menu.Item>
+                    )}
                   </Menu.Items>
                 </Menu>
               )}
