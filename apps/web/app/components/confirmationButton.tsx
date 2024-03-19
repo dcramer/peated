@@ -10,7 +10,7 @@ export default forwardRef<
     className?: string;
     style?: any;
   }>
->(({ onContinue, children, ...props }, ref) => {
+>(function ConfirmationButton({ onContinue, children, ...props }, ref) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
