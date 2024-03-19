@@ -1,7 +1,6 @@
 import Alert from "@peated/web/components/alert";
 import PeatedLogo from "@peated/web/components/assets/Logo";
 import Button from "@peated/web/components/button";
-import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { authenticator } from "@peated/web/services/auth.server";
@@ -16,6 +15,7 @@ import { json } from "@remix-run/node";
 import { Form, Link, useActionData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 import { type SitemapFunction } from "remix-sitemap";
+import LayoutSplash from "../components/layoutSplash";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
@@ -141,7 +141,7 @@ export default function Login() {
   const { error } = useActionData<typeof action>() || { error: null };
 
   return (
-    <Layout splash>
+    <LayoutSplash>
       <div className="flex flex-grow items-center justify-center px-4">
         <Link to="/" className="max-w-xs">
           <PeatedLogo className="text-highlight h-auto w-full" />
@@ -173,6 +173,6 @@ export default function Login() {
           About Peated
         </Link>
       </div>
-    </Layout>
+    </LayoutSplash>
   );
 }

@@ -29,7 +29,7 @@ export default ({ data, ...props }: Props) => {
   );
 };
 
-const Brand = ({ data: { brand } }: Props) => {
+export const Brand = ({ data: { brand } }: Props) => {
   const brandName = brand?.name || "Unknown";
 
   return (
@@ -41,7 +41,7 @@ const Brand = ({ data: { brand } }: Props) => {
   );
 };
 
-const Distillers = ({ data: { distillers } }: Props) => {
+export const Distillers = ({ data: { distillers } }: Props) => {
   if (!distillers?.length) return null;
 
   if (distillers.length > 1) {

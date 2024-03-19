@@ -10,6 +10,7 @@ import Button from "./button";
 import { ClientOnly } from "./clientOnly";
 import CollectionAction from "./collectionAction";
 import LoadingIndicator from "./loadingIndicator";
+import QRCodeClient from "./qrcode.client";
 import QueryBoundary from "./queryBoundary";
 import ShareButton from "./shareButton";
 import SidePanel, { SidePanelHeader } from "./sidePanel";
@@ -44,55 +45,66 @@ export default function BottlePanel({
         <BottleHeader bottle={bottle} to={`/bottles/${bottle.id}`} />
       </SidePanelHeader>
 
-      <div className="my-8 flex justify-center gap-4 lg:justify-start">
-        {user && (
-          <QueryBoundary
-            loading={<SkeletonButton className="w-10" />}
-            fallback={() => null}
-          >
-            <CollectionAction bottle={bottle} />
-          </QueryBoundary>
-        )}
+      <div className="my-8 flex items-start">
+        <div className="h-auto lg:w-10/12">
+          <div className="flex justify-center gap-4 px-4 lg:justify-start lg:px-0">
+            {user && (
+              <QueryBoundary
+                loading={<SkeletonButton className="w-10" />}
+                fallback={() => null}
+              >
+                <CollectionAction bottle={bottle} />
+              </QueryBoundary>
+            )}
 
-        <Button
-          to={tastingPath ?? `/bottles/${bottle.id}/addTasting`}
-          color="primary"
-        >
-          Record a Tasting
-        </Button>
+            <Button
+              to={tastingPath ?? `/bottles/${bottle.id}/addTasting`}
+              color="primary"
+            >
+              Record a Tasting
+            </Button>
 
-        <ShareButton title={bottle.fullName} url={`/bottles/${bottle.id}`} />
-
-        <Button
-          to={`/bottles/${bottle.id}`}
-          icon={
-            <ArrowTopRightOnSquareIcon
-              className="-mr-0.5 h-5 w-5"
-              aria-hidden="true"
+            <ShareButton
+              title={bottle.fullName}
+              url={`/bottles/${bottle.id}`}
             />
-          }
-        />
-      </div>
 
-      <div className="my-6 grid grid-cols-3 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">
-        {stats.map((stat) => (
-          <div key={stat.name}>
-            <div className="text-light leading-7">{stat.name}</div>
-            <div className="order-first text-3xl font-semibold tracking-tight lg:text-5xl">
-              {stat.value || "-"}
+            <Button
+              to={`/bottles/${bottle.id}`}
+              icon={
+                <ArrowTopRightOnSquareIcon
+                  className="-mr-0.5 h-5 w-5"
+                  aria-hidden="true"
+                />
+              }
+            />
+          </div>
+
+          <div className="my-6 grid grid-cols-3 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">
+            {stats.map((stat) => (
+              <div key={stat.name}>
+                <div className="text-light leading-7">{stat.name}</div>
+                <div className="order-first text-3xl font-semibold tracking-tight lg:text-5xl">
+                  {stat.value || "-"}
+                </div>
+              </div>
+            ))}
+            <div className="hidden lg:block">
+              <div className="text-light leading-7">Price</div>
+              <div className="flex items-center">
+                <ClientOnly
+                  fallback={<div className="h-[45px] animate-pulse" />}
+                >
+                  {() => <BottlePriceHistory bottleId={bottle.id} />}
+                </ClientOnly>
+              </div>
             </div>
           </div>
-        ))}
-        <div className="hidden lg:block">
-          <div className="text-light leading-7">Price</div>
-          <div className="flex items-center">
-            <ClientOnly fallback={<div className="h-[45px] animate-pulse" />}>
-              {() => <BottlePriceHistory bottleId={bottle.id} />}
-            </ClientOnly>
-          </div>
+        </div>
+        <div className="hidden lg:block lg:w-2/12">
+          <ClientOnly>{() => <QRCodeClient value={tastingPath} />}</ClientOnly>
         </div>
       </div>
-
       {isLoading ? (
         <LoadingIndicator />
       ) : data ? (

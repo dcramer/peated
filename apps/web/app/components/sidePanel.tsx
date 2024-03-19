@@ -43,7 +43,7 @@ export function SidePanelHeader({
           </div>
         </nav>
       </Header>
-      <div className="lg:p0 flex flex-col items-center space-x-4 border-b border-b-slate-800 px-3 text-white lg:mb-4 lg:flex-row lg:pb-4">
+      <div className="flex flex-col items-center space-x-4 border-b border-b-slate-800 px-3 text-white lg:mb-4 lg:flex-row lg:p-0 lg:pb-4">
         {children}
         {!!onClose && (
           <button
