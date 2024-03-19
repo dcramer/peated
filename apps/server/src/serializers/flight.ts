@@ -9,6 +9,7 @@ export const FlightSerializer = serializer({
       description: item.description,
       public: item.public,
       createdAt: item.createdAt,
+      createdById: item.createdById,
     };
   },
 });

@@ -1,9 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import type { SubmitHandler } from "react-hook-form";
-import { Controller, useForm } from "react-hook-form";
-import type { z } from "zod";
-
 import { FlightInputSchema } from "@peated/server/schemas";
 import type { Bottle } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
@@ -13,6 +8,10 @@ import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
 import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
+import { useState } from "react";
+import type { SubmitHandler } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import type { z } from "zod";
 import Header from "./header";
 import SelectField, { type Option } from "./selectField";
 import Spinner from "./spinner";
@@ -34,7 +33,8 @@ export default function FlightForm({
   onSubmit: SubmitHandler<FormSchemaType>;
   initialData?: {
     name?: string;
-    description?: string;
+    description?: string | null;
+    public?: boolean;
     bottles?: Bottle[];
   };
   title: string;
@@ -43,7 +43,6 @@ export default function FlightForm({
     control,
     register,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(FlightInputSchema),

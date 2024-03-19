@@ -41,6 +41,7 @@ import faktoryInfo from "./routes/faktoryInfo";
 import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
 import flightList from "./routes/flightList";
+import flightUpdate from "./routes/flightUpdate";
 import friendCreate from "./routes/friendCreate";
 import friendDelete from "./routes/friendDelete";
 import friendList from "./routes/friendList";
@@ -108,6 +109,7 @@ export const appRouter = router({
   faktoryInfo,
   flightById,
   flightCreate,
+  flightUpdate,
   flightList,
   friendCreate,
   friendDelete,

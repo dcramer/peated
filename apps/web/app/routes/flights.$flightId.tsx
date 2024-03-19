@@ -1,14 +1,19 @@
+import { Menu } from "@headlessui/react";
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
-import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowsPointingOutIcon,
+  EllipsisVerticalIcon,
+} from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import Layout from "@peated/web/components/layout";
 import { summarize } from "@peated/web/lib/markdown";
 import type { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import BottleLink from "../components/bottleLink";
 import Button from "../components/button";
+import useAuth from "../hooks/useAuth";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
@@ -54,6 +59,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export default function FlightDetails() {
   const { flight, bottles } = useLoaderData<typeof loader>();
+  const { user } = useAuth();
 
   return (
     <Layout>
@@ -66,6 +72,18 @@ export default function FlightDetails() {
             <Button to={`/flights/${flight.id}/overlay`} color="primary">
               <ArrowsPointingOutIcon className="h-4 w-4" />
             </Button>
+            {(user?.mod || user?.id === flight.createdById) && (
+              <Menu as="div" className="menu">
+                <Menu.Button as={Button}>
+                  <EllipsisVerticalIcon className="h-5 w-5" />
+                </Menu.Button>
+                <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right lg:left-0 lg:origin-top-left">
+                  <Menu.Item as={Link} to={`/flights/${flight.id}/edit`}>
+                    Edit Flight
+                  </Menu.Item>
+                </Menu.Items>
+              </Menu>
+            )}
           </div>
           {flight.description && (
             <div className="text-light truncate text-center sm:text-left">
