@@ -28,7 +28,7 @@ function generatePrompt(bottle: Bottle) {
   }
 
   return `
-Describe the following bottle of whisky to an audience:
+Describe the following bottle of whisky:
 
 ${bottle.fullName}
 ${
@@ -40,7 +40,7 @@ ${
 }
 If the whiskey is made in Scotland, it is always spelled "whisky".
 
-'description' should be the description to give to the audience
+'description' should be a description given as if you were a whisky sommelier.
 
 'tastingNotes' should be concise, and focus on the smell and taste. If you cannot fill in all three of 'nose', 'palate', and 'finish', you should not fill in any of them.
 

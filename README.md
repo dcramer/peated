@@ -66,3 +66,9 @@ gcloud container clusters get-credentials default --region=us-central1
 ```shell
 kubectl exec -it deploy/peated-api -- bash
 ```
+
+### Run Arbitrary Command
+
+```shell
+gcloud alpha run jobs execute cli --args bottles,generate-descriptions,3298 --wait
+```
