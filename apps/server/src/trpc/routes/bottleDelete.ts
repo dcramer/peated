@@ -12,6 +12,7 @@ import {
   changes,
   entities,
   reviews,
+  storePrices,
 } from "../../db/schema";
 import { notEmpty } from "../../lib/filter";
 
@@ -80,6 +81,10 @@ export default adminProcedure.input(z.number()).mutation(async function ({
       .update(reviews)
       .set({ bottleId: null })
       .where(eq(reviews.bottleId, bottle.id));
+    await tx
+      .update(storePrices)
+      .set({ bottleId: null })
+      .where(eq(storePrices.bottleId, bottle.id));
     await tx.insert(bottleTombstones).values({
       bottleId: bottle.id,
     });
