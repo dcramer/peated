@@ -57,13 +57,13 @@ export default function FlightDetails() {
   return (
     <LayoutSplash fullWidth>
       <div className="mx-auto max-w-3xl">
-        <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
+        <div className="mb-8 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
           <div className="w-full flex-auto flex-col items-center space-y-1 sm:w-auto sm:items-start">
-            <h1 className="mb-2 truncate text-center text-4xl font-semibold leading-7 sm:text-left">
+            <h1 className="mb-2 text-center text-4xl font-semibold sm:text-left">
               {flight.name}
             </h1>
             {flight.description && (
-              <div className="text-light truncate text-center sm:text-left">
+              <div className="text-light text-center sm:text-left">
                 {flight.description}
               </div>
             )}
