@@ -98,7 +98,11 @@ export default function FlightDetails() {
           </div>
           <div className="hidden p-4 pl-12 lg:block lg:w-4/12">
             <ClientOnly>
-              {() => <QRCodeClient value={`/flights/${flight.id}`} />}
+              {() => (
+                <QRCodeClient
+                  value={`${window.location.protocol}://${window.location.host}/flights/${flight.id}`}
+                />
+              )}
             </ClientOnly>
           </div>
         </div>
