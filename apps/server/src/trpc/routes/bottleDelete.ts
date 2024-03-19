@@ -47,7 +47,6 @@ export default adminProcedure.input(z.number()).mutation(async function ({
     await tx.insert(changes).values({
       objectType: "bottle",
       objectId: bottle.id,
-      createdAt: bottle.createdAt,
       createdById: ctx.user.id,
       displayName: bottle.fullName,
       type: "delete",
