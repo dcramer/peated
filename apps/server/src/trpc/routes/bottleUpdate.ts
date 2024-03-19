@@ -15,7 +15,7 @@ import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike, sql } from "drizzle-orm";
+import { and, eq, ilike, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { upsertEntity } from "../../lib/db";
@@ -282,8 +282,10 @@ export default modProcedure
       ].filter(notEmpty);
 
       // XXX: this could be more optimal, but accounting is a pita
-      await tx.update(entities).set({
-        totalBottles: sql<number>`(
+      await tx
+        .update(entities)
+        .set({
+          totalBottles: sql<number>`(
           SELECT COUNT(*)
           FROM ${bottles}
           WHERE (
@@ -295,9 +297,9 @@ export default modProcedure
               AND ${bottlesToDistillers.distillerId} = ${entities.id}
             )
           )
-          AND ${entities.id} IN ${allEntityIds}
         )`,
-      });
+        })
+        .where(inArray(entities.id, allEntityIds));
 
       await tx.insert(changes).values({
         objectType: "bottle",
