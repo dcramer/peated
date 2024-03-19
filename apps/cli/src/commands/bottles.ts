@@ -12,12 +12,12 @@ const subcommand = program.command("bottles");
 subcommand
   .command("generate-descriptions")
   .description("Generate bottle descriptions")
-  .argument("[bottleId]")
+  .argument("[bottleIds...]")
   .option("--only-missing")
-  .action(async (bottleId, options) => {
+  .action(async (bottleIds, options) => {
     const bottleQuery = await db.query.bottles.findMany({
-      where: bottleId
-        ? (bottles, { eq }) => eq(bottles.id, bottleId)
+      where: bottleIds.length
+        ? (bottles, { inArray }) => inArray(bottles.id, bottleIds)
         : options.onlyMissing
           ? (bottles, { isNull }) => isNull(bottles.description)
           : undefined,

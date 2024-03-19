@@ -14,12 +14,12 @@ const subcommand = program.command("entities");
 subcommand
   .command("generate-descriptions")
   .description("Generate entity descriptions")
-  .argument("[entityId]")
+  .argument("[entityIds...]")
   .option("--only-missing")
-  .action(async (entityId, options) => {
+  .action(async (entityIds, options) => {
     const query = await db.query.entities.findMany({
-      where: entityId
-        ? (entities, { eq }) => eq(entities.id, entityId)
+      where: entityIds.length
+        ? (entities, { inArray }) => inArray(entities.id, entityIds)
         : options.onlyMissing
           ? (entities, { isNull }) => isNull(entities.description)
           : undefined,
