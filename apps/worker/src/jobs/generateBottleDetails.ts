@@ -45,8 +45,6 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 
 'tastingNotes' should be concise, and focus on the smell and taste. If you cannot fill in all three of 'nose', 'palate', and 'finish', you should not fill in any of them.
 
-'statedAge' should be the number of years the spirit has been aged in barrels, if applicable.
-
 'category' should be one of the following:
 
 - ${CATEGORY_LIST.join("\n- ")}
@@ -71,7 +69,6 @@ const OpenAIBottleDetailsSchema = z.object({
     .nullable()
     .optional(),
   category: z.string().nullable().optional(),
-  statedAge: z.number().nullable().optional(),
   suggestedTags: z.array(z.string()).optional(),
 });
 
@@ -153,9 +150,6 @@ export default async function ({ bottleId }: { bottleId: number }) {
 
   if (result.category && result.category !== bottle.category)
     data.category = result.category;
-
-  if (result.statedAge && result.statedAge !== bottle.statedAge)
-    data.statedAge = result.statedAge;
 
   if (Object.keys(data).length === 0) return;
 
