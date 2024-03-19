@@ -23,13 +23,7 @@
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": true
   },
-  "references": [{ "path": "./tsconfig.node.json" }],
-  "ts-node": {
-    "require": ["tsconfig-paths/register"],
-    "compilerOptions": {
-      "module": "commonjs"
-    }
-  }
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

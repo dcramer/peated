@@ -3,13 +3,13 @@
   "name": "@peated/cli",
   "scripts": {
     "build": "tsc",
-    "cli": "ts-node --require dotenv/config ./src/index.ts",
-    "db": "ts-node --require dotenv/config ./src/index.ts db",
-    "bottles": "ts-node --require dotenv/config ./src/index.ts bottles",
-    "entities": "ts-node --require dotenv/config ./src/index.ts entities",
-    "tastings": "ts-node --require dotenv/config ./src/index.ts tastings",
-    "mocks": "ts-node --require dotenv/config ./src/bin/index.ts mocks",
-    "users": "ts-node --require dotenv/config ./src/bin/index.ts users",
+    "cli": "esno --require dotenv/config ./src/index.ts",
+    "db": "esno --require dotenv/config ./src/index.ts db",
+    "bottles": "esno --require dotenv/config ./src/index.ts bottles",
+    "entities": "esno --require dotenv/config ./src/index.ts entities",
+    "tastings": "esno --require dotenv/config ./src/index.ts tastings",
+    "mocks": "esno --require dotenv/config ./src/bin/index.ts mocks",
+    "users": "esno --require dotenv/config ./src/bin/index.ts users",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -32,8 +32,8 @@
     "drizzle-orm": "^0.29.2",
     "esbuild": "^0.19.10",
     "esbuild-node-tsc": "^2.0.5",
+    "esno": "^4.7.0",
     "pg": "^8.11.3",
-    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3"
   },
