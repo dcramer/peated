@@ -40,7 +40,7 @@ export const BottleInputSchema = z.object({
   brand: z.union([EntityInputSchema, z.number()]),
   distillers: z.array(z.union([EntityInputSchema, z.number()])).optional(),
   bottler: z.union([EntityInputSchema, z.number()]).nullable().optional(),
-  statedAge: z.number().nullable().optional(),
+  statedAge: z.number().gte(0).lte(100).nullable().optional(),
   category: CategoryEnum.nullable().optional(),
 });
 
