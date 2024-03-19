@@ -102,7 +102,13 @@ export default function BottlePanel({
           </div>
         </div>
         <div className="hidden lg:block lg:w-2/12">
-          <ClientOnly>{() => <QRCodeClient value={tastingPath} />}</ClientOnly>
+          <ClientOnly>
+            {() => (
+              <QRCodeClient
+                value={`${location.protocol}://${location.host}${tastingPath}`}
+              />
+            )}
+          </ClientOnly>
         </div>
       </div>
       {isLoading ? (
