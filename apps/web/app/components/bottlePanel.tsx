@@ -105,7 +105,7 @@ export default function BottlePanel({
           <ClientOnly>
             {() => (
               <QRCodeClient
-                value={`${window.location.protocol}://${window.location.host}${tastingPath}`}
+                value={`${window.location.protocol}//${window.location.host}${tastingPath}`}
               />
             )}
           </ClientOnly>

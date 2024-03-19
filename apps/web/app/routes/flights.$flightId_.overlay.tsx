@@ -100,7 +100,7 @@ export default function FlightDetails() {
             <ClientOnly>
               {() => (
                 <QRCodeClient
-                  value={`${window.location.protocol}://${window.location.host}/flights/${flight.id}`}
+                  value={`${window.location.protocol}//${window.location.host}/flights/${flight.id}`}
                 />
               )}
             </ClientOnly>
