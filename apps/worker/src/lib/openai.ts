@@ -48,7 +48,7 @@ export async function getStructuredResponse<
         {
           role: "system",
           content: [
-            "You are an expert in whiskey. Your job is to accurately describe information about the whiskey industry.",
+            "Your job is to accurately describe information about the whiskey industry as if you were a whisky sommelier.",
             `The output format should strictly follow JSON schema:\n${zodToJsonSchema(
               schema,
             )}`,
