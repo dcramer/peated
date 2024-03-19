@@ -3,6 +3,7 @@ import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import EntityIcon from "@peated/web/components/assets/Entity";
 import Button from "@peated/web/components/button";
 import Chip from "@peated/web/components/chip";
+import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Layout from "@peated/web/components/layout";
 import ShareButton from "@peated/web/components/shareButton";
 import Tabs from "@peated/web/components/tabs";
@@ -19,7 +20,6 @@ import {
 } from "@remix-run/react";
 import { json, redirect } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
-import confirmationButton from "../components/confirmationButton";
 import PageHeader from "../components/pageHeader";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 import { trpc } from "../lib/trpc";
@@ -173,7 +173,10 @@ export default function EntityDetails() {
                   <Menu.Button as={Button}>
                     <EllipsisVerticalIcon className="h-5 w-5" />
                   </Menu.Button>
-                  <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right lg:left-0 lg:origin-top-left">
+                  <Menu.Items
+                    className="absolute right-0 z-10 mt-2 w-32 origin-top-right"
+                    unmount={false}
+                  >
                     <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
                       Edit Entity
                     </Menu.Item>
@@ -182,7 +185,7 @@ export default function EntityDetails() {
                     </Menu.Item>
                     {user.admin && (
                       <Menu.Item
-                        as={confirmationButton}
+                        as={ConfirmationButton}
                         onContinue={deleteEntity}
                         disabled={deleteEntityMutation.isLoading}
                       >
