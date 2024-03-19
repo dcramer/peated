@@ -140,6 +140,26 @@ test("fills in statedAge", async () => {
   expect(bottle2.statedAge).toBe(10);
 });
 
+test("removes statedAge", async () => {
+  const bottle = await Fixtures.Bottle({ statedAge: 10 });
+
+  const caller = createCaller({
+    user: await Fixtures.User({ mod: true }),
+  });
+  await caller.bottleUpdate({
+    bottle: bottle.id,
+    statedAge: null,
+  });
+
+  const [bottle2] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(omit(bottle, "statedAge")).toEqual(omit(bottle2, "statedAge"));
+  expect(bottle2.statedAge).toBeNull();
+});
+
 test("changes brand", async () => {
   const newBrand = await Fixtures.Entity();
   const bottle = await Fixtures.Bottle();
