@@ -1,7 +1,7 @@
 import type { SessionPayload } from "@peated/web/types";
 import type { Session } from "@remix-run/node";
 import { createCookieSessionStorage } from "@remix-run/node";
-import { redirect } from "@remix-run/server-runtime";
+import { redirectDocument } from "@remix-run/server-runtime";
 import type { Request as ExpressRequest } from "express";
 import invariant from "tiny-invariant";
 
@@ -53,23 +53,20 @@ export async function createSession({
   s.set("user", session.user);
   s.set("accessToken", session.accessToken);
 
-  return redirect(
-    !session.user.pictureUrl ? "/settings" : getSafeRedirect(redirectTo),
-    {
-      headers: {
-        "Set-Cookie": await sessionStorage.commitSession(s, {
-          maxAge: remember
-            ? 60 * 60 * 24 * 7 // 7 days
-            : undefined,
-        }),
-      },
+  return redirectDocument(getSafeRedirect(redirectTo), {
+    headers: {
+      "Set-Cookie": await sessionStorage.commitSession(s, {
+        maxAge: remember
+          ? 60 * 60 * 24 * 7 // 7 days
+          : undefined,
+      }),
     },
-  );
+  });
 }
 
 export async function logout(request: Request | ExpressRequest) {
   const s = await getSession(request);
-  return redirect("/", {
+  return redirectDocument("/", {
     headers: {
       "Set-Cookie": await sessionStorage.destroySession(s),
     },
