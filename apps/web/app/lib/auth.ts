@@ -7,7 +7,7 @@ export function redirectToAuth({ request }: { request: Request }) {
 export function getAuthRedirect({ request }: { request: Request }) {
   const location = new URL(request.url);
 
-  const redirectTo = location.pathname;
+  const redirectTo = location.pathname + location.search;
 
   return `/login?redirectTo=${encodeURIComponent(redirectTo)}`;
 }

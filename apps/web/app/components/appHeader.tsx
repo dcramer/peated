@@ -84,7 +84,9 @@ export default function AppHeader() {
       ) : (
         <div className="mflex items-center gap-x-2">
           <NavLink
-            to={`/login?redirectTo=${encodeURIComponent(location.pathname)}`}
+            to={`/login?redirectTo=${encodeURIComponent(
+              location.pathname + location.search,
+            )}`}
           >
             <div className="h-8 w-8 sm:h-8 sm:w-8">
               <UserAvatar />

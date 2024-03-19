@@ -37,10 +37,9 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
 
     const userDetails = await trpc.userById.query("me");
     if (!userDetails) {
+      const url = new URL(request.url);
       return redirect(
-        `/login?redirectTo=${encodeURIComponent(
-          new URL(request.url).pathname,
-        )}`,
+        `/login?redirectTo=${encodeURIComponent(url.pathname + url.search)}`,
       );
     }
 

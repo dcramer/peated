@@ -9,7 +9,9 @@ export default function EmbeddedLogin() {
         Looks like you'll need to login to participate here.
       </p>
       <Button
-        to={`/login?redirectTo=${encodeURIComponent(location.pathname)}`}
+        to={`/login?redirectTo=${encodeURIComponent(
+          location.pathname + location.search,
+        )}`}
         color="highlight"
       >
         Login to Peated
