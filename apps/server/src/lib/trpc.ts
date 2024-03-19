@@ -44,15 +44,19 @@ export function sentryLink<TRouter extends AnyRouter>(
             observer.next(value);
           },
           error(err) {
-            captureException(err, (scope) => {
-              scope.setFingerprint([err.message]);
-              scope.setExtras({
-                data: err.data,
-                meta: err.meta,
-                shape: err.shape,
+            try {
+              captureException(err, (scope) => {
+                scope.setFingerprint([err.message]);
+                scope.setExtras({
+                  data: err.data,
+                  meta: err.meta,
+                  shape: err.shape,
+                });
+                return scope;
               });
-              return scope;
-            });
+            } catch (err) {
+              console.error(err);
+            }
             observer.error(err);
           },
           complete() {
