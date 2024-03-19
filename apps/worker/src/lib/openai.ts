@@ -59,14 +59,14 @@ export async function getStructuredResponse<
           content: prompt,
         },
       ],
-      // functions: [
-      //   {
-      //     name: "out",
-      //     description:
-      //       "This is the function that returns the result of the agent",
-      //     parameters: zodToJsonSchema(schema),
-      //   },
-      // ],
+      functions: [
+        {
+          name: "out",
+          description:
+            "This is the function that returns the result of the agent",
+          parameters: zodToJsonSchema(schema),
+        },
+      ],
       temperature: 0,
     },
     // {
@@ -75,8 +75,8 @@ export async function getStructuredResponse<
   );
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const output: string = completion.choices[0].message!.content || "";
-  // const output = completion.choices[0].message!.function_call!.arguments!;
+  // const output: string = completion.choices[0].message!.content || "";
+  const output = completion.choices[0].message!.function_call!.arguments!;
 
   let structuredResponse: any;
   try {

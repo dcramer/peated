@@ -40,6 +40,8 @@ ${
 }
 If the whiskey is made in Scotland, it is always spelled "whisky".
 
+'description' should be the description to give to the audience
+
 'tastingNotes' should be concise, and focus on the smell and taste. If you cannot fill in all three of 'nose', 'palate', and 'finish', you should not fill in any of them.
 
 'statedAge' should be the number of years the whiskey has been aged in barrels, if applicable.
