@@ -148,7 +148,9 @@ export default function EntityForm({
             )}
           />
           <TextField
-            {...register("website")}
+            {...register("website", {
+              setValueAs: (v) => (v === "" || !v ? null : v),
+            })}
             error={errors.website}
             autoFocus
             label="Website"
