@@ -1,7 +1,6 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import type {
-  Flight} from "@peated/server/db/schema";
+import type { Flight } from "@peated/server/db/schema";
 import {
   bottles,
   bottlesToDistillers,
@@ -147,10 +146,10 @@ export default publicProcedure
         orderBy = desc(bottles.fullName);
         break;
       case "age":
-        orderBy = asc(bottles.statedAge);
+        orderBy = sql`${bottles.statedAge} ASC NULLS FIRST`;
         break;
       case "-age":
-        orderBy = desc(bottles.statedAge);
+        orderBy = sql`${bottles.statedAge} DESC NULLS LAST`;
         break;
       case "tastings":
         orderBy = asc(bottles.totalTastings);
