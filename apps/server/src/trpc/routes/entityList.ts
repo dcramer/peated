@@ -51,6 +51,7 @@ export default publicProcedure
         or(
           ilike(entities.name, `%${query}%`),
           ilike(entities.name, `%The ${query}%`),
+          ilike(entities.shortName, `%${query}%`),
         ),
       );
     }
