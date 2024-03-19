@@ -31,6 +31,7 @@ function generatePrompt(bottle: Bottle) {
 Describe the following bottle of whisky:
 
 ${bottle.fullName}
+
 ${
   infoLines.length
     ? `\nOther information we already know about this bottle:\n- ${infoLines.join(
@@ -40,17 +41,17 @@ ${
 }
 If the whiskey is made in Scotland, it is always spelled "whisky".
 
-'description' should be a description given as if you were a whisky sommelier.
+'description' should be a well written description of the spirit, with enough information to inform a novice whisky drinker. It should be three paragraphs in length and include newlines. Do not repeat the spirit name in the description more than once.
 
 'tastingNotes' should be concise, and focus on the smell and taste. If you cannot fill in all three of 'nose', 'palate', and 'finish', you should not fill in any of them.
 
-'statedAge' should be the number of years the whiskey has been aged in barrels, if applicable.
+'statedAge' should be the number of years the spirit has been aged in barrels, if applicable.
 
 'category' should be one of the following:
 
 - ${CATEGORY_LIST.join("\n- ")}
 
-'suggestedTags' should be up to five items that reflect the flavor of this whiskey the best. Values MUST be from the following list:
+'suggestedTags' should be up to five items that reflect the flavor of this spirit the best. Values MUST be from the following list:
 
 - ${DEFAULT_TAGS.join("\n- ")}
 `;

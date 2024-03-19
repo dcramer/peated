@@ -44,6 +44,9 @@ export async function getStructuredResponse<
   const completion = await openai.chat.completions.create(
     {
       model,
+      response_format: {
+        type: "json_object",
+      },
       messages: [
         {
           role: "system",
@@ -59,14 +62,6 @@ export async function getStructuredResponse<
           content: prompt,
         },
       ],
-      functions: [
-        {
-          name: "out",
-          description:
-            "This is the function that returns the result of the agent",
-          parameters: zodToJsonSchema(schema),
-        },
-      ],
       temperature: 0,
     },
     // {
@@ -75,8 +70,7 @@ export async function getStructuredResponse<
   );
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  // const output: string = completion.choices[0].message!.content || "";
-  const output = completion.choices[0].message!.function_call!.arguments!;
+  const output: string = completion.choices[0].message!.content || "";
 
   let structuredResponse: any;
   try {
@@ -99,16 +93,6 @@ export async function getStructuredResponse<
     );
     throw err;
   }
-
-  // no idea whats going on here, but robots arent that smart yet
-  // this shouldnt live here either but whatever
-  if (structuredResponse.description instanceof Array)
-    structuredResponse.description = structuredResponse.description.join("");
-  if (
-    structuredResponse.statedAge &&
-    typeof structuredResponse.statedAge !== "number"
-  )
-    structuredResponse.statedAge = null;
 
   try {
     return (fullSchema || schema).parse(structuredResponse);
