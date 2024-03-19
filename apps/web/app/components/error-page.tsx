@@ -4,6 +4,7 @@ import Button from "@peated/web/components/button";
 import config from "@peated/web/config";
 import { useOnlineStatus } from "@peated/web/hooks/useOnlineStatus";
 import { ApiError, ApiUnauthorized, ApiUnavailable } from "@peated/web/lib/api";
+import { TRPCClientError } from "@trpc/client";
 
 export default function ErrorPage() {
   const error = useRouteError() as Error | ApiError;
@@ -23,6 +24,14 @@ export default function ErrorPage() {
   } else if (error instanceof ApiError && error.statusCode === 404) {
     title = "Not Found";
     subtitle = "We couldn't find the page you were looking for.";
+  } else if (
+    error instanceof TRPCClientError &&
+    error.message === "Failed to fetch"
+  ) {
+    title = isOnline ? "Server Unreachable" : "Connection Offline";
+    subtitle = isOnline
+      ? "It looks like Peated's API is unreachable right now. Please try again shortly."
+      : "It looks like your network is offline.";
   } else if (isRouteErrorResponse(error)) {
     if (error.status === 404) {
       title = "Not Found";
