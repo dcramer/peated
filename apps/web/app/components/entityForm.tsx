@@ -148,9 +148,7 @@ export default function EntityForm({
             )}
           />
           <TextField
-            {...register("website", {
-              setValueAs: (v) => (v === "" || !v ? undefined : v),
-            })}
+            {...register("website")}
             error={errors.website}
             autoFocus
             label="Website"
@@ -160,7 +158,7 @@ export default function EntityForm({
           />
           <TextField
             {...register("yearEstablished", {
-              setValueAs: (v) => (v === "" || !v ? undefined : Number(v)),
+              setValueAs: (v) => (v === "" || !v ? null : Number(v)),
             })}
             error={errors.yearEstablished}
             autoFocus

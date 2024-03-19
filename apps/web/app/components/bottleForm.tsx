@@ -182,7 +182,7 @@ export default function BottleForm({
 
           <TextField
             {...register("statedAge", {
-              setValueAs: (v) => (v === "" || !v ? undefined : Number(v)),
+              setValueAs: (v) => (v === "" || !v ? null : Number(v)),
             })}
             error={errors.statedAge}
             type="number"
