@@ -120,7 +120,7 @@ export default function FlightDetails() {
                     {formatCategoryName(bottle.category)}
                   </div>
                 </td>
-                <td className="py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
+                <td className="hidden py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
                   <Button
                     color={bottle.hasTasted ? "default" : "highlight"}
                     size="small"

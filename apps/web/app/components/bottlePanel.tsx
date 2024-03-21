@@ -45,8 +45,8 @@ export default function BottlePanel({
         <BottleHeader bottle={bottle} to={`/bottles/${bottle.id}`} />
       </SidePanelHeader>
 
-      <div className="my-8 flex items-start">
-        <div className="h-auto lg:w-10/12">
+      <div className="my-6 flex items-start">
+        <div className="h-auto flex-1 lg:w-10/12 lg:flex-auto">
           <div className="flex justify-center gap-4 px-4 lg:justify-start lg:px-0">
             {user && (
               <QueryBoundary
