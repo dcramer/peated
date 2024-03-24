@@ -8,7 +8,7 @@ import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { fastify } from "fastify";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
-import { shutdownClient } from "./jobs";
+import { shutdownClient } from "./jobs/utils";
 import { injectAuth } from "./middleware/auth";
 import { router } from "./routes";
 import FastifySentry from "./sentryPlugin";

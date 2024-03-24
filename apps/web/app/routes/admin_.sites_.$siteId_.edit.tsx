@@ -1,4 +1,4 @@
-import { type ExternalSiteType } from "@peated/server/src/types";
+import { type ExternalSiteType } from "@peated/server/types";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";

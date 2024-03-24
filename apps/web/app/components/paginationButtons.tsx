@@ -1,4 +1,4 @@
-import { type PagingRel } from "@peated/server/src/types";
+import { type PagingRel } from "@peated/server/types";
 import { useLocation } from "@remix-run/react";
 import { buildQueryString } from "../lib/urls";
 import Button from "./button";

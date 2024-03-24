@@ -26,7 +26,6 @@ ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
 ADD apps/cli/package.json ./apps/cli/package.json
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/server/package.json ./apps/server/package.json
-ADD apps/worker/package.json ./apps/worker/package.json
 ADD packages/tsconfig/package.json ./packages/tsconfig/package.json
 ADD packages/design/package.json ./packages/design/package.json
 
@@ -74,12 +73,12 @@ FROM base-env as worker
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ /app/
 
-WORKDIR /app/apps/worker
+WORKDIR /app/apps/server
 
 ARG VERSION
 ENV VERSION $VERSION
 
-CMD ["pnpm", "start"]
+CMD ["pnpm", "start:worker"]
 
 # cli service
 FROM base-env as cli
@@ -106,4 +105,4 @@ WORKDIR /app/apps/server
 ARG VERSION
 ENV VERSION $VERSION
 
-CMD ["pnpm", "start"]
+CMD ["pnpm", "start:api"]

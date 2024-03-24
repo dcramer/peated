@@ -1,5 +1,5 @@
 import FontStyles from "@fontsource/raleway/index.css";
-import { sentryLink } from "@peated/server/src/lib/trpc";
+import { sentryLink } from "@peated/server/lib/trpc";
 import type { User } from "@peated/server/types";
 import glyphUrl from "@peated/web/assets/glyph.png";
 import logo192Url from "@peated/web/assets/logo192.png";
