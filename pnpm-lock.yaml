@@ -61,14 +61,14 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@sentry/node':
-        specifier: ~8.0.0-alpha.4
-        version: 8.0.0-alpha.4
+        specifier: ~8.0.0-alpha.5
+        version: 8.0.0-alpha.5
       '@sentry/profiling-node':
-        specifier: ~8.0.0-alpha.4
-        version: 8.0.0-alpha.4
+        specifier: ~8.0.0-alpha.5
+        version: 8.0.0-alpha.5
       '@sentry/utils':
-        specifier: ~8.0.0-alpha.4
-        version: 8.0.0-alpha.4
+        specifier: ~8.0.0-alpha.5
+        version: 8.0.0-alpha.5
       '@trpc/client':
         specifier: ^10.45.0
         version: 10.45.0(@trpc/server@10.45.0)
@@ -154,14 +154,14 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@sentry/node':
-        specifier: ~8.0.0-alpha.4
-        version: 8.0.0-alpha.4
+        specifier: ~8.0.0-alpha.5
+        version: 8.0.0-alpha.5
       '@sentry/profiling-node':
-        specifier: ~8.0.0-alpha.4
-        version: 8.0.0-alpha.4
+        specifier: ~8.0.0-alpha.5
+        version: 8.0.0-alpha.5
       '@sentry/utils':
-        specifier: ~8.0.0-alpha.4
-        version: 8.0.0-alpha.4
+        specifier: ~8.0.0-alpha.5
+        version: 8.0.0-alpha.5
       '@trpc/client':
         specifier: ^10.45.0
         version: 10.45.0(@trpc/server@10.45.0)
@@ -340,8 +340,8 @@ importers:
         specifier: ^5.0.5
         version: 5.0.5
       '@sentry/remix':
-        specifier: ~8.0.0-alpha.4
-        version: 8.0.0-alpha.4(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0)(@remix-run/node@2.7.2)(@remix-run/react@2.7.2)(react@18.2.0)
+        specifier: ~8.0.0-alpha.5
+        version: 8.0.0-alpha.5(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0)(@remix-run/node@2.7.2)(@remix-run/react@2.7.2)(react@18.2.0)
       '@sentry/vite-plugin':
         specifier: ^2.15.0
         version: 2.15.0
@@ -527,11 +527,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@sentry/node':
-        specifier: ~8.0.0-alpha.4
-        version: 8.0.0-alpha.4
+        specifier: ~8.0.0-alpha.5
+        version: 8.0.0-alpha.5
       '@sentry/profiling-node':
-        specifier: ~8.0.0-alpha.4
-        version: 8.0.0-alpha.4
+        specifier: ~8.0.0-alpha.5
+        version: 8.0.0-alpha.5
       '@swc/core':
         specifier: ^1.3.101
         version: 1.3.101
@@ -5226,33 +5226,33 @@ packages:
       join-component: 1.1.0
     dev: false
 
-  /@sentry-internal/feedback@8.0.0-alpha.4:
-    resolution: {integrity: sha512-/Nl6mX8qa84AI6AWvKtzMzKVVUaLUq6bd9uAqEu/N2HlX1WiX3/W/g+Ef//oUM9u/eLgWW22OU4fGy4u0ExP/Q==}
+  /@sentry-internal/feedback@8.0.0-alpha.5:
+    resolution: {integrity: sha512-tM1K2ORg0r1T5lfobeGlDEul8sx32fHW+jZZbF34OtlQe5/GUTpEpfl5jUzdpHHzG6PNAkHV4Ovj0YM0ywQGnQ==}
     engines: {node: '>=14.18'}
     dependencies:
-      '@sentry/core': 8.0.0-alpha.4
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
       preact: 10.19.6
     dev: false
 
-  /@sentry-internal/replay-canvas@8.0.0-alpha.4:
-    resolution: {integrity: sha512-BfdHhBww7W75q03wI/1gvzW9J3Bf9WfG8QSkJY+DLmDdiyC1S1u9BGt8cXznQWqHBOWhAh9Nr5D337j9tmc4fQ==}
+  /@sentry-internal/replay-canvas@8.0.0-alpha.5:
+    resolution: {integrity: sha512-jrsBQqByrHCVODO9adteXh744C+IwmTBetla3f1D3fVNpx5J5XKgyGC5ClDcOIuV7BQhDPAEOV3WEj0V+wZ3Ag==}
     engines: {node: '>=14.18'}
     dependencies:
-      '@sentry/core': 8.0.0-alpha.4
-      '@sentry/replay': 8.0.0-alpha.4
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/replay': 8.0.0-alpha.5
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
     dev: false
 
-  /@sentry-internal/tracing@8.0.0-alpha.4:
-    resolution: {integrity: sha512-tvetJP8TvYmSf/iFVlHSkTaolg/eFtu+EkaIE8JjP0jKsq6oPAGGCeASNHD/wTP/xZ4/JRLvpKg5C51RDh7Hvg==}
+  /@sentry-internal/tracing@8.0.0-alpha.5:
+    resolution: {integrity: sha512-wnzRAWhObB2/CB/w2f37FgrQj+uAzhIcU+HkDax90PYRUHVptUJP6wYdbCTSkf+A6ShBiVAWaT+SqouLRpdIpg==}
     engines: {node: '>=14.18'}
     dependencies:
-      '@sentry/core': 8.0.0-alpha.4
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
     dev: false
 
   /@sentry/babel-plugin-component-annotate@2.15.0:
@@ -5260,17 +5260,17 @@ packages:
     engines: {node: '>= 14'}
     dev: false
 
-  /@sentry/browser@8.0.0-alpha.4:
-    resolution: {integrity: sha512-b9USsjKYKWRDk1ePxBUVRzrrK9Td3tpr0sZtHFe+u0WhVxu0FnxIMycqmhVnz/A2mgZt0qKC2sny/iz0isCyDg==}
+  /@sentry/browser@8.0.0-alpha.5:
+    resolution: {integrity: sha512-zYK27MkyL17mFCfBqstAKIXtYzZr3lNd3PoN5+745ABatpXvkVRa/0gaDeOH3GVWHlKlELEk+V59+iCEKaEP+A==}
     engines: {node: '>=14.18'}
     dependencies:
-      '@sentry-internal/feedback': 8.0.0-alpha.4
-      '@sentry-internal/replay-canvas': 8.0.0-alpha.4
-      '@sentry-internal/tracing': 8.0.0-alpha.4
-      '@sentry/core': 8.0.0-alpha.4
-      '@sentry/replay': 8.0.0-alpha.4
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry-internal/feedback': 8.0.0-alpha.5
+      '@sentry-internal/replay-canvas': 8.0.0-alpha.5
+      '@sentry-internal/tracing': 8.0.0-alpha.5
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/replay': 8.0.0-alpha.5
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
     dev: false
 
   /@sentry/bundler-plugin-core@2.15.0:
@@ -5462,16 +5462,26 @@ packages:
       - supports-color
     dev: false
 
-  /@sentry/core@8.0.0-alpha.4:
-    resolution: {integrity: sha512-eMPDAWHrdaaQJriHZrpDSL4sjdlAgxEZhkkxrBYDMnS5OKCocL4dXAHYzYfgj9Kx1Id01I1C6KYaL65X3I+cuQ==}
+  /@sentry/core@8.0.0-alpha.5:
+    resolution: {integrity: sha512-Git8brepB/lDdBbuo0mgxWXlJCRJ9VJK0BDcGMGfQBubHKLs7jpqHRTVJZpDiUnl/h3wDX0u/yycJeh0aKXWqA==}
     engines: {node: '>=14.18'}
     dependencies:
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
     dev: false
 
-  /@sentry/node@8.0.0-alpha.4:
-    resolution: {integrity: sha512-NsEYV0+gyPJDsjUIh596omCL+s3Xkuv7c7Z5Woe6XsQOaw/fml5SjunkyTedNvyf5yUIVtns8zDV6bOcdV7b4A==}
+  /@sentry/node-experimental@8.0.0-alpha.5:
+    resolution: {integrity: sha512-bS2qWE5e4hQr7xMenHya3AljbRC3zr/0b3zefwG8tG7agHtgbF1zvI6pIUkioPv4PSBVR5LdRcnPvVtOOA3YdQ==}
+    engines: {node: '>=14.18'}
+    dependencies:
+      '@sentry-internal/tracing': 8.0.0-alpha.5
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
+    dev: false
+
+  /@sentry/node@8.0.0-alpha.5:
+    resolution: {integrity: sha512-Kby+uf8Ztc5ImiQJSvNsHd67kZR6XKPo9eCZ666MjgoWzom6M9sWosvTCxFw2GOk+z7B5w63yRMpUMFUxX8aMA==}
     engines: {node: '>=14.18'}
     dependencies:
       '@opentelemetry/api': 1.7.0
@@ -5494,18 +5504,18 @@ packages:
       '@opentelemetry/sdk-trace-base': 1.21.0(@opentelemetry/api@1.7.0)
       '@opentelemetry/semantic-conventions': 1.21.0
       '@prisma/instrumentation': 5.9.0
-      '@sentry/core': 8.0.0-alpha.4
-      '@sentry/opentelemetry': 8.0.0-alpha.4(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0)
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/opentelemetry': 8.0.0-alpha.5(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0)
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
     optionalDependencies:
       opentelemetry-instrumentation-fetch-node: 1.1.0
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /@sentry/opentelemetry@8.0.0-alpha.4(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0):
-    resolution: {integrity: sha512-xEt502gDwQpJKYnRJxb3mwxr81OuHSCrXozAZFb2DggynTwjXjy1nmsLLTLxjvRYas+GbQU0gU39F/U43qQiTA==}
+  /@sentry/opentelemetry@8.0.0-alpha.5(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0):
+    resolution: {integrity: sha512-+TRJlqAckJ+Ciiv8x575QQJp8bbejq8yNgXXg4OG72ymKS45LjE6u6vsPNVkAxZCUoI4sFhnsR33iX2W60Ovzw==}
     engines: {node: '>=14.18'}
     peerDependencies:
       '@opentelemetry/api': ^1.0.0
@@ -5517,37 +5527,41 @@ packages:
       '@opentelemetry/core': 1.21.0(@opentelemetry/api@1.7.0)
       '@opentelemetry/sdk-trace-base': 1.21.0(@opentelemetry/api@1.7.0)
       '@opentelemetry/semantic-conventions': 1.21.0
-      '@sentry/core': 8.0.0-alpha.4
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
     dev: false
 
-  /@sentry/profiling-node@8.0.0-alpha.4:
-    resolution: {integrity: sha512-9LQNpvRKZziBDhCgVgvDbAE/ACJZT/fTQAxxD8sxy2nfLfFhRs4pV06Bar+y/zE7aBfP+0Ul4yDjKVBuMEDDiQ==}
+  /@sentry/profiling-node@8.0.0-alpha.5:
+    resolution: {integrity: sha512-+A7w6cKgbb9UPdM6zDD7llWVRsP62BOWRa1fWf/FpnAWRgXZd9vngyjnda2GREEf2wkktoYs/SneJLy8ZHjeOA==}
     engines: {node: '>=14.18'}
     hasBin: true
     requiresBuild: true
     dependencies:
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/node-experimental': 8.0.0-alpha.5
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
       detect-libc: 2.0.2
       node-abi: 3.52.0
     dev: false
 
-  /@sentry/react@8.0.0-alpha.4(react@18.2.0):
-    resolution: {integrity: sha512-T9tIj7SAqMetxAz74kHoxhOU4zt1/PHkAnGqwQCJoKvkbCirGsTzQAV1E9BpbQnkgQmpD6iQTssl08GItARRkw==}
+  /@sentry/react@8.0.0-alpha.5(react@18.2.0):
+    resolution: {integrity: sha512-7Lx0Fi0VBzdbbyvWjihBJBLRCbJ4hB92upx+jyCmrliwNe/lS2WLGrMGkDbRt7rIPUx5qp9j1YvOXcByspkQoQ==}
     engines: {node: '>=14.18'}
     peerDependencies:
       react: 16.x || 17.x || 18.x
     dependencies:
-      '@sentry/browser': 8.0.0-alpha.4
-      '@sentry/core': 8.0.0-alpha.4
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry/browser': 8.0.0-alpha.5
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
       hoist-non-react-statics: 3.3.2
       react: 18.2.0
     dev: false
 
-  /@sentry/remix@8.0.0-alpha.4(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0)(@remix-run/node@2.7.2)(@remix-run/react@2.7.2)(react@18.2.0):
-    resolution: {integrity: sha512-ZRs2MaciPxopCfpZ7e96tJP+xZ8hhXq9Gl3bf2E+EiffB1NyGc0ogp11PeeaUzzutjwWRd15fVoBg5QWovJNDA==}
+  /@sentry/remix@8.0.0-alpha.5(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0)(@remix-run/node@2.7.2)(@remix-run/react@2.7.2)(react@18.2.0):
+    resolution: {integrity: sha512-0VFnEmKSCejiJnUDIYLSlvWc2j+MWXK9I+SRY4TgwKxnR2wN6xjus+rPAWQpVgMvEa1ufQTkvpkHWYLjdg611A==}
     engines: {node: '>=14.18'}
     hasBin: true
     peerDependencies:
@@ -5559,12 +5573,12 @@ packages:
       '@remix-run/react': 2.7.2(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.3)
       '@remix-run/router': 1.15.1
       '@sentry/cli': 2.30.2
-      '@sentry/core': 8.0.0-alpha.4
-      '@sentry/node': 8.0.0-alpha.4
-      '@sentry/opentelemetry': 8.0.0-alpha.4(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0)
-      '@sentry/react': 8.0.0-alpha.4(react@18.2.0)
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/node': 8.0.0-alpha.5
+      '@sentry/opentelemetry': 8.0.0-alpha.5(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0)
+      '@sentry/react': 8.0.0-alpha.5(react@18.2.0)
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
       glob: 10.3.10
       react: 18.2.0
       yargs: 17.7.2
@@ -5577,26 +5591,26 @@ packages:
       - supports-color
     dev: false
 
-  /@sentry/replay@8.0.0-alpha.4:
-    resolution: {integrity: sha512-lMy1jcGhM8am0mtnhKxIm0zRxicRdt/uMroR6TngUqiTZ1mUavqH1I5G9JeJoESsCbf1I2s++3ci1M5NTOmw7w==}
+  /@sentry/replay@8.0.0-alpha.5:
+    resolution: {integrity: sha512-MIWbfRKDatiFFmHET0WG/ujlJUeumlNTAKSMneU1jP796NawATE2XS+09hfroHLy7pVtyyaz5OdvjhN6oqCqOg==}
     engines: {node: '>=14.18'}
     dependencies:
-      '@sentry-internal/tracing': 8.0.0-alpha.4
-      '@sentry/core': 8.0.0-alpha.4
-      '@sentry/types': 8.0.0-alpha.4
-      '@sentry/utils': 8.0.0-alpha.4
+      '@sentry-internal/tracing': 8.0.0-alpha.5
+      '@sentry/core': 8.0.0-alpha.5
+      '@sentry/types': 8.0.0-alpha.5
+      '@sentry/utils': 8.0.0-alpha.5
     dev: false
 
-  /@sentry/types@8.0.0-alpha.4:
-    resolution: {integrity: sha512-lx/LpoZZ1nwWQOmBPJwgcgHnSBsfRyPTk7Cp3AANSFm2DTdQm3IIVK9qz9nTNqf3qQ+WHLXf/a+QWNd4MRXKCg==}
+  /@sentry/types@8.0.0-alpha.5:
+    resolution: {integrity: sha512-inHzfL74emX1Vk7IgA2t5Rcpb7iFeR85+TDKaEToLxN7BskA4pMHY7ufXbLEz3IfUji8n5ivlw3iruRxUAOLBg==}
     engines: {node: '>=14.18'}
     dev: false
 
-  /@sentry/utils@8.0.0-alpha.4:
-    resolution: {integrity: sha512-whSMyV/hdymcCRJlxdvNqD9ue6Dyby1lbC+MFHo8OWgSY0nTst4trKCDDDr3+2Twi6bJi1OSOYE88BC2aDowQQ==}
+  /@sentry/utils@8.0.0-alpha.5:
+    resolution: {integrity: sha512-De6RbTdVc7WNqgHGyJo++2L4ynfAWKwbIiPIF4+b81uznCl3Gi7GJrtGrYgE1RYSiBvGmIwxOn+Sbnf3VQ//Yw==}
     engines: {node: '>=14.18'}
     dependencies:
-      '@sentry/types': 8.0.0-alpha.4
+      '@sentry/types': 8.0.0-alpha.5
     dev: false
 
   /@sentry/vite-plugin@2.15.0:
