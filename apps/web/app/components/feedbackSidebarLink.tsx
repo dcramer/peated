@@ -1,5 +1,5 @@
 import { BugAntIcon } from "@heroicons/react/24/outline";
-import { type Feedback } from "@sentry-internal/feedback";
+import type { feedbackIntegration } from "@sentry/remix";
 import { getClient } from "@sentry/remix";
 import { useCallback, useState } from "react";
 import SidebarLink from "./sidebarLink";
@@ -11,12 +11,15 @@ export default function FeedbackSidebarLink() {
   // always returned even though it gets loaded in `entry.client` before hydration
 
   const feedback =
-    getClient()?.getIntegrationByName?.<Feedback>("Feedback") ?? null;
+    getClient()?.getIntegrationByName?.<ReturnType<typeof feedbackIntegration>>(
+      "Feedback",
+    ) ?? null;
 
   const linkRef = useCallback(
     (node: HTMLAnchorElement) => {
       if (!feedback || loaded) return;
-      feedback.attachTo(node, {});
+      // TODO: Type this better, and remove the type cast...
+      (feedback as any).attachTo(node, {});
       setLoaded(true);
     },
     [feedback, loaded],
