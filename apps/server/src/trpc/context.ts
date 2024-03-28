@@ -1,4 +1,4 @@
-import { setUser } from "@sentry/node-experimental";
+import { setUser } from "@sentry/node";
 import { type inferAsyncReturnType } from "@trpc/server";
 import { type CreateFastifyContextOptions } from "@trpc/server/adapters/fastify";
 import { getUserFromHeader } from "../lib/auth";

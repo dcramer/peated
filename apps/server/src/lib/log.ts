@@ -1,8 +1,4 @@
-import {
-  captureException,
-  captureMessage,
-  withScope,
-} from "@sentry/node-experimental";
+import { captureException, captureMessage, withScope } from "@sentry/node";
 
 export function logError(
   error: Error | unknown,

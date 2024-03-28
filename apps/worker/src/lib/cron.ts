@@ -1,5 +1,5 @@
 import { logError } from "@peated/server/src/lib/log";
-import * as Sentry from "@sentry/node-experimental";
+import * as Sentry from "@sentry/node";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 
 export const scheduler = new ToadScheduler();

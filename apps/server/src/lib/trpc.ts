@@ -1,5 +1,5 @@
 import { type AppRouter } from "@peated/server/trpc/router";
-import { type captureException } from "@sentry/core";
+import { type captureException } from "@sentry/node";
 import {
   createTRPCProxyClient,
   httpBatchLink,

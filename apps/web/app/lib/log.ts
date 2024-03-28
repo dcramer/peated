@@ -1,4 +1,4 @@
-import { captureException, captureMessage } from "@sentry/react";
+import { captureException, captureMessage } from "@sentry/remix";
 
 export function logError(
   error: Error | unknown,
