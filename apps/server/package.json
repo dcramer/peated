@@ -8,9 +8,9 @@
     "start:api": "esno --require dotenv/config ./src/server.ts",
     "start:worker": "esno --require dotenv/config ./src/worker.ts",
     "typecheck": "tsc --noEmit",
-    "test": "dotenv -e .env.test -- vitest watch --pool=forks",
-    "test:watch": "dotenv -e .env.test -- vitest --pool=forks",
-    "test:ci": "dotenv -e .env.test -- vitest --pool=forks --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
+    "test": "dotenv -e .env.test -- vitest watch",
+    "test:watch": "dotenv -e .env.test -- vitest",
+    "test:ci": "dotenv -e .env.test -- vitest --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
@@ -31,7 +31,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/mime-types": "^2.1.4",
-    "@types/node": "^18.19.26",
+    "@types/node": "~20",
     "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.11.4",
     "@vitest/coverage-v8": "^1.4.0",
