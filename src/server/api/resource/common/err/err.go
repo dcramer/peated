@@ -5,15 +5,13 @@ import (
 )
 
 var (
-	RespDBDataInsertFailure = []byte(`{"error": "db data insert failure"}`)
-	RespDBDataAccessFailure = []byte(`{"error": "db data access failure"}`)
-	RespDBDataUpdateFailure = []byte(`{"error": "db data update failure"}`)
-	RespDBDataRemoveFailure = []byte(`{"error": "db data remove failure"}`)
+	RespDBDataInsertFailure = []byte(`{"error": "Unable to communicate with database"}`)
+	RespDBDataAccessFailure = []byte(`{"error": "Unable to communicate with database"}`)
+	RespDBDataUpdateFailure = []byte(`{"error": "Unable to communicate with database"}`)
+	RespDBDataRemoveFailure = []byte(`{"error": "Unable to communicate with database"}`)
 
-	RespJSONEncodeFailure = []byte(`{"error": "json encode failure"}`)
-	RespJSONDecodeFailure = []byte(`{"error": "json decode failure"}`)
-
-	RespInvalidURLParamID = []byte(`{"error": "invalid url param-id"}`)
+	RespJSONEncodeFailure = []byte(`{"error": "Unable to encode JSON"}`)
+	RespJSONDecodeFailure = []byte(`{"error": "Unable to decode JSON"}`)
 )
 
 type Error struct {

@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	Debug    bool `env:"DEBUG,default=false"`
-	Port     int  `env:"PORT,default=4000"`
-	Database ConfigDB
+	Debug     bool   `env:"DEBUG,default=false"`
+	Port      int    `env:"PORT,default=4000"`
+	JwtSecret string `env:"JWT_SECRET"`
+	Database  ConfigDB
 }
 
 type ConfigDB struct {
