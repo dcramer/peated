@@ -35,7 +35,6 @@ func (r *Repository) List(params *ListParams) (Users, error) {
 	//   };
 	// }
 
-	query := "foo"
 	isAdmin := false
 
 	clauses := make([]clause.Expression, 0)
@@ -48,11 +47,10 @@ func (r *Repository) List(params *ListParams) (Users, error) {
 			clause.Like{Column: "display_name", Value: "%" + params.query + "%"},
 			clause.Like{Column: "email", Value: params.query},
 		))
-	} else if (isAdmin) {
-		return users, nil,
+	} else if isAdmin {
+		return users, nil
 	}
 
-	users := make([]*User, 0)
 	query := r.db.Find(&users).Clauses(clauses...).Offset(0).Limit(100).Order("display_name asc")
 	if err := query.Error; err != nil {
 		return users, err

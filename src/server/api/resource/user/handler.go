@@ -34,7 +34,7 @@ func New(logger *zerolog.Logger, db *gorm.DB) func(chi.Router) {
 }
 
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
-	users, err := a.repository.List()
+	users, err := a.repository.List(&ListParams{})
 
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")

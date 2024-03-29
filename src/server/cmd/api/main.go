@@ -11,7 +11,7 @@ import (
 	"os/signal"
 	"peated/api/router"
 	"peated/config"
-	"peated/internal/logger"
+	"peated/util/logger"
 	"sync"
 	"time"
 

@@ -23,6 +23,10 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+func (User) TableName() string {
+	return "user"
+}
+
 type Users []*User
 
 type UserDTO struct {
