@@ -38,8 +38,8 @@ func New(logger *zerolog.Logger, db *gorm.DB) func(chi.Router) {
 
 type ListInput struct {
 	Query  string `in:"query=query"`
-	Cursor int    `in:"query=cursor,default=0"`
-	Limit  int    `in:"query=limit,default=100"`
+	Cursor int    `in:"query=cursor;default=0"`
+	Limit  int    `in:"query=limit;default=100"`
 }
 
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
