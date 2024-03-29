@@ -18,5 +18,6 @@ export default defineConfig({
       ".*\\/dist\\/.*",
       ".*\\/postgres-data\\/.*",
     ],
+    restoreMocks: true,
   },
 });
