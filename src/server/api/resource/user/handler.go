@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ggicci/httpin"
+
 	"peated/api/resource/common/encoder"
 	e "peated/api/resource/common/err"
 	"peated/model"
@@ -28,22 +30,26 @@ func New(logger *zerolog.Logger, db *gorm.DB) func(chi.Router) {
 		// validator:  validator,
 	}
 	return func(r chi.Router) {
-		r.Get("/", api.List)
+		r.With(httpin.NewInput(ListInput{})).Get("/", api.List)
 		r.Post("/", api.Create)
 		r.Get("/{id}", api.Get)
 	}
 }
 
-func (a *API) List(w http.ResponseWriter, r *http.Request) {
-	queryValues := r.URL.Query()
-	params, err := NewListParamsFromValues(&queryValues)
-	if err != nil {
-		a.logger.Error().Err(err).Msg("")
-		e.BadRequest(w, []byte(`{"error": "invalid query parameters"}`))
-		return
+type ListInput struct {
+	Query  string `in:"query=query"`
+	Cursor int    `in:"query=cursor,default=0"`
+	Limit  int    `in:"query=limit,default=100"`
+}
 
-	}
-	users, err := a.repository.List(r.Context(), params)
+func (a *API) List(w http.ResponseWriter, r *http.Request) {
+	input := r.Context().Value(httpin.Input).(*ListInput)
+
+	users, err := a.repository.List(r.Context(), &ListParams{
+		Query:  input.Query,
+		Cursor: input.Cursor,
+		Limit:  input.Limit,
+	})
 
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")

@@ -2,9 +2,6 @@ package user
 
 import (
 	"context"
-	"errors"
-	"net/url"
-	"strconv"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -24,70 +21,29 @@ func NewRepository(db *gorm.DB) *Repository {
 }
 
 type ListParams struct {
-	query  string `default:""`
-	cursor int    `default:"0"`
-	limit  int    `default:"100"`
-}
-
-func NewListParamsFromValues(queryValues *url.Values) (*ListParams, error) {
-	p := ListParams{
-		query:  queryValues.Get("query"),
-		cursor: 0,
-		limit:  100,
-	}
-
-	if queryValues.Has("cursor") {
-		cursorValue, err := strconv.Atoi(queryValues.Get("cursor"))
-		if err != nil || cursorValue < 0 {
-			return &p, errors.New("invalid value for cursor")
-		}
-		p.cursor = cursorValue
-	}
-
-	if queryValues.Has("limit") {
-		limitValue, err := strconv.Atoi(queryValues.Get("limit"))
-		if err != nil || limitValue < 0 || limitValue > 100 {
-			return &p, errors.New("invalid value for limit")
-		}
-		p.limit = limitValue
-	}
-
-	return &p, nil
+	Query  string `default:""`
+	Cursor int    `default:"0"`
+	Limit  int    `default:"100"`
 }
 
 func (r *Repository) List(ctx context.Context, params *ListParams) (model.Users, error) {
-	// const where: (SQL<unknown> | undefined)[] = [];
-	// if (query) {
-	//   where.push(
-	//     or(ilike(users.displayName, `%${query}%`), ilike(users.email, query)),
-	//   );
-	// } else if (!ctx.user.admin) {
-	//   return {
-	//     results: [],
-	//     rel: {
-	//       nextCursor: null,
-	//       prevCursor: null,
-	//     },
-	//   };
-	// }
-
 	user, _ := ctxUtil.CurrentUser(ctx)
 
 	clauses := make([]clause.Expression, 0)
 
 	users := make([]*model.User, 0)
 
-	if len(params.query) != 0 {
+	if len(params.Query) != 0 {
 		// TODO: should be ILIKE
 		clauses = append(clauses, clause.Or(
-			clause.Like{Column: "display_name", Value: "%" + params.query + "%"},
-			clause.Like{Column: "email", Value: params.query},
+			clause.Like{Column: "display_name", Value: "%" + params.Query + "%"},
+			clause.Like{Column: "email", Value: params.Query},
 		))
 	} else if user.Admin {
 		return users, nil
 	}
 
-	query := r.db.Clauses(clauses...).Offset(params.cursor).Limit(params.limit).Order("display_name asc").Find(&users)
+	query := r.db.Clauses(clauses...).Offset(params.Cursor).Limit(params.Limit).Order("display_name asc").Find(&users)
 	if err := query.Error; err != nil {
 		return users, err
 	}
