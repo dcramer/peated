@@ -2,6 +2,9 @@ package user
 
 import (
 	"context"
+	"errors"
+	"net/url"
+	"strconv"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -24,6 +27,32 @@ type ListParams struct {
 	query  string `default:""`
 	cursor int    `default:"0"`
 	limit  int    `default:"100"`
+}
+
+func NewListParamsFromValues(queryValues *url.Values) (*ListParams, error) {
+	p := ListParams{
+		query:  queryValues.Get("query"),
+		cursor: 0,
+		limit:  100,
+	}
+
+	if queryValues.Has("cursor") {
+		cursorValue, err := strconv.Atoi(queryValues.Get("cursor"))
+		if err != nil || cursorValue < 0 {
+			return &p, errors.New("invalid value for cursor")
+		}
+		p.cursor = cursorValue
+	}
+
+	if queryValues.Has("limit") {
+		limitValue, err := strconv.Atoi(queryValues.Get("limit"))
+		if err != nil || limitValue < 0 || limitValue > 100 {
+			return &p, errors.New("invalid value for limit")
+		}
+		p.limit = limitValue
+	}
+
+	return &p, nil
 }
 
 func (r *Repository) List(ctx context.Context, params *ListParams) (model.Users, error) {

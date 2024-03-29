@@ -3,7 +3,6 @@ package user
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"peated/api/resource/common/encoder"
 	e "peated/api/resource/common/err"
@@ -36,27 +35,15 @@ func New(logger *zerolog.Logger, db *gorm.DB) func(chi.Router) {
 }
 
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
+	queryValues := r.URL.Query()
+	params, err := NewListParamsFromValues(&queryValues)
+	if err != nil {
+		a.logger.Error().Err(err).Msg("")
+		e.BadRequest(w, []byte(`{"error": "invalid query parameters"}`))
+		return
 
-	cursorValue, err := strconv.Atoi(query.Get("cursor"))
-	if err != nil || cursorValue < 0 {
-		cursorValue = 0
 	}
-
-	limitValue, err := strconv.Atoi(query.Get("limit"))
-	if err != nil || limitValue < 0 || limitValue > 100 {
-		limitValue = 100
-	}
-
-	queryValue := query.Get("query")
-
-	users, err := a.repository.List(r.Context(), &ListParams{
-		query:  queryValue,
-		cursor: cursorValue,
-		limit:  limitValue,
-	})
-
-	a.logger.Error().Str("query", queryValue).Int("cursor", cursorValue).Int("limit", limitValue).Msg("search params")
+	users, err := a.repository.List(r.Context(), params)
 
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
