@@ -1,8 +1,13 @@
 package user
 
 import (
+	"context"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+
+	"peated/model"
+	ctxUtil "peated/util/ctx"
 )
 
 type Repository struct {
@@ -16,10 +21,12 @@ func NewRepository(db *gorm.DB) *Repository {
 }
 
 type ListParams struct {
-	query string
+	query  string `default:""`
+	cursor int    `default:"0"`
+	limit  int    `default:"100"`
 }
 
-func (r *Repository) List(params *ListParams) (Users, error) {
+func (r *Repository) List(ctx context.Context, params *ListParams) (model.Users, error) {
 	// const where: (SQL<unknown> | undefined)[] = [];
 	// if (query) {
 	//   where.push(
@@ -35,11 +42,11 @@ func (r *Repository) List(params *ListParams) (Users, error) {
 	//   };
 	// }
 
-	isAdmin := false
+	user, _ := ctxUtil.CurrentUser(ctx)
 
 	clauses := make([]clause.Expression, 0)
 
-	users := make([]*User, 0)
+	users := make([]*model.User, 0)
 
 	if len(params.query) != 0 {
 		// TODO: should be ILIKE
@@ -47,11 +54,11 @@ func (r *Repository) List(params *ListParams) (Users, error) {
 			clause.Like{Column: "display_name", Value: "%" + params.query + "%"},
 			clause.Like{Column: "email", Value: params.query},
 		))
-	} else if isAdmin {
+	} else if user.Admin {
 		return users, nil
 	}
 
-	query := r.db.Find(&users).Clauses(clauses...).Offset(0).Limit(100).Order("display_name asc")
+	query := r.db.Clauses(clauses...).Offset(params.cursor).Limit(params.limit).Order("display_name asc").Find(&users)
 	if err := query.Error; err != nil {
 		return users, err
 	}
@@ -59,7 +66,7 @@ func (r *Repository) List(params *ListParams) (Users, error) {
 	return users, nil
 }
 
-func (r *Repository) Create(user *User) (*User, error) {
+func (r *Repository) Create(user *model.User) (*model.User, error) {
 	if err := r.db.Create(user).Error; err != nil {
 		return nil, err
 	}
@@ -67,8 +74,8 @@ func (r *Repository) Create(user *User) (*User, error) {
 	return user, nil
 }
 
-func (r *Repository) Read(id string) (*User, error) {
-	user := &User{}
+func (r *Repository) Read(id string) (*model.User, error) {
+	user := &model.User{}
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
@@ -76,8 +83,8 @@ func (r *Repository) Read(id string) (*User, error) {
 	return user, nil
 }
 
-func (r *Repository) Update(user *User) (int64, error) {
-	result := r.db.Model(&User{}).
+func (r *Repository) Update(user *model.User) (int64, error) {
+	result := r.db.Model(&model.User{}).
 		// Select("Username", "Email", "DisplayName", "PictureUrl").
 		Where("id = ?", user.ID).
 		Updates(user)
@@ -86,7 +93,7 @@ func (r *Repository) Update(user *User) (int64, error) {
 }
 
 func (r *Repository) Delete(id string) (int64, error) {
-	result := r.db.Where("id = ?", id).Delete(&User{})
+	result := r.db.Where("id = ?", id).Delete(&model.User{})
 
 	return result.RowsAffected, result.Error
 }

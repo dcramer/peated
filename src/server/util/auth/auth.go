@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"peated/api/resource/user"
 	"peated/config"
+	"peated/model"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
@@ -29,20 +29,19 @@ func VerifyToken(config *config.Config, tokenString string) (*UserClaims, error)
 	return claims, nil
 }
 
-func GetUserFromHeader(config *config.Config, db *gorm.DB, header string) (*user.User, error) {
+func GetUserFromHeader(config *config.Config, db *gorm.DB, header string) (*model.User, error) {
 	token := strings.Split(header, "Bearer ")[0]
 	if token == "" {
-		return &user.User{}, errors.Errorf("No token")
+		return &model.User{}, errors.Errorf("No token")
 	}
 
 	claims, err := VerifyToken(config, token)
 	if err != nil {
-		return &user.User{}, err
+		return &model.User{}, err
 	}
 
-	r := user.NewRepository(db)
-	user, err := r.Read(claims.ID)
-	if err != nil {
+	user := &model.User{}
+	if err := db.Where("id = ?", claims.ID).First(&user).Error; err != nil {
 		return user, err
 	}
 
@@ -53,7 +52,7 @@ func GetUserFromHeader(config *config.Config, db *gorm.DB, header string) (*user
 	return user, err
 }
 
-func CreateAccessToken(config *config.Config, db *gorm.DB, user *user.User) (string, error) {
+func CreateAccessToken(config *config.Config, db *gorm.DB, user *model.User) (string, error) {
 	claims := UserClaims{
 		user.ID,
 		jwt.StandardClaims{

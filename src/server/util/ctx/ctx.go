@@ -2,19 +2,19 @@ package ctx
 
 import (
 	"context"
-	"peated/api/resource/user"
+	"peated/model"
 )
 
 const userKey key = "user"
 
 type key string
 
-func CurrentUser(ctx context.Context) (user.User, bool) {
-	user, ok := ctx.Value(userKey).(user.User)
+func CurrentUser(ctx context.Context) (*model.User, bool) {
+	user, ok := ctx.Value(userKey).(model.User)
 
-	return user, ok
+	return &user, ok
 }
 
-func SetCurrentUser(ctx context.Context, user user.User) context.Context {
+func SetCurrentUser(ctx context.Context, user *model.User) context.Context {
 	return context.WithValue(ctx, userKey, user)
 }

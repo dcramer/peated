@@ -21,6 +21,7 @@ func New(
 	r := chi.NewRouter()
 	r.Route("/healthz", health.New(logger))
 	r.Route("/", func(r chi.Router) {
+		r.Use(middleware.ContentTypeJSON)
 		r.Use(middleware.Auth(config, db))
 
 		r.Route("/users", user.New(logger, db))

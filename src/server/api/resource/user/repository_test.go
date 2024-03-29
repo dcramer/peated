@@ -1,7 +1,9 @@
 package user_test
 
 import (
+	"context"
 	"peated/api/resource/user"
+	"peated/model"
 	"testing"
 	"time"
 
@@ -26,7 +28,9 @@ func TestRepository_List(t *testing.T) {
 
 	mock.ExpectQuery("^SELECT (.+) FROM \"user\"").WillReturnRows(mockRows)
 
-	users, err := repo.List(&user.ListParams{})
+	ctx := context.Background()
+
+	users, err := repo.List(ctx, &user.ListParams{})
 	testUtil.NoError(t, err)
 	testUtil.Equal(t, len(users), 2)
 }
@@ -46,7 +50,7 @@ func TestRepository_Create(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 
-	user := &user.User{ID: id, Username: "Username", Email: "Email", PasswordHash: "PasswordHash", DisplayName: "DisplayName", PictureUrl: "PictureUrl", CreatedAt: time.Now()}
+	user := &model.User{ID: id, Username: "Username", Email: "Email", PasswordHash: "PasswordHash", DisplayName: "DisplayName", PictureUrl: "PictureUrl", CreatedAt: time.Now()}
 	_, err = repo.Create(user)
 	testUtil.NoError(t, err)
 }
