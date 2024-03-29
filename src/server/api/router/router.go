@@ -7,18 +7,18 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
+	"gorm.io/gorm"
 )
 
 func New(
 	logger *zerolog.Logger,
 	config *config.Config,
+	db *gorm.DB,
 	// commentStore *commentStore
 	// anotherStore *anotherStore
 ) *chi.Mux {
 	r := chi.NewRouter()
 	r.Route("/healthz", health.New(logger))
-	r.Route("/api", func(r chi.Router) {
-		r.Route("/users", user.New(logger))
-	})
+	r.Route("/users", user.New(logger, db))
 	return r
 }

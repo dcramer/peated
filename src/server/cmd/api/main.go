@@ -14,7 +14,13 @@ import (
 	"peated/internal/logger"
 	"sync"
 	"time"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 )
+
+const fmtDBString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
 
 // https://grafana.com/blog/2024/02/09/how-i-write-http-services-in-go-after-13-years/
 func run(ctx context.Context, stdout, stderr io.Writer, args []string) error {
@@ -24,9 +30,23 @@ func run(ctx context.Context, stdout, stderr io.Writer, args []string) error {
 	config := config.New()
 	logger := logger.New(config.Debug)
 
+	var logLevel gormlogger.LogLevel
+	if config.Debug {
+		logLevel = gormlogger.Info
+	} else {
+		logLevel = gormlogger.Error
+	}
+
+	dbString := fmt.Sprintf(fmtDBString, config.Database.Host, config.Database.Username, config.Database.Password, config.Database.Name, config.Database.Port)
+	db, err := gorm.Open(postgres.Open(dbString), &gorm.Config{Logger: gormlogger.Default.LogMode(logLevel)})
+	if err != nil {
+		return err
+	}
+
 	router := router.New(
 		logger,
 		config,
+		db,
 	)
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort("localhost", fmt.Sprint(config.Port)),

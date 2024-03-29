@@ -1,7 +1,7 @@
 package user
 
 import (
-	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"peated/api/resource/common/encoder"
@@ -9,55 +9,57 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
+	"gorm.io/gorm"
 )
 
 type API struct {
-	logger *zerolog.Logger
+	logger     *zerolog.Logger
+	db         *gorm.DB
+	repository *Repository
 	// validator  *validator.Validate
 }
 
-func New(logger *zerolog.Logger) func(chi.Router) {
+func New(logger *zerolog.Logger, db *gorm.DB) func(chi.Router) {
 	api := &API{
-		logger: logger,
+		logger:     logger,
+		db:         db,
+		repository: NewRepository(db),
 		// validator:  validator,
 	}
 	return func(r chi.Router) {
-		r.Get("/", api.Get)
+		r.Get("/", api.List)
 		r.Post("/", api.Create)
+		r.Get("/{id}", api.Get)
 	}
 }
 
-// func GetUser(w http.ResponseWriter, r *http.Request) {
-// 	id := r.PathValue("id")
-// 	user, err := crud.GetUser(id)
-// 	if err != nil {
-// 		http_utils.Encode(w, r, http.StatusInternalServerError, "")
-// 	} else {
-// 		http_utils.Encode(w, r, http.StatusOK, NewUserResponse(&user))
-// 	}
-// }
+func (a *API) List(w http.ResponseWriter, r *http.Request) {
+	users, err := a.repository.List()
 
-// func CreateUser(w http.ResponseWriter, r *http.Request) {
-// 	newUser, err := crud.CreateUser(model.User{})
-// 	if err != nil {
-// 		http_utils.Encode(w, r, http.StatusInternalServerError, "")
-// 	} else {
-// 		http_utils.Encode(w, r, http.StatusOK, NewUserResponse(&newUser))
-// 	}
-// }
-
-func (a *API) Get(w http.ResponseWriter, r *http.Request) {
-	user, err := GetUser(r.PathValue("id"))
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.ServerError(w, e.RespDBDataAccessFailure)
 		return
 	}
 
-	dto := user.ToDto()
-	if err := json.NewEncoder(w).Encode(dto); err != nil {
+	if len(users) == 0 {
+		fmt.Fprint(w, "[]")
+		return
+	}
+
+	if err := encoder.Encode(w, r, http.StatusOK, users.ToDto()); err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.ServerError(w, e.RespJSONEncodeFailure)
+		return
+	}
+
+}
+
+func (a *API) Get(w http.ResponseWriter, r *http.Request) {
+	user, err := a.repository.Read(r.PathValue("id"))
+	if err != nil {
+		a.logger.Error().Err(err).Msg("")
+		e.ServerError(w, e.RespDBDataAccessFailure)
 		return
 	}
 
@@ -66,8 +68,8 @@ func (a *API) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) Create(w http.ResponseWriter, r *http.Request) {
-	form := &UserInput{}
-	if err := json.NewDecoder(r.Body).Decode(form); err != nil {
+	form, err := encoder.Decode[UserInput](r)
+	if err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.BadRequest(w, e.RespJSONDecodeFailure)
 		return
@@ -85,14 +87,14 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	newUser, err := CreateUser(form.ToModel())
+	newUser, err := a.repository.Create(form.ToModel())
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.ServerError(w, e.RespDBDataInsertFailure)
 		return
 	}
 
-	a.logger.Info().Int("id", newUser.ID).Msg("new user created")
+	a.logger.Info().Str("id", newUser.ID).Msg("new user created")
 
 	encoder.Encode(w, r, http.StatusCreated, newUser.ToDto())
 }

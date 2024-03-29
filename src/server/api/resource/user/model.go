@@ -3,10 +3,12 @@ package user
 import (
 	"strings"
 	"time"
+
+	"github.com/nrednav/cuid2"
 )
 
 type User struct {
-	ID           int    `gorm:"primaryKey" json:"id"`
+	ID           string `gorm:"primaryKey" json:"id"`
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	PasswordHash string `json:"password_hash"`
@@ -21,8 +23,10 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type Users []*User
+
 type UserDTO struct {
-	ID          int    `gorm:"primaryKey" json:"id"`
+	ID          string `json:"id"`
 	Username    string `json:"username"`
 	DisplayName string `json:"display_name"`
 	PictureUrl  string `json:"picture_url"`
@@ -30,6 +34,15 @@ type UserDTO struct {
 
 type UserInput struct {
 	Email string `json:"title" form:"required,max=255"`
+}
+
+func (us Users) ToDto() []*UserDTO {
+	dtos := make([]*UserDTO, len(us))
+	for i, v := range us {
+		dtos[i] = v.ToDto()
+	}
+
+	return dtos
 }
 
 func (u *User) ToDto() *UserDTO {
@@ -45,6 +58,7 @@ func (f *UserInput) ToModel() *User {
 	username := strings.Split(f.Email, "@")[0]
 
 	return &User{
+		ID:          cuid2.Generate(),
 		Email:       f.Email,
 		Username:    username,
 		DisplayName: username,
