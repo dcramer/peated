@@ -1,14 +1,13 @@
 package model
 
 import (
+	"strconv"
 	"strings"
 	"time"
-
-	"github.com/nrednav/cuid2"
 )
 
 type User struct {
-	ID           string `gorm:"primaryKey" json:"id"`
+	ID           uint64 `gorm:"primaryKey" json:"id"`
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	PasswordHash string `json:"password_hash"`
@@ -51,7 +50,7 @@ func (us Users) ToDto() []*UserDTO {
 
 func (u *User) ToDto() *UserDTO {
 	return &UserDTO{
-		ID:          u.ID,
+		ID:          strconv.FormatUint(u.ID, 10),
 		Username:    u.Username,
 		DisplayName: u.DisplayName,
 		PictureUrl:  u.PictureUrl,
@@ -62,7 +61,6 @@ func (f *UserInput) ToModel() *User {
 	username := strings.Split(f.Email, "@")[0]
 
 	return &User{
-		ID:          cuid2.Generate(),
 		Email:       f.Email,
 		Username:    username,
 		DisplayName: username,

@@ -3,10 +3,11 @@ package auth
 import (
 	"peated/config"
 	"peated/model"
+	"strconv"
 	"strings"
 
+	"github.com/go-errors/errors"
 	"github.com/golang-jwt/jwt"
-	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
@@ -32,12 +33,12 @@ func VerifyToken(config *config.Config, tokenString string) (*UserClaims, error)
 func GetUserFromHeader(config *config.Config, db *gorm.DB, header string) (*model.User, error) {
 	token := strings.Split(header, "Bearer ")[0]
 	if token == "" {
-		return &model.User{}, errors.Errorf("No token")
+		return &model.User{}, errors.Errorf("no token")
 	}
 
 	claims, err := VerifyToken(config, token)
 	if err != nil {
-		return &model.User{}, err
+		return &model.User{}, errors.Join(errors.Errorf("unable to verify token"), err)
 	}
 
 	user := &model.User{}
@@ -46,7 +47,7 @@ func GetUserFromHeader(config *config.Config, db *gorm.DB, header string) (*mode
 	}
 
 	if !user.Active {
-		return user, errors.Errorf("Inactive user")
+		return user, errors.Errorf("inactive user")
 	}
 
 	return user, err
@@ -54,7 +55,7 @@ func GetUserFromHeader(config *config.Config, db *gorm.DB, header string) (*mode
 
 func CreateAccessToken(config *config.Config, db *gorm.DB, user *model.User) (string, error) {
 	claims := UserClaims{
-		user.ID,
+		strconv.FormatUint(user.ID, 10),
 		jwt.StandardClaims{
 			ExpiresAt: 15000,
 			Issuer:    "peated",
@@ -62,7 +63,7 @@ func CreateAccessToken(config *config.Config, db *gorm.DB, user *model.User) (st
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(config.JwtSecret)
+	tokenString, err := token.SignedString([]byte(config.JwtSecret))
 
 	return tokenString, err
 }

@@ -11,19 +11,23 @@ export const authenticator = new Authenticator<SessionPayload | null>(
 authenticator.use(
   new FormStrategy(async ({ form, context }) => {
     if (!context) throw new Error("Where da context?");
-    const { trpc } = context;
+    const { api } = context;
     const email = form.get("email") as string;
     const password = form.get("password") as string;
     const code = form.get("code") as string;
 
     try {
       const session = code
-        ? await trpc.authGoogle.mutate({
-            code,
+        ? await api.post("/auth/google", {
+            data: {
+              code,
+            },
           })
-        : await trpc.authBasic.mutate({
-            email,
-            password,
+        : await api.post("/auth/basic", {
+            data: {
+              email,
+              password,
+            },
           });
 
       return session;

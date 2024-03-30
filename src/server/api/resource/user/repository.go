@@ -59,9 +59,27 @@ func (r *Repository) Create(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (r *Repository) Read(id string) (*model.User, error) {
+func (r *Repository) ReadById(id string) (*model.User, error) {
 	user := &model.User{}
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) ReadByEmail(email string) (*model.User, error) {
+	user := &model.User{}
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) ReadByUsername(username string) (*model.User, error) {
+	user := &model.User{}
+	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
 	}
 

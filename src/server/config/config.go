@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/joeshaw/envdecode"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -22,6 +23,11 @@ type ConfigDB struct {
 }
 
 func New() *Config {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	var c Config
 	if err := envdecode.StrictDecode(&c); err != nil {
 		log.Fatalf("Failed to decode: %s", err)

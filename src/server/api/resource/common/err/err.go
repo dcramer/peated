@@ -12,6 +12,8 @@ var (
 
 	RespJSONEncodeFailure = []byte(`{"error": "Unable to encode JSON"}`)
 	RespJSONDecodeFailure = []byte(`{"error": "Unable to decode JSON"}`)
+
+	RespInvalidCredentials = []byte(`{"error": "Invalid credentials"}`)
 )
 
 type Error struct {
@@ -35,4 +37,14 @@ func BadRequest(w http.ResponseWriter, error []byte) {
 func ValidationErrors(w http.ResponseWriter, reps []byte) {
 	w.WriteHeader(http.StatusUnprocessableEntity)
 	w.Write(reps)
+}
+
+func Unauthorized(w http.ResponseWriter, error []byte) {
+	w.WriteHeader(http.StatusUnauthorized)
+	w.Write(error)
+}
+
+func Fobidden(w http.ResponseWriter, error []byte) {
+	w.WriteHeader(http.StatusForbidden)
+	w.Write(error)
 }

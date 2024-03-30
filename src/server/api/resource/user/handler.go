@@ -32,7 +32,7 @@ func New(logger *zerolog.Logger, db *gorm.DB) func(chi.Router) {
 	return func(r chi.Router) {
 		r.With(httpin.NewInput(ListInput{})).Get("/", api.List)
 		r.Post("/", api.Create)
-		r.Get("/{id}", api.Get)
+		r.Get("/{username}", api.Get)
 	}
 }
 
@@ -71,7 +71,7 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) Get(w http.ResponseWriter, r *http.Request) {
-	user, err := a.repository.Read(r.PathValue("id"))
+	user, err := a.repository.ReadByUsername(r.PathValue("username"))
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.ServerError(w, e.RespDBDataAccessFailure)
@@ -109,7 +109,7 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.logger.Info().Str("id", newUser.ID).Msg("new user created")
+	a.logger.Info().Uint64("id", newUser.ID).Msg("new user created")
 
 	encoder.Encode(w, r, http.StatusCreated, newUser.ToDto())
 }

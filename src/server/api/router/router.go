@@ -1,6 +1,7 @@
 package router
 
 import (
+	"peated/api/resource/auth"
 	"peated/api/resource/health"
 	"peated/api/resource/user"
 	"peated/api/router/middleware"
@@ -24,6 +25,7 @@ func New(
 		r.Use(middleware.ContentTypeJSON)
 		r.Use(middleware.Auth(config, db))
 
+		r.Route("/auth", auth.New(config, logger, db))
 		r.Route("/users", user.New(logger, db))
 	})
 	return r
