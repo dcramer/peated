@@ -2,11 +2,13 @@ package model
 
 import (
 	"strconv"
-	"strings"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type User struct {
+	gorm.Model
 	ID           uint64 `gorm:"primaryKey" json:"id"`
 	Username     string `json:"username"`
 	Email        string `json:"email"`
@@ -15,11 +17,13 @@ type User struct {
 	PictureUrl   string `json:"picture_url"`
 
 	Private bool `json:"private"`
-	Active  bool `json:"active"`
+	Active  bool `json:"active" default:"true"`
 	Admin   bool `json:"admin"`
 	Mod     bool `json:"mod"`
 
 	CreatedAt time.Time `json:"created_at"`
+
+	Identities []Identity
 }
 
 func (User) TableName() string {
@@ -33,10 +37,6 @@ type UserDTO struct {
 	Username    string `json:"username"`
 	DisplayName string `json:"display_name"`
 	PictureUrl  string `json:"picture_url"`
-}
-
-type UserInput struct {
-	Email string `json:"title" form:"required,max=255"`
 }
 
 func (us Users) ToDto() []*UserDTO {
@@ -54,25 +54,5 @@ func (u *User) ToDto() *UserDTO {
 		Username:    u.Username,
 		DisplayName: u.DisplayName,
 		PictureUrl:  u.PictureUrl,
-	}
-}
-
-func (f *UserInput) ToModel() *User {
-	username := strings.Split(f.Email, "@")[0]
-
-	return &User{
-		Email:       f.Email,
-		Username:    username,
-		DisplayName: username,
-
-		// PictureUrl:   "",
-		// PasswordHash: "",
-
-		Private: false,
-		Active:  true,
-		Admin:   false,
-		Mod:     false,
-
-		CreatedAt: time.Now(),
 	}
 }

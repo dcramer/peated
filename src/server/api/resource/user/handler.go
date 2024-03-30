@@ -8,7 +8,6 @@ import (
 
 	"peated/api/resource/common/encoder"
 	e "peated/api/resource/common/err"
-	"peated/model"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
@@ -83,7 +82,7 @@ func (a *API) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) Create(w http.ResponseWriter, r *http.Request) {
-	form, err := encoder.Decode[model.UserInput](r)
+	form, err := encoder.Decode[UserInput](r)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.BadRequest(w, e.RespJSONDecodeFailure)

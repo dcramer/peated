@@ -95,6 +95,38 @@ func (r *Repository) Update(user *model.User) (int64, error) {
 	return result.RowsAffected, result.Error
 }
 
+func (r *Repository) UpsertWithIdentity(user *model.User, identity *model.Identity) (*model.User, error) {
+	existingUser := &model.User{}
+	if err := r.db.Where("identity.provider = ? and identity.external_id = ?", identity.Provider, identity.ExternalID).Joins("inner join identity on identity.user_id = user.id").First(&existingUser).Error; err == nil {
+		return existingUser, nil
+	}
+
+	if err := r.db.Where("user.email = ?", user.Email).First(&existingUser).Error; err != nil {
+		// user not found, create it
+		r.db.Transaction(func(tx *gorm.DB) error {
+			if err := tx.Create(user).Error; err != nil {
+				return err
+			}
+			identity.UserID = user.ID
+			if err := tx.Create(identity).Error; err != nil {
+				return err
+			}
+			return nil
+		})
+
+		return user, nil
+	}
+
+	// update existing user with identity
+	// TODO: handle race condition
+	identity.UserID = user.ID
+	if err := r.db.Create(identity).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (r *Repository) Delete(id string) (int64, error) {
 	result := r.db.Where("id = ?", id).Delete(&model.User{})
 

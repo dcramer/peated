@@ -1,6 +1,7 @@
 package router
 
 import (
+	"net/http"
 	"peated/api/resource/auth"
 	"peated/api/resource/health"
 	"peated/api/resource/user"
@@ -24,6 +25,10 @@ func New(
 	r.Route("/", func(r chi.Router) {
 		r.Use(middleware.ContentTypeJSON)
 		r.Use(middleware.Auth(config, db))
+
+		r.Get("/", func(w http.ResponseWriter, _ *http.Request) {
+			w.Write([]byte("{\"version\": \"" + config.Version + "\"}"))
+		})
 
 		r.Route("/auth", auth.New(config, logger, db))
 		r.Route("/users", user.New(logger, db))

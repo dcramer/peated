@@ -11,7 +11,9 @@ type Config struct {
 	Debug     bool   `env:"DEBUG,default=false"`
 	Port      int    `env:"PORT,default=4000"`
 	JwtSecret string `env:"JWT_SECRET"`
+	Version   string `envv:"VERSION"`
 	Database  ConfigDB
+	Google    ConfigGoogle
 }
 
 type ConfigDB struct {
@@ -20,6 +22,11 @@ type ConfigDB struct {
 	Username string `env:"DB_USER,default=postgres"`
 	Password string `env:"DB_PASS,default=postgres"`
 	Name     string `env:"DB_NAME,default=peated"`
+}
+
+type ConfigGoogle struct {
+	ClientID     string `env:"GOOGLE_CLIENT_ID"`
+	ClientSecret string `env:"GOOGLE_CLIENT_SECRET"`
 }
 
 func New() *Config {
