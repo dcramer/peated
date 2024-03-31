@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type ServingStyle string
@@ -15,7 +13,6 @@ const (
 )
 
 type Tasting struct {
-	gorm.Model
 	ID uint64 `gorm:"primaryKey" json:"id"`
 
 	BottleID     uint64       `json:"bottle_id"`

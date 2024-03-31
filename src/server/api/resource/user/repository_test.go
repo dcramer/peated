@@ -2,76 +2,86 @@ package user_test
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"os"
+	"path"
 	"peated/api/resource/user"
-	"peated/db/model"
+	"runtime"
 	"testing"
-	"time"
 
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/nrednav/cuid2"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"gorm.io/gorm"
 
-	mockDB "peated/mock/db"
-	testUtil "peated/util/test"
+	"peated/test"
 )
+
+var ctx context.Context
+var container *postgres.PostgresContainer
+
+func TestMain(m *testing.M) {
+	var err error
+
+	ctx = context.Background()
+
+	// TODO: how do we improve this
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "..", "..", "..")
+	fmt.Printf("dir %s", dir)
+	err = os.Chdir(dir)
+	if err != nil {
+		panic(err)
+	}
+
+	container, err = test.SetupContainer(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := container.Terminate(ctx); err != nil {
+			log.Fatalf("failed to terminate container: %s", err)
+		}
+	}()
+
+	os.Exit(m.Run())
+}
 
 func TestRepository_List(t *testing.T) {
 	t.Parallel()
 
-	db, mock, err := mockDB.NewMockDB()
-	testUtil.NoError(t, err)
+	db, err := test.InitDatabase(ctx, container)
 
-	repo := user.NewRepository(db)
+	test.NoError(t, err)
 
-	mockRows := sqlmock.NewRows([]string{"id", "username", "email"}).
-		AddRow(cuid2.Generate(), "foo", "foo@example.com").
-		AddRow(cuid2.Generate(), "bar", "bar@example.com")
+	err = db.Transaction(func(tx *gorm.DB) error {
+		repo := user.NewRepository(tx)
 
-	mock.ExpectQuery("^SELECT (.+) FROM \"user\"").WillReturnRows(mockRows)
+		users, err := repo.List(ctx, &user.ListParams{})
+		test.NoError(t, err)
+		test.Equal(t, len(users), 0)
 
-	ctx := context.Background()
+		return err
+	})
+	test.NoError(t, err)
 
-	users, err := repo.List(ctx, &user.ListParams{})
-	testUtil.NoError(t, err)
-	testUtil.Equal(t, len(users), 2)
 }
 
-func TestRepository_Create(t *testing.T) {
+func TestRepository_ReadById(t *testing.T) {
 	t.Parallel()
 
-	db, mock, err := mockDB.NewMockDB()
-	testUtil.NoError(t, err)
+	db, err := test.InitDatabase(ctx, container)
 
-	repo := user.NewRepository(db)
+	test.NoError(t, err)
 
-	id := cuid2.Generate()
-	mock.ExpectBegin()
-	mock.ExpectExec("^INSERT INTO \"user\" ").
-		WithArgs(id, "Username", "Email", "PasswordHash", "DisplayName", "PictureUrl", false, false, false, false, mockDB.AnyTime{}).
-		WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectCommit()
+	err = db.Transaction(func(tx *gorm.DB) error {
+		repo := user.NewRepository(tx)
 
-	user := &model.User{ID: id, Username: "Username", Email: "Email", PasswordHash: "PasswordHash", DisplayName: "DisplayName", PictureUrl: "PictureUrl", CreatedAt: time.Now()}
-	_, err = repo.Create(user)
-	testUtil.NoError(t, err)
-}
+		user, err := repo.ReadById(ctx, 1)
+		test.NoError(t, err)
+		test.Equal(t, "Foo Bar", user.DisplayName)
 
-func TestRepository_Read(t *testing.T) {
-	t.Parallel()
-
-	db, mock, err := mockDB.NewMockDB()
-	testUtil.NoError(t, err)
-
-	repo := user.NewRepository(db)
-
-	id := cuid2.Generate()
-	mockRows := sqlmock.NewRows([]string{"id", "username", "email", "display_name"}).
-		AddRow(id, "foo", "foo@example.com", "Foo Bar")
-
-	mock.ExpectQuery("^SELECT (.+) FROM \"user\" WHERE (.+) LIMIT (.+)").
-		WithArgs(id, 1).
-		WillReturnRows(mockRows)
-
-	user, err := repo.Read(id)
-	testUtil.NoError(t, err)
-	testUtil.Equal(t, "Foo Bar", user.DisplayName)
+		return nil
+	})
+	test.NoError(t, err)
 }

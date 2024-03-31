@@ -3,8 +3,6 @@ package model
 import (
 	"peated/db/column"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Category string
@@ -14,7 +12,6 @@ const (
 )
 
 type Bottle struct {
-	gorm.Model
 	ID        uint64   `gorm:"primaryKey" json:"id"`
 	FullName  string   `json:"full_name"`
 	Name      string   `json:"name"`

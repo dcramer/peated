@@ -20,7 +20,6 @@ const (
 
 var (
 	flags = flag.NewFlagSet("migrate", flag.ExitOnError)
-	dir   = flags.String("dir", "migrations", "directory with migration files")
 )
 
 func main() {
@@ -49,7 +48,7 @@ func main() {
 		}
 	}()
 
-	if err := goose.RunContext(context.Background(), command, db, *dir, args[1:]...); err != nil {
+	if err := goose.RunContext(context.Background(), command, db, "migrations", args[1:]...); err != nil {
 		log.Fatalf("migrate %v: %v", command, err)
 	}
 }

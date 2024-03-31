@@ -11,34 +11,21 @@ import (
 	"os/signal"
 	"peated/api/router"
 	"peated/config"
+	"peated/db"
 	"peated/util/logger"
 	"sync"
 	"time"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	gormlogger "gorm.io/gorm/logger"
 )
 
-const fmtDBString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
-
 // https://grafana.com/blog/2024/02/09/how-i-write-http-services-in-go-after-13-years/
-func run(ctx context.Context, stdout, stderr io.Writer, args []string) error {
+func run(ctx context.Context, _, stderr io.Writer, _ []string) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
 	config := config.New()
 	logger := logger.New(config.Debug)
 
-	var logLevel gormlogger.LogLevel
-	if config.Debug {
-		logLevel = gormlogger.Info
-	} else {
-		logLevel = gormlogger.Error
-	}
-
-	dbString := fmt.Sprintf(fmtDBString, config.Database.Host, config.Database.Username, config.Database.Password, config.Database.Name, config.Database.Port)
-	db, err := gorm.Open(postgres.Open(dbString), &gorm.Config{Logger: gormlogger.Default.LogMode(logLevel)})
+	db, err := db.Init(ctx, config)
 	if err != nil {
 		return err
 	}

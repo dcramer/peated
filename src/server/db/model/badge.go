@@ -2,8 +2,6 @@ package model
 
 import (
 	"peated/db/column"
-
-	"gorm.io/gorm"
 )
 
 type BadgeType string
@@ -15,7 +13,6 @@ const (
 )
 
 type Badge struct {
-	gorm.Model
 	ID     uint64       `gorm:"primaryKey" json:"id"`
 	Name   string       `json:"name"`
 	Type   BadgeType    `json:"type"`

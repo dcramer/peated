@@ -2,12 +2,9 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Collection struct {
-	gorm.Model
 	ID           uint64 `gorm:"primaryKey" json:"id"`
 	Name         string `json:"name"`
 	TotalBottles uint   `json:"total_bottles"`

@@ -2,11 +2,9 @@ package model
 
 import (
 	"gorm.io/datatypes"
-	"gorm.io/gorm"
 )
 
 type StorePriceHistory struct {
-	gorm.Model
 	ID      uint64         `gorm:"primaryKey" json:"id"`
 	PriceID uint64         `json:"price_id"`
 	Price   uint           `json:"price"`

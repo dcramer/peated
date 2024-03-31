@@ -2,12 +2,9 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Toast struct {
-	gorm.Model
 	ID        uint64 `gorm:"primaryKey" json:"id"`
 	TastingID uint64 `json:"tasting_id"`
 

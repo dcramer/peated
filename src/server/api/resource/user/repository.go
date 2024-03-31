@@ -59,7 +59,7 @@ func (r *Repository) Create(ctx context.Context, user *model.User) (*model.User,
 	return user, nil
 }
 
-func (r *Repository) ReadById(ctx context.Context, id string) (*model.User, error) {
+func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.User, error) {
 	user := &model.User{}
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err

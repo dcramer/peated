@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type EntityType string
@@ -15,7 +13,6 @@ const (
 )
 
 type Entity struct {
-	gorm.Model
 	ID        uint64       `gorm:"primaryKey" json:"id"`
 	Name      string       `json:"name"`
 	ShortName string       `json:"short_name"`

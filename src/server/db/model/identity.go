@@ -1,7 +1,5 @@
 package model
 
-import "gorm.io/gorm"
-
 type IdentityProvider string
 
 const (
@@ -9,7 +7,6 @@ const (
 )
 
 type Identity struct {
-	gorm.Model
 	ID         uint64           `gorm:"primaryKey" json:"id"`
 	Provider   IdentityProvider `json:"provider"`
 	ExternalID string           `json:"external_id"`

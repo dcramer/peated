@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type FollowStatus string
@@ -15,7 +13,6 @@ const (
 )
 
 type Follow struct {
-	gorm.Model
 	ID         uint64       `gorm:"primaryKey" json:"id"`
 	FromUserID uint64       `json:"from_user_id"`
 	ToUserID   uint64       `json:"to_user_id"`

@@ -2,12 +2,9 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type BadgeAward struct {
-	gorm.Model
 	ID        uint64    `gorm:"primaryKey" json:"id"`
 	BadgeID   uint64    `json:"badge_id"`
 	UserID    uint64    `json:"user_id"`

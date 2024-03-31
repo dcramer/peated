@@ -2,12 +2,9 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type StorePrice struct {
-	gorm.Model
 	ID             uint64 `gorm:"primaryKey" json:"id"`
 	ExternalSiteID uint64 `json:"external_site_id"`
 	Name           string `json:"name"`

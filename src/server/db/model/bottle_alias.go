@@ -1,9 +1,6 @@
 package model
 
-import "gorm.io/gorm"
-
 type BottleAlias struct {
-	gorm.Model
 	Name     string `json:"name" gorm:"primaryKey"`
 	BottleID uint64 `json:"bottle_id"`
 

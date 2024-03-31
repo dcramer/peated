@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type NotificationType string
@@ -15,7 +13,6 @@ const (
 )
 
 type Notification struct {
-	gorm.Model
 	ID         uint64           `gorm:"primaryKey" json:"id"`
 	UserID     uint64           `json:"user_id"`
 	FromUserID uint64           `json:"from_user_id"`

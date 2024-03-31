@@ -3,8 +3,6 @@ package model
 import (
 	"peated/db/column"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type ChangeType string
@@ -27,7 +25,6 @@ const (
 )
 
 type Change struct {
-	gorm.Model
 	ID          uint64       `gorm:"primaryKey" json:"id"`
 	ObjectID    uint64       `json:"object_id"`
 	ObjectType  ObjectType   `json:"object_type"`

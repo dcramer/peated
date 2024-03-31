@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type ExternalSiteType string
@@ -19,7 +17,6 @@ const (
 )
 
 type ExternalSite struct {
-	gorm.Model
 	ID        uint64           `gorm:"primaryKey" json:"id"`
 	Type      ExternalSiteType `json:"type"`
 	Name      string           `json:"name"`

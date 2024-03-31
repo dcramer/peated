@@ -6,7 +6,7 @@ import (
 
 func NoError(t *testing.T, err error) {
 	if err != nil {
-		t.Fatalf("err: %e", err)
+		t.Fatalf("err: %s %e", err.Error(), err)
 	}
 }
 

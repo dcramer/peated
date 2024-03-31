@@ -2,12 +2,9 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Flight struct {
-	gorm.Model
 	ID          uint64 `gorm:"primaryKey" json:"id"`
 	PublicID    string `json:"public_id"`
 	Name        string `json:"name"`
