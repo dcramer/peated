@@ -1,0 +1,30 @@
+package model
+
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
+type StorePrice struct {
+	gorm.Model
+	ID             uint64 `gorm:"primaryKey" json:"id"`
+	ExternalSiteID uint64 `json:"external_site_id"`
+	Name           string `json:"name"`
+	BottleID       uint64 `json:"bottle_id"`
+	Price          uint   `json:"price"`
+	Volume         uint   `json:"volume"`
+	Url            string `json:"url"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+
+	ExternalSite ExternalSite
+	Bottle       Bottle
+}
+
+func (StorePrice) TableName() string {
+	return "store_price"
+}
+
+type StorePrices []*StorePrice

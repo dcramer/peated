@@ -11,12 +11,14 @@ require (
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/joeshaw/envdecode v0.0.0-20200121155833-099f1fc765bd
 	github.com/joho/godotenv v1.5.1
+	github.com/lib/pq v1.10.9
 	github.com/nrednav/cuid2 v1.0.0
 	github.com/pressly/goose/v3 v3.19.2
 	github.com/rs/zerolog v1.32.0
 	golang.org/x/crypto v0.21.0
 	golang.org/x/oauth2 v0.18.0
 	google.golang.org/api v0.126.0
+	gorm.io/datatypes v1.2.0
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.9
 )
@@ -24,7 +26,9 @@ require (
 require (
 	cloud.google.com/go/compute v1.23.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/ggicci/owl v0.7.0 // indirect
+	github.com/go-sql-driver/mysql v1.8.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/s2a-go v0.1.4 // indirect
@@ -48,4 +52,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231106174013-bbf56f31fb17 // indirect
 	google.golang.org/grpc v1.59.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
+	gorm.io/driver/mysql v1.4.7 // indirect
 )

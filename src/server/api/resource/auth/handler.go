@@ -152,18 +152,13 @@ func (a *API) AuthGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//     await db.insert(identities).values({
-	//       provider: "google",
-	//       externalId: payload.sub,
-	//       userId: foundUser.id,
-	//     });
 	currentUser, err := a.repository.UpsertWithIdentity(ctx, &model.User{
 		DisplayName: claims.GivenName,
 		Username:    strings.Split(claims.Email, "@")[0],
 		Email:       claims.Email,
 		Active:      true,
 	}, &model.Identity{
-		Provider:   "google",
+		Provider:   model.IdentityProviderGoogle,
 		ExternalID: claims.Sub,
 	})
 	if err != nil {
