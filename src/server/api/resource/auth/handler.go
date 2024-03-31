@@ -7,9 +7,9 @@ import (
 	"peated/api/resource/common/encoder"
 	e "peated/api/resource/common/err"
 	"peated/api/resource/user"
+	"peated/auth"
 	"peated/config"
-	"peated/model"
-	"peated/util/auth"
+	"peated/db/model"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -54,33 +54,33 @@ func (a *API) AuthEmailPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := a.repository.ReadByEmail(form.Email)
+	currentUser, err := a.repository.ReadByEmail(form.Email)
 	if err != nil {
 		a.logger.Error().Str("email", form.Email).Err(err).Msg("no matching user found")
 		e.Unauthorized(w, e.RespInvalidCredentials)
 		return
 	}
 
-	if len(user.PasswordHash) == 0 {
+	if len(currentUser.PasswordHash) == 0 {
 		a.logger.Error().Str("email", form.Email).Msg("no password set")
 
 		e.Unauthorized(w, e.RespInvalidCredentials)
 		return
 	}
 
-	if !CheckPasswordHash(form.Password, user.PasswordHash) {
+	if !CheckPasswordHash(form.Password, currentUser.PasswordHash) {
 		a.logger.Error().Str("email", form.Email).Msg("password mismatch")
 		e.Unauthorized(w, e.RespInvalidCredentials)
 		return
 	}
 
-	if !user.Active {
+	if !currentUser.Active {
 		a.logger.Error().Str("email", form.Email).Msg("user inactive")
 		e.Unauthorized(w, e.RespInvalidCredentials)
 		return
 	}
 
-	accessToken, err := auth.CreateAccessToken(a.config, a.db, user)
+	accessToken, err := auth.CreateAccessToken(a.config, a.db, currentUser)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create token")
 		e.Unauthorized(w, e.RespInvalidCredentials)
@@ -88,7 +88,7 @@ func (a *API) AuthEmailPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auth := &AuthDTO{
-		User:        user.ToDto(),
+		User:        user.DTOFromUser(currentUser),
 		AccessToken: accessToken,
 	}
 
@@ -156,13 +156,13 @@ func (a *API) AuthGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := model.User{
+	userDetails := model.User{
 		DisplayName: claims.GivenName,
 		Username:    strings.Split(claims.Email, "@")[0],
 		Email:       claims.Email,
 		Active:      true,
 	}
-	identity := model.Identity{
+	identityDetails := model.Identity{
 		Provider:   "google",
 		ExternalID: claims.Sub,
 	}
@@ -171,20 +171,20 @@ func (a *API) AuthGoogle(w http.ResponseWriter, r *http.Request) {
 	//       externalId: payload.sub,
 	//       userId: foundUser.id,
 	//     });
-	newUser, err := a.repository.UpsertWithIdentity(&user, &identity)
+	currentUser, err := a.repository.UpsertWithIdentity(&userDetails, &identityDetails)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create user from token")
 		e.Unauthorized(w, e.RespInvalidCredentials)
 		return
 	}
 
-	if !user.Active {
+	if !currentUser.Active {
 		a.logger.Error().Msg("user inactive")
 		e.Unauthorized(w, e.RespInvalidCredentials)
 		return
 	}
 
-	accessToken, err := auth.CreateAccessToken(a.config, a.db, newUser)
+	accessToken, err := auth.CreateAccessToken(a.config, a.db, currentUser)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create token")
 		e.Unauthorized(w, e.RespInvalidCredentials)
@@ -192,7 +192,7 @@ func (a *API) AuthGoogle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auth := &AuthDTO{
-		User:        user.ToDto(),
+		User:        user.DTOFromUser(currentUser),
 		AccessToken: accessToken,
 	}
 

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"strconv"
 	"time"
 
 	"gorm.io/gorm"
@@ -31,28 +30,3 @@ func (User) TableName() string {
 }
 
 type Users []*User
-
-type UserDTO struct {
-	ID          string `json:"id"`
-	Username    string `json:"username"`
-	DisplayName string `json:"display_name"`
-	PictureUrl  string `json:"picture_url"`
-}
-
-func (us Users) ToDto() []*UserDTO {
-	dtos := make([]*UserDTO, len(us))
-	for i, v := range us {
-		dtos[i] = v.ToDto()
-	}
-
-	return dtos
-}
-
-func (u *User) ToDto() *UserDTO {
-	return &UserDTO{
-		ID:          strconv.FormatUint(u.ID, 10),
-		Username:    u.Username,
-		DisplayName: u.DisplayName,
-		PictureUrl:  u.PictureUrl,
-	}
-}

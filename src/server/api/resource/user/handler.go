@@ -30,7 +30,7 @@ func New(logger *zerolog.Logger, db *gorm.DB) func(chi.Router) {
 	}
 	return func(r chi.Router) {
 		r.With(httpin.NewInput(ListInput{})).Get("/", api.List)
-		r.Post("/", api.Create)
+		// r.Post("/", api.Create)
 		r.Get("/{username}", api.Get)
 	}
 }
@@ -61,7 +61,7 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := encoder.Encode(w, r, http.StatusOK, users.ToDto()); err != nil {
+	if err := encoder.Encode(w, r, http.StatusOK, DTOFromUsers(users)); err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.ServerError(w, e.RespJSONEncodeFailure)
 		return
@@ -77,38 +77,38 @@ func (a *API) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encoder.Encode(w, r, http.StatusOK, user.ToDto())
+	encoder.Encode(w, r, http.StatusOK, DTOFromUser(user))
 
 }
 
-func (a *API) Create(w http.ResponseWriter, r *http.Request) {
-	form, err := encoder.Decode[UserInput](r)
-	if err != nil {
-		a.logger.Error().Err(err).Msg("")
-		e.BadRequest(w, e.RespJSONDecodeFailure)
-		return
-	}
+// func (a *API) Create(w http.ResponseWriter, r *http.Request) {
+// 	form, err := encoder.Decode[UserInput](r)
+// 	if err != nil {
+// 		a.logger.Error().Err(err).Msg("")
+// 		e.BadRequest(w, e.RespJSONDecodeFailure)
+// 		return
+// 	}
 
-	// if err := a.validator.Struct(form); err != nil {
-	// 	respBody, err := json.Marshal(validatorUtil.ToErrResponse(err))
-	// 	if err != nil {
-	// 		a.logger.Error().Err(err).Msg("")
-	// 		e.ServerError(w, e.RespJSONEncodeFailure)
-	// 		return
-	// 	}
+// 	// if err := a.validator.Struct(form); err != nil {
+// 	// 	respBody, err := json.Marshal(validatorUtil.ToErrResponse(err))
+// 	// 	if err != nil {
+// 	// 		a.logger.Error().Err(err).Msg("")
+// 	// 		e.ServerError(w, e.RespJSONEncodeFailure)
+// 	// 		return
+// 	// 	}
 
-	// 	e.ValidationErrors(w, respBody)
-	// 	return
-	// }
+// 	// 	e.ValidationErrors(w, respBody)
+// 	// 	return
+// 	// }
 
-	newUser, err := a.repository.Create(form.ToModel())
-	if err != nil {
-		a.logger.Error().Err(err).Msg("")
-		e.ServerError(w, e.RespDBDataInsertFailure)
-		return
-	}
+// 	newUser, err := a.repository.Create(form.ToModel())
+// 	if err != nil {
+// 		a.logger.Error().Err(err).Msg("")
+// 		e.ServerError(w, e.RespDBDataInsertFailure)
+// 		return
+// 	}
 
-	a.logger.Info().Uint64("id", newUser.ID).Msg("new user created")
+// 	a.logger.Info().Uint64("id", newUser.ID).Msg("new user created")
 
-	encoder.Encode(w, r, http.StatusCreated, newUser.ToDto())
-}
+// 	encoder.Encode(w, r, http.StatusCreated, newUser.ToDto())
+// }

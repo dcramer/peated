@@ -1,6 +1,8 @@
 package auth
 
-import "peated/model"
+import (
+	"peated/api/resource/user"
+)
 
 type EmailPasswordInput struct {
 	Email    string `json:"email"`
@@ -12,8 +14,8 @@ type CodeInput struct {
 }
 
 type AuthDTO struct {
-	User        *model.UserDTO `json:"user"`
-	AccessToken string         `json:"accessToken"`
+	User        *user.UserDTO `json:"user"`
+	AccessToken string        `json:"accessToken"`
 }
 
 type GoogleClaims struct {

@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"peated/model"
-	ctxUtil "peated/util/ctx"
+	"peated/auth"
+	"peated/db/model"
 )
 
 type Repository struct {
@@ -27,7 +27,7 @@ type ListParams struct {
 }
 
 func (r *Repository) List(ctx context.Context, params *ListParams) (model.Users, error) {
-	user, _ := ctxUtil.CurrentUser(ctx)
+	user, _ := auth.CurrentUser(ctx)
 
 	clauses := make([]clause.Expression, 0)
 

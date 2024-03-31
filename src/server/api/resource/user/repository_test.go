@@ -3,7 +3,7 @@ package user_test
 import (
 	"context"
 	"peated/api/resource/user"
-	"peated/model"
+	"peated/db/model"
 	"testing"
 	"time"
 

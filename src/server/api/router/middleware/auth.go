@@ -2,9 +2,8 @@ package middleware
 
 import (
 	"net/http"
+	"peated/auth"
 	"peated/config"
-	"peated/util/auth"
-	ctxUtil "peated/util/ctx"
 
 	"gorm.io/gorm"
 )
@@ -19,7 +18,7 @@ func Auth(config *config.Config, db *gorm.DB) func(http.Handler) http.Handler {
 			headerValue := r.Header.Get(authorizationHeaderKey)
 			if headerValue != "" {
 				if user, err := auth.GetUserFromHeader(config, db, headerValue); err != nil {
-					ctx = ctxUtil.SetCurrentUser(ctx, user)
+					ctx = auth.SetCurrentUser(ctx, user)
 				} else {
 
 				}

@@ -1,8 +1,8 @@
-package ctx
+package auth
 
 import (
 	"context"
-	"peated/model"
+	"peated/db/model"
 )
 
 const userKey key = "user"
