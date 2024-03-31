@@ -51,7 +51,7 @@ func (r *Repository) List(ctx context.Context, params *ListParams) (model.Users,
 	return users, nil
 }
 
-func (r *Repository) Create(user *model.User) (*model.User, error) {
+func (r *Repository) Create(ctx context.Context, user *model.User) (*model.User, error) {
 	if err := r.db.Create(user).Error; err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (r *Repository) Create(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (r *Repository) ReadById(id string) (*model.User, error) {
+func (r *Repository) ReadById(ctx context.Context, id string) (*model.User, error) {
 	user := &model.User{}
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (r *Repository) ReadById(id string) (*model.User, error) {
 	return user, nil
 }
 
-func (r *Repository) ReadByEmail(email string) (*model.User, error) {
+func (r *Repository) ReadByEmail(ctx context.Context, email string) (*model.User, error) {
 	user := &model.User{}
 	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func (r *Repository) ReadByEmail(email string) (*model.User, error) {
 	return user, nil
 }
 
-func (r *Repository) ReadByUsername(username string) (*model.User, error) {
+func (r *Repository) ReadByUsername(ctx context.Context, username string) (*model.User, error) {
 	user := &model.User{}
 	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
@@ -86,7 +86,7 @@ func (r *Repository) ReadByUsername(username string) (*model.User, error) {
 	return user, nil
 }
 
-func (r *Repository) Update(user *model.User) (int64, error) {
+func (r *Repository) Update(ctx context.Context, user *model.User) (int64, error) {
 	result := r.db.Model(&model.User{}).
 		// Select("Username", "Email", "DisplayName", "PictureUrl").
 		Where("id = ?", user.ID).
@@ -95,7 +95,7 @@ func (r *Repository) Update(user *model.User) (int64, error) {
 	return result.RowsAffected, result.Error
 }
 
-func (r *Repository) UpsertWithIdentity(user *model.User, identity *model.Identity) (*model.User, error) {
+func (r *Repository) UpsertWithIdentity(ctx context.Context, user *model.User, identity *model.Identity) (*model.User, error) {
 	existingUser := &model.User{}
 	if err := r.db.Where("identity.provider = ? and identity.external_id = ?", identity.Provider, identity.ExternalID).Joins("inner join identity on identity.user_id = user.id").First(&existingUser).Error; err == nil {
 		return existingUser, nil

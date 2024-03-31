@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"peated/api/resource/common/encoder"
@@ -54,7 +53,7 @@ func (a *API) AuthEmailPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser, err := a.repository.ReadByEmail(form.Email)
+	currentUser, err := a.repository.ReadByEmail(r.Context(), form.Email)
 	if err != nil {
 		a.logger.Error().Str("email", form.Email).Err(err).Msg("no matching user found")
 		e.Unauthorized(w, e.RespInvalidCredentials)
@@ -87,10 +86,7 @@ func (a *API) AuthEmailPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	auth := &AuthDTO{
-		User:        user.DTOFromUser(currentUser),
-		AccessToken: accessToken,
-	}
+	auth := DTOFromUser(r.Context(), currentUser, accessToken)
 
 	encoder.Encode(w, r, http.StatusOK, auth)
 }
@@ -114,7 +110,7 @@ func (a *API) AuthGoogle(w http.ResponseWriter, r *http.Request) {
 		Endpoint: google.Endpoint,
 	}
 
-	ctx := context.Background()
+	ctx := r.Context()
 	token, err := conf.Exchange(ctx, form.Code)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("failed to exchange token")
@@ -156,22 +152,20 @@ func (a *API) AuthGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userDetails := model.User{
-		DisplayName: claims.GivenName,
-		Username:    strings.Split(claims.Email, "@")[0],
-		Email:       claims.Email,
-		Active:      true,
-	}
-	identityDetails := model.Identity{
-		Provider:   "google",
-		ExternalID: claims.Sub,
-	}
 	//     await db.insert(identities).values({
 	//       provider: "google",
 	//       externalId: payload.sub,
 	//       userId: foundUser.id,
 	//     });
-	currentUser, err := a.repository.UpsertWithIdentity(&userDetails, &identityDetails)
+	currentUser, err := a.repository.UpsertWithIdentity(ctx, &model.User{
+		DisplayName: claims.GivenName,
+		Username:    strings.Split(claims.Email, "@")[0],
+		Email:       claims.Email,
+		Active:      true,
+	}, &model.Identity{
+		Provider:   "google",
+		ExternalID: claims.Sub,
+	})
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create user from token")
 		e.Unauthorized(w, e.RespInvalidCredentials)
@@ -191,10 +185,7 @@ func (a *API) AuthGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	auth := &AuthDTO{
-		User:        user.DTOFromUser(currentUser),
-		AccessToken: accessToken,
-	}
+	auth := DTOFromUser(r.Context(), currentUser, accessToken)
 
 	encoder.Encode(w, r, http.StatusOK, auth)
 }

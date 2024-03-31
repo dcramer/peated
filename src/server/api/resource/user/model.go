@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"peated/db/model"
 	"strconv"
 )
@@ -40,16 +41,16 @@ type UserDTO struct {
 	PictureUrl  string `json:"picture_url"`
 }
 
-func DTOFromUsers(us model.Users) []*UserDTO {
+func DTOFromUsers(ctx context.Context, us model.Users) []*UserDTO {
 	dtos := make([]*UserDTO, len(us))
 	for i, v := range us {
-		dtos[i] = DTOFromUser(v)
+		dtos[i] = DTOFromUser(ctx, v)
 	}
 
 	return dtos
 }
 
-func DTOFromUser(u *model.User) *UserDTO {
+func DTOFromUser(ctx context.Context, u *model.User) *UserDTO {
 	return &UserDTO{
 		ID:          strconv.FormatUint(u.ID, 10),
 		Username:    u.Username,

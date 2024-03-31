@@ -42,9 +42,10 @@ type ListInput struct {
 }
 
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
-	input := r.Context().Value(httpin.Input).(*ListInput)
+	ctx := r.Context()
+	input := ctx.Value(httpin.Input).(*ListInput)
 
-	users, err := a.repository.List(r.Context(), &ListParams{
+	users, err := a.repository.List(ctx, &ListParams{
 		Query:  input.Query,
 		Cursor: input.Cursor,
 		Limit:  input.Limit,
@@ -61,7 +62,7 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := encoder.Encode(w, r, http.StatusOK, DTOFromUsers(users)); err != nil {
+	if err := encoder.Encode(w, r, http.StatusOK, DTOFromUsers(ctx, users)); err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.ServerError(w, e.RespJSONEncodeFailure)
 		return
@@ -70,14 +71,15 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) Get(w http.ResponseWriter, r *http.Request) {
-	user, err := a.repository.ReadByUsername(r.PathValue("username"))
+	ctx := r.Context()
+	user, err := a.repository.ReadByUsername(ctx, r.PathValue("username"))
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.ServerError(w, e.RespDBDataAccessFailure)
 		return
 	}
 
-	encoder.Encode(w, r, http.StatusOK, DTOFromUser(user))
+	encoder.Encode(w, r, http.StatusOK, DTOFromUser(ctx, user))
 
 }
 
