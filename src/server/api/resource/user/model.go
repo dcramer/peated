@@ -34,11 +34,27 @@ type UserInput struct {
 // 	}
 // }
 
+type FriendStatus string
+
+const (
+	FriendStatusNone      FriendStatus = "none"
+	FriendStatusPending   FriendStatus = "pending"
+	FriendStatusFollowing FriendStatus = "following"
+)
+
 type UserDTO struct {
 	ID          string `json:"id"`
 	Username    string `json:"username"`
-	DisplayName string `json:"display_name"`
-	PictureUrl  string `json:"picture_url"`
+	DisplayName string `json:"displayName"`
+	PictureUrl  string `json:"pictureUrl"`
+	Private     bool   `json:"private"`
+
+	// optional bits
+	Email        string       `json:"email"`
+	Admin        bool         `json:"admin"`
+	Mod          bool         `json:"mod"`
+	CreatedAt    string       `json:"createdAt"`
+	FriendStatus FriendStatus `json:"friendStatus"`
 }
 
 func DTOFromUsers(ctx context.Context, us model.Users) []*UserDTO {

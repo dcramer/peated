@@ -14,6 +14,8 @@ var (
 	RespJSONDecodeFailure = []byte(`{"error": "Unable to decode JSON"}`)
 
 	RespInvalidCredentials = []byte(`{"error": "Invalid credentials"}`)
+
+	RespUnknownServerError = []byte(`{"error": "Unhandled internal error}`)
 )
 
 type Error struct {

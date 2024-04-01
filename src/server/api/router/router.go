@@ -7,8 +7,10 @@ import (
 	"peated/api/resource/user"
 	"peated/api/router/middleware"
 	"peated/config"
+	"time"
 
 	"github.com/go-chi/chi/v5"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
 )
@@ -21,8 +23,30 @@ func New(
 	// anotherStore *anotherStore
 ) *chi.Mux {
 	r := chi.NewRouter()
-	r.Route("/healthz", health.New(logger))
+
+	r.Use(chiMiddleware.RequestID)
+	r.Use(chiMiddleware.RealIP)
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.Recoverer)
+
+	// Set a timeout value on the request context (ctx), that will signal
+	// through ctx.Done() that the request has timed out and further
+	// processing should be stopped.
+	r.Use(chiMiddleware.Timeout(60 * time.Second))
+
+	r.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("{\"errror\": \"method not allowed on resource\"}"))
+	})
+
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("{\"errror\": \"resource not found\"}"))
+	})
+
+	r.Route("/_health", health.New(logger))
 	r.Route("/", func(r chi.Router) {
+
 		r.Use(middleware.ContentTypeJSON)
 		r.Use(middleware.Auth(config, db))
 

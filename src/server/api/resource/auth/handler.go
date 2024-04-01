@@ -40,12 +40,34 @@ func New(config *config.Config, logger *zerolog.Logger, db *gorm.DB) func(chi.Ro
 		repository: user.NewRepository(db),
 	}
 	return func(r chi.Router) {
-		r.Post("/basic", api.AuthEmailPassword)
-		r.Post("/google", api.AuthGoogle)
+		r.Get("/", api.Read)
+		r.Post("/basic", api.EmailPassword)
+		r.Post("/google", api.Google)
 	}
 }
 
-func (a *API) AuthEmailPassword(w http.ResponseWriter, r *http.Request) {
+/**
+ * Read currently authenticated user.
+ */
+func (a *API) Read(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	user, ok := auth.CurrentUser(ctx)
+	if !ok {
+		a.logger.Error().Msg("no matching user found")
+		e.Unauthorized(w, e.RespInvalidCredentials)
+		return
+	}
+
+	if !user.Active {
+		a.logger.Error().Msg("user inactive")
+		e.Unauthorized(w, e.RespInvalidCredentials)
+		return
+	}
+
+	encoder.Encode(w, r, http.StatusOK, DTOFromUser(ctx, user, ""))
+}
+
+func (a *API) EmailPassword(w http.ResponseWriter, r *http.Request) {
 	form, err := encoder.Decode[EmailPasswordInput](r)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("invalid input")
@@ -91,7 +113,7 @@ func (a *API) AuthEmailPassword(w http.ResponseWriter, r *http.Request) {
 	encoder.Encode(w, r, http.StatusOK, auth)
 }
 
-func (a *API) AuthGoogle(w http.ResponseWriter, r *http.Request) {
+func (a *API) Google(w http.ResponseWriter, r *http.Request) {
 	form, err := encoder.Decode[CodeInput](r)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("invalid input")
