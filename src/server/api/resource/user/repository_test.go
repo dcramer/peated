@@ -10,6 +10,7 @@ import (
 	"peated/test"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -29,17 +30,17 @@ func (suite *UserRepositoryTestSuite) TestRepository_List() {
 	user1, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
 		u.DisplayName = "foo"
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	user2, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
 		u.DisplayName = "bar"
 	})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	repo := user.NewRepository(suite.DB)
 
 	users, err := repo.List(ctx, &user.ListParams{Limit: 100})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, len(users), 2)
 	assert.Equal(t, users[0].ID, user2.ID)
 	assert.Equal(t, users[1].ID, user1.ID)
@@ -51,18 +52,19 @@ func (suite *UserRepositoryTestSuite) TestRepository_ReadById() {
 	ctx := context.Background()
 
 	_, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	user1, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	repo := user.NewRepository(suite.DB)
 
 	user, err := repo.ReadById(ctx, user1.ID)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, user.ID, user1.ID)
 
 	_, err = repo.ReadById(ctx, user1.ID+1)
-	assert.Error(t, err)
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "record not found")
 }
 
 func (suite *UserRepositoryTestSuite) TestRepository_ReadByUsername() {
@@ -71,16 +73,17 @@ func (suite *UserRepositoryTestSuite) TestRepository_ReadByUsername() {
 	ctx := context.Background()
 
 	_, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	user1, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	repo := user.NewRepository(suite.DB)
 
 	user, err := repo.ReadByUsername(ctx, user1.Username)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, user.ID, user1.ID)
 
 	_, err = repo.ReadByUsername(ctx, "_")
-	assert.Error(t, err)
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "record not found")
 }
