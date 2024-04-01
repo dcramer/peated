@@ -43,7 +43,7 @@ func (r *Repository) List(ctx context.Context, params *ListParams) (model.Users,
 		return users, nil
 	}
 
-	query := r.db.Clauses(clauses...).Offset(params.Cursor).Limit(params.Limit).Order("display_name asc").Find(&users)
+	query := r.db.Clauses(clauses...).Offset(params.Cursor).Limit(params.Limit).Order("display_name ASC").Find(&users)
 	if err := query.Error; err != nil {
 		return users, err
 	}

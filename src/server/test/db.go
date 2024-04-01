@@ -2,11 +2,16 @@ package test
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
+	"path"
 	"peated/config"
+	"runtime"
 	"time"
 
 	"github.com/pressly/goose/v3"
+	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -43,6 +48,15 @@ func SetupContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
 }
 
 func RunMigrations(ctx context.Context, c *postgres.PostgresContainer) error {
+	// 	// TODO: how do we improve this
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "..")
+	fmt.Printf("dir %s", dir)
+	err := os.Chdir(dir)
+	if err != nil {
+		return err
+	}
+
 	connectionString, err := c.ConnectionString(ctx)
 	if err != nil {
 		return err
@@ -76,4 +90,46 @@ func InitDatabase(ctx context.Context, c *postgres.PostgresContainer) (*gorm.DB,
 	}
 
 	return db, nil
+}
+
+type DatabaseTestSuite struct {
+	suite.Suite
+
+	ctx       context.Context
+	container *postgres.PostgresContainer
+	dbConn    *gorm.DB
+	DB        *gorm.DB
+}
+
+// TODO: lets just use our local container and bootstrap a test db?
+func (suite *DatabaseTestSuite) SetupSuite() {
+	suite.ctx = context.Background()
+
+	container, err := SetupContainer(suite.ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+		panic(err)
+	}
+
+	db, err := InitDatabase(suite.ctx, container)
+	if err != nil {
+		panic(err)
+	}
+
+	suite.container = container
+	suite.dbConn = db
+}
+
+func (suite *DatabaseTestSuite) SetupTest() {
+	suite.DB = suite.dbConn.Begin()
+}
+
+func (suite *DatabaseTestSuite) TearDownTest() {
+	suite.DB.Rollback()
+}
+
+func (suite *DatabaseTestSuite) TearDownSuite() {
+	if err := suite.container.Terminate(suite.ctx); err != nil {
+		log.Fatalf("failed to terminate container: %s", err)
+	}
 }
