@@ -101,7 +101,7 @@ func (a *API) EmailPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, err := auth.CreateAccessToken(a.config, a.db, currentUser)
+	accessToken, err := auth.CreateAccessToken(a.config, currentUser)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create token")
 		e.Unauthorized(w, e.RespInvalidCredentials)
@@ -195,7 +195,7 @@ func (a *API) Google(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, err := auth.CreateAccessToken(a.config, a.db, currentUser)
+	accessToken, err := auth.CreateAccessToken(a.config, currentUser)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create token")
 		e.Unauthorized(w, e.RespInvalidCredentials)

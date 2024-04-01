@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewServer(db *gorm.DB) *chi.Mux {
+func NewHandler(db *gorm.DB) *chi.Mux {
 	config := NewConfig()
 	logger := logger.New(config.Debug)
 
@@ -42,7 +42,7 @@ type HandlerTestSuite struct {
 
 func (suite *HandlerTestSuite) Request(method string, url string, body io.Reader) *httptest.ResponseRecorder {
 	// TODO: this should be bound once in SetupTest but we need to have it also run the DatabaseTestSuite setup
-	server := NewServer(suite.DB)
+	server := NewHandler(suite.DB)
 
 	req, _ := http.NewRequest(method, url, body)
 
@@ -53,7 +53,7 @@ func (suite *HandlerTestSuite) Request(method string, url string, body io.Reader
 
 func (suite *HandlerTestSuite) RequestWithHandler(method string, url string, body io.Reader, handler func(*http.Request)) *httptest.ResponseRecorder {
 	// TODO: this should be bound once in SetupTest but we need to have it also run the DatabaseTestSuite setup
-	server := NewServer(suite.DB)
+	server := NewHandler(suite.DB)
 
 	req, _ := http.NewRequest(method, url, body)
 

@@ -13,7 +13,12 @@ import (
 )
 
 func DefaultAuthorization(ctx context.Context, db *gorm.DB, c *config.Config) string {
-	user := NewUser(ctx, db, func(u *model.User) {
+	user := DefaultUser(ctx, db)
+	return NewAuthorization(ctx, c, user)
+}
+
+func DefaultUser(ctx context.Context, db *gorm.DB) *model.User {
+	return NewUser(ctx, db, func(u *model.User) {
 		u.Email = "fizz.buzz@example.com"
 		u.DisplayName = "Fizzy Buzz"
 		u.Username = "fizz.buzz"
@@ -22,11 +27,10 @@ func DefaultAuthorization(ctx context.Context, db *gorm.DB, c *config.Config) st
 		u.Mod = false
 	})
 
-	return NewAuthorization(ctx, db, c, user)
 }
 
-func NewAuthorization(ctx context.Context, db *gorm.DB, c *config.Config, user *model.User) string {
-	authToken, err := auth.CreateAccessToken(c, db, user)
+func NewAuthorization(ctx context.Context, c *config.Config, user *model.User) string {
+	authToken, err := auth.CreateAccessToken(c, user)
 	if err != nil {
 		panic(err)
 	}

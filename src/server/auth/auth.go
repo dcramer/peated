@@ -55,7 +55,7 @@ func GetUserFromHeader(config *config.Config, db *gorm.DB, header string) (*mode
 	return user, err
 }
 
-func CreateAccessToken(config *config.Config, db *gorm.DB, user *model.User) (*string, error) {
+func CreateAccessToken(config *config.Config, user *model.User) (*string, error) {
 	if user.ID == 0 {
 		return nil, errors.Errorf("invalid user ID of 0")
 	}
