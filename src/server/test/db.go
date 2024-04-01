@@ -2,7 +2,6 @@ package test
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"path"
@@ -51,10 +50,9 @@ func RunMigrations(ctx context.Context, c *postgres.PostgresContainer) error {
 	// 	// TODO: how do we improve this
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "..")
-	fmt.Printf("dir %s", dir)
 	err := os.Chdir(dir)
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	connectionString, err := c.ConnectionString(ctx)
@@ -117,7 +115,9 @@ func (suite *DatabaseTestSuite) SetupSuite() {
 	}
 
 	suite.container = container
-	suite.dbConn = db
+	suite.dbConn = db.Session(&gorm.Session{
+		SkipDefaultTransaction: true,
+	})
 }
 
 func (suite *DatabaseTestSuite) SetupTest() {

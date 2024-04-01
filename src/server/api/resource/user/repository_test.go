@@ -22,8 +22,6 @@ func TestUserRepository(t *testing.T) {
 func (suite *UserRepositoryTestSuite) TestRepository_List() {
 	t := suite.T()
 
-	t.Parallel()
-
 	ctx := context.Background()
 
 	repo := user.NewRepository(suite.DB)
