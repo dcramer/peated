@@ -33,6 +33,7 @@ func (suite *UserRepositoryTestSuite) TestRepository_List() {
 	user2, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
 		u.DisplayName = "bar"
 	})
+
 	assert.NoError(t, err)
 
 	repo := user.NewRepository(suite.DB)
@@ -44,19 +45,42 @@ func (suite *UserRepositoryTestSuite) TestRepository_List() {
 	assert.Equal(t, users[1].ID, user1.ID)
 }
 
-// func (suite *UserRepositoryTestSuite) TestRepository_ReadById(t *testing.T) {
-// 	t.Parallel()
+func (suite *UserRepositoryTestSuite) TestRepository_ReadById() {
+	t := suite.T()
 
-// 	test.NoError(t, err)
+	ctx := context.Background()
 
-// 	err = db.Transaction(func(tx *gorm.DB) error {
-// 		repo := user.NewRepository(tx)
+	_, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
+	assert.NoError(t, err)
+	user1, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
+	assert.NoError(t, err)
 
-// 		user, err := repo.ReadById(ctx, 1)
-// 		test.NoError(t, err)
-// 		test.Equal(t, "Foo Bar", user.DisplayName)
+	repo := user.NewRepository(suite.DB)
 
-// 		return nil
-// 	})
-// 	test.NoError(t, err)
-// }
+	user, err := repo.ReadById(ctx, user1.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, user.ID, user1.ID)
+
+	_, err = repo.ReadById(ctx, user1.ID+1)
+	assert.Error(t, err)
+}
+
+func (suite *UserRepositoryTestSuite) TestRepository_ReadByUsername() {
+	t := suite.T()
+
+	ctx := context.Background()
+
+	_, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
+	assert.NoError(t, err)
+	user1, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
+	assert.NoError(t, err)
+
+	repo := user.NewRepository(suite.DB)
+
+	user, err := repo.ReadByUsername(ctx, user1.Username)
+	assert.NoError(t, err)
+	assert.Equal(t, user.ID, user1.ID)
+
+	_, err = repo.ReadByUsername(ctx, "_")
+	assert.Error(t, err)
+}
