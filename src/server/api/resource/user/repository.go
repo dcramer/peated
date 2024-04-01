@@ -6,7 +6,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"peated/auth"
 	"peated/db/model"
 )
 
@@ -27,8 +26,6 @@ type ListParams struct {
 }
 
 func (r *Repository) List(ctx context.Context, params *ListParams) (model.Users, error) {
-	user, _ := auth.CurrentUser(ctx)
-
 	clauses := make([]clause.Expression, 0)
 
 	users := make([]*model.User, 0)
@@ -39,8 +36,6 @@ func (r *Repository) List(ctx context.Context, params *ListParams) (model.Users,
 			clause.Like{Column: "display_name", Value: "%" + params.Query + "%"},
 			clause.Like{Column: "email", Value: params.Query},
 		))
-	} else if user.Admin {
-		return users, nil
 	}
 
 	query := r.db.Clauses(clauses...).Offset(params.Cursor).Limit(params.Limit).Order("display_name ASC").Find(&users)

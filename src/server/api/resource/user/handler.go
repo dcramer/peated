@@ -8,6 +8,7 @@ import (
 
 	"peated/api/resource/common/encoder"
 	e "peated/api/resource/common/err"
+	"peated/auth"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
@@ -44,6 +45,11 @@ type ListInput struct {
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	input := ctx.Value(httpin.Input).(*ListInput)
+
+	user, _ := auth.CurrentUser(ctx)
+	if input.Query == "" && !user.Admin {
+		e.BadRequest(w, []byte(`query is required`))
+	}
 
 	users, err := a.repository.List(ctx, &ListParams{
 		Query:  input.Query,

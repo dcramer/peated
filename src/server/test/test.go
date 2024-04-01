@@ -1,0 +1,25 @@
+package test
+
+import "peated/config"
+
+func NewConfig() *config.Config {
+	config := &config.Config{
+		Debug:     true,
+		JwtSecret: "test-jwt-secret",
+
+		Database: config.ConfigDB{
+			Host:     "localhost",
+			Port:     5432,
+			Username: "postgres",
+			Password: "postgres",
+			Name:     "peated",
+		},
+
+		Google: config.ConfigGoogle{
+			ClientID:     "google-client-id",
+			ClientSecret: "google-client-secret",
+		},
+	}
+
+	return config
+}

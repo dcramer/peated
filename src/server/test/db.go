@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"peated/config"
 	"runtime"
 	"time"
 
@@ -20,15 +19,15 @@ import (
 )
 
 func SetupContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
-	c := config.NewDB()
+	c := NewConfig()
 
 	postgresContainer, err := postgres.RunContainer(ctx,
 		testcontainers.WithImage("ghcr.io/baosystems/postgis:15-3.3"),
 		// postgres.WithInitScripts(filepath.Join("testdata", "init-user-db.sh")),
 		// postgres.WithConfigFile(filepath.Join("testdata", "my-postgres.conf")),
-		postgres.WithDatabase(c.Name),
-		postgres.WithUsername(c.Username),
-		postgres.WithPassword(c.Password),
+		postgres.WithDatabase(c.Database.Name),
+		postgres.WithUsername(c.Database.Username),
+		postgres.WithPassword(c.Database.Password),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).

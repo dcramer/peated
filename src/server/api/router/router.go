@@ -19,8 +19,6 @@ func New(
 	logger *zerolog.Logger,
 	config *config.Config,
 	db *gorm.DB,
-	// commentStore *commentStore
-	// anotherStore *anotherStore
 ) *chi.Mux {
 	r := chi.NewRouter()
 
@@ -48,7 +46,7 @@ func New(
 	r.Route("/", func(r chi.Router) {
 
 		r.Use(middleware.ContentTypeJSON)
-		r.Use(middleware.Auth(config, db))
+		r.Use(middleware.Auth(config, db, logger))
 
 		r.Get("/", func(w http.ResponseWriter, _ *http.Request) {
 			w.Write([]byte("{\"version\": \"" + config.Version + "\"}"))

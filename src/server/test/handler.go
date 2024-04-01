@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"peated/api/router"
-	"peated/config"
 	"peated/util/logger"
 
 	"github.com/go-chi/chi/v5"
@@ -13,8 +12,8 @@ import (
 )
 
 func NewServer(db *gorm.DB) *chi.Mux {
-	config := config.New()
-	logger := logger.New(true)
+	config := NewConfig()
+	logger := logger.New(config.Debug)
 
 	router := router.New(
 		logger,
@@ -46,6 +45,19 @@ func (suite *HandlerTestSuite) Request(method string, url string, body io.Reader
 	server := NewServer(suite.DB)
 
 	req, _ := http.NewRequest(method, url, body)
+
+	response := httptest.NewRecorder()
+	server.ServeHTTP(response, req)
+	return response
+}
+
+func (suite *HandlerTestSuite) RequestWithHandler(method string, url string, body io.Reader, handler func(*http.Request)) *httptest.ResponseRecorder {
+	// TODO: this should be bound once in SetupTest but we need to have it also run the DatabaseTestSuite setup
+	server := NewServer(suite.DB)
+
+	req, _ := http.NewRequest(method, url, body)
+
+	handler(req)
 
 	response := httptest.NewRecorder()
 	server.ServeHTTP(response, req)

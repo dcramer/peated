@@ -5,6 +5,7 @@ import (
 	"peated/db/model"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-errors/errors"
 	"github.com/golang-jwt/jwt"
@@ -22,7 +23,7 @@ func VerifyToken(config *config.Config, tokenString string) (*UserClaims, error)
 	})
 
 	if err != nil {
-		return &UserClaims{}, err
+		return nil, err
 	}
 
 	claims := token.Claims.(*UserClaims)
@@ -31,33 +32,39 @@ func VerifyToken(config *config.Config, tokenString string) (*UserClaims, error)
 }
 
 func GetUserFromHeader(config *config.Config, db *gorm.DB, header string) (*model.User, error) {
-	token := strings.Split(header, "Bearer ")[0]
+	token := strings.Split(header, "Bearer ")[1]
+
 	if token == "" {
-		return &model.User{}, errors.Errorf("no token")
+		return nil, errors.Errorf("no token")
 	}
 
 	claims, err := VerifyToken(config, token)
 	if err != nil {
-		return &model.User{}, errors.Join(errors.Errorf("unable to verify token"), err)
+		return nil, errors.Join(errors.Errorf("unable to verify token"), err)
 	}
 
 	user := &model.User{}
 	if err := db.Where("id = ?", claims.ID).First(&user).Error; err != nil {
-		return user, err
+		return nil, err
 	}
 
 	if !user.Active {
-		return user, errors.Errorf("inactive user")
+		return nil, errors.Errorf("inactive user")
 	}
 
 	return user, err
 }
 
-func CreateAccessToken(config *config.Config, db *gorm.DB, user *model.User) (string, error) {
+func CreateAccessToken(config *config.Config, db *gorm.DB, user *model.User) (*string, error) {
+	if user.ID == 0 {
+		return nil, errors.Errorf("invalid user ID of 0")
+	}
+
 	claims := UserClaims{
 		strconv.FormatUint(user.ID, 10),
 		jwt.StandardClaims{
-			ExpiresAt: 15000,
+			// 30 days
+			ExpiresAt: time.Now().Unix() + 2592000,
 			Issuer:    "peated",
 		},
 	}
@@ -65,7 +72,7 @@ func CreateAccessToken(config *config.Config, db *gorm.DB, user *model.User) (st
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(config.JwtSecret))
 
-	return tokenString, err
+	return &tokenString, err
 }
 
 //   export const createUser = async (

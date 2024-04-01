@@ -16,21 +16,19 @@ type UserRepositoryTestSuite struct {
 	test.DatabaseTestSuite
 }
 
-func TestUserRepository(t *testing.T) {
+func TestRepository(t *testing.T) {
 	suite.Run(t, new(UserRepositoryTestSuite))
 }
 
 func (suite *UserRepositoryTestSuite) TestRepository_List() {
 	ctx := context.Background()
 
-	user1, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
+	user1 := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
 		u.DisplayName = "foo"
 	})
-	suite.Require().NoError(err)
-	user2, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
+	user2 := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
 		u.DisplayName = "bar"
 	})
-	suite.Require().NoError(err)
 
 	repo := user.NewRepository(suite.DB)
 
@@ -44,10 +42,8 @@ func (suite *UserRepositoryTestSuite) TestRepository_List() {
 func (suite *UserRepositoryTestSuite) TestRepository_ReadById() {
 	ctx := context.Background()
 
-	_, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
-	suite.Require().NoError(err)
-	user1, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
-	suite.Require().NoError(err)
+	fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
+	user1 := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
 
 	repo := user.NewRepository(suite.DB)
 
@@ -63,10 +59,8 @@ func (suite *UserRepositoryTestSuite) TestRepository_ReadById() {
 func (suite *UserRepositoryTestSuite) TestRepository_ReadByUsername() {
 	ctx := context.Background()
 
-	_, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
-	suite.Require().NoError(err)
-	user1, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
-	suite.Require().NoError(err)
+	fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
+	user1 := fixture.NewUser(ctx, suite.DB, func(u *model.User) {})
 
 	repo := user.NewRepository(suite.DB)
 

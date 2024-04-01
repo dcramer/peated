@@ -53,7 +53,7 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, ok := auth.CurrentUser(ctx)
 	if !ok {
-		a.logger.Error().Msg("no matching user found")
+		a.logger.Error().Msg("unauthenticated session")
 		e.Unauthorized(w, e.RespInvalidCredentials)
 		return
 	}
@@ -108,7 +108,7 @@ func (a *API) EmailPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	auth := DTOFromUser(r.Context(), currentUser, accessToken)
+	auth := DTOFromUser(r.Context(), currentUser, *accessToken)
 
 	encoder.Encode(w, r, http.StatusOK, auth)
 }
@@ -202,7 +202,7 @@ func (a *API) Google(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	auth := DTOFromUser(r.Context(), currentUser, accessToken)
+	auth := DTOFromUser(r.Context(), currentUser, *accessToken)
 
 	encoder.Encode(w, r, http.StatusOK, auth)
 }

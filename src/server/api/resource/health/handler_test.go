@@ -12,7 +12,7 @@ type HealthHandlerTestSuite struct {
 	test.HandlerTestSuite
 }
 
-func TestHealthHandler(t *testing.T) {
+func TestHandler(t *testing.T) {
 	suite.Run(t, new(HealthHandlerTestSuite))
 }
 
