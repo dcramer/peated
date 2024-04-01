@@ -6,6 +6,7 @@ func NewConfig() *config.Config {
 	config := &config.Config{
 		Debug:     true,
 		JwtSecret: "test-jwt-secret",
+		Port:      4000,
 
 		Database: config.ConfigDB{
 			Host:     "localhost",

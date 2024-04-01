@@ -45,6 +45,7 @@ func NewUser(ctx context.Context, db *gorm.DB, handler func(*model.User)) *model
 		Email:       f.Internet().CompanyEmail(),
 		DisplayName: f.Person().Name(),
 		Username:    f.Person().Name(),
+		Active:      true,
 	}
 
 	handler(user)

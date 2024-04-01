@@ -44,7 +44,8 @@ func (suite *HandlerTestSuite) Request(method string, url string, body io.Reader
 	// TODO: this should be bound once in SetupTest but we need to have it also run the DatabaseTestSuite setup
 	server := NewHandler(suite.DB)
 
-	req, _ := http.NewRequest(method, url, body)
+	req, err := http.NewRequest(method, url, body)
+	suite.Require().NoError(err)
 
 	response := httptest.NewRecorder()
 	server.ServeHTTP(response, req)
@@ -55,7 +56,8 @@ func (suite *HandlerTestSuite) RequestWithHandler(method string, url string, bod
 	// TODO: this should be bound once in SetupTest but we need to have it also run the DatabaseTestSuite setup
 	server := NewHandler(suite.DB)
 
-	req, _ := http.NewRequest(method, url, body)
+	req, err := http.NewRequest(method, url, body)
+	suite.Require().NoError(err)
 
 	handler(req)
 

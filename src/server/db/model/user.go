@@ -2,6 +2,8 @@ package model
 
 import (
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -20,6 +22,15 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 
 	Identities []Identity
+}
+
+func (u *User) SetPassword(password []byte) error {
+	hash, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	u.PasswordHash = string(hash)
+	return nil
 }
 
 func (User) TableName() string {
