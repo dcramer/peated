@@ -3,6 +3,8 @@ package user_test
 import (
 	"context"
 	"peated/api/resource/user"
+	"peated/db/model"
+	"peated/test/fixture"
 	"testing"
 
 	"peated/test"
@@ -24,11 +26,22 @@ func (suite *UserRepositoryTestSuite) TestRepository_List() {
 
 	ctx := context.Background()
 
+	user1, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
+		u.DisplayName = "foo"
+	})
+	assert.NoError(t, err)
+	user2, err := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
+		u.DisplayName = "bar"
+	})
+	assert.NoError(t, err)
+
 	repo := user.NewRepository(suite.DB)
 
 	users, err := repo.List(ctx, &user.ListParams{Limit: 100})
 	assert.NoError(t, err)
-	assert.Equal(t, len(users), 0)
+	assert.Equal(t, len(users), 2)
+	assert.Equal(t, users[0].ID, user2.ID)
+	assert.Equal(t, users[1].ID, user1.ID)
 }
 
 // func (suite *UserRepositoryTestSuite) TestRepository_ReadById(t *testing.T) {

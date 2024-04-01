@@ -3,12 +3,12 @@ module peated
 go 1.22
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/ggicci/httpin v0.17.0
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-errors/errors v1.5.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jackc/pgx/v5 v5.5.5
+	github.com/jaswdr/faker/v2 v2.1.0
 	github.com/joeshaw/envdecode v0.0.0-20200121155833-099f1fc765bd
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
