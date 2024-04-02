@@ -37,6 +37,11 @@ func (suite *BadgeRepositoryTestSuite) TestRepository_List() {
 	suite.Equal(len(badges), 2)
 	suite.Equal(badges[0].ID, badge2.ID)
 	suite.Equal(badges[1].ID, badge1.ID)
+
+	badges, err = repo.List(ctx, &badge.ListInput{Query: "FOO", Limit: 100})
+	suite.Require().NoError(err)
+	suite.Equal(len(badges), 1)
+	suite.Equal(badges[0].ID, badge1.ID)
 }
 
 func (suite *BadgeRepositoryTestSuite) TestRepository_ReadById() {
