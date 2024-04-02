@@ -11,13 +11,6 @@ type BadgeInput struct {
 	// Config string `json:"config"`
 }
 
-func (f *BadgeInput) ToModel() *model.Badge {
-	return &model.Badge{
-		Type: f.Type,
-		Name: f.Name,
-	}
-}
-
 type ListInput struct {
 	Sort   string `form:"sort,default=name"`
 	Query  string `form:"query"`

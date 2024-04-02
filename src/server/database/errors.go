@@ -3,6 +3,8 @@ package database
 import (
 	"errors"
 
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
 )
 
@@ -16,17 +18,17 @@ func IsRecordNotFoundErr(err error) bool {
 	return err == gorm.ErrRecordNotFound || err == ErrNotFound
 }
 
-// // IsKeyConflictErr returns true if err is ErrKeyConflict or MySQLError with 1062 code number
-// func IsKeyConflictErr(err error) bool {
-// 	if err == ErrKeyConflict {
-// 		return true
-// 	}
-// 	switch err.(type) {
-// 	case *mysql.MySQLError:
-// 		e := err.(*mysql.MySQLError)
-// 		if e.Number == 1062 {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
+// IsKeyConflictErr returns true if err is ErrKeyConflict or MySQLError with 1062 code number
+func IsKeyConflictErr(err error) bool {
+	if err == ErrKeyConflict {
+		return true
+	}
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		if pgErr.Code == pgerrcode.UniqueViolation {
+			return true
+		}
+	}
+
+	return false
+}

@@ -27,6 +27,10 @@ var (
 	RespInvalidCredentials = gin.H{"message": "Invalid credentials"}
 
 	RespNotFound = gin.H{"message": "resource not found"}
+	RespConflict = gin.H{
+		"message": "entity already exists",
+		"code":    "conflict",
+	}
 
 	RespUnknownServerError = gin.H{"message": "Unhandled internal error"}
 )
@@ -45,6 +49,10 @@ func NewServerError(ctx *gin.Context, error gin.H) {
 
 func NewBadRequest(ctx *gin.Context, error gin.H) {
 	ctx.AbortWithStatusJSON(http.StatusBadRequest, error)
+}
+
+func NewConflict(ctx *gin.Context, error gin.H) {
+	ctx.AbortWithStatusJSON(http.StatusConflict, error)
 }
 
 func NewNotFound(ctx *gin.Context, error gin.H) {
