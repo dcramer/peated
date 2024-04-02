@@ -3,11 +3,11 @@ package fixture
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"peated/auth"
 	"peated/config"
 	"peated/database"
+	"peated/database/column/spatial"
 	"peated/database/model"
 	"time"
 
@@ -113,6 +113,10 @@ func NewEntity(ctx context.Context, db *gorm.DB, handler func(*model.Entity)) *m
 		Country:   f.Address().Country(),
 		Website:   f.Internet().URL(),
 		CreatedAt: time.Now(),
+		Location: &spatial.Point{
+			Lat: 37.7749,
+			Lng: -122.4194,
+		},
 	}
 
 	handler(entity)
@@ -121,7 +125,6 @@ func NewEntity(ctx context.Context, db *gorm.DB, handler func(*model.Entity)) *m
 		if entity.CreatedByID == 0 {
 			entity.CreatedByID = DefaultUser(ctx, tx).ID
 		}
-		fmt.Printf("entity UserID %d", entity.CreatedByID)
 
 		if err := tx.Create(entity).Error; err != nil {
 			return err

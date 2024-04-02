@@ -1,6 +1,7 @@
 package model
 
 import (
+	"peated/database/column/spatial"
 	"time"
 
 	"github.com/lib/pq"
@@ -14,21 +15,22 @@ const (
 
 type Entity struct {
 	ID        uint64         `gorm:"primaryKey" json:"id"`
-	Name      string         `json:"name"`
+	Name      string         `json:"name" gorm:"not null"`
 	ShortName string         `json:"short_name"`
 	Country   string         `json:"country"`
 	Region    string         `json:"region"`
-	Type      pq.StringArray `json:"type" gorm:"type:string[]"`
+	Type      pq.StringArray `json:"type" gorm:"type:string[];default:[];not null"`
+	Location  *spatial.Point `json:"location" gorm:"type:geometry(point, 4326)"`
 
 	Description     string `json:"description"`
-	YearEstablished int    `json:"year_established"`
+	YearEstablished uint   `json:"year_established"`
 	Website         string `json:"website"`
 
-	TotalBottles  uint `json:"total_bottles"`
-	TotalTastings uint `json:"total_tastings"`
+	TotalBottles  uint `json:"total_bottles" gorm:"default:0;not null"`
+	TotalTastings uint `json:"total_tastings" gorm:"default:0;not null"`
 
-	CreatedAt   time.Time `json:"created_at"`
-	CreatedByID uint64    `json:"created_by_id"`
+	CreatedAt   time.Time `json:"created_at" gorm:"not null"`
+	CreatedByID uint64    `json:"created_by_id" gorm:"not null"`
 
 	CreatedBy User
 }
