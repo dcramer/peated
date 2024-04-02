@@ -18,7 +18,7 @@ func IsRecordNotFoundErr(err error) bool {
 	return err == gorm.ErrRecordNotFound || err == ErrNotFound
 }
 
-// IsKeyConflictErr returns true if err is ErrKeyConflict or MySQLError with 1062 code number
+// IsKeyConflictErr returns true if err is ErrKeyConflict or pgerrcode.UniqueViolation
 func IsKeyConflictErr(err error) bool {
 	if err == ErrKeyConflict {
 		return true

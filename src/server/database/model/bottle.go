@@ -1,8 +1,9 @@
 package model
 
 import (
-	"peated/database/column"
 	"time"
+
+	"gorm.io/datatypes"
 )
 
 type Category string
@@ -20,9 +21,9 @@ type Bottle struct {
 	BottlerID uint64   `json:"bottler_id"`
 	StatedAge uint     `json:"stated_age"`
 
-	Description   string       `json:"description"`
-	TastingNotes  column.JSONB `json:"tasting_notes"`
-	SuggestedTags []string     `json:"suggested_tags"`
+	Description   string         `json:"description"`
+	TastingNotes  datatypes.JSON `json:"tasting_notes"`
+	SuggestedTags []string       `json:"suggested_tags"`
 
 	AvgRating     float32 `json:"avg_rating"`
 	TotalTastings uint    `json:"total_tastings"`

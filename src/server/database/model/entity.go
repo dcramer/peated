@@ -2,26 +2,26 @@ package model
 
 import (
 	"time"
+
+	"github.com/lib/pq"
 )
 
-type EntityType string
-
 const (
-	EntityTypeBottler   EntityType = "bottler"
-	EntityTypeBrand     EntityType = "brand"
-	EntityTypeDistiller EntityType = "distiller"
+	EntityTypeBottler   string = "bottler"
+	EntityTypeBrand     string = "brand"
+	EntityTypeDistiller string = "distiller"
 )
 
 type Entity struct {
-	ID        uint64       `gorm:"primaryKey" json:"id"`
-	Name      string       `json:"name"`
-	ShortName string       `json:"short_name"`
-	Country   string       `json:"country"`
-	Region    string       `json:"region"`
-	Type      []EntityType `json:"type"`
+	ID        uint64         `gorm:"primaryKey" json:"id"`
+	Name      string         `json:"name"`
+	ShortName string         `json:"short_name"`
+	Country   string         `json:"country"`
+	Region    string         `json:"region"`
+	Type      pq.StringArray `json:"type" gorm:"type:string[]"`
 
 	Description     string `json:"description"`
-	YearEstablished string `json:"year_established"`
+	YearEstablished int    `json:"year_established"`
 	Website         string `json:"website"`
 
 	TotalBottles  uint `json:"total_bottles"`
