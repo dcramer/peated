@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"peated/api/resource/auth"
 	"peated/api/resource/common/err"
-	"peated/db/model"
+	"peated/database/model"
 	"peated/test"
 	"peated/test/fixture"
 	"testing"

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"peated/config"
-	"peated/db/model"
+	"peated/database/model"
 	"strconv"
 	"strings"
 	"time"

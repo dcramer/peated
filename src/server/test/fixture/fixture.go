@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"peated/auth"
 	"peated/config"
-	"peated/db/model"
+	"peated/database/model"
 
 	"github.com/jaswdr/faker/v2"
 

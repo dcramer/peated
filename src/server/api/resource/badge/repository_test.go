@@ -3,7 +3,7 @@ package badge_test
 import (
 	"context"
 	"peated/api/resource/badge"
-	"peated/db/model"
+	"peated/database/model"
 	"peated/test/fixture"
 	"testing"
 

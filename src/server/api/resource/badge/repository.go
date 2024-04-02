@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"peated/db"
-	"peated/db/model"
+	"peated/database"
+	"peated/database/model"
 )
 
 type Repository struct {
@@ -27,7 +27,7 @@ func (r *Repository) List(ctx context.Context, input *ListInput) (model.Badges, 
 
 	if len(input.Query) != 0 {
 		clauses = append(clauses, clause.Or(
-			db.ILike{Column: "name", Value: "%" + input.Query + "%"},
+			database.ILike{Column: "name", Value: "%" + input.Query + "%"},
 		))
 	}
 
@@ -63,7 +63,7 @@ func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.Badge, err
 	return badge, nil
 }
 
-func (r *Repository) Delete(id string) (int64, error) {
+func (r *Repository) Delete(id uint64) (int64, error) {
 	result := r.db.Where("id = ?", id).Delete(&model.Badge{})
 
 	return result.RowsAffected, result.Error

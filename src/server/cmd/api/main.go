@@ -11,8 +11,8 @@ import (
 	"os/signal"
 	"peated/api/router"
 	"peated/config"
-	"peated/db"
-	"peated/util/logger"
+	"peated/database"
+	"peated/pkg/logging"
 	"sync"
 	"time"
 )
@@ -23,9 +23,9 @@ func run(ctx context.Context, _, stderr io.Writer, _ []string) error {
 	defer cancel()
 
 	config := config.New()
-	logger := logger.New(config.Debug)
+	logger := logging.NewLogger(config.Debug)
 
-	db, err := db.Init(ctx, config)
+	db, err := database.Init(ctx, config)
 	if err != nil {
 		return err
 	}

@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"peated/db/model"
+	"peated/database/model"
 
 	"github.com/gin-gonic/gin"
 )

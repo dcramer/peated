@@ -1,4 +1,4 @@
-package db
+package database
 
 import "gorm.io/gorm/clause"
 

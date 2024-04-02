@@ -33,14 +33,14 @@ func (a *API) List(ctx *gin.Context) {
 
 	user, _ := auth.CurrentUser(ctx)
 	if input.Query == "" && !user.Admin {
-		e.BadRequest(ctx, gin.H{"error": "query is required"})
+		e.NewBadRequest(ctx, gin.H{"error": "query is required"})
 	}
 
 	users, err := a.repository.List(ctx, input)
 
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
-		e.ServerError(ctx, e.RespDBDataAccessFailure)
+		e.NewServerError(ctx, e.RespDBDataAccessFailure)
 		return
 	}
 
@@ -51,7 +51,7 @@ func (a *API) Get(ctx *gin.Context) {
 	user, err := a.repository.ReadByUsername(ctx, ctx.Param("username"))
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
-		e.ServerError(ctx, e.RespDBDataAccessFailure)
+		e.NewServerError(ctx, e.RespDBDataAccessFailure)
 		return
 	}
 

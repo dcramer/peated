@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 	"peated/api/resource/user"
-	"peated/db/model"
+	"peated/database/model"
 )
 
 type EmailPasswordInput struct {

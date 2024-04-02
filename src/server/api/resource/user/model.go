@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"peated/db/model"
+	"peated/database/model"
 	"strconv"
 )
 

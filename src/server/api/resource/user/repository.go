@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"peated/db"
-	"peated/db/model"
+	"peated/database"
+	"peated/database/model"
 )
 
 type Repository struct {
@@ -26,8 +26,8 @@ func (r *Repository) List(ctx context.Context, params *ListInput) (model.Users, 
 
 	if len(params.Query) != 0 {
 		clauses = append(clauses, clause.Or(
-			db.ILike{Column: "display_name", Value: "%" + params.Query + "%"},
-			db.ILike{Column: "email", Value: params.Query},
+			database.ILike{Column: "display_name", Value: "%" + params.Query + "%"},
+			database.ILike{Column: "email", Value: params.Query},
 		))
 	}
 
@@ -115,7 +115,7 @@ func (r *Repository) UpsertWithIdentity(ctx context.Context, user *model.User, i
 	return user, nil
 }
 
-func (r *Repository) Delete(id string) (int64, error) {
+func (r *Repository) Delete(id uint64) (int64, error) {
 	result := r.db.Where("id = ?", id).Delete(&model.User{})
 
 	return result.RowsAffected, result.Error

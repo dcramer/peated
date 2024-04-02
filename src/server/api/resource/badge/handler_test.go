@@ -5,13 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"peated/api/resource/badge"
 	"peated/api/resource/common/err"
-	"peated/db/model"
+	"peated/database/model"
 	"peated/test"
 	"peated/test/fixture"
+	"strconv"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -24,10 +25,18 @@ func TestHandler(t *testing.T) {
 }
 
 func (suite *BadgeHandlerTestSuite) TestHandler_List() {
+	ctx := context.Background()
+
+	badge1 := fixture.NewBadge(ctx, suite.DB, func(b *model.Badge) {})
+
 	response := suite.Request("GET", "/badges", nil)
 
 	suite.Require().Equal(http.StatusOK, response.Code)
-	// suite.JSONResponseEqual(response, err.RespInsufficientPermission)
+	var data *badge.BadgesResponse
+	err := json.Unmarshal(response.Body.Bytes(), &data)
+	suite.Require().NoError(err)
+	suite.Equal(len(data.Badges), 1)
+	suite.Equal(data.Badges[0].ID, strconv.FormatUint(badge1.ID, 10))
 }
 
 func (suite *BadgeHandlerTestSuite) TestHandler_Create_Unauthenticated() {
@@ -58,9 +67,9 @@ func (suite *BadgeHandlerTestSuite) TestHandler_Create_Admin() {
 	})
 
 	suite.Require().Equal(http.StatusCreated, response.Code)
-	var payload gin.H
-	err := json.Unmarshal(response.Body.Bytes(), &payload)
+	var data *badge.BadgeResponse
+	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(payload["name"], "foo")
+	suite.Equal(data.Badge.Name, "foo")
 
 }

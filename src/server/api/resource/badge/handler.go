@@ -2,13 +2,13 @@ package badge
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 
 	e "peated/api/resource/common/err"
 	"peated/api/router/middleware"
 	"peated/config"
+	"peated/pkg/validate"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
@@ -32,15 +32,19 @@ func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *go
 		validator:  v,
 	}
 
-	r.GET("/badges", api.List)
-	r.POST("/badges", middleware.AdminRequired(config, logger, db), api.Create)
-	r.GET("/badges/:id", api.Get)
+	r.GET("/badges", api.badgeList)
+	r.POST("/badges", middleware.AdminRequired(config, logger, db), api.badgeCreate)
+	r.GET("/badges/:id", api.badgeById)
 }
 
-func (a *API) List(ctx *gin.Context) {
+func (a *API) badgeList(ctx *gin.Context) {
 	var input ListInput
 	if err := ctx.ShouldBindQuery(&input); err != nil {
-		e.BadRequest(ctx, gin.H{"error": err.Error()})
+		var details []*validate.ValidationErrDetail
+		if vErrs, ok := err.(validator.ValidationErrors); ok {
+			details = validate.ValidationErrorDetails(&input, "form", vErrs)
+		}
+		e.NewBadRequest(ctx, e.InvalidParameters(details))
 		return
 	}
 
@@ -48,46 +52,57 @@ func (a *API) List(ctx *gin.Context) {
 
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
-		e.ServerError(ctx, e.RespDBDataAccessFailure)
+		e.NewServerError(ctx, e.RespDBDataAccessFailure)
 		return
 	}
 
-	ctx.JSON(200, DTOFromBadges(ctx, badges))
+	ctx.JSON(200, NewBadgesResponse(ctx, badges))
 }
 
-func (a *API) Get(ctx *gin.Context) {
-	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
-	if err != nil {
-		a.logger.Error().Err(err).Msg("")
-		e.BadRequest(ctx, e.RespDBDataAccessFailure)
+func (a *API) badgeById(ctx *gin.Context) {
+	type RequestUri struct {
+		ID uint64 `uri:"id" binding:"numeric"`
+	}
+	var uri RequestUri
+
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		var details []*validate.ValidationErrDetail
+		if vErrs, ok := err.(validator.ValidationErrors); ok {
+			details = validate.ValidationErrorDetails(&uri, "uri", vErrs)
+		}
+		e.NewBadRequest(ctx, e.InvalidParameters(details))
 		return
 	}
 
-	badge, err := a.repository.ReadById(ctx, id)
+	badge, err := a.repository.ReadById(ctx, uri.ID)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
-		e.ServerError(ctx, e.RespDBDataAccessFailure)
+		e.NewServerError(ctx, e.RespDBDataAccessFailure)
 		return
 	}
 
-	ctx.JSON(200, DTOFromBadge(ctx, badge))
+	ctx.JSON(200, NewBadgeResponse(ctx, badge))
 }
 
-func (a *API) Create(ctx *gin.Context) {
+func (a *API) badgeCreate(ctx *gin.Context) {
 	var json BadgeInput
 	if err := ctx.ShouldBindJSON(&json); err != nil {
-		e.BadRequest(ctx, gin.H{"error": err.Error()})
+		var details []*validate.ValidationErrDetail
+		if vErrs, ok := err.(validator.ValidationErrors); ok {
+			details = validate.ValidationErrorDetails(&json, "json", vErrs)
+		}
+		e.NewBadRequest(ctx, e.InvalidParameters(details))
 		return
 	}
 
 	newBadge, err := a.repository.Create(ctx, json.ToModel())
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
-		e.ServerError(ctx, e.RespDBDataInsertFailure)
+		e.NewServerError(ctx, e.RespDBDataInsertFailure)
 		return
 	}
 
 	a.logger.Info().Uint64("id", newBadge.ID).Msg("new badge created")
 
-	ctx.JSON(http.StatusCreated, DTOFromBadge(ctx, newBadge))
+	ctx.JSON(http.StatusCreated, NewBadgeResponse(ctx, newBadge))
 }

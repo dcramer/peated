@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"peated/api/router"
-	"peated/util/logger"
+	"peated/pkg/logging"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -14,7 +14,7 @@ import (
 
 func NewHandler(db *gorm.DB) *gin.Engine {
 	config := NewConfig()
-	logger := logger.New(config.Debug)
+	logger := logging.NewLogger(config.Debug)
 
 	router := router.New(
 		logger,

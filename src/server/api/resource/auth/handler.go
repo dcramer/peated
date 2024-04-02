@@ -6,10 +6,12 @@ import (
 	"peated/api/resource/user"
 	"peated/auth"
 	"peated/config"
-	"peated/db/model"
+	"peated/database/model"
+	"peated/pkg/validate"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
@@ -49,13 +51,13 @@ func (a *API) Read(ctx *gin.Context) {
 	user, ok := auth.CurrentUser(ctx)
 	if !ok {
 		a.logger.Error().Msg("unauthenticated session")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	if !user.Active {
-		a.logger.Error().Msg("user inactive")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		a.logger.Info().Msg("user inactive")
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
@@ -63,42 +65,46 @@ func (a *API) Read(ctx *gin.Context) {
 }
 
 func (a *API) EmailPassword(ctx *gin.Context) {
-	var input EmailPasswordInput
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		e.BadRequest(ctx, gin.H{"error": err.Error()})
+	var data EmailPasswordInput
+	if err := ctx.ShouldBindJSON(&data); err != nil {
+		var details []*validate.ValidationErrDetail
+		if vErrs, ok := err.(validator.ValidationErrors); ok {
+			details = validate.ValidationErrorDetails(&data, "json", vErrs)
+		}
+		e.NewBadRequest(ctx, e.InvalidParameters(details))
 		return
 	}
 
-	currentUser, err := a.repository.ReadByEmail(ctx, input.Email)
+	currentUser, err := a.repository.ReadByEmail(ctx, data.Email)
 	if err != nil {
-		a.logger.Error().Str("email", input.Email).Err(err).Msg("no matching user found")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		a.logger.Error().Str("email", data.Email).Err(err).Msg("no matching user found")
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	if len(currentUser.PasswordHash) == 0 {
-		a.logger.Error().Str("email", input.Email).Msg("no password set")
+		a.logger.Error().Str("email", data.Email).Msg("no password set")
 
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
-	if !CheckPasswordHash(input.Password, currentUser.PasswordHash) {
-		a.logger.Error().Str("email", input.Email).Msg("password mismatch")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+	if !CheckPasswordHash(data.Password, currentUser.PasswordHash) {
+		a.logger.Error().Str("email", data.Email).Msg("password mismatch")
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	if !currentUser.Active {
-		a.logger.Error().Str("email", input.Email).Msg("user inactive")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		a.logger.Error().Str("email", data.Email).Msg("user inactive")
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	accessToken, err := auth.CreateAccessToken(a.config, currentUser)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create token")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
@@ -108,9 +114,13 @@ func (a *API) EmailPassword(ctx *gin.Context) {
 }
 
 func (a *API) Google(ctx *gin.Context) {
-	var input CodeInput
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		e.BadRequest(ctx, gin.H{"error": err.Error()})
+	var data CodeInput
+	if err := ctx.ShouldBindJSON(&data); err != nil {
+		var details []*validate.ValidationErrDetail
+		if vErrs, ok := err.(validator.ValidationErrors); ok {
+			details = validate.ValidationErrorDetails(&data, "json", vErrs)
+		}
+		e.NewBadRequest(ctx, e.InvalidParameters(details))
 		return
 	}
 
@@ -125,44 +135,44 @@ func (a *API) Google(ctx *gin.Context) {
 		Endpoint: google.Endpoint,
 	}
 
-	token, err := conf.Exchange(ctx, input.Code)
+	token, err := conf.Exchange(ctx, data.Code)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("failed to exchange token")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	idTokenString := token.Extra("id_token").(string)
 	if len(idTokenString) == 0 {
 		a.logger.Error().Err(err).Msg("invalid or missing id_token")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	ticket, err := idtoken.Validate(ctx, idTokenString, a.config.Google.ClientID)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to validate id_token")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	jsonbody, err := json.Marshal(ticket.Claims)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to marshal claims")
-		e.ServerError(ctx, e.RespJSONEncodeFailure)
+		e.NewServerError(ctx, e.RespJSONEncodeFailure)
 		return
 	}
 
 	claims := GoogleClaims{}
 	if err := json.Unmarshal(jsonbody, &claims); err != nil {
 		a.logger.Error().Err(err).Msg("unable to unmarshal claims")
-		e.ServerError(ctx, e.RespJSONDecodeFailure)
+		e.NewServerError(ctx, e.RespJSONDecodeFailure)
 		return
 	}
 
 	if len(claims.Email) == 0 {
 		a.logger.Error().Err(err).Msg("no email address")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
@@ -177,20 +187,20 @@ func (a *API) Google(ctx *gin.Context) {
 	})
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create user from token")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	if !currentUser.Active {
 		a.logger.Error().Msg("user inactive")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	accessToken, err := auth.CreateAccessToken(a.config, currentUser)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create token")
-		e.Unauthorized(ctx, e.RespInvalidCredentials)
+		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 

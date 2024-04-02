@@ -1,7 +1,7 @@
 package model
 
 import (
-	"peated/db/column"
+	"peated/database/column"
 	"time"
 )
 
