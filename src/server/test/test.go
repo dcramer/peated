@@ -13,7 +13,7 @@ func NewConfig() *config.Config {
 			Port:     5432,
 			Username: "postgres",
 			Password: "postgres",
-			Name:     "peated",
+			Name:     "test_peated",
 		},
 
 		Google: config.ConfigGoogle{
