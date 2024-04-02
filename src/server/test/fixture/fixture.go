@@ -12,6 +12,10 @@ import (
 	"gorm.io/gorm"
 )
 
+func Faker() faker.Faker {
+	return faker.NewWithSeed(rand.NewSource(rand.Int63()))
+}
+
 func DefaultAuthorization(ctx context.Context, db *gorm.DB, c *config.Config) string {
 	user := DefaultUser(ctx, db)
 	return NewAuthorization(ctx, c, user)
@@ -26,7 +30,6 @@ func DefaultUser(ctx context.Context, db *gorm.DB) *model.User {
 		u.Admin = false
 		u.Mod = false
 	})
-
 }
 
 func NewAuthorization(ctx context.Context, c *config.Config, user *model.User) string {
@@ -39,7 +42,7 @@ func NewAuthorization(ctx context.Context, c *config.Config, user *model.User) s
 }
 
 func NewUser(ctx context.Context, db *gorm.DB, handler func(*model.User)) *model.User {
-	f := faker.NewWithSeed(rand.NewSource(rand.Int63()))
+	f := Faker()
 
 	user := &model.User{
 		Email:       f.Internet().CompanyEmail(),
@@ -58,4 +61,21 @@ func NewUser(ctx context.Context, db *gorm.DB, handler func(*model.User)) *model
 	}
 
 	return user
+}
+
+func NewBadge(ctx context.Context, db *gorm.DB, handler func(*model.Badge)) *model.Badge {
+	f := Faker()
+
+	badge := &model.Badge{
+		Name: f.Lorem().Word(),
+		Type: model.BadgeTypeCategory,
+	}
+
+	handler(badge)
+
+	if err := db.Create(badge).Error; err != nil {
+		panic(err)
+	}
+
+	return badge
 }

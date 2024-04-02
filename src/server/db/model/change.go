@@ -1,8 +1,9 @@
 package model
 
 import (
-	"peated/db/column"
 	"time"
+
+	"gorm.io/datatypes"
 )
 
 type ChangeType string
@@ -25,15 +26,15 @@ const (
 )
 
 type Change struct {
-	ID          uint64       `gorm:"primaryKey" json:"id"`
-	ObjectID    uint64       `json:"object_id"`
-	ObjectType  ObjectType   `json:"object_type"`
-	Type        ChangeType   `json:"type"`
-	DisplayName string       `json:"display_name"`
-	Data        column.JSONB `json:"data"`
+	ID          uint64     `gorm:"primaryKey"`
+	ObjectID    uint64     `gorm:"column:object_id" json:"objectId"`
+	ObjectType  ObjectType `gorm:"column:object_type" json:"objectType"`
+	Type        ChangeType
+	DisplayName string         `gorm:"column:display_name" json:"displayName"`
+	Data        datatypes.JSON `gorm:"type:jsonb"`
 
-	CreatedByID uint64    `json:"created_by_id"`
-	CreatedAt   time.Time `json:"created_at"`
+	CreatedByID uint64    `gorm:"column:creatd_by_id" json:"createdById"`
+	CreatedAt   time.Time `gorm:"column:created_at" json:"createdAt"`
 
 	CreatedBy User
 }

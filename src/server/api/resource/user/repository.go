@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	"peated/db"
 	"peated/db/model"
 )
 
@@ -24,10 +25,9 @@ func (r *Repository) List(ctx context.Context, params *ListInput) (model.Users, 
 	var users model.Users
 
 	if len(params.Query) != 0 {
-		// TODO: should be ILIKE
 		clauses = append(clauses, clause.Or(
-			clause.Like{Column: "display_name", Value: "%" + params.Query + "%"},
-			clause.Like{Column: "email", Value: params.Query},
+			db.ILike{Column: "display_name", Value: "%" + params.Query + "%"},
+			db.ILike{Column: "email", Value: params.Query},
 		))
 	}
 

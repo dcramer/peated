@@ -1,7 +1,7 @@
 package model
 
 import (
-	"peated/db/column"
+	"gorm.io/datatypes"
 )
 
 type BadgeType string
@@ -13,10 +13,10 @@ const (
 )
 
 type Badge struct {
-	ID     uint64       `gorm:"primaryKey" json:"id"`
-	Name   string       `json:"name"`
-	Type   BadgeType    `json:"type"`
-	Config column.JSONB `json:"config" gorm:"type:jsonb"`
+	ID     uint64 `gorm:"primaryKey"`
+	Name   string
+	Type   BadgeType
+	Config datatypes.JSON `json:"config" gorm:"default:{}"`
 }
 
 func (Badge) TableName() string {

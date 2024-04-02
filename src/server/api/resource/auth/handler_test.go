@@ -36,7 +36,7 @@ func (suite *AuthHandlerTestSuite) TestHandler_Read_Authenticated() {
 	user := fixture.DefaultUser(ctx, suite.DB)
 
 	response := suite.RequestWithHandler("GET", "/auth", nil, func(r *http.Request) {
-		r.Header.Set("Authorization", fixture.NewAuthorization(ctx, test.NewConfig(), user))
+		r.Header.Set("Authorization", fixture.NewAuthorization(r.Context(), test.NewConfig(), user))
 	})
 
 	var data auth.AuthDTO

@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	e "peated/api/resource/common/err"
+	"peated/api/router/middleware"
+	"peated/config"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
@@ -20,7 +22,7 @@ type API struct {
 	validator  *validator.Validate
 }
 
-func Routes(r *gin.Engine, logger *zerolog.Logger, db *gorm.DB) {
+func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *gorm.DB) {
 	v := validator.New(validator.WithRequiredStructEnabled())
 
 	api := &API{
@@ -29,14 +31,15 @@ func Routes(r *gin.Engine, logger *zerolog.Logger, db *gorm.DB) {
 		repository: NewRepository(db),
 		validator:  v,
 	}
-	r.GET("/badges/", api.List)
-	// r.POST("/", api.Create)
+
+	r.GET("/badges", api.List)
+	r.POST("/badges", middleware.AdminRequired(config, logger, db), api.Create)
 	r.GET("/badges/:id", api.Get)
 }
 
 func (a *API) List(ctx *gin.Context) {
 	var input ListInput
-	if err := ctx.ShouldBind(&input); err != nil {
+	if err := ctx.ShouldBindQuery(&input); err != nil {
 		e.BadRequest(ctx, gin.H{"error": err.Error()})
 		return
 	}

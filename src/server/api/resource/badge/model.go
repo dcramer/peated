@@ -21,10 +21,10 @@ func (f *BadgeInput) ToModel() *model.Badge {
 }
 
 type ListInput struct {
-	Sort   string `in:"query=sort;default=name" default:"name"`
-	Query  string `in:"query=query"`
-	Cursor int    `in:"query=cursor;default=0" default:"0"`
-	Limit  int    `in:"query=limit;default=100" default:"100"`
+	Sort   string `form:"sort" default:"name"`
+	Query  string `form:"query"`
+	Cursor int    `form:"cursor" default:"0" binding:"gte=0"`
+	Limit  int    `form:"limit" default:"100" binding:"lte=100"`
 }
 
 type BadgeDTO struct {

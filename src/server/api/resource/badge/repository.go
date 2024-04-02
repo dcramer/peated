@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	"peated/db"
 	"peated/db/model"
 )
 
@@ -25,9 +26,8 @@ func (r *Repository) List(ctx context.Context, input *ListInput) (model.Badges, 
 	var badges model.Badges
 
 	if len(input.Query) != 0 {
-		// TODO: should be ILIKE
 		clauses = append(clauses, clause.Or(
-			clause.Like{Column: "name", Value: "%" + input.Query + "%"},
+			db.ILike{Column: "name", Value: "%" + input.Query + "%"},
 		))
 	}
 

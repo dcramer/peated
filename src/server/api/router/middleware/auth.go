@@ -4,6 +4,9 @@ import (
 	"peated/auth"
 	"peated/config"
 
+	"net/http"
+	e "peated/api/resource/common/err"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
@@ -11,7 +14,7 @@ import (
 
 const authorizationHeaderKey = "Authorization"
 
-func Auth(config *config.Config, db *gorm.DB, logger *zerolog.Logger) gin.HandlerFunc {
+func Auth(config *config.Config, logger *zerolog.Logger, db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		headerValue := ctx.Request.Header.Get(authorizationHeaderKey)
 		if headerValue != "" {
@@ -21,6 +24,16 @@ func Auth(config *config.Config, db *gorm.DB, logger *zerolog.Logger) gin.Handle
 			} else {
 				auth.SetCurrentUser(ctx, user)
 			}
+		}
+		ctx.Next()
+	}
+}
+
+func AuthRequired(config *config.Config, logger *zerolog.Logger, db *gorm.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		_, ok := auth.CurrentUser(ctx)
+		if !ok {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, e.RespAuthRequired)
 		}
 		ctx.Next()
 	}

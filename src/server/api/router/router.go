@@ -33,12 +33,12 @@ func New(
 		ctx.JSON(http.StatusOK, gin.H{"version": config.Version})
 	})
 
-	r.Use(middleware.Auth(config, db, logger))
+	r.Use(middleware.Auth(config, logger, db))
 
-	health.Routes(r, logger)
+	health.Routes(r, config, logger)
 	auth.Routes(r, config, logger, db)
-	badge.Routes(r, logger, db)
-	user.Routes(r, logger, db)
+	badge.Routes(r, config, logger, db)
+	user.Routes(r, config, logger, db)
 
 	return r
 }

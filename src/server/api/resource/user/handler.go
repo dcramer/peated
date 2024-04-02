@@ -6,6 +6,7 @@ import (
 
 	e "peated/api/resource/common/err"
 	"peated/auth"
+	"peated/config"
 
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
@@ -17,7 +18,7 @@ type API struct {
 	repository *Repository
 }
 
-func Routes(r *gin.Engine, logger *zerolog.Logger, db *gorm.DB) {
+func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *gorm.DB) {
 	api := &API{
 		logger:     logger,
 		db:         db,
