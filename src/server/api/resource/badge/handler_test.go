@@ -1,7 +1,9 @@
 package badge_test
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"peated/api/resource/common/err"
 	"peated/db/model"
@@ -9,6 +11,7 @@ import (
 	"peated/test/fixture"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -39,8 +42,8 @@ func (suite *BadgeHandlerTestSuite) TestHandler_Create_NonAdmin() {
 		r.Header.Set("Authorization", fixture.DefaultAuthorization(r.Context(), suite.DB, test.NewConfig()))
 	})
 
-	suite.Require().Equal(http.StatusUnauthorized, response.Code)
-	suite.JSONResponseEqual(response, err.RespAuthRequired)
+	suite.Require().Equal(http.StatusForbidden, response.Code)
+	suite.JSONResponseEqual(response, err.RespNoPermission)
 }
 
 func (suite *BadgeHandlerTestSuite) TestHandler_Create_Admin() {
@@ -50,10 +53,14 @@ func (suite *BadgeHandlerTestSuite) TestHandler_Create_Admin() {
 		u.Admin = true
 	})
 
-	response := suite.RequestWithHandler("POST", "/badges", nil, func(r *http.Request) {
+	response := suite.RequestWithHandler("POST", "/badges", bytes.NewBuffer([]byte(`{"name": "foo", "type": "region"}`)), func(r *http.Request) {
 		r.Header.Set("Authorization", fixture.NewAuthorization(r.Context(), test.NewConfig(), user))
 	})
 
-	suite.Require().Equal(http.StatusOK, response.Code)
-	// suite.JSONResponseEqual(response, err.RespInsufficientPermission)
+	suite.Require().Equal(http.StatusCreated, response.Code)
+	var payload gin.H
+	err := json.Unmarshal(response.Body.Bytes(), &payload)
+	suite.Require().NoError(err)
+	suite.Equal(payload["name"], "foo")
+
 }
