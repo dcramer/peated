@@ -19,16 +19,9 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-type ListParams struct {
-	Query  string `default:""`
-	Cursor int    `default:"0"`
-	Limit  int    `default:"100"`
-}
-
-func (r *Repository) List(ctx context.Context, params *ListParams) (model.Users, error) {
-	clauses := make([]clause.Expression, 0)
-
-	users := make([]*model.User, 0)
+func (r *Repository) List(ctx context.Context, params *ListInput) (model.Users, error) {
+	var clauses []clause.Expression
+	var users model.Users
 
 	if len(params.Query) != 0 {
 		// TODO: should be ILIKE
@@ -55,7 +48,7 @@ func (r *Repository) Create(ctx context.Context, user *model.User) (*model.User,
 }
 
 func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.User, error) {
-	user := &model.User{}
+	var user *model.User
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
@@ -64,7 +57,7 @@ func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.User, erro
 }
 
 func (r *Repository) ReadByEmail(ctx context.Context, email string) (*model.User, error) {
-	user := &model.User{}
+	var user *model.User
 	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
 	}
@@ -73,7 +66,7 @@ func (r *Repository) ReadByEmail(ctx context.Context, email string) (*model.User
 }
 
 func (r *Repository) ReadByUsername(ctx context.Context, username string) (*model.User, error) {
-	user := &model.User{}
+	var user *model.User
 	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
 	}
@@ -91,7 +84,7 @@ func (r *Repository) Update(ctx context.Context, user *model.User) (int64, error
 }
 
 func (r *Repository) UpsertWithIdentity(ctx context.Context, user *model.User, identity *model.Identity) (*model.User, error) {
-	existingUser := &model.User{}
+	var existingUser *model.User
 	if err := r.db.Where("identity.provider = ? and identity.external_id = ?", identity.Provider, identity.ExternalID).Joins("inner join identity on identity.user_id = user.id").First(&existingUser).Error; err == nil {
 		return existingUser, nil
 	}

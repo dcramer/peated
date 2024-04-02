@@ -32,7 +32,7 @@ func (suite *UserRepositoryTestSuite) TestRepository_List() {
 
 	repo := user.NewRepository(suite.DB)
 
-	users, err := repo.List(ctx, &user.ListParams{Limit: 100})
+	users, err := repo.List(ctx, &user.ListInput{Limit: 100})
 	suite.Require().NoError(err)
 	suite.Equal(len(users), 2)
 	suite.Equal(users[0].ID, user2.ID)

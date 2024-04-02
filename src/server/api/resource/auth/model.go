@@ -7,12 +7,12 @@ import (
 )
 
 type EmailPasswordInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
 }
 
 type CodeInput struct {
-	Code string `json:"code"`
+	Code string `json:"code" binding:"required"`
 }
 
 type AuthDTO struct {
@@ -31,5 +31,4 @@ func DTOFromUser(ctx context.Context, u *model.User, t string) *AuthDTO {
 		User:        user.DTOFromUser(ctx, u),
 		AccessToken: t,
 	}
-
 }

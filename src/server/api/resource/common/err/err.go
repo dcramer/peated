@@ -2,20 +2,22 @@ package err
 
 import (
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 var (
-	RespDBDataInsertFailure = []byte(`{"error": "Unable to communicate with database"}`)
-	RespDBDataAccessFailure = []byte(`{"error": "Unable to communicate with database"}`)
-	RespDBDataUpdateFailure = []byte(`{"error": "Unable to communicate with database"}`)
-	RespDBDataRemoveFailure = []byte(`{"error": "Unable to communicate with database"}`)
+	RespDBDataInsertFailure = gin.H{"error": "Unable to communicate with database"}
+	RespDBDataAccessFailure = gin.H{"error": "Unable to communicate with database"}
+	RespDBDataUpdateFailure = gin.H{"error": "Unable to communicate with database"}
+	RespDBDataRemoveFailure = gin.H{"error": "Unable to communicate with database"}
 
-	RespJSONEncodeFailure = []byte(`{"error": "Unable to encode JSON"}`)
-	RespJSONDecodeFailure = []byte(`{"error": "Unable to decode JSON"}`)
+	RespJSONEncodeFailure = gin.H{"error": "Unable to encode JSON"}
+	RespJSONDecodeFailure = gin.H{"error": "Unable to decode JSON"}
 
-	RespInvalidCredentials = []byte(`{"error": "Invalid credentials"}`)
+	RespInvalidCredentials = gin.H{"error": "Invalid credentials"}
 
-	RespUnknownServerError = []byte(`{"error": "Unhandled internal error}`)
+	RespUnknownServerError = gin.H{"error": "Unhandled internal error"}
 )
 
 type Error struct {
@@ -26,27 +28,23 @@ type Errors struct {
 	Errors []string `json:"errors"`
 }
 
-func ServerError(w http.ResponseWriter, error []byte) {
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Write(error)
+func ServerError(ctx *gin.Context, error gin.H) {
+	ctx.AbortWithStatusJSON(http.StatusInternalServerError, error)
 }
 
-func BadRequest(w http.ResponseWriter, error []byte) {
-	w.WriteHeader(http.StatusBadRequest)
-	w.Write(error)
+func BadRequest(ctx *gin.Context, error gin.H) {
+	ctx.AbortWithStatusJSON(http.StatusBadRequest, error)
 }
 
-func ValidationErrors(w http.ResponseWriter, reps []byte) {
-	w.WriteHeader(http.StatusUnprocessableEntity)
-	w.Write(reps)
+func ValidationErrors(ctx *gin.Context, error gin.H) {
+	ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, error)
 }
 
-func Unauthorized(w http.ResponseWriter, error []byte) {
-	w.WriteHeader(http.StatusUnauthorized)
-	w.Write(error)
+func Unauthorized(ctx *gin.Context, error gin.H) {
+	ctx.AbortWithStatusJSON(http.StatusUnauthorized, error)
 }
 
-func Fobidden(w http.ResponseWriter, error []byte) {
-	w.WriteHeader(http.StatusForbidden)
-	w.Write(error)
+func Fobidden(ctx *gin.Context, error gin.H) {
+	ctx.AbortWithStatusJSON(http.StatusForbidden, error)
+
 }

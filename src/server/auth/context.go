@@ -1,15 +1,14 @@
 package auth
 
 import (
-	"context"
 	"peated/db/model"
+
+	"github.com/gin-gonic/gin"
 )
 
-const userKey key = "user"
+const userKey string = "user"
 
-type key string
-
-func CurrentUser(ctx context.Context) (*model.User, bool) {
+func CurrentUser(ctx *gin.Context) (*model.User, bool) {
 	user, ok := ctx.Value(userKey).(*model.User)
 	if user == nil {
 		user = &model.User{}
@@ -17,6 +16,6 @@ func CurrentUser(ctx context.Context) (*model.User, bool) {
 	return user, ok
 }
 
-func SetCurrentUser(ctx context.Context, user *model.User) context.Context {
-	return context.WithValue(ctx, userKey, user)
+func SetCurrentUser(ctx *gin.Context, user *model.User) {
+	ctx.Set(userKey, user)
 }

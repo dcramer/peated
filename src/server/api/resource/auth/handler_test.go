@@ -27,7 +27,7 @@ func (suite *AuthHandlerTestSuite) TestHandler_Read_Unauthenticated() {
 	response := suite.Request("GET", "/auth", nil)
 
 	suite.Require().Equal(http.StatusUnauthorized, response.Code)
-	suite.Equal(err.RespInvalidCredentials, response.Body.Bytes())
+	suite.JSONResponseEqual(response, err.RespInvalidCredentials)
 }
 
 func (suite *AuthHandlerTestSuite) TestHandler_Read_Authenticated() {
@@ -75,8 +75,8 @@ func (suite *AuthHandlerTestSuite) TestHandler_EmailPassword_InvalidCredentials(
 		u.Email = "foo@example.com"
 	})
 
-	response := suite.Request("POST", "/auth/basic", bytes.NewBuffer([]byte(`{"username": "foo@example.com", "password": "baz"}`)))
+	response := suite.Request("POST", "/auth/basic", bytes.NewBuffer([]byte(`{"email": "foo@example.com", "password": "baz"}`)))
 
-	suite.Require().Equal(http.StatusUnauthorized, response.Code)
-	suite.Equal(err.RespInvalidCredentials, response.Body.Bytes())
+	suite.Equal(http.StatusUnauthorized, response.Code)
+	suite.JSONResponseEqual(response, err.RespInvalidCredentials)
 }

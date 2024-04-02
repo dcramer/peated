@@ -74,3 +74,9 @@ func DTOFromUser(ctx context.Context, u *model.User) *UserDTO {
 		PictureUrl:  u.PictureUrl,
 	}
 }
+
+type ListInput struct {
+	Query  string `in:"query=query"`
+	Cursor int    `in:"query=cursor;default=0" default:"0"`
+	Limit  int    `in:"query=limit;default=100" default:"100"`
+}

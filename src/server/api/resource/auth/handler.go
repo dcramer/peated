@@ -2,8 +2,6 @@ package auth
 
 import (
 	"encoding/json"
-	"net/http"
-	"peated/api/resource/common/encoder"
 	e "peated/api/resource/common/err"
 	"peated/api/resource/user"
 	"peated/auth"
@@ -11,7 +9,7 @@ import (
 	"peated/db/model"
 	"strings"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
@@ -32,92 +30,87 @@ type API struct {
 	repository *user.Repository
 }
 
-func New(config *config.Config, logger *zerolog.Logger, db *gorm.DB) func(chi.Router) {
+func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *gorm.DB) {
 	api := &API{
 		config:     config,
 		logger:     logger,
 		db:         db,
 		repository: user.NewRepository(db),
 	}
-	return func(r chi.Router) {
-		r.Get("/", api.Read)
-		r.Post("/basic", api.EmailPassword)
-		r.Post("/google", api.Google)
-	}
+	r.GET("/auth", api.Read)
+	r.POST("/auth/basic", api.EmailPassword)
+	r.POST("/auth/google", api.Google)
 }
 
 /**
  * Read currently authenticated user.
  */
-func (a *API) Read(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+func (a *API) Read(ctx *gin.Context) {
 	user, ok := auth.CurrentUser(ctx)
 	if !ok {
 		a.logger.Error().Msg("unauthenticated session")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	if !user.Active {
 		a.logger.Error().Msg("user inactive")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
-	encoder.Encode(w, r, http.StatusOK, DTOFromUser(ctx, user, ""))
+	ctx.JSON(200, DTOFromUser(ctx, user, ""))
 }
 
-func (a *API) EmailPassword(w http.ResponseWriter, r *http.Request) {
-	form, err := encoder.Decode[EmailPasswordInput](r)
-	if err != nil {
-		a.logger.Error().Err(err).Msg("invalid input")
-		e.BadRequest(w, e.RespJSONDecodeFailure)
+func (a *API) EmailPassword(ctx *gin.Context) {
+	var input EmailPasswordInput
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		e.BadRequest(ctx, gin.H{"error": err.Error()})
 		return
 	}
 
-	currentUser, err := a.repository.ReadByEmail(r.Context(), form.Email)
+	currentUser, err := a.repository.ReadByEmail(ctx, input.Email)
 	if err != nil {
-		a.logger.Error().Str("email", form.Email).Err(err).Msg("no matching user found")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		a.logger.Error().Str("email", input.Email).Err(err).Msg("no matching user found")
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	if len(currentUser.PasswordHash) == 0 {
-		a.logger.Error().Str("email", form.Email).Msg("no password set")
+		a.logger.Error().Str("email", input.Email).Msg("no password set")
 
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
-	if !CheckPasswordHash(form.Password, currentUser.PasswordHash) {
-		a.logger.Error().Str("email", form.Email).Msg("password mismatch")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+	if !CheckPasswordHash(input.Password, currentUser.PasswordHash) {
+		a.logger.Error().Str("email", input.Email).Msg("password mismatch")
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	if !currentUser.Active {
-		a.logger.Error().Str("email", form.Email).Msg("user inactive")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		a.logger.Error().Str("email", input.Email).Msg("user inactive")
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	accessToken, err := auth.CreateAccessToken(a.config, currentUser)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create token")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
-	auth := DTOFromUser(r.Context(), currentUser, *accessToken)
+	auth := DTOFromUser(ctx, currentUser, *accessToken)
 
-	encoder.Encode(w, r, http.StatusOK, auth)
+	ctx.JSON(200, auth)
 }
 
-func (a *API) Google(w http.ResponseWriter, r *http.Request) {
-	form, err := encoder.Decode[CodeInput](r)
-	if err != nil {
-		a.logger.Error().Err(err).Msg("invalid input")
-		e.BadRequest(w, e.RespJSONDecodeFailure)
+func (a *API) Google(ctx *gin.Context) {
+	var input CodeInput
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		e.BadRequest(ctx, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -132,45 +125,44 @@ func (a *API) Google(w http.ResponseWriter, r *http.Request) {
 		Endpoint: google.Endpoint,
 	}
 
-	ctx := r.Context()
-	token, err := conf.Exchange(ctx, form.Code)
+	token, err := conf.Exchange(ctx, input.Code)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("failed to exchange token")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	idTokenString := token.Extra("id_token").(string)
 	if len(idTokenString) == 0 {
 		a.logger.Error().Err(err).Msg("invalid or missing id_token")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	ticket, err := idtoken.Validate(ctx, idTokenString, a.config.Google.ClientID)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to validate id_token")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	jsonbody, err := json.Marshal(ticket.Claims)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to marshal claims")
-		e.ServerError(w, e.RespJSONEncodeFailure)
+		e.ServerError(ctx, e.RespJSONEncodeFailure)
 		return
 	}
 
 	claims := GoogleClaims{}
 	if err := json.Unmarshal(jsonbody, &claims); err != nil {
 		a.logger.Error().Err(err).Msg("unable to unmarshal claims")
-		e.ServerError(w, e.RespJSONDecodeFailure)
+		e.ServerError(ctx, e.RespJSONDecodeFailure)
 		return
 	}
 
 	if len(claims.Email) == 0 {
 		a.logger.Error().Err(err).Msg("no email address")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
@@ -185,24 +177,24 @@ func (a *API) Google(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create user from token")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	if !currentUser.Active {
 		a.logger.Error().Msg("user inactive")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
 	accessToken, err := auth.CreateAccessToken(a.config, currentUser)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to create token")
-		e.Unauthorized(w, e.RespInvalidCredentials)
+		e.Unauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
-	auth := DTOFromUser(r.Context(), currentUser, *accessToken)
+	auth := DTOFromUser(ctx, currentUser, *accessToken)
 
-	encoder.Encode(w, r, http.StatusOK, auth)
+	ctx.JSON(200, auth)
 }
