@@ -40,6 +40,32 @@ func (suite *EntityHandlerTestSuite) TestHandler_List() {
 	suite.Equal(data.Entities[0].ID, strconv.FormatUint(entity1.ID, 10))
 }
 
+func (suite *EntityHandlerTestSuite) TestHandler_List_Type() {
+	ctx := context.Background()
+
+	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {
+		var types []string
+		types = append(types, "brand")
+		b.Type = types
+	})
+
+	response := suite.Request("GET", "/entities?type=brand", nil)
+
+	suite.Require().Equal(http.StatusOK, response.Code)
+	var data entity.EntitiesResponse
+	err := json.Unmarshal(response.Body.Bytes(), &data)
+	suite.Require().NoError(err)
+	suite.Require().Equal(len(data.Entities), 1)
+	suite.Equal(data.Entities[0].ID, strconv.FormatUint(entity1.ID, 10))
+
+	response = suite.Request("GET", "/entities?type=distiller", nil)
+
+	suite.Require().Equal(http.StatusOK, response.Code)
+	err = json.Unmarshal(response.Body.Bytes(), &data)
+	suite.Require().NoError(err)
+	suite.Require().Equal(len(data.Entities), 0)
+}
+
 func (suite *EntityHandlerTestSuite) TestHandler_ById() {
 	ctx := context.Background()
 

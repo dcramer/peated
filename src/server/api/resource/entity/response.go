@@ -7,10 +7,19 @@ import (
 )
 
 type Entity struct {
-	ID     string                 `json:"id"`
-	Type   []string               `json:"type"`
-	Name   string                 `json:"name"`
-	Config map[string]interface{} `json:"config"`
+	ID              string   `json:"id"`
+	Name            string   `json:"name"`
+	ShortName       string   `json:"shortName"`
+	Type            []string `json:"type"`
+	Description     string
+	YearEstablished uint `json:"yearEstablished"`
+	Website         string
+	Country         string
+	Region          string
+	Location        []float32
+	CreatedAt       string `json:"createdAt"`
+	TotalTastings   uint   `json:"totalTastings"`
+	TotalBottles    uint   `json:"totalBottles"`
 }
 
 type EntityResponse struct {
