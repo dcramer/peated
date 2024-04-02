@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"peated/api/resource/badge"
 	"peated/api/resource/common/err"
@@ -35,8 +36,28 @@ func (suite *BadgeHandlerTestSuite) TestHandler_List() {
 	var data *badge.BadgesResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(len(data.Badges), 1)
+	suite.Require().Equal(len(data.Badges), 1)
 	suite.Equal(data.Badges[0].ID, strconv.FormatUint(badge1.ID, 10))
+}
+
+func (suite *BadgeHandlerTestSuite) TestHandler_ById() {
+	ctx := context.Background()
+
+	badge1 := fixture.NewBadge(ctx, suite.DB, func(b *model.Badge) {})
+
+	response := suite.Request("GET", fmt.Sprintf("/badges/%d", badge1.ID), nil)
+
+	suite.Require().Equal(http.StatusOK, response.Code)
+	var data *badge.BadgeResponse
+	err := json.Unmarshal(response.Body.Bytes(), &data)
+	suite.Require().NoError(err)
+	suite.Equal(data.Badge.ID, strconv.FormatUint(badge1.ID, 10))
+}
+
+func (suite *BadgeHandlerTestSuite) TestHandler_ById_NotFound() {
+	response := suite.Request("GET", "/badges/1", nil)
+
+	suite.Require().Equal(http.StatusNotFound, response.Code)
 }
 
 func (suite *BadgeHandlerTestSuite) TestHandler_Create_Unauthenticated() {

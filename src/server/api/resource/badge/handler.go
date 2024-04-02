@@ -74,8 +74,12 @@ func (a *API) badgeById(ctx *gin.Context) {
 
 	badge, err := a.repository.ReadById(ctx, uri.ID)
 	if err != nil {
+		if database.IsRecordNotFoundErr(err) {
+			e.NewNotFound(ctx, e.RespNotFound)
+			return
+		}
 		a.logger.Error().Err(err).Msg("")
-		e.NewServerError(ctx, e.RespDBDataAccessFailure)
+		e.NewServerError(ctx, e.RespUnknownServerError)
 		return
 	}
 
