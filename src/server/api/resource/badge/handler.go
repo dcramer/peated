@@ -79,7 +79,7 @@ func (a *API) badgeById(ctx *gin.Context) {
 			return
 		}
 		a.logger.Error().Err(err).Msg("")
-		e.NewServerError(ctx, e.RespUnknownServerError)
+		e.NewServerError(ctx, e.RespDBDataAccessFailure)
 		return
 	}
 
