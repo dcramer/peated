@@ -24,10 +24,11 @@ func (r *Repository) List(ctx context.Context, params *ListInput) (model.Users, 
 	var clauses []clause.Expression
 	var users model.Users
 
-	if len(params.Query) != 0 {
+	if params.Query != "" {
 		clauses = append(clauses, clause.Or(
 			database.ILike{Column: "display_name", Value: "%" + params.Query + "%"},
 			database.ILike{Column: "email", Value: params.Query},
+			database.ILike{Column: "username", Value: params.Query},
 		))
 	}
 

@@ -39,15 +39,15 @@ func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *go
 		db:         db,
 		repository: user.NewRepository(db),
 	}
-	r.GET("/auth", api.Read)
-	r.POST("/auth/basic", api.EmailPassword)
-	r.POST("/auth/google", api.Google)
+	r.GET("/auth", api.authSession)
+	r.POST("/auth/basic", api.authEmailPassword)
+	r.POST("/auth/google", api.authGoogle)
 }
 
 /**
  * Read currently authenticated user.
  */
-func (a *API) Read(ctx *gin.Context) {
+func (a *API) authSession(ctx *gin.Context) {
 	user, ok := auth.CurrentUser(ctx)
 	if !ok {
 		a.logger.Error().Msg("unauthenticated session")
@@ -61,10 +61,10 @@ func (a *API) Read(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, DTOFromUser(ctx, user, ""))
+	ctx.JSON(200, NewAuthResponse(ctx, user, ""))
 }
 
-func (a *API) EmailPassword(ctx *gin.Context) {
+func (a *API) authEmailPassword(ctx *gin.Context) {
 	var data EmailPasswordInput
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		var details []*validate.ValidationErrDetail
@@ -77,7 +77,7 @@ func (a *API) EmailPassword(ctx *gin.Context) {
 
 	currentUser, err := a.repository.ReadByEmail(ctx, data.Email)
 	if err != nil {
-		a.logger.Error().Str("email", data.Email).Err(err).Msg("no matching user found")
+		a.logger.Error().Str("email", data.Email).Err(err).Msg("")
 		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
@@ -108,12 +108,12 @@ func (a *API) EmailPassword(ctx *gin.Context) {
 		return
 	}
 
-	auth := DTOFromUser(ctx, currentUser, *accessToken)
+	auth := NewAuthResponse(ctx, currentUser, *accessToken)
 
 	ctx.JSON(200, auth)
 }
 
-func (a *API) Google(ctx *gin.Context) {
+func (a *API) authGoogle(ctx *gin.Context) {
 	var data CodeInput
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		var details []*validate.ValidationErrDetail
@@ -204,7 +204,7 @@ func (a *API) Google(ctx *gin.Context) {
 		return
 	}
 
-	auth := DTOFromUser(ctx, currentUser, *accessToken)
+	auth := NewAuthResponse(ctx, currentUser, *accessToken)
 
 	ctx.JSON(200, auth)
 }

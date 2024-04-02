@@ -39,8 +39,7 @@ func (suite *AuthHandlerTestSuite) TestHandler_Read_Authenticated() {
 		r.Header.Set("Authorization", fixture.NewAuthorization(r.Context(), test.NewConfig(), user))
 	})
 
-	var data auth.AuthDTO
-
+	var data auth.AuthResponse
 	suite.Require().Equal(http.StatusOK, response.Code)
 	err := json.NewDecoder(response.Body).Decode(&data)
 	suite.Require().NoError(err)
@@ -59,8 +58,7 @@ func (suite *AuthHandlerTestSuite) TestHandler_EmailPassword_ValidCredentials() 
 
 	response := suite.Request("POST", "/auth/basic", bytes.NewBuffer([]byte(`{"email": "foo@example.com", "password": "bar"}`)))
 
-	var data auth.AuthDTO
-
+	var data auth.AuthResponse
 	suite.Require().Equal(http.StatusOK, response.Code)
 	err := json.NewDecoder(response.Body).Decode(&data)
 	suite.Require().NoError(err)

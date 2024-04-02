@@ -33,7 +33,7 @@ func (suite *BadgeHandlerTestSuite) TestHandler_List() {
 	response := suite.Request("GET", "/badges", nil)
 
 	suite.Require().Equal(http.StatusOK, response.Code)
-	var data *badge.BadgesResponse
+	var data badge.BadgesResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Require().Equal(len(data.Badges), 1)
@@ -48,7 +48,7 @@ func (suite *BadgeHandlerTestSuite) TestHandler_ById() {
 	response := suite.Request("GET", fmt.Sprintf("/badges/%d", badge1.ID), nil)
 
 	suite.Require().Equal(http.StatusOK, response.Code)
-	var data *badge.BadgeResponse
+	var data badge.BadgeResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Equal(data.Badge.ID, strconv.FormatUint(badge1.ID, 10))
@@ -88,7 +88,7 @@ func (suite *BadgeHandlerTestSuite) TestHandler_Create_Admin() {
 	})
 
 	suite.Require().Equal(http.StatusCreated, response.Code)
-	var data *badge.BadgeResponse
+	var data badge.BadgeResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Equal(data.Badge.Name, "foo")
