@@ -160,8 +160,13 @@ func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.Entity, er
 	return entity, nil
 }
 
-func (r *Repository) Delete(ctx context.Context, entity *model.Entity) error {
+func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.User) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
+		entity, err := r.ReadById(ctx, id)
+		if err != nil {
+			return err
+		}
+
 		entityData, err := json.Marshal(entity)
 		if err != nil {
 			return err

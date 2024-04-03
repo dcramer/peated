@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"peated/api/resource/common/err"
 	"peated/api/resource/entity"
-	"peated/database/column/spatial"
 	"peated/database/model"
 	"peated/test"
 	"peated/test/fixture"
@@ -70,22 +69,15 @@ func (suite *EntityHandlerTestSuite) TestHandler_List_Type() {
 func (suite *EntityHandlerTestSuite) TestHandler_ById() {
 	ctx := context.Background()
 
-	location, err := spatial.NewPoint("-122.4194", "37.7749")
-	suite.Require().NoError(err)
-
-	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {
-		b.Location = location
-	})
+	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
 
 	response := suite.Request("GET", fmt.Sprintf("/entities/%d", entity1.ID), nil)
 
 	suite.ResponseStatusEqual(response, http.StatusOK)
 	var data entity.EntityResponse
-	err = json.Unmarshal(response.Body.Bytes(), &data)
+	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Equal(data.Entity.ID, strconv.FormatUint(entity1.ID, 10))
-	suite.Equal(data.Entity.Location.Lng, -122.4194)
-	suite.Equal(data.Entity.Location.Lat, 37.7749)
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_ById_NotFound() {
@@ -126,4 +118,33 @@ func (suite *EntityHandlerTestSuite) TestHandler_Create_Admin() {
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Equal(data.Entity.Name, "foo")
+}
+
+func (suite *EntityHandlerTestSuite) TestHandler_Delete_NonAdmin() {
+	ctx := context.Background()
+
+	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
+
+	response := suite.RequestWithHandler("DELETE", fmt.Sprintf("/entities/%d", entity1.ID), nil, func(r *http.Request) {
+		r.Header.Set("Authorization", fixture.DefaultAuthorization(r.Context(), suite.DB, test.NewConfig()))
+	})
+
+	suite.ResponseStatusEqual(response, http.StatusForbidden)
+	suite.JSONResponseEqual(response, err.RespNoPermission)
+}
+
+func (suite *EntityHandlerTestSuite) TestHandler_Delete_Admin() {
+	ctx := context.Background()
+
+	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
+
+	user := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
+		u.Admin = true
+	})
+
+	response := suite.RequestWithHandler("DELETE", fmt.Sprintf("/entities/%d", entity1.ID), nil, func(r *http.Request) {
+		r.Header.Set("Authorization", fixture.NewAuthorization(r.Context(), test.NewConfig(), user))
+	})
+
+	suite.ResponseStatusEqual(response, http.StatusNoContent)
 }

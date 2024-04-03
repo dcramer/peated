@@ -34,6 +34,7 @@ func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *go
 	r.GET("/entities", api.entityList)
 	r.POST("/entities", middleware.AdminRequired(config, logger, db), api.entityCreate)
 	r.GET("/entities/:id", api.entityById)
+	r.DELETE("/entities/:id", middleware.AdminRequired(config, logger, db), api.entityDelete)
 }
 
 func (a *API) entityList(ctx *gin.Context) {
@@ -122,4 +123,40 @@ func (a *API) entityCreate(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, NewEntityResponse(ctx, newEntity))
+}
+
+func (a *API) entityDelete(ctx *gin.Context) {
+	type RequestUri struct {
+		ID uint64 `uri:"id" binding:"numeric"`
+	}
+	var uri RequestUri
+
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		var details []*validate.ValidationErrDetail
+		if vErrs, ok := err.(validator.ValidationErrors); ok {
+			details = validate.ValidationErrorDetails(&uri, "uri", vErrs)
+		}
+		e.NewBadRequest(ctx, e.InvalidParameters(details))
+		return
+	}
+
+	currentUser, ok := auth.CurrentUser(ctx)
+	if !ok {
+		a.logger.Error().Msg("this should not be reachable (entityCreate.currentUser)")
+		e.NewServerError(ctx, e.RespDBDataAccessFailure)
+		return
+	}
+
+	err := a.repository.Delete(ctx, uri.ID, currentUser)
+	if err != nil {
+		if database.IsRecordNotFoundErr(err) {
+			e.NewNotFound(ctx, e.RespNotFound)
+			return
+		}
+		a.logger.Error().Err(err).Msg("")
+		e.NewServerError(ctx, e.RespDBDataRemoveFailure)
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, gin.H{})
 }
