@@ -35,7 +35,6 @@ type ListInput struct {
 }
 
 type EntityMergeInput struct {
-	Root      string `json:"root" binding:"required,numeric"`
-	Other     string `json:"other" binding:"required,numeric"`
-	Direction string `json:"direction" binding:"required,default=mergeInto,oneof=mergeInto mergeFrom"`
+	EntityIDs []uint64 `json:"entityIds" binding:"required,dive,numeric"`
+	Direction string   `json:"direction" binding:"required,default=mergeInto,oneof=mergeInto mergeFrom"`
 }

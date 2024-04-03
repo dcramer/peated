@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/go-errors/errors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -167,16 +168,15 @@ func (r *Repository) Update(ctx context.Context, entity *model.Entity, currentUs
 			return err
 		}
 
-		if err := tx.Model(&model.User{}).Where("id = ?", entity.ID).Updates(entity).Error; err != nil {
+		if err := tx.Model(&model.Entity{}).Where("id = ?", entity.ID).Updates(entity).Error; err != nil {
 			return err
 		}
 
 		if err := tx.Create(&model.Change{
-			ObjectID:   entity.ID,
-			ObjectType: "entity",
-			Type:       model.ChangeTypeUpdate,
-			CreatedAt:  time.Now(),
-			// TODO:
+			ObjectID:    entity.ID,
+			ObjectType:  "entity",
+			Type:        model.ChangeTypeUpdate,
+			CreatedAt:   time.Now(),
 			CreatedByID: currentUser.ID,
 			Data:        entityData,
 		}).Error; err != nil {
@@ -216,4 +216,94 @@ func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.U
 
 		return nil
 	})
+}
+
+func (r *Repository) MergeInto(ctx context.Context, primary *model.Entity, siblingIds []uint64, currentUser *model.User) error {
+	var siblings model.Entities
+	if err := r.db.Find(&siblings, siblingIds).Error; err != nil {
+		return err
+	}
+	if len(siblings) != len(siblingIds) {
+		return errors.New("one or more entities were not found")
+	}
+
+	var totalBottles, totalTastings uint
+
+	for _, e := range siblings {
+		totalBottles += e.TotalBottles
+		totalTastings += e.TotalTastings
+	}
+
+	// TODO: this doesnt handle duplicate bottles
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		tx.Model(&model.Bottle{}).Where("brand_id IN ?", siblingIds).Update("brand_id", primary.ID)
+		tx.Model(&model.Bottle{}).Where("bottler_id IN ?", siblingIds).Update("bottler_id", primary.ID)
+		tx.Model(&model.BottleDistiller{}).Where("distiller_id IN ?", siblingIds).Update("distiller_id", primary.ID)
+
+		for _, id := range siblingIds {
+			tx.Create(&model.EntityTombstone{
+				EntityID:    id,
+				NewEntityID: primary.ID,
+			})
+		}
+
+		tx.Model(&model.Entity{}).Where("entity_id = ?", primary.ID).Updates(map[string]interface{}{
+			"total_bottles":  gorm.Expr("total_bottles + ?", totalBottles),
+			"total_tastings": gorm.Expr("total_tastings + ?", totalTastings),
+		})
+		primary.TotalBottles += totalBottles
+		primary.TotalTastings += totalTastings
+
+		for _, e := range siblings {
+			eData, err := json.Marshal(primary)
+			if err != nil {
+				return err
+			}
+			if err := tx.Create(&model.Change{
+				ObjectID:    e.ID,
+				ObjectType:  "entity",
+				Type:        model.ChangeTypeDelete,
+				CreatedAt:   time.Now(),
+				CreatedByID: currentUser.ID,
+				Data:        eData,
+			}).Error; err != nil {
+				return err
+			}
+		}
+
+		primaryData, err := json.Marshal(primary)
+		if err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Change{
+			ObjectID:    primary.ID,
+			ObjectType:  "entity",
+			Type:        model.ChangeTypeUpdate,
+			CreatedAt:   time.Now(),
+			CreatedByID: currentUser.ID,
+			Data:        primaryData,
+		}).Error; err != nil {
+			return err
+		}
+
+		tx.Where("id IN ?", siblingIds).Delete(&model.Entity{})
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+	// TODO: add this after we add worker support
+	// try {
+	// 	await pushJob("GenerateEntityDetails", { entityId: entity.id });
+	//   } catch (err) {
+	// 	logError(err, {
+	// 	  entity: {
+	// 		id: entity.id,
+	// 	  },
+	// 	});
+	//   }
+
+	return nil
 }

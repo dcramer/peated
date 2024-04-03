@@ -36,6 +36,7 @@ func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *go
 	r.GET("/entities/:id", api.entityById)
 	r.DELETE("/entities/:id", middleware.ModRequired(config, logger, db), api.entityDelete)
 	r.PUT("/entities/:id", middleware.ModRequired(config, logger, db), api.entityUpdate)
+	r.PUT("/entities/:id/merge", middleware.ModRequired(config, logger, db), api.entityMerge)
 }
 
 func (a *API) entityList(ctx *gin.Context) {
