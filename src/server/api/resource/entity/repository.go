@@ -160,8 +160,35 @@ func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.Entity, er
 	return entity, nil
 }
 
+func (r *Repository) Update(ctx context.Context, entity *model.Entity, currentUser *model.User) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		entityData, err := json.Marshal(entity)
+		if err != nil {
+			return err
+		}
+
+		if err := tx.Model(&model.User{}).Where("id = ?", entity.ID).Updates(entity).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Change{
+			ObjectID:   entity.ID,
+			ObjectType: "entity",
+			Type:       model.ChangeTypeUpdate,
+			CreatedAt:  time.Now(),
+			// TODO:
+			CreatedByID: currentUser.ID,
+			Data:        entityData,
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.User) error {
-	err := r.db.Transaction(func(tx *gorm.DB) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
 		entity, err := r.ReadById(ctx, id)
 		if err != nil {
 			return err
@@ -177,12 +204,11 @@ func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.U
 		}
 
 		if err := tx.Create(&model.Change{
-			ObjectID:   entity.ID,
-			ObjectType: "entity",
-			Type:       model.ChangeTypeDelete,
-			CreatedAt:  time.Now(),
-			// TODO:
-			CreatedByID: entity.CreatedByID,
+			ObjectID:    entity.ID,
+			ObjectType:  "entity",
+			Type:        model.ChangeTypeDelete,
+			CreatedAt:   time.Now(),
+			CreatedByID: currentUser.ID,
 			Data:        entityData,
 		}).Error; err != nil {
 			return err
@@ -190,8 +216,4 @@ func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.U
 
 		return nil
 	})
-	if err != nil {
-		return err
-	}
-	return nil
 }

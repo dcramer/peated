@@ -41,6 +41,18 @@ func TimeoutMiddleware(timeout time.Duration) gin.HandlerFunc {
 	}
 }
 
+func ModRequired(config *config.Config, logger *zerolog.Logger, db *gorm.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		user, ok := auth.CurrentUser(ctx)
+		if !ok {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, e.RespAuthRequired)
+		} else if !user.Admin && !user.Mod {
+			ctx.AbortWithStatusJSON(http.StatusForbidden, e.RespNoPermission)
+		}
+		ctx.Next()
+	}
+}
+
 func AdminRequired(config *config.Config, logger *zerolog.Logger, db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		user, ok := auth.CurrentUser(ctx)

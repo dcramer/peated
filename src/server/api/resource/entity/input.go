@@ -13,6 +13,17 @@ type EntityInput struct {
 	Location        *spatial.Point `json:"location"`
 }
 
+type EntityUpdateInput struct {
+	Name            string   `json:"name"`
+	ShortName       string   `json:"shortName"`
+	Type            []string `json:"type" binding:"dive,oneof=bottler brand distiller"`
+	Country         string
+	Region          string
+	YearEstablished uint           `json:"yearEstablished" binding:"numeric,gte=0,lte=2050"`
+	Website         string         `json:"website" binding:"omitempty,url"`
+	Location        *spatial.Point `json:"location"`
+}
+
 type ListInput struct {
 	Sort    string `form:"sort,default=-tastings"`
 	Query   string `form:"query"`

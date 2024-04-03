@@ -93,7 +93,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_Create_Unauthenticated() {
 	suite.JSONResponseEqual(response, err.RespAuthRequired)
 }
 
-func (suite *EntityHandlerTestSuite) TestHandler_Create_NonAdmin() {
+func (suite *EntityHandlerTestSuite) TestHandler_Create_NonMod() {
 	response := suite.RequestWithHandler("POST", "/entities", nil, func(r *http.Request) {
 		r.Header.Set("Authorization", fixture.DefaultAuthorization(r.Context(), suite.DB, test.NewConfig()))
 	})
@@ -102,11 +102,11 @@ func (suite *EntityHandlerTestSuite) TestHandler_Create_NonAdmin() {
 	suite.JSONResponseEqual(response, err.RespNoPermission)
 }
 
-func (suite *EntityHandlerTestSuite) TestHandler_Create_Admin() {
+func (suite *EntityHandlerTestSuite) TestHandler_Create_Mod() {
 	ctx := context.Background()
 
 	user := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
-		u.Admin = true
+		u.Mod = true
 	})
 
 	response := suite.RequestWithHandler("POST", "/entities", bytes.NewBuffer([]byte(`{"name": "foo", "type": ["brand"]}`)), func(r *http.Request) {
@@ -120,7 +120,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_Create_Admin() {
 	suite.Equal(data.Entity.Name, "foo")
 }
 
-func (suite *EntityHandlerTestSuite) TestHandler_Delete_NonAdmin() {
+func (suite *EntityHandlerTestSuite) TestHandler_Delete_NonMod() {
 	ctx := context.Background()
 
 	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
@@ -133,13 +133,13 @@ func (suite *EntityHandlerTestSuite) TestHandler_Delete_NonAdmin() {
 	suite.JSONResponseEqual(response, err.RespNoPermission)
 }
 
-func (suite *EntityHandlerTestSuite) TestHandler_Delete_Admin() {
+func (suite *EntityHandlerTestSuite) TestHandler_Delete_Mod() {
 	ctx := context.Background()
 
 	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
 
 	user := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
-		u.Admin = true
+		u.Mod = true
 	})
 
 	response := suite.RequestWithHandler("DELETE", fmt.Sprintf("/entities/%d", entity1.ID), nil, func(r *http.Request) {
@@ -147,4 +147,33 @@ func (suite *EntityHandlerTestSuite) TestHandler_Delete_Admin() {
 	})
 
 	suite.ResponseStatusEqual(response, http.StatusNoContent)
+}
+
+func (suite *EntityHandlerTestSuite) TestHandler_Update_NonMod() {
+	ctx := context.Background()
+
+	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
+
+	response := suite.RequestWithHandler("PUT", fmt.Sprintf("/entities/%d", entity1.ID), bytes.NewBuffer([]byte("{}")), func(r *http.Request) {
+		r.Header.Set("Authorization", fixture.DefaultAuthorization(r.Context(), suite.DB, test.NewConfig()))
+	})
+
+	suite.ResponseStatusEqual(response, http.StatusForbidden)
+	suite.JSONResponseEqual(response, err.RespNoPermission)
+}
+
+func (suite *EntityHandlerTestSuite) TestHandler_Update_Mod() {
+	ctx := context.Background()
+
+	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
+
+	user := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
+		u.Mod = true
+	})
+
+	response := suite.RequestWithHandler("PUT", fmt.Sprintf("/entities/%d", entity1.ID), bytes.NewBuffer([]byte("{}")), func(r *http.Request) {
+		r.Header.Set("Authorization", fixture.NewAuthorization(r.Context(), test.NewConfig(), user))
+	})
+
+	suite.ResponseStatusEqual(response, http.StatusOK)
 }
