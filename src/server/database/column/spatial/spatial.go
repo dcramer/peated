@@ -7,10 +7,29 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
+
+// future proof this using strings given they're fixed
+// and we should probably be using decimal
+func NewPoint(lng string, lat string) (*Point, error) {
+	dLng, err := strconv.ParseFloat(lng, 64)
+	if err != nil {
+		return nil, err
+	}
+	dLat, err := strconv.ParseFloat(lat, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Point{
+		Lng: dLng,
+		Lat: dLat,
+	}, nil
+}
 
 type Point struct {
 	Lng float64 `json:"lng"`
@@ -28,7 +47,7 @@ func (p *Point) String() string {
 func (p Point) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 	return clause.Expr{
 		SQL:  "ST_PointFromText(?, 4326)",
-		Vars: []interface{}{fmt.Sprintf("POINT(%f %f)", p.Lng, p.Lat)},
+		Vars: []interface{}{fmt.Sprintf("POINT(%v %v)", p.Lng, p.Lat)},
 	}
 }
 
@@ -57,7 +76,6 @@ func (p *Point) Scan(val interface{}) error {
 	if err := binary.Read(r, byteOrder, &wkbGeometryType); err != nil {
 		return err
 	}
-	fmt.Printf("%+v", wkbGeometryType)
 
 	if err := binary.Read(r, byteOrder, p); err != nil {
 		return err

@@ -107,21 +107,23 @@ func NewEntity(ctx context.Context, db *gorm.DB, handler func(*model.Entity)) *m
 	var types []string
 	types = append(types, model.EntityTypeBrand)
 
+	location, err := spatial.NewPoint("-122.4194", "37.7749")
+	if err != nil {
+		panic(err)
+	}
+
 	entity := &model.Entity{
 		Name:      f.App().Name(),
 		Type:      types,
 		Country:   f.Address().Country(),
 		Website:   f.Internet().URL(),
 		CreatedAt: time.Now(),
-		Location: &spatial.Point{
-			Lat: 37.7749,
-			Lng: -122.4194,
-		},
+		Location:  location,
 	}
 
 	handler(entity)
 
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		if entity.CreatedByID == 0 {
 			entity.CreatedByID = DefaultUser(ctx, tx).ID
 		}

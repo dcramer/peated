@@ -14,9 +14,9 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/nrednav/cuid2 v1.0.0
-	github.com/paulmach/orb v0.10.0
 	github.com/pressly/goose/v3 v3.19.2
 	github.com/rs/zerolog v1.32.0
+	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.21.0
 	golang.org/x/oauth2 v0.18.0

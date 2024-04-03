@@ -70,22 +70,22 @@ func (suite *EntityHandlerTestSuite) TestHandler_List_Type() {
 func (suite *EntityHandlerTestSuite) TestHandler_ById() {
 	ctx := context.Background()
 
+	location, err := spatial.NewPoint("-122.4194", "37.7749")
+	suite.Require().NoError(err)
+
 	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {
-		b.Location = &spatial.Point{
-			Lng: 56.5,
-			Lat: -123.1,
-		}
+		b.Location = location
 	})
 
 	response := suite.Request("GET", fmt.Sprintf("/entities/%d", entity1.ID), nil)
 
 	suite.Require().Equal(http.StatusOK, response.Code)
 	var data entity.EntityResponse
-	err := json.Unmarshal(response.Body.Bytes(), &data)
+	err = json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Equal(data.Entity.ID, strconv.FormatUint(entity1.ID, 10))
-	suite.Equal(data.Entity.Location[0], 56.5)
-	suite.Equal(data.Entity.Location[1], -123.1)
+	suite.Equal(data.Entity.Location[0], -122.4194)
+	suite.Equal(data.Entity.Location[1], 37.7749)
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_ById_NotFound() {
