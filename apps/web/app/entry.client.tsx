@@ -1,4 +1,5 @@
 import { RemixBrowser, useLocation, useMatches } from "@remix-run/react";
+import { feedbackModalIntegration } from "@sentry-internal/feedback";
 import * as Sentry from "@sentry/remix";
 import { startTransition, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
@@ -51,7 +52,9 @@ Sentry.init({
       themeLight: feedbackTheme,
       themeDark: feedbackTheme,
       autoInject: false,
+      showScreenshot: false,
     }),
+    feedbackModalIntegration(),
   ],
 
   tracesSampleRate: 1.0,

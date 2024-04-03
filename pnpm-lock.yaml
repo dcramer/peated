@@ -49,8 +49,8 @@ importers:
         version: 2.9.0
     devDependencies:
       '@spotlightjs/spotlight':
-        specifier: ^1.2.13
-        version: 1.2.13
+        specifier: ^2.0.0-alpha.1
+        version: 2.0.0-alpha.1
 
   apps/cli:
     dependencies:
@@ -339,6 +339,9 @@ importers:
       '@rollup/plugin-replace':
         specifier: ^5.0.5
         version: 5.0.5
+      '@sentry-internal/feedback':
+        specifier: ~8.0.0-alpha.7
+        version: 8.0.0-alpha.7
       '@sentry/remix':
         specifier: ~8.0.0-alpha.7
         version: 8.0.0-alpha.7(@opentelemetry/api@1.7.0)(@opentelemetry/core@1.21.0)(@opentelemetry/sdk-trace-base@1.21.0)(@opentelemetry/semantic-conventions@1.21.0)(@remix-run/node@2.7.2)(@remix-run/react@2.7.2)(react@18.2.0)
@@ -515,8 +518,8 @@ importers:
         version: 3.22.4
     devDependencies:
       '@spotlightjs/spotlight':
-        specifier: ^1.2.13
-        version: 1.2.13
+        specifier: ^2.0.0-alpha.1
+        version: 2.0.0-alpha.1
 
   apps/worker:
     dependencies:
@@ -5634,8 +5637,8 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: false
 
-  /@spotlightjs/overlay@1.7.0:
-    resolution: {integrity: sha512-WkJAByFCOzFRXcd4Z1YVTIhm0CVb9rjr1xwpQWZXFjCwyTHGqPa4wBIRQTgi49AiTf3lPr2TbXEltO36O4Um5w==}
+  /@spotlightjs/overlay@2.0.0-alpha.1:
+    resolution: {integrity: sha512-BJM8l9mJ6obTX/3xw1Erj9Pk/eVOP8oUtb3PoNjwQfnOrio7J8wlWjSETES22EslVPFI1kpl2UMtB+s91Ic8zQ==}
     dev: true
 
   /@spotlightjs/sidecar@1.4.0:
@@ -5643,11 +5646,11 @@ packages:
     hasBin: true
     dev: true
 
-  /@spotlightjs/spotlight@1.2.13:
-    resolution: {integrity: sha512-gxz4Y9EVTdtpV+P/gDmj3MoJQyGcWNXPEN5ouvtUTTyzBSh29Km9Geh6rnsdSuy84yPhs2SOBfiBAhbXLZf9xQ==}
+  /@spotlightjs/spotlight@2.0.0-alpha.1:
+    resolution: {integrity: sha512-d5AorTG9HDmyaFy1RBbYrw8UwxFWT9IU4itJRcnEgp/JdwarOmDAF9w0TsBocKtoCsYtspSaXaN0AxTZqS22iA==}
     hasBin: true
     dependencies:
-      '@spotlightjs/overlay': 1.7.0
+      '@spotlightjs/overlay': 2.0.0-alpha.1
       '@spotlightjs/sidecar': 1.4.0
     dev: true
 
