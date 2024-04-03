@@ -218,7 +218,12 @@ func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.U
 	})
 }
 
-func (r *Repository) MergeInto(ctx context.Context, primary *model.Entity, siblingIds []uint64, currentUser *model.User) error {
+func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint64, currentUser *model.User) error {
+	primary, err := r.ReadById(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	var siblings model.Entities
 	if err := r.db.Find(&siblings, siblingIds).Error; err != nil {
 		return err
@@ -235,7 +240,7 @@ func (r *Repository) MergeInto(ctx context.Context, primary *model.Entity, sibli
 	}
 
 	// TODO: this doesnt handle duplicate bottles
-	err := r.db.Transaction(func(tx *gorm.DB) error {
+	err = r.db.Transaction(func(tx *gorm.DB) error {
 		tx.Model(&model.Bottle{}).Where("brand_id IN ?", siblingIds).Update("brand_id", primary.ID)
 		tx.Model(&model.Bottle{}).Where("bottler_id IN ?", siblingIds).Update("bottler_id", primary.ID)
 		tx.Model(&model.BottleDistiller{}).Where("distiller_id IN ?", siblingIds).Update("distiller_id", primary.ID)

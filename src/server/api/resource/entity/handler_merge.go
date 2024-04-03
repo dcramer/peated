@@ -51,7 +51,7 @@ func (a *API) entityMerge(ctx *gin.Context) {
 
 	currentUser, _ := auth.CurrentUser(ctx)
 
-	err := a.repository.Delete(ctx, uri.ID, currentUser)
+	err := a.repository.MergeInto(ctx, uri.ID, data.EntityIDs, currentUser)
 	if err != nil {
 		if database.IsRecordNotFoundErr(err) {
 			e.NewNotFound(ctx, e.RespNotFound)
