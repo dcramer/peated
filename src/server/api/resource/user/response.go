@@ -2,16 +2,17 @@ package user
 
 import (
 	"context"
+	"peated/api/resource/common/nullable"
 	"peated/database/model"
 	"strconv"
 )
 
 type User struct {
-	ID          string  `json:"id"`
-	Username    string  `json:"username"`
-	DisplayName *string `json:"displayName"`
-	PictureUrl  *string `json:"pictureUrl"`
-	Private     bool    `json:"private"`
+	ID          string                    `json:"id"`
+	Username    string                    `json:"username"`
+	DisplayName nullable.Nullable[string] `json:"displayName"`
+	PictureUrl  nullable.Nullable[string] `json:"pictureUrl"`
+	Private     bool                      `json:"private"`
 
 	// TODO: we only want this to exist in auth details response I think?
 	// e.g. they're used for settings
@@ -38,8 +39,8 @@ func NewUserResponse(ctx context.Context, u *model.User) *UserResponse {
 		User: &User{
 			ID:          strconv.FormatUint(u.ID, 10),
 			Username:    u.Username,
-			DisplayName: u.DisplayName,
-			PictureUrl:  u.PictureUrl,
+			DisplayName: nullable.NewNullableFromPointer(u.DisplayName),
+			PictureUrl:  nullable.NewNullableFromPointer(u.PictureUrl),
 			Private:     u.Private,
 		},
 	}

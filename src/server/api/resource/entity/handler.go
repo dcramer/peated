@@ -18,6 +18,20 @@ import (
 	"gorm.io/gorm"
 )
 
+func SliceEqual(s1 []string, s2 []string) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+
+	for n, v := range s1 {
+		if v != s2[n] {
+			return false
+		}
+	}
+
+	return true
+}
+
 type API struct {
 	logger     *zerolog.Logger
 	db         *gorm.DB
@@ -106,12 +120,12 @@ func (a *API) entityCreate(ctx *gin.Context) {
 	// TODO: validate type
 	newEntity, err := a.repository.Create(ctx, &model.Entity{
 		Name:            data.Name,
-		ShortName:       data.ShortName,
+		ShortName:       data.ShortName.MustPointer(),
 		Type:            data.Type,
-		Country:         data.Country,
-		Region:          data.Region,
-		Website:         data.Website,
-		YearEstablished: data.YearEstablished,
+		Country:         data.Country.MustPointer(),
+		Region:          data.Region.MustPointer(),
+		Website:         data.Website.MustPointer(),
+		YearEstablished: data.YearEstablished.MustPointer(),
 		CreatedByID:     currentUser.ID,
 	})
 	if err != nil {
@@ -202,8 +216,20 @@ func (a *API) entityUpdate(ctx *gin.Context) {
 	currentUser, _ := auth.CurrentUser(ctx)
 
 	var values map[string]interface{}
-	if data.Name != nil {
-		values["name"] = data.Name
+	if data.Name.IsSpecified() && data.Name.MustPointer() != &entity.Name {
+		values["name"] = data.Name.MustPointer()
+	}
+	if data.ShortName.IsSpecified() && data.ShortName.MustPointer() != entity.ShortName {
+		values["short_name"] = data.ShortName.MustPointer()
+	}
+	if data.Country.IsSpecified() && data.Country.MustPointer() != entity.Country {
+		values["country"] = data.Country.MustPointer()
+	}
+	if data.Region.IsSpecified() && data.Region.MustPointer() != entity.Region {
+		values["region"] = data.Region.MustPointer()
+	}
+	if data.Type.IsSpecified() && ((data.Type.IsNull() && entity.Type != nil) || !SliceEqual(data.Type.MustGet(), entity.Type)) {
+		values["type"] = data.Type.MustPointer()
 	}
 
 	err = a.repository.Update(ctx, entity, values, currentUser)
@@ -212,6 +238,19 @@ func (a *API) entityUpdate(ctx *gin.Context) {
 		e.NewServerError(ctx, e.RespDBDataRemoveFailure)
 		return
 	}
+
+	// TODO:
+	// if (newEntity.name !== entity.name || !newEntity.description) {
+	// 	try {
+	// 	  await pushJob("GenerateEntityDetails", { entityId: entity.id });
+	// 	} catch (err) {
+	// 	  logError(err, {
+	// 		entity: {
+	// 		  id: entity.id,
+	// 		},
+	// 	  });
+	// 	}
+	//   }
 
 	ctx.JSON(http.StatusOK, NewEntityResponse(ctx, entity))
 }

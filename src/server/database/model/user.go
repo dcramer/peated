@@ -1,6 +1,7 @@
 package model
 
 import (
+	"peated/database"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -29,7 +30,7 @@ func (u *User) SetPassword(password []byte) error {
 	if err != nil {
 		return err
 	}
-	*u.PasswordHash = string(hash)
+	u.PasswordHash = database.Ptr(string(hash))
 	return nil
 }
 

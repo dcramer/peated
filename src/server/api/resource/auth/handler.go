@@ -83,7 +83,7 @@ func (a *API) authEmailPassword(ctx *gin.Context) {
 		return
 	}
 
-	if currentUser.PasswordHash != nil {
+	if currentUser.PasswordHash == nil {
 		a.logger.Error().Str("email", data.Email).Msg("no password set")
 
 		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
