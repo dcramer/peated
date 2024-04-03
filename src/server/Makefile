@@ -1,7 +1,10 @@
 PG_CONTAINER=docker exec -t peated-postgres-1
 
-test: reset-test-db
-	go test ./...
+.PHONY: test
+
+test:
+	# https://github.com/gotestyourself/gotestsum
+	gotestsum ./...
 
 reset-test-db:
 	$(MAKE) drop-test-db
