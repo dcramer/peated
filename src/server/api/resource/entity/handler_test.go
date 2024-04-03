@@ -171,7 +171,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_Update_Mod() {
 		u.Mod = true
 	})
 
-	response := suite.RequestWithHandler("PUT", fmt.Sprintf("/entities/%d", entity1.ID), bytes.NewBuffer([]byte("{}")), func(r *http.Request) {
+	response := suite.RequestWithHandler("PUT", fmt.Sprintf("/entities/%d", entity1.ID), bytes.NewBuffer([]byte("{\"name\": \"TestHandler Update Mod\"}")), func(r *http.Request) {
 		r.Header.Set("Authorization", fixture.NewAuthorization(r.Context(), test.NewConfig(), user))
 	})
 

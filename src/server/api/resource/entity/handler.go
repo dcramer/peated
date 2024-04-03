@@ -215,7 +215,7 @@ func (a *API) entityUpdate(ctx *gin.Context) {
 
 	currentUser, _ := auth.CurrentUser(ctx)
 
-	var values map[string]interface{}
+	var values map[string]interface{} = make(map[string]interface{})
 	if data.Name.IsSpecified() && data.Name.MustPointer() != &entity.Name {
 		values["name"] = data.Name.MustPointer()
 	}
