@@ -176,6 +176,10 @@ func (suite *EntityHandlerTestSuite) TestHandler_Update_Mod() {
 	})
 
 	suite.ResponseStatusEqual(response, http.StatusOK)
+	var data entity.EntityResponse
+	err := json.Unmarshal(response.Body.Bytes(), &data)
+	suite.Require().NoError(err)
+	suite.Equal(data.Entity.Name, "TestHandler Update Mod")
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_Merge_NonMod() {
