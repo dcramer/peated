@@ -161,14 +161,14 @@ func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.Entity, er
 	return entity, nil
 }
 
-func (r *Repository) Update(ctx context.Context, entity *model.Entity, currentUser *model.User) error {
+func (r *Repository) Update(ctx context.Context, entity *model.Entity, values map[string]interface{}, currentUser *model.User) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		entityData, err := json.Marshal(entity)
 		if err != nil {
 			return err
 		}
 
-		if err := tx.Model(&model.Entity{}).Where("id = ?", entity.ID).Updates(entity).Error; err != nil {
+		if err := tx.Model(entity).Where("id = ?", entity.ID).Updates(values).Error; err != nil {
 			return err
 		}
 
@@ -241,21 +241,32 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 
 	// TODO: this doesnt handle duplicate bottles
 	err = r.db.Transaction(func(tx *gorm.DB) error {
-		tx.Model(&model.Bottle{}).Where("brand_id IN ?", siblingIds).Update("brand_id", primary.ID)
-		tx.Model(&model.Bottle{}).Where("bottler_id IN ?", siblingIds).Update("bottler_id", primary.ID)
-		tx.Model(&model.BottleDistiller{}).Where("distiller_id IN ?", siblingIds).Update("distiller_id", primary.ID)
-
 		for _, id := range siblingIds {
-			tx.Create(&model.EntityTombstone{
+			if err = tx.Create(&model.EntityTombstone{
 				EntityID:    id,
 				NewEntityID: primary.ID,
-			})
+			}).Error; err != nil {
+				return err
+			}
 		}
 
-		tx.Model(&model.Entity{}).Where("entity_id = ?", primary.ID).Updates(map[string]interface{}{
+		if err := tx.Model(&model.Bottle{}).Where("brand_id IN ?", siblingIds).Update("brand_id", primary.ID).Error; err != nil {
+			return err
+		}
+		if err = tx.Model(&model.Bottle{}).Where("bottler_id IN ?", siblingIds).Update("bottler_id", primary.ID).Error; err != nil {
+			return err
+		}
+		if err = tx.Model(&model.BottleDistiller{}).Where("distiller_id IN ?", siblingIds).Update("distiller_id", primary.ID).Error; err != nil {
+			return err
+		}
+
+		if err = tx.Model(primary).Where("id = ?", primary.ID).Updates(map[string]interface{}{
 			"total_bottles":  gorm.Expr("total_bottles + ?", totalBottles),
 			"total_tastings": gorm.Expr("total_tastings + ?", totalTastings),
-		})
+		}).Error; err != nil {
+			return err
+		}
+
 		primary.TotalBottles += totalBottles
 		primary.TotalTastings += totalTastings
 
@@ -291,7 +302,9 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 			return err
 		}
 
-		tx.Where("id IN ?", siblingIds).Delete(&model.Entity{})
+		if err := tx.Delete(siblings).Error; err != nil {
+			return err
+		}
 
 		return nil
 	})

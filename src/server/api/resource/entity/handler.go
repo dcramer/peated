@@ -36,7 +36,7 @@ func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *go
 	r.GET("/entities/:id", api.entityById)
 	r.DELETE("/entities/:id", middleware.ModRequired(config, logger, db), api.entityDelete)
 	r.PUT("/entities/:id", middleware.ModRequired(config, logger, db), api.entityUpdate)
-	r.PUT("/entities/:id/merge", middleware.ModRequired(config, logger, db), api.entityMerge)
+	r.POST("/entities/:id/merge", middleware.ModRequired(config, logger, db), api.entityMerge)
 }
 
 func (a *API) entityList(ctx *gin.Context) {
@@ -105,9 +105,14 @@ func (a *API) entityCreate(ctx *gin.Context) {
 
 	// TODO: validate type
 	newEntity, err := a.repository.Create(ctx, &model.Entity{
-		Name:        data.Name,
-		Type:        data.Type,
-		CreatedByID: currentUser.ID,
+		Name:            data.Name,
+		ShortName:       data.ShortName,
+		Type:            data.Type,
+		Country:         data.Country,
+		Region:          data.Region,
+		Website:         data.Website,
+		YearEstablished: data.YearEstablished,
+		CreatedByID:     currentUser.ID,
 	})
 	if err != nil {
 		if database.IsKeyConflictErr(err) {
@@ -196,7 +201,12 @@ func (a *API) entityUpdate(ctx *gin.Context) {
 
 	currentUser, _ := auth.CurrentUser(ctx)
 
-	err = a.repository.Update(ctx, entity, currentUser)
+	var values map[string]interface{}
+	if data.Name != nil {
+		values["name"] = data.Name
+	}
+
+	err = a.repository.Update(ctx, entity, values, currentUser)
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.NewServerError(ctx, e.RespDBDataRemoveFailure)

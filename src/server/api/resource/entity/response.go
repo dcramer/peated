@@ -10,13 +10,13 @@ import (
 type Entity struct {
 	ID              string   `json:"id"`
 	Name            string   `json:"name"`
-	ShortName       string   `json:"shortName"`
+	ShortName       *string  `json:"shortName"`
 	Type            []string `json:"type"`
-	Description     string
-	YearEstablished uint `json:"yearEstablished"`
-	Website         string
-	Country         string
-	Region          string
+	Description     *string
+	YearEstablished *uint `json:"yearEstablished"`
+	Website         *string
+	Country         *string
+	Region          *string
 	Location        *spatial.Point
 	CreatedAt       string `json:"createdAt"`
 	TotalTastings   uint   `json:"totalTastings"`

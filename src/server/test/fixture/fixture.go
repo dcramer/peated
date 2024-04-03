@@ -16,6 +16,10 @@ import (
 	"gorm.io/gorm"
 )
 
+func ptr[T interface{}](v T) *T {
+	return &v
+}
+
 func Faker() faker.Faker {
 	return faker.NewWithSeed(rand.NewSource(rand.Int63()))
 }
@@ -115,8 +119,8 @@ func NewEntity(ctx context.Context, db *gorm.DB, handler func(*model.Entity)) *m
 	entity := &model.Entity{
 		Name:      f.App().Name(),
 		Type:      types,
-		Country:   f.Address().Country(),
-		Website:   f.Internet().URL(),
+		Country:   ptr(f.Address().Country()),
+		Website:   ptr(f.Internet().URL()),
 		CreatedAt: time.Now(),
 		Location:  location,
 	}

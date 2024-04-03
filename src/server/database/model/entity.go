@@ -16,15 +16,15 @@ const (
 type Entity struct {
 	ID        uint64         `gorm:"primaryKey" json:"id"`
 	Name      string         `json:"name" gorm:"not null"`
-	ShortName string         `json:"short_name"`
-	Country   string         `json:"country"`
-	Region    string         `json:"region"`
+	ShortName *string        `json:"short_name"`
+	Country   *string        `json:"country"`
+	Region    *string        `json:"region"`
 	Type      pq.StringArray `json:"type" gorm:"type:string[];default:[];not null"`
 	Location  *spatial.Point `json:"location" gorm:"type:geometry(point, 4326)"`
 
-	Description     string `json:"description"`
-	YearEstablished uint   `json:"year_established"`
-	Website         string `json:"website"`
+	Description     *string `json:"description"`
+	YearEstablished *uint   `json:"year_established"`
+	Website         *string `json:"website"`
 
 	TotalBottles  uint `json:"total_bottles" gorm:"default:0;not null"`
 	TotalTastings uint `json:"total_tastings" gorm:"default:0;not null"`
