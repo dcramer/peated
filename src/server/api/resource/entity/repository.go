@@ -2,6 +2,7 @@ package entity
 
 import (
 	"context"
+	"encoding/json"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -9,6 +10,25 @@ import (
 	"peated/database"
 	"peated/database/model"
 )
+
+type void struct{}
+
+func missing(a, b []string) []string {
+	// create map with length of the 'a' slice
+	ma := make(map[string]void, len(a))
+	diffs := []string{}
+	// Convert first slice to map with empty struct (0 bytes)
+	for _, ka := range a {
+		ma[ka] = void{}
+	}
+	// find missing values in a
+	for _, kb := range b {
+		if _, ok := ma[kb]; !ok {
+			diffs = append(diffs, kb)
+		}
+	}
+	return diffs
+}
 
 type Repository struct {
 	db *gorm.DB
@@ -63,8 +83,6 @@ func (r *Repository) List(ctx context.Context, input *ListInput) (model.Entities
 		orderBy = "total_tastings DESC"
 	}
 
-	// location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
-
 	query := r.db.Clauses(clauses...).Offset(input.Cursor).Limit(input.Limit).Order(orderBy).Find(&entities)
 	if err := query.Error; err != nil {
 		return entities, err
@@ -74,7 +92,47 @@ func (r *Repository) List(ctx context.Context, input *ListInput) (model.Entities
 }
 
 func (r *Repository) Create(ctx context.Context, entity *model.Entity) (*model.Entity, error) {
-	if err := r.db.Create(entity).Error; err != nil {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var changeType string = model.ChangeTypeAdd
+		if err := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(entity).Error; err != nil {
+			return err
+		}
+
+		if entity.ID == 0 {
+			var existing *model.Entity
+			if err := tx.Where("name = ?", entity.Name).First(&existing).Error; err != nil {
+				return err
+			}
+			missingTypes := missing(existing.Type, entity.Type)
+			if len(missingTypes) != 0 {
+				for _, t := range missingTypes {
+					existing.Type = append(existing.Type, t)
+				}
+				tx.Model(entity).Where("id = ?", existing.ID).Update("type", existing.Type)
+			}
+			entity = existing
+			changeType = model.ChangeTypeUpdate
+		}
+
+		entityData, err := json.Marshal(entity)
+		if err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Change{
+			ObjectID:    entity.ID,
+			ObjectType:  "entity",
+			Type:        changeType,
+			CreatedAt:   entity.CreatedAt,
+			CreatedByID: entity.CreatedByID,
+			Data:        entityData,
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
 		return nil, err
 	}
 

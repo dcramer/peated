@@ -22,3 +22,9 @@ type ListInput struct {
 	Cursor  int    `form:"cursor,default=0" binding:"numeric,gte=0"`
 	Limit   int    `form:"limit,default=100" binding:"numeric,lte=100"`
 }
+
+type EntityMergeInput struct {
+	Root      string `json:"root" binding:"required,numeric"`
+	Other     string `json:"other" binding:"required,numeric"`
+	Direction string `json:"direction" binding:"required,default=mergeInto,oneof=mergeInto mergeFrom"`
+}
