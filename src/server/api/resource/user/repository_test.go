@@ -3,6 +3,7 @@ package user_test
 import (
 	"context"
 	"peated/api/resource/user"
+	"peated/database"
 	"peated/database/model"
 	"peated/test/fixture"
 	"testing"
@@ -24,10 +25,10 @@ func (suite *UserRepositoryTestSuite) TestRepository_List() {
 	ctx := context.Background()
 
 	user1 := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
-		u.DisplayName = "foo"
+		u.DisplayName = database.Ptr("foo")
 	})
 	user2 := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
-		u.DisplayName = "bar"
+		u.DisplayName = database.Ptr("bar")
 	})
 
 	repo := user.NewRepository(suite.DB)

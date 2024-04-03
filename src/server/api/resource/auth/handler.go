@@ -6,6 +6,7 @@ import (
 	"peated/api/resource/user"
 	"peated/auth"
 	"peated/config"
+	"peated/database"
 	"peated/database/model"
 	"peated/pkg/validate"
 	"strings"
@@ -82,14 +83,14 @@ func (a *API) authEmailPassword(ctx *gin.Context) {
 		return
 	}
 
-	if len(currentUser.PasswordHash) == 0 {
+	if currentUser.PasswordHash != nil {
 		a.logger.Error().Str("email", data.Email).Msg("no password set")
 
 		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
 	}
 
-	if !CheckPasswordHash(data.Password, currentUser.PasswordHash) {
+	if !CheckPasswordHash(data.Password, *currentUser.PasswordHash) {
 		a.logger.Error().Str("email", data.Email).Msg("password mismatch")
 		e.NewUnauthorized(ctx, e.RespInvalidCredentials)
 		return
@@ -177,7 +178,7 @@ func (a *API) authGoogle(ctx *gin.Context) {
 	}
 
 	currentUser, err := a.repository.UpsertWithIdentity(ctx, &model.User{
-		DisplayName: claims.GivenName,
+		DisplayName: database.Ptr(claims.GivenName),
 		Username:    strings.Split(claims.Email, "@")[0],
 		Email:       claims.Email,
 		Active:      true,

@@ -7,11 +7,11 @@ import (
 )
 
 type User struct {
-	ID          string `json:"id"`
-	Username    string `json:"username"`
-	DisplayName string `json:"displayName"`
-	PictureUrl  string `json:"pictureUrl"`
-	Private     bool   `json:"private"`
+	ID          string  `json:"id"`
+	Username    string  `json:"username"`
+	DisplayName *string `json:"displayName"`
+	PictureUrl  *string `json:"pictureUrl"`
+	Private     bool    `json:"private"`
 
 	// TODO: we only want this to exist in auth details response I think?
 	// e.g. they're used for settings

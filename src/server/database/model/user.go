@@ -7,17 +7,17 @@ import (
 )
 
 type User struct {
-	ID           uint64 `gorm:"primaryKey" json:"id"`
-	Username     string `json:"username"`
-	Email        string `json:"email"`
-	PasswordHash string `json:"password_hash"`
-	DisplayName  string `json:"display_name"`
-	PictureUrl   string `json:"picture_url"`
+	ID           uint64  `gorm:"primaryKey" json:"id"`
+	Username     string  `json:"username" gorm:"not null"`
+	Email        string  `json:"email" gorm:"not null"`
+	PasswordHash *string `json:"password_hash"`
+	DisplayName  *string `json:"display_name"`
+	PictureUrl   *string `json:"picture_url"`
 
-	Private bool `json:"private"`
-	Active  bool `json:"active" default:"true"`
-	Admin   bool `json:"admin"`
-	Mod     bool `json:"mod"`
+	Private bool `json:"private" gorm:"default:false;not null"`
+	Active  bool `json:"active" gorm:"default:true;not null"`
+	Admin   bool `json:"admin" gorm:"default:false;not null"`
+	Mod     bool `json:"mod" gorm:"default:false;not null"`
 
 	CreatedAt time.Time `json:"created_at"`
 
@@ -29,7 +29,7 @@ func (u *User) SetPassword(password []byte) error {
 	if err != nil {
 		return err
 	}
-	u.PasswordHash = string(hash)
+	*u.PasswordHash = string(hash)
 	return nil
 }
 

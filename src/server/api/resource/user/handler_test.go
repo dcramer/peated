@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"peated/api/resource/user"
+	"peated/database"
 	"peated/database/model"
 	"peated/test"
 	"peated/test/fixture"
@@ -44,10 +45,10 @@ func (suite *UserHandlerTestSuite) TestHandler_List_Query() {
 	ctx := context.Background()
 
 	user1 := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
-		u.DisplayName = "foo"
+		u.DisplayName = database.Ptr("foo")
 	})
 	fixture.NewUser(ctx, suite.DB, func(u *model.User) {
-		u.DisplayName = "bar"
+		u.DisplayName = database.Ptr("bar")
 	})
 
 	response := suite.RequestWithHandler("GET", "/users?query=FOO", nil, func(r *http.Request) {
@@ -66,11 +67,11 @@ func (suite *UserHandlerTestSuite) TestHandler_List_Admin() {
 	ctx := context.Background()
 
 	user1 := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
-		u.DisplayName = "foo"
+		u.DisplayName = database.Ptr("foo")
 		u.Admin = true
 	})
 	user2 := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
-		u.DisplayName = "bar"
+		u.DisplayName = database.Ptr("bar")
 	})
 
 	response := suite.RequestWithHandler("GET", "/users", nil, func(r *http.Request) {

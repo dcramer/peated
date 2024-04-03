@@ -16,10 +16,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func ptr[T interface{}](v T) *T {
-	return &v
-}
-
 func Faker() faker.Faker {
 	return faker.NewWithSeed(rand.NewSource(rand.Int63()))
 }
@@ -32,7 +28,7 @@ func DefaultAuthorization(ctx context.Context, db *gorm.DB, c *config.Config) st
 func DefaultUser(ctx context.Context, db *gorm.DB) *model.User {
 	user := &model.User{
 		Email:       "fizz.buzz@example.com",
-		DisplayName: "Fizzy Buzz",
+		DisplayName: database.Ptr("Fizzy Buzz"),
 		Username:    "fizz.buzz",
 		Active:      true,
 		Admin:       false,
@@ -70,7 +66,7 @@ func NewUser(ctx context.Context, db *gorm.DB, handler func(*model.User)) *model
 
 	user := &model.User{
 		Email:       f.Internet().CompanyEmail(),
-		DisplayName: f.Person().Name(),
+		DisplayName: database.Ptr(f.Person().Name()),
 		Username:    f.Internet().User(),
 		Active:      true,
 		CreatedAt:   time.Now(),
@@ -119,8 +115,8 @@ func NewEntity(ctx context.Context, db *gorm.DB, handler func(*model.Entity)) *m
 	entity := &model.Entity{
 		Name:      f.App().Name(),
 		Type:      types,
-		Country:   ptr(f.Address().Country()),
-		Website:   ptr(f.Internet().URL()),
+		Country:   database.Ptr(f.Address().Country()),
+		Website:   database.Ptr(f.Internet().URL()),
 		CreatedAt: time.Now(),
 		Location:  location,
 	}
