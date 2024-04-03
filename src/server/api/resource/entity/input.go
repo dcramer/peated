@@ -1,8 +1,16 @@
 package entity
 
+import "peated/database/column/spatial"
+
 type EntityInput struct {
-	Name string   `json:"name" binding:"required"`
-	Type []string `json:"type" binding:"required"`
+	Name            string   `json:"name" binding:"required"`
+	ShortName       string   `json:"shortName"`
+	Type            []string `json:"type" binding:"required,dive,oneof=bottler brand distiller"`
+	Country         string
+	Region          string
+	YearEstablished uint           `json:"yearEstablished" binding:"numeric,gte=0,lte=2050"`
+	Website         string         `json:"website" binding:"omitempty,url"`
+	Location        *spatial.Point `json:"location"`
 }
 
 type ListInput struct {

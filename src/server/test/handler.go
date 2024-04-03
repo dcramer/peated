@@ -73,3 +73,7 @@ func (suite *HandlerTestSuite) JSONResponseEqual(response *httptest.ResponseReco
 	suite.Require().NoError(err)
 	suite.Equal(value, payload)
 }
+
+func (suite *HandlerTestSuite) ResponseStatusEqual(response *httptest.ResponseRecorder, status int) {
+	suite.Require().Equal(status, response.Code, response.Body.String())
+}

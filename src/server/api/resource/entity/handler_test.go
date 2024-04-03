@@ -33,7 +33,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_List() {
 
 	response := suite.Request("GET", "/entities", nil)
 
-	suite.Require().Equal(http.StatusOK, response.Code)
+	suite.ResponseStatusEqual(response, http.StatusOK)
 	var data entity.EntitiesResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
@@ -52,7 +52,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_List_Type() {
 
 	response := suite.Request("GET", "/entities?type=brand", nil)
 
-	suite.Require().Equal(http.StatusOK, response.Code)
+	suite.ResponseStatusEqual(response, http.StatusOK)
 	var data entity.EntitiesResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
@@ -61,7 +61,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_List_Type() {
 
 	response = suite.Request("GET", "/entities?type=distiller", nil)
 
-	suite.Require().Equal(http.StatusOK, response.Code)
+	suite.ResponseStatusEqual(response, http.StatusOK)
 	err = json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Require().Equal(len(data.Entities), 0)
@@ -79,25 +79,25 @@ func (suite *EntityHandlerTestSuite) TestHandler_ById() {
 
 	response := suite.Request("GET", fmt.Sprintf("/entities/%d", entity1.ID), nil)
 
-	suite.Require().Equal(http.StatusOK, response.Code)
+	suite.ResponseStatusEqual(response, http.StatusOK)
 	var data entity.EntityResponse
 	err = json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Equal(data.Entity.ID, strconv.FormatUint(entity1.ID, 10))
-	suite.Equal(data.Entity.Location[0], -122.4194)
-	suite.Equal(data.Entity.Location[1], 37.7749)
+	suite.Equal(data.Entity.Location.Lng, -122.4194)
+	suite.Equal(data.Entity.Location.Lat, 37.7749)
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_ById_NotFound() {
 	response := suite.Request("GET", "/entities/1", nil)
 
-	suite.Require().Equal(http.StatusNotFound, response.Code)
+	suite.ResponseStatusEqual(response, http.StatusNotFound)
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_Create_Unauthenticated() {
 	response := suite.Request("POST", "/entities", nil)
 
-	suite.Require().Equal(http.StatusUnauthorized, response.Code)
+	suite.ResponseStatusEqual(response, http.StatusUnauthorized)
 	suite.JSONResponseEqual(response, err.RespAuthRequired)
 }
 
@@ -106,7 +106,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_Create_NonAdmin() {
 		r.Header.Set("Authorization", fixture.DefaultAuthorization(r.Context(), suite.DB, test.NewConfig()))
 	})
 
-	suite.Require().Equal(http.StatusForbidden, response.Code)
+	suite.ResponseStatusEqual(response, http.StatusForbidden)
 	suite.JSONResponseEqual(response, err.RespNoPermission)
 }
 
@@ -121,7 +121,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_Create_Admin() {
 		r.Header.Set("Authorization", fixture.NewAuthorization(r.Context(), test.NewConfig(), user))
 	})
 
-	suite.Require().Equal(http.StatusCreated, response.Code)
+	suite.ResponseStatusEqual(response, http.StatusCreated)
 	var data entity.EntityResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)

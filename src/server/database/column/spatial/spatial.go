@@ -32,8 +32,8 @@ func NewPoint(lng string, lat string) (*Point, error) {
 }
 
 type Point struct {
-	Lng float64 `json:"lng"`
-	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng" binding:"longitude"`
+	Lat float64 `json:"lat" binding:"latitude"`
 }
 
 func (p Point) GormDataType() string {
