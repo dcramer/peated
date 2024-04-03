@@ -72,8 +72,8 @@ func (suite *EntityHandlerTestSuite) TestHandler_ById() {
 
 	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {
 		b.Location = &spatial.Point{
-			Lat: -123.1,
 			Lng: 56.5,
+			Lat: -123.1,
 		}
 	})
 
@@ -84,8 +84,8 @@ func (suite *EntityHandlerTestSuite) TestHandler_ById() {
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Equal(data.Entity.ID, strconv.FormatUint(entity1.ID, 10))
-	suite.Equal(data.Entity.Location[0], -123.1)
-	suite.Equal(data.Entity.Location[1], 56.5)
+	suite.Equal(data.Entity.Location[0], 56.5)
+	suite.Equal(data.Entity.Location[1], -123.1)
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_ById_NotFound() {

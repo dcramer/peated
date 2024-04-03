@@ -16,7 +16,7 @@ type Entity struct {
 	Website         string
 	Country         string
 	Region          string
-	Location        [2]float64
+	Location        *[2]float64
 	CreatedAt       string `json:"createdAt"`
 	TotalTastings   uint   `json:"totalTastings"`
 	TotalBottles    uint   `json:"totalBottles"`
@@ -42,6 +42,11 @@ func NewEntitiesResponse(ctx context.Context, us model.Entities) *EntitiesRespon
 }
 
 func NewEntityResponse(ctx context.Context, b *model.Entity) *EntityResponse {
+	var location *[2]float64
+	if b.Location != nil {
+		location = &[2]float64{b.Location.Lng, b.Location.Lat}
+	}
+
 	return &EntityResponse{
 		Entity: &Entity{
 			ID:              strconv.FormatUint(b.ID, 10),
@@ -53,7 +58,7 @@ func NewEntityResponse(ctx context.Context, b *model.Entity) *EntityResponse {
 			Website:         b.Website,
 			Country:         b.Country,
 			Region:          b.Region,
-			Location:        [2]float64{b.Location.Lat, b.Location.Lng},
+			Location:        location,
 			TotalTastings:   b.TotalTastings,
 			TotalBottles:    b.TotalBottles,
 		},

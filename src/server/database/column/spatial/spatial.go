@@ -28,12 +28,11 @@ func (p *Point) String() string {
 func (p Point) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 	return clause.Expr{
 		SQL:  "ST_PointFromText(?, 4326)",
-		Vars: []interface{}{fmt.Sprintf("POINT(%f %f)", p.Lat, p.Lng)},
+		Vars: []interface{}{fmt.Sprintf("POINT(%f %f)", p.Lng, p.Lat)},
 	}
 }
 
 func (p *Point) Scan(val interface{}) error {
-	fmt.Printf("%+v", val)
 	b, err := hex.DecodeString(string(val.(string)))
 	if err != nil {
 		return err
@@ -58,6 +57,7 @@ func (p *Point) Scan(val interface{}) error {
 	if err := binary.Read(r, byteOrder, &wkbGeometryType); err != nil {
 		return err
 	}
+	fmt.Printf("%+v", wkbGeometryType)
 
 	if err := binary.Read(r, byteOrder, p); err != nil {
 		return err
@@ -88,8 +88,8 @@ func (np *NullPoint) Scan(val interface{}) error {
 		return nil
 	}
 	np.Point = Point{
-		Lat: point.Lat,
 		Lng: point.Lng,
+		Lat: point.Lat,
 	}
 	np.Valid = true
 
