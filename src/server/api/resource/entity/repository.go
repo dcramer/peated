@@ -3,6 +3,7 @@ package entity
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -136,6 +137,17 @@ func (r *Repository) Create(ctx context.Context, entity *model.Entity) (*model.E
 		return nil, err
 	}
 
+	// TODO: add this after we add worker support
+	// try {
+	// 	await pushJob("GenerateEntityDetails", { entityId: entity.id });
+	//   } catch (err) {
+	// 	logError(err, {
+	// 	  entity: {
+	// 		id: entity.id,
+	// 	  },
+	// 	});
+	//   }
+
 	return entity, nil
 }
 
@@ -148,8 +160,33 @@ func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.Entity, er
 	return entity, nil
 }
 
-func (r *Repository) Delete(id uint64) (int64, error) {
-	result := r.db.Where("id = ?", id).Delete(&model.Entity{})
+func (r *Repository) Delete(ctx context.Context, entity *model.Entity) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		entityData, err := json.Marshal(entity)
+		if err != nil {
+			return err
+		}
 
-	return result.RowsAffected, result.Error
+		if err := tx.Where("id = ?", entity.ID).Delete(&model.Entity{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Change{
+			ObjectID:   entity.ID,
+			ObjectType: "entity",
+			Type:       model.ChangeTypeDelete,
+			CreatedAt:  time.Now(),
+			// TODO:
+			CreatedByID: entity.CreatedByID,
+			Data:        entityData,
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
