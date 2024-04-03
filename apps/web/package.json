@@ -38,6 +38,7 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@sentry/remix": "~8.0.0-alpha.7",
     "@sentry/vite-plugin": "^2.15.0",
+    "@sentry-internal/feedback": "~8.0.0-alpha.7",
     "@svgr/cli": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
     "@svgr/plugin-svgo": "^8.1.0",
@@ -96,7 +97,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@spotlightjs/spotlight": "^1.2.13"
+    "@spotlightjs/spotlight": "^2.0.0-alpha.1"
   },
   "volta": {
     "extends": "../../package.json"

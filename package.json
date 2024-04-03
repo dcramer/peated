@@ -68,6 +68,6 @@
     ]
   },
   "devDependencies": {
-    "@spotlightjs/spotlight": "^1.2.13"
+    "@spotlightjs/spotlight": "^2.0.0-alpha.1"
   }
 }
