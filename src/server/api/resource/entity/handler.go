@@ -120,12 +120,12 @@ func (a *API) entityCreate(ctx *gin.Context) {
 	// TODO: validate type
 	newEntity, err := a.repository.Create(ctx, &model.Entity{
 		Name:            data.Name,
-		ShortName:       data.ShortName.MustPointer(),
+		ShortName:       data.ShortName.Value,
 		Type:            data.Type,
-		Country:         data.Country.MustPointer(),
-		Region:          data.Region.MustPointer(),
-		Website:         data.Website.MustPointer(),
-		YearEstablished: data.YearEstablished.MustPointer(),
+		Country:         data.Country.Value,
+		Region:          data.Region.Value,
+		Website:         data.Website.Value,
+		YearEstablished: data.YearEstablished.Value,
 		CreatedByID:     currentUser.ID,
 	})
 	if err != nil {
@@ -216,24 +216,28 @@ func (a *API) entityUpdate(ctx *gin.Context) {
 	currentUser, _ := auth.CurrentUser(ctx)
 
 	var values map[string]interface{} = make(map[string]interface{})
-	if data.Name.IsSpecified() && data.Name.MustPointer() != &entity.Name {
-		values["name"] = data.Name.MustPointer()
+	if data.Name.Defined && data.Name.Value != &entity.Name {
+		values["name"] = data.Name.Value
 	}
-	if data.ShortName.IsSpecified() && data.ShortName.MustPointer() != entity.ShortName {
-		values["short_name"] = data.ShortName.MustPointer()
+	if data.ShortName.Defined && data.ShortName.Value != entity.ShortName {
+		values["short_name"] = data.ShortName.Value
 	}
-	if data.Country.IsSpecified() && data.Country.MustPointer() != entity.Country {
-		values["country"] = data.Country.MustPointer()
+	if data.Country.Defined && data.Country.Value != entity.Country {
+		values["country"] = data.Country.Value
 	}
-	if data.Region.IsSpecified() && data.Region.MustPointer() != entity.Region {
-		values["region"] = data.Region.MustPointer()
+	if data.Region.Defined && data.Region.Value != entity.Region {
+		values["region"] = data.Region.Value
 	}
-	if data.Type.IsSpecified() && ((data.Type.IsNull() && entity.Type != nil) || !SliceEqual(data.Type.MustGet(), entity.Type)) {
-		values["type"] = data.Type.MustPointer()
+	if data.Type.Defined && ((data.Type.Value == nil && entity.Type != nil) || !SliceEqual(*data.Type.Value, entity.Type)) {
+		values["type"] = data.Type.Value
 	}
 
 	err = a.repository.Update(ctx, entity, values, currentUser)
 	if err != nil {
+		if database.IsKeyConflictErr(err) {
+			e.NewKeyConflict(ctx, "name", values["name"])
+			return
+		}
 		a.logger.Error().Err(err).Msg("")
 		e.NewServerError(ctx, e.RespDBDataRemoveFailure)
 		return

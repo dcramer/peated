@@ -168,8 +168,25 @@ func (r *Repository) Update(ctx context.Context, entity *model.Entity, values ma
 			return err
 		}
 
-		if err := tx.Model(entity).Where("id = ?", entity.ID).Updates(values).Error; err != nil {
+		var newEntity model.Entity
+		if err := tx.Model(&newEntity).Clauses(clause.Returning{}).Where("id = ?", entity.ID).Updates(values).Error; err != nil {
 			return err
+		}
+
+		if values["short_name"] != nil || values["name"] != nil {
+			// TODO: could add existing full_name to condition to avoid forced write
+			if err := tx.Model(&model.Bottle{}).Where("brand_id = ?", entity.ID).Updates(map[string]interface{}{
+				"full_name": gorm.Expr("? || ' ' || name", newEntity.GetBottlePrefix()),
+			}).Error; err != nil {
+				return err
+			}
+
+			if err := tx.Model(&model.BottleAlias{}).Joins("JOIN bottle ON bottle.id = bottle_alias.bottle_id").
+				Where("bottle.brand_id = ? AND bottle_alias.name = ?", entity.ID, entity.GetBottlePrefix()).Updates(map[string]interface{}{
+				"name": entity.GetBottlePrefix(),
+			}).Error; err != nil {
+				return err
+			}
 		}
 
 		if err := tx.Create(&model.Change{
@@ -199,7 +216,7 @@ func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.U
 			return err
 		}
 
-		if err := tx.Where("id = ?", entity.ID).Delete(&model.Entity{}).Error; err != nil {
+		if err := tx.Delete(entity).Error; err != nil {
 			return err
 		}
 

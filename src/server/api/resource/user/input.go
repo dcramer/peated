@@ -1,20 +1,15 @@
 package user
 
+import "peated/api/resource/common/schema"
+
 type UserInput struct {
 	Username    string `json:"username" form:"required,max=255"`
 	DisplayName string `json:"displayName" form:"max=255"`
-	Private     bool   `json:"private"`
-	Admin       bool   `json:"admin"`
-	Mod         bool   `json:"mod"`
+	// admins only
+	Private schema.Optional[bool] `json:"private"`
+	Admin   schema.Optional[bool] `json:"admin"`
+	Mod     schema.Optional[bool] `json:"mod"`
 }
-
-type FriendStatus string
-
-const (
-	FriendStatusNone      FriendStatus = "none"
-	FriendStatusPending   FriendStatus = "pending"
-	FriendStatusFollowing FriendStatus = "following"
-)
 
 type ListInput struct {
 	Query  string `form:"query"`

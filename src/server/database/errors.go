@@ -23,6 +23,7 @@ func IsKeyConflictErr(err error) bool {
 	if err == ErrKeyConflict {
 		return true
 	}
+
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
 		if pgErr.Code == pgerrcode.UniqueViolation {
@@ -31,4 +32,15 @@ func IsKeyConflictErr(err error) bool {
 	}
 
 	return false
+}
+
+func GetKeyConflictConstraint(err error) string {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		if pgErr.Code == pgerrcode.UniqueViolation {
+			return pgErr.ConstraintName
+		}
+	}
+
+	return ""
 }

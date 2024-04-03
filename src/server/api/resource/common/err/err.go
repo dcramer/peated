@@ -55,6 +55,10 @@ func NewConflict(ctx *gin.Context, error gin.H) {
 	ctx.AbortWithStatusJSON(http.StatusConflict, error)
 }
 
+func NewKeyConflict(ctx *gin.Context, fieldName string, fieldValue interface{}) {
+	ctx.AbortWithStatusJSON(http.StatusConflict, ConstraintFailed(fieldName, fieldValue))
+}
+
 func NewNotFound(ctx *gin.Context, error gin.H) {
 	ctx.AbortWithStatusJSON(http.StatusNotFound, error)
 }
@@ -69,6 +73,18 @@ func NewUnauthorized(ctx *gin.Context, error gin.H) {
 
 func NewFobidden(ctx *gin.Context, error gin.H) {
 	ctx.AbortWithStatusJSON(http.StatusForbidden, error)
+}
+
+func ConstraintFailed(fieldName string, fieldValue interface{}) gin.H {
+	return gin.H{
+		"message": "entity already exists",
+		"code":    "conflict",
+		"errors": &validate.ValidationErrDetail{
+			Field:   fieldName,
+			Value:   fieldValue,
+			Message: "entity already exists this value",
+		},
+	}
 }
 
 func InvalidParameters(details []*validate.ValidationErrDetail) gin.H {

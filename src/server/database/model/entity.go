@@ -39,4 +39,14 @@ func (Entity) TableName() string {
 	return "entity"
 }
 
+func (e *Entity) GetBottlePrefix() string {
+	var namePrefix string
+	if e.ShortName != nil {
+		namePrefix = *e.ShortName
+	} else {
+		namePrefix = e.Name
+	}
+	return namePrefix
+}
+
 type Entities []*Entity

@@ -2,17 +2,22 @@ package user
 
 import (
 	"context"
-	"peated/api/resource/common/nullable"
 	"peated/database/model"
 	"strconv"
 )
 
+const (
+	FriendStatusNone      string = "none"
+	FriendStatusPending   string = "pending"
+	FriendStatusFollowing string = "following"
+)
+
 type User struct {
-	ID          string                    `json:"id"`
-	Username    string                    `json:"username"`
-	DisplayName nullable.Nullable[string] `json:"displayName"`
-	PictureUrl  nullable.Nullable[string] `json:"pictureUrl"`
-	Private     bool                      `json:"private"`
+	ID          string  `json:"id"`
+	Username    string  `json:"username"`
+	DisplayName *string `json:"displayName"`
+	PictureUrl  *string `json:"pictureUrl"`
+	Private     bool    `json:"private"`
 
 	// TODO: we only want this to exist in auth details response I think?
 	// e.g. they're used for settings
@@ -23,7 +28,7 @@ type User struct {
 	CreatedAt string `json:"createdAt,omitempty"`
 
 	// TODO: this is variable, determine if it should always exist
-	FriendStatus FriendStatus `json:"friendStatus,omitempty"`
+	FriendStatus string `json:"friendStatus,omitempty"`
 }
 
 type UserResponse struct {
@@ -39,8 +44,8 @@ func NewUserResponse(ctx context.Context, u *model.User) *UserResponse {
 		User: &User{
 			ID:          strconv.FormatUint(u.ID, 10),
 			Username:    u.Username,
-			DisplayName: nullable.NewNullableFromPointer(u.DisplayName),
-			PictureUrl:  nullable.NewNullableFromPointer(u.PictureUrl),
+			DisplayName: u.DisplayName,
+			PictureUrl:  u.PictureUrl,
 			Private:     u.Private,
 		},
 	}
