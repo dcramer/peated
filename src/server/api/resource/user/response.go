@@ -32,16 +32,16 @@ type User struct {
 }
 
 type UserResponse struct {
-	User *User `json:"user"`
+	User User `json:"user"`
 }
 
 type UsersResponse struct {
-	Users []*User `json:"users"`
+	Users []User `json:"users"`
 }
 
-func NewUserResponse(ctx context.Context, u *model.User) *UserResponse {
-	return &UserResponse{
-		User: &User{
+func NewUserResponse(ctx context.Context, u *model.User) UserResponse {
+	return UserResponse{
+		User: User{
 			ID:          strconv.FormatUint(u.ID, 10),
 			Username:    u.Username,
 			DisplayName: u.DisplayName,
@@ -51,13 +51,13 @@ func NewUserResponse(ctx context.Context, u *model.User) *UserResponse {
 	}
 }
 
-func NewUsersResponse(ctx context.Context, us model.Users) *UsersResponse {
-	users := make([]*User, len(us))
+func NewUsersResponse(ctx context.Context, us model.Users) UsersResponse {
+	users := make([]User, len(us))
 	for i, v := range us {
 		users[i] = NewUserResponse(ctx, v).User
 	}
 
-	return &UsersResponse{
+	return UsersResponse{
 		Users: users,
 	}
 }

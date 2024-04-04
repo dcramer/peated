@@ -24,27 +24,27 @@ type Entity struct {
 }
 
 type EntityResponse struct {
-	Entity *Entity `json:"entity"`
+	Entity Entity `json:"entity"`
 }
 
 type EntitiesResponse struct {
-	Entities []*Entity `json:"entities"`
+	Entities []Entity `json:"entities"`
 }
 
-func NewEntitiesResponse(ctx context.Context, us model.Entities) *EntitiesResponse {
-	entities := make([]*Entity, len(us))
+func NewEntitiesResponse(ctx context.Context, us model.Entities) EntitiesResponse {
+	entities := make([]Entity, len(us))
 	for i, v := range us {
 		entities[i] = NewEntityResponse(ctx, v).Entity
 	}
 
-	return &EntitiesResponse{
+	return EntitiesResponse{
 		Entities: entities,
 	}
 }
 
-func NewEntityResponse(ctx context.Context, b *model.Entity) *EntityResponse {
-	return &EntityResponse{
-		Entity: &Entity{
+func NewEntityResponse(ctx context.Context, b *model.Entity) EntityResponse {
+	return EntityResponse{
+		Entity: Entity{
 			ID:              strconv.FormatUint(b.ID, 10),
 			Name:            b.Name,
 			ShortName:       b.ShortName,

@@ -2,7 +2,6 @@ package bottle
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -38,7 +37,7 @@ func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *go
 	r.GET("/bottles", api.bottleList)
 	r.POST("/bottles", middleware.AuthRequired(config, logger, db), api.bottleCreate)
 	r.GET("/bottles/:id", api.bottleByID)
-	r.GET("/bottles/:id/aliases", api.ListAliases)
+	r.GET("/bottles/:id/aliases", api.bottleAliasList)
 }
 
 func (a *API) bottleList(ctx *gin.Context) {
@@ -56,7 +55,7 @@ func (a *API) bottleList(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, DTOFromBottles(ctx, bottles))
+	ctx.JSON(200, NewBottlesResponse(ctx, bottles))
 }
 
 func (a *API) bottleByID(ctx *gin.Context) {
@@ -102,22 +101,25 @@ func (a *API) bottleByID(ctx *gin.Context) {
 	var totalPeople int64
 	a.db.Model(&model.Tasting{}).Distinct("createdById").Count(&totalPeople)
 
-	ctx.JSON(200, gin.H{
-		"bottle": DTOFromBottle(ctx, bottle),
-		"stats": gin.H{
-			"totalPeople": totalPeople,
-		},
-	})
+	response := NewBottleResponse(ctx, bottle)
+	response.Stats = &BottleStats{
+		TotalPeople: totalPeople,
+	}
+	ctx.JSON(200, response)
 }
 
 func (a *API) bottleCreate(ctx *gin.Context) {
-	var json BottleInput
-	if err := ctx.ShouldBindJSON(&json); err != nil {
-		e.NewBadRequest(ctx, gin.H{"error": err.Error()})
+	var data BottleInput
+	if err := ctx.ShouldBindJSON(&data); err != nil {
+		var details []*validate.ValidationErrDetail
+		if vErrs, ok := err.(validator.ValidationErrors); ok {
+			details = validate.ValidationErrorDetails(&data, "json", vErrs)
+		}
+		e.NewBadRequest(ctx, e.InvalidParameters(details))
 		return
 	}
 
-	newBottle, err := a.repository.Create(ctx, json.ToModel())
+	newBottle, err := a.repository.Create(ctx, data.ToModel())
 	if err != nil {
 		a.logger.Error().Err(err).Msg("")
 		e.NewServerError(ctx, e.RespDBDataInsertFailure)
@@ -126,24 +128,5 @@ func (a *API) bottleCreate(ctx *gin.Context) {
 
 	a.logger.Info().Uint64("id", newBottle.ID).Msg("new bottle created")
 
-	ctx.JSON(http.StatusCreated, DTOFromBottle(ctx, newBottle))
-}
-
-func (a *API) ListAliases(ctx *gin.Context) {
-	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
-	if err != nil {
-		a.logger.Error().Err(err).Msg("")
-		e.NewBadRequest(ctx, e.RespDBDataAccessFailure)
-		return
-	}
-
-	aliases, err := a.repository.ListAliases(ctx, id)
-
-	if err != nil {
-		a.logger.Error().Err(err).Msg("")
-		e.NewServerError(ctx, e.RespDBDataAccessFailure)
-		return
-	}
-
-	ctx.JSON(200, DTOFromBottleAliases(ctx, aliases))
+	ctx.JSON(http.StatusCreated, NewBottleResponse(ctx, newBottle))
 }
