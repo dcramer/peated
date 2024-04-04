@@ -8,7 +8,13 @@ import (
 )
 
 const (
-	CategorySingleMalt string = "single_malt"
+	CategoryBlend          string = "blend"
+	CategoryBourbon        string = "bourbon"
+	CategoryRye            string = "rye"
+	CategorySingleGrain    string = "single_grain"
+	CategorySingleMalt     string = "single_malt"
+	CategorySinglePotStill string = "single_pot_still"
+	CategorySpirit         string = "spirit"
 )
 
 type Bottle struct {

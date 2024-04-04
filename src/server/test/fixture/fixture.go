@@ -111,8 +111,16 @@ func NewBottle(ctx context.Context, db *gorm.DB, handler func(*model.Bottle)) *m
 	f := Faker()
 
 	bottle := &model.Bottle{
-		Name:      fmt.Sprintf("%s #%d", f.App().Name(), f.RandomNumber(100)),
-		Category:  database.Ptr(randChoice([]string{model.CategorySingleMalt})),
+		Name: fmt.Sprintf("%s #%d", f.App().Name(), f.RandomNumber(100)),
+		Category: database.Ptr(randChoice([]string{
+			model.CategoryBlend,
+			model.CategoryBourbon,
+			model.CategoryRye,
+			model.CategorySingleGrain,
+			model.CategorySingleMalt,
+			model.CategorySinglePotStill,
+			model.CategorySpirit,
+		})),
 		StatedAge: database.Ptr(randChoice([]uint{0, 3, 10, 12, 15, 18, 20, 25})),
 		CreatedAt: time.Now(),
 	}
@@ -135,14 +143,15 @@ func NewBottle(ctx context.Context, db *gorm.DB, handler func(*model.Bottle)) *m
 			return err
 		}
 
-		bottleData, err := json.Marshal(bottle)
-		if err != nil {
-			return err
-		}
 		if err := tx.Create(&model.BottleAlias{
 			Name:     bottle.FullName,
 			BottleID: bottle.ID,
 		}).Error; err != nil {
+			return err
+		}
+
+		bottleData, err := json.Marshal(bottle)
+		if err != nil {
 			return err
 		}
 
