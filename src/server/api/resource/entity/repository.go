@@ -162,6 +162,17 @@ func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.Entity, er
 	return entity, nil
 }
 
+func (r *Repository) ReadByTombstone(ctx context.Context, id uint64) (*model.Entity, error) {
+	var entity *model.Entity
+	if err := r.db.Joins("JOIN entity_tombstone ON entity_tombstone.new_entity_id = entity.id").
+		Where("entity_tombstone.entity_id = ?", id).
+		First(&entity).Error; err != nil {
+		return nil, err
+	}
+
+	return entity, nil
+}
+
 func (r *Repository) Update(ctx context.Context, entity *model.Entity, values map[string]interface{}, currentUser *model.User) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		entityData, err := json.Marshal(entity)

@@ -65,7 +65,7 @@ func (r *Repository) ReadById(ctx context.Context, id uint64) (*model.Bottle, er
 
 func (r *Repository) ReadByTombstone(ctx context.Context, id uint64) (*model.Bottle, error) {
 	var bottle *model.Bottle
-	if err := r.db.Joins("JOIN bottle_tombstone ON bottle_tombstone.new_bottle_id = bottle_id").
+	if err := r.db.Joins("JOIN bottle_tombstone ON bottle_tombstone.new_bottle_id = bottle.id").
 		Where("bottle_tombstone.bottle_id = ?", id).
 		First(&bottle).Error; err != nil {
 		return nil, err

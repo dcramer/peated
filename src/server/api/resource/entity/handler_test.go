@@ -86,6 +86,24 @@ func (suite *EntityHandlerTestSuite) TestHandler_ById_NotFound() {
 	suite.ResponseStatusEqual(response, http.StatusNotFound)
 }
 
+func (suite *EntityHandlerTestSuite) TestHandler_ById_Tombstone() {
+	ctx := context.Background()
+
+	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
+	suite.DB.Create(&model.EntityTombstone{
+		EntityID:    entity1.ID * 10,
+		NewEntityID: entity1.ID,
+	})
+
+	response := suite.Request("GET", fmt.Sprintf("/entities/%d", entity1.ID*10), nil)
+
+	suite.ResponseStatusEqual(response, http.StatusOK)
+	var data entity.EntityResponse
+	err := json.Unmarshal(response.Body.Bytes(), &data)
+	suite.Require().NoError(err)
+	suite.Equal(data.Entity.ID, strconv.FormatUint(entity1.ID, 10))
+}
+
 func (suite *EntityHandlerTestSuite) TestHandler_Create_Unauthenticated() {
 	response := suite.Request("POST", "/entities", nil)
 

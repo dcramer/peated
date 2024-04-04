@@ -90,15 +90,25 @@ func (a *API) entityById(ctx *gin.Context) {
 		return
 	}
 
-	entity, err := a.repository.ReadById(ctx, uri.ID)
+	entity, err := a.repository.ReadByTombstone(ctx, uri.ID)
 	if err != nil {
-		if database.IsRecordNotFoundErr(err) {
-			e.NewNotFound(ctx, e.RespNotFound)
+		if !database.IsRecordNotFoundErr(err) {
+			a.logger.Error().Err(err).Msg("")
+			e.NewServerError(ctx, e.RespDBDataAccessFailure)
 			return
 		}
-		a.logger.Error().Err(err).Msg("")
-		e.NewServerError(ctx, e.RespDBDataAccessFailure)
-		return
+
+		entity, err = a.repository.ReadById(ctx, uri.ID)
+		if err != nil {
+			if database.IsRecordNotFoundErr(err) {
+				e.NewNotFound(ctx, e.RespNotFound)
+				return
+			}
+
+			a.logger.Error().Err(err).Msg("")
+			e.NewServerError(ctx, e.RespDBDataAccessFailure)
+			return
+		}
 	}
 
 	ctx.JSON(200, NewEntityResponse(ctx, entity))
