@@ -49,7 +49,8 @@ func NormalizeBottleName(name string, statedAge *uint) string {
 		name = prefixRe.ReplaceAllString(name, ageAsStr+ageSuffix)
 	}
 
-	// return normalizeString(name.replace(` ${age} `, ` ${age}${ageSuffix} `));
+	ageRe := regexp.MustCompile(`\s` + regexp.QuoteMeta(ageAsStr) + `\s`)
+	name = ageRe.ReplaceAllString(name, " "+ageAsStr+ageSuffix+" ")
 
 	return name
 }
