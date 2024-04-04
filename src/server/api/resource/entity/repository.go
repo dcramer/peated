@@ -181,10 +181,7 @@ func (r *Repository) Update(ctx context.Context, entity *model.Entity, values ma
 				return err
 			}
 
-			if err := tx.Model(&model.BottleAlias{}).Joins("JOIN bottle ON bottle.id = bottle_alias.bottle_id").
-				Where("bottle.brand_id = ? AND bottle_alias.name = ?", entity.ID, entity.GetBottlePrefix()).Updates(map[string]interface{}{
-				"name": entity.GetBottlePrefix(),
-			}).Error; err != nil {
+			if err := tx.Raw("UPDATE bottle_alias SET name = bottle.full_name FROM bottle WHERE bottle = bottle_alias.bottle_id AND bottle.brand_id = ? AND bottle_alias.name = ?", entity.ID, entity.GetBottlePrefix()).Error; err != nil {
 				return err
 			}
 		}
@@ -199,6 +196,8 @@ func (r *Repository) Update(ctx context.Context, entity *model.Entity, values ma
 		}).Error; err != nil {
 			return err
 		}
+
+		*entity = newEntity
 
 		return nil
 	})

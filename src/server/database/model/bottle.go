@@ -22,7 +22,7 @@ type Bottle struct {
 
 	Description   string         `json:"description"`
 	TastingNotes  datatypes.JSON `json:"tasting_notes"`
-	SuggestedTags pq.StringArray `json:"suggested_tags"`
+	SuggestedTags pq.StringArray `json:"suggested_tags" gorm:"type:string[];default:[];not null"`
 
 	AvgRating     float64 `json:"avg_rating"`
 	TotalTastings uint    `json:"total_tastings"`
