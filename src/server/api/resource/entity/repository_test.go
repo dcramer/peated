@@ -189,11 +189,4 @@ func (suite *EntityRepositoryTestSuite) TestRepository_Merge() {
 	suite.Equal(brand1.ID, bottle1.BrandID)
 	suite.Equal(brand1.ID, *bottle1.BottlerID)
 	suite.Equal(fmt.Sprintf("%s Old Smokey", brand1.Name), bottle1.FullName)
-
-	// var aliases model.BottleAliases
-	// err = suite.DB.Where("bottle_id = ?", bottle1.ID).Order("name ASC").Find(&aliases).Error
-	// suite.Require().NoError(err)
-	// suite.Require().Equal(len(aliases), 2)
-	// suite.Equal(aliases[0].Name, fmt.Sprintf("%s %s", brand1.Name, bottle1.Name))
-	// suite.Equal(aliases[1].Name, fmt.Sprintf("%s %s", *brand1.ShortName, bottle1.Name))
 }
