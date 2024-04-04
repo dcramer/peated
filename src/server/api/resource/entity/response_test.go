@@ -23,8 +23,8 @@ func TestNewEntityResponse_Location(t *testing.T) {
 	}
 
 	response := entity.NewEntityResponse(ctx, entity1)
-	assert.Equal(t, response.Entity.Location.Lng, -122.4194)
-	assert.Equal(t, response.Entity.Location.Lat, 37.7749)
+	assert.Equal(t, -122.4194, response.Entity.Location.Lng)
+	assert.Equal(t, 37.7749, response.Entity.Location.Lat)
 }
 
 func TestNewEntityResponse_LocationEmpty(t *testing.T) {
@@ -35,6 +35,6 @@ func TestNewEntityResponse_LocationEmpty(t *testing.T) {
 	}
 
 	response := entity.NewEntityResponse(ctx, entity1)
-	assert.Equal(t, response.Entity.ID, strconv.FormatUint(entity1.ID, 10))
+	assert.Equal(t, strconv.FormatUint(entity1.ID, 10), response.Entity.ID)
 	assert.Nil(t, response.Entity.Location)
 }
