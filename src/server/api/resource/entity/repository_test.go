@@ -36,8 +36,8 @@ func (suite *EntityRepositoryTestSuite) TestRepository_Create_ExistingNewType() 
 
 	result, err := repo.Create(ctx, &entity2)
 	suite.Require().NoError(err)
-	suite.Equal(result.ID, entity1.ID)
-	suite.Equal(len(result.Type), 2)
+	suite.Equal(entity1.ID, result.ID)
+	suite.Equal(2, len(result.Type))
 	suite.Contains(result.Type, model.EntityTypeBrand)
 	suite.Contains(result.Type, model.EntityTypeDistiller)
 }
@@ -64,17 +64,17 @@ func (suite *EntityRepositoryTestSuite) TestRepository_Update_NameAsBrand() {
 
 	err := repo.Update(ctx, brand1, values, currentUser)
 	suite.Require().NoError(err)
-	suite.Equal(brand1.Name, "Rickshaw")
+	suite.Equal("Rickshaw", brand1.Name)
 
 	err = suite.DB.Find(&bottle1).Error
 	suite.Require().NoError(err)
-	suite.Equal(bottle1.FullName, "Rickshaw Old Smokey")
+	suite.Equal("Rickshaw Old Smokey", bottle1.FullName)
 
 	var aliases model.BottleAliases
 	err = suite.DB.Where("bottle_id = ?", bottle1.ID).Find(&aliases).Error
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(aliases), 1)
-	suite.Equal(aliases[0].Name, bottle1.FullName)
+	suite.Require().Equal(1, len(aliases))
+	suite.Equal(bottle1.FullName, aliases[0].Name)
 }
 
 func (suite *EntityRepositoryTestSuite) TestRepository_Update_UpdatedShortNameAsBrand() {
@@ -100,17 +100,17 @@ func (suite *EntityRepositoryTestSuite) TestRepository_Update_UpdatedShortNameAs
 
 	err := repo.Update(ctx, brand1, values, currentUser)
 	suite.Require().NoError(err)
-	suite.Equal(*brand1.ShortName, "JT")
+	suite.Equal("JT", *brand1.ShortName)
 
 	err = suite.DB.Find(&bottle1).Error
 	suite.Require().NoError(err)
-	suite.Equal(bottle1.FullName, "JT Old Smokey")
+	suite.Equal("JT Old Smokey", bottle1.FullName)
 
 	var aliases model.BottleAliases
 	err = suite.DB.Where("bottle_id = ?", bottle1.ID).Order("name ASC").Find(&aliases).Error
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(aliases), 1)
-	suite.Equal(aliases[0].Name, "JT Old Smokey")
+	suite.Require().Equal(1, len(aliases))
+	suite.Equal("JT Old Smokey", aliases[0].Name)
 }
 
 func (suite *EntityRepositoryTestSuite) TestRepository_Update_NewShortNameAsBrand() {
@@ -135,16 +135,65 @@ func (suite *EntityRepositoryTestSuite) TestRepository_Update_NewShortNameAsBran
 
 	err := repo.Update(ctx, brand1, values, currentUser)
 	suite.Require().NoError(err)
-	suite.Equal(*brand1.ShortName, "JT")
+	suite.Equal("JT", *brand1.ShortName)
 
 	err = suite.DB.Find(&bottle1).Error
 	suite.Require().NoError(err)
-	suite.Equal(bottle1.FullName, "JT Old Smokey")
+	suite.Equal("JT Old Smokey", bottle1.FullName)
 
 	var aliases model.BottleAliases
 	err = suite.DB.Where("bottle_id = ?", bottle1.ID).Order("name ASC").Find(&aliases).Error
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(aliases), 2)
-	suite.Equal(aliases[0].Name, fmt.Sprintf("%s %s", brand1.Name, bottle1.Name))
-	suite.Equal(aliases[1].Name, fmt.Sprintf("%s %s", *brand1.ShortName, bottle1.Name))
+	suite.Require().Equal(2, len(aliases))
+	suite.Equal(fmt.Sprintf("%s %s", brand1.Name, bottle1.Name), aliases[0].Name)
+	suite.Equal(fmt.Sprintf("%s %s", *brand1.ShortName, bottle1.Name), aliases[1].Name)
+}
+
+func (suite *EntityRepositoryTestSuite) TestRepository_Merge() {
+	ctx := context.Background()
+
+	currentUser := fixture.DefaultUser(ctx, suite.DB)
+
+	brand1 := fixture.NewEntity(ctx, suite.DB, func(e *model.Entity) {
+		e.TotalBottles = 0
+	})
+	brand2 := fixture.NewEntity(ctx, suite.DB, func(e *model.Entity) {
+		e.TotalBottles = 1
+	})
+
+	bottle1 := fixture.NewBottle(ctx, suite.DB, func(b *model.Bottle) {
+		b.Name = "Old Smokey"
+		b.FullName = fmt.Sprintf("%s %s", brand2.GetBottlePrefix(), b.Name)
+		b.BrandID = brand2.ID
+		b.BottlerID = &brand2.ID
+	})
+
+	repo := entity.NewRepository(suite.DB)
+
+	err := repo.MergeInto(ctx, brand1.ID, []uint64{brand2.ID}, currentUser)
+	suite.Require().NoError(err)
+
+	err = suite.DB.First(&brand1).Error
+	suite.Require().NoError(err)
+	suite.Equal(uint(1), brand1.TotalBottles)
+
+	// second brand should get removed
+	err = suite.DB.First(&brand2).Error
+	suite.Require().Error(err)
+
+	err = suite.DB.Where("entity_id = ? AND new_entity_id = ?", brand2.ID, brand1.ID).First(&model.EntityTombstone{}).Error
+	suite.Require().NoError(err)
+
+	err = suite.DB.First(&bottle1).Error
+	suite.Require().NoError(err)
+	suite.Equal(brand1.ID, bottle1.BrandID)
+	suite.Equal(brand1.ID, *bottle1.BottlerID)
+	suite.Equal(fmt.Sprintf("%s Old Smokey", brand1.Name), bottle1.FullName)
+
+	// var aliases model.BottleAliases
+	// err = suite.DB.Where("bottle_id = ?", bottle1.ID).Order("name ASC").Find(&aliases).Error
+	// suite.Require().NoError(err)
+	// suite.Require().Equal(len(aliases), 2)
+	// suite.Equal(aliases[0].Name, fmt.Sprintf("%s %s", brand1.Name, bottle1.Name))
+	// suite.Equal(aliases[1].Name, fmt.Sprintf("%s %s", *brand1.ShortName, bottle1.Name))
 }

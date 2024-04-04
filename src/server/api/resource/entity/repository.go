@@ -277,7 +277,10 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 			}
 		}
 
-		if err := tx.Model(&model.Bottle{}).Where("brand_id IN ?", siblingIds).Update("brand_id", primary.ID).Error; err != nil {
+		if err := tx.Model(&model.Bottle{}).Where("brand_id IN ?", siblingIds).Updates(map[string]interface{}{
+			"brand_id":  primary.ID,
+			"full_name": gorm.Expr("? || ' ' || bottle.name", primary.GetBottlePrefix()),
+		}).Error; err != nil {
 			return err
 		}
 		if err = tx.Model(&model.Bottle{}).Where("bottler_id IN ?", siblingIds).Update("bottler_id", primary.ID).Error; err != nil {
@@ -331,8 +334,13 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 			return err
 		}
 
-		if err := tx.Delete(siblings).Error; err != nil {
+		result := tx.Delete(siblings)
+		if err := result.Error; err != nil {
 			return err
+		}
+
+		if result.RowsAffected != int64(len(siblingIds)) {
+			return errors.Errorf("%d rows deleted via merge; expected %d", result.RowsAffected, len(siblingIds))
 		}
 
 		return nil
@@ -341,6 +349,7 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 	if err != nil {
 		return err
 	}
+
 	// TODO: add this after we add worker support
 	// try {
 	// 	await pushJob("GenerateEntityDetails", { entityId: entity.id });

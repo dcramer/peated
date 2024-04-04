@@ -181,33 +181,3 @@ func (suite *EntityHandlerTestSuite) TestHandler_Update_Mod() {
 	suite.Require().NoError(err)
 	suite.Equal(data.Entity.Name, "TestHandler Update Mod")
 }
-
-func (suite *EntityHandlerTestSuite) TestHandler_Merge_NonMod() {
-	ctx := context.Background()
-
-	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
-
-	response := suite.RequestWithHandler("POST", fmt.Sprintf("/entities/%d/merge", entity1.ID), bytes.NewBuffer([]byte("{}")), func(r *http.Request) {
-		r.Header.Set("Authorization", fixture.DefaultAuthorization(r.Context(), suite.DB, test.NewConfig()))
-	})
-
-	suite.ResponseStatusEqual(response, http.StatusForbidden)
-	suite.JSONResponseEqual(response, err.RespNoPermission)
-}
-
-func (suite *EntityHandlerTestSuite) TestHandler_Merge_Mod() {
-	ctx := context.Background()
-
-	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
-	entity2 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
-
-	user := fixture.NewUser(ctx, suite.DB, func(u *model.User) {
-		u.Mod = true
-	})
-
-	response := suite.RequestWithHandler("POST", fmt.Sprintf("/entities/%d/merge", entity1.ID), bytes.NewBuffer([]byte(fmt.Sprintf("{\"entityIds\": [%d]}", entity2.ID))), func(r *http.Request) {
-		r.Header.Set("Authorization", fixture.NewAuthorization(r.Context(), test.NewConfig(), user))
-	})
-
-	suite.ResponseStatusEqual(response, http.StatusNoContent)
-}

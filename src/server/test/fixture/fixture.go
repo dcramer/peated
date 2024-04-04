@@ -139,6 +139,11 @@ func NewBottle(ctx context.Context, db *gorm.DB, handler func(*model.Bottle)) *m
 			bottle.CreatedByID = DefaultUser(ctx, tx).ID
 		}
 
+		if bottle.FullName == "" {
+			// TODO: this is wrong
+			bottle.FullName = bottle.Name
+		}
+
 		if err := tx.Create(bottle).Error; err != nil {
 			return err
 		}
