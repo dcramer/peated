@@ -36,5 +36,5 @@ func TestNewEntityResponse_LocationEmpty(t *testing.T) {
 
 	response := entity.NewEntityResponse(ctx, entity1)
 	assert.Equal(t, response.Entity.ID, strconv.FormatUint(entity1.ID, 10))
-	assert.Equal(t, response.Entity.Location, nil)
+	assert.Nil(t, response.Entity.Location)
 }
