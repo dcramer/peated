@@ -13,75 +13,67 @@ func TestNormalizeBottleName_JustAge(t *testing.T) {
 	assert.Equal(t, "10-year-old", result)
 }
 
-// describe("normalizeBottleName", () => {
-//   test("just the age", async () => {
-//     const rv = normalizeBottleName("10", 10);
-//     expect(rv).toBe("10-year-old");
-//   });
+func TestNormalizeBottleName_AgeSuffix(t *testing.T) {
+	var age uint = 10
+	result := bottle.NormalizeBottleName("Delicious 10", &age)
+	assert.Equal(t, "Delicious 10-year-old", result)
+}
 
-//   test("age suffix", async () => {
-//     const rv = normalizeBottleName("Delicious 10", 10);
-//     expect(rv).toBe("Delicious 10-year-old");
-//   });
+func TestNormalizeBottleName_AgePrefix(t *testing.T) {
+	var age uint = 10
+	result := bottle.NormalizeBottleName("10 Wood", &age)
+	assert.Equal(t, "10-year-old Wood", result)
+}
 
-//   test("age prefix", async () => {
-//     const rv = normalizeBottleName("10 Wood", 10);
-//     expect(rv).toBe("10-year-old Wood");
-//   });
+func TestNormalizeBottleName_Casing(t *testing.T) {
+	var age uint = 10
+	result := bottle.NormalizeBottleName("10-YEAR-OLD Wood", &age)
+	assert.Equal(t, "10-year-old Wood", result)
+}
 
-//   test("casing", async () => {
-//     const rv = normalizeBottleName("10-YEAR-OLD Wood", 10);
-//     expect(rv).toBe("10-year-old Wood");
-//   });
+func TestNormalizeBottleName_PluralToSingular(t *testing.T) {
+	var age uint = 10
+	result := bottle.NormalizeBottleName("10-years-old Wood", &age)
+	assert.Equal(t, "10-year-old Wood", result)
+}
 
-//   test("plural to singular", async () => {
-//     const rv = normalizeBottleName("10-years-old Wood", 10);
-//     expect(rv).toBe("10-year-old Wood");
-//   });
+func TestNormalizeBottleName_Spacing(t *testing.T) {
+	var age uint = 10
+	result := bottle.NormalizeBottleName("10 years old Wood", &age)
+	assert.Equal(t, "10-year-old Wood", result)
 
-//   test("spacing", async () => {
-//     const rv = normalizeBottleName("10 years old Wood", 10);
-//     expect(rv).toBe("10-year-old Wood");
+	result = bottle.NormalizeBottleName("10 year old Wood", &age)
+	assert.Equal(t, "10-year-old Wood", result)
+}
 
-//     const rv2 = normalizeBottleName("10 year old Wood", 10);
-//     expect(rv2).toBe("10-year-old Wood");
-//   });
+func TestNormalizeBottleName_NumberWithoutAge(t *testing.T) {
+	result := bottle.NormalizeBottleName("10", nil)
+	assert.Equal(t, "10", result)
+}
 
-//   test("12", async () => {
-//     const rv = normalizeBottleName("10");
-//     expect(rv).toBe("10");
-//   });
+func TestNormalizeBottleName_YearSuffix(t *testing.T) {
+	result := bottle.NormalizeBottleName("Delicious 12yr", nil)
+	assert.Equal(t, "Delicious 12-year-old", result)
 
-//   test("Name 12yr", async () => {
-//     const rv = normalizeBottleName("Delicious 12yr");
-//     expect(rv).toBe("Delicious 12-year-old");
-//   });
+	result = bottle.NormalizeBottleName("Delicious 12yr.", nil)
+	assert.Equal(t, "Delicious 12-year-old", result)
 
-//   test("Name 12yr.", async () => {
-//     const rv = normalizeBottleName("Delicious 12yr.");
-//     expect(rv).toBe("Delicious 12-year-old");
-//   });
+	result = bottle.NormalizeBottleName("Delicious 12yrs", nil)
+	assert.Equal(t, "Delicious 12-year-old", result)
 
-//   test("Name 12yrs", async () => {
-//     const rv = normalizeBottleName("Delicious 12yrs");
-//     expect(rv).toBe("Delicious 12-year-old");
-//   });
+	result = bottle.NormalizeBottleName("Delicious 12 year", nil)
+	assert.Equal(t, "Delicious 12-year-old", result)
+}
 
-//   test("Name 12 year", async () => {
-//     const rv = normalizeBottleName("Delicious 12 year");
-//     expect(rv).toBe("Delicious 12-year-old");
-//   });
+func TestNormalizeBottleName_YearContained(t *testing.T) {
+	result := bottle.NormalizeBottleName("Delicious 12 year thing", nil)
+	assert.Equal(t, "Delicious 12-year-old thing", result)
+}
 
-//   test("Name 12 year thing", async () => {
-//     const rv = normalizeBottleName("Delicious 12 Year thing");
-//     expect(rv).toBe("Delicious 12-year-old thing");
-//   });
-
-//   test("Cask No. 1.285 Hello World", async () => {
-//     const rv = normalizeBottleName("Cask No. 1.285 Hello World");
-//     expect(rv).toBe("1.285 Hello World");
-//   });
-// });
+func TestNormalizeBottleName_CaskNoPrefix(t *testing.T) {
+	result := bottle.NormalizeBottleName("Cask No. 1.285 Hello World", nil)
+	assert.Equal(t, "1.285 Hello World", result)
+}
 
 // describe("normalizeVolume", () => {
 //   test("750ml", async () => {

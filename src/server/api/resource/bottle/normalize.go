@@ -10,8 +10,18 @@ import (
 const ageSuffix = "-year-old"
 
 func NormalizeBottleName(name string, statedAge *uint) string {
-	if statedAge != nil && name == strconv.FormatUint(uint64(*statedAge), 10) {
-		return fmt.Sprintf("%s%s", strconv.FormatUint(uint64(*statedAge), 10), ageSuffix)
+	name = NormalizeString(name)
+
+	// this is primarily targeting Scotch Malt Whiskey Society bottles
+	name = strings.TrimPrefix(name, "Cask No. ")
+
+	if statedAge == nil {
+		return name
+	}
+	ageAsStr := strconv.FormatUint(uint64(*statedAge), 10)
+
+	if statedAge != nil && name == ageAsStr {
+		return fmt.Sprintf("%s%s", ageAsStr, ageSuffix)
 	}
 
 	// remove newlines
@@ -30,21 +40,19 @@ func NormalizeBottleName(name string, statedAge *uint) string {
 	//   .replace(/(\d+)\s?yrs?\.?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
 	//   .replace(/(\d+)\s?yrs?\.?($|\s)/i, `$1${ageSuffix}$2`);
 
-	// if (name.startsWith(`${age} `)) {
-	//   name = name.replace(`${age} `, `${age}${ageSuffix} `);
-	// }
-	// if (name.endsWith(` ${age}`)) {
-	//   name = `${name}${ageSuffix}`;
-	// }
+	if strings.HasPrefix(name, fmt.Sprintf("%s ", ageAsStr)) {
+		prefixRe := regexp.MustCompile(`^` + regexp.QuoteMeta(ageAsStr))
+		name = prefixRe.ReplaceAllString(name, ageAsStr+ageSuffix)
+	}
 
-	// // this is primarily targeting Scotch Malt Whiskey Society bottles
-	// if (name.startsWith("Cask No. ")) {
-	//   name = name.substring(9);
-	// }
+	if strings.HasSuffix(name, fmt.Sprintf(" %s", ageAsStr)) {
+		prefixRe := regexp.MustCompile(regexp.QuoteMeta(ageAsStr) + `$`)
+		name = prefixRe.ReplaceAllString(name, ageAsStr+ageSuffix)
+	}
 
 	// return normalizeString(name.replace(` ${age} `, ` ${age}${ageSuffix} `));
 
-	return NormalizeString(name)
+	return name
 }
 
 func NormalizeString(value string) string {
