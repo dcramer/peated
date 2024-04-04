@@ -75,6 +75,16 @@ func TestNormalizeBottleName_CaskNoPrefix(t *testing.T) {
 	assert.Equal(t, "1.285 Hello World", result)
 }
 
+func TestNormalizeBottleName_AgeMidName(t *testing.T) {
+	var age uint = 12
+	result := bottle.NormalizeBottleName("Delicious 12 thing", &age)
+	assert.Equal(t, "Delicious 12-year-old thing", result)
+
+	result = bottle.NormalizeBottleName("Delicious 12 thing", nil)
+	assert.Equal(t, "Delicious 12 thing", result)
+
+}
+
 // describe("normalizeVolume", () => {
 //   test("750ml", async () => {
 //     const rv = normalizeVolume("750ml");
