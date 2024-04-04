@@ -56,5 +56,11 @@ func NormalizeBottleName(name string, statedAge *uint) string {
 }
 
 func NormalizeString(value string) string {
+	smartAposRe := regexp.MustCompile(`[\x{2018}\x{2019}]`)
+	value = smartAposRe.ReplaceAllString(value, "'")
+
+	smartQuotesRe := regexp.MustCompile(`[\x{201C}\x{201D}]`)
+	value = smartQuotesRe.ReplaceAllString(value, "\"")
+
 	return value
 }
