@@ -7,6 +7,7 @@ import (
 
 	e "peated/api/resource/common/err"
 	"peated/api/router/middleware"
+	"peated/auth"
 	"peated/config"
 	"peated/database"
 	"peated/database/model"
@@ -109,6 +110,7 @@ func (a *API) bottleByID(ctx *gin.Context) {
 }
 
 func (a *API) bottleCreate(ctx *gin.Context) {
+
 	var data BottleInput
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		var details []*validate.ValidationErrDetail
@@ -119,14 +121,23 @@ func (a *API) bottleCreate(ctx *gin.Context) {
 		return
 	}
 
-	newBottle, err := a.repository.Create(ctx, data.ToModel())
+	currentUser, _ := auth.CurrentUser(ctx)
+
+	newBottle, err := a.repository.Create(ctx, &model.Bottle{
+		Name:        NormalizeBottleName(data.Name, data.StatedAge.Value),
+		StatedAge:   data.StatedAge.Value,
+		Category:    data.Category.Value,
+		CreatedByID: currentUser.ID,
+	})
 	if err != nil {
+		if database.IsKeyConflictErr(err) {
+			e.NewConflict(ctx, e.RespConflict)
+			return
+		}
 		a.logger.Error().Err(err).Msg("")
 		e.NewServerError(ctx, e.RespDBDataInsertFailure)
 		return
 	}
-
-	a.logger.Info().Uint64("id", newBottle.ID).Msg("new bottle created")
 
 	ctx.JSON(http.StatusCreated, NewBottleResponse(ctx, newBottle))
 }

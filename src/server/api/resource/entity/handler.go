@@ -127,7 +127,6 @@ func (a *API) entityCreate(ctx *gin.Context) {
 
 	currentUser, _ := auth.CurrentUser(ctx)
 
-	// TODO: validate type
 	newEntity, err := a.repository.Create(ctx, &model.Entity{
 		Name:            data.Name,
 		ShortName:       data.ShortName.Value,
