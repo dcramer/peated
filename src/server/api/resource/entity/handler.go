@@ -241,18 +241,26 @@ func (a *API) entityUpdate(ctx *gin.Context) {
 	if data.Type.Defined && ((data.Type.Value == nil && entity.Type != nil) || !SliceEqual(*data.Type.Value, entity.Type)) {
 		values["type"] = data.Type.Value
 	}
-
-	err = a.repository.Update(ctx, entity, values, currentUser)
-	if err != nil {
-		if database.IsKeyConflictErr(err) {
-			e.NewKeyConflict(ctx, "name", values["name"])
-			return
-		}
-		a.logger.Error().Err(err).Msg("")
-		e.NewServerError(ctx, e.RespDBDataRemoveFailure)
-		return
+	if data.YearEstablished.Defined && data.YearEstablished.Value != entity.YearEstablished {
+		values["year_established"] = data.YearEstablished.Value
 	}
 
+	if data.Website.Defined && data.Website.Value != entity.Website {
+		values["website"] = data.Website.Value
+	}
+
+	if len(values) != 0 {
+		err = a.repository.Update(ctx, entity, values, currentUser)
+		if err != nil {
+			if database.IsKeyConflictErr(err) {
+				e.NewKeyConflict(ctx, "name", values["name"])
+				return
+			}
+			a.logger.Error().Err(err).Msg("")
+			e.NewServerError(ctx, e.RespDBDataRemoveFailure)
+			return
+		}
+	}
 	// TODO:
 	// if (newEntity.name !== entity.name || !newEntity.description) {
 	// 	try {
