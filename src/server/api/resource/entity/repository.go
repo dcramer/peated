@@ -184,8 +184,8 @@ func (r *Repository) Update(ctx context.Context, entity *model.Entity, values ma
 
 			// only update previous alias if the actual name changed
 			// short name is additive
-			if values["name"] != nil {
-				if err := tx.Exec("UPDATE bottle_alias SET name = bottle.full_name FROM bottle WHERE bottle.id = bottle_alias.bottle_id AND bottle.brand_id = ? AND bottle_alias.name = ? || ' ' || bottle.name", entity.ID, entity.GetBottlePrefix()).Error; err != nil {
+			if entity.ShortName != nil || values["name"] != nil {
+				if err := tx.Exec("UPDATE bottle_alias SET name = ? || ' ' || bottle.name FROM bottle WHERE bottle.id = bottle_alias.bottle_id AND bottle.brand_id = ? AND bottle_alias.name = ? || ' ' || bottle.name", newEntity.GetBottlePrefix(), entity.ID, entity.GetBottlePrefix()).Error; err != nil {
 					return err
 				}
 			} else if values["short_name"] != nil {

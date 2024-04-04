@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"peated/api/resource/entity"
+	"peated/database"
 	"peated/database/model"
 	"peated/test"
 	"peated/test/fixture"
@@ -76,7 +77,43 @@ func (suite *EntityRepositoryTestSuite) TestRepository_Update_NameAsBrand() {
 	suite.Equal(aliases[0].Name, bottle1.FullName)
 }
 
-func (suite *EntityRepositoryTestSuite) TestRepository_Update_ShortNameAsBrand() {
+func (suite *EntityRepositoryTestSuite) TestRepository_Update_UpdatedShortNameAsBrand() {
+	ctx := context.Background()
+
+	currentUser := fixture.DefaultUser(ctx, suite.DB)
+
+	brand1 := fixture.NewEntity(ctx, suite.DB, func(e *model.Entity) {
+		e.ShortName = database.Ptr("JS")
+		e.Name = "Jim Tom's"
+	})
+
+	bottle1 := fixture.NewBottle(ctx, suite.DB, func(b *model.Bottle) {
+		b.Name = "Old Smokey"
+		b.FullName = "JS Old Smokey"
+		b.BrandID = brand1.ID
+	})
+
+	repo := entity.NewRepository(suite.DB)
+
+	values := make(map[string]interface{})
+	values["short_name"] = "JT"
+
+	err := repo.Update(ctx, brand1, values, currentUser)
+	suite.Require().NoError(err)
+	suite.Equal(*brand1.ShortName, "JT")
+
+	err = suite.DB.Find(&bottle1).Error
+	suite.Require().NoError(err)
+	suite.Equal(bottle1.FullName, "JT Old Smokey")
+
+	var aliases model.BottleAliases
+	err = suite.DB.Where("bottle_id = ?", bottle1.ID).Order("name ASC").Find(&aliases).Error
+	suite.Require().NoError(err)
+	suite.Require().Equal(len(aliases), 1)
+	suite.Equal(aliases[0].Name, "JT Old Smokey")
+}
+
+func (suite *EntityRepositoryTestSuite) TestRepository_Update_NewShortNameAsBrand() {
 	ctx := context.Background()
 
 	currentUser := fixture.DefaultUser(ctx, suite.DB)
