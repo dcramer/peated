@@ -67,7 +67,7 @@ func TestNormalizeBottleName_YearSuffix(t *testing.T) {
 
 func TestNormalizeBottleName_YearContained(t *testing.T) {
 	result := bottle.NormalizeBottleName("Delicious 12 year thing", nil)
-	assert.Equal(t, "Delicious 12-year-old thing", result)
+	assert.Equal(t, "Delicious 12-year-old Thing", result)
 }
 
 func TestNormalizeBottleName_CaskNoPrefix(t *testing.T) {
@@ -78,10 +78,10 @@ func TestNormalizeBottleName_CaskNoPrefix(t *testing.T) {
 func TestNormalizeBottleName_AgeMidName(t *testing.T) {
 	var age uint = 12
 	result := bottle.NormalizeBottleName("Delicious 12 thing", &age)
-	assert.Equal(t, "Delicious 12-year-old thing", result)
+	assert.Equal(t, "Delicious 12-year-old Thing", result)
 
 	result = bottle.NormalizeBottleName("Delicious 12 thing", nil)
-	assert.Equal(t, "Delicious 12 thing", result)
+	assert.Equal(t, "Delicious 12 Thing", result)
 
 }
 

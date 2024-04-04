@@ -2,15 +2,54 @@ package bottle
 
 import (
 	"fmt"
+	"peated/database/model"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/go-errors/errors"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 const ageSuffix = "-year-old"
 
+func ToTitleCase(value string) string {
+	caser := cases.Title(language.English)
+	return caser.String(value)
+}
+
+func CategoryName(name string) string {
+	name = strings.ReplaceAll(name, "_", "")
+
+	name = ToTitleCase(name)
+
+	return name
+}
+
+func NormalizeCategory(name string) (string, error) {
+	nameLower := strings.ToLower(name)
+	if slices.Contains(model.CategoryNames, nameLower) {
+		return nameLower, nil
+	}
+	if strings.HasPrefix(name, "single malt") || strings.HasSuffix(nameLower, "single malt") {
+		return model.CategorySingleMalt, nil
+	}
+
+	for _, c := range model.CategoryNames {
+		if strings.HasPrefix(name, strings.ToLower(CategoryName(c))) {
+			return c, nil
+		}
+	}
+
+	return "", errors.Errorf("invalid category: %s", name)
+}
+
 func NormalizeBottleName(name string, statedAge *uint) string {
 	name = NormalizeString(name)
+
+	name = ToTitleCase(name)
 
 	// this is primarily targeting Scotch Malt Whiskey Society bottles
 	name = strings.TrimPrefix(name, "Cask No. ")

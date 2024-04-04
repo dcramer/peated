@@ -17,6 +17,16 @@ const (
 	CategorySpirit         string = "spirit"
 )
 
+var CategoryNames = []string{
+	CategoryBlend,
+	CategoryBourbon,
+	CategoryRye,
+	CategorySingleGrain,
+	CategorySingleMalt,
+	CategorySinglePotStill,
+	CategorySpirit,
+}
+
 type Bottle struct {
 	ID        uint64  `gorm:"primaryKey" json:"id"`
 	FullName  string  `json:"full_name" gorm:"not null"`
