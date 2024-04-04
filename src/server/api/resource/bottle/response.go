@@ -17,7 +17,7 @@ type BottleStats struct {
 
 type BottleResponse struct {
 	Bottle Bottle       `json:"bottle"`
-	Stats  *BottleStats `json:"stats;omitempty"`
+	Stats  *BottleStats `json:"stats,omitempty"`
 }
 
 type BottlesResponse struct {
