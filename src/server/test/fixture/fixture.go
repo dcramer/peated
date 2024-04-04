@@ -3,6 +3,7 @@ package fixture
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"peated/auth"
 	"peated/config"
@@ -101,11 +102,74 @@ func NewBadge(ctx context.Context, db *gorm.DB, handler func(*model.Badge)) *mod
 	return badge
 }
 
-func NewEntity(ctx context.Context, db *gorm.DB, handler func(*model.Entity)) *model.Entity {
+func randChoice[T any](slice []T) T {
+	n := rand.Intn(len(slice))
+	return slice[n]
+}
+
+func NewBottle(ctx context.Context, db *gorm.DB, handler func(*model.Bottle)) *model.Bottle {
 	f := Faker()
 
-	var types []string
-	types = append(types, model.EntityTypeBrand)
+	bottle := &model.Bottle{
+		Name:      fmt.Sprintf("%s #%d", f.App().Name(), f.RandomNumber(100)),
+		Category:  database.Ptr(randChoice([]string{model.CategorySingleMalt})),
+		StatedAge: database.Ptr(randChoice([]uint{0, 3, 10, 12, 15, 18, 20, 25})),
+		CreatedAt: time.Now(),
+	}
+
+	handler(bottle)
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		if bottle.BrandID == 0 {
+			bottle.BrandID = NewEntity(ctx, db, func(e *model.Entity) {
+				e.Type = []string{model.EntityTypeBrand}
+				e.TotalBottles = 1
+			}).ID
+		}
+
+		if bottle.CreatedByID == 0 {
+			bottle.CreatedByID = DefaultUser(ctx, tx).ID
+		}
+
+		if err := tx.Create(bottle).Error; err != nil {
+			return err
+		}
+
+		bottleData, err := json.Marshal(bottle)
+		if err != nil {
+			return err
+		}
+		if err := tx.Create(&model.BottleAlias{
+			Name:     bottle.FullName,
+			BottleID: bottle.ID,
+		}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Change{
+			ObjectID:    bottle.ID,
+			ObjectType:  "bottle",
+			Type:        model.ChangeTypeAdd,
+			DisplayName: &bottle.FullName,
+			CreatedAt:   bottle.CreatedAt,
+			CreatedByID: bottle.CreatedByID,
+			Data:        bottleData,
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	return bottle
+}
+
+func NewEntity(ctx context.Context, db *gorm.DB, handler func(*model.Entity)) *model.Entity {
+	f := Faker()
 
 	location, err := spatial.NewPoint("-122.4194", "37.7749")
 	if err != nil {
@@ -114,7 +178,7 @@ func NewEntity(ctx context.Context, db *gorm.DB, handler func(*model.Entity)) *m
 
 	entity := &model.Entity{
 		Name:      f.App().Name(),
-		Type:      types,
+		Type:      []string{model.EntityTypeBrand, model.EntityTypeDistiller},
 		Country:   database.Ptr(f.Address().Country()),
 		Website:   database.Ptr(f.Internet().URL()),
 		CreatedAt: time.Now(),
@@ -141,6 +205,7 @@ func NewEntity(ctx context.Context, db *gorm.DB, handler func(*model.Entity)) *m
 			ObjectID:    entity.ID,
 			ObjectType:  "entity",
 			Type:        model.ChangeTypeAdd,
+			DisplayName: &entity.Name,
 			CreatedAt:   entity.CreatedAt,
 			CreatedByID: entity.CreatedByID,
 			Data:        entityData,

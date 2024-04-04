@@ -125,6 +125,7 @@ func (r *Repository) Create(ctx context.Context, entity *model.Entity) (*model.E
 			ObjectID:    entity.ID,
 			ObjectType:  "entity",
 			Type:        changeType,
+			DisplayName: &entity.Name,
 			CreatedAt:   entity.CreatedAt,
 			CreatedByID: entity.CreatedByID,
 			Data:        entityData,
@@ -181,7 +182,7 @@ func (r *Repository) Update(ctx context.Context, entity *model.Entity, values ma
 				return err
 			}
 
-			if err := tx.Raw("UPDATE bottle_alias SET name = bottle.full_name FROM bottle WHERE bottle = bottle_alias.bottle_id AND bottle.brand_id = ? AND bottle_alias.name = ?", entity.ID, entity.GetBottlePrefix()).Error; err != nil {
+			if err := tx.Exec("UPDATE bottle_alias SET name = bottle.full_name FROM bottle WHERE bottle.id = bottle_alias.bottle_id AND bottle.brand_id = ? AND bottle_alias.name = ? || ' ' || bottle.name", entity.ID, entity.GetBottlePrefix()).Error; err != nil {
 				return err
 			}
 		}
@@ -190,6 +191,7 @@ func (r *Repository) Update(ctx context.Context, entity *model.Entity, values ma
 			ObjectID:    entity.ID,
 			ObjectType:  "entity",
 			Type:        model.ChangeTypeUpdate,
+			DisplayName: &entity.Name,
 			CreatedAt:   time.Now(),
 			CreatedByID: currentUser.ID,
 			Data:        entityData,
@@ -223,6 +225,7 @@ func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.U
 			ObjectID:    entity.ID,
 			ObjectType:  "entity",
 			Type:        model.ChangeTypeDelete,
+			DisplayName: &entity.Name,
 			CreatedAt:   time.Now(),
 			CreatedByID: currentUser.ID,
 			Data:        entityData,
@@ -295,6 +298,7 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 				ObjectID:    e.ID,
 				ObjectType:  "entity",
 				Type:        model.ChangeTypeDelete,
+				DisplayName: &e.Name,
 				CreatedAt:   time.Now(),
 				CreatedByID: currentUser.ID,
 				Data:        eData,
@@ -311,6 +315,7 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 			ObjectID:    primary.ID,
 			ObjectType:  "entity",
 			Type:        model.ChangeTypeUpdate,
+			DisplayName: &primary.Name,
 			CreatedAt:   time.Now(),
 			CreatedByID: currentUser.ID,
 			Data:        primaryData,
