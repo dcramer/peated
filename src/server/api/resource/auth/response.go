@@ -8,7 +8,7 @@ import (
 
 type AuthResponse struct {
 	User        *user.User `json:"user"`
-	AccessToken string     `json:"accessToken,omitempty"`
+	AccessToken *string    `json:"accessToken,omitempty"`
 }
 
 type GoogleClaims struct {
@@ -17,7 +17,7 @@ type GoogleClaims struct {
 	Sub       string `json:"sub"`
 }
 
-func NewAuthResponse(ctx context.Context, u *model.User, t string) *AuthResponse {
+func NewAuthResponse(ctx context.Context, u *model.User, t *string) *AuthResponse {
 	return &AuthResponse{
 		User:        user.NewUserResponse(ctx, u).User,
 		AccessToken: t,

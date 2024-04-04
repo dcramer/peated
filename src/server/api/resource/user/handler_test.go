@@ -60,7 +60,7 @@ func (suite *UserHandlerTestSuite) TestHandler_List_Query() {
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
 	suite.Require().Equal(len(data.Users), 1)
-	suite.Equal(data.Users[0].ID, strconv.FormatUint(user1.ID, 10))
+	suite.Equal(strconv.FormatUint(user1.ID, 10), data.Users[0].ID)
 }
 
 func (suite *UserHandlerTestSuite) TestHandler_List_Admin() {
@@ -82,9 +82,9 @@ func (suite *UserHandlerTestSuite) TestHandler_List_Admin() {
 	var data *user.UsersResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(data.Users), 2)
-	suite.Equal(data.Users[0].ID, strconv.FormatUint(user2.ID, 10))
-	suite.Equal(data.Users[1].ID, strconv.FormatUint(user1.ID, 10))
+	suite.Require().Equal(2, len(data.Users))
+	suite.Equal(strconv.FormatUint(user2.ID, 10), data.Users[0].ID)
+	suite.Equal(strconv.FormatUint(user1.ID, 10), data.Users[1].ID)
 }
 
 func (suite *UserHandlerTestSuite) TestHandler_ByUsername() {
@@ -98,7 +98,7 @@ func (suite *UserHandlerTestSuite) TestHandler_ByUsername() {
 	var data user.UserResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.User.ID, strconv.FormatUint(user1.ID, 10))
+	suite.Equal(strconv.FormatUint(user1.ID, 10), data.User.ID)
 }
 
 func (suite *UserHandlerTestSuite) TestHandler_ById_NotFound() {

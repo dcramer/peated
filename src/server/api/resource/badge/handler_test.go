@@ -36,8 +36,8 @@ func (suite *BadgeHandlerTestSuite) TestHandler_List() {
 	var data badge.BadgesResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(data.Badges), 1)
-	suite.Equal(data.Badges[0].ID, strconv.FormatUint(badge1.ID, 10))
+	suite.Require().Equal(1, len(data.Badges))
+	suite.Equal(strconv.FormatUint(badge1.ID, 10), data.Badges[0].ID)
 }
 
 func (suite *BadgeHandlerTestSuite) TestHandler_ById() {
@@ -51,7 +51,7 @@ func (suite *BadgeHandlerTestSuite) TestHandler_ById() {
 	var data badge.BadgeResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.Badge.ID, strconv.FormatUint(badge1.ID, 10))
+	suite.Equal(strconv.FormatUint(badge1.ID, 10), data.Badge.ID)
 }
 
 func (suite *BadgeHandlerTestSuite) TestHandler_ById_NotFound() {
@@ -91,6 +91,6 @@ func (suite *BadgeHandlerTestSuite) TestHandler_Create_Admin() {
 	var data badge.BadgeResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.Badge.Name, "foo")
+	suite.Equal("foo", data.Badge.Name)
 
 }

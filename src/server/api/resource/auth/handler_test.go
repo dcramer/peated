@@ -43,8 +43,8 @@ func (suite *AuthHandlerTestSuite) TestHandler_Read_Authenticated() {
 	suite.Require().Equal(http.StatusOK, response.Code)
 	err := json.NewDecoder(response.Body).Decode(&data)
 	suite.Require().NoError(err)
-	suite.NotEqual(data.User.Email, user.Email)
-	suite.Equal(data.AccessToken, "")
+	suite.NotEqual(user.Email, data.User.Email)
+	suite.Nil(data.AccessToken)
 }
 
 func (suite *AuthHandlerTestSuite) TestHandler_EmailPassword_ValidCredentials() {
@@ -62,8 +62,8 @@ func (suite *AuthHandlerTestSuite) TestHandler_EmailPassword_ValidCredentials() 
 	suite.Require().Equal(http.StatusOK, response.Code)
 	err := json.NewDecoder(response.Body).Decode(&data)
 	suite.Require().NoError(err)
-	suite.NotEqual(data.User.Email, user.Email)
-	suite.NotEqual(data.AccessToken, "")
+	suite.NotEqual(user.Email, data.User.Email)
+	suite.NotEqual("", data.AccessToken)
 }
 
 func (suite *AuthHandlerTestSuite) TestHandler_EmailPassword_InvalidCredentials() {

@@ -62,7 +62,7 @@ func (a *API) authSession(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, NewAuthResponse(ctx, user, ""))
+	ctx.JSON(200, NewAuthResponse(ctx, user, nil))
 }
 
 func (a *API) authEmailPassword(ctx *gin.Context) {
@@ -109,7 +109,7 @@ func (a *API) authEmailPassword(ctx *gin.Context) {
 		return
 	}
 
-	auth := NewAuthResponse(ctx, currentUser, *accessToken)
+	auth := NewAuthResponse(ctx, currentUser, accessToken)
 
 	ctx.JSON(200, auth)
 }
@@ -205,7 +205,7 @@ func (a *API) authGoogle(ctx *gin.Context) {
 		return
 	}
 
-	auth := NewAuthResponse(ctx, currentUser, *accessToken)
+	auth := NewAuthResponse(ctx, currentUser, accessToken)
 
 	ctx.JSON(200, auth)
 }
