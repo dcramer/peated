@@ -2,6 +2,7 @@ package entity_test
 
 import (
 	"context"
+	"fmt"
 	"peated/api/resource/entity"
 	"peated/database/model"
 	"peated/test"
@@ -104,8 +105,9 @@ func (suite *EntityRepositoryTestSuite) TestRepository_Update_ShortNameAsBrand()
 	suite.Equal(bottle1.FullName, "JT Old Smokey")
 
 	var aliases model.BottleAliases
-	err = suite.DB.Where("bottle_id = ?", bottle1.ID).Find(&aliases).Error
+	err = suite.DB.Where("bottle_id = ?", bottle1.ID).Order("name ASC").Find(&aliases).Error
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(aliases), 1)
-	suite.Equal(aliases[0].Name, bottle1.FullName)
+	suite.Require().Equal(len(aliases), 2)
+	suite.Equal(aliases[0].Name, fmt.Sprintf("%s %s", brand1.Name, bottle1.Name))
+	suite.Equal(aliases[1].Name, fmt.Sprintf("%s %s", *brand1.ShortName, bottle1.Name))
 }
