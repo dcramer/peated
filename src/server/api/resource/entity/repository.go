@@ -374,3 +374,60 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 
 	return nil
 }
+
+type UpsertOutcome[T any] struct {
+	Created bool
+	Result  T
+}
+
+func (r *Repository) Upsert(ctx context.Context, value interface{}, entityType string, currentUserID uint64) (*UpsertOutcome[*model.Entity], error) {
+	var entity *model.Entity
+
+	// TODO: we'd prefer this _whole thing_ be a transaction
+	switch value := value.(type) {
+	case uint64:
+		entity, err := r.ReadById(ctx, value)
+		if err != nil {
+			return nil, err
+		}
+
+		// add missing type if needed
+		missingTypes := missing(entity.Type, []string{entityType})
+		if len(missingTypes) != 0 {
+			for _, t := range missingTypes {
+				entity.Type = append(entity.Type, t)
+			}
+			r.db.Model(entity).Clauses(clause.Returning{}).Where("id = ?", entity.ID).Update("type", entity.Type)
+		}
+		return &UpsertOutcome[*model.Entity]{
+			Created: false,
+			Result:  entity,
+		}, nil
+	case model.Entity:
+		entity = &value
+	default:
+		panic(errors.Errorf("invalid value passed to upsert: %+v", value))
+	}
+
+	newEntity, err := r.Create(ctx, entity)
+	if err == nil {
+		return &UpsertOutcome[*model.Entity]{
+			Created: true,
+			Result:  newEntity,
+		}, nil
+	}
+
+	if !database.IsKeyConflictErr(err) {
+		return nil, err
+	}
+
+	err = r.db.Where("name = ?", entity.Name).First(entity).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &UpsertOutcome[*model.Entity]{
+		Created: false,
+		Result:  entity,
+	}, nil
+}

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"peated/api/resource/auth"
 	"peated/api/resource/badge"
+	"peated/api/resource/bottle"
 	"peated/api/resource/entity"
 	"peated/api/resource/health"
 	"peated/api/resource/user"
@@ -38,6 +39,7 @@ func New(
 
 	health.Routes(r, config, logger)
 	auth.Routes(r, config, logger, db)
+	bottle.Routes(r, config, logger, db)
 	badge.Routes(r, config, logger, db)
 	entity.Routes(r, config, logger, db)
 	user.Routes(r, config, logger, db)

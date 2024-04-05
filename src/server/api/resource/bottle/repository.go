@@ -2,6 +2,8 @@ package bottle
 
 import (
 	"context"
+	"encoding/json"
+	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -46,8 +48,70 @@ func (r *Repository) List(ctx context.Context, input *ListInput) (model.Bottles,
 	return bottles, nil
 }
 
-func (r *Repository) Create(ctx context.Context, bottle *model.Bottle) (*model.Bottle, error) {
-	if err := r.db.Create(bottle).Error; err != nil {
+func (r *Repository) Create(ctx context.Context, bottle *model.Bottle, distillers *[]uint64) (*model.Bottle, error) {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(bottle).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "name"}},
+			DoUpdates: clause.AssignmentColumns([]string{"bottle_id"}),
+		}).Create(&model.BottleAlias{
+			BottleID: bottle.ID,
+			Name:     bottle.FullName,
+		}).Error; err != nil {
+			return err
+		}
+
+		if distillers != nil && len(*distillers) > 0 {
+			for _, d := range *distillers {
+				tx.Create(&model.BottleDistiller{
+					BottleID:    bottle.ID,
+					DistillerID: d,
+				})
+			}
+		}
+
+		bottleData, err := json.Marshal(bottle)
+		if err != nil {
+			return err
+		}
+		// TODO: this needs to happen somehow
+		// bottleData["distillerIds"] = distillers
+
+		if err := tx.Create(&model.Change{
+			ObjectID:    bottle.ID,
+			ObjectType:  "bottle",
+			Type:        model.ChangeTypeAdd,
+			DisplayName: &bottle.Name,
+			CreatedAt:   bottle.CreatedAt,
+			CreatedByID: bottle.CreatedByID,
+			Data:        bottleData,
+		}).Error; err != nil {
+			return err
+		}
+
+		allEntityIDs := []uint64{
+			bottle.BrandID,
+		}
+		if bottle.BottlerID != nil {
+			allEntityIDs = append(allEntityIDs, *bottle.BottlerID)
+		}
+		if distillers != nil {
+			allEntityIDs = append(allEntityIDs, *distillers...)
+		}
+
+		if err = tx.Exec(`UPDATE entity SET total_bottles = SELECT COUNT(*) from bottle WHERE bottle.brand_id = entity.id OR bottle.brand_id = entity.id OR EXISTS(
+			SELECT FROM bottle_distiller WHERE bottle_distiller.bottle_id = bottle.id AND bottle_distiller.entity_id = entity.id
+		) AND entity.id IN ?`, allEntityIDs).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -74,10 +138,37 @@ func (r *Repository) ReadByTombstone(ctx context.Context, id uint64) (*model.Bot
 	return bottle, nil
 }
 
-func (r *Repository) Delete(id uint64) (int64, error) {
-	result := r.db.Where("id = ?", id).Delete(&model.Bottle{})
+// TODO:
+func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.User) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		bottle, err := r.ReadById(ctx, id)
+		if err != nil {
+			return err
+		}
 
-	return result.RowsAffected, result.Error
+		changeData, err := json.Marshal(bottle)
+		if err != nil {
+			return err
+		}
+
+		if err := tx.Delete(bottle).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Change{
+			ObjectID:    bottle.ID,
+			ObjectType:  "bottle",
+			Type:        model.ChangeTypeDelete,
+			DisplayName: &bottle.FullName,
+			CreatedAt:   time.Now(),
+			CreatedByID: currentUser.ID,
+			Data:        changeData,
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (r *Repository) ListAliases(ctx context.Context, bottleID uint64) (model.BottleAliases, error) {

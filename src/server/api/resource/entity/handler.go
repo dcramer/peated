@@ -165,12 +165,7 @@ func (a *API) entityDelete(ctx *gin.Context) {
 		return
 	}
 
-	currentUser, ok := auth.CurrentUser(ctx)
-	if !ok {
-		a.logger.Error().Msg("this should not be reachable (entityCreate.currentUser)")
-		e.NewServerError(ctx, e.RespDBDataAccessFailure)
-		return
-	}
+	currentUser, _ := auth.CurrentUser(ctx)
 
 	err := a.repository.Delete(ctx, uri.ID, currentUser)
 	if err != nil {

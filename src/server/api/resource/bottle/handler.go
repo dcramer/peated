@@ -1,11 +1,14 @@
 package bottle
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
 	e "peated/api/resource/common/err"
+	"peated/api/resource/entity"
 	"peated/api/router/middleware"
 	"peated/auth"
 	"peated/config"
@@ -38,6 +41,7 @@ func Routes(r *gin.Engine, config *config.Config, logger *zerolog.Logger, db *go
 	r.GET("/bottles", api.bottleList)
 	r.POST("/bottles", middleware.AuthRequired(config, logger, db), api.bottleCreate)
 	r.GET("/bottles/:id", api.bottleByID)
+	r.DELETE("/bottles/:id", middleware.ModRequired(config, logger, db), api.bottleDelete)
 	r.GET("/bottles/:id/aliases", api.bottleAliasList)
 }
 
@@ -110,7 +114,6 @@ func (a *API) bottleByID(ctx *gin.Context) {
 }
 
 func (a *API) bottleCreate(ctx *gin.Context) {
-
 	var data BottleInput
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		var details []*validate.ValidationErrDetail
@@ -125,12 +128,51 @@ func (a *API) bottleCreate(ctx *gin.Context) {
 
 	normName, normAge := NormalizeBottleName(data.Name, data.StatedAge.Value)
 
-	newBottle, err := a.repository.Create(ctx, &model.Bottle{
+	entRepo := entity.NewRepository(a.db)
+	brandUpsert, err := entRepo.Upsert(ctx, data.Brand, "brand", currentUser.ID)
+	if err != nil {
+		a.logger.Error().Err(err).Msg("")
+		e.NewServerError(ctx, e.RespDBDataInsertFailure)
+		return
+	}
+	brand := brandUpsert.Result
+
+	// dont let users accidentally dupe brand name in bottle name
+	normName = strings.TrimPrefix(normName, brandUpsert.Result.Name)
+
+	bottle := &model.Bottle{
 		Name:        normName,
+		FullName:    fmt.Sprintf("%s %s", brand.GetBottlePrefix(), normName),
 		StatedAge:   normAge,
 		Category:    data.Category.Value,
 		CreatedByID: currentUser.ID,
-	})
+		BrandID:     brand.ID,
+	}
+
+	if data.Bottler.Defined && data.Bottler.Value != nil {
+		bottlerUpsert, err := entRepo.Upsert(ctx, data.Bottler.Value, "bottler", currentUser.ID)
+		if err != nil {
+			a.logger.Error().Err(err).Msg("")
+			e.NewServerError(ctx, e.RespDBDataInsertFailure)
+			return
+		}
+		bottle.BottlerID = &bottlerUpsert.Result.ID
+	}
+
+	var distillerIDs []uint64 = []uint64{}
+	if data.Distillers.Defined && len(*data.Distillers.Value) != 0 {
+		for _, d := range *data.Distillers.Value {
+			distUpsert, err := entRepo.Upsert(ctx, d, "distiller", currentUser.ID)
+			if err != nil {
+				a.logger.Error().Err(err).Msg("")
+				e.NewServerError(ctx, e.RespDBDataInsertFailure)
+				return
+			}
+			distillerIDs = append(distillerIDs, distUpsert.Result.ID)
+		}
+	}
+
+	newBottle, err := a.repository.Create(ctx, bottle, &distillerIDs)
 	if err != nil {
 		if database.IsKeyConflictErr(err) {
 			e.NewConflict(ctx, e.RespConflict)
@@ -142,4 +184,35 @@ func (a *API) bottleCreate(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, NewBottleResponse(ctx, newBottle))
+}
+
+func (a *API) bottleDelete(ctx *gin.Context) {
+	type RequestUri struct {
+		ID uint64 `uri:"id" binding:"numeric"`
+	}
+	var uri RequestUri
+
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		var details []*validate.ValidationErrDetail
+		if vErrs, ok := err.(validator.ValidationErrors); ok {
+			details = validate.ValidationErrorDetails(&uri, "uri", vErrs)
+		}
+		e.NewBadRequest(ctx, e.InvalidParameters(details))
+		return
+	}
+
+	currentUser, _ := auth.CurrentUser(ctx)
+
+	err := a.repository.Delete(ctx, uri.ID, currentUser)
+	if err != nil {
+		if database.IsRecordNotFoundErr(err) {
+			e.NewNotFound(ctx, e.RespNotFound)
+			return
+		}
+		a.logger.Error().Err(err).Msg("")
+		e.NewServerError(ctx, e.RespDBDataRemoveFailure)
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, gin.H{})
 }
