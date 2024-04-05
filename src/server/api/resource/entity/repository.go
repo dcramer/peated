@@ -270,7 +270,7 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 		return errors.New("one or more entities were not found")
 	}
 
-	var totalBottles, totalTastings uint
+	var totalBottles, totalTastings uint64
 
 	for _, e := range siblings {
 		totalBottles += e.TotalBottles

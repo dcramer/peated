@@ -9,8 +9,8 @@ type StorePrice struct {
 	ExternalSiteID uint64 `json:"external_site_id"`
 	Name           string `json:"name"`
 	BottleID       uint64 `json:"bottle_id"`
-	Price          uint   `json:"price"`
-	Volume         uint   `json:"volume"`
+	Price          uint64 `json:"price"`
+	Volume         uint64 `json:"volume"`
 	Url            string `json:"url"`
 
 	CreatedAt time.Time `json:"created_at"`

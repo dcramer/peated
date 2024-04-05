@@ -22,7 +22,7 @@ type ExternalSite struct {
 	Name      string           `json:"name"`
 	LastRunAt time.Time        `json:"last_run_at"`
 	NextRunAt time.Time        `json:"next_run_at"`
-	RunEvery  uint             `json:"run_every"`
+	RunEvery  uint64           `json:"run_every"`
 
 	CreatedAt time.Time `json:"created_at"`
 }

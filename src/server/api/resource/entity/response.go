@@ -13,14 +13,14 @@ type Entity struct {
 	ShortName       *string  `json:"shortName"`
 	Type            []string `json:"type"`
 	Description     *string
-	YearEstablished *uint `json:"yearEstablished"`
+	YearEstablished *uint64 `json:"yearEstablished"`
 	Website         *string
 	Country         *string
 	Region          *string
 	Location        *spatial.Point
 	CreatedAt       string `json:"createdAt"`
-	TotalTastings   uint   `json:"totalTastings"`
-	TotalBottles    uint   `json:"totalBottles"`
+	TotalTastings   uint64 `json:"totalTastings"`
+	TotalBottles    uint64 `json:"totalBottles"`
 }
 
 type EntityResponse struct {

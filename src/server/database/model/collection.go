@@ -7,7 +7,7 @@ import (
 type Collection struct {
 	ID           uint64 `gorm:"primaryKey" json:"id"`
 	Name         string `json:"name"`
-	TotalBottles uint   `json:"total_bottles"`
+	TotalBottles uint64 `json:"total_bottles"`
 
 	CreatedByID uint64    `json:"created_by_id"`
 	CreatedAt   time.Time `json:"created_at"`

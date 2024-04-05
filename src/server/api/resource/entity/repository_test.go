@@ -175,7 +175,7 @@ func (suite *EntityRepositoryTestSuite) TestRepository_Merge() {
 
 	err = suite.DB.First(&brand1).Error
 	suite.Require().NoError(err)
-	suite.Equal(uint(1), brand1.TotalBottles)
+	suite.Equal(uint64(1), brand1.TotalBottles)
 
 	// second brand should get removed
 	err = suite.DB.First(&brand2).Error

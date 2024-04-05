@@ -123,9 +123,11 @@ func (a *API) bottleCreate(ctx *gin.Context) {
 
 	currentUser, _ := auth.CurrentUser(ctx)
 
+	normName, normAge := NormalizeBottleName(data.Name, data.StatedAge.Value)
+
 	newBottle, err := a.repository.Create(ctx, &model.Bottle{
-		Name:        NormalizeBottleName(data.Name, data.StatedAge.Value),
-		StatedAge:   data.StatedAge.Value,
+		Name:        normName,
+		StatedAge:   normAge,
 		Category:    data.Category.Value,
 		CreatedByID: currentUser.ID,
 	})

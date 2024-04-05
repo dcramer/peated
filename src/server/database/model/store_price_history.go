@@ -7,8 +7,8 @@ import (
 type StorePriceHistory struct {
 	ID      uint64         `gorm:"primaryKey" json:"id"`
 	PriceID uint64         `json:"price_id"`
-	Price   uint           `json:"price"`
-	Volume  uint           `json:"volume"`
+	Price   uint64         `json:"price"`
+	Volume  uint64         `json:"volume"`
 	Date    datatypes.Date `json:"date"`
 
 	StorePrice StorePrice `gorm:"references:price_id"`

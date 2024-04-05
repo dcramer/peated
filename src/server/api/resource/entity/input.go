@@ -11,7 +11,7 @@ type EntityInput struct {
 	Type            []string                       `json:"type" binding:"required,dive,oneof=bottler brand distiller"`
 	Country         schema.Optional[string]        `binding:"omitempty"`
 	Region          schema.Optional[string]        `binding:"omitempty"`
-	YearEstablished schema.Optional[uint]          `json:"yearEstablished" binding:"omitempty,numeric,gte=0,lte=2050"`
+	YearEstablished schema.Optional[uint64]        `json:"yearEstablished" binding:"omitempty,numeric,gte=0,lte=2050"`
 	Website         schema.Optional[string]        `json:"website" binding:"omitempty,url"`
 	Location        schema.Optional[spatial.Point] `json:"location" binding:"omitempty"`
 }
@@ -22,7 +22,7 @@ type EntityUpdateInput struct {
 	Type            schema.Optional[[]string]      `json:"type" binding:"omitempty,dive,oneof=bottler brand distiller"`
 	Country         schema.Optional[string]        `binding:"omitempty"`
 	Region          schema.Optional[string]        `binding:"omitempty"`
-	YearEstablished schema.Optional[uint]          `json:"yearEstablished" binding:"omitempty,numeric,gte=0,lte=2050"`
+	YearEstablished schema.Optional[uint64]        `json:"yearEstablished" binding:"omitempty,numeric,gte=0,lte=2050"`
 	Website         schema.Optional[string]        `json:"website" binding:"omitempty,url"`
 	Location        schema.Optional[spatial.Point] `json:"location" binding:"omitempty"`
 }

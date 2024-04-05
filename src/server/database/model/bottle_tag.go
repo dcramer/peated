@@ -3,7 +3,7 @@ package model
 type BottleTag struct {
 	BottleID uint64 `json:"bottle_id" gorm:"primaryKey;autoincrement:false"`
 	Tag      string `json:"tag" gorm:"primaryKey;autoincrement:false"`
-	Count    uint   `json:"count"`
+	Count    uint64 `json:"count"`
 
 	Bottle Bottle
 }

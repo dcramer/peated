@@ -23,11 +23,11 @@ type Entity struct {
 	Location  *spatial.Point `json:"location" gorm:"type:geometry(point, 4326)"`
 
 	Description     *string `json:"description"`
-	YearEstablished *uint   `json:"year_established"`
+	YearEstablished *uint64 `json:"year_established"`
 	Website         *string `json:"website"`
 
-	TotalBottles  uint `json:"total_bottles" gorm:"default:0;not null"`
-	TotalTastings uint `json:"total_tastings" gorm:"default:0;not null"`
+	TotalBottles  uint64 `json:"total_bottles" gorm:"default:0;not null"`
+	TotalTastings uint64 `json:"total_tastings" gorm:"default:0;not null"`
 
 	CreatedAt   time.Time `json:"created_at" gorm:"not null"`
 	CreatedByID uint64    `json:"created_by_id" gorm:"not null"`

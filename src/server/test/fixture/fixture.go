@@ -121,7 +121,7 @@ func NewBottle(ctx context.Context, db *gorm.DB, handler func(*model.Bottle)) *m
 			model.CategorySinglePotStill,
 			model.CategorySpirit,
 		})),
-		StatedAge: database.Ptr(randChoice([]uint{0, 3, 10, 12, 15, 18, 20, 25})),
+		StatedAge: database.Ptr(randChoice([]uint64{0, 3, 10, 12, 15, 18, 20, 25})),
 		CreatedAt: time.Now(),
 	}
 

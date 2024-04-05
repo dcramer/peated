@@ -46,7 +46,7 @@ func NormalizeCategory(name string) (string, error) {
 	return "", errors.Errorf("invalid category: %s", name)
 }
 
-func NormalizeBottleName(name string, statedAge *uint) string {
+func NormalizeBottleName(name string, statedAge *uint64) (string, *uint64) {
 	name = NormalizeString(name)
 
 	name = ToTitleCase(name)
@@ -70,12 +70,23 @@ func NormalizeBottleName(name string, statedAge *uint) string {
 	name = yrsOldRe.ReplaceAllString(name, "$1"+ageSuffix+"$2")
 
 	if statedAge == nil {
-		return name
+		statedAgeRe := regexp.MustCompile(`(\d+)-year-old`)
+		statedAgeMatch := statedAgeRe.FindStringSubmatch(name)
+		if len(statedAgeMatch) > 1 {
+			statedAgeResult, err := strconv.ParseUint(statedAgeMatch[1], 10, 64)
+			if err == nil && statedAgeResult != 0 {
+				statedAge = &statedAgeResult
+			}
+		}
+	}
+
+	if statedAge == nil {
+		return name, statedAge
 	}
 	ageAsStr := strconv.FormatUint(uint64(*statedAge), 10)
 
-	if statedAge != nil && name == ageAsStr {
-		return fmt.Sprintf("%s%s", ageAsStr, ageSuffix)
+	if name == ageAsStr {
+		return fmt.Sprintf("%s%s", ageAsStr, ageSuffix), statedAge
 	}
 
 	if strings.HasPrefix(name, fmt.Sprintf("%s ", ageAsStr)) {
@@ -91,7 +102,7 @@ func NormalizeBottleName(name string, statedAge *uint) string {
 	ageRe := regexp.MustCompile(`\s` + regexp.QuoteMeta(ageAsStr) + `\s`)
 	name = ageRe.ReplaceAllString(name, " "+ageAsStr+ageSuffix+" ")
 
-	return name
+	return name, statedAge
 }
 
 func NormalizeString(value string) string {

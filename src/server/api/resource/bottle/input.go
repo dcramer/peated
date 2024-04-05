@@ -10,7 +10,7 @@ type BottleInput struct {
 	Brand      interface{}                    `json:"brand" binding:"required"`
 	Distillers schema.Optional[[]interface{}] `json:"distillers" binding:"dive"`
 	Bottler    schema.Optional[interface{}]   `json:"bottler"`
-	StatedAge  schema.Optional[uint]          `json:"statedAge" binding:"omitempty,numeric,gte=0,lte=100"`
+	StatedAge  schema.Optional[uint64]        `json:"statedAge" binding:"omitempty,numeric,gte=0,lte=100"`
 	Category   schema.Optional[string]        `json:"category" binding:"omitempty,oneof:blend bourbon rye single_grain single_malt single_pot_still spirit"`
 }
 

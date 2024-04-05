@@ -9,7 +9,7 @@ type Review struct {
 	ExternalSiteID uint64 `json:"external_site_id"`
 	Name           string `json:"name"`
 	BottleID       uint64 `json:"bottle_id"`
-	Rating         uint   `json:"rating"`
+	Rating         uint64 `json:"rating"`
 	Issue          string `json:"issue"`
 	Url            string `json:"url"`
 
