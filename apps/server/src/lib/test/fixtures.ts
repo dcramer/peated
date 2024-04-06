@@ -106,7 +106,7 @@ export const Follow = async (
 };
 
 export const Entity = async (
-  { ...data }: Partial<NewEntity> = {},
+  { ...data }: Partial<Omit<NewEntity, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   const name = faker.company.name();
@@ -148,7 +148,7 @@ export const Bottle = async (
   {
     distillerIds = [],
     ...data
-  }: Partial<NewBottle> & {
+  }: Partial<Omit<NewBottle, "id">> & {
     distillerIds?: number[];
   } = {},
   db: DatabaseType = dbConn,
@@ -253,7 +253,7 @@ export const BottleAlias = async (
 };
 
 export const Tasting = async (
-  { ...data }: Partial<NewTasting> = {},
+  { ...data }: Partial<Omit<NewTasting, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   return await db.transaction(async (tx) => {
@@ -292,7 +292,7 @@ export const Tasting = async (
 };
 
 export const Toast = async (
-  { ...data }: Partial<NewToast> = {},
+  { ...data }: Partial<Omit<NewToast, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   const [result] = await db.transaction(async (tx) => {
@@ -310,7 +310,7 @@ export const Toast = async (
 };
 
 export const Comment = async (
-  { ...data }: Partial<NewComment> = {},
+  { ...data }: Partial<Omit<NewComment, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   const [result] = await db.transaction(async (tx) => {
@@ -333,9 +333,12 @@ export const Flight = async (
     bottles,
     ...data
   }: Partial<
-    NewFlight & {
-      bottles: number[];
-    }
+    Omit<
+      NewFlight & {
+        bottles: number[];
+      },
+      "id"
+    >
   > = {},
   db: DatabaseType = dbConn,
 ) => {
@@ -363,7 +366,7 @@ export const Flight = async (
 };
 
 export const Badge = async (
-  { ...data }: Partial<NewBadge> = {},
+  { ...data }: Partial<Omit<NewBadge, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   const [result] = await db
@@ -382,7 +385,7 @@ export const Badge = async (
 };
 
 export const ExternalSite = async (
-  { ...data }: Partial<NewExternalSite> = {},
+  { ...data }: Partial<Omit<NewExternalSite, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   if (!data.type) data.type = choose([...EXTERNAL_SITE_TYPE_LIST]);
@@ -405,7 +408,7 @@ export const ExternalSite = async (
 };
 
 export const StorePrice = async (
-  { ...data }: Partial<NewStorePrice> = {},
+  { ...data }: Partial<Omit<NewStorePrice, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   return await db.transaction(async (tx) => {
@@ -468,7 +471,7 @@ export const StorePrice = async (
 };
 
 export const StorePriceHistory = async (
-  { ...data }: Partial<NewStorePriceHistory> = {},
+  { ...data }: Partial<Omit<NewStorePriceHistory, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   const [result] = await db.transaction(async (tx) => {
@@ -487,7 +490,7 @@ export const StorePriceHistory = async (
 };
 
 export const Review = async (
-  { ...data }: Partial<NewReview> = {},
+  { ...data }: Partial<Omit<NewReview, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   const [result] = await db.transaction(async (tx) => {
