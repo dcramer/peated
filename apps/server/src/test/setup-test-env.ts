@@ -5,12 +5,11 @@ import { and, eq, sql } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { Client } from "pg";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
+import mockAxios from "vitest-mock-axios";
 import { db, pool } from "../db";
 import { migrate } from "../db/migrate";
 import "../lib/test/expects";
-import { AuthenticatedHeaders, User } from "../lib/test/fixtures";
-
-import mockAxios from "vitest-mock-axios";
+import * as fixtures from "../lib/test/fixtures";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
@@ -61,10 +60,9 @@ const dropTables = async () => {
   if (!tableNames.length) return;
 
   try {
-    // UNSAFE QUERY
     await db.execute(sql.raw(`DROP TABLE ${tableNames} CASCADE;`));
   } catch (error) {
-    console.log({ error });
+    console.error({ error });
   }
 };
 
@@ -73,10 +71,9 @@ const clearTables = async () => {
   if (!tableNames.length) return;
 
   try {
-    // UNSAFE QUERY
     await db.execute(sql.raw(`TRUNCATE TABLE ${tableNames} CASCADE;`));
   } catch (error) {
-    console.log({ error });
+    console.error({ error });
   }
 
   // reset sequences
@@ -86,14 +83,16 @@ const clearTables = async () => {
     .innerJoin(pgNamespace, eq(pgNamespace.oid, pgClass.relnamespace))
     .where(and(eq(pgClass.relkind, "S"), eq(pgNamespace.nspname, schemaname)));
   for (const { relname } of snQuery) {
-    await db.execute(
-      sql.raw(`ALTER SEQUENCE "${schemaname}"."${relname}" RESTART WITH 1;`),
-    );
+    if (!relname.startsWith("__drizzle_migrations")) {
+      await db.execute(
+        sql.raw(`ALTER SEQUENCE "${schemaname}"."${relname}" RESTART WITH 1;`),
+      );
+    }
   }
 };
 
 const createDefaultUser = async () => {
-  return await User({
+  return await fixtures.User({
     email: "fizz.buzz@example.com",
     displayName: "Fizzy Buzz",
     username: "fizz.buzz",
@@ -139,12 +138,15 @@ beforeEach(async (ctx) => {
 
   const user = await createDefaultUser();
 
-  ctx.defaultUser = user;
-  ctx.defaultAuthHeaders = await AuthenticatedHeaders({ user });
+  ctx.defaults = {
+    user,
+    authHeaders: await fixtures.AuthenticatedHeaders({ user }),
+  };
+  ctx.fixtures = fixtures;
 
   global.DefaultFixtures = {
     user,
-    authHeaders: await AuthenticatedHeaders({ user }),
+    authHeaders: ctx.defaultAuthHeaders,
   };
 });
 

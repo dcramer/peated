@@ -33,9 +33,11 @@ declare module "vitest" {
   interface AsymmetricMatchersContaining extends CustomMatchers {}
 
   export interface TestContext {
-    defaultUser: User;
-    defaultAuthHeaders: {
-      Authorization: string;
+    defaults: {
+      user: User;
+      authHeaders: {
+        Authorization: string;
+      };
     };
 
     fixtures: typeof fixtures;
