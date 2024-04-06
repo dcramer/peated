@@ -4,6 +4,7 @@ PG_CONTAINER=docker exec -t peated-postgres-1
 
 test:
 	# https://github.com/gotestyourself/gotestsum
+  # go install gotest.tools/gotestsum@latest
 	gotestsum ./...
 
 reset-test-db:
