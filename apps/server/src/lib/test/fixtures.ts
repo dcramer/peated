@@ -9,7 +9,8 @@ import {
   DEFAULT_TAGS,
   EXTERNAL_SITE_TYPE_LIST,
 } from "../../constants";
-import { db } from "../../db";
+import type { DatabaseType } from "../../db";
+import { db as dbConn } from "../../db";
 import type {
   Entity as EntityType,
   NewBadge,
@@ -59,13 +60,22 @@ export async function loadFixture(...paths: string[]) {
   return data.toString();
 }
 
-export const User = async ({ ...data }: Partial<NewUser> = {}) => {
+export const User = async (
+  { ...data }: Partial<NewUser> = {},
+  db: DatabaseType = dbConn,
+) => {
+  const firstName = data.displayName?.split(" ")[0] || faker.person.firstName();
+
   const [result] = await db
     .insert(users)
     .values({
-      displayName: faker.person.firstName(),
-      email: faker.internet.email(),
-      username: faker.internet.userName().toLowerCase(),
+      displayName: firstName,
+      email: faker.internet.email({
+        firstName,
+      }),
+      username: `${faker.internet.userName().toLowerCase()}${faker.number.int(
+        10000,
+      )}`,
       admin: false,
       mod: false,
       active: true,
@@ -76,21 +86,29 @@ export const User = async ({ ...data }: Partial<NewUser> = {}) => {
   return result;
 };
 
-export const Follow = async ({ ...data }: Partial<NewFollow> = {}) => {
-  const [result] = await db
-    .insert(follows)
-    .values({
-      fromUserId: data.fromUserId || (await User()).id,
-      toUserId: data.toUserId || (await User()).id,
-      status: "following",
-      ...data,
-    })
-    .returning();
+export const Follow = async (
+  { ...data }: Partial<NewFollow> = {},
+  db: DatabaseType = dbConn,
+) => {
+  const [result] = await db.transaction(async (tx) => {
+    return await db
+      .insert(follows)
+      .values({
+        fromUserId: data.fromUserId || (await User({}, tx)).id,
+        toUserId: data.toUserId || (await User({}, tx)).id,
+        status: "following",
+        ...data,
+      })
+      .returning();
+  });
   if (!result) throw new Error("Unable to create fixture");
   return result;
 };
 
-export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
+export const Entity = async (
+  { ...data }: Partial<NewEntity> = {},
+  db: DatabaseType = dbConn,
+) => {
   const name = faker.company.name();
   // XXX(dcramer): not ideal
   const existing = await db.query.entities.findFirst({
@@ -106,7 +124,7 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
         country: faker.location.country(),
         type: ["brand", "distiller"],
         ...data,
-        createdById: data.createdById || (await User()).id,
+        createdById: data.createdById || (await User({}, tx)).id,
       })
       .returning();
 
@@ -126,22 +144,28 @@ export const Entity = async ({ ...data }: Partial<NewEntity> = {}) => {
   });
 };
 
-export const Bottle = async ({
-  distillerIds = [],
-  ...data
-}: Partial<NewBottle> & {
-  distillerIds?: number[];
-} = {}) => {
+export const Bottle = async (
+  {
+    distillerIds = [],
+    ...data
+  }: Partial<NewBottle> & {
+    distillerIds?: number[];
+  } = {},
+  db: DatabaseType = dbConn,
+) => {
   return await db.transaction(async (tx) => {
     const brand = (
       data.brandId
-        ? await db.query.entities.findFirst({
+        ? await tx.query.entities.findFirst({
             where: (entities, { eq }) =>
               eq(entities.id, data.brandId as number),
           })
-        : await Entity({
-            totalBottles: 1,
-          })
+        : await Entity(
+            {
+              totalBottles: 1,
+            },
+            tx,
+          )
     ) as EntityType;
 
     const name =
@@ -162,7 +186,7 @@ export const Bottle = async ({
         name,
         fullName: `${brand.name} ${name}`,
         brandId: brand.id,
-        createdById: data.createdById || (await User()).id,
+        createdById: data.createdById || (await User({}, tx)).id,
       })
       .returning();
 
@@ -172,8 +196,9 @@ export const Bottle = async ({
       for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
         await tx.insert(bottlesToDistillers).values({
           bottleId: bottle.id,
-          distillerId: (await Entity({ type: ["distiller"], totalBottles: 1 }))
-            .id,
+          distillerId: (
+            await Entity({ type: ["distiller"], totalBottles: 1 }, tx)
+          ).id,
         });
       }
     } else {
@@ -204,27 +229,33 @@ export const Bottle = async ({
   });
 };
 
-export const BottleAlias = async ({
-  ...data
-}: Partial<NewBottleAlias> = {}) => {
-  const [result] = await db
-    .insert(bottleAliases)
-    .values({
-      bottleId: data.bottleId || (await Bottle()).id,
-      name: `${toTitleCase(
-        choose([
-          faker.company.buzzNoun(),
-          `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
-        ]),
-      )} #${faker.number.int(100)}`,
-      ...data,
-    })
-    .returning();
+export const BottleAlias = async (
+  { ...data }: Partial<NewBottleAlias> = {},
+  db: DatabaseType = dbConn,
+) => {
+  const [result] = await db.transaction(async (tx) => {
+    return await db
+      .insert(bottleAliases)
+      .values({
+        bottleId: data.bottleId || (await Bottle({}, tx)).id,
+        name: `${toTitleCase(
+          choose([
+            faker.company.buzzNoun(),
+            `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
+          ]),
+        )} #${faker.number.int(100)}`,
+        ...data,
+      })
+      .returning();
+  });
   if (!result) throw new Error("Unable to create fixture");
   return result;
 };
 
-export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
+export const Tasting = async (
+  { ...data }: Partial<NewTasting> = {},
+  db: DatabaseType = dbConn,
+) => {
   return await db.transaction(async (tx) => {
     const [result] = await tx
       .insert(tastings)
@@ -233,8 +264,8 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
         rating: faker.number.float({ min: 1, max: 5 }),
         tags: sample(DEFAULT_TAGS, random(1, 5)),
         ...data,
-        bottleId: data.bottleId || (await Bottle()).id,
-        createdById: data.createdById || (await User()).id,
+        bottleId: data.bottleId || (await Bottle({}, tx)).id,
+        createdById: data.createdById || (await User({}, tx)).id,
       })
       .returning();
 
@@ -260,48 +291,61 @@ export const Tasting = async ({ ...data }: Partial<NewTasting> = {}) => {
   });
 };
 
-export const Toast = async ({ ...data }: Partial<NewToast> = {}) => {
-  const [result] = await db
-    .insert(toasts)
-    .values({
-      createdById: data.createdById || (await User()).id,
-      tastingId: data.tastingId || (await Tasting()).id,
-      ...data,
-    })
-    .returning();
+export const Toast = async (
+  { ...data }: Partial<NewToast> = {},
+  db: DatabaseType = dbConn,
+) => {
+  const [result] = await db.transaction(async (tx) => {
+    return await db
+      .insert(toasts)
+      .values({
+        createdById: data.createdById || (await User({}, tx)).id,
+        tastingId: data.tastingId || (await Tasting({}, tx)).id,
+        ...data,
+      })
+      .returning();
+  });
   if (!result) throw new Error("Unable to create fixture");
   return result;
 };
 
-export const Comment = async ({ ...data }: Partial<NewComment> = {}) => {
-  const [result] = await db
-    .insert(comments)
-    .values({
-      createdById: data.createdById || (await User()).id,
-      tastingId: data.tastingId || (await Tasting()).id,
-      comment: faker.lorem.sentences(random(2, 5)),
-      ...data,
-    })
-    .returning();
+export const Comment = async (
+  { ...data }: Partial<NewComment> = {},
+  db: DatabaseType = dbConn,
+) => {
+  const [result] = await db.transaction(async (tx) => {
+    return await db
+      .insert(comments)
+      .values({
+        createdById: data.createdById || (await User({}, tx)).id,
+        tastingId: data.tastingId || (await Tasting({}, tx)).id,
+        comment: faker.lorem.sentences(random(2, 5)),
+        ...data,
+      })
+      .returning();
+  });
   if (!result) throw new Error("Unable to create fixture");
   return result;
 };
 
-export const Flight = async ({
-  bottles,
-  ...data
-}: Partial<
-  NewFlight & {
-    bottles: number[];
-  }
-> = {}) => {
+export const Flight = async (
+  {
+    bottles,
+    ...data
+  }: Partial<
+    NewFlight & {
+      bottles: number[];
+    }
+  > = {},
+  db: DatabaseType = dbConn,
+) => {
   return await db.transaction(async (tx) => {
     const [flight] = await tx
       .insert(flights)
       .values({
         publicId: generatePublicId(),
         name: faker.word.noun(),
-        createdById: data.createdById || (await User()).id,
+        createdById: data.createdById || (await User({}, tx)).id,
         ...data,
       })
       .returning();
@@ -318,7 +362,10 @@ export const Flight = async ({
   });
 };
 
-export const Badge = async ({ ...data }: Partial<NewBadge> = {}) => {
+export const Badge = async (
+  { ...data }: Partial<NewBadge> = {},
+  db: DatabaseType = dbConn,
+) => {
   const [result] = await db
     .insert(badges)
     .values({
@@ -334,9 +381,10 @@ export const Badge = async ({ ...data }: Partial<NewBadge> = {}) => {
   return result;
 };
 
-export const ExternalSite = async ({
-  ...data
-}: Partial<NewExternalSite> = {}) => {
+export const ExternalSite = async (
+  { ...data }: Partial<NewExternalSite> = {},
+  db: DatabaseType = dbConn,
+) => {
   if (!data.type) data.type = choose([...EXTERNAL_SITE_TYPE_LIST]);
   // XXX(dcramer): not ideal
   const existing = await db.query.externalSites.findFirst({
@@ -356,25 +404,28 @@ export const ExternalSite = async ({
   return result;
 };
 
-export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
-  if (!data.name) {
-    const bottle = data.bottleId
-      ? await db.query.bottles.findFirst({
-          where: eq(bottles.id, data.bottleId),
-          with: { brand: true },
-        })
-      : await Bottle();
-    if (!bottle) throw new Error("Unexpected");
-    data.bottleId = bottle.id;
-    data.name = bottle.fullName;
-  }
-
-  if (!data.price)
-    data.price = parseInt(faker.finance.amount(50, 200, 0), 10) * 100;
-  if (!data.url) data.url = faker.internet.url();
-
+export const StorePrice = async (
+  { ...data }: Partial<NewStorePrice> = {},
+  db: DatabaseType = dbConn,
+) => {
   return await db.transaction(async (tx) => {
-    const [price] = await db
+    if (!data.name) {
+      const bottle = data.bottleId
+        ? await tx.query.bottles.findFirst({
+            where: eq(bottles.id, data.bottleId),
+            with: { brand: true },
+          })
+        : await Bottle({}, tx);
+      if (!bottle) throw new Error("Unexpected");
+      data.bottleId = bottle.id;
+      data.name = bottle.fullName;
+    }
+
+    if (!data.price)
+      data.price = parseInt(faker.finance.amount(50, 200, 0), 10) * 100;
+    if (!data.url) data.url = faker.internet.url();
+
+    const [price] = await tx
       .insert(storePrices)
       .values({
         // lazy fix for tsc
@@ -383,7 +434,7 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
         volume: 750,
         url: "",
         ...data,
-        externalSiteId: data.externalSiteId || (await ExternalSite()).id,
+        externalSiteId: data.externalSiteId || (await ExternalSite({}, tx)).id,
       })
       .onConflictDoUpdate({
         target: [
@@ -416,72 +467,86 @@ export const StorePrice = async ({ ...data }: Partial<NewStorePrice> = {}) => {
   });
 };
 
-export const StorePriceHistory = async ({
-  ...data
-}: Partial<NewStorePriceHistory> = {}) => {
-  const [result] = await db
-    .insert(storePriceHistories)
-    .values({
-      price: parseInt(faker.finance.amount(50, 200, 0), 10) * 100,
-      volume: 750,
-      ...data,
-      priceId: data.priceId || (await StorePrice()).id,
-    })
-    .returning();
+export const StorePriceHistory = async (
+  { ...data }: Partial<NewStorePriceHistory> = {},
+  db: DatabaseType = dbConn,
+) => {
+  const [result] = await db.transaction(async (tx) => {
+    return await db
+      .insert(storePriceHistories)
+      .values({
+        price: parseInt(faker.finance.amount(50, 200, 0), 10) * 100,
+        volume: 750,
+        ...data,
+        priceId: data.priceId || (await StorePrice({}, tx)).id,
+      })
+      .returning();
+  });
   if (!result) throw new Error("Unable to create fixture");
   return result;
 };
 
-export const Review = async ({ ...data }: Partial<NewReview> = {}) => {
-  if (!data.name) {
-    const bottle = data.bottleId
-      ? await db.query.bottles.findFirst({
-          where: eq(bottles.id, data.bottleId),
-          with: { brand: true },
-        })
-      : await Bottle();
-    if (!bottle) throw new Error("Unexpected");
-    data.bottleId = bottle.id;
-    data.name = bottle.fullName;
-  }
+export const Review = async (
+  { ...data }: Partial<NewReview> = {},
+  db: DatabaseType = dbConn,
+) => {
+  const [result] = await db.transaction(async (tx) => {
+    if (!data.name) {
+      const bottle = data.bottleId
+        ? await tx.query.bottles.findFirst({
+            where: eq(bottles.id, data.bottleId),
+            with: { brand: true },
+          })
+        : await Bottle({}, tx);
+      if (!bottle) throw new Error("Unexpected");
+      data.bottleId = bottle.id;
+      data.name = bottle.fullName;
+    }
 
-  const [result] = await db
-    .insert(reviews)
-    .values({
-      name: "",
-      externalSiteId: data.externalSiteId || (await ExternalSite()).id,
-      rating: faker.number.int({ min: 59, max: 100 }),
-      url: faker.internet.url(),
-      issue: "Default",
-      ...data,
-    })
-    .returning();
+    return await db
+      .insert(reviews)
+      .values({
+        name: "",
+        externalSiteId: data.externalSiteId || (await ExternalSite({}, tx)).id,
+        rating: faker.number.int({ min: 59, max: 100 }),
+        url: faker.internet.url(),
+        issue: "Default",
+        ...data,
+      })
+      .returning();
+  });
   if (!result) throw new Error("Unable to create fixture");
   return result;
 };
 
-export const AuthToken = async ({ user }: { user?: UserType | null } = {}) => {
-  if (!user) user = await User();
+export const AuthToken = async (
+  { user }: { user?: UserType | null } = {},
+  db: DatabaseType = dbConn,
+) => {
+  if (!user) user = await User({}, db);
 
   return await createAccessToken(user);
 };
 
-export const AuthenticatedHeaders = async ({
-  user,
-  mod,
-  admin,
-}: {
-  user?: UserType | null;
-  mod?: boolean;
-  admin?: boolean;
-} = {}) => {
+export const AuthenticatedHeaders = async (
+  {
+    user,
+    mod,
+    admin,
+  }: {
+    user?: UserType | null;
+    mod?: boolean;
+    admin?: boolean;
+  } = {},
+  db: DatabaseType = dbConn,
+) => {
   if (!user && admin) {
     user = await User({ admin: true });
   } else if (!user && mod) {
     user = await User({ mod: true });
   }
   return {
-    Authorization: `Bearer ${await AuthToken({ user })}`,
+    Authorization: `Bearer ${await AuthToken({ user }, db)}`,
   };
 };
 
