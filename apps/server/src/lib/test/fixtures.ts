@@ -91,7 +91,7 @@ export const Follow = async (
   db: DatabaseType = dbConn,
 ) => {
   const [result] = await db.transaction(async (tx) => {
-    return await db
+    return await tx
       .insert(follows)
       .values({
         fromUserId: data.fromUserId || (await User({}, tx)).id,
@@ -117,7 +117,7 @@ export const Entity = async (
   if (existing) return existing;
 
   return await db.transaction(async (tx) => {
-    const [entity] = await db
+    const [entity] = await tx
       .insert(entities)
       .values({
         name,
@@ -296,7 +296,7 @@ export const Toast = async (
   db: DatabaseType = dbConn,
 ) => {
   const [result] = await db.transaction(async (tx) => {
-    return await db
+    return await tx
       .insert(toasts)
       .values({
         createdById: data.createdById || (await User({}, tx)).id,
@@ -314,7 +314,7 @@ export const Comment = async (
   db: DatabaseType = dbConn,
 ) => {
   const [result] = await db.transaction(async (tx) => {
-    return await db
+    return await tx
       .insert(comments)
       .values({
         createdById: data.createdById || (await User({}, tx)).id,
@@ -475,7 +475,7 @@ export const StorePriceHistory = async (
   db: DatabaseType = dbConn,
 ) => {
   const [result] = await db.transaction(async (tx) => {
-    return await db
+    return await tx
       .insert(storePriceHistories)
       .values({
         price: parseInt(faker.finance.amount(50, 200, 0), 10) * 100,
@@ -506,7 +506,7 @@ export const Review = async (
       data.name = bottle.fullName;
     }
 
-    return await db
+    return await tx
       .insert(reviews)
       .values({
         name: "",

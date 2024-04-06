@@ -19,9 +19,13 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("creates a new bottle with minimal params", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
-  const brand = await Fixtures.Entity();
+test("creates a new bottle with minimal params", async ({
+  fixtures,
+  defaults,
+}) => {
+  const caller = createCaller({ user: defaults.user });
+  console.log({ allUsers: await db.query.users.findMany() });
+  const brand = await fixtures.Entity();
   const data = await caller.bottleCreate({
     name: "Delicious Wood",
     brand: brand.id,
