@@ -16,10 +16,10 @@ require (
 	github.com/nrednav/cuid2 v1.0.0
 	github.com/pressly/goose/v3 v3.19.2
 	github.com/rs/zerolog v1.32.0
-	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.21.0
 	golang.org/x/oauth2 v0.18.0
+	golang.org/x/text v0.14.0
 	google.golang.org/api v0.126.0
 	gorm.io/datatypes v1.2.0
 	gorm.io/driver/postgres v1.5.7
@@ -60,7 +60,6 @@ require (
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/oapi-codegen/nullable v1.1.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -75,7 +74,6 @@ require (
 	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231106174013-bbf56f31fb17 // indirect
 	google.golang.org/grpc v1.59.0 // indirect
