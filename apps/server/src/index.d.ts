@@ -2,6 +2,7 @@ import type { OAuth2Namespace } from "@fastify/oauth2";
 import "fastify";
 import "vitest";
 import type { User } from "./db/schema";
+import type * as fixtures from "./lib/test/fixtures";
 
 declare namespace NodeJS {
   export interface ProcessEnv {
@@ -30,6 +31,15 @@ interface CustomMatchers<R = unknown> {
 declare module "vitest" {
   interface Assertion<T = any> extends CustomMatchers<T> {}
   interface AsymmetricMatchersContaining extends CustomMatchers {}
+
+  export interface TestContext {
+    defaultUser: User;
+    defaultAuthHeaders: {
+      Authorization: string;
+    };
+
+    fixtures: typeof fixtures;
+  }
 }
 
 declare global {

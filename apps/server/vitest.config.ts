@@ -11,6 +11,7 @@ export default defineConfig({
       reporter: ["json"],
     },
     maxConcurrency: 0,
+    pool: "forks",
     globals: true,
     setupFiles: ["./src/test/setup-test-env.ts"],
     include: ["./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],

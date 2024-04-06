@@ -7,7 +7,6 @@ import {
 } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import { desc, eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -19,8 +18,8 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("requires mod", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
+test("requires mod", async ({ defaultUser }) => {
+  const caller = createCaller({ user: defaultUser });
   expect(() =>
     caller.entityUpdate({
       entity: 1,
@@ -28,11 +27,11 @@ test("requires mod", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("no changes", async () => {
-  const entity = await Fixtures.Entity();
+test("no changes", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
@@ -48,11 +47,11 @@ test("no changes", async () => {
   expect(entity).toEqual(newEntity);
 });
 
-test("can change name", async () => {
-  const entity = await Fixtures.Entity();
+test("can change name", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
@@ -79,11 +78,11 @@ test("can change name", async () => {
   expect(change.data).toEqual({ name: "Delicious Wood" });
 });
 
-test("can change country", async () => {
-  const entity = await Fixtures.Entity();
+test("can change country", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
@@ -101,11 +100,11 @@ test("can change country", async () => {
   expect(newEntity.country).toBe("Scotland");
 });
 
-test("can change region", async () => {
-  const entity = await Fixtures.Entity();
+test("can change region", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
@@ -123,11 +122,11 @@ test("can change region", async () => {
   expect(newEntity.region).toBe("Islay");
 });
 
-test("can change type", async () => {
-  const entity = await Fixtures.Entity();
+test("can change type", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
@@ -145,23 +144,23 @@ test("can change type", async () => {
   expect(newEntity.type).toEqual(["distiller"]);
 });
 
-test("name change updates bottles if brand", async () => {
-  const entity = await Fixtures.Entity({
+test("name change updates bottles if brand", async ({ fixtures }) => {
+  const entity = await fixtures.Entity({
     name: "Foo",
     type: ["brand", "distiller"],
   });
-  const bottle = await Fixtures.Bottle({
+  const bottle = await fixtures.Bottle({
     brandId: entity.id,
     name: "Bar",
   });
   expect(bottle.fullName).toEqual("Foo Bar");
 
-  const otherBottle = await Fixtures.Bottle({
+  const otherBottle = await fixtures.Bottle({
     distillerIds: [entity.id],
   });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
@@ -200,23 +199,23 @@ test("name change updates bottles if brand", async () => {
   expect(newOtherBottle.fullName).toEqual(otherBottle.fullName);
 });
 
-test("short name change updates bottles if brand", async () => {
-  const entity = await Fixtures.Entity({
+test("short name change updates bottles if brand", async ({ fixtures }) => {
+  const entity = await fixtures.Entity({
     name: "Foo",
     type: ["brand", "distiller"],
   });
-  const bottle = await Fixtures.Bottle({
+  const bottle = await fixtures.Bottle({
     brandId: entity.id,
     name: "Bar",
   });
   expect(bottle.fullName).toEqual("Foo Bar");
 
-  const otherBottle = await Fixtures.Bottle({
+  const otherBottle = await fixtures.Bottle({
     distillerIds: [entity.id],
   });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
