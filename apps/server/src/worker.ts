@@ -2,7 +2,7 @@
 import "./sentry";
 
 import config from "@peated/server/config";
-import { registerJob } from "@peated/server/jobs";
+import { registerJob } from "@peated/server/jobs/client";
 import createMissingBottles from "@peated/server/jobs/createMissingBottles";
 import generateBottleDetails from "@peated/server/jobs/generateBottleDetails";
 import generateEntityDetails from "@peated/server/jobs/generateEntityDetails";

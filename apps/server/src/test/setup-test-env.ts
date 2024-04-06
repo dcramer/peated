@@ -13,9 +13,8 @@ import * as fixtures from "../lib/test/fixtures";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
-vi.mock("../jobs");
 vi.mock("axios");
-vi.mock("@peated/server/jobs");
+vi.mock("@peated/server/jobs/client");
 
 afterEach(() => {
   mockAxios.reset();

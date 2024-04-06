@@ -6,7 +6,7 @@ import {
   entities,
   tastings,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs";
+import { pushJob } from "@peated/server/jobs/client";
 import { sql } from "drizzle-orm";
 
 const subcommand = program.command("entities");

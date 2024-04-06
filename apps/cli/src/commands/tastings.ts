@@ -1,6 +1,6 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { pushJob } from "@peated/server/jobs";
+import { pushJob } from "@peated/server/jobs/client";
 
 const subcommand = program.command("tastings");
 
