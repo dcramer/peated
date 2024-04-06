@@ -47,36 +47,21 @@ export default modProcedure
     }
 
     const bottleData: { [name: string]: any } = {};
-
-    if (input.statedAge !== undefined && input.statedAge !== bottle.statedAge) {
-      bottleData.statedAge = input.statedAge;
-    }
-
-    const inputName =
+    const [normName, normStatedAge] =
       input.name || input.statedAge !== undefined
         ? normalizeBottleName(
             input.name || bottle.name,
-            bottleData.statedAge !== undefined
-              ? bottleData.statedAge
-              : bottle.statedAge,
+            input.statedAge !== undefined ? input.statedAge : bottle.statedAge,
           )
-        : null;
+        : [input.name, input.statedAge];
 
-    if (
-      (inputName && inputName !== bottle.name) ||
-      (input.statedAge !== undefined && input.statedAge !== bottle.statedAge)
-    ) {
-      bottleData.statedAge =
-        bottleData.statedAge !== undefined
-          ? bottleData.statedAge
-          : bottle.statedAge;
-      bottleData.name = inputName;
+    if (normName && normName !== bottle.name) {
+      bottleData.name = normName;
+    }
 
-      const statedAgeMatch = bottleData.name.match(/(\d+)-year-old/);
-      if (statedAgeMatch && !input.statedAge) {
-        // fill in statedAge for the user
-        bottleData.statedAge = Number(statedAgeMatch[1]);
-      }
+    console.log(normStatedAge, input.statedAge);
+    if (normStatedAge !== undefined && normStatedAge !== bottle.statedAge) {
+      bottleData.statedAge = normStatedAge;
     }
 
     if (input.category !== undefined && input.category !== bottle.category) {

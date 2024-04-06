@@ -20,10 +20,10 @@ export const normalizeCategory = (name: string): Category | null => {
 
 export const normalizeBottleName = (
   name: string,
-  age?: number | null,
-): string => {
+  age: number | null = null,
+): [string, number | null] => {
   // try to ease UX and normalize common name components
-  if (age && name == `${age}`) return `${age}${ageSuffix}`;
+  if (age && name == `${age}`) return [`${age}${ageSuffix}`, age];
 
   name = name.replace(/\n/, " ").replace(/\s{2,}/, " ");
 
@@ -49,7 +49,15 @@ export const normalizeBottleName = (
     name = name.substring(9);
   }
 
-  return normalizeString(name.replace(` ${age} `, ` ${age}${ageSuffix} `));
+  // replace mid-string age
+  name = name.replace(` ${age} `, ` ${age}${ageSuffix} `);
+
+  const match = name.match(/(\d+)-year-old($|\s)/i);
+  if (!age && match) {
+    age = parseInt(match[1], 10);
+  }
+
+  return [normalizeString(name), age];
 };
 
 /* Normalize volume to milliliters */

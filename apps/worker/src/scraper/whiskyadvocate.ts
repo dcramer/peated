@@ -106,7 +106,7 @@ export async function scrapeReviews(
       console.warn("Unable to identify bottle name");
       continue;
     }
-    const name = normalizeBottleName(
+    const [name] = normalizeBottleName(
       rawName
         .replaceAll(/\n/gi, "")
         .trim()
