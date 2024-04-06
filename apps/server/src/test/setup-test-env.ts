@@ -17,6 +17,7 @@ vi.mock("axios");
 // TODO: no fucking clue how to just use my mock module anymore and docs
 // are almost non-existant
 vi.mock("../jobs/client", async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const oJobs = await importOriginal<typeof import("../jobs/client.js")>();
   return {
     getJobForSite: oJobs.getJobForSite,
@@ -159,10 +160,6 @@ beforeEach(async (ctx) => {
     user,
     authHeaders: ctx.defaultAuthHeaders,
   };
-});
-
-afterEach(async (ctx) => {
-  vi.clearAllMocks();
 });
 
 afterAll(async () => {
