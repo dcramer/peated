@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker";
+import type * as dbSchema from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { type ExternalSiteType } from "@peated/server/types";
 import { eq, sql } from "drizzle-orm";
@@ -12,7 +13,6 @@ import {
 import type { DatabaseType } from "../../db";
 import { db as dbConn } from "../../db";
 import type {
-  Entity as EntityType,
   NewBadge,
   NewBottle,
   NewBottleAlias,
@@ -27,7 +27,6 @@ import type {
   NewTasting,
   NewToast,
   NewUser,
-  User as UserType,
 } from "../../db/schema";
 import {
   badges,
@@ -63,7 +62,7 @@ export async function loadFixture(...paths: string[]) {
 export const User = async (
   { ...data }: Partial<Omit<NewUser, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.User> => {
   const firstName = data.displayName?.split(" ")[0] || faker.person.firstName();
 
   const [result] = await db
@@ -89,7 +88,7 @@ export const User = async (
 export const Follow = async (
   { ...data }: Partial<NewFollow> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.Follow> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
       .insert(follows)
@@ -108,7 +107,7 @@ export const Follow = async (
 export const Entity = async (
   { ...data }: Partial<Omit<NewEntity, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.Entity> => {
   const name = faker.company.name();
   // XXX(dcramer): not ideal
   const existing = await db.query.entities.findFirst({
@@ -152,7 +151,7 @@ export const Bottle = async (
     distillerIds?: number[];
   } = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.Bottle> => {
   return await db.transaction(async (tx) => {
     const brand = (
       data.brandId
@@ -166,7 +165,7 @@ export const Bottle = async (
             },
             tx,
           )
-    ) as EntityType;
+    ) as dbSchema.Entity;
 
     const name =
       data.name ??
@@ -232,7 +231,7 @@ export const Bottle = async (
 export const BottleAlias = async (
   { ...data }: Partial<NewBottleAlias> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.BottleAlias> => {
   const [result] = await db.transaction(async (tx) => {
     return await db
       .insert(bottleAliases)
@@ -255,7 +254,7 @@ export const BottleAlias = async (
 export const Tasting = async (
   { ...data }: Partial<Omit<NewTasting, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.Tasting> => {
   return await db.transaction(async (tx) => {
     const [result] = await tx
       .insert(tastings)
@@ -294,7 +293,7 @@ export const Tasting = async (
 export const Toast = async (
   { ...data }: Partial<Omit<NewToast, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.Toast> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
       .insert(toasts)
@@ -312,7 +311,7 @@ export const Toast = async (
 export const Comment = async (
   { ...data }: Partial<Omit<NewComment, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.Comment> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
       .insert(comments)
@@ -341,7 +340,7 @@ export const Flight = async (
     >
   > = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.Flight> => {
   return await db.transaction(async (tx) => {
     const [flight] = await tx
       .insert(flights)
@@ -368,7 +367,7 @@ export const Flight = async (
 export const Badge = async (
   { ...data }: Partial<Omit<NewBadge, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.Badge> => {
   const [result] = await db
     .insert(badges)
     .values({
@@ -387,7 +386,7 @@ export const Badge = async (
 export const ExternalSite = async (
   { ...data }: Partial<Omit<NewExternalSite, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.ExternalSite> => {
   if (!data.type) data.type = choose([...EXTERNAL_SITE_TYPE_LIST]);
   // XXX(dcramer): not ideal
   const existing = await db.query.externalSites.findFirst({
@@ -410,7 +409,7 @@ export const ExternalSite = async (
 export const StorePrice = async (
   { ...data }: Partial<Omit<NewStorePrice, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.StorePrice> => {
   return await db.transaction(async (tx) => {
     if (!data.name) {
       const bottle = data.bottleId
@@ -473,7 +472,7 @@ export const StorePrice = async (
 export const StorePriceHistory = async (
   { ...data }: Partial<Omit<NewStorePriceHistory, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.StorePriceHistory> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
       .insert(storePriceHistories)
@@ -492,7 +491,7 @@ export const StorePriceHistory = async (
 export const Review = async (
   { ...data }: Partial<Omit<NewReview, "id">> = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<dbSchema.Review> => {
   const [result] = await db.transaction(async (tx) => {
     if (!data.name) {
       const bottle = data.bottleId
@@ -523,9 +522,9 @@ export const Review = async (
 };
 
 export const AuthToken = async (
-  { user }: { user?: UserType | null } = {},
+  { user }: { user?: dbSchema.User | null } = {},
   db: DatabaseType = dbConn,
-) => {
+): Promise<string> => {
   if (!user) user = await User({}, db);
 
   return await createAccessToken(user);
@@ -537,7 +536,7 @@ export const AuthenticatedHeaders = async (
     mod,
     admin,
   }: {
-    user?: UserType | null;
+    user?: dbSchema.User | null;
     mod?: boolean;
     admin?: boolean;
   } = {},
