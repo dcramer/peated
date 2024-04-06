@@ -9,8 +9,8 @@
     "start:worker": "esno --require dotenv/config ./src/worker.ts",
     "typecheck": "tsc --noEmit",
     "test": "pnpm test:watch",
-    "test:watch": "dotenv -e .env.test -- vitest watch --bail=1 --pool=forks",
-    "test:ci": "dotenv -e .env.test -- vitest --pool=forks --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
+    "test:watch": "dotenv -e .env.test -- vitest watch --bail=1",
+    "test:ci": "dotenv -e .env.test -- vitest --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",

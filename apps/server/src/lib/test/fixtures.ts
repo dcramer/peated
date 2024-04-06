@@ -61,7 +61,7 @@ export async function loadFixture(...paths: string[]) {
 }
 
 export const User = async (
-  { ...data }: Partial<NewUser> = {},
+  { ...data }: Partial<Omit<NewUser, "id">> = {},
   db: DatabaseType = dbConn,
 ) => {
   const firstName = data.displayName?.split(" ")[0] || faker.person.firstName();

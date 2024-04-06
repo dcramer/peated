@@ -134,10 +134,13 @@ beforeAll(async () => {
   }
 });
 
-beforeEach(async () => {
+beforeEach(async (ctx) => {
   await clearTables();
 
   const user = await createDefaultUser();
+
+  ctx.defaultUser = user;
+  ctx.defaultAuthHeaders = await AuthenticatedHeaders({ user });
 
   global.DefaultFixtures = {
     user,
@@ -145,7 +148,7 @@ beforeEach(async () => {
   };
 });
 
-afterEach(async () => {
+afterEach(async (ctx) => {
   vi.clearAllMocks();
 });
 
