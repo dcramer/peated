@@ -30,7 +30,7 @@ export async function scrapeProducts(
     }
 
     const [name, volumeRaw] = extractVolume(
-      normalizeBottleName(toTitleCase(`${brand} ${bottle}`)),
+      normalizeBottleName(toTitleCase(`${brand} ${bottle}`))[0],
     );
 
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;

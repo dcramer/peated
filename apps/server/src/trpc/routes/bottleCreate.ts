@@ -22,12 +22,7 @@ import { authedProcedure } from "..";
 export default authedProcedure
   .input(BottleInputSchema)
   .mutation(async function ({ input, ctx }) {
-    let name = normalizeBottleName(input.name, input.statedAge);
-    const statedAgeMatch = name.match(/(\d+)-year-old/);
-    if (statedAgeMatch && !input.statedAge) {
-      // fill in statedAge for the user
-      input.statedAge = Number(statedAgeMatch[1]);
-    }
+    let [name, statedAge] = normalizeBottleName(input.name, input.statedAge);
 
     const user = ctx.user;
     const bottle: Bottle | undefined = await db.transaction(async (tx) => {
@@ -87,7 +82,7 @@ export default authedProcedure
           .values({
             name,
             fullName,
-            statedAge: input.statedAge || null,
+            statedAge: statedAge,
             category: input.category || null,
             brandId: brand.id,
             bottlerId: bottler?.id || null,

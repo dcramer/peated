@@ -119,7 +119,7 @@ test("manipulates name to conform with age", async () => {
 
 test("fills in statedAge", async () => {
   const brand = await Fixtures.Entity();
-  const bottle = await Fixtures.Bottle({ brandId: brand.id });
+  const bottle = await Fixtures.Bottle({ brandId: brand.id, statedAge: null });
 
   const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
@@ -141,7 +141,7 @@ test("fills in statedAge", async () => {
 });
 
 test("removes statedAge", async () => {
-  const bottle = await Fixtures.Bottle({ statedAge: 10 });
+  const bottle = await Fixtures.Bottle({ statedAge: 10, name: "Foo Bar" });
 
   const caller = createCaller({
     user: await Fixtures.User({ mod: true }),
