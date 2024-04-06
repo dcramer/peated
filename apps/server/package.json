@@ -8,8 +8,8 @@
     "start:api": "esno --require dotenv/config ./src/server.ts",
     "start:worker": "esno --require dotenv/config ./src/worker.ts",
     "typecheck": "tsc --noEmit",
-    "test": "dotenv -e .env.test -- vitest watch",
-    "test:watch": "dotenv -e .env.test -- vitest",
+    "test": "pnpm test:watch",
+    "test:watch": "dotenv -e .env.test -- vitest watch --bail=1",
     "test:ci": "dotenv -e .env.test -- vitest --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
   },
   "dependencies": {
