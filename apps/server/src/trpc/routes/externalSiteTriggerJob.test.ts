@@ -1,4 +1,4 @@
-import * as mockJobs from "@peated/server/__mocks__/jobs/client";
+import * as jobs from "@peated/server/jobs/client";
 import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
@@ -23,5 +23,5 @@ test("triggers job", async () => {
     new Date().getTime() - 5000,
   );
 
-  expect(mockJobs.pushJob).toHaveBeenCalledOnce();
+  expect(jobs.pushJob).toHaveBeenCalledOnce();
 });

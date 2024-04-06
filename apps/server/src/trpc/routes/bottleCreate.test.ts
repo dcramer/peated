@@ -24,7 +24,6 @@ test("creates a new bottle with minimal params", async ({
   defaults,
 }) => {
   const caller = createCaller({ user: defaults.user });
-  console.log({ allUsers: await db.query.users.findMany() });
   const brand = await fixtures.Entity();
   const data = await caller.bottleCreate({
     name: "Delicious Wood",
