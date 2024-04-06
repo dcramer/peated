@@ -1,6 +1,6 @@
+import * as jobs from "@peated/server/jobs/client";
 import { type JobFunction } from "faktory-worker";
 import { vi } from "vitest";
-import * as jobs from "../jobs/utils";
 
 export const getClient: typeof jobs.getClient = vi.fn();
 

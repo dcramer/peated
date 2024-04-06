@@ -1,4 +1,4 @@
-import * as mockJobs from "@peated/server/__mocks__/jobs";
+import * as mockJobs from "@peated/server/__mocks__/jobs/client";
 import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 

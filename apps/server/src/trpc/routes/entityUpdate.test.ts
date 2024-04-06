@@ -18,8 +18,8 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("requires mod", async ({ defaultUser }) => {
-  const caller = createCaller({ user: defaultUser });
+test("requires mod", async ({ defaults }) => {
+  const caller = createCaller({ user: defaults.user });
   expect(() =>
     caller.entityUpdate({
       entity: 1,

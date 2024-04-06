@@ -6,7 +6,6 @@ import sharp from "sharp";
 import { Readable } from "stream";
 import buildFastify from "../app";
 import config from "../config";
-import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;
 beforeAll(async () => {
@@ -17,40 +16,40 @@ beforeAll(async () => {
   };
 });
 
-test("cannot update another user's tasting", async () => {
-  const user = await Fixtures.User();
-  const otherUser = await Fixtures.User();
-  const tasting = await Fixtures.Tasting({ createdById: otherUser.id });
+test("cannot update another user's tasting", async ({ fixtures }) => {
+  const user = await fixtures.User();
+  const otherUser = await fixtures.User();
+  const tasting = await fixtures.Tasting({ createdById: otherUser.id });
 
   const response = await app.inject({
     method: "POST",
     url: `/tastings/${tasting.id}/image`,
     payload: {},
-    headers: await Fixtures.AuthenticatedHeaders({ user }),
+    headers: await fixtures.AuthenticatedHeaders({ user }),
   });
 
   expect(response).toRespondWith(403);
 });
 
-test("tasting image does resize down", async () => {
+test("tasting image does resize down", async ({ fixtures, defaults }) => {
   const form = new FormData();
   form.append(
     "file",
-    await Fixtures.SampleSquareImage(),
+    await fixtures.SampleSquareImage(),
     "sample-square-image.jpg",
   );
 
   const encoder = new FormDataEncoder(form);
 
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
   });
   const response = await app.inject({
     method: "POST",
     url: `/tastings/${tasting.id}/image`,
     payload: Readable.from(encoder.encode()),
     headers: {
-      ...DefaultFixtures.authHeaders,
+      ...defaults.authHeaders,
       ...encoder.headers,
     },
   });

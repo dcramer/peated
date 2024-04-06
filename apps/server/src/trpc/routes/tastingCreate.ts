@@ -11,7 +11,7 @@ import {
   follows,
   tastings,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs";
+import { pushJob } from "@peated/server/jobs/client";
 import { checkBadges } from "@peated/server/lib/badges";
 import { isDistantFuture, isDistantPast } from "@peated/server/lib/dates";
 import { notEmpty } from "@peated/server/lib/filter";

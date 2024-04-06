@@ -6,7 +6,6 @@ import sharp from "sharp";
 import { Readable } from "stream";
 import buildFastify from "../app";
 import config from "../config";
-import * as Fixtures from "../lib/test/fixtures";
 
 let app: FastifyInstance;
 beforeAll(async () => {
@@ -17,24 +16,24 @@ beforeAll(async () => {
   };
 });
 
-test("cannot update another user's avatar", async () => {
-  const user = await Fixtures.User();
-  const otherUser = await Fixtures.User();
+test("cannot update another user's avatar", async ({ fixtures }) => {
+  const user = await fixtures.User();
+  const otherUser = await fixtures.User();
 
   const response = await app.inject({
     method: "POST",
     url: `/users/${otherUser.id}/avatar`,
-    headers: await Fixtures.AuthenticatedHeaders({ user }),
+    headers: await fixtures.AuthenticatedHeaders({ user }),
   });
 
   expect(response).toRespondWith(403);
 });
 
-test("avatar does resize down", async () => {
+test("avatar does resize down", async ({ fixtures, defaults }) => {
   const form = new FormData();
   form.append(
     "file",
-    await Fixtures.SampleSquareImage(),
+    await fixtures.SampleSquareImage(),
     "sample-square-image.jpg",
   );
 
@@ -42,10 +41,10 @@ test("avatar does resize down", async () => {
 
   const response = await app.inject({
     method: "POST",
-    url: `/users/${DefaultFixtures.user.id}/avatar`,
+    url: `/users/${defaults.user.id}/avatar`,
     payload: Readable.from(encoder.encode()),
     headers: {
-      ...DefaultFixtures.authHeaders,
+      ...defaults.authHeaders,
       ...encoder.headers,
     },
   });

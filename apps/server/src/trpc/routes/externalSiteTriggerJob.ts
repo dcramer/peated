@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { getJobForSite, pushJob } from "@peated/server/jobs";
+import { getJobForSite, pushJob } from "@peated/server/jobs/client";
 import { ExternalSiteTypeEnum } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteSerializer } from "@peated/server/serializers/externalSite";

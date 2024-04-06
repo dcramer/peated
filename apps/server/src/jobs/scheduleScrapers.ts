@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { getJobForSite, pushJob } from "@peated/server/jobs";
+import { getJobForSite, pushJob } from "@peated/server/jobs/client";
 import { and, eq, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 
 export default async function scheduleScrapers() {

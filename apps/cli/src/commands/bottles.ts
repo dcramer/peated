@@ -1,7 +1,7 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { bottles, reviews, tastings } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs";
+import { pushJob } from "@peated/server/jobs/client";
 import { findEntity } from "@peated/server/lib/bottleFinder";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { createCaller } from "@peated/server/trpc/router";

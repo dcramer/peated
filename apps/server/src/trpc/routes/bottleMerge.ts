@@ -12,7 +12,7 @@ import {
   tastings,
   type Bottle,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs";
+import { pushJob } from "@peated/server/jobs/client";
 import { logError } from "@peated/server/lib/log";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
