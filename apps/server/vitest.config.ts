@@ -17,6 +17,7 @@ export default defineConfig({
         singleThread: true,
       },
     },
+    fileParallelism: false,
     globals: true,
     setupFiles: ["./src/test/setup-test-env.ts"],
     include: ["./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
