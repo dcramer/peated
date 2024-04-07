@@ -95,7 +95,7 @@ export default function FlightDetails() {
       <table className="min-w-full">
         <colgroup>
           <col className="min-w-full sm:w-4/6" />
-          <col className="sm:w-2/6" />
+          <col className="hidden sm:w-2/6" />
         </colgroup>
         <tbody>
           {bottles.results.map((bottle) => {
