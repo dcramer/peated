@@ -10,11 +10,12 @@ import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() =>
-    caller.bottleCreate({
-      name: "Delicious Wood",
-      brand: 1,
-    }),
+  expect(
+    async () =>
+      await caller.bottleCreate({
+        name: "Delicious Wood",
+        brand: 1,
+      }),
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
@@ -103,11 +104,12 @@ test("does not create a new bottle with invalid brandId", async ({
   defaults,
 }) => {
   const caller = createCaller({ user: defaults.user });
-  expect(() =>
-    caller.bottleCreate({
-      name: "Delicious Wood",
-      brand: 5,
-    }),
+  expect(
+    async () =>
+      await caller.bottleCreate({
+        name: "Delicious Wood",
+        brand: 5,
+      }),
   ).rejects.toThrowError(/Could not identify brand/);
 });
 

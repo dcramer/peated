@@ -11,6 +11,8 @@ import { migrate } from "../db/migrate";
 import "../lib/test/expects";
 import * as fixtures from "../lib/test/fixtures";
 
+import "error-cause/auto";
+
 process.env.DISABLE_HTTP_CACHE = "1";
 
 vi.mock("axios");
@@ -27,10 +29,6 @@ vi.mock("../jobs/client", async (importOriginal) => {
     pushJob: vi.fn(() => undefined),
     registerJob: vi.fn(() => undefined),
   };
-});
-
-afterEach(() => {
-  mockAxios.reset();
 });
 
 global.DefaultFixtures = {};
@@ -82,11 +80,7 @@ const clearTables = async () => {
   const tableNames = await getTableNames();
   if (!tableNames.length) return;
 
-  try {
-    await db.execute(sql.raw(`TRUNCATE TABLE ${tableNames} CASCADE;`));
-  } catch (error) {
-    console.error({ error });
-  }
+  await db.execute(sql.raw(`TRUNCATE TABLE ${tableNames} CASCADE;`));
 
   // reset sequences
   const snQuery = await db
@@ -126,6 +120,7 @@ async function setupDatabase() {
     // database does not exist, make it:
     await client.query(`CREATE DATABASE ${applicationDatabaseName}`);
   } else {
+    // TODO:
     // await dropTables();
   }
 
@@ -139,9 +134,7 @@ beforeAll(async () => {
   try {
     await migrate({ db });
   } catch (err) {
-    console.error("Unable to run db migrations", err);
-    // process.exit(1);
-    throw err;
+    throw new Error("Unable to run db migrations", { cause: err });
   }
 });
 
@@ -160,6 +153,10 @@ beforeEach(async (ctx) => {
     user,
     authHeaders: ctx.defaultAuthHeaders,
   };
+});
+
+afterEach(() => {
+  mockAxios.reset();
 });
 
 afterAll(async () => {
