@@ -1,7 +1,6 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {

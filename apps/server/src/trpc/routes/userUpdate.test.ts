@@ -37,7 +37,7 @@ test("can change displayName", async ({ defaults, fixtures }) => {
     .select()
     .from(users)
     .where(eq(users.id, defaults.user.id));
-  expect(user.displayName).toEqual("Joe");
+  expect(user?.displayName).toEqual("Joe");
 });
 
 test("can change username", async ({ defaults, fixtures }) => {
@@ -53,7 +53,7 @@ test("can change username", async ({ defaults, fixtures }) => {
     .select()
     .from(users)
     .where(eq(users.id, defaults.user.id));
-  expect(user.username).toEqual("joeblow");
+  expect(user?.username).toEqual("joeblow");
 });
 
 test("can change mod as admin", async ({ defaults, fixtures }) => {
@@ -71,7 +71,7 @@ test("can change mod as admin", async ({ defaults, fixtures }) => {
     .select()
     .from(users)
     .where(eq(users.id, defaults.user.id));
-  expect(user.mod).toEqual(true);
+  expect(user?.mod).toEqual(true);
 });
 
 test("can change admin as admin", async ({ defaults, fixtures }) => {
@@ -89,7 +89,7 @@ test("can change admin as admin", async ({ defaults, fixtures }) => {
     .select()
     .from(users)
     .where(eq(users.id, defaults.user.id));
-  expect(user.admin).toEqual(true);
+  expect(user?.admin).toEqual(true);
 });
 
 test("cannot change mod as user", async ({ defaults }) => {

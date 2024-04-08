@@ -1,8 +1,7 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "types": ["vitest/globals", "./src/global.d.ts"],
+    "types": ["node", "vitest/globals", "./src/global.d.ts"],
     "baseUrl": "./",
     "paths": {
       "@peated/server/*": ["src/*"]

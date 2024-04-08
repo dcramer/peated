@@ -2,8 +2,9 @@
   "extends": "@peated/tsconfig/tsconfig.json",
   "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "lib": ["es2022", "dom", "dom.iterable"],
     "baseUrl": ".",
+    "jsx": "react-jsx",
     "paths": {
       "@peated/web/*": ["./app/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
