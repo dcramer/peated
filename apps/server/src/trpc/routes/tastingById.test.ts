@@ -1,8 +1,7 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("get tasting by id", async () => {
-  const tasting = await Fixtures.Tasting();
+test("get tasting by id", async ({ fixtures }) => {
+  const tasting = await fixtures.Tasting();
 
   const caller = createCaller({ user: null });
   const data = await caller.tastingById(tasting.id);

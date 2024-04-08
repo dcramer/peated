@@ -1,13 +1,12 @@
 import { db } from "@peated/server/db";
 import { externalSiteConfig } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("requires admin", async () => {
-  const site = await Fixtures.ExternalSite();
+test("requires admin", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   expect(() =>
     caller.externalSiteConfigSet({
@@ -18,10 +17,10 @@ test("requires admin", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("set new value", async () => {
-  const site = await Fixtures.ExternalSite();
+test("set new value", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   await caller.externalSiteConfigSet({
     site: site.type,
@@ -37,8 +36,8 @@ test("set new value", async () => {
   expect(results[0].value).toEqual("bar");
 });
 
-test("set existing value", async () => {
-  const site = await Fixtures.ExternalSite();
+test("set existing value", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
   await db.insert(externalSiteConfig).values({
     externalSiteId: site.id,
     key: "test",
@@ -46,7 +45,7 @@ test("set existing value", async () => {
   });
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   await caller.externalSiteConfigSet({
     site: site.type,

@@ -1,27 +1,26 @@
 import { db } from "@peated/server/db";
 import { and, eq } from "drizzle-orm";
 import { follows, notifications } from "../../db/schema";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("requires authentication", async () => {
+test("requires authentication", async ({ defaults }) => {
   const caller = createCaller({ user: null });
-  expect(() =>
-    caller.friendCreate(DefaultFixtures.user.id),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  expect(() => caller.friendCreate(defaults.user.id)).rejects.toThrowError(
+    /UNAUTHORIZED/,
+  );
 });
 
-test("cannot friend self", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
-  expect(() =>
-    caller.friendCreate(DefaultFixtures.user.id),
-  ).rejects.toThrowError(/Cannot friend yourself/);
+test("cannot friend self", async ({ defaults }) => {
+  const caller = createCaller({ user: defaults.user });
+  expect(() => caller.friendCreate(defaults.user.id)).rejects.toThrowError(
+    /Cannot friend yourself/,
+  );
 });
 
-test("can friend new link", async () => {
-  const otherUser = await Fixtures.User();
+test("can friend new link", async ({ defaults, fixtures }) => {
+  const otherUser = await fixtures.User();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.friendCreate(otherUser.id);
 
   expect(data.status).toEqual("pending");
@@ -31,7 +30,7 @@ test("can friend new link", async () => {
     .from(follows)
     .where(
       and(
-        eq(follows.fromUserId, DefaultFixtures.user.id),
+        eq(follows.fromUserId, defaults.user.id),
         eq(follows.toUserId, otherUser.id),
       ),
     );
@@ -53,16 +52,16 @@ test("can friend new link", async () => {
   expect(notif.userId).toEqual(follow.toUserId);
 });
 
-test("can friend existing link", async () => {
-  const otherUser = await Fixtures.User();
+test("can friend existing link", async ({ defaults, fixtures }) => {
+  const otherUser = await fixtures.User();
 
-  const follow = await Fixtures.Follow({
-    fromUserId: DefaultFixtures.user.id,
+  const follow = await fixtures.Follow({
+    fromUserId: defaults.user.id,
     toUserId: otherUser.id,
     status: "following",
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.friendCreate(otherUser.id);
 
   expect(data.status).toEqual("friends");
@@ -72,7 +71,7 @@ test("can friend existing link", async () => {
     .from(follows)
     .where(
       and(
-        eq(follows.fromUserId, DefaultFixtures.user.id),
+        eq(follows.fromUserId, defaults.user.id),
         eq(follows.toUserId, otherUser.id),
       ),
     );
@@ -80,15 +79,15 @@ test("can friend existing link", async () => {
   expect(newFollow.status).toEqual(follow.status);
 });
 
-test("approves when mutual", async () => {
-  const otherUser = await Fixtures.User();
-  await Fixtures.Follow({
+test("approves when mutual", async ({ defaults, fixtures }) => {
+  const otherUser = await fixtures.User();
+  await fixtures.Follow({
     fromUserId: otherUser.id,
-    toUserId: DefaultFixtures.user.id,
+    toUserId: defaults.user.id,
     status: "pending",
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.friendCreate(otherUser.id);
 
   expect(data.status).toEqual("friends");
@@ -98,7 +97,7 @@ test("approves when mutual", async () => {
     .from(follows)
     .where(
       and(
-        eq(follows.fromUserId, DefaultFixtures.user.id),
+        eq(follows.fromUserId, defaults.user.id),
         eq(follows.toUserId, otherUser.id),
       ),
     );

@@ -1,5 +1,4 @@
 import { db } from "../db";
-import * as Fixtures from "../lib/test/fixtures";
 import { createUser } from "./auth";
 
 test("creates user with no username conflict", async () => {
@@ -16,8 +15,8 @@ test("creates user with no username conflict", async () => {
   expect(user.email).toEqual("bert@example.com");
 });
 
-test("creates user with username conflict", async () => {
-  const existingUser = await Fixtures.User({
+test("creates user with username conflict", async ({ fixtures }) => {
+  const existingUser = await fixtures.User({
     username: "thebert",
   });
 

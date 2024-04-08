@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import { bottleTags, bottles, tastings } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import { and, eq, gt } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires auth", async () => {
@@ -14,23 +13,23 @@ test("requires auth", async () => {
   );
 });
 
-test("cannot update another users tasting", async () => {
+test("cannot update another users tasting", async ({ defaults, fixtures }) => {
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
-  const tasting = await Fixtures.Tasting();
+  const tasting = await fixtures.Tasting();
   expect(() =>
     caller.tastingUpdate({ tasting: tasting.id }),
   ).rejects.toThrowError(/Tasting not found/);
 });
 
-test("no changes", async () => {
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+test("no changes", async ({ defaults, fixtures }) => {
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
   });
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingUpdate({
     tasting: tasting.id,
@@ -46,12 +45,12 @@ test("no changes", async () => {
   expect(tasting).toEqual(newTasting);
 });
 
-test("updates rating", async () => {
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+test("updates rating", async ({ defaults, fixtures }) => {
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
   });
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingUpdate({
     tasting: tasting.id,
@@ -75,12 +74,12 @@ test("updates rating", async () => {
   expect(bottle.avgRating).toEqual(3.5);
 });
 
-test("updates notes", async () => {
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+test("updates notes", async ({ defaults, fixtures }) => {
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
   });
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingUpdate({
     tasting: tasting.id,
@@ -98,12 +97,12 @@ test("updates notes", async () => {
   expect(newTasting.notes).toEqual("hello world");
 });
 
-test("updates tags", async () => {
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+test("updates tags", async ({ defaults, fixtures }) => {
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
   });
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingUpdate({
     tasting: tasting.id,

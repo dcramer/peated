@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { eq } from "drizzle-orm";
 import { entities } from "../../db/schema";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -13,8 +12,8 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("creates a new entity", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
+test("creates a new entity", async ({ defaults }) => {
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.entityCreate({
     name: "Macallan",
   });
@@ -28,12 +27,15 @@ test("creates a new entity", async () => {
   expect(brand.name).toEqual("Macallan");
 });
 
-test("updates existing entity with new type", async () => {
-  const entity = await Fixtures.Entity({
+test("updates existing entity with new type", async ({
+  fixtures,
+  defaults,
+}) => {
+  const entity = await fixtures.Entity({
     type: ["distiller"],
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.entityCreate({
     name: entity.name,
     type: ["brand"],

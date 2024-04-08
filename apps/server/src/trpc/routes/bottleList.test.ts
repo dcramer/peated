@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists bottles", async () => {
-  await Fixtures.Bottle({ name: "Delicious Wood" });
-  await Fixtures.Bottle({ name: "Something Else" });
+test("lists bottles", async ({ fixtures }) => {
+  await fixtures.Bottle({ name: "Delicious Wood" });
+  await fixtures.Bottle({ name: "Something Else" });
 
   const caller = createCaller({ user: null });
   const { results } = await caller.bottleList();
@@ -11,9 +10,9 @@ test("lists bottles", async () => {
   expect(results.length).toBe(2);
 });
 
-test("lists bottles with query", async () => {
-  const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood" });
-  await Fixtures.Bottle({ name: "Something Else" });
+test("lists bottles with query", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({ name: "Delicious Wood" });
+  await fixtures.Bottle({ name: "Something Else" });
 
   const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
@@ -24,9 +23,9 @@ test("lists bottles with query", async () => {
   expect(results[0].id).toBe(bottle1.id);
 });
 
-test("lists bottles with 'The' prefix", async () => {
-  const brand = await Fixtures.Entity({ name: "The Macallan" });
-  const bottle1 = await Fixtures.Bottle({
+test("lists bottles with 'The' prefix", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "The Macallan" });
+  const bottle1 = await fixtures.Bottle({
     name: "Delicious Wood",
     brandId: brand.id,
   });
@@ -40,13 +39,13 @@ test("lists bottles with 'The' prefix", async () => {
   expect(results[0].id).toBe(bottle1.id);
 });
 
-test("lists bottles with distiller", async () => {
-  const distiller1 = await Fixtures.Entity();
-  const bottle1 = await Fixtures.Bottle({
+test("lists bottles with distiller", async ({ fixtures }) => {
+  const distiller1 = await fixtures.Entity();
+  const bottle1 = await fixtures.Bottle({
     name: "Delicious Wood",
     distillerIds: [distiller1.id],
   });
-  await Fixtures.Bottle({ name: "Something Else" });
+  await fixtures.Bottle({ name: "Something Else" });
 
   const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
@@ -57,13 +56,13 @@ test("lists bottles with distiller", async () => {
   expect(results[0].id).toBe(bottle1.id);
 });
 
-test("lists bottles with brand", async () => {
-  const brand1 = await Fixtures.Entity();
-  const bottle1 = await Fixtures.Bottle({
+test("lists bottles with brand", async ({ fixtures }) => {
+  const brand1 = await fixtures.Entity();
+  const bottle1 = await fixtures.Bottle({
     name: "Delicious Wood",
     brandId: brand1.id,
   });
-  await Fixtures.Bottle({ name: "Something Else" });
+  await fixtures.Bottle({ name: "Something Else" });
 
   const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
@@ -74,15 +73,15 @@ test("lists bottles with brand", async () => {
   expect(results[0].id).toBe(bottle1.id);
 });
 
-test("lists bottles with bottler", async () => {
-  const bottler = await Fixtures.Entity({
+test("lists bottles with bottler", async ({ fixtures }) => {
+  const bottler = await fixtures.Entity({
     type: ["bottler"],
   });
-  const bottle1 = await Fixtures.Bottle({
+  const bottle1 = await fixtures.Bottle({
     name: "Delicious Wood",
     bottlerId: bottler.id,
   });
-  await Fixtures.Bottle({ name: "Something Else" });
+  await fixtures.Bottle({ name: "Something Else" });
 
   const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({
@@ -93,9 +92,11 @@ test("lists bottles with bottler", async () => {
   expect(results[0].id).toBe(bottle1.id);
 });
 
-test("lists bottles with query matching brand and name", async () => {
-  const bottle1 = await Fixtures.Bottle({ name: "Delicious Wood 10-year-old" });
-  await Fixtures.Bottle({ name: "Something Else" });
+test("lists bottles with query matching brand and name", async ({
+  fixtures,
+}) => {
+  const bottle1 = await fixtures.Bottle({ name: "Delicious Wood 10-year-old" });
+  await fixtures.Bottle({ name: "Something Else" });
 
   const caller = createCaller({ user: null });
   const { results } = await caller.bottleList({

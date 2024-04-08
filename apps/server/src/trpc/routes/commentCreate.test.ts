@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { comments, tastings } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires auth", async () => {
@@ -17,11 +16,11 @@ test("requires auth", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("new comment", async () => {
-  const tasting = await Fixtures.Tasting();
+test("new comment", async ({ fixtures, defaults }) => {
+  const tasting = await fixtures.Tasting();
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.commentCreate({
     tasting: tasting.id,
@@ -38,7 +37,7 @@ test("new comment", async () => {
     .where(eq(comments.tastingId, tasting.id));
 
   expect(commentList.length).toBe(1);
-  expect(commentList[0].createdById).toBe(DefaultFixtures.user.id);
+  expect(commentList[0].createdById).toBe(defaults.user.id);
   expect(commentList[0].comment).toBe("Hello world!");
 
   const [updatedTasting] = await db

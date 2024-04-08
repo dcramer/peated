@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists comments", async () => {
-  const comment = await Fixtures.Comment();
-  await Fixtures.Comment();
+test("lists comments", async ({ fixtures }) => {
+  const comment = await fixtures.Comment();
+  await fixtures.Comment();
 
   const caller = createCaller({ user: null });
   const { results } = await caller.commentList({

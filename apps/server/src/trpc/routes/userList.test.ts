@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists entities", async () => {
-  await Fixtures.Entity();
-  await Fixtures.Entity();
+test("lists entities", async ({ fixtures }) => {
+  await fixtures.Entity();
+  await fixtures.Entity();
 
   const caller = createCaller({ user: null });
   const { results } = await caller.entityList();
@@ -11,19 +10,19 @@ test("lists entities", async () => {
   expect(results.length).toBe(2);
 });
 
-test("lists users needs a query", async () => {
-  await Fixtures.User();
+test("lists users needs a query", async ({ defaults, fixtures }) => {
+  await fixtures.User();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.userList();
 
   expect(results.length).toBe(0);
 });
 
-test("lists users needs a query", async () => {
-  const user2 = await Fixtures.User({ displayName: "David George" });
+test("lists users needs a query", async ({ defaults, fixtures }) => {
+  const user2 = await fixtures.User({ displayName: "David George" });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.userList({
     query: "david",
   });

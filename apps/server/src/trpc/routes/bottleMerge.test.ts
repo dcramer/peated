@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleTombstones, bottles } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -14,8 +13,10 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("requires mod", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
+test("requires mod", async ({ fixtures }) => {
+  const caller = createCaller({
+    user: await fixtures.User({ mod: false, admin: false }),
+  });
   expect(() =>
     caller.bottleMerge({
       root: 1,
@@ -24,13 +25,13 @@ test("requires mod", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("merge A into B", async () => {
-  const bottleA = await Fixtures.Bottle({ totalTastings: 1 });
-  await Fixtures.Tasting({ bottleId: bottleA.id });
-  const bottleB = await Fixtures.Bottle();
+test("merge A into B", async ({ fixtures }) => {
+  const bottleA = await fixtures.Bottle({ totalTastings: 1 });
+  await fixtures.Tasting({ bottleId: bottleA.id });
+  const bottleB = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.bottleMerge({
     root: bottleA.id,
@@ -60,13 +61,13 @@ test("merge A into B", async () => {
   expect(tombstone.newBottleId).toEqual(newBottleB.id);
 });
 
-test("merge A from B", async () => {
-  const bottleA = await Fixtures.Bottle({ totalTastings: 1 });
-  await Fixtures.Tasting({ bottleId: bottleA.id });
-  const bottleB = await Fixtures.Bottle();
+test("merge A from B", async ({ fixtures }) => {
+  const bottleA = await fixtures.Bottle({ totalTastings: 1 });
+  await fixtures.Tasting({ bottleId: bottleA.id });
+  const bottleB = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.bottleMerge({
     root: bottleA.id,

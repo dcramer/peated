@@ -1,21 +1,20 @@
 import * as jobs from "@peated/server/jobs/client";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("requires admin", async () => {
-  const site = await Fixtures.ExternalSite({ type: "whiskyadvocate" });
+test("requires admin", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   expect(() => caller.externalSiteTriggerJob(site.type)).rejects.toThrowError(
     /UNAUTHORIZED/,
   );
 });
 
-test("triggers job", async () => {
-  const site = await Fixtures.ExternalSite({ type: "whiskyadvocate" });
+test("triggers job", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   const newSite = await caller.externalSiteTriggerJob(site.type);
   expect(newSite.lastRunAt).toBeTruthy();

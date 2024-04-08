@@ -1,6 +1,5 @@
 import config from "@peated/server/config";
 import type { Bottle, Comment, Tasting, User } from "@peated/server/db/schema";
-import * as Fixtures from "@peated/server/lib/test/fixtures";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";
@@ -64,19 +63,19 @@ describe("notifyComment", () => {
   let tasting: Tasting;
   let comment: Comment;
 
-  beforeEach(async () => {
-    author = await Fixtures.User({
+  beforeEach(async ({ fixtures }) => {
+    author = await fixtures.User({
       email: "joe@example.com",
     });
-    bottle = await Fixtures.Bottle();
-    tasting = await Fixtures.Tasting({
+    bottle = await fixtures.Bottle();
+    tasting = await fixtures.Tasting({
       bottleId: bottle.id,
       createdById: author.id,
     });
   });
 
-  test("doesnt notify author", async () => {
-    comment = await Fixtures.Comment({
+  test("doesnt notify author", async ({ fixtures }) => {
+    comment = await fixtures.Comment({
       comment: "**An Comment** on _life_",
       createdById: author.id,
     });
@@ -96,9 +95,9 @@ describe("notifyComment", () => {
     expect(outbox.length).toBe(0);
   });
 
-  test("constructs appropriate email", async () => {
-    const otherAuthor = await Fixtures.User();
-    comment = await Fixtures.Comment({
+  test("constructs appropriate email", async ({ fixtures }) => {
+    const otherAuthor = await fixtures.User();
+    comment = await fixtures.Comment({
       comment: "**An Comment** on _life_",
       createdById: otherAuthor.id,
     });

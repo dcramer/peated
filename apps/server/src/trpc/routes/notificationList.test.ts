@@ -1,13 +1,12 @@
 import { db } from "@peated/server/db";
 import { createNotification } from "../../lib/notifications";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists notifications w/ toast", async () => {
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+test("lists notifications w/ toast", async ({ defaults, fixtures }) => {
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
   });
-  const toast = await Fixtures.Toast({ tastingId: tasting.id });
+  const toast = await fixtures.Toast({ tastingId: tasting.id });
   const notification = await createNotification(db, {
     objectId: toast.id,
     type: "toast",
@@ -16,7 +15,7 @@ test("lists notifications w/ toast", async () => {
     createdAt: toast.createdAt,
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.notificationList();
 
   expect(results.length).toBe(1);
@@ -26,11 +25,11 @@ test("lists notifications w/ toast", async () => {
   expect(results[0].ref.id).toEqual(tasting.id);
 });
 
-test("lists notifications w/ comment", async () => {
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+test("lists notifications w/ comment", async ({ defaults, fixtures }) => {
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
   });
-  const comment = await Fixtures.Comment({ tastingId: tasting.id });
+  const comment = await fixtures.Comment({ tastingId: tasting.id });
   const notification = await createNotification(db, {
     objectId: comment.id,
     type: "comment",
@@ -39,7 +38,7 @@ test("lists notifications w/ comment", async () => {
     createdAt: comment.createdAt,
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.notificationList();
 
   expect(results.length).toBe(1);
@@ -49,8 +48,11 @@ test("lists notifications w/ comment", async () => {
   expect(results[0].ref.id).toEqual(tasting.id);
 });
 
-test("lists notifications w/ friend_request", async () => {
-  const follow = await Fixtures.Follow({ toUserId: DefaultFixtures.user.id });
+test("lists notifications w/ friend_request", async ({
+  defaults,
+  fixtures,
+}) => {
+  const follow = await fixtures.Follow({ toUserId: defaults.user.id });
   const notification = await createNotification(db, {
     objectId: follow.id,
     type: "friend_request",
@@ -59,7 +61,7 @@ test("lists notifications w/ friend_request", async () => {
     createdAt: follow.createdAt,
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.notificationList();
 
   expect(results.length).toBe(1);

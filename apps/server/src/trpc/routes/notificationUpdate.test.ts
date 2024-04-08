@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -13,19 +12,19 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("mark own notification as read", async () => {
+test("mark own notification as read", async ({ defaults, fixtures }) => {
   const [notification] = await db
     .insert(notifications)
     .values({
-      userId: DefaultFixtures.user.id,
-      fromUserId: (await Fixtures.User()).id,
+      userId: defaults.user.id,
+      fromUserId: (await fixtures.User()).id,
       type: "toast",
       objectId: 1,
       createdAt: new Date(),
     })
     .returning();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.notificationUpdate({
     notification: notification.id,
     read: true,
@@ -40,19 +39,19 @@ test("mark own notification as read", async () => {
   expect(newNotification.read).toBe(true);
 });
 
-test("cannot update others notification", async () => {
+test("cannot update others notification", async ({ defaults, fixtures }) => {
   const [notification] = await db
     .insert(notifications)
     .values({
-      userId: (await Fixtures.User()).id,
-      fromUserId: DefaultFixtures.user.id,
+      userId: (await fixtures.User()).id,
+      fromUserId: defaults.user.id,
       type: "toast",
       objectId: 1,
       createdAt: new Date(),
     })
     .returning();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   expect(() =>
     caller.notificationUpdate({
       notification: notification.id,

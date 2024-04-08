@@ -1,10 +1,9 @@
 import { db } from "@peated/server/db";
 import { entityTombstones } from "@peated/server/db/schema";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("get entity by id", async () => {
-  const brand = await Fixtures.Entity();
+test("get entity by id", async ({ fixtures }) => {
+  const brand = await fixtures.Entity();
 
   const caller = createCaller({ user: null });
   const data = await caller.entityById(brand.id);
@@ -16,13 +15,13 @@ test("errors on invalid entity", async () => {
   expect(() => caller.entityById(1)).rejects.toThrowError(/NOT_FOUND/);
 });
 
-test("gets entity with tombstone", async () => {
-  const entity1 = await Fixtures.Entity();
+test("gets entity with tombstone", async ({ fixtures }) => {
+  const entity1 = await fixtures.Entity();
   await db.insert(entityTombstones).values({
     entityId: 999,
     newEntityId: entity1.id,
   });
-  await Fixtures.Bottle();
+  await fixtures.Bottle();
 
   const caller = createCaller({ user: null });
   const data = await caller.entityById(999);

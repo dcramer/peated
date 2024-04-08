@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists bottle history", async () => {
-  const bottle = await Fixtures.Bottle();
-  await Fixtures.StorePrice({
+test("lists bottle history", async ({ fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  await fixtures.StorePrice({
     bottleId: bottle.id,
   });
 

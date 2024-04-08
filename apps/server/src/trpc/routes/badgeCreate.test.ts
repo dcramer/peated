@@ -1,11 +1,10 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { badges } from "../../db/schema";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("requires admin", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
+test("requires admin", async ({ defaults }) => {
+  const caller = createCaller({ user: defaults.user });
   expect(() =>
     caller.badgeCreate({
       type: "category",
@@ -15,9 +14,9 @@ test("requires admin", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("validates config for category", async () => {
+test("validates config for category", async ({ fixtures }) => {
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
 
   expect(() =>
@@ -29,9 +28,9 @@ test("validates config for category", async () => {
   ).rejects.toThrowError(/Failed to validate badge config/);
 });
 
-test("creates badge", async () => {
+test("creates badge", async ({ fixtures }) => {
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
 
   const data = await caller.badgeCreate({

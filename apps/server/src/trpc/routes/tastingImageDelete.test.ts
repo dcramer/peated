@@ -1,5 +1,4 @@
 import { db } from "@peated/server/db";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -11,10 +10,10 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("cannot delete another user's image", async () => {
-  const user = await Fixtures.User();
-  const otherUser = await Fixtures.User();
-  const tasting = await Fixtures.Tasting({ createdById: otherUser.id });
+test("cannot delete another user's image", async ({ fixtures }) => {
+  const user = await fixtures.User();
+  const otherUser = await fixtures.User();
+  const tasting = await fixtures.Tasting({ createdById: otherUser.id });
 
   const caller = createCaller({ user });
   expect(() =>
@@ -24,13 +23,13 @@ test("cannot delete another user's image", async () => {
   ).rejects.toThrowError(/Cannot delete another user's tasting image/);
 });
 
-test("deletes existing image", async () => {
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+test("deletes existing image", async ({ defaults, fixtures }) => {
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
     imageUrl: "http://example.com/image.png",
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.tastingImageDelete({
     tasting: tasting.id,
   });

@@ -1,12 +1,11 @@
 import { db } from "@peated/server/db";
 import { externalSiteConfig } from "@peated/server/db/schema";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("requires admin", async () => {
-  const site = await Fixtures.ExternalSite();
+test("requires admin", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   expect(() =>
     caller.externalSiteConfigGet({
@@ -16,11 +15,11 @@ test("requires admin", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("get missing value", async () => {
-  const site = await Fixtures.ExternalSite();
+test("get missing value", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   const data = await caller.externalSiteConfigGet({
     site: site.type,
@@ -29,11 +28,11 @@ test("get missing value", async () => {
   expect(data).toBeNull();
 });
 
-test("get missing value with default", async () => {
-  const site = await Fixtures.ExternalSite();
+test("get missing value with default", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   const data = await caller.externalSiteConfigGet({
     site: site.type,
@@ -43,8 +42,8 @@ test("get missing value with default", async () => {
   expect(data).toEqual([]);
 });
 
-test("get present value", async () => {
-  const site = await Fixtures.ExternalSite();
+test("get present value", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
   await db.insert(externalSiteConfig).values({
     externalSiteId: site.id,
     key: "test",
@@ -52,7 +51,7 @@ test("get present value", async () => {
   });
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   const data = await caller.externalSiteConfigGet({
     site: site.type,

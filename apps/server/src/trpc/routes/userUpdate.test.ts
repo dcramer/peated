@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -13,9 +12,9 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("cannot update another user", async () => {
-  const user = await Fixtures.User();
-  const otherUser = await Fixtures.User();
+test("cannot update another user", async ({ fixtures }) => {
+  const user = await fixtures.User();
+  const otherUser = await fixtures.User();
 
   const caller = createCaller({ user });
   expect(() =>
@@ -25,10 +24,10 @@ test("cannot update another user", async () => {
   ).rejects.toThrowError(/Cannot edit another user/);
 });
 
-test("can change displayName", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
+test("can change displayName", async ({ defaults, fixtures }) => {
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.userUpdate({
-    user: DefaultFixtures.user.id,
+    user: defaults.user.id,
     displayName: "Joe",
   });
 
@@ -37,14 +36,14 @@ test("can change displayName", async () => {
   const [user] = await db
     .select()
     .from(users)
-    .where(eq(users.id, DefaultFixtures.user.id));
+    .where(eq(users.id, defaults.user.id));
   expect(user.displayName).toEqual("Joe");
 });
 
-test("can change username", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
+test("can change username", async ({ defaults, fixtures }) => {
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.userUpdate({
-    user: DefaultFixtures.user.id,
+    user: defaults.user.id,
     username: "JoeBlow",
   });
 
@@ -53,16 +52,16 @@ test("can change username", async () => {
   const [user] = await db
     .select()
     .from(users)
-    .where(eq(users.id, DefaultFixtures.user.id));
+    .where(eq(users.id, defaults.user.id));
   expect(user.username).toEqual("joeblow");
 });
 
-test("can change mod as admin", async () => {
+test("can change mod as admin", async ({ defaults, fixtures }) => {
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   const data = await caller.userUpdate({
-    user: DefaultFixtures.user.id,
+    user: defaults.user.id,
     mod: true,
   });
 
@@ -71,16 +70,16 @@ test("can change mod as admin", async () => {
   const [user] = await db
     .select()
     .from(users)
-    .where(eq(users.id, DefaultFixtures.user.id));
+    .where(eq(users.id, defaults.user.id));
   expect(user.mod).toEqual(true);
 });
 
-test("can change admin as admin", async () => {
+test("can change admin as admin", async ({ defaults, fixtures }) => {
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   const data = await caller.userUpdate({
-    user: DefaultFixtures.user.id,
+    user: defaults.user.id,
     admin: true,
   });
 
@@ -89,29 +88,29 @@ test("can change admin as admin", async () => {
   const [user] = await db
     .select()
     .from(users)
-    .where(eq(users.id, DefaultFixtures.user.id));
+    .where(eq(users.id, defaults.user.id));
   expect(user.admin).toEqual(true);
 });
 
-test("cannot change mod as user", async () => {
+test("cannot change mod as user", async ({ defaults }) => {
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   expect(() =>
     caller.userUpdate({
-      user: DefaultFixtures.user.id,
+      user: defaults.user.id,
       mod: true,
     }),
   ).rejects.toThrowError(/FORBIDDEN/);
 });
 
-test("cannot change admin as user", async () => {
+test("cannot change admin as user", async ({ defaults }) => {
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   expect(() =>
     caller.userUpdate({
-      user: DefaultFixtures.user.id,
+      user: defaults.user.id,
       admin: true,
     }),
   ).rejects.toThrowError(/FORBIDDEN/);

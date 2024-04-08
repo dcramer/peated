@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleTags, tastings } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -9,13 +8,13 @@ test("requires authentication", async () => {
   expect(() => caller.tastingDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("delete own tasting", async () => {
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+test("delete own tasting", async ({ defaults, fixtures }) => {
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
     tags: ["spiced", "caramel"],
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   await caller.tastingDelete(tasting.id);
 
   const [newTasting] = await db
@@ -35,11 +34,11 @@ test("delete own tasting", async () => {
   }
 });
 
-test("cannot delete others tasting", async () => {
-  const user = await Fixtures.User();
-  const tasting = await Fixtures.Tasting({ createdById: user.id });
+test("cannot delete others tasting", async ({ defaults, fixtures }) => {
+  const user = await fixtures.User();
+  const tasting = await fixtures.Tasting({ createdById: user.id });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   expect(() => caller.tastingDelete(tasting.id)).rejects.toThrowError(
     /Cannot delete another user's tasting/,
   );
