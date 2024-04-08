@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { badges } from "../../db/schema";
@@ -5,13 +6,14 @@ import { createCaller } from "../router";
 
 test("requires admin", async ({ defaults }) => {
   const caller = createCaller({ user: defaults.user });
-  expect(() =>
+  const err = await waitError(
     caller.badgeCreate({
       type: "category",
       name: "Single Malts",
       config: { category: ["single_malt"] },
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("validates config for category", async ({ fixtures }) => {
@@ -19,13 +21,14 @@ test("validates config for category", async ({ fixtures }) => {
     user: await fixtures.User({ admin: true }),
   });
 
-  expect(() =>
+  const err = await waitError(
     caller.badgeCreate({
       type: "category",
       name: "Single Malts",
       config: { bottle: [1] },
     }),
-  ).rejects.toThrowError(/Failed to validate badge config/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("creates badge", async ({ fixtures }) => {

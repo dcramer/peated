@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleTombstones } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("gets bottle", async ({ fixtures }) => {
@@ -13,7 +14,8 @@ test("gets bottle", async ({ fixtures }) => {
 
 test("errors on invalid bottle", async () => {
   const caller = createCaller({ user: null });
-  expect(() => caller.bottleById(1)).rejects.toThrowError(/Bottle not found/);
+  const err = await waitError(caller.bottleById(1));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("gets bottle with tombstone", async ({ fixtures }) => {

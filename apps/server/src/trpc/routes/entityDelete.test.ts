@@ -23,7 +23,6 @@ test("cannot delete without admin", async ({ fixtures }) => {
   const entity = await fixtures.Entity({ createdById: user.id });
 
   const caller = createCaller({ user });
-  expect(() => caller.entityDelete(entity.id)).rejects.toThrowError(
-    /UNAUTHORIZED/,
-  );
+  const err = await waitError(caller.entityDelete(entity.id));
+  expect(err).toMatchInlineSnapshot();
 });

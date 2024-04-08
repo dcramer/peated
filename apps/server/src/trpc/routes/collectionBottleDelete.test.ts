@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { collectionBottles } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "@peated/server/trpc/router";
 import { eq } from "drizzle-orm";
 
@@ -7,13 +8,14 @@ test("requires auth", async () => {
   const caller = createCaller({
     user: null,
   });
-  expect(() =>
+  const err = await waitError(
     caller.collectionBottleDelete({
       user: "me",
       collection: "default",
       bottle: 1,
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("delete bottle in default", async ({ fixtures, defaults }) => {
