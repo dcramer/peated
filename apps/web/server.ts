@@ -9,7 +9,7 @@ Sentry.init({
 });
 
 import prom from "@isaacs/express-prometheus-middleware";
-import { sentryLink } from "@peated/server/src/lib/trpc";
+import { sentryLink } from "@peated/server/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
 import config from "@peated/web/config";
 import { ApiClient } from "@peated/web/lib/api";

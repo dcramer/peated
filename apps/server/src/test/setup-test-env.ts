@@ -11,7 +11,17 @@ import { migrate } from "../db/migrate";
 import "../lib/test/expects";
 import { AuthenticatedHeaders, User } from "../lib/test/fixtures";
 
+import mockAxios from "vitest-mock-axios";
+
+process.env.DISABLE_HTTP_CACHE = "1";
+
 vi.mock("../jobs");
+vi.mock("axios");
+vi.mock("@peated/server/jobs");
+
+afterEach(() => {
+  mockAxios.reset();
+});
 
 global.DefaultFixtures = {};
 
