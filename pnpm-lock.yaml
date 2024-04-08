@@ -102,12 +102,6 @@ importers:
       drizzle-orm:
         specifier: ^0.30.7
         version: 0.30.7(@opentelemetry/api@1.7.0)(@types/pg@8.11.4)(pg@8.11.5)
-      esbuild:
-        specifier: ^0.20.2
-        version: 0.20.2
-      esbuild-node-tsc:
-        specifier: ^2.0.5
-        version: 2.0.5(esbuild@0.20.2)(typescript@5.3.3)
       pg:
         specifier: ^8.11.5
         version: 8.11.5
@@ -222,12 +216,6 @@ importers:
       error-cause:
         specifier: ^1.0.8
         version: 1.0.8
-      esbuild:
-        specifier: ^0.20.2
-        version: 0.20.2
-      esbuild-node-tsc:
-        specifier: ^2.0.5
-        version: 2.0.5(esbuild@0.20.2)(typescript@5.3.3)
       faktory-worker:
         specifier: ^4.5.1
         version: 4.5.1
@@ -249,9 +237,6 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
-      jwks-rsa:
-        specifier: ^3.1.0
-        version: 3.1.0
       mime-types:
         specifier: ^2.1.35
         version: 2.1.35
@@ -273,9 +258,6 @@ importers:
       pino-pretty:
         specifier: ^10.3.1
         version: 10.3.1
-      regenerator-runtime:
-        specifier: ^0.14.1
-        version: 0.14.1
       sharp:
         specifier: ^0.33.3
         version: 0.33.3
@@ -6917,18 +6899,6 @@ packages:
     dev: false
     optional: true
 
-  /esbuild-node-tsc@2.0.5(esbuild@0.20.2)(typescript@5.3.3):
-    resolution: {integrity: sha512-FPHgaamMLJ6nfx4+p+2pF9deu/yfhTitYqf/xsjFnVDQeWEpBo78uiAp9UoCXY29noamXipAWMmMo6suBvjQQw==}
-    hasBin: true
-    peerDependencies:
-      esbuild: '>=0.13.0'
-      typescript: '*'
-    dependencies:
-      esbuild: 0.20.2
-      typescript: 5.3.3
-      yargs: 17.7.2
-    dev: false
-
   /esbuild-openbsd-64@0.15.18:
     resolution: {integrity: sha512-yK5NCcH31Uae076AyQAXeJzt/vxIo9+omZRKj1pauhk3ITuADzuOx5N2fdHrAKPxN+zH3w96uFKlY7yIn490xQ==}
     engines: {node: '>=12'}
@@ -9130,10 +9100,6 @@ packages:
       '@sideway/pinpoint': 2.0.0
     dev: false
 
-  /jose@4.15.5:
-    resolution: {integrity: sha512-jc7BFxgKPKi94uOvEmzlSWFFe2+vASyXaKUpdQKatWAESU2MWjDfFf0fdfc83CDKcA5QecabZeNLyfhe3yKNkg==}
-    dev: false
-
   /joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
@@ -9315,20 +9281,6 @@ packages:
       safe-buffer: 5.2.1
     dev: false
 
-  /jwks-rsa@3.1.0:
-    resolution: {integrity: sha512-v7nqlfezb9YfHHzYII3ef2a2j1XnGeSE/bK3WfumaYCqONAIstJbrEGapz4kadScZzEt7zYCN7bucj8C0Mv/Rg==}
-    engines: {node: '>=14'}
-    dependencies:
-      '@types/express': 4.17.21
-      '@types/jsonwebtoken': 9.0.6
-      debug: 4.3.4(supports-color@5.5.0)
-      jose: 4.15.5
-      limiter: 1.1.5
-      lru-memoizer: 2.2.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: false
-
   /jws@3.2.2:
     resolution: {integrity: sha512-YHlZCB6lMTllWDtSPHz/ZXTsi8S00usEV6v1tjq8tOUZzw7DpSDWVXjXDre6ed1w/pd495ODpHZYSdkRTsa0HA==}
     dependencies:
@@ -9397,10 +9349,6 @@ packages:
   /lilconfig@3.1.1:
     resolution: {integrity: sha512-O18pf7nyvHTckunPWCV1XUNXU1piu01y2b7ATJ0ppkUkk8ocqVWBrYjJBCwHDjD/ZWcfyrA0P4gKhzWGi5EINQ==}
     engines: {node: '>=14'}
-    dev: false
-
-  /limiter@1.1.5:
-    resolution: {integrity: sha512-FWWMIEOxz3GwUI4Ts/IvgVy6LPvoMPgjMdQ185nN6psJyBJ4yOpzqm695/h5umdLJg2vW3GR5iG11MAkR2AzJA==}
     dev: false
 
   /lines-and-columns@1.2.4:
@@ -9475,10 +9423,6 @@ packages:
 
   /lodash.castarray@4.4.0:
     resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
-    dev: false
-
-  /lodash.clonedeep@4.5.0:
-    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
     dev: false
 
   /lodash.debounce@4.0.8:
@@ -9572,13 +9516,6 @@ packages:
     engines: {node: 14 || >=16.14}
     dev: false
 
-  /lru-cache@4.0.2:
-    resolution: {integrity: sha512-uQw9OqphAGiZhkuPlpFGmdTU2tEuhxTourM/19qGJrxBPHAr/f8BT1a0i/lOclESnGatdJG/UCkP9kZB/Lh1iw==}
-    dependencies:
-      pseudomap: 1.0.2
-      yallist: 2.1.2
-    dev: false
-
   /lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
     dependencies:
@@ -9595,13 +9532,6 @@ packages:
   /lru-cache@7.18.3:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
-    dev: false
-
-  /lru-memoizer@2.2.0:
-    resolution: {integrity: sha512-QfOZ6jNkxCcM/BkIPnFsqDhtrazLRsghi9mBwFAzol5GCvj4EkFT899Za3+QwikCg5sRX8JstioBDwOxEyzaNw==}
-    dependencies:
-      lodash.clonedeep: 4.5.0
-      lru-cache: 4.0.2
     dev: false
 
   /lru-queue@0.1.0:
@@ -11458,10 +11388,6 @@ packages:
 
   /proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
-    dev: false
-
-  /pseudomap@1.0.2:
-    resolution: {integrity: sha512-b/YwNhb8lk1Zz2+bXXpS/LK9OisiZZ1SNsSLxN1x2OXVEhW2Ckr/7mWE5vrC1ZTiJlD9g19jWszTmJsB+oEpFQ==}
     dev: false
 
   /psl@1.9.0:
@@ -13757,10 +13683,6 @@ packages:
   /y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
-    dev: false
-
-  /yallist@2.1.2:
-    resolution: {integrity: sha512-ncTzHV7NvsQZkYe1DW7cbDLm0YpzHmZF5r/iyP3ZnQtMiJ+pjzisCiMNI+Sj+xQF5pXhSHxSB3uDbsBTzY/c2A==}
     dev: false
 
   /yallist@3.1.1:
