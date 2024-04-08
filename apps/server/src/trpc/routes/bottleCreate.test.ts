@@ -5,17 +5,19 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { and, eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() =>
+  const err = await waitError(
     caller.bottleCreate({
       name: "Delicious Wood",
       brand: 1,
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("creates a new bottle with minimal params", async ({
@@ -103,12 +105,14 @@ test("does not create a new bottle with invalid brandId", async ({
   defaults,
 }) => {
   const caller = createCaller({ user: defaults.user });
-  expect(() =>
+  const err = await waitError(
     caller.bottleCreate({
       name: "Delicious Wood",
       brand: 5,
     }),
-  ).rejects.toThrowError(/Could not identify brand/);
+  );
+
+  expect(err).toMatchInlineSnapshot("foo");
 });
 
 // test("creates a new bottle with existing brand name", async () => {
@@ -195,7 +199,7 @@ test("does not create a new bottle with invalid distillerId", async ({
   defaults,
 }) => {
   const caller = createCaller({ user: defaults.user });
-  expect(() =>
+  expect(
     caller.bottleCreate({
       name: "Delicious Wood",
       brand: {

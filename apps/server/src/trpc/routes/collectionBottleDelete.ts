@@ -1,11 +1,11 @@
 import { db } from "@peated/server/db";
 import { collectionBottles } from "@peated/server/db/schema";
+import { getUserFromId } from "@peated/server/lib/api";
+import { getDefaultCollection } from "@peated/server/lib/db";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
-import { getUserFromId } from "../../lib/api";
-import { getDefaultCollection } from "../../lib/db";
 
 export default authedProcedure
   .input(

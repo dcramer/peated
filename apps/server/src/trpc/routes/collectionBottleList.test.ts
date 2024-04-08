@@ -1,4 +1,4 @@
-import { createCaller } from "../router";
+import { createCaller } from "@peated/server/trpc/router";
 
 test("lists entities", async ({ fixtures }) => {
   await fixtures.Entity();

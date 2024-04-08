@@ -223,11 +223,11 @@ importers:
         specifier: ^1.0.8
         version: 1.0.8
       esbuild:
-        specifier: ^0.19.12
-        version: 0.19.12
+        specifier: ^0.20.2
+        version: 0.20.2
       esbuild-node-tsc:
         specifier: ^2.0.5
-        version: 2.0.5(esbuild@0.19.12)(typescript@5.3.3)
+        version: 2.0.5(esbuild@0.20.2)(typescript@5.3.3)
       faktory-worker:
         specifier: ^4.5.1
         version: 4.5.1
@@ -6925,6 +6925,18 @@ packages:
       typescript: '*'
     dependencies:
       esbuild: 0.19.12
+      typescript: 5.3.3
+      yargs: 17.7.2
+    dev: false
+
+  /esbuild-node-tsc@2.0.5(esbuild@0.20.2)(typescript@5.3.3):
+    resolution: {integrity: sha512-FPHgaamMLJ6nfx4+p+2pF9deu/yfhTitYqf/xsjFnVDQeWEpBo78uiAp9UoCXY29noamXipAWMmMo6suBvjQQw==}
+    hasBin: true
+    peerDependencies:
+      esbuild: '>=0.13.0'
+      typescript: '*'
+    dependencies:
+      esbuild: 0.20.2
       typescript: 5.3.3
       yargs: 17.7.2
     dev: false
