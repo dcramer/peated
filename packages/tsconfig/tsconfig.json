@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+
     "target": "ES2022",
     "lib": ["DOM", "DOM.Iterable", "ES2022", "WebWorker"],
 
