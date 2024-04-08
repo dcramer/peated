@@ -1,8 +1,7 @@
 // make sure to import this _before_ all other code
 import "../sentry";
 
-import type { SQLChunk } from "drizzle-orm";
-import { SQL, StringChunk, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { Client } from "pg";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
@@ -57,18 +56,13 @@ const getTableNames = async (exclude = SAFE_TABLES) => {
     .join(", ");
 };
 
-const UnsafeSql = (query: string) => {
-  const chunks: SQLChunk[] = [new StringChunk(query)];
-  return new SQL(chunks);
-};
-
 const dropTables = async () => {
   const tableNames = await getTableNames([]);
   if (!tableNames.length) return;
 
   try {
     // UNSAFE QUERY
-    await db.execute(UnsafeSql(`DROP TABLE ${tableNames} CASCADE;`));
+    await db.execute(sql.raw(`DROP TABLE ${tableNames} CASCADE;`));
   } catch (error) {
     console.log({ error });
   }
@@ -80,22 +74,22 @@ const clearTables = async () => {
 
   try {
     // UNSAFE QUERY
-    await db.execute(UnsafeSql(`TRUNCATE TABLE ${tableNames} CASCADE;`));
+    await db.execute(sql.raw(`TRUNCATE TABLE ${tableNames} CASCADE;`));
   } catch (error) {
     console.log({ error });
   }
 
   // reset sequences
-  // const snQuery = await db
-  //   .select({ relname: pgClass.relname })
-  //   .from(pgClass)
-  //   .innerJoin(pgNamespace, eq(pgNamespace.oid, pgClass.relnamespace))
-  //   .where(and(eq(pgClass.relkind, "S"), eq(pgNamespace.nspname, schemaname)));
-  // for (const { relname } of snQuery) {
-  //   await db.execute(
-  //     UnsafeSql(`ALTER SEQUENCE "${schemaname}"."${relname}" RESTART WITH 1;`)
-  //   );
-  // }
+  const snQuery = await db
+    .select({ relname: pgClass.relname })
+    .from(pgClass)
+    .innerJoin(pgNamespace, eq(pgNamespace.oid, pgClass.relnamespace))
+    .where(and(eq(pgClass.relkind, "S"), eq(pgNamespace.nspname, schemaname)));
+  for (const { relname } of snQuery) {
+    await db.execute(
+      sql.raw(`ALTER SEQUENCE "${schemaname}"."${relname}" RESTART WITH 1;`),
+    );
+  }
 };
 
 const createDefaultUser = async () => {
