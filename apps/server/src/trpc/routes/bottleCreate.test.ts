@@ -199,7 +199,7 @@ test("does not create a new bottle with invalid distillerId", async ({
   defaults,
 }) => {
   const caller = createCaller({ user: defaults.user });
-  expect(
+  const err = await waitError(
     caller.bottleCreate({
       name: "Delicious Wood",
       brand: {
@@ -208,7 +208,8 @@ test("does not create a new bottle with invalid distillerId", async ({
       },
       distillers: [500000],
     }),
-  ).rejects.toThrowError(/Could not identify distiller/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 // test("creates a new bottle with existing distiller name", async () => {

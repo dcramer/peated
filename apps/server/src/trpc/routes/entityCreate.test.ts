@@ -5,11 +5,12 @@ import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() =>
+  const err = await waitError(
     caller.entityCreate({
       name: "Delicious Wood",
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("creates a new entity", async ({ defaults }) => {

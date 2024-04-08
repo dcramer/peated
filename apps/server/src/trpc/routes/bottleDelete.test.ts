@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { bottles } from "../../db/schema";
@@ -23,7 +24,6 @@ test("cannot delete without admin", async ({ fixtures }) => {
   const bottle = await fixtures.Bottle({ createdById: user.id });
 
   const caller = createCaller({ user });
-  expect(() => caller.bottleDelete(bottle.id)).rejects.toThrowError(
-    /UNAUTHORIZED/,
-  );
+  const err = await waitError(caller.bottleDelete(bottle.id));
+  expect(err).toMatchInlineSnapshot();
 });

@@ -1,11 +1,13 @@
 import { db } from "@peated/server/db";
 import { comments } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() => caller.commentDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
+  const err = await waitError(caller.commentDelete(1));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("delete own", async ({ defaults, fixtures }) => {
@@ -30,7 +32,6 @@ test("cannot delete others", async ({ defaults, fixtures }) => {
   });
 
   const caller = createCaller({ user: defaults.user });
-  expect(() => caller.commentDelete(comment.id)).rejects.toThrowError(
-    /Cannot delete another user's comment/,
-  );
+  const err = await waitError(caller.commentDelete(comment.id));
+  expect(err).toMatchInlineSnapshot();
 });

@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("lists entities", async ({ fixtures }) => {
@@ -14,11 +15,12 @@ test("cannot list private without friend", async ({ defaults, fixtures }) => {
   const otherUser = await fixtures.User({ private: true });
 
   const caller = createCaller({ user: defaults.user });
-  expect(() =>
+  const err = await waitError(
     caller.collectionList({
       user: otherUser.id,
     }),
-  ).rejects.toThrowError(/User's profile is private/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("can list private with friend", async ({ defaults, fixtures }) => {

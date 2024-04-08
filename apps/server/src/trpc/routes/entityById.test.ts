@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { entityTombstones } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("get entity by id", async ({ fixtures }) => {
@@ -12,7 +13,8 @@ test("get entity by id", async ({ fixtures }) => {
 
 test("errors on invalid entity", async () => {
   const caller = createCaller({ user: null });
-  expect(() => caller.entityById(1)).rejects.toThrowError(/NOT_FOUND/);
+  const err = await waitError(caller.entityById(1));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("gets entity with tombstone", async ({ fixtures }) => {
