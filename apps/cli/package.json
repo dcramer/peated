@@ -29,7 +29,7 @@
     "dotenv-cli": "^7.4.1",
     "drizzle-kit": "^0.20.14",
     "drizzle-orm": "^0.30.7",
-    "esbuild": "^0.19.12",
+    "esbuild": "^0.20.2",
     "esbuild-node-tsc": "^2.0.5",
     "pg": "^8.11.5",
     "tsconfig-paths": "^4.2.0",
