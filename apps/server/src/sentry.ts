@@ -11,4 +11,4 @@ Sentry.init({
   spotlight: config.ENV === "development",
 });
 
-Sentry.setTag("service", "@peated/api");
+Sentry.setTag("service", config.SENTRY_SERVICE);

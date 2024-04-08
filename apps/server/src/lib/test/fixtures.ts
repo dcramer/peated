@@ -52,6 +52,13 @@ import { createAccessToken } from "../auth";
 import { choose, random, sample } from "../rand";
 import { toTitleCase } from "../strings";
 
+export async function loadFixture(...paths: string[]) {
+  const data = await readFile(
+    path.join(__dirname, "..", "..", "..", "__fixtures__", ...paths),
+  );
+  return data.toString();
+}
+
 export const User = async ({ ...data }: Partial<NewUser> = {}) => {
   const [result] = await db
     .insert(users)

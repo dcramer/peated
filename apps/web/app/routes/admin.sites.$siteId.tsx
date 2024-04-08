@@ -1,4 +1,4 @@
-import { type ExternalSiteSchema } from "@peated/server/src/schemas";
+import { type ExternalSiteSchema } from "@peated/server/schemas";
 import { type ExternalSiteType } from "@peated/server/types";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import {

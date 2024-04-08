@@ -21,6 +21,7 @@ export default {
   VERSION: process.env.VERSION || "",
 
   SENTRY_DSN: process.env.SENTRY_DSN || "",
+  SENTRY_SERVICE: process.env.SENTRY_SERVICE || "@peated/server",
 
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
@@ -36,4 +37,8 @@ export default {
     : null,
 
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  OPENAI_HOST: process.env.OPENAI_HOST || "https://api.openai.com/v1",
+  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4-turbo-preview",
+
+  DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
 };

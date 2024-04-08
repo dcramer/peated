@@ -8,6 +8,9 @@ declare namespace NodeJS {
     NODE_ENV: "development" | "production" | "test";
     PORT?: string;
     HOST?: string;
+    DISABLE_HTTP_CACHE?: string;
+    API_SERVER?: string;
+    API_KEY?: string;
   }
 }
 
@@ -36,4 +39,16 @@ declare global {
       Authorization: string;
     };
   };
+}
+
+declare module "faktory-worker/lib/faktory" {
+  export declare type JobFunctionContextWrapper = {
+    (...args: any[]): ContextProvider;
+  };
+  export declare type UnWrappedJobFunction = {
+    (...args: any[]): unknown;
+  };
+  export declare type JobFunction =
+    | JobFunctionContextWrapper
+    | UnWrappedJobFunction;
 }
