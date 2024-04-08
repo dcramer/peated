@@ -6,25 +6,28 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
+import waitError from "@peated/server/lib/test/waitError";
 import { desc, eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() =>
+  const err = await waitError(
     caller.entityUpdate({
       entity: 1,
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("requires mod", async ({ defaults }) => {
   const caller = createCaller({ user: defaults.user });
-  expect(() =>
+  const err = await waitError(
     caller.entityUpdate({
       entity: 1,
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("no changes", async ({ fixtures }) => {

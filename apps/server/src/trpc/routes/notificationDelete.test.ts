@@ -1,20 +1,19 @@
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() => caller.notificationDelete(1)).rejects.toThrowError(
-    /UNAUTHORIZED/,
-  );
+  const err = await waitError(caller.notificationDelete(1));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("invalid notification", async ({ defaults }) => {
   const caller = createCaller({ user: defaults.user });
-  expect(() => caller.notificationDelete(1)).rejects.toThrowError(
-    /Notification not found/,
-  );
+  const err = await waitError(caller.notificationDelete(1));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("delete own notification", async ({ defaults, fixtures }) => {
@@ -52,7 +51,6 @@ test("cannot delete others notification", async ({ defaults, fixtures }) => {
     .returning();
 
   const caller = createCaller({ user: defaults.user });
-  expect(() => caller.notificationDelete(notification.id)).rejects.toThrowError(
-    /Cannot delete another user's notification/,
-  );
+  const err = await waitError(caller.notificationDelete(notification.id));
+  expect(err).toMatchInlineSnapshot();
 });

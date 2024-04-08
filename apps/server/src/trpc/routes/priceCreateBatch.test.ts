@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
@@ -7,9 +8,10 @@ test("requires admin", async ({ fixtures }) => {
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),
   });
-  expect(() =>
+  const err = await waitError(
     caller.priceCreateBatch({ site: "healthyspirits", prices: [] }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("processes new price", async ({ fixtures }) => {

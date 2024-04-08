@@ -1,4 +1,5 @@
 import * as jobs from "@peated/server/jobs/client";
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("requires admin", async ({ fixtures }) => {
@@ -6,9 +7,8 @@ test("requires admin", async ({ fixtures }) => {
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),
   });
-  expect(() => caller.externalSiteTriggerJob(site.type)).rejects.toThrowError(
-    /UNAUTHORIZED/,
-  );
+  const err = await waitError(caller.externalSiteTriggerJob(site.type));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("triggers job", async ({ fixtures }) => {

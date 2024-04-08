@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { bottles, entities, tastings } from "../../db/schema";
 import { createCaller } from "../router";
@@ -7,9 +8,8 @@ test("requires auth", async () => {
   const caller = createCaller({
     user: null,
   });
-  expect(() => caller.tastingCreate({ bottle: 1 })).rejects.toThrowError(
-    /UNAUTHORIZED/,
-  );
+  const err = await waitError(caller.tastingCreate({ bottle: 1 }));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("creates a new tasting with minimal params", async ({
@@ -196,12 +196,13 @@ test("flight requires valid bottle", async ({ defaults, fixtures }) => {
     user: defaults.user,
   });
 
-  expect(() =>
+  const err = await waitError(
     caller.tastingCreate({
       bottle: bottle.id,
       flight: flight.publicId,
     }),
-  ).rejects.toThrowError(/Cannot identify flight/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("creates a new tasting with flight", async ({ defaults, fixtures }) => {
