@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("requires admin", async () => {
+test("requires admin", async ({ fixtures }) => {
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   expect(() =>
     caller.externalSiteCreate({
@@ -13,9 +12,9 @@ test("requires admin", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("triggers job", async () => {
+test("triggers job", async ({ fixtures }) => {
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   const newSite = await caller.externalSiteCreate({
     name: "Whisky Advocate",

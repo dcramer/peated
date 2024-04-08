@@ -1,8 +1,7 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("get site by type", async () => {
-  const site = await Fixtures.ExternalSite();
+test("get site by type", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
 
   const caller = createCaller({ user: null });
   const data = await caller.externalSiteByType(site.type);

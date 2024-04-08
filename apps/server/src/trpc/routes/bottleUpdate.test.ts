@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import { eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -14,8 +13,8 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("requires mod", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
+test("requires mod", async ({ defaults }) => {
+  const caller = createCaller({ user: defaults.user });
   expect(() =>
     caller.bottleUpdate({
       bottle: 1,
@@ -23,11 +22,11 @@ test("requires mod", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("no changes", async () => {
-  const bottle = await Fixtures.Bottle();
+test("no changes", async ({ fixtures }) => {
+  const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.bottleUpdate({
     bottle: bottle.id,
@@ -43,12 +42,12 @@ test("no changes", async () => {
   expect(bottle).toEqual(newBottle);
 });
 
-test("edits a new bottle with new name param", async () => {
-  const brand = await Fixtures.Entity();
-  const bottle = await Fixtures.Bottle({ brandId: brand.id });
+test("edits a new bottle with new name param", async ({ fixtures }) => {
+  const brand = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({ brandId: brand.id });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.bottleUpdate({
     bottle: bottle.id,
@@ -69,11 +68,11 @@ test("edits a new bottle with new name param", async () => {
   expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
 });
 
-test("clears category", async () => {
-  const bottle = await Fixtures.Bottle({ category: "single_malt" });
+test("clears category", async ({ fixtures }) => {
+  const bottle = await fixtures.Bottle({ category: "single_malt" });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.bottleUpdate({
     bottle: bottle.id,
@@ -91,12 +90,12 @@ test("clears category", async () => {
   expect(bottle2.category).toBe(null);
 });
 
-test("manipulates name to conform with age", async () => {
-  const brand = await Fixtures.Entity();
-  const bottle = await Fixtures.Bottle({ brandId: brand.id });
+test("manipulates name to conform with age", async ({ fixtures }) => {
+  const brand = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({ brandId: brand.id, statedAge: null });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   await caller.bottleUpdate({
     bottle: bottle.id,
@@ -117,12 +116,12 @@ test("manipulates name to conform with age", async () => {
   expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
 });
 
-test("fills in statedAge", async () => {
-  const brand = await Fixtures.Entity();
-  const bottle = await Fixtures.Bottle({ brandId: brand.id, statedAge: null });
+test("fills in statedAge", async ({ fixtures }) => {
+  const brand = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({ brandId: brand.id });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   await caller.bottleUpdate({
     bottle: bottle.id,
@@ -140,11 +139,11 @@ test("fills in statedAge", async () => {
   expect(bottle2.statedAge).toBe(10);
 });
 
-test("removes statedAge", async () => {
-  const bottle = await Fixtures.Bottle({ statedAge: 10, name: "Foo Bar" });
+test("removes statedAge", async ({ fixtures }) => {
+  const bottle = await fixtures.Bottle({ name: "Foo Bar", statedAge: 10 });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   await caller.bottleUpdate({
     bottle: bottle.id,
@@ -160,12 +159,12 @@ test("removes statedAge", async () => {
   expect(bottle2.statedAge).toBeNull();
 });
 
-test("changes brand", async () => {
-  const newBrand = await Fixtures.Entity();
-  const bottle = await Fixtures.Bottle();
+test("changes brand", async ({ fixtures }) => {
+  const newBrand = await fixtures.Entity();
+  const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   await caller.bottleUpdate({
     bottle: bottle.id,
@@ -194,15 +193,15 @@ test("changes brand", async () => {
   expect(oldBrand?.totalBottles).toBe(0);
 });
 
-test("removes distiller", async () => {
-  const distillerA = await Fixtures.Entity();
-  const distillerB = await Fixtures.Entity();
-  const bottle = await Fixtures.Bottle({
+test("removes distiller", async ({ fixtures }) => {
+  const distillerA = await fixtures.Entity();
+  const distillerB = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({
     distillerIds: [distillerA.id, distillerB.id],
   });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   await caller.bottleUpdate({
     bottle: bottle.id,
@@ -225,15 +224,15 @@ test("removes distiller", async () => {
   expect(newDistillerB?.totalBottles).toBe(0);
 });
 
-test("changes distiller", async () => {
-  const distillerA = await Fixtures.Entity();
-  const distillerB = await Fixtures.Entity();
-  const bottle = await Fixtures.Bottle({
+test("changes distiller", async ({ fixtures }) => {
+  const distillerA = await fixtures.Entity();
+  const distillerB = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({
     distillerIds: [distillerA.id],
   });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
 
   await caller.bottleUpdate({
@@ -252,15 +251,15 @@ test("changes distiller", async () => {
   expect(newDistillerB?.totalBottles).toBe(1);
 });
 
-test("changes bottler", async () => {
-  const bottlerA = await Fixtures.Entity();
-  const bottlerB = await Fixtures.Entity();
-  const bottle = await Fixtures.Bottle({
+test("changes bottler", async ({ fixtures }) => {
+  const bottlerA = await fixtures.Entity();
+  const bottlerB = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({
     bottlerId: bottlerA.id,
   });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
 
   await caller.bottleUpdate({
@@ -279,16 +278,18 @@ test("changes bottler", async () => {
   expect(newBottlerB?.totalBottles).toBe(1);
 });
 
-test("changes distiller with previous identical brand", async () => {
-  const entityA = await Fixtures.Entity();
-  const entityB = await Fixtures.Entity();
-  const bottle = await Fixtures.Bottle({
+test("changes distiller with previous identical brand", async ({
+  fixtures,
+}) => {
+  const entityA = await fixtures.Entity();
+  const entityB = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({
     brandId: entityA.id,
     distillerIds: [entityA.id],
   });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
 
   await caller.bottleUpdate({

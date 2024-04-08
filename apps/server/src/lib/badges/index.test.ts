@@ -1,25 +1,24 @@
 import { db } from "../../db";
-import * as Fixtures from "../../lib/test/fixtures";
 
 import { checkBadges } from ".";
 
 describe("checkBadges", () => {
-  test("returns matching region badge from brand", async () => {
-    const badge = await Fixtures.Badge({
+  test("returns matching region badge from brand", async ({ fixtures }) => {
+    const badge = await fixtures.Badge({
       type: "region",
       config: { regions: [{ country: "Scotland", region: "Islay" }] },
     });
 
-    const brand = await Fixtures.Entity({
+    const brand = await fixtures.Entity({
       country: "Scotland",
       region: "Islay",
     });
 
-    const bottle = await Fixtures.Bottle({
+    const bottle = await fixtures.Bottle({
       brandId: brand.id,
     });
 
-    const tasting = await Fixtures.Tasting({
+    const tasting = await fixtures.Tasting({
       bottleId: bottle.id,
     });
 

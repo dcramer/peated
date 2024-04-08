@@ -1,8 +1,7 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("get flight by id", async () => {
-  const flight = await Fixtures.Flight();
+test("get flight by id", async ({ fixtures }) => {
+  const flight = await fixtures.Flight();
 
   const caller = createCaller({ user: null });
   const data = await caller.flightById(flight.publicId);

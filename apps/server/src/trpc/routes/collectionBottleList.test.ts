@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists entities", async () => {
-  await Fixtures.Entity();
-  await Fixtures.Entity();
+test("lists entities", async ({ fixtures }) => {
+  await fixtures.Entity();
+  await fixtures.Entity();
 
   const caller = createCaller({ user: null });
   const { results } = await caller.entityList();
@@ -11,10 +10,10 @@ test("lists entities", async () => {
   expect(results.length).toBe(2);
 });
 
-test("cannot list private without friend", async () => {
-  const otherUser = await Fixtures.User({ private: true });
+test("cannot list private without friend", async ({ defaults, fixtures }) => {
+  const otherUser = await fixtures.User({ private: true });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   expect(() =>
     caller.collectionBottleList({
       user: otherUser.id,
@@ -23,15 +22,15 @@ test("cannot list private without friend", async () => {
   ).rejects.toThrowError(/User's profile is private/);
 });
 
-test("can list private with friend", async () => {
-  const otherUser = await Fixtures.User({ private: true });
-  await Fixtures.Follow({
-    fromUserId: DefaultFixtures.user.id,
+test("can list private with friend", async ({ defaults, fixtures }) => {
+  const otherUser = await fixtures.User({ private: true });
+  await fixtures.Follow({
+    fromUserId: defaults.user.id,
     toUserId: otherUser.id,
     status: "following",
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.collectionBottleList({
     user: otherUser.id,
     collection: "default",
@@ -40,10 +39,10 @@ test("can list private with friend", async () => {
   expect(results.length).toEqual(0);
 });
 
-test("can list public without friend", async () => {
-  const otherUser = await Fixtures.User({ private: false });
+test("can list public without friend", async ({ defaults, fixtures }) => {
+  const otherUser = await fixtures.User({ private: false });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.collectionBottleList({
     user: otherUser.id,
     collection: "default",

@@ -1,51 +1,50 @@
 import { db } from "../db";
-import * as Fixtures from "../lib/test/fixtures";
 import { profileVisible } from "./api";
 
 describe("profileVisible", () => {
-  test("not private", async () => {
-    const user = await Fixtures.User({ private: false });
-    const rv = await profileVisible(db, user, DefaultFixtures.user);
+  test("not private", async ({ defaults, fixtures }) => {
+    const user = await fixtures.User({ private: false });
+    const rv = await profileVisible(db, user, defaults.user);
     expect(rv).toBe(true);
   });
 
-  test("not logged in", async () => {
-    const user = await Fixtures.User({ private: true });
+  test("not logged in", async ({ fixtures }) => {
+    const user = await fixtures.User({ private: true });
     const rv = await profileVisible(db, user, null);
     expect(rv).toBe(false);
   });
 
-  test("self", async () => {
-    const user = await Fixtures.User({ private: true });
+  test("self", async ({ fixtures }) => {
+    const user = await fixtures.User({ private: true });
     const rv = await profileVisible(db, user, user);
     expect(rv).toBe(true);
   });
 
-  test("not friends", async () => {
-    const user = await Fixtures.User({ private: true });
-    const rv = await profileVisible(db, user, DefaultFixtures.user);
+  test("not friends", async ({ defaults, fixtures }) => {
+    const user = await fixtures.User({ private: true });
+    const rv = await profileVisible(db, user, defaults.user);
     expect(rv).toBe(false);
   });
 
-  test("not approved", async () => {
-    const user = await Fixtures.User({ private: true });
-    await Fixtures.Follow({
-      fromUserId: DefaultFixtures.user.id,
+  test("not approved", async ({ defaults, fixtures }) => {
+    const user = await fixtures.User({ private: true });
+    await fixtures.Follow({
+      fromUserId: defaults.user.id,
       toUserId: user.id,
       status: "pending",
     });
-    const rv = await profileVisible(db, user, DefaultFixtures.user);
+    const rv = await profileVisible(db, user, defaults.user);
     expect(rv).toBe(false);
   });
 
-  test("friends", async () => {
-    const user = await Fixtures.User({ private: true });
-    await Fixtures.Follow({
-      fromUserId: DefaultFixtures.user.id,
+  test("friends", async ({ defaults, fixtures }) => {
+    const user = await fixtures.User({ private: true });
+    await fixtures.Follow({
+      fromUserId: defaults.user.id,
       toUserId: user.id,
       status: "following",
     });
-    const rv = await profileVisible(db, user, DefaultFixtures.user);
+    const rv = await profileVisible(db, user, defaults.user);
     expect(rv).toBe(true);
   });
 });

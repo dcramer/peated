@@ -44,15 +44,6 @@ declare module "vitest" {
   }
 }
 
-declare global {
-  export const DefaultFixtures: {
-    user: User;
-    authHeaders: {
-      Authorization: string;
-    };
-  };
-}
-
 declare module "faktory-worker/lib/faktory" {
   export declare type JobFunctionContextWrapper = {
     (...args: any[]): ContextProvider;

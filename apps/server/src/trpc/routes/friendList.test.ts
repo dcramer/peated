@@ -1,13 +1,12 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists friends", async () => {
-  const follow1 = await Fixtures.Follow({
-    fromUserId: DefaultFixtures.user.id,
+test("lists friends", async ({ defaults, fixtures }) => {
+  const follow1 = await fixtures.Follow({
+    fromUserId: defaults.user.id,
   });
-  await Fixtures.Follow();
+  await fixtures.Follow();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.friendList();
 
   expect(results.length).toBe(1);

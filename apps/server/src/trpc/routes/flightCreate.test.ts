@@ -12,8 +12,8 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("creates a new flight", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
+test("creates a new flight", async ({ defaults }) => {
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.flightCreate({
     name: "Macallan",
   });

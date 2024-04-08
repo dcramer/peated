@@ -1,28 +1,27 @@
 import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
-import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
-test("requires admin", async () => {
+test("requires admin", async ({ fixtures }) => {
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   expect(() =>
     caller.priceCreateBatch({ site: "healthyspirits", prices: [] }),
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("processes new price", async () => {
-  const site = await Fixtures.ExternalSite({ type: "totalwine" });
-  const bottle = await Fixtures.Bottle({
+test("processes new price", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite({ type: "totalwine" });
+  const bottle = await fixtures.Bottle({
     name: "10-year-old",
-    brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
+    brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
   });
   expect(bottle.fullName).toBe("Ardbeg 10-year-old");
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   await caller.priceCreateBatch({
     site: site.type,
@@ -47,21 +46,21 @@ test("processes new price", async () => {
   expect(prices[0].url).toBe("http://example.com");
 });
 
-test("processes existing price", async () => {
-  const site = await Fixtures.ExternalSite({ type: "totalwine" });
-  const bottle = await Fixtures.Bottle({
+test("processes existing price", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite({ type: "totalwine" });
+  const bottle = await fixtures.Bottle({
     name: "10-year-old",
-    brandId: (await Fixtures.Entity({ name: "Ardbeg" })).id,
+    brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
   });
   expect(bottle.fullName).toBe("Ardbeg 10-year-old");
-  const existingPrice = await Fixtures.StorePrice({
+  const existingPrice = await fixtures.StorePrice({
     bottleId: bottle.id,
     externalSiteId: site.id,
   });
   expect(existingPrice.name).toBe(bottle.fullName);
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   await caller.priceCreateBatch({
     site: site.type,
@@ -88,11 +87,11 @@ test("processes existing price", async () => {
   expect(prices[0].url).toBe("http://example.com");
 });
 
-test("processes new price without bottle", async () => {
-  const site = await Fixtures.ExternalSite({ type: "totalwine" });
+test("processes new price without bottle", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite({ type: "totalwine" });
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   await caller.priceCreateBatch({
     site: site.type,

@@ -1,13 +1,12 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists flights", async () => {
-  const flight1 = await Fixtures.Flight({
-    createdById: DefaultFixtures.user.id,
+test("lists flights", async ({ defaults, fixtures }) => {
+  const flight1 = await fixtures.Flight({
+    createdById: defaults.user.id,
   });
-  await Fixtures.Flight();
+  await fixtures.Flight();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.flightList();
 
   expect(results.length).toBe(1);

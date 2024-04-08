@@ -1,35 +1,34 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists reviews", async () => {
-  await Fixtures.Review();
-  await Fixtures.Review();
+test("lists reviews", async ({ fixtures }) => {
+  await fixtures.Review();
+  await fixtures.Review();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const { results } = await caller.reviewList();
 
   expect(results.length).toBe(2);
 });
 
-test("lists reviews without mod", async () => {
-  await Fixtures.Review();
-  await Fixtures.Review();
+test("lists reviews without mod", async ({ defaults, fixtures }) => {
+  await fixtures.Review();
+  await fixtures.Review();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   expect(() => caller.reviewList()).rejects.toThrowError(/BAD_REQUEST/);
 });
 
-test("lists reviews by site", async () => {
-  const astorwine = await Fixtures.ExternalSite({ type: "astorwines" });
-  const totalwine = await Fixtures.ExternalSite({ type: "totalwine" });
+test("lists reviews by site", async ({ fixtures }) => {
+  const astorwine = await fixtures.ExternalSite({ type: "astorwines" });
+  const totalwine = await fixtures.ExternalSite({ type: "totalwine" });
 
-  const review = await Fixtures.Review({ externalSiteId: astorwine.id });
-  await Fixtures.Review({ externalSiteId: totalwine.id });
+  const review = await fixtures.Review({ externalSiteId: astorwine.id });
+  await fixtures.Review({ externalSiteId: totalwine.id });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const { results } = await caller.reviewList({
     site: astorwine.type,
@@ -39,13 +38,13 @@ test("lists reviews by site", async () => {
   expect(results[0].id).toEqual(review.id);
 });
 
-test("lists reviews by site without mod", async () => {
-  await Fixtures.Review();
-  await Fixtures.Review();
+test("lists reviews by site without mod", async ({ defaults, fixtures }) => {
+  await fixtures.Review();
+  await fixtures.Review();
 
-  const site = await Fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   expect(() =>
     caller.reviewList({
       site: site.type,

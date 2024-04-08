@@ -1,22 +1,21 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists tags", async () => {
-  const bottle = await Fixtures.Bottle();
-  const bottle2 = await Fixtures.Bottle({
+test("lists tags", async ({ fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const bottle2 = await fixtures.Bottle({
     brandId: bottle.brandId,
   });
-  await Fixtures.Tasting({
+  await fixtures.Tasting({
     bottleId: bottle.id,
     tags: ["solvent", "caramel"],
     rating: 5,
   });
-  await Fixtures.Tasting({
+  await fixtures.Tasting({
     bottleId: bottle.id,
     tags: ["cedar", "caramel"],
     rating: 5,
   });
-  await Fixtures.Tasting({
+  await fixtures.Tasting({
     bottleId: bottle2.id,
     tags: ["cedar", "caramel"],
     rating: 5,

@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists tastings", async () => {
-  await Fixtures.Tasting();
-  await Fixtures.Tasting();
+test("lists tastings", async ({ fixtures }) => {
+  await fixtures.Tasting();
+  await fixtures.Tasting();
 
   const caller = createCaller({ user: null });
   const { results } = await caller.tastingList();
@@ -11,10 +10,10 @@ test("lists tastings", async () => {
   expect(results.length).toBe(2);
 });
 
-test("lists tastings with bottle", async () => {
-  const bottle = await Fixtures.Bottle();
-  const tasting = await Fixtures.Tasting({ bottleId: bottle.id });
-  await Fixtures.Tasting();
+test("lists tastings with bottle", async ({ fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const tasting = await fixtures.Tasting({ bottleId: bottle.id });
+  await fixtures.Tasting();
 
   const caller = createCaller({ user: null });
   const { results } = await caller.tastingList({
@@ -25,24 +24,24 @@ test("lists tastings with bottle", async () => {
   expect(results[0].id).toEqual(tasting.id);
 });
 
-test("lists tastings with user", async () => {
-  const tasting = await Fixtures.Tasting({
-    createdById: DefaultFixtures.user.id,
+test("lists tastings with user", async ({ defaults, fixtures }) => {
+  const tasting = await fixtures.Tasting({
+    createdById: defaults.user.id,
   });
-  await Fixtures.Tasting();
+  await fixtures.Tasting();
 
   const caller = createCaller({ user: null });
   const { results } = await caller.tastingList({
-    user: DefaultFixtures.user.id,
+    user: defaults.user.id,
   });
 
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(tasting.id);
 });
 
-test("lists tastings filter friends unauthenticated", async () => {
-  await Fixtures.Tasting();
-  await Fixtures.Tasting();
+test("lists tastings filter friends unauthenticated", async ({ fixtures }) => {
+  await fixtures.Tasting();
+  await fixtures.Tasting();
 
   const caller = createCaller({ user: null });
   expect(() =>
@@ -52,19 +51,19 @@ test("lists tastings filter friends unauthenticated", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("lists tastings filter friends", async () => {
-  await Fixtures.Tasting();
-  await Fixtures.Tasting();
+test("lists tastings filter friends", async ({ defaults, fixtures }) => {
+  await fixtures.Tasting();
+  await fixtures.Tasting();
 
-  const otherUser = await Fixtures.User();
-  await Fixtures.Follow({
-    fromUserId: DefaultFixtures.user.id,
+  const otherUser = await fixtures.User();
+  await fixtures.Follow({
+    fromUserId: defaults.user.id,
     toUserId: otherUser.id,
     status: "following",
   });
-  const lastTasting = await Fixtures.Tasting({ createdById: otherUser.id });
+  const lastTasting = await fixtures.Tasting({ createdById: otherUser.id });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.tastingList({
     filter: "friends",
   });
@@ -73,32 +72,35 @@ test("lists tastings filter friends", async () => {
   expect(results[0].id).toEqual(lastTasting.id);
 });
 
-test("lists tastings hides private while authenticated", async () => {
-  const friend = await Fixtures.User({ private: true });
-  await Fixtures.Follow({
-    fromUserId: DefaultFixtures.user.id,
+test("lists tastings hides private while authenticated", async ({
+  defaults,
+  fixtures,
+}) => {
+  const friend = await fixtures.User({ private: true });
+  await fixtures.Follow({
+    fromUserId: defaults.user.id,
     toUserId: friend.id,
     status: "following",
   });
 
   // should hide tasting from non-friend
-  await Fixtures.Tasting({
-    createdById: (await Fixtures.User({ private: true })).id,
+  await fixtures.Tasting({
+    createdById: (await fixtures.User({ private: true })).id,
   });
   // should show tasting from friend
-  const tasting = await Fixtures.Tasting({ createdById: friend.id });
+  const tasting = await fixtures.Tasting({ createdById: friend.id });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const { results } = await caller.tastingList();
 
   expect(results.length).toBe(1);
   expect(results[0].id).toEqual(tasting.id);
 });
 
-test("lists tastings hides private while anonymous", async () => {
-  const tasting = await Fixtures.Tasting();
-  await Fixtures.Tasting({
-    createdById: (await Fixtures.User({ private: true })).id,
+test("lists tastings hides private while anonymous", async ({ fixtures }) => {
+  const tasting = await fixtures.Tasting();
+  await fixtures.Tasting({
+    createdById: (await fixtures.User({ private: true })).id,
   });
 
   const caller = createCaller({ user: null });

@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { eq } from "drizzle-orm";
 import { bottles, entities, tastings } from "../../db/schema";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires auth", async () => {
@@ -13,15 +12,18 @@ test("requires auth", async () => {
   );
 });
 
-test("creates a new tasting with minimal params", async () => {
-  const entity = await Fixtures.Entity({ type: ["brand", "distiller"] });
-  const bottle = await Fixtures.Bottle({
+test("creates a new tasting with minimal params", async ({
+  defaults,
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({ type: ["brand", "distiller"] });
+  const bottle = await fixtures.Bottle({
     brandId: entity.id,
     distillerIds: [entity.id],
   });
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingCreate({
     bottle: bottle.id,
@@ -36,7 +38,7 @@ test("creates a new tasting with minimal params", async () => {
     .where(eq(tastings.id, data.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
-  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
   expect(tasting.rating).toEqual(3.5);
   expect(tasting.notes).toBeNull();
 
@@ -53,11 +55,11 @@ test("creates a new tasting with minimal params", async () => {
   expect(newEntity.totalTastings).toBe(1);
 });
 
-test("creates a new tasting with tags", async () => {
-  const bottle = await Fixtures.Bottle();
+test("creates a new tasting with tags", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingCreate({
     bottle: bottle.id,
@@ -73,7 +75,7 @@ test("creates a new tasting with tags", async () => {
     .where(eq(tastings.id, data.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
-  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
   expect(tasting.tags).toEqual(["cherry", "peat"]);
 
   const tags = await db.query.bottleTags.findMany({
@@ -87,11 +89,11 @@ test("creates a new tasting with tags", async () => {
   expect(tags[1].count).toBe(1);
 });
 
-test("creates a new tasting with notes", async () => {
-  const bottle = await Fixtures.Bottle();
+test("creates a new tasting with notes", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingCreate({
     bottle: bottle.id,
@@ -109,11 +111,14 @@ test("creates a new tasting with notes", async () => {
   expect(tasting.notes).toEqual("hello world");
 });
 
-test("creates a new tasting with empty rating", async () => {
-  const bottle = await Fixtures.Bottle();
+test("creates a new tasting with empty rating", async ({
+  defaults,
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingCreate({
     bottle: bottle.id,
@@ -127,15 +132,18 @@ test("creates a new tasting with empty rating", async () => {
     .where(eq(tastings.id, data.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
-  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
   expect(tasting.rating).toBeNull();
 });
 
-test("creates a new tasting with empty friends", async () => {
-  const bottle = await Fixtures.Bottle();
+test("creates a new tasting with empty friends", async ({
+  defaults,
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingCreate({
     bottle: bottle.id,
@@ -150,15 +158,18 @@ test("creates a new tasting with empty friends", async () => {
     .where(eq(tastings.id, data.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
-  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
   expect(tasting.friends).toEqual([]);
 });
 
-test("creates a new tasting with zero rating", async () => {
-  const bottle = await Fixtures.Bottle();
+test("creates a new tasting with zero rating", async ({
+  defaults,
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingCreate({
     bottle: bottle.id,
@@ -173,16 +184,16 @@ test("creates a new tasting with zero rating", async () => {
     .where(eq(tastings.id, data.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
-  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
   expect(tasting.rating).toBeNull();
 });
 
-test("flight requires valid bottle", async () => {
-  const bottle = await Fixtures.Bottle();
-  const flight = await Fixtures.Flight();
+test("flight requires valid bottle", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const flight = await fixtures.Flight();
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
 
   expect(() =>
@@ -193,12 +204,12 @@ test("flight requires valid bottle", async () => {
   ).rejects.toThrowError(/Cannot identify flight/);
 });
 
-test("creates a new tasting with flight", async () => {
-  const bottle = await Fixtures.Bottle();
-  const flight = await Fixtures.Flight({ bottles: [bottle.id] });
+test("creates a new tasting with flight", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const flight = await fixtures.Flight({ bottles: [bottle.id] });
 
   const caller = createCaller({
-    user: DefaultFixtures.user,
+    user: defaults.user,
   });
   const data = await caller.tastingCreate({
     bottle: bottle.id,
@@ -213,6 +224,6 @@ test("creates a new tasting with flight", async () => {
     .where(eq(tastings.id, data.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
-  expect(tasting.createdById).toEqual(DefaultFixtures.user.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
   expect(tasting.flightId).toEqual(flight.id);
 });

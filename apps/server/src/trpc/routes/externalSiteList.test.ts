@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists sites", async () => {
-  await Fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await Fixtures.ExternalSite({ type: "healthyspirits" });
+test("lists sites", async ({ fixtures }) => {
+  await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  await fixtures.ExternalSite({ type: "healthyspirits" });
 
   const caller = createCaller({
     user: null,

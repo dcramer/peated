@@ -1,12 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { bottles } from "../../db/schema";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("deletes bottle", async () => {
-  const user = await Fixtures.User({ admin: true });
-  const bottle = await Fixtures.Bottle();
+test("deletes bottle", async ({ fixtures }) => {
+  const user = await fixtures.User({ admin: true });
+  const bottle = await fixtures.Bottle();
 
   const caller = createCaller({ user });
   const data = await caller.bottleDelete(bottle.id);
@@ -19,9 +18,9 @@ test("deletes bottle", async () => {
   expect(newBottle).toBeUndefined();
 });
 
-test("cannot delete without admin", async () => {
-  const user = await Fixtures.User({ mod: true });
-  const bottle = await Fixtures.Bottle({ createdById: user.id });
+test("cannot delete without admin", async ({ fixtures }) => {
+  const user = await fixtures.User({ mod: true });
+  const bottle = await fixtures.Bottle({ createdById: user.id });
 
   const caller = createCaller({ user });
   expect(() => caller.bottleDelete(bottle.id)).rejects.toThrowError(

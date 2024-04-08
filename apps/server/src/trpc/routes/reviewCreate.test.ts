@@ -1,12 +1,11 @@
 import { db } from "@peated/server/db";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("requires admin", async () => {
-  const site = await Fixtures.ExternalSite();
+test("requires admin", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
 
   expect(() =>
@@ -21,11 +20,11 @@ test("requires admin", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("new review with new bottle no entity", async () => {
-  const site = await Fixtures.ExternalSite();
+test("new review with new bottle no entity", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
 
   const data = await caller.reviewCreate({
@@ -48,12 +47,12 @@ test("new review with new bottle no entity", async () => {
   expect(review?.url).toEqual("https://example.com");
 });
 
-test("new review with new bottle matching entity", async () => {
-  const site = await Fixtures.ExternalSite();
-  const brand = await Fixtures.Entity();
+test("new review with new bottle matching entity", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
+  const brand = await fixtures.Entity();
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
 
   const data = await caller.reviewCreate({
@@ -85,12 +84,12 @@ test("new review with new bottle matching entity", async () => {
   expect(bottle?.brandId).toEqual(brand.id);
 });
 
-test("new review with existing bottle", async () => {
-  const site = await Fixtures.ExternalSite();
-  const bottle = await Fixtures.Bottle();
+test("new review with existing bottle", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
+  const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
 
   const data = await caller.reviewCreate({

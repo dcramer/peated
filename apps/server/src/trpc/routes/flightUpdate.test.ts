@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import { flightBottles, flights } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import { eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -14,10 +13,10 @@ test("requires authentication", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("requires mod", async () => {
-  const flight = await Fixtures.Flight();
+test("requires mod", async ({ defaults, fixtures }) => {
+  const flight = await fixtures.Flight();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   expect(() =>
     caller.flightUpdate({
       flight: flight.publicId,
@@ -25,11 +24,11 @@ test("requires mod", async () => {
   ).rejects.toThrowError(/Cannot update another user's flight./);
 });
 
-test("no changes", async () => {
-  const flight = await Fixtures.Flight();
+test("no changes", async ({ fixtures }) => {
+  const flight = await fixtures.Flight();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.flightUpdate({
     flight: flight.publicId,
@@ -45,11 +44,11 @@ test("no changes", async () => {
   expect(flight).toEqual(newFlight);
 });
 
-test("can change name", async () => {
-  const flight = await Fixtures.Flight();
+test("can change name", async ({ fixtures }) => {
+  const flight = await fixtures.Flight();
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.flightUpdate({
     flight: flight.publicId,
@@ -67,14 +66,14 @@ test("can change name", async () => {
   expect(newFlight.name).toBe("Delicious Wood");
 });
 
-test("can change bottles", async () => {
-  const bottle1 = await Fixtures.Bottle();
-  const bottle2 = await Fixtures.Bottle();
-  const bottle3 = await Fixtures.Bottle();
-  const flight = await Fixtures.Flight({ bottles: [bottle1.id, bottle2.id] });
+test("can change bottles", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle();
+  const bottle2 = await fixtures.Bottle();
+  const bottle3 = await fixtures.Bottle();
+  const flight = await fixtures.Flight({ bottles: [bottle1.id, bottle2.id] });
 
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   const data = await caller.flightUpdate({
     flight: flight.publicId,

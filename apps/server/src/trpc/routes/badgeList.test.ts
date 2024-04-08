@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists badges", async () => {
-  await Fixtures.Badge();
-  await Fixtures.Badge();
+test("lists badges", async ({ fixtures }) => {
+  await fixtures.Badge();
+  await fixtures.Badge();
 
   const caller = createCaller({
     user: null,

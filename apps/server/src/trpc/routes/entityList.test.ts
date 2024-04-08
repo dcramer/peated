@@ -1,9 +1,8 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("lists entities", async () => {
-  await Fixtures.Entity();
-  await Fixtures.Entity();
+test("lists entities", async ({ fixtures }) => {
+  await fixtures.Entity();
+  await fixtures.Entity();
 
   const caller = createCaller({ user: null });
   const { results } = await caller.entityList();

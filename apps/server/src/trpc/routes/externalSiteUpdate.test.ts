@@ -1,10 +1,9 @@
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
-test("requires admin", async () => {
-  const site = await Fixtures.ExternalSite();
+test("requires admin", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite();
   const caller = createCaller({
-    user: await Fixtures.User({ mod: true }),
+    user: await fixtures.User({ mod: true }),
   });
   expect(() =>
     caller.externalSiteUpdate({
@@ -13,13 +12,13 @@ test("requires admin", async () => {
   ).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("updates site", async () => {
-  const site = await Fixtures.ExternalSite({
+test("updates site", async ({ fixtures }) => {
+  const site = await fixtures.ExternalSite({
     type: "healthyspirits",
   });
 
   const caller = createCaller({
-    user: await Fixtures.User({ admin: true }),
+    user: await fixtures.User({ admin: true }),
   });
   const newSite = await caller.externalSiteUpdate({
     site: site.type,

@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { follows } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
-import * as Fixtures from "../../lib/test/fixtures";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -9,17 +8,17 @@ test("requires authentication", async () => {
   expect(() => caller.friendDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
 });
 
-test("cannot unfriend self", async () => {
-  const caller = createCaller({ user: DefaultFixtures.user });
-  expect(() =>
-    caller.friendDelete(DefaultFixtures.user.id),
-  ).rejects.toThrowError(/Cannot unfriend yourself/);
+test("cannot unfriend self", async ({ defaults }) => {
+  const caller = createCaller({ user: defaults.user });
+  expect(() => caller.friendDelete(defaults.user.id)).rejects.toThrowError(
+    /Cannot unfriend yourself/,
+  );
 });
 
-test("can unfriend new link", async () => {
-  const otherUser = await Fixtures.User();
+test("can unfriend new link", async ({ defaults, fixtures }) => {
+  const otherUser = await fixtures.User();
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.friendDelete(otherUser.id);
   expect(data.status).toBe("none");
 
@@ -28,22 +27,22 @@ test("can unfriend new link", async () => {
     .from(follows)
     .where(
       and(
-        eq(follows.fromUserId, DefaultFixtures.user.id),
+        eq(follows.fromUserId, defaults.user.id),
         eq(follows.toUserId, otherUser.id),
       ),
     );
   expect(follow).toBeUndefined();
 });
 
-test("can unfriend existing link", async () => {
-  const otherUser = await Fixtures.User();
+test("can unfriend existing link", async ({ defaults, fixtures }) => {
+  const otherUser = await fixtures.User();
 
-  await Fixtures.Follow({
-    fromUserId: DefaultFixtures.user.id,
+  await fixtures.Follow({
+    fromUserId: defaults.user.id,
     toUserId: otherUser.id,
   });
 
-  const caller = createCaller({ user: DefaultFixtures.user });
+  const caller = createCaller({ user: defaults.user });
   const data = await caller.friendDelete(otherUser.id);
   expect(data.status).toBe("none");
 
@@ -52,7 +51,7 @@ test("can unfriend existing link", async () => {
     .from(follows)
     .where(
       and(
-        eq(follows.fromUserId, DefaultFixtures.user.id),
+        eq(follows.fromUserId, defaults.user.id),
         eq(follows.toUserId, otherUser.id),
       ),
     );
