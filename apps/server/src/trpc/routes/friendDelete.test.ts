@@ -1,18 +1,19 @@
 import { db } from "@peated/server/db";
 import { follows } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { and, eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() => caller.friendDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
+  const err = await waitError(caller.friendDelete(1));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("cannot unfriend self", async ({ defaults }) => {
   const caller = createCaller({ user: defaults.user });
-  expect(() => caller.friendDelete(defaults.user.id)).rejects.toThrowError(
-    /Cannot unfriend yourself/,
-  );
+  const err = await waitError(caller.friendDelete(defaults.user.id));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("can unfriend new link", async ({ defaults, fixtures }) => {

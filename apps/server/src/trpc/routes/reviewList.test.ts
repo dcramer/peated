@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("lists reviews", async ({ fixtures }) => {
@@ -17,7 +18,8 @@ test("lists reviews without mod", async ({ defaults, fixtures }) => {
   await fixtures.Review();
 
   const caller = createCaller({ user: defaults.user });
-  expect(() => caller.reviewList()).rejects.toThrowError(/BAD_REQUEST/);
+  const err = await waitError(caller.reviewList());
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("lists reviews by site", async ({ fixtures }) => {
@@ -45,9 +47,10 @@ test("lists reviews by site without mod", async ({ defaults, fixtures }) => {
   const site = await fixtures.ExternalSite();
 
   const caller = createCaller({ user: defaults.user });
-  expect(() =>
+  const err = await waitError(
     caller.reviewList({
       site: site.type,
     }),
-  ).rejects.toThrowError(/BAD_REQUEST/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });

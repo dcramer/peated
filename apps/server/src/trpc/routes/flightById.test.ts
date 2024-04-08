@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("get flight by id", async ({ fixtures }) => {
@@ -10,5 +11,6 @@ test("get flight by id", async ({ fixtures }) => {
 
 test("errors on invalid flight", async () => {
   const caller = createCaller({ user: null });
-  expect(() => caller.flightById("123")).rejects.toThrowError(/NOT_FOUND/);
+  const err = await waitError(caller.flightById("123"));
+  expect(err).toMatchInlineSnapshot();
 });

@@ -1,13 +1,15 @@
 import { db } from "@peated/server/db";
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() =>
+  const err = await waitError(
     caller.tastingImageDelete({
       tasting: 1,
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("cannot delete another user's image", async ({ fixtures }) => {
@@ -16,11 +18,12 @@ test("cannot delete another user's image", async ({ fixtures }) => {
   const tasting = await fixtures.Tasting({ createdById: otherUser.id });
 
   const caller = createCaller({ user });
-  expect(() =>
+  const err = await waitError(
     caller.tastingImageDelete({
       tasting: tasting.id,
     }),
-  ).rejects.toThrowError(/Cannot delete another user's tasting image/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("deletes existing image", async ({ defaults, fixtures }) => {

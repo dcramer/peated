@@ -1,20 +1,19 @@
 import { db } from "@peated/server/db";
+import waitError from "@peated/server/lib/test/waitError";
 import { and, eq } from "drizzle-orm";
 import { follows, notifications } from "../../db/schema";
 import { createCaller } from "../router";
 
 test("requires authentication", async ({ defaults }) => {
   const caller = createCaller({ user: null });
-  expect(() => caller.friendCreate(defaults.user.id)).rejects.toThrowError(
-    /UNAUTHORIZED/,
-  );
+  const err = await waitError(caller.friendCreate(defaults.user.id));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("cannot friend self", async ({ defaults }) => {
   const caller = createCaller({ user: defaults.user });
-  expect(() => caller.friendCreate(defaults.user.id)).rejects.toThrowError(
-    /Cannot friend yourself/,
-  );
+  const err = await waitError(caller.friendCreate(defaults.user.id));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("can friend new link", async ({ defaults, fixtures }) => {

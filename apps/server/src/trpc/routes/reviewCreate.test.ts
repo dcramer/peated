@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("requires admin", async ({ fixtures }) => {
@@ -8,7 +9,7 @@ test("requires admin", async ({ fixtures }) => {
     user: await fixtures.User({ mod: true }),
   });
 
-  expect(() =>
+  const err = await waitError(
     caller.reviewCreate({
       site: site.type,
       name: "Bottle Name",
@@ -17,7 +18,8 @@ test("requires admin", async ({ fixtures }) => {
       url: "https://example.com",
       category: "single_malt",
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("new review with new bottle no entity", async ({ fixtures }) => {

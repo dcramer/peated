@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { entities } from "../../db/schema";
 import { createCaller } from "../router";

@@ -1,15 +1,17 @@
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() =>
+  const err = await waitError(
     caller.notificationUpdate({
       notification: 1,
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("mark own notification as read", async ({ defaults, fixtures }) => {
@@ -52,10 +54,11 @@ test("cannot update others notification", async ({ defaults, fixtures }) => {
     .returning();
 
   const caller = createCaller({ user: defaults.user });
-  expect(() =>
+  const err = await waitError(
     caller.notificationUpdate({
       notification: notification.id,
       read: true,
     }),
-  ).rejects.toThrowError(/Cannot edit another user's notification/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });

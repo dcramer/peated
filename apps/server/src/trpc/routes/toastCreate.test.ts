@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { tastings, toasts } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
@@ -7,7 +8,8 @@ test("requires auth", async () => {
   const caller = createCaller({
     user: null,
   });
-  expect(() => caller.toastCreate(1)).rejects.toThrowError(/UNAUTHORIZED/);
+  const err = await waitError(caller.toastCreate(1));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("cannot toast self", async ({ defaults, fixtures }) => {
@@ -18,9 +20,8 @@ test("cannot toast self", async ({ defaults, fixtures }) => {
   const caller = createCaller({
     user: defaults.user,
   });
-  expect(() => caller.toastCreate(tasting.id)).rejects.toThrowError(
-    /Cannot toast your own tasting/,
-  );
+  const err = await waitError(caller.toastCreate(tasting.id));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("new toast", async ({ defaults, fixtures }) => {

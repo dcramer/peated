@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { entities } from "../../db/schema";

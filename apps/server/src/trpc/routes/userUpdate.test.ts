@@ -1,15 +1,17 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() =>
+  const err = await waitError(
     caller.userUpdate({
       user: 1,
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("cannot update another user", async ({ fixtures }) => {
@@ -17,11 +19,12 @@ test("cannot update another user", async ({ fixtures }) => {
   const otherUser = await fixtures.User();
 
   const caller = createCaller({ user });
-  expect(() =>
+  const err = await waitError(
     caller.userUpdate({
       user: otherUser.id,
     }),
-  ).rejects.toThrowError(/Cannot edit another user/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("can change displayName", async ({ defaults, fixtures }) => {
@@ -96,22 +99,24 @@ test("cannot change mod as user", async ({ defaults }) => {
   const caller = createCaller({
     user: defaults.user,
   });
-  expect(() =>
+  const err = await waitError(
     caller.userUpdate({
       user: defaults.user.id,
       mod: true,
     }),
-  ).rejects.toThrowError(/FORBIDDEN/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("cannot change admin as user", async ({ defaults }) => {
   const caller = createCaller({
     user: defaults.user,
   });
-  expect(() =>
+  const err = await waitError(
     caller.userUpdate({
       user: defaults.user.id,
       admin: true,
     }),
-  ).rejects.toThrowError(/FORBIDDEN/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });

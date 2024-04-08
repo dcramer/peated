@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("lists entities", async ({ fixtures }) => {
@@ -33,5 +34,6 @@ test("lists users needs a query", async ({ defaults, fixtures }) => {
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() => caller.userList()).rejects.toThrowError(/UNAUTHORIZED/);
+  const err = await waitError(caller.userList());
+  expect(err).toMatchInlineSnapshot();
 });

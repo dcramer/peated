@@ -1,11 +1,13 @@
 import { db } from "@peated/server/db";
 import { bottleTags, tastings } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
-  expect(() => caller.tastingDelete(1)).rejects.toThrowError(/UNAUTHORIZED/);
+  const err = await waitError(caller.tastingDelete(1));
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("delete own tasting", async ({ defaults, fixtures }) => {
@@ -39,7 +41,6 @@ test("cannot delete others tasting", async ({ defaults, fixtures }) => {
   const tasting = await fixtures.Tasting({ createdById: user.id });
 
   const caller = createCaller({ user: defaults.user });
-  expect(() => caller.tastingDelete(tasting.id)).rejects.toThrowError(
-    /Cannot delete another user's tasting/,
-  );
+  const err = await waitError(caller.tastingDelete(tasting.id));
+  expect(err).toMatchInlineSnapshot();
 });

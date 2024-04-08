@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("lists tastings", async ({ fixtures }) => {
@@ -44,11 +45,12 @@ test("lists tastings filter friends unauthenticated", async ({ fixtures }) => {
   await fixtures.Tasting();
 
   const caller = createCaller({ user: null });
-  expect(() =>
+  const err = await waitError(
     caller.tastingList({
       filter: "friends",
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("lists tastings filter friends", async ({ defaults, fixtures }) => {

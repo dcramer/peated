@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("requires admin", async ({ fixtures }) => {
@@ -5,11 +6,12 @@ test("requires admin", async ({ fixtures }) => {
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),
   });
-  expect(() =>
+  const err = await waitError(
     caller.externalSiteUpdate({
       site: site.type,
     }),
-  ).rejects.toThrowError(/UNAUTHORIZED/);
+  );
+  expect(err).toMatchInlineSnapshot();
 });
 
 test("updates site", async ({ fixtures }) => {
