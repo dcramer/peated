@@ -7,6 +7,10 @@ reset-db:
 	$(MAKE) drop-db
 	$(MAKE) create-db
 
+reset-test-db:
+	$(MAKE) drop-db-test
+	$(MAKE) create-db-test
+
 drop-db: drop-db-dev drop-db-test
 
 drop-db-dev:

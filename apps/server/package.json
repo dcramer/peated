@@ -9,8 +9,8 @@
     "start:worker": "esno --require dotenv/config ./src/worker.ts",
     "typecheck": "tsc --noEmit",
     "test": "pnpm test:watch",
-    "test:watch": "dotenv -e .env.test -- vitest watch --bail=1",
-    "test:ci": "dotenv -e .env.test -- vitest --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
+    "test:watch": "dotenv -e .env.test -- vitest watch --bail=1 --pool=forks",
+    "test:ci": "dotenv -e .env.test -- vitest --pool=forks --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
@@ -43,7 +43,7 @@
     "dotenv": "^16.4.5",
     "dotenv-cli": "^7.4.1",
     "drizzle-kit": "^0.20.14",
-    "drizzle-orm": "^0.30.6",
+    "drizzle-orm": "^0.30.7",
     "esbuild": "^0.19.12",
     "esbuild-node-tsc": "^2.0.5",
     "esno": "^4.7.0",
@@ -59,8 +59,8 @@
     "nanoid": "^3.3.7",
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
-    "openai": "^4.30.0",
-    "pg": "^8.11.3",
+    "openai": "^4.33.0",
+    "pg": "^8.11.5",
     "pino-pretty": "^10.3.1",
     "regenerator-runtime": "^0.14.1",
     "sharp": "^0.32.6",
