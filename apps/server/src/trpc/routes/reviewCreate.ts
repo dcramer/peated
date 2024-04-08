@@ -11,7 +11,7 @@ import { ReviewSerializer } from "@peated/server/serializers/review";
 import { TRPCError } from "@trpc/server";
 import { eq, isNull, sql } from "drizzle-orm";
 import { adminProcedure } from "..";
-import { createCaller } from "../router";
+import { bottleCreate } from "./bottleCreate";
 
 export default adminProcedure
   .input(ReviewInputSchema)
@@ -31,11 +31,13 @@ export default adminProcedure
     if (!bottleId) {
       const entity = await findEntity(input.name);
       if (entity) {
-        const caller = createCaller(ctx);
-        const result = await caller.bottleCreate({
-          name: input.name,
-          brand: entity.id,
-          category: input.category,
+        const result = await bottleCreate({
+          input: {
+            name: input.name,
+            brand: entity.id,
+            category: input.category,
+          },
+          ctx,
         });
         bottleId = result.id;
       }
