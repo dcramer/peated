@@ -21,6 +21,16 @@ test("requires auth", async () => {
 test("delete bottle in default", async ({ fixtures, defaults }) => {
   const bottle = await fixtures.Bottle();
 
+  const collection = await fixtures.Collection({
+    name: "default",
+    createdById: defaults.user.id,
+  });
+
+  await db.insert(collectionBottles).values({
+    bottleId: bottle.id,
+    collectionId: collection.id,
+  });
+
   const caller = createCaller({
     user: defaults.user,
   });
@@ -35,5 +45,5 @@ test("delete bottle in default", async ({ fixtures, defaults }) => {
     .from(collectionBottles)
     .where(eq(collectionBottles.bottleId, bottle.id));
 
-  expect(bottleList.length).toBe(1);
+  expect(bottleList.length).toBe(0);
 });
