@@ -12,5 +12,5 @@ test("get tasting by id", async ({ fixtures }) => {
 test("errors on invalid tasting", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.tastingById(1));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
 });

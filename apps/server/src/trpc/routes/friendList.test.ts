@@ -17,5 +17,5 @@ test("lists friends", async ({ defaults, fixtures }) => {
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.friendList());
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });

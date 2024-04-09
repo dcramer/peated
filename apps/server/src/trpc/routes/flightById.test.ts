@@ -12,5 +12,5 @@ test("get flight by id", async ({ fixtures }) => {
 test("errors on invalid flight", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.flightById("123"));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
 });

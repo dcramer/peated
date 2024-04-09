@@ -25,5 +25,5 @@ test("cannot delete without admin", async ({ fixtures }) => {
 
   const caller = createCaller({ user });
   const err = await waitError(caller.entityDelete(entity.id));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });

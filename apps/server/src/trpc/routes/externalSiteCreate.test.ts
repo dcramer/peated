@@ -11,7 +11,7 @@ test("requires admin", async ({ fixtures }) => {
       type: "whiskyadvocate",
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("triggers job", async ({ fixtures }) => {
