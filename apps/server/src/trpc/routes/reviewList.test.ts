@@ -19,7 +19,7 @@ test("lists reviews without mod", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(caller.reviewList());
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: BAD_REQUEST]`);
 });
 
 test("lists reviews by site", async ({ fixtures }) => {
@@ -52,5 +52,5 @@ test("lists reviews by site without mod", async ({ defaults, fixtures }) => {
       site: site.type,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: BAD_REQUEST]`);
 });

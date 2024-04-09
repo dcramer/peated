@@ -16,7 +16,7 @@ test("requires admin", async ({ fixtures }) => {
       value: "test",
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("set new value", async ({ fixtures }) => {

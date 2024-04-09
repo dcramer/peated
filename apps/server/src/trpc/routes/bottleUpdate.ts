@@ -59,7 +59,6 @@ export default modProcedure
       bottleData.name = normName;
     }
 
-    console.log(normStatedAge, input.statedAge);
     if (normStatedAge !== undefined && normStatedAge !== bottle.statedAge) {
       bottleData.statedAge = normStatedAge;
     }

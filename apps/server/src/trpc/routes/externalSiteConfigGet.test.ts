@@ -14,7 +14,7 @@ test("requires admin", async ({ fixtures }) => {
       key: "test",
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("get missing value", async ({ fixtures }) => {

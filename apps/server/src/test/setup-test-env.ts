@@ -1,11 +1,12 @@
 // make sure to import this _before_ all other code
 import "../sentry";
 
+import axios from "axios";
+import MockAdapter from "axios-mock-adapter";
 import { and, eq, sql } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { Client } from "pg";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
-import mockAxios from "vitest-mock-axios";
 import { db, pool } from "../db";
 import { migrate } from "../db/migrate";
 import "../lib/test/expects";
@@ -15,7 +16,10 @@ import "error-cause/auto";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
-vi.mock("axios");
+const axiosMock = new MockAdapter(axios);
+
+// vi.mock("axios");
+
 // TODO: no fucking clue how to just use my mock module anymore and docs
 // are almost non-existant
 vi.mock("../jobs/client", async (importOriginal) => {
@@ -143,6 +147,8 @@ beforeEach(async (ctx) => {
 
   const user = await createDefaultUser();
 
+  ctx.axiosMock = axiosMock;
+
   ctx.defaults = {
     user,
     authHeaders: await fixtures.AuthenticatedHeaders({ user }),
@@ -156,7 +162,7 @@ beforeEach(async (ctx) => {
 });
 
 afterEach(() => {
-  mockAxios.reset();
+  axiosMock.reset();
 });
 
 afterAll(async () => {

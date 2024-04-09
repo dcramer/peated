@@ -38,5 +38,5 @@ test("get user w/ friendStatus", async ({ defaults, fixtures }) => {
 test("errors on invalid username", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.userById("notauser"));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
 });

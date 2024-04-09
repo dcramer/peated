@@ -11,7 +11,7 @@ test("requires authentication", async () => {
       user: 1,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("cannot update another user", async ({ fixtures }) => {
@@ -24,7 +24,7 @@ test("cannot update another user", async ({ fixtures }) => {
       user: otherUser.id,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot edit another user.]`);
 });
 
 test("can change displayName", async ({ defaults, fixtures }) => {
@@ -105,7 +105,7 @@ test("cannot change mod as user", async ({ defaults }) => {
       mod: true,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: FORBIDDEN]`);
 });
 
 test("cannot change admin as user", async ({ defaults }) => {
@@ -118,5 +118,5 @@ test("cannot change admin as user", async ({ defaults }) => {
       admin: true,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: FORBIDDEN]`);
 });

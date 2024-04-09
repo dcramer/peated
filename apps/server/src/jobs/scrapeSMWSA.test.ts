@@ -1,18 +1,17 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
-import mockAxios from "vitest-mock-axios";
 import { scrapeBottles } from "./scrapeSMWSA";
 
-test("bottle list", async () => {
+test("bottle list", async ({ axiosMock }) => {
   const url = "https://newmake.smwsa.com/collections/all-products";
   const result = await loadFixture("smwsa", "bottle-list.html");
+
+  axiosMock.onGet(url).reply(200, result);
 
   const items: any[] = [];
 
   const fn = scrapeBottles(url, async (item) => {
     items.push(item);
   });
-
-  mockAxios.mockResponseFor({ url }, { data: result });
 
   await fn;
 

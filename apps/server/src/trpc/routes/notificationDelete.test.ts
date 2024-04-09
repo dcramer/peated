@@ -7,13 +7,13 @@ import { createCaller } from "../router";
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.notificationDelete(1));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("invalid notification", async ({ defaults }) => {
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(caller.notificationDelete(1));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Notification not found.]`);
 });
 
 test("delete own notification", async ({ defaults, fixtures }) => {
@@ -52,5 +52,7 @@ test("cannot delete others notification", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(caller.notificationDelete(notification.id));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Cannot delete another user's notification.]`,
+  );
 });

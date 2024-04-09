@@ -21,7 +21,7 @@ test("cannot list private without friend", async ({ defaults, fixtures }) => {
       collection: "default",
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: User's profile is private.]`);
 });
 
 test("can list private with friend", async ({ defaults, fixtures }) => {

@@ -37,6 +37,7 @@
     "@types/pg": "^8.11.4",
     "@vitest/coverage-v8": "^1.4.0",
     "axios": "^1.6.8",
+    "axios-mock-adapter": "^1.22.0",
     "bcrypt": "^5.1.1",
     "cheerio": "1.0.0-rc.12",
     "commander": "^12.0.0",
@@ -66,7 +67,6 @@
     "typescript": "~5.4.4",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.4.0",
-    "vitest-mock-axios": "^0.1.0",
     "zod": "^3.22.4",
     "zod-to-json-schema": "^3.22.5"
   },

@@ -7,13 +7,13 @@ import { createCaller } from "../router";
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.friendDelete(1));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("cannot unfriend self", async ({ defaults }) => {
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(caller.friendDelete(defaults.user.id));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot unfriend yourself.]`);
 });
 
 test("can unfriend new link", async ({ defaults, fixtures }) => {

@@ -11,7 +11,7 @@ test("requires authentication", async () => {
       name: "Delicious Wood",
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("creates a new entity", async ({ defaults }) => {

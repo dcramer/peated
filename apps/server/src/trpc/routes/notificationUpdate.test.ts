@@ -11,7 +11,7 @@ test("requires authentication", async () => {
       notification: 1,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("mark own notification as read", async ({ defaults, fixtures }) => {
@@ -60,5 +60,7 @@ test("cannot update others notification", async ({ defaults, fixtures }) => {
       read: true,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Cannot edit another user's notification.]`,
+  );
 });

@@ -1,21 +1,18 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
-import mockAxios from "vitest-mock-axios";
 import { scrapeProducts } from "./scrapeTotalWine";
 
-test("simple", async () => {
+test("simple", async ({ axiosMock }) => {
   const url =
     "https://www.totalwine.com/spirits/scotch/single-malt/c/000887?viewall=true&pageSize=120&aty=0,0,0,0";
   const result = await loadFixture("totalwine", "bottle-list.html");
+
+  axiosMock.onGet(url).reply(200, result);
 
   const items: any[] = [];
 
   const fn = scrapeProducts(url, async (item) => {
     items.push(item);
   });
-
-  expect(mockAxios.get).toHaveBeenCalledOnce();
-
-  mockAxios.mockResponseFor({ url }, { data: result });
 
   await fn;
 

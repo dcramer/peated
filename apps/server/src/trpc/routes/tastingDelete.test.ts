@@ -7,7 +7,7 @@ import { createCaller } from "../router";
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.tastingDelete(1));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("delete own tasting", async ({ defaults, fixtures }) => {
@@ -42,5 +42,7 @@ test("cannot delete others tasting", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(caller.tastingDelete(tasting.id));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Cannot delete another user's tasting.]`,
+  );
 });
