@@ -8,7 +8,7 @@ test("requires admin", async ({ fixtures }) => {
     user: await fixtures.User({ mod: true }),
   });
   const err = await waitError(caller.externalSiteTriggerJob(site.type));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("triggers job", async ({ fixtures }) => {

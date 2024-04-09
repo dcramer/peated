@@ -11,7 +11,7 @@ test("requires admin", async ({ fixtures }) => {
       site: site.type,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("updates site", async ({ fixtures }) => {

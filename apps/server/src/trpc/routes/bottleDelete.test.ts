@@ -25,5 +25,5 @@ test("cannot delete without admin", async ({ fixtures }) => {
 
   const caller = createCaller({ user });
   const err = await waitError(caller.bottleDelete(bottle.id));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
