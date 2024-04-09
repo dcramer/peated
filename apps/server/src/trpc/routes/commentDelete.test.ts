@@ -7,7 +7,7 @@ import { createCaller } from "../router";
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.commentDelete(1));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("delete own", async ({ defaults, fixtures }) => {
@@ -33,5 +33,7 @@ test("cannot delete others", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(caller.commentDelete(comment.id));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Cannot delete another user's comment.]`,
+  );
 });

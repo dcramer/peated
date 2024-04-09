@@ -9,7 +9,7 @@ test("requires auth", async () => {
     user: null,
   });
   const err = await waitError(caller.toastCreate(1));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("cannot toast self", async ({ defaults, fixtures }) => {
@@ -21,7 +21,9 @@ test("cannot toast self", async ({ defaults, fixtures }) => {
     user: defaults.user,
   });
   const err = await waitError(caller.toastCreate(tasting.id));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Cannot toast your own tasting.]`,
+  );
 });
 
 test("new toast", async ({ defaults, fixtures }) => {

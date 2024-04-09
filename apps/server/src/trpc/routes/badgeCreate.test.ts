@@ -13,7 +13,7 @@ test("requires admin", async ({ defaults }) => {
       config: { category: ["single_malt"] },
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("validates config for category", async ({ fixtures }) => {
@@ -28,7 +28,9 @@ test("validates config for category", async ({ fixtures }) => {
       config: { bottle: [1] },
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Failed to validate badge config.]`,
+  );
 });
 
 test("creates badge", async ({ fixtures }) => {

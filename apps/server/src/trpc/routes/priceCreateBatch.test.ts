@@ -11,7 +11,7 @@ test("requires admin", async ({ fixtures }) => {
   const err = await waitError(
     caller.priceCreateBatch({ site: "healthyspirits", prices: [] }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("processes new price", async ({ fixtures }) => {

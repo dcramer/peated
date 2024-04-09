@@ -15,7 +15,7 @@ test("requires auth", async () => {
       createdAt: new Date().toISOString(),
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("new comment", async ({ fixtures, defaults }) => {

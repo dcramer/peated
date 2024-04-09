@@ -9,7 +9,7 @@ test("requires auth", async () => {
     user: null,
   });
   const err = await waitError(caller.tastingCreate({ bottle: 1 }));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("creates a new tasting with minimal params", async ({
@@ -202,7 +202,7 @@ test("flight requires valid bottle", async ({ defaults, fixtures }) => {
       flight: flight.publicId,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify flight.]`);
 });
 
 test("creates a new tasting with flight", async ({ defaults, fixtures }) => {

@@ -1,20 +1,17 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
-import mockAxios from "vitest-mock-axios";
 import { scrapeProducts } from "./scrapeWoodenCork";
 
-test("simple", async () => {
+test("simple", async ({ axiosMock }) => {
   const url = "https://woodencork.com/collections/whiskey?cursor=2";
   const result = await loadFixture("woodencork", "bottle-list.html");
+
+  axiosMock.onGet(url).reply(200, result);
 
   const items: any[] = [];
 
   const fn = scrapeProducts(url, async (item) => {
     items.push(item);
   });
-
-  expect(mockAxios.get).toHaveBeenCalledOnce();
-
-  mockAxios.mockResponseFor({ url }, { data: result });
 
   await fn;
 

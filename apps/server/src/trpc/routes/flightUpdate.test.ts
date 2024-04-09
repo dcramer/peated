@@ -12,7 +12,7 @@ test("requires authentication", async () => {
       flight: "1",
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("requires mod", async ({ defaults, fixtures }) => {
@@ -24,7 +24,9 @@ test("requires mod", async ({ defaults, fixtures }) => {
       flight: flight.publicId,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Cannot update another user's flight.]`,
+  );
 });
 
 test("no changes", async ({ fixtures }) => {

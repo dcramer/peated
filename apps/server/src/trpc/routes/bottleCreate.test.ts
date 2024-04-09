@@ -112,7 +112,7 @@ test("does not create a new bottle with invalid brandId", async ({
     }),
   );
 
-  expect(err).toMatchInlineSnapshot("foo");
+  expect(err).toMatchInlineSnapshot("[TRPCError: Could not identify brand.]");
 });
 
 // test("creates a new bottle with existing brand name", async () => {
@@ -209,7 +209,9 @@ test("does not create a new bottle with invalid distillerId", async ({
       distillers: [500000],
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Could not identify distiller.]`,
+  );
 });
 
 // test("creates a new bottle with existing distiller name", async () => {

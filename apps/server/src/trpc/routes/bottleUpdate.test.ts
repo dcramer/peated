@@ -12,7 +12,7 @@ test("requires authentication", async () => {
       bottle: 1,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("requires mod", async ({ defaults }) => {
@@ -22,7 +22,7 @@ test("requires mod", async ({ defaults }) => {
       bottle: 1,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("no changes", async ({ fixtures }) => {
@@ -121,7 +121,7 @@ test("manipulates name to conform with age", async ({ fixtures }) => {
 
 test("fills in statedAge", async ({ fixtures }) => {
   const brand = await fixtures.Entity();
-  const bottle = await fixtures.Bottle({ brandId: brand.id });
+  const bottle = await fixtures.Bottle({ brandId: brand.id, statedAge: null });
 
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),

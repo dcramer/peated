@@ -9,7 +9,7 @@ test("requires authentication", async () => {
       tasting: 1,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("cannot delete another user's image", async ({ fixtures }) => {
@@ -23,7 +23,9 @@ test("cannot delete another user's image", async ({ fixtures }) => {
       tasting: tasting.id,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Cannot delete another user's tasting image.]`,
+  );
 });
 
 test("deletes existing image", async ({ defaults, fixtures }) => {

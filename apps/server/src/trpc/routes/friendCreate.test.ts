@@ -7,13 +7,13 @@ import { createCaller } from "../router";
 test("requires authentication", async ({ defaults }) => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.friendCreate(defaults.user.id));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("cannot friend self", async ({ defaults }) => {
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(caller.friendCreate(defaults.user.id));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot friend yourself.]`);
 });
 
 test("can friend new link", async ({ defaults, fixtures }) => {

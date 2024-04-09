@@ -12,7 +12,7 @@ test("requires authentication", async () => {
       other: 2,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("requires mod", async ({ defaults }) => {
@@ -23,7 +23,7 @@ test("requires mod", async ({ defaults }) => {
       other: 2,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("merge A into B", async ({ fixtures }) => {

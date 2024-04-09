@@ -1,20 +1,19 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
-import mockAxios from "vitest-mock-axios";
 import { scrapeBottles } from "./scrapeSMWS";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
-test("bottle list", async () => {
+test("bottle list", async ({ axiosMock }) => {
   const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
   const result = await loadFixture("smws", "bottle-list.json");
+
+  axiosMock.onGet(url).reply(200, result);
 
   const items: any[] = [];
 
   const fn = scrapeBottles(url, async (item) => {
     items.push(item);
   });
-
-  mockAxios.mockResponseFor({ url }, { data: result });
 
   await fn;
 

@@ -1,4 +1,5 @@
 import type { OAuth2Namespace } from "@fastify/oauth2";
+import type MockAdapter from "axios-mock-adapter";
 import "fastify";
 import "vitest";
 import type { User } from "./db/schema";
@@ -33,6 +34,8 @@ declare module "vitest" {
   interface AsymmetricMatchersContaining extends CustomMatchers {}
 
   export interface TestContext {
+    axiosMock: ReturnValue<typeof MockAdapter>;
+
     defaults: {
       user: User;
       authHeaders: {

@@ -10,7 +10,7 @@ test("requires auth", async () => {
     user: null,
   });
   const err = await waitError(caller.tastingUpdate({ tasting: 1 }));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("cannot update another users tasting", async ({ defaults, fixtures }) => {
@@ -19,7 +19,7 @@ test("cannot update another users tasting", async ({ defaults, fixtures }) => {
   });
   const tasting = await fixtures.Tasting();
   const err = await waitError(caller.tastingUpdate({ tasting: tasting.id }));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Tasting not found.]`);
 });
 
 test("no changes", async ({ defaults, fixtures }) => {

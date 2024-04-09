@@ -50,7 +50,7 @@ test("lists tastings filter friends unauthenticated", async ({ fixtures }) => {
       filter: "friends",
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("lists tastings filter friends", async ({ defaults, fixtures }) => {

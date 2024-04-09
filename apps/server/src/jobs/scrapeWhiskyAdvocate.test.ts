@@ -1,19 +1,18 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
-import mockAxios from "vitest-mock-axios";
 import { scrapeIssueList, scrapeReviews } from "./scrapeWhiskyAdvocate";
 
-test("review list", async () => {
+test("review list", async ({ axiosMock }) => {
   const url =
     "https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=Winter+2023&order_by=published_desc";
   const result = await loadFixture("whiskyadvocate", "bottle-list.html");
+
+  axiosMock.onGet(url).reply(200, result);
 
   const items: any[] = [];
 
   const fn = scrapeReviews(url, async (item) => {
     items.push(item);
   });
-
-  mockAxios.mockResponseFor({ url }, { data: result });
 
   await fn;
 
@@ -27,13 +26,13 @@ test("review list", async () => {
   });
 });
 
-test("issue list", async () => {
+test("issue list", async ({ axiosMock }) => {
   const url = "https://whiskyadvocate.com/ratings-reviews";
   const result = await loadFixture("whiskyadvocate", "empty-search.html");
 
-  const fn = scrapeIssueList(url);
+  axiosMock.onGet(url).reply(200, result);
 
-  mockAxios.mockResponseFor({ url }, { data: result });
+  const fn = scrapeIssueList(url);
 
   const items = await fn;
 

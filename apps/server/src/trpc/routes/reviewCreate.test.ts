@@ -19,7 +19,7 @@ test("requires admin", async ({ fixtures }) => {
       category: "single_malt",
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("new review with new bottle no entity", async ({ fixtures }) => {
