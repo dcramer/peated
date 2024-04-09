@@ -35,5 +35,5 @@ test("lists users needs a query", async ({ defaults, fixtures }) => {
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.userList());
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });

@@ -14,7 +14,7 @@ test("get entity by id", async ({ fixtures }) => {
 test("errors on invalid entity", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.entityById(1));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
 });
 
 test("gets entity with tombstone", async ({ fixtures }) => {

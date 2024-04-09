@@ -15,7 +15,7 @@ test("gets bottle", async ({ fixtures }) => {
 test("errors on invalid bottle", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(caller.bottleById(1));
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Bottle not found.]`);
 });
 
 test("gets bottle with tombstone", async ({ fixtures }) => {
