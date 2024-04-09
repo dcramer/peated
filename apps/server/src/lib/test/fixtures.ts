@@ -35,6 +35,7 @@ import {
   bottles,
   bottlesToDistillers,
   changes,
+  collections,
   comments,
   entities,
   externalSites,
@@ -517,6 +518,21 @@ export const Review = async (
       })
       .returning();
   });
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
+};
+
+export const Collection = async (
+  { ...data }: Partial<Omit<dbSchema.NewCollection, "id">> = {},
+  db: DatabaseType = dbConn,
+): Promise<dbSchema.Collection> => {
+  const [result] = await db
+    .insert(collections)
+    .values({
+      name: faker.company.name(),
+      ...(data as Omit<dbSchema.NewCollection, "name">),
+    })
+    .returning();
   if (!result) throw new Error("Unable to create fixture");
   return result;
 };
