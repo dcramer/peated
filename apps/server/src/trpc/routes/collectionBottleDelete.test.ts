@@ -15,7 +15,7 @@ test("requires auth", async () => {
       bottle: 1,
     }),
   );
-  expect(err).toMatchInlineSnapshot();
+  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
 });
 
 test("delete bottle in default", async ({ fixtures, defaults }) => {
