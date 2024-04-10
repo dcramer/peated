@@ -1,9 +1,11 @@
 import { Link } from "@remix-run/react";
 import type { ComponentPropsWithoutRef } from "react";
+import FlavorProfile from "./flavorProfile";
 import Tooltip from "./tooltip";
 
 type Props = {
   data: {
+    flavorProfile: string | undefined | null;
     brand: {
       id: string | number | undefined | null;
       name: string;
@@ -19,15 +21,7 @@ export default ({ data, ...props }: Props) => {
   return (
     <div {...props}>
       <div className="inline-flex flex-col items-center space-x-1 truncate sm:flex-row sm:items-start">
-        {data.brand.id !== data.distillers[0]?.id ? (
-          <>
-            <Brand data={data} />
-            {!!data.distillers?.length && (
-              <span className="hidden sm:inline-block">&middot;</span>
-            )}
-          </>
-        ) : null}
-        <Distillers data={data} />
+        {!!data.flavorProfile && <FlavorProfile profile={data.flavorProfile} />}
       </div>
     </div>
   );

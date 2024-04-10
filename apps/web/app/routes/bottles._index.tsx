@@ -1,5 +1,8 @@
-import { CATEGORY_LIST } from "@peated/server/constants";
-import { formatCategoryName } from "@peated/server/lib/format";
+import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
+import {
+  formatCategoryName,
+  formatFlavorProfile,
+} from "@peated/server/lib/format";
 import BottleTable from "@peated/web/components/bottleTable";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
@@ -139,6 +142,42 @@ function FilterSidebar() {
                 size="small"
               >
                 {formatCategoryName(category)}
+              </SidebarLink>
+            ))}
+          </ul>
+        </li>
+        <li>
+          <div className="text-sm font-semibold text-slate-200">
+            Flavor Profile
+          </div>
+          <ul role="list" className="-mx-3 mt-2 space-y-1">
+            <SidebarLink
+              active={!qs.get("flavorProfile")}
+              to={{
+                pathname: location.pathname,
+                search: buildQueryString(location.search, {
+                  flavorProfile: "",
+                  cursor: null,
+                }),
+              }}
+              size="small"
+            >
+              Any Flavor Profile
+            </SidebarLink>
+            {FLAVOR_PROFILES.map((flavorProfile) => (
+              <SidebarLink
+                key={flavorProfile}
+                active={qs.get("flavorProfile") === flavorProfile}
+                to={{
+                  pathname: location.pathname,
+                  search: buildQueryString(location.search, {
+                    flavorProfile,
+                    cursor: null,
+                  }),
+                }}
+                size="small"
+              >
+                {formatFlavorProfile(flavorProfile)}
               </SidebarLink>
             ))}
           </ul>

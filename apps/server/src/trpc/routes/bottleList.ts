@@ -1,4 +1,4 @@
-import { CATEGORY_LIST } from "@peated/server/constants";
+import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Flight } from "@peated/server/db/schema";
 import {
@@ -39,6 +39,7 @@ export default publicProcedure
         bottler: z.number().nullish(),
         entity: z.number().nullish(),
         tag: z.string().nullish(),
+        flavorProfile: z.enum(FLAVOR_PROFILES).nullish(),
         flight: z.string().nullish(),
         category: z.enum(CATEGORY_LIST).nullish(),
         age: z.number().nullish(),
@@ -107,6 +108,9 @@ export default publicProcedure
     }
     if (input.category) {
       where.push(eq(bottles.category, input.category));
+    }
+    if (input.flavorProfile) {
+      where.push(eq(bottles.flavorProfile, input.flavorProfile));
     }
     if (input.age) {
       where.push(eq(bottles.statedAge, input.age));

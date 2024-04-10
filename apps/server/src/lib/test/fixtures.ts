@@ -425,7 +425,8 @@ export const StorePrice = async (
     }
 
     if (!data.price)
-      data.price = parseInt(faker.finance.amount(50, 200, 0), 10) * 100;
+      data.price =
+        parseInt(faker.finance.amount({ min: 50, max: 200, dec: 0 }), 10) * 100;
     if (!data.url) data.url = faker.internet.url();
 
     const [price] = await tx
@@ -478,7 +479,9 @@ export const StorePriceHistory = async (
     return await tx
       .insert(storePriceHistories)
       .values({
-        price: parseInt(faker.finance.amount(50, 200, 0), 10) * 100,
+        price:
+          parseInt(faker.finance.amount({ min: 50, max: 200, dec: 0 }), 10) *
+          100,
         volume: 750,
         ...data,
         priceId: data.priceId || (await StorePrice({}, tx)).id,

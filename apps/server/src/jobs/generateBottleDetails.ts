@@ -3,14 +3,16 @@ import {
   CATEGORY_LIST,
   DEFAULT_CREATED_BY_ID,
   DEFAULT_TAGS,
+  FLAVOR_PROFILES,
 } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { bottles, changes } from "@peated/server/db/schema";
 import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
+import { notesForProfile } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
-import { CategoryEnum } from "@peated/server/schemas";
+import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -26,7 +28,9 @@ function generatePrompt(bottle: Bottle) {
   if (bottle.statedAge) {
     infoLines.push(`Stated Age: ${bottle.statedAge}`);
   }
-
+  if (bottle.flavorProfile) {
+    infoLines.push(`Flavor Profile: ${bottle.flavorProfile}`);
+  }
   return `
 Describe the following bottle of whisky:
 
@@ -45,6 +49,10 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 
 'tastingNotes' should be concise, and focus on the smell and taste. If you cannot fill in all three of 'nose', 'palate', and 'finish', you should not fill in any of them.
 
+'flavorProfile' should be one of the following:
+
+- ${FLAVOR_PROFILES.map((f) => `**${f}**: ${notesForProfile(f)}`).join("\n- ")}
+
 'category' should be one of the following:
 
 - ${CATEGORY_LIST.join("\n- ")}
@@ -59,22 +67,23 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 const DefaultTagEnum = z.enum(DEFAULT_TAGS);
 
 const OpenAIBottleDetailsSchema = z.object({
-  description: z.string().nullable().optional(),
+  description: z.string().nullish(),
   tastingNotes: z
     .object({
       nose: z.string(),
       palate: z.string(),
       finish: z.string(),
     })
-    .nullable()
-    .optional(),
-  category: z.string().nullable().optional(),
+    .nullish(),
+  category: z.string().nullish(),
   suggestedTags: z.array(z.string()).optional(),
+  flavorProfile: z.string().nullish(),
 });
 
 // we dont send enums to openai as they dont get used
 const OpenAIBottleDetailsValidationSchema = OpenAIBottleDetailsSchema.extend({
-  category: CategoryEnum.nullable().optional(),
+  category: CategoryEnum.nullish(),
+  flavorProfile: FlavorProfileEnum.nullish(),
   // TODO: ChatGPT is ignoring this shit, so lets validate later and throw away if invalid
   // suggestedTags: z.array(DefaultTagEnum).optional(),
 });
@@ -148,8 +157,19 @@ export default async function ({ bottleId }: { bottleId: number }) {
     }
   }
 
-  if (result.category && result.category !== bottle.category)
+  if (
+    !bottle.category &&
+    result.category &&
+    result.category !== bottle.category
+  )
     data.category = result.category;
+
+  if (
+    !bottle.flavorProfile &&
+    result.flavorProfile &&
+    result.flavorProfile !== bottle.flavorProfile
+  )
+    data.flavorProfile = result.flavorProfile;
 
   if (Object.keys(data).length === 0) return;
 

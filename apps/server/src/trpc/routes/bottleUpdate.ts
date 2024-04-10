@@ -67,6 +67,13 @@ export default modProcedure
       bottleData.category = input.category;
     }
 
+    if (
+      input.flavorProfile !== undefined &&
+      input.flavorProfile !== bottle.flavorProfile
+    ) {
+      bottleData.flavorProfile = input.flavorProfile;
+    }
+
     const user = ctx.user;
     const newBottle = await db.transaction(async (tx) => {
       let brand: Entity | null = null;
