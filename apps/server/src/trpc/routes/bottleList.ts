@@ -67,7 +67,7 @@ export default publicProcedure
           ilike(bottles.fullName, likeQuery),
           ilike(bottles.fullName, otherLikeQuery),
           sql`EXISTS(
-            SELECT 1
+            SELECT
             FROM ${entities} e
             JOIN ${bottlesToDistillers} b
             ON e.id = b.distiller_id AND b.bottle_id = ${bottles.id}
@@ -75,7 +75,7 @@ export default publicProcedure
           )`,
           // lol welcome to search
           sql`EXISTS(
-            SELECT 1
+            SELECT
             FROM ${entities} e
             WHERE e.id = ${bottles.brandId}
               AND (
@@ -91,7 +91,7 @@ export default publicProcedure
     }
     if (input.distiller) {
       where.push(
-        sql`EXISTS(SELECT 1 FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${input.distiller} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
+        sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${input.distiller} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
       );
     }
     if (input.bottler) {
@@ -102,7 +102,7 @@ export default publicProcedure
         or(
           eq(bottles.brandId, input.entity),
           eq(bottles.bottlerId, input.entity),
-          sql`EXISTS(SELECT 1 FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${input.entity} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
+          sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${input.entity} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
         ),
       );
     }
@@ -117,7 +117,7 @@ export default publicProcedure
     }
     if (input.tag) {
       where.push(
-        sql`EXISTS(SELECT 1 FROM ${tastings} WHERE ${input.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
+        sql`EXISTS(SELECT FROM ${tastings} WHERE ${input.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
       );
     }
 
