@@ -15,6 +15,7 @@ import {
 
 import { SERVING_STYLE_LIST } from "../../constants";
 import { bottles } from "./bottles";
+import { flavorProfileEnum } from "./enums";
 import { flights } from "./flights";
 import { users } from "./users";
 
@@ -32,6 +33,7 @@ export const tastings = pgTable(
       .array()
       .default(sql`array[]::varchar[]`)
       .notNull(),
+    flavorProfile: flavorProfileEnum("flavor_profile"),
     rating: doublePrecision("rating"),
     imageUrl: text("image_url"),
     notes: text("notes"),

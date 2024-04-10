@@ -47,6 +47,12 @@ export default authedProcedure
       tastingData.rating = input.rating;
     }
     if (
+      input.flavorProfile !== undefined &&
+      input.flavorProfile !== tasting.flavorProfile
+    ) {
+      tastingData.flavorProfile = input.flavorProfile;
+    }
+    if (
       input.servingStyle !== undefined &&
       input.servingStyle !== tasting.servingStyle
     ) {
