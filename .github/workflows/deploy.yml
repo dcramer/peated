@@ -278,14 +278,12 @@ jobs:
         uses: tj-actions/changed-files@v41
         with:
           files_yaml: |
-            api:
+            server:
               - apps/server/**
             cli:
               - apps/cli/**
             web:
               - apps/web/**
-            worker:
-              - apps/worker/**
             common:
               - packages/**
               - apps/server**
@@ -312,7 +310,7 @@ jobs:
             --wait
 
       - name: "Deploy API"
-        if: ${{ inputs.force || steps.changed-files-yaml.outputs.api_any_changed == 'true' || steps.changed-files-yaml.outputs.common_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.server_any_changed == 'true' || steps.changed-files-yaml.outputs.common_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/peated-api peated-api="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/api:${{ github.sha }}"
           kubectl rollout status deployment/peated-api --timeout=5m
@@ -324,7 +322,7 @@ jobs:
           kubectl rollout status deployment/peated-web --timeout=5m
 
       - name: "Deploy Worker"
-        if: ${{ inputs.force || steps.changed-files-yaml.outputs.worker_any_changed == 'true' || steps.changed-files-yaml.outputs.common_any_changed == 'true' }}
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.server_any_changed == 'true' || steps.changed-files-yaml.outputs.common_any_changed == 'true' }}
         run: |-
           kubectl set image deployment.v1.apps/peated-worker peated-worker="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/peated/worker:${{ github.sha }}"
           kubectl rollout status deployment/peated-worker --timeout=5m
