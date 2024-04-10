@@ -19,7 +19,7 @@ export default fastifyPlugin(async (fastify, options) => {
           source: "url",
         };
         if (!event.contexts) event.contexts = {};
-        event.contexts.environment = filterScaries(process.env);
+        // event.contexts.environment = filterScaries(process.env);
         event.request = {
           method: request.method,
           url: `${request.protocol}://${request.hostname}${request.url}`,
