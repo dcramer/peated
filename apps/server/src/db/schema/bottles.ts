@@ -67,6 +67,10 @@ export const bottles = pgTable(
       brandIdx: index("bottle_brand_idx").on(bottles.brandId),
       bottlerIdx: index("bottle_bottler_idx").on(bottles.bottlerId),
       createdById: index("bottle_created_by_idx").on(bottles.createdById),
+      categoryIdx: index("bottle_category_idx").on(bottles.category),
+      flavorProfileIdx: index("bottle_flavor_profile_idx").on(
+        bottles.flavorProfile,
+      ),
     };
   },
 );
