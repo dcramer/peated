@@ -4,10 +4,14 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
-import { CATEGORY_LIST } from "@peated/server/constants";
-import { formatCategoryName } from "@peated/server/lib/format";
+import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
+import {
+  formatCategoryName,
+  formatFlavorProfile,
+  notesForProfile,
+} from "@peated/server/lib/format";
 import { BottleInputSchema } from "@peated/server/schemas";
-import type { Bottle, Entity } from "@peated/server/types";
+import type { Bottle, Entity, FlavorProfile } from "@peated/server/types";
 import { PreviewBottleCard } from "@peated/web/components/bottleCard";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
@@ -20,6 +24,7 @@ import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { logError } from "@peated/web/lib/log";
 import { isTRPCClientError } from "../lib/trpc";
+import { classesForProfile } from "./flavorProfile";
 import Form from "./form";
 import Header from "./header";
 import Spinner from "./spinner";
@@ -35,6 +40,11 @@ const entityToOption = (entity: Entity): Option => {
     name: entity.name,
   };
 };
+
+const flavorProfileList = FLAVOR_PROFILES.map((c) => ({
+  id: c,
+  name: formatFlavorProfile(c),
+}));
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
 
@@ -64,6 +74,7 @@ export default function BottleForm({
         ? initialData.distillers.map((d) => d.id)
         : [],
       statedAge: initialData.statedAge,
+      flavorProfile: initialData.flavorProfile,
     },
   });
 
@@ -210,6 +221,45 @@ export default function BottleForm({
                     ? {
                         id: value,
                         name: formatCategoryName(value),
+                      }
+                    : undefined
+                }
+              />
+            )}
+          />
+
+          <Controller
+            name="flavorProfile"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.flavorProfile}
+                placeholder="The flavor profile of the spirit."
+                suggestedOptions={[]}
+                label="Flavor Profile"
+                onRenderOption={(option) => {
+                  const classes = classesForProfile(option.id as FlavorProfile);
+                  return (
+                    <div className="flex flex-col items-start justify-start gap-y-2 text-left">
+                      <h4
+                        className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
+                      >
+                        {option.name}
+                      </h4>
+                      <div className="text-light text-sm font-normal">
+                        {notesForProfile(option.id as FlavorProfile)}
+                      </div>
+                    </div>
+                  );
+                }}
+                options={flavorProfileList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: formatFlavorProfile(value),
                       }
                     : undefined
                 }

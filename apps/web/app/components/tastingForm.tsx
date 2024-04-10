@@ -152,7 +152,7 @@ export default function TastingForm({
               <SelectField
                 {...field}
                 error={errors.tags}
-                label="Flavors"
+                label="Notes"
                 targetOptions={5}
                 options={suggestedTags.results.map((t) => ({
                   id: t.tag,

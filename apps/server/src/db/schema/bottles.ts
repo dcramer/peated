@@ -16,7 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { entities } from "./entities";
-import { categoryEnum } from "./enums";
+import { categoryEnum, flavorProfileEnum } from "./enums";
 import { users } from "./users";
 
 type TastingNotes = {
@@ -39,6 +39,7 @@ export const bottles = pgTable(
       () => entities.id,
     ),
     statedAge: smallint("stated_age"),
+    flavorProfile: flavorProfileEnum("flavor_profile"),
 
     description: text("description"),
     tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
