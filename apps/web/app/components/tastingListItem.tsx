@@ -13,6 +13,7 @@ import { trpc } from "@peated/web/lib/trpc";
 import { useEffect, type ComponentPropsWithoutRef } from "react";
 import BottleCard from "./bottleCard";
 import Button from "./button";
+import FlavorProfile from "./flavorProfile";
 import { ImageModal } from "./imageModal";
 import { StaticRating } from "./rating";
 import ShareButton from "./shareButton";
@@ -106,7 +107,11 @@ export default function TastingListItem({
           {tasting.rating && (
             <StaticRating value={tasting.rating} size="small" />
           )}
-          <Tags tags={tasting.tags} />
+          {tasting.flavorProfile ? (
+            <FlavorProfile profile={tasting.flavorProfile} />
+          ) : (
+            <Tags tags={tasting.tags} />
+          )}
         </div>
       </div>
       {!noBottle && <BottleCard bottle={bottle} />}

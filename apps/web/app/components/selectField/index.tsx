@@ -6,7 +6,13 @@ import Chip from "../chip";
 import FormField from "../formField";
 import { filterDupes } from "./helpers";
 import SelectDialog from "./selectDialog";
-import type { CreateOptionForm, OnQuery, OnResults, Option } from "./types";
+import type {
+  CreateOptionForm,
+  OnQuery,
+  OnRenderOption,
+  OnResults,
+  Option,
+} from "./types";
 
 type BaseProps = {
   name?: string;
@@ -41,6 +47,7 @@ type OptionProps = {
   onResults?: OnResults;
   // or fixed value
   options?: Option[];
+  onRenderOption?: OnRenderOption;
   // static suggestions can also be provided
   suggestedOptions?: Option[];
   // maximum number of options to backfill with suggestions
@@ -73,6 +80,7 @@ export default ({
   onQuery,
   onResults,
   options = [],
+  onRenderOption,
   onChange,
   error,
   ...props
@@ -193,6 +201,7 @@ export default ({
         onQuery={onQuery}
         onResults={onResults}
         options={options}
+        onRenderOption={onRenderOption}
       />
     </FormField>
   );
