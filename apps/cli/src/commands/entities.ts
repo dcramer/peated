@@ -7,7 +7,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs/client";
-import { sql } from "drizzle-orm";
+import { asc, inArray, isNull, sql } from "drizzle-orm";
 
 const subcommand = program.command("entities");
 
@@ -17,18 +17,30 @@ subcommand
   .argument("[entityIds...]")
   .option("--only-missing")
   .action(async (entityIds, options) => {
-    const query = await db.query.entities.findMany({
-      where: entityIds.length
-        ? (entities, { inArray }) => inArray(entities.id, entityIds)
-        : options.onlyMissing
-          ? (entities, { isNull }) => isNull(entities.description)
-          : undefined,
-    });
-    for (const entity of query) {
-      console.log(
-        `Generating description for Entity ${entity.id} (${entity.name}).`,
-      );
-      await pushJob("GenerateEntityDetails", { entityId: entity.id });
+    const step = 1000;
+    const baseQuery = db
+      .select({ id: entities.id })
+      .from(entities)
+      .where(
+        entityIds.length
+          ? inArray(entities.id, entityIds)
+          : options.onlyMissing
+            ? isNull(entities.description)
+            : undefined,
+      )
+      .orderBy(asc(entities.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id } of query) {
+        console.log(`Generating description for Entity ${id}.`);
+        await pushJob("GenerateEntityDetails", { entityId: id });
+        hasResults = true;
+      }
+      offset += step;
     }
   });
 
