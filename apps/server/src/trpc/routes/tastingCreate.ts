@@ -76,7 +76,6 @@ export default authedProcedure
       tags: input.tags
         ? Array.from(new Set(input.tags.map((t) => t.toLowerCase())))
         : [],
-      flavorProfile: input.flavorProfile,
       createdById: ctx.user.id,
     };
     if (input.createdAt) {

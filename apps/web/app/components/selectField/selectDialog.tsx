@@ -3,7 +3,6 @@ import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
 import config from "@peated/web/config";
 import classNames from "@peated/web/lib/classNames";
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { debounce } from "ts-debounce";
 import ListItem from "../listItem";
@@ -14,7 +13,6 @@ import type {
   CreateOptionForm,
   EndpointOptions,
   OnQuery,
-  OnRenderOption,
   OnResults,
 } from "./types";
 
@@ -37,7 +35,6 @@ export default ({
   onQuery,
   onResults,
   options,
-  onRenderOption,
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
@@ -51,7 +48,6 @@ export default ({
   endpoint?: EndpointOptions;
   onResults?: OnResults;
   options?: Option[];
-  onRenderOption?: OnRenderOption;
 }) => {
   const [query, setQuery] = useState("");
   const [optionList, setOptionList] = useState<Option[]>([...selectedValues]);
@@ -112,26 +108,20 @@ export default ({
           </div>
         </header>
         <main className={"m-h-screen relative mx-auto max-w-4xl"}>
-          <ul role="list" className="sm:my-2 sm:space-y-2">
+          <ul role="list" className="space-y">
             {optionList.map((option) => {
               return (
-                <ListItem
-                  key={`${option.id}-${option.name}`}
-                  as={motion.li}
-                  className="card group group relative rounded border-b border-slate-700 bg-slate-950 hover:bg-slate-900 sm:border-0"
-                >
-                  {multiple && (
-                    <CheckIcon
-                      className={classNames(
-                        "h-12 w-12 flex-none rounded p-2",
-                        selectedValues.find(
-                          (i) => i.id == option.id && i.name == option.name,
-                        )
-                          ? "bg-highlight text-black"
-                          : "text-light bg-slate-900 group-hover:bg-slate-800",
-                      )}
-                    />
-                  )}
+                <ListItem key={`${option.id}-${option.name}`}>
+                  <CheckIcon
+                    className={classNames(
+                      "h-12 w-12 flex-none rounded-full p-2",
+                      selectedValues.find(
+                        (i) => i.id == option.id && i.name == option.name,
+                      )
+                        ? "bg-highlight text-black"
+                        : "text-light bg-slate-900 group-hover:bg-slate-800",
+                    )}
+                  />
 
                   <div className="flex min-w-0 flex-auto items-center">
                     <div className="font-semibold leading-6 text-white">
@@ -141,7 +131,7 @@ export default ({
                         }}
                       >
                         <span className="absolute inset-x-0 -top-px bottom-0" />
-                        {onRenderOption ? onRenderOption(option) : option.name}
+                        {option.name}
                       </button>
                     </div>
                   </div>

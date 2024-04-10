@@ -16,7 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { entities } from "./entities";
-import { categoryEnum, flavorProfileEnum } from "./enums";
+import { categoryEnum } from "./enums";
 import { users } from "./users";
 
 type TastingNotes = {
@@ -39,7 +39,6 @@ export const bottles = pgTable(
       () => entities.id,
     ),
     statedAge: smallint("stated_age"),
-    flavorProfile: flavorProfileEnum("flavor_profile"),
 
     description: text("description"),
     tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
@@ -200,32 +199,3 @@ export const bottleTombstonesRelations = relations(
 
 export type BottleTombstone = typeof bottleTombstones.$inferSelect;
 export type NewBottleTombstone = typeof bottleTombstones.$inferInsert;
-
-export const bottleFlavorProfiles = pgTable(
-  "bottle_flavor_profile",
-  {
-    bottleId: bigint("bottle_id", { mode: "number" })
-      .references(() => bottles.id)
-      .notNull(),
-    flavor_profile: flavorProfileEnum("flavor_profile").notNull(),
-    count: integer("count").default(0).notNull(),
-  },
-  (bottleTags) => {
-    return {
-      pk: primaryKey(bottleTags.bottleId, bottleTags.flavor_profile),
-    };
-  },
-);
-
-export const bottleFlavorProfilesRelations = relations(
-  bottleFlavorProfiles,
-  ({ one }) => ({
-    bottle: one(bottles, {
-      fields: [bottleFlavorProfiles.bottleId],
-      references: [bottles.id],
-    }),
-  }),
-);
-
-export type BottleFlavorProfile = typeof bottleFlavorProfiles.$inferSelect;
-export type NewBottleFlavorProfile = typeof bottleFlavorProfiles.$inferInsert;

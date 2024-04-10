@@ -4,21 +4,6 @@ export const MAX_FILESIZE = 1048576 * 20;
 
 export const XP_PER_LEVEL = 5;
 
-export const FLAVOR_PROFILES = [
-  "young_spritely",
-  "sweet_fruit_mellow",
-  "spicy_sweet",
-  "spicy_dry",
-  "deep_rich_dried_fruit",
-  "old_dignified",
-  "light_delicate",
-  "juicy_oak_vanilla",
-  "oily_coastal",
-  "lightly_peated",
-  "peated",
-  "heavily_peated",
-] as const;
-
 export const COUNTRY_LIST = [
   "Afghanistan",
   "Albania",

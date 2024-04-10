@@ -109,7 +109,6 @@ export const TastingSerializer = serializer({
       imageUrl: item.imageUrl ? `${config.API_SERVER}${item.imageUrl}` : null,
       notes: item.notes,
       tags: item.tags || [],
-      flavorProfile: item.flavorProfile,
       rating: item.rating,
       servingStyle: item.servingStyle,
       friends: attrs.friends,
