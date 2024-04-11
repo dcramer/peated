@@ -39,7 +39,8 @@ export default async function buildFastify(options = {}) {
   const app = fastify({
     logger: envToLogger[config.ENV] ?? true,
     maxParamLength: 5000,
-    trustProxy: true,
+    // https://cloud.google.com/load-balancing/docs/https#x-forwarded-for_header
+    trustProxy: ["130.211.0.0/22", "35.191.0.0/16"],
     ajv: {
       customOptions: {
         allErrors: process.env.NODE_ENV === "test",
