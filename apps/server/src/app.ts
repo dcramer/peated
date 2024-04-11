@@ -39,6 +39,7 @@ export default async function buildFastify(options = {}) {
   const app = fastify({
     logger: envToLogger[config.ENV] ?? true,
     maxParamLength: 5000,
+    trustProxy: true,
     ajv: {
       customOptions: {
         allErrors: process.env.NODE_ENV === "test",
