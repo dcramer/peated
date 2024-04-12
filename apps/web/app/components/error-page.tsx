@@ -1,13 +1,18 @@
 import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 
+import { type AppRouter } from "@peated/server/trpc/router";
 import Button from "@peated/web/components/button";
 import config from "@peated/web/config";
 import { useOnlineStatus } from "@peated/web/hooks/useOnlineStatus";
 import { ApiError, ApiUnauthorized, ApiUnavailable } from "@peated/web/lib/api";
-import { TRPCClientError } from "@trpc/client";
+import { type TRPCClientError } from "@trpc/client";
+import { isTRPCClientError } from "../lib/trpc";
 
 export default function ErrorPage() {
-  const error = useRouteError() as Error | ApiError;
+  const error = useRouteError() as
+    | Error
+    | ApiError
+    | TRPCClientError<AppRouter>;
   const isOnline = useOnlineStatus();
 
   let title = "Error";
@@ -21,13 +26,20 @@ export default function ErrorPage() {
     title = "Identify Yourself";
     subtitle =
       "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
-  } else if (error instanceof ApiError && error.statusCode === 404) {
+  } else if (
+    (error instanceof ApiError && error.statusCode === 404) ||
+    (isTRPCClientError(error) && error.data?.httpStatus === 404)
+  ) {
     title = "Not Found";
     subtitle = "We couldn't find the page you were looking for.";
   } else if (
-    error instanceof TRPCClientError &&
-    error.message === "Failed to fetch"
+    (error instanceof ApiError && error.statusCode === 401) ||
+    (isTRPCClientError(error) && error.data?.httpStatus === 401)
   ) {
+    title = "Identify Yourself";
+    subtitle =
+      "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
+  } else if (isTRPCClientError(error) && error.message === "Failed to fetch") {
     title = isOnline ? "Server Unreachable" : "Connection Offline";
     subtitle = isOnline
       ? "It looks like Peated's API is unreachable right now. Please try again shortly."
