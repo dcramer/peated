@@ -1,5 +1,8 @@
 import { getUrl } from "@peated/server/lib/scraper";
-import { parseDetailsFromName } from "@peated/server/lib/smws";
+import {
+  parseDetailsFromName,
+  parseFlavorProfile,
+} from "@peated/server/lib/smws";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import { type BottleInputSchema } from "@peated/server/schemas";
 import { type z } from "zod";
@@ -38,6 +41,7 @@ type SMWSPayload = {
     name: string;
     age: number | null;
     cask_no: string;
+    categories: string[];
   }[];
 };
 
@@ -67,6 +71,15 @@ export async function scrapeBottles(
       return;
     }
 
+    const flavorProfileRaw = item.categories.find((c) => {
+      return c.startsWith("All Whisky/Flavour Profiles/");
+    });
+    const flavorProfile = flavorProfileRaw
+      ? parseFlavorProfile(
+          flavorProfileRaw.split("All Whisky/Flavour Profiles/")[1],
+        )
+      : null;
+
     await cb({
       name: details.name,
       category: details.category,
@@ -82,6 +95,7 @@ export async function scrapeBottles(
           name: details.distiller,
         },
       ],
+      flavorProfile,
     });
   });
 }

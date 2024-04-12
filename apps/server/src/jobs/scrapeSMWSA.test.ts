@@ -16,20 +16,23 @@ test("bottle list", async ({ axiosMock }) => {
   await fn;
 
   expect(items.length).toBe(35);
-  expect(items[0]).toEqual({
-    name: "41.176 Baristaliscious",
-    brand: {
-      name: "The Scotch Malt Whisky Society",
-    },
-    bottler: {
-      name: "The Scotch Malt Whisky Society",
-    },
-    category: "single_malt",
-    distillers: [
-      {
-        name: "Dailuaine",
+  expect(items[0]).toMatchInlineSnapshot(`
+    {
+      "bottler": {
+        "name": "The Scotch Malt Whisky Society",
       },
-    ],
-    statedAge: 17,
-  });
+      "brand": {
+        "name": "The Scotch Malt Whisky Society",
+      },
+      "category": "single_malt",
+      "distillers": [
+        {
+          "name": "Dailuaine",
+        },
+      ],
+      "flavorProfile": "juicy_oak_vanilla",
+      "name": "41.176 Baristaliscious",
+      "statedAge": 17,
+    }
+  `);
 });

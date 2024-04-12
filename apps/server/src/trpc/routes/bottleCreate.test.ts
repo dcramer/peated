@@ -1,3 +1,4 @@
+import { FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottles,
@@ -63,6 +64,7 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
     bottler: distiller.id,
     distillers: [distiller.id],
     statedAge: 12,
+    flavorProfile: FLAVOR_PROFILES[0],
   });
 
   expect(data.id).toBeDefined();
@@ -74,6 +76,7 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
   expect(bottle.name).toEqual("Delicious Wood 12-year-old");
   expect(bottle.brandId).toEqual(brand.id);
   expect(bottle.statedAge).toEqual(12);
+  expect(bottle.flavorProfile).toEqual(FLAVOR_PROFILES[0]);
   expect(bottle.createdById).toBe(defaults.user.id);
   const distillers = await db
     .select({ distillerId: bottlesToDistillers.distillerId })

@@ -1,5 +1,5 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
-import { type Category } from "@peated/server/types";
+import type { Category, FlavorProfile } from "@peated/server/types";
 
 // This needs moved into the database and needs to be editable by the community/mods
 // https://www.whiskysaga.com/smws-codes
@@ -311,4 +311,40 @@ export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
     name: `${caskNumber} ${caskName}`,
     distiller: SMWS_DISTILLERY_CODES[distillerNo],
   };
+}
+
+export function parseFlavorProfile(name: string): FlavorProfile | null {
+  name = name.replace("&amp;", "&").replace(",", "");
+
+  switch (name) {
+    case "Young & Spritely":
+      return "young_spritely";
+    case "Sweet Fruit & Mellow":
+    case "Sweet Fruity & Mellow":
+      return "sweet_fruit_mellow";
+    case "Spicy & Sweet":
+      return "spicy_sweet";
+    case "Spicy & Dry":
+      return "spicy_dry";
+    case "Deep Rich & Dried Fruit":
+    case "Deep Rich & Dried Fruits":
+      return "deep_rich_dried_fruit";
+    case "Old & Dignified":
+      return "old_dignified";
+    case "Light & Delicate":
+      return "light_delicate";
+    case "Juicy Oak & Vanilla":
+      return "juicy_oak_vanilla";
+    case "Oily & Coastal":
+      return "oily_coastal";
+    case "Lightly Peated":
+      return "lightly_peated";
+    case "Peated":
+      return "peated";
+    case "Heavily Peated":
+      return "heavily_peated";
+    default:
+      console.error(`Unknown flavor profile: ${name}`);
+      return null;
+  }
 }

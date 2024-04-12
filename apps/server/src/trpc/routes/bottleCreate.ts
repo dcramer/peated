@@ -94,6 +94,7 @@ export async function bottleCreate({
         .values({
           name,
           fullName,
+          flavorProfile: input.flavorProfile,
           statedAge: statedAge,
           category: input.category || null,
           brandId: brand.id,

@@ -18,20 +18,23 @@ test("bottle list", async ({ axiosMock }) => {
   await fn;
 
   expect(items.length).toBe(128);
-  expect(items[0]).toEqual({
-    name: "RW3.6 Truly a flavour bomb",
-    brand: {
-      name: "The Scotch Malt Whisky Society",
-    },
-    bottler: {
-      name: "The Scotch Malt Whisky Society",
-    },
-    category: "rye",
-    distillers: [
-      {
-        name: "New York Distilling Co.",
+  expect(items[0]).toMatchInlineSnapshot(`
+    {
+      "bottler": {
+        "name": "The Scotch Malt Whisky Society",
       },
-    ],
-    statedAge: 5,
-  });
+      "brand": {
+        "name": "The Scotch Malt Whisky Society",
+      },
+      "category": "rye",
+      "distillers": [
+        {
+          "name": "New York Distilling Co.",
+        },
+      ],
+      "flavorProfile": null,
+      "name": "RW3.6 Truly a flavour bomb",
+      "statedAge": 5,
+    }
+  `);
 });

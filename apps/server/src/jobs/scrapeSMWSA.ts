@@ -1,5 +1,8 @@
 import { getUrl } from "@peated/server/lib/scraper";
-import { parseDetailsFromName } from "@peated/server/lib/smws";
+import {
+  parseDetailsFromName,
+  parseFlavorProfile,
+} from "@peated/server/lib/smws";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import { type BottleInputSchema } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
@@ -77,6 +80,9 @@ export async function scrapeBottles(
     const ageSpec = specList.find(([name]) => name === "Age:");
     const statedAge = ageSpec ? Number(ageSpec[1].split(" ")[0]) : null;
 
+    const flavorSpec = specList.find(([name]) => name === "Flavour:");
+    const flavorProfile = flavorSpec ? parseFlavorProfile(flavorSpec[1]) : null;
+
     const details = parseDetailsFromName(`${itemType} ${caskName}`);
     if (!details?.distiller) {
       console.error(`Cannot find distiller: ${itemType}`);
@@ -98,6 +104,7 @@ export async function scrapeBottles(
         name: "The Scotch Malt Whisky Society",
       },
       distillers: [{ name: details.distiller }],
+      flavorProfile,
     });
   }
 }
