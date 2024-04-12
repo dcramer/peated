@@ -85,6 +85,16 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
             )}
             <Heading as="h3">Additional Details</Heading>
             <DefinitionList>
+              <DefinitionList.Term>Brand</DefinitionList.Term>
+              <DefinitionList.Details>
+                <Link
+                  key={bottle.brand.id}
+                  to={`/entities/${bottle.brand.id}`}
+                  className="underline"
+                >
+                  {bottle.brand.name}
+                </Link>
+              </DefinitionList.Details>{" "}
               <DefinitionList.Term>Distilled At</DefinitionList.Term>
               <DefinitionList.Details>
                 {bottle.distillers.length > 0 ? (
