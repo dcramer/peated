@@ -70,11 +70,11 @@ importers:
         specifier: ~8.0.0-alpha.7
         version: 8.0.0-alpha.9
       '@trpc/client':
-        specifier: ^10.45.2
-        version: 10.45.2(@trpc/server@10.45.2)
+        specifier: 11.0.0-rc.334
+        version: 11.0.0-rc.334(@trpc/server@11.0.0-rc.334)
       '@trpc/server':
-        specifier: ^10.45.2
-        version: 10.45.2
+        specifier: 11.0.0-rc.334
+        version: 11.0.0-rc.334
       '@types/bcrypt':
         specifier: ^5.0.2
         version: 5.0.2
@@ -157,11 +157,11 @@ importers:
         specifier: ~8.0.0-alpha.7
         version: 8.0.0-alpha.9
       '@trpc/client':
-        specifier: ^10.45.2
-        version: 10.45.2(@trpc/server@10.45.2)
+        specifier: 11.0.0-rc.334
+        version: 11.0.0-rc.334(@trpc/server@11.0.0-rc.334)
       '@trpc/server':
-        specifier: ^10.45.2
-        version: 10.45.2
+        specifier: 11.0.0-rc.334
+        version: 11.0.0-rc.334
       '@types/bcrypt':
         specifier: ^5.0.2
         version: 5.0.2
@@ -367,17 +367,17 @@ importers:
         specifier: ^0.5.12
         version: 0.5.12(tailwindcss@3.4.3)
       '@tanstack/react-query':
-        specifier: ^4.36.1
-        version: 4.36.1(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^5.25.0
+        version: 5.29.2(react@18.2.0)
       '@trpc/client':
-        specifier: ^10.45.2
-        version: 10.45.2(@trpc/server@10.45.2)
+        specifier: 11.0.0-rc.334
+        version: 11.0.0-rc.334(@trpc/server@11.0.0-rc.334)
       '@trpc/react-query':
-        specifier: ^10.45.2
-        version: 10.45.2(@tanstack/react-query@4.36.1)(@trpc/client@10.45.2)(@trpc/server@10.45.2)(react-dom@18.2.0)(react@18.2.0)
+        specifier: 11.0.0-rc.334
+        version: 11.0.0-rc.334(@tanstack/react-query@5.29.2)(@trpc/client@11.0.0-rc.334)(@trpc/server@11.0.0-rc.334)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server':
-        specifier: ^10.45.2
-        version: 10.45.2
+        specifier: 11.0.0-rc.334
+        version: 11.0.0-rc.334
       '@types/compression':
         specifier: ^1.7.5
         version: 1.7.5
@@ -4110,26 +4110,17 @@ packages:
       tailwindcss: 3.4.3
     dev: false
 
-  /@tanstack/query-core@4.36.1:
-    resolution: {integrity: sha512-DJSilV5+ytBP1FbFcEJovv4rnnm/CokuVvrBEtW/Va9DvuJ3HksbXUJEpI0aV1KtuL4ZoO9AVE6PyNLzF7tLeA==}
+  /@tanstack/query-core@5.29.0:
+    resolution: {integrity: sha512-WgPTRs58hm9CMzEr5jpISe8HXa3qKQ8CxewdYZeVnA54JrPY9B1CZiwsCoLpLkf0dGRZq+LcX5OiJb0bEsOFww==}
     dev: false
 
-  /@tanstack/react-query@4.36.1(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-y7ySVHFyyQblPl3J3eQBWpXZkliroki3ARnBKsdJchlgt7yJLRDUcf4B8soufgiYt3pEQIkBWBx1N9/ZPIeUWw==}
+  /@tanstack/react-query@5.29.2(react@18.2.0):
+    resolution: {integrity: sha512-nyuWILR4u7H5moLGSiifLh8kIqQDLNOHGuSz0rcp+J75fNc8aQLyr5+I2JCHU3n+nJrTTW1ssgAD8HiKD7IFBQ==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
+      react: ^18.0.0
     dependencies:
-      '@tanstack/query-core': 4.36.1
+      '@tanstack/query-core': 5.29.0
       react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
   /@tanstack/react-virtual@3.2.0(react-dom@18.2.0)(react@18.2.0):
@@ -4166,32 +4157,32 @@ packages:
     engines: {node: '>= 10'}
     dev: false
 
-  /@trpc/client@10.45.2(@trpc/server@10.45.2):
-    resolution: {integrity: sha512-ykALM5kYWTLn1zYuUOZ2cPWlVfrXhc18HzBDyRhoPYN0jey4iQHEFSEowfnhg1RvYnrAVjNBgHNeSAXjrDbGwg==}
+  /@trpc/client@11.0.0-rc.334(@trpc/server@11.0.0-rc.334):
+    resolution: {integrity: sha512-nVKOxCfhKxBXvs1MwjfNNsWHQH/rHWzS4SxYPtYld7zqANTfNqn8cuClHMKlkeMKljObFiCfWhbdrBamKO/dDw==}
     peerDependencies:
-      '@trpc/server': 10.45.2
+      '@trpc/server': 11.0.0-rc.334+fdf26e552
     dependencies:
-      '@trpc/server': 10.45.2
+      '@trpc/server': 11.0.0-rc.334
     dev: false
 
-  /@trpc/react-query@10.45.2(@tanstack/react-query@4.36.1)(@trpc/client@10.45.2)(@trpc/server@10.45.2)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-BAqb9bGZIscroradlNx+Cc9522R+idY3BOSf5z0jHUtkxdMbjeGKxSSMxxu7JzoLqSIEC+LVzL3VvF8sdDWaZQ==}
+  /@trpc/react-query@11.0.0-rc.334(@tanstack/react-query@5.29.2)(@trpc/client@11.0.0-rc.334)(@trpc/server@11.0.0-rc.334)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-DvhU7qMfQkLyrhQoDlrtMAGIgJyin9I8WCsF0oGlAD95ygoJcviD8D+lQzSCUttul9rPcNqWDuGhm5laS7V43A==}
     peerDependencies:
-      '@tanstack/react-query': ^4.18.0
-      '@trpc/client': 10.45.2
-      '@trpc/server': 10.45.2
-      react: '>=16.8.0'
-      react-dom: '>=16.8.0'
+      '@tanstack/react-query': ^5.25.0
+      '@trpc/client': 11.0.0-rc.334+fdf26e552
+      '@trpc/server': 11.0.0-rc.334+fdf26e552
+      react: '>=18.2.0'
+      react-dom: '>=18.2.0'
     dependencies:
-      '@tanstack/react-query': 4.36.1(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/client': 10.45.2(@trpc/server@10.45.2)
-      '@trpc/server': 10.45.2
+      '@tanstack/react-query': 5.29.2(react@18.2.0)
+      '@trpc/client': 11.0.0-rc.334(@trpc/server@11.0.0-rc.334)
+      '@trpc/server': 11.0.0-rc.334
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@trpc/server@10.45.2:
-    resolution: {integrity: sha512-wOrSThNNE4HUnuhJG6PfDRp4L2009KDVxsd+2VYH8ro6o/7/jwYZ8Uu5j+VaW+mOmc8EHerHzGcdbGNQSAUPgg==}
+  /@trpc/server@11.0.0-rc.334:
+    resolution: {integrity: sha512-ckg+f4z3Lc0wYvm1Cx8Zjz8b2hguNlUFQeF8vLrtWYBL8HEolshmxOHMG9MLc6WDE6T1R7DZrG+xEwjI44XH9w==}
     dev: false
 
   /@trysound/sax@0.2.0:
@@ -12853,14 +12844,6 @@ packages:
     resolution: {integrity: sha512-E2E1Mx9UeHiK1fxabnUULJEc7BNMmdsMy7hBGiDxDvxgP5/QIYJawQ2g2ZQvqvoXIkyzJA7wWG07hBWa5yuM9Q==}
     dependencies:
       deepmerge: 4.3.1
-    dev: false
-
-  /use-sync-external-store@1.2.0(react@18.2.0):
-    resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      react: 18.2.0
     dev: false
 
   /usehooks-ts@2.16.0(react@18.2.0):
