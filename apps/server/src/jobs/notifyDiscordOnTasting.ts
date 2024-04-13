@@ -23,9 +23,12 @@ export default async function ({ tastingId }: { tastingId: number }) {
     throw new Error(`Unknown tasting: ${tastingId}`);
   }
 
-  if (Math.abs(new Date().getTime() - tasting.createdAt.getTime()) > 300) {
-    throw new Error("Tasting is too old; Not notifying");
-  }
+  // TODO: pretty sure we're mismatched timezones on db + server, and need normalization
+  // move db to UTC (if its not, or if its not storing tzinfo), and then run all these checks
+  // against UTC time
+  // if (Math.abs(new Date().getTime() - tasting.createdAt.getTime()) > 300) {
+  //   throw new Error("Tasting is too old; Not notifying");
+  // }
 
   const fields = [];
   if (tasting.rating !== null)
