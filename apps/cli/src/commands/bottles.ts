@@ -87,7 +87,6 @@ subcommand
           if (bottle.brandId === entity.id) continue;
 
           if (!review.name.startsWith(entity.name)) {
-            console.log([review.name, entity.name]);
             throw new Error();
           }
 

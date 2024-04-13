@@ -220,9 +220,13 @@ const CommentList = ({
 
   if (!data) return;
 
+  const commentIds: Set<number> = new Set();
+
   return (
     <AnimatePresence>
       {[...data.results, ...newValues].map((c) => {
+        if (commentIds.has(c.id)) return null;
+        commentIds.add(c.id);
         if (deleted.includes(c.id)) return null;
         const isAuthor = user?.id === c.createdBy.id;
         return (

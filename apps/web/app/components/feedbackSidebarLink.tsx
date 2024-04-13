@@ -19,7 +19,6 @@ export default function FeedbackSidebarLink() {
     (node: HTMLAnchorElement) => {
       if (!feedback || loaded || !node) return;
       // TODO: Type this better, and remove the type cast...
-      console.log("setting loaded", node);
       (feedback as any).attachTo(node, {});
       setLoaded(true);
     },
