@@ -325,13 +325,26 @@ export const TAG_CATEGORIES = [
 // TODO: reference whisky magazine for numerical, but simplify
 export const COLOR_SCALE = [
   [0, "Clear"],
-  [1, "Straw"],
-  [3, "Honey"],
-  [8, "Gold"],
-  [11, "Amber"],
+  [1, "White Wine"],
+  [2, "Melon Yellow"],
+  [3, "Fine Sherry"],
+  [4, "Pale Honey"],
+  [5, "Pale Gold"],
+  [6, "Medium Gold"],
+  [7, "Deep Gold"],
+  [8, "Amontillado Sherry"],
+  [9, "Pale Brown"],
+  [10, "Medium Brown"],
+  [11, "Deep Brown"],
+  [12, "Palo Coratdo Sherry"],
+  [13, "Burn Amber"],
   [14, "Copper"],
-  [16, "Mahogony"],
-  [20, "Black"],
+  [15, "Tawny"],
+  [16, "Deep Tawhny"],
+  [17, "Oloroso Sherry"],
+  [18, "Vintage Oak"],
+  [19, "Moscatel Sherry"],
+  [20, "Black Bowmore"],
 ] as const;
 
 // TODO:
