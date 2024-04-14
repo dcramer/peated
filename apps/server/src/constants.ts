@@ -309,6 +309,8 @@ export const FLAVOR_PROFILES = [
   "heavily_peated",
 ] as const;
 
+// TODO: maybe utilize https://www.whiskymax.co.uk/charles-macleans-whisky-wheel/
+// instead? its a bit easier to reason about for
 export const TAG_CATEGORIES = [
   "cereal",
   "fruity",
@@ -319,6 +321,24 @@ export const TAG_CATEGORIES = [
   "woody",
   "winey",
 ] as const;
+
+// TODO: reference whisky magazine for numerical, but simplify
+export const COLOR_SCALE = [
+  [0.0, "Clear"],
+  [0.1, "Straw"],
+  [0.3, "Honey"],
+  [0.8, "Gold"],
+  [1.1, "Amber"],
+  [1.4, "Copper"],
+  [1.6, "Mahogony"],
+  [2.0, "Black"],
+] as const;
+
+// TODO:
+export const CASK_FILLS = ["1st_fill", "2nd_fill", "refill"];
+
+// TODO: determine granularity (e.g. hogshead etc)
+export const CASK_TYPES = ["bourbon", "sherry", "other"] as const;
 
 // used for web scraping
 export const defaultHeaders = (url: string) => {
