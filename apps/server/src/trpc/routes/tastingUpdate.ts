@@ -53,6 +53,9 @@ export default authedProcedure
     ) {
       tastingData.servingStyle = input.servingStyle;
     }
+    if (input.color !== undefined && input.color !== tasting.color) {
+      tastingData.color = input.color;
+    }
     // TODO: needs tests yet
     if (input.friends && input.friends.length) {
       const friendUserIds = Array.from(new Set(input.friends));

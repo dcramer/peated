@@ -180,7 +180,9 @@ export default function TastingForm({
                 {...field}
                 onChange={(e) =>
                   onChange(
-                    e.target.value === "" ? undefined : Number(e.target.value),
+                    e.target.value === "" || e.target.value === "-1"
+                      ? undefined
+                      : Number(e.target.value),
                   )
                 }
                 error={errors.color}

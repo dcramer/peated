@@ -73,6 +73,7 @@ export default authedProcedure
       rating: input.rating || null,
       flightId: flight ? flight.id : null,
       servingStyle: input.servingStyle || null,
+      color: input.color || null,
       tags: input.tags ? await validateTags(input.tags) : [],
       createdById: ctx.user.id,
     };
