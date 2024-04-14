@@ -1,8 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FLAVOR_PROFILES, SERVING_STYLE_LIST } from "@peated/server/constants";
+import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { TastingInputSchema } from "@peated/server/schemas";
-import type { Tasting, User } from "@peated/server/types";
+import type {
+  Paginated,
+  ServingStyle,
+  SuggestedTag,
+  Tasting,
+  User,
+} from "@peated/server/types";
 import BottleCard from "@peated/web/components/bottleCard";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
@@ -20,23 +26,18 @@ import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import {
-  formatFlavorProfile,
-  formatServingStyle,
-} from "../../../server/src/lib/format";
 import { isTRPCClientError, trpc } from "../lib/trpc";
 import Form from "./form";
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
 
+function formatServingStyle(style: ServingStyle) {
+  return toTitleCase(style);
+}
+
 const servingStyleList = SERVING_STYLE_LIST.map((c) => ({
   id: c,
   name: formatServingStyle(c),
-}));
-
-const flavorProfileList = FLAVOR_PROFILES.map((c) => ({
-  id: c,
-  name: formatFlavorProfile(c),
 }));
 
 const userToOption = (user: User): Option => {
@@ -50,6 +51,7 @@ export default function TastingForm({
   onSubmit,
   initialData,
   title,
+  suggestedTags,
 }: {
   onSubmit: SubmitHandler<
     FormSchemaType & {
@@ -58,6 +60,7 @@ export default function TastingForm({
   >;
   initialData: Partial<Tasting> & Pick<Tasting, "bottle">;
   title: string;
+  suggestedTags: Paginated<SuggestedTag>;
 }) {
   const {
     control,
@@ -150,8 +153,13 @@ export default function TastingForm({
                 {...field}
                 error={errors.tags}
                 label="Notes"
-                placeholder="What flavors and aromas come to mind with this spirit?"
                 targetOptions={5}
+                placeholder="What flavors and aromas come to mind with this spirit?"
+                options={suggestedTags.results.map((t) => ({
+                  id: t.tag.name,
+                  name: toTitleCase(t.tag.name),
+                  count: t.count,
+                }))}
                 onChange={(value) => onChange(value.map((t: any) => t.id))}
                 value={value?.map((t) => ({
                   id: t,
