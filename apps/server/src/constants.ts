@@ -324,14 +324,14 @@ export const TAG_CATEGORIES = [
 
 // TODO: reference whisky magazine for numerical, but simplify
 export const COLOR_SCALE = [
-  [0.0, "Clear"],
-  [0.1, "Straw"],
-  [0.3, "Honey"],
-  [0.8, "Gold"],
-  [1.1, "Amber"],
-  [1.4, "Copper"],
-  [1.6, "Mahogony"],
-  [2.0, "Black"],
+  [0, "Clear"],
+  [1, "Straw"],
+  [3, "Honey"],
+  [8, "Gold"],
+  [11, "Amber"],
+  [14, "Copper"],
+  [16, "Mahogony"],
+  [20, "Black"],
 ] as const;
 
 // TODO:

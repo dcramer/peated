@@ -4,6 +4,7 @@ import type {
   FlavorProfile,
   ServingStyle,
 } from "@peated/server/types";
+import { COLOR_SCALE } from "../constants";
 
 export function formatCategoryName(
   value: Category | string | undefined | null,
@@ -79,4 +80,14 @@ export function notesForProfile(profile: FlavorProfile): string {
 
 export function formatServingStyle(style: ServingStyle) {
   return toTitleCase(style);
+}
+
+export function formatColor(colorValue: number) {
+  let value = "";
+  for (const [threshold, color] of COLOR_SCALE) {
+    if (colorValue >= threshold) {
+      value = color;
+    }
+  }
+  return value;
 }

@@ -27,6 +27,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import { isTRPCClientError, trpc } from "../lib/trpc";
+import ColorField from "./colorField";
 import Form from "./form";
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
@@ -74,6 +75,7 @@ export default function TastingForm({
       rating: initialData.rating,
       notes: initialData.notes,
       tags: initialData.tags,
+      color: initialData.color,
       servingStyle: initialData.servingStyle,
       friends: initialData.friends ? initialData.friends.map((d) => d.id) : [],
     },
@@ -166,6 +168,23 @@ export default function TastingForm({
                   name: toTitleCase(t),
                 }))}
                 multiple
+              />
+            )}
+          />
+
+          <Controller
+            name="color"
+            control={control}
+            render={({ field: { ref, onChange, ...field } }) => (
+              <ColorField
+                {...field}
+                onChange={(e) =>
+                  onChange(
+                    e.target.value === "" ? undefined : Number(e.target.value),
+                  )
+                }
+                error={errors.color}
+                label="Color"
               />
             )}
           />

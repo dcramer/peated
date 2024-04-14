@@ -1,3 +1,4 @@
+import { formatColor } from "@peated/server/lib/format";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import type { FieldError } from "react-hook-form";
@@ -32,9 +33,9 @@ export default forwardRef<HTMLInputElement, Props>(
       label,
       required,
       className,
-      min = "0.00",
-      max = "5.00",
-      step = "0.25",
+      min = "0",
+      max = "20",
+      step = "1",
       value: initialValue,
       error,
       onChange,
@@ -49,9 +50,9 @@ export default forwardRef<HTMLInputElement, Props>(
         labelNote={
           <div className="text-sm font-medium">
             {!value || typeof value !== "number" ? (
-              "Not Rated"
+              ""
             ) : (
-              <span className="text-highlight">{value.toFixed(2)}</span>
+              <span className="text-highlight">{formatColor(value)}</span>
             )}
           </div>
         }
