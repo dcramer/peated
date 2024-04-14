@@ -74,7 +74,7 @@ export default forwardRef<HTMLInputElement, Props>(
         label={label}
         labelNote={
           <div className="text-sm font-medium">
-            {!value || typeof value !== "number" ? (
+            {value === -1 || typeof value !== "number" ? (
               "Unsure"
             ) : (
               <span className="text-white">{formatColor(value)}</span>
