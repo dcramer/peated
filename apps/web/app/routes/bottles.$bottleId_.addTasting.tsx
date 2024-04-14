@@ -16,14 +16,11 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
 
     if (!user) return redirectToAuth({ request });
 
-    const [bottle, suggestedTags] = await Promise.all([
+    const [bottle] = await Promise.all([
       trpc.bottleById.query(Number(bottleId)),
-      trpc.bottleSuggestedTagList.query({
-        bottle: Number(bottleId),
-      }),
     ]);
 
-    return json({ bottle, suggestedTags });
+    return json({ bottle });
   },
 );
 
@@ -36,7 +33,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function AddTasting() {
-  const { bottle, suggestedTags } = useLoaderData<typeof loader>();
+  const { bottle } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
@@ -53,7 +50,6 @@ export default function AddTasting() {
     <TastingForm
       title="Record Tasting"
       initialData={{ bottle }}
-      suggestedTags={suggestedTags}
       onSubmit={async ({ picture, ...data }) => {
         const tasting = await tastingCreateMutation.mutateAsync({
           ...data,

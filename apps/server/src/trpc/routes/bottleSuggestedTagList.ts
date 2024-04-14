@@ -1,6 +1,5 @@
-import { DEFAULT_TAGS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { bottleTags, bottles } from "@peated/server/db/schema";
+import { bottleTags, bottles, tags } from "@peated/server/db/schema";
 import { shuffle } from "@peated/server/lib/rand";
 import { TRPCError } from "@trpc/server";
 import { desc, eq, or, sql } from "drizzle-orm";
@@ -50,10 +49,12 @@ export default publicProcedure
       ).map((t) => [t.tag, t.total]),
     );
 
-    const results = shuffle(DEFAULT_TAGS)
+    const defaultTags = await db.select().from(tags);
+
+    const results = shuffle(defaultTags)
       .map((t) => ({
         tag: t,
-        count: Number(usedTags[t] || 0),
+        count: Number(usedTags[t.name] || 0),
       }))
       .sort((a, b) => b.count - a.count);
 

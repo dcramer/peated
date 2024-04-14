@@ -1,6 +1,10 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
-import { CATEGORY_LIST, FLAVOR_PROFILES } from "../../constants";
+import {
+  CATEGORY_LIST,
+  FLAVOR_PROFILES,
+  TAG_CATEGORIES,
+} from "../../constants";
 
 export const categoryEnum = pgEnum("category", CATEGORY_LIST);
 
@@ -14,3 +18,5 @@ export const objectTypeEnum = pgEnum("object_type", [
 ]);
 
 export const flavorProfileEnum = pgEnum("flavor_profile", FLAVOR_PROFILES);
+
+export const tagCategoryEnum = pgEnum("tag_category", TAG_CATEGORIES);

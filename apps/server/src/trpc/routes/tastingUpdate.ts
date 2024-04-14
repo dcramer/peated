@@ -14,6 +14,7 @@ import { TRPCError } from "@trpc/server";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
+import { validateTags } from "../validators/tags";
 
 export default authedProcedure
   .input(
@@ -73,14 +74,13 @@ export default authedProcedure
       }
       tastingData.friends = input.friends;
     }
+
     if (
       input.tags &&
       input.tags !== undefined &&
       !arraysEqual(input.tags, tasting.tags)
     ) {
-      tastingData.tags = Array.from(
-        new Set(input.tags.map((t) => t.toLowerCase())),
-      );
+      tastingData.tags = await validateTags(input.tags);
     }
 
     const newTasting = await db.transaction(async (tx) => {

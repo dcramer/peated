@@ -18,11 +18,8 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
 
     // TODO: this would be better if done in parallel
     const tasting = await trpc.tastingById.query(Number(tastingId));
-    const suggestedTags = await trpc.bottleSuggestedTagList.query({
-      bottle: Number(tasting.bottle.id),
-    });
 
-    return json({ tasting, suggestedTags });
+    return json({ tasting });
   },
 );
 
@@ -35,7 +32,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function AddTasting() {
-  const { tasting, suggestedTags } = useLoaderData<typeof loader>();
+  const { tasting } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
@@ -52,7 +49,6 @@ export default function AddTasting() {
     <TastingForm
       title="Edit Tasting"
       initialData={tasting}
-      suggestedTags={suggestedTags}
       onSubmit={async ({ picture, ...data }) => {
         await tastingUpdateMutation.mutateAsync({
           tasting: tasting.id,

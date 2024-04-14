@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import type * as dbSchema from "@peated/server/db/schema";
+import * as dbSchema from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { type ExternalSiteType } from "@peated/server/types";
 import { eq, sql } from "drizzle-orm";
@@ -7,8 +7,9 @@ import { readFile } from "fs/promises";
 import path from "path";
 import {
   CATEGORY_LIST,
-  DEFAULT_TAGS,
   EXTERNAL_SITE_TYPE_LIST,
+  FLAVOR_PROFILES,
+  TAG_CATEGORIES,
 } from "../../constants";
 import type { DatabaseType } from "../../db";
 import { db as dbConn } from "../../db";
@@ -109,7 +110,7 @@ export const Entity = async (
   { ...data }: Partial<Omit<NewEntity, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Entity> => {
-  const name = faker.company.name();
+  const name = data.name || faker.company.name();
   // XXX(dcramer): not ideal
   const existing = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.name, name),
@@ -257,12 +258,16 @@ export const Tasting = async (
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Tasting> => {
   return await db.transaction(async (tx) => {
+    const tags = [];
+    for (let i = 0; i <= random(1, 5); i++) {
+      tags.push((await Tag({}, tx)).name);
+    }
     const [result] = await tx
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
         rating: faker.number.float({ min: 1, max: 5 }),
-        tags: sample(DEFAULT_TAGS, random(1, 5)),
+        tags: tags,
         ...data,
         bottleId: data.bottleId || (await Bottle({}, tx)).id,
         createdById: data.createdById || (await User({}, tx)).id,
@@ -388,7 +393,7 @@ export const ExternalSite = async (
   { ...data }: Partial<Omit<NewExternalSite, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
-  if (!data.type) data.type = choose([...EXTERNAL_SITE_TYPE_LIST]);
+  if (!data.type) data.type = choose(EXTERNAL_SITE_TYPE_LIST);
   // XXX(dcramer): not ideal
   const existing = await db.query.externalSites.findFirst({
     where: (externalSites, { eq }) =>
@@ -534,6 +539,34 @@ export const Collection = async (
     .values({
       name: faker.company.name(),
       ...(data as Omit<dbSchema.NewCollection, "name">),
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
+};
+
+export const Tag = async (
+  { ...data }: Partial<Omit<dbSchema.NewTag, "id">> = {},
+  db: DatabaseType = dbConn,
+): Promise<dbSchema.Tag> => {
+  const name = data.name || faker.word.adjective().toLowerCase();
+
+  // XXX(dcramer): not ideal
+  const existing = await db.query.tags.findFirst({
+    where: (tags, { eq }) => eq(tags.name, name),
+  });
+  if (existing) return existing;
+
+  const [result] = await db
+    .insert(dbSchema.tags)
+    .values({
+      name,
+      tagCategory: choose(TAG_CATEGORIES),
+      flavorProfiles: sample(FLAVOR_PROFILES, random(1, 2)),
+      ...(data as Omit<
+        dbSchema.NewTag,
+        "name" | "tagCategory" | "flavorProfiles"
+      >),
     })
     .returning();
   if (!result) throw new Error("Unable to create fixture");

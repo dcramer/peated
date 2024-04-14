@@ -2,7 +2,6 @@ import config from "@peated/server/config";
 import {
   CATEGORY_LIST,
   DEFAULT_CREATED_BY_ID,
-  DEFAULT_TAGS,
   FLAVOR_PROFILES,
 } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -20,7 +19,7 @@ if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-function generatePrompt(bottle: Bottle) {
+function generatePrompt(bottle: Bottle, tagList: string[]) {
   const infoLines = [];
   if (bottle.category) {
     infoLines.push(`Category: ${bottle.category}`);
@@ -59,12 +58,9 @@ If the whiskey is made in Scotland, it is always spelled "whisky".
 
 'suggestedTags' should be up to five items that reflect the flavor of this spirit the best. Values MUST be from the following list:
 
-- ${DEFAULT_TAGS.join("\n- ")}
+- ${tagList.join("\n- ")}
 `;
 }
-
-// XXX: enums dont work with GPT currently (it ignores them)
-const DefaultTagEnum = z.enum(DEFAULT_TAGS);
 
 const OpenAIBottleDetailsSchema = z.object({
   description: z.string().nullish(),
@@ -90,12 +86,15 @@ const OpenAIBottleDetailsValidationSchema = OpenAIBottleDetailsSchema.extend({
 
 type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
 
-async function generateBottleDetails(bottle: Bottle): Promise<Response | null> {
+async function generateBottleDetails(
+  bottle: Bottle,
+  tagList: string[],
+): Promise<Response | null> {
   if (!config.OPENAI_API_KEY)
     throw new Error("OPENAI_API_KEY is not configured");
 
   const result = await getStructuredResponse(
-    generatePrompt(bottle),
+    generatePrompt(bottle, tagList),
     OpenAIBottleDetailsSchema,
     OpenAIBottleDetailsValidationSchema,
     undefined,
@@ -117,7 +116,9 @@ export default async function ({ bottleId }: { bottleId: number }) {
   if (!bottle) {
     throw new Error(`Unknown bottle: ${bottleId}`);
   }
-  const result = await generateBottleDetails(bottle);
+
+  const tagList = (await db.query.tags.findMany()).map((r) => r.name);
+  const result = await generateBottleDetails(bottle, tagList);
 
   if (!result) {
     throw new Error(`Failed to generate details for bottle: ${bottleId}`);
@@ -138,16 +139,12 @@ export default async function ({ bottleId }: { bottleId: number }) {
     result.suggestedTags?.length &&
     !arraysEqual(result.suggestedTags, bottle.suggestedTags)
   ) {
-    if (
-      !result.suggestedTags.find((t) => !DefaultTagEnum.safeParse(t).success)
-    ) {
+    if (!result.suggestedTags.find((t) => !tagList.includes(t))) {
       data.suggestedTags = result.suggestedTags;
     } else {
       logError(`Invalid value for suggestedTags`, {
         tag: {
-          values: result.suggestedTags.filter(
-            (t) => !DefaultTagEnum.safeParse(t).success,
-          ),
+          values: result.suggestedTags.filter((t) => !tagList.includes(t)),
         },
         bottle: {
           id: bottle.id,

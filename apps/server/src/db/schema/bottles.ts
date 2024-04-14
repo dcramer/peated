@@ -204,3 +204,32 @@ export const bottleTombstonesRelations = relations(
 
 export type BottleTombstone = typeof bottleTombstones.$inferSelect;
 export type NewBottleTombstone = typeof bottleTombstones.$inferInsert;
+
+export const bottleFlavorProfiles = pgTable(
+  "bottle_flavor_profile",
+  {
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    flavorProfile: flavorProfileEnum("flavor_profile").notNull(),
+    count: integer("count").default(0).notNull(),
+  },
+  (table) => {
+    return {
+      pk: primaryKey(table.bottleId, table.flavorProfile),
+    };
+  },
+);
+
+export const bottleFlavorProfilesRelations = relations(
+  bottleFlavorProfiles,
+  ({ one }) => ({
+    bottle: one(bottles, {
+      fields: [bottleFlavorProfiles.bottleId],
+      references: [bottles.id],
+    }),
+  }),
+);
+
+export type BottleFlavorProfile = typeof bottleFlavorProfiles.$inferSelect;
+export type NewBottleFlavorProfile = typeof bottleFlavorProfiles.$inferInsert;

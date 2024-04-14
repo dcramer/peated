@@ -97,6 +97,7 @@ test("updates notes", async ({ defaults, fixtures }) => {
 });
 
 test("updates tags", async ({ defaults, fixtures }) => {
+  const tag = await fixtures.Tag();
   const tasting = await fixtures.Tasting({
     createdById: defaults.user.id,
   });
@@ -105,7 +106,7 @@ test("updates tags", async ({ defaults, fixtures }) => {
   });
   const data = await caller.tastingUpdate({
     tasting: tasting.id,
-    tags: ["oak"],
+    tags: [tag.name],
   });
 
   expect(data.id).toBeDefined();
@@ -116,7 +117,7 @@ test("updates tags", async ({ defaults, fixtures }) => {
     .where(eq(tastings.id, data.id));
 
   expect(omit(tasting, "tags")).toEqual(omit(newTasting, "tags"));
-  expect(newTasting.tags).toEqual(["oak"]);
+  expect(newTasting.tags).toEqual([tag.name]);
 
   const tagList = await db
     .select()
@@ -129,6 +130,6 @@ test("updates tags", async ({ defaults, fixtures }) => {
     );
 
   expect(tagList.length).toEqual(1);
-  expect(tagList[0].tag).toEqual("oak");
+  expect(tagList[0].tag).toEqual(tag.name);
   expect(tagList[0].count).toEqual(1);
 });

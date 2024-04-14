@@ -1,5 +1,9 @@
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { Category, FlavorProfile } from "@peated/server/types";
+import type {
+  Category,
+  FlavorProfile,
+  ServingStyle,
+} from "@peated/server/types";
 
 export function formatCategoryName(
   value: Category | string | undefined | null,
@@ -71,4 +75,8 @@ export function notesForProfile(profile: FlavorProfile): string {
     default:
       return "";
   }
+}
+
+export function formatServingStyle(style: ServingStyle) {
+  return toTitleCase(style);
 }

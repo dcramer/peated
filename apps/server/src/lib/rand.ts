@@ -2,7 +2,7 @@ export function random(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export function choose<T>(choices: T[]): T {
+export function choose<T>(choices: T[] | readonly T[]): T {
   const index = Math.floor(Math.random() * choices.length);
   return choices[index];
 }
