@@ -18,8 +18,6 @@ const TAGS: Record<TagCategory, string[]> = {
   ],
   fruity: [
     "acidic",
-    "anise",
-    "baking_spices",
     "green_apple",
     "lemon_zest",
     "fresh_berries",
@@ -73,6 +71,9 @@ const TAGS: Record<TagCategory, string[]> = {
   ],
   sulphury: ["burnt_matches", "gunpowder"],
   woody: [
+    "anise",
+    "baking_spices",
+    "nutmeg",
     "old_oak",
     "polished_wood",
     "vanilla_bean",
