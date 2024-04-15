@@ -91,23 +91,6 @@
     backdrop-filter: blur(4px);
   }
 
-  .card {
-    @apply overflow-hidden bg-slate-950;
-  }
-
-  .card-alt {
-    @apply bg-slate-950 text-white;
-  }
-
-  .card-header {
-    @apply flex items-center space-x-4;
-    background: rgba(0, 0, 0, 0.25);
-  }
-
-  .card-body {
-    @apply py-3;
-  }
-
   .menu {
     @apply relative text-sm;
   }

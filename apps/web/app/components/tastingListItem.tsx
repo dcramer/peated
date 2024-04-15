@@ -89,35 +89,37 @@ export default function TastingListItem({
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
 
   return (
-    <li className="card ring-1 ring-inset ring-slate-800">
-      <div className="card-header p-3 sm:px-5 sm:py-4">
-        <UserAvatar size={32} user={tasting.createdBy} />
-        <div className="flex-auto space-y-1 font-semibold">
-          <Link
-            to={`/users/${tasting.createdBy.username}`}
-            className="truncate hover:underline"
-          >
-            {tasting.createdBy.username}
-          </Link>
+    <li className="overflow-hidden bg-slate-950 ring-1 ring-inset ring-slate-800">
+      <div className="border-x border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
+        <div className="flex items-center space-x-4 p-3 sm:px-5 sm:py-4">
+          <UserAvatar size={32} user={tasting.createdBy} />
+          <div className="flex-auto space-y-1 font-semibold">
+            <Link
+              to={`/users/${tasting.createdBy.username}`}
+              className="truncate hover:underline"
+            >
+              {tasting.createdBy.username}
+            </Link>
+          </div>
+          <div className="flex flex-col items-end gap-y-2">
+            <Link to={`/tastings/${tasting.id}`} className="hover:underline">
+              <TimeSince
+                className="block text-sm font-light"
+                date={tasting.createdAt}
+              />
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col items-end gap-y-2">
-          <Link to={`/tastings/${tasting.id}`} className="hover:underline">
-            <TimeSince
-              className="block text-sm font-light"
-              date={tasting.createdAt}
-            />
-          </Link>
-        </div>
-      </div>
 
-      {!noBottle && (
-        <div className="p-3 sm:px-5">
-          <BottleCard noGutter bottle={bottle} />
-        </div>
-      )}
+        {!noBottle && (
+          <div className="p-3 sm:px-5">
+            <BottleCard color="inherit" noGutter bottle={bottle} />
+          </div>
+        )}
+      </div>
       <div>
         {!!tasting.imageUrl && (
-          <div className="mb-2 flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mr-4">
+          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mr-4">
             <ImageWithSkeleton
               src={tasting.imageUrl}
               className="h-full cursor-pointer"
@@ -131,12 +133,12 @@ export default function TastingListItem({
             />
           </div>
         )}
-        <div className="text-light px-3 text-sm sm:px-5">
+        <div className="text-light p-3 text-sm sm:px-5">
           {(tasting.servingStyle ||
             tasting.color ||
             tasting.rating ||
             tasting.tags.length > 0) && (
-            <DefinitionList className="grid-cols grid grid-cols-2 gap-y-1 sm:grid-cols-2">
+            <DefinitionList className="grid-cols grid grid-cols-2 gap-y-4 sm:grid-cols-2">
               {tasting.rating && (
                 <div>
                   <DefinitionList.Term>Rating</DefinitionList.Term>
@@ -181,7 +183,7 @@ export default function TastingListItem({
           )}
         </div>
 
-        <aside className="flex items-center space-x-3 px-3 py-2 pb-3 sm:px-5 sm:pb-4">
+        <aside className="flex items-center space-x-3 py-3 sm:px-5 sm:pb-4">
           {!hasToasted && !isTaster && user ? (
             <Button
               icon={
