@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { inArray } from "drizzle-orm";
 
 export async function validateTags(value: string[]): Promise<string[]> {
+  if (value.length === 0) return [];
   const tagList = Array.from(new Set(value.map((t) => t.toLowerCase())));
   const results = await db
     .select()

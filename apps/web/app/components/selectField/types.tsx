@@ -30,3 +30,5 @@ export type OnResults = (results: any[]) => Option[];
 export type OnQuery = (query: string) => Promise<Option[]>;
 
 export type OnRenderOption = (option: Option) => ReactNode;
+
+export type OnRenderChip = (option: Option) => ReactNode;

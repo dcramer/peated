@@ -5,7 +5,12 @@ export function Term(props: ComponentPropsWithoutRef<"dt">) {
 }
 
 export function Details(props: ComponentPropsWithoutRef<"dd">) {
-  return <dd className="text-light mb-4 leading-6" {...props} />;
+  return (
+    <dd
+      className="text-light mb-4 flex items-center gap-x-2 leading-6"
+      {...props}
+    />
+  );
 }
 
 export default function DefinitionList(props: ComponentPropsWithoutRef<"dl">) {

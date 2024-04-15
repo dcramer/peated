@@ -7,14 +7,18 @@ import {
 import { Link } from "@remix-run/react";
 import { useState } from "react";
 
+import { COLOR_SCALE } from "@peated/server/src/constants";
+import { formatColor, formatServingStyle } from "@peated/server/src/lib/format";
 import type { Tasting } from "@peated/server/types";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
 import { useEffect, type ComponentPropsWithoutRef } from "react";
 import BottleCard from "./bottleCard";
 import Button from "./button";
+import DefinitionList from "./definitionList";
 import { ImageModal } from "./imageModal";
 import { StaticRating } from "./rating";
+import ServingStyleIcon from "./servingStyleIcon";
 import ShareButton from "./shareButton";
 import Tags from "./tags";
 import TimeSince from "./timeSince";
@@ -85,9 +89,9 @@ export default function TastingListItem({
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
 
   return (
-    <li className="card p-2 ring-1 ring-inset ring-slate-800">
+    <li className="card ring-1 ring-inset ring-slate-800">
       <div className="card-header p-3 sm:px-5 sm:py-4">
-        <UserAvatar size={48} user={tasting.createdBy} />
+        <UserAvatar size={32} user={tasting.createdBy} />
         <div className="flex-auto space-y-1 font-semibold">
           <Link
             to={`/users/${tasting.createdBy.username}`}
@@ -95,6 +99,8 @@ export default function TastingListItem({
           >
             {tasting.createdBy.username}
           </Link>
+        </div>
+        <div className="flex flex-col items-end gap-y-2">
           <Link to={`/tastings/${tasting.id}`} className="hover:underline">
             <TimeSince
               className="block text-sm font-light"
@@ -102,14 +108,13 @@ export default function TastingListItem({
             />
           </Link>
         </div>
-        <div className="flex flex-col items-end gap-y-2">
-          {tasting.rating && (
-            <StaticRating value={tasting.rating} size="small" />
-          )}
-          <Tags tags={tasting.tags} />
-        </div>
       </div>
-      {!noBottle && <BottleCard bottle={bottle} />}
+
+      {!noBottle && (
+        <div className="p-3 sm:px-5">
+          <BottleCard noGutter bottle={bottle} />
+        </div>
+      )}
       <div>
         {!!tasting.imageUrl && (
           <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mb-0 sm:mr-4">
@@ -126,13 +131,57 @@ export default function TastingListItem({
             />
           </div>
         )}
-        {!hideNotes && !!tasting.notes && (
-          <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
-            {tasting.notes}
-          </p>
-        )}
+        <div className="text-light px-3 text-sm sm:px-5">
+          {(tasting.servingStyle ||
+            tasting.color ||
+            tasting.rating ||
+            tasting.tags.length > 0) && (
+            <DefinitionList className="grid-cols grid grid-cols-2 gap-y-1 sm:grid-cols-2">
+              {tasting.rating && (
+                <div>
+                  <DefinitionList.Term>Rating</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    <StaticRating value={tasting.rating} size="small" />
+                  </DefinitionList.Details>
+                </div>
+              )}
+              {tasting.tags.length > 0 && (
+                <div>
+                  <DefinitionList.Term>Notes</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    <Tags tags={tasting.tags} />
+                  </DefinitionList.Details>
+                </div>
+              )}
+              {tasting.servingStyle && (
+                <div>
+                  <DefinitionList.Term>Style</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    <ServingStyleIcon
+                      servingStyle={tasting.servingStyle}
+                      size={6}
+                    />
+                    {formatServingStyle(tasting.servingStyle)}
+                  </DefinitionList.Details>
+                </div>
+              )}
+              {tasting.color && (
+                <div>
+                  <DefinitionList.Term>Color</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    <div
+                      className="h-4 w-4"
+                      style={{ background: COLOR_SCALE[tasting.color][2] }}
+                    />
+                    {formatColor(tasting.color)}
+                  </DefinitionList.Details>
+                </div>
+              )}
+            </DefinitionList>
+          )}
+        </div>
 
-        <aside className="flex items-center space-x-3 p-3 sm:px-5 sm:py-4">
+        <aside className="flex items-center space-x-3 px-3 py-2 pb-3 sm:px-5 sm:pb-4">
           {!hasToasted && !isTaster && user ? (
             <Button
               icon={

@@ -1,4 +1,5 @@
 import { formatColor } from "@peated/server/lib/format";
+import { COLOR_SCALE } from "@peated/server/src/constants";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import type { FieldError } from "react-hook-form";
@@ -25,30 +26,6 @@ type InputEvent = FormEvent<HTMLInputElement> & {
     value: string;
   };
 };
-
-const colors = [
-  "#ffffff",
-  "#fffbe0",
-  "#fdeda2",
-  "#faea8a",
-  "#f7e07a",
-  "#f5db6d",
-  "#f5d863",
-  "#f0ce62",
-  "#f0c962",
-  "#efc358",
-  "#efbf50",
-  "#e0ae3d",
-  "#dea03d",
-  "#da9635",
-  "#cf7831",
-  "#d06c3a",
-  "#bf573a",
-  "#a23a2f",
-  "#932e24",
-  "#6a3022",
-  "#3b1d12",
-];
 
 export default forwardRef<HTMLInputElement, Props>(
   (
@@ -90,16 +67,16 @@ export default forwardRef<HTMLInputElement, Props>(
         <div className="flex flex-col">
           <div className="flex flex-1 gap-x-2">
             <div className="h-4 flex-1"></div>
-            {colors.map((c, id) => {
+            {COLOR_SCALE.map(([num, _, hexColor]) => {
               return (
                 <div
-                  key={id}
+                  key={num}
                   className={classNames(
                     "h-4 flex-1",
-                    id === value ? "-my-2 h-6 px-2" : "",
+                    num === value ? "-my-2 h-6 px-2" : "",
                   )}
                   style={{
-                    background: c,
+                    background: hexColor,
                   }}
                 ></div>
               );

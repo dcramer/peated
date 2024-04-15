@@ -29,6 +29,7 @@ import type { z } from "zod";
 import { isTRPCClientError, trpc } from "../lib/trpc";
 import ColorField from "./colorField";
 import Form from "./form";
+import ServingStyleIcon from "./servingStyleIcon";
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
 
@@ -214,8 +215,19 @@ export default function TastingForm({
                 {...field}
                 error={errors.servingStyle}
                 label="Serving Style"
+                noDialog
                 targetOptions={servingStyleList.length}
                 options={servingStyleList}
+                onRenderChip={(option) => {
+                  if (!option.id) return option.name;
+                  return (
+                    <ServingStyleIcon
+                      size={8}
+                      servingStyle={option.id as ServingStyle}
+                      className="m-2"
+                    />
+                  );
+                }}
                 onChange={(value) => onChange(value?.id)}
                 value={
                   value

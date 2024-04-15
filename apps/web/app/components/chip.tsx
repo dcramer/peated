@@ -46,7 +46,9 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
         active
           ? "border-slate-700 bg-slate-700 text-white hover:bg-slate-700"
           : colorClass,
-        size === "small" ? "h-[24px] px-[6px] text-sm" : "h-[32px] px-[12px]",
+        size === "small"
+          ? "min-h-[24px] px-[6px] text-sm"
+          : "min-h-[32px] px-[12px]",
       )}
       onClick={onClick}
       {...props}
