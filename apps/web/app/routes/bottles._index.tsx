@@ -252,9 +252,7 @@ function FilterSidebar() {
         )}
         {tag && (
           <li>
-            <div className="text-sm font-semibold text-slate-200">
-              Flavor Profile
-            </div>
+            <div className="text-sm font-semibold text-slate-200">Notes</div>
             <ul role="list" className="-mx-3 mt-2 space-y-1">
               <SidebarLink
                 active={!qs.get("tag")}
@@ -267,7 +265,7 @@ function FilterSidebar() {
                 }}
                 size="small"
               >
-                Any Flavors
+                Any Notes
               </SidebarLink>
               <SidebarLink
                 active={qs.get("tag") === tag}
