@@ -1,6 +1,7 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { logError } from "@peated/server/lib/log";
+import { formatColor } from "../lib/format";
 
 function absoluteUri(url: string, host: string) {
   if (url.indexOf("https://") === 0 || url.indexOf("http://") === 0) return url;
@@ -38,10 +39,24 @@ export default async function ({ tastingId }: { tastingId: number }) {
       inline: true,
     });
 
+  if (tasting.tags)
+    fields.push({
+      name: "Notes",
+      value: tasting.tags.join(", "),
+      inline: true,
+    });
+
   if (tasting.servingStyle)
     fields.push({
       name: "Serving Style",
       value: tasting.servingStyle,
+      inline: true,
+    });
+
+  if (tasting.color)
+    fields.push({
+      name: "Color",
+      value: formatColor(tasting.color),
       inline: true,
     });
 
