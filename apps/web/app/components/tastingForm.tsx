@@ -6,6 +6,7 @@ import type {
   Paginated,
   ServingStyle,
   SuggestedTag,
+  Tag,
   Tasting,
   User,
 } from "@peated/server/types";
@@ -103,6 +104,15 @@ export default function TastingForm({
     }
   };
 
+  type TagOption = Option & { count: number; tag: Tag };
+
+  const tagOptions = suggestedTags.results.map((t) => ({
+    id: t.tag.name,
+    name: toTitleCase(t.tag.name),
+    count: t.count,
+    tag: t.tag,
+  }));
+
   return (
     <Layout
       header={
@@ -152,33 +162,36 @@ export default function TastingForm({
             name="tags"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
+              <SelectField<TagOption>
                 {...field}
                 error={errors.tags}
                 label="Notes"
                 targetOptions={5}
                 placeholder="What flavors and aromas come to mind with this spirit?"
-                options={suggestedTags.results.map((t) => ({
-                  id: t.tag.name,
-                  name: toTitleCase(t.tag.name),
-                  count: t.count,
-                  tag: t.tag,
-                }))}
+                options={tagOptions}
+                onQuery={async (query, options) => {
+                  return options.filter(
+                    (o) =>
+                      o.name.toLowerCase().includes(query.toLowerCase()) ||
+                      o.tag.tagCategory
+                        .toLowerCase()
+                        .includes(query.toLowerCase()),
+                  );
+                }}
                 onRenderOption={(option) => {
                   return (
                     <div className="flex flex-col items-start">
                       <div>{option.name}</div>
                       <div className="text-light font-normal">
-                        {option.tag.tagCategory}
+                        {toTitleCase(option.tag.tagCategory)}
                       </div>
                     </div>
                   );
                 }}
                 onChange={(value) => onChange(value.map((t: any) => t.id))}
-                value={value?.map((t) => ({
-                  id: t,
-                  name: toTitleCase(t),
-                }))}
+                value={
+                  value ? tagOptions.filter((o) => value?.includes(o.id)) : []
+                }
                 multiple
               />
             )}

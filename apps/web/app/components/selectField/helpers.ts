@@ -1,7 +1,10 @@
 import type { Option } from "./types";
 
-export function filterDupes(firstList: Option[], ...moreLists: Option[][]) {
-  const results: Option[] = [...firstList];
+export function filterDupes<T extends Option>(
+  firstList: T[],
+  ...moreLists: T[][]
+) {
+  const results: T[] = [...firstList];
   const matches = new Set(firstList.map((i) => `${i.id || i.name}`));
 
   moreLists.forEach((options) => {

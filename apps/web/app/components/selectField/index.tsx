@@ -30,16 +30,16 @@ type BaseProps = {
   simple?: boolean;
 };
 
-type MultiProps =
+type MultiProps<T extends Option> =
   | {
       multiple?: never;
-      value?: Option | null | undefined;
-      onChange?: (value: Option) => void;
+      value?: T | null | undefined;
+      onChange?: (value: T) => void;
     }
   | {
       multiple: true;
-      value?: Option[] | null | undefined;
-      onChange?: (value: Option[]) => void;
+      value?: T[] | null | undefined;
+      onChange?: (value: T[]) => void;
     };
 
 type OptionProps<T extends Option> = {
@@ -64,7 +64,7 @@ type CreateProps<T extends Option> = {
 };
 
 type Props<T extends Option> = BaseProps &
-  MultiProps &
+  MultiProps<T> &
   OptionProps<T> &
   CreateProps<T>;
 
@@ -112,13 +112,13 @@ export default function SelectField<T extends Option>({
     setValue(newValue);
   }, [JSON.stringify(props.value)]);
 
-  const [value, setValue] = useState<Option[]>(initialValue);
-  const [previousValues, setPreviousValues] = useState<Option[]>(value);
+  const [value, setValue] = useState<T[]>(initialValue);
+  const [previousValues, setPreviousValues] = useState<T[]>(value);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   if (!suggestedOptions) suggestedOptions = options.slice(0, targetOptions);
 
-  const toggleOption = (option: Option) => {
+  const toggleOption = (option: T) => {
     setPreviousValues(filterDupes([option], previousValues));
     if (value.find((i) => i.id == option.id && i.name == option.name)) {
       setValue(value.filter((i) => i.id != option.id || i.name != option.name));
@@ -193,6 +193,7 @@ export default function SelectField<T extends Option>({
             <Chip
               as="button"
               onClick={(e: MouseEvent<HTMLElement>) => {
+                e.preventDefault();
                 e.stopPropagation();
                 setDialogOpen(true);
               }}
@@ -202,7 +203,7 @@ export default function SelectField<T extends Option>({
           )}
       </div>
       {!noDialog && (
-        <SelectDialog
+        <SelectDialog<T>
           open={dialogOpen}
           setOpen={setDialogOpen}
           onSelect={(option) => {

@@ -12,19 +12,13 @@ import CreateOptionDialog from "./createOptionDialog";
 import { filterDupes } from "./helpers";
 import type {
   CreateOptionForm,
-  EndpointOptions,
   OnQuery,
   OnRenderOption,
   OnResults,
+  Option,
 } from "./types";
 
-export type Option = {
-  id?: string | number | null;
-  name: string;
-  [key: string]: any;
-};
-
-export default ({
+export default function SelectDialog<T extends Option>({
   open,
   setOpen,
   onSelect,
@@ -33,30 +27,28 @@ export default ({
   canCreate = false,
   createForm,
   multiple = false,
-  endpoint,
   onQuery,
   onResults,
-  options,
+  options = [],
   onRenderOption,
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
-  onSelect?: (value: Option) => void;
-  selectedValues?: Option[];
+  onSelect?: (value: T) => void;
+  selectedValues?: T[];
   searchPlaceholder?: string;
   canCreate?: boolean;
   multiple?: boolean;
-  createForm?: CreateOptionForm;
-  onQuery?: OnQuery;
-  endpoint?: EndpointOptions;
-  onResults?: OnResults;
-  options?: Option[];
-  onRenderOption?: OnRenderOption;
-}) => {
+  createForm?: CreateOptionForm<T>;
+  onQuery?: OnQuery<T>;
+  onResults?: OnResults<T>;
+  options?: T[];
+  onRenderOption?: OnRenderOption<T>;
+}) {
   const [query, setQuery] = useState("");
-  const [optionList, setOptionList] = useState<Option[]>([...selectedValues]);
-  const [results, setResults] = useState<Option[]>([]);
-  const [previousValues, setPreviousValues] = useState<Option[]>([
+  const [optionList, setOptionList] = useState<T[]>([...selectedValues]);
+  const [results, setResults] = useState<T[]>([]);
+  const [previousValues, setPreviousValues] = useState<T[]>([
     ...selectedValues,
   ]);
 
@@ -64,8 +56,8 @@ export default ({
 
   const fetch = debounce(async (query = "") => {
     const results = onQuery
-      ? await onQuery(query)
-      : options?.filter(
+      ? await onQuery(query, options)
+      : options.filter(
           (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1,
         );
     if (results === undefined) throw new Error("Invalid results returned");
@@ -74,7 +66,7 @@ export default ({
 
   const onSearch = fetch;
 
-  const selectOption = async (option: Option) => {
+  const selectOption = async (option: T) => {
     setPreviousValues(filterDupes([option], previousValues));
     onSelect && onSelect(option);
   };
@@ -96,18 +88,20 @@ export default ({
       <Dialog.Overlay className="fixed inset-0" />
 
       <Dialog.Panel className="dialog-panel">
-        <header className="h-14 flex-shrink-0 overflow-hidden border-b border-b-slate-700 bg-slate-950 lg:h-16">
-          <div className="fixed left-0 right-0 z-10 mx-auto flex h-14 max-w-4xl lg:h-16">
-            <div className="flex flex-1 items-center justify-between px-4">
-              <SearchHeader
-                onClose={() => setOpen(false)}
-                onChange={(value) => {
-                  setQuery(value);
-                }}
-                onDone={multiple ? () => setOpen(false) : undefined}
-                closeIcon={<XMarkIcon className="h-8 w-8" />}
-                placeholder={searchPlaceholder}
-              />
+        <header className="h-14 flex-shrink-0 overflow-hidden lg:h-16">
+          <div className="fixed left-0 right-0 z-10 border-b border-b-slate-700 bg-slate-950">
+            <div className="mx-auto flex h-14 max-w-4xl lg:h-16">
+              <div className="flex flex-1 items-center justify-between px-4">
+                <SearchHeader
+                  onClose={() => setOpen(false)}
+                  onChange={(value) => {
+                    setQuery(value);
+                  }}
+                  onDone={multiple ? () => setOpen(false) : undefined}
+                  closeIcon={<XMarkIcon className="h-8 w-8" />}
+                  placeholder={searchPlaceholder}
+                />
+              </div>
             </div>
           </div>
         </header>
@@ -214,4 +208,4 @@ export default ({
       </Dialog.Panel>
     </Dialog>
   );
-};
+}

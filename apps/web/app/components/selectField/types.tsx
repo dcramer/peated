@@ -1,12 +1,11 @@
 import type { ReactNode } from "react";
 
-export type Option = Record<string, any> & {
+export type Option = {
   id?: string | number | null;
   name: string;
-  count?: number;
 };
 
-export type CreateOptionForm<T> = ({
+export type CreateOptionForm<T extends Option> = ({
   onSubmit,
   onClose,
   data,
@@ -18,17 +17,13 @@ export type CreateOptionForm<T> = ({
   onClose: () => void;
 }) => ReactNode;
 
-export type EndpointOptions =
-  | string
-  | {
-      path: string;
-      query?: Record<string, any>;
-    };
+export type OnResults<T extends Option> = (results: any[]) => T[];
 
-export type OnResults<T> = (results: any[]) => T[];
+export type OnQuery<T extends Option> = (
+  query: string,
+  options: T[],
+) => Promise<T[]>;
 
-export type OnQuery<T> = (query: string) => Promise<T[]>;
+export type OnRenderOption<T extends Option> = (option: T) => ReactNode;
 
-export type OnRenderOption<T> = (option: T) => ReactNode;
-
-export type OnRenderChip<T> = (option: T) => ReactNode;
+export type OnRenderChip<T extends Option> = (option: T) => ReactNode;
