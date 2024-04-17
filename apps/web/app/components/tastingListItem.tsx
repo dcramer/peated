@@ -161,7 +161,7 @@ export default function TastingListItem({
                   <DefinitionList.Details>
                     <ServingStyleIcon
                       servingStyle={tasting.servingStyle}
-                      size={6}
+                      size={4}
                     />
                     {formatServingStyle(tasting.servingStyle)}
                   </DefinitionList.Details>
