@@ -203,13 +203,7 @@ export default function TastingForm({
             render={({ field: { ref, onChange, ...field } }) => (
               <ColorField
                 {...field}
-                onChange={(e) =>
-                  onChange(
-                    e.target.value === "" || e.target.value === "-1"
-                      ? undefined
-                      : Number(e.target.value),
-                  )
-                }
+                onChange={(value) => onChange(value)}
                 error={errors.color}
                 label="Color"
               />

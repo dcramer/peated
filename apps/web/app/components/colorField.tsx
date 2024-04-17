@@ -1,6 +1,6 @@
 import { formatColor } from "@peated/server/lib/format";
 import { COLOR_SCALE } from "@peated/server/src/constants";
-import type { ChangeEvent, FormEvent, ReactNode } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import type { FieldError } from "react-hook-form";
 import classNames from "../lib/classNames";
@@ -14,11 +14,8 @@ type Props = {
   children?: ReactNode;
   className?: string;
   value?: number | null;
-  min?: string | number;
-  max?: string | number;
-  step?: string | number;
   error?: FieldError;
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (value: number | undefined) => void;
 };
 
 type InputEvent = FormEvent<HTMLInputElement> & {
@@ -35,9 +32,6 @@ export default forwardRef<HTMLInputElement, Props>(
       label,
       required,
       className,
-      min = "-1",
-      max = "20",
-      step = "1",
       value: initialValue,
       error,
       onChange,
@@ -64,43 +58,43 @@ export default forwardRef<HTMLInputElement, Props>(
         error={error}
         className={className}
       >
-        <div className="flex flex-col">
-          <div className="flex flex-1 gap-x-2">
-            <div className="h-4 flex-1"></div>
-            {COLOR_SCALE.map(([num, _, hexColor]) => {
-              return (
-                <div
-                  key={num}
-                  className={classNames(
-                    "h-4 flex-1",
-                    num === value ? "-my-2 h-6 px-2" : "",
-                  )}
-                  style={{
-                    background: hexColor,
-                  }}
-                ></div>
-              );
-            })}
-          </div>
+        <div className="flex flex-1 items-center gap-x-1 sm:gap-x-2">
+          <div
+            className="cursor h-4 flex-1"
+            onClick={(e) => {
+              e.preventDefault();
+              onChange && onChange(undefined);
+              setValue(-1);
+            }}
+          ></div>
+          {COLOR_SCALE.map(([num, _, hexColor]) => {
+            return (
+              <button
+                key={num}
+                className={classNames(
+                  "pointer h-4 flex-1",
+                  num === value ? "h-8 px-2" : "",
+                )}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setValue(num);
+                  onChange && onChange(num);
+                }}
+                style={{
+                  background: hexColor,
+                }}
+              ></button>
+            );
+          })}
           <input
+            type="hidden"
             name={name}
             id={`f-${name}`}
-            required={required}
-            min={min}
-            max={max}
-            step={step}
-            ref={ref}
             value={value}
-            type="range"
-            list={`m-${name}`}
-            className="range range-color range-sm mb-6 block h-1 w-full cursor-pointer"
-            {...props}
-            onInput={(e) => {
-              setValue(parseFloat((e as InputEvent).target.value));
-            }}
             onChange={(e) => {
-              setValue(parseFloat(e.target.value));
-              onChange && onChange(e);
+              const value = Number(e.target.value);
+              setValue(value);
+              onChange && onChange(value);
             }}
           />
         </div>
