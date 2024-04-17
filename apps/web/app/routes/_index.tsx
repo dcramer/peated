@@ -1,3 +1,4 @@
+import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/src/lib/format";
 import Alert from "@peated/web/components/alert";
 import Glyph from "@peated/web/components/assets/Glyph";
@@ -92,21 +93,41 @@ export default function Activity() {
             <Tabs fullWidth>
               <Tabs.Item active>Newest Bottles</Tabs.Item>
             </Tabs>
-            <ul className="my-2 flex flex-col gap-y-2">
-              {newBottleList.results.map((b) => {
+            <table className="my-2 min-w-full">
+              {newBottleList.results.map((bottle) => {
                 return (
-                  <li key={b.id} className="group relative leading-7">
-                    <BottleLink bottle={b} />
-                    <strong className="font-normal group-hover:underline">
-                      {b.fullName}
-                    </strong>
-                    <div className="text-light text-sm">
-                      {formatCategoryName(b.category)}
-                    </div>
-                  </li>
+                  <tr key={bottle.id} className="border-b border-slate-800">
+                    <td className="max-w-0 py-2 pl-4 pr-4 text-sm sm:pl-3">
+                      <div className="flex items-center space-x-1">
+                        <BottleLink
+                          bottle={bottle}
+                          className="font-medium hover:underline"
+                        >
+                          {bottle.fullName}
+                        </BottleLink>
+                        {bottle.isFavorite && (
+                          <StarIcon className="h-4 w-4" aria-hidden="true" />
+                        )}
+                        {bottle.hasTasted && (
+                          <CheckBadgeIcon
+                            className="h-4 w-4"
+                            aria-hidden="true"
+                          />
+                        )}
+                      </div>
+                      <div className="text-light text-sm">
+                        <Link
+                          to={`/bottles/?category=${bottle.category}`}
+                          className="hover:underline"
+                        >
+                          {formatCategoryName(bottle.category)}
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
                 );
               })}
-            </ul>
+            </table>
 
             <Tabs fullWidth>
               <Tabs.Item active>Market Prices</Tabs.Item>
@@ -216,35 +237,60 @@ function PriceChanges() {
     <div className="mt-4">
       <BetaNotice>This is a work in progress.</BetaNotice>
       {data.results.length ? (
-        <ul className="space-y-2 text-sm">
+        <table className="my-2 min-w-full text-sm">
+          <colgroup>
+            <col className="min-w-full sm:w-5/6" />
+            <col className="sm:w-1/6" />
+          </colgroup>
           {data.results.map((price) => {
+            const { bottle } = price;
             return (
-              <li key={price.id} className="flex space-x-2">
-                <Link
-                  to={`/bottles/${price.bottle.id}`}
-                  className="flex-auto truncate hover:underline"
-                >
-                  {price.bottle.fullName}
-                </Link>
-                <div className="text-light flex flex-col items-end text-xs">
-                  <span>${(price.price / 100).toFixed(2)}</span>
-                  <span
-                    className={classNames(
-                      price.previousPrice > price.price
-                        ? "text-green-500"
-                        : "text-red-500",
+              <tr key={price.id} className="border-b border-slate-800">
+                <td className="max-w-0 py-2 pl-4 pr-3 text-sm sm:pl-3">
+                  <div className="flex items-center space-x-1">
+                    <BottleLink
+                      bottle={bottle}
+                      className="font-medium hover:underline"
+                    >
+                      {bottle.fullName}
+                    </BottleLink>
+                    {bottle.isFavorite && (
+                      <StarIcon className="h-4 w-4" aria-hidden="true" />
                     )}
-                  >
-                    <PriceDelta
-                      price={price.price}
-                      previous={price.previousPrice}
-                    />
-                  </span>
-                </div>
-              </li>
+                    {bottle.hasTasted && (
+                      <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
+                    )}
+                  </div>
+                  <div className="text-light text-sm">
+                    <Link
+                      to={`/bottles/?category=${bottle.category}`}
+                      className="hover:underline"
+                    >
+                      {formatCategoryName(bottle.category)}
+                    </Link>
+                  </div>
+                </td>
+                <td className="py-2 pl-3 pr-4 text-right sm:table-cell sm:pr-3">
+                  <div className="text-light flex flex-col items-end text-xs">
+                    <span>${(price.price / 100).toFixed(2)}</span>
+                    <span
+                      className={classNames(
+                        price.previousPrice > price.price
+                          ? "text-green-500"
+                          : "text-red-500",
+                      )}
+                    >
+                      <PriceDelta
+                        price={price.price}
+                        previous={price.previousPrice}
+                      />
+                    </span>
+                  </div>
+                </td>
+              </tr>
             );
           })}
-        </ul>
+        </table>
       ) : (
         <p className="mt-4 text-center text-sm">No price history found.</p>
       )}
