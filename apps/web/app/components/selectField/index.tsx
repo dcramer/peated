@@ -9,6 +9,7 @@ import SelectDialog from "./selectDialog";
 import type {
   CreateOptionForm,
   OnQuery,
+  OnRenderChip,
   OnRenderOption,
   OnResults,
   Option,
@@ -22,49 +23,54 @@ type BaseProps = {
   error?: {
     message?: string;
   };
+  noDialog?: boolean;
   placeholder?: string;
   children?: ReactNode;
   className?: string;
   simple?: boolean;
 };
 
-type MultiProps =
+type MultiProps<T extends Option> =
   | {
       multiple?: never;
-      value?: Option | null | undefined;
-      onChange?: (value: Option) => void;
+      value?: T | null | undefined;
+      onChange?: (value: T) => void;
     }
   | {
       multiple: true;
-      value?: Option[] | null | undefined;
-      onChange?: (value: Option[]) => void;
+      value?: T[] | null | undefined;
+      onChange?: (value: T[]) => void;
     };
 
-type OptionProps = {
+type OptionProps<T extends Option> = {
   // options are gathered either via dynamic query
-  onQuery?: OnQuery;
+  onQuery?: OnQuery<T>;
   // coerce results to Options
-  onResults?: OnResults;
+  onResults?: OnResults<T>;
   // or fixed value
-  options?: Option[];
-  onRenderOption?: OnRenderOption;
+  options?: T[];
+  onRenderOption?: OnRenderOption<T>;
+  onRenderChip?: OnRenderChip<T>;
   // static suggestions can also be provided
-  suggestedOptions?: Option[];
+  suggestedOptions?: T[];
   // maximum number of options to backfill with suggestions
   // available for quick selection
   targetOptions?: number;
 };
 
-type CreateProps = {
+type CreateProps<T extends Option> = {
   canCreate?: boolean;
-  createForm?: CreateOptionForm;
+  createForm?: CreateOptionForm<T>;
 };
 
-type Props = BaseProps & MultiProps & OptionProps & CreateProps;
+type Props<T extends Option> = BaseProps &
+  MultiProps<T> &
+  OptionProps<T> &
+  CreateProps<T>;
 
 export type { Option };
 
-export default ({
+export default function SelectField<T extends Option>({
   name,
   helpText,
   label,
@@ -81,10 +87,12 @@ export default ({
   onResults,
   options = [],
   onRenderOption,
+  onRenderChip,
   onChange,
+  noDialog = false,
   error,
   ...props
-}: Props) => {
+}: Props<T>) {
   const initialValue = Array.isArray(props.value)
     ? props.value
     : props.value
@@ -104,13 +112,13 @@ export default ({
     setValue(newValue);
   }, [JSON.stringify(props.value)]);
 
-  const [value, setValue] = useState<Option[]>(initialValue);
-  const [previousValues, setPreviousValues] = useState<Option[]>(value);
+  const [value, setValue] = useState<T[]>(initialValue);
+  const [previousValues, setPreviousValues] = useState<T[]>(value);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   if (!suggestedOptions) suggestedOptions = options.slice(0, targetOptions);
 
-  const toggleOption = (option: Option) => {
+  const toggleOption = (option: T) => {
     setPreviousValues(filterDupes([option], previousValues));
     if (value.find((i) => i.id == option.id && i.name == option.name)) {
       setValue(value.filter((i) => i.id != option.id || i.name != option.name));
@@ -151,22 +159,28 @@ export default ({
       helpText={helpText}
       className={className}
       error={error}
-      labelAction={() => {
-        setDialogOpen(true);
-      }}
-      onClick={() => setDialogOpen(true)}
+      labelAction={
+        !noDialog
+          ? () => {
+              setDialogOpen(true);
+            }
+          : undefined
+      }
+      onClick={!noDialog ? () => setDialogOpen(true) : undefined}
     >
       <div className="mt-1 flex flex-wrap gap-2 overflow-x-auto sm:leading-6">
         {visibleValues.map((option) => (
           <Chip
+            as="button"
             key={`${option.id}-${option.name}`}
             active={value.includes(option)}
             onClick={(e: MouseEvent<HTMLElement>) => {
+              e.preventDefault();
               e.stopPropagation();
               toggleOption(option);
             }}
           >
-            {option.name}
+            {onRenderChip ? onRenderChip(option) : option.name}
           </Chip>
         ))}
         {visibleValues.length === 0 && placeholder && (
@@ -177,7 +191,9 @@ export default ({
           (!options.length || visibleValues.length != options.length) &&
           multiple && (
             <Chip
+              as="button"
               onClick={(e: MouseEvent<HTMLElement>) => {
+                e.preventDefault();
                 e.stopPropagation();
                 setDialogOpen(true);
               }}
@@ -186,23 +202,25 @@ export default ({
             </Chip>
           )}
       </div>
-      <SelectDialog
-        open={dialogOpen}
-        setOpen={setDialogOpen}
-        onSelect={(option) => {
-          const active = toggleOption(option);
-          if (!multiple && active) setDialogOpen(false);
-        }}
-        multiple={multiple}
-        canCreate={canCreate}
-        createForm={createForm}
-        selectedValues={value}
-        searchPlaceholder="Search"
-        onQuery={onQuery}
-        onResults={onResults}
-        options={options}
-        onRenderOption={onRenderOption}
-      />
+      {!noDialog && (
+        <SelectDialog<T>
+          open={dialogOpen}
+          setOpen={setDialogOpen}
+          onSelect={(option) => {
+            const active = toggleOption(option);
+            if (!multiple && active) setDialogOpen(false);
+          }}
+          multiple={multiple}
+          canCreate={canCreate}
+          createForm={createForm}
+          selectedValues={value}
+          searchPlaceholder="Search"
+          onQuery={onQuery}
+          onResults={onResults}
+          options={options}
+          onRenderOption={onRenderOption}
+        />
+      )}
     </FormField>
   );
-};
+}

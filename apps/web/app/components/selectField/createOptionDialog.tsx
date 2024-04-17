@@ -6,7 +6,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { CreateOptionForm, Option } from "./types";
 
 // TODO(dcramer): hitting escape doesnt do what you want here (it does nothing)
-export default function CreateOptionDialog({
+export default function CreateOptionDialog<T extends Option>({
   query = "",
   open,
   setOpen,
@@ -16,13 +16,13 @@ export default function CreateOptionDialog({
   query?: string;
   open: boolean;
   setOpen: (value: boolean) => void;
-  onSubmit: (newOption: Option) => void;
-  render: CreateOptionForm;
+  onSubmit: (newOption: T) => void;
+  render: CreateOptionForm<T>;
 }) {
-  const [newOption, setNewOption] = useState<Option>({
+  const [newOption, setNewOption] = useState<T>({
     id: null,
     name: "",
-  });
+  } as T);
 
   useEffect(() => {
     setNewOption((data) => ({ ...data, name: toTitleCase(query) }));
@@ -38,7 +38,7 @@ export default function CreateOptionDialog({
             setNewOption({
               id: null,
               name: "",
-            });
+            } as T);
             setOpen(false);
           },
           onClose: () => setOpen(false),

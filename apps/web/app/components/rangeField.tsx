@@ -82,12 +82,6 @@ export default forwardRef<HTMLInputElement, Props>(
             onChange && onChange(e);
           }}
         />
-        <datalist id={`m-${name}`}>
-          <option></option>
-          <option value="2"></option>
-          <option value="3"></option>
-          <option value="4"></option>
-        </datalist>
       </FormField>
     );
   },

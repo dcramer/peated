@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zDatetime } from "./common";
 import { UserSchema } from "./users";
 
 export const CommentSchema = z.object({
@@ -10,5 +11,5 @@ export const CommentSchema = z.object({
 
 export const CommentInputSchema = z.object({
   comment: z.string().trim().min(1, "Required"),
-  createdAt: z.string().datetime(),
+  createdAt: zDatetime,
 });

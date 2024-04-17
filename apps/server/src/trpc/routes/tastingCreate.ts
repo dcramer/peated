@@ -13,7 +13,6 @@ import {
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs/client";
 import { checkBadges } from "@peated/server/lib/badges";
-import { isDistantFuture, isDistantPast } from "@peated/server/lib/dates";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { TastingInputSchema } from "@peated/server/schemas";
@@ -22,6 +21,7 @@ import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { authedProcedure } from "..";
+import { validateTags } from "../validators/tags";
 
 export default authedProcedure
   .input(TastingInputSchema)
@@ -73,25 +73,12 @@ export default authedProcedure
       rating: input.rating || null,
       flightId: flight ? flight.id : null,
       servingStyle: input.servingStyle || null,
-      tags: input.tags
-        ? Array.from(new Set(input.tags.map((t) => t.toLowerCase())))
-        : [],
+      color: input.color || null,
+      tags: input.tags ? await validateTags(input.tags) : [],
       createdById: ctx.user.id,
     };
     if (input.createdAt) {
       data.createdAt = new Date(input.createdAt);
-      if (isDistantFuture(data.createdAt, 60 * 5)) {
-        throw new TRPCError({
-          message: "createdAt too far in future.",
-          code: "BAD_REQUEST",
-        });
-      }
-      if (isDistantPast(data.createdAt, 60 * 60 * 24 * 7)) {
-        throw new TRPCError({
-          message: "createdAt too far in the past.",
-          code: "BAD_REQUEST",
-        });
-      }
     }
 
     if (input.friends && input.friends.length) {

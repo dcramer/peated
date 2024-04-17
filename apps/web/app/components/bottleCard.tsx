@@ -2,6 +2,7 @@ import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import { Link } from "@remix-run/react";
+import type { ComponentPropsWithoutRef } from "react";
 import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
 import type { Option } from "./selectField";
@@ -27,7 +28,7 @@ function BottleScaffold({
   category: any;
   brand: any;
   statedAge: any;
-  color?: "default" | "highlight";
+  color?: "default" | "highlight" | "inherit";
   noGutter?: boolean;
   onClick?: () => void;
 }) {
@@ -37,7 +38,9 @@ function BottleScaffold({
         "flex items-center space-x-2 overflow-hidden sm:space-x-3",
         color === "highlight"
           ? "bg-highlight text-black"
-          : "bg-slate-950 text-white",
+          : color === "inherit"
+            ? ""
+            : "bg-slate-950 text-white",
         noGutter ? "" : "p-3 sm:px-5 sm:py-4",
         onClick
           ? color === "highlight"
@@ -98,10 +101,11 @@ export default function BottleCard({
   onClick,
 }: {
   bottle: Bottle;
-  noGutter?: boolean;
-  color?: "highlight" | "default";
   onClick?: (bottle: Bottle) => void;
-}) {
+} & Pick<
+  ComponentPropsWithoutRef<typeof BottleScaffold>,
+  "color" | "noGutter"
+>) {
   return (
     <BottleScaffold
       onClick={onClick ? () => onClick(bottle) : undefined}

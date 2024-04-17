@@ -1,32 +1,29 @@
 import type { ReactNode } from "react";
 
-export type Option = Record<string, any> & {
+export type Option = {
   id?: string | number | null;
   name: string;
-  count?: number;
 };
 
-export type CreateOptionForm = ({
+export type CreateOptionForm<T extends Option> = ({
   onSubmit,
   onClose,
   data,
   onFieldChange,
 }: {
-  data: Option;
-  onFieldChange: (arg0: Partial<Option>) => void;
-  onSubmit: (newOption: Option) => void;
+  data: T;
+  onFieldChange: (arg0: Partial<T>) => void;
+  onSubmit: (newOption: T) => void;
   onClose: () => void;
 }) => ReactNode;
 
-export type EndpointOptions =
-  | string
-  | {
-      path: string;
-      query?: Record<string, any>;
-    };
+export type OnResults<T extends Option> = (results: any[]) => T[];
 
-export type OnResults = (results: any[]) => Option[];
+export type OnQuery<T extends Option> = (
+  query: string,
+  options: T[],
+) => Promise<T[]>;
 
-export type OnQuery = (query: string) => Promise<Option[]>;
+export type OnRenderOption<T extends Option> = (option: T) => ReactNode;
 
-export type OnRenderOption = (option: Option) => ReactNode;
+export type OnRenderChip<T extends Option> = (option: T) => ReactNode;

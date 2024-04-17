@@ -5,6 +5,7 @@ import { TastingInputSchema } from "@peated/server/schemas";
 import type {
   Paginated,
   ServingStyle,
+  SuggestedTag,
   Tag,
   Tasting,
   User,
@@ -27,7 +28,9 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import { isTRPCClientError, trpc } from "../lib/trpc";
+import ColorField from "./colorField";
 import Form from "./form";
+import ServingStyleIcon from "./servingStyleIcon";
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
 
@@ -60,7 +63,7 @@ export default function TastingForm({
   >;
   initialData: Partial<Tasting> & Pick<Tasting, "bottle">;
   title: string;
-  suggestedTags: Paginated<Tag>;
+  suggestedTags: Paginated<SuggestedTag>;
 }) {
   const {
     control,
@@ -74,6 +77,7 @@ export default function TastingForm({
       rating: initialData.rating,
       notes: initialData.notes,
       tags: initialData.tags,
+      color: initialData.color,
       servingStyle: initialData.servingStyle,
       friends: initialData.friends ? initialData.friends.map((d) => d.id) : [],
     },
@@ -99,6 +103,15 @@ export default function TastingForm({
       }
     }
   };
+
+  type TagOption = Option & { count: number; tag: Tag };
+
+  const tagOptions = suggestedTags.results.map((t) => ({
+    id: t.tag.name,
+    name: toTitleCase(t.tag.name),
+    count: t.count,
+    tag: t.tag,
+  }));
 
   return (
     <Layout
@@ -149,22 +162,50 @@ export default function TastingForm({
             name="tags"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
+              <SelectField<TagOption>
                 {...field}
                 error={errors.tags}
                 label="Notes"
                 targetOptions={5}
-                options={suggestedTags.results.map((t) => ({
-                  id: t.tag,
-                  name: toTitleCase(t.tag),
-                  count: t.count,
-                }))}
+                placeholder="What flavors and aromas come to mind with this spirit?"
+                options={tagOptions}
+                onQuery={async (query, options) => {
+                  return options.filter(
+                    (o) =>
+                      o.name.toLowerCase().includes(query.toLowerCase()) ||
+                      o.tag.tagCategory
+                        .toLowerCase()
+                        .includes(query.toLowerCase()),
+                  );
+                }}
+                onRenderOption={(option) => {
+                  return (
+                    <div className="flex flex-col items-start">
+                      <div>{option.name}</div>
+                      <div className="text-light font-normal">
+                        {toTitleCase(option.tag.tagCategory)}
+                      </div>
+                    </div>
+                  );
+                }}
                 onChange={(value) => onChange(value.map((t: any) => t.id))}
-                value={value?.map((t) => ({
-                  id: t,
-                  name: toTitleCase(t),
-                }))}
+                value={
+                  value ? tagOptions.filter((o) => value?.includes(o.id)) : []
+                }
                 multiple
+              />
+            )}
+          />
+
+          <Controller
+            name="color"
+            control={control}
+            render={({ field: { ref, onChange, ...field } }) => (
+              <ColorField
+                {...field}
+                onChange={(value) => onChange(value)}
+                error={errors.color}
+                label="Color"
               />
             )}
           />
@@ -192,8 +233,19 @@ export default function TastingForm({
                 {...field}
                 error={errors.servingStyle}
                 label="Serving Style"
+                noDialog
                 targetOptions={servingStyleList.length}
                 options={servingStyleList}
+                onRenderChip={(option) => {
+                  if (!option.id) return option.name;
+                  return (
+                    <ServingStyleIcon
+                      size={8}
+                      servingStyle={option.id as ServingStyle}
+                      className="m-2"
+                    />
+                  );
+                }}
                 onChange={(value) => onChange(value?.id)}
                 value={
                   value

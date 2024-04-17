@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import type { Comment, NewComment } from "@peated/server/db/schema";
 import { comments, tastings } from "@peated/server/db/schema";
-import { isDistantFuture, isDistantPast } from "@peated/server/lib/dates";
 import { notifyComment } from "@peated/server/lib/email";
 import { createNotification } from "@peated/server/lib/notifications";
 import { CommentInputSchema } from "@peated/server/schemas";
@@ -41,18 +40,6 @@ export default authedProcedure
     };
     if (input.createdAt) {
       data.createdAt = new Date(input.createdAt);
-      if (isDistantFuture(data.createdAt, 60 * 5)) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "createdAt too far in future.",
-        });
-      }
-      if (isDistantPast(data.createdAt, 60 * 60 * 24 * 7)) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "createdAt too far in past.",
-        });
-      }
     }
 
     const user = ctx.user;

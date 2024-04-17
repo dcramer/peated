@@ -6,6 +6,7 @@ import type {
   EXTERNAL_SITE_TYPE_LIST,
   FLAVOR_PROFILES,
   SERVING_STYLE_LIST,
+  TAG_CATEGORIES,
 } from "./constants";
 import type {
   BadgeSchema,
@@ -34,6 +35,8 @@ import type {
 export type Category = (typeof CATEGORY_LIST)[number];
 export type ServingStyle = (typeof SERVING_STYLE_LIST)[number];
 export type FlavorProfile = (typeof FLAVOR_PROFILES)[number];
+export type TagCategory = (typeof TAG_CATEGORIES)[number];
+
 export type ExternalSiteType = (typeof EXTERNAL_SITE_TYPE_LIST)[number];
 export type Country = (typeof COUNTRY_LIST)[number];
 export type BadgeType = (typeof BADGE_TYPE_LIST)[number];
@@ -61,7 +64,12 @@ export type StorePrice = z.infer<typeof StorePriceSchema>;
 export type Tasting = z.infer<typeof TastingSchema>;
 export type User = z.infer<typeof UserSchema>;
 
-export type Tag = { tag: string; count: number };
+export type Tag = {
+  name: string;
+  tagCategory: TagCategory;
+  flavorProfiles: FlavorProfile[];
+};
+export type SuggestedTag = { tag: Tag; count: number };
 
 type NextPagingRel =
   | {

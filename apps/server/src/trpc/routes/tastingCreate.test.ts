@@ -56,6 +56,15 @@ test("creates a new tasting with minimal params", async ({
 });
 
 test("creates a new tasting with tags", async ({ defaults, fixtures }) => {
+  const tags = [
+    await fixtures.Tag({
+      name: "cherry",
+    }),
+    await fixtures.Tag({
+      name: "peat",
+    }),
+  ];
+
   const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
@@ -64,7 +73,7 @@ test("creates a new tasting with tags", async ({ defaults, fixtures }) => {
   const data = await caller.tastingCreate({
     bottle: bottle.id,
     rating: 3.5,
-    tags: ["cherry", "PEAT"],
+    tags: [tags[0].name, tags[1].name],
   });
 
   expect(data.id).toBeDefined();
@@ -76,17 +85,17 @@ test("creates a new tasting with tags", async ({ defaults, fixtures }) => {
 
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(defaults.user.id);
-  expect(tasting.tags).toEqual(["cherry", "peat"]);
+  expect(tasting.tags).toEqual([tags[0].name, tags[1].name]);
 
-  const tags = await db.query.bottleTags.findMany({
+  const bTags = await db.query.bottleTags.findMany({
     where: (bottleTags, { eq }) => eq(bottleTags.bottleId, tasting.bottleId),
     orderBy: (bottleTags, { asc }) => asc(bottleTags.tag),
   });
-  expect(tags.length).toBe(2);
-  expect(tags[0].tag).toBe("cherry");
-  expect(tags[0].count).toBe(1);
-  expect(tags[1].tag).toBe("peat");
-  expect(tags[1].count).toBe(1);
+  expect(bTags.length).toBe(2);
+  expect(bTags[0].tag).toBe(tags[0].name);
+  expect(bTags[0].count).toBe(1);
+  expect(bTags[1].tag).toBe(tags[1].name);
+  expect(bTags[1].count).toBe(1);
 });
 
 test("creates a new tasting with notes", async ({ defaults, fixtures }) => {
