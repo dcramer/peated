@@ -19,10 +19,12 @@ import { publicProcedure } from "..";
 const DEFAULT_SORT = "-tastings";
 
 const SORT_OPTIONS = [
+  "date",
   "name",
   "age",
   "rating",
   "tastings",
+  "-date",
   "-name",
   "-age",
   "-rating",
@@ -143,6 +145,12 @@ export default publicProcedure
 
     let orderBy: SQL<unknown>;
     switch (input.sort) {
+      case "date":
+        orderBy = asc(bottles.createdAt);
+        break;
+      case "-date":
+        orderBy = desc(bottles.createdAt);
+        break;
       case "name":
         orderBy = asc(bottles.fullName);
         break;

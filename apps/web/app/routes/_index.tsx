@@ -1,3 +1,4 @@
+import { formatCategoryName } from "@peated/server/src/lib/format";
 import Alert from "@peated/web/components/alert";
 import Glyph from "@peated/web/components/assets/Glyph";
 import BetaNotice from "@peated/web/components/betaNotice";
@@ -17,6 +18,7 @@ import { Link, useLoaderData, useLocation } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
+import BottleLink from "../components/bottleLink";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 const defaultViewParam = "global";
@@ -26,18 +28,27 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
     const { searchParams } = new URL(request.url);
     const filter = mapFilterParam(searchParams.get("view"));
 
-    return json({
-      tastingList: await trpc.tastingList.query({
+    const [tastingList, newBottleList] = await Promise.all([
+      trpc.tastingList.query({
         filter,
         limit: 10,
       }),
+      trpc.bottleList.query({
+        limit: 10,
+        sort: "-date",
+      }),
+    ]);
+
+    return json({
+      tastingList,
+      newBottleList,
     });
   },
 );
 
 export default function Activity() {
   const { user } = useAuth();
-  const { tastingList } = useLoaderData<typeof loader>();
+  const { tastingList, newBottleList } = useLoaderData<typeof loader>();
   const location = useLocation();
   const qs = new URLSearchParams(location.search);
   const filterParam = mapFilterParam(qs.get("view"));
@@ -45,7 +56,7 @@ export default function Activity() {
   return (
     <Layout>
       <div className="flex w-full">
-        <div className="flex-1 overflow-hidden lg:w-9/12">
+        <div className="flex-1 overflow-hidden lg:w-8/12">
           <Tabs fullWidth border>
             {user && (
               <Tabs.Item
@@ -65,7 +76,7 @@ export default function Activity() {
           </Tabs>
           <ActivityContent tastingList={tastingList} filter={filterParam} />
         </div>
-        <div className="ml-4 hidden w-3/12 lg:block">
+        <div className="ml-4 hidden w-4/12 lg:block">
           {!user && (
             <div className="flex flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800">
               <p className="text-light mb-4 text-sm">
@@ -78,6 +89,25 @@ export default function Activity() {
             </div>
           )}
           <div>
+            <Tabs fullWidth>
+              <Tabs.Item active>Newest Bottles</Tabs.Item>
+            </Tabs>
+            <ul className="my-2 flex flex-col gap-y-2">
+              {newBottleList.results.map((b) => {
+                return (
+                  <li key={b.id} className="group relative leading-7">
+                    <BottleLink bottle={b} />
+                    <strong className="font-normal group-hover:underline">
+                      {b.fullName}
+                    </strong>
+                    <div className="text-light text-sm">
+                      {formatCategoryName(b.category)}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
             <Tabs fullWidth>
               <Tabs.Item active>Market Prices</Tabs.Item>
             </Tabs>
