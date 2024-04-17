@@ -64,7 +64,11 @@ export type StorePrice = z.infer<typeof StorePriceSchema>;
 export type Tasting = z.infer<typeof TastingSchema>;
 export type User = z.infer<typeof UserSchema>;
 
-export type Tag = { name: string };
+export type Tag = {
+  name: string;
+  tagCategory: TagCategory;
+  flavorProfiles: FlavorProfile[];
+};
 export type SuggestedTag = { tag: Tag; count: number };
 
 type NextPagingRel =

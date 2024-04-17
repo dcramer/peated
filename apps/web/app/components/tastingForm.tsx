@@ -162,7 +162,18 @@ export default function TastingForm({
                   id: t.tag.name,
                   name: toTitleCase(t.tag.name),
                   count: t.count,
+                  tag: t.tag,
                 }))}
+                onRenderOption={(option) => {
+                  return (
+                    <div className="flex flex-col items-start">
+                      <div>{option.name}</div>
+                      <div className="text-light font-normal">
+                        {option.tag.tagCategory}
+                      </div>
+                    </div>
+                  );
+                }}
                 onChange={(value) => onChange(value.map((t: any) => t.id))}
                 value={value?.map((t) => ({
                   id: t,

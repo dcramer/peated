@@ -6,15 +6,15 @@ export type Option = Record<string, any> & {
   count?: number;
 };
 
-export type CreateOptionForm = ({
+export type CreateOptionForm<T> = ({
   onSubmit,
   onClose,
   data,
   onFieldChange,
 }: {
-  data: Option;
-  onFieldChange: (arg0: Partial<Option>) => void;
-  onSubmit: (newOption: Option) => void;
+  data: T;
+  onFieldChange: (arg0: Partial<T>) => void;
+  onSubmit: (newOption: T) => void;
   onClose: () => void;
 }) => ReactNode;
 
@@ -25,10 +25,10 @@ export type EndpointOptions =
       query?: Record<string, any>;
     };
 
-export type OnResults = (results: any[]) => Option[];
+export type OnResults<T> = (results: any[]) => T[];
 
-export type OnQuery = (query: string) => Promise<Option[]>;
+export type OnQuery<T> = (query: string) => Promise<T[]>;
 
-export type OnRenderOption = (option: Option) => ReactNode;
+export type OnRenderOption<T> = (option: T) => ReactNode;
 
-export type OnRenderChip = (option: Option) => ReactNode;
+export type OnRenderChip<T> = (option: T) => ReactNode;

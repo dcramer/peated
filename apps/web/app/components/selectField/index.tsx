@@ -42,32 +42,35 @@ type MultiProps =
       onChange?: (value: Option[]) => void;
     };
 
-type OptionProps = {
+type OptionProps<T extends Option> = {
   // options are gathered either via dynamic query
-  onQuery?: OnQuery;
+  onQuery?: OnQuery<T>;
   // coerce results to Options
-  onResults?: OnResults;
+  onResults?: OnResults<T>;
   // or fixed value
-  options?: Option[];
-  onRenderOption?: OnRenderOption;
-  onRenderChip?: OnRenderChip;
+  options?: T[];
+  onRenderOption?: OnRenderOption<T>;
+  onRenderChip?: OnRenderChip<T>;
   // static suggestions can also be provided
-  suggestedOptions?: Option[];
+  suggestedOptions?: T[];
   // maximum number of options to backfill with suggestions
   // available for quick selection
   targetOptions?: number;
 };
 
-type CreateProps = {
+type CreateProps<T extends Option> = {
   canCreate?: boolean;
-  createForm?: CreateOptionForm;
+  createForm?: CreateOptionForm<T>;
 };
 
-type Props = BaseProps & MultiProps & OptionProps & CreateProps;
+type Props<T extends Option> = BaseProps &
+  MultiProps &
+  OptionProps<T> &
+  CreateProps<T>;
 
 export type { Option };
 
-export default ({
+export default function SelectField<T extends Option>({
   name,
   helpText,
   label,
@@ -89,7 +92,7 @@ export default ({
   noDialog = false,
   error,
   ...props
-}: Props) => {
+}: Props<T>) {
   const initialValue = Array.isArray(props.value)
     ? props.value
     : props.value
@@ -219,4 +222,4 @@ export default ({
       )}
     </FormField>
   );
-};
+}
