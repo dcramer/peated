@@ -33,7 +33,7 @@ export default function BottlePanel({
       name: "Avg Rating",
       value:
         bottle.avgRating !== null
-          ? Math.round(bottle.avgRating * 100) / 100
+          ? (Math.round(bottle.avgRating * 100) / 100).toFixed(2)
           : "",
     },
     { name: "Tastings", value: bottle.totalTastings.toLocaleString() },
