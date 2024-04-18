@@ -1,8 +1,6 @@
 import type { User } from "../db/schema";
 
-type Item = {
-  id: number;
-};
+type Item = Record<string, any>;
 
 export type Attrs = Record<number, Record<string, any>>;
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FLAVOR_PROFILES } from "../constants";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 
 export const zTag = z.string();
@@ -28,3 +29,5 @@ export const zDatetime = z
 
     return value;
   });
+
+export const FlavorProfileEnum = z.enum(FLAVOR_PROFILES);

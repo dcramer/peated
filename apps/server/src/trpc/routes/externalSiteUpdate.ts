@@ -40,7 +40,7 @@ export default adminProcedure
       data.runEvery = input.runEvery;
     }
     if (Object.values(data).length === 0) {
-      return site;
+      return await serialize(ExternalSiteSerializer, site, ctx.user);
     }
     const newSite = await db.transaction(async (tx) => {
       let newSite: ExternalSite | undefined;

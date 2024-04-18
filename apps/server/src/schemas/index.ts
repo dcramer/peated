@@ -13,5 +13,6 @@ export * from "./notifications";
 export * from "./reviews";
 export * from "./shared";
 export * from "./stores";
+export * from "./tags";
 export * from "./tastings";
 export * from "./users";

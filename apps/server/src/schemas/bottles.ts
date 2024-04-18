@@ -1,11 +1,10 @@
 import { z } from "zod";
-import { CATEGORY_LIST, FLAVOR_PROFILES } from "../constants";
+import { CATEGORY_LIST } from "../constants";
+import { FlavorProfileEnum } from "./common";
 import { EntityInputSchema, EntitySchema } from "./entities";
 import { UserSchema } from "./users";
 
 export const CategoryEnum = z.enum(CATEGORY_LIST);
-
-export const FlavorProfileEnum = z.enum(FLAVOR_PROFILES);
 
 export const BottleSchema = z.object({
   id: z.number(),

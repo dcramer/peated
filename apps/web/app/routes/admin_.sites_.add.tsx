@@ -20,7 +20,7 @@ export const sitemap: SitemapFunction = () => ({
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Add Store",
+      title: "Add Site",
     },
   ];
 };

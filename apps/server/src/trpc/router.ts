@@ -56,6 +56,10 @@ import priceList from "./routes/priceList";
 import reviewCreate from "./routes/reviewCreate";
 import reviewList from "./routes/reviewList";
 import stats from "./routes/stats";
+import tagByName from "./routes/tagByName";
+import tagCreate from "./routes/tagCreate";
+import tagList from "./routes/tagList";
+import tagUpdate from "./routes/tagUpdate";
 import tastingById from "./routes/tastingById";
 import tastingCreate from "./routes/tastingCreate";
 import tastingDelete from "./routes/tastingDelete";
@@ -126,6 +130,10 @@ export const appRouter = router({
   stats,
   priceList,
   priceCreateBatch,
+  tagByName,
+  tagCreate,
+  tagList,
+  tagUpdate,
   tastingById,
   tastingCreate,
   tastingDelete,

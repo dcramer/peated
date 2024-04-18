@@ -1,26 +1,23 @@
-import { type ExternalSiteType } from "@peated/server/types";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { useNavigate } from "react-router-dom";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
-import SiteForm from "../components/admin/siteForm";
+import TagForm from "../components/admin/tagForm";
 import { redirectToAuth } from "../lib/auth";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 import { trpc } from "../lib/trpc";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, params: { siteId }, context: { user, trpc } }) => {
-    invariant(siteId);
+  async ({ request, params: { tagId }, context: { user, trpc } }) => {
+    invariant(tagId);
 
     if (!user?.admin) return redirectToAuth({ request });
 
-    const site = await trpc.externalSiteByType.query(
-      siteId as ExternalSiteType,
-    );
+    const tag = await trpc.tagByName.query(tagId);
 
-    return json({ site });
+    return json({ tag });
   },
 );
 
@@ -31,26 +28,27 @@ export const sitemap: SitemapFunction = () => ({
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Edit Site",
+      title: "Edit Tag",
     },
   ];
 };
 
-export default function AdminSitesEdit() {
-  const { site } = useLoaderData<typeof loader>();
+export default function AdminTagsEdit() {
+  const { tag } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
-  const siteUpdateMutation = trpc.externalSiteUpdate.useMutation();
+  const tagUpdateMutation = trpc.tagUpdate.useMutation();
 
   return (
-    <SiteForm
+    <TagForm
       onSubmit={async (data) => {
-        const newSite = await siteUpdateMutation.mutateAsync({
-          site: site.type,
+        const newTag = await tagUpdateMutation.mutateAsync({
           ...data,
+          name: tag.name,
         });
-        navigate(`/admin/sites/${newSite.type}`);
+        navigate(`/admin/tags/${newTag.name}`);
       }}
-      initialData={site}
+      edit
+      initialData={tag}
     />
   );
 }

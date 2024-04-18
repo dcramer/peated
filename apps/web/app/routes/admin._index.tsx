@@ -54,6 +54,9 @@ export default function Admin() {
           <li>
             <Link to="/admin/badges">Badges</Link>
           </li>
+          <li>
+            <Link to="/admin/tags">Tags</Link>
+          </li>
         </ul>
       </div>
 
