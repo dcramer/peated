@@ -20,6 +20,7 @@ import { isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
+import { bottleInputSuggestions } from "./bottleFormSuggestions";
 
 export async function bottleCreate({
   input,
@@ -35,12 +36,30 @@ export async function bottleCreate({
       code: "UNAUTHORIZED",
     });
   }
-  let [name, statedAge] = normalizeBottleName(input.name, input.statedAge);
+
+  const bottleData = { ...input };
+
+  const { mandatory } = await bottleInputSuggestions({ input, ctx });
+  // XXX: is there no better way to merge this and keep TS happy
+  if (mandatory.name) bottleData.name = mandatory.name;
+  if (mandatory.category) bottleData.category = mandatory.category;
+  if (mandatory.statedAge) bottleData.statedAge = mandatory.statedAge;
+  if (mandatory.brand) bottleData.brand = mandatory.brand;
+  if (mandatory.distillers) bottleData.distillers = mandatory.distillers;
+  if (mandatory.bottler) bottleData.bottler = mandatory.bottler;
+
+  // TODO: this should happen in the bottleInputSuggestions call
+  let [name, statedAge] = normalizeBottleName(
+    bottleData.name,
+    bottleData.statedAge,
+  );
+  bottleData.name = name;
+  bottleData.statedAge = statedAge;
 
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({
       db: tx,
-      data: input.brand,
+      data: bottleData.brand,
       type: "brand",
       userId: user.id,
     });
@@ -56,11 +75,11 @@ export async function bottleCreate({
 
     // TODO: we need to pull all this name uniform logic into a shared helper, as this
     // is missing from updateBottle
-    if (name.startsWith(brand.name)) {
-      name = name.substring(brand.name.length + 1);
+    if (bottleData.name.startsWith(brand.name)) {
+      bottleData.name = bottleData.name.substring(brand.name.length + 1);
     }
 
-    if (!name) {
+    if (!bottleData.name) {
       throw new TRPCError({
         message: "Invalid bottle name.",
         code: "BAD_REQUEST",
@@ -68,10 +87,10 @@ export async function bottleCreate({
     }
 
     let bottler: Entity | null = null;
-    if (input.bottler) {
+    if (bottleData.bottler) {
       const bottlerUpsert = await upsertEntity({
         db: tx,
-        data: input.bottler,
+        data: bottleData.bottler,
         type: "bottler",
         userId: user.id,
       });
@@ -85,18 +104,15 @@ export async function bottleCreate({
       }
     }
 
-    const fullName = `${brand.shortName || brand.name} ${name}`;
+    const fullName = `${brand.shortName || brand.name} ${bottleData.name}`;
 
     let bottle: Bottle | undefined;
     try {
       [bottle] = await tx
         .insert(bottles)
         .values({
-          name,
+          ...bottleData,
           fullName,
-          flavorProfile: input.flavorProfile,
-          statedAge: statedAge,
-          category: input.category || null,
           brandId: brand.id,
           bottlerId: bottler?.id || null,
           createdById: user.id,
@@ -134,8 +150,8 @@ export async function bottleCreate({
       });
 
     const distillerIds: number[] = [];
-    if (input.distillers)
-      for (const distData of input.distillers) {
+    if (bottleData.distillers)
+      for (const distData of bottleData.distillers) {
         const distUpsert = await upsertEntity({
           db: tx,
           data: distData,

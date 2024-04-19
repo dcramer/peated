@@ -4,8 +4,10 @@ import {
   type EntityInputSchema,
 } from "@peated/server/schemas";
 import { type BottleFormSuggestions } from "@peated/server/types";
+import { TRPCError } from "@trpc/server";
 import { type z } from "zod";
 import { authedProcedure } from "..";
+import { type Context } from "../context";
 import { createCaller } from "../router";
 
 async function getEntity(
@@ -15,55 +17,79 @@ async function getEntity(
   if (!input) return null;
 
   if (typeof input === "number") {
-    return await caller.entityById(input);
+    try {
+      return await caller.entityById(input);
+    } catch (err) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Entity not found with (ID=${input})`,
+        cause: err,
+      });
+    }
   }
   return input;
 }
 
-export default authedProcedure
-  .input(BottleInputSuggestionSchema)
-  .query(async function ({ input, ctx }) {
-    const rv: BottleFormSuggestions = {
-      mandatory: {
-        name: null,
-        category: null,
-        brand: null,
-        bottler: null,
-        distillers: null,
-        statedAge: null,
-      },
-      suggestions: {
-        name: null,
-        category: null,
-        brand: [],
-        bottler: [],
-        distillers: [],
-        statedAge: null,
-      },
-    };
+export async function bottleInputSuggestions({
+  input,
+  ctx,
+}: {
+  input: z.infer<typeof BottleInputSuggestionSchema>;
+  ctx: Context;
+}) {
+  const user = ctx.user;
+  if (!user) {
+    throw new TRPCError({
+      message: "Unauthorzed!",
+      code: "UNAUTHORIZED",
+    });
+  }
 
-    const caller = createCaller(ctx);
+  const rv: BottleFormSuggestions = {
+    mandatory: {
+      name: null,
+      category: null,
+      brand: null,
+      bottler: null,
+      distillers: null,
+      statedAge: null,
+    },
+    suggestions: {
+      name: null,
+      category: null,
+      brand: [],
+      bottler: [],
+      distillers: [],
+      statedAge: null,
+    },
+  };
 
-    const brand = await getEntity(caller, input.brand);
+  const caller = createCaller(ctx);
 
-    if (brand?.name.toLowerCase() === "the scotch malt whisky society") {
-      rv.mandatory.bottler = brand;
+  const brand = await getEntity(caller, input.brand);
 
-      if (input.name) {
-        const details = parseDetailsFromName(input.name);
-        if (details) {
-          rv.mandatory.category = details.category;
-          rv.suggestions.name = details.name;
+  if (brand?.name.toLowerCase() === "the scotch malt whisky society") {
+    rv.mandatory.bottler = brand;
 
-          if (details.distiller) {
-            const distiller = await getEntity(caller, {
-              name: details.distiller,
-            });
-            if (distiller) rv.mandatory.distillers = [distiller];
-          }
+    if (input.name) {
+      const details = parseDetailsFromName(input.name);
+      if (details) {
+        rv.mandatory.category = details.category;
+        rv.suggestions.name = details.name;
+
+        if (details.distiller) {
+          const distiller = await getEntity(caller, {
+            name: details.distiller,
+          });
+          if (distiller) rv.mandatory.distillers = [distiller];
         }
       }
     }
+  }
 
-    return rv;
-  });
+  return rv;
+}
+
+export default authedProcedure
+  .input(BottleInputSuggestionSchema)
+  .query(bottleInputSuggestions);
