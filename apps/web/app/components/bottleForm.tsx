@@ -139,7 +139,7 @@ export default function BottleForm({
       >
         {error && <FormError values={[error]} />}
 
-        <div className="border border-slate-700 p-3 sm:my-4 sm:p-4">
+        <div className="border border-slate-700 p-3 sm:mb-4 sm:p-4">
           <div className="prose text-light max-w-full text-sm leading-6">
             <p>
               It can be tricky to find the right information, so if you're
