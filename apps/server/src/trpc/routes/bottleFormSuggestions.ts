@@ -9,17 +9,17 @@ import { TRPCError } from "@trpc/server";
 import { type z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
-import { createCaller } from "../router";
+import { entityById } from "./entityById";
 
 async function getEntity(
-  caller: ReturnType<typeof createCaller>,
-  input?: number | z.infer<typeof EntityInputSchema> | null,
+  input: number | z.infer<typeof EntityInputSchema> | null | undefined,
+  ctx: Context,
 ) {
   if (!input) return null;
 
   if (typeof input === "number") {
     try {
-      return await caller.entityById(input);
+      return await entityById({ input, ctx });
     } catch (err) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -31,7 +31,7 @@ async function getEntity(
   return input;
 }
 
-export async function bottleInputSuggestions({
+export async function bottleNormalize({
   input,
   ctx,
 }: {
@@ -47,66 +47,56 @@ export async function bottleInputSuggestions({
   }
 
   const rv: BottleFormSuggestions = {
-    mandatory: {
-      name: null,
-      category: null,
-      brand: null,
-      bottler: null,
-      distillers: null,
-      statedAge: null,
-    },
-    suggestions: {
-      name: null,
-      category: null,
-      brand: [],
-      bottler: [],
-      distillers: [],
-      statedAge: null,
-    },
+    name: input.name ?? null,
+    category: input.category ?? null,
+    brand: null,
+    bottler: null,
+    distillers: null,
+    statedAge: input.statedAge ?? null,
+    flavorProfile: input.flavorProfile ?? null,
   };
 
-  const caller = createCaller(ctx);
+  rv.brand = await getEntity(input.brand, ctx);
 
-  const brand = await getEntity(caller, input.brand);
-
-  if (brand?.name.toLowerCase() === "the scotch malt whisky society") {
-    rv.mandatory.bottler = brand;
+  if (rv.brand?.name.toLowerCase() === "the scotch malt whisky society") {
+    rv.bottler = rv.brand;
 
     if (input.name) {
       const details = parseDetailsFromName(input.name);
       if (details) {
-        rv.mandatory.category = details.category;
-        rv.suggestions.name = details.name;
+        rv.category = details.category;
+        rv.name = details.name;
 
         if (details.distiller) {
-          const distiller = await getEntity(caller, {
-            name: details.distiller,
-          });
-          if (distiller) rv.mandatory.distillers = [distiller];
+          const distiller = await getEntity(
+            {
+              name: details.distiller,
+            },
+            ctx,
+          );
+          if (distiller) rv.distillers = [distiller];
         }
       }
     }
   }
 
-  // remove duplicate brand name prefix on bottle name
-  // e.g. Hibiki 12-year-old => Hibiki
-  let name = rv.mandatory.name ?? input.name;
-  let statedAge = rv.mandatory.statedAge ?? input.statedAge;
-  if (brand && name && name.startsWith(brand.name)) {
-    rv.mandatory.name = name.substring(brand.name.length + 1);
+  if (!rv.bottler && input.bottler) {
+    rv.bottler = await getEntity(input.bottler, ctx);
   }
 
-  // TODO: if we're going to use this for both inputs + the server, we should
-  // probably consider what this all means
-  // my thoughts are that 'suggestions' will appear in the UI, and are never enforced
-  // however, mandatory also shows (similar to suggestions), but gets enforced on
-  // submission. this basically means we suggest you change to the required final form
-  // but to ease the UX burden, we only actually freeze that when its submitted
+  // remove duplicate brand name prefix on bottle name
+  // e.g. Hibiki 12-year-old => Hibiki
+  let name = rv.name ?? input.name;
+  let statedAge = rv.statedAge ?? input.statedAge;
+  if (rv.brand && name && name.startsWith(rv.brand.name)) {
+    rv.name = name.substring(rv.brand.name.length + 1);
+  }
+
   if (name && statedAge) {
     [name, statedAge] = normalizeBottleName(name, statedAge);
 
-    rv.mandatory.name = name;
-    rv.mandatory.statedAge = statedAge;
+    rv.name = name;
+    rv.statedAge = statedAge;
   }
 
   return rv;
@@ -114,4 +104,4 @@ export async function bottleInputSuggestions({
 
 export default authedProcedure
   .input(BottleInputSuggestionSchema)
-  .query(bottleInputSuggestions);
+  .query(bottleNormalize);

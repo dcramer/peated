@@ -19,7 +19,7 @@ import { isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
-import { bottleInputSuggestions } from "./bottleFormSuggestions";
+import { bottleNormalize } from "./bottleFormSuggestions";
 
 export async function bottleCreate({
   input,
@@ -36,16 +36,7 @@ export async function bottleCreate({
     });
   }
 
-  const bottleData = { ...input };
-
-  const { mandatory } = await bottleInputSuggestions({ input, ctx });
-  // XXX: is there no better way to merge this and keep TS happy
-  if (mandatory.name) bottleData.name = mandatory.name;
-  if (mandatory.category) bottleData.category = mandatory.category;
-  if (mandatory.statedAge) bottleData.statedAge = mandatory.statedAge;
-  if (mandatory.brand) bottleData.brand = mandatory.brand;
-  if (mandatory.distillers) bottleData.distillers = mandatory.distillers;
-  if (mandatory.bottler) bottleData.bottler = mandatory.bottler;
+  const bottleData = await bottleNormalize({ input, ctx });
 
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({

@@ -10,7 +10,6 @@ import {
 import { pushJob } from "@peated/server/jobs/client";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
@@ -19,6 +18,7 @@ import { and, eq, ilike, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { upsertEntity } from "../../lib/db";
+import { bottleNormalize } from "./bottleFormSuggestions";
 
 export default modProcedure
   .input(
@@ -46,38 +46,31 @@ export default modProcedure
       });
     }
 
-    const bottleData: { [name: string]: any } = {};
-    const [normName, normStatedAge] =
-      input.name || input.statedAge !== undefined
-        ? normalizeBottleName(
-            input.name || bottle.name,
-            input.statedAge !== undefined ? input.statedAge : bottle.statedAge,
-          )
-        : [input.name, input.statedAge];
-
-    if (normName && normName !== bottle.name) {
-      bottleData.name = normName;
-    }
-
-    if (normStatedAge !== undefined && normStatedAge !== bottle.statedAge) {
-      bottleData.statedAge = normStatedAge;
-    }
-
-    if (input.category !== undefined && input.category !== bottle.category) {
-      bottleData.category = input.category;
-    }
-
-    if (
-      input.flavorProfile !== undefined &&
-      input.flavorProfile !== bottle.flavorProfile
-    ) {
-      bottleData.flavorProfile = input.flavorProfile;
-    }
+    const bottleData = await bottleNormalize({
+      input: {
+        name: bottle.name,
+        brand: {
+          name: bottle.brand.name,
+        },
+        bottler: bottle.bottler
+          ? {
+              name: bottle.bottler.name,
+            }
+          : null,
+        statedAge: bottle.statedAge,
+        category: bottle.category,
+        distillers: bottle.bottlesToDistillers.map((d) => ({
+          name: d.distiller.name,
+        })),
+        ...input,
+      },
+      ctx,
+    });
 
     const user = ctx.user;
     const newBottle = await db.transaction(async (tx) => {
       let brand: Entity | null = null;
-      if (input.brand) {
+      if (bottleData.brand) {
         if (
           typeof input.brand === "number"
             ? input.brand !== bottle.brand.id

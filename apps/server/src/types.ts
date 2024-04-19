@@ -100,20 +100,11 @@ type FreeformEntity =
   | z.infer<typeof EntitySchema>;
 
 export type BottleFormSuggestions = {
-  mandatory: {
-    name: string | null;
-    category: Category | null;
-    brand: FreeformEntity | null;
-    bottler: FreeformEntity | null;
-    distillers: FreeformEntity[] | null;
-    statedAge: number | null;
-  };
-  suggestions: {
-    name: string | null;
-    category: Category | null;
-    brand: FreeformEntity[];
-    bottler: FreeformEntity[];
-    distillers: FreeformEntity[];
-    statedAge: number | null;
-  };
+  name: string;
+  category: Category;
+  brand: FreeformEntity;
+  bottler: FreeformEntity | null;
+  distillers: FreeformEntity[] | null;
+  statedAge: number | null;
+  flavorProfile: FlavorProfile | null;
 };
