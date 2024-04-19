@@ -6,12 +6,7 @@ import {
   notesForProfile,
 } from "@peated/server/lib/format";
 import { BottleInputSchema } from "@peated/server/schemas";
-import type {
-  Bottle,
-  BottleFormSuggestions,
-  Entity,
-  FlavorProfile,
-} from "@peated/server/types";
+import type { Bottle, Entity, FlavorProfile } from "@peated/server/types";
 import { PreviewBottleCard } from "@peated/web/components/bottleCard";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
@@ -23,12 +18,11 @@ import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { logError } from "@peated/web/lib/log";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import { debounce } from "ts-debounce";
 import type { z } from "zod";
-import { isTRPCClientError, trpc } from "../lib/trpc";
+import { isTRPCClientError } from "../lib/trpc";
 import { classesForProfile } from "./flavorProfile";
 import Form from "./form";
 import Header from "./header";
@@ -126,23 +120,6 @@ export default function BottleForm({
     initialData.bottler ? entityToOption(initialData.bottler) : undefined,
   );
 
-  const [preview, setPreview] =
-    useState<BottleFormSuggestions>(DEFAULT_SUGGESTIONS);
-
-  const trpcUtils = trpc.useUtils();
-
-  useEffect(() => {
-    const { unsubscribe } = watch(
-      debounce((data, { name, type }) => {
-        if (!data.brand) return;
-        trpcUtils.bottlePreview.fetch(data).then((result) => {
-          setPreview(result);
-        });
-      }, 100),
-    );
-    return () => unsubscribe();
-  }, [watch]);
-
   return (
     <Layout
       header={
@@ -197,7 +174,6 @@ export default function BottleForm({
           <Controller
             name="brand"
             control={control}
-            disabled={!!suggestions.mandatory.brand}
             render={({ field: { onChange, value, ref, ...field } }) => (
               <EntityField
                 {...field}
@@ -232,7 +208,6 @@ export default function BottleForm({
             {...register("statedAge", {
               setValueAs: (v) => (v === "" || !v ? null : Number(v)),
             })}
-            disabled={!!suggestions.mandatory.statedAge}
             error={errors.statedAge}
             type="number"
             label="Stated Age"
@@ -244,7 +219,6 @@ export default function BottleForm({
           <Controller
             name="category"
             control={control}
-            disabled={!!suggestions.mandatory.category}
             render={({ field: { onChange, value, ref, ...field } }) => (
               <SelectField
                 {...field}
@@ -309,7 +283,6 @@ export default function BottleForm({
           <Controller
             name="distillers"
             control={control}
-            disabled={!!suggestions.mandatory.distillers?.length}
             render={({ field: { onChange, value, ref, ...field } }) => (
               <EntityField
                 {...field}
@@ -332,7 +305,6 @@ export default function BottleForm({
           <Controller
             name="bottler"
             control={control}
-            disabled={!!suggestions.mandatory.bottler}
             render={({ field: { onChange, value, ref, ...field } }) => (
               <EntityField
                 {...field}
