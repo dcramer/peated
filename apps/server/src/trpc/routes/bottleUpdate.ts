@@ -18,7 +18,7 @@ import { and, eq, ilike, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { upsertEntity } from "../../lib/db";
-import { bottleNormalize } from "./bottleFormSuggestions";
+import { bottleNormalize } from "./bottlePreview";
 
 export default modProcedure
   .input(
@@ -46,20 +46,23 @@ export default modProcedure
       });
     }
 
-    const bottleData = await bottleNormalize({
+    const bottleData: Record<string, any> = await bottleNormalize({
       input: {
         name: bottle.name,
         brand: {
+          id: bottle.brand.id,
           name: bottle.brand.name,
         },
         bottler: bottle.bottler
           ? {
+              id: bottle.bottler.id,
               name: bottle.bottler.name,
             }
           : null,
         statedAge: bottle.statedAge,
         category: bottle.category,
         distillers: bottle.bottlesToDistillers.map((d) => ({
+          id: d.distiller.id,
           name: d.distiller.name,
         })),
         ...input,
@@ -72,19 +75,19 @@ export default modProcedure
       let brand: Entity | null = null;
       if (bottleData.brand) {
         if (
-          typeof input.brand === "number"
-            ? input.brand !== bottle.brand.id
-            : input.brand.name !== bottle.brand.name
+          typeof bottleData.brand === "number"
+            ? bottleData.brand !== bottle.brand.id
+            : bottleData.brand.name !== bottle.brand.name
         ) {
           const brandUpsert = await upsertEntity({
             db: tx,
-            data: input.brand,
+            data: bottleData.brand,
             userId: user.id,
             type: "brand",
           });
           if (!brandUpsert)
             throw new TRPCError({
-              message: `Unable to find entity: ${input.brand}.`,
+              message: `Unable to find entity: ${bottleData.brand}.`,
               code: "INTERNAL_SERVER_ERROR",
             });
           if (brandUpsert.id !== bottle.brandId) {
@@ -94,21 +97,21 @@ export default modProcedure
         }
       }
 
-      if (input.bottler) {
+      if (bottleData.bottler) {
         if (
-          typeof input.bottler === "number"
-            ? input.bottler !== bottle.bottler?.id
-            : input.bottler.name !== bottle.bottler?.name
+          typeof bottleData.bottler === "number"
+            ? bottleData.bottler !== bottle.bottler?.id
+            : bottleData.bottler.name !== bottle.bottler?.name
         ) {
           const bottlerUpsert = await upsertEntity({
             db: tx,
-            data: input.bottler,
+            data: bottleData.bottler,
             userId: user.id,
             type: "bottler",
           });
           if (!bottlerUpsert) {
             throw new TRPCError({
-              message: `Unable to find entity: ${input.bottler}.`,
+              message: `Unable to find entity: ${bottleData.bottler}.`,
               code: "INTERNAL_SERVER_ERROR",
             });
           }
@@ -199,8 +202,8 @@ export default modProcedure
       );
 
       // find newly added distillers and connect them
-      if (input.distillers) {
-        for (const distData of input.distillers) {
+      if (bottleData.distillers) {
+        for (const distData of bottleData.distillers) {
           const distiller = currentDistillers.find((d2) =>
             typeof distData === "number"
               ? distData === d2.id

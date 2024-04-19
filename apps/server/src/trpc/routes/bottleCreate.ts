@@ -19,7 +19,7 @@ import { isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
-import { bottleNormalize } from "./bottleFormSuggestions";
+import { bottleNormalize } from "./bottlePreview";
 
 export async function bottleCreate({
   input,

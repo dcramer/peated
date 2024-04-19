@@ -37,19 +37,24 @@ export const BottleSchema = z.object({
   hasTasted: z.boolean().optional(),
 });
 
+const EntityChoice = z.union([
+  EntityInputSchema.extend({
+    id: z.number().nullish(),
+  }),
+  z.number(),
+]);
+
 export const BottleInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
-  brand: z.union([EntityInputSchema, z.number()]),
-  flavorProfile: FlavorProfileEnum.nullable().optional(),
-  distillers: z.array(z.union([EntityInputSchema, z.number()])).optional(),
-  bottler: z.union([EntityInputSchema, z.number()]).nullable().optional(),
-  statedAge: z.number().gte(0).lte(100).nullable().optional(),
-  category: CategoryEnum.nullable().optional(),
+  brand: EntityChoice,
+  flavorProfile: FlavorProfileEnum.nullish(),
+  distillers: z.array(EntityChoice).optional(),
+  bottler: EntityChoice.nullish(),
+  statedAge: z.number().gte(0).lte(100).nullish(),
+  category: CategoryEnum.nullish(),
 });
 
 export const BottleMergeSchema = z.object({
   bottleId: z.number(),
   direction: z.enum(["mergeInto", "mergeFrom"]),
 });
-
-export const BottleInputSuggestionSchema = BottleInputSchema.partial();

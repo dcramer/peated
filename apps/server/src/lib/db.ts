@@ -2,15 +2,7 @@ import { eq } from "drizzle-orm";
 import type { DatabaseType, TransactionType } from "../db";
 import type { Entity, EntityType } from "../db/schema";
 import { changes, collections, entities } from "../db/schema";
-
-export type EntityInput =
-  | number
-  | {
-      name: string;
-      country?: string | null;
-      region?: string | null;
-      type?: ("brand" | "bottler" | "distiller")[];
-    };
+import { type EntityInput } from "../types";
 
 export type UpsertOutcome<T> =
   | {
@@ -33,9 +25,10 @@ export const upsertEntity = async ({
 }): Promise<UpsertOutcome<Entity>> => {
   if (!data) return undefined;
 
-  if (typeof data === "number") {
+  if (typeof data === "number" || data.id) {
+    const entityId = typeof data === "number" ? data : Number(data.id);
     const result = await db.query.entities.findFirst({
-      where: (entities, { eq }) => eq(entities.id, data),
+      where: (entities, { eq }) => eq(entities.id, entityId),
     });
 
     if (result && type && !result.type.includes(type)) {

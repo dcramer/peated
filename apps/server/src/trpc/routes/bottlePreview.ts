@@ -1,10 +1,10 @@
 import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
 import {
-  BottleInputSuggestionSchema,
+  BottleInputSchema,
   type EntityInputSchema,
 } from "@peated/server/schemas";
-import { type BottleFormSuggestions } from "@peated/server/types";
+import { type BottlePreviewResult } from "@peated/server/types";
 import { TRPCError } from "@trpc/server";
 import { type z } from "zod";
 import { authedProcedure } from "..";
@@ -12,18 +12,16 @@ import { type Context } from "../context";
 import { entityById } from "./entityById";
 
 async function getEntity(
-  input: number | z.infer<typeof EntityInputSchema> | null | undefined,
+  input: number | z.infer<typeof EntityInputSchema>,
   ctx: Context,
 ) {
-  if (!input) return null;
-
   if (typeof input === "number") {
     try {
       return await entityById({ input, ctx });
     } catch (err) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Entity not found with (ID=${input})`,
+        message: `Entity not found [id: ${input}]`,
         cause: err,
       });
     }
@@ -35,7 +33,7 @@ export async function bottleNormalize({
   input,
   ctx,
 }: {
-  input: z.infer<typeof BottleInputSuggestionSchema>;
+  input: z.infer<typeof BottleInputSchema>;
   ctx: Context;
 }) {
   const user = ctx.user;
@@ -46,17 +44,17 @@ export async function bottleNormalize({
     });
   }
 
-  const rv: BottleFormSuggestions = {
-    name: input.name ?? null,
+  const brand = await getEntity(input.brand, ctx);
+
+  const rv: BottlePreviewResult = {
+    name: input.name,
     category: input.category ?? null,
-    brand: null,
+    brand,
     bottler: null,
     distillers: null,
     statedAge: input.statedAge ?? null,
     flavorProfile: input.flavorProfile ?? null,
   };
-
-  rv.brand = await getEntity(input.brand, ctx);
 
   if (rv.brand?.name.toLowerCase() === "the scotch malt whisky society") {
     rv.bottler = rv.brand;
@@ -64,8 +62,9 @@ export async function bottleNormalize({
     if (input.name) {
       const details = parseDetailsFromName(input.name);
       if (details) {
-        rv.category = details.category;
         rv.name = details.name;
+
+        if (details.category) rv.category = details.category;
 
         if (details.distiller) {
           const distiller = await getEntity(
@@ -102,6 +101,4 @@ export async function bottleNormalize({
   return rv;
 }
 
-export default authedProcedure
-  .input(BottleInputSuggestionSchema)
-  .query(bottleNormalize);
+export default authedProcedure.input(BottleInputSchema).query(bottleNormalize);

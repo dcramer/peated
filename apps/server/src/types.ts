@@ -95,13 +95,23 @@ export type Paginated<T> = {
   rel?: PagingRel;
 };
 
+export type EntityInput =
+  | number
+  | {
+      id?: number;
+      name: string;
+      country?: string | null;
+      region?: string | null;
+      type?: ("brand" | "bottler" | "distiller")[];
+    };
+
 type FreeformEntity =
   | z.infer<typeof EntityInputSchema>
   | z.infer<typeof EntitySchema>;
 
-export type BottleFormSuggestions = {
+export type BottlePreviewResult = {
   name: string;
-  category: Category;
+  category: Category | null;
   brand: FreeformEntity;
   bottler: FreeformEntity | null;
   distillers: FreeformEntity[] | null;
