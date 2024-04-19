@@ -12,9 +12,9 @@ import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
+import Form from "./form";
 import Header from "./header";
 import SelectField, { type Option } from "./selectField";
-import Spinner from "./spinner";
 
 const bottleToOption = (bottle: Bottle): Option => {
   return {
@@ -87,16 +87,10 @@ export default function FlightForm({
       }
       footer={null}
     >
-      {isSubmitting && (
-        <div className="fixed inset-0 z-10">
-          <div className="absolute inset-0 bg-slate-800 opacity-50" />
-          <Spinner />
-        </div>
-      )}
-
-      <form
+      <Form
         className="self-center bg-slate-950 pb-6 sm:mx-16 sm:my-6"
         onSubmit={handleSubmit(onSubmitHandler)}
+        isSubmitting={isSubmitting}
       >
         {error && <FormError values={[error]} />}
         <Fieldset>
@@ -146,7 +140,7 @@ export default function FlightForm({
             )}
           />
         </Fieldset>
-      </form>
+      </Form>
     </Layout>
   );
 }

@@ -8,7 +8,6 @@ import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
-import Spinner from "@peated/web/components/spinner";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
@@ -96,14 +95,7 @@ export default function MergeEntity() {
       }
       footer={null}
     >
-      {isSubmitting && (
-        <div className="fixed inset-0 z-10">
-          <div className="absolute inset-0 bg-slate-800 opacity-50" />
-          <Spinner />
-        </div>
-      )}
-
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmit)} isSubmitting={isSubmitting}>
         {entityMergeMutation.isError && (
           <FormError values={[entityMergeMutation.error.message]} />
         )}

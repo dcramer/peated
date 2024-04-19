@@ -8,7 +8,6 @@ import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import SelectField from "@peated/web/components/selectField";
-import Spinner from "@peated/web/components/spinner";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
 import { isTRPCClientError } from "@peated/web/lib/trpc";
@@ -66,14 +65,11 @@ export default function SiteForm({
       }
       footer={null}
     >
-      {isSubmitting && (
-        <div className="fixed inset-0 z-10">
-          <div className="absolute inset-0 bg-slate-800 opacity-50" />
-          <Spinner />
-        </div>
-      )}
-
-      <Form className="sm:mx-16" onSubmit={handleSubmit(onSubmitHandler)}>
+      <Form
+        className="sm:mx-16"
+        onSubmit={handleSubmit(onSubmitHandler)}
+        isSubmitting={isSubmitting}
+      >
         {error && <FormError values={[error]} />}
 
         <Fieldset>

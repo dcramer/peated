@@ -23,7 +23,7 @@ import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { logError } from "@peated/web/lib/log";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import { debounce } from "ts-debounce";
@@ -32,7 +32,6 @@ import { isTRPCClientError, trpc } from "../lib/trpc";
 import { classesForProfile } from "./flavorProfile";
 import Form from "./form";
 import Header from "./header";
-import Spinner from "./spinner";
 
 const categoryList = CATEGORY_LIST.map((c) => ({
   id: c,
@@ -127,7 +126,7 @@ export default function BottleForm({
     initialData.bottler ? entityToOption(initialData.bottler) : undefined,
   );
 
-  const [suggestions, setSuggestions] =
+  const [preview, setPreview] =
     useState<BottleFormSuggestions>(DEFAULT_SUGGESTIONS);
 
   const trpcUtils = trpc.useUtils();
@@ -136,8 +135,8 @@ export default function BottleForm({
     const { unsubscribe } = watch(
       debounce((data, { name, type }) => {
         if (!data.brand) return;
-        trpcUtils.bottleFormSuggestions.fetch(data).then((result) => {
-          setSuggestions(result);
+        trpcUtils.bottlePreview.fetch(data).then((result) => {
+          setPreview(result);
         });
       }, 100),
     );
@@ -157,14 +156,10 @@ export default function BottleForm({
       }
       footer={null}
     >
-      {isSubmitting && (
-        <div className="fixed inset-0 z-10">
-          <div className="absolute inset-0 bg-slate-800 opacity-50" />
-          <Spinner />
-        </div>
-      )}
-
-      <Form onSubmit={handleSubmit(onSubmitHandler)}>
+      <Form
+        onSubmit={handleSubmit(onSubmitHandler)}
+        isSubmitting={isSubmitting}
+      >
         {error && <FormError values={[error]} />}
 
         <div className="border border-slate-700 p-3 sm:my-4 sm:p-4">

@@ -6,7 +6,6 @@ import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import ImageField from "@peated/web/components/imageField";
 import Layout from "@peated/web/components/layout";
-import Spinner from "@peated/web/components/spinner";
 import useApi from "@peated/web/hooks/useApi";
 import { ApiError } from "@peated/web/lib/api";
 import { redirectToAuth } from "@peated/web/lib/auth";
@@ -138,15 +137,10 @@ export default function EditTastingImage() {
       }
       footer={null}
     >
-      {isSubmitting && (
-        <div className="fixed inset-0 z-10">
-          <div className="absolute inset-0 bg-slate-800 opacity-50" />
-          <Spinner />
-        </div>
-      )}
       <Form
         className="w-full max-w-xl self-center bg-slate-950 pb-6 sm:my-6"
         onSubmit={handleSubmit(onSubmit)}
+        isSubmitting={isSubmitting}
       >
         {error && <FormError values={[error]} />}
 

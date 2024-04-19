@@ -20,7 +20,6 @@ import Layout from "@peated/web/components/layout";
 import RangeField from "@peated/web/components/rangeField";
 import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
-import Spinner from "@peated/web/components/spinner";
 import TextAreaField from "@peated/web/components/textAreaField";
 import { logError } from "@peated/web/lib/log";
 import { useState } from "react";
@@ -126,14 +125,10 @@ export default function TastingForm({
       }
       footer={null}
     >
-      {isSubmitting && (
-        <div className="fixed inset-0 z-10">
-          <div className="absolute inset-0 bg-slate-800 opacity-50" />
-          <Spinner />
-        </div>
-      )}
-
-      <Form onSubmit={handleSubmit(onSubmitHandler)}>
+      <Form
+        onSubmit={handleSubmit(onSubmitHandler)}
+        isSubmitting={isSubmitting}
+      >
         {error && <FormError values={[error]} />}
 
         <div className="sm:mb-4">
