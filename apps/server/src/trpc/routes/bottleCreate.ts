@@ -11,7 +11,6 @@ import { pushJob } from "@peated/server/jobs/client";
 import { upsertEntity } from "@peated/server/lib/db";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
@@ -48,14 +47,6 @@ export async function bottleCreate({
   if (mandatory.distillers) bottleData.distillers = mandatory.distillers;
   if (mandatory.bottler) bottleData.bottler = mandatory.bottler;
 
-  // TODO: this should happen in the bottleInputSuggestions call
-  let [name, statedAge] = normalizeBottleName(
-    bottleData.name,
-    bottleData.statedAge,
-  );
-  bottleData.name = name;
-  bottleData.statedAge = statedAge;
-
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({
       db: tx,
@@ -72,12 +63,6 @@ export async function bottleCreate({
     }
 
     const brand = brandUpsert.result;
-
-    // TODO: we need to pull all this name uniform logic into a shared helper, as this
-    // is missing from updateBottle
-    if (bottleData.name.startsWith(brand.name)) {
-      bottleData.name = bottleData.name.substring(brand.name.length + 1);
-    }
 
     if (!bottleData.name) {
       throw new TRPCError({

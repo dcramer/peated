@@ -1,3 +1,4 @@
+import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
 import {
   BottleInputSuggestionSchema,
@@ -85,6 +86,27 @@ export async function bottleInputSuggestions({
         }
       }
     }
+  }
+
+  // remove duplicate brand name prefix on bottle name
+  // e.g. Hibiki 12-year-old => Hibiki
+  let name = rv.mandatory.name ?? input.name;
+  let statedAge = rv.mandatory.statedAge ?? input.statedAge;
+  if (brand && name && name.startsWith(brand.name)) {
+    rv.mandatory.name = name.substring(brand.name.length + 1);
+  }
+
+  // TODO: if we're going to use this for both inputs + the server, we should
+  // probably consider what this all means
+  // my thoughts are that 'suggestions' will appear in the UI, and are never enforced
+  // however, mandatory also shows (similar to suggestions), but gets enforced on
+  // submission. this basically means we suggest you change to the required final form
+  // but to ease the UX burden, we only actually freeze that when its submitted
+  if (name && statedAge) {
+    [name, statedAge] = normalizeBottleName(name, statedAge);
+
+    rv.mandatory.name = name;
+    rv.mandatory.statedAge = statedAge;
   }
 
   return rv;
