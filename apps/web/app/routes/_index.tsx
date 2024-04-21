@@ -115,14 +115,16 @@ export default function Activity() {
                           />
                         )}
                       </div>
-                      <div className="text-light text-sm">
-                        <Link
-                          to={`/bottles/?category=${bottle.category}`}
-                          className="hover:underline"
-                        >
-                          {formatCategoryName(bottle.category)}
-                        </Link>
-                      </div>
+                      {!!bottle.category && (
+                        <div className="text-light text-sm">
+                          <Link
+                            to={`/bottles/?category=${bottle.category}`}
+                            className="hover:underline"
+                          >
+                            {formatCategoryName(bottle.category)}
+                          </Link>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );
