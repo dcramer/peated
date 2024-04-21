@@ -4,8 +4,8 @@
   "scripts": {
     "assets": "npx @svgr/cli --out-dir app/components/assets -- app/assets",
     "assets:watch": "npm-watch assets",
-    "build": "npm run build:remix && npm run build:server && npm run build:assets && npm run build:sitemap",
-    "build:remix": "cross-env NODE_ENV=production remix build --sourcemap && npm run sentry:upload-sourcemaps && find ./public/build -type f -name '*.map' -delete && find ./build -type f -name '*.map' -delete",
+    "build": "npm run build:remix && npm run build:server && npm run build:assets && npm run build:sitemap && npm run sentry:upload-sourcemaps && find ./public/build -type f -name '*.map' -delete && find ./build -type f -name '*.map' -delete",
+    "build:remix": "cross-env NODE_ENV=production remix build --sourcemap",
     "build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle --sourcemap",
     "build:assets": "npm run assets",
     "build:sitemap": "remix-sitemap",
