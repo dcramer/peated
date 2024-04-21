@@ -209,8 +209,8 @@ export const Bottle = async (
     const [bottle] = await tx
       .insert(bottles)
       .values({
-        category: choose([...CATEGORY_LIST, undefined]),
-        statedAge: choose([undefined, 3, 10, 12, 15, 18, 20, 25]),
+        category: choose([...CATEGORY_LIST, null, null]),
+        statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
         ...data,
         name,
         fullName: `${brand.name} ${name}`,
