@@ -2,7 +2,6 @@ import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { useNavigate } from "@remix-run/react";
 import type { ReactNode } from "react";
 import { useState } from "react";
-import classNames from "../lib/classNames";
 
 export default function SearchHeader({
   name,
@@ -34,21 +33,19 @@ export default function SearchHeader({
   let _lastValue = value;
 
   return (
-    <nav className="flex min-w-full items-stretch justify-between text-white lg:mx-3">
-      <div className="text-light flex items-stretch hover:text-white lg:hover:bg-slate-700">
+    <nav className="flex min-w-full items-stretch justify-between text-white lg:mx-3 lg:gap-x-3">
+      <div className="-mx-3 flex items-center">
         <button
           onClick={() => (onClose ? onClose() : navigate(-1))}
-          className={`${blockStyles} flex items-center justify-center`}
+          className={`${blockStyles} text-light group flex justify-center`}
         >
-          <span className="sr-only">Back</span>
-          <span className="h-8 w-8">{closeIcon}</span>
+          <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
+            {closeIcon}
+          </div>
         </button>
       </div>
       <form
-        className={classNames(
-          blockStyles,
-          `flex flex-auto flex-row items-center justify-center`,
-        )}
+        className={`flex flex-auto flex-col items-stretch justify-center pl-3 pr-2 lg:pr-7`}
         onSubmit={(e) => {
           e.preventDefault();
 
@@ -66,7 +63,7 @@ export default function SearchHeader({
             setValue(e.target.value);
             if (onChange) onChange(e.target.value);
           }}
-          className="w-full transform rounded border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-2"
+          className="block transform rounded border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-1.5"
         />
       </form>
       {onDone && (
@@ -75,7 +72,7 @@ export default function SearchHeader({
             onClick={onDone}
             className={`group min-h-full ${blockStyles}`}
           >
-            <span className="bg-peated-dark group-hover:bg-peated-dark focus-visible:outline-peated rounded p-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+            <span className="text-light rounded bg-slate-800 p-2.5 font-semibold group-hover:bg-slate-700 group-hover:text-white">
               Done
             </span>
           </button>

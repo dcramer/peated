@@ -26,14 +26,14 @@ export default function FormHeader({
 
   return (
     <nav className="flex min-w-full items-stretch justify-between text-white lg:mx-3">
-      <div className="text-light -mx-3 flex hover:text-white">
+      <div className="-mx-3 flex justify-center">
         <button
           onClick={() => (onClose ? onClose() : navigate(-1))}
-          className={`${blockStyles} flex items-stretch hover:bg-slate-800`}
+          className={`${blockStyles} text-light group`}
         >
-          <span className="sr-only">Back</span>
-          <div className="h-8 w-8">
-            {icon || <ChevronLeftIcon className="h-full w-full" />}
+          <div className="sr-only">Back</div>
+          <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
+            {icon || <ChevronLeftIcon className="h-8 w-8" />}
           </div>
         </button>
       </div>
@@ -47,21 +47,21 @@ export default function FormHeader({
           </h2>
         )}
       </div>
-      <div className="-mx-3">
+      <div className="-mr-3 flex justify-center lg:mr-3">
         <button
           onClick={!saveDisabled ? onSave : undefined}
           className={classNames(
-            `text-light min-h-full hover:bg-slate-800 hover:text-white`,
+            `text-light group hover:text-white`,
             blockStyles,
             saveDisabled ? "cursor-auto" : "",
           )}
         >
           <div
             className={classNames(
-              "-my-3 rounded p-3 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+              "rounded p-3 py-1.5 font-semibold shadow-sm",
               saveDisabled
                 ? "bg-peated-dark text-peated"
-                : "focus-visible:outline-peated",
+                : "bg-slate-800 group-hover:bg-slate-700",
             )}
           >
             {saveLabel}
