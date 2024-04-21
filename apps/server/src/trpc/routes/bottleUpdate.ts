@@ -161,32 +161,20 @@ export default modProcedure
         const existingAlias = await tx.query.bottleAliases.findFirst({
           where: ilike(bottleAliases.name, newBottle.fullName),
         });
-        // TODO: consider deleting duplicate alias at this point
-        if (!existingAlias) {
+        if (existingAlias?.bottleId === newBottle.id) {
+          // we're good - likely renaming to an alias that already existed
+        } else if (!existingAlias) {
+          await tx.insert(bottleAliases).values({
+            name: newBottle.fullName,
+            bottleId: newBottle.id,
+          });
+        } else if (!existingAlias.bottleId) {
           await tx
             .update(bottleAliases)
             .set({
-              name: newBottle.fullName,
+              bottleId: newBottle.id,
             })
-            .where(
-              and(
-                eq(bottleAliases.bottleId, newBottle.id),
-                eq(bottleAliases.name, bottle.fullName),
-              ),
-            );
-          // this should only happen on entity change
-        } else if (
-          !existingAlias.bottleId ||
-          existingAlias.bottleId === newBottle.id
-        ) {
-          await tx
-            .delete(bottleAliases)
-            .where(
-              and(
-                eq(bottleAliases.bottleId, newBottle.id),
-                eq(bottleAliases.name, bottle.fullName),
-              ),
-            );
+            .where(and(eq(bottleAliases.name, newBottle.fullName)));
         } else {
           throw new Error(
             `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,

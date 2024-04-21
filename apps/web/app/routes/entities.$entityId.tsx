@@ -1,8 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import EntityIcon from "@peated/web/components/assets/Entity";
 import Button from "@peated/web/components/button";
-import Chip from "@peated/web/components/chip";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Layout from "@peated/web/components/layout";
 import ShareButton from "@peated/web/components/shareButton";
@@ -20,7 +18,7 @@ import {
 } from "@remix-run/react";
 import { json, redirect } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
-import PageHeader from "../components/pageHeader";
+import EntityHeader from "../components/entityHeader";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 import { trpc } from "../lib/trpc";
 
@@ -100,54 +98,7 @@ export default function EntityDetails() {
   return (
     <Layout>
       <div className="w-full p-3 lg:py-0">
-        <PageHeader
-          icon={EntityIcon}
-          title={entity.name}
-          titleExtra={
-            <div className="text-light max-w-full text-center lg:text-left">
-              {!!entity.country && (
-                <>
-                  Located in{" "}
-                  <Link
-                    to={`/entities?country=${encodeURIComponent(
-                      entity.country,
-                    )}`}
-                    className="truncate hover:underline"
-                  >
-                    {entity.country}
-                  </Link>
-                </>
-              )}
-              {!!entity.region && (
-                <span>
-                  {" "}
-                  &middot;{" "}
-                  <Link
-                    to={`/entities?region=${encodeURIComponent(entity.region)}`}
-                    className="truncate hover:underline"
-                  >
-                    {entity.region}
-                  </Link>
-                </span>
-              )}
-            </div>
-          }
-          metadata={
-            <div className="flex gap-x-1">
-              {entity.type.sort().map((t) => (
-                <Chip
-                  key={t}
-                  size="small"
-                  color="highlight"
-                  as={Link}
-                  to={`/entities?type=${encodeURIComponent(t)}`}
-                >
-                  {t}
-                </Chip>
-              ))}
-            </div>
-          }
-        />
+        <EntityHeader entity={entity} />
         <div className="flex flex-col gap-4 lg:flex-row">
           <div className="flex-auto">
             <div className="my-8 flex justify-center gap-4 lg:justify-start">
@@ -177,6 +128,9 @@ export default function EntityDetails() {
                     className="absolute right-0 z-10 mt-2 w-32 origin-top-right"
                     unmount={false}
                   >
+                    <Menu.Item as={Link} to={`/entities/${entity.id}/aliases`}>
+                      View Aliases
+                    </Menu.Item>
                     <Menu.Item as={Link} to={`/entities/${entity.id}/edit`}>
                       Edit Entity
                     </Menu.Item>
@@ -187,7 +141,7 @@ export default function EntityDetails() {
                       <Menu.Item
                         as={ConfirmationButton}
                         onContinue={deleteEntity}
-                        disabled={deleteEntityMutation.isLoading}
+                        disabled={deleteEntityMutation.isPending}
                       >
                         Delete Entity
                       </Menu.Item>

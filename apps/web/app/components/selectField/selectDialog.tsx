@@ -81,7 +81,7 @@ export default function SelectDialog<T extends Option>({
 
   useEffect(() => {
     onSearch(query);
-  }, [query]);
+  }, [query, onQuery]);
 
   return (
     <Dialog as="div" open={open} className="dialog" onClose={setOpen}>

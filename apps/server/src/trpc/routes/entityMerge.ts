@@ -4,6 +4,7 @@ import {
   bottles,
   bottlesToDistillers,
   entities,
+  entityAliases,
   entityTombstones,
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs/client";
@@ -49,6 +50,13 @@ async function mergeEntitiesInto(
         bottlerId: toEntity.id,
       })
       .where(inArray(bottles.bottlerId, fromEntityIds));
+
+    await tx
+      .update(entityAliases)
+      .set({
+        entityId: toEntity.id,
+      })
+      .where(inArray(entityAliases.entityId, fromEntityIds));
 
     await tx
       .update(bottlesToDistillers)

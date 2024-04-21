@@ -2,6 +2,7 @@ import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Flight } from "@peated/server/db/schema";
 import {
+  bottleAliases,
   bottles,
   bottlesToDistillers,
   entities,
@@ -68,6 +69,16 @@ export default publicProcedure
         or(
           ilike(bottles.fullName, likeQuery),
           ilike(bottles.fullName, otherLikeQuery),
+          sql`exists(${db
+            .select({ n: sql`1` })
+            .from(bottleAliases)
+            .where(
+              and(
+                eq(bottleAliases.bottleId, bottles.id),
+                ilike(bottleAliases.name, likeQuery),
+                ilike(bottleAliases.name, otherLikeQuery),
+              ),
+            )})`,
           sql`EXISTS(
             SELECT
             FROM ${entities} e

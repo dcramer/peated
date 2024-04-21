@@ -1,37 +1,37 @@
 import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
-import BottleHeader from "../components/bottleHeader";
 import Chip from "../components/chip";
+import EntityHeader from "../components/entityHeader";
 import Layout from "../components/layout";
 import Tabs from "../components/tabs";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
   async ({ params, context: { trpc } }) => {
-    invariant(params.bottleId);
+    invariant(params.entityId);
 
-    const bottleId = Number(params.bottleId);
+    const entityId = Number(params.entityId);
 
-    const [aliasList, bottle] = await Promise.all([
-      trpc.bottleAliasList.query({
-        bottle: bottleId,
+    const [aliasList, entity] = await Promise.all([
+      trpc.entityAliasList.query({
+        entity: entityId,
       }),
-      trpc.bottleById.query(bottleId),
+      trpc.entityById.query(entityId),
     ]);
-    return json({ aliasList, bottle });
+    return json({ aliasList, entity });
   },
 );
 
-export default function BottleAliases() {
-  const { aliasList, bottle } = useLoaderData<typeof loader>();
+export default function EntityAliases() {
+  const { aliasList, entity } = useLoaderData<typeof loader>();
 
   if (!aliasList) return null;
 
   return (
     <Layout>
       <div className="w-full p-3 lg:py-0">
-        <BottleHeader bottle={bottle} />
+        <EntityHeader entity={entity} />
         <Tabs fullWidth border>
           <Tabs.Item active>Aliases</Tabs.Item>
         </Tabs>
@@ -41,7 +41,7 @@ export default function BottleAliases() {
               return (
                 <li key={alias.name} className="flex items-center gap-2">
                   <div>{alias.name}</div>
-                  {alias.name === bottle.fullName && (
+                  {alias.name === entity.name && (
                     <Chip size="small" color="highlight">
                       Canonical
                     </Chip>

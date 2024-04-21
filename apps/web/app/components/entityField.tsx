@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityInputSchema } from "@peated/server/schemas";
+import { type EntityType } from "@peated/server/src/types";
 import { trpc } from "@peated/web/lib/trpc";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -13,15 +14,24 @@ type FormSchemaType = z.infer<typeof EntityInputSchema>;
 
 export default ({
   createDialogHelpText,
+  searchContext = {},
   ...props
 }: React.ComponentProps<typeof SelectField> & {
   createDialogHelpText?: string;
+  searchContext?: {
+    type?: EntityType | null;
+    brand?: number | null;
+    bottleName?: string | null;
+  };
 }) => {
   const trpcUtils = trpc.useUtils();
   return (
     <SelectField
       onQuery={async (query) => {
-        const { results } = await trpcUtils.entityList.fetch({ query });
+        const { results } = await trpcUtils.entityList.fetch({
+          query,
+          searchContext,
+        });
         return results;
       }}
       createForm={({ data, onFieldChange, onSubmit, onClose }) => {
@@ -73,7 +83,6 @@ export default ({
                 type="text"
                 placeholder="e.g. Islay, Kentucky"
                 autoComplete="off"
-                defaultValue={data.region}
                 onChange={(e) =>
                   onFieldChange({ [e.target.name]: e.target.value })
                 }

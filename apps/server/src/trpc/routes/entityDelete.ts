@@ -3,7 +3,12 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { adminProcedure } from "..";
 import { db } from "../../db";
-import { changes, entities } from "../../db/schema";
+import {
+  changes,
+  entities,
+  entityAliases,
+  entityTombstones,
+} from "../../db/schema";
 
 export default adminProcedure.input(z.number()).mutation(async function ({
   input,
@@ -31,6 +36,11 @@ export default adminProcedure.input(z.number()).mutation(async function ({
       data: {
         ...entity,
       },
+    });
+
+    await tx.delete(entityAliases).where(eq(entityAliases.entityId, entity.id));
+    await tx.insert(entityTombstones).values({
+      entityId: entity.id,
     });
 
     await tx.delete(entities).where(eq(entities.id, entity.id));

@@ -115,9 +115,7 @@ test("does not create a new bottle with invalid brandId", async ({
     }),
   );
 
-  expect(err).toMatchInlineSnapshot(
-    `[TRPCError: Entity not found with (ID=5)]`,
-  );
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Entity not found [id: 5]]`);
 });
 
 // test("creates a new bottle with existing brand name", async () => {
@@ -215,7 +213,7 @@ test("does not create a new bottle with invalid distillerId", async ({
     }),
   );
   expect(err).toMatchInlineSnapshot(
-    `[TRPCError: Could not identify distiller.]`,
+    `[TRPCError: Entity not found [id: 500000]]`,
   );
 });
 

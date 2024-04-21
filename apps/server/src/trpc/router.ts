@@ -25,6 +25,7 @@ import collectionList from "./routes/collectionList";
 import commentCreate from "./routes/commentCreate";
 import commentDelete from "./routes/commentDelete";
 import commentList from "./routes/commentList";
+import entityAliasList from "./routes/entityAliasList";
 import entityById from "./routes/entityById";
 import entityCategoryList from "./routes/entityCategoryList";
 import entityCreate from "./routes/entityCreate";
@@ -100,6 +101,7 @@ export const appRouter = router({
   commentCreate,
   commentDelete,
   commentList,
+  entityAliasList,
   entityById,
   entityCategoryList,
   entityCreate,

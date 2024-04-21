@@ -105,7 +105,7 @@ function FilterSidebar() {
   const tag = qs.get("tag");
 
   return (
-    <div className="flex-coloverflow-y-auto mt-8 flex bg-slate-950 px-6 py-4">
+    <div className="mt-8 flex flex-col overflow-y-auto bg-slate-950 px-6 py-4">
       <ul role="list" className="flex flex-auto flex-col gap-y-7">
         <li>
           <Button to="/addBottle" fullWidth color="highlight">

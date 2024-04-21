@@ -181,8 +181,11 @@ export default function BottleForm({
                 label="Brand"
                 helpText="The brand, or main label of the bottle."
                 placeholder="e.g. Angel's Envy, Hibiki"
-                createDialogHelpText="The brand is the group that bottles the spirit. Sometimes this is
+                createDialogHelpText="The brand is the label the spirit is bottled under. Sometimes this is
                 the same as the distiller."
+                searchContext={{
+                  type: "brand",
+                }}
                 required
                 onChange={(value) => {
                   onChange(value?.id || value);
@@ -287,6 +290,11 @@ export default function BottleForm({
               <EntityField
                 {...field}
                 error={errors.distillers}
+                searchContext={{
+                  type: "distiller",
+                  brand: brandValue ? Number(brandValue.id) : null,
+                  bottleName: watch("name"),
+                }}
                 label="Distiller"
                 placeholder="e.g. Angel's Envy, Suntory Whisky"
                 helpText="The distilleries which produces the spirit(s) for this bottle."
@@ -312,6 +320,11 @@ export default function BottleForm({
                 label="Bottler"
                 helpText="The company bottling the spirit."
                 placeholder="e.g. The Scotch Malt Whisky Society"
+                searchContext={{
+                  type: "bottler",
+                  brand: brandValue ? Number(brandValue.id) : null,
+                  bottleName: watch("name"),
+                }}
                 onChange={(value) => {
                   onChange(value?.id || value);
                   setBottlerValue(value);
