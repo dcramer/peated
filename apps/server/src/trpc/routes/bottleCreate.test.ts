@@ -115,7 +115,7 @@ test("does not create a new bottle with invalid brandId", async ({
     }),
   );
 
-  expect(err).toMatchInlineSnapshot("[TRPCError: Could not identify brand.]");
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Entity not found [id: 5]]`);
 });
 
 // test("creates a new bottle with existing brand name", async () => {
@@ -213,7 +213,7 @@ test("does not create a new bottle with invalid distillerId", async ({
     }),
   );
   expect(err).toMatchInlineSnapshot(
-    `[TRPCError: Could not identify distiller.]`,
+    `[TRPCError: Entity not found [id: 500000]]`,
   );
 });
 
@@ -484,4 +484,27 @@ test("removes duplicated brand name", async ({ defaults, fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
   expect(bottle.name).toEqual("Yum Yum");
+});
+
+test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity({
+    name: "The Scotch Malt Whisky Society",
+  });
+  const distiller = await fixtures.Entity({
+    name: "Glenfarclas",
+  });
+  const caller = createCaller({ user: defaults.user });
+  const data = await caller.bottleCreate({
+    name: "1.54",
+    brand: brand.id,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const dList = await db
+    .select()
+    .from(bottlesToDistillers)
+    .where(eq(bottlesToDistillers.bottleId, data.id));
+  expect(dList.length).toEqual(1);
+  expect(dList[0].distillerId).toEqual(distiller.id);
 });

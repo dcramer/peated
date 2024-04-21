@@ -7,10 +7,14 @@ import { TRPCError } from "@trpc/server";
 import { eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
+import { type Context } from "../context";
 
-export default publicProcedure.input(z.number()).query(async function ({
+export async function entityById({
   input,
   ctx,
+}: {
+  input: number;
+  ctx: Context;
 }) {
   let [entity] = await db
     .select({
@@ -37,4 +41,6 @@ export default publicProcedure.input(z.number()).query(async function ({
   }
 
   return await serialize(EntitySerializer, entity, ctx.user);
-});
+}
+
+export default publicProcedure.input(z.number()).query(entityById);

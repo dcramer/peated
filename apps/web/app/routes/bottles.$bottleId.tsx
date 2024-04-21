@@ -131,7 +131,7 @@ export default function BottleDetails() {
                   <Menu.Item
                     as={ConfirmationButton}
                     onContinue={deleteBottle}
-                    disabled={deleteBottleMutation.isLoading}
+                    disabled={deleteBottleMutation.isPending}
                   >
                     Delete Bottle
                   </Menu.Item>

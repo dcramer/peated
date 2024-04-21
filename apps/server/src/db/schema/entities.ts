@@ -5,6 +5,7 @@ import {
   index,
   pgEnum,
   pgTable,
+  primaryKey,
   smallint,
   text,
   timestamp,
@@ -75,6 +76,32 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
 
 export type Entity = typeof entities.$inferSelect;
 export type NewEntity = typeof entities.$inferInsert;
+
+export const entityAliases = pgTable(
+  "entity_alias",
+  {
+    entityId: bigint("entity_id", { mode: "number" }).references(
+      () => entities.id,
+    ),
+    name: varchar("name", { length: 255 }).notNull(),
+  },
+  (entityAliases) => {
+    return {
+      pk: primaryKey(entityAliases.name),
+      entityIdx: index("entity_alias_entity_idx").on(entityAliases.entityId),
+    };
+  },
+);
+
+export const entityAliasesRelations = relations(entityAliases, ({ one }) => ({
+  entity: one(entities, {
+    fields: [entityAliases.entityId],
+    references: [entities.id],
+  }),
+}));
+
+export type EntityAlias = typeof entityAliases.$inferSelect;
+export type NewEntityAlias = typeof entityAliases.$inferInsert;
 
 export const entityTombstones = pgTable("entity_tombstone", {
   entityId: bigint("entity_id", { mode: "number" }).primaryKey(),

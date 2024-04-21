@@ -162,7 +162,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
         </Header>
       }
     >
-      <ul className="divide-y divide-slate-800 sm:rounded">
+      <ul role="list" className="divide-y divide-slate-800">
         {state === "loading" ? (
           <>
             <SkeletonItem />
@@ -182,7 +182,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
           <>
             {!isUserQuery && (results.length < maxResults || query !== "") && (
               <ListItem color="highlight">
-                <PlusIcon className="hidden h-12 w-12 flex-none rounded-full p-2 sm:block" />
+                <PlusIcon className="hidden h-12 w-12 flex-none rounded p-2 sm:block" />
 
                 <div className="min-w-0 flex-auto">
                   <div className="font-semibold leading-6">

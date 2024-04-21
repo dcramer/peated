@@ -10,7 +10,6 @@ import {
 import { pushJob } from "@peated/server/jobs/client";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
@@ -19,6 +18,7 @@ import { and, eq, ilike, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { upsertEntity } from "../../lib/db";
+import { bottleNormalize } from "./bottlePreview";
 
 export default modProcedure
   .input(
@@ -46,52 +46,48 @@ export default modProcedure
       });
     }
 
-    const bottleData: { [name: string]: any } = {};
-    const [normName, normStatedAge] =
-      input.name || input.statedAge !== undefined
-        ? normalizeBottleName(
-            input.name || bottle.name,
-            input.statedAge !== undefined ? input.statedAge : bottle.statedAge,
-          )
-        : [input.name, input.statedAge];
-
-    if (normName && normName !== bottle.name) {
-      bottleData.name = normName;
-    }
-
-    if (normStatedAge !== undefined && normStatedAge !== bottle.statedAge) {
-      bottleData.statedAge = normStatedAge;
-    }
-
-    if (input.category !== undefined && input.category !== bottle.category) {
-      bottleData.category = input.category;
-    }
-
-    if (
-      input.flavorProfile !== undefined &&
-      input.flavorProfile !== bottle.flavorProfile
-    ) {
-      bottleData.flavorProfile = input.flavorProfile;
-    }
+    const bottleData: Record<string, any> = await bottleNormalize({
+      input: {
+        name: bottle.name,
+        brand: {
+          id: bottle.brand.id,
+          name: bottle.brand.name,
+        },
+        bottler: bottle.bottler
+          ? {
+              id: bottle.bottler.id,
+              name: bottle.bottler.name,
+            }
+          : null,
+        statedAge: bottle.statedAge,
+        category: bottle.category,
+        distillers: bottle.bottlesToDistillers.map((d) => ({
+          id: d.distiller.id,
+          name: d.distiller.name,
+        })),
+        ...input,
+      },
+      ctx,
+    });
 
     const user = ctx.user;
     const newBottle = await db.transaction(async (tx) => {
       let brand: Entity | null = null;
-      if (input.brand) {
+      if (bottleData.brand) {
         if (
-          typeof input.brand === "number"
-            ? input.brand !== bottle.brand.id
-            : input.brand.name !== bottle.brand.name
+          typeof bottleData.brand === "number"
+            ? bottleData.brand !== bottle.brand.id
+            : bottleData.brand.name !== bottle.brand.name
         ) {
           const brandUpsert = await upsertEntity({
             db: tx,
-            data: input.brand,
+            data: bottleData.brand,
             userId: user.id,
             type: "brand",
           });
           if (!brandUpsert)
             throw new TRPCError({
-              message: `Unable to find entity: ${input.brand}.`,
+              message: `Unable to find entity: ${bottleData.brand}.`,
               code: "INTERNAL_SERVER_ERROR",
             });
           if (brandUpsert.id !== bottle.brandId) {
@@ -101,21 +97,21 @@ export default modProcedure
         }
       }
 
-      if (input.bottler) {
+      if (bottleData.bottler) {
         if (
-          typeof input.bottler === "number"
-            ? input.bottler !== bottle.bottler?.id
-            : input.bottler.name !== bottle.bottler?.name
+          typeof bottleData.bottler === "number"
+            ? bottleData.bottler !== bottle.bottler?.id
+            : bottleData.bottler.name !== bottle.bottler?.name
         ) {
           const bottlerUpsert = await upsertEntity({
             db: tx,
-            data: input.bottler,
+            data: bottleData.bottler,
             userId: user.id,
             type: "bottler",
           });
           if (!bottlerUpsert) {
             throw new TRPCError({
-              message: `Unable to find entity: ${input.bottler}.`,
+              message: `Unable to find entity: ${bottleData.bottler}.`,
               code: "INTERNAL_SERVER_ERROR",
             });
           }
@@ -165,32 +161,20 @@ export default modProcedure
         const existingAlias = await tx.query.bottleAliases.findFirst({
           where: ilike(bottleAliases.name, newBottle.fullName),
         });
-        // TODO: consider deleting duplicate alias at this point
-        if (!existingAlias) {
+        if (existingAlias?.bottleId === newBottle.id) {
+          // we're good - likely renaming to an alias that already existed
+        } else if (!existingAlias) {
+          await tx.insert(bottleAliases).values({
+            name: newBottle.fullName,
+            bottleId: newBottle.id,
+          });
+        } else if (!existingAlias.bottleId) {
           await tx
             .update(bottleAliases)
             .set({
-              name: newBottle.fullName,
+              bottleId: newBottle.id,
             })
-            .where(
-              and(
-                eq(bottleAliases.bottleId, newBottle.id),
-                eq(bottleAliases.name, bottle.fullName),
-              ),
-            );
-          // this should only happen on entity change
-        } else if (
-          !existingAlias.bottleId ||
-          existingAlias.bottleId === newBottle.id
-        ) {
-          await tx
-            .delete(bottleAliases)
-            .where(
-              and(
-                eq(bottleAliases.bottleId, newBottle.id),
-                eq(bottleAliases.name, bottle.fullName),
-              ),
-            );
+            .where(and(eq(bottleAliases.name, newBottle.fullName)));
         } else {
           throw new Error(
             `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
@@ -206,8 +190,8 @@ export default modProcedure
       );
 
       // find newly added distillers and connect them
-      if (input.distillers) {
-        for (const distData of input.distillers) {
+      if (bottleData.distillers) {
+        for (const distData of bottleData.distillers) {
           const distiller = currentDistillers.find((d2) =>
             typeof distData === "number"
               ? distData === d2.id

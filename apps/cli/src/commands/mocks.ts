@@ -34,30 +34,44 @@ const loadDefaultSites = async () => {
 };
 
 const loadDefaultEntities = async () => {
-  const mocks: Pick<Entity, "name" | "country" | "region" | "type">[] = [
+  const mocks: Pick<
+    Entity,
+    "name" | "country" | "region" | "type" | "shortName"
+  >[] = [
     {
       name: "The Macallan",
       country: "Scotland",
       region: "Speyside",
       type: ["brand", "distiller", "bottler"],
+      shortName: null,
     },
     {
       name: "The Balvenie",
       country: "Scotland",
       region: "Speyside",
       type: ["brand", "distiller", "bottler"],
+      shortName: null,
     },
     {
       name: "Jack Daniel's",
       country: "United States of America",
       region: "Tennessee",
       type: ["brand", "distiller", "bottler"],
+      shortName: null,
     },
     {
       name: "Maker's Mark",
       country: "United States of America",
       region: "Kentucky",
       type: ["brand"],
+      shortName: null,
+    },
+    {
+      name: "The Scotch Malt Whisky Society",
+      country: "United Kingdom",
+      region: null,
+      type: ["brand", "bottler"],
+      shortName: "SMWS",
     },
   ];
 

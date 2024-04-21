@@ -11,6 +11,7 @@ import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
 import bottleList from "./routes/bottleList";
 import bottleMerge from "./routes/bottleMerge";
+import bottlePreview from "./routes/bottlePreview";
 import bottlePriceHistory from "./routes/bottlePriceHistory";
 import bottlePriceList from "./routes/bottlePriceList";
 import bottleSuggestedTagList from "./routes/bottleSuggestedTagList";
@@ -24,6 +25,7 @@ import collectionList from "./routes/collectionList";
 import commentCreate from "./routes/commentCreate";
 import commentDelete from "./routes/commentDelete";
 import commentList from "./routes/commentList";
+import entityAliasList from "./routes/entityAliasList";
 import entityById from "./routes/entityById";
 import entityCategoryList from "./routes/entityCategoryList";
 import entityCreate from "./routes/entityCreate";
@@ -80,8 +82,9 @@ export const appRouter = router({
   badgeCreate,
   badgeList,
   bottleById,
-  bottleDelete,
   bottleCreate,
+  bottleDelete,
+  bottlePreview,
   bottleList,
   bottleAliasList,
   bottleMerge,
@@ -98,6 +101,7 @@ export const appRouter = router({
   commentCreate,
   commentDelete,
   commentList,
+  entityAliasList,
   entityById,
   entityCategoryList,
   entityCreate,

@@ -11,7 +11,6 @@ import { pushJob } from "@peated/server/jobs/client";
 import { upsertEntity } from "@peated/server/lib/db";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
@@ -20,6 +19,7 @@ import { isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
+import { bottleNormalize } from "./bottlePreview";
 
 export async function bottleCreate({
   input,
@@ -35,12 +35,13 @@ export async function bottleCreate({
       code: "UNAUTHORIZED",
     });
   }
-  let [name, statedAge] = normalizeBottleName(input.name, input.statedAge);
+
+  const bottleData = await bottleNormalize({ input, ctx });
 
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({
       db: tx,
-      data: input.brand,
+      data: bottleData.brand,
       type: "brand",
       userId: user.id,
     });
@@ -54,13 +55,7 @@ export async function bottleCreate({
 
     const brand = brandUpsert.result;
 
-    // TODO: we need to pull all this name uniform logic into a shared helper, as this
-    // is missing from updateBottle
-    if (name.startsWith(brand.name)) {
-      name = name.substring(brand.name.length + 1);
-    }
-
-    if (!name) {
+    if (!bottleData.name) {
       throw new TRPCError({
         message: "Invalid bottle name.",
         code: "BAD_REQUEST",
@@ -68,10 +63,10 @@ export async function bottleCreate({
     }
 
     let bottler: Entity | null = null;
-    if (input.bottler) {
+    if (bottleData.bottler) {
       const bottlerUpsert = await upsertEntity({
         db: tx,
-        data: input.bottler,
+        data: bottleData.bottler,
         type: "bottler",
         userId: user.id,
       });
@@ -85,18 +80,15 @@ export async function bottleCreate({
       }
     }
 
-    const fullName = `${brand.shortName || brand.name} ${name}`;
+    const fullName = `${brand.shortName || brand.name} ${bottleData.name}`;
 
     let bottle: Bottle | undefined;
     try {
       [bottle] = await tx
         .insert(bottles)
         .values({
-          name,
+          ...bottleData,
           fullName,
-          flavorProfile: input.flavorProfile,
-          statedAge: statedAge,
-          category: input.category || null,
           brandId: brand.id,
           bottlerId: bottler?.id || null,
           createdById: user.id,
@@ -134,8 +126,8 @@ export async function bottleCreate({
       });
 
     const distillerIds: number[] = [];
-    if (input.distillers)
-      for (const distData of input.distillers) {
+    if (bottleData.distillers)
+      for (const distData of bottleData.distillers) {
         const distUpsert = await upsertEntity({
           db: tx,
           data: distData,

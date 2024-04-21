@@ -25,7 +25,7 @@ export default function SearchHeader({
   const navigate = useNavigate();
   const [value, setValue] = useState(props.value || "");
 
-  const blockStyles = `px-0 py-1 sm:py-3`;
+  const blockStyles = `p-3`;
 
   // we store the onChange event here as setState is async
   // and if you type a value and quickly hit enter (to submit)
@@ -33,18 +33,19 @@ export default function SearchHeader({
   let _lastValue = value;
 
   return (
-    <nav className="flex min-w-full items-center justify-between text-white">
-      <div className="flex text-white hover:text-white">
+    <nav className="flex min-w-full items-stretch justify-between text-white lg:mx-3 lg:gap-x-3">
+      <div className="-mx-3 flex items-center">
         <button
           onClick={() => (onClose ? onClose() : navigate(-1))}
-          className={`-m-1.5 p-1.5 ${blockStyles} pr-4 outline-0 sm:pr-6`}
+          className={`${blockStyles} text-light group flex justify-center`}
         >
-          <span className="sr-only">Back</span>
-          <span className="h-10 w-10">{closeIcon}</span>
+          <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
+            {closeIcon}
+          </div>
         </button>
       </div>
       <form
-        className={`flex-auto`}
+        className={`flex flex-auto flex-col items-stretch justify-center pl-3 pr-2 lg:pr-7`}
         onSubmit={(e) => {
           e.preventDefault();
 
@@ -62,16 +63,16 @@ export default function SearchHeader({
             setValue(e.target.value);
             if (onChange) onChange(e.target.value);
           }}
-          className="w-full transform rounded border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-2"
+          className="block transform rounded border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-1.5"
         />
       </form>
       {onDone && (
         <div className="flex">
           <button
             onClick={onDone}
-            className={`group min-h-full ${blockStyles} pl-3 sm:pl-6`}
+            className={`group min-h-full ${blockStyles}`}
           >
-            <span className="bg-peated-dark group-hover:bg-peated-dark focus-visible:outline-peated rounded p-2.5 font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+            <span className="text-light rounded bg-slate-800 p-2.5 font-semibold group-hover:bg-slate-700 group-hover:text-white">
               Done
             </span>
           </button>

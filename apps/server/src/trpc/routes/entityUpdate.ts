@@ -6,6 +6,7 @@ import {
   bottles,
   changes,
   entities,
+  entityAliases,
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs/client";
 import { arraysEqual } from "@peated/server/lib/equals";
@@ -14,7 +15,7 @@ import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { TRPCError } from "@trpc/server";
-import { and, eq, getTableColumns, ne, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, ilike, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 
@@ -93,6 +94,39 @@ export default modProcedure
         throw err;
       }
       if (!newEntity) return;
+
+      if (data.name) {
+        const newAliases = [data.name];
+        if (data.name.startsWith("The ")) {
+          newAliases.push(data.name.substring(4));
+        }
+
+        for (const newAlias of newAliases) {
+          const existingAlias = await tx.query.entityAliases.findFirst({
+            where: ilike(entityAliases.name, newAlias),
+          });
+
+          if (existingAlias?.entityId === newEntity.id) {
+            // we're good - likely renaming to an alias that already existed
+          } else if (!existingAlias) {
+            await tx.insert(entityAliases).values({
+              name: newAlias,
+              entityId: newEntity.id,
+            });
+          } else if (!existingAlias.entityId) {
+            await tx
+              .update(entityAliases)
+              .set({
+                entityId: newEntity.id,
+              })
+              .where(and(eq(entityAliases.name, newAlias)));
+          } else {
+            throw new Error(
+              `Duplicate alias found (${existingAlias.entityId}). Not implemented.`,
+            );
+          }
+        }
+      }
 
       if (data.name || data.shortName) {
         await tx

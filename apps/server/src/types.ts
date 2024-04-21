@@ -15,6 +15,7 @@ import type {
   CollectionBottleSchema,
   CollectionSchema,
   CommentSchema,
+  EntityInputSchema,
   EntitySchema,
   EntityTypeEnum,
   ExternalSiteSchema,
@@ -92,4 +93,28 @@ export type PagingRel = NextPagingRel & PrevPagingRel;
 export type Paginated<T> = {
   results: T[];
   rel?: PagingRel;
+};
+
+export type EntityInput =
+  | number
+  | {
+      id?: number;
+      name: string;
+      country?: string | null;
+      region?: string | null;
+      type?: ("brand" | "bottler" | "distiller")[];
+    };
+
+type FreeformEntity =
+  | z.infer<typeof EntityInputSchema>
+  | z.infer<typeof EntitySchema>;
+
+export type BottlePreviewResult = {
+  name: string;
+  category: Category | null;
+  brand: FreeformEntity;
+  bottler: FreeformEntity | null;
+  distillers: FreeformEntity[] | null;
+  statedAge: number | null;
+  flavorProfile: FlavorProfile | null;
 };

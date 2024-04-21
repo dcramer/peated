@@ -10,6 +10,7 @@ import { type MetaFunction, type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
+import Button from "../components/button";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 const DEFAULT_SORT = "-tastings";
@@ -93,6 +94,12 @@ function FilterSidebar() {
   return (
     <div className="flex-coloverflow-y-auto mt-8 flex bg-slate-950 px-6 py-4">
       <ul role="list" className="flex flex-auto flex-col gap-y-7">
+        <li>
+          <Button to="/addEntity" fullWidth color="highlight">
+            Add Entity
+          </Button>
+        </li>
+
         <li>
           <div className="text-sm font-semibold text-slate-200">Type</div>
           <ul role="list" className="-mx-3 mt-2 space-y-1">

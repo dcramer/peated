@@ -1,9 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import type { SubmitHandler } from "react-hook-form";
-import { Controller, useForm } from "react-hook-form";
-import type { z } from "zod";
-
 import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import {
   formatCategoryName,
@@ -23,11 +18,14 @@ import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { logError } from "@peated/web/lib/log";
+import { useState } from "react";
+import type { SubmitHandler } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import type { z } from "zod";
 import { isTRPCClientError } from "../lib/trpc";
 import { classesForProfile } from "./flavorProfile";
 import Form from "./form";
 import Header from "./header";
-import Spinner from "./spinner";
 
 const categoryList = CATEGORY_LIST.map((c) => ({
   id: c,
@@ -47,6 +45,25 @@ const flavorProfileList = FLAVOR_PROFILES.map((c) => ({
 }));
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
+
+const DEFAULT_SUGGESTIONS = {
+  mandatory: {
+    name: null,
+    category: null,
+    brand: null,
+    bottler: null,
+    distillers: null,
+    statedAge: null,
+  },
+  suggestions: {
+    name: null,
+    category: null,
+    brand: [],
+    bottler: [],
+    distillers: [],
+    statedAge: null,
+  },
+};
 
 export default function BottleForm({
   onSubmit,
@@ -116,17 +133,13 @@ export default function BottleForm({
       }
       footer={null}
     >
-      {isSubmitting && (
-        <div className="fixed inset-0 z-10">
-          <div className="absolute inset-0 bg-slate-800 opacity-50" />
-          <Spinner />
-        </div>
-      )}
-
-      <Form onSubmit={handleSubmit(onSubmitHandler)}>
+      <Form
+        onSubmit={handleSubmit(onSubmitHandler)}
+        isSubmitting={isSubmitting}
+      >
         {error && <FormError values={[error]} />}
 
-        <div className="border border-slate-700 p-3 sm:my-4 sm:p-4">
+        <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
           <div className="prose text-light max-w-full text-sm leading-6">
             <p>
               It can be tricky to find the right information, so if you're
@@ -168,8 +181,11 @@ export default function BottleForm({
                 label="Brand"
                 helpText="The brand, or main label of the bottle."
                 placeholder="e.g. Angel's Envy, Hibiki"
-                createDialogHelpText="The brand is the group that bottles the spirit. Sometimes this is
+                createDialogHelpText="The brand is the label the spirit is bottled under. Sometimes this is
                 the same as the distiller."
+                searchContext={{
+                  type: "brand",
+                }}
                 required
                 onChange={(value) => {
                   onChange(value?.id || value);
@@ -274,6 +290,11 @@ export default function BottleForm({
               <EntityField
                 {...field}
                 error={errors.distillers}
+                searchContext={{
+                  type: "distiller",
+                  brand: brandValue ? Number(brandValue.id) : null,
+                  bottleName: watch("name"),
+                }}
                 label="Distiller"
                 placeholder="e.g. Angel's Envy, Suntory Whisky"
                 helpText="The distilleries which produces the spirit(s) for this bottle."
@@ -299,6 +320,11 @@ export default function BottleForm({
                 label="Bottler"
                 helpText="The company bottling the spirit."
                 placeholder="e.g. The Scotch Malt Whisky Society"
+                searchContext={{
+                  type: "bottler",
+                  brand: brandValue ? Number(brandValue.id) : null,
+                  bottleName: watch("name"),
+                }}
                 onChange={(value) => {
                   onChange(value?.id || value);
                   setBottlerValue(value);

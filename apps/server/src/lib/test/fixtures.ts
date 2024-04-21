@@ -131,6 +131,11 @@ export const Entity = async (
 
     if (!entity) throw new Error("Unable to create fixture");
 
+    await tx.insert(dbSchema.entityAliases).values({
+      entityId: entity.id,
+      name: entity.name,
+    });
+
     await tx.insert(changes).values({
       objectId: entity.id,
       objectType: "entity",
@@ -143,6 +148,29 @@ export const Entity = async (
 
     return entity;
   });
+};
+
+export const EntityAlias = async (
+  { ...data }: Partial<dbSchema.NewEntityAlias> = {},
+  db: DatabaseType = dbConn,
+): Promise<dbSchema.EntityAlias> => {
+  const [result] = await db.transaction(async (tx) => {
+    return await db
+      .insert(dbSchema.entityAliases)
+      .values({
+        entityId: data.entityId || (await Entity({}, tx)).id,
+        name: `${toTitleCase(
+          choose([
+            faker.company.buzzNoun(),
+            `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
+          ]),
+        )} #${faker.number.int(100)}`,
+        ...data,
+      })
+      .returning();
+  });
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
 };
 
 export const Bottle = async (

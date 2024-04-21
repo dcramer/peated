@@ -311,3 +311,29 @@ test("changes distiller with previous identical brand", async ({
   });
   expect(newEntityB?.totalBottles).toBe(1);
 });
+
+test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity({
+    name: "The Scotch Malt Whisky Society",
+  });
+  const distiller = await fixtures.Entity({
+    name: "Glenfarclas",
+  });
+  const bottle = await fixtures.Bottle({ brandId: brand.id });
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
+    name: "1.54",
+    brand: brand.id,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const dList = await db
+    .select()
+    .from(bottlesToDistillers)
+    .where(eq(bottlesToDistillers.bottleId, data.id));
+  expect(dList.length).toEqual(1);
+  expect(dList[0].distillerId).toEqual(distiller.id);
+});
