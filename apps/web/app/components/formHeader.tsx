@@ -22,23 +22,23 @@ export default function FormHeader({
 }) {
   const navigate = useNavigate();
 
-  const blockStyles = `px-0 py-1 sm:py-3`;
+  const blockStyles = `p-3`;
 
   return (
-    <nav className="flex min-w-full items-center justify-between text-white">
-      <div className="flex text-white hover:text-white">
+    <nav className="flex min-w-full items-stretch justify-between text-white lg:mx-3">
+      <div className="text-light -mx-3 flex hover:text-white">
         <button
           onClick={() => (onClose ? onClose() : navigate(-1))}
-          className={`-m-1.5 p-1.5 ${blockStyles} pr-3 sm:pr-6`}
+          className={`${blockStyles} flex items-stretch hover:bg-slate-800`}
         >
           <span className="sr-only">Back</span>
-          <div className="h-10 w-10">
-            {icon || <ChevronLeftIcon className="h-10 w-10" />}
+          <div className="h-8 w-8">
+            {icon || <ChevronLeftIcon className="h-full w-full" />}
           </div>
         </button>
       </div>
       <div
-        className={`flex flex-auto flex-row justify-center gap-x-2 ${blockStyles}`}
+        className={`flex flex-auto flex-row items-center justify-center gap-x-2 ${blockStyles}`}
       >
         <h1 className="text-lg">{title}</h1>
         {subtitle && (
@@ -47,25 +47,25 @@ export default function FormHeader({
           </h2>
         )}
       </div>
-      <div className="flex">
+      <div className="-mx-3">
         <button
           onClick={!saveDisabled ? onSave : undefined}
           className={classNames(
-            `group min-h-full pl-3 sm:pl-6`,
+            `text-light min-h-full hover:bg-slate-800 hover:text-white`,
             blockStyles,
             saveDisabled ? "cursor-auto" : "",
           )}
         >
-          <span
+          <div
             className={classNames(
-              "rounded p-2.5 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+              "-my-3 rounded p-3 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
               saveDisabled
                 ? "bg-peated-dark text-peated"
-                : "group-hover:text-highlight focus-visible:outline-peatedt bg-slate-950 text-white",
+                : "focus-visible:outline-peated",
             )}
           >
             {saveLabel}
-          </span>
+          </div>
         </button>
       </div>
     </nav>

@@ -83,6 +83,8 @@ export default function SelectDialog<T extends Option>({
     onSearch(query);
   }, [query, onQuery]);
 
+  const listItemClasses = `card group group relative border-b border-slate-800 bg-slate-950 hover:bg-slate-900`;
+
   return (
     <Dialog as="div" open={open} className="dialog" onClose={setOpen}>
       <Dialog.Overlay className="fixed inset-0" />
@@ -91,41 +93,41 @@ export default function SelectDialog<T extends Option>({
         <header className="h-14 flex-shrink-0 overflow-hidden lg:h-16">
           <div className="fixed left-0 right-0 z-10 border-b border-b-slate-700 bg-slate-950">
             <div className="mx-auto flex h-14 max-w-4xl lg:h-16">
-              <div className="flex flex-1 items-center justify-between px-4">
-                <SearchHeader
-                  onClose={() => setOpen(false)}
-                  onChange={(value) => {
-                    setQuery(value);
-                  }}
-                  onDone={multiple ? () => setOpen(false) : undefined}
-                  closeIcon={<XMarkIcon className="h-8 w-8" />}
-                  placeholder={searchPlaceholder}
-                />
-              </div>
+              <SearchHeader
+                onClose={() => setOpen(false)}
+                onChange={(value) => {
+                  setQuery(value);
+                }}
+                onDone={multiple ? () => setOpen(false) : undefined}
+                closeIcon={<XMarkIcon className="h-full w-full" />}
+                placeholder={searchPlaceholder}
+              />
             </div>
           </div>
         </header>
-        <main className={"m-h-screen relative mx-auto max-w-4xl"}>
-          <ul role="list" className="sm:my-2 sm:space-y-2">
+        <main
+          className={
+            "m-h-screen relative mx-auto max-w-4xl border-slate-800 lg:border-x"
+          }
+        >
+          <ul role="list" className="lg:space-y-2">
             {optionList.map((option) => {
               return (
                 <ListItem
                   key={`${option.id}-${option.name}`}
                   as={motion.li}
-                  className="card group group relative rounded border-b border-slate-700 bg-slate-950 hover:bg-slate-900 sm:border-0"
+                  className={listItemClasses}
                 >
-                  {multiple && (
-                    <CheckIcon
-                      className={classNames(
-                        "h-12 w-12 flex-none rounded p-2",
-                        selectedValues.find(
-                          (i) => i.id == option.id && i.name == option.name,
-                        )
-                          ? "bg-highlight text-black"
-                          : "text-light bg-slate-900 group-hover:bg-slate-800",
-                      )}
-                    />
-                  )}
+                  <CheckIcon
+                    className={classNames(
+                      "-ml-2 h-10 w-10 flex-none rounded p-2",
+                      selectedValues.find(
+                        (i) => i.id == option.id && i.name == option.name,
+                      )
+                        ? "bg-highlight text-black"
+                        : "text-light bg-slate-900 group-hover:bg-slate-800",
+                    )}
+                  />
 
                   <div className="flex min-w-0 flex-auto items-center">
                     <div className="font-semibold leading-6 text-white">
@@ -144,8 +146,8 @@ export default function SelectDialog<T extends Option>({
             })}
             {(results.length < 10 || query !== "") &&
               (canCreate && createForm ? (
-                <ListItem>
-                  <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+                <ListItem as={motion.li} className={listItemClasses}>
+                  <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
                   <div className="min-w-0 flex-auto">
                     <div className="font-semibold leading-6">
@@ -172,8 +174,8 @@ export default function SelectDialog<T extends Option>({
                   </div>
                 </ListItem>
               ) : (
-                <ListItem>
-                  <PlusIcon className="h-12 w-12 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+                <ListItem as={motion.li} className={listItemClasses}>
+                  <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
                   <div className="min-w-0 flex-auto">
                     <div className="font-semibold leading-6">
