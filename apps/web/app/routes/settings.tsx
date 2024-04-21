@@ -111,7 +111,7 @@ export default function Settings() {
           <FormHeader
             title="Settings"
             onSave={handleSubmit(onSubmit)}
-            icon={<XMarkIcon className="h-full w-full" />}
+            icon={<XMarkIcon className="h-8 w-8" />}
             saveDisabled={isSubmitting}
             onClose={() => navigate(`/users/${user.username}`)}
           />

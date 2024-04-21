@@ -40,7 +40,7 @@ export default function ImageEditorModal({
           header={
             <Header>
               <FormHeader
-                icon={<XMarkIcon className="h-full w-full" />}
+                icon={<XMarkIcon className="h-8 w-8" />}
                 title="Crop Image"
                 onClose={() => setOpen(false)}
                 onSave={() => {
