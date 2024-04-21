@@ -22,7 +22,7 @@ import { z } from "zod";
 import { modProcedure } from "..";
 
 // TODO: this should happen async
-async function mergeBottlesInto(
+export async function mergeBottlesInto(
   toBottle: Bottle,
   ...fromBottles: Bottle[]
 ): Promise<Bottle> {

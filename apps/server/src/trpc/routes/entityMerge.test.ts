@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { entities, entityTombstones } from "@peated/server/db/schema";
+import { bottles, entities, entityTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
@@ -96,4 +96,41 @@ test("merge A from B", async ({ fixtures }) => {
     .from(entityTombstones)
     .where(eq(entityTombstones.entityId, entityB.id));
   expect(tombstone.newEntityId).toEqual(newEntityA.id);
+});
+
+test("merge duplicate bottle", async ({ fixtures }) => {
+  const entityA = await fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
+  const bottleA = await fixtures.Bottle({
+    brandId: entityA.id,
+    name: "Duplicate",
+  });
+  const entityB = await fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
+  const bottleB = await fixtures.Bottle({
+    brandId: entityB.id,
+    name: "Duplicate",
+  });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityMerge({
+    root: entityA.id,
+    other: entityB.id,
+    direction: "mergeInto",
+  });
+
+  expect(data.id).toEqual(entityB.id);
+
+  const [newBottleA] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottleA.id));
+  expect(newBottleA).toBeUndefined();
+
+  const [newBottleB] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottleB.id));
+  expect(newBottleB).toBeDefined();
+  expect(newBottleB.name).toEqual("Duplicate");
 });

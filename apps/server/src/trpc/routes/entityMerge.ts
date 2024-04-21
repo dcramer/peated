@@ -12,9 +12,10 @@ import { logError } from "@peated/server/lib/log";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { TRPCError } from "@trpc/server";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
+import { mergeBottlesInto } from "./bottleMerge";
 
 // TODO: this should happen async
 async function mergeEntitiesInto(
@@ -37,12 +38,48 @@ async function mergeEntitiesInto(
 
   // TODO: this doesnt handle duplicate bottles
   return await db.transaction(async (tx) => {
-    await tx
-      .update(bottles)
-      .set({
-        brandId: toEntity.id,
-      })
+    const bottleList = await tx
+      .select()
+      .from(bottles)
       .where(inArray(bottles.brandId, fromEntityIds));
+
+    for (const bottle of bottleList) {
+      try {
+        await tx.transaction(async (btx) => {
+          await btx
+            .update(bottles)
+            .set({
+              brandId: toEntity.id,
+            })
+            .where(eq(bottles.id, bottle.id));
+        });
+      } catch (err: any) {
+        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+          // merge the bottle with its duplicate
+          const [toBottle] = await tx
+            .select()
+            .from(bottles)
+            .where(
+              and(
+                eq(bottles.name, bottle.name),
+                eq(bottles.brandId, toEntity.id),
+              ),
+            );
+          if (!toBottle) {
+            throw new TRPCError({
+              code: "NOT_IMPLEMENTED",
+              message:
+                "An error occurred while trying to merge duplicate bottles.",
+              cause: err,
+            });
+          }
+
+          await mergeBottlesInto(toBottle, bottle);
+        } else {
+          throw err;
+        }
+      }
+    }
 
     await tx
       .update(bottles)
