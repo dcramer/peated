@@ -263,14 +263,16 @@ function PriceChanges() {
                       <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
                     )}
                   </div>
-                  <div className="text-light text-sm">
-                    <Link
-                      to={`/bottles/?category=${bottle.category}`}
-                      className="hover:underline"
-                    >
-                      {formatCategoryName(bottle.category)}
-                    </Link>
-                  </div>
+                  {!!bottle.category && (
+                    <div className="text-light text-sm">
+                      <Link
+                        to={`/bottles/?category=${bottle.category}`}
+                        className="hover:underline"
+                      >
+                        {formatCategoryName(bottle.category)}
+                      </Link>
+                    </div>
+                  )}
                 </td>
                 <td className="py-2 pl-3 pr-4 text-right sm:table-cell sm:pr-3">
                   <div className="text-light flex flex-col items-end text-xs">
