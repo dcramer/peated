@@ -488,7 +488,7 @@ test("removes duplicated brand name", async ({ defaults, fixtures }) => {
   expect(bottle.name).toEqual("Yum Yum");
 });
 
-test("applies SMWS from bottle suggestions", async ({ defaults, fixtures }) => {
+test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {
   const brand = await fixtures.Entity({
     name: "The Scotch Malt Whisky Society",
   });

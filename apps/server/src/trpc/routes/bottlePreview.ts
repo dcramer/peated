@@ -83,16 +83,20 @@ export async function bottleNormalize({
     rv.bottler = await getEntity(input.bottler, ctx);
   }
 
-  // remove duplicate brand name prefix on bottle name
-  // e.g. Hibiki 12-year-old => Hibiki
-  let name = rv.name ?? input.name;
-  let statedAge = rv.statedAge ?? input.statedAge;
-  if (rv.brand && name && name.startsWith(rv.brand.name)) {
-    rv.name = name.substring(rv.brand.name.length + 1);
+  if (!rv.distillers && input.distillers) {
+    rv.distillers = await Promise.all(
+      input.distillers.map((d) => getEntity(d, ctx)),
+    );
   }
 
-  if (name && statedAge) {
-    [name, statedAge] = normalizeBottleName(name, statedAge);
+  // remove duplicate brand name prefix on bottle name
+  // e.g. Hibiki 12-year-old => Hibiki
+  if (rv.brand && rv.name && rv.name.startsWith(rv.brand.name)) {
+    rv.name = rv.name.substring(rv.brand.name.length + 1);
+  }
+
+  if (rv.name) {
+    const [name, statedAge] = normalizeBottleName(rv.name, rv.statedAge);
 
     rv.name = name;
     rv.statedAge = statedAge;
