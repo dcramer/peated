@@ -103,6 +103,7 @@ export default authedProcedure
           throw new TRPCError({
             message: "Tasting already exists.",
             code: "CONFLICT",
+            cause: err,
           });
         }
         throw err;

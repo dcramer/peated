@@ -55,6 +55,7 @@ export default adminProcedure
           throw new TRPCError({
             message: "Site with type already exists.",
             code: "CONFLICT",
+            cause: err,
           });
         }
         throw err;

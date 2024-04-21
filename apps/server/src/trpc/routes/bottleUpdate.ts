@@ -150,6 +150,7 @@ export default modProcedure
           throw new TRPCError({
             message: "Bottle with name already exists under brand.",
             code: "CONFLICT",
+            cause: err,
           });
         }
         throw err;

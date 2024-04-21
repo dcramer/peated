@@ -27,6 +27,7 @@ export default modProcedure.input(TagInputSchema).mutation(async function ({
         throw new TRPCError({
           message: "Tag with name already exists.",
           code: "CONFLICT",
+          cause: err,
         });
       }
       throw err;

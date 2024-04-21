@@ -89,6 +89,7 @@ export default modProcedure
           throw new TRPCError({
             message: "Entity with name already exists.",
             code: "CONFLICT",
+            cause: err,
           });
         }
         throw err;

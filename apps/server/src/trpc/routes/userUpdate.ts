@@ -89,9 +89,9 @@ export default authedProcedure
         throw new TRPCError({
           message: "Username in use.",
           code: "CONFLICT",
+          cause: err,
         });
-      } else {
-        throw err;
       }
+      throw err;
     }
   });

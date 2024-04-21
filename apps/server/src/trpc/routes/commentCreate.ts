@@ -56,6 +56,7 @@ export default authedProcedure
           throw new TRPCError({
             code: "CONFLICT",
             message: "Comment already exists.",
+            cause: err,
           });
         }
         throw err;
