@@ -12,8 +12,8 @@ authenticator.use(
   new FormStrategy(async ({ form, context }) => {
     if (!context) throw new Error("Where da context?");
     const { trpc } = context;
-    const email = form.get("email") as string;
-    const password = form.get("password") as string;
+    const email = (form.get("email") || "") as string;
+    const password = (form.get("password") || "") as string;
     const code = form.get("code") as string;
 
     try {
