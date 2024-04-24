@@ -11,39 +11,12 @@ function filterScaries(env: NodeJS.ProcessEnv) {
 }
 
 export default fastifyPlugin(async (fastify, options) => {
-  fastify.addHook("onRequest", async (request) => {
-    Sentry.addEventProcessor((event) => {
-      try {
-        event.transaction = `${request.method} ${request.routeOptions.url}`;
-        event.transaction_info = {
-          source: "url",
-        };
-        if (!event.contexts) event.contexts = {};
-        // event.contexts.environment = filterScaries(process.env);
-        event.request = {
-          method: request.method,
-          url: `${request.protocol}://${request.hostname}${request.url}`,
-          headers: request.headers as Record<string, string>, // idgaf
-          query_string: request.query as Record<string, any>,
-        };
-      } catch (err) {
-        console.error(err);
-      }
-
-      return event;
-    });
-  });
-
   fastify.addHook("preValidation", async (request) => {
     Sentry.addEventProcessor((event) => {
       if (!event.request) {
-        event.request = {
-          method: request.method,
-          url: `${request.protocol}://${request.hostname}${request.url}`,
-          headers: request.headers as Record<string, string>, // idgaf
-          query_string: request.query as Record<string, any>,
-        };
+        event.request = {};
       }
+
       try {
         // upgrade the request w/ body
         event.request.data =

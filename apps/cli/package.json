@@ -15,9 +15,9 @@
   "dependencies": {
     "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",
-    "@sentry/node": "~8.0.0-alpha.7",
-    "@sentry/profiling-node": "~8.0.0-alpha.7",
-    "@sentry/utils": "~8.0.0-alpha.7",
+    "@sentry/node": "~8.0.0-beta.3",
+    "@sentry/profiling-node": "~8.0.0-beta.3",
+    "@sentry/utils": "~8.0.0-beta.3",
     "@trpc/client": "11.0.0-rc.334",
     "@trpc/server": "11.0.0-rc.334",
     "@types/bcrypt": "^5.0.2",
