@@ -5,7 +5,6 @@ ENV NODE_ENV="production" \
     PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 RUN apt update -y && apt install -y libc-dev fftw-dev gcc g++ make libc6 ca-certificates
-RUN npm install -g -f pnpm
 
 FROM base as base-env
 WORKDIR /app
