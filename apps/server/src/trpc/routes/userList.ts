@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { and, asc, ilike, or } from "drizzle-orm";
+import { and, asc, desc, ilike, or } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@peated/server/db";
@@ -8,11 +8,15 @@ import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { authedProcedure } from "..";
 
+const SORT_OPTIONS = ["name", "created", "-created", "-name"] as const;
+
 export default authedProcedure
   .input(
     z
       .object({
         query: z.string().default(""),
+        sort: z.enum(SORT_OPTIONS).default("name"),
+
         cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(25),
       })
@@ -22,7 +26,10 @@ export default authedProcedure
         limit: 100,
       }),
   )
-  .query(async function ({ input: { query, cursor, limit, ...input }, ctx }) {
+  .query(async function ({
+    input: { query, cursor, limit, sort, ...input },
+    ctx,
+  }) {
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
@@ -40,13 +47,29 @@ export default authedProcedure
       };
     }
 
+    let orderBy: SQL<unknown>;
+    switch (sort) {
+      case "-name":
+        orderBy = desc(users.username);
+        break;
+      case "created":
+        orderBy = asc(users.createdAt);
+        break;
+      case "-created":
+        orderBy = desc(users.createdAt);
+        break;
+      default:
+        orderBy = asc(users.username);
+        break;
+    }
+
     const results = await db
       .select()
       .from(users)
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(users.displayName));
+      .orderBy(orderBy);
 
     return {
       results: await serialize(

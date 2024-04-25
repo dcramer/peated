@@ -4,7 +4,8 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
-import SiteTable from "../components/admin/siteTable";
+import Table from "../components/table";
+import TimeSince from "../components/timeSince";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
@@ -46,8 +47,24 @@ export default function AdminSites() {
           Add Site
         </Button>
       </div>
+
       {siteList.results.length > 0 ? (
-        <SiteTable siteList={siteList.results} rel={siteList.rel} />
+        <Table
+          items={siteList.results}
+          rel={siteList.rel}
+          defaultSort="-created"
+          primaryKey={(item) => item.type}
+          url={(item) => `/admin/sites/${item.type}`}
+          columns={[
+            { name: "name", sort: "name", sortDefaultOrder: "asc" },
+            {
+              name: "lastRunAt",
+              title: "Last Run",
+              value: (v) =>
+                v.lastRunAt ? <TimeSince date={v.lastRunAt} /> : <>&mdash;</>,
+            },
+          ]}
+        />
       ) : (
         <EmptyActivity>
           Looks like there's nothing in the database yet. Weird.
