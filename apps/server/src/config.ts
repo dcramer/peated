@@ -38,7 +38,7 @@ export default {
 
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   OPENAI_HOST: process.env.OPENAI_HOST || "https://api.openai.com/v1",
-  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4-turbo-preview",
+  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4o",
 
   DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
 };
