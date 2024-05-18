@@ -1,6 +1,8 @@
 import config from "@peated/server/config";
 import { logError } from "@peated/server/lib/log";
+import { startSpan } from "@sentry/node";
 import OpenAI from "openai";
+import type { ChatCompletionMessageParam } from "openai/resources";
 import { type z, type ZodSchema } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
@@ -41,13 +43,13 @@ export async function getStructuredResponse<
   });
 
   // https://wundergraph.com/blog/return_json_from_openai
-  const completion = await openai.chat.completions.create(
+  const completion = await startSpan(
     {
-      model,
-      response_format: {
-        type: "json_object",
-      },
-      messages: [
+      op: `ai.chat_completions.create`,
+      name: "getStructuredResponse",
+    },
+    async (span) => {
+      const messages: ChatCompletionMessageParam[] = [
         {
           role: "system",
           content: [
@@ -61,12 +63,39 @@ export async function getStructuredResponse<
           role: "user",
           content: prompt,
         },
-      ],
-      temperature: 0,
+      ];
+
+      span.setAttribute("ai.input_messages", JSON.stringify(messages));
+      span.setAttribute("ai.model_id", model);
+      span.setAttribute("ai.streaming", false);
+
+      const result = await openai.chat.completions.create(
+        {
+          model,
+          response_format: {
+            type: "json_object",
+          },
+          messages,
+          temperature: 0,
+        },
+        // {
+        //   timeout: 300,
+        // },
+      );
+
+      if (result.usage) {
+        span.setAttribute("ai.total_tokens.used", result.usage?.total_tokens);
+        span.setAttribute("ai.prompt_tokens.used", result.usage?.prompt_tokens);
+        span.setAttribute(
+          "ai.completion_tokens.used",
+          result.usage?.completion_tokens,
+        );
+      }
+
+      span.setAttribute("ai.responses", JSON.stringify(result.choices));
+
+      return result;
     },
-    // {
-    //   timeout: 300,
-    // },
   );
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
