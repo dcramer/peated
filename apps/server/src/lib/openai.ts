@@ -45,7 +45,7 @@ export async function getStructuredResponse<
   // https://wundergraph.com/blog/return_json_from_openai
   const completion = await startSpan(
     {
-      op: `ai.chat_completions.create`,
+      op: "ai.run",
       name: "getStructuredResponse",
     },
     async (span) => {

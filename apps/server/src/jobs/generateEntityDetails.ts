@@ -6,6 +6,7 @@ import { changes, entities } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { CountryEnum, EntityTypeEnum } from "@peated/server/schemas";
+import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -85,20 +86,26 @@ async function generateEntityDetails(entity: Entity): Promise<Response | null> {
   if (!config.OPENAI_API_KEY)
     throw new Error("OPENAI_API_KEY is not configured");
 
-  const result = await getStructuredResponse(
-    generatePrompt(entity),
-    OpenAIBottleDetailsSchema,
-    OpenAIBottleDetailsValidationSchema,
-    undefined,
+  return await startSpan(
     {
-      entity: {
-        id: entity.id,
-        name: entity.name,
-      },
+      op: "ai.pipeline",
+      name: "generateEntityDetails",
+    },
+    async (span) => {
+      return await getStructuredResponse(
+        generatePrompt(entity),
+        OpenAIBottleDetailsSchema,
+        OpenAIBottleDetailsValidationSchema,
+        undefined,
+        {
+          entity: {
+            id: entity.id,
+            name: entity.name,
+          },
+        },
+      );
     },
   );
-
-  return result;
 }
 
 export default async ({ entityId }: { entityId: number }) => {

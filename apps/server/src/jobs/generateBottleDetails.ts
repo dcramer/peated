@@ -12,6 +12,7 @@ import { notesForProfile } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
+import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -93,20 +94,26 @@ async function generateBottleDetails(
   if (!config.OPENAI_API_KEY)
     throw new Error("OPENAI_API_KEY is not configured");
 
-  const result = await getStructuredResponse(
-    generatePrompt(bottle, tagList),
-    OpenAIBottleDetailsSchema,
-    OpenAIBottleDetailsValidationSchema,
-    undefined,
+  return await startSpan(
     {
-      bottle: {
-        id: bottle.id,
-        fullName: bottle.fullName,
-      },
+      op: "ai.pipeline",
+      name: "generateBottleDetails",
+    },
+    async (span) => {
+      return await getStructuredResponse(
+        generatePrompt(bottle, tagList),
+        OpenAIBottleDetailsSchema,
+        OpenAIBottleDetailsValidationSchema,
+        undefined,
+        {
+          bottle: {
+            id: bottle.id,
+            fullName: bottle.fullName,
+          },
+        },
+      );
     },
   );
-
-  return result;
 }
 
 export default async function ({ bottleId }: { bottleId: number }) {
