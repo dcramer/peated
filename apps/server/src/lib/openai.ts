@@ -21,6 +21,7 @@ export async function getStructuredResponse<
   Schema extends ZodSchema<any>,
   FullSchema extends ZodSchema<any>,
 >(
+  pipelineName: string,
   prompt: string,
   schema: Schema,
   fullSchema: FullSchema,
@@ -31,6 +32,7 @@ export async function getStructuredResponse<
   Schema extends ZodSchema<any>,
   FullSchema extends ZodSchema<any>,
 >(
+  pipelineName: string,
   prompt: string,
   schema: Schema,
   fullSchema: FullSchema | null = null,
@@ -65,6 +67,7 @@ export async function getStructuredResponse<
         },
       ];
 
+      span.setAttribute("ai.pipeline.name", pipelineName);
       span.setAttribute("ai.input_messages", JSON.stringify(messages));
       span.setAttribute("ai.model_id", model);
       span.setAttribute("ai.streaming", false);

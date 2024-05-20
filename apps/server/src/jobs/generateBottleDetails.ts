@@ -101,6 +101,7 @@ async function generateBottleDetails(
     },
     async (span) => {
       return await getStructuredResponse(
+        "generateBottleDetails",
         generatePrompt(bottle, tagList),
         OpenAIBottleDetailsSchema,
         OpenAIBottleDetailsValidationSchema,

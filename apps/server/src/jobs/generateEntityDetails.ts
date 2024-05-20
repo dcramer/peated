@@ -93,6 +93,7 @@ async function generateEntityDetails(entity: Entity): Promise<Response | null> {
     },
     async (span) => {
       return await getStructuredResponse(
+        "generateEntityDetails",
         generatePrompt(entity),
         OpenAIBottleDetailsSchema,
         OpenAIBottleDetailsValidationSchema,
