@@ -1,6 +1,6 @@
 import config from "@peated/server/config";
 import { logError } from "@peated/server/lib/log";
-import { setMeasurement, startSpan } from "@sentry/node";
+import { metrics, startSpan } from "@sentry/node";
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources";
 import { type ZodSchema, type z } from "zod";
@@ -88,20 +88,11 @@ export async function getStructuredResponse<
       );
 
       if (result.usage) {
-        setMeasurement(
-          "ai.total_tokens.used",
-          result.usage.total_tokens,
-          "none",
-        );
-        setMeasurement(
-          "ai.prompt_tokens.used",
-          result.usage?.prompt_tokens,
-          "none",
-        );
-        setMeasurement(
+        metrics.increment("ai.total_tokens.used", result.usage.total_tokens);
+        metrics.increment("ai.prompt_tokens.used", result.usage?.prompt_tokens);
+        metrics.increment(
           "ai.completion_tokens.used",
           result.usage?.completion_tokens,
-          "none",
         );
       }
 
