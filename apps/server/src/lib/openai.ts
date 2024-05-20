@@ -11,6 +11,7 @@ import zodToJsonSchema from "zod-to-json-schema";
 const DEFAULT_MODEL: string = config.OPENAI_MODEL;
 
 export async function getStructuredResponse<Schema extends ZodSchema<any>>(
+  pipelineName: string,
   prompt: string,
   schema: Schema,
   fullSchema?: undefined | null,
