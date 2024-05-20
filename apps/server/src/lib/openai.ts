@@ -89,10 +89,10 @@ export async function getStructuredResponse<
 
       if (result.usage) {
         metrics.increment("ai.total_tokens.used", result.usage.total_tokens);
-        metrics.increment("ai.prompt_tokens.used", result.usage?.prompt_tokens);
+        metrics.increment("ai.prompt_tokens.used", result.usage.prompt_tokens);
         metrics.increment(
           "ai.completion_tokens.used",
-          result.usage?.completion_tokens,
+          result.usage.completion_tokens,
         );
       }
 
