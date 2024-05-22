@@ -36,8 +36,8 @@ func (suite *EntityHandlerTestSuite) TestHandler_List() {
 	var data entity.EntitiesResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(data.Entities), 1)
-	suite.Equal(data.Entities[0].ID, strconv.FormatUint(entity1.ID, 10))
+	suite.Require().Equal(1, len(data.Entities))
+	suite.Equal(strconv.FormatUint(entity1.ID, 10), data.Entities[0].ID)
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_List_Type() {
@@ -55,7 +55,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_List_Type() {
 	var data entity.EntitiesResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(data.Entities), 1)
+	suite.Require().Equal(1, len(data.Entities))
 	suite.Equal(data.Entities[0].ID, strconv.FormatUint(entity1.ID, 10))
 
 	response = suite.Request("GET", "/entities?type=distiller", nil)
@@ -63,7 +63,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_List_Type() {
 	suite.ResponseStatusEqual(response, http.StatusOK)
 	err = json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(data.Entities), 0)
+	suite.Require().Equal(0, len(data.Entities))
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_ById() {
@@ -77,7 +77,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_ById() {
 	var data entity.EntityResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.Entity.ID, strconv.FormatUint(entity1.ID, 10))
+	suite.Equal(strconv.FormatUint(entity1.ID, 10), data.Entity.ID)
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_ById_NotFound() {
@@ -92,7 +92,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_ById_Tombstone() {
 	entity1 := fixture.NewEntity(ctx, suite.DB, func(b *model.Entity) {})
 	suite.DB.Create(&model.EntityTombstone{
 		EntityID:    entity1.ID * 10,
-		NewEntityID: entity1.ID,
+		NewEntityID: &entity1.ID,
 	})
 
 	response := suite.Request("GET", fmt.Sprintf("/entities/%d", entity1.ID*10), nil)
@@ -101,7 +101,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_ById_Tombstone() {
 	var data entity.EntityResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.Entity.ID, strconv.FormatUint(entity1.ID, 10))
+	suite.Equal(strconv.FormatUint(entity1.ID, 10), data.Entity.ID)
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_Create_Unauthenticated() {
@@ -135,7 +135,7 @@ func (suite *EntityHandlerTestSuite) TestHandler_Create_Mod() {
 	var data entity.EntityResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.Entity.Name, "foo")
+	suite.Equal("foo", data.Entity.Name)
 }
 
 func (suite *EntityHandlerTestSuite) TestHandler_Delete_NonMod() {
@@ -197,5 +197,5 @@ func (suite *EntityHandlerTestSuite) TestHandler_Update_Mod() {
 	var data entity.EntityResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.Entity.Name, "TestHandler Update Mod")
+	suite.Equal("TestHandler Update Mod", data.Entity.Name)
 }

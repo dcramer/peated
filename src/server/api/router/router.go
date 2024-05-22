@@ -5,13 +5,17 @@ import (
 	"peated/api/resource/auth"
 	"peated/api/resource/badge"
 	"peated/api/resource/bottle"
+	"peated/api/resource/common/schema"
 	"peated/api/resource/entity"
 	"peated/api/resource/health"
 	"peated/api/resource/user"
 	"peated/api/router/middleware"
 	"peated/config"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
 )
@@ -22,6 +26,12 @@ func New(
 	db *gorm.DB,
 ) *gin.Engine {
 	r := gin.Default()
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterCustomTypeFunc(func(field reflect.Value) interface{} {
+			return nil
+		}, schema.Optional[string]{}, schema.Optional[uint64]{})
+	}
 
 	r.NoMethod(func(ctx *gin.Context) {
 		ctx.JSON(http.StatusMethodNotAllowed, gin.H{"error": "method not allowed on resource"})

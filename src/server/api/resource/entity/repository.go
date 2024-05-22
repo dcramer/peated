@@ -282,7 +282,7 @@ func (r *Repository) MergeInto(ctx context.Context, id uint64, siblingIds []uint
 		for _, id := range siblingIds {
 			if err = tx.Create(&model.EntityTombstone{
 				EntityID:    id,
-				NewEntityID: primary.ID,
+				NewEntityID: &primary.ID,
 			}).Error; err != nil {
 				return err
 			}
@@ -380,13 +380,17 @@ type UpsertOutcome[T any] struct {
 	Result  T
 }
 
-func (r *Repository) Upsert(ctx context.Context, value interface{}, entityType string, currentUserID uint64) (*UpsertOutcome[*model.Entity], error) {
+type EntityOrID interface {
+	ID() *uint64
+	Entity() *model.Entity
+}
+
+func (r *Repository) Upsert(ctx context.Context, value EntityOrID, entityType string, currentUserID uint64) (*UpsertOutcome[*model.Entity], error) {
 	var entity *model.Entity
 
 	// TODO: we'd prefer this _whole thing_ be a transaction
-	switch value := value.(type) {
-	case uint64:
-		entity, err := r.ReadById(ctx, value)
+	if value.ID() != nil {
+		entity, err := r.ReadById(ctx, *value.ID())
 		if err != nil {
 			return nil, err
 		}
@@ -403,11 +407,9 @@ func (r *Repository) Upsert(ctx context.Context, value interface{}, entityType s
 			Created: false,
 			Result:  entity,
 		}, nil
-	case model.Entity:
-		entity = &value
-	default:
-		panic(errors.Errorf("invalid value passed to upsert: %+v", value))
 	}
+
+	entity = value.Entity()
 
 	newEntity, err := r.Create(ctx, entity)
 	if err == nil {

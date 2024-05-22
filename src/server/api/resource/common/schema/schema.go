@@ -22,3 +22,5 @@ func NewOptional[T any](t *T) Optional[T] {
 		Value:   t,
 	}
 }
+
+type Choice []interface{}

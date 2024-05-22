@@ -3,6 +3,7 @@ package entity
 import (
 	"peated/api/resource/common/schema"
 	"peated/database/column/spatial"
+	"peated/database/model"
 )
 
 type EntityInput struct {
@@ -39,4 +40,12 @@ type ListInput struct {
 
 type EntityMergeInput struct {
 	EntityIDs []uint64 `json:"entityIds" binding:"required,dive,numeric"`
+}
+
+func NewEntityFromInput(input EntityInput) model.Entity {
+	return model.Entity{
+		Name:      input.Name,
+		ShortName: input.ShortName.Value,
+		Type:      input.Type,
+	}
 }

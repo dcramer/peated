@@ -146,12 +146,18 @@ func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.U
 			return err
 		}
 
-		changeData, err := json.Marshal(bottle)
-		if err != nil {
+		var distillers model.BottleDistillers
+		if err := tx.Where("bottle_id = ?", bottle.ID).Find(&distillers).Error; err != nil {
 			return err
 		}
+		var distillerIDs []uint64
+		for _, d := range distillers {
+			distillerIDs = append(distillerIDs, d.DistillerID)
+		}
 
-		if err := tx.Delete(bottle).Error; err != nil {
+		// TODO insert distillerIds
+		changeData, err := json.Marshal(bottle)
+		if err != nil {
 			return err
 		}
 
@@ -164,6 +170,57 @@ func (r *Repository) Delete(ctx context.Context, id uint64, currentUser *model.U
 			CreatedByID: currentUser.ID,
 			Data:        changeData,
 		}).Error; err != nil {
+			return err
+		}
+
+		allEntityIDs := []uint64{
+			bottle.BrandID,
+		}
+		if bottle.BottlerID != nil {
+			allEntityIDs = append(allEntityIDs, *bottle.BottlerID)
+		}
+		if len(distillerIDs) != 0 {
+			allEntityIDs = append(allEntityIDs, distillerIDs...)
+		}
+
+		if err = tx.Exec(`UPDATE entity SET total_bottles = total_bottles - 1 WHERE entity.id IN ?`, allEntityIDs).Error; err != nil {
+			return err
+		}
+
+		var relations = []interface{}{
+			model.BottleTag{},
+			model.BottleDistiller{},
+			model.BottleAlias{},
+		}
+
+		for _, r := range relations {
+			if err = tx.Where("bottle_id = ?", bottle.ID).Delete(&r).Error; err != nil {
+				return err
+			}
+		}
+
+		relations = []interface{}{
+			model.Review{},
+			model.StorePrice{},
+		}
+
+		for _, r := range relations {
+			if err = tx.Model(&r).Where("bottle_id = ?", bottle.ID).Update("bottle_id", nil).Error; err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Create(&model.BottleTombstone{
+			BottleID: bottle.ID,
+		}).Error; err != nil {
+			return err
+		}
+
+		if err = tx.Where("bottle_id = ?", bottle.ID).Delete(&model.BottleTag{}).Error; err != nil {
+			return err
+		}
+
+		if err = tx.Delete(&bottle).Error; err != nil {
 			return err
 		}
 

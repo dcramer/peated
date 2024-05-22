@@ -36,8 +36,8 @@ func (suite *BottleHandlerTestSuite) TestHandler_List() {
 	var data bottle.BottlesResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Require().Equal(len(data.Bottles), 1)
-	suite.Equal(data.Bottles[0].ID, strconv.FormatUint(bottle1.ID, 10))
+	suite.Require().Equal(1, len(data.Bottles))
+	suite.Equal(strconv.FormatUint(bottle1.ID, 10), data.Bottles[0].ID)
 }
 
 func (suite *BottleHandlerTestSuite) TestHandler_ById() {
@@ -51,7 +51,7 @@ func (suite *BottleHandlerTestSuite) TestHandler_ById() {
 	var data bottle.BottleResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.Bottle.ID, strconv.FormatUint(bottle1.ID, 10))
+	suite.Equal(strconv.FormatUint(bottle1.ID, 10), data.Bottle.ID)
 }
 
 func (suite *BottleHandlerTestSuite) TestHandler_ById_NotFound() {
@@ -66,7 +66,7 @@ func (suite *BottleHandlerTestSuite) TestHandler_ById_Tombstone() {
 	bottle1 := fixture.NewBottle(ctx, suite.DB, func(b *model.Bottle) {})
 	suite.DB.Create(&model.BottleTombstone{
 		BottleID:    bottle1.ID * 10,
-		NewBottleID: bottle1.ID,
+		NewBottleID: &bottle1.ID,
 	})
 
 	response := suite.Request("GET", fmt.Sprintf("/bottles/%d", bottle1.ID*10), nil)
@@ -75,7 +75,7 @@ func (suite *BottleHandlerTestSuite) TestHandler_ById_Tombstone() {
 	var data bottle.BottleResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.Bottle.ID, strconv.FormatUint(bottle1.ID, 10))
+	suite.Equal(strconv.FormatUint(bottle1.ID, 10), data.Bottle.ID)
 }
 
 func (suite *BottleHandlerTestSuite) TestHandler_Create_Unauthenticated() {
@@ -92,7 +92,7 @@ func (suite *BottleHandlerTestSuite) TestHandler_Create_NonMod() {
 		u.Mod = true
 	})
 
-	response := suite.RequestWithHandler("POST", "/bottles", bytes.NewBuffer([]byte(`{"name": "foo"}`)), func(r *http.Request) {
+	response := suite.RequestWithHandler("POST", "/bottles", bytes.NewBuffer([]byte(`{"name": "foo", "category": "single_malt", "brand": {"name": "Jim"}}`)), func(r *http.Request) {
 		r.Header.Set("Authorization", fixture.NewAuthorization(r.Context(), test.NewConfig(), user))
 	})
 
@@ -100,7 +100,7 @@ func (suite *BottleHandlerTestSuite) TestHandler_Create_NonMod() {
 	var data bottle.BottleResponse
 	err := json.Unmarshal(response.Body.Bytes(), &data)
 	suite.Require().NoError(err)
-	suite.Equal(data.Bottle.Name, "foo")
+	suite.Equal("foo", data.Bottle.Name)
 }
 
 func (suite *BottleHandlerTestSuite) TestHandler_Delete_NonMod() {

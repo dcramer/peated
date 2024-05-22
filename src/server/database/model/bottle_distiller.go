@@ -1,8 +1,8 @@
 package model
 
 type BottleDistiller struct {
-	BottleID    uint64 `json:"bottle_id" gorm:"primaryKey;autoincrement:false"`
-	DistillerID uint64 `json:"distiller_id" gorm:"primaryKey;autoincrement:false"`
+	BottleID    uint64 `json:"bottle_id" gorm:"primaryKey;autoincrement:false;not null"`
+	DistillerID uint64 `json:"distiller_id" gorm:"primaryKey;autoincrement:false;not null"`
 
 	Bottle    Bottle
 	Distiller Entity
