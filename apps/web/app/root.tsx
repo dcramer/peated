@@ -1,8 +1,8 @@
 import FontStyles from "@fontsource/raleway/index.css";
 import { sentryLink } from "@peated/server/lib/trpc";
 import type { User } from "@peated/server/types";
-import glyphUrl from "@peated/web/assets/glyph.png";
-import logo192Url from "@peated/web/assets/logo192.png";
+import icon192Url from "@peated/web/assets/icon192.png";
+import glyphUrl from "@peated/web/assets/icon512.png";
 import ErrorPage from "@peated/web/components/error-page";
 import { AuthProvider } from "@peated/web/hooks/useAuth";
 import { OnlineStatusProvider } from "@peated/web/hooks/useOnlineStatus";
@@ -91,7 +91,7 @@ export const links: LinksFunction = () => [
   {
     rel: "apple-touch-icon",
     type: "image/png",
-    href: logo192Url,
+    href: icon192Url,
     color: config.THEME_COLOR,
   },
 
