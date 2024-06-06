@@ -1,5 +1,6 @@
 import glyphUrl from "@peated/web/assets/glyph.png";
-import logo192Url from "@peated/web/assets/logo192.png";
+import icon192Url from "@peated/web/assets/icon192.png";
+import icon512Url from "@peated/web/assets/icon512.png";
 import config from "@peated/web/config";
 import { json } from "@remix-run/server-runtime";
 
@@ -33,13 +34,13 @@ export async function loader() {
           type: "image/png",
         },
         {
-          src: logo192Url,
+          src: icon192Url,
           sizes: "192x192",
           type: "image/png",
           density: "4.0",
         },
         {
-          src: "/logo512.png",
+          src: icon512Url,
           sizes: "512x512",
           type: "image/png",
         },
