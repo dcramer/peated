@@ -11,6 +11,7 @@ export const EntityInputSchema = z.object({
   shortName: z.string().trim().nullable().optional(),
   country: z.string().trim().nullable().optional(),
   region: z.string().trim().nullable().optional(),
+  description: z.string().trim().nullable().optional(),
   yearEstablished: z
     .number()
     .lte(new Date().getFullYear())

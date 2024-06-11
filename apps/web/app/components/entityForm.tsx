@@ -16,7 +16,9 @@ import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
+import useAuth from "../hooks/useAuth";
 import { logError } from "../lib/log";
+import TextAreaField from "./textAreaField";
 
 const entityTypes = [
   { id: "brand", name: "Brand" },
@@ -49,9 +51,12 @@ export default function EntityForm({
       region: initialData.region,
       type: initialData.type,
       yearEstablished: initialData.yearEstablished,
+      description: initialData.description,
       website: initialData.website,
     },
   });
+
+  const { user } = useAuth();
 
   const [error, setError] = useState<string | undefined>();
 
@@ -164,6 +169,16 @@ export default function EntityForm({
             placeholder="e.g. 1969"
             autoComplete="off"
           />
+          {user && (user.mod || user.admin) && (
+            <TextAreaField
+              {...register("description", {
+                setValueAs: (v) => (v === "" || !v ? null : v),
+              })}
+              error={errors.description}
+              autoFocus
+              label="Description"
+            />
+          )}
         </Fieldset>
       </Form>
     </Layout>

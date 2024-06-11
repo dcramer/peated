@@ -256,3 +256,40 @@ test("short name change updates bottles if brand", async ({ fixtures }) => {
 
   expect(newOtherBottle.fullName).toEqual(otherBottle.fullName);
 });
+
+test("sets descriptionSrc with description", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    description: "Delicious Wood",
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(omit(entity, "description", "descriptionSrc")).toEqual(
+    omit(newEntity, "description", "descriptionSrc"),
+  );
+  expect(newEntity.description).toBe("Delicious Wood");
+  expect(newEntity.descriptionSrc).toEqual("user");
+
+  const [change] = await db
+    .select()
+    .from(changes)
+    .where(eq(changes.objectId, newEntity.id))
+    .orderBy(desc(changes.createdAt))
+    .limit(1);
+
+  expect(change.data).toEqual({
+    description: "Delicious Wood",
+    descriptionSrc: "user",
+  });
+});

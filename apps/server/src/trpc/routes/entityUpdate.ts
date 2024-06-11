@@ -56,6 +56,14 @@ export default modProcedure
       data.type = input.type;
     }
     if (
+      input.description !== undefined &&
+      input.description !== entity.description
+    ) {
+      data.description = input.description;
+      data.descriptionSrc =
+        input.description && input.description !== null ? "user" : null;
+    }
+    if (
       input.yearEstablished !== undefined &&
       input.yearEstablished !== entity.yearEstablished
     ) {

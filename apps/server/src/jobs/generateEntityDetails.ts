@@ -122,17 +122,19 @@ export default async ({ entityId }: { entityId: number }) => {
     throw new Error(`Failed to generate details fpr entity: ${entityId}`);
   }
   const data: Record<string, any> = {};
-  if (result.description && result.description !== entity.description)
-    data.description = result.description;
-
   if (
-    result.yearEstablished &&
-    result.yearEstablished !== entity.yearEstablished
-  )
+    (!data.descriptionSrc || data.descriptionSrc === "generated") &&
+    result.description &&
+    result.description !== entity.description
+  ) {
+    data.description = result.description;
+    data.descriptionSrc = "generated";
+  }
+
+  if (!entity.yearEstablished && result.yearEstablished)
     data.yearEstablished = result.yearEstablished;
 
-  if (result.website && result.website !== entity.website)
-    data.website = result.website;
+  if (!entity.website && result.website) data.website = result.website;
 
   if (
     result.type?.length &&
@@ -140,11 +142,9 @@ export default async ({ entityId }: { entityId: number }) => {
   )
     data.type = result.type;
 
-  if (result.country && result.country !== entity.country)
-    data.country = result.country;
+  if (!entity.country && result.country) data.country = result.country;
 
-  if (result.region && result.region !== entity.region)
-    data.region = result.region;
+  if (!entity.region && result.region) data.region = result.region;
 
   if (Object.keys(data).length === 0) return;
 

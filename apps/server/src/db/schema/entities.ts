@@ -26,6 +26,11 @@ export const entityTypeEnum = pgEnum("entity_type", [
   "bottler",
 ]);
 
+export const contentSourceEnum = pgEnum("content_source", [
+  "generated",
+  "user",
+]);
+
 export const entities = pgTable(
   "entity",
   {
@@ -38,6 +43,7 @@ export const entities = pgTable(
     type: entityTypeEnum("type").array().notNull(),
 
     description: text("description"),
+    descriptionSrc: contentSourceEnum("description_src"),
     yearEstablished: smallint("year_established"),
     website: varchar("website", { length: 255 }),
 

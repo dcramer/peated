@@ -19,6 +19,10 @@ export default authedProcedure
       createdById: ctx.user.id,
     };
 
+    if (data.description && data.description !== "") {
+      data.descriptionSrc = "user";
+    }
+
     const user = ctx.user;
     const entity = await db.transaction(async (tx) => {
       const [entity] = await tx
