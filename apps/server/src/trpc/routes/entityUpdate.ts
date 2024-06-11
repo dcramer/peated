@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { type SerializedPoint } from "@peated/server/db/columns";
+import type {
+  UnserializedPoint} from "@peated/server/db/columns";
+import {
+  type SerializedPoint,
+} from "@peated/server/db/columns";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,
@@ -27,7 +31,10 @@ export default modProcedure
   )
   .mutation(async function ({ input, ctx }) {
     const [entity] = await db
-      .select()
+      .select({
+        ...getTableColumns(entities),
+        location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
+      })
       .from(entities)
       .where(eq(entities.id, input.entity));
 
@@ -71,6 +78,20 @@ export default modProcedure
     }
     if (input.website !== undefined && input.website !== entity.website) {
       data.website = input.website;
+    }
+    if (
+      input.location !== undefined &&
+      (!input.location ||
+        !entity.location ||
+        !arraysEqual(
+          input.location,
+          (JSON.parse(entity.location) as UnserializedPoint).coordinates as [
+            number,
+            number,
+          ],
+        ))
+    ) {
+      data.location = input.location;
     }
     if (Object.values(data).length === 0) {
       return await serialize(EntitySerializer, entity, ctx.user);
