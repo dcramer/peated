@@ -14,7 +14,7 @@ if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-function generatePrompt(entity: Entity) {
+function generatePrompt(entity: Partial<Entity>) {
   const infoLines = [];
   if (entity.country && entity.region) {
     infoLines.push(`Origin: ${entity.region}, ${entity.country}`);
@@ -66,7 +66,7 @@ Its valid to include all three values in 'type' if they are accurate, but at lea
 `;
 }
 
-const OpenAIBottleDetailsSchema = z.object({
+export const OpenAIEntityDetailsSchema = z.object({
   description: z.string().nullable().optional(),
   yearEstablished: z.number().nullable().optional(),
   website: z.string().url().nullable().optional(),
@@ -75,28 +75,30 @@ const OpenAIBottleDetailsSchema = z.object({
   type: z.array(z.string()).optional(),
 });
 
-const OpenAIBottleDetailsValidationSchema = OpenAIBottleDetailsSchema.extend({
+const OpenAIEntityDetailsValidationSchema = OpenAIEntityDetailsSchema.extend({
   country: CountryEnum.nullable().optional(),
   type: z.array(EntityTypeEnum).optional(),
 });
 
-type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
+export type GeneratedEntityDetails = z.infer<typeof OpenAIEntityDetailsSchema>;
 
-async function generateEntityDetails(entity: Entity): Promise<Response | null> {
+export async function getGeneratedEntityDetails(
+  entity: Partial<Entity>,
+): Promise<GeneratedEntityDetails | null> {
   if (!config.OPENAI_API_KEY)
     throw new Error("OPENAI_API_KEY is not configured");
 
   return await startSpan(
     {
       op: "ai.pipeline",
-      name: "generateEntityDetails",
+      name: "getGeneratedEntityDetails",
     },
     async (span) => {
       return await getStructuredResponse(
-        "generateEntityDetails",
+        "getGeneratedEntityDetails",
         generatePrompt(entity),
-        OpenAIBottleDetailsSchema,
-        OpenAIBottleDetailsValidationSchema,
+        OpenAIEntityDetailsSchema,
+        OpenAIEntityDetailsValidationSchema,
         undefined,
         {
           entity: {
@@ -116,7 +118,7 @@ export default async ({ entityId }: { entityId: number }) => {
   if (!entity) {
     throw new Error(`Unknown entity: ${entityId}`);
   }
-  const result = await generateEntityDetails(entity);
+  const result = await getGeneratedEntityDetails(entity);
 
   if (!result) {
     throw new Error(`Failed to generate details fpr entity: ${entityId}`);

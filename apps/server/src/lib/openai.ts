@@ -43,6 +43,8 @@ export async function getStructuredResponse<
   const openai = new OpenAI({
     apiKey: config.OPENAI_API_KEY,
     baseURL: config.OPENAI_HOST,
+    organization: config.OPENAI_ORGANIZATION,
+    project: config.OPENAI_PROJECT,
   });
 
   // https://wundergraph.com/blog/return_json_from_openai

@@ -1,3 +1,4 @@
+import { BoltIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityInputSchema } from "@peated/server/schemas";
@@ -11,13 +12,14 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
-import { isTRPCClientError } from "@peated/web/lib/trpc";
+import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import useAuth from "../hooks/useAuth";
 import { logError } from "../lib/log";
+import Button from "./button";
 import TextAreaField from "./textAreaField";
 
 const entityTypes = [
@@ -41,6 +43,8 @@ export default function EntityForm({
     control,
     register,
     handleSubmit,
+    getValues,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(EntityInputSchema),
@@ -59,6 +63,8 @@ export default function EntityForm({
   const { user } = useAuth();
 
   const [error, setError] = useState<string | undefined>();
+
+  const generateDataMutation = trpc.entityGenerateDetails.useMutation();
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
@@ -113,6 +119,44 @@ export default function EntityForm({
             autoComplete="off"
             helpText="An abberviated name if applicable. This will take place of the full name in bottle labels."
           />
+        </Fieldset>
+
+        <Fieldset>
+          <legend className="text-light flex w-full items-center border-t border-slate-800 bg-slate-950 px-4 py-5">
+            <div className="flex-grow">Additional Details</div>
+            {user && (user.mod || user.admin) && (
+              <Button
+                color="default"
+                onClick={async () => {
+                  const result =
+                    await generateDataMutation.mutateAsync(getValues());
+
+                  const currentValues = getValues();
+                  if (
+                    result &&
+                    result.description &&
+                    !currentValues.description
+                  )
+                    setValue("description", result.description);
+                  if (
+                    result &&
+                    result.yearEstablished &&
+                    !currentValues.yearEstablished
+                  )
+                    setValue("yearEstablished", result.yearEstablished);
+                  if (result && result.country && !currentValues.country)
+                    setValue("country", result.country);
+                  if (result && result.region && !currentValues.region)
+                    setValue("region", result.region);
+                }}
+                disabled={generateDataMutation.isPending}
+                icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
+              >
+                Help me fill this in [Beta]
+              </Button>
+            )}
+          </legend>
+
           <CountryField
             control={control}
             name="country"
@@ -177,6 +221,7 @@ export default function EntityForm({
               error={errors.description}
               autoFocus
               label="Description"
+              rows={8}
             />
           )}
         </Fieldset>

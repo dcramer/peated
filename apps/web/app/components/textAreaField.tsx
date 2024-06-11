@@ -16,7 +16,7 @@ type Props = {
 } & React.ComponentProps<typeof TextArea>;
 
 export default forwardRef<HTMLTextAreaElement, Props>(function TextAreaField(
-  { name, helpText, label, required, error, className, ...props },
+  { name, helpText, label, required, error, className, children, ...props },
   ref,
 ) {
   return (
@@ -35,6 +35,7 @@ export default forwardRef<HTMLTextAreaElement, Props>(function TextAreaField(
         ref={ref}
         {...props}
       />
+      {children}
     </FormField>
   );
 });

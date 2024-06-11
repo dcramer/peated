@@ -30,6 +30,7 @@ import entityById from "./routes/entityById";
 import entityCategoryList from "./routes/entityCategoryList";
 import entityCreate from "./routes/entityCreate";
 import entityDelete from "./routes/entityDelete";
+import entityGenerateDetails from "./routes/entityGenerateDetails";
 import entityList from "./routes/entityList";
 import entityMerge from "./routes/entityMerge";
 import entityUpdate from "./routes/entityUpdate";
@@ -106,6 +107,7 @@ export const appRouter = router({
   entityCategoryList,
   entityCreate,
   entityDelete,
+  entityGenerateDetails,
   entityList,
   entityMerge,
   entityUpdate,
