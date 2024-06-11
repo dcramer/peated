@@ -7,10 +7,16 @@ import { ClientOnly } from "./clientOnly";
 type Props = Omit<ComponentPropsWithoutRef<typeof Link>, "to"> & {
   to?: string;
   bottle: Bottle;
+  withPanel?: boolean;
   flightId?: string;
 };
 
-export default function BottleLink({ bottle, flightId, ...props }: Props) {
+export default function BottleLink({
+  bottle,
+  flightId,
+  withPanel = false,
+  ...props
+}: Props) {
   const [open, setOpen] = useState(false);
 
   const tastingPath = flightId
@@ -21,26 +27,30 @@ export default function BottleLink({ bottle, flightId, ...props }: Props) {
     <>
       <Link
         onClick={(e) => {
-          e.preventDefault();
-          setOpen(true);
+          if (withPanel) {
+            e.preventDefault();
+            setOpen(true);
+          }
         }}
         title={bottle.fullName}
         className="absolute inset-0"
         to={`/bottles/${bottle.id}`}
         {...props}
       />
-      <ClientOnly>
-        {() => (
-          <BottlePanel
-            tastingPath={tastingPath}
-            bottle={bottle}
-            open={open}
-            onClose={() => {
-              setOpen(false);
-            }}
-          />
-        )}
-      </ClientOnly>
+      {withPanel && (
+        <ClientOnly>
+          {() => (
+            <BottlePanel
+              tastingPath={tastingPath}
+              bottle={bottle}
+              open={open}
+              onClose={() => {
+                setOpen(false);
+              }}
+            />
+          )}
+        </ClientOnly>
+      )}
     </>
   );
 }
