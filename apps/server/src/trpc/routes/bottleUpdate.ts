@@ -70,6 +70,15 @@ export default modProcedure
       ctx,
     });
 
+    if (
+      input.description !== undefined &&
+      input.description !== bottle.description
+    ) {
+      bottleData.description = input.description;
+      bottleData.descriptionSrc =
+        input.description && input.description !== null ? "user" : null;
+    }
+
     const user = ctx.user;
     const newBottle = await db.transaction(async (tx) => {
       let brand: Entity | null = null;
@@ -300,10 +309,11 @@ export default modProcedure
     }
 
     if (
-      newBottle.fullName !== bottle.fullName ||
-      !newBottle.description ||
-      !newBottle.tastingNotes ||
-      newBottle.suggestedTags.length === 0
+      (newBottle.fullName !== bottle.fullName ||
+        !newBottle.description ||
+        !newBottle.tastingNotes ||
+        newBottle.suggestedTags.length === 0) &&
+      newBottle.descriptionSrc !== "user"
     ) {
       try {
         await pushJob("GenerateBottleDetails", { bottleId: bottle.id });

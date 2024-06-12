@@ -1,3 +1,4 @@
+import { BoltIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import {
@@ -22,10 +23,13 @@ import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import { isTRPCClientError } from "../lib/trpc";
+import useAuth from "../hooks/useAuth";
+import { isTRPCClientError, trpc } from "../lib/trpc";
+import Button from "./button";
 import { classesForProfile } from "./flavorProfile";
 import Form from "./form";
 import Header from "./header";
+import TextAreaField from "./textAreaField";
 
 const categoryList = CATEGORY_LIST.map((c) => ({
   id: c,
@@ -78,6 +82,8 @@ export default function BottleForm({
     control,
     register,
     handleSubmit,
+    getValues,
+    setValue,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
@@ -95,7 +101,11 @@ export default function BottleForm({
     },
   });
 
+  const { user } = useAuth();
+
   const [error, setError] = useState<string | undefined>();
+
+  const generateDataMutation = trpc.bottleGenerateDetails.useMutation();
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
@@ -334,6 +344,44 @@ export default function BottleForm({
               />
             )}
           />
+        </Fieldset>
+
+        <Fieldset>
+          <legend className="text-light flex w-full items-center border-t border-slate-800 bg-slate-950 px-4 py-5">
+            <div className="flex-grow">Additional Details</div>
+            {user && (user.mod || user.admin) && (
+              <Button
+                color="default"
+                onClick={async () => {
+                  const result =
+                    await generateDataMutation.mutateAsync(getValues());
+
+                  const currentValues = getValues();
+                  if (
+                    result &&
+                    result.description &&
+                    !currentValues.description
+                  )
+                    setValue("description", result.description);
+                }}
+                disabled={generateDataMutation.isPending}
+                icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
+              >
+                Help me fill this in [Beta]
+              </Button>
+            )}
+          </legend>
+          {user && (user.mod || user.admin) && (
+            <TextAreaField
+              {...register("description", {
+                setValueAs: (v) => (v === "" || !v ? null : v),
+              })}
+              error={errors.description}
+              autoFocus
+              label="Description"
+              rows={8}
+            />
+          )}
         </Fieldset>
       </Form>
     </Layout>

@@ -16,7 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { entities } from "./entities";
-import { categoryEnum, flavorProfileEnum } from "./enums";
+import { categoryEnum, contentSourceEnum, flavorProfileEnum } from "./enums";
 import { users } from "./users";
 
 type TastingNotes = {
@@ -42,6 +42,8 @@ export const bottles = pgTable(
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
     description: text("description"),
+    descriptionSrc: contentSourceEnum("description_src"),
+
     tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
     suggestedTags: varchar("suggested_tags", { length: 64 })
       .array()

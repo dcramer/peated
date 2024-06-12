@@ -16,6 +16,8 @@ import {
 import { geography } from "../columns";
 
 import { bottles, bottlesToDistillers } from ".";
+import { contentSourceEnum } from "./enums";
+
 import { users } from "./users";
 
 export type EntityType = "brand" | "distiller" | "bottler";
@@ -24,11 +26,6 @@ export const entityTypeEnum = pgEnum("entity_type", [
   "brand",
   "distiller",
   "bottler",
-]);
-
-export const contentSourceEnum = pgEnum("content_source", [
-  "generated",
-  "user",
 ]);
 
 export const entities = pgTable(

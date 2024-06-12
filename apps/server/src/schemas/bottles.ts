@@ -52,6 +52,7 @@ export const BottleInputSchema = z.object({
   bottler: EntityChoice.nullish(),
   statedAge: z.number().gte(0).lte(100).nullish(),
   category: CategoryEnum.nullish(),
+  description: z.string().nullable().optional(),
 });
 
 export const BottleMergeSchema = z.object({

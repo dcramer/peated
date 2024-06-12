@@ -20,3 +20,8 @@ export const objectTypeEnum = pgEnum("object_type", [
 export const flavorProfileEnum = pgEnum("flavor_profile", FLAVOR_PROFILES);
 
 export const tagCategoryEnum = pgEnum("tag_category", TAG_CATEGORIES);
+
+export const contentSourceEnum = pgEnum("content_source", [
+  "generated",
+  "user",
+]);

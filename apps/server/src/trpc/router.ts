@@ -9,6 +9,7 @@ import bottleAliasList from "./routes/bottleAliasList";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
+import bottleGenerateDetails from "./routes/bottleGenerateDetails";
 import bottleList from "./routes/bottleList";
 import bottleMerge from "./routes/bottleMerge";
 import bottlePreview from "./routes/bottlePreview";
@@ -88,6 +89,7 @@ export const appRouter = router({
   bottlePreview,
   bottleList,
   bottleAliasList,
+  bottleGenerateDetails,
   bottleMerge,
   bottlePriceHistory,
   bottlePriceList,

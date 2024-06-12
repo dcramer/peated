@@ -680,6 +680,13 @@
       "when": 1718109415914,
       "tag": "0096_uneven_mysterio",
       "breakpoints": false
+    },
+    {
+      "idx": 97,
+      "version": "5",
+      "when": 1718173640192,
+      "tag": "0097_flat_scarecrow",
+      "breakpoints": false
     }
   ]
 }

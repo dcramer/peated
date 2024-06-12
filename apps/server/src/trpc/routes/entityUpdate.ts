@@ -1,9 +1,6 @@
 import { db } from "@peated/server/db";
-import type {
-  UnserializedPoint} from "@peated/server/db/columns";
-import {
-  type SerializedPoint,
-} from "@peated/server/db/columns";
+import type { UnserializedPoint } from "@peated/server/db/columns";
+import { type SerializedPoint } from "@peated/server/db/columns";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,
@@ -207,7 +204,10 @@ export default modProcedure
       });
     }
 
-    if (newEntity.name !== entity.name || !newEntity.description) {
+    if (
+      (newEntity.name !== entity.name || !newEntity.description) &&
+      newEntity.descriptionSrc !== "user"
+    ) {
       try {
         await pushJob("GenerateEntityDetails", { entityId: entity.id });
       } catch (err) {

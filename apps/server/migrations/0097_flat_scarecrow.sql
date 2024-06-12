@@ -1,0 +1,1 @@
+ALTER TABLE "bottle" ADD COLUMN "description_src" "content_source";

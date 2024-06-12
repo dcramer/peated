@@ -20,7 +20,7 @@ if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-function generatePrompt(bottle: Bottle, tagList: string[]) {
+function generatePrompt(bottle: Partial<Bottle>, tagList: string[]) {
   const infoLines = [];
   if (bottle.category) {
     infoLines.push(`Category: ${bottle.category}`);
@@ -85,12 +85,12 @@ const OpenAIBottleDetailsValidationSchema = OpenAIBottleDetailsSchema.extend({
   // suggestedTags: z.array(DefaultTagEnum).optional(),
 });
 
-type Response = z.infer<typeof OpenAIBottleDetailsSchema>;
+export type GeneratedBottleDetails = z.infer<typeof OpenAIBottleDetailsSchema>;
 
-async function generateBottleDetails(
-  bottle: Bottle,
+export async function getGeneratedBottleDetails(
+  bottle: Partial<Bottle>,
   tagList: string[],
-): Promise<Response | null> {
+): Promise<GeneratedBottleDetails | null> {
   if (!config.OPENAI_API_KEY)
     throw new Error("OPENAI_API_KEY is not configured");
 
@@ -126,22 +126,30 @@ export default async function ({ bottleId }: { bottleId: number }) {
   }
 
   const tagList = (await db.query.tags.findMany()).map((r) => r.name);
-  const result = await generateBottleDetails(bottle, tagList);
+  const result = await getGeneratedBottleDetails(bottle, tagList);
 
   if (!result) {
     throw new Error(`Failed to generate details for bottle: ${bottleId}`);
   }
 
   const data: Record<string, any> = {};
-  if (result.description && result.description !== bottle.description)
+
+  if (
+    (!data.descriptionSrc || data.descriptionSrc === "generated") &&
+    result.description &&
+    result.description !== bottle.description
+  ) {
     data.description = result.description;
+    data.descriptionSrc = "generated";
+  }
 
   if (
     result.tastingNotes &&
     (!bottle.tastingNotes ||
       !objectsShallowEqual(result.tastingNotes, bottle.tastingNotes))
-  )
+  ) {
     data.tastingNotes = result.tastingNotes;
+  }
 
   if (
     result.suggestedTags?.length &&
@@ -166,15 +174,17 @@ export default async function ({ bottleId }: { bottleId: number }) {
     !bottle.category &&
     result.category &&
     result.category !== bottle.category
-  )
+  ) {
     data.category = result.category;
+  }
 
   if (
     !bottle.flavorProfile &&
     result.flavorProfile &&
     result.flavorProfile !== bottle.flavorProfile
-  )
+  ) {
     data.flavorProfile = result.flavorProfile;
+  }
 
   if (Object.keys(data).length === 0) return;
 
