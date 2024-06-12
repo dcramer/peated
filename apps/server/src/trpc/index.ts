@@ -1,4 +1,4 @@
-import { startSpan, withScope } from "@sentry/node";
+import { trpcMiddleware } from "@sentry/node";
 import { TRPCError, initTRPC } from "@trpc/server";
 import { type Context } from "./context";
 
@@ -41,28 +41,10 @@ const isMod = t.middleware(({ ctx, next }) => {
   });
 });
 
-const instrumented = t.middleware(async ({ ctx, next, path, type }) => {
-  return await withScope(async (scope) => {
-    return await startSpan(
-      {
-        op: `trpc.${type}`,
-        name: path,
-      },
-      async (span) => {
-        span.setAttribute("rpc.method", path);
-        span.setAttribute("rpc.system", "trpc");
-        // span.setAttribute("server.address", "");
-
-        return await next({ ctx });
-      },
-    );
-  });
-});
-
 export const router = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const middleware = t.middleware;
-export const publicProcedure = t.procedure.use(instrumented);
+export const publicProcedure = t.procedure.use(trpcMiddleware());
 export const authedProcedure = publicProcedure.use(isAuthed);
 export const adminProcedure = publicProcedure.use(isAdmin);
 export const modProcedure = publicProcedure.use(isMod);
