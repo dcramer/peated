@@ -49,6 +49,12 @@ export default async function buildFastify(options = {}) {
     ...options,
   });
 
+  app.addHook("preHandler", (request, reply, done) => {
+    // default
+    reply.headers({ "Cache-Control": "no-cache" });
+    done();
+  });
+
   app.register(fastifyTRPCPlugin, {
     prefix: "/trpc",
     trpcOptions: { router: appRouter, createContext },
