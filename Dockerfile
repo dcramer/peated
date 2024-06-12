@@ -48,6 +48,7 @@ ENV VERSION=$VERSION \
 
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
+    SENTRY_RELEASE="${VERSION:-$NF_GIT_SHA}" \
     pnpm build
 
 # web service
