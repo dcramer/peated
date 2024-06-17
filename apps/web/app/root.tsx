@@ -104,6 +104,10 @@ export async function loader({ context }: LoaderFunctionArgs) {
   });
 }
 
+export function shouldRevalidate() {
+  return false;
+}
+
 type LoaderData = {
   sentryTrace?: string;
   sentryBaggage?: string;
