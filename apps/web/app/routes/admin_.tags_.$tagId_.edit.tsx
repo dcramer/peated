@@ -1,6 +1,5 @@
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { useNavigate } from "react-router-dom";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
@@ -10,14 +9,14 @@ import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 import { trpc } from "../lib/trpc";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, params: { tagId }, context: { user, trpc } }) => {
+  async ({ request, params: { tagId }, context: { user, queryUtils } }) => {
     invariant(tagId);
 
     if (!user?.admin) return redirectToAuth({ request });
 
-    const tag = await trpc.tagByName.query(tagId);
+    const tag = await queryUtils.tagByName.ensureData(tagId);
 
-    return json({ tag });
+    return { tag };
   },
 );
 

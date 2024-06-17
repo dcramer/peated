@@ -63,11 +63,13 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 }
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, params: { tastingId }, context: { trpc, user } }) => {
+  async ({ request, params: { tastingId }, context: { queryUtils, user } }) => {
     invariant(tastingId);
     if (!user) return redirectToAuth({ request });
 
-    return json({ tasting: await trpc.tastingById.query(Number(tastingId)) });
+    return {
+      tasting: await queryUtils.tastingById.ensureData(Number(tastingId)),
+    };
   },
 );
 

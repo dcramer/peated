@@ -2,26 +2,25 @@ import BadgeTable from "@peated/web/components/admin/badgeTable";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({
-  request,
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  const { searchParams } = new URL(request.url);
-  const badgeList = await trpc.badgeList.query({
-    sort: "name",
-    ...Object.fromEntries(searchParams.entries()),
-  });
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { queryUtils } }) => {
+    const { searchParams } = new URL(request.url);
+    const badgeList = await queryUtils.badgeList.ensureData({
+      sort: "name",
+      ...Object.fromEntries(searchParams.entries()),
+    });
 
-  return json({ badgeList });
-}
+    return { badgeList };
+  },
+);
 
 export default function AdminBadges() {
   const { badgeList } = useLoaderData<typeof loader>();

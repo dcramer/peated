@@ -5,24 +5,23 @@ import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import TastingForm from "../components/tastingForm";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, params: { tastingId }, context: { trpc, user } }) => {
+  async ({ request, params: { tastingId }, context: { queryUtils, user } }) => {
     invariant(tastingId);
 
     if (!user) return redirectToAuth({ request });
 
     // TODO: this would be better if done in parallel
-    const tasting = await trpc.tastingById.query(Number(tastingId));
-    const suggestedTags = await trpc.bottleSuggestedTagList.query({
+    const tasting = await queryUtils.tastingById.ensureData(Number(tastingId));
+    const suggestedTags = await queryUtils.bottleSuggestedTagList.ensureData({
       bottle: Number(tasting.bottle.id),
     });
 
-    return json({ tasting, suggestedTags });
+    return { tasting, suggestedTags };
   },
 );
 

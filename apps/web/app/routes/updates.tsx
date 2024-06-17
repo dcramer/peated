@@ -4,12 +4,11 @@ import Layout from "@peated/web/components/layout";
 import Tabs from "@peated/web/components/tabs";
 import { type MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ context: { trpc } }) => {
-    return json({ changeList: await trpc.changeList.query() });
+  async ({ context: { queryUtils } }) => {
+    return { changeList: await queryUtils.changeList.ensureData() };
   },
 );
 

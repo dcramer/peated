@@ -20,7 +20,6 @@ export type IsomorphicContext = {
   request: LoaderFunctionArgs["request"] | ClientLoaderFunctionArgs["request"];
   params: LoaderFunctionArgs["params"] | ClientLoaderFunctionArgs["params"];
   context: {
-    trpc: ReturnType<typeof makeTRPCClient>;
     queryClient: QueryClient;
     queryUtils: ReturnType<typeof createTRPCQueryUtils<AppRouter>>;
     user: User | null;
@@ -64,7 +63,7 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
       const context: IsomorphicContext = {
         request,
         params,
-        context: { trpc, user, queryUtils, queryClient },
+        context: { user, queryUtils, queryClient },
         isServer: true,
       };
       const rv = await callback(context);
@@ -91,7 +90,6 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
         request,
         params,
         context: {
-          trpc: trpcClient,
           user: window.REMIX_CONTEXT.user,
           queryClient,
           queryUtils,

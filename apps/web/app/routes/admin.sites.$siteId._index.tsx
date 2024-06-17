@@ -1,26 +1,28 @@
 import { type ExternalSiteType } from "@peated/server/types";
 import StorePriceTable from "@peated/web/components/admin/storePriceTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { json, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  invariant(params.siteId);
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { queryUtils }, params: { siteId } }) => {
+    invariant(siteId);
 
-  const { searchParams } = new URL(request.url);
-  const priceList = await context.trpc.priceList.query({
-    site: params.siteId as ExternalSiteType,
-    ...Object.fromEntries(searchParams.entries()),
-  });
+    const { searchParams } = new URL(request.url);
+    const priceList = await queryUtils.priceList.ensureData({
+      site: siteId as ExternalSiteType,
+      ...Object.fromEntries(searchParams.entries()),
+    });
 
-  return json({ priceList });
-};
+    return { priceList };
+  },
+);
 
 export default function AdminSiteDetails() {
   const { priceList } = useLoaderData<typeof loader>();

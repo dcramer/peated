@@ -11,7 +11,6 @@ import Layout from "@peated/web/components/layout";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -30,12 +29,12 @@ export const meta: MetaFunction = () => {
 };
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { bottleId }, context: { trpc } }) => {
+  async ({ params: { bottleId }, context: { queryUtils } }) => {
     invariant(bottleId);
 
-    const bottle = await trpc.bottleById.query(Number(bottleId));
+    const bottle = await queryUtils.bottleById.ensureData(Number(bottleId));
 
-    return json({ bottle });
+    return { bottle };
   },
 );
 

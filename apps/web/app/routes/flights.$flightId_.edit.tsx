@@ -2,7 +2,6 @@ import Spinner from "@peated/web/components/spinner";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import FlightForm from "../components/flightForm";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
@@ -16,17 +15,17 @@ export const meta: MetaFunction = () => {
 };
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { flightId }, context: { trpc } }) => {
+  async ({ params: { flightId }, context: { queryUtils } }) => {
     invariant(flightId);
 
     const [flight, bottles] = await Promise.all([
-      trpc.flightById.query(flightId),
-      trpc.bottleList.query({
+      queryUtils.flightById.ensureData(flightId),
+      queryUtils.bottleList.ensureData({
         flight: flightId,
       }),
     ]);
 
-    return json({ flight, bottles });
+    return { flight, bottles };
   },
 );
 

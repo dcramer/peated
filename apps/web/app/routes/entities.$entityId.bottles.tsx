@@ -3,12 +3,11 @@ import BottleTable from "@peated/web/components/bottleTable";
 import QueryBoundary from "@peated/web/components/queryBoundary";
 import { type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation, useOutletContext } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { entityId }, request, context: { trpc } }) => {
+  async ({ params: { entityId }, request, context: { queryUtils } }) => {
     invariant(entityId);
     const { searchParams } = new URL(request.url);
     const numericFields = new Set([
@@ -21,8 +20,8 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
       "entity",
     ]);
 
-    return json({
-      bottleList: await trpc.bottleList.query({
+    return {
+      bottleList: await queryUtils.bottleList.ensureData({
         ...Object.fromEntries(
           [...searchParams.entries()].map(([k, v]) =>
             numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
@@ -30,7 +29,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
         ),
         entity: Number(entityId),
       }),
-    });
+    };
   },
 );
 
