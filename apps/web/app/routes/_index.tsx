@@ -93,41 +93,43 @@ export default function Activity() {
               <Tabs.Item active>Newest Bottles</Tabs.Item>
             </Tabs>
             <table className="my-2 min-w-full">
-              {newBottleList.results.map((bottle) => {
-                return (
-                  <tr key={bottle.id} className="border-b border-slate-800">
-                    <td className="max-w-0 py-2 pl-4 pr-4 text-sm sm:pl-3">
-                      <div className="flex items-center space-x-1">
-                        <BottleLink
-                          bottle={bottle}
-                          className="font-medium hover:underline"
-                        >
-                          {bottle.fullName}
-                        </BottleLink>
-                        {bottle.isFavorite && (
-                          <StarIcon className="h-4 w-4" aria-hidden="true" />
-                        )}
-                        {bottle.hasTasted && (
-                          <CheckBadgeIcon
-                            className="h-4 w-4"
-                            aria-hidden="true"
-                          />
-                        )}
-                      </div>
-                      {!!bottle.category && (
-                        <div className="text-light text-sm">
-                          <Link
-                            to={`/bottles/?category=${bottle.category}`}
-                            className="hover:underline"
+              <tbody>
+                {newBottleList.results.map((bottle) => {
+                  return (
+                    <tr key={bottle.id} className="border-b border-slate-800">
+                      <td className="max-w-0 py-2 pl-4 pr-4 text-sm sm:pl-3">
+                        <div className="flex items-center space-x-1">
+                          <BottleLink
+                            bottle={bottle}
+                            className="font-medium hover:underline"
                           >
-                            {formatCategoryName(bottle.category)}
-                          </Link>
+                            {bottle.fullName}
+                          </BottleLink>
+                          {bottle.isFavorite && (
+                            <StarIcon className="h-4 w-4" aria-hidden="true" />
+                          )}
+                          {bottle.hasTasted && (
+                            <CheckBadgeIcon
+                              className="h-4 w-4"
+                              aria-hidden="true"
+                            />
+                          )}
                         </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
+                        {!!bottle.category && (
+                          <div className="text-light text-sm">
+                            <Link
+                              to={`/bottles/?category=${bottle.category}`}
+                              className="hover:underline"
+                            >
+                              {formatCategoryName(bottle.category)}
+                            </Link>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
 
             <Tabs fullWidth>
