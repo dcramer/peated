@@ -87,7 +87,7 @@ export default async function buildFastify(options = {}) {
   app.register(FastifyCors, {
     credentials: true,
     origin: config.CORS_HOST,
-    maxAge: 3600,
+    maxAge: 600,
   });
 
   app.register(router);
