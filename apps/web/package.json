@@ -22,7 +22,6 @@
     "@headlessui/react": "^1.7.19",
     "@heroicons/react": "^2.1.3",
     "@hookform/resolvers": "^3.4.0",
-    "@isaacs/express-prometheus-middleware": "^1.2.1",
     "@peated/design": "workspace:*",
     "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",

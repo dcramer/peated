@@ -8,7 +8,6 @@ Sentry.init({
   // tracePropagationTargets: ["localhost", "peated.com", config.API_SERVER],
 });
 
-import prom from "@isaacs/express-prometheus-middleware";
 import { sentryLink } from "@peated/server/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
 import config from "@peated/web/config";
@@ -34,14 +33,6 @@ Sentry.setTag("service", "@peated/web");
 
 const app = express();
 const metricsApp = express();
-
-app.use(
-  prom({
-    metricsPath: "/metrics",
-    collectDefaultMetrics: true,
-    metricsApp,
-  }),
-);
 
 app.use((req, res, next) => {
   // redirect old domain to new

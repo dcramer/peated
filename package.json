@@ -9,6 +9,7 @@
     "setup": "pnpm install && npm run db:migrate",
     "dev": "nf start",
     "dev:web": "PORT=3000 API_SERVER=http://localhost:4000 dotenv -e .env.local -- pnpm --filter='./apps/web' dev",
+    "dev:mobile": "dotenv -e .env.local -- pnpm --filter='./apps/mobile' dev",
     "dev:api": "PORT=4000 dotenv -e .env.local -- pnpm --filter='./apps/server' dev:api",
     "dev:worker": "dotenv -e .env.local -- pnpm --filter='./apps/server' dev:worker",
     "cli": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli",
@@ -46,7 +47,8 @@
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.13",
-    "simple-git-hooks": "^2.11.1"
+    "simple-git-hooks": "^2.11.1",
+    "typescript": "~5.4.4"
   },
   "engines": {
     "node": ">=20.0.0 <21.0.0"
@@ -66,6 +68,15 @@
     "{apps,packages}/**/*.{ts,tsx}": [
       "eslint --cache --fix"
     ]
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "@babel/*",
+        "expo-modules-*",
+        "typescript"
+      ]
+    }
   },
   "devDependencies": {
     "@spotlightjs/spotlight": "^2.0.0-alpha.1"
