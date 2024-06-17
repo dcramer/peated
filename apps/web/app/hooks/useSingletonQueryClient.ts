@@ -10,7 +10,7 @@ export function getQueryClient(): QueryClient {
           networkMode: "offlineFirst",
           // suspense: true,
           retry: false,
-          // cacheTime: 0,
+          staleTime: 60 * 1000,
         },
       },
     });
