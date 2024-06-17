@@ -1,26 +1,25 @@
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import TagTable from "../components/admin/tagTable";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({
-  request,
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  const { searchParams } = new URL(request.url);
-  const tagList = await trpc.tagList.query({
-    ...Object.fromEntries(searchParams.entries()),
-  });
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { queryUtils } }) => {
+    const { searchParams } = new URL(request.url);
+    const tagList = await queryUtils.tagList.ensureData({
+      ...Object.fromEntries(searchParams.entries()),
+    });
 
-  return json({ tagList });
-}
+    return { tagList };
+  },
+);
 
 export default function AdminTags() {
   const { tagList } = useLoaderData<typeof loader>();

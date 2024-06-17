@@ -1,5 +1,4 @@
 import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import BottleHeader from "../components/bottleHeader";
 import Chip from "../components/chip";
@@ -8,18 +7,18 @@ import Tabs from "../components/tabs";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params, context: { trpc } }) => {
+  async ({ params, context: { queryUtils } }) => {
     invariant(params.bottleId);
 
     const bottleId = Number(params.bottleId);
 
     const [aliasList, bottle] = await Promise.all([
-      trpc.bottleAliasList.query({
+      queryUtils.bottleAliasList.ensureData({
         bottle: bottleId,
       }),
-      trpc.bottleById.query(bottleId),
+      queryUtils.bottleById.ensureData(bottleId),
     ]);
-    return json({ aliasList, bottle });
+    return { aliasList, bottle };
   },
 );
 

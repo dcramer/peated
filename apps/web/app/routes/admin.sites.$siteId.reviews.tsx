@@ -1,31 +1,33 @@
 import { type ExternalSiteType } from "@peated/server/types";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { json, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
 import ReviewTable from "../components/admin/reviewTable";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  invariant(params.siteId);
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { queryUtils }, params: { siteId } }) => {
+    invariant(siteId);
 
-  const { searchParams } = new URL(request.url);
-  const numericFields = new Set(["cursor", "limit"]);
-  const reviewList = await context.trpc.reviewList.query({
-    site: params.siteId as ExternalSiteType,
-    ...Object.fromEntries(
-      [...searchParams.entries()].map(([k, v]) =>
-        numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
+    const { searchParams } = new URL(request.url);
+    const numericFields = new Set(["cursor", "limit"]);
+    const reviewList = await queryUtils.reviewList.ensureData({
+      site: siteId as ExternalSiteType,
+      ...Object.fromEntries(
+        [...searchParams.entries()].map(([k, v]) =>
+          numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
+        ),
       ),
-    ),
-  });
+    });
 
-  return json({ reviewList });
-};
+    return { reviewList };
+  },
+);
 
 export default function AdminSiteDetails() {
   const { reviewList } = useLoaderData<typeof loader>();

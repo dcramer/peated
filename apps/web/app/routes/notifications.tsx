@@ -5,7 +5,6 @@ import Tabs from "@peated/web/components/tabs";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -13,17 +12,17 @@ export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ context: { trpc, user }, request }) => {
+  async ({ context: { queryUtils, user }, request }) => {
     if (!user) return redirectToAuth({ request });
 
     const { searchParams } = new URL(request.url);
 
-    return json({
-      notificationList: await trpc.notificationList.query({
+    return {
+      notificationList: await queryUtils.notificationList.ensureData({
         filter: "unread",
         ...Object.fromEntries(searchParams.entries()),
       }),
-    });
+    };
   },
 );
 

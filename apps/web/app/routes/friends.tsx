@@ -10,7 +10,6 @@ import { redirectToAuth } from "@peated/web/lib/auth";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { useState } from "react";
 import type { SitemapFunction } from "remix-sitemap";
 import PaginationButtons from "../components/paginationButtons";
@@ -21,12 +20,12 @@ export const sitemap: SitemapFunction = () => ({
 });
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, context: { trpc, user } }) => {
+  async ({ request, context: { queryUtils, user } }) => {
     if (!user) return redirectToAuth({ request });
 
-    return json({
-      friendList: await trpc.friendList.query(),
-    });
+    return {
+      friendList: await queryUtils.friendList.ensureData(),
+    };
   },
 );
 

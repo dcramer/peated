@@ -13,17 +13,18 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { tastingId }, context: { trpc } }) => {
+  async ({ params: { tastingId }, context: { queryUtils } }) => {
     invariant(tastingId);
 
-    return json({ tasting: await trpc.tastingById.query(Number(tastingId)) });
+    return {
+      tasting: await queryUtils.tastingById.ensureData(Number(tastingId)),
+    };
   },
 );
 

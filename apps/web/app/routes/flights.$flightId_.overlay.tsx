@@ -1,7 +1,6 @@
 import { summarize } from "@peated/web/lib/markdown";
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import BottleLink from "../components/bottleLink";
 import { Distillers } from "../components/bottleMetadata";
@@ -11,15 +10,20 @@ import QRCodeClient from "../components/qrcode.client";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { flightId }, context: { trpc } }) => {
+  async ({ params: { flightId }, context: { queryUtils } }) => {
     invariant(flightId);
 
-    return json({
-      flight: await trpc.flightById.query(flightId),
-      bottles: await trpc.bottleList.query({
+    const [flight, bottles] = await Promise.all([
+      queryUtils.flightById.ensureData(flightId),
+      queryUtils.bottleList.ensureData({
         flight: flightId,
       }),
-    });
+    ]);
+
+    return {
+      flight,
+      bottles,
+    };
   },
 );
 

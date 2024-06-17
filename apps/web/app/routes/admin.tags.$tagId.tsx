@@ -1,11 +1,7 @@
 import { type ExternalSiteSchema } from "@peated/server/schemas";
 import { toTitleCase } from "@peated/server/src/lib/strings";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import {
-  json,
-  type LoaderFunctionArgs,
-  type MetaFunction,
-} from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import type { SitemapFunction } from "remix-sitemap";
@@ -13,21 +9,21 @@ import invariant from "tiny-invariant";
 import { type z } from "zod";
 import Button from "../components/button";
 import QueryBoundary from "../components/queryBoundary";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({
-  params: { tagId },
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  invariant(tagId);
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ params: { tagId }, context: { queryUtils } }) => {
+    invariant(tagId);
 
-  const tag = await trpc.tagByName.query(tagId);
+    const tag = await queryUtils.tagByName.ensureData(tagId);
 
-  return json({ tag });
-}
+    return { tag };
+  },
+);
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) return [];

@@ -14,19 +14,19 @@ import { summarize } from "@peated/web/lib/markdown";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
-import { json, redirect } from "@remix-run/server-runtime";
+import { redirect } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import BottleHeader from "../components/bottleHeader";
 import CollectionAction from "../components/collectionAction";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, params, context: { trpc } }) => {
+  async ({ request, params, context: { queryUtils } }) => {
     invariant(params.bottleId);
 
     const bottleId = Number(params.bottleId);
 
-    const bottle = await trpc.bottleById.query(bottleId);
+    const bottle = await queryUtils.bottleById.ensureData(bottleId);
     // tombstone path - redirect to the absolute url to ensure search engines dont get mad
     if (bottle.id !== bottleId) {
       const location = new URL(request.url);
@@ -37,7 +37,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
       return redirect(newPath);
     }
 
-    return json({ bottle });
+    return { bottle };
   },
 );
 

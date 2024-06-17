@@ -1,4 +1,5 @@
 import { makeTRPCClient } from "@peated/server/lib/trpc";
+import { type AppRouter } from "@peated/server/src/trpc/router";
 import { type User } from "@peated/server/types";
 import config from "@peated/web/config";
 import {
@@ -6,16 +7,20 @@ import {
   type ClientLoaderFunctionArgs,
 } from "@remix-run/react";
 import {
+  json,
   type LoaderFunction,
   type LoaderFunctionArgs,
 } from "@remix-run/server-runtime";
 import { captureException } from "@sentry/remix";
+import { dehydrate } from "@tanstack/react-query";
+import { createTRPCQueryUtils } from "@trpc/react-query";
+import { getQueryClient } from "../hooks/useSingletonQueryClient";
 
 export type IsomorphicContext = {
   request: LoaderFunctionArgs["request"] | ClientLoaderFunctionArgs["request"];
   params: LoaderFunctionArgs["params"] | ClientLoaderFunctionArgs["params"];
   context: {
-    trpc: ReturnType<typeof makeTRPCClient>;
+    queryUtils: ReturnType<typeof createTRPCQueryUtils<AppRouter>>;
     user: User | null;
   };
   isServer: boolean;
@@ -48,13 +53,24 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
       params,
       context: { trpc, user },
     }) {
+      const queryClient = getQueryClient();
+      const queryUtils = createTRPCQueryUtils({
+        queryClient,
+        client: trpc,
+      });
+
       const context: IsomorphicContext = {
         request,
         params,
-        context: { trpc, user },
+        context: { user, queryUtils },
         isServer: true,
       };
-      return await callback(context);
+      const rv = await callback(context);
+      if (!(rv instanceof Response)) {
+        const dehydratedState = dehydrate(queryClient);
+        return json({ ...rv, dehydratedState });
+      }
+      return rv;
     } satisfies LoaderFunction,
     clientLoader: async function clientLoader({ request, params }) {
       const trpcClient = makeTRPCClient(
@@ -63,10 +79,19 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
         captureException,
       );
 
+      const queryClient = getQueryClient();
+      const queryUtils = createTRPCQueryUtils({
+        queryClient,
+        client: trpcClient,
+      });
+
       const context: IsomorphicContext = {
         request,
         params,
-        context: { trpc: trpcClient, user: window.REMIX_CONTEXT.user },
+        context: {
+          user: window.REMIX_CONTEXT.user,
+          queryUtils,
+        },
         isServer: false,
       };
       return await callback(context);

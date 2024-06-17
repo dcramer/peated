@@ -7,6 +7,7 @@ import FastifyMultipart from "@fastify/multipart";
 import { shutdownClient } from "@peated/server/jobs/client";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { fastify } from "fastify";
+import { setTimeout } from "node:timers/promises";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
 import { injectAuth } from "./middleware/auth";
@@ -48,6 +49,13 @@ export default async function buildFastify(options = {}) {
     },
     ...options,
   });
+
+  if (config.ENV === "development") {
+    console.log("Adding 300ms delay to all requests");
+    app.addHook("onRequest", async (request, reply) => {
+      await setTimeout(300);
+    });
+  }
 
   app.addHook("preHandler", (request, reply, done) => {
     // default

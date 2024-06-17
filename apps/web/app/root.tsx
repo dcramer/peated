@@ -23,11 +23,7 @@ import {
 } from "@remix-run/react";
 import * as Sentry from "@sentry/remix";
 import { withSentry } from "@sentry/remix";
-import {
-  QueryClient,
-  QueryClientProvider,
-  hydrate,
-} from "@tanstack/react-query";
+import { HydrationBoundary, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import type { ComponentProps, PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
@@ -35,6 +31,7 @@ import { useDehydratedState } from "use-dehydrated-state";
 import LoadingIndicator from "./components/loadingIndicator";
 import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
+import useSingletonQueryClient from "./hooks/useSingletonQueryClient";
 import { ApiUnauthorized } from "./lib/api";
 import { logError } from "./lib/log";
 import { trpc } from "./lib/trpc";
@@ -107,6 +104,10 @@ export async function loader({ context }: LoaderFunctionArgs) {
   });
 }
 
+export function shouldRevalidate() {
+  return false;
+}
+
 type LoaderData = {
   sentryTrace?: string;
   sentryBaggage?: string;
@@ -128,19 +129,7 @@ export default withSentry(function App() {
     Sentry.setUser(null);
   }
 
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            networkMode: "offlineFirst",
-            // suspense: true,
-            retry: false,
-            // cacheTime: 0,
-          },
-        },
-      }),
-  );
+  const queryClient = useSingletonQueryClient();
 
   const dehydratedState = useDehydratedState();
 
@@ -151,8 +140,6 @@ export default withSentry(function App() {
     };
   });
 
-  hydrate(queryClient, dehydratedState);
-
   return (
     <Document config={config} data={data} accessToken={accessToken} user={user}>
       <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
@@ -162,16 +149,18 @@ export default withSentry(function App() {
           key={accessToken}
         >
           <QueryClientProvider client={queryClient}>
-            <OnlineStatusProvider>
-              <AuthProvider user={user}>
-                <ApiProvider
-                  accessToken={accessToken}
-                  server={config.API_SERVER}
-                >
-                  <Outlet />
-                </ApiProvider>
-              </AuthProvider>
-            </OnlineStatusProvider>
+            <HydrationBoundary state={dehydratedState}>
+              <OnlineStatusProvider>
+                <AuthProvider user={user}>
+                  <ApiProvider
+                    accessToken={accessToken}
+                    server={config.API_SERVER}
+                  >
+                    <Outlet />
+                  </ApiProvider>
+                </AuthProvider>
+              </OnlineStatusProvider>
+            </HydrationBoundary>
           </QueryClientProvider>
         </TRPCProvider>
       </GoogleOAuthProvider>

@@ -9,7 +9,6 @@ import Layout from "@peated/web/components/layout";
 import { summarize } from "@peated/web/lib/markdown";
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import BottleLink from "../components/bottleLink";
 import Button from "../components/button";
@@ -17,15 +16,15 @@ import useAuth from "../hooks/useAuth";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { flightId }, context: { trpc } }) => {
+  async ({ params: { flightId }, context: { queryUtils } }) => {
     invariant(flightId);
 
-    return json({
-      flight: await trpc.flightById.query(flightId),
-      bottles: await trpc.bottleList.query({
+    return {
+      flight: await queryUtils.flightById.ensureData(flightId),
+      bottles: await queryUtils.bottleList.ensureData({
         flight: flightId,
       }),
-    });
+    };
   },
 );
 

@@ -1,32 +1,31 @@
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { SitemapFunction } from "remix-sitemap";
 import Table from "../components/table";
 import TimeSince from "../components/timeSince";
+import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const sitemap: SitemapFunction = () => ({
   exclude: true,
 });
 
-export async function loader({
-  request,
-  context: { trpc },
-}: LoaderFunctionArgs) {
-  const { searchParams } = new URL(request.url);
-  const numericFields = new Set(["cursor", "limit"]);
+export const { loader, clientLoader } = makeIsomorphicLoader(
+  async ({ request, context: { queryUtils } }) => {
+    const { searchParams } = new URL(request.url);
+    const numericFields = new Set(["cursor", "limit"]);
 
-  const userList = await trpc.userList.query({
-    sort: "-created",
-    ...Object.fromEntries(
-      [...searchParams.entries()].map(([k, v]) =>
-        numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
+    const userList = await queryUtils.userList.ensureData({
+      sort: "-created",
+      ...Object.fromEntries(
+        [...searchParams.entries()].map(([k, v]) =>
+          numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
+        ),
       ),
-    ),
-  });
+    });
 
-  return json({ userList });
-}
+    return { userList };
+  },
+);
 
 export default function AdminUsers() {
   const { userList } = useLoaderData<typeof loader>();

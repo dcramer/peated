@@ -2,7 +2,6 @@ import Spinner from "@peated/web/components/spinner";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import EntityForm from "../components/entityForm";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
@@ -16,12 +15,12 @@ export const meta: MetaFunction = () => {
 };
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { entityId }, context: { trpc } }) => {
+  async ({ params: { entityId }, context: { queryUtils } }) => {
     invariant(entityId);
 
-    const entity = await trpc.entityById.query(Number(entityId));
+    const entity = await queryUtils.entityById.ensureData(Number(entityId));
 
-    return json({ entity });
+    return { entity };
   },
 );
 

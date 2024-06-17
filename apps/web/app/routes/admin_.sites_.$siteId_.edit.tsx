@@ -1,7 +1,6 @@
 import { type ExternalSiteType } from "@peated/server/types";
 import { type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { useNavigate } from "react-router-dom";
 import type { SitemapFunction } from "remix-sitemap";
 import invariant from "tiny-invariant";
@@ -11,16 +10,16 @@ import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 import { trpc } from "../lib/trpc";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, params: { siteId }, context: { user, trpc } }) => {
+  async ({ request, params: { siteId }, context: { user, queryUtils } }) => {
     invariant(siteId);
 
     if (!user?.admin) return redirectToAuth({ request });
 
-    const site = await trpc.externalSiteByType.query(
+    const site = await queryUtils.externalSiteByType.ensureData(
       siteId as ExternalSiteType,
     );
 
-    return json({ site });
+    return { site };
   },
 );
 

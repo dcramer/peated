@@ -16,7 +16,6 @@ import classNames from "@peated/web/lib/classNames";
 import { trpc } from "@peated/web/lib/trpc";
 import { type SerializeFrom } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 import BottleLink from "../components/bottleLink";
@@ -25,25 +24,25 @@ import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 const defaultViewParam = "global";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, context: { trpc } }) => {
+  async ({ request, context: { queryUtils } }) => {
     const { searchParams } = new URL(request.url);
     const filter = mapFilterParam(searchParams.get("view"));
 
     const [tastingList, newBottleList] = await Promise.all([
-      trpc.tastingList.query({
+      queryUtils.tastingList.ensureData({
         filter,
         limit: 10,
       }),
-      trpc.bottleList.query({
+      queryUtils.bottleList.ensureData({
         limit: 10,
         sort: "-date",
       }),
     ]);
 
-    return json({
+    return {
       tastingList,
       newBottleList,
-    });
+    };
   },
 );
 

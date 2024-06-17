@@ -1,20 +1,19 @@
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { username }, context: { trpc } }) => {
+  async ({ params: { username }, context: { queryUtils } }) => {
     invariant(username);
 
-    return json({
-      favoriteList: await trpc.collectionBottleList.query({
+    return {
+      favoriteList: await queryUtils.collectionBottleList.ensureData({
         user: username,
         collection: "default",
       }),
-    });
+    };
   },
 );
 

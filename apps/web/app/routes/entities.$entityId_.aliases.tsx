@@ -1,5 +1,4 @@
 import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import Chip from "../components/chip";
 import EntityHeader from "../components/entityHeader";
@@ -8,18 +7,18 @@ import Tabs from "../components/tabs";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params, context: { trpc } }) => {
+  async ({ params, context: { queryUtils } }) => {
     invariant(params.entityId);
 
     const entityId = Number(params.entityId);
 
     const [aliasList, entity] = await Promise.all([
-      trpc.entityAliasList.query({
+      queryUtils.entityAliasList.ensureData({
         entity: entityId,
       }),
-      trpc.entityById.query(entityId),
+      queryUtils.entityById.ensureData(entityId),
     ]);
-    return json({ aliasList, entity });
+    return { aliasList, entity };
   },
 );
 
