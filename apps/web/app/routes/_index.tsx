@@ -16,7 +16,6 @@ import classNames from "@peated/web/lib/classNames";
 import { trpc } from "@peated/web/lib/trpc";
 import { type SerializeFrom } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 import BottleLink from "../components/bottleLink";
@@ -40,10 +39,10 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
       }),
     ]);
 
-    return json({
+    return {
       tastingList,
       newBottleList,
-    });
+    };
   },
 );
 

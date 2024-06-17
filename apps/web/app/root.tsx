@@ -23,7 +23,7 @@ import {
 } from "@remix-run/react";
 import * as Sentry from "@sentry/remix";
 import { withSentry } from "@sentry/remix";
-import { QueryClientProvider, hydrate } from "@tanstack/react-query";
+import { HydrationBoundary, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import type { ComponentProps, PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
@@ -136,8 +136,6 @@ export default withSentry(function App() {
     };
   });
 
-  hydrate(queryClient, dehydratedState);
-
   return (
     <Document config={config} data={data} accessToken={accessToken} user={user}>
       <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
@@ -147,16 +145,18 @@ export default withSentry(function App() {
           key={accessToken}
         >
           <QueryClientProvider client={queryClient}>
-            <OnlineStatusProvider>
-              <AuthProvider user={user}>
-                <ApiProvider
-                  accessToken={accessToken}
-                  server={config.API_SERVER}
-                >
-                  <Outlet />
-                </ApiProvider>
-              </AuthProvider>
-            </OnlineStatusProvider>
+            <HydrationBoundary state={dehydratedState}>
+              <OnlineStatusProvider>
+                <AuthProvider user={user}>
+                  <ApiProvider
+                    accessToken={accessToken}
+                    server={config.API_SERVER}
+                  >
+                    <Outlet />
+                  </ApiProvider>
+                </AuthProvider>
+              </OnlineStatusProvider>
+            </HydrationBoundary>
           </QueryClientProvider>
         </TRPCProvider>
       </GoogleOAuthProvider>
