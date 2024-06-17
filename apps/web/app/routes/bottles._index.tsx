@@ -31,7 +31,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, context: { trpc } }) => {
+  async ({ request, context: { queryUtils } }) => {
     const { searchParams } = new URL(request.url);
     const numericFields = new Set([
       "cursor",
@@ -43,7 +43,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
       "entity",
     ]);
     return json({
-      bottleList: await trpc.bottleList.query(
+      bottleList: await queryUtils.bottleList.ensureData(
         Object.fromEntries(
           [...searchParams.entries()].map(([k, v]) =>
             numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
