@@ -8,7 +8,6 @@ import SidebarLink from "@peated/web/components/sidebarLink";
 import { buildQueryString } from "@peated/web/lib/urls";
 import { type MetaFunction, type SerializeFrom } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
 import Button from "../components/button";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
@@ -28,18 +27,18 @@ export const meta: MetaFunction = () => {
 };
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, context: { trpc } }) => {
+  async ({ request, context: { queryUtils } }) => {
     const { searchParams } = new URL(request.url);
     const numericFields = new Set(["cursor", "limit"]);
-    return json({
-      entityList: await trpc.entityList.query(
+    return {
+      entityList: await queryUtils.entityList.ensureData(
         Object.fromEntries(
           [...searchParams.entries()].map(([k, v]) =>
             numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
           ),
         ),
       ),
-    });
+    };
   },
 );
 

@@ -12,7 +12,6 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
 import { type MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useSubmit } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 
@@ -41,10 +40,10 @@ const UserTagDistribution = ({ userId }: { userId: number }) => {
 };
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ params: { username }, context: { trpc } }) => {
+  async ({ params: { username }, context: { queryUtils } }) => {
     invariant(username);
 
-    return json({ user: await trpc.userById.query(username as string) });
+    return { user: await queryUtils.userById.ensureData(username as string) };
   },
 );
 

@@ -4,7 +4,6 @@ import Layout from "@peated/web/components/layout";
 import ListItem from "@peated/web/components/listItem";
 import { type MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
 import { type SitemapFunction } from "remix-sitemap";
 import PageHeader from "../components/pageHeader";
 import PaginationButtons from "../components/paginationButtons";
@@ -16,12 +15,12 @@ export const sitemap: SitemapFunction = () => ({
 });
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, context: { trpc, user } }) => {
+  async ({ request, context: { queryUtils, user } }) => {
     if (!user) return redirectToAuth({ request });
 
-    return json({
-      flightList: await trpc.flightList.query(),
-    });
+    return {
+      flightList: await queryUtils.flightList.ensureData(),
+    };
   },
 );
 

@@ -16,19 +16,19 @@ import {
   useNavigate,
   useParams,
 } from "@remix-run/react";
-import { json, redirect } from "@remix-run/server-runtime";
+import { redirect } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import EntityHeader from "../components/entityHeader";
 import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 import { trpc } from "../lib/trpc";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, params, context: { trpc } }) => {
+  async ({ request, params, context: { queryUtils } }) => {
     invariant(params.entityId);
 
     const entityId = Number(params.entityId);
 
-    const entity = await trpc.entityById.query(entityId);
+    const entity = await queryUtils.entityById.ensureData(entityId);
     // tombstone path - redirect to the absolute url to ensure search engines dont get mad
     if (entity.id !== entityId) {
       const location = new URL(request.url);
@@ -39,7 +39,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
       return redirect(newPath);
     }
 
-    return json({ entity });
+    return { entity };
   },
 );
 

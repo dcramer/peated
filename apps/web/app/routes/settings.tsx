@@ -17,7 +17,7 @@ import { toBlob } from "@peated/web/lib/blobs";
 import { trpc } from "@peated/web/lib/trpc";
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { json, redirect } from "@remix-run/server-runtime";
+import { redirect } from "@remix-run/server-runtime";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -32,10 +32,10 @@ export const sitemap: SitemapFunction = () => ({
 });
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ context: { user, trpc }, request }) => {
+  async ({ context: { user, queryUtils }, request }) => {
     if (!user) return redirectToAuth({ request });
 
-    const userDetails = await trpc.userById.query("me");
+    const userDetails = await queryUtils.userById.ensureData("me");
     if (!userDetails) {
       const url = new URL(request.url);
       return redirect(
@@ -43,7 +43,7 @@ export const { loader, clientLoader } = makeIsomorphicLoader(
       );
     }
 
-    return json({ user: userDetails });
+    return { user: userDetails };
   },
 );
 

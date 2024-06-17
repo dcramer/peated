@@ -24,16 +24,16 @@ import { makeIsomorphicLoader } from "../lib/isomorphicLoader";
 const defaultViewParam = "global";
 
 export const { loader, clientLoader } = makeIsomorphicLoader(
-  async ({ request, context: { trpc } }) => {
+  async ({ request, context: { queryUtils } }) => {
     const { searchParams } = new URL(request.url);
     const filter = mapFilterParam(searchParams.get("view"));
 
     const [tastingList, newBottleList] = await Promise.all([
-      trpc.tastingList.query({
+      queryUtils.tastingList.ensureData({
         filter,
         limit: 10,
       }),
-      trpc.bottleList.query({
+      queryUtils.bottleList.ensureData({
         limit: 10,
         sort: "-date",
       }),
