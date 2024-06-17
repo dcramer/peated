@@ -23,11 +23,7 @@ import {
 } from "@remix-run/react";
 import * as Sentry from "@sentry/remix";
 import { withSentry } from "@sentry/remix";
-import {
-  QueryClient,
-  QueryClientProvider,
-  hydrate,
-} from "@tanstack/react-query";
+import { QueryClientProvider, hydrate } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import type { ComponentProps, PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
@@ -35,6 +31,7 @@ import { useDehydratedState } from "use-dehydrated-state";
 import LoadingIndicator from "./components/loadingIndicator";
 import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
+import useSingletonQueryClient from "./hooks/useSingletonQueryClient";
 import { ApiUnauthorized } from "./lib/api";
 import { logError } from "./lib/log";
 import { trpc } from "./lib/trpc";
@@ -128,19 +125,7 @@ export default withSentry(function App() {
     Sentry.setUser(null);
   }
 
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            networkMode: "offlineFirst",
-            // suspense: true,
-            retry: false,
-            // cacheTime: 0,
-          },
-        },
-      }),
-  );
+  const queryClient = useSingletonQueryClient();
 
   const dehydratedState = useDehydratedState();
 
