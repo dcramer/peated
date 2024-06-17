@@ -12,7 +12,7 @@ import {
   type LoaderFunctionArgs,
 } from "@remix-run/server-runtime";
 import { captureException } from "@sentry/remix";
-import { dehydrate, type QueryClient } from "@tanstack/react-query";
+import { dehydrate } from "@tanstack/react-query";
 import { createTRPCQueryUtils } from "@trpc/react-query";
 import { getQueryClient } from "../hooks/useSingletonQueryClient";
 
@@ -20,7 +20,6 @@ export type IsomorphicContext = {
   request: LoaderFunctionArgs["request"] | ClientLoaderFunctionArgs["request"];
   params: LoaderFunctionArgs["params"] | ClientLoaderFunctionArgs["params"];
   context: {
-    queryClient: QueryClient;
     queryUtils: ReturnType<typeof createTRPCQueryUtils<AppRouter>>;
     user: User | null;
   };
@@ -63,7 +62,7 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
       const context: IsomorphicContext = {
         request,
         params,
-        context: { user, queryUtils, queryClient },
+        context: { user, queryUtils },
         isServer: true,
       };
       const rv = await callback(context);
@@ -91,7 +90,6 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
         params,
         context: {
           user: window.REMIX_CONTEXT.user,
-          queryClient,
           queryUtils,
         },
         isServer: false,
