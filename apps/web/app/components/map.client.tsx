@@ -1,14 +1,52 @@
 import type { LatLngTuple } from "leaflet";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import L from "leaflet";
+import { useState } from "react";
+import { MapContainer, Marker, TileLayer, useMapEvent } from "react-leaflet";
+
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import "leaflet/dist/leaflet.css";
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+function LocationMarker({
+  initialPosition,
+  editable = false,
+}: {
+  initialPosition?: LatLngTuple | null;
+  editable?: boolean;
+}) {
+  // const markerRef = useRe(null);
+
+  const [position, setPosition] = useState<LatLngTuple>(
+    initialPosition || DEFAULT_POSITION,
+  );
+
+  const map = useMapEvent("click", (e) => {
+    if (editable) {
+      const { lat, lng } = e.latlng;
+      setPosition([lat, lng]);
+    }
+  });
+  return <Marker position={position} />;
+}
+
+const DEFAULT_POSITION: LatLngTuple = [51.505, -0.09] as const;
 
 export function Map({
-  position = [51.505, -0.09],
-  height,
   width,
+  height,
+  position = DEFAULT_POSITION,
+  editable = false,
 }: {
-  position: LatLngTuple;
+  width: string;
   height: string;
-  width?: string;
+  position?: LatLngTuple | null;
+  editable?: boolean;
 }) {
   return (
     <div style={{ height, width }}>
@@ -17,23 +55,19 @@ export function Map({
           height: "100%",
         }}
         className="rounded"
-        center={position}
+        center={position || DEFAULT_POSITION}
         zoom={13}
-        dragging={false}
-        doubleClickZoom={false}
-        scrollWheelZoom={false}
-        attributionControl={false}
-        zoomControl={false}
+        dragging={editable}
+        doubleClickZoom={editable}
+        scrollWheelZoom={editable}
+        attributionControl={editable}
+        zoomControl={editable}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+          url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png"
         />
-        <Marker position={position}>
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        </Marker>
+        <LocationMarker initialPosition={position} editable={editable} />
       </MapContainer>
     </div>
   );

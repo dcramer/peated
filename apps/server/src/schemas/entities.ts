@@ -10,8 +10,11 @@ export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
 export const EntityInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
   shortName: z.string().trim().nullable().optional(),
+  type: z.array(EntityTypeEnum).optional(),
   country: z.string().trim().nullable().optional(),
   region: z.string().trim().nullable().optional(),
+  address: z.string().trim().nullable().optional(),
+  location: PointSchema.nullable().optional(),
   description: z.string().trim().nullable().optional(),
   descriptionSrc: ContentSourceEnum.nullable().optional(),
   yearEstablished: z
@@ -20,20 +23,19 @@ export const EntityInputSchema = z.object({
     .nullable()
     .optional(),
   website: z.string().url().nullable().optional(),
-  type: z.array(EntityTypeEnum).optional(),
-  location: PointSchema.nullable().optional(),
 });
 
 export const EntitySchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
   shortName: z.string().trim().nullable(),
+  type: z.array(EntityTypeEnum),
   description: z.string().nullable().optional(),
   yearEstablished: z.number().lte(new Date().getFullYear()).nullable(),
   website: z.string().url().nullable(),
   country: z.string().trim().nullable(),
   region: z.string().trim().nullable(),
-  type: z.array(EntityTypeEnum),
+  address: z.string().trim().nullable().optional(),
   location: PointSchema.nullable(),
 
   totalTastings: z.number(),

@@ -20,6 +20,7 @@ import { logError } from "@peated/server/lib/log";
 import * as Sentry from "@sentry/node";
 import type { JobFunction } from "faktory-worker";
 import faktory from "faktory-worker";
+import geocodeEntityLocation from "./jobs/geocodeEntityLocation";
 
 async function main() {
   // dont run the scraper in dev
@@ -51,6 +52,7 @@ async function main() {
 // faktory does not have correct types
 registerJob("GenerateBottleDetails", generateBottleDetails as JobFunction);
 registerJob("GenerateEntityDetails", generateEntityDetails as JobFunction);
+registerJob("GeocodeEntityLocation", geocodeEntityLocation as JobFunction);
 registerJob("NotifyDiscordOnTasting", notifyDiscordOnTasting as JobFunction);
 registerJob("ScrapeAstorWines", scrapeAstorWines);
 registerJob("ScrapeHealthySpirits", scrapeHealthySpirits);
