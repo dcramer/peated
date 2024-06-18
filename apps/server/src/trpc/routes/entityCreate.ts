@@ -20,7 +20,9 @@ export default authedProcedure
     };
 
     if (data.description && data.description !== "") {
-      data.descriptionSrc = "user";
+      data.descriptionSrc =
+        input.descriptionSrc ||
+        (input.description && input.description !== null ? "user" : null);
     }
 
     const user = ctx.user;

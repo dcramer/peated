@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { ENTITY_TYPE_LIST } from "../constants";
+import { ContentSourceEnum } from "./common";
 import { PointSchema } from "./shared";
 import { UserSchema } from "./users";
 
@@ -12,6 +13,7 @@ export const EntityInputSchema = z.object({
   country: z.string().trim().nullable().optional(),
   region: z.string().trim().nullable().optional(),
   description: z.string().trim().nullable().optional(),
+  descriptionSrc: ContentSourceEnum.nullable().optional(),
   yearEstablished: z
     .number()
     .lte(new Date().getFullYear())

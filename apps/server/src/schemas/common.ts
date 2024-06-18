@@ -31,3 +31,5 @@ export const zDatetime = z
   });
 
 export const FlavorProfileEnum = z.enum(FLAVOR_PROFILES);
+
+export const ContentSourceEnum = z.enum(["generated", "user"]);

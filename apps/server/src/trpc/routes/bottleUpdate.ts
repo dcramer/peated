@@ -76,7 +76,8 @@ export default modProcedure
     ) {
       bottleData.description = input.description;
       bottleData.descriptionSrc =
-        input.description && input.description !== null ? "user" : null;
+        input.descriptionSrc ||
+        (input.description && input.description !== null ? "user" : null);
     }
 
     const user = ctx.user;

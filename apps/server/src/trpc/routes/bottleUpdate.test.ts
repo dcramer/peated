@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
+import {
+  bottles,
+  bottlesToDistillers,
+  entities,
+} from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
@@ -252,6 +256,39 @@ test("changes distiller", async ({ fixtures }) => {
     where: (entities, { eq }) => eq(entities.id, distillerB.id),
   });
   expect(newDistillerB?.totalBottles).toBe(1);
+});
+
+test("adds distiller", async ({ fixtures }) => {
+  const distillerA = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({
+    distillerIds: [],
+  });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  await caller.bottleUpdate({
+    bottle: bottle.id,
+    distillers: [distillerA.id],
+  });
+
+  const distillers = await db
+    .select({ distiller: entities })
+    .from(entities)
+    .innerJoin(
+      bottlesToDistillers,
+      eq(bottlesToDistillers.distillerId, entities.id),
+    )
+    .where(eq(bottlesToDistillers.bottleId, bottle.id));
+  expect(distillers.length).toBe(1);
+  const { distiller } = distillers[0];
+  expect(distiller.id).toEqual(distillerA.id);
+
+  const newDistillerA = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, distillerA.id),
+  });
+  expect(newDistillerA?.totalBottles).toBe(1);
 });
 
 test("changes bottler", async ({ fixtures }) => {

@@ -36,7 +36,14 @@ export async function bottleCreate({
     });
   }
 
-  const bottleData = await bottleNormalize({ input, ctx });
+  const bottleData: Record<string, any> = await bottleNormalize({ input, ctx });
+
+  if (input.description !== undefined) {
+    bottleData.description = input.description;
+    bottleData.descriptionSrc =
+      input.descriptionSrc ||
+      (input.description && input.description !== null ? "user" : null);
+  }
 
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({

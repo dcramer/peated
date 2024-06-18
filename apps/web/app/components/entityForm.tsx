@@ -138,6 +138,7 @@ export default function EntityForm({
                     !currentValues.description
                   )
                     setValue("description", result.description);
+                  setValue("descriptionSrc", "generated");
                   if (
                     result &&
                     result.yearEstablished &&
@@ -217,6 +218,9 @@ export default function EntityForm({
             <TextAreaField
               {...register("description", {
                 setValueAs: (v) => (v === "" || !v ? null : v),
+                onChange: () => {
+                  setValue("descriptionSrc", "user");
+                },
               })}
               error={errors.description}
               autoFocus

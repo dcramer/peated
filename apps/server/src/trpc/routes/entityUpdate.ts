@@ -65,7 +65,8 @@ export default modProcedure
     ) {
       data.description = input.description;
       data.descriptionSrc =
-        input.description && input.description !== null ? "user" : null;
+        input.descriptionSrc ||
+        (input.description && input.description !== null ? "user" : null);
     }
     if (
       input.yearEstablished !== undefined &&

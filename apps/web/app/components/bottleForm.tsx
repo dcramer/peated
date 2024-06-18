@@ -361,8 +361,10 @@ export default function BottleForm({
                     result &&
                     result.description &&
                     !currentValues.description
-                  )
+                  ) {
                     setValue("description", result.description);
+                    setValue("descriptionSrc", "generated");
+                  }
                 }}
                 disabled={generateDataMutation.isPending}
                 icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
@@ -375,6 +377,9 @@ export default function BottleForm({
             <TextAreaField
               {...register("description", {
                 setValueAs: (v) => (v === "" || !v ? null : v),
+                onChange: () => {
+                  setValue("descriptionSrc", "user");
+                },
               })}
               error={errors.description}
               autoFocus
