@@ -4,15 +4,14 @@ import type { Entity } from "@peated/server/types";
 import RobotImage from "@peated/web/assets/robot.png";
 import { ClientOnly } from "@peated/web/components/clientOnly";
 import { DistributionChart } from "@peated/web/components/distributionChart";
-import { Map } from "@peated/web/components/map.client";
 import Markdown from "@peated/web/components/markdown";
 import QueryBoundary from "@peated/web/components/queryBoundary";
 import { trpc } from "@peated/web/lib/trpc";
 import { parseDomain } from "@peated/web/lib/urls";
 import type { LinksFunction } from "@remix-run/node";
 import { Link, useOutletContext, useParams } from "@remix-run/react";
-import { type LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
+import EntityMap from "../components/entityMap";
 
 export const links: LinksFunction = () => [
   {
@@ -122,7 +121,7 @@ export default function EntityDetailsOverview() {
                   )}
                 </div>
               </div>
-              <EntityMap position={entity.location} />
+              <EntityMap entity={entity} />
             </dd>
           </dl>
         </div>
@@ -156,25 +155,5 @@ const EntitySpiritDistribution = ({ entityId }: { entityId: number }) => {
         )}`
       }
     />
-  );
-};
-
-const EntityMap = ({ position }: { position: LatLngTuple | null }) => {
-  const mapHeight = "400px";
-  const mapWidth = "100%";
-
-  if (!position) return null;
-
-  return (
-    <ClientOnly
-      fallback={
-        <div
-          className="animate-pulse bg-slate-800"
-          style={{ height: mapHeight, width: mapWidth }}
-        />
-      }
-    >
-      {() => <Map height={mapHeight} width={mapWidth} position={position} />}
-    </ClientOnly>
   );
 };

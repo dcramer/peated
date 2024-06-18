@@ -99,6 +99,7 @@ export default function EntityDetails() {
     <Layout>
       <div className="w-full p-3 lg:py-0">
         <EntityHeader entity={entity} />
+
         <div className="flex flex-col gap-4 lg:flex-row">
           <div className="flex-auto">
             <div className="my-8 flex justify-center gap-4 lg:justify-start">

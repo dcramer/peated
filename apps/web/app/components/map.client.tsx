@@ -1,7 +1,14 @@
 import type { LatLngTuple } from "leaflet";
 import L from "leaflet";
+import type { ReactNode} from "react";
 import { useState } from "react";
-import { MapContainer, Marker, TileLayer, useMapEvent } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMapEvent,
+} from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
 
@@ -11,15 +18,17 @@ const markerIcon = L.divIcon({
 </svg>`,
   className: "svg-icon",
   iconSize: [24, 24],
-  iconAnchor: [12, 24],
+  iconAnchor: [12, 0],
 });
 
 function LocationMarker({
   initialPosition,
   editable = false,
+  children,
 }: {
   initialPosition?: LatLngTuple | null;
   editable?: boolean;
+  children?: ReactNode | null;
 }) {
   // const markerRef = useRe(null);
 
@@ -33,7 +42,11 @@ function LocationMarker({
       setPosition([lat, lng]);
     }
   });
-  return <Marker position={position} icon={markerIcon} />;
+  return (
+    <Marker position={position} icon={markerIcon}>
+      <Popup>{children}</Popup>
+    </Marker>
+  );
 }
 
 const DEFAULT_POSITION: LatLngTuple = [51.505, -0.09] as const;
@@ -43,11 +56,13 @@ export function Map({
   height,
   position = DEFAULT_POSITION,
   editable = false,
+  markerContent,
 }: {
   width: string;
   height: string;
   position?: LatLngTuple | null;
   editable?: boolean;
+  markerContent?: ReactNode | null;
 }) {
   return (
     <div style={{ height, width }}>
@@ -57,7 +72,7 @@ export function Map({
         }}
         className="rounded"
         center={position || DEFAULT_POSITION}
-        zoom={12}
+        zoom={20}
         dragging={editable}
         doubleClickZoom={editable}
         scrollWheelZoom={editable}
@@ -66,9 +81,17 @@ export function Map({
       >
         <TileLayer
           attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-          url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png"
+          url={
+            "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}" +
+            (L.Browser.retina ? "@2x.png" : ".png")
+          }
+          subdomains="abcd"
+          maxZoom={20}
+          minZoom={0}
         />
-        <LocationMarker initialPosition={position} editable={editable} />
+        <LocationMarker initialPosition={position} editable={editable}>
+          {markerContent}
+        </LocationMarker>
       </MapContainer>
     </div>
   );
