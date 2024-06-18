@@ -150,6 +150,8 @@ export default function EntityForm({
                     setValue("country", result.country);
                   if (result && result.region && !currentValues.region)
                     setValue("region", result.region);
+                  if (result && result.address && !currentValues.address)
+                    setValue("address", result.address);
                 }}
                 disabled={generateDataMutation.isPending}
                 icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
