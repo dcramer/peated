@@ -96,6 +96,7 @@ export default function EntityDetailsOverview() {
                     <Link
                       to={`http://maps.google.com/?q=${encodeURIComponent(`${entity.name}, ${entity.address}`)}`}
                       target="_blank"
+                      className="text-highlight"
                     >
                       <MapIcon className="h-4 w-4" />
                     </Link>
