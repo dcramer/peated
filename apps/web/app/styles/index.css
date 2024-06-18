@@ -162,3 +162,8 @@
     outline-offset: 0.125rem;
   }
 }
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  @apply bg-slate-900;
+}

@@ -35,16 +35,18 @@ export const entities = pgTable(
 
     name: text("name").notNull(),
     shortName: text("short_name"),
+
     country: text("country"),
     region: text("region"),
+    address: text("address"),
+    location: geography("location"),
+
     type: entityTypeEnum("type").array().notNull(),
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
     yearEstablished: smallint("year_established"),
     website: varchar("website", { length: 255 }),
-
-    location: geography("location"),
 
     totalBottles: bigint("total_bottles", { mode: "number" })
       .default(0)

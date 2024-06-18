@@ -1,17 +1,17 @@
+import { MapIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Entity } from "@peated/server/types";
 import RobotImage from "@peated/web/assets/robot.png";
 import { ClientOnly } from "@peated/web/components/clientOnly";
 import { DistributionChart } from "@peated/web/components/distributionChart";
-import { Map } from "@peated/web/components/map.client";
 import Markdown from "@peated/web/components/markdown";
 import QueryBoundary from "@peated/web/components/queryBoundary";
 import { trpc } from "@peated/web/lib/trpc";
 import { parseDomain } from "@peated/web/lib/urls";
 import type { LinksFunction } from "@remix-run/node";
-import { useOutletContext, useParams } from "@remix-run/react";
-import { type LatLngTuple } from "leaflet";
+import { Link, useOutletContext, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
+import EntityMap from "../components/entityMap";
 
 export const links: LinksFunction = () => [
   {
@@ -54,7 +54,6 @@ export default function EntityDetailsOverview() {
             )}
           </ClientOnly>
         </div>
-        <EntityMap position={entity.location} />
       </div>
 
       <div className="my-6 px-3 md:px-0">
@@ -87,6 +86,43 @@ export default function EntityDetailsOverview() {
                 <dd>{entity.shortName}</dd>
               </>
             )}
+            <dt>Location</dt>
+            <dd className="flex flex-col space-y-2">
+              <div>
+                {entity.address ? (
+                  <div className="flex flex-row items-center gap-x-2">
+                    {entity.address}
+                    <Link
+                      to={`http://maps.google.com/?q=${encodeURIComponent(`${entity.name}, ${entity.address}`)}`}
+                      target="_blank"
+                      className="text-highlight"
+                    >
+                      <MapIcon className="h-4 w-4" />
+                    </Link>
+                  </div>
+                ) : null}
+                <div>
+                  {entity.region && entity.country ? (
+                    <>
+                      <Link to={`/entities?region=${entity.region}`}>
+                        {entity.region}
+                      </Link>
+                      <span>, </span>
+                      <Link to={`/entities?country=${entity.country}`}>
+                        {entity.country}
+                      </Link>
+                    </>
+                  ) : (
+                    (
+                      <Link to={`/entities?country=${entity.country}`}>
+                        {entity.country}
+                      </Link>
+                    ) ?? <em>n/a</em>
+                  )}
+                </div>
+              </div>
+              <EntityMap entity={entity} />
+            </dd>
           </dl>
         </div>
       </div>
@@ -119,25 +155,5 @@ const EntitySpiritDistribution = ({ entityId }: { entityId: number }) => {
         )}`
       }
     />
-  );
-};
-
-const EntityMap = ({ position }: { position: LatLngTuple | null }) => {
-  const mapHeight = "200px";
-  const mapWidth = mapHeight;
-
-  if (!position) return null;
-
-  return (
-    <ClientOnly
-      fallback={
-        <div
-          className="animate-pulse bg-slate-800"
-          style={{ height: mapHeight, width: mapWidth }}
-        />
-      }
-    >
-      {() => <Map height={mapHeight} width={mapWidth} position={position} />}
-    </ClientOnly>
   );
 };

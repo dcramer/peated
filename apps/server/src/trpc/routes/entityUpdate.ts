@@ -56,6 +56,23 @@ export default modProcedure
     if (input.region !== undefined && input.region !== entity.region) {
       data.region = input.region;
     }
+    if (input.address !== undefined && input.address !== entity.address) {
+      data.address = input.address;
+    }
+    if (
+      input.location !== undefined &&
+      (!input.location ||
+        !entity.location ||
+        !arraysEqual(
+          input.location,
+          (JSON.parse(entity.location) as UnserializedPoint).coordinates as [
+            number,
+            number,
+          ],
+        ))
+    ) {
+      data.location = input.location;
+    }
     if (input.type !== undefined && !arraysEqual(input.type, entity.type)) {
       data.type = input.type;
     }
@@ -76,20 +93,6 @@ export default modProcedure
     }
     if (input.website !== undefined && input.website !== entity.website) {
       data.website = input.website;
-    }
-    if (
-      input.location !== undefined &&
-      (!input.location ||
-        !entity.location ||
-        !arraysEqual(
-          input.location,
-          (JSON.parse(entity.location) as UnserializedPoint).coordinates as [
-            number,
-            number,
-          ],
-        ))
-    ) {
-      data.location = input.location;
     }
     if (Object.values(data).length === 0) {
       return await serialize(EntitySerializer, entity, ctx.user);
@@ -211,6 +214,20 @@ export default modProcedure
     ) {
       try {
         await pushJob("GenerateEntityDetails", { entityId: entity.id });
+      } catch (err) {
+        logError(err, {
+          entity: {
+            id: entity.id,
+          },
+        });
+      }
+    }
+
+    const hasChangedLocation =
+      (data.address || data.country || data.region) && !data.location;
+    if (hasChangedLocation) {
+      try {
+        await pushJob("GeocodeEntityLocation", { entityId: entity.id });
       } catch (err) {
         logError(err, {
           entity: {

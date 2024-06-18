@@ -53,6 +53,7 @@ export default function EntityForm({
       shortName: initialData.shortName,
       country: initialData.country,
       region: initialData.region,
+      address: initialData.address,
       type: initialData.type,
       yearEstablished: initialData.yearEstablished,
       description: initialData.description,
@@ -173,6 +174,15 @@ export default function EntityForm({
             type="text"
             placeholder="e.g. Islay, Kentucky"
             autoComplete="off"
+          />
+          <TextAreaField
+            {...register("address")}
+            error={errors.description}
+            autoFocus
+            label="Address"
+            helpText="The address of the entity. This should be the location of the distiller or tasting room."
+            placeholder="e.g. 132 Whisky Ln, Islay, Scotland, PA42 7DU"
+            rows={2}
           />
           <Controller
             name="type"

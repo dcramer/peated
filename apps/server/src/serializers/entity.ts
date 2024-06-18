@@ -16,12 +16,13 @@ export const EntitySerializer = serializer({
       id: item.id,
       name: item.name,
       shortName: item.shortName,
+      type: item.type,
       description: item.description,
       yearEstablished: item.yearEstablished,
       website: item.website,
       country: item.country,
       region: item.region,
-      type: item.type,
+      address: item.address,
       location: item.location
         ? ((JSON.parse(item.location) as UnserializedPoint).coordinates as [
             number,
