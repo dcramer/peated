@@ -14,6 +14,7 @@ import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
+import type { BottlePreviewResult } from "@peated/server/types";
 import { TRPCError } from "@trpc/server";
 import { isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
@@ -36,7 +37,8 @@ export async function bottleCreate({
     });
   }
 
-  const bottleData: Record<string, any> = await bottleNormalize({ input, ctx });
+  const bottleData: BottlePreviewResult & Record<string, any> =
+    await bottleNormalize({ input, ctx });
 
   if (input.description !== undefined) {
     bottleData.description = input.description;
