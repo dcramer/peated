@@ -9,7 +9,7 @@ import QueryBoundary from "@peated/web/components/queryBoundary";
 import { trpc } from "@peated/web/lib/trpc";
 import { parseDomain } from "@peated/web/lib/urls";
 import type { LinksFunction } from "@remix-run/node";
-import { useOutletContext, useParams } from "@remix-run/react";
+import { Link, useOutletContext, useParams } from "@remix-run/react";
 import { type LatLngTuple } from "leaflet";
 import invariant from "tiny-invariant";
 
@@ -87,6 +87,29 @@ export default function EntityDetailsOverview() {
                 <dd>{entity.shortName}</dd>
               </>
             )}
+            <dt>Location</dt>
+            <dd>
+              {entity.address ? <div>{entity.address}</div> : null}
+              <div>
+                {entity.region && entity.country ? (
+                  <>
+                    <Link to={`/entities?region=${entity.region}`}>
+                      {entity.region}
+                    </Link>
+                    <span>, </span>
+                    <Link to={`/entities?country=${entity.country}`}>
+                      {entity.country}
+                    </Link>
+                  </>
+                ) : (
+                  (
+                    <Link to={`/entities?country=${entity.country}`}>
+                      {entity.country}
+                    </Link>
+                  ) ?? <em>n/a</em>
+                )}
+              </div>
+            </dd>
           </dl>
         </div>
       </div>

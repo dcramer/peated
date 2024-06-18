@@ -9,6 +9,7 @@ import { CountryEnum, EntityTypeEnum } from "@peated/server/schemas";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { pushJob } from "./client";
 
 if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
@@ -58,6 +59,8 @@ Describe the entity as a distiller, bottler, or brand, whichever one it primaril
 
 'region' should be the region of the country where the entity is located, if known. Examples of regions might be "Speyside" or "Islay".
 
+'address' should only be filled in if its a distillery, and should be the street address of the where the distillery is located.
+
 The 'type' field must contain every value which is accurate for this entity, describing if the entity operates as brand, a distiller, and/or a bottler.
 If the entity is a distiller, include 'distiller' in the 'type' field.
 If the entity is a brand, include 'brand' in the 'type' field.
@@ -72,6 +75,7 @@ export const OpenAIEntityDetailsSchema = z.object({
   website: z.string().url().nullable().optional(),
   country: z.string().nullable().optional(),
   region: z.string().nullable().optional(),
+  address: z.string().nullable().optional(),
   type: z.array(z.string()).optional(),
 });
 
@@ -119,6 +123,7 @@ export default async ({ entityId }: { entityId: number }) => {
     throw new Error(`Unknown entity: ${entityId}`);
   }
   const result = await getGeneratedEntityDetails(entity);
+  console.log({ result });
 
   if (!result) {
     throw new Error(`Failed to generate details fpr entity: ${entityId}`);
@@ -137,6 +142,8 @@ export default async ({ entityId }: { entityId: number }) => {
     data.yearEstablished = result.yearEstablished;
 
   if (!entity.website && result.website) data.website = result.website;
+
+  if (!entity.address && result.address) data.address = result.address;
 
   if (
     result.type?.length &&
@@ -164,4 +171,8 @@ export default async ({ entityId }: { entityId: number }) => {
       },
     });
   });
+
+  if (data.address) {
+    await pushJob("GeocodeEntityLocation", { entityId });
+  }
 };

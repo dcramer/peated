@@ -201,6 +201,9 @@ importers:
       commander:
         specifier: ^12.0.0
         version: 12.0.0
+      core-js:
+        specifier: ^3.37.1
+        version: 3.37.1
       croner:
         specifier: ^7.0.7
         version: 7.0.7
@@ -6248,6 +6251,11 @@ packages:
     resolution: {integrity: sha512-9TNiImhKvQqSUkOvk/mMRZzOANTiEVC7WaBNhHcKM7x+/5E1l5NvsysR19zuDQScE8k+kfQXWRN3AtS/eOSHpg==}
     dependencies:
       browserslist: 4.23.1
+    dev: false
+
+  /core-js@3.37.1:
+    resolution: {integrity: sha512-Xn6qmxrQZyB0FFY8E3bgRXei3lWDJHhvI+u0q9TKIYM49G8pAr0FgnnrFRAmsbptZL1yxRADVXn+x5AGsbBfyw==}
+    requiresBuild: true
     dev: false
 
   /core-util-is@1.0.3:

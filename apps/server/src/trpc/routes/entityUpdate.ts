@@ -223,5 +223,19 @@ export default modProcedure
       }
     }
 
+    const hasChangedLocation =
+      (data.address || data.country || data.region) && !data.location;
+    if (hasChangedLocation) {
+      try {
+        await pushJob("GeocodeEntityLocation", { entityId: entity.id });
+      } catch (err) {
+        logError(err, {
+          entity: {
+            id: entity.id,
+          },
+        });
+      }
+    }
+
     return await serialize(EntitySerializer, newEntity, ctx.user);
   });
