@@ -1,3 +1,4 @@
+import { MapIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Entity } from "@peated/server/types";
 import RobotImage from "@peated/web/assets/robot.png";
@@ -54,7 +55,6 @@ export default function EntityDetailsOverview() {
             )}
           </ClientOnly>
         </div>
-        <EntityMap position={entity.location} />
       </div>
 
       <div className="my-6 px-3 md:px-0">
@@ -88,27 +88,40 @@ export default function EntityDetailsOverview() {
               </>
             )}
             <dt>Location</dt>
-            <dd>
-              {entity.address ? <div>{entity.address}</div> : null}
+            <dd className="flex flex-col space-y-2">
               <div>
-                {entity.region && entity.country ? (
-                  <>
-                    <Link to={`/entities?region=${entity.region}`}>
-                      {entity.region}
+                {entity.address ? (
+                  <div className="flex flex-row items-center gap-x-2">
+                    {entity.address}
+                    <Link
+                      to={`http://maps.google.com/?q=${encodeURIComponent(`${entity.name}, ${entity.address}`)}`}
+                      target="_blank"
+                    >
+                      <MapIcon className="h-4 w-4" />
                     </Link>
-                    <span>, </span>
-                    <Link to={`/entities?country=${entity.country}`}>
-                      {entity.country}
-                    </Link>
-                  </>
-                ) : (
-                  (
-                    <Link to={`/entities?country=${entity.country}`}>
-                      {entity.country}
-                    </Link>
-                  ) ?? <em>n/a</em>
-                )}
+                  </div>
+                ) : null}
+                <div>
+                  {entity.region && entity.country ? (
+                    <>
+                      <Link to={`/entities?region=${entity.region}`}>
+                        {entity.region}
+                      </Link>
+                      <span>, </span>
+                      <Link to={`/entities?country=${entity.country}`}>
+                        {entity.country}
+                      </Link>
+                    </>
+                  ) : (
+                    (
+                      <Link to={`/entities?country=${entity.country}`}>
+                        {entity.country}
+                      </Link>
+                    ) ?? <em>n/a</em>
+                  )}
+                </div>
               </div>
+              <EntityMap position={entity.location} />
             </dd>
           </dl>
         </div>
@@ -146,8 +159,8 @@ const EntitySpiritDistribution = ({ entityId }: { entityId: number }) => {
 };
 
 const EntityMap = ({ position }: { position: LatLngTuple | null }) => {
-  const mapHeight = "200px";
-  const mapWidth = mapHeight;
+  const mapHeight = "400px";
+  const mapWidth = "100%";
 
   if (!position) return null;
 
