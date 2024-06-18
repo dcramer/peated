@@ -5,6 +5,7 @@
     "lib": ["es2022", "dom", "dom.iterable"],
     "baseUrl": ".",
     "jsx": "react-jsx",
+    "moduleResolution": "Bundler",
     "paths": {
       "@peated/web/*": ["./app/*"],
       "@peated/server/*": ["../../apps/server/src/*"]

@@ -3,7 +3,7 @@ import { feedbackModalIntegration } from "@sentry-internal/feedback";
 import * as Sentry from "@sentry/remix";
 import { startTransition, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
-import config from "./config";
+import config from "../app/config";
 
 const feedbackTheme = {
   foreground: "#94a3b8", // slate-400

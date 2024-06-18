@@ -1,5 +1,4 @@
 import * as Sentry from "@sentry/node";
-import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import config from "./config";
 
 Sentry.init({
@@ -7,7 +6,6 @@ Sentry.init({
   release: config.VERSION,
   tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
-  integrations: [nodeProfilingIntegration()],
   spotlight: config.ENV === "development",
 });
 
