@@ -12,7 +12,7 @@ import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { authedProcedure } from "..";
 
 export default authedProcedure
@@ -28,7 +28,7 @@ export default authedProcedure
       const [country] = await db
         .select()
         .from(countries)
-        .where(eq(countries.name, input.country))
+        .where(eq(sql`LOWER(${countries.name})`, input.country.toLowerCase()))
         .limit(1);
       if (!country) {
         throw new TRPCError({

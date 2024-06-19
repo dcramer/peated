@@ -8,7 +8,7 @@ import Tabs from "@peated/web/components/tabs";
 import useAuth from "@peated/web/hooks/useAuth";
 import { summarize } from "@peated/web/lib/markdown";
 import { getEntityUrl } from "@peated/web/lib/urls";
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -70,13 +70,6 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     },
   ];
 };
-
-export const links: LinksFunction = () => [
-  {
-    rel: "stylesheet",
-    href: "https://unpkg.com/leaflet@1.8.0/dist/leaflet.css",
-  },
-];
 
 export default function EntityDetails() {
   const { entity } = useLoaderData<typeof loader>();

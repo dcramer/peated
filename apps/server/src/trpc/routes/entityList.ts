@@ -4,13 +4,14 @@ import { type SerializedPoint } from "@peated/server/db/columns";
 import {
   bottles,
   bottlesToDistillers,
+  countries,
   entities,
   entityAliases,
 } from "@peated/server/db/schema";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
-import { CountryEnum } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
+import { TRPCError } from "@trpc/server";
 import type { SQL } from "drizzle-orm";
 import {
   and,
@@ -44,7 +45,7 @@ export default publicProcedure
       .object({
         query: z.string().default(""),
         name: z.string().nullish(),
-        country: CountryEnum.nullish(),
+        country: z.string().nullish(),
         region: z.string().nullish(),
         type: z.enum(ENTITY_TYPE_LIST).nullish(),
         searchContext: z
@@ -107,7 +108,18 @@ export default publicProcedure
       where.push(sql`${input.type} = ANY(${entities.type})`);
     }
     if (input.country) {
-      where.push(ilike(entities.country, input.country));
+      const [result] = await db
+        .select({ id: countries.id })
+        .from(countries)
+        .where(eq(sql`LOWER(${countries.name})`, input.country.toLowerCase()))
+        .limit(1);
+      if (!result) {
+        throw new TRPCError({
+          message: "Invalid country",
+          code: "BAD_REQUEST",
+        });
+      }
+      where.push(eq(entities.countryId, result.id));
     }
     if (input.region) {
       where.push(ilike(entities.region, input.region));

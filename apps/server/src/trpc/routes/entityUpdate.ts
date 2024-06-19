@@ -55,7 +55,7 @@ export default modProcedure
       const [country] = await db
         .select()
         .from(countries)
-        .where(eq(countries.name, input.country))
+        .where(eq(sql`LOWER(${countries.name})`, input.country.toLowerCase()))
         .limit(1);
       if (!country) {
         throw new TRPCError({
