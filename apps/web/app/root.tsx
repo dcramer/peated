@@ -28,6 +28,7 @@ import { httpBatchLink } from "@trpc/client";
 import type { ComponentProps, PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
 import { useDehydratedState } from "use-dehydrated-state";
+import { useHydrated } from "./components/clientOnly";
 import LoadingIndicator from "./components/loadingIndicator";
 import { default as config } from "./config";
 import { ApiProvider } from "./hooks/useApi";
@@ -129,7 +130,8 @@ export default withSentry(function App() {
     Sentry.setUser(null);
   }
 
-  const queryClient = useSingletonQueryClient();
+  const hydrated = useHydrated();
+  const queryClient = useSingletonQueryClient({ ssr: !hydrated });
 
   const dehydratedState = useDehydratedState();
 

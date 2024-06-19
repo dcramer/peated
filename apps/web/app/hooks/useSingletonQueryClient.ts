@@ -2,7 +2,11 @@ import { QueryClient } from "@tanstack/react-query";
 
 let queryClient: QueryClient | null = null;
 
-export function getQueryClient({ ssr }: { ssr: boolean }): QueryClient {
+type QueryClientConfig = {
+  ssr: boolean;
+};
+
+export function getQueryClient({ ssr }: QueryClientConfig): QueryClient {
   if (queryClient === null) {
     queryClient = new QueryClient({
       defaultOptions: {
@@ -19,6 +23,6 @@ export function getQueryClient({ ssr }: { ssr: boolean }): QueryClient {
   return queryClient;
 }
 
-export default function useSingletonQueryClient() {
-  return getQueryClient();
+export default function useSingletonQueryClient(config: QueryClientConfig) {
+  return getQueryClient(config);
 }
