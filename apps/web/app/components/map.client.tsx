@@ -1,6 +1,6 @@
 import type { LatLngTuple } from "leaflet";
 import L from "leaflet";
-import type { ReactNode} from "react";
+import type { ReactNode } from "react";
 import { useState } from "react";
 import {
   MapContainer,
@@ -72,7 +72,7 @@ export function Map({
         }}
         className="rounded"
         center={position || DEFAULT_POSITION}
-        zoom={20}
+        zoom={10}
         dragging={editable}
         doubleClickZoom={editable}
         scrollWheelZoom={editable}
