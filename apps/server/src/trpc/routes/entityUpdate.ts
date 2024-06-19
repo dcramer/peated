@@ -6,6 +6,7 @@ import {
   bottleAliases,
   bottles,
   changes,
+  countries,
   entities,
   entityAliases,
 } from "@peated/server/db/schema";
@@ -50,8 +51,21 @@ export default modProcedure
     if (input.shortName !== undefined && input.shortName !== entity.shortName) {
       data.shortName = input.shortName;
     }
-    if (input.country !== undefined && input.country !== entity.country) {
-      data.country = input.country;
+    if (input.country !== undefined && input.country) {
+      const [country] = await db
+        .select()
+        .from(countries)
+        .where(eq(countries.name, input.country))
+        .limit(1);
+      if (!country) {
+        throw new TRPCError({
+          message: "Country not found.",
+          code: "NOT_FOUND",
+        });
+      }
+      if (country.id !== entity.countryId) {
+        data.countryId = country.id;
+      }
     }
     if (input.region !== undefined && input.region !== entity.region) {
       data.region = input.region;

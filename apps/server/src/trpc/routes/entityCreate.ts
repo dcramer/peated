@@ -1,6 +1,11 @@
 import { db } from "@peated/server/db";
 import type { NewEntity } from "@peated/server/db/schema";
-import { changes, entities, entityAliases } from "@peated/server/db/schema";
+import {
+  changes,
+  countries,
+  entities,
+  entityAliases,
+} from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs/client";
 import { logError } from "@peated/server/lib/log";
 import { EntityInputSchema } from "@peated/server/schemas";
@@ -18,6 +23,21 @@ export default authedProcedure
       type: input.type || [],
       createdById: ctx.user.id,
     };
+
+    if (input.country) {
+      const [country] = await db
+        .select()
+        .from(countries)
+        .where(eq(countries.name, input.country))
+        .limit(1);
+      if (!country) {
+        throw new TRPCError({
+          message: "Country not found.",
+          code: "NOT_FOUND",
+        });
+      }
+      data.countryId = country.id;
+    }
 
     if (data.description && data.description !== "") {
       data.descriptionSrc =

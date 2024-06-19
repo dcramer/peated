@@ -15,7 +15,7 @@ import {
 
 import { geography } from "../columns";
 
-import { bottles, bottlesToDistillers } from ".";
+import { bottles, bottlesToDistillers, countries } from ".";
 import { contentSourceEnum } from "./enums";
 
 import { users } from "./users";
@@ -37,6 +37,9 @@ export const entities = pgTable(
     shortName: text("short_name"),
 
     country: text("country"),
+    countryId: bigint("country_id", { mode: "number" }).references(
+      () => countries.id,
+    ),
     region: text("region"),
     address: text("address"),
     location: geography("location"),
