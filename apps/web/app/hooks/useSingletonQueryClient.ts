@@ -14,7 +14,7 @@ export function getQueryClient({ ssr }: QueryClientConfig): QueryClient {
           networkMode: "offlineFirst",
           // suspense: true,
           retry: false,
-          staleTime: ssr ? 0 : 300,
+          staleTime: ssr ? 0 : 5 * 60 * 1000, // 5 minutes
         },
       },
     });
