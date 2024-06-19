@@ -123,7 +123,6 @@ export default async ({ entityId }: { entityId: number }) => {
     throw new Error(`Unknown entity: ${entityId}`);
   }
   const result = await getGeneratedEntityDetails(entity);
-  console.log({ result });
 
   if (!result) {
     throw new Error(`Failed to generate details fpr entity: ${entityId}`);
