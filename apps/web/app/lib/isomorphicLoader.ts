@@ -53,7 +53,7 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
       params,
       context: { trpc, user },
     }) {
-      const queryClient = getQueryClient();
+      const queryClient = getQueryClient({ ssr: true });
       const queryUtils = createTRPCQueryUtils({
         queryClient,
         client: trpc,
@@ -79,7 +79,7 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
         captureException,
       );
 
-      const queryClient = getQueryClient();
+      const queryClient = getQueryClient({ ssr: false });
       const queryUtils = createTRPCQueryUtils({
         queryClient,
         client: trpcClient,

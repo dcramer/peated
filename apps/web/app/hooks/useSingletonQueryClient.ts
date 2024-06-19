@@ -2,7 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 
 let queryClient: QueryClient | null = null;
 
-export function getQueryClient(): QueryClient {
+export function getQueryClient({ ssr }: { ssr: boolean }): QueryClient {
   if (queryClient === null) {
     queryClient = new QueryClient({
       defaultOptions: {
@@ -10,7 +10,8 @@ export function getQueryClient(): QueryClient {
           networkMode: "offlineFirst",
           // suspense: true,
           retry: false,
-          staleTime: 60 * 1000,
+          staleTime: ssr ? 0 : 300,
+          gcTime: ssr ? 0 : 300,
         },
       },
     });
