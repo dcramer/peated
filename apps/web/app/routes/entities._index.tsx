@@ -162,7 +162,7 @@ function FilterSidebar() {
                 {country}
               </SidebarLink>
             ))}
-            {country && Object.keys(MAJOR_COUNTRIES).includes(country) && (
+            {country && !Object.keys(MAJOR_COUNTRIES).includes(country) && (
               <SidebarLink
                 key={country}
                 active={qs.get("country") === country}
