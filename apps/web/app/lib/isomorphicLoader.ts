@@ -23,7 +23,7 @@ export type IsomorphicContext = {
     queryUtils: ReturnType<typeof createTRPCQueryUtils<AppRouter>>;
     user: User | null;
   };
-  isServer: boolean;
+  ssr: boolean;
 };
 
 type DataFunctionValue = Response | NonNullable<unknown> | null;
@@ -63,7 +63,7 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
         request,
         params,
         context: { user, queryUtils },
-        isServer: true,
+        ssr: true,
       };
       const rv = await callback(context);
       if (!(rv instanceof Response)) {
@@ -92,7 +92,7 @@ export function makeIsomorphicLoader<T extends DataFunctionValue>(
           user: window.REMIX_CONTEXT.user,
           queryUtils,
         },
-        isServer: false,
+        ssr: false,
       };
       return await callback(context);
     } satisfies ClientLoaderFunction,

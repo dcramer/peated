@@ -6,10 +6,10 @@ const OnlineStatusContext = React.createContext(true);
 export const OnlineStatusProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const isServer = typeof navigator === "undefined";
+  const ssr = typeof navigator === "undefined";
 
   const [onlineStatus, setOnlineStatus] = useState<boolean>(
-    isServer ? true : navigator.onLine,
+    ssr ? true : navigator.onLine,
   );
 
   useEffect(() => {
