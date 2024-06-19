@@ -125,7 +125,7 @@ export default async ({ entityId }: { entityId: number }) => {
   const result = await getGeneratedEntityDetails(entity);
 
   if (!result) {
-    throw new Error(`Failed to generate details fpr entity: ${entityId}`);
+    throw new Error(`Failed to generate details for entity: ${entityId}`);
   }
   const data: Record<string, any> = {};
   if (
