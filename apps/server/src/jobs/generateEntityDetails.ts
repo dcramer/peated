@@ -18,9 +18,9 @@ if (!config.OPENAI_API_KEY) {
 function generatePrompt(entity: Partial<Entity>) {
   const infoLines = [];
   if (entity.country && entity.region) {
-    infoLines.push(`Origin: ${entity.region}, ${entity.country}`);
+    infoLines.push(`Location: ${entity.region}, ${entity.country}`);
   } else if (entity.country) {
-    infoLines.push(`Origin: ${entity.country}`);
+    infoLines.push(`Location: ${entity.country}`);
   }
   if (entity.yearEstablished) {
     infoLines.push(`Year Established: ${entity.yearEstablished}`);
