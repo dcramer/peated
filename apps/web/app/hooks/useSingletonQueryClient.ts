@@ -15,7 +15,6 @@ export function getQueryClient({ ssr }: QueryClientConfig): QueryClient {
           // suspense: true,
           retry: false,
           staleTime: ssr ? 0 : 300,
-          gcTime: ssr ? 0 : 300,
         },
       },
     });
