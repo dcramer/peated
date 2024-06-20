@@ -90,7 +90,7 @@ test("can change country", async ({ fixtures }) => {
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
-    country: country.slug,
+    country: country.name,
   });
 
   expect(data.id).toBeDefined();
