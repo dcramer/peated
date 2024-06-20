@@ -14,13 +14,27 @@ import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import type { BottlePreviewResult } from "@peated/server/types";
+import type {
+  BottlePreviewResult,
+  EntityInput,
+  FreeformEntity,
+} from "@peated/server/types";
 import { TRPCError } from "@trpc/server";
 import { isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
 import { bottleNormalize } from "./bottlePreview";
+
+function coerceToUpsert(data: FreeformEntity): EntityInput {
+  if (data.country instanceof Object) {
+    return {
+      ...data,
+      country: data.country.name,
+    };
+  }
+  return data as EntityInput;
+}
 
 export async function bottleCreate({
   input,
@@ -50,7 +64,7 @@ export async function bottleCreate({
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({
       db: tx,
-      data: bottleData.brand,
+      data: coerceToUpsert(bottleData.brand),
       type: "brand",
       userId: user.id,
     });
@@ -75,7 +89,7 @@ export async function bottleCreate({
     if (bottleData.bottler) {
       const bottlerUpsert = await upsertEntity({
         db: tx,
-        data: bottleData.bottler,
+        data: coerceToUpsert(bottleData.bottler),
         type: "bottler",
         userId: user.id,
       });
@@ -140,7 +154,7 @@ export async function bottleCreate({
       for (const distData of bottleData.distillers) {
         const distUpsert = await upsertEntity({
           db: tx,
-          data: distData,
+          data: coerceToUpsert(distData),
           userId: user.id,
           type: "distiller",
         });
