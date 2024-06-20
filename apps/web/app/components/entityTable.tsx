@@ -91,12 +91,10 @@ export default ({
                   {!!entity.country && (
                     <div>
                       <Link
-                        to={`/entities?country=${encodeURIComponent(
-                          entity.country,
-                        )}`}
+                        to={`/locations/${entity.country.slug}`}
                         className="hover:underline"
                       >
-                        {entity.country}
+                        {entity.country.name}
                       </Link>
                     </div>
                   )}

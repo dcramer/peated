@@ -63,7 +63,7 @@ export default function CountryDetails() {
 
         <div>
           <h2>Popular Distilleries</h2>
-          {topEntityList.length ? (
+          {topEntityList.results.length ? (
             <EntityTable entityList={topEntityList.results} />
           ) : (
             <p className="text-light">
