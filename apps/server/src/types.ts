@@ -105,7 +105,7 @@ export type EntityInput =
       type?: ("brand" | "bottler" | "distiller")[];
     };
 
-type FreeformEntity =
+export type FreeformEntity =
   | z.infer<typeof EntityInputSchema>
   | z.infer<typeof EntitySchema>;
 

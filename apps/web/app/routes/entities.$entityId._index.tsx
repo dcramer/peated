@@ -8,17 +8,9 @@ import Markdown from "@peated/web/components/markdown";
 import QueryBoundary from "@peated/web/components/queryBoundary";
 import { trpc } from "@peated/web/lib/trpc";
 import { parseDomain } from "@peated/web/lib/urls";
-import type { LinksFunction } from "@remix-run/node";
 import { Link, useOutletContext, useParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import EntityMap from "../components/entityMap";
-
-export const links: LinksFunction = () => [
-  {
-    rel: "stylesheet",
-    href: "https://unpkg.com/leaflet@1.8.0/dist/leaflet.css",
-  },
-];
 
 export default function EntityDetailsOverview() {
   const { entity } = useOutletContext<{ entity: Entity }>();
@@ -108,16 +100,16 @@ export default function EntityDetailsOverview() {
                         {entity.region}
                       </Link>
                       <span>, </span>
-                      <Link to={`/entities?country=${entity.country}`}>
-                        {entity.country}
+                      <Link to={`/locations/${entity.country.slug}`}>
+                        {entity.country.name}
                       </Link>
                     </>
+                  ) : entity.country ? (
+                    <Link to={`/locations/${entity.country.slug}`}>
+                      {entity.country.name}
+                    </Link>
                   ) : (
-                    (
-                      <Link to={`/entities?country=${entity.country}`}>
-                        {entity.country}
-                      </Link>
-                    ) ?? <em>n/a</em>
+                    <em>n/a</em>
                   )}
                 </div>
               </div>

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { ENTITY_TYPE_LIST } from "../constants";
 import { ContentSourceEnum } from "./common";
+import { CountrySchema } from "./countries";
 import { PointSchema } from "./shared";
 import { UserSchema } from "./users";
 
@@ -33,7 +34,7 @@ export const EntitySchema = z.object({
   description: z.string().nullable().optional(),
   yearEstablished: z.number().lte(new Date().getFullYear()).nullable(),
   website: z.string().url().nullable(),
-  country: z.string().trim().nullable(),
+  country: CountrySchema.nullable(),
   region: z.string().trim().nullable(),
   address: z.string().trim().nullable().optional(),
   location: PointSchema.nullable(),

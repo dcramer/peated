@@ -21,14 +21,14 @@ export default function EntityHeader({
             <>
               Located in{" "}
               <Link
-                to={`/entities?country=${encodeURIComponent(entity.country)}`}
+                to={`/locations/${entity.country.slug}`}
                 className="truncate hover:underline"
               >
-                {entity.country}
+                {entity.country.name}
               </Link>
             </>
           )}
-          {!!entity.region && (
+          {!!entity.country && !!entity.region && (
             <span>
               {" "}
               &middot;{" "}

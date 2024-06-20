@@ -21,7 +21,6 @@ import type {
   NewEntity,
   NewExternalSite,
   NewFlight,
-  NewFollow,
   NewReview,
   NewStorePrice,
   NewStorePriceHistory,
@@ -38,6 +37,7 @@ import {
   changes,
   collections,
   comments,
+  countries,
   entities,
   externalSites,
   flightBottles,
@@ -88,7 +88,7 @@ export const User = async (
 };
 
 export const Follow = async (
-  { ...data }: Partial<NewFollow> = {},
+  { ...data }: Partial<dbSchema.NewFollow> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Follow> => {
   const [result] = await db.transaction(async (tx) => {
@@ -98,6 +98,25 @@ export const Follow = async (
         fromUserId: data.fromUserId || (await User({}, tx)).id,
         toUserId: data.toUserId || (await User({}, tx)).id,
         status: "following",
+        ...data,
+      })
+      .returning();
+  });
+  if (!result) throw new Error("Unable to create fixture");
+  return result;
+};
+
+export const Country = async (
+  { ...data }: Partial<dbSchema.NewCountry> = {},
+  db: DatabaseType = dbConn,
+): Promise<dbSchema.Country> => {
+  if (!data.name) data.name = faker.location.country();
+  const [result] = await db.transaction(async (tx) => {
+    return await tx
+      .insert(countries)
+      .values({
+        name: "", // cant be asked to fix TS
+        slug: faker.helpers.slugify(data.name as string),
         ...data,
       })
       .returning();
