@@ -6,6 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 type Auth = {
   setUser: (user: User | null) => void;
   user: User | null;
+  isLoggedIn: boolean;
 };
 
 const AuthContext = createContext<Auth>({
@@ -13,6 +14,7 @@ const AuthContext = createContext<Auth>({
     throw new Error("Missing AuthProvider");
   },
   user: null,
+  isLoggedIn: false,
 });
 
 export const AuthProvider = ({
@@ -38,6 +40,7 @@ export const AuthProvider = ({
             }
           : null,
         setUser: setValue,
+        isLoggedIn: !!user,
       }}
     >
       {children}
