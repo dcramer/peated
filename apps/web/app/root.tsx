@@ -180,7 +180,7 @@ function TRPCProvider({
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
-        sentryLink(Sentry.captureException),
+        sentryLink(),
         httpBatchLink({
           url: `${config.API_SERVER}/trpc`,
           async headers() {
