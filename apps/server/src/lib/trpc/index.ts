@@ -1,5 +1,5 @@
 import { type AppRouter } from "@peated/server/trpc/router";
-import { type captureException } from "@sentry/node";
+import { captureException } from "@sentry/core";
 import {
   createTRPCProxyClient,
   httpBatchLink,
@@ -8,18 +8,13 @@ import {
 import { type AnyRouter } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 
-type AnySentryCaptureException = typeof captureException;
-
-export function makeTRPCClient<
-  SentryCaptureException extends AnySentryCaptureException,
->(
+export function makeTRPCClient(
   apiServer: string,
   accessToken?: string | null | undefined,
-  captureException?: SentryCaptureException,
 ) {
   return createTRPCProxyClient<AppRouter>({
     links: [
-      ...(captureException ? [sentryLink<AppRouter>(captureException)] : []),
+      sentryLink<AppRouter>(),
       httpBatchLink({
         url: `${apiServer}/trpc`,
         async headers() {
@@ -32,9 +27,7 @@ export function makeTRPCClient<
   });
 }
 
-export function sentryLink<TRouter extends AnyRouter>(
-  captureException: AnySentryCaptureException,
-): TRPCLink<TRouter> {
+export function sentryLink<TRouter extends AnyRouter>(): TRPCLink<TRouter> {
   return () => {
     return ({ next, op }) => {
       return observable((observer) => {
