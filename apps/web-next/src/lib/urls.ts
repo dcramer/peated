@@ -5,15 +5,18 @@ export function getEntityUrl(entity: Entity) {
 }
 
 export function buildQueryString(
-  search: string,
+  searchParams: URLSearchParams,
   newParams: Record<string, any>,
 ): string {
-  const qs = new URLSearchParams(search);
-  for (const [key, value] of Object.entries(newParams)) {
-    if (value === undefined || value === null) qs.delete(key);
-    else qs.set(key, value);
-  }
-  return qs.toString();
+  const newEntries = Array.from(Object.entries(newParams)).filter(([k, v]) => {
+    return !k || v === undefined || v === null;
+  });
+  Array.from(searchParams.entries()).forEach(([k, v]) => {
+    if (!newParams[k]) {
+      newEntries.push([k, v]);
+    }
+  });
+  return new URLSearchParams(newEntries).toString();
 }
 
 export function parseDomain(url: string) {

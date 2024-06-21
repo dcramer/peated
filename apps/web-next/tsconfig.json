@@ -4,14 +4,11 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/app/favorites/layout.tsx.old"
   ],
   "compilerOptions": {
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["esnext", "dom", "dom.iterable"],
     "baseUrl": ".",
     "jsx": "preserve",
     "plugins": [
@@ -20,21 +17,13 @@
       }
     ],
     "paths": {
-      "@peated/web-next/*": [
-        "./src/*"
-      ],
+      "@peated/web-next/*": ["./src/*"],
       // COMPAT: remove when migrated
-      "@peated/web/*": [
-        "./src/*"
-      ],
-      "@peated/server/*": [
-        "../../apps/server/src/*"
-      ]
+      "@peated/web/*": ["./src/*"],
+      "@peated/server/*": ["../../apps/server/src/*"]
     },
     "noEmit": true,
     "module": "esnext"
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

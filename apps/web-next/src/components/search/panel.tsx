@@ -1,9 +1,12 @@
+"use client";
+
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
-import { Link, useLocation, useNavigate } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { debounce } from "ts-debounce";
 import Header from "../header";
 import Layout from "../layout";
@@ -20,9 +23,7 @@ export type Props = {
 
 export default function SearchPanel({ onClose, onQueryChange }: Props) {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const qs = new URLSearchParams(location.search);
+  const qs = useSearchParams();
 
   const maxResults = 50;
 
@@ -88,12 +89,40 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
     return results.reduce((prev, cur) => [...prev, ...cur], []);
   }, 300);
 
+  const sortResults = useCallback(
+    (unsortedResults: Result[]) => {
+      const exactMatches: number[] = [];
+      const lowerQuery = query.toLowerCase();
+      unsortedResults.forEach((value, index) => {
+        if (value.type !== "user") {
+          if (value.ref.name.toLowerCase() === lowerQuery) {
+            exactMatches.push(index);
+          }
+        } else {
+          if (
+            value.ref.displayName?.toLowerCase() === lowerQuery ||
+            value.ref.username.toLowerCase() === lowerQuery
+          ) {
+            exactMatches.push(index);
+          }
+        }
+      });
+
+      const results = [...unsortedResults];
+      exactMatches.forEach((resultIndex, index) => {
+        const item = results.splice(resultIndex, 1);
+        results.unshift(...item);
+      });
+      return results;
+    },
+    [query],
+  );
+
   useEffect(() => {
-    const qs = new URLSearchParams(location.search);
     const query = qs.get("q") || "";
     setQuery(query);
     if (onQueryChange) onQueryChange(query);
-  }, [location.search]);
+  }, [onQueryChange, qs]);
 
   useEffect(() => {
     setState("loading");
@@ -106,33 +135,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
       setResults(sortResults(results));
       setState("ready");
     });
-  }, [query]);
-
-  const sortResults = (unsortedResults: Result[]) => {
-    const exactMatches: number[] = [];
-    const lowerQuery = query.toLowerCase();
-    unsortedResults.forEach((value, index) => {
-      if (value.type !== "user") {
-        if (value.ref.name.toLowerCase() === lowerQuery) {
-          exactMatches.push(index);
-        }
-      } else {
-        if (
-          value.ref.displayName?.toLowerCase() === lowerQuery ||
-          value.ref.username.toLowerCase() === lowerQuery
-        ) {
-          exactMatches.push(index);
-        }
-      }
-    });
-
-    const results = [...unsortedResults];
-    exactMatches.forEach((resultIndex, index) => {
-      const item = results.splice(resultIndex, 1);
-      results.unshift(...item);
-    });
-    return results;
-  };
+  }, [fetch, sortResults, query]);
 
   return (
     <Layout
@@ -188,7 +191,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
                   <div className="font-semibold leading-6">
                     <Link href="/addBottle">
                       <span className="absolute inset-x-0 -top-px bottom-0" />
-                      Can't find a bottle?
+                      {"Can't find a bottle?"}
                     </Link>
                   </div>
                   <div className="text-highlight-dark mt-1 flex gap-x-1 leading-5">

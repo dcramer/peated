@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
+import { type UrlObject } from "url";
 import classNames from "../lib/classNames";
 
 type ButtonColor = "primary" | "default" | "highlight" | undefined;
@@ -24,7 +25,7 @@ type BaseProps = {
 
 type ConditionalProps =
   | {
-      href?: string;
+      href?: string | UrlObject;
       onClick?: never;
     }
   | {

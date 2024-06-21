@@ -1,13 +1,21 @@
 import { type Metadata } from "next";
+import { type ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Favorites",
 };
 
 export default function Layout({
+  auth,
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  auth: ReactNode;
+  children: ReactNode;
 }>) {
-  return children;
+  return (
+    <>
+      {auth}
+      {children}
+    </>
+  );
 }

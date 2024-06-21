@@ -1,16 +1,23 @@
-import type { Metadata } from "next";
+import "@fontsource/raleway/index.css";
+import "@peated/web-next/styles/index.css";
+import type { Metadata, Viewport } from "next";
 import Fathom from "../components/Fathom";
 import config from "../config";
-import "./globals.css";
+// import "./globals.css";
 import { getSession } from "./login/actions";
 import Providers from "./providers/providers";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1.0,
+  userScalable: false,
+  themeColor: config.THEME_COLOR,
+};
 
 export const metadata: Metadata = {
   title: "Peated",
   description: config.DESCRIPTION,
-  viewport:
-    "width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0",
-  themeColor: config.THEME_COLOR,
 };
 
 export default async function RootLayout({
