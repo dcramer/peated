@@ -51,7 +51,7 @@ export default function EntityForm({
     defaultValues: {
       name: initialData.name,
       shortName: initialData.shortName,
-      country: initialData.country,
+      country: initialData.country?.name,
       region: initialData.region,
       address: initialData.address,
       type: initialData.type,
