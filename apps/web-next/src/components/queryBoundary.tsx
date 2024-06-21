@@ -5,7 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import EmptyActivity from "./emptyActivity";
 import Spinner from "./spinner";
 
-export default ({
+export default function QueryBoundary({
   children = <Spinner />,
   fallback = ErrorView,
   loading,
@@ -13,15 +13,17 @@ export default ({
   children: ReactNode;
   fallback?: any;
   loading?: ReactNode;
-}) => (
-  <QueryErrorResetBoundary>
-    {({ reset }) => (
-      <ErrorBoundary onReset={reset} fallbackRender={fallback}>
-        {children}
-      </ErrorBoundary>
-    )}
-  </QueryErrorResetBoundary>
-);
+}) {
+  return (
+    <QueryErrorResetBoundary>
+      {({ reset }) => (
+        <ErrorBoundary onReset={reset} fallbackRender={fallback}>
+          {children}
+        </ErrorBoundary>
+      )}
+    </QueryErrorResetBoundary>
+  );
+}
 
 const ErrorView = ({ error, resetErrorBoundary }: any) => {
   // const isOnline = useOnlineStatus();

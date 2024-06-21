@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";

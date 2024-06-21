@@ -1,10 +1,4 @@
 import type { ReactNode } from "react";
-
-// import { AppFooter } from "./appFooter";
-// import AppHeader from "./appHeader";
-// import Footer from "./footer";
-// import Header from "./header";
-
 import { AppFooter } from "./appFooter";
 import AppHeader from "./appHeader";
 import Footer from "./footer";

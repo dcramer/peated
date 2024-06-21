@@ -1,12 +1,14 @@
+"use client";
+
 import { type PagingRel } from "@peated/server/types";
-import { useLocation } from "@remix-run/react";
+import { useSearchParams } from "next/navigation";
 import { buildQueryString } from "../lib/urls";
 import Button from "./button";
 
 export default function PaginationButtons({ rel }: { rel?: PagingRel | null }) {
-  if (!rel) return null;
+  const searchParams = useSearchParams();
 
-  const location = useLocation();
+  if (!rel) return null;
 
   return (
     <nav
@@ -18,7 +20,7 @@ export default function PaginationButtons({ rel }: { rel?: PagingRel | null }) {
           href={
             rel.prevCursor
               ? {
-                  search: buildQueryString(location.search, {
+                  search: buildQueryString(searchParams, {
                     cursor: rel.prevCursor,
                   }),
                 }
@@ -32,7 +34,7 @@ export default function PaginationButtons({ rel }: { rel?: PagingRel | null }) {
           href={
             rel.nextCursor
               ? {
-                  search: buildQueryString(location.search, {
+                  search: buildQueryString(searchParams, {
                     cursor: rel.nextCursor,
                   }),
                 }

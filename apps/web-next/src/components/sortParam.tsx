@@ -1,8 +1,10 @@
+"use client";
+
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { buildQueryString } from "@peated/web/lib/urls";
 import Link from "next/link";
-import { useLocation } from "react-router-dom";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export default function SortParam({
   name,
@@ -15,13 +17,14 @@ export default function SortParam({
   sort?: string | null;
   defaultOrder?: "asc" | "desc";
 }) {
-  const location = useLocation();
   const invertSort = `-${name}`;
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   return (
     <Link
       href={{
-        pathname: location.pathname,
-        search: buildQueryString(location.search, {
+        pathname: pathname,
+        search: buildQueryString(searchParams, {
           sort:
             sort === name
               ? invertSort

@@ -33,22 +33,23 @@ export function getSafeRedirect(value: string | null) {
 
 export function redirectToAuth({
   pathname = "/",
-  search = "",
+  searchParams,
 }: {
   pathname?: string;
-  search?: string;
+  searchParams?: URLSearchParams;
 }) {
-  return redirect(getAuthRedirect({ pathname, search }));
+  return redirect(getAuthRedirect({ pathname, searchParams }));
 }
 
 export function getAuthRedirect({
   pathname = "/",
-  search = "",
+  searchParams,
 }: {
   pathname?: string;
-  search?: string;
+  searchParams?: URLSearchParams;
 }) {
-  const redirectTo = pathname + search;
+  const redirectTo =
+    pathname + (searchParams ? `?${searchParams.toString()}` : "");
 
   return `/login?redirectTo=${encodeURIComponent(redirectTo)}`;
 }

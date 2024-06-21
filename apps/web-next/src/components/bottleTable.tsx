@@ -30,7 +30,7 @@ export default function BottleTable({
   sort?: string;
 }) {
   const searchParams = useSearchParams();
-  const sort = initialSort ?? new URLSearchParams(location.search).get("sort");
+  const sort = initialSort ?? searchParams.get("sort");
 
   let lastGroup: Grouper;
   return (

@@ -9,12 +9,12 @@ import BottlePriceHistory from "./bottlePriceHistory.client";
 import Button from "./button";
 import { ClientOnly } from "./clientOnly";
 import CollectionAction from "./collectionAction";
-import LoadingIndicator from "./loadingIndicator";
 import QRCodeClient from "./qrcode.client";
 import QueryBoundary from "./queryBoundary";
 import ShareButton from "./shareButton";
 import SidePanel, { SidePanelHeader } from "./sidePanel";
 import SkeletonButton from "./skeletonButton";
+import Spinner from "./spinner";
 
 export default function BottlePanel({
   bottle,
@@ -111,11 +111,7 @@ export default function BottlePanel({
           </ClientOnly>
         </div>
       </div>
-      {isLoading ? (
-        <LoadingIndicator />
-      ) : data ? (
-        <BottleOverview bottle={data} />
-      ) : null}
+      {isLoading ? <Spinner /> : data ? <BottleOverview bottle={data} /> : null}
     </SidePanel>
   );
 }
