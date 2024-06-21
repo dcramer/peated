@@ -6,16 +6,9 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({
-  auth,
   children,
 }: Readonly<{
-  auth: ReactNode;
   children: ReactNode;
 }>) {
-  return (
-    <>
-      {auth}
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

@@ -4,7 +4,8 @@ import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
 
 import useAuth from "@peated/web/hooks/useAuth";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { getAuthRedirect } from "../lib/auth";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 import { ProfileDropdown } from "./profileDropdown";
@@ -15,6 +16,7 @@ export default function AppHeader() {
   const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -86,9 +88,10 @@ export default function AppHeader() {
       ) : (
         <div className="mflex items-center gap-x-2">
           <NavLink
-            href={`/login?redirectTo=${encodeURIComponent(
-              location.pathname + location.search,
-            )}`}
+            href={`/login?redirectTo=${getAuthRedirect({
+              pathname,
+              searchParams,
+            })}`}
           >
             <div className="h-8 w-8 sm:h-8 sm:w-8">
               <UserAvatar />
