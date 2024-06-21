@@ -45,13 +45,7 @@ const BasicLogin = () => {
   );
 };
 
-export default function Login({
-  searchParams,
-}: {
-  searchParams: Record<string, any>;
-}) {
-  const redirectTo = searchParams.redirectTo;
-
+export default function Login() {
   return (
     <LayoutSplash>
       <div className="flex flex-grow items-center justify-center px-4">
