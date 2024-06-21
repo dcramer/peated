@@ -1,14 +1,18 @@
-import { sentryLink } from "@peated/server/src/lib/trpc";
+import { makeTRPCClient, sentryLink } from "@peated/server/src/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
 import { createTRPCNext } from "@trpc/next";
+import { ssrPrepass } from "@trpc/next/ssrPrepass";
 import {
   TRPCClientError,
   createTRPCReact,
   httpBatchLink,
 } from "@trpc/react-query";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import config from "../config";
 
 export const trpcClient = createTRPCNext<AppRouter>({
+  ssr: true,
+  ssrPrepass,
   config(opts) {
     return {
       links: [
@@ -76,3 +80,9 @@ export function isTRPCClientError(
     cause instanceof TRPCClientError || Object.hasOwn(cause as any, "data")
   );
 }
+
+const proxyClient = makeTRPCClient(config.API_SERVER);
+
+const helpers = createServerSideHelpers({
+  client: proxyClient,
+});
