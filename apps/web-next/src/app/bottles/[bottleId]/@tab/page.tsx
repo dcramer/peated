@@ -4,7 +4,7 @@ import BottlePriceHistory, {
 } from "@peated/web/components/bottlePriceHistory";
 import { summarize } from "@peated/web/lib/markdown";
 import { Suspense } from "react";
-import { getBottle } from "../utils.server";
+import { getBottle } from "../../utils.server";
 
 // export const sitemap: SitemapFunction = async ({
 //   config: sitemapConfig,
@@ -40,27 +40,17 @@ export async function generateMetadata({
 
   const description = summarize(bottle.description || "", 200);
 
-  return [
-    {
+  return {
+    title: bottle.fullName,
+    description,
+    openGraph: {
       title: bottle.fullName,
+      description: description,
     },
-    {
-      name: "description",
-      content: description,
+    twitter: {
+      card: "product",
     },
-    {
-      property: "og:title",
-      content: bottle.fullName,
-    },
-    {
-      property: "og:description",
-      content: description,
-    },
-    {
-      property: "twitter:card",
-      content: "product",
-    },
-  ];
+  };
 }
 
 export default async function BottleDetails({

@@ -1,3 +1,5 @@
+"use client";
+
 import type { PolymorphicProps } from "@peated/web/types";
 import { motion } from "framer-motion";
 import type { ElementType } from "react";

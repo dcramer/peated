@@ -1,8 +1,23 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getBottle } from "../../../utils.server";
 
-export default async function BottleActivity({
+export async function generateMetadata({
+  params: { bottleId },
+}: {
+  params: { bottleId: string };
+}) {
+  const bottle = await getBottle(Number(bottleId));
+
+  return [
+    {
+      title: `Tastings for ${bottle.fullName}`,
+    },
+  ];
+}
+
+export default async function BottleTastings({
   params: { bottleId },
 }: {
   params: { bottleId: string };
