@@ -5,7 +5,7 @@ import Content from "./content";
 
 export default async function Page() {
   if (!(await isLoggedIn())) {
-    return redirectToAuth({ pathname: "/friends " });
+    return redirectToAuth({ pathname: "/friends" });
   }
   const trpcClient = await getTrpcClient();
   const friendList = await trpcClient.friendList.query();
