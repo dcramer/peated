@@ -7,7 +7,11 @@ type Props = {
   children?: ReactNode;
 };
 
-export default ({ mobileOnly = false, children, color = "default" }: Props) => {
+export default function Header({
+  mobileOnly = false,
+  children,
+  color = "default",
+}: Props) {
   return (
     <header
       className={classNames(
@@ -31,4 +35,4 @@ export default ({ mobileOnly = false, children, color = "default" }: Props) => {
       </div>
     </header>
   );
-};
+}

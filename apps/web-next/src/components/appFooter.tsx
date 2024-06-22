@@ -4,7 +4,7 @@ import PeatedGlyph from "./assets/Glyph";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 
-export function AppFooter() {
+export default function AppFooter() {
   return (
     <nav className="sm:min-h-18 mx-auto flex min-h-14 w-full max-w-4xl items-center justify-center gap-x-6 px-3 sm:px-3 lg:px-0">
       <NavLink href="/">

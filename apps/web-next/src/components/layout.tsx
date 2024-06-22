@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { AppFooter } from "./appFooter";
+import { Suspense, type ReactNode } from "react";
+import AppFooter from "./appFooter";
 import AppHeader from "./appHeader";
 import Footer from "./footer";
 import Header from "./header";
@@ -10,23 +10,12 @@ export default function Layout({
   header,
   footer,
   rightSidebar,
-  splash,
 }: {
   children: ReactNode;
   header?: ReactNode;
   footer?: ReactNode;
   rightSidebar?: ReactNode;
-  splash?: boolean;
-  onSave?: any;
 }) {
-  if (splash) {
-    return (
-      <main className="mx-auto flex h-screen max-w-xl items-center justify-center p-4 lg:p-8">
-        <div className="flex-auto">{children}</div>
-      </main>
-    );
-  }
-
   return (
     <>
       {header !== undefined ? (
@@ -37,7 +26,9 @@ export default function Layout({
         </Header>
       )}
 
-      <Sidebar />
+      <Suspense>
+        <Sidebar />
+      </Suspense>
 
       <div className="flex">
         <main className="w-full max-w-7xl flex-auto lg:pl-64">
