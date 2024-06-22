@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "Login",
 };
 
-const BasicLogin = () => {
+function BasicLogin() {
   return (
     <Form action={authenticate} method="post">
       <TextField
@@ -43,7 +43,7 @@ const BasicLogin = () => {
       </div>
     </Form>
   );
-};
+}
 
 export default function Login() {
   return (

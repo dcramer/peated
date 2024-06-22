@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import Fathom from "../components/Fathom";
 import config from "../config";
 // import "./globals.css";
+import React from "react";
 import Layout from "../components/layout";
 import { getSession } from "../lib/session.server";
 import Providers from "./providers/providers";
@@ -23,9 +24,14 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  sidebar,
+  ...props
 }: Readonly<{
   children: React.ReactNode;
+  sidebar: React.ReactNode;
 }>) {
+  console.log({ sidebar, props });
+
   const session = await getSession();
 
   return (
@@ -37,7 +43,7 @@ export default async function RootLayout({
             accessToken: session.accessToken,
           }}
         >
-          <Layout>{children}</Layout>
+          <Layout rightSidebar={sidebar}>{children}</Layout>
 
           {config.FATHOM_SITE_ID && (
             <Fathom

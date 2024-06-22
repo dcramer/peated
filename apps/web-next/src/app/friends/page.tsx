@@ -1,7 +1,13 @@
+import SimpleHeader from "@peated/web/components/simpleHeader";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import type { Metadata } from "next";
 import Content from "./content";
+
+export const metadata: Metadata = {
+  title: "Friends",
+};
 
 export default async function Page() {
   if (!(await isLoggedIn())) {
@@ -10,5 +16,10 @@ export default async function Page() {
   const trpcClient = await getTrpcClient();
   const friendList = await trpcClient.friendList.query();
 
-  return <Content friendList={friendList} />;
+  return (
+    <>
+      <SimpleHeader>Favorites</SimpleHeader>
+      <Content friendList={friendList} />
+    </>
+  );
 }
