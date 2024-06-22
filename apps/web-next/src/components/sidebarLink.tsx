@@ -25,8 +25,8 @@ export default forwardRef(function SidebarLink<
   ref: PolymorphicRef<E>,
 ) {
   const Component = as ?? defaultElement;
-
   const Icon = icon;
+
   return (
     <li>
       <Component
