@@ -11,7 +11,6 @@ import QueryBoundary from "@peated/web/components/queryBoundary";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import Tabs from "@peated/web/components/tabs";
-import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc, trpcClient } from "@peated/web/lib/trpc";
 import Link from "next/link";
@@ -48,10 +47,10 @@ import { type ReactNode } from "react";
 
 export default function BottleDetails({
   params,
-  children,
+  tab,
 }: {
   params: Record<string, any>;
-  children: ReactNode;
+  tab: ReactNode;
 }) {
   const { user } = useAuth();
 
@@ -149,20 +148,7 @@ export default function BottleDetails({
         </Tabs.Item>
       </Tabs>
 
-      {children}
-
-      {bottle.createdBy && (
-        <div className="text-light mt-8 text-center text-sm sm:text-left">
-          This bottle was first added by{" "}
-          <Link
-            href={`/users/${bottle.createdBy.username}`}
-            className="font-medium hover:underline"
-          >
-            {bottle.createdBy.displayName}
-          </Link>{" "}
-          {bottle.createdAt && <TimeSince date={bottle.createdAt} />}
-        </div>
-      )}
+      {tab}
     </>
   );
 }

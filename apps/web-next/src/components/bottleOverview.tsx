@@ -11,6 +11,7 @@ import BottleTagDistribution, {
 import DefinitionList from "./definitionList";
 import Heading from "./heading";
 import Markdown from "./markdown";
+import TimeSince from "./timeSince";
 
 export default function BottleOverview({ bottle }: { bottle: Bottle }) {
   return (
@@ -107,6 +108,19 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
           />
         </div>
       </div>
+
+      {bottle.createdBy && (
+        <div className="text-light mt-8 text-center text-sm sm:text-left">
+          This bottle was first added by{" "}
+          <Link
+            href={`/users/${bottle.createdBy.username}`}
+            className="font-medium hover:underline"
+          >
+            {bottle.createdBy.displayName}
+          </Link>{" "}
+          {bottle.createdAt && <TimeSince date={bottle.createdAt} />}
+        </div>
+      )}
     </>
   );
 }
