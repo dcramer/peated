@@ -1,5 +1,17 @@
 import type { User } from "@peated/server/types";
 
+export function UserAvatarSkeleton({ size }: { size?: number }) {
+  return (
+    <div
+      className="h-full w-full animate-pulse rounded bg-slate-800"
+      style={{
+        width: size,
+        height: size,
+      }}
+    />
+  );
+}
+
 export default function UserAvatar({
   user,
   size,

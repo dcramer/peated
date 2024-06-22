@@ -1,12 +1,6 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/app/favorites/layout.tsx.old"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "compilerOptions": {
     "lib": ["esnext", "dom", "dom.iterable"],
     "baseUrl": ".",

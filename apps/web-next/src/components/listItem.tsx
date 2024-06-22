@@ -1,5 +1,4 @@
 import type { PolymorphicProps } from "@peated/web/types";
-import { motion } from "framer-motion";
 import type { ElementType } from "react";
 import classNames from "../lib/classNames";
 
@@ -8,7 +7,7 @@ type Props = {
   color?: "default" | "highlight";
 };
 
-const defaultElement = motion.div;
+const defaultElement = "div";
 
 export default function ListItem<
   E extends ElementType = typeof defaultElement,
