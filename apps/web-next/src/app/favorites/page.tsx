@@ -1,15 +1,16 @@
-"use client";
-
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import PaginationButtons from "@peated/web/components/paginationButtons";
-import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpcClient } from "@peated/web/lib/trpc";
+import { redirectToAuth } from "@peated/web/lib/auth";
+import { isLoggedIn } from "@peated/web/lib/auth.server";
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
-export default function Page() {
-  useAuthRequired();
-
-  const [favoriteList] = trpcClient.collectionBottleList.useSuspenseQuery({
+export default async function Page() {
+  if (!(await isLoggedIn())) {
+    return redirectToAuth({ pathname: "/favorites" });
+  }
+  const trpcClient = await getTrpcClient();
+  const favoriteList = await trpcClient.collectionBottleList.query({
     user: "me",
     collection: "default",
   });
