@@ -571,6 +571,9 @@ importers:
       '@trpc/server':
         specifier: 11.0.0-rc.413
         version: 11.0.0-rc.413
+      dayjs:
+        specifier: ^1.11.11
+        version: 1.11.11
       fathom-client:
         specifier: ^3.7.0
         version: 3.7.0
