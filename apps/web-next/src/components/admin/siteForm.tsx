@@ -11,10 +11,10 @@ import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
 import { isTRPCClientError } from "@peated/web/lib/trpc";
-import { Form } from "@remix-run/react";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
+import Form from "../form";
 
 type FormSchemaType = z.infer<typeof ExternalSiteSchemaInputSchema>;
 
