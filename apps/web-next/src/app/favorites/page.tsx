@@ -1,9 +1,15 @@
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import PaginationButtons from "@peated/web/components/paginationButtons";
+import SimpleHeader from "@peated/web/components/simpleHeader";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Favorites",
+};
 
 export default async function Page() {
   if (!(await isLoggedIn())) {
@@ -17,6 +23,7 @@ export default async function Page() {
 
   return (
     <>
+      <SimpleHeader>Favorites</SimpleHeader>
       {favoriteList.results.length ? (
         <BottleTable bottleList={favoriteList.results} />
       ) : (

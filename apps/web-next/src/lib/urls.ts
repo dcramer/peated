@@ -5,13 +5,13 @@ export function getEntityUrl(entity: Entity) {
 }
 
 export function buildQueryString(
-  searchParams: URLSearchParams,
+  searchParams: URLSearchParams | Record<string, string | string[]>,
   newParams: Record<string, any>,
 ): string {
   const newEntries = Array.from(Object.entries(newParams)).filter(([k, v]) => {
     return !k || v === undefined || v === null;
   });
-  Array.from(searchParams.entries()).forEach(([k, v]) => {
+  Array.from(Object.entries(searchParams)).forEach(([k, v]) => {
     if (!newParams[k]) {
       newEntries.push([k, v]);
     }
