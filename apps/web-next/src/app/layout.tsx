@@ -1,5 +1,5 @@
 import "@fontsource/raleway/index.css";
-import "@peated/web-next/styles/index.css";
+import "@peated/web/styles/index.css";
 import type { Metadata, Viewport } from "next";
 import Fathom from "../components/Fathom";
 import config from "../config";

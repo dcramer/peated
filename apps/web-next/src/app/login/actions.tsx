@@ -1,6 +1,6 @@
 import { makeTRPCClient } from "@peated/server/src/lib/trpc";
-import config from "@peated/web-next/config";
-import { sessionOptions, type SessionData } from "@peated/web-next/lib/auth";
+import config from "@peated/web/config";
+import { sessionOptions, type SessionData } from "@peated/web/lib/auth";
 import { TRPCClientError } from "@trpc/client";
 import { getIronSession } from "iron-session";
 import { revalidatePath } from "next/cache";

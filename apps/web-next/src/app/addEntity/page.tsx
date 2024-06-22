@@ -1,7 +1,7 @@
 "use client";
 
-import useAuthRequired from "@peated/web-next/hooks/useAuthRequired";
 import EntityForm from "@peated/web/components/entityForm";
+import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { trpcClient } from "@peated/web/lib/trpc";
 import { useRouter } from "next/navigation";
 

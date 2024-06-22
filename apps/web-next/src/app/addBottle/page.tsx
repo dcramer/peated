@@ -2,10 +2,10 @@
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity } from "@peated/server/types";
-import useAuthRequired from "@peated/web-next/hooks/useAuthRequired";
-import { trpcClient } from "@peated/web-next/lib/trpc";
 import BottleForm from "@peated/web/components/bottleForm";
 import Spinner from "@peated/web/components/spinner";
+import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { trpcClient } from "@peated/web/lib/trpc";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 

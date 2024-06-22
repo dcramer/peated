@@ -17,8 +17,6 @@
       }
     ],
     "paths": {
-      "@peated/web-next/*": ["./src/*"],
-      // COMPAT: remove when migrated
       "@peated/web/*": ["./src/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     },

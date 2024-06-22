@@ -1,5 +1,5 @@
-import config from "@peated/web-next/config";
-import { ApiClient } from "@peated/web-next/lib/api";
+import config from "@peated/web/config";
+import { ApiClient } from "@peated/web/lib/api";
 import { createContext, useContext } from "react";
 
 const ApiContext = createContext<ApiClient>(

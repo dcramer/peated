@@ -1,10 +1,10 @@
-import PeatedLogo from "@peated/web-next/components/assets/Logo";
-import Button from "@peated/web-next/components/button";
-import Form from "@peated/web-next/components/form";
-import GoogleLoginButton from "@peated/web-next/components/googleLoginButton";
-import LayoutSplash from "@peated/web-next/components/layoutSplash";
-import TextField from "@peated/web-next/components/textField";
-import config from "@peated/web-next/config";
+import PeatedLogo from "@peated/web/components/assets/Logo";
+import Button from "@peated/web/components/button";
+import Form from "@peated/web/components/form";
+import GoogleLoginButton from "@peated/web/components/googleLoginButton";
+import LayoutSplash from "@peated/web/components/layoutSplash";
+import TextField from "@peated/web/components/textField";
+import config from "@peated/web/config";
 import { type Metadata } from "next";
 import Link from "next/link";
 import { authenticate } from "./actions";

@@ -16,4 +16,4 @@ Sentry.init({
   debug: false,
 });
 
-Sentry.setTag("service", "@peated/web-next");
+Sentry.setTag("service", "@peated/web");
