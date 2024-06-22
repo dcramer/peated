@@ -7,46 +7,42 @@ import { AuthProvider } from "@peated/web-next/hooks/useAuth";
 import { OnlineStatusProvider } from "@peated/web-next/hooks/useOnlineStatus";
 import useSingletonQueryClient from "@peated/web-next/hooks/useSingletonQueryClient";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { setUser } from "@sentry/nextjs";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { type SessionData } from "../../lib/auth";
 import TRPCProvider from "./trpc";
 
 export default function Providers({
   children,
-  session,
+  session: { user, accessToken },
 }: {
   children: React.ReactNode;
   session: SessionData;
 }) {
-  // if (user) {
-  //   Sentry.setUser({
-  //     id: `${user?.id}`,
-  //     username: user?.username,
-  //     email: user?.email,
-  //   });
-  // } else {
-  //   Sentry.setUser(null);
-  // }
+  setUser(
+    user
+      ? {
+          id: `${user?.id}`,
+          username: user?.username,
+          email: user?.email,
+        }
+      : null,
+  );
 
   const hydrated = useHydrated();
   const queryClient = useSingletonQueryClient({ ssr: !hydrated });
-
-  // const dehydratedState = useDehydratedState();
 
   return (
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
       <TRPCProvider
         queryClient={queryClient}
-        accessToken={session.accessToken}
-        key={session.accessToken}
+        accessToken={accessToken}
+        key={accessToken}
       >
         <QueryClientProvider client={queryClient}>
           <OnlineStatusProvider>
-            <AuthProvider user={session.user}>
-              <ApiProvider
-                accessToken={session.accessToken}
-                server={config.API_SERVER}
-              >
+            <AuthProvider user={user}>
+              <ApiProvider accessToken={accessToken} server={config.API_SERVER}>
                 {children}
               </ApiProvider>
             </AuthProvider>
