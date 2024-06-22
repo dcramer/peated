@@ -1,4 +1,4 @@
-import { makeTRPCClient, sentryLink } from "@peated/server/src/lib/trpc";
+import { sentryLink } from "@peated/server/src/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
 import { createTRPCNext } from "@trpc/next";
 import { ssrPrepass } from "@trpc/next/ssrPrepass";
@@ -7,8 +7,28 @@ import {
   createTRPCReact,
   httpBatchLink,
 } from "@trpc/react-query";
-import { createServerSideHelpers } from "@trpc/react-query/server";
 import config from "../config";
+
+export const trpc = createTRPCReact<AppRouter>({
+  overrides: {
+    useMutation: {
+      /**
+       * This function is called whenever a `.useMutation` succeeds
+       **/
+      async onSuccess(opts) {
+        /**
+         * @note that order here matters:
+         * The order here allows route changes in `onSuccess` without
+         * having a flash of content change whilst redirecting.
+         **/
+        // Calls the `onSuccess` defined in the `useQuery()`-options:
+        await opts.originalFn();
+        // Invalidate all queries in the react-query cache:
+        await opts.queryClient.invalidateQueries();
+      },
+    },
+  },
+});
 
 export const trpcClient = createTRPCNext<AppRouter>({
   ssr: true,
@@ -34,27 +54,6 @@ export const trpcClient = createTRPCNext<AppRouter>({
   },
 });
 
-export const trpc = createTRPCReact<AppRouter>({
-  overrides: {
-    useMutation: {
-      /**
-       * This function is called whenever a `.useMutation` succeeds
-       **/
-      async onSuccess(opts) {
-        /**
-         * @note that order here matters:
-         * The order here allows route changes in `onSuccess` without
-         * having a flash of content change whilst redirecting.
-         **/
-        // Calls the `onSuccess` defined in the `useQuery()`-options:
-        await opts.originalFn();
-        // Invalidate all queries in the react-query cache:
-        await opts.queryClient.invalidateQueries();
-      },
-    },
-  },
-});
-
 export function isTRPCClientError(
   cause: unknown,
 ): cause is TRPCClientError<AppRouter> {
@@ -62,9 +61,3 @@ export function isTRPCClientError(
     cause instanceof TRPCClientError || Object.hasOwn(cause as any, "data")
   );
 }
-
-const proxyClient = makeTRPCClient(config.API_SERVER);
-
-const helpers = createServerSideHelpers({
-  client: proxyClient,
-});

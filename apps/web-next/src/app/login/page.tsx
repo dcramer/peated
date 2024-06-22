@@ -5,9 +5,9 @@ import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import LayoutSplash from "@peated/web/components/layoutSplash";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
+import { authenticate } from "@peated/web/lib/auth.server";
 import { type Metadata } from "next";
 import Link from "next/link";
-import { authenticate } from "./actions";
 
 // export const sitemap: SitemapFunction = () => ({
 //   exclude: true,
