@@ -10,11 +10,9 @@ function RatingIcon({ rating }: { rating: number }) {
 }
 
 export default function BottleReviews({ bottleId }: { bottleId: number }) {
-  const { data } = trpc.reviewList.useQuery({
+  const [data] = trpc.reviewList.useSuspenseQuery({
     bottle: bottleId,
   });
-
-  if (!data) return null;
 
   const { results } = data;
 
