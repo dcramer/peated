@@ -3,8 +3,6 @@ import Button from "@peated/web/components/button";
 import CollectionAction from "@peated/web/components/collectionAction";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
-import Tabs, { TabItem } from "@peated/web/components/tabs";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { getBottle } from "../utils.server";
@@ -13,11 +11,9 @@ import ModActions from "./modActions";
 export default async function Layout({
   params,
   children,
-  tab,
 }: {
   params: Record<string, any>;
   children: ReactNode;
-  tab: ReactNode;
 }) {
   const bottleId = Number(params.bottleId);
   const bottle = await getBottle(bottleId);
@@ -54,25 +50,7 @@ export default async function Layout({
         </div>
       </div>
 
-      {tab ? (
-        <>
-          <Tabs fullWidth border>
-            <TabItem as={Link} href={baseUrl} controlled>
-              Overview
-            </TabItem>
-            <TabItem as={Link} href={`${baseUrl}/tastings`} controlled>
-              Tastings ({bottle.totalTastings.toLocaleString()})
-            </TabItem>
-            <TabItem as={Link} href={`${baseUrl}/prices`} controlled>
-              Prices
-            </TabItem>
-          </Tabs>
-
-          {tab}
-        </>
-      ) : (
-        children
-      )}
+      {children}
     </>
   );
 }
