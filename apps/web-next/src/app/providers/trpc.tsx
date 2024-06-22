@@ -1,8 +1,8 @@
 "use client";
 
 import { sentryLink } from "@peated/server/lib/trpc";
-import config from "@peated/web-next/config";
-import { trpc } from "@peated/web-next/lib/trpc";
+import config from "@peated/web/config";
+import { trpc } from "@peated/web/lib/trpc";
 import { httpBatchLink } from "@trpc/client";
 import type { ComponentProps } from "react";
 import { useState } from "react";

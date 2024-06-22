@@ -5,12 +5,12 @@ import {
   formatCategoryName,
   formatFlavorProfile,
 } from "@peated/server/lib/format";
-import { trpcClient } from "@peated/web-next/lib/trpc";
 import BottleTable from "@peated/web/components/bottleTable";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Layout from "@peated/web/components/layout";
 import SidebarLink from "@peated/web/components/sidebarLink";
+import { trpcClient } from "@peated/web/lib/trpc";
 import { buildQueryString } from "@peated/web/lib/urls";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";

@@ -18,4 +18,4 @@ Sentry.init({
   spotlight: process.env.NODE_ENV === "development",
 });
 
-Sentry.setTag("service", "@peated/web-next");
+Sentry.setTag("service", "@peated/web");

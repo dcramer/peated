@@ -2,16 +2,16 @@
 
 import { AtSymbolIcon } from "@heroicons/react/20/solid";
 import type { FriendStatus } from "@peated/server/types";
-import Layout from "@peated/web-next/components/layout";
-import SimpleHeader from "@peated/web-next/components/simpleHeader";
-import Spinner from "@peated/web-next/components/spinner";
-import useAuthRequired from "@peated/web-next/hooks/useAuthRequired";
-import { trpcClient } from "@peated/web-next/lib/trpc";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
 import ListItem from "@peated/web/components/listItem";
 import PaginationButtons from "@peated/web/components/paginationButtons";
+import SimpleHeader from "@peated/web/components/simpleHeader";
+import Spinner from "@peated/web/components/spinner";
 import UserAvatar from "@peated/web/components/userAvatar";
+import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { trpcClient } from "@peated/web/lib/trpc";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 

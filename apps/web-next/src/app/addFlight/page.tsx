@@ -1,7 +1,7 @@
 "use client";
 
-import useAuthRequired from "@peated/web-next/hooks/useAuthRequired";
 import FlightForm from "@peated/web/components/flightForm";
+import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc";
 import { useRouter } from "next/navigation";
 

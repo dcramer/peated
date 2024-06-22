@@ -1,12 +1,12 @@
 "use client";
 
-import Layout from "@peated/web-next/components/layout";
-import SimpleHeader from "@peated/web-next/components/simpleHeader";
-import Spinner from "@peated/web-next/components/spinner";
-import useAuthRequired from "@peated/web-next/hooks/useAuthRequired";
-import { trpcClient } from "@peated/web-next/lib/trpc";
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
+import SimpleHeader from "@peated/web/components/simpleHeader";
+import Spinner from "@peated/web/components/spinner";
+import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { trpcClient } from "@peated/web/lib/trpc";
 import { Suspense } from "react";
 
 export default function Page() {

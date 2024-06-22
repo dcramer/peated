@@ -1,4 +1,4 @@
-import config from "@peated/web-next/config";
+import config from "@peated/web/config";
 
 export type ApiRequestOptions = {
   method?: "GET" | "POST" | "DELETE" | "PUT";
