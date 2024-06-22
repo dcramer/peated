@@ -4,7 +4,8 @@ import type { Metadata, Viewport } from "next";
 import Fathom from "../components/Fathom";
 import config from "../config";
 // import "./globals.css";
-import { getSession } from "./login/actions";
+import Layout from "../components/layout";
+import { getSession } from "../lib/session.server";
 import Providers from "./providers/providers";
 
 export const viewport: Viewport = {
@@ -36,7 +37,7 @@ export default async function RootLayout({
             accessToken: session.accessToken,
           }}
         >
-          {children}
+          <Layout>{children}</Layout>
 
           {config.FATHOM_SITE_ID && (
             <Fathom

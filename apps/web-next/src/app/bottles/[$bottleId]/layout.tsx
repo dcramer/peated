@@ -7,7 +7,6 @@ import Button from "@peated/web/components/button";
 import { ClientOnly } from "@peated/web/components/clientOnly";
 import CollectionAction from "@peated/web/components/collectionAction";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
-import Layout from "@peated/web/components/layout";
 import QueryBoundary from "@peated/web/components/queryBoundary";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
@@ -81,7 +80,7 @@ export default function BottleDetails({
   const baseUrl = `/bottles/${bottle.id}`;
 
   return (
-    <Layout>
+    <>
       <div className="w-full p-3 lg:py-0">
         <BottleHeader bottle={bottle} />
 
@@ -164,6 +163,6 @@ export default function BottleDetails({
           {bottle.createdAt && <TimeSince date={bottle.createdAt} />}
         </div>
       )}
-    </Layout>
+    </>
   );
 }
