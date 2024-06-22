@@ -4,33 +4,19 @@ import { AtSymbolIcon } from "@heroicons/react/20/solid";
 import type { FriendStatus } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import Layout from "@peated/web/components/layout";
 import ListItem from "@peated/web/components/listItem";
 import PaginationButtons from "@peated/web/components/paginationButtons";
-import SimpleHeader from "@peated/web/components/simpleHeader";
-import Spinner from "@peated/web/components/spinner";
 import UserAvatar from "@peated/web/components/userAvatar";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { trpcClient } from "@peated/web/lib/trpc";
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 
 export default function Page() {
   useAuthRequired();
 
   const [friendList] = trpcClient.friendList.useSuspenseQuery();
 
-  return (
-    <Layout>
-      <SimpleHeader>Friends</SimpleHeader>
-      <Suspense fallback={<Spinner />}>
-        <Content friendList={friendList} />
-      </Suspense>
-    </Layout>
-  );
-}
-
-function Content({ friendList }) {
   const [friendStatus, setFriendStatus] = useState<
     Record<string, FriendStatus>
   >(
@@ -78,7 +64,7 @@ function Content({ friendList }) {
         {results.length ? (
           results.map(({ user, ...friend }) => {
             return (
-              <ListItem key={user.id}>
+              <ListItem as="li" key={user.id}>
                 <div className="flex flex-auto items-center space-x-4">
                   <UserAvatar size={48} user={user} />
                   <div className="flex-auto space-y-1 font-medium">
