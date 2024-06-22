@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";

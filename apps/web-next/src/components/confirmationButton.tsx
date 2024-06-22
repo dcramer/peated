@@ -1,6 +1,7 @@
+"use client";
+
 import type { PropsWithChildren } from "react";
 import { forwardRef, useState } from "react";
-import { ClientOnly } from "./clientOnly";
 import ConfirmationDialog from "./confirmationDialog.client";
 
 export default forwardRef<
@@ -16,20 +17,16 @@ export default forwardRef<
   return (
     <button {...props} ref={ref} onClick={() => setIsOpen(true)}>
       {children}
-      <ClientOnly>
-        {() => (
-          <ConfirmationDialog
-            isOpen={isOpen}
-            onContinue={() => {
-              setIsOpen(false);
-              onContinue();
-            }}
-            onCancel={() => {
-              setIsOpen(false);
-            }}
-          />
-        )}
-      </ClientOnly>
+      <ConfirmationDialog
+        isOpen={isOpen}
+        onContinue={() => {
+          setIsOpen(false);
+          onContinue();
+        }}
+        onCancel={() => {
+          setIsOpen(false);
+        }}
+      />
     </button>
   );
 });

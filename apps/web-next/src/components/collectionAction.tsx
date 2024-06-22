@@ -1,3 +1,5 @@
+"use client";
+
 import { StarIcon as StarIconFilled } from "@heroicons/react/20/solid";
 import { StarIcon } from "@heroicons/react/24/outline";
 import type { Bottle } from "@peated/server/types";
@@ -5,7 +7,7 @@ import { trpc } from "@peated/web/lib/trpc";
 import Button from "./button";
 
 export default function CollectionAction({ bottle }: { bottle: Bottle }) {
-  const { data: isCollected, isLoading } = trpc.collectionList.useQuery(
+  const [isCollected, { isLoading }] = trpc.collectionList.useSuspenseQuery(
     {
       bottle: bottle.id,
       user: "me",
@@ -14,11 +16,13 @@ export default function CollectionAction({ bottle }: { bottle: Bottle }) {
       select: (data) => data.results.length > 0,
     },
   );
-
   const favoriteBottleMutation = trpc.collectionBottleCreate.useMutation();
   const unfavoriteBottleMutation = trpc.collectionBottleDelete.useMutation();
 
-  if (isCollected === undefined) return null;
+  const isAnyLoading =
+    isLoading ||
+    favoriteBottleMutation.isPending ||
+    unfavoriteBottleMutation.isPending;
 
   return (
     <Button
@@ -35,7 +39,7 @@ export default function CollectionAction({ bottle }: { bottle: Bottle }) {
               collection: "default",
             });
       }}
-      disabled={isLoading}
+      disabled={isAnyLoading}
       color="primary"
     >
       {isCollected ? (

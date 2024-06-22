@@ -19,7 +19,7 @@ export default function TastingList({
   };
 
   return (
-    <ul className="sm:rounded">
+    <ul className="mt-1 sm:rounded">
       <AnimatePresence>
         {values
           .filter((t) => !deletedValues.includes(t.id))
