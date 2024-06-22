@@ -26,7 +26,7 @@ export default async function BottleAliases({
               <li key={alias.name} className="flex items-center gap-2">
                 <div>{alias.name}</div>
                 {alias.name === bottle.fullName && (
-                  <Chip size="small" color="highlight">
+                  <Chip as="div" size="small" color="highlight">
                     Canonical
                   </Chip>
                 )}
