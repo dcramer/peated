@@ -63,28 +63,23 @@ export default async function Layout({
 
   return (
     <>
-      <Suspense>
-        <div className="w-full p-3 lg:py-0">
-          <BottleHeader bottle={bottle} />
+      <div className="w-full p-3 lg:py-0">
+        <BottleHeader bottle={bottle} />
 
-          <div className="my-8 flex justify-center gap-4 lg:justify-start">
-            <Suspense fallback={<SkeletonButton className="w-10" />}>
-              <CollectionAction bottle={bottle} />
-            </Suspense>
+        <div className="my-8 flex justify-center gap-4 lg:justify-start">
+          <Suspense fallback={<SkeletonButton className="w-10" />}>
+            <CollectionAction bottle={bottle} />
+          </Suspense>
 
-            <Button href={`/bottles/${bottle.id}/addTasting`} color="primary">
-              Record a Tasting
-            </Button>
+          <Button href={`/bottles/${bottle.id}/addTasting`} color="primary">
+            Record a Tasting
+          </Button>
 
-            <ShareButton
-              title={bottle.fullName}
-              url={`/bottles/${bottle.id}`}
-            />
+          <ShareButton title={bottle.fullName} url={`/bottles/${bottle.id}`} />
 
-            <ModActions bottle={bottle} />
-          </div>
+          <ModActions bottle={bottle} />
         </div>
-      </Suspense>
+      </div>
 
       <Tabs fullWidth border>
         <TabItem as={Link} href={baseUrl} controlled>
