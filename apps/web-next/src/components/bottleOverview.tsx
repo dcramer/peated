@@ -101,7 +101,7 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
             </DefinitionList>
           </div>
           <img
-            src={RobotImage}
+            src={RobotImage.src}
             className="hidden h-40 w-40 sm:block"
             alt="peated robot"
           />
