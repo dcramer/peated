@@ -24,14 +24,13 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  auth,
   sidebar,
-  ...props
 }: Readonly<{
   children: React.ReactNode;
+  auth: React.ReactNode;
   sidebar: React.ReactNode;
 }>) {
-  console.log({ sidebar, props });
-
   const session = await getSession();
 
   return (
@@ -43,6 +42,8 @@ export default async function RootLayout({
             accessToken: session.accessToken,
           }}
         >
+          {auth}
+
           <Layout rightSidebar={sidebar}>{children}</Layout>
 
           {config.FATHOM_SITE_ID && (

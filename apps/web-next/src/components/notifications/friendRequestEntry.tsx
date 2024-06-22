@@ -1,9 +1,11 @@
+"use client";
+
 import type { FriendStatus } from "@peated/server/types";
 import { trpc } from "@peated/web/lib/trpc";
 import type { FriendRequestNotification } from "../../types";
 import Button from "../button";
 
-export default ({
+export default function FriendRequestEntry({
   notification: { ref },
   onArchive,
   onMarkRead,
@@ -11,7 +13,7 @@ export default ({
   notification: FriendRequestNotification;
   onArchive: () => void;
   onMarkRead: () => void;
-}) => {
+}) {
   const friendCreateMutation = trpc.friendCreate.useMutation({
     onSuccess: () => onArchive(),
   });
@@ -50,4 +52,4 @@ export default ({
       </Button>
     </div>
   );
-};
+}
