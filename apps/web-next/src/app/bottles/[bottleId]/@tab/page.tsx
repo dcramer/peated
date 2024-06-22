@@ -2,8 +2,9 @@ import BottleOverview from "@peated/web/components/bottleOverview";
 import BottlePriceHistory, {
   BottlePriceHistorySkeleton,
 } from "@peated/web/components/bottlePriceHistory";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { summarize } from "@peated/web/lib/markdown";
 import { Suspense } from "react";
+import { getBottle } from "../utils.server";
 
 // export const sitemap: SitemapFunction = async ({
 //   config: sitemapConfig,
@@ -30,13 +31,44 @@ import { Suspense } from "react";
 //   return output;
 // };
 
+export async function generateMetadata({
+  params: { bottleId },
+}: {
+  params: { bottleId: string };
+}) {
+  const bottle = await getBottle(Number(bottleId));
+
+  const description = summarize(bottle.description || "", 200);
+
+  return [
+    {
+      title: bottle.fullName,
+    },
+    {
+      name: "description",
+      content: description,
+    },
+    {
+      property: "og:title",
+      content: bottle.fullName,
+    },
+    {
+      property: "og:description",
+      content: description,
+    },
+    {
+      property: "twitter:card",
+      content: "product",
+    },
+  ];
+}
+
 export default async function BottleDetails({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.query(Number(bottleId));
+  const bottle = await getBottle(Number(bottleId));
   const stats = [
     {
       name: "Avg Rating",

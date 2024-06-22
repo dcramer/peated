@@ -4,39 +4,11 @@ import CollectionAction from "@peated/web/components/collectionAction";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import ModActions from "./modActions";
-
-// export const meta: MetaFunction<typeof loader> = ({ data }) => {
-//   if (!data) return [];
-
-//   const description = summarize(data.bottle.description || "", 200);
-
-//   return [
-//     {
-//       title: data.bottle.fullName,
-//     },
-//     {
-//       name: "description",
-//       content: description,
-//     },
-//     {
-//       property: "og:title",
-//       content: data.bottle.fullName,
-//     },
-//     {
-//       property: "og:description",
-//       content: description,
-//     },
-//     {
-//       property: "twitter:card",
-//       content: "product",
-//     },
-//   ];
-// };
+import { getBottle } from "./utils.server";
 
 export default async function Layout({
   params,
@@ -46,9 +18,8 @@ export default async function Layout({
   tab: ReactNode;
 }) {
   const bottleId = Number(params.bottleId);
+  const bottle = await getBottle(bottleId);
 
-  const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.query(bottleId);
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (bottle.id !== bottleId) {
     // const newPath = pathname.replace(
