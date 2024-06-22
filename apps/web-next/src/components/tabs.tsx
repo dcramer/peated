@@ -32,7 +32,7 @@ type ItemProps = {
 
 const defaultElement = "button";
 
-Tabs.Item = function TabItem<E extends ElementType = typeof defaultElement>({
+export function TabItem<E extends ElementType = typeof defaultElement>({
   as,
   active,
   count,
@@ -72,6 +72,8 @@ Tabs.Item = function TabItem<E extends ElementType = typeof defaultElement>({
       )}
     </Component>
   );
-};
+}
+
+Tabs.Item = TabItem;
 
 export default Tabs;
