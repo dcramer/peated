@@ -1,7 +1,7 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/src/lib/format";
 import Button from "@peated/web/components/button";
-import Tabs from "@peated/web/components/tabs";
+import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -43,20 +43,20 @@ export default async function Home({
         <div className="flex-1 overflow-hidden lg:w-8/12">
           <Tabs fullWidth border>
             {user && (
-              <Tabs.Item
+              <TabItem
                 as={Link}
                 href="?view=friends"
                 active={filter == "friends"}
               >
                 Friends
-              </Tabs.Item>
+              </TabItem>
             )}
-            <Tabs.Item as={Link} href="./" active={filter === "global"}>
+            <TabItem as={Link} href="./" active={filter === "global"}>
               Global
-            </Tabs.Item>
-            {/* <Tabs.Item href="?view=local" active={filterQ === "local"}>
+            </TabItem>
+            {/* <TabItem href="?view=local" active={filterQ === "local"}>
           Local
-        </Tabs.Item> */}
+        </TabItem> */}
           </Tabs>
           <ActivityContent
             tastingList={tastingList || { results: [] }}
@@ -77,7 +77,7 @@ export default async function Home({
           )}
           <div>
             <Tabs fullWidth>
-              <Tabs.Item active>Newest Bottles</Tabs.Item>
+              <TabItem active>Newest Bottles</TabItem>
             </Tabs>
             <table className="my-2 min-w-full">
               <tbody>
@@ -124,7 +124,7 @@ export default async function Home({
             </table>
 
             <Tabs fullWidth>
-              <Tabs.Item active>Market Prices</Tabs.Item>
+              <TabItem active>Market Prices</TabItem>
             </Tabs>
             <Suspense fallback={<PriceChangesSkeleton />}>
               <PriceChanges />
