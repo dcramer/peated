@@ -5,7 +5,7 @@ import useAuth from "../hooks/useAuth";
 import { trpc } from "../lib/trpc";
 import BottleHeader from "./bottleHeader";
 import BottleOverview from "./bottleOverview";
-import BottlePriceHistory from "./bottlePriceHistory.client";
+import BottlePriceHistory from "./bottlePriceHistory";
 import Button from "./button";
 import { ClientOnly } from "./clientOnly";
 import CollectionAction from "./collectionAction";
