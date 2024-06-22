@@ -9,11 +9,11 @@ type Item = {
 export function DistributionChart({
   items,
   totalCount,
-  to,
+  href,
 }: {
   items: Item[];
   totalCount: number;
-  to?: (item: Item) => string;
+  href?: (item: Item) => string;
 }) {
   const colorNames = [
     // "bg-slate-100 text-black border-slate-700 border",
@@ -45,7 +45,7 @@ export function DistributionChart({
     <div className="relative flex flex-col space-y-1 truncate text-xs font-bold">
       {results.map((item, index) => {
         const pct = (item.count / totalCount) * 100;
-        const itemTo = to && to(item);
+        const itemTo = href && href(item);
         return itemTo ? (
           <Link
             key={item.name}

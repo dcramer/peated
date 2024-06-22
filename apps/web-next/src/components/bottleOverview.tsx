@@ -1,9 +1,13 @@
+"use client";
+
 import type { Bottle } from "@peated/server/types";
 import RobotImage from "@peated/web/assets/robot.png";
 import Link from "next/link";
-import { Fragment } from "react";
+import { Fragment, Suspense } from "react";
 import BottleReviews from "./bottleReviews.client";
-import BottleTagDistribution from "./bottleTagDistribution.client";
+import BottleTagDistribution, {
+  BottleTagDistributionSkeleton,
+} from "./bottleTagDistribution.client";
 import { ClientOnly } from "./clientOnly";
 import DefinitionList from "./definitionList";
 import Heading from "./heading";
@@ -14,26 +18,11 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
   return (
     <>
       <div className="my-6 px-3 md:px-0">
-        <ClientOnly
-          fallback={
-            <div
-              className="animate-pulse bg-slate-800"
-              style={{ height: 200 }}
-            />
-          }
-        >
+        <ClientOnly fallback={<BottleTagDistributionSkeleton />}>
           {() => (
-            <QueryBoundary
-              fallback={
-                <div
-                  className="animate-pulse bg-slate-800"
-                  style={{ height: 200 }}
-                />
-              }
-              loading={<Fragment />}
-            >
+            <Suspense fallback={<BottleTagDistributionSkeleton />}>
               <BottleTagDistribution bottleId={bottle.id} />
-            </QueryBoundary>
+            </Suspense>
           )}
         </ClientOnly>
       </div>
@@ -129,7 +118,11 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
               </DefinitionList.Details>
             </DefinitionList>
           </div>
-          <img src={RobotImage} className="hidden h-40 w-40 sm:block" />
+          <img
+            src={RobotImage}
+            className="hidden h-40 w-40 sm:block"
+            alt="peated robot"
+          />
         </div>
       </div>
     </>

@@ -1,9 +1,9 @@
-"use client";
-
-import { type Bottle } from "@peated/server/types";
 import BottleOverview from "@peated/web/components/bottleOverview";
-import BottlePriceHistory from "@peated/web/components/bottlePriceHistory.client";
-import { ClientOnly } from "@peated/web/components/clientOnly";
+import BottlePriceHistory, {
+  BottlePriceHistorySkeleton,
+} from "@peated/web/components/bottlePriceHistory";
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { Suspense } from "react";
 
 // export const sitemap: SitemapFunction = async ({
 //   config: sitemapConfig,
@@ -30,11 +30,13 @@ import { ClientOnly } from "@peated/web/components/clientOnly";
 //   return output;
 // };
 
-export default function BottleDetails({
-  bottle,
+export default async function BottleDetails({
+  params: { bottleId },
 }: {
-  bottle: Bottle & { people: number };
+  params: { bottleId: string };
 }) {
+  const trpcClient = await getTrpcClient();
+  const bottle = await trpcClient.bottleById.query(Number(bottleId));
   const stats = [
     {
       name: "Avg Rating",
@@ -61,9 +63,9 @@ export default function BottleDetails({
         <div className="hidden lg:block">
           <div className="text-light leading-7">Price</div>
           <div className="flex items-center">
-            <ClientOnly fallback={<div className="h-[45px] animate-pulse" />}>
-              {() => <BottlePriceHistory bottleId={bottle.id} />}
-            </ClientOnly>
+            <Suspense fallback={<BottlePriceHistorySkeleton />}>
+              <BottlePriceHistory bottleId={bottle.id} />
+            </Suspense>
           </div>
         </div>
       </div>

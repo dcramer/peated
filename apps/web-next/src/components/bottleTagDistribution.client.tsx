@@ -1,16 +1,20 @@
+"use client";
+
 import { trpc } from "../lib/trpc";
 import { DistributionChart } from "./distributionChart";
+
+export function BottleTagDistributionSkeleton() {
+  return <div className="animate-pulse bg-slate-800" style={{ height: 200 }} />;
+}
 
 export default function BottleTagDistribution({
   bottleId,
 }: {
   bottleId: number;
 }) {
-  const { data } = trpc.bottleTagList.useQuery({
+  const [data] = trpc.bottleTagList.useSuspenseQuery({
     bottle: bottleId,
   });
-
-  if (!data) return null;
 
   const { results, totalCount } = data;
 
