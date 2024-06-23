@@ -1,7 +1,7 @@
+import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import TastingList from "@peated/web/components/tastingList";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { getUser } from "../../utils.server";
+import { getUser } from "../../../utils.server";
 
 export async function generateMetadata({
   params: { username },
@@ -11,7 +11,7 @@ export async function generateMetadata({
   const user = await getUser(username);
 
   return {
-    title: `@${user.username}`,
+    title: `Favorites by @${user.username}`,
     openGraph: {
       type: "profile",
       profile: {
@@ -21,20 +21,21 @@ export async function generateMetadata({
   };
 }
 
-export default async function UserTastings({
+export default async function UserFavorites({
   params: { username },
 }: {
   params: { username: string };
 }) {
   const user = await getUser(username);
   const trpcClient = await getTrpcClient();
-  const tastingList = await trpcClient.tastingList.query({
-    user: user.id,
+  const favoriteList = await trpcClient.collectionBottleList.query({
+    user: username,
+    collection: "default",
   });
 
-  return tastingList.results.length ? (
-    <TastingList values={tastingList.results} />
+  return favoriteList.results.length ? (
+    <BottleTable bottleList={favoriteList.results} rel={favoriteList.rel} />
   ) : (
-    <EmptyActivity>Looks like this ones a bit short on tastings.</EmptyActivity>
+    <EmptyActivity>No favorites recorded yet.</EmptyActivity>
   );
 }
