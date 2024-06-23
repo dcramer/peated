@@ -1,6 +1,6 @@
 "use client";
 
-import { trpcClient } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc";
 
 export function StatsSkeleton() {
   return (
@@ -24,7 +24,7 @@ function SkeletonStat({ name }: { name: string }) {
 }
 
 export default function Stats() {
-  const [data] = trpcClient.stats.useSuspenseQuery();
+  const [data] = trpc.stats.useSuspenseQuery();
 
   if (!data) {
     return <div>{"Oops, maybe you're offline?"}</div>;

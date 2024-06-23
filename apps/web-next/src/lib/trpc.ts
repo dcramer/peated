@@ -1,12 +1,7 @@
-import { sentryLink } from "@peated/server/src/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
-import config from "@peated/web/config";
-import { createTRPCNext } from "@trpc/next";
-import { ssrPrepass } from "@trpc/next/ssrPrepass";
 import {
   TRPCClientError,
   createTRPCReact,
-  httpBatchLink,
   type inferReactQueryProcedureOptions,
 } from "@trpc/react-query";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
@@ -32,29 +27,31 @@ export const trpc = createTRPCReact<AppRouter>({
   },
 });
 
-export const trpcClient = createTRPCNext<AppRouter>({
-  ssr: true,
-  ssrPrepass,
-  config(opts) {
-    return {
-      suspense: true,
-      links: [
-        sentryLink(),
-        httpBatchLink({
-          url: `${config.API_SERVER}/trpc`,
-          // async headers() {
-          //   const session = await getSession();
-          //   return {
-          //     authorization: session.accessToken
-          //       ? `Bearer ${session.accessToken}`
-          //       : "",
-          //   };
-          // },
-        }),
-      ],
-    };
-  },
-});
+// TODO: im not even sure what the difference is within this implementation, but it doesnt
+// provide us a great wait to pass in credentials vs our context provider
+// export const trpcClient = createTRPCNext<AppRouter>({
+//   ssr: true,
+//   ssrPrepass,
+//   config(opts) {
+//     return {
+//       suspense: true,
+//       links: [
+//         sentryLink(),
+//         httpBatchLink({
+//           url: `${config.API_SERVER}/trpc`,
+//           // async headers() {
+//           //   const session = await getSession();
+//           //   return {
+//           //     authorization: session.accessToken
+//           //       ? `Bearer ${session.accessToken}`
+//           //       : "",
+//           //   };
+//           // },
+//         }),
+//       ],
+//     };
+//   },
+// });
 
 export function isTRPCClientError(
   cause: unknown,

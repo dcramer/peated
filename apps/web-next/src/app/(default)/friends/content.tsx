@@ -8,7 +8,7 @@ import ListItem from "@peated/web/components/listItem";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import UserAvatar from "@peated/web/components/userAvatar";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpcClient } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -23,7 +23,7 @@ export default function Content({ friendList }: { friendList: any }) {
     ),
   );
 
-  const friendCreateMutation = trpcClient.friendCreate.useMutation({
+  const friendCreateMutation = trpc.friendCreate.useMutation({
     onSuccess: (status, toUserId) => {
       setFriendStatus((state) => ({
         ...state,
@@ -31,7 +31,7 @@ export default function Content({ friendList }: { friendList: any }) {
       }));
     },
   });
-  const friendDeleteMutation = trpcClient.friendDelete.useMutation({
+  const friendDeleteMutation = trpc.friendDelete.useMutation({
     onSuccess: (status, toUserId) => {
       setFriendStatus((state) => ({
         ...state,

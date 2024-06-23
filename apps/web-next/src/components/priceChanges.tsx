@@ -4,7 +4,7 @@ import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/src/lib/format";
 import BetaNotice from "@peated/web/components/betaNotice";
 import classNames from "@peated/web/lib/classNames";
-import { trpcClient } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc";
 import Link from "next/link";
 import BottleLink from "./bottleLink";
 
@@ -24,7 +24,7 @@ export function PriceChangesSkeleton() {
 }
 
 export default function PriceChanges() {
-  const [data] = trpcClient.priceChangeList.useSuspenseQuery();
+  const [data] = trpc.priceChangeList.useSuspenseQuery();
 
   return (
     <div className="mt-4">
