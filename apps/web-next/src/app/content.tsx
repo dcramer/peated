@@ -2,91 +2,11 @@
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/src/lib/format";
-import Alert from "@peated/web/components/alert";
-import Glyph from "@peated/web/components/assets/Glyph";
 import BetaNotice from "@peated/web/components/betaNotice";
-import EmptyActivity from "@peated/web/components/emptyActivity";
-import Spinner from "@peated/web/components/spinner";
-import TastingList from "@peated/web/components/tastingList";
 import classNames from "@peated/web/lib/classNames";
 import { trpcClient } from "@peated/web/lib/trpc";
 import Link from "next/link";
-import { Fragment } from "react";
-import { useEventListener } from "usehooks-ts";
 import BottleLink from "../components/bottleLink";
-
-export function ActivityContent({
-  tastingList,
-  filter,
-}: {
-  // TODO: this is wrong, cant remember how to ref the 'output' here a better
-  // solution in trpc
-  tastingList: ReturnType<typeof trpcClient.tastingList.useQuery>;
-  filter: string;
-}) {
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-  } = trpcClient.tastingList.useInfiniteQuery(
-    { filter, limit: 10 },
-    {
-      staleTime: Infinity,
-      initialData: { pages: [tastingList], pageParams: [null] },
-      getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,
-    },
-  );
-
-  const onScroll = () => {
-    if (!hasNextPage) return;
-    const scrollTop = document.documentElement.scrollTop;
-    const scrollHeight = document.documentElement.scrollHeight;
-    const clientHeight = document.documentElement.clientHeight;
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
-      fetchNextPage();
-    }
-  };
-
-  useEventListener("scroll", onScroll);
-
-  if (error) {
-    return (
-      <EmptyActivity>
-        <Alert noMargin>
-          Looks like we hit an error trying to load activity. Have a dram and
-          try again later?
-        </Alert>
-      </EmptyActivity>
-    );
-  }
-
-  if (!data) return null;
-
-  return (
-    <>
-      {data.pages.length > 1 || data.pages[0].results.length ? (
-        data.pages.map((group, i) => (
-          <Fragment key={i}>
-            <TastingList values={group.results} />
-          </Fragment>
-        ))
-      ) : (
-        <EmptyActivity href="/search?tasting">
-          <Glyph className="h-16 w-16" />
-
-          <div className="mt-4 font-semibold">What are you drinking?</div>
-          <div className="mt-2 block">
-            Get started by recording your first tasting notes.
-          </div>
-        </EmptyActivity>
-      )}
-      <div>{isFetching && !isFetchingNextPage ? <Spinner /> : null}</div>
-    </>
-  );
-}
 
 export function PriceChangesSkeleton() {
   return (

@@ -1,41 +1,26 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/src/lib/format";
+import BottleLink from "@peated/web/components/bottleLink";
 import Button from "@peated/web/components/button";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
+import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import Link from "next/link";
-import { Suspense } from "react";
-import BottleLink from "../components/bottleLink";
-import { getCurrentUser } from "../lib/auth.server";
-import { ActivityContent, PriceChanges, PriceChangesSkeleton } from "./content";
+import { type ReactNode } from "react";
+// import { PriceChanges, PriceChangesSkeleton } from "./content";
 
-const defaultViewParam = "global";
-
-function mapFilterParam(value: string | null) {
-  if (value === "friends" || value === "local") return value;
-  return defaultViewParam;
-}
-
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Record<string, any>;
-}) {
-  const filter = mapFilterParam(searchParams.view);
-
+export default async function Layout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
   const trpc = await getTrpcClient();
   const user = await getCurrentUser();
 
-  const [tastingList, newBottleList] = await Promise.all([
-    trpc.tastingList.query({
-      filter,
-      limit: 10,
-    }),
-    trpc.bottleList.query({
-      sort: "-date",
-      limit: 10,
-    }),
-  ]);
+  const newBottleList = await trpc.bottleList.query({
+    sort: "-date",
+    limit: 10,
+  });
 
   return (
     <>
@@ -43,25 +28,18 @@ export default async function Home({
         <div className="flex-1 overflow-hidden lg:w-8/12">
           <Tabs fullWidth border>
             {user && (
-              <TabItem
-                as={Link}
-                href="?view=friends"
-                active={filter == "friends"}
-              >
+              <TabItem as={Link} href="/activity/friends" controlled>
                 Friends
               </TabItem>
             )}
-            <TabItem as={Link} href="./" active={filter === "global"}>
+            <TabItem as={Link} href="/" controlled>
               Global
             </TabItem>
-            {/* <TabItem href="?view=local" active={filterQ === "local"}>
+            {/* <TabItem href="/activity/local" controlled>
           Local
         </TabItem> */}
           </Tabs>
-          <ActivityContent
-            tastingList={tastingList || { results: [] }}
-            filter={filter}
-          />
+          {children}
         </div>
         <div className="ml-4 hidden w-4/12 lg:block">
           {!user && (
@@ -126,9 +104,6 @@ export default async function Home({
             <Tabs fullWidth>
               <TabItem active>Market Prices</TabItem>
             </Tabs>
-            <Suspense fallback={<PriceChangesSkeleton />}>
-              <PriceChanges />
-            </Suspense>
           </div>
         </div>
       </div>

@@ -1,13 +1,15 @@
 import { sentryLink } from "@peated/server/src/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
+import config from "@peated/web/config";
 import { createTRPCNext } from "@trpc/next";
 import { ssrPrepass } from "@trpc/next/ssrPrepass";
 import {
   TRPCClientError,
   createTRPCReact,
   httpBatchLink,
+  type inferReactQueryProcedureOptions,
 } from "@trpc/react-query";
-import config from "../config";
+import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 
 export const trpc = createTRPCReact<AppRouter>({
   overrides: {
@@ -61,3 +63,7 @@ export function isTRPCClientError(
     cause instanceof TRPCClientError || Object.hasOwn(cause as any, "data")
   );
 }
+
+export type ReactQueryOptions = inferReactQueryProcedureOptions<AppRouter>;
+export type RouterInputs = inferRouterInputs<AppRouter>;
+export type RouterOutputs = inferRouterOutputs<AppRouter>;
