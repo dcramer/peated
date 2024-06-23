@@ -1,7 +1,7 @@
 import { type CountrySchema } from "@peated/server/schemas";
 import { type z } from "zod";
 import { serializer } from ".";
-import { type SerializedPoint } from "../db/columns";
+import { type SerializedPoint, type UnserializedPoint } from "../db/columns";
 import { type Country, type User } from "../db/schema";
 
 export const CountrySerializer = serializer({
