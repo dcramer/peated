@@ -10,6 +10,7 @@ import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
+import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -24,6 +25,8 @@ export default function MergeBottle({
 }: {
   params: { bottleId: string };
 }) {
+  useAuthRequired();
+
   const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
   const trpcUtils = trpc.useUtils();
 
