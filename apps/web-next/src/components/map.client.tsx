@@ -1,3 +1,5 @@
+"use client";
+
 import type { LatLngTuple } from "leaflet";
 import L from "leaflet";
 import type { ReactNode } from "react";

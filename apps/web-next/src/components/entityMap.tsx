@@ -1,3 +1,5 @@
+"use client";
+
 import { type Entity } from "@peated/server/src/types";
 import Link from "next/link";
 import { ClientOnly } from "./clientOnly";
@@ -13,6 +15,7 @@ export default function EntityMap({
   width?: string;
 }) {
   if (!entity.location || !entity.address) return null;
+
   return (
     <ClientOnly
       fallback={
