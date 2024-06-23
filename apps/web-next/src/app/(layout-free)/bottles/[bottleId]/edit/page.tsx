@@ -3,6 +3,7 @@
 import BottleForm from "@peated/web/components/bottleForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc";
+import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 
 export default function MergeBottle({
@@ -39,7 +40,10 @@ export default function MergeBottle({
             ...data,
           },
           {
-            onSuccess: () => router.push(`/bottles/${bottleId}`),
+            onSuccess: () => {
+              revalidatePath(`/bottles/${bottleId}`);
+              router.push(`/bottles/${bottleId}`);
+            },
           },
         );
       }}

@@ -18,6 +18,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
+import { revalidatePath } from "next/cache";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -83,7 +84,10 @@ export default function Page() {
     await userUpdateMutation.mutateAsync(
       { ...data, user: "me" },
       {
-        onSuccess: (newUser) => router.push(`/users/${newUser.username}`),
+        onSuccess: (newUser) => {
+          revalidatePath(`/users/${newUser.username}`);
+          router.push(`/users/${newUser.username}`);
+        },
       },
     );
   };

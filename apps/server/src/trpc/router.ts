@@ -27,6 +27,7 @@ import commentCreate from "./routes/commentCreate";
 import commentDelete from "./routes/commentDelete";
 import commentList from "./routes/commentList";
 import countryBySlug from "./routes/countryBySlug";
+import countryCategoryList from "./routes/countryCategoryList";
 import countryList from "./routes/countryList";
 import entityAliasList from "./routes/entityAliasList";
 import entityById from "./routes/entityById";
@@ -104,6 +105,7 @@ export const appRouter = router({
   collectionBottleList,
   collectionList,
   countryBySlug,
+  countryCategoryList,
   countryList,
   commentCreate,
   commentDelete,
