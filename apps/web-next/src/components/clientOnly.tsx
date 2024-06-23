@@ -22,7 +22,5 @@ type Props = {
 };
 
 export function ClientOnly({ children, fallback = null }: Props) {
-  return (
-    <>{useHydrated() ? (children ? children() ?? null : null) : fallback}</>
-  );
+  return <>{useHydrated() ? (children ? children() : null) : fallback}</>;
 }
