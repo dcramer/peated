@@ -7,6 +7,7 @@ function BottleTableRowSkeleton() {
     </tr>
   );
 }
+
 export default function Loading() {
   return (
     <>
