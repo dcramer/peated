@@ -13,8 +13,6 @@ export default function ActivityFeed({
   tastingList,
   filter = "global",
 }: {
-  // TODO: this is wrong, cant remember how to ref the 'output' here a better
-  // solution in trpc
   tastingList: RouterOutputs["tastingList"];
   filter: "global" | "friends" | "local";
 }) {
