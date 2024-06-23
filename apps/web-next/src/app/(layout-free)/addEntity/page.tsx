@@ -2,7 +2,7 @@
 
 import EntityForm from "@peated/web/components/entityForm";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpcClient } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc";
 import { useRouter } from "next/navigation";
 
 export default function AddEntity() {
@@ -10,7 +10,7 @@ export default function AddEntity() {
 
   const router = useRouter();
 
-  const entityCreateMutation = trpcClient.entityCreate.useMutation();
+  const entityCreateMutation = trpc.entityCreate.useMutation();
 
   return (
     <EntityForm
