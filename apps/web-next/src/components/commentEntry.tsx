@@ -1,3 +1,5 @@
+"use client";
+
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { User } from "@peated/server/types";
