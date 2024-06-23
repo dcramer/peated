@@ -1,10 +1,12 @@
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
 import { notEmpty } from "@peated/server/src/lib/filter";
+import CountrySpiritDistribution from "@peated/web/components/countrySpiritDistribution";
 import EntityTable from "@peated/web/components/entityTable";
 import Map from "@peated/web/components/map";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
+import { Suspense } from "react";
 import { getCountry } from "../utils.server";
 
 export async function generateMetadata({
@@ -55,6 +57,21 @@ export default async function Page({
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="my-6 flex flex-col gap-4 px-3 sm:flex-row md:px-0">
+        <div className="flex-auto">
+          <Suspense
+            fallback={
+              <div
+                className="animate-pulse rounded bg-slate-800"
+                style={{ height: 20 }}
+              />
+            }
+          >
+            <CountrySpiritDistribution countrySlug={country.slug} />
+          </Suspense>
+        </div>
       </div>
 
       <Tabs fullWidth border>
