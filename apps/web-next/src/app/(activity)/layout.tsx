@@ -2,11 +2,14 @@ import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/src/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import Button from "@peated/web/components/button";
+import PriceChanges, {
+  PriceChangesSkeleton,
+} from "@peated/web/components/priceChanges";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import Link from "next/link";
-import { type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 // import { PriceChanges, PriceChangesSkeleton } from "./content";
 
 export default async function Layout({
@@ -104,6 +107,9 @@ export default async function Layout({
             <Tabs fullWidth>
               <TabItem active>Market Prices</TabItem>
             </Tabs>
+            <Suspense fallback={<PriceChangesSkeleton />}>
+              <PriceChanges />
+            </Suspense>
           </div>
         </div>
       </div>

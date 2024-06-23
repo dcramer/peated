@@ -6,7 +6,16 @@ import BetaNotice from "@peated/web/components/betaNotice";
 import classNames from "@peated/web/lib/classNames";
 import { trpcClient } from "@peated/web/lib/trpc";
 import Link from "next/link";
-import BottleLink from "../components/bottleLink";
+import BottleLink from "./bottleLink";
+
+function PriceDelta({ price, previous }: { price: number; previous: number }) {
+  const sign = price > previous ? "+" : "-";
+  return (
+    <span className="flex items-center">
+      {sign}${(Math.abs(price - previous) / 100).toFixed(2)}
+    </span>
+  );
+}
 
 export function PriceChangesSkeleton() {
   return (
@@ -14,10 +23,8 @@ export function PriceChangesSkeleton() {
   );
 }
 
-export function PriceChanges() {
-  const { data } = trpcClient.priceChangeList.useQuery();
-
-  if (!data) return null;
+export default function PriceChanges() {
+  const [data] = trpcClient.priceChangeList.useSuspenseQuery();
 
   return (
     <div className="mt-4">
@@ -83,14 +90,5 @@ export function PriceChanges() {
         <p className="mt-4 text-center text-sm">No price history found.</p>
       )}
     </div>
-  );
-}
-
-function PriceDelta({ price, previous }: { price: number; previous: number }) {
-  const sign = price > previous ? "+" : "-";
-  return (
-    <span className="flex items-center">
-      {sign}${(Math.abs(price - previous) / 100).toFixed(2)}
-    </span>
   );
 }
