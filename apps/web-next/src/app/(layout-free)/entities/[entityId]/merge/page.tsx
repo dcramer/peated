@@ -20,7 +20,7 @@ import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 
-export default function MergeEntity({
+export default function Page({
   params: { entityId },
 }: {
   params: { entityId: string };

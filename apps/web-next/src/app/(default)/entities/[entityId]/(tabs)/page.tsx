@@ -120,9 +120,7 @@ export default async function EntityDetails({
                   )}
                 </div>
               </div>
-              <Suspense>
-                <EntityMap entity={entity} />
-              </Suspense>
+              <EntityMap entity={entity} />
             </dd>
           </dl>
         </div>

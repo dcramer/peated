@@ -53,19 +53,21 @@ function LocationMarker({
 
 const DEFAULT_POSITION: LatLngTuple = [51.505, -0.09] as const;
 
-export function Map({
-  width,
-  height,
-  position = DEFAULT_POSITION,
-  editable = false,
-  markerContent,
-}: {
+type Props = {
   width: string;
   height: string;
   position?: LatLngTuple | null;
   editable?: boolean;
   markerContent?: ReactNode | null;
-}) {
+};
+
+export default function MapClient({
+  width,
+  height,
+  position = DEFAULT_POSITION,
+  editable = false,
+  markerContent,
+}: Props) {
   return (
     <div style={{ height, width }}>
       <MapContainer
