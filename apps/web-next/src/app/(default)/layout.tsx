@@ -3,12 +3,10 @@ import "@peated/web/styles/index.css";
 import React from "react";
 import Layout from "../../components/layout";
 
-export default async function RootLayout({
+export default async function DefaultLayout({
   children,
-  sidebar,
 }: Readonly<{
   children: React.ReactNode;
-  sidebar: React.ReactNode;
 }>) {
-  return <Layout rightSidebar={sidebar}>{children}</Layout>;
+  return <Layout>{children}</Layout>;
 }
