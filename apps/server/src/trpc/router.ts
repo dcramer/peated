@@ -48,6 +48,7 @@ import externalSiteUpdate from "./routes/externalSiteUpdate";
 import faktoryInfo from "./routes/faktoryInfo";
 import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
+import flightDelete from "./routes/flightDelete";
 import flightList from "./routes/flightList";
 import flightUpdate from "./routes/flightUpdate";
 import friendCreate from "./routes/friendCreate";
@@ -129,6 +130,7 @@ export const appRouter = router({
   faktoryInfo,
   flightById,
   flightCreate,
+  flightDelete,
   flightUpdate,
   flightList,
   friendCreate,

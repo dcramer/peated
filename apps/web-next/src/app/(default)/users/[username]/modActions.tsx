@@ -6,6 +6,7 @@ import { type User } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
+import { revalidatePath } from "next/cache";
 
 export default function ModActions({ user }: { user: User }) {
   const { user: currentUser } = useAuth();
@@ -24,6 +25,7 @@ export default function ModActions({ user }: { user: User }) {
         if (data.id === currentUser?.id)
           trpcUtils.userById.setData("me", newUser);
       }
+      revalidatePath(`/users/${user.username}`);
     },
   });
 

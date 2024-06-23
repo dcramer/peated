@@ -7,6 +7,7 @@ import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -22,6 +23,7 @@ export default function ModActions({ entity }: { entity: Entity }) {
   const deleteEntity = async () => {
     // TODO: show confirmation message
     await deleteEntityMutation.mutateAsync(entity.id);
+    revalidatePath(`/entities/${entity.id}`);
     router.push("/");
   };
 

@@ -9,7 +9,7 @@ import useSingletonQueryClient from "@peated/web/hooks/useSingletonQueryClient";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { type SessionData } from "../../lib/auth";
+import { type SessionData } from "../../lib/session.server";
 import TRPCProvider from "./trpc";
 
 export default function Providers({
