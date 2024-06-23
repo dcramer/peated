@@ -2,13 +2,13 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import classNames from "@peated/web/lib/classNames";
 import type { ReactNode } from "react";
 
-export default ({
+export default function Alert({
   children,
   noMargin = false,
 }: {
   children: ReactNode;
   noMargin?: boolean;
-}) => {
+}) {
   return (
     <div className={classNames("p-4", noMargin ? "" : "mb-4")}>
       <div className="flex">
@@ -22,4 +22,4 @@ export default ({
       </div>
     </div>
   );
-};
+}

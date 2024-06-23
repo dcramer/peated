@@ -3,13 +3,13 @@ import Link from "next/link";
 import type { Badge, PagingRel } from "@peated/server/types";
 import PaginationButtons from "../paginationButtons";
 
-export default ({
+export default function BadgeTable({
   badgeList,
   rel,
 }: {
   badgeList: Badge[];
   rel?: PagingRel;
-}) => {
+}) {
   return (
     <>
       <table className="min-w-full">
@@ -45,4 +45,4 @@ export default ({
       <PaginationButtons rel={rel} />
     </>
   );
-};
+}

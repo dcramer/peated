@@ -1,14 +1,16 @@
+"use client";
+
 import classNames from "@peated/web/lib/classNames";
 import { useState, type ReactNode } from "react";
 import Button from "./button";
 
-export default ({
+export default function Collapsable({
   children,
   mobileOnly = false,
 }: {
   children: ReactNode;
   mobileOnly?: boolean;
-}) => {
+}) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -40,4 +42,4 @@ export default ({
       )}
     </div>
   );
-};
+}
