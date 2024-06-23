@@ -1,3 +1,5 @@
+"use client";
+
 import { PlusIcon } from "@heroicons/react/20/solid";
 import type { MouseEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
