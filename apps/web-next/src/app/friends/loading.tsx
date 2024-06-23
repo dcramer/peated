@@ -1,5 +1,4 @@
 import ListItem from "@peated/web/components/listItem";
-import SimpleHeader from "@peated/web/components/simpleHeader";
 import { UserAvatarSkeleton } from "@peated/web/components/userAvatar";
 
 function SkeletonFriend() {
@@ -21,7 +20,6 @@ function SkeletonFriend() {
 export default function Loading() {
   return (
     <>
-      <SimpleHeader>Friends</SimpleHeader>
       <ul className="divide-y divide-slate-800 sm:rounded">
         <SkeletonFriend />
         <SkeletonFriend />

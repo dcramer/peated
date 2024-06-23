@@ -1,4 +1,3 @@
-import SimpleHeader from "@peated/web/components/simpleHeader";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
@@ -18,7 +17,6 @@ export default async function Page() {
 
   return (
     <>
-      <SimpleHeader>Favorites</SimpleHeader>
       <Content friendList={friendList} />
     </>
   );
