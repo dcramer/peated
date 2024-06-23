@@ -1,3 +1,5 @@
+"use client";
+
 import dayjs from "dayjs";
 import DayJsRelativeTime from "dayjs/plugin/relativeTime";
 import { useState } from "react";

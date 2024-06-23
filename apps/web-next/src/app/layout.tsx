@@ -1,12 +1,10 @@
 import "@fontsource/raleway/index.css";
+import Fathom from "@peated/web/components/Fathom";
+import config from "@peated/web/config";
+import { getSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
 import type { Metadata, Viewport } from "next";
-import Fathom from "../components/Fathom";
-import config from "../config";
-// import "./globals.css";
 import React from "react";
-import Layout from "../components/layout";
-import { getSession } from "../lib/session.server";
 import Providers from "./providers/providers";
 
 export const viewport: Viewport = {
@@ -25,11 +23,9 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
   auth,
-  sidebar,
 }: Readonly<{
   children: React.ReactNode;
   auth: React.ReactNode;
-  sidebar: React.ReactNode;
 }>) {
   const session = await getSession();
 
@@ -44,7 +40,7 @@ export default async function RootLayout({
         >
           {auth}
 
-          <Layout rightSidebar={sidebar}>{children}</Layout>
+          {children}
 
           {config.FATHOM_SITE_ID && (
             <Fathom

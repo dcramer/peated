@@ -2,6 +2,20 @@ import Chip from "@peated/web/components/chip";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { getBottle } from "../../utils.server";
 
+export async function generateMetadata({
+  params: { bottleId },
+}: {
+  params: { bottleId: string };
+}) {
+  const bottle = await getBottle(Number(bottleId));
+
+  return [
+    {
+      title: `Aliases for ${bottle.fullName}`,
+    },
+  ];
+}
+
 export default async function BottleAliases({
   params: { bottleId },
 }: {
