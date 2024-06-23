@@ -28,8 +28,6 @@ export default async function Layout({
     return redirect(`/bottles/${bottle.id}/`);
   }
 
-  const baseUrl = `/bottles/${bottle.id}`;
-
   return (
     <>
       <div className="w-full p-3 lg:py-0">

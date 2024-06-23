@@ -1,6 +1,5 @@
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
 import { getBottle } from "../../utils.server";
 
@@ -13,16 +12,6 @@ export default async function Layout({
 }) {
   const bottleId = Number(params.bottleId);
   const bottle = await getBottle(bottleId);
-
-  // tombstone path - redirect to the absolute url to ensure search engines dont get mad
-  if (bottle.id !== bottleId) {
-    // const newPath = pathname.replace(
-    //   `/bottles/${bottleId}`,
-    //   `/bottles/${bottle.id}`,
-    // );
-    // TODO: this should redirect to subpath
-    return redirect(`/bottles/${bottle.id}/`);
-  }
 
   const baseUrl = `/bottles/${bottle.id}`;
 

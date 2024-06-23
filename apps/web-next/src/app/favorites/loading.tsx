@@ -1,5 +1,3 @@
-import SimpleHeader from "@peated/web/components/simpleHeader";
-
 function BottleTableRowSkeleton() {
   return (
     <tr>
@@ -12,7 +10,6 @@ function BottleTableRowSkeleton() {
 export default function Loading() {
   return (
     <>
-      <SimpleHeader>Favorites</SimpleHeader>
       <table className="min-w-full">
         <colgroup>
           <col className="min-w-full sm:w-1/2" />
