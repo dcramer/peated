@@ -5,7 +5,7 @@ import type { Entity } from "@peated/server/types";
 import BottleForm from "@peated/web/components/bottleForm";
 import Spinner from "@peated/web/components/spinner";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpcClient } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -28,7 +28,7 @@ export default function AddBottle() {
   });
 
   const queryOrder: string[] = [];
-  const initialQueries = trpcClient.useQueries((t) => {
+  const initialQueries = trpc.useQueries((t) => {
     const rv = [];
     if (distiller) {
       queryOrder.push("distiller");
