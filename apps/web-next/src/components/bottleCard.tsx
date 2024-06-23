@@ -7,10 +7,14 @@ import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
 import type { Option } from "./selectField";
 
+type EntityOption = Option & {
+  shortName?: string;
+};
+
 type BottleFormData = {
   name: string;
-  brand?: Option | null | undefined;
-  distillers?: Option[] | null | undefined;
+  brand?: EntityOption | null | undefined;
+  distillers?: EntityOption[] | null | undefined;
   statedAge?: number | null | undefined;
   category?: string | null | undefined;
 };
