@@ -1,3 +1,5 @@
+"use client";
+
 import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import {
@@ -11,6 +13,7 @@ import { formatColor, formatServingStyle } from "@peated/server/src/lib/format";
 import type { Tasting } from "@peated/server/types";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { useEffect, type ComponentPropsWithoutRef } from "react";
 import BottleCard from "./bottleCard";
@@ -255,7 +258,14 @@ export default function TastingListItem({
                       onClick={async () => {
                         await tastingDeleteMutation.mutateAsync(tasting.id);
                         if (onDelete) onDelete(tasting);
-                        else location.reload();
+                        else {
+                          revalidatePath(`/`);
+                          revalidatePath(`/tastings/${tasting.id}`);
+                          revalidatePath(
+                            `/users/${tasting.createdBy.username}`,
+                          );
+                          location.reload();
+                        }
                       }}
                     >
                       Delete Tasting
