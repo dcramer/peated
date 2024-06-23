@@ -1,31 +1,31 @@
 import Chip from "@peated/web/components/chip";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { getBottle } from "../../utils.server";
+import { getEntity } from "../../utils.server";
 
 export async function generateMetadata({
-  params: { bottleId },
+  params: { entityId },
 }: {
-  params: { bottleId: string };
+  params: { entityId: string };
 }) {
-  const bottle = await getBottle(Number(bottleId));
+  const entity = await getEntity(Number(entityId));
 
   return [
     {
-      title: `Other Names for ${bottle.fullName}`,
+      title: `Other Names for ${entity.name}`,
     },
   ];
 }
 
-export default async function BottleAliases({
-  params: { bottleId },
+export default async function EntityAliases({
+  params: { entityId },
 }: {
-  params: { bottleId: string };
+  params: { entityId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const [bottle, aliasList] = await Promise.all([
-    getBottle(Number(bottleId)),
-    trpcClient.bottleAliasList.query({
-      bottle: Number(bottleId),
+  const [entity, aliasList] = await Promise.all([
+    getEntity(Number(entityId)),
+    trpcClient.entityAliasList.query({
+      entity: Number(entityId),
     }),
   ]);
 
@@ -37,7 +37,7 @@ export default async function BottleAliases({
             return (
               <li key={alias.name} className="flex items-center gap-2">
                 <div>{alias.name}</div>
-                {alias.name === bottle.fullName && (
+                {alias.name === entity.name && (
                   <Chip as="div" size="small" color="highlight">
                     Canonical
                   </Chip>
