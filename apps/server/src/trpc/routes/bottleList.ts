@@ -12,6 +12,7 @@ import {
 } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
+import { TRPCError } from "@trpc/server";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -20,6 +21,7 @@ import { publicProcedure } from "..";
 const DEFAULT_SORT = "-tastings";
 
 const SORT_OPTIONS = [
+  "brand",
   "date",
   "name",
   "age",
@@ -156,6 +158,15 @@ export default publicProcedure
 
     let orderBy: SQL<unknown>;
     switch (input.sort) {
+      case "brand":
+        if (!input.entity) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Cannot sort by brand without entity filter.",
+          });
+        }
+        orderBy = asc(entities.name);
+        break;
       case "date":
         orderBy = asc(bottles.createdAt);
         break;
