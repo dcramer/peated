@@ -9,7 +9,7 @@ import FormField from "../formField";
 import { filterDupes } from "./helpers";
 import SelectDialog from "./selectDialog";
 import type {
-  CreateOptionForm,
+  CreateForm,
   OnQuery,
   OnRenderChip,
   OnRenderOption,
@@ -62,7 +62,7 @@ type OptionProps<T extends Option> = {
 
 type CreateProps<T extends Option> = {
   canCreate?: boolean;
-  createForm?: CreateOptionForm<T>;
+  createForm?: CreateForm<T>;
 };
 
 type Props<T extends Option> = BaseProps &

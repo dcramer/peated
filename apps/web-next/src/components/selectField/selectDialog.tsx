@@ -12,7 +12,7 @@ import SearchHeader from "../searchHeader";
 import CreateOptionDialog from "./createOptionDialog";
 import { filterDupes } from "./helpers";
 import type {
-  CreateOptionForm,
+  CreateForm,
   OnQuery,
   OnRenderOption,
   OnResults,
@@ -40,7 +40,7 @@ export default function SelectDialog<T extends Option>({
   searchPlaceholder?: string;
   canCreate?: boolean;
   multiple?: boolean;
-  createForm?: CreateOptionForm<T>;
+  createForm?: CreateForm<T>;
   onQuery?: OnQuery<T>;
   onResults?: OnResults<T>;
   options?: T[];
