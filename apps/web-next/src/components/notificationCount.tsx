@@ -1,19 +1,18 @@
 "use client";
 
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpcClient } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc";
 import { ClientOnly } from "./clientOnly";
 
 function NotificationCountContent() {
   const { user } = useAuth();
-  const { data: unreadNotificationCount } =
-    trpcClient.notificationCount.useQuery(
-      { filter: "unread" },
-      {
-        staleTime: 60 * 1000,
-        enabled: !!user && typeof document !== "undefined",
-      },
-    );
+  const { data: unreadNotificationCount } = trpc.notificationCount.useQuery(
+    { filter: "unread" },
+    {
+      staleTime: 60 * 1000,
+      enabled: !!user && typeof document !== "undefined",
+    },
+  );
 
   if (unreadNotificationCount && unreadNotificationCount.count > 0) {
     return (
