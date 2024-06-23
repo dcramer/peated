@@ -1,3 +1,5 @@
+"use client";
+
 import { BoltIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
@@ -49,25 +51,6 @@ const flavorProfileList = FLAVOR_PROFILES.map((c) => ({
 }));
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
-
-const DEFAULT_SUGGESTIONS = {
-  mandatory: {
-    name: null,
-    category: null,
-    brand: null,
-    bottler: null,
-    distillers: null,
-    statedAge: null,
-  },
-  suggestions: {
-    name: null,
-    category: null,
-    brand: [],
-    bottler: [],
-    distillers: [],
-    statedAge: null,
-  },
-};
 
 export default function BottleForm({
   onSubmit,
@@ -152,7 +135,7 @@ export default function BottleForm({
         <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
           <div className="prose text-light max-w-full text-sm leading-6">
             <p>
-              It can be tricky to find the right information, so if you're
+              It can be tricky to find the right information, so if you&apos;re
               struggling, just try to fill in the components that you're
               confident about. The brand will almost always have multiple
               bottles (e.g. <em>Hibiki</em>), and the bottle name, if nothing

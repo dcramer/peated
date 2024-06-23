@@ -15,7 +15,12 @@ export const CountrySerializer = serializer({
     return {
       name: item.name,
       slug: item.slug,
-      location: item.location,
+      location: item.location
+        ? ((JSON.parse(item.location) as UnserializedPoint).coordinates as [
+            number,
+            number,
+          ])
+        : null,
     };
   },
 });

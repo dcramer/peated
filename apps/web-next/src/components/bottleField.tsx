@@ -1,7 +1,11 @@
+"use client";
+
 import { trpc } from "@peated/web/lib/trpc";
 import SelectField from "./selectField";
 
-export default ({ ...props }: React.ComponentProps<typeof SelectField>) => {
+export default function BottleField({
+  ...props
+}: React.ComponentProps<typeof SelectField>) {
   const trpcUtils = trpc.useUtils();
   return (
     <SelectField
@@ -15,4 +19,4 @@ export default ({ ...props }: React.ComponentProps<typeof SelectField>) => {
       {...props}
     />
   );
-};
+}

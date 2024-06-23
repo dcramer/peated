@@ -1,6 +1,8 @@
+"use client";
+
 import { formatColor } from "@peated/server/lib/format";
 import { COLOR_SCALE } from "@peated/server/src/constants";
-import type { FormEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import type { FieldError } from "react-hook-form";
 import classNames from "../lib/classNames";
@@ -16,12 +18,6 @@ type Props = {
   value?: number | null;
   error?: FieldError;
   onChange?: (value: number | undefined) => void;
-};
-
-type InputEvent = FormEvent<HTMLInputElement> & {
-  target: {
-    value: string;
-  };
 };
 
 export default forwardRef<HTMLInputElement, Props>(
