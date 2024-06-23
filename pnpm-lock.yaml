@@ -532,6 +532,9 @@ importers:
 
   apps/web-next:
     dependencies:
+      '@fontsource/raleway':
+        specifier: ^5.0.19
+        version: 5.0.19
       '@headlessui/react':
         specifier: ^1.7.19
         version: 1.7.19(react-dom@18.3.1)(react@18.3.1)
