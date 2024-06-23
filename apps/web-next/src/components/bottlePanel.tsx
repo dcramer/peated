@@ -1,6 +1,6 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { type Bottle } from "@peated/server/types";
-import { type ComponentPropsWithoutRef } from "react";
+import { Suspense, type ComponentPropsWithoutRef } from "react";
 import useAuth from "../hooks/useAuth";
 import { trpc } from "../lib/trpc";
 import BottleHeader from "./bottleHeader";
@@ -10,7 +10,6 @@ import Button from "./button";
 import { ClientOnly } from "./clientOnly";
 import CollectionAction from "./collectionAction";
 import QRCodeClient from "./qrcode.client";
-import QueryBoundary from "./queryBoundary";
 import ShareButton from "./shareButton";
 import SidePanel, { SidePanelHeader } from "./sidePanel";
 import SkeletonButton from "./skeletonButton";
@@ -48,14 +47,9 @@ export default function BottlePanel({
       <div className="my-6 flex items-start">
         <div className="h-auto flex-1 lg:w-10/12 lg:flex-auto">
           <div className="flex justify-center gap-4 px-4 lg:justify-start lg:px-0">
-            {user && (
-              <QueryBoundary
-                loading={<SkeletonButton className="w-10" />}
-                fallback={() => null}
-              >
-                <CollectionAction bottle={bottle} />
-              </QueryBoundary>
-            )}
+            <Suspense fallback={<SkeletonButton className="w-10" />}>
+              <CollectionAction bottle={bottle} />
+            </Suspense>
 
             <Button
               href={tastingPath ?? `/bottles/${bottle.id}/addTasting`}
