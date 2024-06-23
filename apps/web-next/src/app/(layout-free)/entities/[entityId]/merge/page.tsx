@@ -1,9 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BottleMergeSchema } from "@peated/server/schemas";
-import BottleField from "@peated/web/components/bottleField";
+import { EntityMergeSchema } from "@peated/server/schemas";
 import ChoiceField from "@peated/web/components/choiceField";
+import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import FormError from "@peated/web/components/formError";
@@ -18,26 +18,26 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
-type FormSchemaType = z.infer<typeof BottleMergeSchema>;
+type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 
-export default function MergeBottle({
-  params: { bottleId },
+export default function MergeEntity({
+  params: { entityId },
 }: {
-  params: { bottleId: string };
+  params: { entityId: string };
 }) {
   useModRequired();
 
-  const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
+  const [entity] = trpc.entityById.useSuspenseQuery(Number(entityId));
   const trpcUtils = trpc.useUtils();
 
   const router = useRouter();
 
-  const [otherBottleName, setOtherBottleName] = useState<string>("Other");
+  const [otherEntityName, setOtherEntityName] = useState<string>("Other");
 
   // TODO: move to queries
-  const bottleMergeMutation = trpc.bottleMerge.useMutation({
-    onSuccess: (newBottle) => {
-      trpcUtils.bottleById.invalidate(newBottle.id);
+  const entityMergeMutation = trpc.entityMerge.useMutation({
+    onSuccess: (newEntity) => {
+      trpcUtils.entityById.invalidate(newEntity.id);
       // const previous = trpcUtils.bottleById.getData(newBottle.id);
       // trpcUtils.bottleById.setData(newBottle.id, {
       //   ...previous,
@@ -51,21 +51,21 @@ export default function MergeBottle({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(BottleMergeSchema),
+    resolver: zodResolver(EntityMergeSchema),
     defaultValues: {
       direction: "mergeInto",
     },
   });
 
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    await bottleMergeMutation.mutateAsync(
+    await entityMergeMutation.mutateAsync(
       {
-        root: bottle.id,
-        other: data.bottleId,
+        root: entity.id,
+        other: data.entityId,
         direction: data.direction,
       },
       {
-        onSuccess: (newBottle) => router.push(`/bottles/${newBottle.id}`),
+        onSuccess: (newEntity) => router.push(`/entities/${newEntity.id}`),
       },
     );
   };
@@ -75,7 +75,7 @@ export default function MergeBottle({
       header={
         <Header>
           <FormHeader
-            title="Merge Bottle"
+            title="Merge Entity"
             saveDisabled={isSubmitting}
             onSave={handleSubmit(onSubmit)}
             saveLabel="Continue"
@@ -84,26 +84,26 @@ export default function MergeBottle({
       }
     >
       <Form onSubmit={handleSubmit(onSubmit)} isSubmitting={isSubmitting}>
-        {bottleMergeMutation.isError && (
-          <FormError values={[bottleMergeMutation.error.message]} />
+        {entityMergeMutation.isError && (
+          <FormError values={[entityMergeMutation.error.message]} />
         )}
 
         <Fieldset>
           <Controller
-            name="bottleId"
+            name="entityId"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
-              <BottleField
+              <EntityField
                 {...field}
-                error={errors.bottleId}
-                label="Other Bottle"
+                error={errors.entityId}
+                label="Other Entity"
                 required
                 onChange={(value) => {
                   onChange(value?.id);
-                  setOtherBottleName(value?.name || "Other");
+                  setOtherEntityName(value?.name || "Other");
                 }}
                 onResults={(results) => {
-                  return results.filter((r) => r.id !== bottle.id);
+                  return results.filter((r) => r.id !== entity.id);
                 }}
               />
             )}
@@ -116,11 +116,11 @@ export default function MergeBottle({
             choices={[
               {
                 id: "mergeFrom",
-                name: `Merge "${otherBottleName}" into "${bottle.fullName}"`,
+                name: `Merge "${otherEntityName}" into "${entity.name}"`,
               },
               {
                 id: "mergeInto",
-                name: `Merge "${bottle.fullName}" into "${otherBottleName}"`,
+                name: `Merge "${entity.name}" into "${otherEntityName}"`,
               },
             ]}
             error={errors.direction}
