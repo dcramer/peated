@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import { toTitleCase } from "@peated/server/lib/strings";
 
-import type { CreateOptionForm, Option } from "./types";
+import type { CreateForm, Option } from "./types";
 
 // TODO(dcramer): hitting escape doesnt do what you want here (it does nothing)
 export default function CreateOptionDialog<T extends Option>({
@@ -19,7 +19,7 @@ export default function CreateOptionDialog<T extends Option>({
   open: boolean;
   setOpen: (value: boolean) => void;
   onSubmit: (newOption: T) => void;
-  render: CreateOptionForm<T>;
+  render: CreateForm<T>;
 }) {
   const [newOption, setNewOption] = useState<T>({
     id: null,
