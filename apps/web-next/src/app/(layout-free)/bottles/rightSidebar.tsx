@@ -5,85 +5,9 @@ import {
   formatCategoryName,
   formatFlavorProfile,
 } from "@peated/server/lib/format";
-import { toTitleCase } from "@peated/server/lib/strings";
 import Button from "@peated/web/components/button";
-import SidebarLink from "@peated/web/components/sidebarLink";
-import { buildQueryString } from "@peated/web/lib/urls";
+import FilterSidebarSection from "@peated/web/components/filterListSection";
 import { useSearchParams } from "next/navigation";
-
-function FilterSidebarSection({
-  searchParams,
-  title,
-  name,
-  value,
-  options,
-  formatValue,
-}: {
-  searchParams: URLSearchParams;
-  title?: string;
-  name: string;
-  value?: string;
-  options?: [string, string][];
-  formatValue?: (key: string) => string;
-}) {
-  const currentValue = value === undefined ? searchParams.get(name) : value;
-  const titleValue = title ?? toTitleCase(name);
-  return (
-    <li>
-      <div className="text-sm font-semibold text-slate-200">{titleValue}</div>
-      <ul role="list" className="-mx-3 mt-2 space-y-1">
-        <SidebarLink
-          active={!currentValue}
-          href={{
-            // pathname: location.pathname,
-            search: buildQueryString(searchParams, {
-              [name]: "",
-              cursor: null,
-            }),
-          }}
-          size="small"
-        >
-          Any {titleValue}
-        </SidebarLink>
-        {options ? (
-          options.map(([k, v]) => (
-            <SidebarLink
-              key={k}
-              active={currentValue === v}
-              href={{
-                // pathname: location.pathname,
-                search: buildQueryString(searchParams, {
-                  [name]: k,
-                  cursor: null,
-                }),
-              }}
-              size="small"
-            >
-              {formatValue ? formatValue(k) : v}
-            </SidebarLink>
-          ))
-        ) : (
-          <SidebarLink
-            key={currentValue}
-            active
-            href={{
-              // pathname: location.pathname,
-              search: buildQueryString(searchParams, {
-                [name]: currentValue,
-                cursor: null,
-              }),
-            }}
-            size="small"
-          >
-            {formatValue && currentValue
-              ? formatValue(currentValue)
-              : currentValue}
-          </SidebarLink>
-        )}
-      </ul>
-    </li>
-  );
-}
 
 export default function BottleListSidebar() {
   const searchParams = useSearchParams();
@@ -105,14 +29,14 @@ export default function BottleListSidebar() {
           name="flavorProfile"
           options={FLAVOR_PROFILES.map((k) => [k, formatFlavorProfile(k)])}
         />
-        {searchParams.entity ? (
+        {searchParams.get("entity") ? (
           <FilterSidebarSection
             searchParams={searchParams}
             title="Relationship"
             name="entity"
           />
         ) : null}
-        {searchParams.age ? (
+        {searchParams.get("age") ? (
           <FilterSidebarSection
             searchParams={searchParams}
             title="Age"
@@ -120,7 +44,7 @@ export default function BottleListSidebar() {
             formatValue={(v) => `${v} years`}
           />
         ) : null}
-        {searchParams.tag ? (
+        {searchParams.get("tag") ? (
           <FilterSidebarSection
             searchParams={searchParams}
             title="Notes"
