@@ -1,7 +1,9 @@
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import Layout from "@peated/web/components/layout";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import type { Metadata } from "next";
+import BottleListSidebar from "./rightSidebar";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -33,9 +35,8 @@ export default async function BottleList({
     ),
   );
 
-  // TODO: we need to somehow 'slot' the right sidebar, but how do we do that and semi-colocate code?
   return (
-    <>
+    <Layout rightSidebar={<BottleListSidebar />}>
       {bottleList.results.length > 0 ? (
         <BottleTable
           bottleList={bottleList.results}
@@ -47,6 +48,6 @@ export default async function BottleList({
           {"Looks like there's nothing in the database yet. Weird."}
         </EmptyActivity>
       )}
-    </>
+    </Layout>
   );
 }

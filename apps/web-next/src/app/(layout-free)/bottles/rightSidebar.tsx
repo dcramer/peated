@@ -1,3 +1,5 @@
+"use client";
+
 import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import {
   formatCategoryName,
@@ -7,6 +9,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import Button from "@peated/web/components/button";
 import SidebarLink from "@peated/web/components/sidebarLink";
 import { buildQueryString } from "@peated/web/lib/urls";
+import { useSearchParams } from "next/navigation";
 
 function FilterSidebarSection({
   searchParams,
@@ -16,14 +19,14 @@ function FilterSidebarSection({
   options,
   formatValue,
 }: {
-  searchParams: Record<string, string>;
+  searchParams: URLSearchParams;
   title?: string;
   name: string;
   value?: string;
   options?: [string, string][];
   formatValue?: (key: string) => string;
 }) {
-  const currentValue = value === undefined ? searchParams[name] : value;
+  const currentValue = value === undefined ? searchParams.get(name) : value;
   const titleValue = title ?? toTitleCase(name);
   return (
     <li>
@@ -72,7 +75,9 @@ function FilterSidebarSection({
             }}
             size="small"
           >
-            {formatValue ? formatValue(currentValue) : currentValue}
+            {formatValue && currentValue
+              ? formatValue(currentValue)
+              : currentValue}
           </SidebarLink>
         )}
       </ul>
@@ -80,11 +85,8 @@ function FilterSidebarSection({
   );
 }
 
-export default function BottleListSidebar({
-  searchParams,
-}: {
-  searchParams: Record<string, any>;
-}) {
+export default function BottleListSidebar() {
+  const searchParams = useSearchParams();
   return (
     <div className="mt-8 flex flex-col overflow-y-auto bg-slate-950 px-6 py-4">
       <ul role="list" className="flex flex-auto flex-col gap-y-7">
