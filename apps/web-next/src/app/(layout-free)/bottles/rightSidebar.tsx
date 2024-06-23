@@ -27,6 +27,7 @@ export default function BottleListSidebar() {
         <FilterSidebarSection
           searchParams={searchParams}
           name="flavorProfile"
+          title="Flavor Profile"
           options={FLAVOR_PROFILES.map((k) => [k, formatFlavorProfile(k)])}
         />
         {searchParams.get("entity") ? (
