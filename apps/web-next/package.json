@@ -22,6 +22,7 @@
     "@trpc/next": "11.0.0-rc.413",
     "@trpc/react-query": "11.0.0-rc.413",
     "@trpc/server": "11.0.0-rc.413",
+    "@types/leaflet": "^1.9.12",
     "dayjs": "^1.11.11",
     "fathom-client": "^3.7.0",
     "framer-motion": "^10.18.0",
