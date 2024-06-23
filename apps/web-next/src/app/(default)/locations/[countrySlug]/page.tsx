@@ -1,10 +1,10 @@
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
+import { notEmpty } from "@peated/server/src/lib/filter";
 import EntityTable from "@peated/web/components/entityTable";
-import Heading from "@peated/web/components/heading";
 import Map from "@peated/web/components/map";
 import PageHeader from "@peated/web/components/pageHeader";
-import { Suspense } from "react";
+import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCountry } from "../utils.server";
 
 export async function generateMetadata({
@@ -35,7 +35,7 @@ export default async function Page({
     }),
   ]);
 
-  const [mapHeight, mapWidth] = ["400px", "100%"];
+  const [mapHeight, mapWidth] = ["200px", "100%"];
 
   const stats = [
     { name: "Distilleries", value: country.totalDistilleries.toLocaleString() },
@@ -56,33 +56,34 @@ export default async function Page({
           </div>
         ))}
       </div>
-      <div className="flex flex-col space-y-4">
-        <Suspense
-          fallback={
-            <div
-              className="animate-pulse bg-slate-800"
-              style={{ height: mapHeight, width: mapWidth }}
-            />
-          }
-        >
-          <Map
-            height={mapHeight}
-            width={mapWidth}
-            position={country.location}
-          />
-        </Suspense>
 
-        <div>
-          <Heading as="h2">Popular Distilleries</Heading>
-          {topEntityList.results.length ? (
-            <EntityTable entityList={topEntityList.results} />
-          ) : (
-            <p className="text-light">
-              {"It looks like we don't know of any distilleries in the area."}
-            </p>
-          )}
-        </div>
-      </div>
+      <Tabs fullWidth border>
+        <TabItem active>Distilleries</TabItem>
+      </Tabs>
+
+      <Map
+        height={mapHeight}
+        width={mapWidth}
+        position={country.location}
+        markers={topEntityList.results
+          .map((e) => {
+            if (!e.location) return null;
+            return {
+              position: e.location,
+              name: e.name,
+              address: e.address,
+            };
+          })
+          .filter(notEmpty)}
+      />
+
+      {topEntityList.results.length ? (
+        <EntityTable entityList={topEntityList.results} />
+      ) : (
+        <p className="text-light">
+          {"It looks like we don't know of any distilleries in the area."}
+        </p>
+      )}
     </>
   );
 }

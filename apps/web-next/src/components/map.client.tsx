@@ -25,11 +25,11 @@ const markerIcon = L.divIcon({
 
 function LocationMarker({
   initialPosition,
-  editable = false,
+  useAsPosition = false,
   children,
 }: {
   initialPosition?: LatLngTuple | null;
-  editable?: boolean;
+  useAsPosition?: boolean;
   children?: ReactNode | null;
 }) {
   // const markerRef = useRe(null);
@@ -38,15 +38,16 @@ function LocationMarker({
     initialPosition || DEFAULT_POSITION,
   );
 
-  const map = useMapEvent("click", (e) => {
-    if (editable) {
+  useMapEvent("click", (e) => {
+    if (useAsPosition) {
       const { lat, lng } = e.latlng;
       setPosition([lat, lng]);
     }
   });
+
   return (
     <Marker position={position} icon={markerIcon}>
-      <Popup>{children}</Popup>
+      {children ? <Popup>{children}</Popup> : null}
     </Marker>
   );
 }
@@ -57,16 +58,21 @@ type Props = {
   width: string;
   height: string;
   position?: LatLngTuple | null;
-  editable?: boolean;
-  markerContent?: ReactNode | null;
+  controls?: boolean;
+  markers?: {
+    position: LatLngTuple;
+    name?: string | null;
+    address?: string | null;
+    useAsPosition?: boolean;
+  }[];
 };
 
 export default function MapClient({
   width,
   height,
   position = DEFAULT_POSITION,
-  editable = false,
-  markerContent,
+  markers = [],
+  controls = true,
 }: Props) {
   return (
     <div style={{ height, width }}>
@@ -77,11 +83,11 @@ export default function MapClient({
         className="rounded"
         center={position || DEFAULT_POSITION}
         zoom={10}
-        dragging={editable}
-        doubleClickZoom={editable}
-        scrollWheelZoom={editable}
-        attributionControl={editable}
-        zoomControl={editable}
+        dragging={controls}
+        doubleClickZoom={controls}
+        scrollWheelZoom={controls}
+        attributionControl={controls}
+        zoomControl={controls}
       >
         <TileLayer
           attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
@@ -93,9 +99,29 @@ export default function MapClient({
           maxZoom={20}
           minZoom={0}
         />
-        <LocationMarker initialPosition={position} editable={editable}>
-          {markerContent}
-        </LocationMarker>
+        {markers.map((m) => {
+          return (
+            <LocationMarker
+              initialPosition={m.position}
+              useAsPosition={m.useAsPosition}
+              key={m.position.join(",")}
+            >
+              {m.name && m.address ? (
+                <div className="flex flex-row items-center gap-x-2">
+                  <a
+                    href={`http://maps.google.com/?q=${encodeURIComponent(`${m.name}, ${m.address}`)}`}
+                    target="_blank"
+                    className="text-highlight"
+                  >
+                    {m.name}
+                    <br />
+                    {m.address}
+                  </a>
+                </div>
+              ) : null}
+            </LocationMarker>
+          );
+        })}
       </MapContainer>
     </div>
   );

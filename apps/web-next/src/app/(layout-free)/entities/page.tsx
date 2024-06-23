@@ -34,6 +34,7 @@ export default async function EntityList({
           entityList={entityList.results}
           rel={entityList.rel}
           sort={searchParams.sort || DEFAULT_SORT}
+          withLocations
         />
       ) : (
         <EmptyActivity>

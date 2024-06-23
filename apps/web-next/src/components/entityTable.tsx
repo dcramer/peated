@@ -11,11 +11,13 @@ import SortParam from "./sortParam";
 export default function EntityTable({
   entityList,
   rel,
+  withLocations = false,
   withTastings = false,
   sort: initialSort,
 }: {
   entityList: Entity[];
   withTastings?: boolean;
+  withLocations?: boolean;
   rel?: PagingRel;
   sort?: string;
 }) {
@@ -29,12 +31,15 @@ export default function EntityTable({
           <col
             className={classNames(
               "min-w-full",
-              withTastings ? "sm:w-1/2" : "sm:w-3/5",
+              withTastings && withLocations ? "sm:w-1/2" : "",
+              withTastings && !withLocations ? "sm:w-4/5" : "",
+              !withTastings && withLocations ? "sm:w-3/5" : "",
+              !withTastings && !withLocations ? "sm:w-4/5" : "",
             )}
           />
           <col className="sm:w-1/10" />
           {withTastings && <col className="sm:w-1/10" />}
-          <col className="sm:w-3/10" />
+          {withLocations && <col className="sm:w-3/10" />}
         </colgroup>
         <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
           <tr>
@@ -49,12 +54,14 @@ export default function EntityTable({
                 <SortParam name="tastings" sort={sort} defaultOrder="desc" />
               </th>
             )}
-            <th
-              scope="col"
-              className="hidden px-3 py-2.5 text-right sm:table-cell"
-            >
-              Location
-            </th>
+            {withLocations && (
+              <th
+                scope="col"
+                className="hidden px-3 py-2.5 text-right sm:table-cell"
+              >
+                Location
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -89,30 +96,32 @@ export default function EntityTable({
                     {entity.totalTastings.toLocaleString()}
                   </td>
                 )}
-                <td className="hidden space-y-2 px-3 py-3 text-right sm:table-cell">
-                  {!!entity.country && (
-                    <div>
-                      <Link
-                        href={`/locations/${entity.country.slug}`}
-                        className="hover:underline"
-                      >
-                        {entity.country.name}
-                      </Link>
-                    </div>
-                  )}
-                  {!!entity.region && (
-                    <div>
-                      <Link
-                        href={`/entities?region=${encodeURIComponent(
-                          entity.region,
-                        )}`}
-                        className="text-light hover:underline"
-                      >
-                        {entity.region}
-                      </Link>
-                    </div>
-                  )}
-                </td>
+                {withLocations && (
+                  <td className="hidden space-y-2 px-3 py-3 text-right sm:table-cell">
+                    {!!entity.country && (
+                      <div>
+                        <Link
+                          href={`/locations/${entity.country.slug}`}
+                          className="hover:underline"
+                        >
+                          {entity.country.name}
+                        </Link>
+                      </div>
+                    )}
+                    {!!entity.region && (
+                      <div>
+                        <Link
+                          href={`/entities?region=${encodeURIComponent(
+                            entity.region,
+                          )}`}
+                          className="text-light hover:underline"
+                        >
+                          {entity.region}
+                        </Link>
+                      </div>
+                    )}
+                  </td>
+                )}
               </tr>
             );
           })}
