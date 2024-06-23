@@ -25,7 +25,11 @@ export default async function Page() {
         {flightList.results.length ? (
           flightList.results.map((flight) => {
             return (
-              <ListItem key={flight.id} as={Link} to={`/flights/${flight.id}`}>
+              <ListItem
+                key={flight.id}
+                as={Link}
+                href={`/flights/${flight.id}`}
+              >
                 <div className="flex flex-auto items-center space-x-4">
                   <div className="flex-auto space-y-1 font-medium group-hover:underline">
                     {flight.name || <em>unknown flight</em>}
