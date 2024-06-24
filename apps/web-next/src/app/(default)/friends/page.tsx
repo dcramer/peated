@@ -10,8 +10,10 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   if (!(await isLoggedIn())) {
-    return redirectToAuth({ pathname: "/friends" });
+    redirectToAuth({ pathname: "/friends" });
+    return null;
   }
+
   const trpcClient = await getTrpcClient();
   const friendList = await trpcClient.friendList.ensureData();
 

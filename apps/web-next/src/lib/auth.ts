@@ -23,8 +23,9 @@ export function getAuthRedirect({
   pathname?: string;
   searchParams?: URLSearchParams;
 }) {
+  const finalPathname = pathname.indexOf("/login") === 0 ? "/" : pathname;
   const redirectTo =
-    pathname + (searchParams ? `?${searchParams.toString()}` : "");
+    finalPathname + (searchParams ? `?${searchParams.toString()}` : "");
 
   return `/login?redirectTo=${encodeURIComponent(redirectTo)}`;
 }

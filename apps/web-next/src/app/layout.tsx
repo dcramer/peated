@@ -22,10 +22,10 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  auth,
+  // auth,
 }: Readonly<{
   children: React.ReactNode;
-  auth: React.ReactNode;
+  // auth: React.ReactNode;
 }>) {
   const session = await getSession();
 
@@ -38,8 +38,6 @@ export default async function RootLayout({
             accessToken: session.accessToken,
           }}
         >
-          {auth}
-
           {children}
 
           {config.FATHOM_SITE_ID && (
