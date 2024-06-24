@@ -5,7 +5,6 @@ import BottleLink from "@peated/web/components/bottleLink";
 import Button from "@peated/web/components/button";
 import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { getFlight } from "../utils.server";
 import ModActions from "./modActions";
 
 export async function generateMetadata({
@@ -13,7 +12,8 @@ export async function generateMetadata({
 }: {
   params: { flightId: string };
 }) {
-  const flight = await getFlight(flightId);
+  const trpcClient = await getTrpcClient();
+  const flight = await trpcClient.flightById.ensureData(flightId);
   const description = summarize(flight.description || "", 200);
 
   return {
@@ -29,8 +29,8 @@ export default async function Page({
 }) {
   const trpcClient = await getTrpcClient();
   const [flight, bottleList] = await Promise.all([
-    getFlight(flightId),
-    trpcClient.bottleList.query({
+    trpcClient.flightById.ensureData(flightId),
+    trpcClient.bottleList.ensureData({
       flight: flightId,
     }),
   ]);
