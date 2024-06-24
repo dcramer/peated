@@ -9,8 +9,9 @@ export function buildQueryString(
   newParams: Record<string, any>,
 ): string {
   const newEntries = Array.from(Object.entries(newParams)).filter(([k, v]) => {
-    return !k || v === undefined || v === null;
+    return k && v !== undefined && v !== null;
   });
+
   Array.from(Object.entries(searchParams)).forEach(([k, v]) => {
     if (!newParams[k]) {
       newEntries.push([k, v]);

@@ -20,37 +20,26 @@ export default function BottleListSidebar() {
           </Button>
         </li>
         <FilterSidebarSection
-          searchParams={searchParams}
           name="category"
           options={CATEGORY_LIST.map((k) => [k, formatCategoryName(k)])}
         />
         <FilterSidebarSection
-          searchParams={searchParams}
           name="flavorProfile"
           title="Flavor Profile"
           options={FLAVOR_PROFILES.map((k) => [k, formatFlavorProfile(k)])}
         />
         {searchParams.get("entity") ? (
-          <FilterSidebarSection
-            searchParams={searchParams}
-            title="Relationship"
-            name="entity"
-          />
+          <FilterSidebarSection title="Relationship" name="entity" />
         ) : null}
         {searchParams.get("age") ? (
           <FilterSidebarSection
-            searchParams={searchParams}
             title="Age"
             name="age"
             formatValue={(v) => `${v} years`}
           />
         ) : null}
         {searchParams.get("tag") ? (
-          <FilterSidebarSection
-            searchParams={searchParams}
-            title="Notes"
-            name="tag"
-          />
+          <FilterSidebarSection title="Notes" name="tag" />
         ) : null}
       </ul>
     </div>

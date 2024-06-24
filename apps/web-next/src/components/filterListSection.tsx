@@ -1,24 +1,28 @@
+"use client";
+
 import { toTitleCase } from "@peated/server/lib/strings";
 import SidebarLink from "@peated/web/components/sidebarLink";
 import { buildQueryString } from "@peated/web/lib/urls";
+import { useSearchParams } from "next/navigation";
 
 export default function FilterSidebarSection({
-  searchParams,
   title,
   name,
   value,
   options,
   formatValue,
 }: {
-  searchParams: URLSearchParams;
   title?: string;
   name: string;
   value?: string;
   options?: [string, string][];
   formatValue?: (key: string) => string;
 }) {
+  const searchParams = useSearchParams();
+
   const currentValue = value === undefined ? searchParams.get(name) : value;
   const titleValue = title ?? toTitleCase(name);
+
   return (
     <li>
       <div className="text-sm font-semibold text-slate-200">{titleValue}</div>
@@ -40,7 +44,7 @@ export default function FilterSidebarSection({
           options.map(([k, v]) => (
             <SidebarLink
               key={k}
-              active={currentValue === v}
+              active={currentValue === k}
               href={{
                 // pathname: location.pathname,
                 search: buildQueryString(searchParams, {
