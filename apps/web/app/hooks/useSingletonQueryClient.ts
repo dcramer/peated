@@ -6,8 +6,12 @@ type QueryClientConfig = {
   ssr: boolean;
 };
 
+export function clearQueryClient() {
+  queryClient = null;
+}
+
 export function getQueryClient({ ssr }: QueryClientConfig): QueryClient {
-  if (queryClient === null || ssr) {
+  if (queryClient === null) {
     queryClient = new QueryClient({
       defaultOptions: {
         queries: {

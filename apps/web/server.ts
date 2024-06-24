@@ -29,6 +29,7 @@ import type { Request } from "express";
 import express from "express";
 import morgan from "morgan";
 import path from "path";
+import { clearQueryClient } from "./app/hooks/useSingletonQueryClient";
 
 Sentry.setTag("service", "@peated/web");
 
@@ -111,6 +112,8 @@ app.all("*", async (req, res, next) => {
   if (accessToken && !user) {
     return logout(req);
   }
+
+  clearQueryClient();
 
   next();
 });
