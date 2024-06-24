@@ -51,7 +51,7 @@ export default function About() {
                 {config.VERSION}
               </a>
             ) : (
-              <em>an unknown version</em>
+              <em>(unknown)</em>
             )}
           </p>
         </div>

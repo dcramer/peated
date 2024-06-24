@@ -60,7 +60,7 @@ export const meta: MetaFunction = () => {
 
 const BasicLogin = () => {
   return (
-    <Form method="post">
+    <Form method="POST">
       <TextField
         name="email"
         type="email"

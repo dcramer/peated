@@ -27,6 +27,7 @@ import commentCreate from "./routes/commentCreate";
 import commentDelete from "./routes/commentDelete";
 import commentList from "./routes/commentList";
 import countryBySlug from "./routes/countryBySlug";
+import countryCategoryList from "./routes/countryCategoryList";
 import countryList from "./routes/countryList";
 import entityAliasList from "./routes/entityAliasList";
 import entityById from "./routes/entityById";
@@ -47,6 +48,7 @@ import externalSiteUpdate from "./routes/externalSiteUpdate";
 import faktoryInfo from "./routes/faktoryInfo";
 import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
+import flightDelete from "./routes/flightDelete";
 import flightList from "./routes/flightList";
 import flightUpdate from "./routes/flightUpdate";
 import friendCreate from "./routes/friendCreate";
@@ -104,6 +106,7 @@ export const appRouter = router({
   collectionBottleList,
   collectionList,
   countryBySlug,
+  countryCategoryList,
   countryList,
   commentCreate,
   commentDelete,
@@ -127,6 +130,7 @@ export const appRouter = router({
   faktoryInfo,
   flightById,
   flightCreate,
+  flightDelete,
   flightUpdate,
   flightList,
   friendCreate,

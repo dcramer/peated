@@ -24,6 +24,7 @@
     "@paralleldrive/cuid2": "^2.2.2",
     "@peated/design": "workspace:*",
     "@peated/tsconfig": "workspace:*",
+    "@sentry/core": "^8.10.0",
     "@sentry/node": "^8.9.2",
     "@sentry/profiling-node": "^8.9.2",
     "@sentry/utils": "^8.9.2",
@@ -69,7 +70,7 @@
     "typescript": "~5.4.4",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.4.0",
-    "zod": "^3.22.4",
+    "zod": "^3.23.8",
     "zod-to-json-schema": "^3.22.5"
   },
   "volta": {

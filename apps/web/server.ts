@@ -121,7 +121,7 @@ app.all("*", async (req, res, next) => {
 function getLoadContext(req: Request): AppLoadContext {
   const trpc = createTRPCProxyClient<AppRouter>({
     links: [
-      sentryLink(Sentry.captureException),
+      sentryLink(),
       httpBatchLink({
         url: `${config.API_SERVER}/trpc`,
         async headers() {
