@@ -2,30 +2,32 @@ import { type AppRouter } from "@peated/server/trpc/router";
 import {
   TRPCClientError,
   createTRPCReact,
+  type CreateTRPCReact,
   type inferReactQueryProcedureOptions,
 } from "@trpc/react-query";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 
-export const trpc = createTRPCReact<AppRouter>({
-  overrides: {
-    useMutation: {
-      /**
-       * This function is called whenever a `.useMutation` succeeds
-       **/
-      async onSuccess(opts) {
+export const trpc: CreateTRPCReact<AppRouter, unknown> =
+  createTRPCReact<AppRouter>({
+    overrides: {
+      useMutation: {
         /**
-         * @note that order here matters:
-         * The order here allows route changes in `onSuccess` without
-         * having a flash of content change whilst redirecting.
+         * This function is called whenever a `.useMutation` succeeds
          **/
-        // Calls the `onSuccess` defined in the `useQuery()`-options:
-        await opts.originalFn();
-        // Invalidate all queries in the react-query cache:
-        await opts.queryClient.invalidateQueries();
+        async onSuccess(opts) {
+          /**
+           * @note that order here matters:
+           * The order here allows route changes in `onSuccess` without
+           * having a flash of content change whilst redirecting.
+           **/
+          // Calls the `onSuccess` defined in the `useQuery()`-options:
+          await opts.originalFn();
+          // Invalidate all queries in the react-query cache:
+          await opts.queryClient.invalidateQueries();
+        },
       },
     },
-  },
-});
+  });
 
 // TODO: im not even sure what the difference is within this implementation, but it doesnt
 // provide us a great wait to pass in credentials vs our context provider

@@ -3,11 +3,12 @@ import { type AppRouter } from "@peated/server/src/trpc/router";
 import config from "@peated/web/config";
 import { httpBatchLink } from "@trpc/client";
 import { createTRPCQueryUtils } from "@trpc/react-query";
+import { type CreateQueryUtils } from "@trpc/react-query/shared";
 import getQueryClient from "./getQueryClient";
 import { getSession } from "./session.server";
 import { trpc } from "./trpc";
 
-export async function getTrpcClient() {
+export async function getTrpcClient(): Promise<CreateQueryUtils<AppRouter>> {
   const session = await getSession();
   const accessToken = session.accessToken;
 
