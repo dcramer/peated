@@ -3,8 +3,10 @@ import Fathom from "@peated/web/components/fathom";
 import config from "@peated/web/config";
 import { getSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
+import { dehydrate } from "@tanstack/react-query";
 import type { Metadata, Viewport } from "next";
 import React from "react";
+import getQueryClient from "../lib/getQueryClient";
 import Providers from "./providers/providers";
 
 export const viewport: Viewport = {
@@ -28,11 +30,15 @@ export default async function RootLayout({
   auth: React.ReactNode;
 }>) {
   const session = await getSession();
+  const queryClient = getQueryClient();
+
+  const dehydratedState = dehydrate(queryClient);
 
   return (
     <html lang="en">
       <body className="h-full">
         <Providers
+          dehydratedState={dehydratedState}
           session={{
             user: session.user,
             accessToken: session.accessToken,

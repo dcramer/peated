@@ -1,23 +1,24 @@
 "use client";
 
-import { useHydrated } from "@peated/web/components/clientOnly";
 import { default as config } from "@peated/web/config";
 import { ApiProvider } from "@peated/web/hooks/useApi";
 import { AuthProvider } from "@peated/web/hooks/useAuth";
 import { OnlineStatusProvider } from "@peated/web/hooks/useOnlineStatus";
-import useSingletonQueryClient from "@peated/web/hooks/useSingletonQueryClient";
+import getQueryClient from "@peated/web/lib/getQueryClient";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { HydrationBoundary, QueryClientProvider } from "@tanstack/react-query";
 import { type SessionData } from "../../lib/session.server";
 import TRPCProvider from "./trpc";
 
 export default function Providers({
   children,
   session: { user, accessToken },
+  dehydratedState,
 }: {
   children: React.ReactNode;
   session: SessionData;
+  dehydratedState: any;
 }) {
   setUser(
     user
@@ -29,8 +30,7 @@ export default function Providers({
       : null,
   );
 
-  const hydrated = useHydrated();
-  const queryClient = useSingletonQueryClient({ ssr: !hydrated });
+  const queryClient = getQueryClient();
 
   return (
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
@@ -40,13 +40,18 @@ export default function Providers({
         key={accessToken}
       >
         <QueryClientProvider client={queryClient}>
-          <OnlineStatusProvider>
-            <AuthProvider user={user}>
-              <ApiProvider accessToken={accessToken} server={config.API_SERVER}>
-                {children}
-              </ApiProvider>
-            </AuthProvider>
-          </OnlineStatusProvider>
+          <HydrationBoundary state={dehydratedState}>
+            <OnlineStatusProvider>
+              <AuthProvider user={user}>
+                <ApiProvider
+                  accessToken={accessToken}
+                  server={config.API_SERVER}
+                >
+                  {children}
+                </ApiProvider>
+              </AuthProvider>
+            </OnlineStatusProvider>
+          </HydrationBoundary>
         </QueryClientProvider>
       </TRPCProvider>
     </GoogleOAuthProvider>
