@@ -8,8 +8,8 @@ import { getSession } from "./session.server";
 import { isTRPCClientError } from "./trpc";
 
 export async function logout(
-  prevState: any,
-  formData: FormData,
+  prevState?: any,
+  formData?: FormData,
   redirectTo = "/",
 ) {
   const session = await getSession();
