@@ -1,13 +1,19 @@
+"use client";
+
 import Button from "@peated/web/components/button";
 import Form from "@peated/web/components/form";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
-import { authenticate } from "@peated/web/lib/auth.server";
+import { authenticate } from "@peated/web/lib/auth.actions";
+import { useFormState, useFormStatus } from "react-dom";
+import Alert from "./alert";
 
-function BasicLogin() {
+function BasicLogin({ action }: { action: any }) {
+  const { pending } = useFormStatus();
+
   return (
-    <Form action={authenticate} method="post">
+    <Form action={action}>
       <TextField
         name="email"
         type="email"
@@ -25,7 +31,7 @@ function BasicLogin() {
         className="mb-2 rounded"
       />
       <div className="flex justify-center">
-        <Button type="submit" color="highlight" fullWidth>
+        <Button type="submit" color="highlight" fullWidth loading={pending}>
           Sign in
         </Button>
       </div>
@@ -34,12 +40,14 @@ function BasicLogin() {
 }
 
 export default function LoginForm() {
+  const [error, formAction] = useFormState(authenticate, undefined);
+
   return (
     <div className="min-w-sm mt-8 flex-auto">
-      {/* {error ? <Alert>{error}</Alert> : null} */}
+      {error ? <Alert>{error}</Alert> : null}
       {config.GOOGLE_CLIENT_ID && (
         <>
-          <GoogleLoginButton />
+          <GoogleLoginButton action={formAction} />
           <div className="relative my-4 text-slate-700">
             <div
               className="absolute inset-0 flex items-center"
@@ -53,7 +61,7 @@ export default function LoginForm() {
           </div>
         </>
       )}
-      <BasicLogin />
+      <BasicLogin action={formAction} />
     </div>
   );
 }

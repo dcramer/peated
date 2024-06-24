@@ -1,7 +1,19 @@
 import { withSentryConfig } from "@sentry/nextjs";
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  env: {
+    DEBUG: !!process.env.DEBUG,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
+    SENTRY_DSN: process.env.SENTRY_DSN,
+    API_SERVER: process.env.API_SERVER || "http://localhost:4000",
+    FATHOM_SITE_ID: process.env.FATHOM_SITE_ID,
+
+    VERSION: process.env.VERSION,
+    GITHUB_REPO: "https://github.com/dcramer/peated",
+    DISCORD_LINK: "https://discord.gg/d7GFPfy88Z",
+  },
+};
 
 export default withSentryConfig(nextConfig, {
   // For all available options, see:

@@ -5,6 +5,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import classNames from "@peated/web/lib/classNames";
 import Link from "next/link";
 import { Fragment, useRef } from "react";
+import LogoutButton from "./logoutButton";
 import UserAvatar from "./userAvatar";
 
 export function ProfileDropdown() {
@@ -80,13 +81,7 @@ export function ProfileDropdown() {
                   <Link href={`/users/${user.username}`}>Profile</Link>
                 </Menu.Item>
                 <Menu.Item>
-                  <button
-                    onClick={async () => {
-                      // await logout();
-                    }}
-                  >
-                    Sign out
-                  </button>
+                  <LogoutButton />
                 </Menu.Item>
               </div>
               {user.admin && (

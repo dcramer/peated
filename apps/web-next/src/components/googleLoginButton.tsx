@@ -2,10 +2,12 @@
 
 import { useGoogleLogin } from "@react-oauth/google";
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import Button from "./button";
 
-export default function GoogleLoginButton() {
+export default function GoogleLoginButton({ action }: { action: any }) {
   const [loading, setLoading] = useState(false);
+  const { pending } = useFormStatus();
 
   const googleLogin = useGoogleLogin({
     flow: "auth-code",
@@ -13,7 +15,8 @@ export default function GoogleLoginButton() {
       const data = new FormData();
       data.append("code", codeResponse.code);
       // TODO:
-      // submit(data, { method: "POST" });
+      action(data);
+
       setLoading(false);
     },
     onError: () => {
@@ -30,7 +33,7 @@ export default function GoogleLoginButton() {
         setLoading(true);
         googleLogin();
       }}
-      disabled={loading}
+      disabled={loading || pending}
     >
       <svg
         className="-ml-1 mr-2 h-4 w-4"

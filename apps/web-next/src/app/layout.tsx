@@ -5,7 +5,6 @@ import { getSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
 import type { Metadata, Viewport } from "next";
 import React from "react";
-import getQueryClient from "../lib/getQueryClient";
 import Providers from "./providers/providers";
 
 export const viewport: Viewport = {
@@ -29,7 +28,6 @@ export default async function RootLayout({
   auth: React.ReactNode;
 }>) {
   const session = await getSession();
-  const queryClient = getQueryClient();
 
   return (
     <html lang="en">
