@@ -3,7 +3,6 @@ import EntityHeader from "@peated/web/components/entityHeader";
 import ShareButton from "@peated/web/components/shareButton";
 import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
-import { getEntity } from "../utils.server";
 import ModActions from "./modActions";
 
 export default async function Layout({
@@ -14,7 +13,8 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const entityId = Number(params.entityId);
-  const entity = await getEntity(entityId);
+  const trpcClient = await getTrpcClient();
+  const entity = await trpcClient.entityById.ensureData(entityId);
 
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (entity.id !== entityId) {

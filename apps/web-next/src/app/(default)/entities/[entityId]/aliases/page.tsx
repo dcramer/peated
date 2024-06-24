@@ -1,13 +1,13 @@
 import Chip from "@peated/web/components/chip";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { getEntity } from "../../utils.server";
 
 export async function generateMetadata({
   params: { entityId },
 }: {
   params: { entityId: string };
 }) {
-  const entity = await getEntity(Number(entityId));
+  const trpcClient = await getTrpcClient();
+  const entity = await trpcClient.entityById.ensureData(Number(entityId));
 
   return [
     {
@@ -23,8 +23,8 @@ export default async function EntityAliases({
 }) {
   const trpcClient = await getTrpcClient();
   const [entity, aliasList] = await Promise.all([
-    getEntity(Number(entityId)),
-    trpcClient.entityAliasList.query({
+    trpcClient.entityById.ensureData(Number(entityId)),
+    trpcClient.entityAliasList.ensureData({
       entity: Number(entityId),
     }),
   ]);

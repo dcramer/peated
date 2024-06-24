@@ -1,7 +1,7 @@
 import Tabs, { TabItem } from "@peated/web/components/tabs";
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import Link from "next/link";
 import { type ReactNode } from "react";
-import { getBottle } from "../../utils.server";
 
 export default async function Layout({
   params,
@@ -11,7 +11,8 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const bottleId = Number(params.bottleId);
-  const bottle = await getBottle(bottleId);
+  const trpcClient = await getTrpcClient();
+  const bottle = await trpcClient.bottleById.ensureData(bottleId);
 
   const baseUrl = `/bottles/${bottle.id}`;
 

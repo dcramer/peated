@@ -1,14 +1,14 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { getUser } from "../../utils.server";
 
 export async function generateMetadata({
   params: { username },
 }: {
   params: { username: string };
 }) {
-  const user = await getUser(username);
+  const trpcClient = await getTrpcClient();
+  const user = await trpcClient.userById.ensureData(username);
 
   return {
     title: `@${user.username}`,
@@ -26,9 +26,9 @@ export default async function UserTastings({
 }: {
   params: { username: string };
 }) {
-  const user = await getUser(username);
   const trpcClient = await getTrpcClient();
-  const tastingList = await trpcClient.tastingList.query({
+  const user = await trpcClient.userById.ensureData(username);
+  const tastingList = await trpcClient.tastingList.ensureData({
     user: user.id,
   });
 

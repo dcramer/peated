@@ -5,7 +5,7 @@ import { Suspense } from "react";
 export default async function Page() {
   const filter = "global";
   const trpcClient = await getTrpcClient();
-  const tastingList = await trpcClient.tastingList.query({
+  const tastingList = await trpcClient.tastingList.ensureData({
     filter,
     limit: 10,
   });

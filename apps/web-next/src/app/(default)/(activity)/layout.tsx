@@ -20,7 +20,7 @@ export default async function Layout({
   const trpc = await getTrpcClient();
   const user = await getCurrentUser();
 
-  const newBottleList = await trpc.bottleList.query({
+  const newBottleList = await trpc.bottleList.ensureData({
     sort: "-date",
     limit: 10,
   });

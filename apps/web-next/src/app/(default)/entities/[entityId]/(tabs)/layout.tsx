@@ -1,17 +1,17 @@
 import Tabs, { TabItem } from "@peated/web/components/tabs";
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import Link from "next/link";
 import { type ReactNode } from "react";
-import { getEntity } from "../../utils.server";
 
 export default async function Layout({
-  params,
+  params: { entityId },
   children,
 }: {
-  params: Record<string, any>;
+  params: { entityId: string };
   children: ReactNode;
 }) {
-  const entityId = Number(params.entityId);
-  const entity = await getEntity(entityId);
+  const trpcClient = await getTrpcClient();
+  const entity = await trpcClient.entityById.ensureData(Number(entityId));
 
   const baseUrl = `/entities/${entity.id}`;
 

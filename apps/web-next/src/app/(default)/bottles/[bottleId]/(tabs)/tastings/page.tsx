@@ -1,14 +1,14 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { getBottle } from "../../../utils.server";
 
 export async function generateMetadata({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
-  const bottle = await getBottle(Number(bottleId));
+  const trpcClient = await getTrpcClient();
+  const bottle = await trpcClient.bottleById.ensureData(Number(bottleId));
 
   return [
     {
@@ -23,7 +23,7 @@ export default async function BottleTastings({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const tastingList = await trpcClient.tastingList.query({
+  const tastingList = await trpcClient.tastingList.ensureData({
     bottle: Number(bottleId),
   });
 

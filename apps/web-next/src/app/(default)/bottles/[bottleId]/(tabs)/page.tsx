@@ -3,8 +3,8 @@ import BottlePriceHistory, {
   BottlePriceHistorySkeleton,
 } from "@peated/web/components/bottlePriceHistory";
 import { summarize } from "@peated/web/lib/markdown";
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { Suspense } from "react";
-import { getBottle } from "../../utils.server";
 
 // export const sitemap: SitemapFunction = async ({
 //   config: sitemapConfig,
@@ -36,7 +36,8 @@ export async function generateMetadata({
 }: {
   params: { bottleId: string };
 }) {
-  const bottle = await getBottle(Number(bottleId));
+  const trpcClient = await getTrpcClient();
+  const bottle = await trpcClient.bottleById.ensureData(Number(bottleId));
 
   const description = summarize(bottle.description || "", 200);
 
@@ -58,7 +59,9 @@ export default async function BottleDetails({
 }: {
   params: { bottleId: string };
 }) {
-  const bottle = await getBottle(Number(bottleId));
+  const trpcClient = await getTrpcClient();
+  const bottle = await trpcClient.bottleById.ensureData(Number(bottleId));
+
   const stats = [
     {
       name: "Avg Rating",

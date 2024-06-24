@@ -13,7 +13,7 @@ export default async function Page() {
     return redirectToAuth({ pathname: "/friends" });
   }
   const trpcClient = await getTrpcClient();
-  const friendList = await trpcClient.friendList.query();
+  const friendList = await trpcClient.friendList.ensureData();
 
   return (
     <>

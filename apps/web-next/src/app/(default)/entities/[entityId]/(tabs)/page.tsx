@@ -4,17 +4,18 @@ import EntityMap from "@peated/web/components/entityMap";
 import EntitySpiritDistribution from "@peated/web/components/entitySpiritDistribution";
 import Markdown from "@peated/web/components/markdown";
 import { summarize } from "@peated/web/lib/markdown";
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { parseDomain } from "@peated/web/lib/urls";
 import Link from "next/link";
 import { Suspense } from "react";
-import { getEntity } from "../../utils.server";
 
 export async function generateMetadata({
   params: { entityId },
 }: {
   params: { entityId: string };
 }) {
-  const entity = await getEntity(Number(entityId));
+  const trpcClient = await getTrpcClient();
+  const entity = await trpcClient.entityById.ensureData(Number(entityId));
 
   const description = summarize(entity.description || "", 200);
 
@@ -36,7 +37,8 @@ export default async function EntityDetails({
 }: {
   params: { entityId: string };
 }) {
-  const entity = await getEntity(Number(entityId));
+  const trpcClient = await getTrpcClient();
+  const entity = await trpcClient.entityById.ensureData(Number(entityId));
 
   return (
     <>

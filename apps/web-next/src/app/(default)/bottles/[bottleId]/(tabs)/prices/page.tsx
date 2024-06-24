@@ -1,14 +1,14 @@
 import BetaNotice from "@peated/web/components/betaNotice";
 import TimeSince from "@peated/web/components/timeSince";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { getBottle } from "../../../utils.server";
 
 export async function generateMetadata({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
-  const bottle = await getBottle(Number(bottleId));
+  const trpcClient = await getTrpcClient();
+  const bottle = await trpcClient.bottleById.ensureData(Number(bottleId));
 
   return [
     {
@@ -23,7 +23,7 @@ export default async function BottlePrices({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const priceList = await trpcClient.bottlePriceList.query({
+  const priceList = await trpcClient.bottlePriceList.ensureData({
     bottle: Number(bottleId),
   });
 

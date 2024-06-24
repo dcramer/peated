@@ -7,16 +7,9 @@ import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
 import useAuth from "../hooks/useAuth";
 import Button from "./button";
 
-export default function CollectionAction({ bottle }: { bottle: Bottle }) {
-  const { user } = useAuth();
-
-  if (!user) {
-    return (
-      <Button href="/login" color="primary">
-        <StarIcon className="h-4 w-4" aria-hidden="true" />
-      </Button>
-    );
-  }
+function CollectionActionAuthenticated({ bottle }: { bottle: Bottle }) {
+  const favoriteBottleMutation = trpc.collectionBottleCreate.useMutation();
+  const unfavoriteBottleMutation = trpc.collectionBottleDelete.useMutation();
 
   let isCollected = false;
   let isLoading = false;
@@ -34,17 +27,10 @@ export default function CollectionAction({ bottle }: { bottle: Bottle }) {
     isLoading = collectedQuery.isLoading;
   } catch (err) {
     if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
-      return (
-        <Button href="/login" color="primary">
-          <StarIcon className="h-4 w-4" aria-hidden="true" />
-        </Button>
-      );
+      return <CollectionActionUnauthenticated />;
     }
     throw err;
   }
-
-  const favoriteBottleMutation = trpc.collectionBottleCreate.useMutation();
-  const unfavoriteBottleMutation = trpc.collectionBottleDelete.useMutation();
 
   const isAnyLoading =
     isLoading ||
@@ -76,4 +62,22 @@ export default function CollectionAction({ bottle }: { bottle: Bottle }) {
       )}
     </Button>
   );
+}
+
+function CollectionActionUnauthenticated() {
+  return (
+    <Button href="/login" color="primary">
+      <StarIcon className="h-4 w-4" aria-hidden="true" />
+    </Button>
+  );
+}
+
+export default function CollectionAction({ bottle }: { bottle: Bottle }) {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <CollectionActionUnauthenticated />;
+  }
+
+  return <CollectionActionAuthenticated bottle={bottle} />;
 }

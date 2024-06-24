@@ -27,7 +27,7 @@ export default async function BottleList({
   ]);
 
   const trpcClient = await getTrpcClient();
-  const bottleList = await trpcClient.bottleList.query(
+  const bottleList = await trpcClient.bottleList.ensureData(
     Object.fromEntries(
       [...Object.entries(searchParams)].map(([k, v]) =>
         numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],

@@ -8,18 +8,20 @@ import UserTagDistribution from "@peated/web/components/userTagDistribution";
 import { getCurrentUser, logout } from "@peated/web/lib/auth.server";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
-import { getUser } from "../utils.server";
 import FriendButton from "./friendButton";
 import ModActions from "./modActions";
 
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
 export default async function Layout({
-  params,
+  params: { username },
   children,
 }: {
-  params: Record<string, any>;
+  params: { username: string };
   children: ReactNode;
 }) {
-  const user = await getUser(params.username);
+  const trpcClient = await getTrpcClient();
+  const user = await trpcClient.userById.ensureData(username);
+
   const currentUser = await getCurrentUser();
 
   const isPrivate =

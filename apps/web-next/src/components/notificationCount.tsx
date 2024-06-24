@@ -1,17 +1,24 @@
 "use client";
 
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc";
+import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
 
-export default function NotificationCount() {
-  const { user } = useAuth();
-  const [unreadNotificationCount] = trpc.notificationCount.useSuspenseQuery(
-    { filter: "unread" },
-    {
-      staleTime: 60 * 1000,
-      // enabled: !!user && typeof document !== "undefined",
-    },
-  );
+function NotificationCountAuthentciated() {
+  let unreadNotificationCount;
+  try {
+    [unreadNotificationCount] = trpc.notificationCount.useSuspenseQuery(
+      { filter: "unread" },
+      {
+        staleTime: 60 * 1000,
+        // enabled: !!user && typeof document !== "undefined",
+      },
+    );
+  } catch (err) {
+    if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
+      return null;
+    }
+    throw err;
+  }
 
   if (unreadNotificationCount && unreadNotificationCount.count > 0) {
     return (
@@ -22,4 +29,12 @@ export default function NotificationCount() {
   }
 
   return null;
+}
+
+export default function NotificationCount() {
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  return <NotificationCountAuthentciated />;
 }

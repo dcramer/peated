@@ -19,7 +19,7 @@ export default async function EntityList({
   const numericFields = new Set(["cursor", "limit"]);
 
   const trpcClient = await getTrpcClient();
-  const entityList = await trpcClient.entityList.query(
+  const entityList = await trpcClient.entityList.ensureData(
     Object.fromEntries(
       [...Object.entries(searchParams)].map(([k, v]) =>
         numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],

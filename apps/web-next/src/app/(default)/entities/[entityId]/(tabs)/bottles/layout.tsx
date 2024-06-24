@@ -1,12 +1,12 @@
 import { type ReactNode } from "react";
-import { getEntity } from "../../../utils.server";
 
 export async function generateMetadata({
   params: { entityId },
 }: {
   params: { entityId: string };
 }) {
-  const entity = await getEntity(Number(entityId));
+  const trpcClient = await getTrpcClient();
+  const entity = await trpcClient.entityById.ensureData(Number(entityId));
 
   return [
     {

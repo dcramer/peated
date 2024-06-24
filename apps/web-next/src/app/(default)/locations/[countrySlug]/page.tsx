@@ -7,14 +7,14 @@ import Map from "@peated/web/components/map";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { Suspense } from "react";
-import { getCountry } from "../utils.server";
 
 export async function generateMetadata({
   params: { countrySlug },
 }: {
   params: { countrySlug: string };
 }) {
-  const country = await getCountry(countrySlug);
+  const trpcClient = await getTrpcClient();
+  const country = await trpcClient.countryBySlug.ensureData(countrySlug);
 
   return {
     title: `Whisky from ${country.name}`,
@@ -28,8 +28,8 @@ export default async function Page({
 }) {
   const trpcClient = await getTrpcClient();
   const [country, topEntityList] = await Promise.all([
-    getCountry(countrySlug),
-    trpcClient.entityList.query({
+    trpcClient.countryBySlug.ensureData(countrySlug),
+    trpcClient.entityList.ensureData({
       country: countrySlug,
       type: "distiller",
       sort: "-bottles",
