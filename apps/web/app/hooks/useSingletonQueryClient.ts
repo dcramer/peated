@@ -7,7 +7,7 @@ type QueryClientConfig = {
 };
 
 export function getQueryClient({ ssr }: QueryClientConfig): QueryClient {
-  if (queryClient === null) {
+  if (queryClient === null || ssr) {
     queryClient = new QueryClient({
       defaultOptions: {
         queries: {
