@@ -1,10 +1,7 @@
 import { type Metadata } from "next";
-import { type ReactNode } from "react";
+
+export { default } from "@peated/web/components/defaultLayout";
 
 export const metadata: Metadata = {
   title: "Record Tasting",
 };
-
-export default function Layout({ children }: { children: ReactNode }) {
-  return <>{children}</>;
-}

@@ -1,14 +1,7 @@
 import { type Metadata } from "next";
-import { type ReactNode } from "react";
+
+export { default } from "@peated/web/components/defaultLayout";
 
 export const metadata: Metadata = {
   title: "Add Entity",
 };
-
-export default function Layout({
-  children,
-}: Readonly<{
-  children: ReactNode;
-}>) {
-  return <>{children}</>;
-}
