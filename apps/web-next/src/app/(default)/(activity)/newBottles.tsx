@@ -8,8 +8,8 @@ import Link from "next/link";
 
 export function NewBottlesSkeleton() {
   const Row = () => (
-    <tr className="border-b border-slate-800">
-      <td className="max-w-0 space-y-1 px-4 py-1 text-sm sm:px-3">
+    <tr className=" border-b border-slate-800">
+      <td className="max-w-0 space-y-1 overflow-hidden px-4 py-1 text-sm sm:px-3">
         <div className="flex animate-pulse items-center overflow-hidden bg-slate-800 -indent-96">
           Bottle
         </div>

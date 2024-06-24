@@ -14,6 +14,7 @@ export default async function Page() {
   if (!(await isLoggedIn())) {
     return redirectToAuth({ pathname: "/favorites" });
   }
+
   const trpcClient = await getTrpcClient();
   const favoriteList = await trpcClient.collectionBottleList.ensureData({
     user: "me",

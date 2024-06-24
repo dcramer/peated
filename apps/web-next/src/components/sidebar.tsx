@@ -9,9 +9,12 @@ import {
   StarIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
+import BottleIcon from "@peated/web/assets/bottle.svg";
+import BottlerIcon from "@peated/web/assets/bottler.svg";
+import BrandIcon from "@peated/web/assets/brand.svg";
+import DistillerIcon from "@peated/web/assets/distiller.svg";
 import config from "@peated/web/config";
 import { usePathname } from "next/navigation";
-import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
 import Button from "./button";
 import FeedbackSidebarLink from "./feedbackSidebarLink";
 import HeaderLogo from "./headerLogo";
@@ -83,10 +86,24 @@ export default function Sidebar() {
                   </SidebarLink>
                   <SidebarLink
                     href="/distillers"
-                    icon={EntityIcon}
+                    icon={DistillerIcon}
                     active={pathname.startsWith("/distillers")}
                   >
                     Distillers
+                  </SidebarLink>
+                  <SidebarLink
+                    href="/brands"
+                    icon={BrandIcon}
+                    active={pathname.startsWith("/brands")}
+                  >
+                    Brands
+                  </SidebarLink>
+                  <SidebarLink
+                    href="/brands"
+                    icon={BottlerIcon}
+                    active={pathname.startsWith("/bottlers")}
+                  >
+                    Bottlers
                   </SidebarLink>
                 </ul>
               </li>

@@ -13,6 +13,13 @@ const nextConfig = {
     GITHUB_REPO: "https://github.com/dcramer/peated",
     DISCORD_LINK: "https://discord.gg/d7GFPfy88Z",
   },
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ["@svgr/webpack"],
+    });
+    return config;
+  },
 };
 
 export default withSentryConfig(nextConfig, {
