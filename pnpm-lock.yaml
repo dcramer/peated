@@ -604,6 +604,9 @@ importers:
       react:
         specifier: ^18
         version: 18.3.1
+      react-avatar-editor:
+        specifier: ^13.0.2
+        version: 13.0.2(@babel/core@7.24.7)(react-dom@18.3.1)(react@18.3.1)
       react-dom:
         specifier: ^18
         version: 18.3.1(react@18.3.1)
@@ -644,6 +647,9 @@ importers:
       '@types/react':
         specifier: ^18
         version: 18.3.3
+      '@types/react-avatar-editor':
+        specifier: ^13.0.2
+        version: 13.0.2
       '@types/react-dom':
         specifier: ^18
         version: 18.3.0
@@ -6303,7 +6309,6 @@ packages:
     resolution: {integrity: sha512-vnGU4sx5TDB9JMCuw+kB3+jfDNMhVlpBbgMRZG9NzVnaBb5xUjVV4VmHdD2O8gj/pb5GN+QXKk7jan09aMjG2A==}
     dependencies:
       '@types/react': 18.3.3
-    dev: false
 
   /@types/react-dom@18.3.0:
     resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}

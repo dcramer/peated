@@ -1,10 +1,12 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { forwardRef, useEffect, useState } from "react";
 
 import { type Point } from "@peated/server/src/types";
 import { ClientOnly } from "./clientOnly";
 import FormField from "./formField";
-import { Map } from "./map.client";
+import Map from "./map";
 import TextInput from "./textInput";
 
 type Props = Omit<
