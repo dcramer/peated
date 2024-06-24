@@ -40,7 +40,6 @@ export default function Page() {
     [user] = trpc.userById.useSuspenseQuery("me");
   } catch (err) {
     if (isTRPCClientError(err) && err.data?.code === "NOT_FOUND") {
-      console.log(err);
       redirect("/login");
     }
     throw err;
