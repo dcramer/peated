@@ -5,13 +5,14 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UserAvatar from "@peated/web/components/userAvatar";
 import UserTagDistribution from "@peated/web/components/userTagDistribution";
-import { getCurrentUser, logout } from "@peated/web/lib/auth.server";
+import { getCurrentUser } from "@peated/web/lib/auth.server";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import FriendButton from "./friendButton";
 import ModActions from "./modActions";
 
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import LogoutButton from "./logoutButton";
 export default async function Layout({
   params: { username },
   children,
@@ -94,9 +95,7 @@ export default async function Layout({
                   <Button href="/settings" color="primary">
                     Edit Profile
                   </Button>
-                  <Button onClick={logout} color="primary">
-                    Sign Out
-                  </Button>
+                  <LogoutButton />
                 </>
               )}
 

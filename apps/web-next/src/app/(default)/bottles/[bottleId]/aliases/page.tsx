@@ -1,13 +1,13 @@
 import Chip from "@peated/web/components/chip";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { getBottle } from "../../utils.server";
 
 export async function generateMetadata({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
-  const bottle = await getBottle(Number(bottleId));
+  const trpcClient = await getTrpcClient();
+  const bottle = await trpcClient.bottleById.ensureData(Number(bottleId));
 
   return [
     {
@@ -23,8 +23,8 @@ export default async function BottleAliases({
 }) {
   const trpcClient = await getTrpcClient();
   const [bottle, aliasList] = await Promise.all([
-    getBottle(Number(bottleId)),
-    trpcClient.bottleAliasList.query({
+    trpcClient.bottleById.ensureData(Number(bottleId)),
+    trpcClient.bottleAliasList.ensureData({
       bottle: Number(bottleId),
     }),
   ]);
