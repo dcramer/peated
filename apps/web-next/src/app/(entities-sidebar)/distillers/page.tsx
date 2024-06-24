@@ -28,6 +28,7 @@ export default function Page() {
           entityList={entityList.results}
           rel={entityList.rel}
           sort={searchParams.get("sort") || DEFAULT_SORT}
+          type="distiller"
           withLocations
         />
       ) : (

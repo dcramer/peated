@@ -1,8 +1,9 @@
-import type { ReactNode } from "react";
+"use client";
 
 import { RadioGroup } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import classNames from "@peated/web/lib/classNames";
+import type { ReactNode } from "react";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { useController } from "react-hook-form";
 import FormField from "./formField";

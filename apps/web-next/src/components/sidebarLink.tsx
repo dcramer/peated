@@ -30,6 +30,7 @@ export default forwardRef(function SidebarLink<
   return (
     <li>
       <Component
+        href=""
         className={classNames(
           active
             ? "text-highlight border-highlight"

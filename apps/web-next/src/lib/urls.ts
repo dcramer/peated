@@ -1,7 +1,23 @@
-import type { Entity } from "@peated/server/types";
+import type { Entity, EntityType } from "@peated/server/types";
 
 export function getEntityUrl(entity: Entity) {
   return `/entities/${entity.id}`;
+}
+
+export function getEntityTypeSearchUrl(type: EntityType) {
+  let link: string;
+  switch (type) {
+    case "bottler":
+      link = "/bottlers";
+      break;
+    case "brand":
+      link = "/brands";
+      break;
+    case "distiller":
+      link = "/distillers";
+      break;
+  }
+  return link;
 }
 
 export function buildQueryString(

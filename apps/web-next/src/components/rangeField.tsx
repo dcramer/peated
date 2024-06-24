@@ -1,3 +1,5 @@
+"use client";
+
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import type { FieldError } from "react-hook-form";

@@ -50,7 +50,7 @@ export default function NotificationEntry({
                     className="mr-1 font-semibold hover:underline"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/users/${notification.fromUser?.username}`);
+                      router.push(`/users/${notification.fromUser?.username}`);
                     }}
                   >
                     {notification.fromUser.displayName}

@@ -95,7 +95,7 @@ export default async function Page({
       />
 
       {topEntityList.results.length ? (
-        <EntityTable entityList={topEntityList.results} />
+        <EntityTable entityList={topEntityList.results} type="distiller" />
       ) : (
         <p className="text-light">
           {"It looks like we don't know of any distilleries in the area."}

@@ -138,9 +138,9 @@ export default function SelectField<T extends Option>({
   useEffect(() => {
     if (!onChange) return;
     if (multiple) {
-      onChange(value);
+      (onChange as (value: T[]) => void)(value);
     } else {
-      onChange(value[0]);
+      (onChange as (value: T) => void)(value[0]);
     }
   }, [JSON.stringify(value)]);
 

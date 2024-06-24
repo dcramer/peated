@@ -1,3 +1,5 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FlightInputSchema } from "@peated/server/schemas";
 import type { Bottle } from "@peated/server/types";

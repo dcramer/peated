@@ -1,9 +1,10 @@
 "use client";
 
-import type { Entity, PagingRel } from "@peated/server/types";
+import type { Entity, EntityType, PagingRel } from "@peated/server/types";
 import classNames from "@peated/web/lib/classNames";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { getEntityTypeSearchUrl } from "../lib/urls";
 import Chip from "./chip";
 import PaginationButtons from "./paginationButtons";
 import SortParam from "./sortParam";
@@ -14,15 +15,19 @@ export default function EntityTable({
   withLocations = false,
   withTastings = false,
   sort: initialSort,
+  type,
 }: {
   entityList: Entity[];
   withTastings?: boolean;
   withLocations?: boolean;
   rel?: PagingRel;
   sort?: string;
+  type: EntityType;
 }) {
   const searchParams = useSearchParams();
   const sort = initialSort ?? searchParams.get("sort");
+
+  const link = getEntityTypeSearchUrl(type);
 
   return (
     <>
@@ -81,7 +86,7 @@ export default function EntityTable({
                         key={t}
                         size="small"
                         as={Link}
-                        href={`/entities?type=${encodeURIComponent(t)}`}
+                        href={`${link}?type=${encodeURIComponent(t)}`}
                       >
                         {t}
                       </Chip>
@@ -111,7 +116,7 @@ export default function EntityTable({
                     {!!entity.region && (
                       <div>
                         <Link
-                          href={`/entities?region=${encodeURIComponent(
+                          href={`/${link}?region=${encodeURIComponent(
                             entity.region,
                           )}`}
                           className="text-light hover:underline"

@@ -82,7 +82,17 @@ const LocationMap = ({ position }: { position: Point | null }) => {
       }
     >
       {() => (
-        <Map width={mapWidth} height={mapHeight} position={position} editable />
+        <Map
+          width={mapWidth}
+          height={mapHeight}
+          position={position}
+          markers={[
+            {
+              position: position || [0, 0],
+              useAsPosition: true,
+            },
+          ]}
+        />
       )}
     </ClientOnly>
   );

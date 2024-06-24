@@ -1,6 +1,7 @@
 import type { Entity } from "@peated/server/types";
 import EntityIcon from "@peated/web/components/assets/Entity";
 import Link from "next/link";
+import { getEntityTypeSearchUrl } from "../lib/urls";
 import Chip from "./chip";
 import PageHeader from "./pageHeader";
 
@@ -29,16 +30,7 @@ export default function EntityHeader({
             </>
           )}
           {!!entity.country && !!entity.region && (
-            <span>
-              {" "}
-              &middot;{" "}
-              <Link
-                href={`/entities?region=${encodeURIComponent(entity.region)}`}
-                className="truncate hover:underline"
-              >
-                {entity.region}
-              </Link>
-            </span>
+            <span> &middot; {entity.region}</span>
           )}
         </div>
       }
@@ -50,7 +42,7 @@ export default function EntityHeader({
               size="small"
               color="highlight"
               as={Link}
-              href={`/entities?type=${encodeURIComponent(t)}`}
+              href={`${getEntityTypeSearchUrl(t)}?type=${encodeURIComponent(t)}`}
             >
               {t}
             </Chip>

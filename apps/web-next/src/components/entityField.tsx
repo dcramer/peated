@@ -8,7 +8,7 @@ import Button from "./button";
 import CountryField from "./countryField";
 import Fieldset from "./fieldset";
 import SelectField from "./selectField";
-import { type CreateFormOptions } from "./selectField/types";
+import { type CreateFormOptions, type Option } from "./selectField/types";
 import TextField from "./textField";
 
 type FormSchemaType = z.infer<typeof EntityInputSchema>;
@@ -51,7 +51,7 @@ function CreateForm({
   onFieldChange,
   onSubmit,
   onClose,
-}: CreateFormOptions & {
+}: CreateFormOptions<Option> & {
   createDialogHelpText?: string;
 }) {
   const {

@@ -1,3 +1,5 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";

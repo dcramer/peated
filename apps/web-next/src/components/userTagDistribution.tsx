@@ -20,7 +20,7 @@ export default function UserTagDistribution({ userId }: { userId: number }) {
         tag: t.tag,
       }))}
       totalCount={totalCount}
-      to={(item) => `/bottles?tag=${encodeURIComponent(item.name)}`}
+      href={(item) => `/bottles?tag=${encodeURIComponent(item.name)}`}
     />
   );
 }

@@ -105,9 +105,7 @@ export default async function EntityDetails({
                 <div>
                   {entity.region && entity.country ? (
                     <>
-                      <Link href={`/entities?region=${entity.region}`}>
-                        {entity.region}
-                      </Link>
+                      {entity.region}
                       <span>, </span>
                       <Link href={`/locations/${entity.country.slug}`}>
                         {entity.country.name}

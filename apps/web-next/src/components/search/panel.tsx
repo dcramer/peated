@@ -5,7 +5,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { debounce } from "ts-debounce";
 import Header from "../header";
@@ -28,6 +28,8 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
   const maxResults = 50;
 
   const directToTasting = qs.has("tasting");
+
+  const router = useRouter();
 
   const [query, setQuery] = useState(qs.get("q") || "");
   const [state, setState] = useState<"loading" | "ready">("loading");
@@ -151,13 +153,10 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
               if (onQueryChange) onQueryChange(query);
             }}
             onSubmit={(value) => {
-              navigate(
+              router.replace(
                 `${location.pathname}?q=${encodeURIComponent(value)}&${
                   directToTasting ? "tasting" : ""
                 }`,
-                {
-                  replace: true,
-                },
               );
             }}
             onClose={onClose}
