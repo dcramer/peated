@@ -1,6 +1,6 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
-import BottleIcon from "@peated/web/components/assets/Bottle";
+import BottleIcon from "@peated/web/assets/bottle.svg";
 import Link from "next/link";
 import BottleMetadata from "./bottleMetadata";
 import PageHeader from "./pageHeader";

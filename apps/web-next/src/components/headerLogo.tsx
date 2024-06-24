@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import PeatedGlyph from "./assets/Glyph";
-import PeatedLogo from "./assets/Logo";
+import PeatedGlyph from "@peated/web/assets/glyph.svg";
+import PeatedLogo from "@peated/web/assets/logo.svg";
 
 export default function HeaderLogo() {
   return (

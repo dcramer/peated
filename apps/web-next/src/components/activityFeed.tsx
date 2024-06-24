@@ -1,7 +1,7 @@
 "use client";
 
+import Glyph from "@peated/web/assets/glyph.svg";
 import Alert from "@peated/web/components/alert";
-import Glyph from "@peated/web/components/assets/Glyph";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Spinner from "@peated/web/components/spinner";
 import TastingList from "@peated/web/components/tastingList";
