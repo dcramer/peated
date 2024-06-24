@@ -26,8 +26,10 @@ const makeQueryClient = () => {
 
 const getServerQueryClient = cache(() => makeQueryClient());
 
-function getQueryClient(ssr = true) {
-  if (ssr) return getServerQueryClient();
+// isServerComponent must be true for any server component
+// and false for any client component (even if server rendered)
+function getQueryClient(isServerComponent = true) {
+  if (isServerComponent) return getServerQueryClient();
   return makeQueryClient();
 }
 
