@@ -10,7 +10,7 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import config from "@peated/web/config";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Bottle as BottleIcon, Entity as EntityIcon } from "./assets";
 import Button from "./button";
 import FeedbackSidebarLink from "./feedbackSidebarLink";
@@ -19,7 +19,6 @@ import SidebarLink from "./sidebarLink";
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const queryString = useSearchParams();
 
   return (
     <>
@@ -40,7 +39,9 @@ export default function Sidebar() {
                   <SidebarLink
                     href="/"
                     icon={HomeIcon}
-                    active={pathname === "/"}
+                    active={
+                      pathname === "/" || pathname.startsWith("/activity/")
+                    }
                   >
                     Activity
                   </SidebarLink>
@@ -81,15 +82,9 @@ export default function Sidebar() {
                     Bottles
                   </SidebarLink>
                   <SidebarLink
-                    href={{
-                      pathname: "/entities",
-                      search: "?type=distiller",
-                    }}
+                    href="/distillers"
                     icon={EntityIcon}
-                    active={
-                      pathname === "/entities" &&
-                      queryString.get("type") === "distiller"
-                    }
+                    active={pathname.startsWith("/distillers")}
                   >
                     Distillers
                   </SidebarLink>

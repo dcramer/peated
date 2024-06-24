@@ -1,14 +1,18 @@
 "use client";
 
+import { type EntityType } from "@peated/server/types";
 import EntityForm from "@peated/web/components/entityForm";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AddEntity() {
   useAuthRequired();
 
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const type = searchParams.getAll("type") as EntityType[];
 
   const entityCreateMutation = trpc.entityCreate.useMutation();
 
@@ -18,6 +22,7 @@ export default function AddEntity() {
         const newEntity = await entityCreateMutation.mutateAsync(data);
         router.push(`/entities/${newEntity.id}`);
       }}
+      initialData={{ type }}
       title="Add Entity"
     />
   );

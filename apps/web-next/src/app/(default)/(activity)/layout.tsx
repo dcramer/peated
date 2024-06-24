@@ -1,15 +1,12 @@
-import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
-import { formatCategoryName } from "@peated/server/src/lib/format";
-import BottleLink from "@peated/web/components/bottleLink";
 import Button from "@peated/web/components/button";
 import PriceChanges, {
   PriceChangesSkeleton,
 } from "@peated/web/components/priceChanges";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
+import NewBottles, { NewBottlesSkeleton } from "./newBottles";
 // import { PriceChanges, PriceChangesSkeleton } from "./content";
 
 export default async function Layout({
@@ -17,13 +14,7 @@ export default async function Layout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const trpc = await getTrpcClient();
   const user = await getCurrentUser();
-
-  const newBottleList = await trpc.bottleList.ensureData({
-    sort: "-date",
-    limit: 10,
-  });
 
   return (
     <>
@@ -60,49 +51,10 @@ export default async function Layout({
             <Tabs fullWidth>
               <TabItem active>Newest Bottles</TabItem>
             </Tabs>
-            <table className="my-2 min-w-full">
-              <tbody>
-                {newBottleList &&
-                  newBottleList.results.map((bottle) => {
-                    return (
-                      <tr key={bottle.id} className="border-b border-slate-800">
-                        <td className="max-w-0 py-2 pl-4 pr-4 text-sm sm:pl-3">
-                          <div className="flex items-center space-x-1">
-                            <BottleLink
-                              bottle={bottle}
-                              className="font-medium hover:underline"
-                            >
-                              {bottle.fullName}
-                            </BottleLink>
-                            {bottle.isFavorite && (
-                              <StarIcon
-                                className="h-4 w-4"
-                                aria-hidden="true"
-                              />
-                            )}
-                            {bottle.hasTasted && (
-                              <CheckBadgeIcon
-                                className="h-4 w-4"
-                                aria-hidden="true"
-                              />
-                            )}
-                          </div>
-                          {!!bottle.category && (
-                            <div className="text-light text-sm">
-                              <Link
-                                href={`/bottles/?category=${bottle.category}`}
-                                className="hover:underline"
-                              >
-                                {formatCategoryName(bottle.category)}
-                              </Link>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
+
+            <Suspense fallback={<NewBottlesSkeleton />}>
+              <NewBottles />
+            </Suspense>
 
             <Tabs fullWidth>
               <TabItem active>Market Prices</TabItem>

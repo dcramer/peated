@@ -22,12 +22,14 @@ export default function BottleTable({
   groupTo,
   rel,
   sort: initialSort,
+  noHeaders = false,
 }: {
   bottleList: (Bottle | CollectionBottle)[];
   groupBy?: (bottle: Bottle) => Grouper;
   groupTo?: (group: Entity) => string;
   rel?: PagingRel;
   sort?: string;
+  noHeaders?: boolean;
 }) {
   const searchParams = useSearchParams();
   const sort = initialSort ?? searchParams.get("sort");
@@ -42,31 +44,33 @@ export default function BottleTable({
           <col className="sm:w-1/6" />
           <col className="sm:w-1/6" />
         </colgroup>
-        <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
-          <tr>
-            <th scope="col" className="py-3.5 pl-4 pr-3 text-left sm:pl-3">
-              <SortParam name="name" label="Bottle" sort={sort} />
-            </th>
-            <th
-              scope="col"
-              className="hidden px-3 py-3.5 text-center sm:table-cell"
-            >
-              <SortParam name="tastings" sort={sort} defaultOrder="desc" />
-            </th>
-            <th
-              scope="col"
-              className="hidden px-3 py-3.5 text-center sm:table-cell"
-            >
-              <SortParam name="rating" sort={sort} defaultOrder="desc" />
-            </th>
-            <th
-              scope="col"
-              className="hidden py-3.5 pl-3 pr-4 text-right sm:table-cell sm:pr-3"
-            >
-              <SortParam name="age" sort={sort} defaultOrder="desc" />
-            </th>
-          </tr>
-        </thead>
+        {!noHeaders && (
+          <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
+            <tr>
+              <th scope="col" className="py-3.5 pl-4 pr-3 text-left sm:pl-3">
+                <SortParam name="name" label="Bottle" sort={sort} />
+              </th>
+              <th
+                scope="col"
+                className="hidden px-3 py-3.5 text-center sm:table-cell"
+              >
+                <SortParam name="tastings" sort={sort} defaultOrder="desc" />
+              </th>
+              <th
+                scope="col"
+                className="hidden px-3 py-3.5 text-center sm:table-cell"
+              >
+                <SortParam name="rating" sort={sort} defaultOrder="desc" />
+              </th>
+              <th
+                scope="col"
+                className="hidden py-3.5 pl-3 pr-4 text-right sm:table-cell sm:pr-3"
+              >
+                <SortParam name="age" sort={sort} defaultOrder="desc" />
+              </th>
+            </tr>
+          </thead>
+        )}
         <tbody>
           {bottleList.map((bottleOrCb) => {
             const bottle =

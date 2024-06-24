@@ -7,18 +7,19 @@ import { useSearchParams } from "next/navigation";
 
 const DEFAULT_SORT = "-tastings";
 
-export default function EntityList() {
+export default function Page() {
   const searchParams = useSearchParams();
 
   const numericFields = new Set(["cursor", "limit"]);
 
-  const [entityList] = trpc.entityList.useSuspenseQuery(
-    Object.fromEntries(
+  const [entityList] = trpc.entityList.useSuspenseQuery({
+    ...Object.fromEntries(
       Array.from(searchParams.entries()).map(([k, v]) =>
         numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
       ),
     ),
-  );
+    type: "bottler",
+  });
 
   return (
     <>

@@ -13,12 +13,12 @@ export default function AddBottle() {
   useAuthRequired();
 
   const router = useRouter();
-  const qs = useSearchParams();
-  const name = toTitleCase(qs.get("name") || "");
+  const searchParams = useSearchParams();
+  const name = toTitleCase(searchParams.get("name") || "");
 
-  const distiller = qs.get("distiller") || null;
-  const brand = qs.get("brand") || null;
-  const bottler = qs.get("bottler") || null;
+  const distiller = searchParams.get("distiller") || null;
+  const brand = searchParams.get("brand") || null;
+  const bottler = searchParams.get("bottler") || null;
 
   const needsToLoad = Boolean(distiller || brand || bottler);
   const [loading, setLoading] = useState<boolean>(needsToLoad);

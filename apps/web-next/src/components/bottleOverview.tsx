@@ -61,7 +61,7 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
               <DefinitionList.Details>
                 <Link
                   key={bottle.brand.id}
-                  href={`/entities/${bottle.brand.id}`}
+                  href={`/brands/${bottle.brand.id}`}
                   className="underline"
                 >
                   {bottle.brand.name}
@@ -74,7 +74,7 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                     {bottle.distillers.map((d) => (
                       <Link
                         key={d.id}
-                        href={`/entities/${d.id}`}
+                        href={`/distillers/${d.id}`}
                         className="underline"
                       >
                         {d.name}
@@ -90,7 +90,7 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                 {bottle.bottler ? (
                   <Link
                     key={bottle.bottler.id}
-                    href={`/entities/${bottle.bottler.id}`}
+                    href={`/bottlers/${bottle.bottler.id}`}
                     className="underline"
                   >
                     {bottle.bottler.name}
