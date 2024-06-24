@@ -47,6 +47,7 @@
     "@types/leaflet": "^1.9.12",
     "@types/node": "^20",
     "@types/react": "^18",
+    "@types/react-avatar-editor": "^13.0.2",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
