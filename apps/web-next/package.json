@@ -48,6 +48,7 @@
     "@spotlightjs/spotlight": "2.0.0",
     "@types/leaflet": "^1.9.12",
     "@types/node": "^20",
+    "@types/pica": "^9.0.4",
     "@types/react": "^18",
     "@types/react-avatar-editor": "^13.0.2",
     "@types/react-dom": "^18",

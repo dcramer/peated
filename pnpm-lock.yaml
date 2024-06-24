@@ -647,6 +647,9 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.12.5
+      '@types/pica':
+        specifier: ^9.0.4
+        version: 9.0.4
       '@types/react':
         specifier: ^18
         version: 18.3.3
@@ -6295,7 +6298,6 @@ packages:
 
   /@types/pica@9.0.4:
     resolution: {integrity: sha512-Wr8bZ53IVjFWMLRsWEiGCfCDWoKORczxC04+XlvQrhn0tF3qDMQoLFHPPzZBcCi2uu5D6+alfrvidpTthFwKbw==}
-    dev: false
 
   /@types/prop-types@15.7.12:
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
