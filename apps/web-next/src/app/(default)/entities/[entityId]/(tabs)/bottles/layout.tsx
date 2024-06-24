@@ -1,3 +1,4 @@
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
