@@ -86,7 +86,7 @@ export default async function buildFastify(options = {}) {
   });
   app.register(FastifyCors, {
     credentials: true,
-    origin: config.CORS_HOST,
+    origin: config.CORS_HOST.split(","),
     maxAge: 600,
   });
 
