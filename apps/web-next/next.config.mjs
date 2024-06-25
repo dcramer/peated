@@ -9,7 +9,7 @@ const nextConfig = {
     API_SERVER: process.env.API_SERVER || "http://localhost:4000",
     FATHOM_SITE_ID: process.env.FATHOM_SITE_ID,
 
-    VERSION: process.env.VERSION,
+    VERSION: process.env.VERSION || process.env.VERCEL_GIT_COMMIT_SHA,
     GITHUB_REPO: "https://github.com/dcramer/peated",
     DISCORD_LINK: "https://discord.gg/d7GFPfy88Z",
   },
