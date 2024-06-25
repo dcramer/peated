@@ -5,7 +5,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "build": "pnpm -r --filter='./apps/**' --filter='./packages/**' run build",
+    "build": "pnpm -r --filter='./apps/**' --filter='./packages/**' --filter='!web-next' run build",
     "setup": "pnpm install && npm run db:migrate",
     "dev": "nf start",
     "dev:web": "PORT=3000 API_SERVER=http://localhost:4000 dotenv -e .env.local -- pnpm --filter='./apps/web-next' dev",
