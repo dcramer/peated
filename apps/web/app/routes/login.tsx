@@ -1,5 +1,5 @@
-import PeatedLogo from "@peated/web/assets/logo.svg";
 import Alert from "@peated/web/components/alert";
+import PeatedLogo from "@peated/web/components/assets/Logo";
 import Button from "@peated/web/components/button";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
