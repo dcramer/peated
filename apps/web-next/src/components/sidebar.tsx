@@ -99,7 +99,7 @@ export default function Sidebar() {
                     Brands
                   </SidebarLink>
                   <SidebarLink
-                    href="/brands"
+                    href="/bottlers"
                     icon={BottlerIcon}
                     active={pathname.startsWith("/bottlers")}
                   >

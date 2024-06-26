@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && next-sitemap",
     "start": "next start",
     "lint": "next lint"
   },
@@ -29,6 +29,7 @@
     "leaflet": "^1.9.4",
     "marked": "^9.1.6",
     "next": "14.2.4",
+    "next-sitemap": "^4.2.3",
     "pica": "^9.0.1",
     "react": "^18",
     "react-avatar-editor": "^13.0.2",
@@ -43,9 +44,9 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@peated/tsconfig": "workspace:*",
     "@spotlightjs/spotlight": "2.0.0",
     "@svgr/webpack": "^8.1.0",
-    "@peated/tsconfig": "workspace:*",
     "@types/leaflet": "^1.9.12",
     "@types/node": "^20",
     "@types/pica": "^9.0.4",
