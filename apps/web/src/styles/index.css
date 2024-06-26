@@ -117,15 +117,19 @@
   }
 
   .dialog-panel {
-    @apply relative h-screen min-h-full min-w-full overflow-hidden overflow-y-auto text-left;
+    @apply relative h-screen min-h-full min-w-full cursor-pointer overflow-hidden overflow-y-auto text-left backdrop-blur-md;
 
-    background-color: rgba(15, 23, 42, 1);
+    background-color: rgba(15, 23, 42, 0.65);
     background-image: linear-gradient(
       to right,
-      rgba(15, 23, 42, 1),
-      rgba(0, 0, 0, 1),
-      rgba(15, 23, 42, 1)
+      rgba(15, 23, 42, 0.65),
+      rgba(0, 0, 0, 0.65),
+      rgba(15, 23, 42, 0.65)
     );
+
+    img {
+      @apply cursor-auto rounded-lg;
+    }
   }
 
   .range {
