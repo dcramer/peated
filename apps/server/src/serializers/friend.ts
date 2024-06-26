@@ -35,7 +35,7 @@ export const FriendSerializer = serializer({
   },
   item: (item: Follow, attrs: Record<string, any>, currentUser?: User) => {
     return {
-      id: attrs.user.id,
+      id: attrs.user.id || item.toUserId,
       status: item.status === "following" ? "friends" : item.status,
       createdAt: item.createdAt,
       user: attrs.user,

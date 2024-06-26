@@ -28,7 +28,7 @@ export default function ListItem<
       )}
       {...props}
     >
-      <div className="mx-auto max-w-7xl justify-between gap-x-6 px-3 lg:px-6">
+      <div className="mx-auto max-w-7xl justify-between gap-x-3 px-3">
         <div className="flex items-center gap-x-4 py-3">{children}</div>
       </div>
     </Component>

@@ -29,32 +29,6 @@ export const trpc: CreateTRPCReact<AppRouter, unknown> =
     },
   });
 
-// TODO: im not even sure what the difference is within this implementation, but it doesnt
-// provide us a great wait to pass in credentials vs our context provider
-// export const trpcClient = createTRPCNext<AppRouter>({
-//   ssr: true,
-//   ssrPrepass,
-//   config(opts) {
-//     return {
-//       suspense: true,
-//       links: [
-//         sentryLink(),
-//         httpBatchLink({
-//           url: `${config.API_SERVER}/trpc`,
-//           // async headers() {
-//           //   const session = await getSession();
-//           //   return {
-//           //     authorization: session.accessToken
-//           //       ? `Bearer ${session.accessToken}`
-//           //       : "",
-//           //   };
-//           // },
-//         }),
-//       ],
-//     };
-//   },
-// });
-
 export function isTRPCClientError(
   cause: unknown,
 ): cause is TRPCClientError<AppRouter> {

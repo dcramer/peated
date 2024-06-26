@@ -1,25 +1,34 @@
-import { redirectToAuth } from "@peated/web/lib/auth";
-import { isLoggedIn } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import type { Metadata } from "next";
-import Content from "./content";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Friends",
-};
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import PaginationButtons from "@peated/web/components/paginationButtons";
+import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { trpc } from "@peated/web/lib/trpc";
+import FriendListItem from "./friendListItem";
 
-export default async function Page() {
-  if (!(await isLoggedIn())) {
-    redirectToAuth({ pathname: "/friends" });
-    return null;
-  }
+export default function Page() {
+  useAuthRequired();
 
-  const trpcClient = await getTrpcClient();
-  const friendList = await trpcClient.friendList.ensureData();
+  const [friendList] = trpc.friendList.useSuspenseQuery();
+
+  const { results, rel } = friendList;
 
   return (
     <>
-      <Content friendList={friendList} />
+      <ul className="divide-y divide-slate-800 sm:rounded">
+        {results.length ? (
+          results.map((friend) => {
+            return <FriendListItem key={friend.id} friend={friend} />;
+          })
+        ) : (
+          <EmptyActivity>
+            {
+              "You could definitely use a few more friends. We're not judging or anything."
+            }
+          </EmptyActivity>
+        )}
+      </ul>
+      <PaginationButtons rel={rel} />
     </>
   );
 }

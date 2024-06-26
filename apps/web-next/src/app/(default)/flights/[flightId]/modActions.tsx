@@ -4,7 +4,7 @@ import { Menu } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { type Flight } from "@peated/server/types";
 import Button from "@peated/web/components/button";
-import confirmationButton from "@peated/web/components/confirmationButton";
+import ConfirmationButton from "@peated/web/components/confirmationButton";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
 import { revalidatePath } from "next/cache";
@@ -38,7 +38,7 @@ export default function ModActions({ flight }: { flight: Flight }) {
         </Menu.Item>
         {user?.admin && (
           <Menu.Item
-            as={confirmationButton}
+            as={ConfirmationButton}
             onContinue={deleteFlight}
             disabled={deleteFlightMutation.isPending}
           >
