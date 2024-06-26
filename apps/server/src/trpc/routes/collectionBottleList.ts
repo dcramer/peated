@@ -6,11 +6,11 @@ import { TRPCError } from "@trpc/server";
 import type { SQL } from "drizzle-orm";
 import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { publicProcedure } from "..";
 import { getUserFromId, profileVisible } from "../../lib/api";
 import { getDefaultCollection } from "../../lib/db";
 
-export default authedProcedure
+export default publicProcedure
   .input(
     z.object({
       collection: z.union([z.literal("default"), z.number()]),
