@@ -3,7 +3,7 @@ import { FriendStatusEnum } from "./shared";
 import { UserSchema } from "./users";
 
 export const FriendSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   status: FriendStatusEnum,
   user: UserSchema,
   createdAt: z.string().datetime().optional(),

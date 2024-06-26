@@ -43,7 +43,7 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
   const { user } = friend;
 
   return (
-    <ListItem as="li" key={user.id}>
+    <ListItem as="li">
       <div
         className={classNames(
           "flex flex-auto items-center space-x-4",
