@@ -6,7 +6,7 @@ import { trpc } from "@peated/web/lib/trpc";
 import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 
-export default function MergeBottle({
+export default function Page({
   params: { bottleId },
 }: {
   params: { bottleId: string };

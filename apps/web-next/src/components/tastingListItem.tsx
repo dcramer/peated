@@ -248,12 +248,6 @@ export default function TastingListItem({
                       </Menu.Item>
                     )}
                     <Menu.Item
-                      as={Link}
-                      href={`/tastings/${tasting.id}/editImage`}
-                    >
-                      Change Photo
-                    </Menu.Item>
-                    <Menu.Item
                       as="button"
                       onClick={async () => {
                         await tastingDeleteMutation.mutateAsync(tasting.id);
