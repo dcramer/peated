@@ -7,7 +7,6 @@ import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
-import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -23,7 +22,6 @@ export default function ModActions({ flight }: { flight: Flight }) {
   const deleteFlight = async () => {
     // TODO: show confirmation message
     await deleteFlightMutation.mutateAsync(flight.id);
-    revalidatePath(`/flights/${flight.id}`);
     router.push("/");
   };
 

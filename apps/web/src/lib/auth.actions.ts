@@ -2,7 +2,6 @@
 
 import { makeTRPCClient } from "@peated/server/src/lib/trpc";
 import config from "@peated/web/config";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSession } from "./session.server";
 import { isTRPCClientError } from "./trpc";
@@ -14,7 +13,7 @@ export async function logout(
 ) {
   const session = await getSession();
   session.destroy();
-  revalidatePath(redirectTo);
+  redirect(redirectTo);
 }
 
 export async function authenticate(
@@ -61,7 +60,5 @@ export async function authenticate(
     throw err;
   }
 
-  revalidatePath("/login");
-  revalidatePath(redirectTo);
   redirect(redirectTo);
 }

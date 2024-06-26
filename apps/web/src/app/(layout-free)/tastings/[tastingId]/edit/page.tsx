@@ -61,7 +61,6 @@ export default function Page({
           if (flight) {
             router.push(`/flights/${flight}`);
           } else {
-            // revalidatePath(`/tastings/${tasting.id}`);
             router.push(`/tastings/${tasting.id}`);
           }
         }

@@ -3,7 +3,6 @@
 import EntityForm from "@peated/web/components/entityForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc";
-import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -41,7 +40,6 @@ export default function Page({
           },
           {
             onSuccess: () => {
-              revalidatePath(`/entities/${entity.id}`);
               router.push(`/entities/${entity.id}`);
             },
           },

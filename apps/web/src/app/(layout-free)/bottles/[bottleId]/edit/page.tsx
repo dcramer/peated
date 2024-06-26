@@ -3,7 +3,6 @@
 import BottleForm from "@peated/web/components/bottleForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc";
-import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -41,7 +40,6 @@ export default function Page({
           },
           {
             onSuccess: () => {
-              revalidatePath(`/bottles/${bottleId}`);
               router.push(`/bottles/${bottleId}`);
             },
           },
