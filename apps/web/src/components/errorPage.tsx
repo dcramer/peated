@@ -18,8 +18,8 @@ export function ErrorPage404({
 }
 
 export default function ErrorPage({
-  title = "Error",
-  subtitle = "Sorry, an unexpected error has occurred.",
+  title,
+  subtitle,
   error,
   onTryAgain,
 }: {
@@ -30,6 +30,7 @@ export default function ErrorPage({
 }) {
   const isOnline = useOnlineStatus();
 
+  // i hate all of this
   if (!title || !subtitle) {
     if (error instanceof ApiUnavailable) {
       title = title ?? isOnline ? "Server Unreachable" : "Connection Offline";
@@ -44,13 +45,15 @@ export default function ErrorPage({
         "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
     } else if (
       (error instanceof ApiError && error.statusCode === 404) ||
-      (isTRPCClientError(error) && error.data?.httpStatus === 404)
+      (isTRPCClientError(error) && error.data?.httpStatus === 404) ||
+      error.message === "NOT_FOUND"
     ) {
       title = title ?? "Not Found";
       subtitle = subtitle ?? "We couldn't find the page you were looking for.";
     } else if (
       (error instanceof ApiError && error.statusCode === 401) ||
-      (isTRPCClientError(error) && error.data?.httpStatus === 401)
+      (isTRPCClientError(error) && error.data?.httpStatus === 401) ||
+      error.message === "UNAUTHORIZED"
     ) {
       title = title ?? "Identify Yourself";
       subtitle =
@@ -65,6 +68,9 @@ export default function ErrorPage({
         subtitle ?? isOnline
           ? "It looks like Peated's API is unreachable right now. Please try again shortly."
           : "It looks like your network is offline.";
+    } else {
+      title = "Error";
+      subtitle = "Sorry, an unexpected error has occurred.";
     }
   }
 
