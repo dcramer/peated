@@ -3,6 +3,7 @@ import Fathom from "@peated/web/components/fathom";
 import config from "@peated/web/config";
 import { getSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
+import { setUser } from "@sentry/nextjs";
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import Providers from "./providers/providers";
@@ -31,6 +32,18 @@ export default async function RootLayout({
   // auth: React.ReactNode;
 }>) {
   const session = await getSession();
+
+  // we need to bind the user on the server, but we also do this in providers
+  // so it stays updated on the client appropriately
+  setUser(
+    session.user
+      ? {
+          id: `${session.user.id}`,
+          username: session.user.username,
+          email: session.user.email,
+        }
+      : null,
+  );
 
   return (
     <html lang="en">
