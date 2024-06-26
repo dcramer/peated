@@ -9,6 +9,9 @@ import { type ComponentProps, type ReactNode } from "react";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 import { isTRPCClientError } from "../lib/trpc";
 
+const DEFAULT_TITLE = "Error";
+const DEFAULT_SUBTITLE = "Sorry, an unexpected error has occurred.";
+
 export function ErrorPage404({
   title = "Not Found",
   subtitle = "We couldn't find the page you were looking for.",
@@ -31,7 +34,7 @@ export default function ErrorPage({
   const isOnline = useOnlineStatus();
 
   // i hate all of this
-  if (!title || !subtitle) {
+  if (error && (!title || !subtitle)) {
     if (error instanceof ApiUnavailable) {
       title = title ?? isOnline ? "Server Unreachable" : "Connection Offline";
       subtitle =
@@ -68,9 +71,6 @@ export default function ErrorPage({
         subtitle ?? isOnline
           ? "It looks like Peated's API is unreachable right now. Please try again shortly."
           : "It looks like your network is offline.";
-    } else {
-      title = "Error";
-      subtitle = "Sorry, an unexpected error has occurred.";
     }
   }
 
@@ -80,9 +80,11 @@ export default function ErrorPage({
         <main className="self-justify-center inline self-center p-3">
           <div className="text-center">
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
-              {title}
+              {title || DEFAULT_TITLE}
             </h1>
-            <div className="mt-6 leading-7 text-white">{subtitle}</div>
+            <div className="mt-6 leading-7 text-white">
+              {subtitle ? !title && DEFAULT_SUBTITLE : null}
+            </div>
 
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button href="/" color="primary">
