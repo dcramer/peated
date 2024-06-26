@@ -1,3 +1,5 @@
+"use client";
+
 import ChangeList from "@peated/web/components/changeList";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import { trpc } from "@peated/web/lib/trpc";
