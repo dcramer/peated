@@ -88,10 +88,10 @@ export default function AppHeader() {
       ) : (
         <div className="mflex items-center gap-x-2">
           <NavLink
-            href={`/login?redirectTo=${getAuthRedirect({
+            href={getAuthRedirect({
               pathname,
               searchParams,
-            })}`}
+            })}
           >
             <div className="h-8 w-8 sm:h-8 sm:w-8">
               <UserAvatar />
