@@ -8,6 +8,7 @@ import getQueryClient from "@peated/web/lib/getQueryClient";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { type SessionData } from "../../lib/session.server";
 import TRPCProvider from "./trpc";
 
@@ -38,13 +39,18 @@ export default function Providers({
         key={accessToken}
       >
         <QueryClientProvider client={queryClient}>
-          <OnlineStatusProvider>
-            <AuthProvider user={user}>
-              <ApiProvider accessToken={accessToken} server={config.API_SERVER}>
-                {children}
-              </ApiProvider>
-            </AuthProvider>
-          </OnlineStatusProvider>
+          <ReactQueryStreamedHydration>
+            <OnlineStatusProvider>
+              <AuthProvider user={user}>
+                <ApiProvider
+                  accessToken={accessToken}
+                  server={config.API_SERVER}
+                >
+                  {children}
+                </ApiProvider>
+              </AuthProvider>
+            </OnlineStatusProvider>
+          </ReactQueryStreamedHydration>
         </QueryClientProvider>
       </TRPCProvider>
     </GoogleOAuthProvider>
