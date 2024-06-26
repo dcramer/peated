@@ -4,7 +4,7 @@ resource "google_storage_bucket" "peated" {
   uniform_bucket_level_access = true
 
   cors {
-    origin          = ["https://peated.app", "https://peated.com"]
+    origin          = ["https://peated.app", "https://peated.com", "https://peated-web-next.vercel.app"]
     method          = ["GET"]
     response_header = ["Content-Type"]
     max_age_seconds = 3600
