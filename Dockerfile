@@ -50,23 +50,6 @@ ENV VERSION=$VERSION \
 
 RUN pnpm build
 
-# web service
-FROM base-env as web
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ /app/
-
-ENV HOST=0.0.0.0 \
-    PORT=3000
-
-EXPOSE 3000
-
-WORKDIR /app/apps/web
-
-ARG VERSION
-ENV VERSION $VERSION
-
-CMD ["pnpm", "start"]
-
 # worker service
 FROM base-env as worker
 COPY --from=prod-deps /app/node_modules /app/node_modules

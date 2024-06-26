@@ -1,14 +1,16 @@
-# https://www.robotstxt.org/robotstxt.html
-User-Agent: SemrushBot
+# SemrushBot
+User-agent: SemrushBot
 Disallow: /
 
-# disallow some LLM indexers
+# GPTBot
 User-agent: GPTBot
 Disallow: /
 
-User-Agent: PerplexityBot
+# PerplexityBot
+User-agent: PerplexityBot
 Disallow: /
 
+# *
 User-agent: *
 Allow: /
 Disallow: /_health
@@ -17,4 +19,11 @@ Disallow: /settings
 Disallow: /flights
 Disallow: /friends
 Disallow: /addBottle
+Disallow: /addEntity
 Disallow: /addFlight
+
+# Host
+Host: https://peated.com
+
+# Sitemaps
+Sitemap: https://peated.com/sitemap.xml

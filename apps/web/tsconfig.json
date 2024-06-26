@@ -1,15 +1,21 @@
 {
   "extends": "@peated/tsconfig/tsconfig.json",
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "compilerOptions": {
-    "lib": ["es2022", "dom", "dom.iterable"],
+    "lib": ["esnext", "dom", "dom.iterable"],
     "baseUrl": ".",
-    "jsx": "react-jsx",
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@peated/web/*": ["./app/*"],
+      "@peated/web/*": ["./src/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     },
-    // Remix takes care of building everything in `remix build`.
-    "noEmit": true
-  }
+    "noEmit": true,
+    "module": "esnext"
+  },
+  "exclude": ["node_modules"]
 }
