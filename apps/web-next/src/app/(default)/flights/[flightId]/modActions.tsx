@@ -32,7 +32,7 @@ export default function ModActions({ flight }: { flight: Flight }) {
       <Menu.Button as={Button}>
         <EllipsisVerticalIcon className="h-5 w-5" />
       </Menu.Button>
-      <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right lg:left-0 lg:origin-top-left">
+      <Menu.Items className="absolute right-0 z-40 mt-2 w-32 origin-top-right lg:left-0 lg:origin-top-left">
         <Menu.Item as={Link} href={`/flights/${flight.id}/edit`}>
           Edit Flight
         </Menu.Item>

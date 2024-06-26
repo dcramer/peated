@@ -236,7 +236,7 @@ export default function TastingListItem({
               <Menu.Button as={Button}>
                 <EllipsisVerticalIcon className="h-5 w-5" />
               </Menu.Button>
-              <Menu.Items className="absolute inset-x-0 bottom-10 right-0 z-10 w-44 origin-bottom-right">
+              <Menu.Items className="absolute inset-x-0 bottom-10 right-0 z-40 w-44 origin-bottom-right">
                 {(user?.admin || isTaster) && (
                   <>
                     {isTaster && (

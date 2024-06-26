@@ -33,7 +33,7 @@ export default function ModActions({ entity }: { entity: Entity }) {
         <EllipsisVerticalIcon className="h-5 w-5" />
       </Menu.Button>
       <Menu.Items
-        className="absolute right-0 z-10 mt-2 w-32 origin-top-right"
+        className="absolute right-0 z-40 mt-2 w-32 origin-top-right"
         unmount={false}
       >
         <Menu.Item as={Link} href={`/entities/${entity.id}/aliases`}>

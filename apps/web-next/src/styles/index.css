@@ -113,7 +113,7 @@
   }
 
   .dialog {
-    @apply fixed inset-0 z-10 min-h-screen overflow-y-auto text-center;
+    @apply fixed inset-0 z-50 min-h-screen overflow-y-auto text-center;
   }
 
   .dialog-panel {

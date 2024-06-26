@@ -36,7 +36,7 @@ export default function ModActions({ user }: { user: User }) {
       <Menu.Button as={Button}>
         <EllipsisVerticalIcon className="h-5 w-5" />
       </Menu.Button>
-      <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right">
+      <Menu.Items className="absolute right-0 z-40 mt-2 w-64 origin-top-right">
         <Menu.Item
           as="button"
           onClick={() => {

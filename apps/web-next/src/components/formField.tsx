@@ -19,7 +19,7 @@ type Props = React.ComponentPropsWithoutRef<"div"> & {
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
 };
 
-export default ({
+export default function FormField({
   className,
   children,
   required,
@@ -30,7 +30,7 @@ export default ({
   error,
   labelAction,
   onClick,
-}: Props) => {
+}: Props) {
   return (
     <div
       className={classNames(
@@ -64,4 +64,4 @@ export default ({
       {false && helpText && <HelpText>{helpText}</HelpText>}
     </div>
   );
-};
+}

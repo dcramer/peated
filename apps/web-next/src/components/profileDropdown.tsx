@@ -74,7 +74,7 @@ export function ProfileDropdown() {
               onMouseEnter={() => onMouseEnter()}
               onMouseLeave={() => onMouseLeave(open)}
               static
-              className="absolute right-0 z-10 mt-0 w-48 origin-top-right divide-y divide-slate-700"
+              className="absolute right-0 z-40 mt-0 w-48 origin-top-right divide-y divide-slate-700"
             >
               <div>
                 <Menu.Item>

@@ -137,7 +137,7 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
       setResults(sortResults(results));
       setState("ready");
     });
-  }, [fetch, sortResults, query]);
+  }, [query]);
 
   return (
     <Layout
