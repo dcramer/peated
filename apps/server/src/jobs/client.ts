@@ -36,6 +36,7 @@ export async function shutdownClient() {
 export type JobName =
   | "GenerateBottleDetails"
   | "GenerateEntityDetails"
+  | "GeocodeCountryLocation"
   | "GeocodeEntityLocation"
   | "NotifyDiscordOnTasting"
   | "ScrapeAstorWines"

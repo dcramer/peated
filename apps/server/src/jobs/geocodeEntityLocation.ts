@@ -41,7 +41,7 @@ export default async ({ entityId }: { entityId: number }) => {
   };
 
   await db.transaction(async (tx) => {
-    await db.update(entities).set(data).where(eq(entities.id, entity.id));
+    await tx.update(entities).set(data).where(eq(entities.id, entity.id));
 
     await tx.insert(changes).values({
       objectType: "entity",

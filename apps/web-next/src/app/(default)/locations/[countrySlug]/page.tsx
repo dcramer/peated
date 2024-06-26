@@ -2,6 +2,7 @@ import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
 import { notEmpty } from "@peated/server/src/lib/filter";
 import CountrySpiritDistribution from "@peated/web/components/countrySpiritDistribution";
+import EmptyActivity from "@peated/web/components/emptyActivity";
 import EntityTable from "@peated/web/components/entityTable";
 import Map from "@peated/web/components/map";
 import PageHeader from "@peated/web/components/pageHeader";
@@ -97,9 +98,9 @@ export default async function Page({
       {topEntityList.results.length ? (
         <EntityTable entityList={topEntityList.results} type="distiller" />
       ) : (
-        <p className="text-light">
+        <EmptyActivity>
           {"It looks like we don't know of any distilleries in the area."}
-        </p>
+        </EmptyActivity>
       )}
     </>
   );
