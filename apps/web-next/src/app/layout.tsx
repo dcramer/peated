@@ -16,7 +16,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Peated",
+  title: {
+    template: "%s | Peated",
+    default: "Peated",
+  },
   description: config.DESCRIPTION,
 };
 
