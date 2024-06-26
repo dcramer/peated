@@ -37,6 +37,3 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
-
-public/robots.txt
-public/sitemap*.xml
