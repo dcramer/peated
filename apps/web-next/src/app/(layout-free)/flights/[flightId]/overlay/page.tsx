@@ -2,9 +2,7 @@
 
 import BottleLink from "@peated/web/components/bottleLink";
 import { Distillers } from "@peated/web/components/bottleMetadata";
-import { ClientOnly } from "@peated/web/components/clientOnly";
 import LayoutSplash from "@peated/web/components/layoutSplash";
-import QRCodeClient from "@peated/web/components/qrcode.client";
 import { trpc } from "@peated/web/lib/trpc";
 
 export default function Page({
@@ -61,15 +59,7 @@ export default function Page({
               </tbody>
             </table>
           </div>
-          <div className="hidden p-4 pl-12 lg:block lg:w-4/12">
-            <ClientOnly>
-              {() => (
-                <QRCodeClient
-                  value={`${window.location.protocol}//${window.location.host}/flights/${flight.id}`}
-                />
-              )}
-            </ClientOnly>
-          </div>
+          <div className="hidden p-4 pl-12 lg:block lg:w-4/12"></div>
         </div>
       </div>
     </LayoutSplash>

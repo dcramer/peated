@@ -8,7 +8,7 @@ export default function Map({
   height,
   ...props
 }: ComponentPropsWithoutRef<typeof MapClient>) {
-  if (!window) {
+  if (typeof window === "undefined") {
     return (
       <div
         style={{ height, width }}
