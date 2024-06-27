@@ -1,5 +1,6 @@
 "use client";
 
+import { MapIcon } from "@heroicons/react/20/solid";
 import {
   ChatBubbleLeftIcon,
   CodeBracketSquareIcon,
@@ -84,6 +85,17 @@ export default function Sidebar() {
                   >
                     Bottles
                   </SidebarLink>
+                  <SidebarLink
+                    href="/locations"
+                    icon={MapIcon}
+                    active={pathname.startsWith("/locations")}
+                  >
+                    Locations
+                  </SidebarLink>
+                </ul>
+              </li>
+              <li>
+                <ul role="list" className="-mx-2 space-y-1">
                   <SidebarLink
                     href="/distillers"
                     icon={DistillerIcon}
