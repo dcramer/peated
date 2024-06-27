@@ -2,11 +2,11 @@
 
 import Button from "@peated/web/components/button";
 import { logout } from "@peated/web/lib/auth.actions";
-import { useActionState } from "react";
+import { useFormState } from "react-dom";
 
 export default function LogoutButton() {
   // TODO: this needs to show some kind of loading state
-  const [, formAction] = useActionState(logout, undefined);
+  const [, formAction] = useFormState(logout, undefined);
   return (
     <form action={formAction}>
       <Button type="submit" color="primary">
