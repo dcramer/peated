@@ -2,6 +2,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false,
   env: {
     DEBUG: process.env.DEBUG ? "true" : "",
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
