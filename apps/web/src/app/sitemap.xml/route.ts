@@ -21,6 +21,7 @@ export async function GET() {
   const sitemapIndexXML = await buildSitemapIndex([
     "/sitemaps/bottles/sitemap.xml",
     "/sitemaps/entities/sitemap.xml",
+    "/sitemaps/locations/sitemap.xml",
   ]);
 
   return new Response(sitemapIndexXML, {
