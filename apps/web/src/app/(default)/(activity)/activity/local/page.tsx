@@ -1,10 +1,10 @@
 "use client";
 
 import ActivityFeed from "@peated/web/components/activityFeed";
+import { trpc } from "@peated/web/lib/trpc";
 
 export default function Page() {
   const filter = "local";
-  const filter = "friends";
   const [tastingList] = trpc.tastingList.useSuspenseQuery({
     filter,
     limit: 10,
