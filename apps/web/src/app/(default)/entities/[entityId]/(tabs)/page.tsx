@@ -9,6 +9,8 @@ import { parseDomain } from "@peated/web/lib/urls";
 import Link from "next/link";
 import { Suspense } from "react";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params: { entityId },
 }: {
