@@ -7,6 +7,8 @@ import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import ModActions from "./modActions";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params: { flightId },
 }: {

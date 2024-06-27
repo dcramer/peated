@@ -2,6 +2,8 @@ import BetaNotice from "@peated/web/components/betaNotice";
 import TimeSince from "@peated/web/components/timeSince";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params: { bottleId },
 }: {

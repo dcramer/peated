@@ -2,6 +2,8 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params: { entityId },
 }: {
