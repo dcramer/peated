@@ -1,4 +1,4 @@
-import { inArray } from "drizzle-orm";
+import { getTableColumns, inArray, sql } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
@@ -13,7 +13,10 @@ export const EntitySerializer = serializer({
     const countryIds = itemList.map((i) => i.countryId).filter(notEmpty);
     const countryList = countryIds.length
       ? await db
-          .select()
+          .select({
+            ...getTableColumns(countries),
+            location: sql<SerializedPoint>`ST_AsGeoJSON(${countries.location}) as location`,
+          })
           .from(countries)
           .where(inArray(countries.id, countryIds))
       : [];
