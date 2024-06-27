@@ -6,7 +6,8 @@ import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { authenticate } from "@peated/web/lib/auth.actions";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import Alert from "./alert";
 
 function BasicLogin({ action }: { action: any }) {
@@ -40,7 +41,7 @@ function BasicLogin({ action }: { action: any }) {
 }
 
 export default function LoginForm() {
-  const [error, formAction] = useFormState(authenticate, undefined);
+  const [error, formAction] = useActionState(authenticate, undefined);
 
   return (
     <div className="min-w-sm mt-8 flex-auto">
