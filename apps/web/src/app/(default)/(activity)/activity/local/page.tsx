@@ -1,18 +1,14 @@
-import ActivityFeed from "@peated/web/components/activityFeed";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { Suspense } from "react";
+"use client";
 
-export default async function Page() {
+import ActivityFeed from "@peated/web/components/activityFeed";
+
+export default function Page() {
   const filter = "local";
-  const trpcClient = await getTrpcClient();
-  const tastingList = await trpcClient.tastingList.ensureData({
+  const filter = "friends";
+  const [tastingList] = trpc.tastingList.useSuspenseQuery({
     filter,
     limit: 10,
   });
 
-  return (
-    <Suspense>
-      <ActivityFeed tastingList={tastingList} filter={filter} />
-    </Suspense>
-  );
+  return <ActivityFeed tastingList={tastingList} filter={filter} />;
 }
