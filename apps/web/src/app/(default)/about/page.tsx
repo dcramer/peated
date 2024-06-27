@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Stats, { StatsSkeleton } from "./stats";
 
+export const dynamic = "force-static";
+
 // export const sitemap: SitemapFunction = () => ({
 //   priority: 0.3,
 //   changefreq: "monthly",
