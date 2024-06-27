@@ -156,6 +156,23 @@ export default async ({ entityId }: { entityId: number }) => {
 
   if (Object.keys(data).length === 0) return;
 
+  if (data.website) {
+    try {
+      await fetch(data.website, {
+        headers: {
+          "User-Agent": "PeatedBot/1.0 (https://peated.com)",
+        },
+      });
+    } catch (err) {
+      console.error(
+        `Discarded website (${data.website}) as possible hallucination`,
+        err,
+      );
+      // dont allow LLMs to hallucinate fake URLs
+      data.website = null;
+    }
+  }
+
   await db.transaction(async (tx) => {
     await db.update(entities).set(data).where(eq(entities.id, entity.id));
 
