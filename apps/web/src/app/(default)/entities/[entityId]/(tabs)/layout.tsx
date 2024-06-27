@@ -3,6 +3,8 @@ import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import Link from "next/link";
 import { type ReactNode } from "react";
 
+export const dynamic = "force-dynamic";
+
 export default async function Layout({
   params: { entityId },
   children,
