@@ -8,9 +8,14 @@ import type { Metadata, Viewport } from "next";
 import React from "react";
 import Providers from "./providers/providers";
 
+// default behavior is to disable cache, as it breaks quite a few flows
+// which are fairly dynamic (e.g. add tasting, add bottle, etc)
+
 export const fetchCache = "default-no-store";
 
 export const dynamic = "force-dynamic";
+
+export const revalidate = 0;
 
 export const viewport: Viewport = {
   width: "device-width",
