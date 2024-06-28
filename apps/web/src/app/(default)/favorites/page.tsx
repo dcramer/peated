@@ -5,6 +5,8 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import { trpc } from "@peated/web/lib/trpc";
 
+export const fetchCache = "default-no-store";
+
 export default function Page() {
   const [favoriteList] = trpc.collectionBottleList.useSuspenseQuery({
     user: "me",

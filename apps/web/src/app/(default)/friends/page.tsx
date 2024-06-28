@@ -6,6 +6,8 @@ import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc";
 import FriendListItem from "./friendListItem";
 
+export const fetchCache = "default-no-store";
+
 export default function Page() {
   useAuthRequired();
 

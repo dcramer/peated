@@ -3,6 +3,8 @@ import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { type ReactNode } from "react";
 
+export const fetchCache = "default-no-store";
+
 export const dynamic = "force-dynamic";
 
 export default async function Layout({

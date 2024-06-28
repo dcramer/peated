@@ -7,12 +7,14 @@ import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UserAvatar from "@peated/web/components/userAvatar";
 import UserTagDistribution from "@peated/web/components/userTagDistribution";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { Suspense, type ReactNode } from "react";
 import FriendButton from "./friendButton";
+import LogoutButton from "./logoutButton";
 import ModActions from "./modActions";
 
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import LogoutButton from "./logoutButton";
+export const fetchCache = "default-no-store";
+
 export default async function Layout({
   params: { username },
   children,

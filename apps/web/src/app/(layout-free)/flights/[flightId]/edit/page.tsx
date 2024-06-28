@@ -4,6 +4,8 @@ import FlightForm from "@peated/web/components/flightForm";
 import { trpc } from "@peated/web/lib/trpc";
 import { useRouter } from "next/navigation";
 
+export const fetchCache = "default-no-store";
+
 export const dynamic = "force-dynamic";
 
 export default function Page({

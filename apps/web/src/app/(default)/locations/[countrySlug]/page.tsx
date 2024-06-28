@@ -9,6 +9,8 @@ import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { Suspense } from "react";
 
+export const fetchCache = "default-no-store";
+
 export async function generateMetadata({
   params: { countrySlug },
 }: {

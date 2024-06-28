@@ -24,6 +24,8 @@ import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 
+export const fetchCache = "default-no-store";
+
 export const dynamic = "force-dynamic";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;

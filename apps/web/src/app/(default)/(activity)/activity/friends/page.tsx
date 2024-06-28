@@ -3,6 +3,8 @@
 import ActivityFeed from "@peated/web/components/activityFeed";
 import { trpc } from "@peated/web/lib/trpc";
 
+export const fetchCache = "default-no-store";
+
 export default function Page() {
   const filter = "friends";
   const [tastingList] = trpc.tastingList.useSuspenseQuery({

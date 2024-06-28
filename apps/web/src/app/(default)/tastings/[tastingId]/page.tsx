@@ -2,6 +2,8 @@ import TastingComments from "@peated/web/components/tastingComments";
 import TastingListItem from "@peated/web/components/tastingListItem";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
+export const fetchCache = "default-no-store";
+
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
