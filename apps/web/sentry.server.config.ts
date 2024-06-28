@@ -3,20 +3,11 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
-import config from "./src/config";
+import { SharedSentryConfig } from "./src/config";
 
 Sentry.init({
-  dsn: config.SENTRY_DSN,
+  ...SharedSentryConfig,
 
-  // Adjust this value in production, or use tracesSampler for greater control
-  tracesSampleRate: 1,
-
-  ignoreTransactions: ["/%2Fhealth"],
-
-  // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: false,
-
-  // Uncomment the line below to enable Spotlight (https://spotlightjs.com)
   spotlight: process.env.NODE_ENV === "development",
 });
 

@@ -16,4 +16,11 @@ const config = {
   THEME_COLOR: "#fbbf24",
 };
 
+export const SharedSentryConfig = {
+  dsn: config.SENTRY_DSN,
+  ignoreTransactions: ["/%2Fhealth"],
+  tracesSampleRate: 1,
+  debug: false,
+};
+
 export default config;
