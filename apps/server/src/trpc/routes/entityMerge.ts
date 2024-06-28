@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import type { SerializedPoint } from "@peated/server/db/columns";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottles,
@@ -12,7 +13,7 @@ import { logError } from "@peated/server/lib/log";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { mergeBottlesInto } from "./bottleMerge";
@@ -116,7 +117,10 @@ async function mergeEntitiesInto(
         totalTastings: sql`${entities.totalTastings} + ${totalTastings}`,
       })
       .where(eq(entities.id, toEntity.id))
-      .returning();
+      .returning({
+        ...getTableColumns(entities),
+        location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
+      });
 
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
 
