@@ -5,6 +5,8 @@
 import * as Sentry from "@sentry/nextjs";
 import config from "./src/config";
 
+import * as Spotlight from "@spotlightjs/spotlight";
+
 Sentry.init({
   dsn: config.SENTRY_DSN,
 
@@ -33,3 +35,7 @@ Sentry.init({
 });
 
 Sentry.setTag("service", "@peated/web");
+
+if (process.env.NODE_ENV === "development") {
+  Spotlight.init();
+}
