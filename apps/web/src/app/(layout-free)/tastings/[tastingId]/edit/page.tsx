@@ -8,6 +8,8 @@ import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc";
 import { useRouter, useSearchParams } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default function Page({
   params: { tastingId },
 }: {

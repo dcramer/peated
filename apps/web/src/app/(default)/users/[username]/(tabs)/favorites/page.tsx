@@ -2,6 +2,8 @@ import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params: { username },
 }: {

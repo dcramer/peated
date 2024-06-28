@@ -5,6 +5,8 @@ import { Distillers } from "@peated/web/components/bottleMetadata";
 import LayoutSplash from "@peated/web/components/layoutSplash";
 import { trpc } from "@peated/web/lib/trpc";
 
+export const dynamic = "force-dynamic";
+
 export default function Page({
   params: { flightId },
 }: {

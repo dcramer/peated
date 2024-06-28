@@ -18,6 +18,8 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 
 export default function Page({
