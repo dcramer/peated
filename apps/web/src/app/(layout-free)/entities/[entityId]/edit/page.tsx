@@ -9,6 +9,8 @@ export const fetchCache = "default-no-store";
 
 export const dynamic = "force-dynamic";
 
+export const revalidate = 0;
+
 export default function Page({
   params: { entityId },
 }: {
