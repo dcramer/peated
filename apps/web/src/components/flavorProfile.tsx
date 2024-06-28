@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import { type ComponentPropsWithoutRef } from "react";
 import { formatFlavorProfile } from "../../../server/src/lib/format";
 import { type FlavorProfile } from "../../../server/src/types";

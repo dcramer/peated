@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 
 import { toTitleCase } from "@peated/server/src/lib/strings";
 import type { PagingRel, Tag } from "@peated/server/types";

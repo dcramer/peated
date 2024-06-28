@@ -1,6 +1,6 @@
+import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import Link from "next/link";
 import { type ReactNode } from "react";
 
 export const dynamic = "force-dynamic";

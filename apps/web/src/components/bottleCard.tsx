@@ -1,7 +1,7 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
 import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";

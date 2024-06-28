@@ -1,12 +1,12 @@
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import Link from "@peated/web/components/link";
 import ListItem from "@peated/web/components/listItem";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 

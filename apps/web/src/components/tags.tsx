@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import Separated from "./separated";
 import Tooltip from "./tooltip";
 

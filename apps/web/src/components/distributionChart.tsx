@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 
 type Item = {
   name: string;

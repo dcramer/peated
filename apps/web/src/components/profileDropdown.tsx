@@ -1,9 +1,9 @@
 "use client";
 
 import { Menu, Transition } from "@headlessui/react";
+import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import classNames from "@peated/web/lib/classNames";
-import Link from "next/link";
 import { Fragment, useRef } from "react";
 import LogoutButton from "./logoutButton";
 import UserAvatar from "./userAvatar";

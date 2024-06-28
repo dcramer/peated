@@ -1,6 +1,6 @@
+import Link from "@peated/web/components/link";
 import PageHeader from "@peated/web/components/pageHeader";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Locations",

@@ -2,8 +2,8 @@
 
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
+import Link from "@peated/web/components/link";
 import { buildQueryString } from "@peated/web/lib/urls";
-import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export default function SortParam({

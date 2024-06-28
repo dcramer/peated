@@ -1,6 +1,6 @@
+import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import { type PolymorphicProps, type PolymorphicRef } from "@peated/web/types";
-import Link from "next/link";
 import { forwardRef, type ElementType } from "react";
 
 type Props = {

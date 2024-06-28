@@ -1,8 +1,8 @@
 import PeatedLogo from "@peated/web/assets/logo.svg";
 import LayoutSplash from "@peated/web/components/layoutSplash";
+import Link from "@peated/web/components/link";
 import LoginForm from "@peated/web/components/loginForm";
 import { type Metadata } from "next";
-import Link from "next/link";
 
 // export const sitemap: SitemapFunction = () => ({
 //   exclude: true,

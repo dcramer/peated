@@ -2,8 +2,8 @@
 
 import { toTitleCase } from "@peated/server/src/lib/strings";
 import type { PagingRel } from "@peated/server/types";
+import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { ReactElement } from "react";
 import PaginationButtons from "./paginationButtons";

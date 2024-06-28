@@ -1,5 +1,5 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 
 export default function FloatingButton({ href }: { href: string }) {
   return (

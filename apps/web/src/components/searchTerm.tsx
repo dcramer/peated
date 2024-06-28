@@ -1,7 +1,7 @@
 "use client";
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import { useSearchParams } from "next/navigation";
 
 export function SearchTerm({ name, value }: { name: string; value?: string }) {

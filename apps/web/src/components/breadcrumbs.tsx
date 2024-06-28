@@ -1,6 +1,6 @@
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/20/solid";
+import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
-import Link from "next/link";
 
 type Page = {
   name: string;

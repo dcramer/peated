@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
 import FlavorProfile from "./flavorProfile";
 import Tooltip from "./tooltip";

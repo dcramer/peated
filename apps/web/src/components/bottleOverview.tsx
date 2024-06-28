@@ -2,7 +2,7 @@
 
 import type { Bottle } from "@peated/server/types";
 import RobotImage from "@peated/web/assets/robot.png";
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import { Suspense } from "react";
 import BottleReviews from "./bottleReviews";
 import BottleTagDistribution, {

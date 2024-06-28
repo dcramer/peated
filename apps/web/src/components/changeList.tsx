@@ -1,6 +1,6 @@
 import type { Change, PagingRel, User } from "@peated/server/types";
+import Link from "@peated/web/components/link";
 import { AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import ListItem from "./listItem";
 import PaginationButtons from "./paginationButtons";
 import TimeSince from "./timeSince";

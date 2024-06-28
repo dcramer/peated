@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
 import { type UrlObject } from "url";

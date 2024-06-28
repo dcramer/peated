@@ -2,11 +2,11 @@ import { MapIcon } from "@heroicons/react/24/outline";
 import RobotImage from "@peated/web/assets/robot.png";
 import EntityMap from "@peated/web/components/entityMap";
 import EntitySpiritDistribution from "@peated/web/components/entitySpiritDistribution";
+import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { parseDomain } from "@peated/web/lib/urls";
-import Link from "next/link";
 import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";

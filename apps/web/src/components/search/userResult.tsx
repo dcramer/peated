@@ -1,6 +1,6 @@
 import { AtSymbolIcon } from "@heroicons/react/20/solid";
 import type { User } from "@peated/server/types";
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import Chip from "../chip";
 import UserAvatar from "../userAvatar";
 

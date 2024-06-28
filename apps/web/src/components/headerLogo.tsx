@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import PeatedLogo from "@peated/web/assets/logo.svg";

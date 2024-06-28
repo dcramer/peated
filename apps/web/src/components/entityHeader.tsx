@@ -1,6 +1,6 @@
 import type { Entity } from "@peated/server/types";
 import EntityIcon from "@peated/web/assets/entity.svg";
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import { getEntityTypeSearchUrl } from "../lib/urls";
 import Chip from "./chip";
 import PageHeader from "./pageHeader";

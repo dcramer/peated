@@ -1,7 +1,7 @@
 "use client";
 
 import { type Bottle } from "@peated/server/types";
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import { useState, type ComponentPropsWithoutRef } from "react";
 import BottlePanel from "./bottlePanel";
 import { ClientOnly } from "./clientOnly";

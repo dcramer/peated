@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@peated/web/components/link";
 import type { ReactNode } from "react";
 
 type Props =

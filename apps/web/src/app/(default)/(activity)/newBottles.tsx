@@ -3,8 +3,8 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/src/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
+import Link from "@peated/web/components/link";
 import { trpc } from "@peated/web/lib/trpc";
-import Link from "next/link";
 
 export function NewBottlesSkeleton() {
   const Row = () => (

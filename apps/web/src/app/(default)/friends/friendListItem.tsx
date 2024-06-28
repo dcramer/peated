@@ -2,11 +2,11 @@ import { Menu } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { type Friend, type FriendStatus } from "@peated/server/types";
 import Button from "@peated/web/components/button";
+import Link from "@peated/web/components/link";
 import ListItem from "@peated/web/components/listItem";
 import UserAvatar from "@peated/web/components/userAvatar";
 import classNames from "@peated/web/lib/classNames";
 import { trpc } from "@peated/web/lib/trpc";
-import Link from "next/link";
 import { useState } from "react";
 
 function actionLabel(status: FriendStatus) {

@@ -1,10 +1,10 @@
 import Button from "@peated/web/components/button";
+import Link from "@peated/web/components/link";
 import PriceChanges, {
   PriceChangesSkeleton,
 } from "@peated/web/components/priceChanges";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import NewBottles, { NewBottlesSkeleton } from "./newBottles";
 // import { PriceChanges, PriceChangesSkeleton } from "./content";
