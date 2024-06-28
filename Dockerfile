@@ -50,30 +50,7 @@ ENV VERSION=$VERSION \
 
 RUN pnpm build
 
-# worker service
-FROM base-env as worker
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ /app/
-
-WORKDIR /app/apps/server
-
-ARG VERSION
-ENV VERSION $VERSION
-
-CMD ["pnpm", "start:worker"]
-
-# cli service
-FROM base-env as cli
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ /app/
-
-WORKDIR /app/apps/api
-
-ARG VERSION
-ENV VERSION $VERSION
-
-# api service
-FROM base-env as api
+FROM base-env as server
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/ /app/
 
@@ -87,4 +64,6 @@ WORKDIR /app/apps/server
 ARG VERSION
 ENV VERSION $VERSION
 
-CMD ["pnpm", "start:api"]
+# override the command
+# e.g. pnpm start:worker
+CMD ["exit", "1"]
