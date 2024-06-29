@@ -722,6 +722,13 @@
       "when": 1718801610631,
       "tag": "0102_silent_nemesis",
       "breakpoints": false
+    },
+    {
+      "idx": 103,
+      "version": "5",
+      "when": 1719700861049,
+      "tag": "0103_rich_sentry",
+      "breakpoints": false
     }
   ]
 }

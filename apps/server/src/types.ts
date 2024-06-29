@@ -3,6 +3,7 @@ import type {
   BADGE_TYPE_LIST,
   CATEGORY_LIST,
   COUNTRY_LIST,
+  CURRENCY_LIST,
   EXTERNAL_SITE_TYPE_LIST,
   FLAVOR_PROFILES,
   SERVING_STYLE_LIST,
@@ -37,6 +38,7 @@ export type Category = (typeof CATEGORY_LIST)[number];
 export type ServingStyle = (typeof SERVING_STYLE_LIST)[number];
 export type FlavorProfile = (typeof FLAVOR_PROFILES)[number];
 export type TagCategory = (typeof TAG_CATEGORIES)[number];
+export type Currency = (typeof CURRENCY_LIST)[number];
 
 export type ExternalSiteType = (typeof EXTERNAL_SITE_TYPE_LIST)[number];
 export type Country = (typeof COUNTRY_LIST)[number];

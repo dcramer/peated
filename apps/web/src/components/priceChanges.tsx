@@ -2,17 +2,28 @@
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/src/lib/format";
+import { type Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import { trpc } from "@peated/web/lib/trpc";
 import BottleLink from "./bottleLink";
+import Price from "./price";
 
-function PriceDelta({ price, previous }: { price: number; previous: number }) {
+function PriceDelta({
+  price,
+  previous,
+  currency,
+}: {
+  price: number;
+  previous: number;
+  currency: Currency;
+}) {
   const sign = price > previous ? "+" : "-";
   return (
     <span className="flex items-center">
-      {sign}${(Math.abs(price - previous) / 100).toFixed(2)}
+      {sign}
+      <Price value={Math.abs(price - previous)} currency={currency} />
     </span>
   );
 }
@@ -71,7 +82,9 @@ export default function PriceChanges() {
                   </td>
                   <td className="py-2 pl-3 pr-4 text-right sm:table-cell sm:pr-3">
                     <div className="text-light flex flex-col items-end text-xs">
-                      <span>${(price.price / 100).toFixed(2)}</span>
+                      <span>
+                        <Price value={price.price} currency={price.currency} />
+                      </span>
                       <span
                         className={classNames(
                           price.previousPrice > price.price
@@ -82,6 +95,7 @@ export default function PriceChanges() {
                         <PriceDelta
                           price={price.price}
                           previous={price.previousPrice}
+                          currency={price.currency}
                         />
                       </span>
                     </div>

@@ -87,7 +87,7 @@ export async function scrapeProducts(
     cb({
       name,
       price,
-      priceUnit: "USD",
+      currency: "usd",
       volume,
       // image,
       url: absoluteUrl(productUrl, url),

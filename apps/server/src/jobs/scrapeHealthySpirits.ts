@@ -60,7 +60,7 @@ export async function scrapeProducts(
     cb({
       name,
       price,
-      priceUnit: "USD",
+      currency: "usd",
       volume,
       url: absoluteUrl(productUrl, url),
     });

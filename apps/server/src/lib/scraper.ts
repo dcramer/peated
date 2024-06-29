@@ -1,4 +1,5 @@
 import { defaultHeaders } from "@peated/server/constants";
+import type { Currency } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
 import { existsSync, mkdirSync, statSync } from "fs";
@@ -113,7 +114,7 @@ export async function chunked<T>(
 export type StorePrice = {
   name: string;
   price: number;
-  priceUnit: string;
+  currency: Currency;
   url: string;
   volume: number;
 };

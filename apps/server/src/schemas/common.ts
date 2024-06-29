@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FLAVOR_PROFILES } from "../constants";
+import { CURRENCY_LIST, FLAVOR_PROFILES } from "../constants";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 
 export const zTag = z.string();
@@ -33,3 +33,5 @@ export const zDatetime = z
 export const FlavorProfileEnum = z.enum(FLAVOR_PROFILES);
 
 export const ContentSourceEnum = z.enum(["generated", "user"]);
+
+export const CurrencyEnum = z.enum(CURRENCY_LIST);

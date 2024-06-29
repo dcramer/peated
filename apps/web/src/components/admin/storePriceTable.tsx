@@ -1,6 +1,6 @@
-import Link from "@peated/web/components/link";
-
 import type { Bottle, PagingRel, StorePrice } from "@peated/server/types";
+import Link from "@peated/web/components/link";
+import Price from "@peated/web/components/price";
 import PaginationButtons from "../paginationButtons";
 
 export default function StorePriceTable({
@@ -57,7 +57,7 @@ export default function StorePriceTable({
                   </div>
                 </td>
                 <td className="hidden px-3 py-3 text-right sm:table-cell">
-                  ${price.price / 100}
+                  <Price value={price.price} currency={price.currency} />
                 </td>
               </tr>
             );

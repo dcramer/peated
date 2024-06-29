@@ -42,6 +42,10 @@ export default publicProcedure
         id: sql<number>`${storePrices.bottleId}`,
         price: sql<number>`AVG(${storePrices.price})`,
         previousPrice: sql<number>`AVG(${storePriceHistories.price})`,
+        // force the type to fix nullable in default
+        bottleId: sql<number>`${storePrices.bottleId}`,
+        // assume this never changes
+        currency: storePrices.currency,
       })
       .from(storePrices)
       .innerJoin(
@@ -49,7 +53,7 @@ export default publicProcedure
         eq(storePriceHistories.priceId, storePrices.id),
       )
       .where(and(...where))
-      .groupBy(storePrices.bottleId)
+      .groupBy(storePrices.bottleId, storePrices.currency)
       .having(
         sql`ABS(AVG(${storePriceHistories.price}) - AVG(${storePrices.price})) > ${minChange}`,
       )
@@ -58,6 +62,8 @@ export default publicProcedure
       )
       .limit(limit + 1)
       .offset(offset);
+
+    console.log(results[0]);
 
     return {
       results: await serialize(

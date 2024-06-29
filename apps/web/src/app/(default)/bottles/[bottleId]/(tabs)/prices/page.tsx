@@ -1,4 +1,5 @@
 import BetaNotice from "@peated/web/components/betaNotice";
+import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
@@ -42,7 +43,9 @@ export default async function BottlePrices({
               <li key={price.id}>
                 <a href={price.url} className="flex hover:underline">
                   <span className="flex-auto">{price.site?.name}</span>
-                  <span>${(price.price / 100).toFixed(2)}</span>
+                  <span>
+                    <Price value={price.price} currency={price.currency} />
+                  </span>
                 </a>
                 <span className="text-light text-xs">
                   {price.volume}mL &mdash; <TimeSince date={price.updatedAt} />

@@ -4,25 +4,38 @@ import {
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
 import { trpcClient } from "@peated/server/lib/trpc/server";
-import { type BottleInputSchema } from "@peated/server/schemas";
+import {
+  type BottleInputSchema,
+  type StorePriceInputSchema,
+} from "@peated/server/schemas";
 import { type z } from "zod";
 
 export default async function scrapeSMWS() {
   await scrapeBottles(
     `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
-    async (item) => {
+    async (bottle, price) => {
       if (process.env.ACCESS_TOKEN) {
-        console.log(`Submitting [${item.name}]`);
+        console.log(`Submitting [${bottle.name}]`);
 
         try {
           await trpcClient.bottleCreate.mutate({
-            ...item,
+            ...bottle,
+          });
+        } catch (err) {
+          console.error(err);
+          return;
+        }
+
+        try {
+          await trpcClient.priceCreateBatch.mutate({
+            site: "smws",
+            prices: [price],
           });
         } catch (err) {
           console.error(err);
         }
       } else {
-        console.log(`Dry Run [${item.name}]`);
+        console.log(`Dry Run [${bottle.name}]`);
       }
     },
   );
@@ -42,12 +55,17 @@ type SMWSPayload = {
     age: number | null;
     cask_no: string;
     categories: string[];
+    price: number;
+    url: string;
   }[];
 };
 
 export async function scrapeBottles(
   url: string,
-  cb: (bottle: z.infer<typeof BottleInputSchema>) => Promise<void>,
+  cb: (
+    bottle: z.infer<typeof BottleInputSchema>,
+    price: z.infer<typeof StorePriceInputSchema>,
+  ) => Promise<void>,
 ) {
   const body = await getUrl(url);
   const data = JSON.parse(body) as SMWSPayload;
@@ -80,22 +98,31 @@ export async function scrapeBottles(
         )
       : null;
 
-    await cb({
-      name: details.name,
-      category: details.category,
-      statedAge,
-      brand: {
-        name: "The Scotch Malt Whisky Society",
-      },
-      bottler: {
-        name: "The Scotch Malt Whisky Society",
-      },
-      distillers: [
-        {
-          name: details.distiller,
+    await cb(
+      {
+        name: details.name,
+        category: details.category,
+        statedAge,
+        brand: {
+          name: "The Scotch Malt Whisky Society",
         },
-      ],
-      flavorProfile,
-    });
+        bottler: {
+          name: "The Scotch Malt Whisky Society",
+        },
+        distillers: [
+          {
+            name: details.distiller,
+          },
+        ],
+        flavorProfile,
+      },
+      {
+        name: details.name,
+        price: item.price,
+        currency: "gbp",
+        volume: 750,
+        url: `https://smws.com${item.url}`,
+      },
+    );
   });
 }
