@@ -4,26 +4,41 @@ import {
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
 import { trpcClient } from "@peated/server/lib/trpc/server";
-import { type BottleInputSchema } from "@peated/server/schemas";
+import {
+  type BottleInputSchema,
+  type StorePriceInputSchema,
+} from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
 import { type z } from "zod";
 
 export default async function scrapeSMWSA() {
   await scrapeBottles(
     `https://newmake.smwsa.com/collections/all-products`,
-    async (item) => {
+    async (bottle, price) => {
       if (process.env.ACCESS_TOKEN) {
-        console.log(`Submitting [${item.name}]`);
+        console.log(`Submitting [${bottle.name}]`);
 
         try {
           await trpcClient.bottleCreate.mutate({
-            ...item,
+            ...bottle,
           });
         } catch (err) {
           console.error(err);
+          return;
+        }
+
+        if (price) {
+          try {
+            await trpcClient.priceCreateBatch.mutate({
+              site: "smwsa",
+              prices: [price],
+            });
+          } catch (err) {
+            console.error(err);
+          }
         }
       } else {
-        console.log(`Dry Run [${item.name}]`);
+        console.log(`Dry Run [${bottle.name}]`);
       }
     },
   );
@@ -39,7 +54,10 @@ export default async function scrapeSMWSA() {
 
 export async function scrapeBottles(
   url: string,
-  cb: (bottle: z.infer<typeof BottleInputSchema>) => Promise<void>,
+  cb: (
+    bottle: z.infer<typeof BottleInputSchema>,
+    price: z.infer<typeof StorePriceInputSchema> | null,
+  ) => Promise<void>,
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
@@ -77,6 +95,23 @@ export async function scrapeBottles(
       specList.push([name, value]);
     });
 
+    const rawPrice = $(".product-collection-module__price", el)
+      .first()
+      .text()
+      .trim();
+    const price =
+      rawPrice && rawPrice.startsWith("$")
+        ? Number(rawPrice.substring(1))
+        : null;
+
+    const url = $("a.product-collection-module__grid-item-gallery", el)
+      .first()
+      .attr("href");
+    if (!url) {
+      console.error(`Cannot find url: ${name}`);
+      continue;
+    }
+
     const ageSpec = specList.find(([name]) => name === "Age:");
     const statedAge = ageSpec ? Number(ageSpec[1].split(" ")[0]) : null;
 
@@ -93,18 +128,29 @@ export async function scrapeBottles(
       continue;
     }
 
-    await cb({
-      name: details.name,
-      category: details.category,
-      statedAge,
-      brand: {
-        name: "The Scotch Malt Whisky Society",
+    await cb(
+      {
+        name: details.name,
+        category: details.category,
+        statedAge,
+        brand: {
+          name: "The Scotch Malt Whisky Society",
+        },
+        bottler: {
+          name: "The Scotch Malt Whisky Society",
+        },
+        distillers: [{ name: details.distiller }],
+        flavorProfile,
       },
-      bottler: {
-        name: "The Scotch Malt Whisky Society",
-      },
-      distillers: [{ name: details.distiller }],
-      flavorProfile,
-    });
+      price
+        ? {
+            name: details.name,
+            price,
+            volume: 750,
+            currency: "usd",
+            url,
+          }
+        : null,
+    );
   }
 }
