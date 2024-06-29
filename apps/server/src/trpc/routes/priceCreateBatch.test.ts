@@ -31,6 +31,7 @@ test("processes new price", async ({ fixtures }) => {
       {
         name: "Ardbeg 10-year-old",
         price: 9999,
+        currency: "usd",
         volume: 750,
         url: "http://example.com",
       },
@@ -70,6 +71,7 @@ test("processes existing price", async ({ fixtures }) => {
       {
         name: "Ardbeg 10-year-old",
         price: 2999,
+        currency: "usd",
         volume: 750,
         url: "http://example.com",
       },
@@ -101,6 +103,7 @@ test("processes new price without bottle", async ({ fixtures }) => {
       {
         name: "Ardbeg 10-year-old",
         price: 2999,
+        currency: "usd",
         volume: 750,
         url: "http://example.com",
       },

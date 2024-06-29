@@ -353,7 +353,7 @@ export const CASK_FILLS = ["1st_fill", "2nd_fill", "refill"];
 // TODO: determine granularity (e.g. hogshead etc)
 export const CASK_TYPES = ["bourbon", "sherry", "other"] as const;
 
-export const CURRENCY_LIST = ["usd", "gbp", "eur"];
+export const CURRENCY_LIST = ["usd", "gbp", "eur"] as const;
 
 // used for web scraping
 export const defaultHeaders = (url: string) => {
