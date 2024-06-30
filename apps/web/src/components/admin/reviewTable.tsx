@@ -1,15 +1,13 @@
 import Link from "@peated/web/components/link";
 
-import type { Bottle, PagingRel, Review } from "@peated/server/types";
+import type { PagingRel, Review } from "@peated/server/types";
 import PaginationButtons from "../paginationButtons";
 
 export default function ReviewTable({
   reviewList,
   rel,
 }: {
-  reviewList: (Review & {
-    bottle?: Bottle;
-  })[];
+  reviewList: Review[];
   rel?: PagingRel;
 }) {
   return (
