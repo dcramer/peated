@@ -91,7 +91,7 @@ export default function ErrorPage({
               {title || DEFAULT_TITLE}
             </h1>
             <div className="mt-6 leading-7 text-white">
-              {subtitle ? !title && DEFAULT_SUBTITLE : null}
+              {subtitle ? subtitle : !title && DEFAULT_SUBTITLE}
             </div>
 
             <div className="mt-10 flex items-center justify-center gap-x-6">
