@@ -10,6 +10,7 @@ import {
 } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
 import { type z } from "zod";
+import { isTRPCClientError } from "../lib/trpc";
 
 export default async function scrapeSMWSA() {
   await scrapeBottles(
@@ -23,7 +24,10 @@ export default async function scrapeSMWSA() {
             ...bottle,
           });
         } catch (err) {
-          console.error(err);
+          if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
+            console.error(err);
+            return;
+          }
         }
 
         if (price) {
@@ -33,7 +37,9 @@ export default async function scrapeSMWSA() {
               prices: [price],
             });
           } catch (err) {
-            console.error(err);
+            if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
+              console.error(err);
+            }
           }
         }
       } else {

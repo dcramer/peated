@@ -1,6 +1,6 @@
+import { isTRPCClientError } from "@peated/server/lib/trpc";
 import { type AppRouter } from "@peated/server/trpc/router";
 import {
-  TRPCClientError,
   createTRPCReact,
   type CreateTRPCReact,
   type inferReactQueryProcedureOptions,
@@ -29,13 +29,7 @@ export const trpc: CreateTRPCReact<AppRouter, unknown> =
     },
   });
 
-export function isTRPCClientError(
-  cause: unknown,
-): cause is TRPCClientError<AppRouter> {
-  return (
-    cause instanceof TRPCClientError || Object.hasOwn(cause as any, "data")
-  );
-}
+export { isTRPCClientError };
 
 export type ReactQueryOptions = inferReactQueryProcedureOptions<AppRouter>;
 export type RouterInputs = inferRouterInputs<AppRouter>;

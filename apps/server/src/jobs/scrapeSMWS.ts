@@ -9,6 +9,7 @@ import {
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { type z } from "zod";
+import { isTRPCClientError } from "../lib/trpc";
 
 export default async function scrapeSMWS() {
   await scrapeBottles(
@@ -22,7 +23,10 @@ export default async function scrapeSMWS() {
             ...bottle,
           });
         } catch (err) {
-          console.error(err);
+          if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
+            console.error(err);
+            return;
+          }
         }
 
         try {
@@ -31,7 +35,9 @@ export default async function scrapeSMWS() {
             prices: [price],
           });
         } catch (err) {
-          console.error(err);
+          if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
+            console.error(err);
+          }
         }
       } else {
         console.log(`Dry Run [${bottle.name}]`);

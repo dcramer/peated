@@ -1,6 +1,7 @@
 import { type AppRouter } from "@peated/server/trpc/router";
 import { captureException } from "@sentry/core";
 import {
+  TRPCClientError,
   createTRPCProxyClient,
   httpBatchLink,
   type TRPCLink,
@@ -59,4 +60,12 @@ export function sentryLink<TRouter extends AnyRouter>(): TRPCLink<TRouter> {
       });
     };
   };
+}
+
+export function isTRPCClientError(
+  cause: unknown,
+): cause is TRPCClientError<AppRouter> {
+  return (
+    cause instanceof TRPCClientError || Object.hasOwn(cause as any, "data")
+  );
 }
