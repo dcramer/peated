@@ -67,14 +67,12 @@ export default function TastingListItem({
   noBottle,
   onDelete,
   onToast,
-  hideNotes = false,
   noCommentAction = false,
 }: {
   tasting: Tasting;
   noBottle?: boolean;
   onDelete?: (tasting: Tasting) => void;
   onToast?: (tasting: Tasting) => void;
-  hideNotes?: boolean;
   noCommentAction?: boolean;
 }) {
   const { bottle } = tasting;
@@ -134,6 +132,11 @@ export default function TastingListItem({
               setOpen={setImageOpen}
             />
           </div>
+        )}
+        {!!tasting.notes && (
+          <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
+            {tasting.notes}
+          </p>
         )}
         <div className="text-light p-3 text-sm sm:px-5">
           {(tasting.servingStyle ||
