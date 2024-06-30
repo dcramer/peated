@@ -24,7 +24,6 @@ export default async function scrapeSMWSA() {
           });
         } catch (err) {
           console.error(err);
-          return;
         }
 
         if (price) {

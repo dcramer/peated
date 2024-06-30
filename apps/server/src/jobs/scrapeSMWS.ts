@@ -23,7 +23,6 @@ export default async function scrapeSMWS() {
           });
         } catch (err) {
           console.error(err);
-          return;
         }
 
         try {
