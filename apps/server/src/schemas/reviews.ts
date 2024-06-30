@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CategoryEnum } from "./bottles";
+import { BottleSchema, CategoryEnum } from "./bottles";
 import { ExternalSiteSchema, ExternalSiteTypeEnum } from "./externalSites";
 
 export const ReviewSchema = z.object({
@@ -8,6 +8,8 @@ export const ReviewSchema = z.object({
   rating: z.number(),
   url: z.string(),
   site: ExternalSiteSchema,
+  bottle: BottleSchema.nullish(),
+  createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
 

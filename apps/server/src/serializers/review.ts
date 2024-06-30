@@ -74,8 +74,8 @@ export const ReviewSerializer = serializer({
       url: item.url,
       bottle: attrs.bottle,
       site: attrs.site,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.updatedAt.toISOString(),
     };
   },
 });
