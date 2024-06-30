@@ -42,7 +42,7 @@ export default publicProcedure.input(z.number()).query(async function ({
     .where(
       and(
         eq(storePrices.bottleId, bottle.id),
-        sql`${storePrices.updatedAt} > NOW() - interval '1 month'`,
+        sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
       ),
     )
     .orderBy(desc(storePrices.updatedAt))
