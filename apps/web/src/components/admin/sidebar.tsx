@@ -18,7 +18,7 @@ export default function AdminSidebar() {
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
-                <Button href="/search?tasting" fullWidth color="primary">
+                <Button href="/" fullWidth color="primary">
                   Return Home
                 </Button>
               </li>
