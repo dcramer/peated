@@ -134,9 +134,7 @@ export default function TastingListItem({
           </div>
         )}
         {!!tasting.notes && (
-          <p className="text-peated p-3 text-sm sm:px-5 sm:py-4">
-            {tasting.notes}
-          </p>
+          <p className="text-peated p-3 text-sm sm:px-5">{tasting.notes}</p>
         )}
         <div className="text-light p-3 text-sm sm:px-5">
           {(tasting.servingStyle ||
