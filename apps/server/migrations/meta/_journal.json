@@ -729,6 +729,13 @@
       "when": 1719700861049,
       "tag": "0103_rich_sentry",
       "breakpoints": false
+    },
+    {
+      "idx": 104,
+      "version": "5",
+      "when": 1719727735298,
+      "tag": "0104_simple_barracuda",
+      "breakpoints": false
     }
   ]
 }

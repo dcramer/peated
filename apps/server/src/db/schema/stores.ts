@@ -28,7 +28,7 @@ export const storePrices = pgTable(
       () => bottles.id,
     ),
     price: integer("price").notNull(),
-    currency: currencyEnum("currency").default("usd").notNull(),
+    currency: currencyEnum("currency").notNull(),
     volume: integer("volume").notNull(),
     url: text("url").notNull().unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
