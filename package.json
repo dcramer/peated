@@ -40,15 +40,15 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "dotenv": "^16.4.5",
-    "dotenv-cli": "^7.4.1",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react": "^7.34.3",
     "foreman": "^3.0.1",
     "lint-staged": "^14.0.1",
-    "pnpm": "^8.15.6",
-    "prettier": "^3.2.5",
+    "pnpm": "^8.15.8",
+    "prettier": "^3.3.2",
     "prettier-plugin-organize-imports": "^3.2.4",
-    "prettier-plugin-tailwindcss": "^0.5.13",
+    "prettier-plugin-tailwindcss": "^0.5.14",
     "simple-git-hooks": "^2.11.1"
   },
   "engines": {
@@ -71,6 +71,6 @@
     ]
   },
   "devDependencies": {
-    "@spotlightjs/spotlight": "^2.0.0-alpha.1"
+    "@spotlightjs/spotlight": "^2.0.0"
   }
 }
