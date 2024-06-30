@@ -4,6 +4,7 @@ import {
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
+import { CurrencyEnum } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -13,6 +14,7 @@ export default publicProcedure
   .input(
     z.object({
       bottle: z.number(),
+      currency: CurrencyEnum.default("usd"),
     }),
   )
   .query(async function ({ input, ctx }) {
@@ -39,6 +41,7 @@ export default publicProcedure
       .innerJoin(storePrices, eq(storePriceHistories.priceId, storePrices.id))
       .where(
         and(
+          eq(storePrices.currency, input.currency),
           eq(storePrices.bottleId, bottle.id),
           sql`${storePrices.updatedAt} > NOW() - interval '1 year'`,
         ),

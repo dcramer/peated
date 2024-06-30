@@ -1,10 +1,7 @@
 import BottleOverview from "@peated/web/components/bottleOverview";
-import BottlePriceHistory, {
-  BottlePriceHistorySkeleton,
-} from "@peated/web/components/bottlePriceHistory";
+import Price from "@peated/web/components/price";
 import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import { Suspense } from "react";
 
 export const fetchCache = "default-no-store";
 
@@ -76,11 +73,21 @@ export default async function BottleDetails({
     },
     { name: "Tastings", value: bottle.totalTastings.toLocaleString() },
     { name: "People", value: bottle.people.toLocaleString() },
+    {
+      name: "Price",
+      value: bottle.lastPrice ? (
+        <Price
+          value={bottle.lastPrice.price}
+          currency={bottle.lastPrice.currency}
+          noCents
+        />
+      ) : null,
+    },
   ];
 
   return (
     <>
-      <div className="my-6 grid grid-cols-3 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">
+      <div className="my-6 grid grid-cols-2 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">
         {stats.map((stat) => (
           <div key={stat.name}>
             <div className="text-light leading-7">{stat.name}</div>
@@ -89,14 +96,6 @@ export default async function BottleDetails({
             </div>
           </div>
         ))}
-        <div className="hidden lg:block">
-          <div className="text-light leading-7">Price</div>
-          <div className="flex items-center">
-            <Suspense fallback={<BottlePriceHistorySkeleton />}>
-              <BottlePriceHistory bottleId={bottle.id} />
-            </Suspense>
-          </div>
-        </div>
       </div>
       <BottleOverview bottle={bottle} />
     </>
