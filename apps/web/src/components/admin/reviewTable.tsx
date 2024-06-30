@@ -8,7 +8,7 @@ export default function ReviewTable({
   rel,
 }: {
   reviewList: (Review & {
-    bottle: Bottle;
+    bottle?: Bottle;
   })[];
   rel?: PagingRel;
 }) {
