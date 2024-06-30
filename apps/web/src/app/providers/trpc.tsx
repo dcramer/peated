@@ -20,6 +20,7 @@ export default function TRPCProvider({
         sentryLink(),
         httpBatchLink({
           url: `${config.API_SERVER}/trpc`,
+          maxBatchSize: 10,
           async headers() {
             return {
               authorization: accessToken ? `Bearer ${accessToken}` : "",

@@ -3,7 +3,7 @@ import { captureException } from "@sentry/core";
 import {
   TRPCClientError,
   createTRPCProxyClient,
-  httpBatchLink,
+  httpLink,
   type TRPCLink,
 } from "@trpc/client";
 import { type AnyRouter } from "@trpc/server";
@@ -16,7 +16,7 @@ export function makeTRPCClient(
   return createTRPCProxyClient<AppRouter>({
     links: [
       sentryLink<AppRouter>(),
-      httpBatchLink({
+      httpLink({
         url: `${apiServer}/trpc`,
         async headers() {
           return {
