@@ -92,7 +92,7 @@ export default async function scrapeHealthySpirits() {
 
   if (process.env.ACCESS_TOKEN) {
     console.log("Pushing new price data to API");
-    chunked(
+    await chunked(
       products,
       100,
       async (items) =>

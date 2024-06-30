@@ -76,7 +76,7 @@ export async function scrapeBottles(
   const body = await getUrl(url);
   const data = JSON.parse(body) as SMWSPayload;
 
-  chunked(data.items, 10, async (items) => {
+  await chunked(data.items, 10, async (items) => {
     await Promise.all(
       items.map(async (item) => {
         const caskName = item.name;
