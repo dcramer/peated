@@ -63,8 +63,6 @@ export default publicProcedure
       .limit(limit + 1)
       .offset(offset);
 
-    console.log(results[0]);
-
     return {
       results: await serialize(
         BottlePriceChangeSerializer,
