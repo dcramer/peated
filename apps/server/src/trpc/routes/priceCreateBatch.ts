@@ -45,6 +45,7 @@ export default adminProcedure
             externalSiteId: site.id,
             name: sp.name,
             price: sp.price,
+            currency: sp.currency,
             volume: sp.volume,
             url: sp.url,
           })
@@ -57,6 +58,7 @@ export default adminProcedure
             set: {
               bottleId,
               price: sp.price,
+              currency: sp.currency,
               url: sp.url,
               volume: sp.volume,
               updatedAt: sql`NOW()`,
@@ -69,6 +71,7 @@ export default adminProcedure
           .values({
             priceId: priceId,
             price: sp.price,
+            currency: sp.currency,
             volume: sp.volume,
             date: sql`CURRENT_DATE`,
           })
