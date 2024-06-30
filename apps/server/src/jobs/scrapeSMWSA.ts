@@ -150,7 +150,7 @@ export async function scrapeBottles(
       },
       price
         ? {
-            name: details.name,
+            name: `SMWS ${details.name}`,
             price,
             volume: 750,
             currency: "usd",

@@ -125,7 +125,7 @@ export async function scrapeBottles(
             flavorProfile,
           },
           {
-            name: details.name,
+            name: `SMWS ${details.name}`,
             price: Math.floor(item.price * 100),
             currency: "gbp",
             volume: 750,
