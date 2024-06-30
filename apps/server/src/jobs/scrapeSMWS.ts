@@ -123,7 +123,7 @@ export async function scrapeBottles(
       },
       {
         name: details.name,
-        price: item.price * 100,
+        price: Math.floor(item.price * 100),
         currency: "gbp",
         volume: 750,
         url: `https://smws.com${item.url}`,

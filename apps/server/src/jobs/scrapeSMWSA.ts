@@ -106,7 +106,7 @@ export async function scrapeBottles(
       .trim();
     const price =
       rawPrice && rawPrice.startsWith("$")
-        ? Number(rawPrice.substring(1)) * 100
+        ? Math.floor(Number(rawPrice.substring(1)) * 100)
         : null;
 
     const url = $("a.product-collection-module__grid-item-gallery", el)
