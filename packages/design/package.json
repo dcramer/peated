@@ -11,11 +11,11 @@
   "dependencies": {
     "@peated/tsconfig": "workspace:*",
     "@tailwindcss/forms": "^0.5.7",
-    "@tailwindcss/typography": "^0.5.13",
-    "prettier-plugin-tailwindcss": "^0.5.14",
-    "tailwindcss": "^3.4.4",
+    "@tailwindcss/typography": "^0.5.12",
+    "prettier-plugin-tailwindcss": "^0.5.13",
+    "tailwindcss": "^3.4.3",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "~5.4.5"
+    "typescript": "~5.4.4"
   },
   "volta": {
     "extends": "../../package.json"
