@@ -1,4 +1,4 @@
-import { getUrl } from "@peated/server/lib/scraper";
+import { chunked, getUrl } from "@peated/server/lib/scraper";
 import {
   parseDetailsFromName,
   parseFlavorProfile,
@@ -75,59 +75,63 @@ export async function scrapeBottles(
   const body = await getUrl(url);
   const data = JSON.parse(body) as SMWSPayload;
 
-  data.items.forEach(async (item) => {
-    const caskName = item.name;
-    if (!caskName) {
-      console.warn(`Cannot find cask name for product`);
-      return;
-    }
+  chunked(data.items, 10, async (items) => {
+    await Promise.all(
+      items.map(async (item) => {
+        const caskName = item.name;
+        if (!caskName) {
+          console.warn(`Cannot find cask name for product`);
+          return;
+        }
 
-    const statedAge = item.age;
+        const statedAge = item.age;
 
-    const details = parseDetailsFromName(`${item.cask_no} ${caskName}`);
-    if (!details?.distiller) {
-      console.error(`Cannot find distiller: ${item.cask_no} ${caskName}`);
-      return;
-    }
-    if (!details?.category) {
-      console.error(`Unsupported spirit: ${item.cask_no} ${caskName}`);
-      return;
-    }
+        const details = parseDetailsFromName(`${item.cask_no} ${caskName}`);
+        if (!details?.distiller) {
+          console.error(`Cannot find distiller: ${item.cask_no} ${caskName}`);
+          return;
+        }
+        if (!details?.category) {
+          console.error(`Unsupported spirit: ${item.cask_no} ${caskName}`);
+          return;
+        }
 
-    const flavorProfileRaw = item.categories.find((c) => {
-      return c.startsWith("All Whisky/Flavour Profiles/");
-    });
-    const flavorProfile = flavorProfileRaw
-      ? parseFlavorProfile(
-          flavorProfileRaw.split("All Whisky/Flavour Profiles/")[1],
-        )
-      : null;
+        const flavorProfileRaw = item.categories.find((c) => {
+          return c.startsWith("All Whisky/Flavour Profiles/");
+        });
+        const flavorProfile = flavorProfileRaw
+          ? parseFlavorProfile(
+              flavorProfileRaw.split("All Whisky/Flavour Profiles/")[1],
+            )
+          : null;
 
-    await cb(
-      {
-        name: details.name,
-        category: details.category,
-        statedAge,
-        brand: {
-          name: "The Scotch Malt Whisky Society",
-        },
-        bottler: {
-          name: "The Scotch Malt Whisky Society",
-        },
-        distillers: [
+        await cb(
           {
-            name: details.distiller,
+            name: details.name,
+            category: details.category,
+            statedAge,
+            brand: {
+              name: "The Scotch Malt Whisky Society",
+            },
+            bottler: {
+              name: "The Scotch Malt Whisky Society",
+            },
+            distillers: [
+              {
+                name: details.distiller,
+              },
+            ],
+            flavorProfile,
           },
-        ],
-        flavorProfile,
-      },
-      {
-        name: details.name,
-        price: Math.floor(item.price * 100),
-        currency: "gbp",
-        volume: 750,
-        url: `https://smws.com${item.url}`,
-      },
+          {
+            name: details.name,
+            price: Math.floor(item.price * 100),
+            currency: "gbp",
+            volume: 750,
+            url: `https://smws.com${item.url}`,
+          },
+        );
+      }),
     );
   });
 }
