@@ -24,7 +24,7 @@ export default function Page({
       onSubmit={async (data) => {
         const newSite = await siteUpdateMutation.mutateAsync({
           ...data,
-          type: site.type,
+          site: site.type,
         });
         router.push(`/admin/sites/${newSite.type}`);
       }}
