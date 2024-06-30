@@ -15,7 +15,7 @@
     "@peated/design": "workspace:*",
     "@peated/server": "workspace:*",
     "@react-oauth/google": "^0.11.1",
-    "@sentry/nextjs": "^8.10.0",
+    "@sentry/nextjs": "^8.13.0",
     "@tanstack/react-query": "^5.45.1",
     "@tanstack/react-query-next-experimental": "^5.48.0",
     "@trpc/client": "11.0.0-rc.413",
