@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
 import Form from "../form";
+import AdminSidebar from "./sidebar";
 
 type FormSchemaType = z.infer<typeof ExternalSiteSchemaInputSchema>;
 
@@ -23,9 +24,11 @@ const SITE_TYPES = EXTERNAL_SITE_TYPE_LIST.map((t) => ({ id: t, name: t }));
 export default function SiteForm({
   onSubmit,
   initialData = {},
+  title = "Add Site",
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
   initialData?: Partial<ExternalSite>;
+  title?: string;
 }) {
   const {
     control,
@@ -54,10 +57,11 @@ export default function SiteForm({
 
   return (
     <Layout
+      sidebar={<AdminSidebar />}
       header={
         <Header>
           <FormHeader
-            title="Add Site"
+            title={title}
             saveDisabled={isSubmitting}
             onSave={handleSubmit(onSubmitHandler)}
           />

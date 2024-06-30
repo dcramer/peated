@@ -17,6 +17,7 @@ import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
 import Form from "../form";
+import AdminSidebar from "./sidebar";
 
 type FormSchemaType = z.infer<typeof TagInputSchema>;
 
@@ -34,10 +35,12 @@ export default function TagForm({
   onSubmit,
   initialData = {},
   edit = false,
+  title = "Add Tag",
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
   initialData?: Partial<ExternalSite>;
   edit?: boolean;
+  title?: string;
 }) {
   const {
     control,
@@ -66,10 +69,11 @@ export default function TagForm({
 
   return (
     <Layout
+      sidebar={<AdminSidebar />}
       header={
         <Header>
           <FormHeader
-            title="Add Tag"
+            title={title}
             saveDisabled={isSubmitting}
             onSave={handleSubmit(onSubmitHandler)}
           />

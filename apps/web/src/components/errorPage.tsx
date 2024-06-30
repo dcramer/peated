@@ -20,6 +20,14 @@ export function ErrorPage404({
   return <ErrorPage title={title} subtitle={subtitle} {...props} />;
 }
 
+export function ErrorPageForbidden({
+  title = "Forbidden",
+  subtitle = "Looks like you don't have permission to access this page.",
+  ...props
+}: ComponentProps<typeof ErrorPage>) {
+  return <ErrorPage title={title} subtitle={subtitle} {...props} />;
+}
+
 export default function ErrorPage({
   title,
   subtitle,

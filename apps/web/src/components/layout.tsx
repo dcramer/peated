@@ -1,4 +1,4 @@
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import AppFooter from "./appFooter";
 import AppHeader from "./appHeader";
 import Footer from "./footer";
@@ -9,11 +9,13 @@ export default function Layout({
   children,
   header,
   footer,
+  sidebar,
   rightSidebar,
 }: {
   children: ReactNode;
   header?: ReactNode;
   footer?: ReactNode;
+  sidebar?: ReactNode;
   rightSidebar?: ReactNode;
 }) {
   return (
@@ -26,9 +28,7 @@ export default function Layout({
         </Header>
       )}
 
-      <Suspense>
-        <Sidebar />
-      </Suspense>
+      {sidebar ?? <Sidebar />}
 
       <div className="flex">
         <main className="w-full max-w-7xl flex-auto lg:pl-64">

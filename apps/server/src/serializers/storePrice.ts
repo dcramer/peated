@@ -16,7 +16,7 @@ export const StorePriceSerializer = serializer({
       volume: item.volume,
       currency: item.currency,
       url: item.url,
-      updatedAt: attrs.updatedAt,
+      updatedAt: item.updatedAt,
     };
   },
 });

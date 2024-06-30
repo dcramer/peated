@@ -9,6 +9,7 @@ import {
   type User,
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
+import { type ReviewSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
@@ -60,7 +61,11 @@ export const ReviewSerializer = serializer({
     );
   },
 
-  item: (item: Review, attrs: ReviewAttrs, currentUser?: User) => {
+  item: (
+    item: Review,
+    attrs: ReviewAttrs,
+    currentUser?: User,
+  ): z.infer<typeof ReviewSchema> => {
     return {
       id: item.id,
       name: item.name,
@@ -68,6 +73,8 @@ export const ReviewSerializer = serializer({
       url: item.url,
       bottle: attrs.bottle,
       site: attrs.site,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
     };
   },
 });
