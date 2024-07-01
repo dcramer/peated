@@ -489,6 +489,7 @@ export const StorePrice = async (
         price: 0,
         volume: 750,
         url: "",
+        currency: "usd",
         ...data,
         externalSiteId: data.externalSiteId || (await ExternalSite({}, tx)).id,
       })
@@ -515,6 +516,7 @@ export const StorePrice = async (
         priceId: price.id,
         price: price.price,
         volume: price.volume,
+        currency: price.currency,
         date: sql`CURRENT_DATE`,
       })
       .onConflictDoNothing();
