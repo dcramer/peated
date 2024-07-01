@@ -128,16 +128,11 @@ subcommand
       .select({ id: entities.id })
       .from(entities)
       .where(
-        and(
-          sql`${"distiller"} = ANY(${entities.type})`,
-          isNotNull(entities.address),
-          isNotNull(entities.country),
-          entityIds.length
-            ? inArray(entities.id, entityIds)
-            : options.onlyMissing
-              ? isNull(entities.location)
-              : undefined,
-        ),
+        entityIds.length
+          ? inArray(entities.id, entityIds)
+          : options.onlyMissing
+            ? isNull(entities.location)
+            : undefined,
       )
       .orderBy(asc(entities.id));
 
