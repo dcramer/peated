@@ -2,12 +2,14 @@
 import "./sentry";
 
 import FastifyCors from "@fastify/cors";
+import FastifyExpress from "@fastify/express";
 import FastifyHelmet from "@fastify/helmet";
 import FastifyMultipart from "@fastify/multipart";
 import { shutdownClient } from "@peated/server/jobs/client";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { fastify } from "fastify";
 import { setTimeout } from "node:timers/promises";
+import { expressHandler } from "trpc-playground/handlers/express";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
 import { injectAuth } from "./middleware/auth";
@@ -50,6 +52,11 @@ export default async function buildFastify(options = {}) {
     ...options,
   });
 
+  app.addHook("preHandler", (request, reply, done) => {
+    // default
+    reply.headers({ "Cache-Control": "no-cache" });
+    done();
+  });
   if (config.ENV === "development") {
     console.log("Adding 300ms delay to all requests");
     app.addHook("onRequest", async (request, reply) => {
@@ -57,14 +64,29 @@ export default async function buildFastify(options = {}) {
     });
   }
 
-  app.addHook("preHandler", (request, reply, done) => {
-    // default
-    reply.headers({ "Cache-Control": "no-cache" });
-    done();
-  });
+  const trpcApiEndpoint = "/trpc";
+
+  if (config.ENV === "development") {
+    await app.register(FastifyExpress);
+
+    const playgroundEndpoint = "/_debug/trpc";
+
+    app.use(
+      playgroundEndpoint,
+      await expressHandler({
+        trpcApiEndpoint,
+        playgroundEndpoint,
+        router: appRouter,
+        // uncomment this if you're using superjson
+        // request: {
+        //   superjson: true,
+        // },
+      }),
+    );
+  }
 
   app.register(fastifyTRPCPlugin, {
-    prefix: "/trpc",
+    prefix: trpcApiEndpoint,
     trpcOptions: { router: appRouter, createContext },
   });
 
