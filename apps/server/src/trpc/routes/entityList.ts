@@ -63,7 +63,7 @@ export default publicProcedure
     const where: (SQL<unknown> | undefined)[] = [];
     if (query) {
       where.push(
-        sql`${entities.searchVector} @@ websearch_to_tsquery ('english', ${query}) DESC`,
+        sql`${entities.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
       );
     }
     if (input.name) {
@@ -104,7 +104,7 @@ export default publicProcedure
     switch (input.sort) {
       case "rank":
         if (query) {
-          orderBy = sql`ts_rank(${entities.searchVector}, websearch_to_tsquery('english', ${query}))`;
+          orderBy = sql`ts_rank(${entities.searchVector}, websearch_to_tsquery('english', ${query})) DESC`;
         } else {
           orderBy = desc(entities.totalTastings);
         }
