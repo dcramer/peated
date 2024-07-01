@@ -52,7 +52,10 @@ export default async function buildFastify(options = {}) {
 
   app.addHook("preHandler", (request, reply, done) => {
     // default
-    reply.headers({ "Cache-Control": "no-cache" });
+    reply.headers({
+      "Cache-Control":
+        "private, no-cache, no-store, max-age=0, must-revalidate",
+    });
     done();
   });
 
