@@ -17,11 +17,16 @@ import ResultRow from "./result";
 import { SkeletonItem } from "./skeletonItem";
 
 export type Props = {
+  value?: string;
   onClose?: () => void;
   onQueryChange?: (value: string) => void;
 };
 
-export default function SearchPanel({ onClose, onQueryChange }: Props) {
+export default function SearchPanel({
+  value = "",
+  onClose,
+  onQueryChange,
+}: Props) {
   const { user } = useAuth();
   const qs = useSearchParams();
 
@@ -31,13 +36,24 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
 
   const router = useRouter();
 
-  const [query, setQuery] = useState(qs.get("q") || "");
+  const [query, setQuery] = useState(qs.get("q") || value);
   const [state, setState] = useState<"loading" | "ready">("loading");
 
   const [results, setResults] = useState<readonly Result[]>([]);
   const isUserQuery = query.indexOf("@") !== -1;
 
   const trpcUtils = trpc.useUtils();
+
+  useEffect(() => {
+    const query = qs.get("q") || "";
+    setQuery(query);
+    if (onQueryChange) onQueryChange(query);
+  }, [onQueryChange, qs]);
+
+  useEffect(() => {
+    setQuery(value);
+    if (onQueryChange) onQueryChange(value);
+  }, [value]);
 
   // TODO: handle errors
   const fetch = debounce(
@@ -67,7 +83,8 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
             })
             .then((data) =>
               data.results.map<Result>((b) => ({ type: "bottle", ref: b })),
-            ),
+            )
+            .catch(() => []),
         );
       }
 
@@ -80,7 +97,8 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
             })
             .then((data) =>
               data.results.map<Result>((b) => ({ type: "user", ref: b })),
-            ),
+            )
+            .catch(() => []),
         );
       }
 
@@ -90,7 +108,8 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
             .fetch({ query, limit: maxResults })
             .then((data) =>
               data.results.map<Result>((b) => ({ type: "entity", ref: b })),
-            ),
+            )
+            .catch(() => []),
         );
       }
       const results = await Promise.all(promises);
@@ -130,12 +149,6 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
     },
     [query],
   );
-
-  useEffect(() => {
-    const query = qs.get("q") || "";
-    setQuery(query);
-    if (onQueryChange) onQueryChange(query);
-  }, [onQueryChange, qs]);
 
   useEffect(() => {
     setState("loading");

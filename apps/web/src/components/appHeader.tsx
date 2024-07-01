@@ -10,6 +10,7 @@ import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 import { ProfileDropdown } from "./profileDropdown";
 import { SearchPanel } from "./search";
+import SearchHeaderForm from "./searchHeaderForm";
 import UserAvatar from "./userAvatar";
 
 export default function AppHeader() {
@@ -28,49 +29,42 @@ export default function AppHeader() {
 
   return (
     <div className="flex flex-auto items-center gap-x-2 sm:gap-x-4">
-      <form
-        className="flex-auto"
-        onSubmit={(e) => {
-          e.preventDefault();
-          router.push(`/search?q=${encodeURIComponent(query)}`);
+      <SearchHeaderForm
+        placeholder="Search for bottles, brands, and people"
+        value={query}
+        onSubmit={(value) => {
+          router.push(`/search?q=${encodeURIComponent(value)}`);
         }}
+        onChange={(value) => {
+          setQuery(value);
+          if (!searchOpen) setSearchOpen(true);
+        }}
+        onFocus={() => {
+          // not sure a better way to work around default focus
+          if (!searchFocused) {
+            setSearchFocused(true);
+            setSearchOpen(true);
+          }
+        }}
+      />
+      <Dialog
+        open={searchOpen}
+        as="div"
+        className="dialog"
+        onClose={setSearchOpen}
       >
-        <input
-          name="q"
-          placeholder="Search for bottles, brands, and people"
-          autoComplete="off"
-          className="w-full transform rounded border-0 border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-2"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            if (!searchOpen) setSearchOpen(true);
-          }}
-          onFocus={() => {
-            // not sure a better way to work around default focus
-            if (!searchFocused) {
-              setSearchFocused(true);
-              setSearchOpen(true);
-            }
-          }}
-        />
-        <Dialog
-          open={searchOpen}
-          as="div"
-          className="dialog"
-          onClose={setSearchOpen}
-        >
-          <Dialog.Overlay className="fixed inset-0" />
-          <Dialog.Panel className="dialog-panel">
-            <SearchPanel
-              onQueryChange={(value) => setQuery(value)}
-              onClose={() => {
-                setSearchOpen(false);
-                setTimeout(() => setSearchFocused(false), 100);
-              }}
-            />
-          </Dialog.Panel>
-        </Dialog>
-      </form>
+        <Dialog.Overlay className="fixed inset-0" />
+        <Dialog.Panel className="dialog-panel">
+          <SearchPanel
+            value={query}
+            onQueryChange={(value) => setQuery(value)}
+            onClose={() => {
+              setSearchOpen(false);
+              setTimeout(() => setSearchFocused(false), 100);
+            }}
+          />
+        </Dialog.Panel>
+      </Dialog>
       {user ? (
         <div className="flex items-center gap-x-2">
           <div className="hidden sm:block">
