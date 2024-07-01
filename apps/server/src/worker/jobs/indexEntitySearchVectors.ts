@@ -16,7 +16,7 @@ export default async ({ entityId }: { entityId: number }) => {
     .from(entityAliases)
     .where(eq(entityAliases.entityId, entity.id));
 
-  const searchVector = buildEntitySearchVector(entity, aliasList);
+  const searchVector = buildEntitySearchVector(entity, aliasList) || null;
 
   console.log(`Updating index for Entity ${entity.id}: ${searchVector}`);
 

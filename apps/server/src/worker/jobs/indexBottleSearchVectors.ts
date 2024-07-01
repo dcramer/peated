@@ -41,13 +41,9 @@ export default async ({ bottleId }: { bottleId: number }) => {
     ? await db.select().from(entities).where(eq(entities.id, bottle.bottlerId))
     : [];
 
-  const searchVector = buildBottleSearchVector(
-    bottle,
-    brand,
-    aliasList,
-    bottler,
-    distillerList,
-  );
+  const searchVector =
+    buildBottleSearchVector(bottle, brand, aliasList, bottler, distillerList) ||
+    null;
 
   console.log(`Updating index for Bottle ${bottle.id}: ${searchVector}`);
 
