@@ -3,10 +3,6 @@ import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata({
   params: { bottleId },
 }: {

@@ -3,8 +3,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Stats, { StatsSkeleton } from "./stats";
 
-export const fetchCache = "default-no-store";
-
 export const dynamic = "force-static";
 
 // export const sitemap: SitemapFunction = () => ({

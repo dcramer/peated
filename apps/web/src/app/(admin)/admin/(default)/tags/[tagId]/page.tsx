@@ -5,10 +5,6 @@ import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import { trpc } from "@peated/web/lib/trpc";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export default function Page({
   params: { tagId },
 }: {

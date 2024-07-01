@@ -4,10 +4,6 @@ import { getSession } from "@peated/web/lib/session.server";
 import { type Metadata } from "next";
 import React from "react";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: "Admin",
 };

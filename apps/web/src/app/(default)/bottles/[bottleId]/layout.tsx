@@ -8,10 +8,6 @@ import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import ModActions from "./modActions";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export default async function Layout({
   params,
   children,

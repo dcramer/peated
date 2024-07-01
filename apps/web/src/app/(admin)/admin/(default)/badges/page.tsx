@@ -7,10 +7,6 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import { trpc } from "@peated/web/lib/trpc";
 import { useSearchParams } from "next/navigation";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export default function Page() {
   const searchParams = useSearchParams();
   const [badgeList] = trpc.badgeList.useSuspenseQuery({

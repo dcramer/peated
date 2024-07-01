@@ -9,10 +9,6 @@ import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { parseDomain } from "@peated/web/lib/urls";
 import { Suspense } from "react";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata({
   params: { entityId },
 }: {

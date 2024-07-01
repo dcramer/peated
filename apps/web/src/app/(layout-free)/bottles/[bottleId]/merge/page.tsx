@@ -18,10 +18,6 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 type FormSchemaType = z.infer<typeof BottleMergeSchema>;
 
 export default function MergeBottle({

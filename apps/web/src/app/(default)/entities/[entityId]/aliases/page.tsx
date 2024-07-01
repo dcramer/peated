@@ -1,10 +1,6 @@
 import Chip from "@peated/web/components/chip";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata({
   params: { entityId },
 }: {

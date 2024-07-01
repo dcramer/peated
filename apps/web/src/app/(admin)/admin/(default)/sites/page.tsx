@@ -8,10 +8,6 @@ import TimeSince from "@peated/web/components/timeSince";
 import { trpc } from "@peated/web/lib/trpc";
 import { useSearchParams } from "next/navigation";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export default function Page() {
   const searchParams = useSearchParams();
   const [siteList] = trpc.externalSiteList.useSuspenseQuery({

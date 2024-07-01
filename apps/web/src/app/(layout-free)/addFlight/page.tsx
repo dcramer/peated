@@ -5,10 +5,6 @@ import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc";
 import { useRouter } from "next/navigation";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export default function AddFlight() {
   useAuthRequired();
 

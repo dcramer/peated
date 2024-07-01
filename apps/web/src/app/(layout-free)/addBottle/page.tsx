@@ -9,10 +9,6 @@ import { trpc } from "@peated/web/lib/trpc";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 export default function AddBottle() {
   useAuthRequired();
 

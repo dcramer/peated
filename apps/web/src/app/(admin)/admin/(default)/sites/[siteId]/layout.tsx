@@ -12,10 +12,6 @@ import { trpc } from "@peated/web/lib/trpc";
 import { useState, type ReactNode } from "react";
 import { type z } from "zod";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 type UpdateSiteFn = (data: z.infer<typeof ExternalSiteSchema>) => void;
 
 function TriggerJobButton({

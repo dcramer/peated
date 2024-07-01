@@ -3,10 +3,6 @@ import Price from "@peated/web/components/price";
 import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
-export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
-
 // export const sitemap: SitemapFunction = async ({
 //   config: sitemapConfig,
 //   request,
