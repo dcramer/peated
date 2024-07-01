@@ -13,7 +13,7 @@ export class TSVector {
   }
 
   mapToDriverValue() {
-    return `setweight(to_tsvector(${this.value}), ${this.weight})`;
+    return sql`setweight(to_tsvector(${this.value}), ${this.weight})`;
   }
 }
 
@@ -28,7 +28,10 @@ export function tsvector<TData extends TSVectorType = string>(name: string) {
     toDriver(value: TData) {
       if (typeof value === "string") return sql`to_tsvector(${value})`;
       else if (Array.isArray(value))
-        return value.map((v) => v.mapToDriverValue()).join(" || ' ' || ");
+        return sql.join(
+          value.map((v) => v.mapToDriverValue()),
+          sql` || ' ' || `,
+        );
       return value.mapToDriverValue();
     },
   })(name);
