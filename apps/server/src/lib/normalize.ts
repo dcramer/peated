@@ -18,6 +18,13 @@ export const normalizeCategory = (name: string): Category | null => {
   return null;
 };
 
+export const normalizeEntityName = (name: string): string => {
+  if (name.toLowerCase().endsWith(" distillery")) {
+    name = name.replace(/ distillery$/i, "");
+  }
+  return name;
+};
+
 export const normalizeBottleName = (
   name: string,
   age: number | null = null,

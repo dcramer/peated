@@ -13,6 +13,7 @@ import {
 import { pushJob } from "@peated/server/jobs/client";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
+import { normalizeEntityName } from "@peated/server/lib/normalize";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
@@ -46,7 +47,7 @@ export default modProcedure
     const data: { [name: string]: any } = {};
 
     if (input.name && input.name !== entity.name) {
-      data.name = input.name;
+      data.name = normalizeEntityName(input.name);
     }
     if (input.shortName !== undefined && input.shortName !== entity.shortName) {
       data.shortName = input.shortName;

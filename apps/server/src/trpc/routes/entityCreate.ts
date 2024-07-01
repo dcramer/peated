@@ -8,6 +8,7 @@ import {
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/jobs/client";
 import { logError } from "@peated/server/lib/log";
+import { normalizeEntityName } from "@peated/server/lib/normalize";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
@@ -20,6 +21,7 @@ export default authedProcedure
   .mutation(async function ({ input, ctx }) {
     const data: NewEntity = {
       ...input,
+      name: normalizeEntityName(input.name),
       type: input.type || [],
       createdById: ctx.user.id,
     };
