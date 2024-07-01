@@ -45,7 +45,7 @@ export default function SearchHeaderForm({
       }}
     >
       <input
-        autoFocus
+        autoFocus={!onFocus}
         name={name}
         value={value}
         placeholder={placeholder}
