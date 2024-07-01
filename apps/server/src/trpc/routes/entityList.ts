@@ -73,7 +73,7 @@ export default publicProcedure
     const where: (SQL<unknown> | undefined)[] = [];
     if (query) {
       where.push(
-        sql`${entities.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        sql`${entities.searchVector} @@ websearch_to_tsquery ('english', ${query}) DESC`,
       );
     }
     if (input.name) {

@@ -128,7 +128,7 @@ export default publicProcedure
     switch (input.sort) {
       case "rank":
         if (query) {
-          orderBy = sql`ts_rank(${bottles.searchVector}, websearch_to_tsquery('english', ${query}))`;
+          orderBy = sql`ts_rank(${bottles.searchVector}, websearch_to_tsquery('english', ${query})) DESC`;
         } else {
           orderBy = desc(bottles.totalTastings);
         }
