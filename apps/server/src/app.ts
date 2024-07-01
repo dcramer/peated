@@ -66,24 +66,22 @@ export default async function buildFastify(options = {}) {
 
   const trpcApiEndpoint = "/trpc";
 
-  if (config.ENV === "development") {
-    await app.register(FastifyExpress);
+  await app.register(FastifyExpress);
 
-    const playgroundEndpoint = "/_debug/trpc";
+  const playgroundEndpoint = "/_debug/trpc";
 
-    app.use(
+  app.use(
+    playgroundEndpoint,
+    await expressHandler({
+      trpcApiEndpoint,
       playgroundEndpoint,
-      await expressHandler({
-        trpcApiEndpoint,
-        playgroundEndpoint,
-        router: appRouter,
-        // uncomment this if you're using superjson
-        // request: {
-        //   superjson: true,
-        // },
-      }),
-    );
-  }
+      router: appRouter,
+      // uncomment this if you're using superjson
+      // request: {
+      //   superjson: true,
+      // },
+    }),
+  );
 
   app.register(fastifyTRPCPlugin, {
     prefix: trpcApiEndpoint,
