@@ -5,27 +5,17 @@ import type {
   NewEntity,
   NewEntityAlias,
 } from "../db/schema";
-import { notEmpty } from "./filter";
-
-function uniq<T>(values: T[]): T[] {
-  const seen = new Set();
-  return values.filter((item) => {
-    if (seen.has(item)) return false;
-    seen.add(item);
-    return true;
-  });
-}
 
 export function buildEntitySearchVector(
   entity: NewEntity,
   aliasList?: NewEntityAlias[],
-) {
+): TSVector[] {
   const values: TSVector[] = [
     new TSVector(entity.name, "A"),
     ...(entity.shortName ? [new TSVector(entity.shortName, "B")] : []),
   ];
   aliasList?.forEach((a) => values.push(new TSVector(a.name, "A")));
-  return uniq(values.filter(notEmpty)).join(" ");
+  return values;
 }
 
 export function buildBottleSearchVector(
@@ -34,7 +24,7 @@ export function buildBottleSearchVector(
   aliasList?: NewBottleAlias[],
   bottler?: NewEntity,
   distillerList?: NewEntity[],
-) {
+): TSVector[] {
   const values: TSVector[] = [
     new TSVector(bottle.fullName, "A"),
     new TSVector(bottle.name, "B"),
@@ -43,5 +33,5 @@ export function buildBottleSearchVector(
   if (bottler) values.push(new TSVector(bottler.name, "C"));
   aliasList?.forEach((a) => values.push(new TSVector(a.name, "A")));
   distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));
-  return uniq(values.filter(notEmpty)).join(" ");
+  return values;
 }
