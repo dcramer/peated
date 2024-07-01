@@ -58,6 +58,8 @@ export default publicProcedure.input(z.number()).query(async function ({
   return {
     ...(await serialize(BottleSerializer, bottle, ctx.user)),
     people: totalPeople,
-    lastPrice: await serialize(StorePriceSerializer, lastPrice, ctx.user),
+    lastPrice: lastPrice
+      ? await serialize(StorePriceSerializer, lastPrice, ctx.user)
+      : null,
   };
 });
