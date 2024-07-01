@@ -1,5 +1,4 @@
 import { db } from "@peated/server/db";
-import { type SerializedPoint } from "@peated/server/db/columns/geoemetry";
 import {
   bottles,
   bottlesToDistillers,
@@ -9,7 +8,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
 import { TRPCError } from "@trpc/server";
-import { and, eq, getTableColumns, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 import { type Context } from "../context";
@@ -22,10 +21,7 @@ export async function countryBySlug({
   ctx: Context;
 }) {
   const [country] = await db
-    .select({
-      ...getTableColumns(countries),
-      location: sql<SerializedPoint>`ST_AsGeoJSON(${countries.location}) as location`,
-    })
+    .select()
     .from(countries)
     .where(eq(countries.slug, input));
 

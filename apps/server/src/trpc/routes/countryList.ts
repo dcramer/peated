@@ -1,9 +1,8 @@
 import { db } from "@peated/server/db";
-import type { SerializedPoint } from "@peated/server/db/columns/geoemetry";
 import { countries } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
-import { and, asc, getTableColumns, ilike, sql, type SQL } from "drizzle-orm";
+import { and, asc, ilike, type SQL } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -30,10 +29,7 @@ export default publicProcedure
     }
 
     const results = await db
-      .select({
-        ...getTableColumns(countries),
-        location: sql<SerializedPoint>`ST_AsGeoJSON(${countries.location}) as location`,
-      })
+      .select()
       .from(countries)
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)

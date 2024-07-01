@@ -1,11 +1,7 @@
-import { getTableColumns, inArray, sql } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import {
-  type SerializedPoint,
-  type UnserializedPoint,
-} from "../db/columns/geoemetry";
 import { countries, type Entity, type User } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { type EntitySchema } from "../schemas";
@@ -16,10 +12,7 @@ export const EntitySerializer = serializer({
     const countryIds = itemList.map((i) => i.countryId).filter(notEmpty);
     const countryList = countryIds.length
       ? await db
-          .select({
-            ...getTableColumns(countries),
-            location: sql<SerializedPoint>`ST_AsGeoJSON(${countries.location}) as location`,
-          })
+          .select()
           .from(countries)
           .where(inArray(countries.id, countryIds))
       : [];
@@ -42,9 +35,7 @@ export const EntitySerializer = serializer({
     );
   },
   item: (
-    item: Entity & {
-      location: SerializedPoint;
-    },
+    item: Entity,
     attrs: Record<string, any>,
     currentUser?: User,
   ): z.infer<typeof EntitySchema> => {
@@ -59,12 +50,7 @@ export const EntitySerializer = serializer({
       country: attrs.country,
       region: item.region,
       address: item.address,
-      location: item.location
-        ? ((JSON.parse(item.location) as UnserializedPoint).coordinates as [
-            number,
-            number,
-          ])
-        : null,
+      location: item.location,
       createdAt: item.createdAt.toISOString(),
 
       totalTastings: item.totalTastings,

@@ -1,8 +1,7 @@
-import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { type SerializedPoint } from "../db/columns/geoemetry";
 import type { Bottle, Flight, User } from "../db/schema";
 import {
   bottlesToDistillers,
@@ -53,10 +52,7 @@ export const BottleSerializer = serializer({
     );
 
     const entityList = await db
-      .select({
-        ...getTableColumns(entities),
-        location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
-      })
+      .select()
       .from(entities)
       .where(inArray(entities.id, entityIds));
     const entitiesById = Object.fromEntries(

@@ -288,6 +288,9 @@ importers:
       vitest:
         specifier: ~1.4.0
         version: 1.4.0(@types/node@20.12.14)
+      wkx:
+        specifier: ^0.5.0
+        version: 0.5.0
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -11365,6 +11368,12 @@ packages:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
     dependencies:
       string-width: 4.2.3
+    dev: false
+
+  /wkx@0.5.0:
+    resolution: {integrity: sha512-Xng/d4Ichh8uN4l0FToV/258EjMGU9MGcA0HV2d9B/ZpZB3lqQm7nkOdZdm5GhKtLLhAE7PiVQwN4eN+2YJJUg==}
+    dependencies:
+      '@types/node': 20.14.9
     dev: false
 
   /word-wrap@1.2.5:

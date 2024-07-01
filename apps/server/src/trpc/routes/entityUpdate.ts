@@ -1,6 +1,4 @@
 import { db } from "@peated/server/db";
-import type { UnserializedPoint } from "@peated/server/db/columns/geoemetry";
-import { type SerializedPoint } from "@peated/server/db/columns/geoemetry";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,
@@ -18,7 +16,7 @@ import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, getTableColumns, ilike, ne, sql } from "drizzle-orm";
+import { and, eq, ilike, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 
@@ -30,10 +28,7 @@ export default modProcedure
   )
   .mutation(async function ({ input, ctx }) {
     const [entity] = await db
-      .select({
-        ...getTableColumns(entities),
-        location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
-      })
+      .select()
       .from(entities)
       .where(eq(entities.id, input.entity));
 
@@ -77,15 +72,7 @@ export default modProcedure
     }
     if (
       input.location !== undefined &&
-      (!input.location ||
-        !entity.location ||
-        !arraysEqual(
-          input.location,
-          (JSON.parse(entity.location) as UnserializedPoint).coordinates as [
-            number,
-            number,
-          ],
-        ))
+      (!input.location || !entity.location || !arraysEqual(input.location))
     ) {
       data.location = input.location;
     }
@@ -117,11 +104,7 @@ export default modProcedure
 
     const user = ctx.user;
     const newEntity = await db.transaction(async (tx) => {
-      let newEntity:
-        | (Entity & {
-            location: SerializedPoint;
-          })
-        | undefined;
+      let newEntity: Entity | undefined;
 
       const aliasList = await tx.query.entityAliases.findMany({
         where: eq(entityAliases.entityId, entity.id),
@@ -132,10 +115,7 @@ export default modProcedure
           .update(entities)
           .set(data)
           .where(eq(entities.id, entity.id))
-          .returning({
-            ...getTableColumns(entities),
-            location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
-          });
+          .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "entity_name_unq") {
           throw new TRPCError({

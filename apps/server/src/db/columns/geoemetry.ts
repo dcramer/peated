@@ -1,13 +1,10 @@
 import { sql } from "drizzle-orm";
 import { customType } from "drizzle-orm/pg-core";
+import wkx from "wkx";
 
-// {"type":"Point","coordinates":[1,1]}
-export type SerializedPoint = string;
+type LatLng = [number, number];
 
-export type UnserializedPoint = {
-  coordinates: [number, number];
-  type: "Point";
-};
+type GeometryPointType = Point | LatLng | string;
 
 export class Point {
   lat: number;
@@ -22,8 +19,6 @@ export class Point {
     return sql`ST_SetSRID(ST_MakePoint(${this.lat}, ${this.lng}), 4326)`;
   }
 }
-
-type GeometryPointType = Point | [number, number] | string;
 
 // export function geography<TData extends GeographyType = string>(name: string) {
 //   return customType<{ data: TData; driverData: string }>({
@@ -40,15 +35,23 @@ type GeometryPointType = Point | [number, number] | string;
 //   })(name);
 // }
 
-export function geometry_point<TData extends GeometryPointType = string>(
-  name: string,
-) {
-  return customType<{ data: TData; driverData: string }>({
+export function geometry_point(name: string) {
+  return customType<{ data: LatLng; driverData: string }>({
     dataType() {
       return "geometry(Point, 4326)";
     },
 
-    toDriver(value: TData) {
+    fromDriver(value): LatLng {
+      const parsed = wkx.Geometry.parse(
+        Buffer.from(value, "hex"),
+      ) as unknown as {
+        x: number;
+        y: number;
+      };
+      return [parsed.x, parsed.y];
+    },
+
+    toDriver(value: GeometryPointType) {
       if (typeof value === "string") return value;
       if (Array.isArray(value))
         return sql`ST_SetSRID(ST_MakePoint(${value[0]}, ${value[1]}), 4326)`;

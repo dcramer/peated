@@ -1,6 +1,5 @@
 import { ENTITY_TYPE_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { type SerializedPoint } from "@peated/server/db/columns/geoemetry";
 import {
   bottles,
   bottlesToDistillers,
@@ -13,16 +12,7 @@ import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { TRPCError } from "@trpc/server";
 import type { SQL } from "drizzle-orm";
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  getTableColumns,
-  ilike,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -211,10 +201,7 @@ export default publicProcedure
     }
 
     let results = await db
-      .select({
-        ...getTableColumns(entities),
-        location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
-      })
+      .select()
       .from(entities)
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
