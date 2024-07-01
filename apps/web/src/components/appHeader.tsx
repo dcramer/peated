@@ -46,25 +46,26 @@ export default function AppHeader() {
             setSearchOpen(true);
           }
         }}
-      />
-      <Dialog
-        open={searchOpen}
-        as="div"
-        className="dialog"
-        onClose={setSearchOpen}
       >
-        <Dialog.Overlay className="fixed inset-0" />
-        <Dialog.Panel className="dialog-panel">
-          <SearchPanel
-            value={query}
-            onQueryChange={(value) => setQuery(value)}
-            onClose={() => {
-              setSearchOpen(false);
-              setTimeout(() => setSearchFocused(false), 100);
-            }}
-          />
-        </Dialog.Panel>
-      </Dialog>
+        <Dialog
+          open={searchOpen}
+          as="div"
+          className="dialog"
+          onClose={setSearchOpen}
+        >
+          <Dialog.Overlay className="fixed inset-0" />
+          <Dialog.Panel className="dialog-panel">
+            <SearchPanel
+              value={query}
+              onQueryChange={(value) => setQuery(value)}
+              onClose={() => {
+                setSearchOpen(false);
+                setTimeout(() => setSearchFocused(false), 100);
+              }}
+            />
+          </Dialog.Panel>
+        </Dialog>
+      </SearchHeaderForm>
       {user ? (
         <div className="flex items-center gap-x-2">
           <div className="hidden sm:block">

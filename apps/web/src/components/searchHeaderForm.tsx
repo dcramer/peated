@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export default function SearchHeaderForm({
   name = "q",
@@ -8,6 +8,7 @@ export default function SearchHeaderForm({
   onChange,
   onSubmit,
   onFocus,
+  children,
   ...props
 }: {
   value?: string;
@@ -16,12 +17,14 @@ export default function SearchHeaderForm({
   onChange?: (value: string) => void;
   onSubmit?: (value: string) => void;
   onFocus?: () => void;
+  children?: ReactNode;
 }) {
   const [value, setValue] = useState(props.value ?? "");
 
   useEffect(() => {
-    setValue(props.value ?? "");
-    if (onChange) onChange(props.value);
+    const newValue = props.value ?? "";
+    setValue(newValue);
+    if (onChange) onChange(newValue);
   }, [props.value]);
 
   // we store the onChange event here as setState is async
@@ -54,6 +57,7 @@ export default function SearchHeaderForm({
         }}
         className="block transform rounded border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-1.5"
       />
+      {children}
     </form>
   );
 }

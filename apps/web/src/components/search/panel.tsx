@@ -36,24 +36,24 @@ export default function SearchPanel({
 
   const router = useRouter();
 
-  const [query, setQuery] = useState(qs.get("q") || value);
+  const [query, setQuery] = useState(qs.get("q") ?? value ?? "");
   const [state, setState] = useState<"loading" | "ready">("loading");
 
   const [results, setResults] = useState<readonly Result[]>([]);
-  const isUserQuery = query.indexOf("@") !== -1;
+  const isUserQuery = query.indexOf("@") !== -1 && user;
 
   const trpcUtils = trpc.useUtils();
 
   useEffect(() => {
-    const query = qs.get("q") || "";
+    const query = qs.get("q") ?? "";
     setQuery(query);
     if (onQueryChange) onQueryChange(query);
   }, [onQueryChange, qs]);
 
   useEffect(() => {
-    setQuery(value);
-    if (onQueryChange) onQueryChange(value);
-  }, [value]);
+    setQuery(value ?? "");
+    if (onQueryChange) onQueryChange(value ?? "");
+  }, [onQueryChange, value]);
 
   // TODO: handle errors
   const fetch = debounce(
@@ -205,33 +205,37 @@ export default function SearchPanel({
           </>
         ) : (
           <>
-            {!isUserQuery && (results.length < maxResults || query !== "") && (
-              <ListItem color="highlight">
-                <PlusIcon className="hidden h-12 w-12 flex-none rounded p-2 sm:block" />
+            {query &&
+              !isUserQuery &&
+              (results.length < maxResults || query) && (
+                <ListItem color="highlight">
+                  <PlusIcon className="hidden h-12 w-12 flex-none rounded p-2 sm:block" />
 
-                <div className="min-w-0 flex-auto">
-                  <div className="font-semibold leading-6">
-                    <Link href="/addBottle">
-                      <span className="absolute inset-x-0 -top-px bottom-0" />
-                      {"Can't find a bottle?"}
-                    </Link>
+                  <div className="min-w-0 flex-auto">
+                    <div className="font-semibold leading-6">
+                      <Link href="/addBottle">
+                        <span className="absolute inset-x-0 -top-px bottom-0" />
+                        {"Can't find a bottle?"}
+                      </Link>
+                    </div>
+                    <div className="text-highlight-dark mt-1 flex gap-x-1 leading-5">
+                      {query !== "" ? (
+                        <span>
+                          Tap here to add{" "}
+                          <strong className="truncate">
+                            {toTitleCase(query)}
+                          </strong>{" "}
+                          to the database.
+                        </span>
+                      ) : (
+                        <span>
+                          Tap here to add a new entry to the database.
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-highlight-dark mt-1 flex gap-x-1 leading-5">
-                    {query !== "" ? (
-                      <span>
-                        Tap here to add{" "}
-                        <strong className="truncate">
-                          {toTitleCase(query)}
-                        </strong>{" "}
-                        to the database.
-                      </span>
-                    ) : (
-                      <span>Tap here to add a new entry to the database.</span>
-                    )}
-                  </div>
-                </div>
-              </ListItem>
-            )}
+                </ListItem>
+              )}
             {results.map((result) => {
               return (
                 <ListItem key={`${result.type}-${result.ref.id}`}>

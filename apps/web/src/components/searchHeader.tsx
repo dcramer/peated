@@ -12,6 +12,7 @@ export default function SearchHeader({
   ...props
 }: ComponentPropsWithoutRef<typeof SearchHeaderForm> & {
   closeIcon?: ReactNode;
+  onClose?: () => void;
   onDone?: () => void;
 }) {
   const router = useRouter();
