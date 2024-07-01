@@ -66,7 +66,6 @@
     "pino-pretty": "^10.3.1",
     "sharp": "^0.33.4",
     "toad-scheduler": "^3.0.1",
-    "trpc-playground": "^1.0.4",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.16.0",
     "typescript": "~5.4.5",

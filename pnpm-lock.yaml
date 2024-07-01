@@ -273,9 +273,6 @@ importers:
       toad-scheduler:
         specifier: ^3.0.1
         version: 3.0.1
-      trpc-playground:
-        specifier: ^1.0.4
-        version: 1.0.4(@trpc/server@11.0.0-rc.334)(@types/node@20.12.14)(fastify@4.28.1)(typescript@5.4.5)(zod@3.23.8)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -4237,32 +4234,6 @@ packages:
     engines: {node: '>= 10'}
     dev: false
 
-  /@trpc-playground/html@1.0.4(@types/node@20.12.14):
-    resolution: {integrity: sha512-HVnqaUXxEJJcrAHvVgivwtZFqTE6NNxXxrXEnd+rCxun97xnZknwdiTxq69wQEsZYxPrgtwPmO/nAEZL8AReWg==}
-    dependencies:
-      vite: 4.5.3(@types/node@20.12.14)
-      xss: 1.0.15
-    transitivePeerDependencies:
-      - '@types/node'
-      - less
-      - lightningcss
-      - sass
-      - stylus
-      - sugarss
-      - terser
-    dev: false
-
-  /@trpc-playground/types@1.0.0(@trpc/server@11.0.0-rc.334)(typescript@5.4.5):
-    resolution: {integrity: sha512-Ap5aNaVlglfM9WLkPLKF2rHDZ8CwHcqK32A8YaqTyHUuoEFTSOh6oSgVU6Cv8toxClKiTXFvbWmE4aZxIoh4Zg==}
-    peerDependencies:
-      '@trpc/server': ^10
-    dependencies:
-      '@trpc/server': 11.0.0-rc.334
-      ts-essentials: 9.4.2(typescript@5.4.5)
-    transitivePeerDependencies:
-      - typescript
-    dev: false
-
   /@trpc/client@11.0.0-rc.334(@trpc/server@11.0.0-rc.334):
     resolution: {integrity: sha512-nVKOxCfhKxBXvs1MwjfNNsWHQH/rHWzS4SxYPtYld7zqANTfNqn8cuClHMKlkeMKljObFiCfWhbdrBamKO/dDw==}
     peerDependencies:
@@ -5817,10 +5788,6 @@ packages:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
-
-  /cssfilter@0.0.10:
-    resolution: {integrity: sha512-FAaLDaplstoRsDR8XGYH51znUN0UY7nMc6Z9/fvE8EXGwvJE9hu7W2vHwx1+bd6gCYnln9nLbzxFTrcO9YQDZw==}
-    dev: false
 
   /csso@5.0.5:
     resolution: {integrity: sha512-0LrrStPOdJj+SPCCrGhzryycLjwcgUSHBtxNA8aIDxf0GLsRh1cKYhB00Gd1lDOS4yGH69+SNn13+TWbVHETFQ==}
@@ -8421,10 +8388,6 @@ packages:
     resolution: {integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==}
     dev: false
 
-  /lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: false
-
   /log-update@5.0.1:
     resolution: {integrity: sha512-5UtUDQ/6edw4ofyljDNcOVJQ4c7OjDro4h3y8e1GQL5iYElYclVHJ3zeWchylvMaKnDbDilC8irOVyexnA/Slw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -10817,47 +10780,8 @@ packages:
       punycode: 2.3.1
     dev: false
 
-  /trpc-playground@1.0.4(@trpc/server@11.0.0-rc.334)(@types/node@20.12.14)(fastify@4.28.1)(typescript@5.4.5)(zod@3.23.8):
-    resolution: {integrity: sha512-6nVf1o2LNoo1g6oTS24yajoH7xV4CFjxGAbAH7qLXqa3yo9qB5QHsWLbrm1hNt51SyCG++P0zHJaCdVfgvEVDg==}
-    peerDependencies:
-      '@trpc/server': ^10
-      zod: ^3
-    dependencies:
-      '@trpc-playground/html': 1.0.4(@types/node@20.12.14)
-      '@trpc-playground/types': 1.0.0(@trpc/server@11.0.0-rc.334)(typescript@5.4.5)
-      '@trpc/server': 11.0.0-rc.334
-      lodash: 4.17.21
-      uttp: 0.1.3(fastify@4.28.1)
-      zod: 3.23.8
-      zod-to-ts: 1.2.0(typescript@5.4.5)(zod@3.23.8)
-    transitivePeerDependencies:
-      - '@types/node'
-      - express
-      - fastify
-      - h3
-      - koa
-      - less
-      - lightningcss
-      - sass
-      - stylus
-      - sugarss
-      - terser
-      - typescript
-    dev: false
-
   /ts-debounce@4.0.0:
     resolution: {integrity: sha512-+1iDGY6NmOGidq7i7xZGA4cm8DAa6fqdYcvO5Z6yBevH++Bdo9Qt/mN0TzHUgcCcKv1gmh9+W5dHqz8pMWbCbg==}
-    dev: false
-
-  /ts-essentials@9.4.2(typescript@5.4.5):
-    resolution: {integrity: sha512-mB/cDhOvD7pg3YCLk2rOtejHjjdSi9in/IBYE13S+8WA5FBSraYf4V/ws55uvs0IvQ/l0wBOlXy5yBNZ9Bl8ZQ==}
-    peerDependencies:
-      typescript: '>=4.1.0'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      typescript: 5.4.5
     dev: false
 
   /ts-interface-checker@0.1.13:
@@ -11118,26 +11042,6 @@ packages:
     engines: {node: '>= 0.4.0'}
     dev: false
 
-  /uttp@0.1.3(fastify@4.28.1):
-    resolution: {integrity: sha512-LWRHPNmivLr/4rTt3CXVtQfWdhzoN7OQwBPHfcsYGffeFo9a8/CtDxtl3xcVR965paRjLr3Ocxs/shwyjPzE2Q==}
-    peerDependencies:
-      express: ^4
-      fastify: ^3 || ^4
-      h3: '*'
-      koa: ^2
-    peerDependenciesMeta:
-      express:
-        optional: true
-      fastify:
-        optional: true
-      h3:
-        optional: true
-      koa:
-        optional: true
-    dependencies:
-      fastify: 4.28.1
-    dev: false
-
   /uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
@@ -11188,42 +11092,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
       - typescript
-    dev: false
-
-  /vite@4.5.3(@types/node@20.12.14):
-    resolution: {integrity: sha512-kQL23kMeX92v3ph7IauVkXkikdDRsYMGTVl5KY2E9OY4ONLvkHf04MDTbnfo6NKxZiDLWzVpP5oTa8hQD8U3dg==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      '@types/node': 20.12.14
-      esbuild: 0.18.20
-      postcss: 8.4.39
-      rollup: 3.29.4
-    optionalDependencies:
-      fsevents: 2.3.3
     dev: false
 
   /vite@5.3.2(@types/node@20.12.14):
@@ -11548,15 +11416,6 @@ packages:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
     dev: false
 
-  /xss@1.0.15:
-    resolution: {integrity: sha512-FVdlVVC67WOIPvfOwhoMETV72f6GbW7aOabBC3WxN/oUdoEMDyLz4OgRv5/gck2ZeNqEQu+Tb0kloovXOfpYVg==}
-    engines: {node: '>= 0.10.0'}
-    hasBin: true
-    dependencies:
-      commander: 2.20.3
-      cssfilter: 0.0.10
-    dev: false
-
   /xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
@@ -11593,16 +11452,6 @@ packages:
     peerDependencies:
       zod: ^3.23.3
     dependencies:
-      zod: 3.23.8
-    dev: false
-
-  /zod-to-ts@1.2.0(typescript@5.4.5)(zod@3.23.8):
-    resolution: {integrity: sha512-x30XE43V+InwGpvTySRNz9kB7qFU8DlyEy7BsSTCHPH1R0QasMmHWZDCzYm6bVXtj/9NNJAZF3jW8rzFvH5OFA==}
-    peerDependencies:
-      typescript: ^4.9.4 || ^5.0.2
-      zod: ^3
-    dependencies:
-      typescript: 5.4.5
       zod: 3.23.8
     dev: false
 
