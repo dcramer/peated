@@ -82,7 +82,7 @@ export default function MapClient({
         style={{
           height: "100%",
         }}
-        className="rounded"
+        className="z-10 rounded"
         center={position || DEFAULT_POSITION}
         zoom={initialZoom}
         dragging={controls}
