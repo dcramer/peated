@@ -20,6 +20,7 @@ import { publicProcedure } from "..";
 const DEFAULT_SORT = "-tastings";
 
 const SORT_OPTIONS = [
+  "rank",
   "brand",
   "date",
   "name",
@@ -125,6 +126,13 @@ export default publicProcedure
 
     let orderBy: SQL<unknown>;
     switch (input.sort) {
+      case "rank":
+        if (query) {
+          orderBy = sql`ts_rank(${bottles.searchVector}, websearch_to_tsquery('english', ${query}))`;
+        } else {
+          orderBy = desc(bottles.totalTastings);
+        }
+        break;
       case "brand":
         if (!input.entity) {
           throw new TRPCError({

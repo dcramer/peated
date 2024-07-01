@@ -26,9 +26,10 @@ import {
 import { z } from "zod";
 import { publicProcedure } from "..";
 
-const DEFAULT_SORT = "-tastings";
+const DEFAULT_SORT = "rank";
 
 const SORT_OPTIONS = [
+  "rank",
   "name",
   "created",
   "tastings",
@@ -70,7 +71,7 @@ export default publicProcedure
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
-    if (query !== "") {
+    if (query) {
       where.push(
         sql`${entities.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
       );
@@ -111,6 +112,13 @@ export default publicProcedure
 
     let orderBy: SQL<unknown>;
     switch (input.sort) {
+      case "rank":
+        if (query) {
+          orderBy = sql`ts_rank(${entities.searchVector}, websearch_to_tsquery('english', ${query}))`;
+        } else {
+          orderBy = desc(entities.totalTastings);
+        }
+        break;
       case "name":
         orderBy = asc(entities.name);
         break;
