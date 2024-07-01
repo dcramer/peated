@@ -5,7 +5,7 @@ import { db } from "../db";
 import {
   type SerializedPoint,
   type UnserializedPoint,
-} from "../db/columns/geography";
+} from "../db/columns/geoemetry";
 import { countries, type Entity, type User } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { type EntitySchema } from "../schemas";

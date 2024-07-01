@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
-import type { UnserializedPoint } from "@peated/server/db/columns/geography";
-import { type SerializedPoint } from "@peated/server/db/columns/geography";
+import type { UnserializedPoint } from "@peated/server/db/columns/geoemetry";
+import { type SerializedPoint } from "@peated/server/db/columns/geoemetry";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,

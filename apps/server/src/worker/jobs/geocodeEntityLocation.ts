@@ -5,7 +5,13 @@ import { DEFAULT_CREATED_BY_ID } from "../../constants";
 import { db } from "../../db";
 import { changes, entities, type Entity } from "../../db/schema";
 
-export default async ({ entityId }: { entityId: number }) => {
+export default async ({
+  entityId,
+  force = false,
+}: {
+  entityId: number;
+  force?: boolean;
+}) => {
   if (!config.GOOGLE_MAPS_API_KEY) {
     throw new Error("GOOGLE_MAPS_API_KEY is not configured");
   }
@@ -19,11 +25,11 @@ export default async ({ entityId }: { entityId: number }) => {
 
   // short circuit if its already bound - we should unset this before
   // running if we want to re-run
-  if (entity.location) {
+  if (entity.location && !force) {
     return;
   }
 
-  if (!entity.address || !entity.country) return null;
+  if (!entity.address || !entity.country) return;
 
   const client = new Client();
 

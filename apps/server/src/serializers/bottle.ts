@@ -2,7 +2,7 @@ import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { type SerializedPoint } from "../db/columns/geography";
+import { type SerializedPoint } from "../db/columns/geoemetry";
 import type { Bottle, Flight, User } from "../db/schema";
 import {
   bottlesToDistillers,

@@ -14,7 +14,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { bottles, bottlesToDistillers, countries } from ".";
 import { tsvector } from "../columns";
-import { geography } from "../columns/geography";
+import { geometry_point } from "../columns/geoemetry";
 import { contentSourceEnum } from "./enums";
 import { users } from "./users";
 
@@ -42,7 +42,7 @@ export const entities = pgTable(
     ),
     region: text("region"),
     address: text("address"),
-    location: geography("location"),
+    location: geometry_point("location"),
 
     type: entityTypeEnum("type").array().notNull(),
 

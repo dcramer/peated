@@ -1,6 +1,6 @@
 import { ENTITY_TYPE_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { type SerializedPoint } from "@peated/server/db/columns/geography";
+import { type SerializedPoint } from "@peated/server/db/columns/geoemetry";
 import {
   bottles,
   bottlesToDistillers,

@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import type { SerializedPoint } from "@peated/server/db/columns/geography";
+import type { SerializedPoint } from "@peated/server/db/columns/geoemetry";
 import { countries } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";

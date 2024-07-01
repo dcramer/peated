@@ -4,7 +4,7 @@ import { serializer } from ".";
 import {
   type SerializedPoint,
   type UnserializedPoint,
-} from "../db/columns/geography";
+} from "../db/columns/geoemetry";
 import { type Country, type User } from "../db/schema";
 
 export const CountrySerializer = serializer({
