@@ -1,4 +1,4 @@
-import { Client } from "@googlemaps/google-maps-services-js";
+import { Client, PlaceType2 } from "@googlemaps/google-maps-services-js";
 import { eq } from "drizzle-orm";
 import config from "../../config";
 import { db } from "../../db";
@@ -30,6 +30,11 @@ export default async ({ countryId }: { countryId: number }) => {
   }
 
   const match = result.data.results[0];
+  if (match.types.indexOf(PlaceType2.country) !== -1) {
+    throw new Error(
+      `Failed to geocode country (invalid match type): ${country.slug} - ${match.types.join(", ")}`,
+    );
+  }
 
   const data: Record<string, any> = {
     location: [match.geometry.location.lat, match.geometry.location.lng],
