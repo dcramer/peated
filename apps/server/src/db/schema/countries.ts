@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { bigserial, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
-import { geography } from "../columns";
+import { geography } from "../columns/geography";
 
 export const countries = pgTable(
   "country",

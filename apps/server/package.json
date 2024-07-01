@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc",
     "dev:api": "tsx watch --require dotenv/config ./src/server.ts",
-    "dev:worker": "tsx watch --require dotenv/config ./src/worker.ts",
+    "dev:worker": "tsx watch --require dotenv/config ./src/faktory-worker.ts",
     "start:api": "tsx --require dotenv/config ./src/server.ts",
     "start:worker": "tsx --require dotenv/config ./src/worker.ts",
     "typecheck": "tsc --noEmit",

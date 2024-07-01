@@ -1,5 +1,5 @@
-import * as jobs from "@peated/server/jobs/client";
 import waitError from "@peated/server/lib/test/waitError";
+import * as jobs from "@peated/server/worker/client";
 import { createCaller } from "../router";
 
 test("requires admin", async ({ fixtures }) => {

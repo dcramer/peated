@@ -40,56 +40,67 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
   const trpcUtils = trpc.useUtils();
 
   // TODO: handle errors
-  const fetch = debounce(async (query: string): Promise<Result[]> => {
-    // union results from various apis
-    // priority is:
-    // - users
-    // - bottles
-    // - entities
-    // (but prioritize exact matches)
-    // trpc.useQueries(t => {
+  const fetch = debounce(
+    async (
+      query: string,
+    ): Promise<{
+      query: string;
+      results: Result[];
+    }> => {
+      // union results from various apis
+      // priority is:
+      // - users
+      // - bottles
+      // - entities
+      // (but prioritize exact matches)
+      // trpc.useQueries(t => {
 
-    // })
-    // user, bottles, entities
-    const promises = [];
-    if (directToTasting || !isUserQuery) {
-      promises.push(
-        trpcUtils.bottleList
-          .fetch({
-            query,
-            limit: maxResults,
-          })
-          .then((data) =>
-            data.results.map<Result>((b) => ({ type: "bottle", ref: b })),
-          ),
-      );
-    }
+      // })
+      // user, bottles, entities
+      const promises = [];
+      if (directToTasting || !isUserQuery) {
+        promises.push(
+          trpcUtils.bottleList
+            .fetch({
+              query,
+              limit: maxResults,
+            })
+            .then((data) =>
+              data.results.map<Result>((b) => ({ type: "bottle", ref: b })),
+            ),
+        );
+      }
 
-    if (!directToTasting && user && (isUserQuery || query)) {
-      promises.push(
-        trpcUtils.userList
-          .fetch({
-            query,
-            limit: maxResults,
-          })
-          .then((data) =>
-            data.results.map<Result>((b) => ({ type: "user", ref: b })),
-          ),
-      );
-    }
+      if (!directToTasting && user && (isUserQuery || query)) {
+        promises.push(
+          trpcUtils.userList
+            .fetch({
+              query,
+              limit: maxResults,
+            })
+            .then((data) =>
+              data.results.map<Result>((b) => ({ type: "user", ref: b })),
+            ),
+        );
+      }
 
-    if (!directToTasting) {
-      promises.push(
-        trpcUtils.entityList
-          .fetch({ query, limit: maxResults })
-          .then((data) =>
-            data.results.map<Result>((b) => ({ type: "entity", ref: b })),
-          ),
-      );
-    }
-    const results = await Promise.all(promises);
-    return results.reduce((prev, cur) => [...prev, ...cur], []);
-  }, 300);
+      if (!directToTasting) {
+        promises.push(
+          trpcUtils.entityList
+            .fetch({ query, limit: maxResults })
+            .then((data) =>
+              data.results.map<Result>((b) => ({ type: "entity", ref: b })),
+            ),
+        );
+      }
+      const results = await Promise.all(promises);
+      return {
+        query,
+        results: results.reduce((prev, cur) => [...prev, ...cur], []),
+      };
+    },
+    300,
+  );
 
   const sortResults = useCallback(
     (unsortedResults: Result[]) => {
@@ -129,12 +140,11 @@ export default function SearchPanel({ onClose, onQueryChange }: Props) {
   useEffect(() => {
     setState("loading");
     fetch.cancel();
-    const currentQuery = query;
     const currentFetch = fetch(query);
     setTimeout(async () => {
       const results = await currentFetch;
-      if (currentQuery !== query) return;
-      setResults(sortResults(results));
+      if (results.query !== query) return;
+      setResults(sortResults(results.results));
       setState("ready");
     });
   }, [query]);

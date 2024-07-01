@@ -1,4 +1,4 @@
-import { getClient } from "@peated/server/jobs/client";
+import { getClient } from "@peated/server/worker/client";
 import { adminProcedure } from "..";
 
 export default adminProcedure.query(async function () {

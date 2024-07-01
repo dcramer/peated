@@ -9,7 +9,7 @@ import { CountryEnum, EntityTypeEnum } from "@peated/server/schemas";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { pushJob } from "./client";
+import { pushJob } from "../client";
 
 if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
@@ -89,9 +89,6 @@ export type GeneratedEntityDetails = z.infer<typeof OpenAIEntityDetailsSchema>;
 export async function getGeneratedEntityDetails(
   entity: Partial<Entity>,
 ): Promise<GeneratedEntityDetails | null> {
-  if (!config.OPENAI_API_KEY)
-    throw new Error("OPENAI_API_KEY is not configured");
-
   return await startSpan(
     {
       op: "ai.pipeline",
@@ -116,12 +113,32 @@ export async function getGeneratedEntityDetails(
 }
 
 export default async ({ entityId }: { entityId: number }) => {
+  if (!config.OPENAI_API_KEY) {
+    return;
+  }
+
   const entity = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.id, entityId),
   });
   if (!entity) {
     throw new Error(`Unknown entity: ${entityId}`);
   }
+
+  const generateDesc =
+    !entity.descriptionSrc || entity.descriptionSrc === "generated";
+
+  // test if we need to run at all
+  if (
+    !generateDesc &&
+    entity.yearEstablished &&
+    entity.address &&
+    entity.website &&
+    entity.country &&
+    entity.region
+  ) {
+    return;
+  }
+
   const result = await getGeneratedEntityDetails(entity);
 
   if (!result) {
@@ -129,7 +146,7 @@ export default async ({ entityId }: { entityId: number }) => {
   }
   const data: Record<string, any> = {};
   if (
-    (!data.descriptionSrc || data.descriptionSrc === "generated") &&
+    generateDesc &&
     result.description &&
     result.description !== entity.description
   ) {

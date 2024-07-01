@@ -91,9 +91,6 @@ export async function getGeneratedBottleDetails(
   bottle: Partial<Bottle>,
   tagList: string[],
 ): Promise<GeneratedBottleDetails | null> {
-  if (!config.OPENAI_API_KEY)
-    throw new Error("OPENAI_API_KEY is not configured");
-
   return await startSpan(
     {
       op: "ai.pipeline",
@@ -118,11 +115,29 @@ export async function getGeneratedBottleDetails(
 }
 
 export default async function ({ bottleId }: { bottleId: number }) {
+  if (!config.OPENAI_API_KEY) {
+    return;
+  }
+
   const bottle = await db.query.bottles.findFirst({
     where: (bottles, { eq }) => eq(bottles.id, bottleId),
   });
   if (!bottle) {
     throw new Error(`Unknown bottle: ${bottleId}`);
+  }
+
+  const generateDesc =
+    !bottle.descriptionSrc || bottle.descriptionSrc === "generated";
+
+  // test if we need to run at all
+  if (
+    !generateDesc &&
+    bottle.tastingNotes &&
+    bottle.suggestedTags &&
+    bottle.category &&
+    bottle.flavorProfile
+  ) {
+    return;
   }
 
   const tagList = (await db.query.tags.findMany()).map((r) => r.name);
@@ -135,7 +150,7 @@ export default async function ({ bottleId }: { bottleId: number }) {
   const data: Record<string, any> = {};
 
   if (
-    (!data.descriptionSrc || data.descriptionSrc === "generated") &&
+    generateDesc &&
     result.description &&
     result.description !== bottle.description
   ) {

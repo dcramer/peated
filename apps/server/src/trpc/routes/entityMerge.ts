@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import type { SerializedPoint } from "@peated/server/db/columns";
+import type { SerializedPoint } from "@peated/server/db/columns/geography";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottles,
@@ -8,10 +8,10 @@ import {
   entityAliases,
   entityTombstones,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
 import { logError } from "@peated/server/lib/log";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -37,8 +37,7 @@ async function mergeEntitiesInto(
     0,
   );
 
-  // TODO: this doesnt handle duplicate bottles
-  return await db.transaction(async (tx) => {
+  const newEntity = await db.transaction(async (tx) => {
     const bottleList = await tx
       .select()
       .from(bottles)
@@ -110,6 +109,7 @@ async function mergeEntitiesInto(
       });
     }
 
+    // TODO: re-index searchVector
     const [entity] = await tx
       .update(entities)
       .set({
@@ -126,6 +126,18 @@ async function mergeEntitiesInto(
 
     return entity;
   });
+
+  try {
+    await pushJob("OnEntityChange", { entityId: newEntity.id });
+  } catch (err) {
+    logError(err, {
+      entity: {
+        id: newEntity.id,
+      },
+    });
+  }
+
+  return newEntity;
 }
 
 export default modProcedure
@@ -174,15 +186,6 @@ export default modProcedure
     const toEntity = input.direction === "mergeInto" ? otherEntity : rootEntity;
 
     const newEntity = await mergeEntitiesInto(toEntity, fromEntity);
-    try {
-      await pushJob("GenerateEntityDetails", { entityId: toEntity.id });
-    } catch (err) {
-      logError(err, {
-        entity: {
-          id: toEntity.id,
-        },
-      });
-    }
 
     return await serialize(EntitySerializer, newEntity, ctx.user);
   });

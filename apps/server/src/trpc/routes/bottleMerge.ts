@@ -12,10 +12,10 @@ import {
   tastings,
   type Bottle,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
 import { logError } from "@peated/server/lib/log";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -32,7 +32,7 @@ export async function mergeBottlesInto(
   );
 
   // TODO: this doesnt handle duplicate bottles
-  return await db.transaction(async (tx) => {
+  const newBottle = await db.transaction(async (tx) => {
     await tx
       .update(tastings)
       .set({
@@ -123,6 +123,18 @@ export async function mergeBottlesInto(
 
     return bottle;
   });
+
+  try {
+    await pushJob("OnBottleChange", { bottleId: newBottle.id });
+  } catch (err) {
+    logError(err, {
+      bottle: {
+        id: newBottle.id,
+      },
+    });
+  }
+
+  return newBottle;
 }
 
 export default modProcedure
@@ -171,15 +183,6 @@ export default modProcedure
     const toBottle = input.direction === "mergeInto" ? otherBottle : rootBottle;
 
     const newBottle = await mergeBottlesInto(toBottle, fromBottle);
-    try {
-      await pushJob("GenerateBottleDetails", { bottleId: toBottle.id });
-    } catch (err) {
-      logError(err, {
-        entity: {
-          id: toBottle.id,
-        },
-      });
-    }
 
     return await serialize(BottleSerializer, newBottle, ctx.user);
   });

@@ -1,8 +1,10 @@
+import { logError } from "@peated/server/lib/log";
 import { getUrl } from "@peated/server/lib/scraper";
 import {
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
+import { isTRPCClientError } from "@peated/server/lib/trpc";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import {
   type BottleInputSchema,
@@ -10,8 +12,6 @@ import {
 } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
 import { type z } from "zod";
-import { logError } from "../lib/log";
-import { isTRPCClientError } from "../lib/trpc";
 
 export default async function scrapeSMWSA() {
   await scrapeBottles(

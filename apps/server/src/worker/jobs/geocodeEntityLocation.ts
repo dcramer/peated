@@ -1,9 +1,9 @@
 import { Client } from "@googlemaps/google-maps-services-js";
 import { eq } from "drizzle-orm";
-import config from "../config";
-import { DEFAULT_CREATED_BY_ID } from "../constants";
-import { db } from "../db";
-import { changes, entities } from "../db/schema";
+import config from "../../config";
+import { DEFAULT_CREATED_BY_ID } from "../../constants";
+import { db } from "../../db";
+import { changes, entities } from "../../db/schema";
 
 export default async ({ entityId }: { entityId: number }) => {
   if (!config.GOOGLE_MAPS_API_KEY) {
@@ -15,6 +15,12 @@ export default async ({ entityId }: { entityId: number }) => {
   });
   if (!entity) {
     throw new Error(`Unknown entity: ${entityId}`);
+  }
+
+  // short circuit if its already bound - we should unset this before
+  // running if we want to re-run
+  if (entity.location) {
+    return;
   }
 
   if (!entity.address || !entity.country) return null;

@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { type SerializedPoint } from "@peated/server/db/columns";
+import { type SerializedPoint } from "@peated/server/db/columns/geography";
 import {
   bottles,
   bottlesToDistillers,

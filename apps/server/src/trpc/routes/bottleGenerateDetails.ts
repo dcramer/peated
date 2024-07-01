@@ -1,5 +1,5 @@
-import { getGeneratedBottleDetails } from "@peated/server/jobs/generateBottleDetails";
 import { BottleInputSchema } from "@peated/server/schemas";
+import { getGeneratedBottleDetails } from "@peated/server/worker/jobs/generateBottleDetails";
 import { type z } from "zod";
 import { modProcedure } from "..";
 import { type Context } from "../context";

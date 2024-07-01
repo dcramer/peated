@@ -7,12 +7,12 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { and, eq, ilike, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -131,6 +131,70 @@ export default modProcedure
         }
       }
 
+      // these are the final values
+      const distillerIds: number[] = [];
+      const distillerList: Entity[] = [];
+
+      const newDistillerIds: number[] = [];
+      const removedDistillerIds: number[] = [];
+      const currentDistillers = bottle.bottlesToDistillers.map(
+        (d) => d.distiller,
+      );
+
+      // find newly added distillers and connect them
+      if (bottleData.distillers) {
+        for (const distData of bottleData.distillers) {
+          const distiller = currentDistillers.find((d2) =>
+            typeof distData === "number"
+              ? distData === d2.id
+              : distData.name === d2.name,
+          );
+
+          if (!distiller) {
+            const distUpsert = await upsertEntity({
+              db: tx,
+              data: distData,
+              userId: user.id,
+              type: "distiller",
+            });
+            if (!distUpsert) {
+              throw new TRPCError({
+                message: `Unable to find entity: ${distData}.`,
+                code: "INTERNAL_SERVER_ERROR",
+              });
+            }
+
+            await tx.insert(bottlesToDistillers).values({
+              bottleId: bottle.id,
+              distillerId: distUpsert.id,
+            });
+
+            distillerIds.push(distUpsert.id);
+            newDistillerIds.push(distUpsert.id);
+            distillerList.push(distUpsert.result);
+          } else {
+            distillerIds.push(distiller.id);
+            distillerList.push(distiller);
+          }
+        }
+
+        // find existing distillers which should no longer exist and remove them
+        const removedDistillers = currentDistillers.filter(
+          (d) => !distillerIds.includes(d.id),
+        );
+        for (const distiller of removedDistillers) {
+          removedDistillerIds.push(distiller.id);
+          await tx
+            .delete(bottlesToDistillers)
+            .where(
+              and(
+                eq(bottlesToDistillers.distillerId, distiller.id),
+                eq(bottlesToDistillers.bottleId, bottle.id),
+              ),
+            );
+        }
+      }
+
       if (bottleData.name || bottleData.brandId) {
         if (!brand) {
           brand =
@@ -143,6 +207,10 @@ export default modProcedure
           bottleData.name ?? bottle.name
         }`;
       }
+
+      const aliasList = await db.query.bottleAliases.findMany({
+        where: eq(bottleAliases.bottleId, bottle.id),
+      });
 
       let newBottle: Bottle | undefined;
       try {
@@ -190,65 +258,6 @@ export default modProcedure
           throw new Error(
             `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
           );
-        }
-      }
-
-      const distillerIds: number[] = [];
-      const newDistillerIds: number[] = [];
-      const removedDistillerIds: number[] = [];
-      const currentDistillers = bottle.bottlesToDistillers.map(
-        (d) => d.distiller,
-      );
-
-      // find newly added distillers and connect them
-      if (bottleData.distillers) {
-        for (const distData of bottleData.distillers) {
-          const distiller = currentDistillers.find((d2) =>
-            typeof distData === "number"
-              ? distData === d2.id
-              : distData.name === d2.name,
-          );
-
-          if (!distiller) {
-            const distUpsert = await upsertEntity({
-              db: tx,
-              data: distData,
-              userId: user.id,
-              type: "distiller",
-            });
-            if (!distUpsert) {
-              throw new TRPCError({
-                message: `Unable to find entity: ${distData}.`,
-                code: "INTERNAL_SERVER_ERROR",
-              });
-            }
-
-            await tx.insert(bottlesToDistillers).values({
-              bottleId: bottle.id,
-              distillerId: distUpsert.id,
-            });
-
-            distillerIds.push(distUpsert.id);
-            newDistillerIds.push(distUpsert.id);
-          } else {
-            distillerIds.push(distiller.id);
-          }
-        }
-
-        // find existing distillers which should no longer exist and remove them
-        const removedDistillers = currentDistillers.filter(
-          (d) => !distillerIds.includes(d.id),
-        );
-        for (const distiller of removedDistillers) {
-          removedDistillerIds.push(distiller.id);
-          await tx
-            .delete(bottlesToDistillers)
-            .where(
-              and(
-                eq(bottlesToDistillers.distillerId, distiller.id),
-                eq(bottlesToDistillers.bottleId, bottle.id),
-              ),
-            );
         }
       }
 
@@ -309,22 +318,14 @@ export default modProcedure
       });
     }
 
-    if (
-      (newBottle.fullName !== bottle.fullName ||
-        !newBottle.description ||
-        !newBottle.tastingNotes ||
-        newBottle.suggestedTags.length === 0) &&
-      newBottle.descriptionSrc !== "user"
-    ) {
-      try {
-        await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
-      } catch (err) {
-        logError(err, {
-          bottle: {
-            id: bottle.id,
-          },
-        });
-      }
+    try {
+      await pushJob("OnBottleChange", { bottleId: bottle.id });
+    } catch (err) {
+      logError(err, {
+        bottle: {
+          id: bottle.id,
+        },
+      });
     }
 
     return await serialize(BottleSerializer, newBottle, ctx.user);

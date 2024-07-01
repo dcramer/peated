@@ -1,77 +1,13 @@
-import { context, propagation } from "@opentelemetry/api";
 import cuid2 from "@paralleldrive/cuid2";
+import { logError } from "@peated/server/lib/log";
+import type { ExternalSiteType } from "@peated/server/types";
 import * as Sentry from "@sentry/node";
 import type { JobFunction } from "faktory-worker";
-import faktory, { type Client } from "faktory-worker";
-import { logError } from "../lib/log";
-import type { ExternalSiteType } from "../types";
+import faktory from "faktory-worker";
+import { type JobName } from "./types";
 
-let client: Client | null = null;
-
-// process.on("SIGTERM", () => shutdownClient());
-// process.on("SIGINT", () => shutdownClient());
-// process.on("SIGUSR1", () => shutdownClient());
-// process.on("SIGUSR2", () => shutdownClient());
-// process.on("uncaughtException", () => shutdownClient());
-// process.on("beforeExit", () => shutdownClient());
-
-export async function getClient() {
-  if (!client) {
-    client = await faktory.connect();
-  }
-  return client;
-}
-
-export async function hasActiveClient() {
-  return !!client;
-}
-
-export async function shutdownClient() {
-  if (!client) return;
-  await client.close();
-  client = null;
-}
-
-// TODO: how can we automate registration here without importing the job code?
-export type JobName =
-  | "GenerateBottleDetails"
-  | "GenerateEntityDetails"
-  | "GeocodeCountryLocation"
-  | "GeocodeEntityLocation"
-  | "NotifyDiscordOnTasting"
-  | "ScrapeAstorWines"
-  | "ScrapeHealthySpirits"
-  | "ScrapeSMWS"
-  | "ScrapeSMWSA"
-  | "ScrapeTotalWine"
-  | "ScrapeWoodenCork"
-  | "ScrapeWhiskyAdvocate"
-  | "CreateMissingBottles";
-
-export async function pushJob(jobName: JobName, args?: any) {
-  const client = await getClient();
-  await Sentry.startSpan(
-    {
-      op: "publish",
-      name: `faktory.${jobName.toLowerCase()}`,
-    },
-    async (span) => {
-      span.setAttribute("messaging.operation", "publish");
-      span.setAttribute("messaging.system", "faktory");
-
-      // pull out traceparent to forward to faktory job
-      const activeContext = {};
-      propagation.inject(context.active(), activeContext);
-      try {
-        await client.job(jobName, args, { traceContext: activeContext }).push();
-      } catch (e) {
-        span.setStatus({
-          code: 2, // ERROR
-        });
-        throw e;
-      }
-    },
-  );
+export async function runJob(jobName: JobName, args?: any) {
+  return await faktory.registry[jobName](args);
 }
 
 type TraceContext = {

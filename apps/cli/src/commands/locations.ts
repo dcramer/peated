@@ -1,7 +1,7 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
+import { pushJob } from "@peated/server/worker/client";
 import { and, asc, isNull } from "drizzle-orm";
 
 const subcommand = program.command("locations");

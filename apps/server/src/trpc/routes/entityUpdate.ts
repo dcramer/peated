@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
-import type { UnserializedPoint } from "@peated/server/db/columns";
-import { type SerializedPoint } from "@peated/server/db/columns";
+import type { UnserializedPoint } from "@peated/server/db/columns/geography";
+import { type SerializedPoint } from "@peated/server/db/columns/geography";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,
@@ -10,13 +10,13 @@ import {
   entities,
   entityAliases,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
 import { normalizeEntityName } from "@peated/server/lib/normalize";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { and, eq, getTableColumns, ilike, ne, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -73,6 +73,7 @@ export default modProcedure
     }
     if (input.address !== undefined && input.address !== entity.address) {
       data.address = input.address;
+      data.location = null;
     }
     if (
       input.location !== undefined &&
@@ -88,6 +89,7 @@ export default modProcedure
     ) {
       data.location = input.location;
     }
+
     if (input.type !== undefined && !arraysEqual(input.type, entity.type)) {
       data.type = input.type;
     }
@@ -120,6 +122,11 @@ export default modProcedure
             location: SerializedPoint;
           })
         | undefined;
+
+      const aliasList = await tx.query.entityAliases.findMany({
+        where: eq(entityAliases.entityId, entity.id),
+      });
+
       try {
         [newEntity] = await tx
           .update(entities)
@@ -223,33 +230,14 @@ export default modProcedure
       });
     }
 
-    if (
-      (newEntity.name !== entity.name || !newEntity.description) &&
-      newEntity.descriptionSrc !== "user"
-    ) {
-      try {
-        await pushJob("GenerateEntityDetails", { entityId: entity.id });
-      } catch (err) {
-        logError(err, {
-          entity: {
-            id: entity.id,
-          },
-        });
-      }
-    }
-
-    const hasChangedLocation =
-      (data.address || data.country || data.region) && !data.location;
-    if (hasChangedLocation) {
-      try {
-        await pushJob("GeocodeEntityLocation", { entityId: entity.id });
-      } catch (err) {
-        logError(err, {
-          entity: {
-            id: entity.id,
-          },
-        });
-      }
+    try {
+      await pushJob("OnEntityChange", { entityId: entity.id });
+    } catch (err) {
+      logError(err, {
+        entity: {
+          id: entity.id,
+        },
+      });
     }
 
     return await serialize(EntitySerializer, newEntity, ctx.user);

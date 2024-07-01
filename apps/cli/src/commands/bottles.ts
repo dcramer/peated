@@ -1,10 +1,10 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { bottles, reviews, tastings } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
 import { findEntity } from "@peated/server/lib/bottleFinder";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { createCaller } from "@peated/server/trpc/router";
+import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 
 const subcommand = program.command("bottles");
@@ -35,7 +35,7 @@ subcommand
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id } of query) {
         console.log(`Generating description for Bottle ${id}.`);
-        await pushJob("GenerateBottleDetails", { bottleId: id });
+        await runJob("GenerateBottleDetails", { bottleId: id });
         hasResults = true;
       }
       offset += step;
@@ -47,7 +47,7 @@ subcommand
   .description("Create missing bottles")
   .action(async (options) => {
     console.log(`Pushing job [CreateMissingBottles].`);
-    await pushJob("CreateMissingBottles");
+    await runJob("CreateMissingBottles");
   });
 
 subcommand
@@ -121,3 +121,36 @@ subcommand.command("fix-stats").action(async () => {
       )`,
   });
 });
+
+subcommand
+  .command("index-search")
+  .description("Update bottle search indexes")
+  .argument("[bottleIds...]")
+  .option("--only-missing")
+  .action(async (bottleIds, options) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({ id: bottles.id })
+      .from(bottles)
+      .where(
+        bottleIds.length
+          ? inArray(bottles.id, bottleIds)
+          : options.onlyMissing
+            ? isNull(bottles.description)
+            : undefined,
+      )
+      .orderBy(asc(bottles.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id } of query) {
+        console.log(`Indexing search vectors for Bottle ${id}.`);
+        await runJob("IndexBottleSearchVectors", { bottleId: id });
+        hasResults = true;
+      }
+      offset += step;
+    }
+  });
