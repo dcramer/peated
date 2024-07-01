@@ -12,7 +12,7 @@ export async function generateMetadata({
   params: { tastingId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const tasting = await trpcClient.tastingById.ensureData(Number(tastingId));
+  const tasting = await trpcClient.tastingById.fetch(Number(tastingId));
   const title = `${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`;
   return {
     title,
@@ -40,7 +40,7 @@ export default async function Page({
   params: { tastingId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const tasting = await trpcClient.tastingById.ensureData(Number(tastingId));
+  const tasting = await trpcClient.tastingById.fetch(Number(tastingId));
 
   return (
     <>

@@ -15,7 +15,7 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.ensureData(Number(entityId));
+  const entity = await trpcClient.entityById.fetch(Number(entityId));
 
   const baseUrl = `/entities/${entity.id}`;
 

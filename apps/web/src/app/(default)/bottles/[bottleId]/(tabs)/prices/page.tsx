@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.ensureData(Number(bottleId));
+  const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
   return [
     {
@@ -28,7 +28,7 @@ export default async function BottlePrices({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const priceList = await trpcClient.bottlePriceList.ensureData({
+  const priceList = await trpcClient.bottlePriceList.fetch({
     bottle: Number(bottleId),
   });
 

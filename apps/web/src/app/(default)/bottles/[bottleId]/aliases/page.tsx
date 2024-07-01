@@ -11,7 +11,7 @@ export async function generateMetadata({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.ensureData(Number(bottleId));
+  const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
   return [
     {
@@ -27,8 +27,8 @@ export default async function BottleAliases({
 }) {
   const trpcClient = await getTrpcClient();
   const [bottle, aliasList] = await Promise.all([
-    trpcClient.bottleById.ensureData(Number(bottleId)),
-    trpcClient.bottleAliasList.ensureData({
+    trpcClient.bottleById.fetch(Number(bottleId)),
+    trpcClient.bottleAliasList.fetch({
       bottle: Number(bottleId),
     }),
   ]);

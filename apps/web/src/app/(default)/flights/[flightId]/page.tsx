@@ -17,7 +17,7 @@ export async function generateMetadata({
   params: { flightId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const flight = await trpcClient.flightById.ensureData(flightId);
+  const flight = await trpcClient.flightById.fetch(flightId);
   const description = summarize(flight.description || "", 200);
 
   return {
@@ -33,8 +33,8 @@ export default async function Page({
 }) {
   const trpcClient = await getTrpcClient();
   const [flight, bottleList] = await Promise.all([
-    trpcClient.flightById.ensureData(flightId),
-    trpcClient.bottleList.ensureData({
+    trpcClient.flightById.fetch(flightId),
+    trpcClient.bottleList.fetch({
       flight: flightId,
     }),
   ]);

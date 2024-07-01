@@ -19,7 +19,7 @@ export default async function Layout({
 }) {
   const entityId = Number(params.entityId);
   const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.ensureData(entityId);
+  const entity = await trpcClient.entityById.fetch(entityId);
 
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (entity.id !== entityId) {

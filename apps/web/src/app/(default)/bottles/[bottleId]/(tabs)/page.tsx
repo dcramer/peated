@@ -38,7 +38,7 @@ export async function generateMetadata({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.ensureData(Number(bottleId));
+  const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
   const description = summarize(bottle.description || "", 200);
 
@@ -61,7 +61,7 @@ export default async function BottleDetails({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.ensureData(Number(bottleId));
+  const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
   const stats = [
     {

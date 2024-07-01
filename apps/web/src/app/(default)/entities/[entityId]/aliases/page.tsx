@@ -11,7 +11,7 @@ export async function generateMetadata({
   params: { entityId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.ensureData(Number(entityId));
+  const entity = await trpcClient.entityById.fetch(Number(entityId));
 
   return [
     {
@@ -27,8 +27,8 @@ export default async function EntityAliases({
 }) {
   const trpcClient = await getTrpcClient();
   const [entity, aliasList] = await Promise.all([
-    trpcClient.entityById.ensureData(Number(entityId)),
-    trpcClient.entityAliasList.ensureData({
+    trpcClient.entityById.fetch(Number(entityId)),
+    trpcClient.entityAliasList.fetch({
       entity: Number(entityId),
     }),
   ]);

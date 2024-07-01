@@ -12,7 +12,7 @@ export async function generateMetadata({
   params: { entityId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.ensureData(Number(entityId));
+  const entity = await trpcClient.entityById.fetch(Number(entityId));
 
   return [
     {
@@ -27,7 +27,7 @@ export default async function EntityTastings({
   params: { entityId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const tastingList = await trpcClient.tastingList.ensureData({
+  const tastingList = await trpcClient.tastingList.fetch({
     entity: Number(entityId),
   });
 

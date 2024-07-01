@@ -23,7 +23,7 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.ensureData(username);
+  const user = await trpcClient.userById.fetch(username);
 
   const currentUser = await getCurrentUser();
 

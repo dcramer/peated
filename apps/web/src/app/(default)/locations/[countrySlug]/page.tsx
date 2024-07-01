@@ -17,7 +17,7 @@ export async function generateMetadata({
   params: { countrySlug: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const country = await trpcClient.countryBySlug.ensureData(countrySlug);
+  const country = await trpcClient.countryBySlug.fetch(countrySlug);
 
   return {
     title: `Whisky from ${country.name}`,
@@ -31,8 +31,8 @@ export default async function Page({
 }) {
   const trpcClient = await getTrpcClient();
   const [country, topEntityList] = await Promise.all([
-    trpcClient.countryBySlug.ensureData(countrySlug),
-    trpcClient.entityList.ensureData({
+    trpcClient.countryBySlug.fetch(countrySlug),
+    trpcClient.entityList.fetch({
       country: countrySlug,
       type: "distiller",
       sort: "-bottles",

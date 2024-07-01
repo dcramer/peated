@@ -9,7 +9,7 @@ export async function generateMetadata({
   params: { entityId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.ensureData(Number(entityId));
+  const entity = await trpcClient.entityById.fetch(Number(entityId));
 
   return [
     {

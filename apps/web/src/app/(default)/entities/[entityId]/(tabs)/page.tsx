@@ -19,7 +19,7 @@ export async function generateMetadata({
   params: { entityId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.ensureData(Number(entityId));
+  const entity = await trpcClient.entityById.fetch(Number(entityId));
 
   const description = summarize(entity.description || "", 200);
 
@@ -42,7 +42,7 @@ export default async function EntityDetails({
   params: { entityId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.ensureData(Number(entityId));
+  const entity = await trpcClient.entityById.fetch(Number(entityId));
 
   return (
     <>

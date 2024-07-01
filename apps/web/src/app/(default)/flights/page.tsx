@@ -21,7 +21,7 @@ export default async function Page() {
     return redirectToAuth({ pathname: "/favorites" });
   }
   const trpcClient = await getTrpcClient();
-  const flightList = await trpcClient.flightList.ensureData();
+  const flightList = await trpcClient.flightList.fetch();
 
   return (
     <>

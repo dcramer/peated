@@ -21,7 +21,7 @@ export default async function Layout({
 }) {
   const bottleId = Number(params.bottleId);
   const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.ensureData(bottleId);
+  const bottle = await trpcClient.bottleById.fetch(bottleId);
 
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (bottle.id !== bottleId) {

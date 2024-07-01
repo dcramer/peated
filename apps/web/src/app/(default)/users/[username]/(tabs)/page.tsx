@@ -10,7 +10,7 @@ export async function generateMetadata({
   params: { username: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.ensureData(username);
+  const user = await trpcClient.userById.fetch(username);
 
   return {
     title: `@${user.username}`,
@@ -29,8 +29,8 @@ export default async function UserTastings({
   params: { username: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.ensureData(username);
-  const tastingList = await trpcClient.tastingList.ensureData({
+  const user = await trpcClient.userById.fetch(username);
+  const tastingList = await trpcClient.tastingList.fetch({
     user: user.id,
   });
 

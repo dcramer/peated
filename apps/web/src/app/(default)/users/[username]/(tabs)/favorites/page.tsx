@@ -12,7 +12,7 @@ export async function generateMetadata({
   params: { username: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.ensureData(username);
+  const user = await trpcClient.userById.fetch(username);
 
   return {
     title: `Favorites by @${user.username}`,
@@ -31,7 +31,7 @@ export default async function UserFavorites({
   params: { username: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const favoriteList = await trpcClient.collectionBottleList.ensureData({
+  const favoriteList = await trpcClient.collectionBottleList.fetch({
     user: username,
     collection: "default",
   });
