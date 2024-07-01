@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import config from "../../config";
 import { DEFAULT_CREATED_BY_ID } from "../../constants";
 import { db } from "../../db";
-import { changes, entities } from "../../db/schema";
+import { changes, entities, type Entity } from "../../db/schema";
 
 export default async ({ entityId }: { entityId: number }) => {
   if (!config.GOOGLE_MAPS_API_KEY) {
@@ -45,7 +45,7 @@ export default async ({ entityId }: { entityId: number }) => {
     `Updating location for Entity ${entity.id}: ${match.formatted_address} - ${match.geometry.location.lat}, ${match.geometry.location.lng}`,
   );
 
-  const data: Record<string, any> = {
+  const data: Partial<Entity> = {
     address: match.formatted_address,
     location: [match.geometry.location.lat, match.geometry.location.lng],
   };

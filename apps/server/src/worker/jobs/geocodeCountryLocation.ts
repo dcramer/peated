@@ -2,6 +2,7 @@ import { Client, PlaceType2 } from "@googlemaps/google-maps-services-js";
 import { eq } from "drizzle-orm";
 import config from "../../config";
 import { db } from "../../db";
+import type { Country} from "../../db/schema";
 import { countries } from "../../db/schema";
 
 export default async ({ countryId }: { countryId: number }) => {
@@ -36,7 +37,7 @@ export default async ({ countryId }: { countryId: number }) => {
     );
   }
 
-  const data: Record<string, any> = {
+  const data: Partial<Country> = {
     location: [match.geometry.location.lat, match.geometry.location.lng],
   };
 
