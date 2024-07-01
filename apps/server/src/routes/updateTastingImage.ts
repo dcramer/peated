@@ -61,7 +61,6 @@ export default {
       return res.status(400).send({ error: "Bad request", code: "no_file" });
     }
 
-    console.error("we here");
     let imageUrl: string;
     try {
       imageUrl = await storeFile({
