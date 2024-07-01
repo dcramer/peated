@@ -1,15 +1,8 @@
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
-
-import { notEmpty } from "@peated/server/src/lib/filter";
 import CountrySpiritDistribution from "@peated/web/components/countrySpiritDistribution";
-import EmptyActivity from "@peated/web/components/emptyActivity";
-import EntityTable from "@peated/web/components/entityTable";
-import Map from "@peated/web/components/map";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
-import { Suspense } from "react";
-
-export const fetchCache = "default-no-store";
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { Suspense, type ReactNode } from "react";
 
 export async function generateMetadata({
   params: { countrySlug },
@@ -26,21 +19,13 @@ export async function generateMetadata({
 
 export default async function Page({
   params: { countrySlug },
+  children,
 }: {
   params: { countrySlug: string };
+  children: ReactNode;
 }) {
   const trpcClient = await getTrpcClient();
-  const [country, topEntityList] = await Promise.all([
-    trpcClient.countryBySlug.fetch(countrySlug),
-    trpcClient.entityList.fetch({
-      country: countrySlug,
-      type: "distiller",
-      sort: "-bottles",
-      limit: 5,
-    }),
-  ]);
-
-  const [mapHeight, mapWidth] = ["200px", "100%"];
+  const country = await trpcClient.countryBySlug.fetch(countrySlug);
 
   const stats = [
     { name: "Distilleries", value: country.totalDistilleries.toLocaleString() },
@@ -81,29 +66,7 @@ export default async function Page({
         <TabItem active>Distilleries</TabItem>
       </Tabs>
 
-      <Map
-        height={mapHeight}
-        width={mapWidth}
-        position={country.location}
-        markers={topEntityList.results
-          .map((e) => {
-            if (!e.location) return null;
-            return {
-              position: e.location,
-              name: e.name,
-              address: e.address,
-            };
-          })
-          .filter(notEmpty)}
-      />
-
-      {topEntityList.results.length ? (
-        <EntityTable entityList={topEntityList.results} type="distiller" />
-      ) : (
-        <EmptyActivity>
-          {"It looks like we don't know of any distilleries in the area."}
-        </EmptyActivity>
-      )}
+      {children}
     </>
   );
 }
