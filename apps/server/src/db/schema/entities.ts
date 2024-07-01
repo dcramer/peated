@@ -12,12 +12,10 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
-
-import { geography } from "../columns";
-
 import { bottles, bottlesToDistillers, countries } from ".";
+import { tsvector } from "../columns";
+import { geography } from "../columns/geography";
 import { contentSourceEnum } from "./enums";
-
 import { users } from "./users";
 
 export type EntityType = "brand" | "distiller" | "bottler";
@@ -35,6 +33,8 @@ export const entities = pgTable(
 
     name: text("name").notNull(),
     shortName: text("short_name"),
+
+    searchVector: tsvector("search_vector"),
 
     country: text("country"),
     countryId: bigint("country_id", { mode: "number" }).references(
@@ -63,12 +63,15 @@ export const entities = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (entities) => {
+  (table) => {
     return {
       nameIndex: uniqueIndex("entity_name_unq")
-        .on(entities.name)
+        .on(table.name)
         .using(sql`btree (LOWER(full_name))`),
-      createdById: index("entity_created_by_idx").on(entities.createdById),
+      searchVectorIndex: index("entity_search_idx")
+        .on(table.searchVector)
+        .using(sql`gin(${table.searchVector})`),
+      createdById: index("entity_created_by_idx").on(table.createdById),
     };
   },
 );

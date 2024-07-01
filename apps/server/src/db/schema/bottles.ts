@@ -15,6 +15,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { tsvector } from "../columns";
 import { entities } from "./entities";
 import { categoryEnum, contentSourceEnum, flavorProfileEnum } from "./enums";
 import { users } from "./users";
@@ -31,6 +32,9 @@ export const bottles = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     fullName: varchar("full_name", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
+
+    searchVector: tsvector("search_vector"),
+
     category: categoryEnum("category"),
     brandId: bigint("brand_id", { mode: "number" })
       .references(() => entities.id)
@@ -60,18 +64,21 @@ export const bottles = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (bottles) => {
+  (table) => {
     return {
-      unique: uniqueIndex("bottle_brand_unq").on(bottles.name, bottles.brandId),
+      unique: uniqueIndex("bottle_brand_unq").on(table.name, table.brandId),
       uniqueName: uniqueIndex("bottle_full_name_unq")
-        .on(bottles.fullName)
+        .on(table.fullName)
         .using(sql`btree (LOWER(full_name))`),
-      brandIdx: index("bottle_brand_idx").on(bottles.brandId),
-      bottlerIdx: index("bottle_bottler_idx").on(bottles.bottlerId),
-      createdById: index("bottle_created_by_idx").on(bottles.createdById),
-      categoryIdx: index("bottle_category_idx").on(bottles.category),
+      searchVectorIndex: index("bottle_search_idx")
+        .on(table.searchVector)
+        .using(sql`gin(${table.searchVector})`),
+      brandIdx: index("bottle_brand_idx").on(table.brandId),
+      bottlerIdx: index("bottle_bottler_idx").on(table.bottlerId),
+      createdById: index("bottle_created_by_idx").on(table.createdById),
+      categoryIdx: index("bottle_category_idx").on(table.category),
       flavorProfileIdx: index("bottle_flavor_profile_idx").on(
-        bottles.flavorProfile,
+        table.flavorProfile,
       ),
     };
   },

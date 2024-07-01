@@ -6,12 +6,13 @@ import {
   entities,
   entityAliases,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
 import { logError } from "@peated/server/lib/log";
 import { normalizeEntityName } from "@peated/server/lib/normalize";
+import { buildEntitySearchVector } from "@peated/server/lib/search";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { authedProcedure } from "..";
@@ -51,7 +52,10 @@ export default authedProcedure
     const entity = await db.transaction(async (tx) => {
       const [entity] = await tx
         .insert(entities)
-        .values(data)
+        .values({
+          ...data,
+          searchVector: buildEntitySearchVector(data),
+        })
         .onConflictDoNothing()
         .returning();
 
@@ -110,7 +114,7 @@ export default authedProcedure
     }
 
     try {
-      await pushJob("GenerateEntityDetails", { entityId: entity.id });
+      await pushJob("OnEntityChange", { entityId: entity.id });
     } catch (err) {
       logError(err, {
         entity: {

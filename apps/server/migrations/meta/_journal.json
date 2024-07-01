@@ -736,6 +736,20 @@
       "when": 1719727735298,
       "tag": "0104_simple_barracuda",
       "breakpoints": false
+    },
+    {
+      "idx": 105,
+      "version": "5",
+      "when": 1719854178513,
+      "tag": "0105_round_vulcan",
+      "breakpoints": false
+    },
+    {
+      "idx": 106,
+      "version": "5",
+      "when": 1719857072484,
+      "tag": "0106_complete_veda",
+      "breakpoints": false
     }
   ]
 }

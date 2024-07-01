@@ -2,7 +2,10 @@ import { getTableColumns, inArray, sql } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { type SerializedPoint, type UnserializedPoint } from "../db/columns";
+import {
+  type SerializedPoint,
+  type UnserializedPoint,
+} from "../db/columns/geography";
 import { countries, type Entity, type User } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { type EntitySchema } from "../schemas";

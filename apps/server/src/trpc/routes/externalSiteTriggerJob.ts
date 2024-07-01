@@ -1,9 +1,10 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { getJobForSite, pushJob } from "@peated/server/jobs/client";
 import { ExternalSiteTypeEnum } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteSerializer } from "@peated/server/serializers/externalSite";
+import { pushJob } from "@peated/server/worker/client";
+import { getJobForSite } from "@peated/server/worker/jobs/utils";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { adminProcedure } from "..";

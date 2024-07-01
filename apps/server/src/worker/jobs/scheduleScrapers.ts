@@ -1,7 +1,8 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { getJobForSite, pushJob } from "@peated/server/jobs/client";
+import { pushJob } from "@peated/server/worker/client";
 import { and, eq, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
+import { getJobForSite } from "./utils";
 
 export default async function scheduleScrapers() {
   const pending = await db

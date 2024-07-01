@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import * as dbSchema from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { type ExternalSiteType } from "@peated/server/types";
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
 import {
@@ -13,21 +13,6 @@ import {
 } from "../../constants";
 import type { DatabaseType } from "../../db";
 import { db as dbConn } from "../../db";
-import type {
-  NewBadge,
-  NewBottle,
-  NewBottleAlias,
-  NewComment,
-  NewEntity,
-  NewExternalSite,
-  NewFlight,
-  NewReview,
-  NewStorePrice,
-  NewStorePriceHistory,
-  NewTasting,
-  NewToast,
-  NewUser,
-} from "../../db/schema";
 import {
   badges,
   bottleAliases,
@@ -52,6 +37,7 @@ import {
 } from "../../db/schema";
 import { createAccessToken } from "../auth";
 import { choose, random, sample } from "../rand";
+import { buildBottleSearchVector, buildEntitySearchVector } from "../search";
 import { toTitleCase } from "../strings";
 
 export async function loadFixture(...paths: string[]) {
@@ -62,7 +48,7 @@ export async function loadFixture(...paths: string[]) {
 }
 
 export const User = async (
-  { ...data }: Partial<Omit<NewUser, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewUser, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.User> => {
   const firstName = data.displayName?.split(" ")[0] || faker.person.firstName();
@@ -126,7 +112,7 @@ export const Country = async (
 };
 
 export const Entity = async (
-  { ...data }: Partial<Omit<NewEntity, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewEntity, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Entity> => {
   const name = data.name || faker.company.name();
@@ -137,15 +123,19 @@ export const Entity = async (
   if (existing) return existing;
 
   return await db.transaction(async (tx) => {
+    const entityData: dbSchema.NewEntity = {
+      name,
+      country: faker.location.country(),
+      type: ["brand", "distiller"],
+      ...data,
+      createdById: data.createdById || (await User({}, tx)).id,
+    };
+
+    const searchVector = buildEntitySearchVector(entityData);
+
     const [entity] = await tx
       .insert(entities)
-      .values({
-        name,
-        country: faker.location.country(),
-        type: ["brand", "distiller"],
-        ...data,
-        createdById: data.createdById || (await User({}, tx)).id,
-      })
+      .values({ ...entityData, searchVector })
       .returning();
 
     if (!entity) throw new Error("Unable to create fixture");
@@ -196,7 +186,7 @@ export const Bottle = async (
   {
     distillerIds = [],
     ...data
-  }: Partial<Omit<NewBottle, "id">> & {
+  }: Partial<Omit<dbSchema.NewBottle, "id">> & {
     distillerIds?: number[];
   } = {},
   db: DatabaseType = dbConn,
@@ -225,16 +215,41 @@ export const Bottle = async (
         ]),
       )} #${faker.number.int(100)}`;
 
+    const bottleData: dbSchema.NewBottle = {
+      category: choose([...CATEGORY_LIST, null, null]),
+      statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
+      ...data,
+      name,
+      fullName: `${brand.name} ${name}`,
+      brandId: brand.id,
+      createdById: data.createdById || (await User({}, tx)).id,
+    };
+
+    const distillerList = distillerIds.length
+      ? await tx.query.entities.findMany({
+          where: inArray(entities.id, distillerIds),
+        })
+      : [];
+
+    const bottler = bottleData.bottlerId
+      ? await tx.query.entities.findFirst({
+          where: eq(entities.id, bottleData.bottlerId),
+        })
+      : undefined;
+
+    const searchVector = buildBottleSearchVector(
+      bottleData,
+      brand,
+      [],
+      bottler,
+      distillerList,
+    );
+
     const [bottle] = await tx
       .insert(bottles)
       .values({
-        category: choose([...CATEGORY_LIST, null, null]),
-        statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
-        ...data,
-        name,
-        fullName: `${brand.name} ${name}`,
-        brandId: brand.id,
-        createdById: data.createdById || (await User({}, tx)).id,
+        ...bottleData,
+        searchVector,
       })
       .returning();
 
@@ -278,7 +293,7 @@ export const Bottle = async (
 };
 
 export const BottleAlias = async (
-  { ...data }: Partial<NewBottleAlias> = {},
+  { ...data }: Partial<dbSchema.NewBottleAlias> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.BottleAlias> => {
   const [result] = await db.transaction(async (tx) => {
@@ -301,7 +316,7 @@ export const BottleAlias = async (
 };
 
 export const Tasting = async (
-  { ...data }: Partial<Omit<NewTasting, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewTasting, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Tasting> => {
   return await db.transaction(async (tx) => {
@@ -344,7 +359,7 @@ export const Tasting = async (
 };
 
 export const Toast = async (
-  { ...data }: Partial<Omit<NewToast, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewToast, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Toast> => {
   const [result] = await db.transaction(async (tx) => {
@@ -362,7 +377,7 @@ export const Toast = async (
 };
 
 export const Comment = async (
-  { ...data }: Partial<Omit<NewComment, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewComment, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Comment> => {
   const [result] = await db.transaction(async (tx) => {
@@ -386,7 +401,7 @@ export const Flight = async (
     ...data
   }: Partial<
     Omit<
-      NewFlight & {
+      dbSchema.NewFlight & {
         bottles: number[];
       },
       "id"
@@ -418,7 +433,7 @@ export const Flight = async (
 };
 
 export const Badge = async (
-  { ...data }: Partial<Omit<NewBadge, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewBadge, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Badge> => {
   const [result] = await db
@@ -437,7 +452,7 @@ export const Badge = async (
 };
 
 export const ExternalSite = async (
-  { ...data }: Partial<Omit<NewExternalSite, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
   if (!data.type) data.type = choose(EXTERNAL_SITE_TYPE_LIST);
@@ -452,7 +467,7 @@ export const ExternalSite = async (
     .insert(externalSites)
     .values({
       name: faker.company.name(),
-      ...(data as Omit<NewExternalSite, "name">),
+      ...(data as Omit<dbSchema.NewExternalSite, "name">),
     })
     .returning();
   if (!result) throw new Error("Unable to create fixture");
@@ -460,7 +475,7 @@ export const ExternalSite = async (
 };
 
 export const StorePrice = async (
-  { ...data }: Partial<Omit<NewStorePrice, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewStorePrice, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.StorePrice> => {
   return await db.transaction(async (tx) => {
@@ -526,7 +541,7 @@ export const StorePrice = async (
 };
 
 export const StorePriceHistory = async (
-  { ...data }: Partial<Omit<NewStorePriceHistory, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewStorePriceHistory, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.StorePriceHistory> => {
   const [result] = await db.transaction(async (tx) => {
@@ -547,7 +562,7 @@ export const StorePriceHistory = async (
 };
 
 export const Review = async (
-  { ...data }: Partial<Omit<NewReview, "id">> = {},
+  { ...data }: Partial<Omit<dbSchema.NewReview, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Review> => {
   const [result] = await db.transaction(async (tx) => {
@@ -626,9 +641,7 @@ export const AuthToken = async (
   { user }: { user?: dbSchema.User | null } = {},
   db: DatabaseType = dbConn,
 ): Promise<string> => {
-  if (!user) user = await User({}, db);
-
-  return await createAccessToken(user);
+  return await createAccessToken(user ?? (await User({}, db)));
 };
 
 export const AuthenticatedHeaders = async (

@@ -1,8 +1,8 @@
 import { Client } from "@googlemaps/google-maps-services-js";
 import { eq } from "drizzle-orm";
-import config from "../config";
-import { db } from "../db";
-import { countries } from "../db/schema";
+import config from "../../config";
+import { db } from "../../db";
+import { countries } from "../../db/schema";
 
 export default async ({ countryId }: { countryId: number }) => {
   if (!config.GOOGLE_MAPS_API_KEY) {

@@ -2,7 +2,6 @@ import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Flight } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottles,
   bottlesToDistillers,
   entities,
@@ -14,7 +13,7 @@ import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { TRPCError } from "@trpc/server";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -65,40 +64,8 @@ export default publicProcedure
     const where: (SQL<unknown> | undefined)[] = [];
 
     if (query) {
-      const likeQuery = `%${query}%`;
-      const otherLikeQuery = `%The ${query}%`;
       where.push(
-        or(
-          ilike(bottles.fullName, likeQuery),
-          ilike(bottles.fullName, otherLikeQuery),
-          sql`exists(${db
-            .select({ n: sql`1` })
-            .from(bottleAliases)
-            .where(
-              and(
-                eq(bottleAliases.bottleId, bottles.id),
-                ilike(bottleAliases.name, likeQuery),
-                ilike(bottleAliases.name, otherLikeQuery),
-              ),
-            )})`,
-          sql`EXISTS(
-            SELECT
-            FROM ${entities} e
-            JOIN ${bottlesToDistillers} b
-            ON e.id = b.distiller_id AND b.bottle_id = ${bottles.id}
-            WHERE e.name ILIKE ${likeQuery}
-          )`,
-          // lol welcome to search
-          sql`EXISTS(
-            SELECT
-            FROM ${entities} e
-            WHERE e.id = ${bottles.brandId}
-              AND (
-                e.name ILIKE ${likeQuery}
-                OR e.name ILIKE ${otherLikeQuery}
-              )
-          )`,
-        ),
+        sql`${bottles.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
       );
     }
     if (input.brand) {

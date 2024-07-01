@@ -1,5 +1,5 @@
-import { getGeneratedEntityDetails } from "@peated/server/jobs/generateEntityDetails";
 import { EntityInputSchema } from "@peated/server/schemas";
+import { getGeneratedEntityDetails } from "@peated/server/worker/jobs/generateEntityDetails";
 import { type z } from "zod";
 import { modProcedure } from "..";
 import { type Context } from "../context";

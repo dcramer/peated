@@ -11,13 +11,13 @@ import {
   follows,
   tastings,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
 import { checkBadges } from "@peated/server/lib/badges";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { TastingInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { authedProcedure } from "..";

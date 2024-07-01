@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import type { Bottle, Entity } from "@peated/server/db/schema";
+import type { Bottle, Entity, NewBottle } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottles,
@@ -7,7 +7,6 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
 import { upsertEntity } from "@peated/server/lib/db";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
@@ -19,6 +18,7 @@ import type {
   EntityInput,
   FreeformEntity,
 } from "@peated/server/types";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
@@ -61,6 +61,13 @@ export async function bottleCreate({
       (input.description && input.description !== null ? "user" : null);
   }
 
+  if (!bottleData.name) {
+    throw new TRPCError({
+      message: "Invalid bottle name.",
+      code: "BAD_REQUEST",
+    });
+  }
+
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({
       db: tx,
@@ -77,13 +84,6 @@ export async function bottleCreate({
     }
 
     const brand = brandUpsert.result;
-
-    if (!bottleData.name) {
-      throw new TRPCError({
-        message: "Invalid bottle name.",
-        code: "BAD_REQUEST",
-      });
-    }
 
     let bottler: Entity | null = null;
     if (bottleData.bottler) {
@@ -103,20 +103,36 @@ export async function bottleCreate({
       }
     }
 
-    const fullName = `${brand.shortName || brand.name} ${bottleData.name}`;
+    const distillerIds: number[] = [];
+    const distillerList: Entity[] = [];
+    if (bottleData.distillers)
+      for (const distData of bottleData.distillers) {
+        const distUpsert = await upsertEntity({
+          db: tx,
+          data: coerceToUpsert(distData),
+          userId: user.id,
+          type: "distiller",
+        });
+        if (!distUpsert) {
+          throw new TRPCError({
+            message: "Could not identify distiller.",
+            code: "BAD_REQUEST",
+          });
+        }
+        distillerList.push(distUpsert.result);
+        distillerIds.push(distUpsert.id);
+      }
 
+    const bottleInsertData: NewBottle = {
+      ...bottleData,
+      brandId: brand.id,
+      bottlerId: bottler?.id || null,
+      createdById: user.id,
+      fullName: `${brand.shortName || brand.name} ${bottleData.name}`,
+    };
     let bottle: Bottle | undefined;
     try {
-      [bottle] = await tx
-        .insert(bottles)
-        .values({
-          ...bottleData,
-          fullName,
-          brandId: brand.id,
-          bottlerId: bottler?.id || null,
-          createdById: user.id,
-        })
-        .returning();
+      [bottle] = await tx.insert(bottles).values(bottleInsertData).returning();
     } catch (err: any) {
       if (
         err?.code === "23505" &&
@@ -139,7 +155,7 @@ export async function bottleCreate({
       .insert(bottleAliases)
       .values({
         bottleId: bottle.id,
-        name: fullName,
+        name: bottle.fullName,
       })
       .onConflictDoUpdate({
         target: [bottleAliases.name],
@@ -149,28 +165,12 @@ export async function bottleCreate({
         where: isNull(bottleAliases.bottleId),
       });
 
-    const distillerIds: number[] = [];
-    if (bottleData.distillers)
-      for (const distData of bottleData.distillers) {
-        const distUpsert = await upsertEntity({
-          db: tx,
-          data: coerceToUpsert(distData),
-          userId: user.id,
-          type: "distiller",
-        });
-        if (!distUpsert) {
-          throw new TRPCError({
-            message: "Could not identify distiller.",
-            code: "BAD_REQUEST",
-          });
-        }
-        await tx.insert(bottlesToDistillers).values({
-          bottleId: bottle.id,
-          distillerId: distUpsert.id,
-        });
-
-        distillerIds.push(distUpsert.id);
-      }
+    for (const distillerId of distillerIds) {
+      await tx.insert(bottlesToDistillers).values({
+        bottleId: bottle.id,
+        distillerId,
+      });
+    }
 
     await tx.insert(changes).values({
       objectType: "bottle",
@@ -220,7 +220,7 @@ export async function bottleCreate({
   }
 
   try {
-    await pushJob("GenerateBottleDetails", { bottleId: bottle.id });
+    await pushJob("OnBottleChange", { bottleId: bottle.id });
   } catch (err) {
     logError(err, {
       bottle: {

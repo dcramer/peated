@@ -1,6 +1,6 @@
 import { ENTITY_TYPE_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { type SerializedPoint } from "@peated/server/db/columns";
+import { type SerializedPoint } from "@peated/server/db/columns/geography";
 import {
   bottles,
   bottlesToDistillers,
@@ -72,23 +72,7 @@ export default publicProcedure
     const where: (SQL<unknown> | undefined)[] = [];
     if (query !== "") {
       where.push(
-        or(
-          ilike(entities.name, `%${query}%`),
-          ilike(entities.name, `%The ${query}%`),
-          ilike(entities.shortName, `%${query}%`),
-          sql`exists(${db
-            .select({ n: sql`1` })
-            .from(entityAliases)
-            .where(
-              and(
-                eq(entityAliases.entityId, entities.id),
-                or(
-                  ilike(entityAliases.name, `%${query}%`),
-                  ilike(entityAliases.name, `%The ${query}%`),
-                ),
-              ),
-            )})`,
-        ),
+        sql`${entities.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
       );
     }
     if (input.name) {

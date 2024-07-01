@@ -68,7 +68,9 @@ test("can change name", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "name")).toEqual(omit(newEntity, "name"));
+  expect(omit(entity, "name", "searchVector")).toEqual(
+    omit(newEntity, "name", "searchVector"),
+  );
   expect(newEntity.name).toBe("Delicious Wood");
 
   const [change] = await db
@@ -100,7 +102,9 @@ test("can change country", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "countryId")).toEqual(omit(newEntity, "countryId"));
+  expect(omit(entity, "countryId", "searchVector")).toEqual(
+    omit(newEntity, "countryId", "searchVector"),
+  );
   expect(newEntity.countryId).toBe(country.id);
 });
 
@@ -122,7 +126,9 @@ test("can change region", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "region")).toEqual(omit(newEntity, "region"));
+  expect(omit(entity, "region", "searchVector")).toEqual(
+    omit(newEntity, "region", "searchVector"),
+  );
   expect(newEntity.region).toBe("Islay");
 });
 
@@ -144,7 +150,9 @@ test("can change type", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "type")).toEqual(omit(newEntity, "type"));
+  expect(omit(entity, "type", "searchVector")).toEqual(
+    omit(newEntity, "type", "searchVector"),
+  );
   expect(newEntity.type).toEqual(["distiller"]);
 });
 
@@ -178,7 +186,9 @@ test("name change updates bottles if brand", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "name")).toEqual(omit(newEntity, "name"));
+  expect(omit(entity, "name", "searchVector")).toEqual(
+    omit(newEntity, "name", "searchVector"),
+  );
   expect(newEntity.name).toBe("Bar");
 
   const [newBottle] = await db
@@ -233,7 +243,9 @@ test("short name change updates bottles if brand", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "shortName")).toEqual(omit(newEntity, "shortName"));
+  expect(omit(entity, "shortName", "searchVector")).toEqual(
+    omit(newEntity, "shortName", "searchVector"),
+  );
   expect(newEntity.shortName).toBe("F");
 
   const [newBottle] = await db
@@ -276,8 +288,8 @@ test("sets descriptionSrc with description", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "description", "descriptionSrc")).toEqual(
-    omit(newEntity, "description", "descriptionSrc"),
+  expect(omit(entity, "description", "descriptionSrc", "searchVector")).toEqual(
+    omit(newEntity, "description", "descriptionSrc", "searchVector"),
   );
   expect(newEntity.description).toBe("Delicious Wood");
   expect(newEntity.descriptionSrc).toEqual("user");

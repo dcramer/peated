@@ -1,16 +1,16 @@
+import { logError } from "@peated/server/lib/log";
 import { chunked, getUrl } from "@peated/server/lib/scraper";
 import {
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
+import { isTRPCClientError } from "@peated/server/lib/trpc";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { type z } from "zod";
-import { logError } from "../lib/log";
-import { isTRPCClientError } from "../lib/trpc";
 
 export default async function scrapeSMWS() {
   await scrapeBottles(
