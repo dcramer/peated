@@ -32,6 +32,7 @@ export default function Page({
       <Map
         height={mapHeight}
         width={mapWidth}
+        initialZoom={6}
         position={country.location}
         markers={topEntityList.results
           .map((e) => {

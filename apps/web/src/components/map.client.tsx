@@ -65,6 +65,7 @@ type Props = {
     address?: string | null;
     useAsPosition?: boolean;
   }[];
+  initialZoom?: number; // max 20
 };
 
 export default function MapClient({
@@ -73,6 +74,7 @@ export default function MapClient({
   position = DEFAULT_POSITION,
   markers = [],
   controls = true,
+  initialZoom = 10,
 }: Props) {
   return (
     <div style={{ height, width }}>
@@ -82,7 +84,7 @@ export default function MapClient({
         }}
         className="rounded"
         center={position || DEFAULT_POSITION}
-        zoom={10}
+        zoom={initialZoom}
         dragging={controls}
         doubleClickZoom={controls}
         scrollWheelZoom={controls}
