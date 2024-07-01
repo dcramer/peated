@@ -1,14 +1,35 @@
 import { sql } from "drizzle-orm";
 import { customType } from "drizzle-orm/pg-core";
 
-export function tsvector<TData>(name: string) {
+type TSVectorWeight = "A" | "B" | "C" | "D";
+
+export class TSVector {
+  value: string;
+  weight: TSVectorWeight;
+
+  constructor(value: string, weight: TSVectorWeight = "A") {
+    this.value = value;
+    this.weight = weight;
+  }
+
+  mapToDriverValue() {
+    return `setweight(to_tsvector(${this.value}), ${this.weight})`;
+  }
+}
+
+type TSVectorType = string | TSVector | TSVector[];
+
+export function tsvector<TData extends TSVectorType = string>(name: string) {
   return customType<{ data: TData; driverData: string }>({
     dataType() {
       return "tsvector";
     },
 
     toDriver(value: TData) {
-      return sql`to_tsvector(${value})`;
+      if (typeof value === "string") return sql`to_tsvector(${value})`;
+      else if (Array.isArray(value))
+        return value.map((v) => v.mapToDriverValue()).join(" || ' ' || ");
+      return value.mapToDriverValue();
     },
   })(name);
 }

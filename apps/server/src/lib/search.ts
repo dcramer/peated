@@ -1,3 +1,4 @@
+import { TSVector } from "../db/columns";
 import type {
   NewBottle,
   NewBottleAlias,
@@ -19,11 +20,11 @@ export function buildEntitySearchVector(
   entity: NewEntity,
   aliasList?: NewEntityAlias[],
 ) {
-  const values: (string | null | undefined)[] = [
-    entity.name,
-    entity.shortName ?? null,
+  const values: TSVector[] = [
+    new TSVector(entity.name, "A"),
+    ...(entity.shortName ? [new TSVector(entity.shortName, "B")] : []),
   ];
-  aliasList?.forEach((a) => values.push(a.name));
+  aliasList?.forEach((a) => values.push(new TSVector(a.name, "A")));
   return uniq(values.filter(notEmpty)).join(" ");
 }
 
@@ -34,9 +35,13 @@ export function buildBottleSearchVector(
   bottler?: NewEntity,
   distillerList?: NewEntity[],
 ) {
-  const values: (string | null | undefined)[] = [bottle.name, brand.name];
-  if (bottler) values.push(bottler.name);
-  aliasList?.forEach((a) => values.push(a.name));
-  distillerList?.forEach((a) => values.push(a.name));
+  const values: TSVector[] = [
+    new TSVector(bottle.fullName, "A"),
+    new TSVector(bottle.name, "B"),
+    new TSVector(brand.name, "B"),
+  ];
+  if (bottler) values.push(new TSVector(bottler.name, "C"));
+  aliasList?.forEach((a) => values.push(new TSVector(a.name, "A")));
+  distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));
   return uniq(values.filter(notEmpty)).join(" ");
 }
