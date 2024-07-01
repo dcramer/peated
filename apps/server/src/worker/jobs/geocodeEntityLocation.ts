@@ -41,6 +41,10 @@ export default async ({ entityId }: { entityId: number }) => {
 
   const match = result.data.results[0];
 
+  console.log(
+    `Updating location for Entity ${entity.id}: ${match.formatted_address} - ${match.geometry.location.lat}, ${match.geometry.location.lng}`,
+  );
+
   const data: Record<string, any> = {
     address: match.formatted_address,
     location: [match.geometry.location.lat, match.geometry.location.lng],
