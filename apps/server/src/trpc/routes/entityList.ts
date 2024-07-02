@@ -87,7 +87,12 @@ export default publicProcedure
       const [result] = await db
         .select({ id: countries.id })
         .from(countries)
-        .where(eq(sql`LOWER(${countries.name})`, input.country.toLowerCase()))
+        .where(
+          or(
+            eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()),
+            eq(sql`LOWER(${countries.name})`, input.country.toLowerCase()),
+          ),
+        )
         .limit(1);
       if (!result) {
         throw new TRPCError({
