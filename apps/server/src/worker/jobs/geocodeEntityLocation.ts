@@ -107,7 +107,7 @@ export default async ({
   }
 
   console.log(
-    `Updating location for Entity ${entity.id}: ${match.formatted_address} - ${match.geometry.location.lat}, ${match.geometry.location.lng}`,
+    `Updating location for Entity ${entity.id}: ${match.formatted_address} (${match.geometry.location.lat}, ${match.geometry.location.lng})`,
   );
 
   const data: Partial<Entity> = {

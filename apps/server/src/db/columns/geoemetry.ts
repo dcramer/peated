@@ -42,6 +42,7 @@ export function geometry_point(name: string) {
     },
 
     fromDriver(value): LatLng {
+      console.log({ value });
       const parsed = wkx.Geometry.parse(
         Buffer.from(value, "hex"),
       ) as unknown as {
