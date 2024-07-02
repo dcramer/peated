@@ -10,6 +10,7 @@ export const CountrySerializer = serializer({
     currentUser?: User,
   ): z.infer<typeof CountrySchema> => {
     return {
+      id: item.id,
       name: item.name,
       slug: item.slug,
       description: item.description,

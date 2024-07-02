@@ -3,6 +3,7 @@ import { ContentSourceEnum } from "./common";
 import { PointSchema } from "./shared";
 
 export const CountrySchema = z.object({
+  id: z.number(),
   name: z.string().trim().min(1, "Required"),
   slug: z.string().trim().min(1, "Required"),
   description: z.string().nullish(),
