@@ -21,6 +21,8 @@ export default publicProcedure
       }),
   )
   .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
+    ctx.maxAge = 86400;
+
     const where: (SQL<unknown> | undefined)[] = [];
 
     const offset = (cursor - 1) * limit;
