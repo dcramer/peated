@@ -29,7 +29,9 @@ import commentDelete from "./routes/commentDelete";
 import commentList from "./routes/commentList";
 import countryBySlug from "./routes/countryBySlug";
 import countryCategoryList from "./routes/countryCategoryList";
+import countryGenerateDetails from "./routes/countryGenerateDetails";
 import countryList from "./routes/countryList";
+import countryUpdate from "./routes/countryUpdate";
 import entityAliasList from "./routes/entityAliasList";
 import entityById from "./routes/entityById";
 import entityCategoryList from "./routes/entityCategoryList";
@@ -109,7 +111,9 @@ export const appRouter = router({
   collectionList,
   countryBySlug,
   countryCategoryList,
+  countryGenerateDetails,
   countryList,
+  countryUpdate,
   commentCreate,
   commentDelete,
   commentList,

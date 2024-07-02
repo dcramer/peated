@@ -2,7 +2,6 @@ import type { z } from "zod";
 import type {
   BADGE_TYPE_LIST,
   CATEGORY_LIST,
-  COUNTRY_LIST,
   CURRENCY_LIST,
   EXTERNAL_SITE_TYPE_LIST,
   FLAVOR_PROFILES,
@@ -16,6 +15,7 @@ import type {
   CollectionBottleSchema,
   CollectionSchema,
   CommentSchema,
+  CountrySchema,
   EntityInputSchema,
   EntitySchema,
   EntityTypeEnum,
@@ -41,7 +41,6 @@ export type TagCategory = (typeof TAG_CATEGORIES)[number];
 export type Currency = (typeof CURRENCY_LIST)[number];
 
 export type ExternalSiteType = (typeof EXTERNAL_SITE_TYPE_LIST)[number];
-export type Country = (typeof COUNTRY_LIST)[number];
 export type BadgeType = (typeof BADGE_TYPE_LIST)[number];
 
 export type EntityType = z.infer<typeof EntityTypeEnum>;
@@ -56,6 +55,7 @@ export type Change = z.infer<typeof ChangeSchema>;
 export type Collection = z.infer<typeof CollectionSchema>;
 export type CollectionBottle = z.infer<typeof CollectionBottleSchema>;
 export type Comment = z.infer<typeof CommentSchema>;
+export type Country = z.infer<typeof CountrySchema>;
 export type ExternalSite = z.infer<typeof ExternalSiteSchema>;
 export type Entity = z.infer<typeof EntitySchema>;
 export type Flight = z.infer<typeof FlightSchema>;

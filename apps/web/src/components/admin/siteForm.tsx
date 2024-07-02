@@ -1,3 +1,5 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EXTERNAL_SITE_TYPE_LIST } from "@peated/server/constants";
 import { ExternalSiteSchemaInputSchema } from "@peated/server/schemas";

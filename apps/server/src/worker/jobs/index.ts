@@ -2,6 +2,7 @@ import type { JobFunction } from "faktory-worker";
 import faktory from "faktory-worker";
 import createMissingBottles from "./createMissingBottles";
 import generateBottleDetails from "./generateBottleDetails";
+import generateCountryDetails from "./generateCountryDetails";
 import generateEntityDetails from "./generateEntityDetails";
 import geocodeCountryLocation from "./geocodeCountryLocation";
 import geocodeEntityLocation from "./geocodeEntityLocation";
@@ -25,6 +26,7 @@ import { registerJob } from "./utils";
 
 // faktory does not have correct types
 registerJob("GenerateBottleDetails", generateBottleDetails as JobFunction);
+registerJob("GenerateCountryDetails", generateCountryDetails as JobFunction);
 registerJob("GenerateEntityDetails", generateEntityDetails as JobFunction);
 registerJob("GeocodeCountryLocation", geocodeCountryLocation as JobFunction);
 registerJob("GeocodeEntityLocation", geocodeEntityLocation as JobFunction);

@@ -7,6 +7,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { geometry_point } from "../columns/geoemetry";
+import { contentSourceEnum } from "./enums";
 
 export const countries = pgTable(
   "country",
@@ -15,6 +16,8 @@ export const countries = pgTable(
     name: text("name").notNull(),
     slug: text("slug").notNull(),
     location: geometry_point("location"),
+    description: text("description"),
+    descriptionSrc: contentSourceEnum("description_src"),
     totalBottles: bigint("total_bottles", { mode: "number" })
       .default(0)
       .notNull(),

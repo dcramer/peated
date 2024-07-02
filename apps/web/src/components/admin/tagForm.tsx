@@ -1,9 +1,11 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FLAVOR_PROFILES, TAG_CATEGORIES } from "@peated/server/constants";
 import { TagInputSchema } from "@peated/server/schemas";
 import { formatFlavorProfile } from "@peated/server/src/lib/format";
 import { toTitleCase } from "@peated/server/src/lib/strings";
-import { type ExternalSite } from "@peated/server/types";
+import { type Tag } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
@@ -38,7 +40,7 @@ export default function TagForm({
   title = "Add Tag",
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
-  initialData?: Partial<ExternalSite>;
+  initialData?: Partial<Tag>;
   edit?: boolean;
   title?: string;
 }) {

@@ -9,7 +9,6 @@ import { CountryEnum, EntityTypeEnum } from "@peated/server/schemas";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { pushJob } from "../client";
 
 if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
@@ -203,8 +202,4 @@ export default async ({ entityId }: { entityId: number }) => {
       },
     });
   });
-
-  if (data.address) {
-    await pushJob("GeocodeEntityLocation", { entityId });
-  }
 };

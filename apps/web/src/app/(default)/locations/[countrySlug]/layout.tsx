@@ -1,4 +1,6 @@
 import CountrySpiritDistribution from "@peated/web/components/countrySpiritDistribution";
+import Heading from "@peated/web/components/heading";
+import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
@@ -61,6 +63,15 @@ export default async function Page({
           </Suspense>
         </div>
       </div>
+
+      {country.description && (
+        <>
+          <Heading as="h3">Whisky in {country.name}</Heading>
+          <div className="prose prose-invert -mt-1 max-w-none flex-auto">
+            <Markdown content={country.description} />
+          </div>
+        </>
+      )}
 
       <Tabs fullWidth border>
         <TabItem active>Distilleries</TabItem>

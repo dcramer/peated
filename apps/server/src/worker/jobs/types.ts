@@ -1,6 +1,7 @@
 // TODO: how can we automate registration here without importing the job code?
 export type JobName =
   | "GenerateBottleDetails"
+  | "GenerateCountryDetails"
   | "GenerateEntityDetails"
   | "GeocodeCountryLocation"
   | "GeocodeEntityLocation"
