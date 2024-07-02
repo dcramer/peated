@@ -17,9 +17,17 @@ export async function generateMetadata({
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 
+  const title = `${entity.name} Distillery Codes`;
+  const description = `Mapping of distillery codes found on bottles from ${entity.name}`;
+
   return [
     {
-      title: `${entity.name} Distillery Codes`,
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+      },
     },
   ];
 }
