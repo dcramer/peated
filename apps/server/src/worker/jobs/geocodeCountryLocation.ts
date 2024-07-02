@@ -2,7 +2,7 @@ import { Client, PlaceType2 } from "@googlemaps/google-maps-services-js";
 import { eq } from "drizzle-orm";
 import config from "../../config";
 import { db } from "../../db";
-import type { Country} from "../../db/schema";
+import type { Country } from "../../db/schema";
 import { countries } from "../../db/schema";
 
 export default async ({ countryId }: { countryId: number }) => {
@@ -31,7 +31,7 @@ export default async ({ countryId }: { countryId: number }) => {
   }
 
   const match = result.data.results[0];
-  if (match.types.indexOf(PlaceType2.country) !== -1) {
+  if (match.types.indexOf(PlaceType2.country) === -1) {
     throw new Error(
       `Failed to geocode country (invalid match type): ${country.slug} - ${match.types.join(", ")}`,
     );
