@@ -13,6 +13,7 @@ export const CountrySerializer = serializer({
       name: item.name,
       slug: item.slug,
       location: item.location,
+      totalBottles: item.totalBottles,
     };
   },
 });

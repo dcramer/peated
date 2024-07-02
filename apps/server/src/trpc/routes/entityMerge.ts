@@ -12,7 +12,7 @@ import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { mergeBottlesInto } from "./bottleMerge";
@@ -108,20 +108,9 @@ async function mergeEntitiesInto(
       });
     }
 
-    // TODO: re-index searchVector
-    const [entity] = await tx
-      .update(entities)
-      .set({
-        totalBottles: sql`${entities.totalBottles} + ${totalBottles}`,
-        totalTastings: sql`${entities.totalTastings} + ${totalTastings}`,
-        updatedAt: sql`NOW()`,
-      })
-      .where(eq(entities.id, toEntity.id))
-      .returning();
-
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
 
-    return entity;
+    return toEntity;
   });
 
   try {

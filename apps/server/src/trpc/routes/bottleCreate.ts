@@ -5,10 +5,8 @@ import {
   bottles,
   bottlesToDistillers,
   changes,
-  entities,
 } from "@peated/server/db/schema";
 import { upsertEntity } from "@peated/server/lib/db";
-import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -20,7 +18,7 @@ import type {
 } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { isNull, sql } from "drizzle-orm";
+import { isNull } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
@@ -183,30 +181,6 @@ export async function bottleCreate({
         ...bottle,
         distillerIds,
       },
-    });
-
-    const allEntityIds = [
-      ...distillerIds,
-      bottle.brandId,
-      bottle.bottlerId,
-    ].filter(notEmpty);
-
-    // XXX: this could be more optimal, but accounting is a pita
-    await tx.update(entities).set({
-      totalBottles: sql<number>`(
-        SELECT COUNT(*)
-        FROM ${bottles}
-        WHERE (
-          ${bottles.brandId} = ${entities.id}
-          OR ${bottles.bottlerId} = ${entities.id}
-          OR EXISTS(
-            SELECT FROM ${bottlesToDistillers}
-            WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-            AND ${bottlesToDistillers.distillerId} = ${entities.id}
-          )
-        )
-        AND ${entities.id} IN ${allEntityIds}
-      )`,
     });
 
     return bottle;

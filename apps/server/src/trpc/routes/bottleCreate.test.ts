@@ -46,11 +46,6 @@ test("creates a new bottle with minimal params", async ({
     .from(bottlesToDistillers)
     .where(eq(bottlesToDistillers.bottleId, bottle.id));
   expect(distillers.length).toBe(0);
-  const [newBrand] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.id, brand.id));
-  expect(newBrand.totalBottles).toBe(1);
 });
 
 test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
@@ -84,16 +79,6 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
     .where(eq(bottlesToDistillers.bottleId, bottle.id));
   expect(distillers.length).toBe(1);
   expect(distillers[0].distillerId).toEqual(distiller.id);
-
-  const newDistiller = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, distiller.id),
-  });
-  expect(newDistiller?.totalBottles).toBe(1);
-
-  const newBrand = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, brand.id),
-  });
-  expect(newBrand?.totalBottles).toBe(1);
 
   const changeList = await db
     .select({ change: changes })
@@ -142,7 +127,6 @@ test("creates a new bottle with existing brand name", async ({
 
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toEqual(existingBrand.id);
-  expect(brand.totalBottles).toBe(1);
 
   // it should not create a change entry for the brand
   const changeList = await db
@@ -179,7 +163,6 @@ test("creates a new bottle with new brand name", async ({ defaults }) => {
   expect(bottle.brandId).toBeDefined();
   expect(brand.name).toBe("Hard Knox");
   expect(brand.createdById).toBe(defaults.user.id);
-  expect(brand.totalBottles).toBe(1);
 
   // it should create a change entry for the brand
   const changeList = await db
@@ -198,7 +181,6 @@ test("creates a new bottle with new brand name", async ({ defaults }) => {
     .select()
     .from(entities)
     .where(eq(entities.id, brand.id));
-  expect(newBrand.totalBottles).toEqual(1);
 });
 
 test("does not create a new bottle with invalid distillerId", async ({
@@ -257,7 +239,6 @@ test("creates a new bottle with existing distiller name", async ({
 
   expect(distillers.length).toEqual(1);
   expect(distillers[0].distiller.id).toEqual(existingDistiller.id);
-  expect(distillers[0].distiller.totalBottles).toBe(1);
 
   // it should not create a change entry for the brand
   const changeList = await db
@@ -313,13 +294,6 @@ test("creates a new bottle with new distiller name", async ({
   expect(distiller.id).toBeDefined();
   expect(distiller.name).toBe("Hard Knox");
   expect(distiller.createdById).toBe(defaults.user.id);
-  expect(distiller.totalBottles).toBe(1);
-
-  const [newBrand] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.id, brand.id));
-  expect(newBrand.totalBottles).toBe(1);
 
   // it should create a change entry for the distiller
   const changeList = await db
@@ -374,7 +348,6 @@ test("creates a new bottle with new distiller name and brand name", async ({
   expect(distiller.id).toBeDefined();
   expect(distiller.name).toBe("Hard Knox");
   expect(distiller.createdById).toBe(defaults.user.id);
-  expect(distiller.totalBottles).toBe(1);
 
   const [brand] = await db
     .select()
@@ -382,7 +355,6 @@ test("creates a new bottle with new distiller name and brand name", async ({
     .where(eq(entities.id, bottle.brandId));
   expect(brand.name).toBe("Rip Van");
   expect(brand.region).toBe("Kentucky");
-  expect(brand.totalBottles).toBe(1);
 
   // it should create a change entry for the brand and distiller
   const changeList = await db
@@ -437,7 +409,6 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
   expect(distiller.id).toEqual(bottle.brandId);
   expect(distiller.name).toBe("Hard Knox");
   expect(distiller.createdById).toBe(defaults.user.id);
-  expect(distiller.totalBottles).toBe(1);
   expect(distiller.id).toBe(bottle.brandId);
 
   // it should create a change entry for the brand and distiller

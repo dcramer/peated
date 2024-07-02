@@ -1,7 +1,7 @@
-import generateBottleDetails from "./generateBottleDetails";
-import indexBottleSearchVectors from "./indexBottleSearchVectors";
+import { runJob } from "./";
 
 export default async ({ bottleId }: { bottleId: number }) => {
-  generateBottleDetails({ bottleId });
-  indexBottleSearchVectors({ bottleId });
+  runJob("GenerateBottleDetails", { bottleId });
+  runJob("IndexBottleSearchVectors", { bottleId });
+  runJob("UpdateBottleStats", { bottleId });
 };

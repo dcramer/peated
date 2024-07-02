@@ -1,4 +1,5 @@
 import type { JobFunction } from "faktory-worker";
+import faktory from "faktory-worker";
 import createMissingBottles from "./createMissingBottles";
 import generateBottleDetails from "./generateBottleDetails";
 import generateEntityDetails from "./generateEntityDetails";
@@ -16,7 +17,11 @@ import scrapeSMWSA from "./scrapeSMWSA";
 import scrapeTotalWine from "./scrapeTotalWine";
 import scrapeWhiskeyAdvocate from "./scrapeWhiskyAdvocate";
 import scrapeWoodenCork from "./scrapeWoodenCork";
-import { registerJob, runJob } from "./utils";
+import { type JobName } from "./types";
+import updateBottleStats from "./updateBottleStats";
+import updateCountryStats from "./updateCountryStats";
+import updateEntityStats from "./updateEntityStats";
+import { registerJob } from "./utils";
 
 // faktory does not have correct types
 registerJob("GenerateBottleDetails", generateBottleDetails as JobFunction);
@@ -42,5 +47,14 @@ registerJob("ScrapeTotalWine", scrapeTotalWine);
 registerJob("ScrapeWoodenCork", scrapeWoodenCork);
 registerJob("ScrapeWhiskyAdvocate", scrapeWhiskeyAdvocate);
 registerJob("CreateMissingBottles", createMissingBottles);
+registerJob("UpdateBottleStats", updateBottleStats as JobFunction);
+registerJob("UpdateCountryStats", updateCountryStats as JobFunction);
+registerJob("UpdateEntityStats", updateEntityStats as JobFunction);
 
-export { registerJob, runJob };
+export async function runJob(jobName: JobName, args?: any) {
+  const jobFn = faktory.registry[jobName];
+  if (!jobFn) throw new Error(`Unknown job: ${jobName}`);
+  return await jobFn(args);
+}
+
+export { registerJob };

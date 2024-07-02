@@ -69,7 +69,7 @@ export const User = async (
       ...data,
     })
     .returning();
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create User fixture");
   return result;
 };
 
@@ -88,7 +88,7 @@ export const Follow = async (
       })
       .returning();
   });
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create Follow fixture");
   return result;
 };
 
@@ -97,7 +97,7 @@ export const Country = async (
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Country> => {
   if (!data.name) data.name = faker.location.country();
-  const [result] = await db.transaction(async (tx) => {
+  let [result] = await db.transaction(async (tx) => {
     return await tx
       .insert(countries)
       .values({
@@ -108,7 +108,13 @@ export const Country = async (
       .onConflictDoNothing()
       .returning();
   });
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) {
+    [result] = await db
+      .select()
+      .from(countries)
+      .where(eq(countries.name, data.name));
+  }
+  if (!result) throw new Error("Unable to create Country fixture");
   return result;
 };
 
@@ -139,7 +145,7 @@ export const Entity = async (
       .values({ ...entityData, searchVector })
       .returning();
 
-    if (!entity) throw new Error("Unable to create fixture");
+    if (!entity) throw new Error("Unable to create Entity fixture");
 
     await tx.insert(dbSchema.entityAliases).values({
       entityId: entity.id,
@@ -179,7 +185,7 @@ export const EntityAlias = async (
       })
       .returning();
   });
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create EntityAlias fixture");
   return result;
 };
 
@@ -254,7 +260,7 @@ export const Bottle = async (
       })
       .returning();
 
-    if (!bottle) throw new Error("Unable to create fixture");
+    if (!bottle) throw new Error("Unable to create Bottle fixture");
 
     if (!distillerIds.length) {
       for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
@@ -312,7 +318,7 @@ export const BottleAlias = async (
       })
       .returning();
   });
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create BottleAlias fixture");
   return result;
 };
 
@@ -337,7 +343,7 @@ export const Tasting = async (
       })
       .returning();
 
-    if (!result) throw new Error("Unable to create fixture");
+    if (!result) throw new Error("Unable to create Tasting fixture");
 
     for (const tag of result.tags) {
       await tx
@@ -373,7 +379,7 @@ export const Toast = async (
       })
       .returning();
   });
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create Toast fixture");
   return result;
 };
 
@@ -392,7 +398,7 @@ export const Comment = async (
       })
       .returning();
   });
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create Comment fixture");
   return result;
 };
 
@@ -420,7 +426,7 @@ export const Flight = async (
         ...data,
       })
       .returning();
-    if (!flight) throw new Error("Unable to create fixture");
+    if (!flight) throw new Error("Unable to create Flight fixture");
     if (bottles) {
       for (const bottleId of bottles) {
         await tx.insert(flightBottles).values({
@@ -448,7 +454,7 @@ export const Badge = async (
       ...data,
     })
     .returning();
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create Badge fixture");
   return result;
 };
 
@@ -471,7 +477,7 @@ export const ExternalSite = async (
       ...(data as Omit<dbSchema.NewExternalSite, "name">),
     })
     .returning();
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create ExternalSite fixture");
   return result;
 };
 
@@ -524,7 +530,7 @@ export const StorePrice = async (
       })
       .returning();
 
-    if (!price) throw new Error("Unable to create fixture");
+    if (!price) throw new Error("Unable to create StorePrice fixture");
 
     await tx
       .insert(storePriceHistories)
@@ -558,7 +564,7 @@ export const StorePriceHistory = async (
       })
       .returning();
   });
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create StorePriceHistory fixture");
   return result;
 };
 
@@ -591,7 +597,7 @@ export const Review = async (
       })
       .returning();
   });
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create Review fixture");
   return result;
 };
 
@@ -606,7 +612,7 @@ export const Collection = async (
       ...(data as Omit<dbSchema.NewCollection, "name">),
     })
     .returning();
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create Collection fixture");
   return result;
 };
 
@@ -634,7 +640,7 @@ export const Tag = async (
       >),
     })
     .returning();
-  if (!result) throw new Error("Unable to create fixture");
+  if (!result) throw new Error("Unable to create Tag fixture");
   return result;
 };
 

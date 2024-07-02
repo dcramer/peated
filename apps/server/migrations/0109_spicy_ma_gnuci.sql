@@ -1,0 +1,1 @@
+ALTER TABLE "country" ADD COLUMN "total_bottles" bigint DEFAULT 0 NOT NULL;
