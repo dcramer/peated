@@ -39,7 +39,7 @@ export function NewBottlesSkeleton() {
 
 export default function NewBottles() {
   const [newBottleList] = trpc.bottleList.useSuspenseQuery({
-    sort: "-date",
+    sort: "-created",
     limit: 10,
   });
 
