@@ -93,7 +93,7 @@ export default function CountryForm({
 
           <TextField
             {...register("slug")}
-            label="slug"
+            label="Slug"
             placeholder="e.g. united-states"
             readOnly={edit}
             error={errors.slug}
