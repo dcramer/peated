@@ -36,7 +36,7 @@ export default publicProcedure
       .object({
         query: z.string().default(""),
         name: z.string().nullish(),
-        country: z.string().nullish(),
+        country: z.union([z.number(), z.string()]).nullish(),
         region: z.string().nullish(),
         type: z.enum(ENTITY_TYPE_LIST).nullish(),
         bottler: z.number().nullish(),
@@ -83,7 +83,10 @@ export default publicProcedure
     if (input.type) {
       where.push(sql`${input.type} = ANY(${entities.type})`);
     }
-    if (input.country) {
+
+    if (typeof input.country === "number") {
+      where.push(eq(entities.countryId, input.country));
+    } else if (input.country) {
       const [result] = await db
         .select({ id: countries.id })
         .from(countries)
