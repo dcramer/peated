@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
-import { and, asc, desc, ilike, type SQL } from "drizzle-orm";
+import { and, asc, desc, ilike, ne, type SQL } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -18,6 +18,7 @@ export default publicProcedure
         cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(100),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
+        hasBottles: z.boolean().default(false),
       })
       .default({
         query: "",
@@ -34,6 +35,10 @@ export default publicProcedure
     const offset = (cursor - 1) * limit;
     if (query) {
       where.push(ilike(countries.name, `%${query}%`));
+    }
+
+    if (input.hasBottles) {
+      where.push(ne(countries.totalBottles, 0));
     }
 
     let orderBy: SQL<unknown>;

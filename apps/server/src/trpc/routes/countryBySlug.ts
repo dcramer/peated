@@ -1,10 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottles,
-  bottlesToDistillers,
-  countries,
-  entities,
-} from "@peated/server/db/schema";
+import { countries, entities } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
 import { TRPCError } from "@trpc/server";
@@ -35,16 +30,6 @@ export async function countryBySlug({
       ),
     );
 
-  const [{ totalBottles }] = await db
-    .select({ totalBottles: sql<number>`COUNT(*)` })
-    .from(bottles)
-    .innerJoin(
-      bottlesToDistillers,
-      eq(bottlesToDistillers.bottleId, bottles.id),
-    )
-    .innerJoin(entities, eq(bottlesToDistillers.distillerId, entities.id))
-    .where(and(eq(entities.countryId, country.id)));
-
   if (!country) {
     throw new TRPCError({
       code: "NOT_FOUND",
@@ -54,7 +39,6 @@ export async function countryBySlug({
   return {
     ...(await serialize(CountrySerializer, country, ctx.user)),
     totalDistilleries,
-    totalBottles,
   };
 }
 
