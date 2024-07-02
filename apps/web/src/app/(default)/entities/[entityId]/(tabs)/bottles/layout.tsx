@@ -13,7 +13,7 @@ export async function generateMetadata({
 
   return [
     {
-      title: `Whiskies by ${entity.name}`,
+      title: `Whiskies from ${entity.name}`,
     },
   ];
 }
