@@ -46,7 +46,7 @@ export async function getGeneratedCountryDetails(
         undefined,
         {
           country: {
-            id: country.id,
+            id: country.slug,
             name: country.name,
           },
         },
