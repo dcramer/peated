@@ -1,11 +1,11 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { bottles, reviews, tastings } from "@peated/server/db/schema";
+import { bottles, reviews } from "@peated/server/db/schema";
 import { findEntity } from "@peated/server/lib/bottleFinder";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { createCaller } from "@peated/server/trpc/router";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 
 const subcommand = program.command("bottles");
 
@@ -107,20 +107,30 @@ subcommand
     }
   });
 
-subcommand.command("fix-stats").action(async () => {
-  await db.update(bottles).set({
-    avgRating: sql<number>`(
-        SELECT AVG(rating)
-        FROM ${tastings}
-        WHERE ${tastings.bottleId} = ${bottles.id}
-      )`,
-    totalTastings: sql<number>`(
-        SELECT COUNT(*)
-        FROM ${tastings}
-        WHERE ${tastings.bottleId} = ${bottles.id}
-      )`,
+subcommand
+  .command("fix-stats")
+  .argument("[bottleIds...]")
+  .action(async (bottleIds) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({ id: bottles.id })
+      .from(bottles)
+      .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
+      .orderBy(asc(bottles.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id } of query) {
+        console.log(`Updating stats for Bottle ${id}.`);
+        await runJob("UpdateBottleStats", { bottleId: id });
+        hasResults = true;
+      }
+      offset += step;
+    }
   });
-});
 
 subcommand
   .command("index-search")

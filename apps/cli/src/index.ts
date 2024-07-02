@@ -2,6 +2,9 @@
 
 import "./sentry";
 
+// import jobs
+import "@peated/server/worker/jobs";
+
 import { logError } from "@peated/server/lib/log";
 import "./commands";
 import program from "./program";

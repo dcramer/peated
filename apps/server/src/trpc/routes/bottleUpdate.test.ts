@@ -315,15 +315,11 @@ test("changes bottler", async ({ fixtures }) => {
     bottler: bottlerB.id,
   });
 
-  const newBottlerA = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, bottlerA.id),
-  });
-  expect(newBottlerA?.totalBottles).toBe(0);
-
-  const newBottlerB = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, bottlerB.id),
-  });
-  expect(newBottlerB?.totalBottles).toBe(1);
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+  expect(newBottle.bottlerId).toEqual(bottlerB.id);
 });
 
 test("changes distiller with previous identical brand", async ({

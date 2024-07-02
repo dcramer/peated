@@ -1,11 +1,6 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import {
-  bottles,
-  bottlesToDistillers,
-  entities,
-  tastings,
-} from "@peated/server/db/schema";
+import { entities } from "@peated/server/db/schema";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 
@@ -84,40 +79,30 @@ subcommand
     }
   });
 
-subcommand.command("fix-stats").action(async () => {
-  await db.update(entities).set({
-    totalBottles: sql<number>`(
-      SELECT COUNT(*)
-      FROM ${bottles}
-      WHERE (
-        ${bottles.brandId} = ${entities.id}
-        OR ${bottles.bottlerId} = ${entities.id}
-        OR EXISTS(
-          SELECT FROM ${bottlesToDistillers}
-          WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-          AND ${bottlesToDistillers.distillerId} = ${entities.id}
-        )
-      )
-    )`,
-    totalTastings: sql<number>`(
-      SELECT COUNT(*)
-      FROM ${tastings}
-      WHERE ${tastings.bottleId} IN (
-        SELECT ${bottles.id}
-        FROM ${bottles}
-        WHERE (
-          ${bottles.brandId} = ${entities.id}
-          OR ${bottles.bottlerId} = ${entities.id}
-          OR EXISTS(
-            SELECT FROM ${bottlesToDistillers}
-            WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-            AND ${bottlesToDistillers.distillerId} = ${entities.id}
-          )
-        )
-        )
-    )`,
+subcommand
+  .command("fix-stats")
+  .argument("[entityIds...]")
+  .action(async (entityIds) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({ id: entities.id })
+      .from(entities)
+      .where(entityIds.length ? inArray(entities.id, entityIds) : undefined)
+      .orderBy(asc(entities.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id } of query) {
+        console.log(`Updating stats for Entity ${id}.`);
+        await runJob("UpdateEntityStats", { entityId: id });
+        hasResults = true;
+      }
+      offset += step;
+    }
   });
-});
 
 subcommand
   .command("index-search")

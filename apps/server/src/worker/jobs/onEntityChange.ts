@@ -1,9 +1,8 @@
-import generateEntityDetails from "./generateEntityDetails";
-import geocodeEntityLocation from "./geocodeEntityLocation";
-import indexEntitySearchVectors from "./indexEntitySearchVectors";
+import { runJob } from "./";
 
 export default async ({ entityId }: { entityId: number }) => {
-  generateEntityDetails({ entityId });
-  indexEntitySearchVectors({ entityId });
-  geocodeEntityLocation({ entityId });
+  runJob("GenerateEntityDetails", { entityId });
+  runJob("IndexEntitySearchVectors", { entityId });
+  runJob("GeocodeEntityLocation", { entityId });
+  runJob("UpdateEntityStats", { entityId });
 };

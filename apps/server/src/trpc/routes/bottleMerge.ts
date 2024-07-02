@@ -102,17 +102,6 @@ export async function mergeBottlesInto(
         });
     }
 
-    // update materialized stats
-    const [bottle] = await tx
-      .update(bottles)
-      .set({
-        totalTastings: sql`(SELECT COUNT(*) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
-        avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
-        updatedAt: sql`NOW()`,
-      })
-      .where(eq(bottles.id, toBottle.id))
-      .returning();
-
     // wipe old bottles
     await tx
       .delete(bottleTags)
@@ -122,7 +111,7 @@ export async function mergeBottlesInto(
       .where(inArray(bottlesToDistillers.bottleId, fromBottleIds));
     await tx.delete(bottles).where(inArray(bottles.id, fromBottleIds));
 
-    return bottle;
+    return toBottle;
   });
 
   try {

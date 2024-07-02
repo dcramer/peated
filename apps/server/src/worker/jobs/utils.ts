@@ -7,7 +7,9 @@ import faktory from "faktory-worker";
 import { type JobName } from "./types";
 
 export async function runJob(jobName: JobName, args?: any) {
-  return await faktory.registry[jobName](args);
+  const jobFn = faktory.registry[jobName];
+  if (!jobFn) throw new Error(`Unknown job: ${jobName}`);
+  return await jobFn(args);
 }
 
 type TraceContext = {

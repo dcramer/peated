@@ -1,16 +1,23 @@
 import { sql } from "drizzle-orm";
-import { bigserial, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  bigserial,
+  pgTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { geometry_point } from "../columns/geoemetry";
 
 export const countries = pgTable(
   "country",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-
     name: text("name").notNull(),
     slug: text("slug").notNull(),
-
     location: geometry_point("location"),
+    totalBottles: bigint("total_bottles", { mode: "number" })
+      .default(0)
+      .notNull(),
   },
   (countries) => {
     return {

@@ -52,8 +52,6 @@ test("merge A into B", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, entityB.id));
   expect(newEntityB).toBeDefined();
-  expect(newEntityB.totalTastings).toEqual(4);
-  expect(newEntityB.totalBottles).toEqual(3);
 
   const [tombstone] = await db
     .select()
@@ -82,8 +80,6 @@ test("merge A from B", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, entityA.id));
   expect(newEntityA).toBeDefined();
-  expect(newEntityA.totalTastings).toEqual(4);
-  expect(newEntityA.totalBottles).toEqual(3);
 
   const [newEntityB] = await db
     .select()
