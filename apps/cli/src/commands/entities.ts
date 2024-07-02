@@ -7,7 +7,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, asc, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 
 const subcommand = program.command("entities");
 
@@ -56,7 +56,10 @@ subcommand
       .from(entities)
       .where(
         and(
-          sql`${"distiller"} = ANY(${entities.type})`,
+          or(
+            sql`${"distiller"} = ANY(${entities.type})`,
+            sql`${"bottler"} = ANY(${entities.type})`,
+          ),
           isNotNull(entities.countryId),
           entityIds.length
             ? inArray(entities.id, entityIds)
