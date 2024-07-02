@@ -249,6 +249,18 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   GN6: "Holyrood Distillery",
 };
 
+export const SMWS_CATEGORY_LIST = [
+  ["", "Single Malt Whisky"],
+  ["G", "Single Grain Whisky"],
+  ["B", "Bourbon"],
+  ["RW", "Rye"],
+  ["CW1", "Corn Whisky"],
+  ["R", "Rum"],
+  ["GN", "Gin"],
+  ["C", "Cognac"],
+  ["A", "Armagnac"],
+];
+
 export function getCategoryFromCask(caskNumber: string) {
   if (caskNumber.startsWith("GN")) {
     return "gin";

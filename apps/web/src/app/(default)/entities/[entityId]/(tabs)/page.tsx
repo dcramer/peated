@@ -64,9 +64,14 @@ export default async function EntityDetails({
               <Markdown content={entity.description} />
             </div>
 
-            <img src={RobotImage.src} className="hidden h-40 w-40 sm:block" />
+            <img
+              src={RobotImage.src}
+              className="hidden h-40 w-40 sm:block"
+              alt="robot image"
+            />
           </div>
         )}
+
         <div className="prose prose-invert max-w-none flex-auto">
           <dl>
             <dt>Website</dt>

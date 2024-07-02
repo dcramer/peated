@@ -1,6 +1,11 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import type { Bottle, Entity, ExternalSite } from "@peated/server/db/schema";
+import type {
+  Bottle,
+  Entity,
+  EntityType,
+  ExternalSite,
+} from "@peated/server/db/schema";
 import {
   bottles,
   externalSites,
@@ -8,9 +13,10 @@ import {
   users,
 } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
-import { random } from "@peated/server/lib/rand";
+import { random, sample } from "@peated/server/lib/rand";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { and, eq, ne, sql } from "drizzle-orm";
+import { SMWS_DISTILLERY_CODES } from "../../../server/src/lib/smws";
 
 const loadDefaultSites = async () => {
   const store1 =
@@ -34,38 +40,19 @@ const loadDefaultSites = async () => {
 };
 
 const loadDefaultEntities = async () => {
+  const distilleryList = [];
+  for (
+    let i = 1, distilleryName;
+    (distilleryName = SMWS_DISTILLERY_CODES[i]);
+    i++
+  ) {
+    distilleryList.push(distilleryName);
+  }
+
   const mocks: Pick<
     Entity,
     "name" | "country" | "region" | "type" | "shortName"
   >[] = [
-    {
-      name: "The Macallan",
-      country: "Scotland",
-      region: "Speyside",
-      type: ["brand", "distiller", "bottler"],
-      shortName: null,
-    },
-    {
-      name: "The Balvenie",
-      country: "Scotland",
-      region: "Speyside",
-      type: ["brand", "distiller", "bottler"],
-      shortName: null,
-    },
-    {
-      name: "Jack Daniel's",
-      country: "United States of America",
-      region: "Tennessee",
-      type: ["brand", "distiller", "bottler"],
-      shortName: null,
-    },
-    {
-      name: "Maker's Mark",
-      country: "United States of America",
-      region: "Kentucky",
-      type: ["brand"],
-      shortName: null,
-    },
     {
       name: "The Scotch Malt Whisky Society",
       country: "United Kingdom",
@@ -73,6 +60,13 @@ const loadDefaultEntities = async () => {
       type: ["brand", "bottler"],
       shortName: "SMWS",
     },
+    ...distilleryList.map((name) => ({
+      name,
+      type: ["brand", "distiller"] as EntityType[],
+      country: null,
+      region: null,
+      shortName: null,
+    })),
   ];
 
   const results: Entity[] = [];
@@ -94,7 +88,7 @@ const loadDefaultBottles = async (
 ) => {
   const mocks: Pick<Bottle, "name" | "statedAge" | "brandId">[] = [];
 
-  brandList.forEach((brand) => {
+  sample(brandList, 5).forEach((brand) => {
     mocks.push(
       {
         name: "12-year-old",
