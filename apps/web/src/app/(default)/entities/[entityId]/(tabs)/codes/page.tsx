@@ -72,7 +72,7 @@ export default async function Page({
           .
         </p>
         <p>
-          If you find something incorrect orr missing, please{" "}
+          If you find something incorrect or missing, please{" "}
           <a href="https://github.com/dcramer/peated/issues">report an issue</a>
           .
         </p>
@@ -128,7 +128,7 @@ export default async function Page({
                             distillerName
                           )}
                         </td>
-                        <td className="text-light border-b border-slate-800 p-3 text-sm">
+                        <td className="text-light border-b border-slate-800 p-3 text-center text-sm">
                           {distiller && distiller.country ? (
                             <Link
                               href={`/countries/${distiller.country.slug}`}
