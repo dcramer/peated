@@ -106,7 +106,7 @@ export default async function Page({
               <colgroup>
                 <col className="w-12" />
                 <col />
-                <col className="hidden w-32 sm:table-column" />
+                <col className="hidden w-48 sm:table-column" />
               </colgroup>
               <tbody>
                 {categoryDistillerList.map(
