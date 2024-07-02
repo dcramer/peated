@@ -63,6 +63,7 @@ import priceCreateBatch from "./routes/priceCreateBatch";
 import priceList from "./routes/priceList";
 import reviewCreate from "./routes/reviewCreate";
 import reviewList from "./routes/reviewList";
+import smwsDistillerList from "./routes/smwsDistillerList";
 import stats from "./routes/stats";
 import tagByName from "./routes/tagByName";
 import tagCreate from "./routes/tagCreate";
@@ -146,6 +147,7 @@ export const appRouter = router({
   stats,
   priceList,
   priceCreateBatch,
+  smwsDistillerList,
   tagByName,
   tagCreate,
   tagList,

@@ -36,11 +36,19 @@ export default async function Page({
     return notFound();
   }
 
-  const {
-    results: [distillery],
-  } = await trpcClient.entityList.fetch({
-    name: SMWS_DISTILLERY_CODES[4],
-  });
+  const { results: distillerList } = await trpcClient.smwsDistillerList.fetch();
+
+  const exampleDistiller = distillerList.find(
+    (d) => d.name.toLowerCase() === SMWS_DISTILLERY_CODES[4].toLowerCase(),
+  );
+
+  if (!exampleDistiller) {
+    throw new Error("Unable to find example distiller for SMWS codes.");
+  }
+
+  const distillersByName = Object.fromEntries(
+    distillerList.map((d) => [d.name, d]),
+  );
 
   return (
     <>
@@ -50,7 +58,10 @@ export default async function Page({
           system. For example, <strong>Cask No. 4.360 Jangling dram</strong>{" "}
           means it is the <strong>360th cask</strong> from{" "}
           <strong>distillery number 4</strong>. In this case, distillery maps to{" "}
-          <Link href={`/entities/${distillery.id}`}>{distillery.name}</Link>.
+          <Link href={`/entities/${exampleDistiller.id}`}>
+            {exampleDistiller.name}
+          </Link>
+          .
         </p>
         <p>
           If you find something incorrect orr missing, please{" "}
@@ -59,16 +70,24 @@ export default async function Page({
         </p>
       </div>
       {SMWS_CATEGORY_LIST.map(([catCode, catTitle]) => {
-        const distilleryList = [];
+        const categoryDistillerList: [
+          string,
+          string,
+          (typeof distillerList)[number],
+        ][] = [];
         for (
-          let i = 1, distilleryName;
-          (distilleryName = SMWS_DISTILLERY_CODES[`${catCode}${i}`]);
+          let i = 1, distillerName;
+          (distillerName = SMWS_DISTILLERY_CODES[`${catCode}${i}`]);
           i++
         ) {
-          distilleryList.push([`${catCode}${i}`, distilleryName]);
+          categoryDistillerList.push([
+            `${catCode}${i}`,
+            distillerName,
+            distillersByName[distillerName],
+          ]);
         }
 
-        if (!distilleryList.length) return null;
+        if (!categoryDistillerList.length) return null;
 
         return (
           <div className="mb-8 mt-4" key={catCode}>
@@ -78,20 +97,45 @@ export default async function Page({
             <table className="min-w-full table-auto">
               <colgroup>
                 <col className="w-4" />
+                <col />
+                <col className="hidden w-32 sm:table-cell" />
               </colgroup>
               <tbody>
-                {distilleryList.map(([code, name]) => {
-                  return (
-                    <tr key={code}>
-                      <td className="border-b border-slate-800 p-3 text-sm">
-                        {code}
-                      </td>
-                      <td className="border-b border-slate-800 p-3 text-sm">
-                        {name}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {categoryDistillerList.map(
+                  ([code, distillerName, distiller]) => {
+                    return (
+                      <tr key={code}>
+                        <td className="border-b border-slate-800 p-3 text-sm">
+                          {code}
+                        </td>
+                        <td className="border-b border-slate-800 p-3 text-sm">
+                          {distiller ? (
+                            <Link
+                              href={`/entities/${distiller.id}`}
+                              className="hover:underline"
+                            >
+                              {distiller.name}
+                            </Link>
+                          ) : (
+                            distillerName
+                          )}
+                        </td>
+                        <td className="text-light border-b border-slate-800 p-3 text-sm">
+                          {distiller && distiller.country ? (
+                            <Link
+                              href={`/countries/${distiller.country.slug}`}
+                              className="hover:underline"
+                            >
+                              {distiller.country.name}
+                            </Link>
+                          ) : (
+                            <em>n/a</em>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  },
+                )}
               </tbody>
             </table>
           </div>

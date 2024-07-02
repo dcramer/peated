@@ -39,6 +39,7 @@ export default publicProcedure
         country: z.string().nullish(),
         region: z.string().nullish(),
         type: z.enum(ENTITY_TYPE_LIST).nullish(),
+        bottler: z.number().nullish(),
         searchContext: z
           .object({
             type: z.enum(ENTITY_TYPE_LIST).nullish(),
@@ -48,7 +49,7 @@ export default publicProcedure
           .nullish(),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
         cursor: z.number().gte(1).default(1),
-        limit: z.number().lte(100).default(100),
+        limit: z.number().lte(500).default(100),
       })
       .default({
         query: "",
@@ -98,6 +99,15 @@ export default publicProcedure
     }
     if (input.region) {
       where.push(ilike(entities.region, input.region));
+    }
+    if (input.bottler) {
+      where.push(sql`${entities.id} IN (
+        SELECT DISTINCT ${bottlesToDistillers.distillerId}
+          FROM ${bottles}
+          JOIN ${bottlesToDistillers}
+            ON ${bottlesToDistillers.bottleId} = ${bottles.id}
+         WHERE ${bottles.bottlerId} = ${input.bottler}
+      )`);
     }
 
     let orderBy: SQL<unknown>;
