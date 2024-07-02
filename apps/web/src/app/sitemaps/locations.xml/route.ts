@@ -7,7 +7,7 @@ export async function GET() {
   const trpcClient = await getTrpcClient();
 
   let cursor: number | null = 1;
-  const pages: Sitemap = [];
+  const pages: Sitemap = [{ url: "/locations" }];
   while (cursor) {
     const { results, rel } = await trpcClient.countryList.fetch(
       {
