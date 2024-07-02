@@ -15,12 +15,14 @@ if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-function generatePrompt(entity: Partial<Entity>) {
+type InputEntity = Partial<Entity> & { country: { name: string } | null };
+
+function generatePrompt(entity: InputEntity) {
   const infoLines = [];
   if (entity.country && entity.region) {
-    infoLines.push(`Location: ${entity.region}, ${entity.country}`);
+    infoLines.push(`Location: ${entity.region}, ${entity.country.name}`);
   } else if (entity.country) {
-    infoLines.push(`Location: ${entity.country}`);
+    infoLines.push(`Location: ${entity.country.name}`);
   }
   if (entity.yearEstablished) {
     infoLines.push(`Year Established: ${entity.yearEstablished}`);
@@ -59,8 +61,6 @@ Describe the entity as a distiller, bottler, or brand, whichever one it primaril
 
 'region' should be the region of the country where the entity is located, if known. Examples of regions might be "Speyside" or "Islay".
 
-'address' should only be filled in if its a distillery, and should be the street address of the where the distillery is located.
-
 The 'type' field must contain every value which is accurate for this entity, describing if the entity operates as brand, a distiller, and/or a bottler.
 If the entity is a distiller, include 'distiller' in the 'type' field.
 If the entity is a brand, include 'brand' in the 'type' field.
@@ -75,7 +75,6 @@ export const OpenAIEntityDetailsSchema = z.object({
   website: z.string().url().nullable().optional(),
   country: z.string().nullable().optional(),
   region: z.string().nullable().optional(),
-  address: z.string().nullable().optional(),
   type: z.array(z.string()).optional(),
 });
 
@@ -87,7 +86,7 @@ const OpenAIEntityDetailsValidationSchema = OpenAIEntityDetailsSchema.extend({
 export type GeneratedEntityDetails = z.infer<typeof OpenAIEntityDetailsSchema>;
 
 export async function getGeneratedEntityDetails(
-  entity: Partial<Entity>,
+  entity: InputEntity,
 ): Promise<GeneratedEntityDetails | null> {
   return await startSpan(
     {
@@ -119,6 +118,9 @@ export default async ({ entityId }: { entityId: number }) => {
 
   const entity = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.id, entityId),
+    with: {
+      country: true,
+    },
   });
   if (!entity) {
     throw new Error(`Unknown entity: ${entityId}`);
@@ -131,7 +133,6 @@ export default async ({ entityId }: { entityId: number }) => {
   if (
     !generateDesc &&
     entity.yearEstablished &&
-    entity.address &&
     entity.website &&
     entity.country &&
     entity.region
@@ -158,8 +159,6 @@ export default async ({ entityId }: { entityId: number }) => {
     data.yearEstablished = result.yearEstablished;
 
   if (!entity.website && result.website) data.website = result.website;
-
-  if (!entity.address && result.address) data.address = result.address;
 
   if (
     result.type?.length &&

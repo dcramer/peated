@@ -2,7 +2,21 @@
 
 import BottleTable from "@peated/web/components/bottleTable";
 import { trpc } from "@peated/web/lib/trpc";
+import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { useSearchParams } from "next/navigation";
+
+export async function generateMetadata({
+  params: { entityId },
+}: {
+  params: { entityId: string };
+}) {
+  const trpcClient = await getTrpcClient();
+  const entity = await trpcClient.entityById.fetch(Number(entityId));
+
+  return {
+    title: `Whiskies from ${entity.name}`,
+  };
+}
 
 export default function EntityTastings({
   params: { entityId },

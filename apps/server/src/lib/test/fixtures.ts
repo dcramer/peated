@@ -105,6 +105,7 @@ export const Country = async (
         slug: faker.helpers.slugify(data.name as string),
         ...data,
       })
+      .onConflictDoNothing()
       .returning();
   });
   if (!result) throw new Error("Unable to create fixture");
@@ -125,7 +126,7 @@ export const Entity = async (
   return await db.transaction(async (tx) => {
     const entityData: dbSchema.NewEntity = {
       name,
-      country: faker.location.country(),
+      countryId: data.countryId ?? (await Country({}, tx)).id,
       type: ["brand", "distiller"],
       ...data,
       createdById: data.createdById || (await User({}, tx)).id,

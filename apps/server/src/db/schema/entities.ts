@@ -36,7 +36,7 @@ export const entities = pgTable(
 
     searchVector: tsvector("search_vector"),
 
-    country: text("country"),
+    _country: text("country"),
     countryId: bigint("country_id", { mode: "number" }).references(
       () => countries.id,
     ),
@@ -79,6 +79,10 @@ export const entities = pgTable(
 export const entitiesRelations = relations(entities, ({ one, many }) => ({
   distillersToBottles: many(bottlesToDistillers),
   brandsToBottles: many(bottles),
+  country: one(countries, {
+    fields: [entities.countryId],
+    references: [countries.id],
+  }),
   createdBy: one(users, {
     fields: [entities.createdById],
     references: [users.id],

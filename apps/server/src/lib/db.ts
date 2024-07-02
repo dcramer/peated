@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { DatabaseType, TransactionType } from "../db";
 import type { Entity, EntityType } from "../db/schema";
-import { changes, collections, entities } from "../db/schema";
+import { changes, collections, countries, entities } from "../db/schema";
 import { type EntityInput } from "../types";
 
 export type UpsertOutcome<T> =
@@ -40,11 +40,19 @@ export const upsertEntity = async ({
     return result ? { id: result.id, result, created: false } : undefined;
   }
 
+  const [country] = data.country
+    ? await db
+        .select({ id: countries.id })
+        .from(countries)
+        .where(eq(countries.name, data.country))
+        .limit(1)
+    : [];
+
   const [result] = await db
     .insert(entities)
     .values({
       name: data.name,
-      country: data.country || null,
+      countryId: country ? country.id : null,
       region: data.region || null,
       type: Array.from(
         new Set([...(type ? [type] : []), ...(data.type || [])]),

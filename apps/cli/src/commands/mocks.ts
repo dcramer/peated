@@ -49,13 +49,10 @@ const loadDefaultEntities = async () => {
     distilleryList.push(distilleryName);
   }
 
-  const mocks: Pick<
-    Entity,
-    "name" | "country" | "region" | "type" | "shortName"
-  >[] = [
+  // TODO: add countries
+  const mocks: Pick<Entity, "name" | "region" | "type" | "shortName">[] = [
     {
       name: "The Scotch Malt Whisky Society",
-      country: "United Kingdom",
       region: null,
       type: ["brand", "bottler"],
       shortName: "SMWS",
@@ -63,7 +60,6 @@ const loadDefaultEntities = async () => {
     ...distilleryList.map((name) => ({
       name,
       type: ["brand", "distiller"] as EntityType[],
-      country: null,
       region: null,
       shortName: null,
     })),

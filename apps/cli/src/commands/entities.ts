@@ -57,8 +57,7 @@ subcommand
       .where(
         and(
           sql`${"distiller"} = ANY(${entities.type})`,
-          isNotNull(entities.address),
-          isNotNull(entities.country),
+          isNotNull(entities.countryId),
           entityIds.length
             ? inArray(entities.id, entityIds)
             : options.onlyMissing

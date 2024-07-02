@@ -4,7 +4,7 @@ import type { IBadge, TastingWithRelations } from "./base";
 export const RegionConfig = z.object({
   regions: z.array(
     z.object({
-      country: z.string(),
+      countryId: z.number(),
       region: z.string(),
     }),
   ),
@@ -16,11 +16,12 @@ export const RegionBadge: IBadge<RegionConfigType> = {
   test: (config: RegionConfigType, tasting: TastingWithRelations) => {
     const { brand, bottlesToDistillers } = tasting.bottle;
 
-    for (const { region, country } of config.regions) {
-      if (country === brand.country && region === brand.region) return true;
+    for (const { region, countryId } of config.regions) {
+      if (countryId === brand.countryId && region === brand.region) return true;
       if (
         bottlesToDistillers.find(
-          ({ distiller: d }) => country === d.country && region === d.region,
+          ({ distiller: d }) =>
+            countryId === d.countryId && region === d.region,
         )
       )
         return true;

@@ -129,7 +129,6 @@ test("creates a new bottle with existing brand name", async ({
     name: "Delicious Wood",
     brand: {
       name: existingBrand.name,
-      country: existingBrand.country,
     },
   });
 
@@ -165,7 +164,6 @@ test("creates a new bottle with new brand name", async ({ defaults }) => {
     name: "Delicious Wood",
     brand: {
       name: "Hard Knox",
-      country: "Scotland",
     },
   });
 
@@ -180,7 +178,6 @@ test("creates a new bottle with new brand name", async ({ defaults }) => {
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toBeDefined();
   expect(brand.name).toBe("Hard Knox");
-  expect(brand.country).toBe("Scotland");
   expect(brand.createdById).toBe(defaults.user.id);
   expect(brand.totalBottles).toBe(1);
 
@@ -213,7 +210,6 @@ test("does not create a new bottle with invalid distillerId", async ({
       name: "Delicious Wood",
       brand: {
         name: "Hard Knox",
-        country: "Scotland",
       },
       distillers: [500000],
     }),
@@ -234,12 +230,10 @@ test("creates a new bottle with existing distiller name", async ({
     name: "Delicious Wood",
     brand: {
       name: existingBrand.name,
-      country: existingBrand.country,
     },
     distillers: [
       {
         name: existingDistiller.name,
-        country: existingDistiller.country,
       },
     ],
   });
@@ -318,7 +312,6 @@ test("creates a new bottle with new distiller name", async ({
   const { distiller } = distillers[0];
   expect(distiller.id).toBeDefined();
   expect(distiller.name).toBe("Hard Knox");
-  expect(distiller.country).toBe("Scotland");
   expect(distiller.createdById).toBe(defaults.user.id);
   expect(distiller.totalBottles).toBe(1);
 
@@ -380,7 +373,6 @@ test("creates a new bottle with new distiller name and brand name", async ({
   const { distiller } = distillers[0];
   expect(distiller.id).toBeDefined();
   expect(distiller.name).toBe("Hard Knox");
-  expect(distiller.country).toBe("Scotland");
   expect(distiller.createdById).toBe(defaults.user.id);
   expect(distiller.totalBottles).toBe(1);
 
@@ -444,7 +436,6 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
   const { distiller } = distillers[0];
   expect(distiller.id).toEqual(bottle.brandId);
   expect(distiller.name).toBe("Hard Knox");
-  expect(distiller.country).toBe("Scotland");
   expect(distiller.createdById).toBe(defaults.user.id);
   expect(distiller.totalBottles).toBe(1);
   expect(distiller.id).toBe(bottle.brandId);

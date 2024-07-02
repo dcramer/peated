@@ -13,7 +13,14 @@ export async function entityGenerateDetails({
   input: z.infer<typeof InputSchema>;
   ctx: Context;
 }) {
-  const result = await getGeneratedEntityDetails(input);
+  const result = await getGeneratedEntityDetails({
+    ...input,
+    country: input.country
+      ? {
+          name: input.country,
+        }
+      : null,
+  });
   return result;
 }
 
