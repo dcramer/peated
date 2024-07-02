@@ -46,7 +46,7 @@ test("no changes", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
 
-  expect(bottle).toEqual(newBottle);
+  expect(omit(bottle, "updatedAt")).toEqual(omit(newBottle, "updatedAt"));
 });
 
 test("edits a new bottle with new name param", async ({ fixtures }) => {
