@@ -108,6 +108,7 @@ export async function mergeBottlesInto(
       .set({
         totalTastings: sql`(SELECT COUNT(*) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
         avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
+        updatedAt: sql`NOW()`,
       })
       .where(eq(bottles.id, toBottle.id))
       .returning();

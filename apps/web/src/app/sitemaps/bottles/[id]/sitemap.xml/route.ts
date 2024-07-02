@@ -28,7 +28,7 @@ export async function GET(
     pages.push(
       ...results.map((bottle) => ({
         url: `/bottles/${bottle.id}`,
-        lastModified: bottle.createdAt, // not correct
+        lastModified: bottle.updatedAt, // not correct
       })),
     );
 

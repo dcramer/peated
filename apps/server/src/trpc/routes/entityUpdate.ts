@@ -111,7 +111,10 @@ export default modProcedure
       try {
         [newEntity] = await tx
           .update(entities)
-          .set(data)
+          .set({
+            ...data,
+            updatedAt: sql`NOW()`,
+          })
           .where(eq(entities.id, entity.id))
           .returning();
       } catch (err: any) {

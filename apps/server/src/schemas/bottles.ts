@@ -31,6 +31,7 @@ export const BottleSchema = z.object({
   totalTastings: z.number().gte(0),
 
   createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
   createdBy: UserSchema.optional(),
 
   isFavorite: z.boolean().optional(),

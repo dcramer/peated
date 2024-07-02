@@ -114,6 +114,7 @@ async function mergeEntitiesInto(
       .set({
         totalBottles: sql`${entities.totalBottles} + ${totalBottles}`,
         totalTastings: sql`${entities.totalTastings} + ${totalTastings}`,
+        updatedAt: sql`NOW()`,
       })
       .where(eq(entities.id, toEntity.id))
       .returning();

@@ -59,6 +59,7 @@ export const entities = pgTable(
       .notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),

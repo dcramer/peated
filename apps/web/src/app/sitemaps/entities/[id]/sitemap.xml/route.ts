@@ -28,7 +28,7 @@ export async function GET(
     pages.push(
       ...results.map((entity) => ({
         url: `/entities/${entity.id}`,
-        lastModified: entity.createdAt, // not correct
+        lastModified: entity.updatedAt, // not correct
       })),
     );
 

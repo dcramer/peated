@@ -214,7 +214,10 @@ export default modProcedure
           ? (
               await tx
                 .update(bottles)
-                .set(bottleData)
+                .set({
+                  ...bottleData,
+                  updatedAt: sql`NOW()`,
+                })
                 .where(eq(bottles.id, bottle.id))
                 .returning()
             )[0]

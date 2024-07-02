@@ -43,6 +43,7 @@ export const EntitySchema = z.object({
   totalBottles: z.number(),
 
   createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
   createdBy: UserSchema.optional(),
 });
 

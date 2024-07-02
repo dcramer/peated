@@ -52,6 +52,7 @@ export const EntitySerializer = serializer({
       address: item.address,
       location: item.location,
       createdAt: item.createdAt.toISOString(),
+      updatedAt: item.createdAt.toISOString(),
 
       totalTastings: item.totalTastings,
       totalBottles: item.totalBottles,

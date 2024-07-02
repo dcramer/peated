@@ -162,6 +162,9 @@ export const BottleSerializer = serializer({
       suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,
       hasTasted: attrs.hasTasted,
+
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.createdAt.toISOString(),
     };
   },
 });

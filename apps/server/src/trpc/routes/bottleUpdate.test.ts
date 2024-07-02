@@ -68,8 +68,8 @@ test("edits a new bottle with new name param", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
 
-  expect(omit(bottle, "name", "fullName", "searchVector")).toEqual(
-    omit(bottle2, "name", "fullName", "searchVector"),
+  expect(omit(bottle, "name", "fullName", "searchVector", "updatedAt")).toEqual(
+    omit(bottle2, "name", "fullName", "searchVector", "updatedAt"),
   );
   expect(bottle2.name).toBe("Delicious Wood");
   expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
@@ -93,7 +93,9 @@ test("clears category", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
 
-  expect(omit(bottle, "category")).toEqual(omit(bottle2, "category"));
+  expect(omit(bottle, "category", "updatedAt")).toEqual(
+    omit(bottle2, "category", "updatedAt"),
+  );
   expect(bottle2.category).toBe(null);
 });
 
@@ -115,8 +117,10 @@ test("manipulates name to conform with age", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(omit(bottle, "name", "fullName", "statedAge", "searchVector")).toEqual(
-    omit(bottle2, "name", "fullName", "statedAge", "searchVector"),
+  expect(
+    omit(bottle, "name", "fullName", "statedAge", "searchVector", "updatedAt"),
+  ).toEqual(
+    omit(bottle2, "name", "fullName", "statedAge", "searchVector", "updatedAt"),
   );
   expect(bottle2.statedAge).toBe(10);
   expect(bottle2.name).toBe("Delicious 10-year-old");
@@ -140,8 +144,10 @@ test("fills in statedAge", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(omit(bottle, "name", "fullName", "statedAge", "searchVector")).toEqual(
-    omit(bottle2, "name", "fullName", "statedAge", "searchVector"),
+  expect(
+    omit(bottle, "name", "fullName", "statedAge", "searchVector", "updatedAt"),
+  ).toEqual(
+    omit(bottle2, "name", "fullName", "statedAge", "searchVector", "updatedAt"),
   );
   expect(bottle2.statedAge).toBe(10);
 });
@@ -162,7 +168,9 @@ test("removes statedAge", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(omit(bottle, "statedAge")).toEqual(omit(bottle2, "statedAge"));
+  expect(omit(bottle, "statedAge", "updatedAt")).toEqual(
+    omit(bottle2, "statedAge", "updatedAt"),
+  );
   expect(bottle2.statedAge).toBeNull();
 });
 
@@ -183,9 +191,9 @@ test("changes brand", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(omit(bottle, "brandId", "fullName", "searchVector")).toEqual(
-    omit(bottle2, "brandId", "fullName", "searchVector"),
-  );
+  expect(
+    omit(bottle, "brandId", "fullName", "searchVector", "updatedAt"),
+  ).toEqual(omit(bottle2, "brandId", "fullName", "searchVector", "updatedAt"));
   expect(bottle2.brandId).toBe(newBrand.id);
   expect(bottle2.fullName).toBe(`${newBrand.name} ${bottle.name}`);
 
