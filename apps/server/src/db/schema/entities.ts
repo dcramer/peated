@@ -72,6 +72,7 @@ export const entities = pgTable(
       searchVectorIndex: index("entity_search_idx")
         .on(table.searchVector)
         .using(sql`gin(${table.searchVector})`),
+      countryId: index("entity_country_by_idx").on(table.countryId),
       createdById: index("entity_created_by_idx").on(table.createdById),
     };
   },

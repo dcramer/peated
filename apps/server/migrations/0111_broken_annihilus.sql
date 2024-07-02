@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "entity_country_by_idx" ON "entity" ("country_id");
