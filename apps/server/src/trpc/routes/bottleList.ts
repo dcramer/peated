@@ -22,12 +22,12 @@ const DEFAULT_SORT = "-tastings";
 const SORT_OPTIONS = [
   "rank",
   "brand",
-  "date",
+  "created",
   "name",
   "age",
   "rating",
   "tastings",
-  "-date",
+  "-created",
   "-name",
   "-age",
   "-rating",
@@ -142,10 +142,10 @@ export default publicProcedure
         }
         orderBy = asc(entities.name);
         break;
-      case "date":
+      case "created":
         orderBy = asc(bottles.createdAt);
         break;
-      case "-date":
+      case "-created":
         orderBy = desc(bottles.createdAt);
         break;
       case "name":

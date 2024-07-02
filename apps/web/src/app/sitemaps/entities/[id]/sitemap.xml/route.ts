@@ -19,6 +19,7 @@ export async function GET(
       {
         cursor,
         limit: 100,
+        sort: "created",
       },
       {
         gcTime: 0,
