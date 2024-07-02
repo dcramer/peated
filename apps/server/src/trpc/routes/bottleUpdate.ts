@@ -208,10 +208,6 @@ export default modProcedure
         }`;
       }
 
-      const aliasList = await db.query.bottleAliases.findMany({
-        where: eq(bottleAliases.bottleId, bottle.id),
-      });
-
       let newBottle: Bottle | undefined;
       try {
         newBottle = Object.values(bottleData).length

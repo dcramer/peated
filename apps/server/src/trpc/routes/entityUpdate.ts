@@ -72,7 +72,9 @@ export default modProcedure
     }
     if (
       input.location !== undefined &&
-      (!input.location || !entity.location || !arraysEqual(input.location))
+      (!input.location ||
+        !entity.location ||
+        !arraysEqual(input.location, entity.location))
     ) {
       data.location = input.location;
     }
@@ -105,10 +107,6 @@ export default modProcedure
     const user = ctx.user;
     const newEntity = await db.transaction(async (tx) => {
       let newEntity: Entity | undefined;
-
-      const aliasList = await tx.query.entityAliases.findMany({
-        where: eq(entityAliases.entityId, entity.id),
-      });
 
       try {
         [newEntity] = await tx
