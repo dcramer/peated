@@ -6,6 +6,14 @@ type LatLng = [number, number];
 
 type GeometryPointType = Point | LatLng | string;
 
+type GeoemetryPointGeoJson = {
+  type: "Point";
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+};
+
 export class Point {
   lat: number;
   lng: number;
@@ -41,15 +49,18 @@ export function geometry_point(name: string) {
       return "geometry(Point, 4326)";
     },
 
-    fromDriver(value): LatLng {
-      console.log({ value });
-      const parsed = wkx.Geometry.parse(
-        Buffer.from(value, "hex"),
-      ) as unknown as {
-        x: number;
-        y: number;
-      };
-      return [parsed.x, parsed.y];
+    fromDriver(value: string | GeoemetryPointGeoJson): LatLng {
+      if (typeof value === "string") {
+        const parsed = wkx.Geometry.parse(
+          Buffer.from(value, "hex"),
+        ) as unknown as {
+          x: number;
+          y: number;
+        };
+        return [parsed.x, parsed.y];
+      }
+
+      return [value.coordinates.lat, value.coordinates.lng];
     },
 
     toDriver(value: GeometryPointType) {
