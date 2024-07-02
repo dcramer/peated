@@ -1,7 +1,7 @@
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
-export const dynamic = "force-static";
+export const revalidate = 3600;
 
 export async function GET() {
   const trpcClient = await getTrpcClient();
