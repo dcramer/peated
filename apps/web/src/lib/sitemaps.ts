@@ -38,3 +38,19 @@ export async function buildPagesSitemap(pages: Sitemap) {
   xml += "</urlset>";
   return xml;
 }
+
+export async function buildSitemapIndex(sitemaps: string[]) {
+  const baseUrl = config.URL_PREFIX;
+
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>';
+  xml += '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+  for (const url of sitemaps) {
+    xml += "<sitemap>";
+    xml += `<loc>${baseUrl}${url}</loc>`;
+    xml += "</sitemap>";
+  }
+
+  xml += "</sitemapindex>";
+  return xml;
+}
