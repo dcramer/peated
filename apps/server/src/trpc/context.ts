@@ -19,4 +19,4 @@ export async function createContext({ req, res }: CreateFastifyContextOptions) {
   return { user, maxAge: 0 };
 }
 
-export type Context = Awaited<typeof createContext>;
+export type Context = Awaited<ReturnType<Awaited<typeof createContext>>>;

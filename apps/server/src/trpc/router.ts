@@ -1,4 +1,5 @@
 import { createCallerFactory, router } from ".";
+import type { Context } from "./context";
 
 import auth from "./routes/auth";
 import authBasic from "./routes/authBasic";
@@ -168,4 +169,13 @@ export const appRouter = router({
 
 export type AppRouter = typeof appRouter;
 
-export const createCaller = createCallerFactory(appRouter);
+const callerFactory = createCallerFactory(appRouter);
+
+const DEFAULTS = { user: null, maxAge: 0 };
+
+export const createCaller = (context: Partial<Context> = DEFAULTS) => {
+  return callerFactory({
+    ...DEFAULTS,
+    ...context,
+  });
+};
