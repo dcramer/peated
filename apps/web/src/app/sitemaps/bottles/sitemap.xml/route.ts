@@ -1,8 +1,6 @@
 import { buildSitemapIndex } from "@peated/web/lib/sitemaps";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
-export const dynamic = "force-static";
-
 const PAGE_LIMIT = 1000;
 
 function range(end: number, _: number): number[];
