@@ -20,13 +20,14 @@ const numericFields = new Set([
 export default function BottleList() {
   const searchParams = useSearchParams();
 
-  const [bottleList] = trpc.bottleList.useSuspenseQuery(
-    Object.fromEntries(
+  const [bottleList] = trpc.bottleList.useSuspenseQuery({
+    ...Object.fromEntries(
       Array.from(searchParams.entries()).map(([k, v]) =>
         numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
       ),
     ),
-  );
+    limit: 100,
+  });
 
   return (
     <>

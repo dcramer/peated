@@ -21,13 +21,14 @@ export default function EntityTastings({
   ]);
 
   const [bottleList] = trpc.bottleList.useSuspenseQuery({
+    sort: "brand",
     ...Object.fromEntries(
       [...searchParams.entries()].map(([k, v]) =>
         numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
       ),
     ),
     entity: Number(entityId),
-    sort: "brand",
+    limit: 100,
   });
 
   return (
