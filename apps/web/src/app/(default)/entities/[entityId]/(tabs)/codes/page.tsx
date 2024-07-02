@@ -104,7 +104,7 @@ export default async function Page({
             </Heading>
             <table className="min-w-full table-auto">
               <colgroup>
-                <col className="w-4" />
+                <col className="w-8" />
                 <col />
                 <col className="hidden w-16 sm:table-cell" />
               </colgroup>
