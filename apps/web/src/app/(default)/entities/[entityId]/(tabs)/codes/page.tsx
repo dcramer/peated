@@ -104,9 +104,9 @@ export default async function Page({
             </Heading>
             <table className="min-w-full table-auto">
               <colgroup>
-                <col className="w-8" />
+                <col className="w-12" />
                 <col />
-                <col className="hidden w-16 sm:table-cell" />
+                <col className="hidden w-32 sm:table-column" />
               </colgroup>
               <tbody>
                 {categoryDistillerList.map(
@@ -128,7 +128,7 @@ export default async function Page({
                             distillerName
                           )}
                         </td>
-                        <td className="text-light border-b border-slate-800 p-3 text-center text-sm">
+                        <td className="text-light hidden border-b border-slate-800 p-3 text-center text-sm sm:table-cell">
                           {distiller && distiller.country ? (
                             <Link
                               href={`/countries/${distiller.country.slug}`}
