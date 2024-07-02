@@ -22,7 +22,8 @@ export default async function Page() {
       <table className="min-w-full table-auto">
         <colgroup>
           <col />
-          <col className="hidden w-16 sm:table-column" />
+          <col className="hidden w-32 sm:table-column" />
+          <col className="hidden w-32 sm:table-column" />
         </colgroup>
         <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
           <tr>
@@ -31,6 +32,9 @@ export default async function Page() {
             </th>
             <th scope="col" className="px-3 py-2.5 text-center sm:table-cell">
               Bottles
+            </th>
+            <th scope="col" className="px-3 py-2.5 text-center sm:table-cell">
+              Distillers
             </th>
           </tr>
         </thead>
@@ -45,6 +49,9 @@ export default async function Page() {
                 </td>
                 <td className="text-light hidden border-b border-slate-800 p-3 text-center text-sm sm:table-cell">
                   {country.totalBottles.toLocaleString()}
+                </td>
+                <td className="text-light hidden border-b border-slate-800 p-3 text-center text-sm sm:table-cell">
+                  {country.totalDistillers.toLocaleString()}
                 </td>
               </tr>
             );

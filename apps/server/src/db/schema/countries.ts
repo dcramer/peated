@@ -18,6 +18,9 @@ export const countries = pgTable(
     totalBottles: bigint("total_bottles", { mode: "number" })
       .default(0)
       .notNull(),
+    totalDistillers: bigint("total_distillers", { mode: "number" })
+      .default(0)
+      .notNull(),
   },
   (countries) => {
     return {

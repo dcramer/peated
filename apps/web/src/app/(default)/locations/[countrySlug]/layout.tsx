@@ -28,7 +28,7 @@ export default async function Page({
   const country = await trpcClient.countryBySlug.fetch(countrySlug);
 
   const stats = [
-    { name: "Distilleries", value: country.totalDistilleries.toLocaleString() },
+    { name: "Distillers", value: country.totalDistillers.toLocaleString() },
     { name: "Bottles", value: country.totalBottles.toLocaleString() },
   ];
 

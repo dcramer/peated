@@ -14,6 +14,7 @@ export const CountrySerializer = serializer({
       slug: item.slug,
       location: item.location,
       totalBottles: item.totalBottles,
+      totalDistillers: item.totalDistillers,
     };
   },
 });

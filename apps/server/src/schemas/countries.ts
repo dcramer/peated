@@ -6,4 +6,5 @@ export const CountrySchema = z.object({
   slug: z.string().trim().min(1, "Required"),
   location: PointSchema.nullable().optional(),
   totalBottles: z.number(),
+  totalDistillers: z.number(),
 });

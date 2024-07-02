@@ -11,6 +11,12 @@ export default async ({ countryId }: { countryId: number }) => {
   await db
     .update(countries)
     .set({
+      totalDistillers: sql<number>`(
+        SELECT COUNT(*)
+        FROM ${entities}
+        WHERE 'distiller' = ANY(${entities.type})
+          AND ${entities.countryId} = ${countries.id}
+      )`,
       totalBottles: sql<number>`(
         SELECT COUNT(*)
         FROM ${bottles}
