@@ -9,11 +9,9 @@ export async function generateMetadata({
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 
-  return [
-    {
-      title: `Other Names for ${entity.name}`,
-    },
-  ];
+  return {
+    title: `Other Names for ${entity.name}`,
+  };
 }
 
 export default async function EntityAliases({

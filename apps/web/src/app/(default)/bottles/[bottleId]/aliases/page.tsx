@@ -9,11 +9,9 @@ export async function generateMetadata({
   const trpcClient = await getTrpcClient();
   const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
-  return [
-    {
-      title: `Other Names for ${bottle.fullName}`,
-    },
-  ];
+  return {
+    title: `Other Names for ${bottle.fullName}`,
+  };
 }
 
 export default async function BottleAliases({

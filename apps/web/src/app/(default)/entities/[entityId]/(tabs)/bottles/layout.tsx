@@ -11,11 +11,9 @@ export async function generateMetadata({
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 
-  return [
-    {
-      title: `Whiskies from ${entity.name}`,
-    },
-  ];
+  return {
+    title: `Whiskies from ${entity.name}`,
+  };
 }
 
 export default function DefaultLayout({ children }: { children: ReactNode }) {

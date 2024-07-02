@@ -20,16 +20,10 @@ export async function generateMetadata({
   const title = `${entity.name} Distillery Codes`;
   const description = `Mapping of distillery codes found on bottles from ${entity.name}`;
 
-  return [
-    {
-      title,
-      description,
-      openGraph: {
-        title,
-        description,
-      },
-    },
-  ];
+  return {
+    title,
+    description,
+  };
 }
 
 export default async function Page({

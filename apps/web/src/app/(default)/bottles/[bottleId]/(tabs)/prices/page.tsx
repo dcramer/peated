@@ -11,11 +11,9 @@ export async function generateMetadata({
   const trpcClient = await getTrpcClient();
   const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
-  return [
-    {
-      title: `Prices for ${bottle.fullName}`,
-    },
-  ];
+  return {
+    title: `Prices for ${bottle.fullName}`,
+  };
 }
 
 export default async function BottlePrices({
