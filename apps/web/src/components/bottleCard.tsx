@@ -13,6 +13,7 @@ type EntityOption = Option & {
 
 type BottleFormData = {
   name: string;
+  vintageYear?: number | null;
   brand?: EntityOption | null | undefined;
   distillers?: EntityOption[] | null | undefined;
   statedAge?: number | null | undefined;
@@ -89,7 +90,7 @@ export const PreviewBottleCard = ({
   const { brand } = data;
   return (
     <BottleScaffold
-      name={brand ? `${brand.shortName || brand.name} ${data.name}` : data.name}
+      name={`${brand ? `${brand.shortName || brand.name} ${data.name}` : data.name}${data.vintageYear ? ` (${data.vintageYear})` : ""}`}
       category={data.category ? formatCategoryName(data.category) : null}
       brand={brand ? brand.name : "Unknown Bottle"}
       statedAge={data.statedAge ? `Aged ${data.statedAge} years` : null}
@@ -119,6 +120,18 @@ export default function BottleCard({
             <BottleLink bottle={bottle} className="hover:underline">
               {bottle.fullName}
             </BottleLink>
+            {bottle.vintageYear && (
+              <>
+                {" "}
+                <span
+                  className={
+                    color === "highlight" ? "text-black" : "text-light"
+                  }
+                >
+                  ({bottle.vintageYear})
+                </span>
+              </>
+            )}
           </h4>
           {bottle.isFavorite && (
             <div className="w-4">

@@ -58,6 +58,14 @@ export default function NewBottles() {
                     >
                       {bottle.fullName}
                     </BottleLink>
+                    {bottle.vintageYear && (
+                      <>
+                        {" "}
+                        <span className="text-light">
+                          ({bottle.vintageYear})
+                        </span>
+                      </>
+                    )}
                     {bottle.isFavorite && (
                       <StarIcon className="h-4 w-4" aria-hidden="true" />
                     )}

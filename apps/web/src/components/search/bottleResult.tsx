@@ -31,6 +31,12 @@ export default function BottleResultRow({
             <span className="absolute inset-x-0 -top-px bottom-0" />
             {bottle.name}
           </Link>
+          {bottle.vintageYear && (
+            <>
+              {" "}
+              <span className="text-light">({bottle.vintageYear})</span>
+            </>
+          )}
           {bottle.isFavorite && (
             <StarIcon className="h-4 w-4" aria-hidden="true" />
           )}
