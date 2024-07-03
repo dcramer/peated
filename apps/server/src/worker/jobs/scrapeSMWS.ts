@@ -10,6 +10,7 @@ import {
   type BottleInputSchema,
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
+import type { CaskFill, CaskSize, CaskType } from "@peated/server/types";
 import { type z } from "zod";
 
 export default async function scrapeSMWS() {
@@ -60,11 +61,27 @@ type SMWSPayload = {
     name: string;
     age: number | null;
     cask_no: string;
+    cask_type: string;
     categories: string[];
     price: number;
     url: string;
   }[];
 };
+
+function parseCaskType(
+  caskType: string,
+): [CaskFill | null, CaskType | null, CaskSize | null] {
+  const result = caskType.match(
+    /(new|1st fill|2nd fill|refill)\s.*(bourbon|oloroso|oak|px|rum)\s.*(barrique|barrel|hogshead|butt)/i,
+  );
+  if (!result) return [null, null, null];
+  // new = 1st fill
+  return [
+    result[0].replace("new", "1st_fill").replace(" ", "_") as CaskFill,
+    result[1].replace("px", "pedro_ximenez").replace(" ", "_") as CaskType,
+    result[2] as CaskSize,
+  ];
+}
 
 export async function scrapeBottles(
   url: string,
@@ -106,6 +123,9 @@ export async function scrapeBottles(
             )
           : null;
 
+        const [caskFill, caskType, caskSize] = parseCaskType(item.cask_type);
+        // "2nd fill ex-bourbon hogshead"
+
         await cb(
           {
             name: details.name,
@@ -123,6 +143,9 @@ export async function scrapeBottles(
               },
             ],
             flavorProfile,
+            caskFill,
+            caskSize,
+            caskType,
           },
           {
             name: `SMWS ${details.name}`,

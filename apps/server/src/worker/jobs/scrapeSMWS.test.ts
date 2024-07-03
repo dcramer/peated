@@ -26,6 +26,9 @@ test("bottle list", async ({ axiosMock }) => {
       "brand": {
         "name": "The Scotch Malt Whisky Society",
       },
+      "caskFill": null,
+      "caskSize": null,
+      "caskType": null,
       "category": "rye",
       "distillers": [
         {
@@ -35,6 +38,28 @@ test("bottle list", async ({ axiosMock }) => {
       "flavorProfile": null,
       "name": "RW3.6 Truly a flavour bomb",
       "statedAge": 5,
+    }
+  `);
+  expect(items[1]).toMatchInlineSnapshot(`
+    {
+      "bottler": {
+        "name": "The Scotch Malt Whisky Society",
+      },
+      "brand": {
+        "name": "The Scotch Malt Whisky Society",
+      },
+      "caskFill": "2nd_fill ex-bourbon hogshead",
+      "caskSize": "bourbon",
+      "caskType": "2nd_fill",
+      "category": "single_malt",
+      "distillers": [
+        {
+          "name": "Bowmore",
+        },
+      ],
+      "flavorProfile": "lightly_peated",
+      "name": "3.350 Gladrags of yesteryear",
+      "statedAge": 19,
     }
   `);
 });
