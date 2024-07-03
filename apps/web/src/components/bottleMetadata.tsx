@@ -1,6 +1,10 @@
+import {
+  type CaskFill,
+  type CaskSize,
+  type CaskType,
+} from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
-import FlavorProfile from "./flavorProfile";
 import Tooltip from "./tooltip";
 
 type Props = {
@@ -14,15 +18,42 @@ type Props = {
       id: string | number | undefined | null;
       name: string;
     }[];
+    caskFill: CaskFill | null;
+    caskSize: CaskSize | null;
+    caskType: CaskType | null;
   };
 } & ComponentPropsWithoutRef<"p">;
 
 export default function BottleMetadata({ data, ...props }: Props) {
   return (
-    <div {...props}>
-      <div className="inline-flex flex-col items-center space-x-1 truncate sm:flex-row sm:items-start">
-        {!!data.flavorProfile && <FlavorProfile profile={data.flavorProfile} />}
-      </div>
+    <div {...props} className="flex gap-x-2">
+      {data.caskFill && data.caskType && (
+        <CaskDetails
+          caskFill={data.caskFill}
+          caskSize={data.caskSize}
+          caskType={data.caskType}
+        />
+      )}
+    </div>
+  );
+}
+
+import { toTitleCase } from "@peated/server/src/lib/strings";
+
+function CaskDetails({
+  caskFill,
+  caskSize,
+  caskType,
+}: {
+  caskFill: CaskFill | null;
+  caskSize: CaskSize | null;
+  caskType: CaskType | null;
+}) {
+  return (
+    <div className="text-light">
+      {caskFill ? toTitleCase(caskFill) : ""}{" "}
+      {caskSize ? toTitleCase(caskSize) : ""}{" "}
+      {caskType ? toTitleCase(caskType) : ""}
     </div>
   );
 }

@@ -20,6 +20,7 @@ import type { z } from "zod";
 import useAuth from "../hooks/useAuth";
 import { logError } from "../lib/log";
 import Button from "./button";
+import Legend from "./legend";
 import TextAreaField from "./textAreaField";
 
 const entityTypes = [
@@ -49,15 +50,8 @@ export default function EntityForm({
   } = useForm<FormSchemaType>({
     resolver: zodResolver(EntityInputSchema),
     defaultValues: {
-      name: initialData.name,
-      shortName: initialData.shortName,
+      ...initialData,
       country: initialData.country?.name,
-      region: initialData.region,
-      address: initialData.address,
-      type: initialData.type,
-      yearEstablished: initialData.yearEstablished,
-      description: initialData.description,
-      website: initialData.website,
     },
   });
 
@@ -123,8 +117,7 @@ export default function EntityForm({
         </Fieldset>
 
         <Fieldset>
-          <legend className="text-light flex w-full items-center border-t border-slate-800 bg-slate-950 px-4 py-5">
-            <div className="flex-grow">Additional Details</div>
+          <Legend title="Additional Details">
             {user && (user.mod || user.admin) && (
               <Button
                 color="default"
@@ -157,7 +150,7 @@ export default function EntityForm({
                 Help me fill this in [Beta]
               </Button>
             )}
-          </legend>
+          </Legend>
 
           <CountryField
             control={control}

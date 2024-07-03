@@ -7,6 +7,7 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
+import { generateUniqHash } from "@peated/server/lib/bottleHash";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
@@ -208,6 +209,10 @@ export default modProcedure
         }`;
       }
 
+      const bottleUpdateData: Omit<Partial<Bottle>, "uniqHash"> = {
+        ...bottleData,
+      };
+
       let newBottle: Bottle | undefined;
       try {
         newBottle = Object.values(bottleData).length
@@ -216,6 +221,11 @@ export default modProcedure
                 .update(bottles)
                 .set({
                   ...bottleData,
+                  uniqHash: generateUniqHash({
+                    fullName: bottle.fullName,
+                    vintageYear: bottle.vintageYear,
+                    ...bottleUpdateData,
+                  }),
                   updatedAt: sql`NOW()`,
                 })
                 .where(eq(bottles.id, bottle.id))
@@ -223,9 +233,9 @@ export default modProcedure
             )[0]
           : bottle;
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+        if (err?.code === "23505" && err?.constraint === "bottle_uniq_hash") {
           throw new TRPCError({
-            message: "Bottle with name already exists under brand.",
+            message: "Bottle already exists.",
             code: "CONFLICT",
             cause: err,
           });

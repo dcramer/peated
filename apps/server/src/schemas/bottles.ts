@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
-import { ContentSourceEnum, FlavorProfileEnum } from "./common";
+import {
+  CaskFillEnum,
+  CaskSizeEnum,
+  CaskTypeEnum,
+  ContentSourceEnum,
+  FlavorProfileEnum,
+} from "./common";
 import { EntityInputSchema, EntitySchema } from "./entities";
 import { UserSchema } from "./users";
 
@@ -10,6 +16,8 @@ export const BottleSchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
   fullName: z.string(),
+
+  category: CategoryEnum.nullable(),
   description: z.string().nullable().optional(),
   tastingNotes: z
     .object({
@@ -21,17 +29,24 @@ export const BottleSchema = z.object({
     .optional(),
   suggestedTags: z.array(z.string()).optional(),
   flavorProfile: FlavorProfileEnum.nullable(),
+
+  statedAge: z.number().nullable(),
+  vintageYear: z.number().gte(1800).lte(new Date().getFullYear()).nullable(),
+  caskType: CaskTypeEnum.nullable(),
+  caskSize: CaskSizeEnum.nullable(),
+  caskFill: CaskFillEnum.nullable(),
+  releaseDate: z.string().date().nullable(),
+
   brand: EntitySchema,
   distillers: z.array(EntitySchema),
   bottler: EntitySchema.nullable(),
-  statedAge: z.number().nullable(),
-  category: CategoryEnum.nullable(),
 
   avgRating: z.number().gte(0).lte(5).nullable(),
   totalTastings: z.number().gte(0),
 
-  createdAt: z.string().datetime().optional(),
-  updatedAt: z.string().datetime().optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+
   createdBy: UserSchema.optional(),
 
   isFavorite: z.boolean().optional(),
@@ -47,15 +62,22 @@ const EntityChoice = z.union([
 
 export const BottleInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
-  brand: EntityChoice,
-  flavorProfile: FlavorProfileEnum.nullish(),
-  distillers: z.array(EntityChoice).optional(),
-  bottler: EntityChoice.nullish(),
-  statedAge: z.number().gte(0).lte(100).nullish(),
   category: CategoryEnum.nullish(),
 
-  description: z.string().nullable().optional(),
-  descriptionSrc: ContentSourceEnum.nullable().optional(),
+  brand: EntityChoice,
+  flavorProfile: FlavorProfileEnum.nullish(),
+  distillers: z.array(EntityChoice).nullish(),
+  bottler: EntityChoice.nullish(),
+
+  statedAge: z.number().nullish(),
+  vintageYear: z.number().gte(1800).lte(new Date().getFullYear()).nullish(),
+  caskType: CaskTypeEnum.nullish(),
+  caskSize: CaskSizeEnum.nullish(),
+  caskFill: CaskFillEnum.nullish(),
+  releaseDate: z.string().date().nullish(),
+
+  description: z.string().nullish(),
+  descriptionSrc: ContentSourceEnum.nullish(),
 });
 
 export const BottleMergeSchema = z.object({

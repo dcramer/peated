@@ -47,6 +47,7 @@ export async function bottleNormalize({
   const brand = await getEntity(input.brand, ctx);
 
   const rv: BottlePreviewResult = {
+    ...input,
     name: input.name,
     category: input.category ?? null,
     brand,

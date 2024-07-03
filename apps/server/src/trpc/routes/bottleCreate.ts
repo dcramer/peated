@@ -6,6 +6,7 @@ import {
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
+import { generateUniqHash } from "@peated/server/lib/bottleHash";
 import { upsertEntity } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
@@ -121,22 +122,25 @@ export async function bottleCreate({
         distillerIds.push(distUpsert.id);
       }
 
-    const bottleInsertData: NewBottle = {
+    const bottleInsertData: Omit<NewBottle, "uniqHash"> = {
       ...bottleData,
       brandId: brand.id,
       bottlerId: bottler?.id || null,
       createdById: user.id,
       fullName: `${brand.shortName || brand.name} ${bottleData.name}`,
     };
+
     let bottle: Bottle | undefined;
     try {
-      [bottle] = await tx.insert(bottles).values(bottleInsertData).returning();
+      [bottle] = await tx
+        .insert(bottles)
+        .values({
+          ...bottleInsertData,
+          uniqHash: generateUniqHash(bottleInsertData),
+        })
+        .returning();
     } catch (err: any) {
-      if (
-        err?.code === "23505" &&
-        (err?.constraint === "bottle_brand_unq" ||
-          err?.constraint === "bottle_name_unq")
-      ) {
+      if (err?.code === "23505" && err?.constraint === "bottle_uniq_hash") {
         throw new TRPCError({
           message: "Bottle with name already exists under brand.",
           code: "CONFLICT",

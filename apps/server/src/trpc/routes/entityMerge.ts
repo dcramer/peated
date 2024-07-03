@@ -7,12 +7,13 @@ import {
   entityAliases,
   entityTombstones,
 } from "@peated/server/db/schema";
+import { generateUniqHash } from "@peated/server/lib/bottleHash";
 import { logError } from "@peated/server/lib/log";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { mergeBottlesInto } from "./bottleMerge";
@@ -25,15 +26,6 @@ async function mergeEntitiesInto(
   const fromEntityIds = fromEntities.map((e) => e.id);
   console.log(
     `Merging entities ${fromEntityIds.join(", ")} into ${toEntity.id}.`,
-  );
-
-  const totalBottles = fromEntities.reduce(
-    (acc, ent) => acc + ent.totalBottles,
-    0,
-  );
-  const totalTastings = fromEntities.reduce(
-    (acc, ent) => acc + ent.totalTastings,
-    0,
   );
 
   const newEntity = await db.transaction(async (tx) => {
@@ -49,11 +41,17 @@ async function mergeEntitiesInto(
             .update(bottles)
             .set({
               brandId: toEntity.id,
+              fullName: `${toEntity.name} ${bottle.name}`,
+              uniqHash: generateUniqHash({
+                ...bottle,
+                fullName: `${toEntity.name} ${bottle.name}`,
+              }),
             })
             .where(eq(bottles.id, bottle.id));
         });
+        pushJob("IndexBottleSearchVectors", { bottleId: bottle.id });
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+        if (err?.code === "23505" && err?.constraint === "bottle_uniq_hash") {
           // merge the bottle with its duplicate
           const [toBottle] = await tx
             .select()
@@ -62,6 +60,11 @@ async function mergeEntitiesInto(
               and(
                 eq(bottles.name, bottle.name),
                 eq(bottles.brandId, toEntity.id),
+                ...[
+                  bottle.vintageYear
+                    ? eq(bottles.vintageYear, bottle.vintageYear)
+                    : isNull(bottles.vintageYear),
+                ],
               ),
             );
           if (!toBottle) {

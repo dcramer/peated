@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  date,
   doublePrecision,
   index,
   integer,
@@ -15,6 +16,11 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import {
+  CASK_FILLS,
+  CASK_SIZE_IDS,
+  CASK_TYPE_IDS,
+} from "@peated/server/constants";
 import { tsvector } from "../columns";
 import { entities } from "./entities";
 import { categoryEnum, contentSourceEnum, flavorProfileEnum } from "./enums";
@@ -33,6 +39,9 @@ export const bottles = pgTable(
     fullName: varchar("full_name", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
 
+    // md5(lower(fullName), vintageYear)
+    uniqHash: varchar("uniq_hash", { length: 32 }).notNull(),
+
     searchVector: tsvector("search_vector"),
 
     category: categoryEnum("category"),
@@ -44,6 +53,12 @@ export const bottles = pgTable(
     ),
     statedAge: smallint("stated_age"),
     flavorProfile: flavorProfileEnum("flavor_profile"),
+
+    vintageYear: smallint("vintage_year"),
+    caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
+    caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
+    caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
+    releaseDate: date("release_date"),
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
@@ -67,10 +82,7 @@ export const bottles = pgTable(
   },
   (table) => {
     return {
-      unique: uniqueIndex("bottle_brand_unq").on(table.name, table.brandId),
-      uniqueName: uniqueIndex("bottle_full_name_unq")
-        .on(table.fullName)
-        .using(sql`btree (LOWER(full_name))`),
+      uniqHash: uniqueIndex("bottle_uniq_hash").on(table.uniqHash),
       searchVectorIndex: index("bottle_search_idx")
         .on(table.searchVector)
         .using(sql`gin(${table.searchVector})`),

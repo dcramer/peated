@@ -99,6 +99,22 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                   <em>unknown</em>
                 )}
               </DefinitionList.Details>
+              {!!bottle.vintageYear && (
+                <>
+                  <DefinitionList.Term>Vintage Year</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.vintageYear}
+                  </DefinitionList.Details>
+                </>
+              )}
+              {!!bottle.releaseDate && (
+                <>
+                  <DefinitionList.Term>Release Date</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.releaseDate}
+                  </DefinitionList.Details>
+                </>
+              )}
             </DefinitionList>
           </div>
           <img

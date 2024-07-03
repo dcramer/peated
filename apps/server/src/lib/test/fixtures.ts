@@ -36,6 +36,7 @@ import {
   users,
 } from "../../db/schema";
 import { createAccessToken } from "../auth";
+import { generateUniqHash } from "../bottleHash";
 import { choose, random, sample } from "../rand";
 import { buildBottleSearchVector, buildEntitySearchVector } from "../search";
 import { toTitleCase } from "../strings";
@@ -222,7 +223,7 @@ export const Bottle = async (
         ]),
       )} #${faker.number.int(100)}`;
 
-    const bottleData: dbSchema.NewBottle = {
+    const bottleData: Omit<dbSchema.NewBottle, "uniqHash"> = {
       category: choose([...CATEGORY_LIST, null, null]),
       statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
       ...data,
@@ -257,6 +258,7 @@ export const Bottle = async (
       .values({
         ...bottleData,
         searchVector,
+        uniqHash: generateUniqHash(bottleData),
       })
       .returning();
 
