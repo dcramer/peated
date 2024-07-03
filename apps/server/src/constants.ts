@@ -347,11 +347,61 @@ export const COLOR_SCALE = [
   [20, "Black Bowmore", "#3b1d12"],
 ] as const;
 
-// TODO:
-export const CASK_FILLS = ["1st_fill", "2nd_fill", "refill"];
+// blame theo for this monstrosity
+const createTuple = <T extends Readonly<{ id: string }[]>>(arr: T) =>
+  arr.map((s) => s.id) as {
+    [K in keyof T]: T[K] extends { id: infer U } ? U : never;
+  };
 
-// TODO: determine granularity (e.g. hogshead etc)
-export const CASK_TYPES = ["bourbon", "sherry", "other"] as const;
+export const CASK_FILLS = ["1st_fill", "2nd_fill", "refill", "other"] as const;
+
+export const CASK_TYPES = [
+  { id: "bourbon", category: "whisky" },
+  { id: "amontilado", category: "sherry" },
+  { id: "fino", category: "sherry" },
+  { id: "manzanilla", category: "sherry" },
+  { id: "oloroso", category: "sherry" },
+  { id: "palo_cortado", category: "sherry" },
+  { id: "pedro_ximenez", category: "sherry", shortName: "px" },
+  { id: "liqueur_muscat", category: "fortified_wine" },
+  { id: "madeira", category: "fortified_wine" },
+  { id: "marsala", category: "fortified_wine" },
+  { id: "tawny_port", category: "fortified_wine" },
+  { id: "ruby_port", category: "fortified_wine" },
+  { id: "rose_port", category: "fortified_wine" },
+  { id: "white_port", category: "fortified_wine" },
+  { id: "amarone", category: "wine" },
+  { id: "barolo", category: "wine" },
+  { id: "bordeaux", category: "wine" },
+  { id: "burgundy", category: "wine" },
+  { id: "chardonnay", category: "wine" },
+  { id: "muscat", category: "wine" },
+  { id: "sauternes", category: "wine" },
+  { id: "tokaji", category: "wine" },
+  { id: "rum_white", category: "rum" },
+  { id: "rum_dark", category: "rum" },
+  { id: "cognac", category: "cognac" },
+  { id: "oak", category: "wood" },
+  { id: "other", category: "other" },
+] as const;
+
+export const CASK_TYPE_IDS = createTuple(CASK_TYPES);
+
+export const CASK_SIZES = [
+  { id: "quarter_cask", size: [45, 50] },
+  {
+    id: "barrel",
+    size: [190, 200],
+  },
+  { id: "hogshead", size: [225, 250] },
+  { id: "barrique", size: [225, 300] },
+  { id: "puncheon", size: [450, 500] },
+  { id: "butt", size: [475, 500] },
+  { id: "port_pipe", size: [550, 650] },
+  { id: "madeira_drum", size: [600, 650] },
+] as const;
+
+export const CASK_SIZE_IDS = createTuple(CASK_SIZES);
 
 export const CURRENCY_LIST = ["usd", "gbp", "eur"] as const;
 
@@ -368,3 +418,5 @@ export const defaultHeaders = (url: string) => {
     Referer: urlParts.origin,
   };
 };
+
+export const BOT_USER_AGENT = "PeatedBot/1.0 (https://peated.com)";

@@ -19,7 +19,7 @@ export function buildEntitySearchVector(
 }
 
 export function buildBottleSearchVector(
-  bottle: NewBottle,
+  bottle: Omit<NewBottle, "uniqHash">,
   brand: NewEntity,
   aliasList?: NewBottleAlias[],
   bottler?: NewEntity,
@@ -30,6 +30,8 @@ export function buildBottleSearchVector(
     new TSVector(bottle.name, "B"),
     new TSVector(brand.name, "B"),
   ];
+  if (bottle.vintageYear)
+    values.push(new TSVector(`${bottle.vintageYear}`, "B"));
   if (bottler) values.push(new TSVector(bottler.name, "C"));
   aliasList?.forEach((a) => values.push(new TSVector(a.name, "A")));
   distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));

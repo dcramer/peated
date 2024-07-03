@@ -1,5 +1,9 @@
 import config from "@peated/server/config";
-import { COUNTRY_LIST, DEFAULT_CREATED_BY_ID } from "@peated/server/constants";
+import {
+  BOT_USER_AGENT,
+  COUNTRY_LIST,
+  DEFAULT_CREATED_BY_ID,
+} from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
@@ -175,7 +179,7 @@ export default async ({ entityId }: { entityId: number }) => {
     try {
       await fetch(data.website, {
         headers: {
-          "User-Agent": "PeatedBot/1.0 (https://peated.com)",
+          "User-Agent": BOT_USER_AGENT,
         },
       });
     } catch (err) {

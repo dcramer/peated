@@ -2,13 +2,20 @@
 
 import { BoltIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
+import {
+  CASK_FILLS,
+  CASK_SIZES,
+  CASK_TYPES,
+  CATEGORY_LIST,
+  FLAVOR_PROFILES,
+} from "@peated/server/constants";
 import {
   formatCategoryName,
   formatFlavorProfile,
   notesForProfile,
 } from "@peated/server/lib/format";
 import { BottleInputSchema } from "@peated/server/schemas";
+import { toTitleCase } from "@peated/server/src/lib/strings";
 import type { Bottle, Entity, FlavorProfile } from "@peated/server/types";
 import { PreviewBottleCard } from "@peated/web/components/bottleCard";
 import EntityField from "@peated/web/components/entityField";
@@ -31,6 +38,7 @@ import Button from "./button";
 import { classesForProfile } from "./flavorProfile";
 import Form from "./form";
 import Header from "./header";
+import Legend from "./legend";
 import TextAreaField from "./textAreaField";
 
 const categoryList = CATEGORY_LIST.map((c) => ({
@@ -48,6 +56,21 @@ const entityToOption = (entity: Entity): Option => {
 const flavorProfileList = FLAVOR_PROFILES.map((c) => ({
   id: c,
   name: formatFlavorProfile(c),
+}));
+
+const caskFillList = CASK_FILLS.map((id) => ({
+  id,
+  name: toTitleCase(id),
+}));
+
+const caskSizeList = CASK_SIZES.map(({ id }) => ({
+  id,
+  name: toTitleCase(id),
+}));
+
+const caskTypeList = CASK_TYPES.map(({ id }) => ({
+  id,
+  name: toTitleCase(id),
 }));
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
@@ -72,15 +95,12 @@ export default function BottleForm({
   } = useForm<FormSchemaType>({
     resolver: zodResolver(BottleInputSchema),
     defaultValues: {
-      name: initialData.name,
-      category: initialData.category,
+      ...initialData,
       bottler: initialData.bottler?.id,
       brand: initialData.brand?.id,
       distillers: initialData.distillers
         ? initialData.distillers.map((d) => d.id)
         : [],
-      statedAge: initialData.statedAge,
-      flavorProfile: initialData.flavorProfile,
     },
   });
 
@@ -330,11 +350,108 @@ export default function BottleForm({
         </Fieldset>
 
         <Fieldset>
-          <legend className="text-light flex w-full items-center border-t border-slate-800 bg-slate-950 px-4 py-5">
-            <div className="flex-grow">Additional Details</div>
+          <Legend title="Vintage and Cask Details" />
+
+          <TextField
+            {...register("vintageYear", {
+              setValueAs: (v) => (v === "" || !v ? null : Number(v)),
+            })}
+            error={errors.vintageYear}
+            type="number"
+            label="Vintage Year"
+            placeholder="e.g. 2024"
+            helpText="The specific yearl vintage of this bottle, if applicable."
+          />
+
+          <Controller
+            name="caskFill"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.category}
+                label="Cask Fill"
+                placeholder="e.g. 1st Fill"
+                simple
+                options={caskFillList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: toTitleCase(value),
+                      }
+                    : undefined
+                }
+              />
+            )}
+          />
+
+          <Controller
+            name="caskSize"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.category}
+                label="Cask Size"
+                placeholder="e.g. Hogshead"
+                simple
+                options={caskSizeList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: toTitleCase(value),
+                      }
+                    : undefined
+                }
+              />
+            )}
+          />
+
+          <Controller
+            name="caskType"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.category}
+                label="Cask Type"
+                placeholder="e.g. Bourbon"
+                simple
+                options={caskTypeList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: toTitleCase(value),
+                      }
+                    : undefined
+                }
+              />
+            )}
+          />
+
+          <TextField
+            {...register("releaseDate", {
+              setValueAs: (v) => (v === "" || !v ? null : v),
+            })}
+            error={errors.releaseDate}
+            type="date"
+            label="Release Date"
+            placeholder="e.g. 2024-05-01"
+            helpText="The date this labeling was released."
+          />
+        </Fieldset>
+
+        <Fieldset>
+          <Legend title="Additional Details">
             {user && (user.mod || user.admin) && (
               <Button
-                color="default"
+                color="primary"
                 onClick={async () => {
                   const result =
                     await generateDataMutation.mutateAsync(getValues());
@@ -355,7 +472,7 @@ export default function BottleForm({
                 Help me fill this in [Beta]
               </Button>
             )}
-          </legend>
+          </Legend>
           {user && (user.mod || user.admin) && (
             <TextAreaField
               {...register("description", {

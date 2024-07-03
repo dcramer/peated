@@ -17,6 +17,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
 import Button from "../button";
 import Form from "../form";
+import Legend from "../legend";
 import TextAreaField from "../textAreaField";
 import AdminSidebar from "./sidebar";
 
@@ -102,8 +103,7 @@ export default function CountryForm({
         </Fieldset>
 
         <Fieldset>
-          <legend className="text-light flex w-full items-center border-t border-slate-800 bg-slate-950 px-4 py-5">
-            <div className="flex-grow">Additional Details</div>
+          <Legend title="Additional Details">
             <Button
               color="default"
               onClick={async () => {
@@ -120,7 +120,7 @@ export default function CountryForm({
             >
               Help me fill this in [Beta]
             </Button>
-          </legend>
+          </Legend>
           <TextAreaField
             {...register("description", {
               setValueAs: (v) => (v === "" || !v ? null : v),

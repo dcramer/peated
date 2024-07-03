@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Alert from "./alert";
 
-export default ({ values }: { values: ReactNode[] }) => {
+export default function FormError({ values }: { values: ReactNode[] }) {
   return (
     <Alert>
       <h3 className="text-sm font-medium text-red-800">
@@ -16,4 +16,4 @@ export default ({ values }: { values: ReactNode[] }) => {
       </div>
     </Alert>
   );
-};
+}

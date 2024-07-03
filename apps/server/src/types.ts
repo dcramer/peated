@@ -1,6 +1,9 @@
 import type { z } from "zod";
 import type {
   BADGE_TYPE_LIST,
+  CASK_FILLS,
+  CASK_SIZE_IDS,
+  CASK_TYPE_IDS,
   CATEGORY_LIST,
   CURRENCY_LIST,
   EXTERNAL_SITE_TYPE_LIST,
@@ -39,6 +42,9 @@ export type ServingStyle = (typeof SERVING_STYLE_LIST)[number];
 export type FlavorProfile = (typeof FLAVOR_PROFILES)[number];
 export type TagCategory = (typeof TAG_CATEGORIES)[number];
 export type Currency = (typeof CURRENCY_LIST)[number];
+export type CaskType = (typeof CASK_TYPE_IDS)[number];
+export type CaskSize = (typeof CASK_SIZE_IDS)[number];
+export type CaskFill = (typeof CASK_FILLS)[number];
 
 export type ExternalSiteType = (typeof EXTERNAL_SITE_TYPE_LIST)[number];
 export type BadgeType = (typeof BADGE_TYPE_LIST)[number];
@@ -113,10 +119,21 @@ export type FreeformEntity =
 
 export type BottlePreviewResult = {
   name: string;
-  category: Category | null;
+  category?: Category | null;
   brand: FreeformEntity;
-  bottler: FreeformEntity | null;
-  distillers: FreeformEntity[] | null;
-  statedAge: number | null;
-  flavorProfile: FlavorProfile | null;
+  bottler?: FreeformEntity | null;
+  distillers?: FreeformEntity[] | null;
+  statedAge?: number | null;
+  flavorProfile?: FlavorProfile | null;
+  caskSize?: CaskSize | null;
+  caskType?: CaskType | null;
+  caskFill?: CaskFill | null;
+  vintageYear?: number | null;
+  releaseDate?: string | null;
 };
+
+// blame theo for this monstrosity
+export const createTuple = <T extends Readonly<{ id: string }[]>>(arr: T) =>
+  arr.map((s) => s.id) as {
+    [K in keyof T]: T[K] extends { id: infer U } ? U : never;
+  };

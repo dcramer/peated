@@ -486,3 +486,67 @@ test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {
   expect(dList.length).toEqual(1);
   expect(dList[0].distillerId).toEqual(distiller.id);
 });
+
+test("saves cask information", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleCreate({
+    brand: brand.id,
+    name: "Old Whisky",
+    caskType: "bourbon",
+    caskSize: "hogshead",
+    caskFill: "1st_fill",
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(newBottle.caskType).toEqual("bourbon");
+  expect(newBottle.caskSize).toEqual("hogshead");
+  expect(newBottle.caskFill).toEqual("1st_fill");
+});
+
+test("saves vintage information", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleCreate({
+    brand: brand.id,
+    name: "Old Whisky",
+    vintageYear: 2024,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(newBottle.vintageYear).toEqual(2024);
+});
+
+test("saves release date", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleCreate({
+    brand: brand.id,
+    name: "Old Whisky",
+    releaseDate: "2024-01-02",
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(newBottle.releaseDate).toEqual("2024-01-02");
+});

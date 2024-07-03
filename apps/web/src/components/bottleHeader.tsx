@@ -16,13 +16,18 @@ export default function BottleHeader({
     <PageHeader
       icon={BottleIcon}
       title={
-        href ? (
-          <Link href={href} className="hover:underline">
-            {bottle.fullName}
-          </Link>
-        ) : (
-          bottle.fullName
-        )
+        <div className="flex gap-x-2">
+          {href ? (
+            <Link href={href} className="hover:underline">
+              {bottle.fullName}
+            </Link>
+          ) : (
+            bottle.fullName
+          )}
+          {bottle.vintageYear && (
+            <span className="text-light">({bottle.vintageYear})</span>
+          )}
+        </div>
       }
       titleExtra={
         <BottleMetadata
