@@ -51,6 +51,8 @@ jobs:
           run_install: false
       - name: Setup Node
         uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Run docker images
         run: docker compose up -d
       - name: Get pnpm store directory
