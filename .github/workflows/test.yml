@@ -46,6 +46,9 @@ jobs:
           fetch-depth: 0
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          run_install: false
       - name: Setup Node
         uses: actions/setup-node@v4
       - name: Run docker images
