@@ -77,9 +77,9 @@ function parseCaskType(
   if (!result) return [null, null, null];
   // new = 1st fill
   return [
-    result[0].replace("new", "1st_fill").replace(" ", "_") as CaskFill,
-    result[1].replace("px", "pedro_ximenez").replace(" ", "_") as CaskType,
-    result[2] as CaskSize,
+    result[1].replace("new", "1st_fill").replace(" ", "_") as CaskFill,
+    result[2].replace("px", "pedro_ximenez").replace(" ", "_") as CaskType,
+    result[3] as CaskSize,
   ];
 }
 

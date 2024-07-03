@@ -48,9 +48,9 @@ test("bottle list", async ({ axiosMock }) => {
       "brand": {
         "name": "The Scotch Malt Whisky Society",
       },
-      "caskFill": "2nd_fill ex-bourbon hogshead",
-      "caskSize": "bourbon",
-      "caskType": "2nd_fill",
+      "caskFill": "2nd_fill",
+      "caskSize": "hogshead",
+      "caskType": "bourbon",
       "category": "single_malt",
       "distillers": [
         {
