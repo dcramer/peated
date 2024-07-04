@@ -19,10 +19,11 @@ import type {
 } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { isNull } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
+import { ConflictError } from "../errors";
 import { bottleNormalize } from "./bottlePreview";
 
 function coerceToUpsert(data: FreeformEntity): EntityInput {
@@ -130,22 +131,24 @@ export async function bottleCreate({
       fullName: `${brand.shortName || brand.name} ${bottleData.name}`,
     };
 
+    const uniqHash = generateUniqHash(bottleInsertData);
+
     let bottle: Bottle | undefined;
     try {
       [bottle] = await tx
         .insert(bottles)
         .values({
           ...bottleInsertData,
-          uniqHash: generateUniqHash(bottleInsertData),
+          uniqHash,
         })
         .returning();
     } catch (err: any) {
       if (err?.code === "23505" && err?.constraint === "bottle_uniq_hash") {
-        throw new TRPCError({
-          message: "Bottle with name already exists under brand.",
-          code: "CONFLICT",
-          cause: err,
-        });
+        const [existingBottle] = await db
+          .select()
+          .from(bottles)
+          .where(eq(bottles.uniqHash, uniqHash));
+        throw new ConflictError(existingBottle, err);
       }
       throw err;
     }

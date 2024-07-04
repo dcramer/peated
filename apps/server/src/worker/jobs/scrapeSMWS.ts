@@ -21,7 +21,7 @@ export default async function scrapeSMWS() {
         console.log(`Submitting [${bottle.name}]`);
 
         try {
-          await trpcClient.bottleCreate.mutate({
+          await trpcClient.bottleUpsert.mutate({
             ...bottle,
           });
         } catch (err) {
