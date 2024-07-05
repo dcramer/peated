@@ -388,16 +388,16 @@ export default function BottleForm({
           />
 
           <Controller
-            name="caskSize"
+            name="caskType"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
               <SelectField
                 {...field}
                 error={errors.category}
-                label="Cask Size"
-                placeholder="e.g. Hogshead"
+                label="Cask Type"
+                placeholder="e.g. Bourbon"
                 simple
-                options={caskSizeList}
+                options={caskTypeList}
                 onChange={(value) => onChange(value?.id)}
                 value={
                   value
@@ -412,16 +412,16 @@ export default function BottleForm({
           />
 
           <Controller
-            name="caskType"
+            name="caskSize"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
               <SelectField
                 {...field}
                 error={errors.category}
-                label="Cask Type"
-                placeholder="e.g. Bourbon"
+                label="Cask Size"
+                placeholder="e.g. Hogshead"
                 simple
-                options={caskTypeList}
+                options={caskSizeList}
                 onChange={(value) => onChange(value?.id)}
                 value={
                   value

@@ -52,8 +52,8 @@ function CaskDetails({
   return (
     <div className="text-light">
       {caskFill ? toTitleCase(caskFill) : ""}{" "}
-      {caskType ? toTitleCase(caskType) : ""}
-      {caskSize ? toTitleCase(caskSize) : ""}{" "}
+      {caskType ? toTitleCase(caskType) : ""}{" "}
+      {caskSize ? toTitleCase(caskSize) : ""}
     </div>
   );
 }
