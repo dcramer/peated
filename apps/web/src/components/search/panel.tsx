@@ -6,16 +6,16 @@ import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { debounce } from "ts-debounce";
+import { useEffect, useState } from "react";
 import Header from "../header";
 import Layout from "../layout";
 import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";
 import type { Result } from "./result";
 import ResultRow from "./result";
-import { SkeletonItem } from "./skeletonItem";
 
+import { useDebounceCallback } from "usehooks-ts";
+import Spinner from "../spinner";
 export type Props = {
   value?: string;
   onClose?: () => void;
@@ -56,7 +56,7 @@ export default function SearchPanel({
   }, [onQueryChange, value]);
 
   // TODO: handle errors
-  const fetch = debounce(
+  const onQuery = useDebounceCallback(
     async (
       query: string,
     ): Promise<{
@@ -73,6 +73,8 @@ export default function SearchPanel({
 
       // })
       // user, bottles, entities
+      setState("loading");
+
       const promises = [];
       if (directToTasting || !isUserQuery) {
         promises.push(
@@ -113,53 +115,47 @@ export default function SearchPanel({
         );
       }
       const results = await Promise.all(promises);
-      return {
-        query,
-        results: results.reduce((prev, cur) => [...prev, ...cur], []),
-      };
+
+      setResults(
+        sortResults(
+          query,
+          results.reduce((prev, cur) => [...prev, ...cur], []),
+        ),
+      );
+
+      setQuery(query);
+      setState("ready");
     },
-    300,
   );
 
-  const sortResults = useCallback(
-    (unsortedResults: Result[]) => {
-      const exactMatches: number[] = [];
-      const lowerQuery = query.toLowerCase();
-      unsortedResults.forEach((value, index) => {
-        if (value.type !== "user") {
-          if (value.ref.name.toLowerCase() === lowerQuery) {
-            exactMatches.push(index);
-          }
-        } else {
-          if (
-            value.ref.displayName?.toLowerCase() === lowerQuery ||
-            value.ref.username.toLowerCase() === lowerQuery
-          ) {
-            exactMatches.push(index);
-          }
+  const sortResults = (query: string, unsortedResults: Result[]) => {
+    const exactMatches: number[] = [];
+    const lowerQuery = query.toLowerCase();
+    unsortedResults.forEach((value, index) => {
+      if (value.type !== "user") {
+        if (value.ref.name.toLowerCase() === lowerQuery) {
+          exactMatches.push(index);
         }
-      });
+      } else {
+        if (
+          value.ref.displayName?.toLowerCase() === lowerQuery ||
+          value.ref.username.toLowerCase() === lowerQuery
+        ) {
+          exactMatches.push(index);
+        }
+      }
+    });
 
-      const results = [...unsortedResults];
-      exactMatches.forEach((resultIndex, index) => {
-        const item = results.splice(resultIndex, 1);
-        results.unshift(...item);
-      });
-      return results;
-    },
-    [query],
-  );
+    const results = [...unsortedResults];
+    exactMatches.forEach((resultIndex, index) => {
+      const item = results.splice(resultIndex, 1);
+      results.unshift(...item);
+    });
+    return results;
+  };
 
   useEffect(() => {
-    setState("loading");
-    fetch.cancel();
-    const currentFetch = fetch(query);
-    setTimeout(async () => {
-      const results = await currentFetch;
-      if (results.query !== query) return;
-      setResults(sortResults(results.results));
-      setState("ready");
-    });
+    onQuery(query);
   }, [query]);
 
   return (
@@ -172,7 +168,7 @@ export default function SearchPanel({
             placeholder="Search for bottles, brands, and people"
             value={query}
             onChange={(value) => {
-              setQuery(value);
+              onQuery(value);
               if (onQueryChange) onQueryChange(query);
             }}
             onSubmit={(value) => {
@@ -187,67 +183,45 @@ export default function SearchPanel({
         </Header>
       }
     >
+      {state === "loading" && (
+        <div className="fixed inset-0 z-10">
+          <div className="absolute inset-0 bg-slate-800 opacity-50" />
+          <Spinner />
+        </div>
+      )}
       <ul role="list" className="divide-y divide-slate-800">
-        {state === "loading" ? (
-          <>
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-            <SkeletonItem />
-          </>
-        ) : (
-          <>
-            {query &&
-              !isUserQuery &&
-              (results.length < maxResults || query) && (
-                <ListItem color="highlight">
-                  <PlusIcon className="hidden h-12 w-12 flex-none rounded p-2 sm:block" />
+        {query && !isUserQuery && (results.length < maxResults || query) && (
+          <ListItem color="highlight">
+            <PlusIcon className="hidden h-12 w-12 flex-none rounded p-2 sm:block" />
 
-                  <div className="min-w-0 flex-auto">
-                    <div className="font-semibold leading-6">
-                      <Link href="/addBottle">
-                        <span className="absolute inset-x-0 -top-px bottom-0" />
-                        {"Can't find a bottle?"}
-                      </Link>
-                    </div>
-                    <div className="text-highlight-dark mt-1 flex gap-x-1 leading-5">
-                      {query !== "" ? (
-                        <span>
-                          Tap here to add{" "}
-                          <strong className="truncate">
-                            {toTitleCase(query)}
-                          </strong>{" "}
-                          to the database.
-                        </span>
-                      ) : (
-                        <span>
-                          Tap here to add a new entry to the database.
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </ListItem>
-              )}
-            {results.map((result) => {
-              return (
-                <ListItem key={`${result.type}-${result.ref.id}`}>
-                  <ResultRow
-                    result={result}
-                    directToTasting={directToTasting}
-                  />
-                </ListItem>
-              );
-            })}
-          </>
+            <div className="min-w-0 flex-auto">
+              <div className="font-semibold leading-6">
+                <Link href="/addBottle">
+                  <span className="absolute inset-x-0 -top-px bottom-0" />
+                  {"Can't find a bottle?"}
+                </Link>
+              </div>
+              <div className="text-highlight-dark mt-1 flex gap-x-1 leading-5">
+                {query !== "" ? (
+                  <span>
+                    Tap here to add{" "}
+                    <strong className="truncate">{toTitleCase(query)}</strong>{" "}
+                    to the database.
+                  </span>
+                ) : (
+                  <span>Tap here to add a new entry to the database.</span>
+                )}
+              </div>
+            </div>
+          </ListItem>
         )}
+        {results.map((result) => {
+          return (
+            <ListItem key={`${result.type}-${result.ref.id}`}>
+              <ResultRow result={result} directToTasting={directToTasting} />
+            </ListItem>
+          );
+        })}
       </ul>
     </Layout>
   );

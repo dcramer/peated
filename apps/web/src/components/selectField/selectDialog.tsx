@@ -5,10 +5,11 @@ import config from "@peated/web/config";
 import classNames from "@peated/web/lib/classNames";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { debounce } from "ts-debounce";
+import { useDebounceCallback } from "usehooks-ts";
 import Header from "../header";
 import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";
+import Spinner from "../spinner";
 import CreateOptionDialog from "./createOptionDialog";
 import { filterDupes } from "./helpers";
 import type {
@@ -52,10 +53,12 @@ export default function SelectDialog<T extends Option>({
   const [previousValues, setPreviousValues] = useState<T[]>([
     ...selectedValues,
   ]);
+  const [isLoading, setLoading] = useState(false);
 
   const [createOpen, setCreateOpen] = useState(false);
 
-  const fetch = debounce(async (query = "") => {
+  const onSearch = useDebounceCallback(async (query = "") => {
+    setLoading(true);
     const results = onQuery
       ? await onQuery(query, options)
       : options.filter(
@@ -63,9 +66,9 @@ export default function SelectDialog<T extends Option>({
         );
     if (results === undefined) throw new Error("Invalid results returned");
     setResults(onResults ? onResults(results) : results);
-  }, 300);
-
-  const onSearch = fetch;
+    setQuery(query);
+    setLoading(false);
+  });
 
   const selectOption = async (option: T) => {
     setPreviousValues(filterDupes([option], previousValues));
@@ -80,10 +83,6 @@ export default function SelectDialog<T extends Option>({
     JSON.stringify(previousValues),
   ]);
 
-  useEffect(() => {
-    onSearch(query);
-  }, [query, onQuery]);
-
   const listItemClasses = `card group group relative border-b border-slate-800 bg-slate-950 hover:bg-slate-900`;
 
   return (
@@ -95,7 +94,7 @@ export default function SelectDialog<T extends Option>({
           <SearchHeader
             onClose={() => setOpen(false)}
             onChange={(value) => {
-              setQuery(value);
+              onSearch(value);
             }}
             onDone={multiple ? () => setOpen(false) : undefined}
             closeIcon={<XMarkIcon className="h-8 w-8" />}
@@ -104,7 +103,13 @@ export default function SelectDialog<T extends Option>({
         </Header>
         <div className="flex">
           <main className="relative min-h-screen w-full max-w-7xl flex-auto lg:pl-64">
-            <div className="mx-auto lg:px-8">
+            <div className="relative mx-auto lg:px-8">
+              {isLoading && (
+                <div className="fixed inset-0 z-10">
+                  <div className="absolute inset-0 bg-slate-800 opacity-50" />
+                  <Spinner />
+                </div>
+              )}
               <ul role="list" className="divide-y divide-slate-800">
                 {optionList.map((option) => {
                   return (
