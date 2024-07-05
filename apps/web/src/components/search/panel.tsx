@@ -7,53 +7,44 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useDebounceCallback } from "usehooks-ts";
 import Header from "../header";
 import Layout from "../layout";
 import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";
+import Spinner from "../spinner";
 import type { Result } from "./result";
 import ResultRow from "./result";
 
-import { useDebounceCallback } from "usehooks-ts";
-import Spinner from "../spinner";
+const maxResults = 50;
+
 export type Props = {
   value?: string;
+  initialValue?: string;
   onClose?: () => void;
   onQueryChange?: (value: string) => void;
 };
 
 export default function SearchPanel({
-  value = "",
+  value,
+  initialValue,
   onClose,
   onQueryChange,
 }: Props) {
   const { user } = useAuth();
   const qs = useSearchParams();
 
-  const maxResults = 50;
-
   const directToTasting = qs.has("tasting");
 
   const router = useRouter();
 
-  const [query, setQuery] = useState(qs.get("q") ?? value ?? "");
+  const [query, setQuery] = useState(initialValue || value || "");
   const [state, setState] = useState<"loading" | "ready">("loading");
 
   const [results, setResults] = useState<readonly Result[]>([]);
   const isUserQuery = query.indexOf("@") !== -1 && user;
 
   const trpcUtils = trpc.useUtils();
-
-  useEffect(() => {
-    const query = qs.get("q") ?? "";
-    setQuery(query);
-    if (onQueryChange) onQueryChange(query);
-  }, [onQueryChange, qs]);
-
-  useEffect(() => {
-    setQuery(value ?? "");
-    if (onQueryChange) onQueryChange(value ?? "");
-  }, [onQueryChange, value]);
 
   // TODO: handle errors
   const onQuery = useDebounceCallback(async (query: string) => {
@@ -118,8 +109,21 @@ export default function SearchPanel({
     );
 
     setQuery(query);
+    if (onQueryChange) onQueryChange(query);
     setState("ready");
   });
+
+  useEffect(() => {
+    setQuery(value || "");
+    if (onQueryChange) onQueryChange(value || "");
+    onQuery(value || "");
+  }, [value]);
+
+  useEffect(() => {
+    setQuery(initialValue || "");
+    if (onQueryChange) onQueryChange(initialValue || "");
+    onQuery(initialValue || "");
+  }, [initialValue]);
 
   const sortResults = (query: string, unsortedResults: Result[]) => {
     const exactMatches: number[] = [];
@@ -146,10 +150,6 @@ export default function SearchPanel({
     });
     return results;
   };
-
-  useEffect(() => {
-    onQuery(query);
-  }, [query]);
 
   return (
     <Layout

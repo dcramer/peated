@@ -5,6 +5,12 @@ export const metadata: Metadata = {
   title: "Search",
 };
 
-export default function Page() {
-  return <SearchPanel />;
+export default function Page({
+  searchParams,
+}: {
+  searchParams: Record<string, any>;
+}) {
+  const query = searchParams.q ?? "";
+
+  return <SearchPanel initialValue={query} />;
 }
