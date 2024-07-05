@@ -258,14 +258,17 @@ export async function bottleUpdate({
     if (!newBottle) return;
 
     if (bottleData.name) {
+      const aliasName = newBottle.vintageYear
+        ? `${newBottle.fullName} (${newBottle.vintageYear})`
+        : newBottle.fullName;
       const existingAlias = await tx.query.bottleAliases.findFirst({
-        where: ilike(bottleAliases.name, newBottle.fullName),
+        where: ilike(bottleAliases.name, aliasName),
       });
       if (existingAlias?.bottleId === newBottle.id) {
         // we're good - likely renaming to an alias that already existed
       } else if (!existingAlias) {
         await tx.insert(bottleAliases).values({
-          name: newBottle.fullName,
+          name: aliasName,
           bottleId: newBottle.id,
         });
       } else if (!existingAlias.bottleId) {
@@ -274,7 +277,7 @@ export async function bottleUpdate({
           .set({
             bottleId: newBottle.id,
           })
-          .where(and(eq(bottleAliases.name, newBottle.fullName)));
+          .where(and(eq(bottleAliases.name, aliasName)));
       } else {
         throw new Error(
           `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,

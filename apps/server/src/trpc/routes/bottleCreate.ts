@@ -156,11 +156,15 @@ export async function bottleCreate({
       return;
     }
 
+    const aliasName = bottle.vintageYear
+      ? `${bottle.fullName} (${bottle.vintageYear})`
+      : bottle.fullName;
+
     await tx
       .insert(bottleAliases)
       .values({
         bottleId: bottle.id,
-        name: bottle.fullName,
+        name: aliasName,
       })
       .onConflictDoUpdate({
         target: [bottleAliases.name],
