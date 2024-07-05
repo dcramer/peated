@@ -6,6 +6,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import { createCaller } from "@peated/server/trpc/router";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
+import { generateUniqHash } from "../../../server/src/lib/bottleHash";
 
 const subcommand = program.command("bottles");
 
@@ -104,6 +105,40 @@ subcommand
           });
         }
       }
+    }
+  });
+
+subcommand
+  .command("fix-hashes")
+  .argument("[bottleIds...]")
+  .description("Fix bottle unique hashes")
+  .action(async (bottleIds) => {
+    const step = 1000;
+    const baseQuery = db
+      .select()
+      .from(bottles)
+      .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
+      .orderBy(asc(bottles.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const bottle of query) {
+        const uniqHash = generateUniqHash(bottle);
+        if (bottle.uniqHash !== uniqHash) {
+          console.log(`Updating hash for Bottle ${bottle.id}.`);
+          await db
+            .update(bottles)
+            .set({
+              uniqHash,
+            })
+            .where(eq(bottles.id, bottle.id));
+        }
+        hasResults = true;
+      }
+      offset += step;
     }
   });
 
