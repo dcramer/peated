@@ -129,12 +129,18 @@ subcommand
         const uniqHash = generateUniqHash(bottle);
         if (bottle.uniqHash !== uniqHash) {
           console.log(`Updating hash for Bottle ${bottle.id}.`);
-          await db
-            .update(bottles)
-            .set({
-              uniqHash,
-            })
-            .where(eq(bottles.id, bottle.id));
+          try {
+            await db.transaction(async (tx) => {
+              await tx
+                .update(bottles)
+                .set({
+                  uniqHash,
+                })
+                .where(eq(bottles.id, bottle.id));
+            });
+          } catch (err) {
+            console.error(`Unable to update hash for ${bottle.id}`, err);
+          }
         }
         hasResults = true;
       }
