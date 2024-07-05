@@ -1,5 +1,11 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
-import type { Category, FlavorProfile } from "@peated/server/types";
+import type {
+  CaskFill,
+  CaskSize,
+  CaskType,
+  Category,
+  FlavorProfile,
+} from "@peated/server/types";
 
 // This needs moved into the database and needs to be editable by the community/mods
 // https://www.whiskysaga.com/smws-codes
@@ -359,4 +365,50 @@ export function parseFlavorProfile(name: string): FlavorProfile | null {
       console.error(`Unknown flavor profile: ${name}`);
       return null;
   }
+}
+
+function parseFill(value: string): CaskFill | null {
+  if (!value) return null;
+
+  value = value.toLowerCase();
+  switch (value) {
+    case "new":
+    case "1st fill":
+    case "first fill":
+      return "1st_fill";
+    case "2nd fill":
+    case "second fill":
+      return "2nd_fill";
+    case "refill":
+      return "refill";
+    default:
+      return null;
+  }
+}
+
+function parseType(value: string): CaskType | null {
+  if (!value) return null;
+  return value
+    .toLowerCase()
+    .replace("px", "pedro_ximenez")
+    .replace(" ", "_") as CaskType;
+}
+
+export function parseCaskType(
+  caskType: string,
+): [CaskFill | null, CaskType | null, CaskSize | null] {
+  const caskFillMatch = caskType.match(
+    /(new|first fill|second fill|1st fill|2nd fill|refill)/i,
+  );
+  const caskTypeMatch = caskType.match(
+    /(bourbon|oloroso|oak|px|rum|armagnac)/i,
+  );
+  const caskSizeMatch = caskType.match(/(barrique|barrel|hogshead|butt)/i);
+
+  // new = 1st fill
+  return [
+    caskFillMatch ? parseFill(caskFillMatch[1]) : null,
+    caskTypeMatch ? parseType(caskTypeMatch[1]) : null,
+    caskSizeMatch ? (caskSizeMatch[1].toLowerCase() as CaskSize) : null,
+  ];
 }

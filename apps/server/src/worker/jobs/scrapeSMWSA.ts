@@ -1,6 +1,7 @@
 import { logError } from "@peated/server/lib/log";
 import { getUrl } from "@peated/server/lib/scraper";
 import {
+  parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
@@ -124,6 +125,11 @@ export async function scrapeBottles(
     const flavorSpec = specList.find(([name]) => name === "Flavour:");
     const flavorProfile = flavorSpec ? parseFlavorProfile(flavorSpec[1]) : null;
 
+    const caskSpec = specList.find(([name]) => name === "Cask:");
+    const [caskFill, caskType, caskSize] = caskSpec
+      ? parseCaskType(caskSpec[1])
+      : [null, null, null];
+
     const details = parseDetailsFromName(`${itemType} ${caskName}`);
     if (!details?.distiller) {
       console.error(`Cannot find distiller: ${itemType}`);
@@ -147,6 +153,9 @@ export async function scrapeBottles(
         },
         distillers: [{ name: details.distiller }],
         flavorProfile,
+        caskFill,
+        caskType,
+        caskSize,
       },
       price
         ? {
