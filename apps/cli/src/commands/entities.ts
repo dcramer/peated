@@ -32,7 +32,7 @@ subcommand
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id } of query) {
         console.log(`Generating description for Entity ${id}.`);
-        await runJob("GenerateEntityDetails", { entityId: id });
+        await runJob("GenerateEntityDetails", { entityId: id, force: true });
         hasResults = true;
       }
       offset += step;

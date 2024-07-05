@@ -114,7 +114,13 @@ export async function getGeneratedEntityDetails(
   );
 }
 
-export default async ({ entityId }: { entityId: number }) => {
+export default async ({
+  entityId,
+  force = false,
+}: {
+  entityId: number;
+  force?: boolean;
+}) => {
   if (!config.OPENAI_API_KEY) {
     return;
   }
@@ -130,7 +136,8 @@ export default async ({ entityId }: { entityId: number }) => {
   }
 
   const generateDesc =
-    !entity.descriptionSrc || entity.descriptionSrc === "generated";
+    (!entity.descriptionSrc || entity.descriptionSrc === "generated") &&
+    (!entity.description || force);
 
   // test if we need to run at all
   if (
