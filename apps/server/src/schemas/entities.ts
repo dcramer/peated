@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ENTITY_TYPE_LIST } from "../constants";
 import { ContentSourceEnum } from "./common";
 import { CountrySchema } from "./countries";
+import { RegionSchema } from "./regions";
 import { PointSchema } from "./shared";
 import { UserSchema } from "./users";
 
@@ -10,20 +11,16 @@ export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
 
 export const EntityInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
-  shortName: z.string().trim().nullable().optional(),
+  shortName: z.string().trim().nullish(),
   type: z.array(EntityTypeEnum).optional(),
-  country: z.string().trim().nullable().optional(),
-  region: z.string().trim().nullable().optional(),
-  address: z.string().trim().nullable().optional(),
-  location: PointSchema.nullable().optional(),
-  description: z.string().trim().nullable().optional(),
-  descriptionSrc: ContentSourceEnum.nullable().optional(),
-  yearEstablished: z
-    .number()
-    .lte(new Date().getFullYear())
-    .nullable()
-    .optional(),
-  website: z.string().url().nullable().optional(),
+  country: z.number().nullish(),
+  region: z.number().nullish(),
+  address: z.string().trim().nullish(),
+  location: PointSchema.nullish(),
+  description: z.string().trim().nullish(),
+  descriptionSrc: ContentSourceEnum.nullish(),
+  yearEstablished: z.number().lte(new Date().getFullYear()).nullish(),
+  website: z.string().url().nullish(),
 });
 
 export const EntitySchema = z.object({
@@ -31,12 +28,12 @@ export const EntitySchema = z.object({
   name: z.string().trim().min(1, "Required"),
   shortName: z.string().trim().nullable(),
   type: z.array(EntityTypeEnum),
-  description: z.string().nullable().optional(),
+  description: z.string().nullish(),
   yearEstablished: z.number().lte(new Date().getFullYear()).nullable(),
   website: z.string().url().nullable(),
   country: CountrySchema.nullable(),
-  region: z.string().trim().nullable(),
-  address: z.string().trim().nullable().optional(),
+  region: RegionSchema.nullable(),
+  address: z.string().trim().nullish(),
   location: PointSchema.nullable(),
 
   totalTastings: z.number(),

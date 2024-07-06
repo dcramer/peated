@@ -14,7 +14,10 @@ export default function Form({
         </div>
       )}
 
-      <form className="self-center bg-slate-950 pb-6 sm:pb-0" {...props} />
+      <form
+        className="self-center rounded bg-slate-950 pb-6 sm:pb-0"
+        {...props}
+      />
     </>
   );
 }

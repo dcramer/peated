@@ -16,6 +16,7 @@ import { bottles, bottlesToDistillers, countries } from ".";
 import { tsvector } from "../columns";
 import { geometry_point } from "../columns/geoemetry";
 import { contentSourceEnum } from "./enums";
+import { regions } from "./regions";
 import { users } from "./users";
 
 export type EntityType = "brand" | "distiller" | "bottler";
@@ -40,7 +41,10 @@ export const entities = pgTable(
     countryId: bigint("country_id", { mode: "number" }).references(
       () => countries.id,
     ),
-    region: text("region"),
+    _region: text("region"),
+    regionId: bigint("region_id", { mode: "number" }).references(
+      () => regions.id,
+    ),
     address: text("address"),
     location: geometry_point("location"),
 
@@ -73,6 +77,7 @@ export const entities = pgTable(
         .on(table.searchVector)
         .using(sql`gin(${table.searchVector})`),
       countryId: index("entity_country_by_idx").on(table.countryId),
+      regionId: index("entity_region_idx").on(table.regionId),
       createdById: index("entity_created_by_idx").on(table.createdById),
     };
   },
@@ -84,6 +89,10 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
   country: one(countries, {
     fields: [entities.countryId],
     references: [countries.id],
+  }),
+  region: one(regions, {
+    fields: [entities.countryId],
+    references: [regions.id],
   }),
   createdBy: one(users, {
     fields: [entities.createdById],

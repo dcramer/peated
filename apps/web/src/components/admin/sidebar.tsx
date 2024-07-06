@@ -37,6 +37,12 @@ export default function AdminSidebar() {
                     Badges
                   </SidebarLink>
                   <SidebarLink
+                    href="/admin/locations"
+                    active={pathname.startsWith("/admin/locations")}
+                  >
+                    Locations
+                  </SidebarLink>
+                  <SidebarLink
                     href="/admin/tags"
                     active={pathname.startsWith("/admin/tags")}
                   >

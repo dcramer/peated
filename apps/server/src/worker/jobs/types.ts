@@ -3,7 +3,9 @@ export type JobName =
   | "GenerateBottleDetails"
   | "GenerateCountryDetails"
   | "GenerateEntityDetails"
+  | "GenerateRegionDetails"
   | "GeocodeCountryLocation"
+  | "GeocodeRegionLocation"
   | "GeocodeEntityLocation"
   | "IndexBottleSearchVectors"
   | "IndexEntitySearchVectors"
@@ -20,4 +22,5 @@ export type JobName =
   | "CreateMissingBottles"
   | "UpdateBottleStats"
   | "UpdateCountryStats"
-  | "UpdateEntityStats";
+  | "UpdateEntityStats"
+  | "UpdateRegionStats";

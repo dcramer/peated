@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import * as dbSchema from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { type ExternalSiteType } from "@peated/server/types";
+import slugify from "@sindresorhus/slugify";
 import { eq, inArray, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
@@ -103,7 +104,7 @@ export const Country = async (
       .insert(countries)
       .values({
         name: "", // cant be asked to fix TS
-        slug: faker.helpers.slugify(data.name as string),
+        slug: slugify(data.name as string),
         ...data,
       })
       .onConflictDoNothing()
@@ -116,6 +117,33 @@ export const Country = async (
       .where(eq(countries.name, data.name));
   }
   if (!result) throw new Error("Unable to create Country fixture");
+  return result;
+};
+
+export const Region = async (
+  { ...data }: Partial<dbSchema.NewRegion> = {},
+  db: DatabaseType = dbConn,
+): Promise<dbSchema.Region> => {
+  if (!data.name) data.name = faker.location.state();
+  let [result] = await db.transaction(async (tx) => {
+    return await tx
+      .insert(dbSchema.regions)
+      .values({
+        countryId: data.countryId || (await Country({}, tx)).id,
+        name: "", // cant be asked to fix TS
+        slug: slugify(data.name as string),
+        ...data,
+      })
+      .onConflictDoNothing()
+      .returning();
+  });
+  if (!result) {
+    [result] = await db
+      .select()
+      .from(dbSchema.regions)
+      .where(eq(dbSchema.regions.name, data.name));
+  }
+  if (!result) throw new Error("Unable to create Region fixture");
   return result;
 };
 

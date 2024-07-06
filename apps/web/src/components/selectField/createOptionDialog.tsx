@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import { useEffect, useState } from "react";
 
 import { toTitleCase } from "@peated/server/lib/strings";
@@ -32,27 +32,28 @@ export default function CreateOptionDialog<T extends Option>({
 
   return (
     <Dialog open={open} as="div" className="dialog" onClose={setOpen}>
-      <Dialog.Overlay className="fixed inset-0" />
-      <Dialog.Panel className="dialog-panel flex items-center justify-center px-4 pb-4 pt-5 sm:p-6">
-        {render({
-          onSubmit: (...params) => {
-            onSubmit(...params);
-            setNewOption({
-              id: null,
-              name: "",
-            } as T);
-            setOpen(false);
-          },
-          onClose: () => setOpen(false),
-          data: newOption,
-          onFieldChange: (value) => {
-            setNewOption({
-              ...newOption,
-              ...value,
-            });
-          },
-        })}
-      </Dialog.Panel>
+      <div className="fixed inset-0">
+        <DialogPanel className="dialog-panel flex items-center justify-center px-4 pb-4 pt-5 sm:p-6">
+          {render({
+            onSubmit: (...params) => {
+              onSubmit(...params);
+              setNewOption({
+                id: null,
+                name: "",
+              } as T);
+              setOpen(false);
+            },
+            onClose: () => setOpen(false),
+            data: newOption,
+            onFieldChange: (value) => {
+              setNewOption({
+                ...newOption,
+                ...value,
+              });
+            },
+          })}
+        </DialogPanel>
+      </div>
     </Dialog>
   );
 }

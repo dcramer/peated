@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import { useRouter } from "next/navigation";
 
 export function Modal({ children }: { children: React.ReactNode }) {
@@ -9,9 +9,9 @@ export function Modal({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <Dialog as="div" open className="dialog" onClose={router.back}>
-        <Dialog.Overlay className="fixed inset-0" />
-
-        <Dialog.Panel className="dialog-panel">{children}</Dialog.Panel>
+        <div className="fixed inset-0">
+          <DialogPanel className="dialog-panel">{children}</DialogPanel>
+        </div>
       </Dialog>
     </div>
   );

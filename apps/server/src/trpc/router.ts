@@ -65,6 +65,11 @@ import notificationUpdate from "./routes/notificationUpdate";
 import priceChangeList from "./routes/priceChangeList";
 import priceCreateBatch from "./routes/priceCreateBatch";
 import priceList from "./routes/priceList";
+import regionBySlug from "./routes/regionBySlug";
+import regionCreate from "./routes/regionCreate";
+import regionGenerateDetails from "./routes/regionGenerateDetails";
+import regionList from "./routes/regionList";
+import regionUpdate from "./routes/regionUpdate";
 import reviewCreate from "./routes/reviewCreate";
 import reviewList from "./routes/reviewList";
 import smwsDistillerList from "./routes/smwsDistillerList";
@@ -149,6 +154,11 @@ export const appRouter = router({
   notificationList,
   notificationUpdate,
   priceChangeList,
+  regionBySlug,
+  regionCreate,
+  regionGenerateDetails,
+  regionList,
+  regionUpdate,
   reviewCreate,
   reviewList,
   stats,

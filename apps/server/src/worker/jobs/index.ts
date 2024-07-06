@@ -4,8 +4,10 @@ import createMissingBottles from "./createMissingBottles";
 import generateBottleDetails from "./generateBottleDetails";
 import generateCountryDetails from "./generateCountryDetails";
 import generateEntityDetails from "./generateEntityDetails";
+import generateRegionDetails from "./generateRegionDetails";
 import geocodeCountryLocation from "./geocodeCountryLocation";
 import geocodeEntityLocation from "./geocodeEntityLocation";
+import geocodeRegionLocation from "./geocodeRegionLocation";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
 import indexEntitySearchVectors from "./indexEntitySearchVectors";
 import notifyDiscordOnTasting from "./notifyDiscordOnTasting";
@@ -22,13 +24,16 @@ import { type JobName } from "./types";
 import updateBottleStats from "./updateBottleStats";
 import updateCountryStats from "./updateCountryStats";
 import updateEntityStats from "./updateEntityStats";
+import updateRegionStats from "./updateRegionStats";
 import { registerJob } from "./utils";
 
 // faktory does not have correct types
 registerJob("GenerateBottleDetails", generateBottleDetails as JobFunction);
 registerJob("GenerateCountryDetails", generateCountryDetails as JobFunction);
 registerJob("GenerateEntityDetails", generateEntityDetails as JobFunction);
+registerJob("GenerateRegionDetails", generateRegionDetails as JobFunction);
 registerJob("GeocodeCountryLocation", geocodeCountryLocation as JobFunction);
+registerJob("GeocodeRegionLocation", geocodeRegionLocation as JobFunction);
 registerJob("GeocodeEntityLocation", geocodeEntityLocation as JobFunction);
 registerJob(
   "IndexBottleSearchVectors",
@@ -52,6 +57,7 @@ registerJob("CreateMissingBottles", createMissingBottles);
 registerJob("UpdateBottleStats", updateBottleStats as JobFunction);
 registerJob("UpdateCountryStats", updateCountryStats as JobFunction);
 registerJob("UpdateEntityStats", updateEntityStats as JobFunction);
+registerJob("UpdateRegionStats", updateRegionStats as JobFunction);
 
 export async function runJob(jobName: JobName, args?: any) {
   const jobFn = faktory.registry[jobName];

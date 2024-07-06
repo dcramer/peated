@@ -14,6 +14,7 @@ export const CountrySerializer = serializer({
       name: item.name,
       slug: item.slug,
       description: item.description,
+      summary: item.summary,
       location: item.location,
       totalBottles: item.totalBottles,
       totalDistillers: item.totalDistillers,

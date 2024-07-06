@@ -17,12 +17,19 @@ function generatePrompt(country: InputCountry) {
   return `
 Tell me about the whisky culture in ${country.name}, and what sets it apart from other regions.
 
-'description' should include two paragraphs formatted using markdown: the first should focus on its history & origin, the second should describe its unique approach, what styles it produces, and any interesting related facts. The description should be at least 100 words, and no more than 200.
+'summary' should be one or two sentences that describe the requirements, if any for whisky produced in the region.
+
+'description' should include two or three sections, formatted as paragraphs using newlines:
+
+The first paragraph should focus on the region's history & origin.
+The second paragraph should describe the region's unique approach, what styles it produces, and any interesting related facts.
+The third paragraph, should describe any requirements to producing whisky in the region.
 `;
 }
 
 export const OpenAICountryDetailsSchema = z.object({
   description: z.string().nullable().optional(),
+  summary: z.string().nullable().optional(),
 });
 
 export type GeneratedCountryDetails = z.infer<
@@ -93,9 +100,11 @@ export default async ({ countryId }: { countryId: number }) => {
     data.descriptionSrc = "generated";
   }
 
+  if (!country.summary && result.summary) {
+    data.summary = result.summary;
+  }
+
   if (Object.keys(data).length === 0) return;
 
-  await db.transaction(async (tx) => {
-    await db.update(countries).set(data).where(eq(countries.id, country.id));
-  });
+  await db.update(countries).set(data).where(eq(countries.id, country.id));
 };

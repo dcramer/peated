@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import {
   ChatBubbleLeftRightIcon,
@@ -233,21 +233,18 @@ export default function TastingListItem({
 
           {(user?.admin || isTaster) && (
             <Menu as="div" className="menu">
-              <Menu.Button as={Button}>
+              <MenuButton as={Button}>
                 <EllipsisVerticalIcon className="h-5 w-5" />
-              </Menu.Button>
-              <Menu.Items className="absolute inset-x-0 bottom-10 right-0 z-40 w-44 origin-bottom-right">
+              </MenuButton>
+              <MenuItems className="absolute inset-x-0 bottom-10 right-0 z-40 w-44 origin-bottom-right">
                 {(user?.admin || isTaster) && (
                   <>
                     {isTaster && (
-                      <Menu.Item
-                        as={Link}
-                        href={`/tastings/${tasting.id}/edit`}
-                      >
+                      <MenuItem as={Link} href={`/tastings/${tasting.id}/edit`}>
                         Edit Tasting
-                      </Menu.Item>
+                      </MenuItem>
                     )}
-                    <Menu.Item
+                    <MenuItem
                       as="button"
                       onClick={async () => {
                         await tastingDeleteMutation.mutateAsync(tasting.id);
@@ -258,10 +255,10 @@ export default function TastingListItem({
                       }}
                     >
                       Delete Tasting
-                    </Menu.Item>
+                    </MenuItem>
                   </>
                 )}
-              </Menu.Items>
+              </MenuItems>
             </Menu>
           )}
         </aside>

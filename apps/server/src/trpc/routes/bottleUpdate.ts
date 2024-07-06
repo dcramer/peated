@@ -8,17 +8,17 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { generateUniqHash } from "@peated/server/lib/bottleHash";
-import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
+import { type BottlePreviewResult } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike, inArray, sql } from "drizzle-orm";
+import { and, eq, ilike, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
-import { upsertEntity } from "../../lib/db";
+import { coerceToUpsert, upsertEntity } from "../../lib/db";
 import { type Context } from "../context";
 import { bottleNormalize } from "./bottlePreview";
 
@@ -60,29 +60,30 @@ export async function bottleUpdate({
     });
   }
 
-  const bottleData: Record<string, any> = await bottleNormalize({
-    input: {
-      name: bottle.name,
-      brand: {
-        id: bottle.brand.id,
-        name: bottle.brand.name,
+  const bottleData: BottlePreviewResult & Record<string, any> =
+    await bottleNormalize({
+      input: {
+        name: bottle.name,
+        brand: {
+          id: bottle.brand.id,
+          name: bottle.brand.name,
+        },
+        bottler: bottle.bottler
+          ? {
+              id: bottle.bottler.id,
+              name: bottle.bottler.name,
+            }
+          : null,
+        statedAge: bottle.statedAge,
+        category: bottle.category,
+        distillers: bottle.bottlesToDistillers.map((d) => ({
+          id: d.distiller.id,
+          name: d.distiller.name,
+        })),
+        ...input,
       },
-      bottler: bottle.bottler
-        ? {
-            id: bottle.bottler.id,
-            name: bottle.bottler.name,
-          }
-        : null,
-      statedAge: bottle.statedAge,
-      category: bottle.category,
-      distillers: bottle.bottlesToDistillers.map((d) => ({
-        id: d.distiller.id,
-        name: d.distiller.name,
-      })),
-      ...input,
-    },
-    ctx,
-  });
+      ctx,
+    });
 
   if (
     input.description !== undefined &&
@@ -104,7 +105,7 @@ export async function bottleUpdate({
       ) {
         const brandUpsert = await upsertEntity({
           db: tx,
-          data: bottleData.brand,
+          data: coerceToUpsert(bottleData.brand),
           userId: user.id,
           type: "brand",
         });
@@ -128,7 +129,7 @@ export async function bottleUpdate({
       ) {
         const bottlerUpsert = await upsertEntity({
           db: tx,
-          data: bottleData.bottler,
+          data: coerceToUpsert(bottleData.bottler),
           userId: user.id,
           type: "bottler",
         });
@@ -166,7 +167,7 @@ export async function bottleUpdate({
         if (!distiller) {
           const distUpsert = await upsertEntity({
             db: tx,
-            data: distData,
+            data: coerceToUpsert(distData),
             userId: user.id,
             type: "distiller",
           });
@@ -284,41 +285,6 @@ export async function bottleUpdate({
         );
       }
     }
-
-    if (!brand) {
-      brand = (await tx.query.entities.findFirst({
-        where: (entities, { eq }) =>
-          eq(entities.id, (newBottle as Bottle).brandId),
-      })) as Entity;
-    }
-
-    const allEntityIds = [
-      ...distillerIds,
-      bottle.brandId,
-      newBottle.brandId,
-      bottle.bottlerId,
-      newBottle.bottlerId,
-    ].filter(notEmpty);
-
-    // XXX: this could be more optimal, but accounting is a pita
-    await tx
-      .update(entities)
-      .set({
-        totalBottles: sql<number>`(
-          SELECT COUNT(*)
-          FROM ${bottles}
-          WHERE (
-            ${bottles.brandId} = ${entities.id}
-            OR ${bottles.bottlerId} = ${entities.id}
-            OR EXISTS(
-              SELECT FROM ${bottlesToDistillers}
-              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-              AND ${bottlesToDistillers.distillerId} = ${entities.id}
-            )
-          )
-        )`,
-      })
-      .where(inArray(entities.id, allEntityIds));
 
     await tx.insert(changes).values({
       objectType: "bottle",

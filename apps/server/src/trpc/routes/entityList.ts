@@ -6,6 +6,7 @@ import {
   countries,
   entities,
   entityAliases,
+  regions,
 } from "@peated/server/db/schema";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { serialize } from "@peated/server/serializers";
@@ -84,30 +85,63 @@ export default publicProcedure
       where.push(sql`${input.type} = ANY(${entities.type})`);
     }
 
-    if (typeof input.country === "number") {
-      where.push(eq(entities.countryId, input.country));
-    } else if (input.country) {
-      const [result] = await db
-        .select({ id: countries.id })
-        .from(countries)
-        .where(
-          or(
-            eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()),
-            eq(sql`LOWER(${countries.name})`, input.country.toLowerCase()),
-          ),
-        )
-        .limit(1);
-      if (!result) {
+    if (input.country) {
+      let countryId: number | null = null;
+      if (typeof input.country === "number") {
+        where.push(eq(entities.countryId, input.country));
+        countryId = input.country;
+      } else if (input.country) {
+        [{ countryId }] = await db
+          .select({ countryId: countries.id })
+          .from(countries)
+          .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
+          .limit(1);
+        if (!countryId) {
+          throw new TRPCError({
+            message: "Invalid country",
+            code: "BAD_REQUEST",
+          });
+        }
+        where.push(eq(entities.countryId, countryId));
+      }
+
+      if (!countryId) {
         throw new TRPCError({
           message: "Invalid country",
           code: "BAD_REQUEST",
         });
       }
-      where.push(eq(entities.countryId, result.id));
+
+      if (typeof input.region === "number") {
+        where.push(eq(entities.regionId, input.region));
+      } else if (input.region) {
+        const [result] = await db
+          .select({ id: regions.id })
+          .from(regions)
+          .where(
+            and(
+              eq(sql`LOWER(${regions.slug})`, input.region.toLowerCase()),
+              eq(regions.countryId, countryId),
+            ),
+          )
+          .limit(1);
+        if (!result) {
+          throw new TRPCError({
+            message: "Invalid country",
+            code: "BAD_REQUEST",
+          });
+        }
+        where.push(eq(entities.regionId, result.id));
+      }
+    } else if (typeof input.region === "number") {
+      where.push(eq(entities.regionId, input.region));
+    } else if (input.region) {
+      throw new TRPCError({
+        message: "Invalid country",
+        code: "BAD_REQUEST",
+      });
     }
-    if (input.region) {
-      where.push(ilike(entities.region, input.region));
-    }
+
     if (input.bottler) {
       where.push(sql`${entities.id} IN (
         SELECT DISTINCT ${bottlesToDistillers.distillerId}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { type User } from "@peated/server/types";
 import Button from "@peated/web/components/button";
@@ -31,11 +31,11 @@ export default function ModActions({ user }: { user: User }) {
 
   return (
     <Menu as="div" className="menu">
-      <Menu.Button as={Button}>
+      <MenuButton as={Button}>
         <EllipsisVerticalIcon className="h-5 w-5" />
-      </Menu.Button>
-      <Menu.Items className="absolute right-0 z-40 mt-2 w-64 origin-top-right">
-        <Menu.Item
+      </MenuButton>
+      <MenuItems className="absolute right-0 z-40 mt-2 w-64 origin-top-right">
+        <MenuItem
           as="button"
           onClick={() => {
             userUpdateMutation.mutate({
@@ -45,8 +45,8 @@ export default function ModActions({ user }: { user: User }) {
           }}
         >
           {user.mod ? "Remove Moderator Role" : "Add Moderator Role"}
-        </Menu.Item>
-      </Menu.Items>
+        </MenuItem>
+      </MenuItems>
     </Menu>
   );
 }

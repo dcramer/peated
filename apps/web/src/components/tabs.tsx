@@ -54,7 +54,7 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
 
   const className = classNames(
     active ? activeStyles : inactiveStyles,
-    "flex whitespace-nowrap border-b-4 px-1 py-4 text-sm font-medium",
+    "flex whitespace-nowrap border-b-4 px-3 py-4 text-sm font-medium",
   );
 
   return (
@@ -73,7 +73,4 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
     </Component>
   );
 }
-
-Tabs.Item = TabItem;
-
 export default Tabs;

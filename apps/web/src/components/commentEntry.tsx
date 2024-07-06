@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { User } from "@peated/server/types";
 import Link from "@peated/web/components/link";
@@ -58,16 +58,16 @@ export default function CommentEntry<
           <div>
             {showMenu && (
               <Menu as="div" className="menu">
-                <Menu.Button as={button} size="small" color="primary">
+                <MenuButton as={button} size="small" color="primary">
                   <EllipsisVerticalIcon className="h-5 w-5" />
-                </Menu.Button>
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded">
+                </MenuButton>
+                <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded">
                   {canDelete && (
-                    <Menu.Item as="button" onClick={onDelete}>
+                    <MenuItem as="button" onClick={onDelete}>
                       Delete Comment
-                    </Menu.Item>
+                    </MenuItem>
                   )}
-                </Menu.Items>
+                </MenuItems>
               </Menu>
             )}
           </div>

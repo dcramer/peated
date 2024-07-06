@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { type Entity } from "@peated/server/types";
 import Button from "@peated/web/components/button";
@@ -27,32 +27,32 @@ export default function ModActions({ entity }: { entity: Entity }) {
 
   return (
     <Menu as="div" className="menu">
-      <Menu.Button as={Button}>
+      <MenuButton as={Button}>
         <EllipsisVerticalIcon className="h-5 w-5" />
-      </Menu.Button>
-      <Menu.Items
+      </MenuButton>
+      <MenuItems
         className="absolute right-0 z-40 mt-2 w-32 origin-top-right"
         unmount={false}
       >
-        <Menu.Item as={Link} href={`/entities/${entity.id}/aliases`}>
+        <MenuItem as={Link} href={`/entities/${entity.id}/aliases`}>
           View Aliases
-        </Menu.Item>
-        <Menu.Item as={Link} href={`/entities/${entity.id}/edit`}>
+        </MenuItem>
+        <MenuItem as={Link} href={`/entities/${entity.id}/edit`}>
           Edit Entity
-        </Menu.Item>
-        <Menu.Item as={Link} href={`/entities/${entity.id}/merge`}>
+        </MenuItem>
+        <MenuItem as={Link} href={`/entities/${entity.id}/merge`}>
           Merge Entity
-        </Menu.Item>
+        </MenuItem>
         {user.admin && (
-          <Menu.Item
+          <MenuItem
             as={ConfirmationButton}
             onContinue={deleteEntity}
             disabled={deleteEntityMutation.isPending}
           >
             Delete Entity
-          </Menu.Item>
+          </MenuItem>
         )}
-      </Menu.Items>
+      </MenuItems>
     </Menu>
   );
 }

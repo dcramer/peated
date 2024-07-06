@@ -1,7 +1,6 @@
 import config from "@peated/server/config";
 import {
   BOT_USER_AGENT,
-  COUNTRY_LIST,
   DEFAULT_CREATED_BY_ID,
 } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -9,7 +8,7 @@ import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { getStructuredResponse } from "@peated/server/lib/openai";
-import { CountryEnum, EntityTypeEnum } from "@peated/server/schemas";
+import { EntityTypeEnum } from "@peated/server/schemas";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -18,12 +17,15 @@ if (!config.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not configured.");
 }
 
-type InputEntity = Partial<Entity> & { country: { name: string } | null };
+type InputEntity = Partial<Entity> & {
+  country: { name: string } | null;
+  region: { name: string } | null;
+};
 
 function generatePrompt(entity: InputEntity) {
   const infoLines = [];
   if (entity.country && entity.region) {
-    infoLines.push(`Location: ${entity.region}, ${entity.country.name}`);
+    infoLines.push(`Location: ${entity.region.name}, ${entity.country.name}`);
   } else if (entity.country) {
     infoLines.push(`Location: ${entity.country.name}`);
   }
@@ -58,12 +60,6 @@ Describe the entity as a distiller, bottler, or brand, whichever one it primaril
 
 'website' should be the URL to the official website, if one exists. Include the HTTPS protocol in the website value.
 
-'country' should be where the entity is located, if known. Country should be one of the following values:
-
-- ${COUNTRY_LIST.join("\n- ")}
-
-'region' should be the region of the country where the entity is located, if known. Examples of regions might be "Speyside" or "Islay".
-
 The 'type' field must contain every value which is accurate for this entity, describing if the entity operates as brand, a distiller, and/or a bottler.
 If the entity is a distiller, include 'distiller' in the 'type' field.
 If the entity is a brand, include 'brand' in the 'type' field.
@@ -76,13 +72,10 @@ export const OpenAIEntityDetailsSchema = z.object({
   description: z.string().nullable().optional(),
   yearEstablished: z.number().nullable().optional(),
   website: z.string().url().nullable().optional(),
-  country: z.string().nullable().optional(),
-  region: z.string().nullable().optional(),
   type: z.array(z.string()).optional(),
 });
 
 const OpenAIEntityDetailsValidationSchema = OpenAIEntityDetailsSchema.extend({
-  country: CountryEnum.nullable().optional(),
   type: z.array(EntityTypeEnum).optional(),
 });
 
@@ -129,6 +122,7 @@ export default async ({
     where: (entities, { eq }) => eq(entities.id, entityId),
     with: {
       country: true,
+      region: true,
     },
   });
   if (!entity) {
@@ -140,13 +134,7 @@ export default async ({
     (!entity.description || force);
 
   // test if we need to run at all
-  if (
-    !generateDesc &&
-    entity.yearEstablished &&
-    entity.website &&
-    entity.country &&
-    entity.region
-  ) {
+  if (!generateDesc && entity.yearEstablished && entity.website) {
     return;
   }
 
@@ -176,10 +164,6 @@ export default async ({
   )
     data.type = result.type;
 
-  if (!entity.country && result.country) data.country = result.country;
-
-  if (!entity.region && result.region) data.region = result.region;
-
   if (Object.keys(data).length === 0) return;
 
   if (data.website) {
@@ -200,7 +184,7 @@ export default async ({
   }
 
   await db.transaction(async (tx) => {
-    await db.update(entities).set(data).where(eq(entities.id, entity.id));
+    await tx.update(entities).set(data).where(eq(entities.id, entity.id));
 
     await tx.insert(changes).values({
       objectType: "entity",

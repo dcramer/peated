@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { type Flight } from "@peated/server/types";
 import Button from "@peated/web/components/button";
@@ -27,23 +27,23 @@ export default function ModActions({ flight }: { flight: Flight }) {
 
   return (
     <Menu as="div" className="menu">
-      <Menu.Button as={Button}>
+      <MenuButton as={Button}>
         <EllipsisVerticalIcon className="h-5 w-5" />
-      </Menu.Button>
-      <Menu.Items className="absolute right-0 z-40 mt-2 w-32 origin-top-right lg:left-0 lg:origin-top-left">
-        <Menu.Item as={Link} href={`/flights/${flight.id}/edit`}>
+      </MenuButton>
+      <MenuItems className="absolute right-0 z-40 mt-2 w-32 origin-top-right lg:left-0 lg:origin-top-left">
+        <MenuItem as={Link} href={`/flights/${flight.id}/edit`}>
           Edit Flight
-        </Menu.Item>
+        </MenuItem>
         {user?.admin && (
-          <Menu.Item
+          <MenuItem
             as={ConfirmationButton}
             onContinue={deleteFlight}
             disabled={deleteFlightMutation.isPending}
           >
             Delete Flight
-          </Menu.Item>
+          </MenuItem>
         )}
-      </Menu.Items>
+      </MenuItems>
     </Menu>
   );
 }

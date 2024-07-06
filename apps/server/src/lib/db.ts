@@ -1,7 +1,9 @@
 import { eq } from "drizzle-orm";
+import { type z } from "zod";
 import type { DatabaseType, TransactionType } from "../db";
 import type { Entity, EntityType } from "../db/schema";
-import { changes, collections, countries, entities } from "../db/schema";
+import { changes, collections, entities } from "../db/schema";
+import { type EntityInputSchema, type EntitySchema } from "../schemas";
 import { type EntityInput } from "../types";
 
 export type UpsertOutcome<T> =
@@ -11,6 +13,19 @@ export type UpsertOutcome<T> =
       created: boolean;
     }
   | undefined;
+
+export function coerceToUpsert(
+  data: z.infer<typeof EntityInputSchema> | z.infer<typeof EntitySchema>,
+): EntityInput {
+  const rv: EntityInput = { ...data };
+  if (data.country instanceof Object) {
+    rv.countryId = data.country.id;
+  }
+  if (data.region instanceof Object) {
+    rv.regionId = data.region.id;
+  }
+  return data;
+}
 
 export const upsertEntity = async ({
   db,
@@ -40,20 +55,12 @@ export const upsertEntity = async ({
     return result ? { id: result.id, result, created: false } : undefined;
   }
 
-  const [country] = data.country
-    ? await db
-        .select({ id: countries.id })
-        .from(countries)
-        .where(eq(countries.name, data.country))
-        .limit(1)
-    : [];
-
   const [result] = await db
     .insert(entities)
     .values({
       name: data.name,
-      countryId: country ? country.id : null,
-      region: data.region || null,
+      countryId: data.countryId,
+      regionId: data.regionId,
       type: Array.from(
         new Set([...(type ? [type] : []), ...(data.type || [])]),
       ),

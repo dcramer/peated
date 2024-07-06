@@ -2,7 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { type EntityType } from "@peated/server/src/types";
 import { trpc } from "@peated/web/lib/trpc";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import Button from "./button";
 import CountryField from "./countryField";
@@ -64,6 +65,8 @@ function CreateForm({
     defaultValues: data,
   });
 
+  const [countryValue, setCountryValue] = useState<Option | undefined>();
+
   return (
     <form
       onSubmit={(e) => {
@@ -86,14 +89,24 @@ function CreateForm({
           autoComplete="off"
         />
 
-        <CountryField
+        <Controller
           control={control}
           name="country"
-          error={errors.country}
-          label="Country"
-          placeholder="e.g. Scotland, United States of America"
-          required
+          render={({ field: { onChange, value, ref, ...field } }) => (
+            <CountryField
+              {...field}
+              error={errors.region}
+              label="Country"
+              placeholder="e.g. Scotland"
+              onChange={(value) => {
+                onChange(value?.id);
+                setCountryValue(value);
+              }}
+              value={countryValue}
+            />
+          )}
         />
+
         <TextField
           {...register("region")}
           error={errors.region}
