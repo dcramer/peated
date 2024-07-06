@@ -1,10 +1,15 @@
 "use client";
 
-import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
+import {
+  CASK_TYPES,
+  CATEGORY_LIST,
+  FLAVOR_PROFILES,
+} from "@peated/server/constants";
 import {
   formatCategoryName,
   formatFlavorProfile,
 } from "@peated/server/lib/format";
+import { toTitleCase } from "@peated/server/src/lib/strings";
 import Button from "@peated/web/components/button";
 import FilterSidebarSection from "@peated/web/components/filterListSection";
 import { useSearchParams } from "next/navigation";
@@ -27,6 +32,11 @@ export default function BottleListSidebar() {
           name="flavorProfile"
           title="Flavor Profile"
           options={FLAVOR_PROFILES.map((k) => [k, formatFlavorProfile(k)])}
+        />
+        <FilterSidebarSection
+          title="Cask"
+          name="caskType"
+          options={CASK_TYPES.map((k) => [k.id, toTitleCase(k.id)])}
         />
         {searchParams.get("entity") ? (
           <FilterSidebarSection title="Relationship" name="entity" />

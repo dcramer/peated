@@ -9,6 +9,7 @@ import {
   flights,
   tastings,
 } from "@peated/server/db/schema";
+import { CaskTypeEnum } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { TRPCError } from "@trpc/server";
@@ -48,6 +49,7 @@ export default publicProcedure
         flight: z.string().nullish(),
         category: z.enum(CATEGORY_LIST).nullish(),
         age: z.number().nullish(),
+        caskType: CaskTypeEnum.nullish(),
         cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(25),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
@@ -97,6 +99,9 @@ export default publicProcedure
     }
     if (input.age) {
       where.push(eq(bottles.statedAge, input.age));
+    }
+    if (input.caskType) {
+      where.push(eq(bottles.caskType, input.caskType));
     }
     if (input.tag) {
       where.push(
