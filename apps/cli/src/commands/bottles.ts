@@ -7,6 +7,7 @@ import { createCaller } from "@peated/server/trpc/router";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 import { generateUniqHash } from "../../../server/src/lib/bottleHash";
+import { mergeBottlesInto } from "../../../server/src/trpc/routes/bottleMerge";
 
 const subcommand = program.command("bottles");
 
@@ -139,6 +140,15 @@ subcommand
                 .where(eq(bottles.id, bottle.id));
             });
           } catch (err) {
+            const [existingBottle] = await db
+              .select()
+              .from(bottles)
+              .where(eq(bottles.uniqHash, uniqHash));
+            if (existingBottle.id > bottle.id) {
+              mergeBottlesInto(existingBottle, bottle);
+            } else {
+              mergeBottlesInto(bottle, existingBottle);
+            }
             console.error(`Unable to update hash for ${bottle.id}`, err);
           }
         }
