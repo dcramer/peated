@@ -140,6 +140,10 @@ subcommand
                 .where(eq(bottles.id, bottle.id));
             });
           } catch (err) {
+            console.error(
+              `Unable to update hash for ${bottle.id}. Merging instead.`,
+              err,
+            );
             const [existingBottle] = await db
               .select()
               .from(bottles)
@@ -149,7 +153,6 @@ subcommand
             } else {
               mergeBottlesInto(bottle, existingBottle);
             }
-            console.error(`Unable to update hash for ${bottle.id}`, err);
           }
         }
         hasResults = true;
