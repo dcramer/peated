@@ -22,7 +22,7 @@ export default function Page({
       limit: 20,
     }),
   ]);
-  F;
+
   return (
     <>
       {topEntityList.results.length ? (
