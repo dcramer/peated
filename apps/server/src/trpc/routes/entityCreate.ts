@@ -5,6 +5,7 @@ import {
   countries,
   entities,
   entityAliases,
+  regions,
 } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
 import { normalizeEntityName } from "@peated/server/lib/normalize";
@@ -14,7 +15,7 @@ import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { authedProcedure } from "..";
 
 export default authedProcedure
@@ -31,7 +32,7 @@ export default authedProcedure
       const [country] = await db
         .select()
         .from(countries)
-        .where(eq(sql`LOWER(${countries.name})`, input.country.toLowerCase()))
+        .where(eq(countries.id, input.country))
         .limit(1);
       if (!country) {
         throw new TRPCError({
@@ -40,6 +41,21 @@ export default authedProcedure
         });
       }
       data.countryId = country.id;
+    }
+
+    if (input.region) {
+      const [region] = await db
+        .select()
+        .from(regions)
+        .where(eq(regions.id, input.region))
+        .limit(1);
+      if (!region || region.countryId !== data.countryId) {
+        throw new TRPCError({
+          message: "Region not found.",
+          code: "NOT_FOUND",
+        });
+      }
+      data.regionId = region.id;
     }
 
     if (data.description && data.description !== "") {

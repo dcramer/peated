@@ -7,16 +7,12 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { generateUniqHash } from "@peated/server/lib/bottleHash";
-import { upsertEntity } from "@peated/server/lib/db";
+import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import type {
-  BottlePreviewResult,
-  EntityInput,
-  FreeformEntity,
-} from "@peated/server/types";
+import type { BottlePreviewResult } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq, isNull } from "drizzle-orm";
@@ -25,16 +21,6 @@ import { authedProcedure } from "..";
 import { type Context } from "../context";
 import { ConflictError } from "../errors";
 import { bottleNormalize } from "./bottlePreview";
-
-function coerceToUpsert(data: FreeformEntity): EntityInput {
-  if (data.country instanceof Object) {
-    return {
-      ...data,
-      country: data.country.name,
-    };
-  }
-  return data as EntityInput;
-}
 
 export async function bottleCreate({
   input,

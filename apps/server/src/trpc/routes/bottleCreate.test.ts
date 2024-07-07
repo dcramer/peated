@@ -267,7 +267,6 @@ test("creates a new bottle with new distiller name", async ({
     distillers: [
       {
         name: "Hard Knox",
-        country: "Scotland",
       },
     ],
   });
@@ -316,12 +315,10 @@ test("creates a new bottle with new distiller name and brand name", async ({
     name: "Delicious Wood",
     brand: {
       name: "Rip Van",
-      region: "Kentucky",
     },
     distillers: [
       {
         name: "Hard Knox",
-        country: "Scotland",
       },
     ],
   });
@@ -354,7 +351,6 @@ test("creates a new bottle with new distiller name and brand name", async ({
     .from(entities)
     .where(eq(entities.id, bottle.brandId));
   expect(brand.name).toBe("Rip Van");
-  expect(brand.region).toBe("Kentucky");
 
   // it should create a change entry for the brand and distiller
   const changeList = await db
@@ -377,12 +373,10 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
     name: "Delicious Wood",
     brand: {
       name: "Hard Knox",
-      country: "Scotland",
     },
     distillers: [
       {
         name: "Hard Knox",
-        country: "Scotland",
       },
     ],
   });

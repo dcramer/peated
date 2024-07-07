@@ -30,7 +30,16 @@ export default function EntityHeader({
             </>
           )}
           {!!entity.country && !!entity.region && (
-            <span> &middot; {entity.region}</span>
+            <span>
+              {" "}
+              &middot;{" "}
+              <Link
+                href={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
+                className="truncate hover:underline"
+              >
+                {entity.region.name}
+              </Link>
+            </span>
           )}
         </div>
       }

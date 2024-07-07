@@ -10,7 +10,7 @@ import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
-import SelectField from "@peated/web/components/selectField";
+import SelectField, { type Option } from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
 import { useState } from "react";
@@ -21,6 +21,7 @@ import useAuth from "../hooks/useAuth";
 import { logError } from "../lib/log";
 import Button from "./button";
 import Legend from "./legend";
+import RegionField from "./regionField";
 import TextAreaField from "./textAreaField";
 
 const entityTypes = [
@@ -51,13 +52,32 @@ export default function EntityForm({
     resolver: zodResolver(EntityInputSchema),
     defaultValues: {
       ...initialData,
-      country: initialData.country?.name,
+      country: initialData.country ? initialData.country.id : null,
+      region: initialData.region ? initialData.region.id : null,
     },
   });
 
   const { user } = useAuth();
 
   const [error, setError] = useState<string | undefined>();
+
+  const [countryValue, setCountryValue] = useState<Option | undefined>(
+    initialData.country
+      ? {
+          id: initialData.country.id,
+          name: initialData.country.name,
+        }
+      : undefined,
+  );
+
+  const [regionValue, setRegionValue] = useState<Option | undefined>(
+    initialData.region
+      ? {
+          id: initialData.region.id,
+          name: initialData.region.name,
+        }
+      : undefined,
+  );
 
   const generateDataMutation = trpc.entityGenerateDetails.useMutation();
 
@@ -139,10 +159,6 @@ export default function EntityForm({
                     !currentValues.yearEstablished
                   )
                     setValue("yearEstablished", result.yearEstablished);
-                  if (result && result.country && !currentValues.country)
-                    setValue("country", result.country);
-                  if (result && result.region && !currentValues.region)
-                    setValue("region", result.region);
                 }}
                 disabled={generateDataMutation.isPending}
                 icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
@@ -152,22 +168,48 @@ export default function EntityForm({
             )}
           </Legend>
 
-          <CountryField
+          <Controller
             control={control}
             name="country"
-            error={errors.country}
-            label="Country"
-            placeholder="e.g. Scotland, United States of America"
-            required
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <CountryField
+                {...field}
+                error={errors.country}
+                label="Country"
+                placeholder="e.g. Scotland"
+                onChange={(value) => {
+                  onChange(value?.id);
+                  // if (regionValue?.country.id !== value?.id)
+                  setRegionValue(undefined);
+                  setCountryValue(value);
+                }}
+                value={countryValue}
+              />
+            )}
           />
-          <TextField
-            {...register("region")}
-            error={errors.region}
-            label="Region"
-            type="text"
-            placeholder="e.g. Islay, Kentucky"
-            autoComplete="off"
+
+          <Controller
+            control={control}
+            name="region"
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <RegionField
+                {...field}
+                error={errors.region}
+                label="Region"
+                placeholder="e.g. Islay, Kentucky"
+                searchContext={{
+                  country: getValues("country"),
+                }}
+                onChange={(value) => {
+                  onChange(value?.id);
+                  setRegionValue(value);
+                }}
+                value={regionValue}
+                rememberValues={false}
+              />
+            )}
           />
+
           <TextAreaField
             {...register("address")}
             error={errors.description}

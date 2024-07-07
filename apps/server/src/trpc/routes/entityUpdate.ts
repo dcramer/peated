@@ -7,6 +7,7 @@ import {
   countries,
   entities,
   entityAliases,
+  regions,
 } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
@@ -51,7 +52,7 @@ export default modProcedure
       const [country] = await db
         .select()
         .from(countries)
-        .where(eq(sql`LOWER(${countries.name})`, input.country.toLowerCase()))
+        .where(eq(countries.id, input.country))
         .limit(1);
       if (!country) {
         throw new TRPCError({
@@ -63,8 +64,24 @@ export default modProcedure
         data.countryId = country.id;
       }
     }
-    if (input.region !== undefined && input.region !== entity.region) {
-      data.region = input.region;
+    if (input.region !== undefined && input.region) {
+      const [region] = await db
+        .select()
+        .from(regions)
+        .where(eq(regions.id, input.region))
+        .limit(1);
+      if (
+        !region ||
+        region.countryId !== (data.countryId ?? entity.countryId)
+      ) {
+        throw new TRPCError({
+          message: "Region not found.",
+          code: "NOT_FOUND",
+        });
+      }
+      if (region.id !== entity.regionId) {
+        data.regionId = region.id;
+      }
     }
     if (input.address !== undefined && input.address !== entity.address) {
       data.address = input.address;

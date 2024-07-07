@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  char,
   pgTable,
   text,
   uniqueIndex,
@@ -15,9 +16,13 @@ export const countries = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     name: text("name").notNull(),
     slug: text("slug").notNull(),
+    alpha2: char("alpha2", {
+      length: 2,
+    }),
     location: geometry_point("location"),
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
+    summary: text("summary"),
     totalBottles: bigint("total_bottles", { mode: "number" })
       .default(0)
       .notNull(),

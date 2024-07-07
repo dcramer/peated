@@ -31,6 +31,7 @@ import type {
   NotificationSchema,
   ObjectTypeEnum,
   PointSchema,
+  RegionSchema,
   ReviewSchema,
   StorePriceSchema,
   TastingSchema,
@@ -62,6 +63,7 @@ export type Collection = z.infer<typeof CollectionSchema>;
 export type CollectionBottle = z.infer<typeof CollectionBottleSchema>;
 export type Comment = z.infer<typeof CommentSchema>;
 export type Country = z.infer<typeof CountrySchema>;
+export type Region = z.infer<typeof RegionSchema>;
 export type ExternalSite = z.infer<typeof ExternalSiteSchema>;
 export type Entity = z.infer<typeof EntitySchema>;
 export type Flight = z.infer<typeof FlightSchema>;
@@ -108,12 +110,12 @@ export type EntityInput =
   | {
       id?: number;
       name: string;
-      country?: string | null;
-      region?: string | null;
+      countryId?: number | null;
+      regionId?: number | null;
       type?: ("brand" | "bottler" | "distiller")[];
     };
 
-export type FreeformEntity =
+type FreeformEntity =
   | z.infer<typeof EntityInputSchema>
   | z.infer<typeof EntitySchema>;
 

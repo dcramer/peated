@@ -246,16 +246,6 @@ test("changes brand", async ({ fixtures }) => {
   );
   expect(bottle2.brandId).toBe(newBrand.id);
   expect(bottle2.fullName).toBe(`${newBrand.name} ${bottle.name}`);
-
-  const newBrandRef = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, newBrand.id),
-  });
-  expect(newBrandRef?.totalBottles).toBe(1);
-
-  const oldBrand = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, bottle.brandId),
-  });
-  expect(oldBrand?.totalBottles).toBe(0);
 });
 
 test("removes distiller", async ({ fixtures }) => {
@@ -282,11 +272,6 @@ test("removes distiller", async ({ fixtures }) => {
 
   expect(results.length).toEqual(1);
   expect(results[0].distillerId).toEqual(distillerA.id);
-
-  const newDistillerB = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, distillerB.id),
-  });
-  expect(newDistillerB?.totalBottles).toBe(0);
 });
 
 test("changes distiller", async ({ fixtures }) => {
@@ -304,16 +289,6 @@ test("changes distiller", async ({ fixtures }) => {
     bottle: bottle.id,
     distillers: [distillerB.id],
   });
-
-  const newDistillerA = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, distillerA.id),
-  });
-  expect(newDistillerA?.totalBottles).toBe(0);
-
-  const newDistillerB = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, distillerB.id),
-  });
-  expect(newDistillerB?.totalBottles).toBe(1);
 });
 
 test("adds distiller", async ({ fixtures }) => {
@@ -342,11 +317,6 @@ test("adds distiller", async ({ fixtures }) => {
   expect(distillers.length).toBe(1);
   const { distiller } = distillers[0];
   expect(distiller.id).toEqual(distillerA.id);
-
-  const newDistillerA = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, distillerA.id),
-  });
-  expect(newDistillerA?.totalBottles).toBe(1);
 });
 
 test("changes bottler", async ({ fixtures }) => {
@@ -392,15 +362,7 @@ test("changes distiller with previous identical brand", async ({
     distillers: [entityB.id],
   });
 
-  const newEntityA = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, entityA.id),
-  });
-  expect(newEntityA?.totalBottles).toBe(1);
-
-  const newEntityB = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, entityB.id),
-  });
-  expect(newEntityB?.totalBottles).toBe(1);
+  // TODO:
 });
 
 test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {

@@ -1,6 +1,12 @@
 "use client";
 
-import { Menu, Transition } from "@headlessui/react";
+import {
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Transition,
+} from "@headlessui/react";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import classNames from "@peated/web/lib/classNames";
@@ -41,7 +47,7 @@ export function ProfileDropdown() {
     <Menu as="div" className="menu hidden sm:block">
       {({ open }) => (
         <>
-          <Menu.Button
+          <MenuButton
             ref={buttonRef}
             className={classNames(
               "relative flex max-w-xs items-center p-2 text-sm hover:bg-slate-800 hover:text-white focus:outline-none",
@@ -59,7 +65,7 @@ export function ProfileDropdown() {
             <div className="h-8 w-8 sm:h-8 sm:w-8">
               <UserAvatar user={user} />
             </div>
-          </Menu.Button>
+          </MenuButton>
           <Transition
             as={Fragment}
             enter="transition ease-out duration-100"
@@ -69,7 +75,7 @@ export function ProfileDropdown() {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items
+            <MenuItems
               ref={dropdownRef}
               onMouseEnter={() => onMouseEnter()}
               onMouseLeave={() => onMouseLeave(open)}
@@ -77,21 +83,21 @@ export function ProfileDropdown() {
               className="absolute right-0 z-40 mt-0 w-48 origin-top-right divide-y divide-slate-700"
             >
               <div>
-                <Menu.Item>
+                <MenuItem>
                   <Link href={`/users/${user.username}`}>Profile</Link>
-                </Menu.Item>
-                <Menu.Item>
+                </MenuItem>
+                <MenuItem>
                   <LogoutButton />
-                </Menu.Item>
+                </MenuItem>
               </div>
               {user.admin && (
                 <div>
-                  <Menu.Item>
+                  <MenuItem>
                     <Link href={`/admin`}>Admin</Link>
-                  </Menu.Item>
+                  </MenuItem>
                 </div>
               )}
-            </Menu.Items>
+            </MenuItems>
           </Transition>
         </>
       )}

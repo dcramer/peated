@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { type Bottle } from "@peated/server/types";
 import Button from "@peated/web/components/button";
@@ -27,32 +27,32 @@ export default function ModActions({ bottle }: { bottle: Bottle }) {
 
   return (
     <Menu as="div" className="menu">
-      <Menu.Button as={Button}>
+      <MenuButton as={Button}>
         <EllipsisVerticalIcon className="h-5 w-5" />
-      </Menu.Button>
-      <Menu.Items
+      </MenuButton>
+      <MenuItems
         className="absolute right-0 z-40 mt-2 w-32 origin-top-right"
         unmount={false}
       >
-        <Menu.Item as={Link} href={`/bottles/${bottle.id}/aliases`}>
+        <MenuItem as={Link} href={`/bottles/${bottle.id}/aliases`}>
           View Aliases
-        </Menu.Item>
-        <Menu.Item as={Link} href={`/bottles/${bottle.id}/edit`}>
+        </MenuItem>
+        <MenuItem as={Link} href={`/bottles/${bottle.id}/edit`}>
           Edit Bottle
-        </Menu.Item>
-        <Menu.Item as={Link} href={`/bottles/${bottle.id}/merge`}>
+        </MenuItem>
+        <MenuItem as={Link} href={`/bottles/${bottle.id}/merge`}>
           Merge Bottle
-        </Menu.Item>
+        </MenuItem>
         {user?.admin && (
-          <Menu.Item
+          <MenuItem
             as={ConfirmationButton}
             onContinue={deleteBottle}
             disabled={deleteBottleMutation.isPending}
           >
             Delete Bottle
-          </Menu.Item>
+          </MenuItem>
         )}
-      </Menu.Items>
+      </MenuItems>
     </Menu>
   );
 }

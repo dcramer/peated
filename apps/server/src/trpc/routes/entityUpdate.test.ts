@@ -92,7 +92,7 @@ test("can change country", async ({ fixtures }) => {
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
-    country: country.name,
+    country: country.id,
   });
 
   expect(data.id).toBeDefined();
@@ -114,9 +114,12 @@ test("can change region", async ({ fixtures }) => {
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),
   });
+  const region = await fixtures.Region();
+
   const data = await caller.entityUpdate({
     entity: entity.id,
-    region: "Islay",
+    country: region.countryId,
+    region: region.id,
   });
 
   expect(data.id).toBeDefined();
@@ -126,10 +129,12 @@ test("can change region", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "region", "searchVector", "updatedAt")).toEqual(
-    omit(newEntity, "region", "searchVector", "updatedAt"),
+  expect(
+    omit(entity, "countryId", "regionId", "searchVector", "updatedAt"),
+  ).toEqual(
+    omit(newEntity, "countryId", "regionId", "searchVector", "updatedAt"),
   );
-  expect(newEntity.region).toBe("Islay");
+  expect(newEntity.regionId).toBe(region.id);
 });
 
 test("can change type", async ({ fixtures }) => {

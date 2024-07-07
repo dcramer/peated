@@ -1,4 +1,4 @@
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { createContext, useContext, type ReactNode } from "react";
 import Header from "./header";
@@ -82,7 +82,7 @@ export default function SidePanel({
       {...props}
     >
       <SidePanelContext.Provider value={context}>
-        <Dialog.Panel>{children}</Dialog.Panel>
+        <DialogPanel>{children}</DialogPanel>
       </SidePanelContext.Provider>
     </Dialog>
   );

@@ -30,6 +30,7 @@ type BaseProps = {
   children?: ReactNode;
   className?: string;
   simple?: boolean;
+  readOnly?: boolean;
 };
 
 type MultiProps<T extends Option> =
@@ -58,6 +59,7 @@ type OptionProps<T extends Option> = {
   // maximum number of options to backfill with suggestions
   // available for quick selection
   targetOptions?: number;
+  rememberValues?: boolean;
 };
 
 type CreateProps<T extends Option> = {
@@ -93,6 +95,8 @@ export default function SelectField<T extends Option>({
   onChange,
   noDialog = false,
   error,
+  readOnly = false,
+  rememberValues = true,
   ...props
 }: Props<T>) {
   const initialValue = Array.isArray(props.value)
@@ -144,7 +148,9 @@ export default function SelectField<T extends Option>({
     }
   }, [JSON.stringify(value)]);
 
-  const visibleValues = filterDupes(value, previousValues);
+  const visibleValues = rememberValues
+    ? filterDupes(value, previousValues)
+    : value;
 
   if (visibleValues.length < targetOptions) {
     filterDupes(visibleValues, suggestedOptions)
@@ -162,13 +168,13 @@ export default function SelectField<T extends Option>({
       className={className}
       error={error}
       labelAction={
-        !noDialog
+        !noDialog && !readOnly
           ? () => {
               setDialogOpen(true);
             }
           : undefined
       }
-      onClick={!noDialog ? () => setDialogOpen(true) : undefined}
+      onClick={!noDialog && !readOnly ? () => setDialogOpen(true) : undefined}
     >
       <div className="mt-1 flex flex-wrap gap-2 overflow-x-auto sm:leading-6">
         {visibleValues.map((option) => (
@@ -179,7 +185,7 @@ export default function SelectField<T extends Option>({
             onClick={(e: MouseEvent<HTMLElement>) => {
               e.preventDefault();
               e.stopPropagation();
-              toggleOption(option);
+              !readOnly && toggleOption(option);
             }}
           >
             {onRenderChip ? onRenderChip(option) : option.name}
@@ -197,14 +203,14 @@ export default function SelectField<T extends Option>({
               onClick={(e: MouseEvent<HTMLElement>) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setDialogOpen(true);
+                !noDialog && !readOnly && setDialogOpen(true);
               }}
             >
               <PlusIcon className="text-peated h-6 w-6" />
             </Chip>
           )}
       </div>
-      {!noDialog && (
+      {!noDialog && !readOnly && (
         <SelectDialog<T>
           open={dialogOpen}
           setOpen={setDialogOpen}

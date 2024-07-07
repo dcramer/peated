@@ -1,9 +1,5 @@
 import { BottleInputSchema } from "@peated/server/schemas";
-import type {
-  BottlePreviewResult,
-  EntityInput,
-  FreeformEntity,
-} from "@peated/server/types";
+import type { BottlePreviewResult } from "@peated/server/types";
 import { TRPCError } from "@trpc/server";
 import type { z } from "zod";
 import { modProcedure } from "..";
@@ -12,16 +8,6 @@ import { ConflictError } from "../errors";
 import { bottleCreate } from "./bottleCreate";
 import { bottleNormalize } from "./bottlePreview";
 import { bottleUpdate } from "./bottleUpdate";
-
-function coerceToUpsert(data: FreeformEntity): EntityInput {
-  if (data.country instanceof Object) {
-    return {
-      ...data,
-      country: data.country.name,
-    };
-  }
-  return data as EntityInput;
-}
 
 export async function bottleUpsert({
   input,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import {
   ArrowPathRoundedSquareIcon,
   XMarkIcon,
@@ -36,64 +36,65 @@ export default function ImageEditorModal({
 
   return (
     <Dialog open={open} as="div" className="dialog" onClose={setOpen}>
-      <Dialog.Overlay className="fixed inset-0" />
-      <Dialog.Panel className="dialog-panel">
-        <Layout
-          header={
-            <Header>
-              <FormHeader
-                icon={<XMarkIcon className="h-8 w-8" />}
-                title="Crop Image"
-                onClose={() => setOpen(false)}
-                onSave={() => {
-                  if (ref.current) {
-                    onSave(ref.current.getImage());
-                    setOpen(false);
-                  }
-                }}
-              />
-            </Header>
-          }
-          footer={
-            <Footer>
-              <div className="flex h-32 w-full flex-col items-center gap-x-2 gap-y-2 p-3">
-                <input
-                  type="range"
-                  min={1}
-                  max={3}
-                  step={0.01}
-                  value={scale}
-                  className="range range-sm mb-6 block h-1 w-full cursor-pointer"
-                  onInput={(e) => {
-                    setScale(parseFloat((e as any).target.value));
+      <div className="fixed inset-0">
+        <DialogPanel className="dialog-panel">
+          <Layout
+            header={
+              <Header>
+                <FormHeader
+                  icon={<XMarkIcon className="h-8 w-8" />}
+                  title="Crop Image"
+                  onClose={() => setOpen(false)}
+                  onSave={() => {
+                    if (ref.current) {
+                      onSave(ref.current.getImage());
+                      setOpen(false);
+                    }
                   }}
                 />
-                <div className="flex gap-x-2">
-                  <Button
-                    onClick={() => {
-                      const newRotate = rotate >= 270 ? 0 : rotate + 90;
-                      setRotate(newRotate);
+              </Header>
+            }
+            footer={
+              <Footer>
+                <div className="flex h-32 w-full flex-col items-center gap-x-2 gap-y-2 p-3">
+                  <input
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.01}
+                    value={scale}
+                    className="range range-sm mb-6 block h-1 w-full cursor-pointer"
+                    onInput={(e) => {
+                      setScale(parseFloat((e as any).target.value));
                     }}
-                    icon={<ArrowPathRoundedSquareIcon className="h-6 w-6" />}
-                  ></Button>
+                  />
+                  <div className="flex gap-x-2">
+                    <Button
+                      onClick={() => {
+                        const newRotate = rotate >= 270 ? 0 : rotate + 90;
+                        setRotate(newRotate);
+                      }}
+                      icon={<ArrowPathRoundedSquareIcon className="h-6 w-6" />}
+                    ></Button>
+                  </div>
                 </div>
-              </div>
-            </Footer>
-          }
-        >
-          <div className=" flex flex-auto items-center justify-center">
-            <AvatarEditor
-              ref={ref}
-              image={image}
-              border={20}
-              scale={scale}
-              width={Math.min(600, windowSize.width) - 40}
-              height={Math.min(600, windowSize.width) - 40}
-              rotate={rotate}
-            />
-          </div>
-        </Layout>
-      </Dialog.Panel>
+              </Footer>
+            }
+          >
+            <div className=" flex flex-auto items-center justify-center">
+              <AvatarEditor
+                ref={ref}
+                image={image}
+                border={20}
+                scale={scale}
+                width={Math.min(600, windowSize.width) - 40}
+                height={Math.min(600, windowSize.width) - 40}
+                rotate={rotate}
+              />
+            </div>
+          </Layout>
+        </DialogPanel>
+      </div>
     </Dialog>
   );
 }

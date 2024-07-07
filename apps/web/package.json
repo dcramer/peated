@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "@fontsource/raleway": "^5.0.19",
-    "@headlessui/react": "^1.7.19",
-    "@heroicons/react": "^2.1.3",
+    "@headlessui/react": "^2.1.2",
+    "@heroicons/react": "^2.1.4",
     "@hookform/resolvers": "^3.6.0",
     "@peated/design": "workspace:*",
     "@peated/server": "workspace:*",

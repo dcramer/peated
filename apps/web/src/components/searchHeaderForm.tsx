@@ -8,6 +8,7 @@ export default function SearchHeaderForm({
   onChange,
   onSubmit,
   onFocus,
+  autoFocus,
   children,
   ...props
 }: {
@@ -17,6 +18,7 @@ export default function SearchHeaderForm({
   onChange?: (value: string) => void;
   onSubmit?: (value: string) => void;
   onFocus?: () => void;
+  autoFocus?: boolean;
   children?: ReactNode;
 }) {
   const [value, setValue] = useState(props.value ?? "");
@@ -45,7 +47,7 @@ export default function SearchHeaderForm({
       }}
     >
       <input
-        autoFocus={!onFocus}
+        autoFocus={autoFocus || !onFocus}
         name={name}
         value={value}
         placeholder={placeholder}

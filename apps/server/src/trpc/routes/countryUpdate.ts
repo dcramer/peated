@@ -33,12 +33,6 @@ export async function countryUpdate({
 
   const data: { [name: string]: any } = {};
 
-  if (input.name && input.name !== country.name) {
-    data.name = input.name;
-  }
-  if (input.slug && input.slug !== country.slug) {
-    data.slug = input.slug;
-  }
   if (
     input.description !== undefined &&
     input.description !== country.description
@@ -47,6 +41,10 @@ export async function countryUpdate({
     data.descriptionSrc =
       input.descriptionSrc ||
       (input.description && input.description !== null ? "user" : null);
+  }
+
+  if (input.summary !== undefined && input.summary !== country.summary) {
+    data.summary = input.summary;
   }
 
   if (Object.values(data).length === 0) {

@@ -1,8 +1,9 @@
+import { MAJOR_COUNTRIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
-import { and, asc, desc, ilike, ne, type SQL } from "drizzle-orm";
+import { and, asc, desc, ilike, inArray, ne, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -18,6 +19,7 @@ export default publicProcedure
         cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(100),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
+        onlyMajor: z.boolean().default(false),
         hasBottles: z.boolean().default(false),
       })
       .default({
@@ -39,6 +41,15 @@ export default publicProcedure
 
     if (input.hasBottles) {
       where.push(ne(countries.totalBottles, 0));
+    }
+
+    if (input.onlyMajor) {
+      where.push(
+        inArray(
+          sql`LOWER(${countries.slug})`,
+          MAJOR_COUNTRIES.map(([, slug]) => slug),
+        ),
+      );
     }
 
     let orderBy: SQL<unknown>;

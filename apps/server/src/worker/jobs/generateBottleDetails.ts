@@ -204,7 +204,7 @@ export default async function ({ bottleId }: { bottleId: number }) {
   if (Object.keys(data).length === 0) return;
 
   await db.transaction(async (tx) => {
-    await db.update(bottles).set(data).where(eq(bottles.id, bottle.id));
+    await tx.update(bottles).set(data).where(eq(bottles.id, bottle.id));
 
     await tx.insert(changes).values({
       objectType: "bottle",

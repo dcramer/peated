@@ -88,16 +88,8 @@ export default function CountryForm({
             {...register("name")}
             label="Name"
             placeholder="e.g. United States"
-            error={errors.name}
-            required
-          />
-
-          <TextField
-            {...register("slug")}
-            label="Slug"
-            placeholder="e.g. united-states"
             readOnly={edit}
-            error={errors.slug}
+            error={errors.name}
             required
           />
         </Fieldset>
@@ -114,6 +106,8 @@ export default function CountryForm({
                 if (result && result.description && !currentValues.description)
                   setValue("description", result.description);
                 setValue("descriptionSrc", "generated");
+                if (result && result.summary && !currentValues.summary)
+                  setValue("summary", result.summary);
               }}
               disabled={generateDataMutation.isPending}
               icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
@@ -131,6 +125,15 @@ export default function CountryForm({
             error={errors.description}
             autoFocus
             label="Description"
+            rows={8}
+          />
+
+          <TextAreaField
+            {...register("summary")}
+            error={errors.description}
+            autoFocus
+            helpText="One or two sentences describing the rules for whisky in this region."
+            label="Summary"
             rows={8}
           />
         </Fieldset>

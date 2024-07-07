@@ -117,11 +117,11 @@ export default function EntityTable({
                       <div>
                         <Link
                           href={`/${link}?region=${encodeURIComponent(
-                            entity.region,
+                            entity.region.id,
                           )}`}
                           className="text-light hover:underline"
                         >
-                          {entity.region}
+                          {entity.region.name}
                         </Link>
                       </div>
                     )}

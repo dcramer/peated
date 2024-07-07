@@ -1,4 +1,4 @@
-import { Menu } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { type Friend, type FriendStatus } from "@peated/server/types";
 import Button from "@peated/web/components/button";
@@ -62,11 +62,11 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
         </div>
         <div className="flex items-center gap-x-4">
           <Menu as="div" className="menu">
-            <Menu.Button as={Button}>
+            <MenuButton as={Button}>
               <EllipsisVerticalIcon className="h-5 w-5" />
-            </Menu.Button>
-            <Menu.Items className="absolute right-0 z-40 mt-2 w-48 origin-top-right">
-              <Menu.Item
+            </MenuButton>
+            <MenuItems className="absolute right-0 z-40 mt-2 w-48 origin-top-right">
+              <MenuItem
                 as="button"
                 color="primary"
                 disabled={isPending}
@@ -80,8 +80,8 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
                 }}
               >
                 {actionLabel(friendStatus)}
-              </Menu.Item>
-            </Menu.Items>
+              </MenuItem>
+            </MenuItems>
           </Menu>
         </div>
       </div>

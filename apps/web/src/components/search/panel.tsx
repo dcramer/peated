@@ -158,6 +158,7 @@ export default function SearchPanel({
         <Header>
           <SearchHeader
             name="q"
+            autoFocus
             placeholder="Search for bottles, brands, and people"
             value={query}
             onChange={(value) => {

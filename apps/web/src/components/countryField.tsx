@@ -1,58 +1,38 @@
-import type { ReactNode } from "react";
+"use client";
 
-import { COUNTRY_LIST, MAJOR_COUNTRIES } from "@peated/server/constants";
-import type { FieldValues, UseControllerProps } from "react-hook-form";
-import { useController } from "react-hook-form";
+import { MAJOR_COUNTRIES } from "@peated/server/constants";
+import { trpc } from "@peated/web/lib/trpc";
 import SelectField from "./selectField";
 
-type Props<T extends FieldValues> = {
-  label?: string;
-  helpText?: string;
-  required?: boolean;
-  children?: ReactNode;
-  className?: string;
-  value?: string | null;
-  onChange?: (value: string) => void;
-} & Omit<
-  React.ComponentProps<typeof SelectField>,
-  "options" | "onChange" | "multiple" | "endpoint" | "value"
-> &
-  UseControllerProps<T>;
+export default function CountryField(
+  props: React.ComponentProps<typeof SelectField>,
+) {
+  const [{ results: suggestedOptions }] = trpc.countryList.useSuspenseQuery({
+    onlyMajor: true,
+    sort: "-bottles",
+  });
 
-function formatOption(c: string) {
-  return {
-    id: c,
-    name: c,
-  };
-}
+  const trpcUtils = trpc.useUtils();
 
-export default function CountryField<T extends FieldValues>({
-  helpText,
-  label,
-  required,
-  className,
-  error,
-  ...props
-}: Props<T>) {
-  const {
-    field: { name, value, onChange },
-  } = useController<T>(props);
+  MAJOR_COUNTRIES.map(([name, slug]) => ({
+    id: slug,
+    name,
+  }));
 
-  const options = COUNTRY_LIST.map(formatOption);
   return (
     <SelectField
-      label={label}
-      name={name}
-      value={value ? { id: value, name: value } : undefined}
-      required={required}
-      helpText={helpText}
-      className={className}
-      options={options}
-      suggestedOptions={options.filter(({ id }) =>
-        Object.keys(MAJOR_COUNTRIES).includes(id),
-      )}
-      error={error}
-      onChange={(value) => onChange && onChange(value ? value.name : "")}
+      onQuery={async (query) => {
+        const { results } = await trpcUtils.countryList.fetch({
+          query,
+          sort: "-bottles",
+        });
+        return results.map((r) => ({
+          id: r.id,
+          name: r.name,
+        }));
+      }}
+      suggestedOptions={suggestedOptions}
+      {...props}
     />
   );
 }

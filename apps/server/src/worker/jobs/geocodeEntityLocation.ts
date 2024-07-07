@@ -7,10 +7,13 @@ import {
   entities,
   type Country,
   type Entity,
+  type Region,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 
-async function locateAddress(entity: Entity & { country: Country | null }) {
+async function locateAddress(
+  entity: Entity & { country: Country | null; region: Region | null },
+) {
   if (!config.GOOGLE_MAPS_API_KEY) {
     throw new Error("GOOGLE_MAPS_API_KEY is not configured");
   }
@@ -35,7 +38,9 @@ async function locateAddress(entity: Entity & { country: Country | null }) {
   return result;
 }
 
-async function geocodeAddress(entity: Entity & { country: Country | null }) {
+async function geocodeAddress(
+  entity: Entity & { country: Country | null; region: Region | null },
+) {
   if (!config.GOOGLE_MAPS_API_KEY) {
     throw new Error("GOOGLE_MAPS_API_KEY is not configured");
   }
@@ -46,7 +51,7 @@ async function geocodeAddress(entity: Entity & { country: Country | null }) {
 
   const client = new Client();
 
-  const query = `${entity.address}, ${entity.region ? entity.region + "," : ""} ${entity.country.name}`;
+  const query = `${entity.address}, ${entity.region ? entity.region.name + "," : ""} ${entity.country.name}`;
   const result = await client.geocode({
     params: {
       key: config.GOOGLE_MAPS_API_KEY,
@@ -76,6 +81,7 @@ export default async ({
     where: (entities, { eq }) => eq(entities.id, entityId),
     with: {
       country: true,
+      region: true,
     },
   });
 

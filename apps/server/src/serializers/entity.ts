@@ -2,10 +2,11 @@ import { inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { countries, type Entity, type User } from "../db/schema";
+import { countries, regions, type Entity, type User } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { type EntitySchema } from "../schemas";
 import { CountrySerializer } from "./country";
+import { RegionSerializer } from "./region";
 
 export const EntitySerializer = serializer({
   attrs: async (itemList: Entity[], currentUser?: User) => {
@@ -23,12 +24,24 @@ export const EntitySerializer = serializer({
       ),
     );
 
+    const regionIds = itemList.map((i) => i.regionId).filter(notEmpty);
+    const regionList = regionIds.length
+      ? await db.select().from(regions).where(inArray(regions.id, regionIds))
+      : [];
+
+    const regionsById = Object.fromEntries(
+      (await serialize(RegionSerializer, regionList, currentUser)).map(
+        (data, index) => [regionList[index].id, data],
+      ),
+    );
+
     return Object.fromEntries(
       itemList.map((item) => {
         return [
           item.id,
           {
             country: item.countryId ? countriesById[item.countryId] : null,
+            region: item.regionId ? regionsById[item.regionId] : null,
           },
         ];
       }),
@@ -48,7 +61,7 @@ export const EntitySerializer = serializer({
       yearEstablished: item.yearEstablished,
       website: item.website,
       country: attrs.country,
-      region: item.region,
+      region: attrs.region,
       address: item.address,
       location: item.location,
       createdAt: item.createdAt.toISOString(),

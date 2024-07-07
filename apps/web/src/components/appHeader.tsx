@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import { useEffect, useState } from "react";
 
 import useAuth from "@peated/web/hooks/useAuth";
@@ -53,17 +53,18 @@ export default function AppHeader() {
           className="dialog"
           onClose={setSearchOpen}
         >
-          <Dialog.Overlay className="fixed inset-0" />
-          <Dialog.Panel className="dialog-panel">
-            <SearchPanel
-              value={query}
-              onQueryChange={(value) => setQuery(value)}
-              onClose={() => {
-                setSearchOpen(false);
-                setTimeout(() => setSearchFocused(false), 100);
-              }}
-            />
-          </Dialog.Panel>
+          <div className="fixed inset-0">
+            <DialogPanel className="dialog-panel">
+              <SearchPanel
+                value={query}
+                onQueryChange={(value) => setQuery(value)}
+                onClose={() => {
+                  setSearchOpen(false);
+                  setTimeout(() => setSearchFocused(false), 100);
+                }}
+              />
+            </DialogPanel>
+          </div>
         </Dialog>
       </SearchHeaderForm>
       {user ? (
