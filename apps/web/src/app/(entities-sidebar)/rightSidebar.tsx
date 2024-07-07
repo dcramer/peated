@@ -21,7 +21,7 @@ export default function EntityListSidebar({ type }: { type: EntityType }) {
 
         <FilterSidebarSection
           name="country"
-          options={MAJOR_COUNTRIES.map((k) => [k, k])}
+          options={MAJOR_COUNTRIES.map(([v, k]) => [k, v])}
         />
         {searchParams.get("region") ? (
           <FilterSidebarSection name="region" />
