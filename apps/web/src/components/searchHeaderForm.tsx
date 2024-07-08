@@ -29,9 +29,11 @@ export default function SearchHeaderForm({
   });
 
   useEffect(() => {
-    const newValue = props.value ?? "";
-    setValue(newValue);
-    if (onChange) onChange(newValue);
+    if (props.value !== value) {
+      const newValue = props.value ?? "";
+      setValue(newValue);
+      if (onChange) onChange(newValue);
+    }
   }, [props.value]);
 
   // we store the onChange event here as setState is async
