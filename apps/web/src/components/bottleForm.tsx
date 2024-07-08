@@ -259,45 +259,6 @@ export default function BottleForm({
           />
 
           <Controller
-            name="flavorProfile"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.flavorProfile}
-                placeholder="The flavor profile of the spirit."
-                suggestedOptions={[]}
-                label="Flavor Profile"
-                onRenderOption={(option) => {
-                  const classes = classesForProfile(option.id as FlavorProfile);
-                  return (
-                    <div className="flex flex-col items-start justify-start gap-y-2 text-left">
-                      <h4
-                        className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
-                      >
-                        {option.name}
-                      </h4>
-                      <div className="text-light text-sm font-normal">
-                        {notesForProfile(option.id as FlavorProfile)}
-                      </div>
-                    </div>
-                  );
-                }}
-                options={flavorProfileList}
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name: formatFlavorProfile(value),
-                      }
-                    : undefined
-                }
-              />
-            )}
-          />
-
-          <Controller
             name="distillers"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
@@ -322,6 +283,17 @@ export default function BottleForm({
                 multiple
               />
             )}
+          />
+
+          <TextField
+            {...register("vintageYear", {
+              setValueAs: (v) => (v === "" || !v ? null : Number(v)),
+            })}
+            error={errors.vintageYear}
+            type="number"
+            label="Vintage Year"
+            placeholder="e.g. 2024"
+            helpText="The specific yearl vintage of this bottle, if applicable."
           />
 
           <Controller
@@ -351,18 +323,7 @@ export default function BottleForm({
         </Fieldset>
 
         <Fieldset>
-          <Legend title="Vintage and Cask Details" />
-
-          <TextField
-            {...register("vintageYear", {
-              setValueAs: (v) => (v === "" || !v ? null : Number(v)),
-            })}
-            error={errors.vintageYear}
-            type="number"
-            label="Vintage Year"
-            placeholder="e.g. 2024"
-            helpText="The specific yearl vintage of this bottle, if applicable."
-          />
+          <Legend title="Cask Details" />
 
           <Controller
             name="caskFill"
@@ -435,17 +396,6 @@ export default function BottleForm({
               />
             )}
           />
-
-          <TextField
-            {...register("releaseDate", {
-              setValueAs: (v) => (v === "" || !v ? null : v),
-            })}
-            error={errors.releaseDate}
-            type="date"
-            label="Release Date"
-            placeholder="e.g. 2024-05-01"
-            helpText="The date this labeling was released."
-          />
         </Fieldset>
 
         <Fieldset>
@@ -474,6 +424,46 @@ export default function BottleForm({
               </Button>
             )}
           </Legend>
+
+          <Controller
+            name="flavorProfile"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.flavorProfile}
+                placeholder="The flavor profile of the spirit."
+                suggestedOptions={[]}
+                label="Flavor Profile"
+                onRenderOption={(option) => {
+                  const classes = classesForProfile(option.id as FlavorProfile);
+                  return (
+                    <div className="flex flex-col items-start justify-start gap-y-2 text-left">
+                      <h4
+                        className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
+                      >
+                        {option.name}
+                      </h4>
+                      <div className="text-light text-sm font-normal">
+                        {notesForProfile(option.id as FlavorProfile)}
+                      </div>
+                    </div>
+                  );
+                }}
+                options={flavorProfileList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: formatFlavorProfile(value),
+                      }
+                    : undefined
+                }
+              />
+            )}
+          />
+
           {user && (user.mod || user.admin) && (
             <TextAreaField
               {...register("description", {
@@ -488,6 +478,17 @@ export default function BottleForm({
               rows={8}
             />
           )}
+
+          <TextField
+            {...register("releaseDate", {
+              setValueAs: (v) => (v === "" || !v ? null : v),
+            })}
+            error={errors.releaseDate}
+            type="date"
+            label="Release Date"
+            placeholder="e.g. 2024-05-01"
+            helpText="The date this labeling was released."
+          />
         </Fieldset>
       </Form>
     </Layout>
