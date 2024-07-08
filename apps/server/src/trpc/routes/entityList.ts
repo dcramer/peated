@@ -92,7 +92,7 @@ export default publicProcedure
         countryId = input.country;
       } else if (input.country) {
         const [result] = await db
-          .select({ countryId: countries.id })
+          .select({ id: countries.id })
           .from(countries)
           .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
           .limit(1);
