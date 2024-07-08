@@ -3,7 +3,7 @@ import { db } from "@peated/server/db";
 import { countries, regions } from "@peated/server/db/schema";
 import { runJob } from "@peated/server/worker/client";
 import slugify from "@sindresorhus/slugify";
-import { and, asc, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 
 const LOCATION_DATA = [
   {
@@ -148,6 +148,39 @@ const LOCATION_DATA = [
 ];
 
 const subcommand = program.command("locations");
+
+subcommand
+  .command("generate-country-descriptions")
+  .description("Generate country descriptions")
+  .argument("[countryIds...]")
+  .option("--only-missing")
+  .action(async (countryIds, options) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({ id: countries.id })
+      .from(countries)
+      .where(
+        countryIds.length
+          ? inArray(countries.id, countryIds)
+          : options.onlyMissing
+            ? or(isNull(countries.description), isNull(countries.summary))
+            : undefined,
+      )
+      .orderBy(asc(countries.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id } of query) {
+        console.log(`Generating description for country ${id}.`);
+        await runJob("GenerateCountryDetails", { countryId: id });
+        hasResults = true;
+      }
+      offset += step;
+    }
+  });
 
 subcommand
   .command("geocode-countries")

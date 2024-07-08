@@ -68,10 +68,7 @@ export default async ({ countryId }: { countryId: number }) => {
   }
 
   const country = await db.query.countries.findFirst({
-    where: (counries, { eq }) => eq(counries.id, countryId),
-    with: {
-      country: true,
-    },
+    where: (countries, { eq }) => eq(countries.id, countryId),
   });
   if (!country) {
     throw new Error(`Unknown country: ${countryId}`);
