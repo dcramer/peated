@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import useAutofocus from "../hooks/useAutofocus";
 
 export default function SearchHeaderForm({
   name = "q",
@@ -22,6 +23,10 @@ export default function SearchHeaderForm({
   children?: ReactNode;
 }) {
   const [value, setValue] = useState(props.value ?? "");
+
+  const ref = useAutofocus<HTMLInputElement>(() => {
+    return autoFocus || !onFocus;
+  });
 
   useEffect(() => {
     const newValue = props.value ?? "";
@@ -58,6 +63,7 @@ export default function SearchHeaderForm({
           if (onChange) onChange(e.target.value);
         }}
         className="block transform rounded border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-1.5"
+        ref={ref}
       />
       {children}
     </form>
