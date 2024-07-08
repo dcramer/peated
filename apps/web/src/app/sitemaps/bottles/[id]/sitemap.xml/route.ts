@@ -11,7 +11,7 @@ export async function GET(
 ) {
   const trpcClient = await getTrpcClient();
 
-  let cursor = Number(id) * PAGE_LIMIT;
+  let cursor = (Number(id) - 1) * PAGE_LIMIT + 1;
   let count = 0;
   const pages: Sitemap = [];
   while (cursor) {
