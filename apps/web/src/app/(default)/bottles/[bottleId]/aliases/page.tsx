@@ -3,6 +3,7 @@
 import Chip from "@peated/web/components/chip";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Table from "@peated/web/components/table";
+import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
 
@@ -33,6 +34,10 @@ export default function BottleAliases({
               )}
             </>
           ),
+        },
+        {
+          name: "created",
+          value: (item) => <TimeSince date={item.createdAt} />,
         },
         {
           hidden: !user?.mod,

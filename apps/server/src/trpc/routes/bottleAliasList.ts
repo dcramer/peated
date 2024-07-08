@@ -35,6 +35,7 @@ export default publicProcedure
         isCanonical:
           `${bottle.fullName}${bottle.vintageYear ? ` (${bottle.vintageYear})` : ""}` ==
           a.name,
+        createdAt: a.createdAt.toISOString(),
       })),
     };
   });

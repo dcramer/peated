@@ -186,6 +186,7 @@ export const bottleAliases = pgTable(
       () => bottles.id,
     ),
     name: varchar("name", { length: 255 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (bottleAliases) => {
     return {

@@ -110,6 +110,7 @@ export const entityAliases = pgTable(
       () => entities.id,
     ),
     name: varchar("name", { length: 255 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (entityAliases) => {
     return {

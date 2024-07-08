@@ -33,6 +33,7 @@ export default publicProcedure
       results: results.map((a) => ({
         name: a.name,
         isCanonical: a.name === entity.name,
+        createdAt: a.createdAt.toISOString(),
       })),
     };
   });
