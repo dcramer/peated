@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import AppFooter from "./appFooter";
 import AppHeader from "./appHeader";
 import Footer from "./footer";
@@ -37,7 +37,7 @@ export default function Layout({
 
         {rightSidebar ? (
           <div className="hidden lg:z-20 lg:w-96 lg:flex-col xl:flex">
-            {rightSidebar}
+            <Suspense>{rightSidebar}</Suspense>
           </div>
         ) : null}
       </div>
