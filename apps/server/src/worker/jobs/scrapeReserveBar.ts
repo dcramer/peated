@@ -26,12 +26,18 @@ export async function scrapeProducts(
     }
 
     const productUrl = bottle.attr("href");
-    if (!productUrl) throw new Error("Unable to identify Product URL");
+    if (!productUrl) {
+      console.warn("Unable to identify Product URL");
+      return;
+    }
 
     const [name] = normalizeBottleName(bottle.text());
 
     const volumeRaw = $(".product-tile__volume", el).first().text();
-    if (!volumeRaw) throw new Error("Unable to identify Product Volume");
+    if (!volumeRaw) {
+      console.warn("Unable to identify Product Volume");
+      return;
+    }
 
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : 750;
     if (!volume) {
