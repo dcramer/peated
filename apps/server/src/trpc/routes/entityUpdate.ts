@@ -163,6 +163,7 @@ export default modProcedure
             await tx.insert(entityAliases).values({
               name: newAlias,
               entityId: newEntity.id,
+              createdAt: newEntity.createdAt,
             });
           } else if (!existingAlias.entityId) {
             await tx

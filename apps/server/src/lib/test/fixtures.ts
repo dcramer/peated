@@ -179,6 +179,7 @@ export const Entity = async (
     await tx.insert(dbSchema.entityAliases).values({
       entityId: entity.id,
       name: entity.name,
+      createdAt: entity.createdAt,
     });
 
     await tx.insert(changes).values({
@@ -313,6 +314,7 @@ export const Bottle = async (
     await tx.insert(bottleAliases).values({
       bottleId: bottle.id,
       name: bottle.fullName,
+      createdAt: bottle.createdAt,
     });
 
     await tx.insert(changes).values({

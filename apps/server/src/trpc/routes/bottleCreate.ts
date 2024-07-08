@@ -151,6 +151,7 @@ export async function bottleCreate({
       .values({
         bottleId: bottle.id,
         name: aliasName,
+        createdAt: bottle.createdAt,
       })
       .onConflictDoUpdate({
         target: [bottleAliases.name],

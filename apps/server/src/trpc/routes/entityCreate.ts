@@ -100,12 +100,14 @@ export default authedProcedure
       await tx.insert(entityAliases).values({
         entityId: entity.id,
         name: entity.name,
+        createdAt: entity.createdAt,
       });
 
       if (entity.name.startsWith("The ")) {
         await tx.insert(entityAliases).values({
           entityId: entity.id,
           name: entity.name.substring(4),
+          createdAt: entity.createdAt,
         });
       }
 

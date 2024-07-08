@@ -272,6 +272,7 @@ export async function bottleUpdate({
         await tx.insert(bottleAliases).values({
           name: aliasName,
           bottleId: newBottle.id,
+          createdAt: newBottle.createdAt,
         });
       } else if (!existingAlias.bottleId) {
         await tx
