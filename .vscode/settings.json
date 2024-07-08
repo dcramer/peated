@@ -1,3 +1,8 @@
 {
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/page.tsx": "${dirname} - Page",
+    "**/app/**/layout.tsx": "${dirname} - Layout",
+    "**/component/**/index.tsx": "${dirname} - Component"
+  }
 }
