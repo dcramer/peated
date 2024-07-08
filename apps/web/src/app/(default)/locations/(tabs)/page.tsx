@@ -11,6 +11,7 @@ export default async function Page() {
   const trpcClient = await getTrpcClient();
   const countryList = await trpcClient.countryList.fetch({
     onlyMajor: true,
+    sort: "-bottles",
   });
 
   return (
