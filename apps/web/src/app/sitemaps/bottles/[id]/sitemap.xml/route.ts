@@ -9,7 +9,7 @@ export async function GET(
   request: Request,
   { params: { id } }: { params: { id: string } },
 ) {
-  const startCursor = (Number(id) - 1) * PAGE_LIMIT + 1;
+  const startCursor = (Number(id) - 1) * (PAGE_LIMIT / 100) + 1;
   const trpcClient = await getTrpcClient();
 
   let cursor: number | null = startCursor;
