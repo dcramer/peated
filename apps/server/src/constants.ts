@@ -87,7 +87,7 @@ export const COLOR_SCALE = [
   [10, "Medium Brown", "#efbf50"],
   [11, "Deep Brown", "#e0ae3d"],
   [12, "Palo Coratdo Sherry", "#dea03d"],
-  [13, "Burn Amber", "#da9635"],
+  [13, "Burnt Amber", "#da9635"],
   [14, "Copper", "#cf7831"],
   [15, "Tawny", "#d06c3a"],
   [16, "Deep Tawhny", "#bf573a"],
