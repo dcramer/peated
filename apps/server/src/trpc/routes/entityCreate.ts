@@ -103,6 +103,14 @@ export default authedProcedure
         createdAt: entity.createdAt,
       });
 
+      if (entity.shortName) {
+        await tx.insert(entityAliases).values({
+          entityId: entity.id,
+          name: entity.shortName,
+          createdAt: entity.createdAt,
+        });
+      }
+
       if (entity.name.startsWith("The ")) {
         await tx.insert(entityAliases).values({
           entityId: entity.id,
