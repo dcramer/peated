@@ -81,32 +81,6 @@ export default function SearchPanel({
     onQuery(initialValue || "");
   }, [initialValue]);
 
-  const sortResults = (query: string, unsortedResults: Result[]) => {
-    const exactMatches: number[] = [];
-    const lowerQuery = query.toLowerCase();
-    unsortedResults.forEach((value, index) => {
-      if (value.type !== "user") {
-        if (value.ref.name.toLowerCase() === lowerQuery) {
-          exactMatches.push(index);
-        }
-      } else {
-        if (
-          value.ref.displayName?.toLowerCase() === lowerQuery ||
-          value.ref.username.toLowerCase() === lowerQuery
-        ) {
-          exactMatches.push(index);
-        }
-      }
-    });
-
-    const results = [...unsortedResults];
-    exactMatches.forEach((resultIndex, index) => {
-      const item = results.splice(resultIndex, 1);
-      results.unshift(...item);
-    });
-    return results;
-  };
-
   return (
     <Layout
       footer={null}
