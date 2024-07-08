@@ -14,18 +14,8 @@ test("lists entity aliases", async ({ fixtures }) => {
     entity: entity.id,
   });
   expect(results.length).toEqual(2);
-  expect(results).toMatchInlineSnapshot(`
-    [
-      {
-        "createdAt": "2024-07-08T03:01:05.849Z",
-        "isCanonical": true,
-        "name": "Foo",
-      },
-      {
-        "createdAt": "2024-07-08T03:01:05.877Z",
-        "isCanonical": false,
-        "name": "Foo Bar",
-      },
-    ]
-  `);
+  expect(results[0].name).toEqual("Foo");
+  expect(results[0].isCanonical).toEqual(true);
+  expect(results[1].name).toEqual("Foo Bar");
+  expect(results[1].isCanonical).toEqual(false);
 });

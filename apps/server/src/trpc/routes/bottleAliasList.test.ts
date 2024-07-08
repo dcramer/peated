@@ -16,18 +16,8 @@ test("lists bottle aliases", async ({ fixtures }) => {
     bottle: bottle.id,
   });
   expect(results.length).toEqual(2);
-  expect(results).toMatchInlineSnapshot(`
-    [
-      {
-        "createdAt": "2024-07-08T03:01:05.255Z",
-        "isCanonical": true,
-        "name": "Brand Foo",
-      },
-      {
-        "createdAt": "2024-07-08T03:01:05.281Z",
-        "isCanonical": false,
-        "name": "Foo Bar",
-      },
-    ]
-  `);
+  expect(results[0].name).toEqual("Brand Foo");
+  expect(results[0].isCanonical).toEqual(true);
+  expect(results[1].name).toEqual("Foo Bar");
+  expect(results[1].isCanonical).toEqual(false);
 });
