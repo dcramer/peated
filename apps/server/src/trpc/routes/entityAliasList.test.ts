@@ -17,9 +17,11 @@ test("lists entity aliases", async ({ fixtures }) => {
   expect(results).toMatchInlineSnapshot(`
     [
       {
+        "isCanonical": true,
         "name": "Foo",
       },
       {
+        "isCanonical": false,
         "name": "Foo Bar",
       },
     ]

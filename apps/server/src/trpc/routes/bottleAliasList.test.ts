@@ -18,9 +18,11 @@ test("lists bottle aliases", async ({ fixtures }) => {
   expect(results).toMatchInlineSnapshot(`
     [
       {
+        "isCanonical": true,
         "name": "Brand Foo",
       },
       {
+        "isCanonical": false,
         "name": "Foo Bar",
       },
     ]
