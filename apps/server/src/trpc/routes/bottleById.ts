@@ -36,6 +36,10 @@ export default publicProcedure.input(z.number()).query(async function ({
     }
   }
 
+  const createdBy = await db.query.users.findFirst({
+    where: (table, { eq }) => eq(table.id, bottle.createdById),
+  });
+
   const [lastPrice] = await db
     .select()
     .from(storePrices)
@@ -57,6 +61,7 @@ export default publicProcedure.input(z.number()).query(async function ({
 
   return {
     ...(await serialize(BottleSerializer, bottle, ctx.user)),
+    createdBy,
     people: totalPeople,
     lastPrice: lastPrice
       ? await serialize(StorePriceSerializer, lastPrice, ctx.user)
