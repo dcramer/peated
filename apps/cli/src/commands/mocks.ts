@@ -14,9 +14,10 @@ import {
 } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
 import { random, sample } from "@peated/server/lib/rand";
+import { SMWS_DISTILLERY_CODES } from "@peated/server/lib/smws";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
+import { type Category } from "@peated/server/types";
 import { and, eq, ne, sql } from "drizzle-orm";
-import { SMWS_DISTILLERY_CODES } from "../../../server/src/lib/smws";
 
 const loadDefaultSites = async () => {
   const store1 =
@@ -76,29 +77,87 @@ const loadDefaultEntities = async () => {
   return results;
 };
 
+const BOTTLE_META: {
+  name: string;
+  category?: Category;
+  statedAge?: number;
+}[] = [
+  {
+    name: "10-year-old",
+    category: "single_malt",
+    statedAge: 10,
+  },
+  {
+    name: "12-year-old",
+    category: "single_malt",
+    statedAge: 12,
+  },
+  {
+    name: "15-year-old",
+    category: "single_malt",
+    statedAge: 15,
+  },
+  {
+    name: "18-year-old",
+    category: "single_malt",
+    statedAge: 18,
+  },
+  {
+    name: "Double Rye",
+    category: "rye",
+  },
+  {
+    name: "Double Bourbon",
+    category: "bourbon",
+  },
+  {
+    name: "Bourbon",
+    category: "bourbon",
+  },
+  {
+    name: "Single Malt",
+    category: "single_malt",
+  },
+  {
+    name: "American Bourbon",
+    category: "bourbon",
+  },
+  {
+    name: "American Rye",
+    category: "rye",
+  },
+  {
+    name: "Barrel Strength",
+    category: "single_malt",
+  },
+];
+
 const loadDefaultBottles = async (
-  brandList: Entity[],
+  entityList: Entity[],
   siteList: ExternalSite[],
 ) => {
-  const mocks: Pick<Bottle, "name" | "statedAge" | "brandId">[] = [];
+  const mocks: (Pick<Bottle, "name" | "brandId" | "category" | "statedAge"> & {
+    distillerIds?: number[];
+  })[] = [];
 
-  sample(brandList, 5).forEach((brand) => {
+  const distilleryIdList = entityList
+    .filter((e) => e.type.includes("distiller"))
+    .map((e) => e.id);
+
+  sample(
+    entityList.filter((e) => e.type.includes("brand")),
+    5,
+  ).forEach((brand) => {
     mocks.push(
-      {
-        name: "12-year-old",
-        statedAge: 12,
+      ...sample(BOTTLE_META, random(1, 8)).map((data) => ({
+        category: null,
+        statedAge: null,
+        ...data,
         brandId: brand.id,
-      },
-      {
-        name: "18-year-old",
-        statedAge: 18,
-        brandId: brand.id,
-      },
-      {
-        name: "25-year-old",
-        statedAge: 25,
-        brandId: brand.id,
-      },
+        distillerIds: brand.type.includes("distiller")
+          ? [brand.id]
+          : sample(distilleryIdList, random(0, 2)),
+      })),
     );
   });
 
@@ -174,9 +233,9 @@ subcommand
   )
   .action(async (email, options) => {
     // load some realistic entities
-    const brandList = await loadDefaultEntities();
+    const entityList = await loadDefaultEntities();
     const siteList = await loadDefaultSites();
-    const bottleList = await loadDefaultBottles(brandList, siteList);
+    const bottleList = await loadDefaultBottles(entityList, siteList);
 
     for (let i = 0; i < options.tastings; i++) {
       const tasting = await Fixtures.Tasting({
