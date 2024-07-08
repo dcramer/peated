@@ -27,7 +27,7 @@ export default function BottleHeader({
                 href={`/entities/${bottle.brand.id}`}
                 className="hover:underline"
               >
-                {bottle.brand.name}
+                {bottle.brand.shortName || bottle.brand.name}
               </Link>
               {bottle.name}
             </div>
