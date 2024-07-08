@@ -273,13 +273,17 @@ export async function bottleUpdate({
           name: aliasName,
           bottleId: newBottle.id,
         });
-      } else {
+      } else if (!existingAlias.bottleId) {
         await tx
           .update(bottleAliases)
           .set({
             bottleId: newBottle.id,
           })
           .where(and(eq(bottleAliases.name, aliasName)));
+      } else {
+        throw new Error(
+          `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
+        );
       }
     }
 
