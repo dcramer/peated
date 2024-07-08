@@ -17,10 +17,12 @@ test("lists entity aliases", async ({ fixtures }) => {
   expect(results).toMatchInlineSnapshot(`
     [
       {
+        "createdAt": "2024-07-08T03:01:05.849Z",
         "isCanonical": true,
         "name": "Foo",
       },
       {
+        "createdAt": "2024-07-08T03:01:05.877Z",
         "isCanonical": false,
         "name": "Foo Bar",
       },

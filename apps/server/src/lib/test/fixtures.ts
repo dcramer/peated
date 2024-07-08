@@ -68,6 +68,7 @@ export const User = async (
       admin: false,
       mod: false,
       active: true,
+      createdAt: new Date(),
       ...data,
     })
     .returning();
@@ -86,6 +87,7 @@ export const Follow = async (
         fromUserId: data.fromUserId || (await User({}, tx)).id,
         toUserId: data.toUserId || (await User({}, tx)).id,
         status: "following",
+        createdAt: new Date(),
         ...data,
       })
       .returning();
@@ -163,6 +165,8 @@ export const Entity = async (
       name,
       countryId: data.countryId ?? (await Country({}, tx)).id,
       type: ["brand", "distiller"],
+      createdAt: new Date(),
+      updatedAt: new Date(),
       ...data,
       createdById: data.createdById || (await User({}, tx)).id,
     };
@@ -211,6 +215,7 @@ export const EntityAlias = async (
             `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
           ]),
         )} #${faker.number.int(100)}`,
+        createdAt: new Date(),
         ...data,
       })
       .returning();
@@ -255,6 +260,8 @@ export const Bottle = async (
     const bottleData: Omit<dbSchema.NewBottle, "uniqHash"> = {
       category: choose([...CATEGORY_LIST, null, null]),
       statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       ...data,
       name,
       fullName: `${brand.name} ${name}`,
@@ -346,6 +353,7 @@ export const BottleAlias = async (
             `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
           ]),
         )} #${faker.number.int(100)}`,
+        createdAt: new Date(),
         ...data,
       })
       .returning();
@@ -369,6 +377,7 @@ export const Tasting = async (
         notes: faker.lorem.sentence(),
         rating: faker.number.float({ min: 1, max: 5 }),
         tags: tags,
+        createdAt: new Date(),
         ...data,
         bottleId: data.bottleId || (await Bottle({}, tx)).id,
         createdById: data.createdById || (await User({}, tx)).id,
@@ -407,6 +416,7 @@ export const Toast = async (
       .values({
         createdById: data.createdById || (await User({}, tx)).id,
         tastingId: data.tastingId || (await Tasting({}, tx)).id,
+        createdAt: new Date(),
         ...data,
       })
       .returning();
@@ -426,6 +436,7 @@ export const Comment = async (
         createdById: data.createdById || (await User({}, tx)).id,
         tastingId: data.tastingId || (await Tasting({}, tx)).id,
         comment: faker.lorem.sentences(random(2, 5)),
+        createdAt: new Date(),
         ...data,
       })
       .returning();
@@ -455,6 +466,7 @@ export const Flight = async (
         publicId: generatePublicId(),
         name: faker.word.noun(),
         createdById: data.createdById || (await User({}, tx)).id,
+        createdAt: new Date(),
         ...data,
       })
       .returning();
@@ -544,6 +556,8 @@ export const StorePrice = async (
         volume: 750,
         url: "",
         currency: "usd",
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...data,
         externalSiteId: data.externalSiteId || (await ExternalSite({}, tx)).id,
       })
@@ -557,7 +571,7 @@ export const StorePrice = async (
           bottleId: data.bottleId,
           price: data.price,
           url: data.url,
-          updatedAt: sql`NOW()`,
+          updatedAt: new Date(),
         },
       })
       .returning();
@@ -571,6 +585,7 @@ export const StorePrice = async (
         price: price.price,
         volume: price.volume,
         currency: price.currency,
+        // TODO: mock
         date: sql`CURRENT_DATE`,
       })
       .onConflictDoNothing();
@@ -593,6 +608,7 @@ export const StorePriceHistory = async (
         volume: 750,
         ...data,
         priceId: data.priceId || (await StorePrice({}, tx)).id,
+        createdAt: new Date(),
       })
       .returning();
   });
@@ -625,6 +641,7 @@ export const Review = async (
         rating: faker.number.int({ min: 59, max: 100 }),
         url: faker.internet.url(),
         issue: "Default",
+        createdAt: new Date(),
         ...data,
       })
       .returning();
@@ -641,6 +658,7 @@ export const Collection = async (
     .insert(collections)
     .values({
       name: faker.company.name(),
+      createdAt: new Date(),
       ...(data as Omit<dbSchema.NewCollection, "name">),
     })
     .returning();

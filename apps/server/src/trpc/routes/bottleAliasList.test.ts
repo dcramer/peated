@@ -11,6 +11,7 @@ test("lists bottle aliases", async ({ fixtures }) => {
   const caller = createCaller({
     user: null,
   });
+
   const { results } = await caller.bottleAliasList({
     bottle: bottle.id,
   });
@@ -18,10 +19,12 @@ test("lists bottle aliases", async ({ fixtures }) => {
   expect(results).toMatchInlineSnapshot(`
     [
       {
+        "createdAt": "2024-07-08T03:01:05.255Z",
         "isCanonical": true,
         "name": "Brand Foo",
       },
       {
+        "createdAt": "2024-07-08T03:01:05.281Z",
         "isCanonical": false,
         "name": "Foo Bar",
       },
