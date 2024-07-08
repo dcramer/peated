@@ -48,7 +48,6 @@ export async function bottleNormalize({
 
   const rv: BottlePreviewResult = {
     ...input,
-    name: input.name,
     category: input.category ?? null,
     brand,
     bottler: null,

@@ -80,6 +80,7 @@ export async function bottleUpdate({
           id: d.distiller.id,
           name: d.distiller.name,
         })),
+        vintageYear: bottle.vintageYear,
         ...input,
       },
       ctx,
