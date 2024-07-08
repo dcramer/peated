@@ -18,7 +18,7 @@ export default async function Layout({
 
   return (
     <>
-      <Tabs fullWidth border>
+      <Tabs border>
         <TabItem as={Link} href={baseUrl} controlled>
           Overview
         </TabItem>

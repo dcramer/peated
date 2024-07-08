@@ -128,7 +128,7 @@ export default function Layout({
         </div>
       </div>
 
-      <Tabs fullWidth border>
+      <Tabs border>
         <TabItem as={Link} href={`/admin/sites/${site.type}`} controlled>
           Prices
         </TabItem>
