@@ -108,8 +108,15 @@ export async function bottleNormalize({
   );
   if (vintageYearMatch) {
     if (!rv.vintageYear) {
-      rv.vintageYear = parseInt(vintageYearMatch[1] || vintageYearMatch[4], 10);
+      const vintageYear = parseInt(
+        vintageYearMatch[1] || vintageYearMatch[4],
+        10,
+      );
+      if (vintageYear > 1900 && vintageYear < new Date().getFullYear() + 1)
+        rv.vintageYear = vintageYear;
     }
+  }
+  if (rv.vintageYear) {
     // TODO: regex this
     rv.name = stripSuffix(rv.name, ` ${rv.vintageYear}`);
     rv.name = stripSuffix(rv.name, ` (${rv.vintageYear})`);
