@@ -17,8 +17,8 @@ export async function generateMetadata({
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 
-  const title = `${entity.name} Distillery Codes`;
-  const description = `Mapping of distillery codes found on bottles from ${entity.name}`;
+  const title = `${entity.name}${entity.shortName ? ` (${entity.shortName})` : ""} Distillery Codes`;
+  const description = `Mapping of distillery codes found on bottles from ${entity.name}${entity.shortName ? ` (${entity.shortName})` : ""}.`;
 
   return {
     title,
@@ -56,7 +56,7 @@ export default async function Page({
     <>
       <div className="prose prose-invert my-4 max-w-none">
         <p>
-          {entity.name} encodes the distillery name as part of the cask numbber
+          {entity.name} encodes the distillery name as part of the cask number
           system. For example, <strong>Cask No. 4.360 Jangling dram</strong>{" "}
           means it is the <strong>360th cask</strong> from{" "}
           <strong>distillery number 4</strong>. In this case, distillery maps to{" "}
