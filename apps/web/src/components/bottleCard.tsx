@@ -23,7 +23,7 @@ type BottleFormData = {
 function BottleScaffold({
   name,
   category,
-  brand,
+  distillers,
   statedAge,
   color = "default",
   noGutter = false,
@@ -31,7 +31,7 @@ function BottleScaffold({
 }: {
   name: any;
   category: any;
-  brand: any;
+  distillers: any;
   statedAge: any;
   color?: "default" | "highlight" | "inherit";
   noGutter?: boolean;
@@ -66,7 +66,7 @@ function BottleScaffold({
             color === "highlight" ? "" : "text-light",
           )}
         >
-          {category}
+          {distillers}
         </div>
       </div>
       <div
@@ -75,7 +75,7 @@ function BottleScaffold({
           "hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex",
         )}
       >
-        <div className="max-w-full truncate">{brand}</div>
+        <div className="max-w-full truncate">{category}</div>
         <div>{statedAge}</div>
       </div>
     </div>
@@ -92,7 +92,11 @@ export const PreviewBottleCard = ({
     <BottleScaffold
       name={`${brand ? `${brand.shortName || brand.name} ${data.name}` : data.name}${data.vintageYear ? ` (${data.vintageYear})` : ""}`}
       category={data.category ? formatCategoryName(data.category) : null}
-      brand={brand ? brand.name : "Unknown Bottle"}
+      distillers={
+        data.distillers?.length
+          ? data.distillers.map((d) => d.name).join(" ")
+          : null
+      }
       statedAge={data.statedAge ? `Aged ${data.statedAge} years` : null}
       color="highlight"
     />
@@ -157,10 +161,18 @@ export default function BottleCard({
           )}
         </div>
       }
-      brand={
-        <Link href={`/entities/${bottle.brand.id}`} className="hover:underline">
-          {bottle.brand.name}
-        </Link>
+      distillers={
+        bottle.distillers?.length
+          ? bottle.distillers.map((d) => (
+              <Link
+                key={d.id}
+                href={`/entities/${d.id}`}
+                className="hover:underline"
+              >
+                {d.name}
+              </Link>
+            ))
+          : null
       }
       statedAge={bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
       color={color}
