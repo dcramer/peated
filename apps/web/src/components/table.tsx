@@ -24,7 +24,7 @@ export default function Table<T extends Record<string, any>>({
   items,
   columns,
   primaryKey = (item: T) => String(item.id),
-  url = (item: T) => primaryKey(item),
+  url = (item: T) => null,
   rel,
   defaultSort,
   withSearch = false,
@@ -32,7 +32,7 @@ export default function Table<T extends Record<string, any>>({
   items: T[];
   columns: Column<T>[];
   primaryKey?: (item: T) => string;
-  url?: (item: T) => string;
+  url?: (item: T) => string | null;
   rel?: PagingRel;
   defaultSort?: string;
   withSearch?: boolean;
