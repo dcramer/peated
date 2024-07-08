@@ -1,5 +1,6 @@
 import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
+import { stripPrefix, stripSuffix } from "@peated/server/lib/strings";
 import {
   BottleInputSchema,
   type EntityInputSchema,
@@ -118,20 +119,6 @@ export async function bottleNormalize({
   }
 
   return rv;
-}
-
-function stripSuffix(value: string, suffix: string) {
-  if (value.endsWith(suffix)) {
-    return value.substring(0, value.length - suffix.length);
-  }
-  return value;
-}
-
-function stripPrefix(value: string, prefix: string) {
-  if (value.startsWith(prefix)) {
-    return value.substring(prefix.length);
-  }
-  return value;
 }
 
 export default authedProcedure.input(BottleInputSchema).query(bottleNormalize);

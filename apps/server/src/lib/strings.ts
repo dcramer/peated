@@ -30,3 +30,17 @@ export function humanizeBytes(bytes: number, si = false, dp = 1) {
 
   return bytes.toFixed(dp) + " " + units[u];
 }
+
+export function stripSuffix(value: string, suffix: string) {
+  if (value.endsWith(suffix)) {
+    return value.substring(0, value.length - suffix.length);
+  }
+  return value;
+}
+
+export function stripPrefix(value: string, prefix: string) {
+  if (value.startsWith(prefix)) {
+    return value.substring(prefix.length);
+  }
+  return value;
+}
