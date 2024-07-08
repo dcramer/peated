@@ -1,7 +1,7 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { countries, regions } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/worker/client";
+import { runJob } from "@peated/server/worker/client";
 import slugify from "@sindresorhus/slugify";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
@@ -168,7 +168,33 @@ subcommand
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id } of query) {
         console.log(`Geocoding location for Country ${id}.`);
-        await pushJob("GeocodeCountryLocation", { countryId: id });
+        await runJob("GeocodeCountryLocation", { countryId: id });
+        hasResults = true;
+      }
+      offset += step;
+    }
+  });
+
+subcommand
+  .command("geocode-regions")
+  .description("Geocode regions")
+  .option("--only-missing")
+  .action(async (options) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({ id: regions.id })
+      .from(regions)
+      .where(and(options.onlyMissing ? isNull(regions.location) : undefined))
+      .orderBy(asc(regions.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id } of query) {
+        console.log(`Geocoding location for Region ${id}.`);
+        await runJob("GeocodeRegionLocation", { regionId: id });
         hasResults = true;
       }
       offset += step;
@@ -178,7 +204,6 @@ subcommand
 subcommand
   .command("load-regions")
   .description("Load region data")
-  .option("--only-missing")
   .action(async (options) => {
     for (const countryData of LOCATION_DATA) {
       const [country] = await db
@@ -209,3 +234,24 @@ subcommand
       }
     }
   });
+
+subcommand.command("fix-region-stats").action(async (options) => {
+  const step = 1000;
+  const baseQuery = db
+    .select({ id: regions.id })
+    .from(regions)
+    .orderBy(asc(regions.id));
+
+  let hasResults = true;
+  let offset = 0;
+  while (hasResults) {
+    hasResults = false;
+    const query = await baseQuery.offset(offset).limit(step);
+    for (const { id } of query) {
+      console.log(`Updating stats for Region ${id}.`);
+      await runJob("UpdateRegionStats", { regionId: id });
+      hasResults = true;
+    }
+    offset += step;
+  }
+});
