@@ -32,6 +32,7 @@ export default async ({ regionId }: { regionId: number }) => {
   const match = parsed.features.find(
     (f) =>
       (f.properties.addresstype === "country" ||
+        f.properties.addresstype === "province" ||
         f.properties.addresstype === "state" ||
         f.properties.addresstype === "county") &&
       f.properties.type === "administrative" &&

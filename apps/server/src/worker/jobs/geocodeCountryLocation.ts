@@ -30,6 +30,7 @@ export default async ({ countryId }: { countryId: number }) => {
   const match = parsed.features.find(
     (f) =>
       (f.properties.addresstype === "country" ||
+        f.properties.addresstype === "province" ||
         f.properties.addresstype === "state") &&
       f.properties.type === "administrative" &&
       f.properties.importance > 0.5,
