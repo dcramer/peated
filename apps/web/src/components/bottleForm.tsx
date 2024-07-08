@@ -179,6 +179,7 @@ export default function BottleForm({
               statedAge: watch("statedAge"),
               distillers: distillersValue,
               brand: brandValue,
+              vintageYear: watch("vintageYear"),
             }}
           />
         </div>
