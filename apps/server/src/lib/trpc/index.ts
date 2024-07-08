@@ -1,26 +1,22 @@
 import { type AppRouter } from "@peated/server/trpc/router";
-import { type captureException } from "@sentry/node";
+import { captureException } from "@sentry/core";
 import {
+  TRPCClientError,
   createTRPCProxyClient,
-  httpBatchLink,
+  httpLink,
   type TRPCLink,
 } from "@trpc/client";
 import { type AnyRouter } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 
-type AnySentryCaptureException = typeof captureException;
-
-export function makeTRPCClient<
-  SentryCaptureException extends AnySentryCaptureException,
->(
+export function makeTRPCClient(
   apiServer: string,
   accessToken?: string | null | undefined,
-  captureException?: SentryCaptureException,
 ) {
   return createTRPCProxyClient<AppRouter>({
     links: [
-      ...(captureException ? [sentryLink<AppRouter>(captureException)] : []),
-      httpBatchLink({
+      sentryLink<AppRouter>(),
+      httpLink({
         url: `${apiServer}/trpc`,
         async headers() {
           return {
@@ -32,9 +28,7 @@ export function makeTRPCClient<
   });
 }
 
-export function sentryLink<TRouter extends AnyRouter>(
-  captureException: AnySentryCaptureException,
-): TRPCLink<TRouter> {
+export function sentryLink<TRouter extends AnyRouter>(): TRPCLink<TRouter> {
   return () => {
     return ({ next, op }) => {
       return observable((observer) => {
@@ -66,4 +60,12 @@ export function sentryLink<TRouter extends AnyRouter>(
       });
     };
   };
+}
+
+export function isTRPCClientError(
+  cause: unknown,
+): cause is TRPCClientError<AppRouter> {
+  return (
+    cause instanceof TRPCClientError || Object.hasOwn(cause as any, "data")
+  );
 }

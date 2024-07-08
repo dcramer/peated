@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { COUNTRY_LIST } from "../constants";
 
 export const PointSchema = z.tuple([z.number(), z.number()]);
 
@@ -15,5 +14,3 @@ export const ObjectTypeEnum = z.enum([
   "entity",
   "tasting",
 ]);
-
-export const CountryEnum = z.enum(COUNTRY_LIST);

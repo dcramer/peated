@@ -29,6 +29,21 @@ test("creates a new entity", async ({ defaults }) => {
   expect(brand.name).toEqual("Macallan");
 });
 
+test("removes distillery suffix", async ({ defaults }) => {
+  const caller = createCaller({ user: defaults.user });
+  const data = await caller.entityCreate({
+    name: "Macallan Distillery",
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [brand] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+  expect(brand.name).toEqual("Macallan");
+});
+
 test("updates existing entity with new type", async ({
   fixtures,
   defaults,

@@ -1,5 +1,4 @@
 import { setUser } from "@sentry/node";
-import { type inferAsyncReturnType } from "@trpc/server";
 import { type CreateFastifyContextOptions } from "@trpc/server/adapters/fastify";
 import { getUserFromHeader } from "../lib/auth";
 
@@ -17,7 +16,7 @@ export async function createContext({ req, res }: CreateFastifyContextOptions) {
         ip_address: req.ip,
       });
 
-  return { user };
+  return { user, maxAge: 0 };
 }
 
-export type Context = inferAsyncReturnType<typeof createContext>;
+export type Context = Awaited<ReturnType<Awaited<typeof createContext>>>;

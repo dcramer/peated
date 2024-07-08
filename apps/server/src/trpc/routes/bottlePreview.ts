@@ -47,7 +47,7 @@ export async function bottleNormalize({
   const brand = await getEntity(input.brand, ctx);
 
   const rv: BottlePreviewResult = {
-    name: input.name,
+    ...input,
     category: input.category ?? null,
     brand,
     bottler: null,
@@ -91,8 +91,8 @@ export async function bottleNormalize({
 
   // remove duplicate brand name prefix on bottle name
   // e.g. Hibiki 12-year-old => Hibiki
-  if (rv.brand && rv.name && rv.name.startsWith(rv.brand.name)) {
-    rv.name = rv.name.substring(rv.brand.name.length + 1);
+  if (rv.brand) {
+    rv.name = stripPrefix(rv.name, `${rv.brand.name} `);
   }
 
   if (rv.name) {
@@ -102,7 +102,36 @@ export async function bottleNormalize({
     rv.statedAge = statedAge;
   }
 
+  // TODO: we want to remove the year from the name in mid-match
+  const vintageYearMatch = rv.name.match(
+    /(\b(\d{4})\b)|(\((\d{4})(?: release)?\))/i,
+  );
+  if (vintageYearMatch) {
+    if (!rv.vintageYear) {
+      rv.vintageYear = parseInt(vintageYearMatch[1] || vintageYearMatch[4], 10);
+    }
+    // TODO: regex this
+    rv.name = stripSuffix(rv.name, ` ${rv.vintageYear}`);
+    rv.name = stripSuffix(rv.name, ` (${rv.vintageYear})`);
+    rv.name = stripSuffix(rv.name, ` (${rv.vintageYear} release)`);
+    rv.name = stripSuffix(rv.name, ` (${rv.vintageYear} Release)`);
+  }
+
   return rv;
+}
+
+function stripSuffix(value: string, suffix: string) {
+  if (value.endsWith(suffix)) {
+    return value.substring(0, value.length - suffix.length);
+  }
+  return value;
+}
+
+function stripPrefix(value: string, prefix: string) {
+  if (value.startsWith(prefix)) {
+    return value.substring(prefix.length);
+  }
+  return value;
 }
 
 export default authedProcedure.input(BottleInputSchema).query(bottleNormalize);

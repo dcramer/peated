@@ -64,6 +64,7 @@ export default publicProcedure
 
         where.push(eq(tastings.createdById, ctx.user.id));
       } else {
+        // TODO: support username
         where.push(eq(tastings.createdById, input.user));
       }
     }

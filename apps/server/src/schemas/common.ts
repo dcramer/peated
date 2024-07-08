@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { FLAVOR_PROFILES } from "../constants";
+import {
+  CASK_FILLS,
+  CASK_SIZE_IDS,
+  CASK_TYPE_IDS,
+  CURRENCY_LIST,
+  FLAVOR_PROFILES,
+} from "../constants";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 
 export const zTag = z.string();
@@ -31,3 +37,13 @@ export const zDatetime = z
   });
 
 export const FlavorProfileEnum = z.enum(FLAVOR_PROFILES);
+
+export const ContentSourceEnum = z.enum(["generated", "user"]);
+
+export const CurrencyEnum = z.enum(CURRENCY_LIST);
+
+export const CaskFillEnum = z.enum(CASK_FILLS);
+
+export const CaskTypeEnum = z.enum(CASK_TYPE_IDS);
+
+export const CaskSizeEnum = z.enum(CASK_SIZE_IDS);

@@ -1,22 +1,23 @@
 import { db } from "@peated/server/db";
-import type { UnserializedPoint } from "@peated/server/db/columns";
-import { type SerializedPoint } from "@peated/server/db/columns";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottles,
   changes,
+  countries,
   entities,
   entityAliases,
+  regions,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
+import { normalizeEntityName } from "@peated/server/lib/normalize";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, getTableColumns, ilike, ne, sql } from "drizzle-orm";
+import { and, eq, ilike, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 
@@ -28,10 +29,7 @@ export default modProcedure
   )
   .mutation(async function ({ input, ctx }) {
     const [entity] = await db
-      .select({
-        ...getTableColumns(entities),
-        location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
-      })
+      .select()
       .from(entities)
       .where(eq(entities.id, input.entity));
 
@@ -45,17 +43,59 @@ export default modProcedure
     const data: { [name: string]: any } = {};
 
     if (input.name && input.name !== entity.name) {
-      data.name = input.name;
+      data.name = normalizeEntityName(input.name);
     }
     if (input.shortName !== undefined && input.shortName !== entity.shortName) {
       data.shortName = input.shortName;
     }
-    if (input.country !== undefined && input.country !== entity.country) {
-      data.country = input.country;
+    if (input.country !== undefined && input.country) {
+      const [country] = await db
+        .select()
+        .from(countries)
+        .where(eq(countries.id, input.country))
+        .limit(1);
+      if (!country) {
+        throw new TRPCError({
+          message: "Country not found.",
+          code: "NOT_FOUND",
+        });
+      }
+      if (country.id !== entity.countryId) {
+        data.countryId = country.id;
+      }
     }
-    if (input.region !== undefined && input.region !== entity.region) {
-      data.region = input.region;
+    if (input.region !== undefined && input.region) {
+      const [region] = await db
+        .select()
+        .from(regions)
+        .where(eq(regions.id, input.region))
+        .limit(1);
+      if (
+        !region ||
+        region.countryId !== (data.countryId ?? entity.countryId)
+      ) {
+        throw new TRPCError({
+          message: "Region not found.",
+          code: "NOT_FOUND",
+        });
+      }
+      if (region.id !== entity.regionId) {
+        data.regionId = region.id;
+      }
     }
+    if (input.address !== undefined && input.address !== entity.address) {
+      data.address = input.address;
+      data.location = null;
+    }
+    if (
+      input.location !== undefined &&
+      (!input.location ||
+        !entity.location ||
+        !arraysEqual(input.location, entity.location))
+    ) {
+      data.location = input.location;
+    }
+
     if (input.type !== undefined && !arraysEqual(input.type, entity.type)) {
       data.type = input.type;
     }
@@ -65,7 +105,8 @@ export default modProcedure
     ) {
       data.description = input.description;
       data.descriptionSrc =
-        input.description && input.description !== null ? "user" : null;
+        input.descriptionSrc ||
+        (input.description && input.description !== null ? "user" : null);
     }
     if (
       input.yearEstablished !== undefined &&
@@ -76,40 +117,23 @@ export default modProcedure
     if (input.website !== undefined && input.website !== entity.website) {
       data.website = input.website;
     }
-    if (
-      input.location !== undefined &&
-      (!input.location ||
-        !entity.location ||
-        !arraysEqual(
-          input.location,
-          (JSON.parse(entity.location) as UnserializedPoint).coordinates as [
-            number,
-            number,
-          ],
-        ))
-    ) {
-      data.location = input.location;
-    }
     if (Object.values(data).length === 0) {
       return await serialize(EntitySerializer, entity, ctx.user);
     }
 
     const user = ctx.user;
     const newEntity = await db.transaction(async (tx) => {
-      let newEntity:
-        | (Entity & {
-            location: SerializedPoint;
-          })
-        | undefined;
+      let newEntity: Entity | undefined;
+
       try {
         [newEntity] = await tx
           .update(entities)
-          .set(data)
+          .set({
+            ...data,
+            updatedAt: sql`NOW()`,
+          })
           .where(eq(entities.id, entity.id))
-          .returning({
-            ...getTableColumns(entities),
-            location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
-          });
+          .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "entity_name_unq") {
           throw new TRPCError({
@@ -139,6 +163,7 @@ export default modProcedure
             await tx.insert(entityAliases).values({
               name: newAlias,
               entityId: newEntity.id,
+              createdAt: newEntity.createdAt,
             });
           } else if (!existingAlias.entityId) {
             await tx
@@ -204,19 +229,14 @@ export default modProcedure
       });
     }
 
-    if (
-      (newEntity.name !== entity.name || !newEntity.description) &&
-      newEntity.descriptionSrc !== "user"
-    ) {
-      try {
-        await pushJob("GenerateEntityDetails", { entityId: entity.id });
-      } catch (err) {
-        logError(err, {
-          entity: {
-            id: entity.id,
-          },
-        });
-      }
+    try {
+      await pushJob("OnEntityChange", { entityId: entity.id });
+    } catch (err) {
+      logError(err, {
+        entity: {
+          id: entity.id,
+        },
+      });
     }
 
     return await serialize(EntitySerializer, newEntity, ctx.user);

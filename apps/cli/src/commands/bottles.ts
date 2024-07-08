@@ -1,11 +1,13 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { bottles, reviews, tastings } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
+import { bottles, reviews } from "@peated/server/db/schema";
 import { findEntity } from "@peated/server/lib/bottleFinder";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { createCaller } from "@peated/server/trpc/router";
-import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
+import { runJob } from "@peated/server/worker/client";
+import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
+import { generateUniqHash } from "../../../server/src/lib/bottleHash";
+import { mergeBottlesInto } from "../../../server/src/trpc/routes/bottleMerge";
 
 const subcommand = program.command("bottles");
 
@@ -35,7 +37,7 @@ subcommand
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id } of query) {
         console.log(`Generating description for Bottle ${id}.`);
-        await pushJob("GenerateBottleDetails", { bottleId: id });
+        await runJob("GenerateBottleDetails", { bottleId: id });
         hasResults = true;
       }
       offset += step;
@@ -47,7 +49,7 @@ subcommand
   .description("Create missing bottles")
   .action(async (options) => {
     console.log(`Pushing job [CreateMissingBottles].`);
-    await pushJob("CreateMissingBottles");
+    await runJob("CreateMissingBottles");
   });
 
 subcommand
@@ -107,17 +109,112 @@ subcommand
     }
   });
 
-subcommand.command("fix-stats").action(async () => {
-  await db.update(bottles).set({
-    avgRating: sql<number>`(
-        SELECT AVG(rating)
-        FROM ${tastings}
-        WHERE ${tastings.bottleId} = ${bottles.id}
-      )`,
-    totalTastings: sql<number>`(
-        SELECT COUNT(*)
-        FROM ${tastings}
-        WHERE ${tastings.bottleId} = ${bottles.id}
-      )`,
+subcommand
+  .command("fix-hashes")
+  .argument("[bottleIds...]")
+  .description("Fix bottle unique hashes")
+  .action(async (bottleIds) => {
+    const step = 1000;
+    const baseQuery = db
+      .select()
+      .from(bottles)
+      .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
+      .orderBy(asc(bottles.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const bottle of query) {
+        const uniqHash = generateUniqHash(bottle);
+        if (bottle.uniqHash !== uniqHash) {
+          console.log(`Updating hash for Bottle ${bottle.id}.`);
+          try {
+            await db.transaction(async (tx) => {
+              await tx
+                .update(bottles)
+                .set({
+                  uniqHash,
+                })
+                .where(eq(bottles.id, bottle.id));
+            });
+          } catch (err) {
+            console.error(
+              `Unable to update hash for ${bottle.id}. Merging instead.`,
+              err,
+            );
+            const [existingBottle] = await db
+              .select()
+              .from(bottles)
+              .where(eq(bottles.uniqHash, uniqHash));
+            if (existingBottle.id > bottle.id) {
+              mergeBottlesInto(existingBottle, bottle);
+            } else {
+              mergeBottlesInto(bottle, existingBottle);
+            }
+          }
+        }
+        hasResults = true;
+      }
+      offset += step;
+    }
   });
-});
+
+subcommand
+  .command("fix-stats")
+  .argument("[bottleIds...]")
+  .action(async (bottleIds) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({ id: bottles.id })
+      .from(bottles)
+      .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
+      .orderBy(asc(bottles.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id } of query) {
+        console.log(`Updating stats for Bottle ${id}.`);
+        await runJob("UpdateBottleStats", { bottleId: id });
+        hasResults = true;
+      }
+      offset += step;
+    }
+  });
+
+subcommand
+  .command("index-search")
+  .description("Update bottle search indexes")
+  .argument("[bottleIds...]")
+  .option("--only-missing")
+  .action(async (bottleIds, options) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({ id: bottles.id })
+      .from(bottles)
+      .where(
+        bottleIds.length
+          ? inArray(bottles.id, bottleIds)
+          : options.onlyMissing
+            ? isNull(bottles.description)
+            : undefined,
+      )
+      .orderBy(asc(bottles.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id } of query) {
+        console.log(`Indexing search vectors for Bottle ${id}.`);
+        await runJob("IndexBottleSearchVectors", { bottleId: id });
+        hasResults = true;
+      }
+      offset += step;
+    }
+  });

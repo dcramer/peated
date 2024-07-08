@@ -14,14 +14,8 @@ test("lists entity aliases", async ({ fixtures }) => {
     entity: entity.id,
   });
   expect(results.length).toEqual(2);
-  expect(results).toMatchInlineSnapshot(`
-    [
-      {
-        "name": "Foo",
-      },
-      {
-        "name": "Foo Bar",
-      },
-    ]
-  `);
+  expect(results[0].name).toEqual("Foo");
+  expect(results[0].isCanonical).toEqual(true);
+  expect(results[1].name).toEqual("Foo Bar");
+  expect(results[1].isCanonical).toEqual(false);
 });

@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  date,
   doublePrecision,
   index,
   integer,
@@ -15,6 +16,12 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import {
+  CASK_FILLS,
+  CASK_SIZE_IDS,
+  CASK_TYPE_IDS,
+} from "@peated/server/constants";
+import { tsvector } from "../columns";
 import { entities } from "./entities";
 import { categoryEnum, contentSourceEnum, flavorProfileEnum } from "./enums";
 import { users } from "./users";
@@ -31,6 +38,12 @@ export const bottles = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     fullName: varchar("full_name", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
+
+    // md5(lower(fullName), vintageYear)
+    uniqHash: varchar("uniq_hash", { length: 32 }).notNull(),
+
+    searchVector: tsvector("search_vector"),
+
     category: categoryEnum("category"),
     brandId: bigint("brand_id", { mode: "number" })
       .references(() => entities.id)
@@ -40,6 +53,12 @@ export const bottles = pgTable(
     ),
     statedAge: smallint("stated_age"),
     flavorProfile: flavorProfileEnum("flavor_profile"),
+
+    vintageYear: smallint("vintage_year"),
+    caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
+    caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
+    caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
+    releaseDate: date("release_date"),
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
@@ -56,22 +75,23 @@ export const bottles = pgTable(
       .notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
   },
-  (bottles) => {
+  (table) => {
     return {
-      unique: uniqueIndex("bottle_brand_unq").on(bottles.name, bottles.brandId),
-      uniqueName: uniqueIndex("bottle_full_name_unq")
-        .on(bottles.fullName)
-        .using(sql`btree (LOWER(full_name))`),
-      brandIdx: index("bottle_brand_idx").on(bottles.brandId),
-      bottlerIdx: index("bottle_bottler_idx").on(bottles.bottlerId),
-      createdById: index("bottle_created_by_idx").on(bottles.createdById),
-      categoryIdx: index("bottle_category_idx").on(bottles.category),
+      uniqHash: uniqueIndex("bottle_uniq_hash").on(table.uniqHash),
+      searchVectorIndex: index("bottle_search_idx")
+        .on(table.searchVector)
+        .using(sql`gin(${table.searchVector})`),
+      brandIdx: index("bottle_brand_idx").on(table.brandId),
+      bottlerIdx: index("bottle_bottler_idx").on(table.bottlerId),
+      createdById: index("bottle_created_by_idx").on(table.createdById),
+      categoryIdx: index("bottle_category_idx").on(table.category),
       flavorProfileIdx: index("bottle_flavor_profile_idx").on(
-        bottles.flavorProfile,
+        table.flavorProfile,
       ),
     };
   },
@@ -166,6 +186,7 @@ export const bottleAliases = pgTable(
       () => bottles.id,
     ),
     name: varchar("name", { length: 255 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (bottleAliases) => {
     return {

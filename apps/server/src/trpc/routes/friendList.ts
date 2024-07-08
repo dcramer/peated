@@ -53,6 +53,7 @@ export default authedProcedure
     const results = await db
       .select({
         ...getTableColumns(follows),
+        toUser: getTableColumns(users),
       })
       .from(follows)
       .where(and(...where))

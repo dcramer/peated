@@ -68,14 +68,16 @@ test("can change name", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "name")).toEqual(omit(newEntity, "name"));
+  expect(omit(entity, "name", "searchVector", "updatedAt")).toEqual(
+    omit(newEntity, "name", "searchVector", "updatedAt"),
+  );
   expect(newEntity.name).toBe("Delicious Wood");
 
   const [change] = await db
     .select()
     .from(changes)
     .where(eq(changes.objectId, newEntity.id))
-    .orderBy(desc(changes.createdAt))
+    .orderBy(desc(changes.id))
     .limit(1);
 
   expect(change.data).toEqual({ name: "Delicious Wood" });
@@ -83,13 +85,14 @@ test("can change name", async ({ fixtures }) => {
 
 test("can change country", async ({ fixtures }) => {
   const entity = await fixtures.Entity();
+  const country = await fixtures.Country();
 
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),
   });
   const data = await caller.entityUpdate({
     entity: entity.id,
-    country: "Scotland",
+    country: country.id,
   });
 
   expect(data.id).toBeDefined();
@@ -99,8 +102,10 @@ test("can change country", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "country")).toEqual(omit(newEntity, "country"));
-  expect(newEntity.country).toBe("Scotland");
+  expect(omit(entity, "countryId", "searchVector", "updatedAt")).toEqual(
+    omit(newEntity, "countryId", "searchVector", "updatedAt"),
+  );
+  expect(newEntity.countryId).toBe(country.id);
 });
 
 test("can change region", async ({ fixtures }) => {
@@ -109,9 +114,12 @@ test("can change region", async ({ fixtures }) => {
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),
   });
+  const region = await fixtures.Region();
+
   const data = await caller.entityUpdate({
     entity: entity.id,
-    region: "Islay",
+    country: region.countryId,
+    region: region.id,
   });
 
   expect(data.id).toBeDefined();
@@ -121,8 +129,12 @@ test("can change region", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "region")).toEqual(omit(newEntity, "region"));
-  expect(newEntity.region).toBe("Islay");
+  expect(
+    omit(entity, "countryId", "regionId", "searchVector", "updatedAt"),
+  ).toEqual(
+    omit(newEntity, "countryId", "regionId", "searchVector", "updatedAt"),
+  );
+  expect(newEntity.regionId).toBe(region.id);
 });
 
 test("can change type", async ({ fixtures }) => {
@@ -143,7 +155,9 @@ test("can change type", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "type")).toEqual(omit(newEntity, "type"));
+  expect(omit(entity, "type", "searchVector", "updatedAt")).toEqual(
+    omit(newEntity, "type", "searchVector", "updatedAt"),
+  );
   expect(newEntity.type).toEqual(["distiller"]);
 });
 
@@ -177,7 +191,9 @@ test("name change updates bottles if brand", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "name")).toEqual(omit(newEntity, "name"));
+  expect(omit(entity, "name", "searchVector", "updatedAt")).toEqual(
+    omit(newEntity, "name", "searchVector", "updatedAt"),
+  );
   expect(newEntity.name).toBe("Bar");
 
   const [newBottle] = await db
@@ -232,7 +248,9 @@ test("short name change updates bottles if brand", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "shortName")).toEqual(omit(newEntity, "shortName"));
+  expect(omit(entity, "shortName", "searchVector", "updatedAt")).toEqual(
+    omit(newEntity, "shortName", "searchVector", "updatedAt"),
+  );
   expect(newEntity.shortName).toBe("F");
 
   const [newBottle] = await db
@@ -275,8 +293,16 @@ test("sets descriptionSrc with description", async ({ fixtures }) => {
     .from(entities)
     .where(eq(entities.id, data.id));
 
-  expect(omit(entity, "description", "descriptionSrc")).toEqual(
-    omit(newEntity, "description", "descriptionSrc"),
+  expect(
+    omit(entity, "description", "descriptionSrc", "searchVector", "updatedAt"),
+  ).toEqual(
+    omit(
+      newEntity,
+      "description",
+      "descriptionSrc",
+      "searchVector",
+      "updatedAt",
+    ),
   );
   expect(newEntity.description).toBe("Delicious Wood");
   expect(newEntity.descriptionSrc).toEqual("user");
@@ -285,7 +311,7 @@ test("sets descriptionSrc with description", async ({ fixtures }) => {
     .select()
     .from(changes)
     .where(eq(changes.objectId, newEntity.id))
-    .orderBy(desc(changes.createdAt))
+    .orderBy(desc(changes.id))
     .limit(1);
 
   expect(change.data).toEqual({

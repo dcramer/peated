@@ -1,4 +1,4 @@
-import { shutdownClient } from "@peated/server/jobs/client";
+import { shutdownClient } from "@peated/server/worker/client";
 import { startInactiveSpan } from "@sentry/node";
 import { Command } from "commander";
 import { basename } from "path";

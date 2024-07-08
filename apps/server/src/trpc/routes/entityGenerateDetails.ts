@@ -1,5 +1,8 @@
-import { getGeneratedEntityDetails } from "@peated/server/jobs/generateEntityDetails";
+import { db } from "@peated/server/db";
+import { countries, regions } from "@peated/server/db/schema";
 import { EntityInputSchema } from "@peated/server/schemas";
+import { getGeneratedEntityDetails } from "@peated/server/worker/jobs/generateEntityDetails";
+import { eq } from "drizzle-orm";
 import { type z } from "zod";
 import { modProcedure } from "..";
 import { type Context } from "../context";
@@ -13,7 +16,22 @@ export async function entityGenerateDetails({
   input: z.infer<typeof InputSchema>;
   ctx: Context;
 }) {
-  const result = await getGeneratedEntityDetails(input);
+  const country = input.country
+    ? await db.query.countries.findFirst({
+        where: eq(countries.id, input.country),
+      })
+    : null;
+  const region = input.region
+    ? await db.query.regions.findFirst({
+        where: eq(regions.id, input.region),
+      })
+    : null;
+
+  const result = await getGeneratedEntityDetails({
+    ...input,
+    country: country || null,
+    region: region || null,
+  });
   return result;
 }
 

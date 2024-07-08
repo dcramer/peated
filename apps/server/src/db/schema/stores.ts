@@ -5,6 +5,7 @@ import {
   date,
   index,
   integer,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -12,6 +13,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { bottles } from "./bottles";
 import { externalSites } from "./externalSites";
+
+export const currencyEnum = pgEnum("currency", ["usd", "gbp", "eur"]);
 
 export const storePrices = pgTable(
   "store_price",
@@ -25,6 +28,7 @@ export const storePrices = pgTable(
       () => bottles.id,
     ),
     price: integer("price").notNull(),
+    currency: currencyEnum("currency").notNull(),
     volume: integer("volume").notNull(),
     url: text("url").notNull().unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -65,6 +69,7 @@ export const storePriceHistories = pgTable(
       .references(() => storePrices.id)
       .notNull(),
     price: integer("price").notNull(),
+    currency: currencyEnum("currency").default("usd").notNull(),
     volume: integer("volume").notNull(),
     date: date("date").defaultNow().notNull(),
   },

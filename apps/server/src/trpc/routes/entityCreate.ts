@@ -1,11 +1,19 @@
 import { db } from "@peated/server/db";
 import type { NewEntity } from "@peated/server/db/schema";
-import { changes, entities, entityAliases } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
+import {
+  changes,
+  countries,
+  entities,
+  entityAliases,
+  regions,
+} from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
+import { normalizeEntityName } from "@peated/server/lib/normalize";
+import { buildEntitySearchVector } from "@peated/server/lib/search";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { authedProcedure } from "..";
@@ -15,19 +23,55 @@ export default authedProcedure
   .mutation(async function ({ input, ctx }) {
     const data: NewEntity = {
       ...input,
+      name: normalizeEntityName(input.name),
       type: input.type || [],
       createdById: ctx.user.id,
     };
 
+    if (input.country) {
+      const [country] = await db
+        .select()
+        .from(countries)
+        .where(eq(countries.id, input.country))
+        .limit(1);
+      if (!country) {
+        throw new TRPCError({
+          message: "Country not found.",
+          code: "NOT_FOUND",
+        });
+      }
+      data.countryId = country.id;
+    }
+
+    if (input.region) {
+      const [region] = await db
+        .select()
+        .from(regions)
+        .where(eq(regions.id, input.region))
+        .limit(1);
+      if (!region || region.countryId !== data.countryId) {
+        throw new TRPCError({
+          message: "Region not found.",
+          code: "NOT_FOUND",
+        });
+      }
+      data.regionId = region.id;
+    }
+
     if (data.description && data.description !== "") {
-      data.descriptionSrc = "user";
+      data.descriptionSrc =
+        input.descriptionSrc ||
+        (input.description && input.description !== null ? "user" : null);
     }
 
     const user = ctx.user;
     const entity = await db.transaction(async (tx) => {
       const [entity] = await tx
         .insert(entities)
-        .values(data)
+        .values({
+          ...data,
+          searchVector: buildEntitySearchVector(data),
+        })
         .onConflictDoNothing()
         .returning();
 
@@ -56,12 +100,22 @@ export default authedProcedure
       await tx.insert(entityAliases).values({
         entityId: entity.id,
         name: entity.name,
+        createdAt: entity.createdAt,
       });
+
+      if (entity.shortName) {
+        await tx.insert(entityAliases).values({
+          entityId: entity.id,
+          name: entity.shortName,
+          createdAt: entity.createdAt,
+        });
+      }
 
       if (entity.name.startsWith("The ")) {
         await tx.insert(entityAliases).values({
           entityId: entity.id,
           name: entity.name.substring(4),
+          createdAt: entity.createdAt,
         });
       }
 
@@ -86,7 +140,7 @@ export default authedProcedure
     }
 
     try {
-      await pushJob("GenerateEntityDetails", { entityId: entity.id });
+      await pushJob("OnEntityChange", { entityId: entity.id });
     } catch (err) {
       logError(err, {
         entity: {

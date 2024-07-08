@@ -7,12 +7,13 @@ import {
   entityAliases,
   entityTombstones,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/jobs/client";
+import { generateUniqHash } from "@peated/server/lib/bottleHash";
 import { logError } from "@peated/server/lib/log";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { mergeBottlesInto } from "./bottleMerge";
@@ -27,17 +28,7 @@ async function mergeEntitiesInto(
     `Merging entities ${fromEntityIds.join(", ")} into ${toEntity.id}.`,
   );
 
-  const totalBottles = fromEntities.reduce(
-    (acc, ent) => acc + ent.totalBottles,
-    0,
-  );
-  const totalTastings = fromEntities.reduce(
-    (acc, ent) => acc + ent.totalTastings,
-    0,
-  );
-
-  // TODO: this doesnt handle duplicate bottles
-  return await db.transaction(async (tx) => {
+  const newEntity = await db.transaction(async (tx) => {
     const bottleList = await tx
       .select()
       .from(bottles)
@@ -50,11 +41,17 @@ async function mergeEntitiesInto(
             .update(bottles)
             .set({
               brandId: toEntity.id,
+              fullName: `${toEntity.name} ${bottle.name}`,
+              uniqHash: generateUniqHash({
+                ...bottle,
+                fullName: `${toEntity.name} ${bottle.name}`,
+              }),
             })
             .where(eq(bottles.id, bottle.id));
         });
+        pushJob("IndexBottleSearchVectors", { bottleId: bottle.id });
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "bottle_brand_unq") {
+        if (err?.code === "23505" && err?.constraint === "bottle_uniq_hash") {
           // merge the bottle with its duplicate
           const [toBottle] = await tx
             .select()
@@ -63,6 +60,11 @@ async function mergeEntitiesInto(
               and(
                 eq(bottles.name, bottle.name),
                 eq(bottles.brandId, toEntity.id),
+                ...[
+                  bottle.vintageYear
+                    ? eq(bottles.vintageYear, bottle.vintageYear)
+                    : isNull(bottles.vintageYear),
+                ],
               ),
             );
           if (!toBottle) {
@@ -109,19 +111,22 @@ async function mergeEntitiesInto(
       });
     }
 
-    const [entity] = await tx
-      .update(entities)
-      .set({
-        totalBottles: sql`${entities.totalBottles} + ${totalBottles}`,
-        totalTastings: sql`${entities.totalTastings} + ${totalTastings}`,
-      })
-      .where(eq(entities.id, toEntity.id))
-      .returning();
-
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
 
-    return entity;
+    return toEntity;
   });
+
+  try {
+    await pushJob("OnEntityChange", { entityId: newEntity.id });
+  } catch (err) {
+    logError(err, {
+      entity: {
+        id: newEntity.id,
+      },
+    });
+  }
+
+  return newEntity;
 }
 
 export default modProcedure
@@ -170,15 +175,6 @@ export default modProcedure
     const toEntity = input.direction === "mergeInto" ? otherEntity : rootEntity;
 
     const newEntity = await mergeEntitiesInto(toEntity, fromEntity);
-    try {
-      await pushJob("GenerateEntityDetails", { entityId: toEntity.id });
-    } catch (err) {
-      logError(err, {
-        entity: {
-          id: toEntity.id,
-        },
-      });
-    }
 
     return await serialize(EntitySerializer, newEntity, ctx.user);
   });

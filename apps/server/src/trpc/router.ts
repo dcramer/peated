@@ -1,10 +1,12 @@
 import { createCallerFactory, router } from ".";
+import type { Context } from "./context";
 
 import auth from "./routes/auth";
 import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
 import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
+import bottleAliasDelete from "./routes/bottleAliasDelete";
 import bottleAliasList from "./routes/bottleAliasList";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
@@ -18,6 +20,7 @@ import bottlePriceList from "./routes/bottlePriceList";
 import bottleSuggestedTagList from "./routes/bottleSuggestedTagList";
 import bottleTagList from "./routes/bottleTagList";
 import bottleUpdate from "./routes/bottleUpdate";
+import bottleUpsert from "./routes/bottleUpsert";
 import changeList from "./routes/changeList";
 import collectionBottleCreate from "./routes/collectionBottleCreate";
 import collectionBottleDelete from "./routes/collectionBottleDelete";
@@ -26,6 +29,12 @@ import collectionList from "./routes/collectionList";
 import commentCreate from "./routes/commentCreate";
 import commentDelete from "./routes/commentDelete";
 import commentList from "./routes/commentList";
+import countryBySlug from "./routes/countryBySlug";
+import countryCategoryList from "./routes/countryCategoryList";
+import countryGenerateDetails from "./routes/countryGenerateDetails";
+import countryList from "./routes/countryList";
+import countryUpdate from "./routes/countryUpdate";
+import entityAliasDelete from "./routes/entityAliasDelete";
 import entityAliasList from "./routes/entityAliasList";
 import entityById from "./routes/entityById";
 import entityCategoryList from "./routes/entityCategoryList";
@@ -45,6 +54,7 @@ import externalSiteUpdate from "./routes/externalSiteUpdate";
 import faktoryInfo from "./routes/faktoryInfo";
 import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
+import flightDelete from "./routes/flightDelete";
 import flightList from "./routes/flightList";
 import flightUpdate from "./routes/flightUpdate";
 import friendCreate from "./routes/friendCreate";
@@ -57,8 +67,16 @@ import notificationUpdate from "./routes/notificationUpdate";
 import priceChangeList from "./routes/priceChangeList";
 import priceCreateBatch from "./routes/priceCreateBatch";
 import priceList from "./routes/priceList";
+import regionBySlug from "./routes/regionBySlug";
+import regionCreate from "./routes/regionCreate";
+import regionGenerateDetails from "./routes/regionGenerateDetails";
+import regionList from "./routes/regionList";
+import regionUpdate from "./routes/regionUpdate";
 import reviewCreate from "./routes/reviewCreate";
 import reviewList from "./routes/reviewList";
+import search from "./routes/search";
+import similarBottleList from "./routes/similarBottleList";
+import smwsDistillerList from "./routes/smwsDistillerList";
 import stats from "./routes/stats";
 import tagByName from "./routes/tagByName";
 import tagCreate from "./routes/tagCreate";
@@ -88,6 +106,7 @@ export const appRouter = router({
   bottleDelete,
   bottlePreview,
   bottleList,
+  bottleAliasDelete,
   bottleAliasList,
   bottleGenerateDetails,
   bottleMerge,
@@ -96,14 +115,21 @@ export const appRouter = router({
   bottleSuggestedTagList,
   bottleTagList,
   bottleUpdate,
+  bottleUpsert,
   changeList,
   collectionBottleCreate,
   collectionBottleDelete,
   collectionBottleList,
   collectionList,
+  countryBySlug,
+  countryCategoryList,
+  countryGenerateDetails,
+  countryList,
+  countryUpdate,
   commentCreate,
   commentDelete,
   commentList,
+  entityAliasDelete,
   entityAliasList,
   entityById,
   entityCategoryList,
@@ -123,6 +149,7 @@ export const appRouter = router({
   faktoryInfo,
   flightById,
   flightCreate,
+  flightDelete,
   flightUpdate,
   flightList,
   friendCreate,
@@ -133,11 +160,19 @@ export const appRouter = router({
   notificationList,
   notificationUpdate,
   priceChangeList,
+  regionBySlug,
+  regionCreate,
+  regionGenerateDetails,
+  regionList,
+  regionUpdate,
   reviewCreate,
   reviewList,
+  similarBottleList,
   stats,
   priceList,
   priceCreateBatch,
+  search,
+  smwsDistillerList,
   tagByName,
   tagCreate,
   tagList,
@@ -158,4 +193,13 @@ export const appRouter = router({
 
 export type AppRouter = typeof appRouter;
 
-export const createCaller = createCallerFactory(appRouter);
+const callerFactory = createCallerFactory(appRouter);
+
+const DEFAULTS = { user: null, maxAge: 0 };
+
+export const createCaller = (context: Partial<Context> = DEFAULTS) => {
+  return callerFactory({
+    ...DEFAULTS,
+    ...context,
+  });
+};

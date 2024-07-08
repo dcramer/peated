@@ -1,0 +1,59 @@
+"use client";
+
+import { Dialog, DialogPanel } from "@headlessui/react";
+import { useEffect, useState } from "react";
+
+import { toTitleCase } from "@peated/server/lib/strings";
+
+import type { CreateForm, Option } from "./types";
+
+// TODO(dcramer): hitting escape doesnt do what you want here (it does nothing)
+export default function CreateOptionDialog<T extends Option>({
+  query = "",
+  open,
+  setOpen,
+  onSubmit,
+  render,
+}: {
+  query?: string;
+  open: boolean;
+  setOpen: (value: boolean) => void;
+  onSubmit: (newOption: T) => void;
+  render: CreateForm<T>;
+}) {
+  const [newOption, setNewOption] = useState<T>({
+    id: null,
+    name: "",
+  } as T);
+
+  useEffect(() => {
+    setNewOption((data) => ({ ...data, name: toTitleCase(query) }));
+  }, [query]);
+
+  return (
+    <Dialog open={open} as="div" className="dialog" onClose={setOpen}>
+      <div className="fixed inset-0">
+        <DialogPanel className="dialog-panel flex items-center justify-center px-4 pb-4 pt-5 sm:p-6">
+          {render({
+            onSubmit: (...params) => {
+              onSubmit(...params);
+              setNewOption({
+                id: null,
+                name: "",
+              } as T);
+              setOpen(false);
+            },
+            onClose: () => setOpen(false),
+            data: newOption,
+            onFieldChange: (value) => {
+              setNewOption({
+                ...newOption,
+                ...value,
+              });
+            },
+          })}
+        </DialogPanel>
+      </div>
+    </Dialog>
+  );
+}

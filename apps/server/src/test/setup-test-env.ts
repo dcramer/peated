@@ -22,16 +22,14 @@ const axiosMock = new MockAdapter(axios);
 
 // TODO: no fucking clue how to just use my mock module anymore and docs
 // are almost non-existant
-vi.mock("../jobs/client", async (importOriginal) => {
+vi.mock("../worker/client", async () => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  const oJobs = await importOriginal<typeof import("../jobs/client.js")>();
+  // const oJobs = await importOriginal<typeof import("../worker/client.js")>();
   return {
-    getJobForSite: oJobs.getJobForSite,
     getClient: vi.fn(),
     hasActiveClient: vi.fn(async () => true),
     shutdownClient: vi.fn(),
     pushJob: vi.fn(() => undefined),
-    registerJob: vi.fn(() => undefined),
   };
 });
 

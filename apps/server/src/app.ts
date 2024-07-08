@@ -4,9 +4,10 @@ import "./sentry";
 import FastifyCors from "@fastify/cors";
 import FastifyHelmet from "@fastify/helmet";
 import FastifyMultipart from "@fastify/multipart";
-import { shutdownClient } from "@peated/server/jobs/client";
+import { shutdownClient } from "@peated/server/worker/client";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { fastify } from "fastify";
+import { setTimeout } from "node:timers/promises";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
 import { injectAuth } from "./middleware/auth";
@@ -51,9 +52,19 @@ export default async function buildFastify(options = {}) {
 
   app.addHook("preHandler", (request, reply, done) => {
     // default
-    reply.headers({ "Cache-Control": "no-cache" });
+    reply.headers({
+      "Cache-Control":
+        "private, no-cache, no-store, max-age=0, must-revalidate",
+    });
     done();
   });
+
+  if (config.ENV === "development") {
+    console.log("Adding 300ms delay to all requests");
+    app.addHook("onRequest", async (request, reply) => {
+      await setTimeout(300);
+    });
+  }
 
   app.register(fastifyTRPCPlugin, {
     prefix: "/trpc",
@@ -76,7 +87,11 @@ export default async function buildFastify(options = {}) {
     },
     contentSecurityPolicy: false,
   });
-  app.register(FastifyCors, { credentials: true, origin: config.CORS_HOST });
+  app.register(FastifyCors, {
+    credentials: true,
+    origin: config.CORS_HOST.split(","),
+    maxAge: 600,
+  });
 
   app.register(router);
   app.register(FastifySentry);

@@ -1,8 +1,7 @@
-import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { type SerializedPoint } from "../db/columns";
 import type { Bottle, Flight, User } from "../db/schema";
 import {
   bottlesToDistillers,
@@ -53,10 +52,7 @@ export const BottleSerializer = serializer({
     );
 
     const entityList = await db
-      .select({
-        ...getTableColumns(entities),
-        location: sql<SerializedPoint>`ST_AsGeoJSON(${entities.location}) as location`,
-      })
+      .select()
       .from(entities)
       .where(inArray(entities.id, entityIds));
     const entitiesById = Object.fromEntries(
@@ -153,11 +149,19 @@ export const BottleSerializer = serializer({
       id: item.id,
       name: item.name,
       fullName: item.fullName,
+
+      category: item.category,
       description: item.description,
       flavorProfile: item.flavorProfile,
       tastingNotes: item.tastingNotes,
+
       statedAge: item.statedAge,
-      category: item.category,
+      vintageYear: item.vintageYear,
+      caskType: item.caskType,
+      caskFill: item.caskFill,
+      caskSize: item.caskSize,
+      releaseDate: item.releaseDate ? item.releaseDate.split(" ", 1)[0] : null,
+
       brand: attrs.brand,
       distillers: attrs.distillers,
       bottler: attrs.bottler,
@@ -166,6 +170,9 @@ export const BottleSerializer = serializer({
       suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,
       hasTasted: attrs.hasTasted,
+
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.createdAt.toISOString(),
     };
   },
 });

@@ -4,14 +4,17 @@ import { checkBadges } from ".";
 
 describe("checkBadges", () => {
   test("returns matching region badge from brand", async ({ fixtures }) => {
+    const country = await fixtures.Country();
+    const region = await fixtures.Region({ countryId: country.id });
+
     const badge = await fixtures.Badge({
       type: "region",
-      config: { regions: [{ country: "Scotland", region: "Islay" }] },
+      config: { regions: [{ countryId: country.id, regionId: region.id }] },
     });
 
     const brand = await fixtures.Entity({
-      country: "Scotland",
-      region: "Islay",
+      countryId: country.id,
+      regionId: region.id,
     });
 
     const bottle = await fixtures.Bottle({

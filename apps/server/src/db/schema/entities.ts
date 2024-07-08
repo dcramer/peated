@@ -12,12 +12,11 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
-
-import { geography } from "../columns";
-
-import { bottles, bottlesToDistillers } from ".";
+import { bottles, bottlesToDistillers, countries } from ".";
+import { tsvector } from "../columns";
+import { geometry_point } from "../columns/geoemetry";
 import { contentSourceEnum } from "./enums";
-
+import { regions } from "./regions";
 import { users } from "./users";
 
 export type EntityType = "brand" | "distiller" | "bottler";
@@ -35,16 +34,26 @@ export const entities = pgTable(
 
     name: text("name").notNull(),
     shortName: text("short_name"),
-    country: text("country"),
-    region: text("region"),
+
+    searchVector: tsvector("search_vector"),
+
+    _country: text("country"),
+    countryId: bigint("country_id", { mode: "number" }).references(
+      () => countries.id,
+    ),
+    _region: text("region"),
+    regionId: bigint("region_id", { mode: "number" }).references(
+      () => regions.id,
+    ),
+    address: text("address"),
+    location: geometry_point("location"),
+
     type: entityTypeEnum("type").array().notNull(),
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
     yearEstablished: smallint("year_established"),
     website: varchar("website", { length: 255 }),
-
-    location: geography("location"),
 
     totalBottles: bigint("total_bottles", { mode: "number" })
       .default(0)
@@ -54,16 +63,22 @@ export const entities = pgTable(
       .notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
   },
-  (entities) => {
+  (table) => {
     return {
       nameIndex: uniqueIndex("entity_name_unq")
-        .on(entities.name)
+        .on(table.name)
         .using(sql`btree (LOWER(full_name))`),
-      createdById: index("entity_created_by_idx").on(entities.createdById),
+      searchVectorIndex: index("entity_search_idx")
+        .on(table.searchVector)
+        .using(sql`gin(${table.searchVector})`),
+      countryId: index("entity_country_by_idx").on(table.countryId),
+      regionId: index("entity_region_idx").on(table.regionId),
+      createdById: index("entity_created_by_idx").on(table.createdById),
     };
   },
 );
@@ -71,6 +86,14 @@ export const entities = pgTable(
 export const entitiesRelations = relations(entities, ({ one, many }) => ({
   distillersToBottles: many(bottlesToDistillers),
   brandsToBottles: many(bottles),
+  country: one(countries, {
+    fields: [entities.countryId],
+    references: [countries.id],
+  }),
+  region: one(regions, {
+    fields: [entities.countryId],
+    references: [regions.id],
+  }),
   createdBy: one(users, {
     fields: [entities.createdById],
     references: [users.id],
@@ -87,6 +110,7 @@ export const entityAliases = pgTable(
       () => entities.id,
     ),
     name: varchar("name", { length: 255 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (entityAliases) => {
     return {

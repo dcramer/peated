@@ -1,21 +1,14 @@
-import { inArray } from "drizzle-orm";
+import { type z } from "zod";
 import { serialize, serializer } from ".";
-import { db } from "../db";
 import type { Follow, User } from "../db/schema";
-import { users } from "../db/schema";
+import { type FriendSchema } from "../schemas";
 import { UserSerializer } from "./user";
 
+type FriendEntry = Follow & { toUser: User };
+
 export const FriendSerializer = serializer({
-  attrs: async (itemList: Follow[], currentUser?: User) => {
-    const userList = await db
-      .select()
-      .from(users)
-      .where(
-        inArray(
-          users.id,
-          itemList.map((i) => i.toUserId),
-        ),
-      );
+  attrs: async (itemList: FriendEntry[], currentUser?: User) => {
+    const userList = itemList.map((i) => i.toUser);
     const usersById = Object.fromEntries(
       (await serialize(UserSerializer, userList, currentUser)).map(
         (data, index) => [userList[index].id, data],
@@ -33,11 +26,17 @@ export const FriendSerializer = serializer({
       }),
     );
   },
-  item: (item: Follow, attrs: Record<string, any>, currentUser?: User) => {
+  item: (
+    item: FriendEntry,
+    attrs: {
+      user: ReturnType<(typeof UserSerializer)["item"]>;
+    },
+    currentUser?: User,
+  ): z.infer<typeof FriendSchema> => {
     return {
       id: attrs.user.id,
       status: item.status === "following" ? "friends" : item.status,
-      createdAt: item.createdAt,
+      createdAt: item.createdAt.toISOString(),
       user: attrs.user,
     };
   },

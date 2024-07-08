@@ -1,5 +1,11 @@
 import { CATEGORY_LIST } from "@peated/server/constants";
-import type { Category, FlavorProfile } from "@peated/server/types";
+import type {
+  CaskFill,
+  CaskSize,
+  CaskType,
+  Category,
+  FlavorProfile,
+} from "@peated/server/types";
 
 // This needs moved into the database and needs to be editable by the community/mods
 // https://www.whiskysaga.com/smws-codes
@@ -79,7 +85,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   72: "Miltonduff",
   73: "Aultmore",
   74: "North Port",
-  75: "Glenury / Glenury Royal",
+  75: "Glenury", // Glenury Royal
   76: "Mortlach",
   77: "Glen Ord",
   78: "Ben Nevis",
@@ -108,30 +114,30 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   101: "Knockando",
   102: "Dalwhinnie",
   103: "Royal Lochnagar",
-  104: "Glenburgie (Glencraig)",
+  104: "Glenburgie", // Glencraig
   105: "Tormore",
   106: "Cardhu",
   107: "Glenallachie",
   108: "Allt-a-Bhainne",
-  109: "Miltonduff (Mosstowie)",
+  109: "Miltonduff", // Mosstowie
   110: "Oban",
   111: "Lagavulin",
-  112: "Loch Lomond (Inchmurrin)",
-  113: "Braeval (Braes of Glenlivet)",
-  114: "Springbank (Longrow)",
-  115: "Knockdhu (AnCnoc)",
+  112: "Loch Lomond", // Inchmurrin
+  113: "Braeval", // Braes of Glenlivet
+  114: "Springbank", // Longrow
+  115: "Knockdhu", // AnCnoc
   116: "Yoichi",
-  117: "Cooley (Unpeated)",
-  118: "Cooley / Connemara (Peated)",
+  117: "Cooley", // (Unpeated)
+  118: "Cooley", // Connemara (Peated)
   119: "Yamazaki",
   120: "Hakushu",
   121: "Isle of Arran",
-  122: "Loch Lomond (Croftengea)",
+  122: "Loch Lomond", // Croftengea
   123: "Glengoyne",
   124: "Miyagikyo",
   125: "Glenmorangie",
-  126: "Springbank (Hazelburn)",
-  127: "Bruichladdich (Port Charlotte)",
+  126: "Springbank", // Hazelburn
+  127: "Bruichladdich", // Port Charlotte
   128: "Penderyn",
   129: "Kilchoman",
   130: "Chichibu",
@@ -139,16 +145,16 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   132: "Karuizawa",
   133: "Westland",
   134: "Paul John",
-  135: "Loch Lomond (Inchmoan)",
+  135: "Loch Lomond", // Inchmoan
   136: "Eden Mill",
-  137: "St. George’s (The English Whisky Co.)",
+  137: "St. George's",
   138: "Nantou",
   139: "Kavalan",
   140: "Balcones",
   141: "Fary Lochan",
   142: "Breuckelen Distilling",
   143: "Copperworks Distilling Co.",
-  144: "High Coast Distillery (formerly Box Whisky)",
+  144: "High Coast Distillery",
   145: "Smögen Whisky",
   146: "Cotswolds",
   147: "Archie Rose",
@@ -161,7 +167,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   154: "Mosgaard Whisky",
   155: "Milk & Honey Distillery",
   156: "Glasgow Distillery",
-  157: "Distillerie de Warenghem (Armorik)",
+  157: "Armorik",
   158: "Yuza Distillery",
 
   // Single Grain
@@ -179,7 +185,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   G12: "Nikka Coffey Malt",
   G13: "Chita",
   G14: "Dumbarton",
-  G15: "Loch Lomond (Rhosdhu)",
+  G15: "Loch Lomond", // Rhosdhu
   G16: "Glasgow Distillery",
 
   // Bourbon
@@ -187,9 +193,9 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   B2: "New Bernheim",
   B3: "Rock Town",
   B4: "FEW Spirits",
-  B5: "George Dickel (Cascade Hollow)",
+  B5: "Cascade Hollow",
   B6: "Finger Lakes Distilling",
-  B7: "MGP (Midwest Grain Products)",
+  B7: "Midwest Grain Products",
 
   // Rye
   RW1: "FEW Spirits",
@@ -205,14 +211,14 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
 
   // Rum
   R1: "Monymusk",
-  R2: "Demerara Distillers (El Dorado)",
+  R2: "Demerara Distillers", // El Dorado
   R3: "West Indies Rum",
-  R4: "Trinidad Distillers (Angostura)",
+  R4: "Trinidad Distillers", // Angostura
   R5: "Long Pond",
   R6: "Foursquare",
   R7: "Hampden",
-  R8: "Compañía Licorera de Nicaragua (Flor de Caña)",
-  R9: "Varela Hermanos (Ron Abuelo)",
+  R8: "Compañía Licorera de Nicaragua", // Flor de Caña
+  R9: "Varela Hermanos", // Ron Abuelo
   R10: "Trinidad Distiller’s",
   R11: "Worthy Park",
   R12: "Travellers",
@@ -222,7 +228,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   // Armagnac
   A1: "Chateau de Lacaze",
   A2: "Domaine Laguille",
-  A3: "J. Goudoulin (Veuve Goudoulin)",
+  A3: "J. Goudoulin", // Veuve Goudoulin
   A4: "Domaine d’Espérance",
   A5: "Chateau de Laubade",
   A6: "Domaine Lasalle",
@@ -233,7 +239,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   C1: "Camus",
   C2: "Domaine de Chez Guérive",
   C3: "Louis Royer",
-  C4: "Distillery D’Aumagne",
+  C4: "Distillery D'Aumagne",
   C5: "Tiffon Cognac",
   C6: "M & H Bonneau",
   C7: "Guy Rateau",
@@ -248,6 +254,18 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   GN5: "Scottish Gin",
   GN6: "Holyrood Distillery",
 };
+
+export const SMWS_CATEGORY_LIST = [
+  ["", "Single Malt Whisky"],
+  ["G", "Single Grain Whisky"],
+  ["B", "Bourbon"],
+  ["RW", "Rye"],
+  ["CW1", "Corn Whisky"],
+  ["R", "Rum"],
+  ["GN", "Gin"],
+  ["C", "Cognac"],
+  ["A", "Armagnac"],
+];
 
 export function getCategoryFromCask(caskNumber: string) {
   if (caskNumber.startsWith("GN")) {
@@ -347,4 +365,50 @@ export function parseFlavorProfile(name: string): FlavorProfile | null {
       console.error(`Unknown flavor profile: ${name}`);
       return null;
   }
+}
+
+function parseFill(value: string): CaskFill | null {
+  if (!value) return null;
+
+  value = value.toLowerCase();
+  switch (value) {
+    case "new":
+    case "1st fill":
+    case "first fill":
+      return "1st_fill";
+    case "2nd fill":
+    case "second fill":
+      return "2nd_fill";
+    case "refill":
+      return "refill";
+    default:
+      return null;
+  }
+}
+
+function parseType(value: string): CaskType | null {
+  if (!value) return null;
+  return value
+    .toLowerCase()
+    .replace("px", "pedro_ximenez")
+    .replace(" ", "_") as CaskType;
+}
+
+export function parseCaskType(
+  caskType: string,
+): [CaskFill | null, CaskType | null, CaskSize | null] {
+  const caskFillMatch = caskType.match(
+    /(new|first fill|second fill|1st fill|2nd fill|refill)/i,
+  );
+  const caskTypeMatch = caskType.match(
+    /(bourbon|oloroso|oak|px|rum|armagnac)/i,
+  );
+  const caskSizeMatch = caskType.match(/(barrique|barrel|hogshead|butt)/i);
+
+  // new = 1st fill
+  return [
+    caskFillMatch ? parseFill(caskFillMatch[1]) : null,
+    caskTypeMatch ? parseType(caskTypeMatch[1]) : null,
+    caskSizeMatch ? (caskSizeMatch[1].toLowerCase() as CaskSize) : null,
+  ];
 }

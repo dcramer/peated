@@ -32,6 +32,10 @@ export default publicProcedure
     return {
       results: results.map((a) => ({
         name: a.name,
+        isCanonical:
+          `${bottle.fullName}${bottle.vintageYear ? ` (${bottle.vintageYear})` : ""}` ==
+          a.name,
+        createdAt: a.createdAt.toISOString(),
       })),
     };
   });

@@ -1,4 +1,5 @@
 import { defaultHeaders } from "@peated/server/constants";
+import type { Currency } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
 import { existsSync, mkdirSync, statSync } from "fs";
@@ -17,6 +18,7 @@ export class PageNotFound extends Error {}
 export async function getUrl(
   url: string,
   noCache = !!process.env.DISABLE_HTTP_CACHE,
+  headers: Record<string, string> = {},
 ) {
   const filename = `${CACHE}/${encodeURIComponent(url)}`;
 
@@ -24,10 +26,10 @@ export async function getUrl(
     status = 0;
   if (!existsSync(filename) || noCache) {
     console.log(`${url} not cached, fetching from internet`);
-    ({ data, status } = await cacheUrl(url, filename));
+    ({ data, status } = await cacheUrl(url, filename, headers));
   } else if (statSync(filename).mtimeMs < new Date().getTime() - CACHE_EXPIRE) {
     console.log(`${url} cache outdated, fetching from internet`);
-    ({ data, status } = await cacheUrl(url, filename));
+    ({ data, status } = await cacheUrl(url, filename, headers));
   } else {
     const fs = await open(filename, "r");
     const payload = await fs.readFile();
@@ -42,12 +44,19 @@ export async function getUrl(
   return data;
 }
 
-export async function cacheUrl(url: string, filename: string) {
+export async function cacheUrl(
+  url: string,
+  filename: string,
+  headers: Record<string, string> = {},
+) {
   let data = "";
   let status = 0;
   try {
     ({ status, data } = await axios.get(url, {
-      headers: defaultHeaders(url),
+      headers: {
+        ...defaultHeaders(url),
+        ...headers,
+      },
     }));
     // gross
     if (typeof data !== "string") data = JSON.stringify(data);
@@ -113,7 +122,7 @@ export async function chunked<T>(
 export type StorePrice = {
   name: string;
   price: number;
-  priceUnit: string;
+  currency: Currency;
   url: string;
   volume: number;
 };

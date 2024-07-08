@@ -10,3 +10,10 @@ export const omit = (obj: object, ...props: string[]) =>
 export function notEmpty<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined;
 }
+
+// https://johnnyreilly.com/bulletproof-uniq-with-typescript
+export function uniq<T extends string | number | bigint | boolean | symbol>(
+  iterable: Iterable<T>,
+) {
+  return [...new Set(iterable)];
+}

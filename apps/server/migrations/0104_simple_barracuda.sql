@@ -1,0 +1,1 @@
+ALTER TABLE "store_price" ALTER COLUMN "currency" DROP DEFAULT;

@@ -1,8 +1,10 @@
 import { inArray } from "drizzle-orm";
+import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Comment, User } from "../db/schema";
 import { users } from "../db/schema";
+import { type CommentSchema } from "../schemas";
 import { UserSerializer } from "./user";
 
 export const CommentSerializer = serializer({
@@ -34,11 +36,15 @@ export const CommentSerializer = serializer({
     );
   },
 
-  item: (item: Comment, attrs: Record<string, any>, currentUser?: User) => {
+  item: (
+    item: Comment,
+    attrs: Record<string, any>,
+    currentUser?: User,
+  ): z.infer<typeof CommentSchema> => {
     return {
       id: item.id,
       comment: item.comment,
-      createdAt: item.createdAt,
+      createdAt: item.createdAt.toISOString(),
       createdBy: attrs.createdBy,
     };
   },

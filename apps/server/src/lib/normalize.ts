@@ -18,6 +18,13 @@ export const normalizeCategory = (name: string): Category | null => {
   return null;
 };
 
+export const normalizeEntityName = (name: string): string => {
+  if (name.toLowerCase().endsWith(" distillery")) {
+    name = name.replace(/ distillery$/i, "");
+  }
+  return name;
+};
+
 export const normalizeBottleName = (
   name: string,
   age: number | null = null,
@@ -62,7 +69,7 @@ export const normalizeBottleName = (
 
 /* Normalize volume to milliliters */
 export function normalizeVolume(volume: string): number | null {
-  const match = volume.match(/^\s*([0-9.]+)\s?(ml|l)\s*(\sbottle)?$/i);
+  const match = volume.match(/^\s*([0-9.]+)\s?(ml|l)\s*,?(\sbottle)?$/i);
   if (!match) return null;
 
   const [amount, measure] = match.slice(1, 3);

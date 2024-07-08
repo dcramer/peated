@@ -2,19 +2,25 @@ import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { ExternalSite, StorePrice, User } from "../db/schema";
-import type { BottlePriceChangeSchema } from "../schemas";
+import type { BottlePriceChangeSchema, StorePriceSchema } from "../schemas";
+import type { Currency } from "../types";
 import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
 export const StorePriceSerializer = serializer({
-  item: (item: StorePrice, attrs: Record<string, any>, currentUser?: User) => {
+  item: (
+    item: StorePrice,
+    attrs: Record<string, any>,
+    currentUser?: User,
+  ): z.infer<typeof StorePriceSchema> => {
     return {
       id: item.id,
       name: item.name,
       price: item.price,
       volume: item.volume,
+      currency: item.currency,
       url: item.url,
-      updatedAt: attrs.updatedAt,
+      updatedAt: item.updatedAt.toISOString(),
     };
   },
 });
@@ -50,15 +56,16 @@ export const StorePriceWithSiteSerializer = serializer({
     item: StorePrice & { externalSite: ExternalSite },
     attrs: Record<string, any>,
     currentUser?: User,
-  ) => {
+  ): z.infer<typeof StorePriceSchema> => {
     return {
       id: item.id,
       name: item.name,
       price: item.price,
       volume: item.volume,
+      currency: item.currency,
       url: item.url,
       site: attrs.site,
-      updatedAt: item.updatedAt,
+      updatedAt: item.updatedAt.toISOString(),
     };
   },
 });
@@ -68,6 +75,7 @@ export type BottlePriceChange = {
   id: number;
   price: number;
   previousPrice: number;
+  currency: Currency;
   bottleId: number;
 };
 
@@ -106,6 +114,7 @@ export const BottlePriceChangeSerializer = serializer({
     return {
       id: item.id,
       price: item.price,
+      currency: item.currency,
       previousPrice: item.previousPrice,
       bottle: attrs.bottle,
     };

@@ -2,14 +2,6 @@ import * as Sentry from "@sentry/node";
 import { isString, normalize } from "@sentry/utils";
 import fastifyPlugin from "fastify-plugin";
 
-function filterScaries(env: NodeJS.ProcessEnv) {
-  return Object.fromEntries(
-    Object.entries(env).filter(([k, v]) => {
-      return !k.match(/password|secret|auth|key|token/i);
-    }),
-  );
-}
-
 export default fastifyPlugin(async (fastify, options) => {
   fastify.addHook("preValidation", async (request) => {
     Sentry.addEventProcessor((event) => {

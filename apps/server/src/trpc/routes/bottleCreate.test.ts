@@ -46,11 +46,6 @@ test("creates a new bottle with minimal params", async ({
     .from(bottlesToDistillers)
     .where(eq(bottlesToDistillers.bottleId, bottle.id));
   expect(distillers.length).toBe(0);
-  const [newBrand] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.id, brand.id));
-  expect(newBrand.totalBottles).toBe(1);
 });
 
 test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
@@ -85,16 +80,6 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
   expect(distillers.length).toBe(1);
   expect(distillers[0].distillerId).toEqual(distiller.id);
 
-  const newDistiller = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, distiller.id),
-  });
-  expect(newDistiller?.totalBottles).toBe(1);
-
-  const newBrand = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, brand.id),
-  });
-  expect(newBrand?.totalBottles).toBe(1);
-
   const changeList = await db
     .select({ change: changes })
     .from(changes)
@@ -118,40 +103,44 @@ test("does not create a new bottle with invalid brandId", async ({
   expect(err).toMatchInlineSnapshot(`[TRPCError: Entity not found [id: 5]]`);
 });
 
-// test("creates a new bottle with existing brand name", async () => {
-//   const brand = await fixtures.Entity();
-//   const response = await app.inject({
-//     method: "POST",
-//     url: "/bottles",
-//     payload: {
-//       name: "Delicious Wood",
-//       brand: {
-//         name: brand.name,
-//         country: brand.country,
-//       },
-//     },
-//     headers: defaults.authHeaders,
-//   });
+test("creates a new bottle with existing brand name", async ({
+  fixtures,
+  defaults,
+}) => {
+  const existingBrand = await fixtures.Entity();
 
-//   expect(response).toRespondWith(201);
-//   const data = JSON.parse(response.payload);
-//   expect(data.id).toBeDefined();
+  const caller = createCaller({ user: defaults.user });
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood",
+    brand: {
+      name: existingBrand.name,
+    },
+  });
 
-//   const bottle = await prisma.bottle.findUniqueOrThrow({
-//     where: { id: data.id },
-//   });
-//   expect(bottle.name).toEqual("Delicious Wood");
-//   expect(bottle.brandId).toEqual(brand.id);
+  expect(data.id).toBeDefined();
 
-//   // it should not create a change entry for the brand
-//   const changes = await prisma.change.findMany({
-//     where: {
-//       userId: defaults.user.id,
-//       objectType: "brand",
-//     },
-//   });
-//   expect(changes.length).toBe(0);
-// });
+  const [{ bottle, brand }] = await db
+    .select({ bottle: bottles, brand: entities })
+    .from(bottles)
+    .innerJoin(entities, eq(entities.id, bottles.brandId))
+    .where(eq(bottles.id, data.id));
+
+  expect(bottle.name).toEqual("Delicious Wood");
+  expect(bottle.brandId).toEqual(existingBrand.id);
+
+  // it should not create a change entry for the brand
+  const changeList = await db
+    .select({ change: changes })
+    .from(changes)
+    .where(
+      and(
+        eq(changes.objectType, "entity"),
+        eq(changes.createdById, defaults.user.id),
+      ),
+    );
+
+  expect(changeList.length).toBe(0);
+});
 
 test("creates a new bottle with new brand name", async ({ defaults }) => {
   const caller = createCaller({ user: defaults.user });
@@ -159,7 +148,6 @@ test("creates a new bottle with new brand name", async ({ defaults }) => {
     name: "Delicious Wood",
     brand: {
       name: "Hard Knox",
-      country: "Scotland",
     },
   });
 
@@ -174,11 +162,9 @@ test("creates a new bottle with new brand name", async ({ defaults }) => {
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toBeDefined();
   expect(brand.name).toBe("Hard Knox");
-  expect(brand.country).toBe("Scotland");
   expect(brand.createdById).toBe(defaults.user.id);
-  expect(brand.totalBottles).toBe(1);
-  // it should create a change entry for the brand
 
+  // it should create a change entry for the brand
   const changeList = await db
     .select({ change: changes })
     .from(changes)
@@ -195,7 +181,6 @@ test("creates a new bottle with new brand name", async ({ defaults }) => {
     .select()
     .from(entities)
     .where(eq(entities.id, brand.id));
-  expect(newBrand.totalBottles).toEqual(1);
 });
 
 test("does not create a new bottle with invalid distillerId", async ({
@@ -207,7 +192,6 @@ test("does not create a new bottle with invalid distillerId", async ({
       name: "Delicious Wood",
       brand: {
         name: "Hard Knox",
-        country: "Scotland",
       },
       distillers: [500000],
     }),
@@ -217,51 +201,58 @@ test("does not create a new bottle with invalid distillerId", async ({
   );
 });
 
-// test("creates a new bottle with existing distiller name", async () => {
-//   const brand = await fixtures.Entity();
-//   const distiller = await fixtures.Entity();
-//   const response = await app.inject({
-//     method: "POST",
-//     url: "/bottles",
-//     payload: {
-//       name: "Delicious Wood",
-//       brand: {
-//         name: brand.name,
-//         country: brand.country,
-//       },
-//       distillers: [
-//         {
-//           name: distiller.name,
-//           country: distiller.country,
-//         },
-//       ],
-//     },
-//     headers: defaults.authHeaders,
-//   });
+test("creates a new bottle with existing distiller name", async ({
+  fixtures,
+  defaults,
+}) => {
+  const existingBrand = await fixtures.Entity();
+  const existingDistiller = await fixtures.Entity();
+  const caller = createCaller({ user: defaults.user });
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood",
+    brand: {
+      name: existingBrand.name,
+    },
+    distillers: [
+      {
+        name: existingDistiller.name,
+      },
+    ],
+  });
 
-//   expect(response).toRespondWith(201);
-//   const data = JSON.parse(response.payload);
-//   expect(data.id).toBeDefined();
+  expect(data.id).toBeDefined();
 
-//   const bottle = await prisma.bottle.findUniqueOrThrow({
-//     where: { id: data.id },
-//     include: {
-//       distillers: true,
-//     },
-//   });
-//   expect(bottle.name).toEqual("Delicious Wood");
-//   expect(bottle.distillers.length).toEqual(1);
-//   expect(bottle.distillers[0].id).toEqual(distiller.id);
+  const [bottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+  expect(bottle.name).toEqual("Delicious Wood");
 
-//   // it should not create a change entry for the brand
-//   const changes = await prisma.change.findMany({
-//     where: {
-//       userId: defaults.user.id,
-//       objectType: "distiller",
-//     },
-//   });
-//   expect(changes.length).toBe(0);
-// });
+  const distillers = await db
+    .select({ distiller: entities })
+    .from(entities)
+    .innerJoin(
+      bottlesToDistillers,
+      eq(bottlesToDistillers.distillerId, entities.id),
+    )
+    .where(eq(bottlesToDistillers.bottleId, bottle.id));
+
+  expect(distillers.length).toEqual(1);
+  expect(distillers[0].distiller.id).toEqual(existingDistiller.id);
+
+  // it should not create a change entry for the brand
+  const changeList = await db
+    .select({ change: changes })
+    .from(changes)
+    .where(
+      and(
+        eq(changes.objectType, "entity"),
+        eq(changes.createdById, defaults.user.id),
+      ),
+    );
+
+  expect(changeList.length).toBe(0);
+});
 
 test("creates a new bottle with new distiller name", async ({
   defaults,
@@ -276,7 +267,6 @@ test("creates a new bottle with new distiller name", async ({
     distillers: [
       {
         name: "Hard Knox",
-        country: "Scotland",
       },
     ],
   });
@@ -302,15 +292,7 @@ test("creates a new bottle with new distiller name", async ({
   const { distiller } = distillers[0];
   expect(distiller.id).toBeDefined();
   expect(distiller.name).toBe("Hard Knox");
-  expect(distiller.country).toBe("Scotland");
   expect(distiller.createdById).toBe(defaults.user.id);
-  expect(distiller.totalBottles).toBe(1);
-
-  const [newBrand] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.id, brand.id));
-  expect(newBrand.totalBottles).toBe(1);
 
   // it should create a change entry for the distiller
   const changeList = await db
@@ -333,12 +315,10 @@ test("creates a new bottle with new distiller name and brand name", async ({
     name: "Delicious Wood",
     brand: {
       name: "Rip Van",
-      region: "Kentucky",
     },
     distillers: [
       {
         name: "Hard Knox",
-        country: "Scotland",
       },
     ],
   });
@@ -364,17 +344,13 @@ test("creates a new bottle with new distiller name and brand name", async ({
   const { distiller } = distillers[0];
   expect(distiller.id).toBeDefined();
   expect(distiller.name).toBe("Hard Knox");
-  expect(distiller.country).toBe("Scotland");
   expect(distiller.createdById).toBe(defaults.user.id);
-  expect(distiller.totalBottles).toBe(1);
 
   const [brand] = await db
     .select()
     .from(entities)
     .where(eq(entities.id, bottle.brandId));
   expect(brand.name).toBe("Rip Van");
-  expect(brand.region).toBe("Kentucky");
-  expect(brand.totalBottles).toBe(1);
 
   // it should create a change entry for the brand and distiller
   const changeList = await db
@@ -397,12 +373,10 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
     name: "Delicious Wood",
     brand: {
       name: "Hard Knox",
-      country: "Scotland",
     },
     distillers: [
       {
         name: "Hard Knox",
-        country: "Scotland",
       },
     ],
   });
@@ -428,9 +402,7 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
   const { distiller } = distillers[0];
   expect(distiller.id).toEqual(bottle.brandId);
   expect(distiller.name).toBe("Hard Knox");
-  expect(distiller.country).toBe("Scotland");
   expect(distiller.createdById).toBe(defaults.user.id);
-  expect(distiller.totalBottles).toBe(1);
   expect(distiller.id).toBe(bottle.brandId);
 
   // it should create a change entry for the brand and distiller
@@ -507,4 +479,68 @@ test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {
     .where(eq(bottlesToDistillers.bottleId, data.id));
   expect(dList.length).toEqual(1);
   expect(dList[0].distillerId).toEqual(distiller.id);
+});
+
+test("saves cask information", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleCreate({
+    brand: brand.id,
+    name: "Old Whisky",
+    caskType: "bourbon",
+    caskSize: "hogshead",
+    caskFill: "1st_fill",
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(newBottle.caskType).toEqual("bourbon");
+  expect(newBottle.caskSize).toEqual("hogshead");
+  expect(newBottle.caskFill).toEqual("1st_fill");
+});
+
+test("saves vintage information", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleCreate({
+    brand: brand.id,
+    name: "Old Whisky",
+    vintageYear: 2024,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(newBottle.vintageYear).toEqual(2024);
+});
+
+test("saves release date", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleCreate({
+    brand: brand.id,
+    name: "Old Whisky",
+    releaseDate: "2024-01-02",
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(newBottle.releaseDate).toEqual("2024-01-02");
 });

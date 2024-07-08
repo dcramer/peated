@@ -50,7 +50,7 @@ export default publicProcedure
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(desc(changes.createdAt));
+      .orderBy(desc(changes.id));
 
     return {
       results: await serialize(
