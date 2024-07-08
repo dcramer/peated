@@ -12,9 +12,9 @@ export function buildEntitySearchVector(
 ): TSVector[] {
   const values: TSVector[] = [
     new TSVector(entity.name, "A"),
-    ...(entity.shortName ? [new TSVector(entity.shortName, "B")] : []),
+    ...(entity.shortName ? [new TSVector(entity.shortName, "A")] : []),
   ];
-  aliasList?.forEach((a) => values.push(new TSVector(a.name, "A")));
+  aliasList?.forEach((a) => values.push(new TSVector(a.name, "B")));
   return values;
 }
 

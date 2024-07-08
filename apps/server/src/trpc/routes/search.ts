@@ -28,15 +28,22 @@ function sortResults(query: string, unsortedResults: Result[]) {
   const exactMatches: number[] = [];
   const lowerQuery = query.toLowerCase();
   unsortedResults.forEach((value, index) => {
-    if (value.type !== "user") {
-      if (value.ref.name.toLowerCase() === lowerQuery) {
+    if (value.type === "entity") {
+      if (
+        value.ref.name.toLowerCase() === lowerQuery ||
+        value.ref.shortName?.toLowerCase() === lowerQuery
+      ) {
         exactMatches.push(index);
       }
-    } else {
+    } else if (value.type === "user") {
       if (
         value.ref.displayName?.toLowerCase() === lowerQuery ||
         value.ref.username.toLowerCase() === lowerQuery
       ) {
+        exactMatches.push(index);
+      }
+    } else {
+      if (value.ref.name.toLowerCase() === lowerQuery) {
         exactMatches.push(index);
       }
     }
