@@ -30,6 +30,16 @@ export async function userList({
   input: z.infer<typeof InputSchema>;
   ctx: Context;
 }) {
+  if (!ctx.user) {
+    return {
+      results: [],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    };
+  }
+
   const offset = (cursor - 1) * limit;
 
   const where: (SQL<unknown> | undefined)[] = [];
