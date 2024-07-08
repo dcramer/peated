@@ -115,7 +115,7 @@ export default function Table<T extends Record<string, any>>({
                     <td
                       key={String(col)}
                       className={classNames(
-                        "p-3",
+                        "group relative p-3",
                         colN !== 0 ? "hidden sm:table-cell" : "",
                         colAlign === "left"
                           ? "text-left"
@@ -124,11 +124,10 @@ export default function Table<T extends Record<string, any>>({
                             : "text-right",
                       )}
                     >
-                      {colN === 0 && urlPath ? (
-                        <Link href={urlPath}>{value}</Link>
-                      ) : (
-                        value
+                      {colN === 0 && urlPath && (
+                        <Link href={urlPath} className="absolute inset-0" />
                       )}
+                      {value}
                     </td>
                   );
                 })}

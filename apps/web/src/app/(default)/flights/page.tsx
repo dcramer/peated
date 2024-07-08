@@ -1,60 +1,47 @@
+"use client";
+
 import Button from "@peated/web/components/button";
-import EmptyActivity from "@peated/web/components/emptyActivity";
-import Link from "@peated/web/components/link";
-import ListItem from "@peated/web/components/listItem";
-import PaginationButtons from "@peated/web/components/paginationButtons";
-import { redirectToAuth } from "@peated/web/lib/auth";
-import { isLoggedIn } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
-import type { Metadata } from "next";
+import PageHeader from "@peated/web/components/pageHeader";
+import Table from "@peated/web/components/table";
+import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { trpc } from "@peated/web/lib/trpc";
 
-export const metadata: Metadata = {
-  title: "Flights",
-};
+export default function Page() {
+  useAuthRequired();
 
-export default async function Page() {
-  if (!(await isLoggedIn())) {
-    return redirectToAuth({ pathname: "/favorites" });
-  }
-  const trpcClient = await getTrpcClient();
-  const flightList = await trpcClient.flightList.fetch();
+  const [flightList] = trpc.flightList.useSuspenseQuery();
 
   return (
     <>
-      <div className="divide-y divide-slate-800 sm:rounded">
-        {flightList.results.length ? (
-          flightList.results.map((flight) => {
-            return (
-              <ListItem
-                key={flight.id}
-                as={Link}
-                href={`/flights/${flight.id}`}
-              >
-                <div className="flex flex-auto items-center space-x-4">
-                  <div className="flex-auto space-y-1 font-medium group-hover:underline">
-                    {flight.name || <em>unknown flight</em>}
-                  </div>
-                  {flight.description && (
-                    <div className="text-light text-sm">
-                      {flight.description}
-                    </div>
-                  )}
+      <PageHeader
+        title="Flights"
+        metadata={
+          <Button color="primary" href="/addFlight">
+            Add Flight
+          </Button>
+        }
+      />
+      <Table
+        items={flightList.results}
+        rel={flightList.rel}
+        defaultSort="name"
+        url={(item) => `/flights/${item.id}`}
+        columns={[
+          {
+            name: "name",
+            sort: "name",
+            sortDefaultOrder: "asc",
+            value: (item) => (
+              <>
+                <div className="font-bold group-hover:underline">
+                  {item.name}
                 </div>
-              </ListItem>
-            );
-          })
-        ) : (
-          <EmptyActivity href={`/addFlight`}>
-            <span className="text-light mb-4 block">
-              Flights allow you to create a record of a set of tastings, either
-              for yourself, or to make it easy to share with friends.
-            </span>
-
-            <Button color="highlight">Create a Flight</Button>
-          </EmptyActivity>
-        )}
-      </div>
-      <PaginationButtons rel={flightList.rel} />
+                <div className="text-light">{item.description ?? ""}</div>
+              </>
+            ),
+          },
+        ]}
+      />
     </>
   );
 }

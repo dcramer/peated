@@ -1,19 +1,7 @@
-import Button from "@peated/web/components/button";
-import PageHeader from "@peated/web/components/pageHeader";
-import { type ReactNode } from "react";
+import type { Metadata } from "next";
 
-export default function Layout({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <PageHeader
-        title="Flights"
-        metadata={
-          <Button color="primary" href="/addFlight">
-            Add Flight
-          </Button>
-        }
-      />
-      {children}
-    </>
-  );
-}
+export { default } from "@peated/web/components/defaultLayout";
+
+export const metadata: Metadata = {
+  title: "Flights",
+};
