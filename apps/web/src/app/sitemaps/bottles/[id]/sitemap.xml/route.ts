@@ -9,9 +9,10 @@ export async function GET(
   request: Request,
   { params: { id } }: { params: { id: string } },
 ) {
+  const startCursor = (Number(id) - 1) * PAGE_LIMIT + 1;
   const trpcClient = await getTrpcClient();
 
-  let cursor: number | null = (Number(id) - 1) * PAGE_LIMIT + 1;
+  let cursor: number | null = startCursor;
   let count = 0;
   const pages: Sitemap = [];
   while (cursor && count < PAGE_LIMIT) {
@@ -41,6 +42,7 @@ export async function GET(
 
   return new Response(pagesSitemapXML, {
     headers: {
+      "X-Cursor-Start": `${startCursor}`,
       "Content-Type": "application/xml",
     },
   });
