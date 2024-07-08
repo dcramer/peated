@@ -32,6 +32,7 @@ export default publicProcedure
     return {
       results: results.map((a) => ({
         name: a.name,
+        isCanonical: a.name === entity.name,
       })),
     };
   });

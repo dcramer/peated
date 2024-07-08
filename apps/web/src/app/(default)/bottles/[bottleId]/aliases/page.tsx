@@ -1,54 +1,58 @@
+"use client";
+
 import Chip from "@peated/web/components/chip";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import ConfirmationButton from "@peated/web/components/confirmationButton";
+import Table from "@peated/web/components/table";
+import useAuth from "@peated/web/hooks/useAuth";
+import { trpc } from "@peated/web/lib/trpc";
 
-export async function generateMetadata({
+export default function BottleAliases({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
-
-  return {
-    title: `Other Names for ${bottle.fullName}`,
-  };
-}
-
-export default async function BottleAliases({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
-}) {
-  const trpcClient = await getTrpcClient();
-  const [bottle, aliasList] = await Promise.all([
-    trpcClient.bottleById.fetch(Number(bottleId)),
-    trpcClient.bottleAliasList.fetch({
-      bottle: Number(bottleId),
-    }),
-  ]);
+  const { user } = useAuth();
+  const [aliasList] = trpc.bottleAliasList.useSuspenseQuery({
+    bottle: Number(bottleId),
+  });
+  const deleteAliasMutation = trpc.bottleAliasDelete.useMutation();
 
   return (
-    <div className="w-full p-3 lg:py-0">
-      {aliasList.results.length ? (
-        <ul className="mt-4 space-y-2 text-sm">
-          {aliasList.results.map((alias) => {
-            return (
-              <li key={alias.name} className="flex items-center gap-2">
-                <div>{alias.name}</div>
-                {alias.name === bottle.fullName && (
-                  <Chip as="div" size="small" color="highlight">
-                    Canonical
-                  </Chip>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      ) : (
-        <p className="mt-4 text-center text-sm">
-          No aliases found. This is a bug!
-        </p>
-      )}
-    </div>
+    <Table
+      items={aliasList.results}
+      columns={[
+        {
+          name: "name",
+          value: (item) => (
+            <>
+              <div>{item.name}</div>
+              {item.isCanonical && (
+                <Chip as="div" size="small" color="highlight">
+                  Canonical
+                </Chip>
+              )}
+            </>
+          ),
+        },
+        {
+          hidden: !user?.mod,
+          name: "delete",
+          title: "",
+          value: (item) =>
+            !item.isCanonical && (
+              <ConfirmationButton
+                onContinue={() =>
+                  deleteAliasMutation.mutate({
+                    bottle: Number(bottleId),
+                    name: item.name,
+                  })
+                }
+              >
+                Delete
+              </ConfirmationButton>
+            ),
+        },
+      ]}
+    />
   );
 }

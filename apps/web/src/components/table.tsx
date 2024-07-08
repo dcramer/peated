@@ -17,6 +17,7 @@ type Column<T extends Record<string, any>> = {
   align?: "left" | "right" | "center" | "default";
   title?: string;
   value?: (item: T) => ReactElement | string | null | false;
+  hidden?: boolean;
 };
 
 export default function Table<T extends Record<string, any>>({
@@ -56,6 +57,8 @@ export default function Table<T extends Record<string, any>>({
         <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
           <tr>
             {columns.map((col, colN) => {
+              if (col.hidden) return null;
+
               const colName = col.title ?? toTitleCase(String(col.name));
               const colAlign =
                 (col.align || "default") !== "default"
@@ -103,6 +106,8 @@ export default function Table<T extends Record<string, any>>({
                 className="table-row border-b border-slate-800 text-sm"
               >
                 {columns.map((col, colN) => {
+                  if (col.hidden) return null;
+
                   const value = col.value ? col.value(item) : item[col.name];
                   const colAlign =
                     (col.align || "default") !== "default"
@@ -115,7 +120,7 @@ export default function Table<T extends Record<string, any>>({
                     <td
                       key={String(col)}
                       className={classNames(
-                        "group relative p-3",
+                        "group relative flex items-center gap-x-2 p-3",
                         colN !== 0 ? "hidden sm:table-cell" : "",
                         colAlign === "left"
                           ? "text-left"

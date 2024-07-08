@@ -6,6 +6,7 @@ import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
 import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
+import bottleAliasDelete from "./routes/bottleAliasDelete";
 import bottleAliasList from "./routes/bottleAliasList";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
@@ -33,6 +34,7 @@ import countryCategoryList from "./routes/countryCategoryList";
 import countryGenerateDetails from "./routes/countryGenerateDetails";
 import countryList from "./routes/countryList";
 import countryUpdate from "./routes/countryUpdate";
+import entityAliasDelete from "./routes/entityAliasDelete";
 import entityAliasList from "./routes/entityAliasList";
 import entityById from "./routes/entityById";
 import entityCategoryList from "./routes/entityCategoryList";
@@ -102,6 +104,7 @@ export const appRouter = router({
   bottleDelete,
   bottlePreview,
   bottleList,
+  bottleAliasDelete,
   bottleAliasList,
   bottleGenerateDetails,
   bottleMerge,
@@ -124,6 +127,7 @@ export const appRouter = router({
   commentCreate,
   commentDelete,
   commentList,
+  entityAliasDelete,
   entityAliasList,
   entityById,
   entityCategoryList,
