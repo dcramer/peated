@@ -10,7 +10,7 @@ const DEFAULT_SORT = "-tastings";
 export default function Page() {
   const searchParams = useSearchParams();
 
-  const numericFields = new Set(["cursor", "limit"]);
+  const numericFields = new Set(["cursor", "limit", "country", "region"]);
 
   const [entityList] = trpc.entityList.useSuspenseQuery({
     ...Object.fromEntries(

@@ -18,22 +18,26 @@ export const EntitySerializer = serializer({
           .where(inArray(countries.id, countryIds))
       : [];
 
-    const countriesById = Object.fromEntries(
-      (await serialize(CountrySerializer, countryList, currentUser)).map(
-        (data, index) => [countryList[index].id, data],
-      ),
-    );
+    const countriesById = countryList.length
+      ? Object.fromEntries(
+          (await serialize(CountrySerializer, countryList, currentUser)).map(
+            (data, index) => [countryList[index].id, data],
+          ),
+        )
+      : {};
 
     const regionIds = itemList.map((i) => i.regionId).filter(notEmpty);
     const regionList = regionIds.length
       ? await db.select().from(regions).where(inArray(regions.id, regionIds))
       : [];
 
-    const regionsById = Object.fromEntries(
-      (await serialize(RegionSerializer, regionList, currentUser)).map(
-        (data, index) => [regionList[index].id, data],
-      ),
-    );
+    const regionsById = regionList.length
+      ? Object.fromEntries(
+          (await serialize(RegionSerializer, regionList, currentUser)).map(
+            (data, index) => [regionList[index].id, data],
+          ),
+        )
+      : {};
 
     return Object.fromEntries(
       itemList.map((item) => {

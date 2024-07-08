@@ -91,17 +91,18 @@ export default publicProcedure
         where.push(eq(entities.countryId, input.country));
         countryId = input.country;
       } else if (input.country) {
-        [{ countryId }] = await db
+        const [result] = await db
           .select({ countryId: countries.id })
           .from(countries)
           .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
           .limit(1);
-        if (!countryId) {
+        if (!result) {
           throw new TRPCError({
             message: "Invalid country",
             code: "BAD_REQUEST",
           });
         }
+        countryId = result.id;
         where.push(eq(entities.countryId, countryId));
       }
 
