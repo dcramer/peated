@@ -91,6 +91,8 @@ export function getJobForSite(site: ExternalSiteType): [JobName, ...unknown[]] {
       return ["ScrapeTotalWine"];
     case "astorwines":
       return ["ScrapeAstorWines"];
+    case "reservebar":
+      return ["ScrapeReserveBar"];
     case "smws":
       return ["ScrapeSMWS"];
     case "smwsa":

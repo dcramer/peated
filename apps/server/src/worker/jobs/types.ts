@@ -14,6 +14,7 @@ export type JobName =
   | "OnEntityChange"
   | "ScrapeAstorWines"
   | "ScrapeHealthySpirits"
+  | "ScrapeReserveBar"
   | "ScrapeSMWS"
   | "ScrapeSMWSA"
   | "ScrapeTotalWine"
