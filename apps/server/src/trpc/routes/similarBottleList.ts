@@ -1,9 +1,10 @@
 import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
+import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { TRPCError } from "@trpc/server";
 import { and, asc, eq, ne, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -44,20 +45,26 @@ export default publicProcedure
       .orderBy(asc(bottles.fullName));
 
     if (!results.length) {
+      const d1 = alias(bottlesToDistillers, "d1");
+      const d2 = alias(bottlesToDistillers, "d2");
       results = await db
         .select()
         .from(bottles)
         .where(
           and(
             eq(bottles.brandId, bottle.brandId),
-            sql`${bottles.searchVector} @@ websearch_to_tsquery ('english', ${bottle.name})`,
+            // eq(bottles.category, bottle.category),
             ne(bottles.id, bottle.id),
+            sql`EXISTS (
+              SELECT FROM ${bottlesToDistillers} as d1
+              INNER JOIN ${bottlesToDistillers} as d2
+                ON ${d1.distillerId} = ${d2.distillerId}
+              WHERE ${d1.bottleId} = ${bottles.id}
+                AND ${d2.bottleId} = ${bottle.id})`,
           ),
         )
         .limit(limit)
-        .orderBy(
-          sql`ts_rank(${bottles.searchVector}, websearch_to_tsquery('english', ${bottle.name})) DESC`,
-        );
+        .orderBy(asc(bottles.fullName));
     }
 
     return {
