@@ -11,7 +11,7 @@ export async function generateMetadata({
   const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
   return {
-    title: `Similar Bottles to ${bottle.fullName}`,
+    title: `Whisky Similar to ${bottle.fullName}`,
   };
 }
 
