@@ -56,7 +56,7 @@ export default function ChoiceField<T extends FieldValues>({
                 value={choice.id}
                 className="group relative flex cursor-pointer px-5 py-4 text-white focus:outline-none"
               >
-                {({ active, checked }) => (
+                {({ checked }) => (
                   <>
                     <div className="flex w-full items-center justify-between space-x-4">
                       <div
