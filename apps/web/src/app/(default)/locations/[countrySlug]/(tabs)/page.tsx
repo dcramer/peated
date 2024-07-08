@@ -12,8 +12,7 @@ export default function Page({
   params: { countrySlug: string };
 }) {
   const searchParams = useSearchParams();
-  const [[country, topEntityList]] = trpc.useSuspenseQueries((t) => [
-    t.countryBySlug(countrySlug),
+  const [[topEntityList]] = trpc.useSuspenseQueries((t) => [
     t.entityList({
       ...Object.fromEntries(searchParams.entries()),
       country: countrySlug,
