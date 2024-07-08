@@ -12,11 +12,16 @@ import {
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import { load as cheerio } from "cheerio";
 
+const cookieValue =
+  'persisted="{"address":"301 Mission St, San Francisco, CA 94105, USA","address1":"301 Mission St","city":"SF","postalCode":"94105","place_id":"ChIJ68ImfGOAhYARGxkajD7cq9M","lat":"37.7904705","long":"-122.3961641","state_code":"CA","is_gift":false}"';
+
 export async function scrapeProducts(
   url: string,
   cb: (product: StorePrice) => Promise<void>,
 ) {
-  const data = await getUrl(url);
+  const data = await getUrl(url, false, {
+    Cookie: cookieValue,
+  });
   const $ = cheerio(data);
   $(".product-grid .b-product-grid__item").each((_, el) => {
     const bottle = $("div.pdp-link > a", el).first();

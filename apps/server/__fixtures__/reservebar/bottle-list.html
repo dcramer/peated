@@ -26,7 +26,6 @@
 
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -154,10 +153,10 @@
                         allow_display_features: true,
                     });
                 })
-                .catch(e => console.warn(`Sun Jul 07 2024 21:09:29 GMT-0000 (GMT) - gtag.js (err): `, e))
+                .catch(e => console.warn(`Mon Jul 08 2024 01:17:19 GMT-0000 (GMT) - gtag.js (err): `, e))
 
         } catch (e) {
-            console.warn(`Sun Jul 07 2024 21:09:29 GMT-0000 (GMT) - gtag.js (err): `, e)
+            console.warn(`Mon Jul 08 2024 01:17:19 GMT-0000 (GMT) - gtag.js (err): `, e)
         }
     </script>
 
@@ -192,18 +191,7 @@
 
     let segmentMetaCLIs = {};
 
-    let transient = {
-  "action": "SegmentData-Transient",
-  "queryString": "",
-  "locale": "default",
-  "body": {
-    "auth_id": "668b1ec3288ba15649339b3d",
-    "user_id": "668b1ec3288ba15649339b3d",
-    "email": "dcramer@gmail.com",
-    "first_name": "David",
-    "last_name": "Cramer"
-  }
-} ?? {};
+    let transient = false ?? {};
 
     if (transient.hasOwnProperty("body")) {
         segmentMetaProfile.profile = {
@@ -1997,7 +1985,7 @@ Recipes
 </a>
 </div>
 <div class="header__item minicart" data-action-url="/on/demandware.store/Sites-reservebarus-Site/default/Cart-MiniCartShow">
-<aside data-testid="miniCartAside" class="js-minicart-inner ">
+<aside data-testid="miniCartAside" class="js-minicart-inner m-loader-hide">
 <div class="content">
 <div class="popover popover-bottom rb-cart">
 <div class="cart-empty">
@@ -2011,7 +1999,7 @@ Restocking
 </div>
 </div>
 <div class="backdrop"></div>
-<div class="cart-updating ">
+<div class="cart-updating m-hide">
 <p class="cart-updating-text">
 Preparing Your Cart
 </p>
@@ -2023,8 +2011,8 @@ Preparing Your Cart
 <path d="M6.4001 15.6996C7.11807 15.6996 7.7001 15.1176 7.7001 14.3996C7.7001 13.6816 7.11807 13.0996 6.4001 13.0996C5.68213 13.0996 5.1001 13.6816 5.1001 14.3996C5.1001 15.1176 5.68213 15.6996 6.4001 15.6996Z" />
 <path d="M12.8 15.6996C13.518 15.6996 14.1 15.1176 14.1 14.3996C14.1 13.6816 13.518 13.0996 12.8 13.0996C12.082 13.0996 11.5 13.6816 11.5 14.3996C11.5 15.1176 12.082 15.6996 12.8 15.6996Z" />
 </svg>
-<span class="minicart-quantity js-minicart-quantity m-not-empty">
-2
+<span class="minicart-quantity js-minicart-quantity ">
+0
 </span>
 </button>
 </div>
@@ -12101,7 +12089,7 @@ Terms &amp; Conditions
 * 2-Hour Delivery Guarantee
 <div class="row">
 <div class="col-12 pl-5">
-Our two-hour delivery guarantee promises your order will be delivered within two hours from the time you receive your order confirmation. The two-hour guarantee only applies to purchases made where all products are available for on-demand fulfillment and does not apply to orders including shipping-only products or for addresses where delivery is not available. Any changes or modifications to orders once placed voids the guarantee. If your order does not arrive within the specified window, you will receive a discount code good for $10 off your next order. In the event this occurs, please contact customer service via email <a href="/cdn-cgi/l/email-protection#3655434542595b53445e535a4676445345534440535457441855595b094543545c5355420b041b7e5943441672535a5f4053444f16714357445758425353167f5847435f444f"><span class="__cf_email__" data-cfemail="7615030502191b13041e131a0636041305130400131417045815191b">[email&#160;protected]</span></a> and include your order number, email address, and the time it took for your delivery to arrive and we will send you your $10 off code.
+Our two-hour delivery guarantee promises your order will be delivered within two hours from the time you receive your order confirmation. The two-hour guarantee only applies to purchases made where all products are available for on-demand fulfillment and does not apply to orders including shipping-only products or for addresses where delivery is not available. Any changes or modifications to orders once placed voids the guarantee. If your order does not arrive within the specified window, you will receive a discount code good for $10 off your next order. In the event this occurs, please contact customer service via email <a href="/cdn-cgi/l/email-protection#2a495f595e45474f58424f465a6a584f594f585c4f484b580449454715595f48404f495e17180762455f580a6e4f46435c4f58530a6d5f4b584b445e4f4f0a63445b5f435853"><span class="__cf_email__" data-cfemail="7a190f090e15171f08121f160a3a081f091f080c1f181b0854191517">[email&#160;protected]</span></a> and include your order number, email address, and the time it took for your delivery to arrive and we will send you your $10 off code.
 </div>
 </div>
 </div>
