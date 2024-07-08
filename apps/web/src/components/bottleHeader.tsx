@@ -22,7 +22,15 @@ export default function BottleHeader({
               {bottle.fullName}
             </Link>
           ) : (
-            bottle.fullName
+            <div className="flex gap-x-2">
+              <Link
+                href={`/entities/${bottle.brand.id}`}
+                className="hover:underline"
+              >
+                {bottle.brand.name}
+              </Link>
+              {bottle.name}
+            </div>
           )}
           {bottle.vintageYear && (
             <span className="text-light">({bottle.vintageYear})</span>

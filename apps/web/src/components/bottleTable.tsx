@@ -105,7 +105,6 @@ export default function BottleTable({
                     </BottleLink>
                     {bottle.vintageYear && (
                       <>
-                        {" "}
                         <span className="text-light">
                           ({bottle.vintageYear})
                         </span>

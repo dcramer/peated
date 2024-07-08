@@ -26,34 +26,18 @@ type Props = {
 
 export default function BottleMetadata({ data, ...props }: Props) {
   return (
-    <div {...props} className="flex gap-x-2">
-      {data.caskFill && data.caskType && (
-        <CaskDetails
-          caskFill={data.caskFill}
-          caskSize={data.caskSize}
-          caskType={data.caskType}
-        />
-      )}
-    </div>
-  );
-}
-
-import { toTitleCase } from "@peated/server/src/lib/strings";
-
-function CaskDetails({
-  caskFill,
-  caskSize,
-  caskType,
-}: {
-  caskFill: CaskFill | null;
-  caskSize: CaskSize | null;
-  caskType: CaskType | null;
-}) {
-  return (
-    <div className="text-light">
-      {caskFill ? toTitleCase(caskFill) : ""}{" "}
-      {caskType ? toTitleCase(caskType) : ""}{" "}
-      {caskSize ? toTitleCase(caskSize) : ""}
+    <div {...props} className="text-light flex gap-x-2">
+      {data.distillers.map((d) => {
+        return (
+          <Link
+            key={d.id}
+            href={`/entities/${d.id}`}
+            className="hover:underline"
+          >
+            {d.name}
+          </Link>
+        );
+      })}
     </div>
   );
 }

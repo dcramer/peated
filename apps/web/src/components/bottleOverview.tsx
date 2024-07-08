@@ -8,6 +8,7 @@ import BottleReviews from "./bottleReviews";
 import BottleTagDistribution, {
   BottleTagDistributionSkeleton,
 } from "./bottleTagDistribution";
+import CaskDetails from "./caskDetails";
 import DefinitionList from "./definitionList";
 import Heading from "./heading";
 import Markdown from "./markdown";
@@ -98,6 +99,14 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                 ) : (
                   <em>unknown</em>
                 )}
+              </DefinitionList.Details>
+              <DefinitionList.Term>Cask Details</DefinitionList.Term>
+              <DefinitionList.Details>
+                <CaskDetails
+                  caskFill={bottle.caskFill}
+                  caskSize={bottle.caskSize}
+                  caskType={bottle.caskType}
+                />
               </DefinitionList.Details>
               {!!bottle.vintageYear && (
                 <>
