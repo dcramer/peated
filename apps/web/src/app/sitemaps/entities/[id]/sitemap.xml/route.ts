@@ -11,10 +11,10 @@ export async function GET(
 ) {
   const trpcClient = await getTrpcClient();
 
-  let cursor = (Number(id) - 1) * PAGE_LIMIT + 1;
+  let cursor: number | null = (Number(id) - 1) * PAGE_LIMIT + 1;
   let count = 0;
   const pages: Sitemap = [];
-  while (cursor) {
+  while (cursor && count < PAGE_LIMIT) {
     const { results, rel } = await trpcClient.entityList.fetch(
       {
         cursor,
@@ -33,14 +33,8 @@ export async function GET(
       })),
     );
 
-    if (!rel?.nextCursor) break;
-
     cursor = rel.nextCursor;
     count += results.length;
-
-    if (count >= PAGE_LIMIT) {
-      break;
-    }
   }
 
   const pagesSitemapXML = await buildPagesSitemap(pages);
