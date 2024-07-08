@@ -5,6 +5,7 @@ import type {
   NewEntity,
   NewEntityAlias,
 } from "../db/schema";
+import { formatCategoryName } from "./format";
 
 export function buildEntitySearchVector(
   entity: NewEntity,
@@ -30,6 +31,8 @@ export function buildBottleSearchVector(
     new TSVector(bottle.name, "B"),
     new TSVector(brand.name, "B"),
   ];
+  if (bottle.category)
+    values.push(new TSVector(formatCategoryName(bottle.category), "C"));
   if (bottle.vintageYear)
     values.push(new TSVector(`${bottle.vintageYear}`, "B"));
   if (bottler) values.push(new TSVector(bottler.name, "C"));
