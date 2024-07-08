@@ -3,7 +3,7 @@ import { db } from "@peated/server/db";
 import { countries, regions } from "@peated/server/db/schema";
 import { runJob } from "@peated/server/worker/client";
 import slugify from "@sindresorhus/slugify";
-import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 
 const LOCATION_DATA = [
   {
@@ -147,26 +147,26 @@ const LOCATION_DATA = [
   },
 ];
 
-const subcommand = program.command("locations");
+const subcommand = program.command("regions");
 
 subcommand
-  .command("generate-country-descriptions")
-  .description("Generate country descriptions")
-  .argument("[countryIds...]")
+  .command("generate-descriptions")
+  .description("Generate region descriptions")
+  .argument("[regionIds...]")
   .option("--only-missing")
-  .action(async (countryIds, options) => {
+  .action(async (regionIds, options) => {
     const step = 1000;
     const baseQuery = db
-      .select({ id: countries.id })
-      .from(countries)
+      .select({ id: regions.id })
+      .from(regions)
       .where(
-        countryIds.length
-          ? inArray(countries.id, countryIds)
+        regionIds.length
+          ? inArray(regions.id, regionIds)
           : options.onlyMissing
-            ? or(isNull(countries.description), isNull(countries.summary))
+            ? isNull(regions.description)
             : undefined,
       )
-      .orderBy(asc(countries.id));
+      .orderBy(asc(regions.id));
 
     let hasResults = true;
     let offset = 0;
@@ -174,8 +174,8 @@ subcommand
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id } of query) {
-        console.log(`Generating description for country ${id}.`);
-        await runJob("GenerateCountryDetails", { countryId: id });
+        console.log(`Generating description for region ${id}.`);
+        await runJob("GenerateRegionDetails", { regionId: id });
         hasResults = true;
       }
       offset += step;
@@ -183,33 +183,7 @@ subcommand
   });
 
 subcommand
-  .command("geocode-countries")
-  .description("Geocode countries")
-  .option("--only-missing")
-  .action(async (options) => {
-    const step = 1000;
-    const baseQuery = db
-      .select({ id: countries.id })
-      .from(countries)
-      .where(and(options.onlyMissing ? isNull(countries.location) : undefined))
-      .orderBy(asc(countries.id));
-
-    let hasResults = true;
-    let offset = 0;
-    while (hasResults) {
-      hasResults = false;
-      const query = await baseQuery.offset(offset).limit(step);
-      for (const { id } of query) {
-        console.log(`Geocoding location for Country ${id}.`);
-        await runJob("GeocodeCountryLocation", { countryId: id });
-        hasResults = true;
-      }
-      offset += step;
-    }
-  });
-
-subcommand
-  .command("geocode-regions")
+  .command("geocode-locations")
   .description("Geocode regions")
   .option("--only-missing")
   .action(async (options) => {
@@ -235,7 +209,7 @@ subcommand
   });
 
 subcommand
-  .command("load-regions")
+  .command("load-data")
   .description("Load region data")
   .action(async (options) => {
     for (const countryData of LOCATION_DATA) {
@@ -268,7 +242,7 @@ subcommand
     }
   });
 
-subcommand.command("fix-region-stats").action(async (options) => {
+subcommand.command("fix-stats").action(async (options) => {
   const step = 1000;
   const baseQuery = db
     .select({ id: regions.id })
