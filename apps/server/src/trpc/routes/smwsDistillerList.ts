@@ -1,9 +1,9 @@
 import { db } from "@peated/server/db";
-import { entities } from "@peated/server/db/schema";
+import { entities, entityAliases } from "@peated/server/db/schema";
 import { SMWS_DISTILLERY_CODES } from "@peated/server/lib/smws";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
-import { inArray } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { publicProcedure } from "..";
 
 export default publicProcedure.query(async function ({ ctx }) {
@@ -12,7 +12,9 @@ export default publicProcedure.query(async function ({ ctx }) {
   const results = await db
     .select()
     .from(entities)
-    .where(inArray(entities.name, Object.values(SMWS_DISTILLERY_CODES)));
+    .where(
+      sql`${entities.id} IN (SELECT ${entityAliases.entityId} FROM ${entityAliases} WHERE ${entityAliases.name} IN ${Object.values(SMWS_DISTILLERY_CODES)})`,
+    );
 
   return {
     results: await serialize(EntitySerializer, results, ctx.user),
