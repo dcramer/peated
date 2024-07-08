@@ -74,6 +74,7 @@ import regionList from "./routes/regionList";
 import regionUpdate from "./routes/regionUpdate";
 import reviewCreate from "./routes/reviewCreate";
 import reviewList from "./routes/reviewList";
+import search from "./routes/search";
 import smwsDistillerList from "./routes/smwsDistillerList";
 import stats from "./routes/stats";
 import tagByName from "./routes/tagByName";
@@ -168,6 +169,7 @@ export const appRouter = router({
   stats,
   priceList,
   priceCreateBatch,
+  search,
   smwsDistillerList,
   tagByName,
   tagCreate,

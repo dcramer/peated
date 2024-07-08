@@ -48,65 +48,21 @@ export default function SearchPanel({
 
   // TODO: handle errors
   const onQuery = useDebounceCallback(async (query: string) => {
-    // union results from various apis
-    // priority is:
-    // - users
-    // - bottles
-    // - entities
-    // (but prioritize exact matches)
-    // trpc.useQueries(t => {
-
-    // })
-    // user, bottles, entities
     setState("loading");
 
-    const promises = [];
-    if (directToTasting || !isUserQuery) {
-      promises.push(
-        trpcUtils.bottleList
-          .fetch({
-            query,
-            limit: maxResults,
-          })
-          .then((data) =>
-            data.results.map<Result>((b) => ({ type: "bottle", ref: b })),
-          )
-          .catch(() => []),
-      );
-    }
+    const include: ("bottles" | "entities" | "users")[] = [];
+    if (directToTasting || !isUserQuery) include.push("bottles");
+    if (!directToTasting && user && (isUserQuery || query))
+      include.push("users");
+    if (!directToTasting) include.push("entities");
 
-    if (!directToTasting && user && (isUserQuery || query)) {
-      promises.push(
-        trpcUtils.userList
-          .fetch({
-            query,
-            limit: maxResults,
-          })
-          .then((data) =>
-            data.results.map<Result>((b) => ({ type: "user", ref: b })),
-          )
-          .catch(() => []),
-      );
-    }
+    const { results } = await trpcUtils.search.fetch({
+      query,
+      limit: maxResults,
+      include,
+    });
 
-    if (!directToTasting) {
-      promises.push(
-        trpcUtils.entityList
-          .fetch({ query, limit: maxResults })
-          .then((data) =>
-            data.results.map<Result>((b) => ({ type: "entity", ref: b })),
-          )
-          .catch(() => []),
-      );
-    }
-    const results = await Promise.all(promises);
-
-    setResults(
-      sortResults(
-        query,
-        results.reduce((prev, cur) => [...prev, ...cur], []),
-      ),
-    );
+    setResults(results);
 
     setQuery(query);
     if (onQueryChange) onQueryChange(query);
