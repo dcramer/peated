@@ -3,14 +3,15 @@
 import { makeTRPCClient } from "@peated/server/src/lib/trpc";
 import config from "@peated/web/config";
 import { redirect } from "next/navigation";
+import { getSafeRedirect } from "./auth";
 import { getSession } from "./session.server";
 import { isTRPCClientError } from "./trpc";
 
-export async function logout(
-  prevState?: any,
-  formData?: FormData,
-  redirectTo = "/",
-) {
+export async function logout(prevState?: any, formData?: FormData) {
+  const redirectTo = getSafeRedirect(
+    formData ? ((formData.get("redirectTo") || "/") as string) : null,
+  );
+
   const session = await getSession();
   session.destroy();
   redirect(redirectTo);
@@ -19,7 +20,6 @@ export async function logout(
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
-  redirectTo = "/",
 ) {
   "use server";
 
@@ -32,6 +32,9 @@ export async function authenticate(
   const email = (formData.get("email") || "") as string;
   const password = (formData.get("password") || "") as string;
   const code = formData.get("code") as string;
+  const redirectTo = getSafeRedirect(
+    (formData.get("redirectTo") || "/") as string,
+  );
 
   const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
 

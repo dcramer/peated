@@ -1,6 +1,7 @@
 "use client";
 
 import { useGoogleLogin } from "@react-oauth/google";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import Button from "./button";
@@ -8,12 +9,15 @@ import Button from "./button";
 export default function GoogleLoginButton({ action }: { action: any }) {
   const [loading, setLoading] = useState(false);
   const { pending } = useFormStatus();
+  const searchParams = useSearchParams();
 
   const googleLogin = useGoogleLogin({
     flow: "auth-code",
     onSuccess: async (codeResponse) => {
       const data = new FormData();
       data.append("code", codeResponse.code);
+      if (searchParams.get("redirectTo"))
+        data.append("redirectTo", searchParams.get("redirectTo") as string);
       // TODO:
       action(data);
 
