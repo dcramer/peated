@@ -12,7 +12,7 @@ const LOCATION_DATA = [
   },
   { name: "Ireland", regions: [] },
   {
-    name: "United States of America",
+    name: "United States",
     regions: [
       "Alabama",
       "Alaska",
