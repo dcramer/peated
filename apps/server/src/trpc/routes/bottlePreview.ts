@@ -103,13 +103,18 @@ export async function bottleNormalize({
   }
 
   // TODO: we want to remove the year from the name in mid-match
-  const vintageYearMatch = rv.name.match(/(\b(\d{4})\b)|(\((\d{4})\))/);
+  const vintageYearMatch = rv.name.match(
+    /(\b(\d{4})\b)|(\((\d{4})(?: release)?\))/i,
+  );
   if (vintageYearMatch) {
     if (!rv.vintageYear) {
-      rv.vintageYear = parseInt(vintageYearMatch[2] || vintageYearMatch[4], 10);
+      rv.vintageYear = parseInt(vintageYearMatch[1] || vintageYearMatch[4], 10);
     }
+    // TODO: regex this
     rv.name = stripSuffix(rv.name, ` ${rv.vintageYear}`);
     rv.name = stripSuffix(rv.name, ` (${rv.vintageYear})`);
+    rv.name = stripSuffix(rv.name, ` (${rv.vintageYear} release)`);
+    rv.name = stripSuffix(rv.name, ` (${rv.vintageYear} Release)`);
   }
 
   return rv;
