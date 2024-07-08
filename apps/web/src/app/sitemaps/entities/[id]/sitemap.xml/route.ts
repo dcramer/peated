@@ -29,7 +29,7 @@ export async function GET(
     pages.push(
       ...results.map((entity) => ({
         url: `/entities/${entity.id}`,
-        lastModified: entity.updatedAt, // not correct
+        lastModified: entity.updatedAt,
       })),
     );
 
