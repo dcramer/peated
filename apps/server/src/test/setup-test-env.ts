@@ -16,11 +16,6 @@ import "error-cause/auto";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
-const date = new Date(2024, 7, 4);
-
-vi.useFakeTimers();
-vi.setSystemTime(date);
-
 const axiosMock = new MockAdapter(axios);
 
 // vi.mock("axios");

@@ -77,7 +77,7 @@ test("can change name", async ({ fixtures }) => {
     .select()
     .from(changes)
     .where(eq(changes.objectId, newEntity.id))
-    .orderBy(desc(changes.createdAt))
+    .orderBy(desc(changes.id))
     .limit(1);
 
   expect(change.data).toEqual({ name: "Delicious Wood" });
@@ -311,7 +311,7 @@ test("sets descriptionSrc with description", async ({ fixtures }) => {
     .select()
     .from(changes)
     .where(eq(changes.objectId, newEntity.id))
-    .orderBy(desc(changes.createdAt))
+    .orderBy(desc(changes.id))
     .limit(1);
 
   expect(change.data).toEqual({
