@@ -606,9 +606,10 @@ export const StorePriceHistory = async (
           parseInt(faker.finance.amount({ min: 50, max: 200, dec: 0 }), 10) *
           100,
         volume: 750,
+        // TODO: mock
+        // date: new Date(),
         ...data,
         priceId: data.priceId || (await StorePrice({}, tx)).id,
-        createdAt: new Date(),
       })
       .returning();
   });
