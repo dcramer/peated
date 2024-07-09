@@ -274,6 +274,7 @@ export default function BottleForm({
                 placeholder="e.g. Angel's Envy, Suntory Whisky"
                 helpText="The distilleries which produces the spirit(s) for this bottle."
                 createDialogHelpText="The distiller is the group that makes the spirit."
+                suggestedOptions={brandValue ? [brandValue] : []}
                 onChange={(value) => {
                   onChange(value.map((t: any) => t.id || t));
                   setDistillersValue(value);
@@ -306,6 +307,7 @@ export default function BottleForm({
                 label="Bottler"
                 helpText="The company bottling the spirit."
                 placeholder="e.g. The Scotch Malt Whisky Society"
+                suggestedOptions={brandValue ? [brandValue] : []}
                 searchContext={{
                   type: "bottler",
                   brand: brandValue ? Number(brandValue.id) : null,
