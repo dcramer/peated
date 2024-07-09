@@ -15,10 +15,10 @@ const Tabs = ({ fullWidth, border, noMargin, ...props }: Props) => {
   return (
     <nav
       className={classNames(
-        "-mb-px flex space-x-8",
+        "flex space-x-8",
         fullWidth ? "[&>*]:flex-auto [&>*]:justify-center" : "",
         border ? "border-b border-slate-700" : "",
-        noMargin ? "" : "mb-4",
+        noMargin ? "-mb-px" : "mb-4",
       )}
       aria-label="Tabs"
       {...props}
