@@ -19,12 +19,6 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
   return (
     <>
       <div className="my-6 px-3 md:px-0">
-        <Suspense fallback={<BottleTagDistributionSkeleton />}>
-          <BottleTagDistribution bottleId={bottle.id} />
-        </Suspense>
-      </div>
-
-      <div className="my-6 px-3 md:px-0">
         <div className="flex space-x-4">
           <div className="max-w-none flex-auto">
             <Suspense>
@@ -41,6 +35,11 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
             {bottle.tastingNotes && (
               <>
                 <Heading as="h3">Tasting Notes</Heading>
+                <div className="my-6 px-3 md:px-0">
+                  <Suspense fallback={<BottleTagDistributionSkeleton />}>
+                    <BottleTagDistribution bottleId={bottle.id} />
+                  </Suspense>
+                </div>
                 <DefinitionList>
                   <DefinitionList.Term>Nose</DefinitionList.Term>
                   <DefinitionList.Details>
