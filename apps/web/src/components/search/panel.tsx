@@ -63,22 +63,25 @@ export default function SearchPanel({
     });
 
     setResults(results);
-
-    setQuery(query);
-    if (onQueryChange) onQueryChange(query);
     setState("ready");
   });
 
   useEffect(() => {
-    setQuery(value || "");
-    if (onQueryChange) onQueryChange(value || "");
-    onQuery(value || "");
+    const curValue = value || "";
+    if (query !== curValue) {
+      setQuery(curValue);
+      if (onQueryChange) onQueryChange(curValue);
+      onQuery(curValue);
+    }
   }, [value]);
 
   useEffect(() => {
-    setQuery(initialValue || "");
-    if (onQueryChange) onQueryChange(initialValue || "");
-    onQuery(initialValue || "");
+    const curValue = initialValue || "";
+    if (query !== curValue) {
+      setQuery(curValue);
+      if (onQueryChange) onQueryChange(curValue);
+      onQuery(curValue);
+    }
   }, [initialValue]);
 
   return (
@@ -92,6 +95,7 @@ export default function SearchPanel({
             placeholder="Search for bottles, brands, and people"
             value={query}
             onChange={(value) => {
+              setQuery(query);
               onQuery(value);
               if (onQueryChange) onQueryChange(query);
             }}
