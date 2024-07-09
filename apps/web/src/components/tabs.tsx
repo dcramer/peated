@@ -30,6 +30,7 @@ type ItemProps = {
   active?: boolean;
   count?: number;
   controlled?: boolean;
+  desktopOnly?: boolean;
 };
 
 const defaultElement = "button";
@@ -40,6 +41,7 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
   count,
   children,
   controlled,
+  desktopOnly,
   ...props
 }: PolymorphicProps<E, ItemProps>) {
   const Component = as ?? defaultElement;
@@ -56,7 +58,8 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
 
   const className = classNames(
     active ? activeStyles : inactiveStyles,
-    "flex whitespace-nowrap border-b-4 px-3 py-4 text-sm font-medium",
+    "whitespace-nowrap border-b-4 px-3 py-4 text-sm font-medium",
+    desktopOnly ? "hidden lg:flex" : "flex",
   );
 
   return (

@@ -28,7 +28,7 @@ export default async function Layout({
         <TabItem as={Link} href={`${baseUrl}/prices`} controlled>
           Prices
         </TabItem>
-        <TabItem as={Link} href={`${baseUrl}/similar`} controlled>
+        <TabItem as={Link} href={`${baseUrl}/similar`} controlled desktopOnly>
           Similar
         </TabItem>
       </Tabs>
