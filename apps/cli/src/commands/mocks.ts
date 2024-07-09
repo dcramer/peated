@@ -18,6 +18,7 @@ import { SMWS_DISTILLERY_CODES } from "@peated/server/lib/smws";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { type Category } from "@peated/server/types";
 import { and, eq, ne, sql } from "drizzle-orm";
+import { MAJOR_COUNTRIES } from "../../../server/src/constants";
 
 const loadDefaultSites = async () => {
   const store1 =
@@ -64,13 +65,25 @@ const loadDefaultEntities = async () => {
     })),
   ];
 
+  const majorCountries = await db.query.countries.findMany({
+    where: (countries, { inArray }) =>
+      inArray(
+        countries.name,
+        MAJOR_COUNTRIES.map(([name]) => name),
+      ),
+  });
+
   const results: Entity[] = [];
 
   for (const data of mocks) {
     results.push(
       (await db.query.entities.findFirst({
         where: (entities, { eq }) => eq(entities.name, data.name),
-      })) || (await Fixtures.Entity(data)),
+      })) ||
+        (await Fixtures.Entity({
+          ...data,
+          countryId: sample(majorCountries, 1)[0].id,
+        })),
     );
   }
 
