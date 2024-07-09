@@ -36,13 +36,13 @@ export const normalizeBottleName = (
 
   // "years old" type patterns
   name = name
-    .replace(/(\d+)[\s-]?years?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
-    .replace(/(\d+)[\s-]?years?($|\s)/i, `$1${ageSuffix}$2`);
+    .replace(/(\d{1,2})[\s-]?years?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
+    .replace(/(\d{1,2})[\s-]?years?($|\s)/i, `$1${ageSuffix}$2`);
 
   // abberviated yr
   name = name
-    .replace(/(\d+)\s?yrs?\.?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
-    .replace(/(\d+)\s?yrs?\.?($|\s)/i, `$1${ageSuffix}$2`);
+    .replace(/(\d{1,2})\s?yrs?\.?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
+    .replace(/(\d{1,2})\s?yrs?\.?($|\s)/i, `$1${ageSuffix}$2`);
 
   if (name.startsWith(`${age} `)) {
     name = name.replace(`${age} `, `${age}${ageSuffix} `);
@@ -59,7 +59,7 @@ export const normalizeBottleName = (
   // replace mid-string age
   name = name.replace(` ${age} `, ` ${age}${ageSuffix} `);
 
-  const match = name.match(/(\d+)-year-old($|\s)/i);
+  const match = name.match(/(\d{1,2})-year-old($|\s)/i);
   if (!age && match) {
     age = parseInt(match[1], 10);
   }
