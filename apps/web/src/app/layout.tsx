@@ -28,6 +28,9 @@ export const metadata: Metadata = {
     template: "%s | Peated",
     default: "Peated",
   },
+  openGraph: {
+    siteName: "Peated",
+  },
   description: config.DESCRIPTION,
 };
 
