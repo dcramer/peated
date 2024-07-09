@@ -14,21 +14,7 @@ export default function Page({
 
   const [entity] = trpc.entityById.useSuspenseQuery(Number(entityId));
   const router = useRouter();
-
-  const trpcUtils = trpc.useUtils();
-
-  const entityUpdateMutation = trpc.entityUpdate.useMutation({
-    onSuccess: (data) => {
-      if (!data) return;
-      const previous = trpcUtils.entityById.getData(data.id);
-      if (previous) {
-        trpcUtils.entityById.setData(data.id, {
-          ...previous,
-          ...data,
-        });
-      }
-    },
-  });
+  const entityUpdateMutation = trpc.entityUpdate.useMutation();
 
   return (
     <EntityForm

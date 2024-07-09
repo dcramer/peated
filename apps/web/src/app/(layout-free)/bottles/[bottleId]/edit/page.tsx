@@ -13,22 +13,8 @@ export default function Page({
   useModRequired();
 
   const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
-  const trpcUtils = trpc.useUtils();
-
   const router = useRouter();
-
-  const bottleUpdateMutation = trpc.bottleUpdate.useMutation({
-    onSuccess: (data) => {
-      if (!data) return;
-      const previous = trpcUtils.bottleById.getData(data.id);
-      if (previous) {
-        trpcUtils.bottleById.setData(data.id, {
-          ...previous,
-          ...data,
-        });
-      }
-    },
-  });
+  const bottleUpdateMutation = trpc.bottleUpdate.useMutation();
 
   return (
     <BottleForm
