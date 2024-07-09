@@ -1,4 +1,5 @@
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
+import { UserSerializer } from "@peated/server/serializers/user";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -61,7 +62,9 @@ export default publicProcedure.input(z.number()).query(async function ({
 
   return {
     ...(await serialize(BottleSerializer, bottle, ctx.user)),
-    createdBy,
+    createdBy: createdBy
+      ? await serialize(UserSerializer, createdBy, ctx.user)
+      : null,
     people: totalPeople,
     lastPrice: lastPrice
       ? await serialize(StorePriceSerializer, lastPrice, ctx.user)
