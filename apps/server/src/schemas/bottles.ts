@@ -47,7 +47,7 @@ export const BottleSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 
-  createdBy: UserSchema.optional(),
+  createdBy: UserSchema.nullable(),
 
   isFavorite: z.boolean().optional(),
   hasTasted: z.boolean().optional(),
