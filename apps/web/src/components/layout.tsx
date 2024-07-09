@@ -19,7 +19,7 @@ export default function Layout({
   rightSidebar?: ReactNode;
 }) {
   return (
-    <>
+    <div>
       {header !== undefined ? (
         header
       ) : (
@@ -49,6 +49,6 @@ export default function Layout({
           <AppFooter />
         </Footer>
       )}
-    </>
+    </div>
   );
 }

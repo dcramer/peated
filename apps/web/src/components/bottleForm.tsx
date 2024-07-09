@@ -475,7 +475,6 @@ export default function BottleForm({
                 },
               })}
               error={errors.description}
-              autoFocus
               label="Description"
               rows={8}
             />
