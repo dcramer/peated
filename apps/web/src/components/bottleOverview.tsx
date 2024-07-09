@@ -133,13 +133,18 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                 <DefinitionList.Term>Added By</DefinitionList.Term>
                 <DefinitionList.Details>
                   {bottle.createdBy ? (
-                    <Link
-                      href={`/users/${bottle.createdBy.username}`}
-                      className="flex items-center gap-x-2 truncate hover:underline"
-                    >
-                      <UserAvatar size={16} user={bottle.createdBy} />
-                      {bottle.createdBy.username}
-                    </Link>
+                    <>
+                      <Link
+                        href={`/users/${bottle.createdBy.username}`}
+                        className="flex items-center gap-x-2 truncate hover:underline"
+                      >
+                        <UserAvatar size={16} user={bottle.createdBy} />
+                        {bottle.createdBy.username}
+                      </Link>
+                      {bottle.createdAt && (
+                        <TimeSince date={bottle.createdAt} />
+                      )}
+                    </>
                   ) : (
                     <em>unknown</em>
                   )}
@@ -154,19 +159,6 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
           />
         </div>
       </div>
-
-      {bottle.createdBy && (
-        <div className="text-light mt-8 text-center text-sm sm:text-left">
-          This bottle was first added by{" "}
-          <Link
-            href={`/users/${bottle.createdBy.username}`}
-            className="font-medium hover:underline"
-          >
-            {bottle.createdBy.displayName}
-          </Link>{" "}
-          {bottle.createdAt && <TimeSince date={bottle.createdAt} />}
-        </div>
-      )}
     </>
   );
 }
