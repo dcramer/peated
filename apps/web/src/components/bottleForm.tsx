@@ -409,15 +409,18 @@ export default function BottleForm({
                   const result =
                     await generateDataMutation.mutateAsync(getValues());
 
+                  if (!result) return;
                   const currentValues = getValues();
-                  if (
-                    result &&
-                    result.description &&
-                    !currentValues.description
-                  ) {
+                  if (result.description && !currentValues.description) {
                     setValue("description", result.description);
                     setValue("descriptionSrc", "generated");
                   }
+
+                  if (result.flavorProfile && !currentValues.flavorProfile)
+                    setValue(
+                      "flavorProfile",
+                      result.flavorProfile as FlavorProfile,
+                    );
                 }}
                 disabled={generateDataMutation.isPending}
                 icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
