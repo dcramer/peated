@@ -4,4 +4,5 @@ export { default } from "@peated/web/components/defaultLayout";
 
 export const metadata: Metadata = {
   title: "Add Bottle",
+  alternates: { canonical: "https://peated.com/addBottle" },
 };

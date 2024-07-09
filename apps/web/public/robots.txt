@@ -15,12 +15,6 @@ User-agent: *
 Allow: /
 Disallow: /_health
 Disallow: /admin
-Disallow: /settings
-Disallow: /flights
-Disallow: /friends
-Disallow: /addBottle
-Disallow: /addEntity
-Disallow: /addFlight
 
 # Host
 Host: https://peated.com
