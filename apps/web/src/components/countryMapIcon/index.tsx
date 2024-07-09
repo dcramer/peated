@@ -213,7 +213,7 @@ import SvalbardandJanMayenMap from "./assets/svalbard-and-jan-mayen.svg";
 import SwedenMap from "./assets/sweden.svg";
 import SwitzerlandMap from "./assets/switzerland.svg";
 import SyrianArabRepublicMap from "./assets/syrian-arab-republic.svg";
-import TaiwanProvinceofChinaMap from "./assets/taiwan-province-of-china.svg";
+import Taiwan from "./assets/taiwan.svg";
 import TajikistanMap from "./assets/tajikistan.svg";
 import TanzaniaUnitedRepublicofMap from "./assets/tanzania-united-republic-of.svg";
 import ThailandMap from "./assets/thailand.svg";
@@ -481,8 +481,8 @@ export default function CountryMapIcon({
       return <PakistanMap {...props} />;
     case "norway":
       return <NorwayMap {...props} />;
-    case "taiwan-province-of-china":
-      return <TaiwanProvinceofChinaMap {...props} />;
+    case "taiwan":
+      return <Taiwan {...props} />;
     case "türkiye":
       return <TürkiyeMap {...props} />;
     case "greece":
