@@ -1,13 +1,11 @@
 import { MapIcon } from "@heroicons/react/24/outline";
 import RobotImage from "@peated/web/assets/robot.png";
 import EntityMap from "@peated/web/components/entityMap";
-import EntitySpiritDistribution from "@peated/web/components/entitySpiritDistribution";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import { parseDomain } from "@peated/web/lib/urls";
-import { Suspense } from "react";
 
 export async function generateMetadata({
   params: { entityId },
@@ -42,21 +40,6 @@ export default async function EntityDetails({
 
   return (
     <>
-      <div className="my-6 flex flex-col gap-4 px-3 sm:flex-row md:px-0">
-        <div className="flex-auto">
-          <Suspense
-            fallback={
-              <div
-                className="animate-pulse rounded bg-slate-800"
-                style={{ height: 20 }}
-              />
-            }
-          >
-            <EntitySpiritDistribution entityId={entity.id} />
-          </Suspense>
-        </div>
-      </div>
-
       <div className="my-6 px-3 md:px-0">
         {entity.description && (
           <div className="flex space-x-4">
