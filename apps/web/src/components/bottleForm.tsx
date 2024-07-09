@@ -294,7 +294,7 @@ export default function BottleForm({
             type="number"
             label="Vintage Year"
             placeholder="e.g. 2024"
-            helpText="The specific yearl vintage of this bottle, if applicable."
+            helpText="If applicable, the year the whisky was distilled and transferred to a cask."
           />
 
           <Controller
