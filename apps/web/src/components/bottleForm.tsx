@@ -272,7 +272,7 @@ export default function BottleForm({
                 }}
                 label="Distiller"
                 placeholder="e.g. Angel's Envy, Suntory Whisky"
-                helpText="The distilleries which produces the spirit(s) for this bottle."
+                helpText="The distilleries which produce the spirit(s) for this bottle."
                 createDialogHelpText="The distiller is the group that makes the spirit."
                 suggestedOptions={brandValue ? [brandValue] : []}
                 onChange={(value) => {
@@ -294,7 +294,7 @@ export default function BottleForm({
             type="number"
             label="Vintage Year"
             placeholder="e.g. 2024"
-            helpText="If applicable, the year the whisky was distilled and transferred to a cask."
+            helpText="The year this spirit was distilled and transferred to a cask."
           />
 
           <Controller

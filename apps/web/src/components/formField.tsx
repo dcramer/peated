@@ -61,7 +61,7 @@ export default function FormField({
         </FormLabel>
       )}
       {children}
-      {false && helpText && <HelpText>{helpText}</HelpText>}
+      {helpText && <HelpText>{helpText}</HelpText>}
     </div>
   );
 }
