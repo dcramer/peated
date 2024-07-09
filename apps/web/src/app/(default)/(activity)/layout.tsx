@@ -20,7 +20,7 @@ export default async function Layout({
     <>
       <div className="flex w-full">
         <div className="flex-1 overflow-hidden lg:w-8/12">
-          <Tabs fullWidth border>
+          <Tabs fullWidth border noMargin>
             {user && (
               <TabItem as={Link} href="/activity/friends" controlled>
                 Friends

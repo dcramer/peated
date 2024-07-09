@@ -7,16 +7,18 @@ import classNames from "../lib/classNames";
 
 type Props = {
   fullWidth?: boolean;
+  noMargin?: boolean;
   border?: boolean;
 } & React.ComponentPropsWithoutRef<"nav">;
 
-const Tabs = ({ fullWidth, border, ...props }: Props) => {
+const Tabs = ({ fullWidth, border, noMargin, ...props }: Props) => {
   return (
     <nav
       className={classNames(
         "-mb-px flex space-x-8",
         fullWidth ? "[&>*]:flex-auto [&>*]:justify-center" : "",
         border ? "border-b border-slate-700" : "",
+        noMargin ? "" : "mb-4",
       )}
       aria-label="Tabs"
       {...props}
