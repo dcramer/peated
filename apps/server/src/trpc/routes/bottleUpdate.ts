@@ -96,6 +96,8 @@ export async function bottleUpdate({
       (input.description && input.description !== null ? "user" : null);
   }
 
+  const newAliases: string[] = [];
+
   const newBottle = await db.transaction(async (tx) => {
     let brand: Entity | null = null;
     if (bottleData.brand) {
@@ -213,7 +215,7 @@ export async function bottleUpdate({
     if (bottleData.name || bottleData.brandId) {
       if (!brand) {
         brand =
-          (await db.query.entities.findFirst({
+          (await tx.query.entities.findFirst({
             where: eq(entities.id, bottle.brandId),
           })) || null;
         if (!brand) throw new Error("Unexpected");
@@ -274,6 +276,7 @@ export async function bottleUpdate({
           bottleId: newBottle.id,
           createdAt: newBottle.createdAt,
         });
+        newAliases.push(aliasName);
       } else if (!existingAlias.bottleId) {
         await tx
           .update(bottleAliases)
@@ -318,6 +321,18 @@ export async function bottleUpdate({
         id: bottle.id,
       },
     });
+  }
+
+  for (const aliasName of newAliases) {
+    try {
+      pushJob("OnBottleAliasChange", { name: aliasName });
+    } catch (err) {
+      logError(err, {
+        bottle: {
+          id: bottle.id,
+        },
+      });
+    }
   }
 
   return await serialize(BottleSerializer, newBottle, ctx.user);

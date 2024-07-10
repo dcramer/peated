@@ -54,6 +54,8 @@ export async function bottleCreate({
     });
   }
 
+  const newAliases: string[] = [];
+
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({
       db: tx,
@@ -160,6 +162,8 @@ export async function bottleCreate({
         },
         where: isNull(bottleAliases.bottleId),
       });
+    // TODO: not entirely accurate
+    newAliases.push(aliasName);
 
     for (const distillerId of distillerIds) {
       await tx.insert(bottlesToDistillers).values({
@@ -199,6 +203,18 @@ export async function bottleCreate({
         id: bottle.id,
       },
     });
+  }
+
+  for (const aliasName of newAliases) {
+    try {
+      pushJob("OnBottleAliasChange", { name: aliasName });
+    } catch (err) {
+      logError(err, {
+        bottle: {
+          id: bottle.id,
+        },
+      });
+    }
   }
 
   return await serialize(BottleSerializer, bottle, ctx.user);

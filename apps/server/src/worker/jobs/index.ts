@@ -8,9 +8,11 @@ import generateRegionDetails from "./generateRegionDetails";
 import geocodeCountryLocation from "./geocodeCountryLocation";
 import geocodeEntityLocation from "./geocodeEntityLocation";
 import geocodeRegionLocation from "./geocodeRegionLocation";
+import indexBottleAlias from "./indexBottleAlias";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
 import indexEntitySearchVectors from "./indexEntitySearchVectors";
 import notifyDiscordOnTasting from "./notifyDiscordOnTasting";
+import onBottleAliasChange from "./onBottleAliasChange";
 import onBottleChange from "./onBottleChange";
 import onEntityChange from "./onEntityChange";
 import scrapeAstorWines from "./scrapeAstorWines";
@@ -36,6 +38,7 @@ registerJob("GenerateRegionDetails", generateRegionDetails as JobFunction);
 registerJob("GeocodeCountryLocation", geocodeCountryLocation as JobFunction);
 registerJob("GeocodeRegionLocation", geocodeRegionLocation as JobFunction);
 registerJob("GeocodeEntityLocation", geocodeEntityLocation as JobFunction);
+registerJob("IndexBottleAlias", indexBottleAlias as JobFunction);
 registerJob(
   "IndexBottleSearchVectors",
   indexBottleSearchVectors as JobFunction,
@@ -45,6 +48,7 @@ registerJob(
   indexEntitySearchVectors as JobFunction,
 );
 registerJob("NotifyDiscordOnTasting", notifyDiscordOnTasting as JobFunction);
+registerJob("OnBottleAliasChange", onBottleAliasChange as JobFunction);
 registerJob("OnBottleChange", onBottleChange as JobFunction);
 registerJob("OnEntityChange", onEntityChange as JobFunction);
 registerJob("ScrapeAstorWines", scrapeAstorWines);

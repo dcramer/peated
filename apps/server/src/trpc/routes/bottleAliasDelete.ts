@@ -26,7 +26,9 @@ export default modProcedure
     }
 
     const [bottleAlias] = await db
-      .select()
+      .select({
+        name: bottleAliases.name,
+      })
       .from(bottleAliases)
       .where(
         and(

@@ -13,6 +13,7 @@
     "test:ci": "dotenv -e .env.test -- vitest --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^0.0.36",
     "@faker-js/faker": "^8.4.1",
     "@fastify/cors": "^8.5.0",
     "@fastify/express": "^3.0.0",
@@ -40,6 +41,7 @@
     "@types/nodemailer": "^6.4.15",
     "@types/pg": "^8.11.6",
     "@vitest/coverage-v8": "^1.6.0",
+    "ai": "^3.2.19",
     "axios": "~1.6.8",
     "axios-mock-adapter": "~1.22.0",
     "bcrypt": "^5.1.1",

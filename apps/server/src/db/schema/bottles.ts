@@ -22,6 +22,7 @@ import {
   CASK_TYPE_IDS,
 } from "@peated/server/constants";
 import { tsvector } from "../columns";
+import { vector } from "../columns/vector";
 import { entities } from "./entities";
 import { categoryEnum, contentSourceEnum, flavorProfileEnum } from "./enums";
 import { users } from "./users";
@@ -186,10 +187,12 @@ export const bottleAliases = pgTable(
       () => bottles.id,
     ),
     name: varchar("name", { length: 255 }).notNull(),
+    embedding: vector("embedding", { length: 3072 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (bottleAliases) => {
     return {
+      // TODO: lowercase
       pk: primaryKey(bottleAliases.name),
       bottleIdx: index("bottle_alias_bottle_idx").on(bottleAliases.bottleId),
     };
