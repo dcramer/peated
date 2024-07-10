@@ -1,6 +1,6 @@
 import { ilike, sql } from "drizzle-orm";
 import { db } from "../db";
-import { bottleAliases, bottles, entities, type Entity } from "../db/schema";
+import { bottleAliases, entities, type Entity } from "../db/schema";
 
 export async function findBottleId(name: string): Promise<number | null> {
   let result: { id: number | null } | null | undefined;
@@ -17,10 +17,10 @@ export async function findBottleId(name: string): Promise<number | null> {
   // name: Aberfeldy 18-year-old Single Malt Scotch Whisky
   // bottle.fullName: Aberfeldy 18-year-old
   [result] = await db
-    .select({ id: bottles.id })
-    .from(bottles)
-    .where(sql`${name} ILIKE '%' || ${bottles.fullName} || '%'`)
-    .orderBy(bottles.fullName)
+    .select({ id: bottleAliases.bottleId })
+    .from(bottleAliases)
+    .where(sql`${name} ILIKE '%' || ${bottleAliases.name} || '%'`)
+    .orderBy(sql`LENGTH(${bottleAliases.name}) DESC`)
     .limit(1);
   if (result) return result?.id;
 
@@ -28,10 +28,10 @@ export async function findBottleId(name: string): Promise<number | null> {
   // name: Aberfeldy 18-year-old
   // bottle.fullName: Aberfeldy 18-year-old Super Series
   [result] = await db
-    .select({ id: bottles.id })
-    .from(bottles)
-    .where(ilike(bottles.fullName, `${name} %`))
-    .orderBy(bottles.fullName)
+    .select({ id: bottleAliases.bottleId })
+    .from(bottleAliases)
+    .where(ilike(bottleAliases.name, `${name} %`))
+    .orderBy(sql`LENGTH(${bottleAliases.name}) DESC`)
     .limit(1);
 
   return result?.id || null;
