@@ -19,11 +19,17 @@ export default function BottleStats({
     {
       name: "Price",
       value: bottle.lastPrice ? (
-        <Price
-          value={bottle.lastPrice.price}
-          currency={bottle.lastPrice.currency}
-          noCents
-        />
+        <a
+          href={bottle.lastPrice.url}
+          className="hover:underline"
+          target="_blank"
+        >
+          <Price
+            value={bottle.lastPrice.price}
+            currency={bottle.lastPrice.currency}
+            noCents
+          />
+        </a>
       ) : null,
     },
   ];

@@ -36,7 +36,9 @@ export default async function BottlePrices({
             return (
               <li key={price.id}>
                 <a href={price.url} className="flex hover:underline">
-                  <span className="flex-auto">{price.site?.name}</span>
+                  <span className="flex-auto">
+                    {price.site?.name} &mdash; {price.name}
+                  </span>
                   <span>
                     <Price value={price.price} currency={price.currency} />
                   </span>
