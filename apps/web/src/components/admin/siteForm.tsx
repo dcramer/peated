@@ -27,10 +27,12 @@ export default function SiteForm({
   onSubmit,
   initialData = {},
   title = "Add Site",
+  edit = false,
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
   initialData?: Partial<ExternalSite>;
   title?: string;
+  edit?: boolean;
 }) {
   const {
     control,
@@ -97,6 +99,7 @@ export default function SiteForm({
                 placeholder="e.g. totalwine"
                 helpText="The internal implementation for this site to aggregate prices."
                 options={SITE_TYPES}
+                readOnly={edit}
                 simple
                 required
                 onChange={(value) => onChange(value?.id)}

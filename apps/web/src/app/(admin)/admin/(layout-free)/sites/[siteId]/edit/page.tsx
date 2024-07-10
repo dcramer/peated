@@ -1,7 +1,7 @@
 "use client";
 
 import { type ExternalSiteType } from "@peated/server/types";
-import TagForm from "@peated/web/components/admin/tagForm";
+import SiteForm from "@peated/web/components/admin/siteForm";
 import { trpc } from "@peated/web/lib/trpc";
 import { useRouter } from "next/navigation";
 
@@ -16,7 +16,7 @@ export default function Page({
   const siteUpdateMutation = trpc.externalSiteUpdate.useMutation();
 
   return (
-    <TagForm
+    <SiteForm
       onSubmit={async (data) => {
         const newSite = await siteUpdateMutation.mutateAsync({
           ...data,
