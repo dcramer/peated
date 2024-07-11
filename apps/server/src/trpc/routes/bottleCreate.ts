@@ -15,7 +15,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { eq, isNull } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
@@ -148,20 +148,28 @@ export async function bottleCreate({
       ? `${bottle.fullName} (${bottle.vintageYear})`
       : bottle.fullName;
 
-    await tx
-      .insert(bottleAliases)
-      .values({
-        bottleId: bottle.id,
-        name: aliasName,
-        createdAt: bottle.createdAt,
-      })
-      .onConflictDoUpdate({
-        target: [bottleAliases.name],
-        set: {
-          bottleId: bottle.id,
-        },
-        where: isNull(bottleAliases.bottleId),
-      });
+    await tx.execute(
+      sql`INSERT INTO ${bottleAliases} (bottle_id, name, created_at)
+        VALUES (${bottle.id}, ${aliasName}, ${bottle.createdAt})
+        ON CONFLICT (LOWER(${bottleAliases.name}))
+        DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL`,
+    );
+    // TODO: target does not yet support our constraint ref
+    // await tx
+    //   .insert(bottleAliases)
+    //   .values({
+    //     bottleId: bottle.id,
+    //     name: aliasName,
+    //     createdAt: bottle.createdAt,
+    //   })
+    //   .onConflictDoUpdate({
+    //     target: sql`LOWER($bottleAliases.name})`,
+    //     targetWhere: sql`LOWER(${bottleAliases.name}) = ${aliasName}`,
+    //     set: {
+    //       bottleId: bottle.id,
+    //     },
+    //     setWhere: isNull(bottleAliases.bottleId),
+    //   });
     // TODO: not entirely accurate
     newAliases.push(aliasName);
 
