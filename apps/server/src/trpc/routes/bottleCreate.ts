@@ -1,13 +1,16 @@
 import { db } from "@peated/server/db";
 import type { Bottle, Entity, NewBottle } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottles,
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
 import { generateUniqHash } from "@peated/server/lib/bottleHash";
-import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
+import {
+  coerceToUpsert,
+  upsertBottleAlias,
+  upsertEntity,
+} from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -15,7 +18,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
@@ -148,28 +151,8 @@ export async function bottleCreate({
       ? `${bottle.fullName} (${bottle.vintageYear})`
       : bottle.fullName;
 
-    await tx.execute(
-      sql`INSERT INTO ${bottleAliases} (bottle_id, name, created_at)
-        VALUES (${bottle.id}, ${aliasName}, ${bottle.createdAt})
-        ON CONFLICT (LOWER(${bottleAliases.name}))
-        DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL`,
-    );
-    // TODO: target does not yet support our constraint ref
-    // await tx
-    //   .insert(bottleAliases)
-    //   .values({
-    //     bottleId: bottle.id,
-    //     name: aliasName,
-    //     createdAt: bottle.createdAt,
-    //   })
-    //   .onConflictDoUpdate({
-    //     target: sql`LOWER($bottleAliases.name})`,
-    //     targetWhere: sql`LOWER(${bottleAliases.name}) = ${aliasName}`,
-    //     set: {
-    //       bottleId: bottle.id,
-    //     },
-    //     setWhere: isNull(bottleAliases.bottleId),
-    //   });
+    await upsertBottleAlias(tx, bottle.id, aliasName);
+
     // TODO: not entirely accurate
     newAliases.push(aliasName);
 

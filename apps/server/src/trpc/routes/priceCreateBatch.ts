@@ -6,12 +6,13 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
+import { upsertBottleAlias } from "@peated/server/lib/db";
 import {
   ExternalSiteTypeEnum,
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
-import { eq, isNull, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { adminProcedure } from "..";
 
@@ -78,19 +79,7 @@ export default adminProcedure
           .onConflictDoNothing();
 
         if (bottleId) {
-          await tx
-            .insert(bottleAliases)
-            .values({
-              bottleId,
-              name: sp.name,
-            })
-            .onConflictDoUpdate({
-              target: [bottleAliases.name],
-              set: {
-                bottleId,
-              },
-              where: isNull(bottleAliases.bottleId),
-            });
+          await upsertBottleAlias(tx, bottleId, sp.name);
         } else {
           await db
             .insert(bottleAliases)
