@@ -1,15 +1,10 @@
 import { TSVector } from "../db/columns";
-import type {
-  NewBottle,
-  NewBottleAlias,
-  NewEntity,
-  NewEntityAlias,
-} from "../db/schema";
+import type { NewBottle, NewBottleAlias, NewEntity } from "../db/schema";
 import { formatCategoryName } from "./format";
 
 export function buildEntitySearchVector(
   entity: NewEntity,
-  aliasList?: NewEntityAlias[],
+  aliasList?: { name: string }[],
 ): TSVector[] {
   const values: TSVector[] = [
     new TSVector(entity.name, "A"),

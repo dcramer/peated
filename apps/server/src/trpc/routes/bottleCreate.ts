@@ -1,13 +1,16 @@
 import { db } from "@peated/server/db";
 import type { Bottle, Entity, NewBottle } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottles,
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
 import { generateUniqHash } from "@peated/server/lib/bottleHash";
-import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
+import {
+  coerceToUpsert,
+  upsertBottleAlias,
+  upsertEntity,
+} from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -15,7 +18,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
@@ -53,6 +56,8 @@ export async function bottleCreate({
       code: "BAD_REQUEST",
     });
   }
+
+  const newAliases: string[] = [];
 
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({
@@ -146,20 +151,10 @@ export async function bottleCreate({
       ? `${bottle.fullName} (${bottle.vintageYear})`
       : bottle.fullName;
 
-    await tx
-      .insert(bottleAliases)
-      .values({
-        bottleId: bottle.id,
-        name: aliasName,
-        createdAt: bottle.createdAt,
-      })
-      .onConflictDoUpdate({
-        target: [bottleAliases.name],
-        set: {
-          bottleId: bottle.id,
-        },
-        where: isNull(bottleAliases.bottleId),
-      });
+    await upsertBottleAlias(tx, bottle.id, aliasName);
+
+    // TODO: not entirely accurate
+    newAliases.push(aliasName);
 
     for (const distillerId of distillerIds) {
       await tx.insert(bottlesToDistillers).values({
@@ -199,6 +194,18 @@ export async function bottleCreate({
         id: bottle.id,
       },
     });
+  }
+
+  for (const aliasName of newAliases) {
+    try {
+      pushJob("OnBottleAliasChange", { name: aliasName });
+    } catch (err) {
+      logError(err, {
+        bottle: {
+          id: bottle.id,
+        },
+      });
+    }
   }
 
   return await serialize(BottleSerializer, bottle, ctx.user);

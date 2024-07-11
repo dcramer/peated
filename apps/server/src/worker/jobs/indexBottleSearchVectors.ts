@@ -17,7 +17,9 @@ export default async ({ bottleId }: { bottleId: number }) => {
   }
 
   const aliasList = await db
-    .select()
+    .select({
+      name: bottleAliases.name,
+    })
     .from(bottleAliases)
     .where(eq(bottleAliases.bottleId, bottle.id));
 

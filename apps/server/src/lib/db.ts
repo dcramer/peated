@@ -1,8 +1,8 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { type z } from "zod";
 import type { DatabaseType, TransactionType } from "../db";
 import type { Entity, EntityType } from "../db/schema";
-import { changes, collections, entities } from "../db/schema";
+import { bottleAliases, changes, collections, entities } from "../db/schema";
 import { type EntityInputSchema, type EntitySchema } from "../schemas";
 import { type EntityInput } from "../types";
 
@@ -115,3 +115,33 @@ export const getDefaultCollection = async (
     }))
   );
 };
+
+export async function upsertBottleAlias(
+  db: DatabaseType | TransactionType,
+  bottleId: number,
+  name: string,
+) {
+  await db.execute(
+    sql`INSERT INTO ${bottleAliases} (bottle_id, name)
+      VALUES (${bottleId}, ${name})
+      ON CONFLICT (LOWER(${bottleAliases.name}))
+      DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL`,
+  );
+
+  // TODO: target does not yet support our constraint ref
+  // await tx
+  //   .insert(bottleAliases)
+  //   .values({
+  //     bottleId: bottle.id,
+  //     name: aliasName,
+  //     createdAt: bottle.createdAt,
+  //   })
+  //   .onConflictDoUpdate({
+  //     target: sql`LOWER($bottleAliases.name})`,
+  //     targetWhere: sql`LOWER(${bottleAliases.name}) = ${aliasName}`,
+  //     set: {
+  //       bottleId: bottle.id,
+  //     },
+  //     setWhere: isNull(bottleAliases.bottleId),
+  //   });
+}

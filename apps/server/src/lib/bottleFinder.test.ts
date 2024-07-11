@@ -38,6 +38,23 @@ test("findBottle matches alias", async ({ fixtures }) => {
   expect(result).toBe(bottle.id);
 });
 
+test("findBottle prioritizes correct prefix", async ({ fixtures }) => {
+  const entity = await fixtures.Entity({ name: "Aberfeldy" });
+  const bottle = await fixtures.Bottle({
+    brandId: entity.id,
+    name: "18-year-old",
+  });
+  const bottle2 = await fixtures.Bottle({
+    brandId: entity.id,
+    name: "18-year-old Port Cask",
+  });
+  const result = await findBottleId("Aberfeldy 18-year-old Port Cask");
+  expect(result).toBe(bottle2.id);
+
+  const result2 = await findBottleId("Aberfeldy 18-year-old");
+  expect(result2).toBe(bottle.id);
+});
+
 test("findEntity matches exact", async ({ fixtures }) => {
   const entity = await fixtures.Entity({ name: "Hibiki" });
   const result = await findEntity("Hibiki");

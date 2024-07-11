@@ -1,0 +1,26 @@
+ARG PG_MAJOR=15
+
+# Use the PostGIS image as the base
+FROM postgis/postgis:$PG_MAJOR-3.4
+ARG PG_MAJOR
+ARG PG_VECTOR=0.7.2
+
+# Install necessary packages
+RUN apt-get update && \
+		apt-mark hold locales && \
+		apt-get install -y --no-install-recommends build-essential git postgresql-server-dev-$PG_MAJOR && \
+    git clone --depth 1 --branch v$PG_VECTOR https://github.com/pgvector/pgvector.git /tmp/pgvector && \
+		cd /tmp/pgvector && \
+		make clean && \
+		make OPTFLAGS="" && \
+		make install && \
+		mkdir /usr/share/doc/pgvector && \
+		cp LICENSE README.md /usr/share/doc/pgvector && \
+		rm -r /tmp/pgvector && \
+		apt-get remove -y build-essential postgresql-server-dev-$PG_MAJOR && \
+		apt-get autoremove -y && \
+		apt-mark unhold locales && \
+		rm -rf /var/lib/apt/lists/*
+
+# Copy initialization scripts
+# COPY ./docker-entrypoint-initdb.d/ /docker-entrypoint-initdb.d/

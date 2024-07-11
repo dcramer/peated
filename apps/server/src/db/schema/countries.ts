@@ -30,14 +30,16 @@ export const countries = pgTable(
       .default(0)
       .notNull(),
   },
-  (countries) => {
+  (table) => {
     return {
-      nameUnique: uniqueIndex("country_name_unq")
-        .on(countries.name)
-        .using(sql`btree (LOWER(name))`),
-      slugUnique: uniqueIndex("country_slug_unq")
-        .on(countries.slug)
-        .using(sql`btree (LOWER(slug))`),
+      nameUnique: uniqueIndex("country_name_unq").using(
+        "btree",
+        sql`LOWER(${table.name})`,
+      ),
+      slugUnique: uniqueIndex("country_slug_unq").using(
+        "btree",
+        sql`LOWER(${table.slug})`,
+      ),
     };
   },
 );
