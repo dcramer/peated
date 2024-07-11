@@ -17,7 +17,7 @@ import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike, ne, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 
@@ -152,16 +152,23 @@ export default modProcedure
           newAliases.push(data.name.substring(4));
         }
 
-        for (const newAlias of newAliases) {
+        for (const aliasName of newAliases) {
           const existingAlias = await tx.query.entityAliases.findFirst({
-            where: ilike(entityAliases.name, newAlias),
+            where: eq(sql`LOWER(${entityAliases.name})`, aliasName),
           });
 
           if (existingAlias?.entityId === newEntity.id) {
+            if (existingAlias.name !== aliasName) {
+              // case change
+              await tx
+                .update(entityAliases)
+                .set({ name: aliasName })
+                .where(eq(entityAliases.name, existingAlias.name));
+            }
             // we're good - likely renaming to an alias that already existed
           } else if (!existingAlias) {
             await tx.insert(entityAliases).values({
-              name: newAlias,
+              name: aliasName,
               entityId: newEntity.id,
               createdAt: newEntity.createdAt,
             });
@@ -171,7 +178,7 @@ export default modProcedure
               .set({
                 entityId: newEntity.id,
               })
-              .where(and(eq(entityAliases.name, newAlias)));
+              .where(and(eq(entityAliases.name, existingAlias.name)));
           } else {
             throw new Error(
               `Duplicate alias found (${existingAlias.entityId}). Not implemented.`,

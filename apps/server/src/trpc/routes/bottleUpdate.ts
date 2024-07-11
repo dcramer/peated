@@ -15,7 +15,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { type BottlePreviewResult } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { coerceToUpsert, upsertEntity } from "../../lib/db";
@@ -266,9 +266,16 @@ export async function bottleUpdate({
         ? `${newBottle.fullName} (${newBottle.vintageYear})`
         : newBottle.fullName;
       const existingAlias = await tx.query.bottleAliases.findFirst({
-        where: ilike(bottleAliases.name, aliasName),
+        where: eq(sql`LOWER(${bottleAliases.name})`, aliasName),
       });
       if (existingAlias?.bottleId === newBottle.id) {
+        if (existingAlias.name !== aliasName) {
+          // case change
+          await tx
+            .update(bottleAliases)
+            .set({ name: aliasName })
+            .where(eq(bottleAliases.name, existingAlias.name));
+        }
         // we're good - likely renaming to an alias that already existed
       } else if (!existingAlias) {
         await tx.insert(bottleAliases).values({
@@ -283,7 +290,7 @@ export async function bottleUpdate({
           .set({
             bottleId: newBottle.id,
           })
-          .where(and(eq(bottleAliases.name, aliasName)));
+          .where(and(eq(bottleAliases.name, existingAlias.name)));
       } else {
         throw new Error(
           `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
