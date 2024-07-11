@@ -266,7 +266,7 @@ export async function bottleUpdate({
         ? `${newBottle.fullName} (${newBottle.vintageYear})`
         : newBottle.fullName;
       const existingAlias = await tx.query.bottleAliases.findFirst({
-        where: eq(sql`LOWER(${bottleAliases.name})`, aliasName),
+        where: eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()),
       });
       if (existingAlias?.bottleId === newBottle.id) {
         if (existingAlias.name !== aliasName) {

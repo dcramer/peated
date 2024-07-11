@@ -154,7 +154,10 @@ export default modProcedure
 
         for (const aliasName of newAliases) {
           const existingAlias = await tx.query.entityAliases.findFirst({
-            where: eq(sql`LOWER(${entityAliases.name})`, aliasName),
+            where: eq(
+              sql`LOWER(${entityAliases.name})`,
+              aliasName.toLowerCase(),
+            ),
           });
 
           if (existingAlias?.entityId === newEntity.id) {

@@ -97,6 +97,7 @@ export default authedProcedure
         return null;
       }
 
+      // TODO: handle existing duplicate
       await tx.insert(entityAliases).values({
         entityId: entity.id,
         name: entity.name,
