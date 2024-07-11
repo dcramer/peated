@@ -1,4 +1,4 @@
-import { ilike, sql } from "drizzle-orm";
+import { eq, ilike, sql } from "drizzle-orm";
 import { db } from "../db";
 import { bottleAliases, entities, type Entity } from "../db/schema";
 
@@ -9,7 +9,7 @@ export async function findBottleId(name: string): Promise<number | null> {
   [result] = await db
     .select({ id: bottleAliases.bottleId })
     .from(bottleAliases)
-    .where(ilike(bottleAliases.name, name))
+    .where(eq(sql`LOWER(${bottleAliases.name})`, sql`LOWER(${name})`))
     .limit(1);
   if (result?.id) return result?.id;
 

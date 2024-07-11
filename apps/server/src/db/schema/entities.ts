@@ -5,7 +5,6 @@ import {
   index,
   pgEnum,
   pgTable,
-  primaryKey,
   smallint,
   text,
   timestamp,
@@ -70,12 +69,14 @@ export const entities = pgTable(
   },
   (table) => {
     return {
-      nameIndex: uniqueIndex("entity_name_unq")
-        .on(table.name)
-        .using(sql`btree (LOWER(full_name))`),
-      searchVectorIndex: index("entity_search_idx")
-        .on(table.searchVector)
-        .using(sql`gin(${table.searchVector})`),
+      nameIndex: uniqueIndex("entity_name_unq").using(
+        "btree",
+        sql`LOWER(${table.name})`,
+      ),
+      searchVectorIndex: index("entity_search_idx").using(
+        "gin",
+        table.searchVector,
+      ),
       countryId: index("entity_country_by_idx").on(table.countryId),
       regionId: index("entity_region_idx").on(table.regionId),
       createdById: index("entity_created_by_idx").on(table.createdById),
@@ -112,10 +113,13 @@ export const entityAliases = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (entityAliases) => {
+  (table) => {
     return {
-      pk: primaryKey(entityAliases.name),
-      entityIdx: index("entity_alias_entity_idx").on(entityAliases.entityId),
+      entityIdx: index("entity_alias_entity_idx").on(table.entityId),
+      nameIdx: uniqueIndex("entity_alias_name_idx").using(
+        "btree",
+        sql`LOWER(${table.name})`,
+      ),
     };
   },
 );

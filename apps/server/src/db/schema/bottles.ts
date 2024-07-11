@@ -84,9 +84,10 @@ export const bottles = pgTable(
   (table) => {
     return {
       uniqHash: uniqueIndex("bottle_uniq_hash").on(table.uniqHash),
-      searchVectorIndex: index("bottle_search_idx")
-        .on(table.searchVector)
-        .using(sql`gin(${table.searchVector})`),
+      searchVectorIndex: index("bottle_search_idx").using(
+        "gin",
+        table.searchVector,
+      ),
       brandIdx: index("bottle_brand_idx").on(table.brandId),
       bottlerIdx: index("bottle_bottler_idx").on(table.bottlerId),
       createdById: index("bottle_created_by_idx").on(table.createdById),
@@ -190,11 +191,13 @@ export const bottleAliases = pgTable(
     embedding: vector("embedding", { length: 3072 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (bottleAliases) => {
+  (table) => {
     return {
-      // TODO: lowercase
-      pk: primaryKey(bottleAliases.name),
-      bottleIdx: index("bottle_alias_bottle_idx").on(bottleAliases.bottleId),
+      nameIdx: uniqueIndex("bottle_alias_name_idx").using(
+        "btree",
+        sql`LOWER(${table.name})`,
+      ),
+      bottleIdx: index("bottle_alias_bottle_idx").on(table.bottleId),
     };
   },
 );
