@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, ilike, sql } from "drizzle-orm";
+import { and, asc, eq, ilike, isNull, sql } from "drizzle-orm";
 
 import { db } from "@peated/server/db";
 import { externalSites, storePrices } from "@peated/server/db/schema";
@@ -16,6 +16,7 @@ export default adminProcedure
       .object({
         site: ExternalSiteTypeEnum.optional(),
         query: z.string().default(""),
+        onlyUnknown: z.boolean().optional(),
         cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(100),
       })
@@ -42,6 +43,10 @@ export default adminProcedure
         });
       }
       where.push(eq(storePrices.externalSiteId, site.id));
+    }
+
+    if (input.onlyUnknown) {
+      where.push(isNull(storePrices.bottleId));
     }
 
     if (query) {

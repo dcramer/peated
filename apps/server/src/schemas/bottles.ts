@@ -81,6 +81,12 @@ export const BottleInputSchema = z.object({
 });
 
 export const BottleMergeSchema = z.object({
+  // TODO: rename to bottle
   bottleId: z.number(),
   direction: z.enum(["mergeInto", "mergeFrom"]),
+});
+
+export const BottleAliasSchema = z.object({
+  bottle: z.number(),
+  name: z.string(),
 });

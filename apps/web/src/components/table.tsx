@@ -16,6 +16,7 @@ type Column<T extends Record<string, any>> = {
   sortDefaultOrder?: "asc" | "desc";
   align?: "left" | "right" | "center" | "default";
   title?: string;
+  width?: string;
   value?: (item: T) => ReactElement | string | null | false;
   hidden?: boolean;
 };
@@ -49,7 +50,7 @@ export default function Table<T extends Record<string, any>>({
             return (
               <col
                 key={col.name}
-                className={classNames(colN !== 0 ? "w-32" : "")}
+                className={classNames(col.width ?? (colN !== 0 ? "w-32" : ""))}
               />
             );
           })}
@@ -118,7 +119,7 @@ export default function Table<T extends Record<string, any>>({
 
                   return (
                     <td
-                      key={String(col)}
+                      key={col.name}
                       className={classNames(
                         "group relative flex items-center gap-x-2 p-3",
                         colN !== 0 ? "hidden sm:table-cell" : "",

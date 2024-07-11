@@ -129,7 +129,7 @@ export default function SelectDialog<T extends Option>({
                         />
 
                         <div className="flex min-w-0 flex-auto items-center">
-                          <div className="font-semibold leading-6 text-white">
+                          <div className="font-semibold text-white">
                             <button
                               onClick={() => {
                                 selectOption(option);
@@ -151,17 +151,17 @@ export default function SelectDialog<T extends Option>({
                         <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
                         <div className="min-w-0 flex-auto">
-                          <div className="font-semibold leading-6">
+                          <div className="font-semibold">
                             <button onClick={() => setCreateOpen(true)}>
                               <span className="absolute inset-x-0 -top-px bottom-0" />
                               Can't find what you're looking for?
                             </button>
                           </div>
-                          <div className="mt-1 flex gap-x-1 text-sm leading-5">
+                          <div className="mt-1 flex gap-x-1 text-sm">
                             {query !== "" ? (
                               <span>
                                 Tap here to add{" "}
-                                <strong className="truncate">
+                                <strong className="truncate font-bold">
                                   {toTitleCase(query)}
                                 </strong>{" "}
                                 to the database.
@@ -179,7 +179,7 @@ export default function SelectDialog<T extends Option>({
                         <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
                         <div className="min-w-0 flex-auto">
-                          <div className="font-semibold leading-6">
+                          <div className="font-semibold">
                             <a
                               href={config.GITHUB_REPO}
                               target="_blank"
@@ -189,7 +189,7 @@ export default function SelectDialog<T extends Option>({
                               Can't find what you're looking for?
                             </a>
                           </div>
-                          <div className="mt-1 flex gap-x-1 text-sm leading-5">
+                          <div className="mt-1 flex gap-x-1 text-sm">
                             Well, that stinks. Maybe open an issue on GitHub?
                           </div>
                         </div>
