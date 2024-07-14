@@ -35,7 +35,6 @@ export default function BottleSelector({
     setLoading(true);
     const { results } = await trpcUtils.bottleList.fetch({ query });
     setResults(results);
-    setQuery(query);
     setLoading(false);
   });
 
@@ -62,6 +61,7 @@ export default function BottleSelector({
               onClose={onClose}
               value={query}
               onChange={(value) => {
+                setQuery(query);
                 onSearch(value);
               }}
               closeIcon={<XMarkIcon className="h-8 w-8" />}
