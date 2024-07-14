@@ -48,7 +48,7 @@ export default function Page() {
                     onClick={() => {
                       setUnmatchedBottle(item);
                     }}
-                    className="cursor-pointer hover:underline"
+                    className="cursor-pointer font-bold hover:underline"
                   >
                     {item.name}
                   </a>
