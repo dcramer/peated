@@ -36,7 +36,7 @@ export default async function Layout({
           <div className="flex-auto">
             <div className="my-8 flex justify-center gap-4 lg:justify-start">
               <Button
-                href={`/addBottle?${
+                href={`/addBottle?returnTo=${encodeURIComponent(`/entities/${entityId}`)}&${
                   entity.type.includes("brand") ? `brand=${entity.id}&` : ""
                 }${
                   entity.type.includes("distiller")

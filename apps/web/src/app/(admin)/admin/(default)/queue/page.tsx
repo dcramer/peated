@@ -7,11 +7,12 @@ import SimpleHeader from "@peated/web/components/simpleHeader";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
 import { trpc, type RouterOutputs } from "@peated/web/lib/trpc";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import BottleSelector from "./bottleSelector";
 
 export default function Page() {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [priceList] = trpc.priceList.useSuspenseQuery({
     ...Object.fromEntries(searchParams.entries()),
@@ -80,6 +81,7 @@ export default function Page() {
       <BottleSelector
         open={!!unmatchedBottle}
         name={unmatchedBottle?.name}
+        returnTo={pathname}
         onClose={() => {
           setUnmatchedBottle(null);
         }}

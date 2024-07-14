@@ -20,7 +20,11 @@ export default function BottleListSidebar() {
     <div className="mt-8 flex flex-col overflow-y-auto bg-slate-950 px-6 py-4">
       <ul role="list" className="flex flex-auto flex-col gap-y-7">
         <li>
-          <Button href="/addBottle" fullWidth color="highlight">
+          <Button
+            href={`/addBottle?returnTo=${encodeURIComponent("/bottles")}`}
+            fullWidth
+            color="highlight"
+          >
             Add Bottle
           </Button>
         </li>

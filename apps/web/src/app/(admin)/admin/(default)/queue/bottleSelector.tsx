@@ -15,11 +15,13 @@ import { useDebounceCallback } from "usehooks-ts";
 export default function BottleSelector({
   open,
   name,
+  returnTo,
   onClose,
   onSelect,
 }: {
   open: boolean;
   name?: string | null;
+  returnTo?: string;
   onClose: () => void;
   onSelect?: (value: Bottle) => void;
 }) {
@@ -111,7 +113,9 @@ export default function BottleSelector({
 
                       <div className="min-w-0 flex-auto">
                         <div className="font-semibold">
-                          <a href="/addBottle">
+                          <a
+                            href={`/addBottle?${returnTo ? `returnTo=${encodeURIComponent(returnTo)}` : ""}`}
+                          >
                             <span className="absolute inset-x-0 -top-px bottom-0" />
                             Can't find what you're looking for?
                           </a>

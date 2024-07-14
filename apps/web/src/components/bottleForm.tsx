@@ -79,10 +79,12 @@ export default function BottleForm({
   onSubmit,
   initialData,
   title,
+  returnTo,
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
   initialData: Partial<Bottle>;
   title: string;
+  returnTo?: string | null;
 }) {
   const {
     control,
@@ -107,6 +109,7 @@ export default function BottleForm({
   const { user } = useAuth();
 
   const [error, setError] = useState<string | undefined>();
+  const router = useRouter();
 
   const generateDataMutation = trpc.bottleGenerateDetails.useMutation();
 
@@ -141,6 +144,7 @@ export default function BottleForm({
             title={title}
             saveDisabled={isSubmitting}
             onSave={handleSubmit(onSubmitHandler)}
+            onClose={() => (returnTo ? router.push(returnTo) : router.back())}
           />
         </Header>
       }
