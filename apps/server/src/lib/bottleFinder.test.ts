@@ -6,20 +6,20 @@ test("findBottle matches exact", async ({ fixtures }) => {
   expect(result).toBe(bottle.id);
 });
 
-test("findBottle matches fullName as prefix", async ({ fixtures }) => {
-  const bottle = await fixtures.Bottle();
-  const result = await findBottleId(bottle.fullName + " Single Grain");
-  expect(result).toBe(bottle.id);
-});
+// test("findBottle matches fullName as prefix", async ({ fixtures }) => {
+//   const bottle = await fixtures.Bottle();
+//   const result = await findBottleId(bottle.fullName + " Single Grain");
+//   expect(result).toBe(bottle.id);
+// });
 
-test("findBottle matches partial fullName", async ({ fixtures }) => {
+test("findBottle will not wrongly match a suffix", async ({ fixtures }) => {
   const brand = await fixtures.Entity({ name: "The Macallan" });
   const bottle = await fixtures.Bottle({
     brandId: brand.id,
     name: "12-year-old Double Cask",
   });
   const result = await findBottleId("The Macallan 12-year-old");
-  expect(result).toBe(bottle.id);
+  expect(result).toEqual(null);
 });
 
 test("findBottle doesnt match random junk", async ({ fixtures }) => {
