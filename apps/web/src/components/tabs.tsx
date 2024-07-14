@@ -16,7 +16,9 @@ const Tabs = ({ fullWidth, border, noMargin, ...props }: Props) => {
     <nav
       className={classNames(
         "flex space-x-8",
-        fullWidth ? "[&>*]:flex-auto [&>*]:justify-center" : "",
+        fullWidth
+          ? "[&>*]:flex-auto [&>*]:justify-center"
+          : "max-lg:[&>*]:flex-auto max-lg:[&>*]:justify-center",
         border ? "border-b border-slate-700" : "",
         noMargin ? "-mb-px" : "mb-4",
       )}
