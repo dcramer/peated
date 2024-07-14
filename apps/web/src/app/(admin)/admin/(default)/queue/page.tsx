@@ -42,16 +42,21 @@ export default function Page() {
             value: (item) => {
               const match = assignments[item.name];
               return (
-                <>
+                <div>
                   <a
                     onClick={() => {
                       setUnmatchedBottle(item);
                     }}
+                    className="hover:underline"
                   >
                     {item.name}
                   </a>
                   <div>
-                    <Link href={item.url}>View Listing</Link>
+                    [
+                    <Link href={item.url} className="hover:underline">
+                      View Listing
+                    </Link>
+                    ]
                   </div>
                   {match && (
                     <div className="text-light">
@@ -61,7 +66,7 @@ export default function Page() {
                       </Link>
                     </div>
                   )}
-                </>
+                </div>
               );
             },
           },
