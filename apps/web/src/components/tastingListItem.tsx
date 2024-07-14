@@ -186,7 +186,7 @@ export default function TastingListItem({
           )}
         </div>
 
-        <aside className="flex items-center space-x-3 py-3 sm:px-5 sm:pb-4">
+        <aside className="flex items-center space-x-3 px-3 py-3 sm:px-5 sm:pb-4">
           {!hasToasted && !isTaster && user ? (
             <Button
               icon={
@@ -195,10 +195,16 @@ export default function TastingListItem({
                   aria-hidden="true"
                 />
               }
-              onClick={async () => {
-                await toastCreateMutation.mutateAsync(tasting.id);
+              onClick={() => {
                 setHasToasted(true);
-                onToast && onToast(tasting);
+                toastCreateMutation.mutate(tasting.id, {
+                  onError: () => {
+                    setHasToasted(false);
+                  },
+                  onSuccess: () => {
+                    onToast && onToast(tasting);
+                  },
+                });
               }}
             >
               Toast
