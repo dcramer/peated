@@ -113,7 +113,9 @@ export default function SearchPanel({
 
             <div className="min-w-0 flex-auto">
               <div className="font-semibold leading-6">
-                <Link href="/addBottle">
+                <Link
+                  href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}`}
+                >
                   <span className="absolute inset-x-0 -top-px bottom-0" />
                   {"Can't find a bottle?"}
                 </Link>

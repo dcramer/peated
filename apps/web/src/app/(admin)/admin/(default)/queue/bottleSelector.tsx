@@ -114,7 +114,7 @@ export default function BottleSelector({
                       <div className="min-w-0 flex-auto">
                         <div className="font-semibold">
                           <a
-                            href={`/addBottle?${returnTo ? `returnTo=${encodeURIComponent(returnTo)}` : ""}`}
+                            href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}&${returnTo ? `returnTo=${encodeURIComponent(returnTo)}` : ""}`}
                           >
                             <span className="absolute inset-x-0 -top-px bottom-0" />
                             Can't find what you're looking for?
