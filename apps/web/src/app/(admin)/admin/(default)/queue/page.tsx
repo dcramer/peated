@@ -1,11 +1,12 @@
 "use client";
 
 import { type Bottle } from "@peated/server/types";
+import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
-import { type RouterOutputs, trpc } from "@peated/web/lib/trpc";
+import { trpc, type RouterOutputs } from "@peated/web/lib/trpc";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import BottleSelector from "./bottleSelector";
@@ -25,6 +26,8 @@ export default function Page() {
 
   // lets create bottle alias
   const bottleAliasUpsertMutation = trpc.bottleAliasUpsert.useMutation();
+
+  const { flash } = useFlashMessages();
 
   return (
     <>
@@ -79,6 +82,15 @@ export default function Page() {
             bottle: bottle.id,
             name,
           });
+          flash(
+            <div>
+              Assigned{" "}
+              <strong className="font-bold">{unmatchedBottle.name}</strong> to{" "}
+              <Link href={`/bottles/${bottle.id}`} className="underline">
+                {bottle.name}
+              </Link>
+            </div>,
+          );
           setAssignments((value) => ({
             ...value,
             [name]: bottle,
