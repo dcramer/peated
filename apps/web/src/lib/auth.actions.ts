@@ -65,3 +65,16 @@ export async function authenticate(
 
   redirect(redirectTo);
 }
+
+export async function updateSession() {
+  "use server";
+
+  const session = await getSession();
+  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+
+  const user = await trpcClient.userById.query("me");
+  session.user = user;
+  // should rotate access token too
+  // session.accessToken = data.accessToken;
+  session.save();
+}
