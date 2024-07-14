@@ -46,12 +46,7 @@ export default function EntityAliases({
           value: (item) =>
             !item.isCanonical && (
               <ConfirmationButton
-                onContinue={() =>
-                  deleteAliasMutation.mutate({
-                    entity: Number(entityId),
-                    name: item.name,
-                  })
-                }
+                onContinue={() => deleteAliasMutation.mutate(item.name)}
               >
                 Delete
               </ConfirmationButton>

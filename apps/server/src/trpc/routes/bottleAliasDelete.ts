@@ -1,56 +1,37 @@
 import { db } from "@peated/server/db";
-import {
-  bottleAliases,
-  bottles,
-  reviews,
-  storePrices,
-} from "@peated/server/db/schema";
-import { BottleAliasSchema } from "@peated/server/schemas";
+import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { z } from "zod";
 import { modProcedure } from "..";
 
-export default modProcedure.input(BottleAliasSchema).mutation(async function ({
+export default modProcedure.input(z.string()).mutation(async function ({
   input,
   ctx,
 }) {
-  const [bottle] = await db
-    .select()
-    .from(bottles)
-    .where(eq(bottles.id, input.bottle));
+  const alias = await db.query.bottleAliases.findFirst({
+    where: eq(sql`LOWER(${bottleAliases.name})`, input.toLowerCase()),
+    with: {
+      bottle: true,
+    },
+  });
 
-  if (!bottle) {
-    throw new TRPCError({
-      message: "Bottle not found.",
-      code: "NOT_FOUND",
-    });
-  }
-
-  const [bottleAlias] = await db
-    .select({
-      name: bottleAliases.name,
-    })
-    .from(bottleAliases)
-    .where(
-      and(
-        eq(bottleAliases.bottleId, input.bottle),
-        eq(bottleAliases.name, input.name),
-      ),
-    );
-
-  if (!bottleAlias) {
+  if (!alias) {
     throw new TRPCError({
       message: "Bottle Alias not found.",
       code: "NOT_FOUND",
     });
   }
 
-  const canonicalName = `${bottle.fullName}${bottle.vintageYear ? ` (${bottle.vintageYear})` : ""}`;
-  if (bottleAlias.name === canonicalName)
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "Cannot delete canonical name",
-    });
+  if (alias.bottle) {
+    const { bottle } = alias;
+    const canonicalName = `${bottle.fullName}${bottle.vintageYear ? ` (${bottle.vintageYear})` : ""}`;
+    if (alias.name.toLowerCase() === canonicalName.toLowerCase())
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Cannot delete canonical name",
+      });
+  }
 
   await db.transaction(async (tx) => {
     // clear any pinned matches as they are/were likely wrong
@@ -60,23 +41,14 @@ export default modProcedure.input(BottleAliasSchema).mutation(async function ({
         .set({
           bottleId: null,
         })
-        .where(
-          eq(sql`LOWER(${storePrices.name})`, bottleAlias.name.toLowerCase()),
-        ),
+        .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase())),
       tx
         .update(reviews)
         .set({
           bottleId: null,
         })
-        .where(eq(sql`LOWER(${reviews.name})`, bottleAlias.name.toLowerCase())),
-      tx
-        .delete(bottleAliases)
-        .where(
-          and(
-            eq(bottleAliases.bottleId, input.bottle),
-            eq(bottleAliases.name, input.name),
-          ),
-        ),
+        .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase())),
+      tx.delete(bottleAliases).where(eq(bottleAliases.name, alias.name)),
     ]);
   });
 
