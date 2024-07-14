@@ -5,7 +5,6 @@ import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import Table from "@peated/web/components/table";
-import TimeSince from "@peated/web/components/timeSince";
 import { trpc, type RouterOutputs } from "@peated/web/lib/trpc";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -52,13 +51,6 @@ export default function Page() {
                   >
                     {item.name}
                   </a>
-                  <div>
-                    [
-                    <Link href={item.url} className="hover:underline">
-                      View Listing
-                    </Link>
-                    ]
-                  </div>
                   {match && (
                     <div className="text-light">
                       Matched to{" "}
@@ -72,8 +64,16 @@ export default function Page() {
             },
           },
           {
-            name: "updated",
-            value: (item) => <TimeSince date={item.updatedAt} />,
+            name: "source",
+            value: (item) => (
+              <>
+                [
+                <Link href={item.url} className="hover:underline">
+                  View Source
+                </Link>
+                ]
+              </>
+            ),
           },
         ]}
       />
