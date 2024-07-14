@@ -41,6 +41,7 @@ import Header from "./header";
 import Legend from "./legend";
 import TextAreaField from "./textAreaField";
 
+import { useRouter } from "next/navigation";
 const categoryList = CATEGORY_LIST.map((c) => ({
   id: c,
   name: formatCategoryName(c),
