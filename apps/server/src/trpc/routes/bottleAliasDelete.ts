@@ -1,8 +1,13 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, bottles } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottles,
+  reviews,
+  storePrices,
+} from "@peated/server/db/schema";
 import { BottleAliasSchema } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { modProcedure } from "..";
 
 export default modProcedure.input(BottleAliasSchema).mutation(async function ({
@@ -47,14 +52,33 @@ export default modProcedure.input(BottleAliasSchema).mutation(async function ({
       message: "Cannot delete canonical name",
     });
 
-  await db
-    .delete(bottleAliases)
-    .where(
-      and(
-        eq(bottleAliases.bottleId, input.bottle),
-        eq(bottleAliases.name, input.name),
-      ),
-    );
+  await db.transaction(async (tx) => {
+    // clear any pinned matches as they are/were likely wrong
+    await Promise.all([
+      tx
+        .update(storePrices)
+        .set({
+          bottleId: null,
+        })
+        .where(
+          eq(sql`LOWER(${storePrices.name})`, bottleAlias.name.toLowerCase()),
+        ),
+      tx
+        .update(reviews)
+        .set({
+          bottleId: null,
+        })
+        .where(eq(sql`LOWER(${reviews.name})`, bottleAlias.name.toLowerCase())),
+      tx
+        .delete(bottleAliases)
+        .where(
+          and(
+            eq(bottleAliases.bottleId, input.bottle),
+            eq(bottleAliases.name, input.name),
+          ),
+        ),
+    ]);
+  });
 
   return {};
 });
