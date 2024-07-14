@@ -1,11 +1,15 @@
 "use client";
 
-import { Dialog, DialogPanel } from "@headlessui/react";
 import { useEffect, useState } from "react";
 
 import { toTitleCase } from "@peated/server/lib/strings";
 
+import FormHeader from "../formHeader";
+import LayoutModal from "../layoutModal";
+import { Modal } from "../modal";
 import type { CreateForm, Option } from "./types";
+
+type OnSubmit<T> = (newOption: T) => void;
 
 // TODO(dcramer): hitting escape doesnt do what you want here (it does nothing)
 export default function CreateOptionDialog<T extends Option>({
@@ -14,12 +18,14 @@ export default function CreateOptionDialog<T extends Option>({
   setOpen,
   onSubmit,
   render,
+  title = "Add Option",
 }: {
   query?: string;
   open: boolean;
   setOpen: (value: boolean) => void;
-  onSubmit: (newOption: T) => void;
+  onSubmit: OnSubmit<T>;
   render: CreateForm<T>;
+  title?: string;
 }) {
   const [newOption, setNewOption] = useState<T>({
     id: null,
@@ -30,30 +36,45 @@ export default function CreateOptionDialog<T extends Option>({
     setNewOption((data) => ({ ...data, name: toTitleCase(query) }));
   }, [query]);
 
+  const onSubmitHandler = () => {
+    onSubmit(newOption);
+    setNewOption({
+      id: null,
+      name: "",
+    } as T);
+    setOpen(false);
+  };
+
   return (
-    <Dialog open={open} as="div" className="dialog" onClose={setOpen}>
-      <div className="fixed inset-0">
-        <DialogPanel className="dialog-panel flex items-center justify-center px-4 pb-4 pt-5 sm:p-6">
-          {render({
-            onSubmit: (...params) => {
-              onSubmit(...params);
-              setNewOption({
-                id: null,
-                name: "",
-              } as T);
-              setOpen(false);
-            },
-            onClose: () => setOpen(false),
-            data: newOption,
-            onFieldChange: (value) => {
-              setNewOption({
-                ...newOption,
-                ...value,
-              });
-            },
-          })}
-        </DialogPanel>
-      </div>
-    </Dialog>
+    <Modal open={open} onClose={setOpen}>
+      <LayoutModal
+        header={
+          <FormHeader
+            title={title}
+            onSave={onSubmitHandler}
+            onClose={() => setOpen(false)}
+          />
+        }
+      >
+        {render({
+          onSubmit: (newOption) => {
+            onSubmit(newOption);
+            setNewOption({
+              id: null,
+              name: "",
+            } as T);
+            setOpen(false);
+          },
+          onClose: () => setOpen(false),
+          data: newOption,
+          onFieldChange: (value) => {
+            setNewOption({
+              ...newOption,
+              ...value,
+            });
+          },
+        })}
+      </LayoutModal>
+    </Modal>
   );
 }

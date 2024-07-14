@@ -80,6 +80,7 @@ export default function Page() {
 
       <BottleSelector
         open={!!unmatchedBottle}
+        source={unmatchedBottle?.url}
         name={unmatchedBottle?.name}
         returnTo={pathname}
         onClose={() => {

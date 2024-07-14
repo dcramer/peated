@@ -18,7 +18,7 @@ export default function About() {
   return (
     <>
       <div className="flex gap-4 px-2 sm:px-0">
-        <div className="prose w-9/12 py-6">
+        <div className="prose prose-invert w-9/12 py-6">
           <h1>The Mission</h1>
           <p>
             Peated, inspired by apps like Untapped and Vivino, aims to create a
@@ -53,7 +53,7 @@ export default function About() {
           </p>
         </div>
         <div className="hidden w-3/12 sm:block">
-          <div className="prose py-6 text-center">
+          <div className="prose prose-invert py-6 text-center">
             <h1>Key Data</h1>
           </div>
           <Suspense fallback={<StatsSkeleton />}>

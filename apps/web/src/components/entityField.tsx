@@ -5,9 +5,10 @@ import { trpc } from "@peated/web/lib/trpc";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import Button from "./button";
 import CountryField from "./countryField";
 import Fieldset from "./fieldset";
+import Form from "./form";
+import RegionField from "./regionField";
 import SelectField from "./selectField";
 import { type CreateFormOptions, type Option } from "./selectField/types";
 import TextField from "./textField";
@@ -28,7 +29,7 @@ export default function EntityField({
 }) {
   const trpcUtils = trpc.useUtils();
   return (
-    <SelectField
+    <SelectField<Option>
       onQuery={async (query) => {
         const { results } = await trpcUtils.entityList.fetch({
           query,
@@ -36,6 +37,12 @@ export default function EntityField({
         });
         return results;
       }}
+      onRenderOption={(item) => (
+        <div className="flex flex-col items-start">
+          <div>{item.name}</div>
+          <div className="text-light font-normal">{item.shortName || null}</div>
+        </div>
+      )}
       createForm={(props) => {
         return (
           <CreateForm createDialogHelpText={createDialogHelpText} {...props} />
@@ -59,6 +66,7 @@ function CreateForm({
     control,
     register,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(EntityInputSchema),
@@ -66,66 +74,78 @@ function CreateForm({
   });
 
   const [countryValue, setCountryValue] = useState<Option | undefined>();
+  const [regionValue, setRegionValue] = useState<Option | undefined>();
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        return handleSubmit(onSubmit)(e);
-      }}
-      className="max-w-md flex-auto"
-    >
-      <Fieldset>
-        <p className="mb-4">{createDialogHelpText}</p>
-        <TextField
-          {...register("name")}
-          error={errors.name}
-          autoFocus
-          label="Name"
-          type="text"
-          placeholder="e.g. Macallan"
-          required
-          autoComplete="off"
-        />
-
-        <Controller
-          control={control}
-          name="country"
-          render={({ field: { onChange, value, ref, ...field } }) => (
-            <CountryField
-              {...field}
-              error={errors.region}
-              label="Country"
-              placeholder="e.g. Scotland"
-              onChange={(value) => {
-                onChange(value?.id);
-                setCountryValue(value);
-              }}
-              value={countryValue}
-            />
-          )}
-        />
-
-        <TextField
-          {...register("region")}
-          error={errors.region}
-          name="region"
-          label="Region"
-          type="text"
-          placeholder="e.g. Islay, Kentucky"
-          autoComplete="off"
-          onChange={(e) => onFieldChange({ [e.target.name]: e.target.value })}
-        />
-        <div className="mt-5 flex flex-row-reverse gap-x-2 sm:mt-6">
-          <Button color="primary" type="submit" disabled={isSubmitting}>
-            Save Changes
-          </Button>
-          <Button onClick={onClose} disabled={isSubmitting}>
-            Cancel
-          </Button>
+    <>
+      <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
+        <div className="prose prose-invert text-light max-w-full text-sm leading-6">
+          {createDialogHelpText}
         </div>
-      </Fieldset>
-    </form>
+      </div>
+
+      <Form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          return handleSubmit(onSubmit)(e);
+        }}
+      >
+        <Fieldset>
+          <TextField
+            {...register("name")}
+            error={errors.name}
+            autoFocus
+            label="Name"
+            type="text"
+            placeholder="e.g. Macallan"
+            required
+            autoComplete="off"
+          />
+
+          <Controller
+            control={control}
+            name="country"
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <CountryField
+                {...field}
+                error={errors.region}
+                label="Country"
+                placeholder="e.g. Scotland"
+                onChange={(value) => {
+                  onChange(value?.id);
+                  // if (regionValue?.country.id !== value?.id)
+                  setRegionValue(undefined);
+                  setCountryValue(value);
+                }}
+                value={countryValue}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="region"
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <RegionField
+                {...field}
+                error={errors.region}
+                label="Region"
+                placeholder="e.g. Islay, Kentucky"
+                searchContext={{
+                  country: getValues("country"),
+                }}
+                onChange={(value) => {
+                  onChange(value?.id);
+                  setRegionValue(value);
+                }}
+                value={regionValue}
+                rememberValues={false}
+              />
+            )}
+          />
+        </Fieldset>
+      </Form>
+    </>
   );
 }

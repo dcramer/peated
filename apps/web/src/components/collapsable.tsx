@@ -1,45 +1,33 @@
 "use client";
 
-import classNames from "@peated/web/lib/classNames";
-import { useState, type ReactNode } from "react";
-import Button from "./button";
+import { LazyMotion, domAnimation, m } from "framer-motion";
+import { type ReactNode } from "react";
 
 export default function Collapsable({
+  open,
   children,
-  mobileOnly = false,
 }: {
+  open: boolean;
   children: ReactNode;
-  mobileOnly?: boolean;
 }) {
-  const [visible, setVisible] = useState(false);
+  const animate = {
+    transition: { type: "tween" },
+    height: open ? "auto" : 0,
+    //opacity: open ? 1 : .5
+  };
 
   return (
-    <div
-      className={classNames(
-        mobileOnly ? "sm:max-h-none" : "",
-        visible ? "" : "relative max-h-48",
-      )}
-    >
-      <div
-        className={classNames(
-          mobileOnly ? "sm:max-h-none sm:overflow-auto" : "",
-          visible ? "" : "max-h-48 overflow-hidden",
-        )}
-      >
-        {children}
-      </div>
-      {!visible && (
-        <div
-          className={classNames(
-            mobileOnly ? "sm:hidden" : "",
-            "gradient-top-opaque absolute bottom-0 left-0 right-0 flex items-center justify-center p-4",
-          )}
+    <LazyMotion features={domAnimation} strict>
+      <div aria-expanded={open}>
+        <m.div
+          style={{ overflow: "hidden" }}
+          initial={{ height: 0, opacity: 1 }}
+          animate={animate}
+          exit={{ height: 0, opacity: 1 }}
         >
-          <Button color="primary" onClick={() => setVisible(true)}>
-            Show More
-          </Button>
-        </div>
-      )}
-    </div>
+          {children}
+        </m.div>
+      </div>
+    </LazyMotion>
   );
 }

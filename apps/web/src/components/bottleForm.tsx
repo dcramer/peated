@@ -28,6 +28,7 @@ import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { logError } from "@peated/web/lib/log";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -35,13 +36,13 @@ import type { z } from "zod";
 import useAuth from "../hooks/useAuth";
 import { isTRPCClientError, trpc } from "../lib/trpc";
 import Button from "./button";
+import Collapsable from "./collapsable";
 import { classesForProfile } from "./flavorProfile";
 import Form from "./form";
 import Header from "./header";
 import Legend from "./legend";
 import TextAreaField from "./textAreaField";
 
-import { useRouter } from "next/navigation";
 const categoryList = CATEGORY_LIST.map((c) => ({
   id: c,
   name: formatCategoryName(c),
@@ -137,6 +138,9 @@ export default function BottleForm({
     initialData.bottler ? entityToOption(initialData.bottler) : undefined,
   );
 
+  const [showCaskDetails, setShowCaskDetails] = useState(false);
+  const [showAddDetails, setShowAddDetails] = useState(false);
+
   return (
     <Layout
       header={
@@ -158,7 +162,7 @@ export default function BottleForm({
         {error && <FormError values={[error]} />}
 
         <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
-          <div className="prose text-light max-w-full text-sm leading-6">
+          <div className="prose prose-invert text-light max-w-full text-sm leading-6">
             <p>
               It can be tricky to find the right information, so if you&apos;re
               struggling, just try to fill in the components that you're
@@ -330,83 +334,92 @@ export default function BottleForm({
         </Fieldset>
 
         <Fieldset>
-          <Legend title="Cask Details" />
-
-          <Controller
-            name="caskFill"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.category}
-                label="Cask Fill"
-                placeholder="e.g. 1st Fill"
-                simple
-                options={caskFillList}
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name: toTitleCase(value),
-                      }
-                    : undefined
-                }
-              />
-            )}
+          <Legend
+            title="Cask Details"
+            isCollapsed={showCaskDetails}
+            onCollapse={() => setShowCaskDetails(!showCaskDetails)}
           />
+          <Collapsable open={showCaskDetails}>
+            <Controller
+              name="caskFill"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  error={errors.category}
+                  label="Cask Fill"
+                  placeholder="e.g. 1st Fill"
+                  simple
+                  options={caskFillList}
+                  onChange={(value) => onChange(value?.id)}
+                  value={
+                    value
+                      ? {
+                          id: value,
+                          name: toTitleCase(value),
+                        }
+                      : undefined
+                  }
+                />
+              )}
+            />
 
-          <Controller
-            name="caskType"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.category}
-                label="Cask Type"
-                placeholder="e.g. Bourbon"
-                simple
-                options={caskTypeList}
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name: toTitleCase(value),
-                      }
-                    : undefined
-                }
-              />
-            )}
-          />
+            <Controller
+              name="caskType"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  error={errors.category}
+                  label="Cask Type"
+                  placeholder="e.g. Bourbon"
+                  simple
+                  options={caskTypeList}
+                  onChange={(value) => onChange(value?.id)}
+                  value={
+                    value
+                      ? {
+                          id: value,
+                          name: toTitleCase(value),
+                        }
+                      : undefined
+                  }
+                />
+              )}
+            />
 
-          <Controller
-            name="caskSize"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.category}
-                label="Cask Size"
-                placeholder="e.g. Hogshead"
-                simple
-                options={caskSizeList}
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name: toTitleCase(value),
-                      }
-                    : undefined
-                }
-              />
-            )}
-          />
+            <Controller
+              name="caskSize"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  error={errors.category}
+                  label="Cask Size"
+                  placeholder="e.g. Hogshead"
+                  simple
+                  options={caskSizeList}
+                  onChange={(value) => onChange(value?.id)}
+                  value={
+                    value
+                      ? {
+                          id: value,
+                          name: toTitleCase(value),
+                        }
+                      : undefined
+                  }
+                />
+              )}
+            />
+          </Collapsable>
         </Fieldset>
 
         <Fieldset>
-          <Legend title="Additional Details">
+          <Legend
+            title="Additional Details"
+            isCollapsed={showAddDetails}
+            onCollapse={() => setShowAddDetails(!showAddDetails)}
+          >
             {user && (user.mod || user.admin) && (
               <Button
                 color="primary"
@@ -434,70 +447,73 @@ export default function BottleForm({
               </Button>
             )}
           </Legend>
-
-          <Controller
-            name="flavorProfile"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.flavorProfile}
-                placeholder="The flavor profile of the spirit."
-                suggestedOptions={[]}
-                label="Flavor Profile"
-                onRenderOption={(option) => {
-                  const classes = classesForProfile(option.id as FlavorProfile);
-                  return (
-                    <div className="flex flex-col items-start justify-start gap-y-2 text-left">
-                      <h4
-                        className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
-                      >
-                        {option.name}
-                      </h4>
-                      <div className="text-light text-sm font-normal">
-                        {notesForProfile(option.id as FlavorProfile)}
+          <Collapsable open={showAddDetails}>
+            <Controller
+              name="flavorProfile"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  error={errors.flavorProfile}
+                  placeholder="The flavor profile of the spirit."
+                  suggestedOptions={[]}
+                  label="Flavor Profile"
+                  onRenderOption={(option) => {
+                    const classes = classesForProfile(
+                      option.id as FlavorProfile,
+                    );
+                    return (
+                      <div className="flex flex-col items-start justify-start gap-y-2 text-left">
+                        <h4
+                          className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
+                        >
+                          {option.name}
+                        </h4>
+                        <div className="text-light text-sm font-normal">
+                          {notesForProfile(option.id as FlavorProfile)}
+                        </div>
                       </div>
-                    </div>
-                  );
-                }}
-                options={flavorProfileList}
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name: formatFlavorProfile(value),
-                      }
-                    : undefined
-                }
+                    );
+                  }}
+                  options={flavorProfileList}
+                  onChange={(value) => onChange(value?.id)}
+                  value={
+                    value
+                      ? {
+                          id: value,
+                          name: formatFlavorProfile(value),
+                        }
+                      : undefined
+                  }
+                />
+              )}
+            />
+
+            {user && (user.mod || user.admin) && (
+              <TextAreaField
+                {...register("description", {
+                  setValueAs: (v) => (v === "" || !v ? null : v),
+                  onChange: () => {
+                    setValue("descriptionSrc", "user");
+                  },
+                })}
+                error={errors.description}
+                label="Description"
+                rows={8}
               />
             )}
-          />
 
-          {user && (user.mod || user.admin) && (
-            <TextAreaField
-              {...register("description", {
+            <TextField
+              {...register("releaseDate", {
                 setValueAs: (v) => (v === "" || !v ? null : v),
-                onChange: () => {
-                  setValue("descriptionSrc", "user");
-                },
               })}
-              error={errors.description}
-              label="Description"
-              rows={8}
+              error={errors.releaseDate}
+              type="date"
+              label="Release Date"
+              placeholder="e.g. 2024-05-01"
+              helpText="The date this labeling was released."
             />
-          )}
-
-          <TextField
-            {...register("releaseDate", {
-              setValueAs: (v) => (v === "" || !v ? null : v),
-            })}
-            error={errors.releaseDate}
-            type="date"
-            label="Release Date"
-            placeholder="e.g. 2024-05-01"
-            helpText="The date this labeling was released."
-          />
+          </Collapsable>
         </Fieldset>
       </Form>
     </Layout>

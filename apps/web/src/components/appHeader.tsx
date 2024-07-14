@@ -1,11 +1,11 @@
 "use client";
 
-import { Dialog, DialogPanel } from "@headlessui/react";
 import { useEffect, useState } from "react";
 
 import useAuth from "@peated/web/hooks/useAuth";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getAuthRedirect } from "../lib/auth";
+import { Modal } from "./modal";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 import { ProfileDropdown } from "./profileDropdown";
@@ -47,25 +47,16 @@ export default function AppHeader() {
           }
         }}
       >
-        <Dialog
-          open={searchOpen}
-          as="div"
-          className="dialog"
-          onClose={setSearchOpen}
-        >
-          <div className="fixed inset-0">
-            <DialogPanel className="dialog-panel">
-              <SearchPanel
-                value={query}
-                onQueryChange={(value) => setQuery(value)}
-                onClose={() => {
-                  setSearchOpen(false);
-                  setTimeout(() => setSearchFocused(false), 100);
-                }}
-              />
-            </DialogPanel>
-          </div>
-        </Dialog>
+        <Modal open={searchOpen} onClose={setSearchOpen}>
+          <SearchPanel
+            value={query}
+            onQueryChange={(value) => setQuery(value)}
+            onClose={() => {
+              setSearchOpen(false);
+              setTimeout(() => setSearchFocused(false), 100);
+            }}
+          />
+        </Modal>
       </SearchHeaderForm>
       {user ? (
         <div className="flex items-center gap-x-2">
