@@ -41,14 +41,14 @@ ADD . .
 ARG VERSION
 ARG SENTRY_PROJECT
 ARG SENTRY_ORG
-ARG SENTRY_AUTH_TOKEN
 ENV VERSION=$VERSION \
     SENTRY_RELEASE=$VERSION \
     SENTRY_ORG=$SENTRY_ORG \
-    SENTRY_PROJECT=$SENTRY_PROJECT \
-    SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+    SENTRY_PROJECT=$SENTRY_PROJECT
 
-RUN pnpm build
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
+    SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
+    pnpm build
 
 FROM base-env as server
 COPY --from=prod-deps /app/node_modules /app/node_modules
