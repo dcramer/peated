@@ -26,7 +26,7 @@ export default async ({ name }: { name: string }) => {
         .set({
           bottleId: alias.bottleId,
         })
-        .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase())),
+        .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase())),
     ]);
   }
 
