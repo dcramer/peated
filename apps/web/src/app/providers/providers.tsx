@@ -1,5 +1,6 @@
 "use client";
 
+import FlashMessages from "@peated/web/components/flash";
 import { default as config } from "@peated/web/config";
 import { ApiProvider } from "@peated/web/hooks/useApi";
 import { AuthProvider } from "@peated/web/hooks/useAuth";
@@ -46,7 +47,7 @@ export default function Providers({
                   accessToken={accessToken}
                   server={config.API_SERVER}
                 >
-                  {children}
+                  <FlashMessages>{children}</FlashMessages>
                 </ApiProvider>
               </AuthProvider>
             </OnlineStatusProvider>

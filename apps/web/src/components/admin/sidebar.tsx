@@ -25,6 +25,12 @@ export default function AdminSidebar() {
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
                   <SidebarLink
+                    href="/admin/queue"
+                    active={pathname.startsWith("/admin/queue")}
+                  >
+                    Queue
+                  </SidebarLink>
+                  <SidebarLink
                     href="/admin/sites"
                     active={pathname.startsWith("/admin/sites")}
                   >

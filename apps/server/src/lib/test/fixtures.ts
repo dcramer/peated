@@ -538,7 +538,8 @@ export const StorePrice = async (
           })
         : await Bottle({}, tx);
       if (!bottle) throw new Error("Unexpected");
-      data.bottleId = bottle.id;
+      // this lets us pass in something that should match, but hasnt
+      if (data.bottleId === undefined) data.bottleId = bottle.id;
       data.name = bottle.fullName;
     }
 
@@ -630,7 +631,8 @@ export const Review = async (
           })
         : await Bottle({}, tx);
       if (!bottle) throw new Error("Unexpected");
-      data.bottleId = bottle.id;
+      // this lets us pass in something that should match, but hasnt
+      if (data.bottleId === undefined) data.bottleId = bottle.id;
       data.name = bottle.fullName;
     }
 
