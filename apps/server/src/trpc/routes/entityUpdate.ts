@@ -215,7 +215,10 @@ export default modProcedure
           FROM ${bottles}
           WHERE ${bottles.id} = ${bottleAliases.bottleId}
             AND ${bottles.brandId} = ${newEntity.id}
-            AND ${bottleAliases.name} = ${entity.name} || ' ' || ${bottles.name}`);
+            AND ${bottleAliases.name} = ${entity.name} || ' ' || ${bottles.name}
+          ON CONFLICT (LOWER(${bottleAliases.name}))
+          DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL;
+          `);
       }
 
       await tx.insert(changes).values({
