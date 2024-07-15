@@ -1,5 +1,6 @@
 const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const path = require("path");
+const { FileStore } = require("metro-cache");
 
 // Find the project and workspace directories
 const projectRoot = __dirname;
@@ -14,6 +15,13 @@ config.watchFolders = [monorepoRoot];
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
   path.resolve(monorepoRoot, "node_modules"),
+];
+
+// Use turborepo to restore the cache when possible
+config.cacheStores = [
+  new FileStore({
+    root: path.join(projectRoot, "node_modules", ".cache", "metro"),
+  }),
 ];
 
 module.exports = config;
