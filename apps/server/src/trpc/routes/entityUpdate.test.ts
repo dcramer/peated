@@ -319,3 +319,47 @@ test("sets descriptionSrc with description", async ({ fixtures }) => {
     descriptionSrc: "user",
   });
 });
+
+test("updates existing conflicting alias", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+  const existingAlias = await fixtures.BottleAlias({
+    bottleId: null,
+    name: "Cool Cats Single Barrel Bourbon",
+  });
+  const existingBottle = await fixtures.Bottle({
+    brandId: entity.id,
+    name: "Single Barrel Bourbon",
+  });
+
+  expect(existingAlias.bottleId).toBeNull();
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    name: "Cool Cats",
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(newEntity.name).toEqual("Cool Cats");
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, existingBottle.id));
+  expect(newBottle.fullName).toEqual("Cool Cats Single Barrel Bourbon");
+
+  const [newAlias] = await db
+    .select()
+    .from(bottleAliases)
+    .where(eq(bottleAliases.name, existingAlias.name));
+  expect(newAlias.name).toEqual("Cool Cats Single Barrel Bourbon");
+  expect(newAlias.bottleId).toEqual(newBottle.id);
+});

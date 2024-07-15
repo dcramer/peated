@@ -166,7 +166,12 @@ export default modProcedure
               await tx
                 .update(entityAliases)
                 .set({ name: aliasName })
-                .where(eq(entityAliases.name, existingAlias.name));
+                .where(
+                  eq(
+                    sql`LOWER(${entityAliases.name})`,
+                    existingAlias.name.toLowerCase(),
+                  ),
+                );
             }
             // we're good - likely renaming to an alias that already existed
           } else if (!existingAlias) {
@@ -181,7 +186,12 @@ export default modProcedure
               .set({
                 entityId: newEntity.id,
               })
-              .where(and(eq(entityAliases.name, existingAlias.name)));
+              .where(
+                eq(
+                  sql`LOWER(${entityAliases.name})`,
+                  existingAlias.name.toLowerCase(),
+                ),
+              );
           } else {
             throw new Error(
               `Duplicate alias found (${existingAlias.entityId}). Not implemented.`,
@@ -209,16 +219,24 @@ export default modProcedure
               ),
             ),
           );
+
+        // we do insert vs update to handle the ON CONFLICT scenario
         await tx.execute(sql`
-          UPDATE ${bottleAliases}
-          SET "name" = ${bottles.fullName}
-          FROM ${bottles}
-          WHERE ${bottles.id} = ${bottleAliases.bottleId}
-            AND ${bottles.brandId} = ${newEntity.id}
-            AND ${bottleAliases.name} = ${entity.name} || ' ' || ${bottles.name}
-          ON CONFLICT (LOWER(${bottleAliases.name}))
-          DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL;
-          `);
+            INSERT INTO ${bottleAliases} (name, bottle_id)
+            SELECT ${bottles.fullName}, ${bottles.id} FROM ${bottles}
+            WHERE ${bottles.brandId} = ${newEntity.id}
+            ON CONFLICT (LOWER(${bottleAliases.name}))
+            DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL
+        `);
+
+        await tx.execute(sql`
+            DELETE FROM ${bottleAliases}
+            WHERE ${bottleAliases.bottleId} IN (
+              SELECT ${bottles.id} FROM ${bottles}
+               WHERE ${bottles.brandId} = ${newEntity.id}
+                 AND LOWER(${bottleAliases.name}) = LOWER(${entity.name} || ' ' || ${bottles.name})
+            )
+        `);
       }
 
       await tx.insert(changes).values({
