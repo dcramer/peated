@@ -58,6 +58,7 @@ export async function bottleCreate({
   }
 
   const newAliases: string[] = [];
+  const newEntityIds: Set<number> = new Set();
 
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({
@@ -73,6 +74,7 @@ export async function bottleCreate({
         code: "BAD_REQUEST",
       });
     }
+    if (brandUpsert.created) newEntityIds.add(brandUpsert.id);
 
     const brand = brandUpsert.result;
 
@@ -84,14 +86,14 @@ export async function bottleCreate({
         type: "bottler",
         userId: user.id,
       });
-      if (bottlerUpsert) {
-        bottler = bottlerUpsert.result;
-      } else {
+      if (!bottlerUpsert) {
         throw new TRPCError({
           message: "Could not identify bottler.",
           code: "BAD_REQUEST",
         });
       }
+      if (bottlerUpsert.created) newEntityIds.add(bottlerUpsert.id);
+      bottler = bottlerUpsert.result;
     }
 
     const distillerIds: number[] = [];
@@ -110,6 +112,7 @@ export async function bottleCreate({
             code: "BAD_REQUEST",
           });
         }
+        if (distUpsert.created) newEntityIds.add(distUpsert.id);
         distillerList.push(distUpsert.result);
         distillerIds.push(distUpsert.id);
       }
@@ -203,6 +206,18 @@ export async function bottleCreate({
       logError(err, {
         bottle: {
           id: bottle.id,
+        },
+      });
+    }
+  }
+
+  for (const entityId of newEntityIds.values()) {
+    try {
+      pushJob("OnEntityChange", { entityId });
+    } catch (err) {
+      logError(err, {
+        entity: {
+          id: entityId,
         },
       });
     }

@@ -97,6 +97,7 @@ export async function bottleUpdate({
   }
 
   const newAliases: string[] = [];
+  const newEntityIds: Set<number> = new Set();
 
   const newBottle = await db.transaction(async (tx) => {
     let brand: Entity | null = null;
@@ -121,6 +122,7 @@ export async function bottleUpdate({
           bottleData.brandId = brandUpsert.id;
         }
         brand = brandUpsert.result;
+        if (brandUpsert.created) newEntityIds.add(brandUpsert.id);
       }
     }
 
@@ -145,6 +147,7 @@ export async function bottleUpdate({
         if (bottlerUpsert.id !== bottle.bottlerId) {
           bottleData.bottlerId = bottlerUpsert.id;
         }
+        if (bottlerUpsert.created) newEntityIds.add(bottlerUpsert.id);
       }
     }
 
@@ -180,6 +183,7 @@ export async function bottleUpdate({
               code: "INTERNAL_SERVER_ERROR",
             });
           }
+          if (distUpsert.created) newEntityIds.add(distUpsert.id);
 
           await tx.insert(bottlesToDistillers).values({
             bottleId: bottle.id,
@@ -337,6 +341,18 @@ export async function bottleUpdate({
       logError(err, {
         bottle: {
           id: bottle.id,
+        },
+      });
+    }
+  }
+
+  for (const entityId of newEntityIds.values()) {
+    try {
+      pushJob("OnEntityChange", { entityId });
+    } catch (err) {
+      logError(err, {
+        entity: {
+          id: entityId,
         },
       });
     }
