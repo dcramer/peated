@@ -28,7 +28,6 @@
     "@peated/tsconfig": "workspace:*",
     "@sentry/core": "^8.16.0",
     "@sentry/node": "^8.16.0",
-    "@sentry/profiling-node": "^8.16.0",
     "@sentry/utils": "^8.16.0",
     "@sindresorhus/slugify": "^2.2.1",
     "@trpc/client": "11.0.0-rc.334",
