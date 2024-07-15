@@ -51,6 +51,7 @@ export default async function EntityDetails({
               src={RobotImage.src}
               className="hidden h-40 w-40 sm:block"
               alt="robot image"
+              aria-hidden="true"
             />
           </div>
         )}

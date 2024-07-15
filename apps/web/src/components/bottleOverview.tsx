@@ -155,6 +155,7 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
             src={RobotImage.src}
             className="hidden h-40 w-40 sm:block"
             alt="peated robot"
+            aria-hidden="true"
           />
         </div>
       </div>
