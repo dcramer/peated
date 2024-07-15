@@ -200,7 +200,6 @@ export default function TastingListItem({
             }
             active={hasToasted}
             disabled={!canToast}
-            href={!user ? "/login" : undefined}
             onClick={
               canToast
                 ? () => {
