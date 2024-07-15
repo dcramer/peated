@@ -12,7 +12,9 @@ import type { Tasting } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
+import { getAuthRedirect } from "../lib/auth";
 import BottleCard from "./bottleCard";
 import Button from "./button";
 import Counter from "./counter";
@@ -76,6 +78,10 @@ export default function TastingListItem({
 }) {
   const { bottle } = tasting;
   const { user } = useAuth();
+
+  const pathname = usePathname();
+
+  const router = useRouter();
 
   const tastingDeleteMutation = trpc.tastingDelete.useMutation();
   const toastCreateMutation = trpc.toastCreate.useMutation();
@@ -208,7 +214,9 @@ export default function TastingListItem({
                       },
                     });
                   }
-                : undefined
+                : () => {
+                    router.push(getAuthRedirect({ pathname }));
+                  }
             }
           >
             <Counter value={totalToasts} />
