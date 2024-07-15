@@ -169,6 +169,8 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   156: "Glasgow Distillery",
   157: "Armorik",
   158: "Yuza Distillery",
+  159: "Komagatake",
+  160: "Tsunuki",
 
   // Single Grain
   G1: "North British",

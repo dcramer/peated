@@ -16,21 +16,23 @@ export default function EntityResultRow({
   return (
     <>
       <EntityIcon className="m-2 hidden h-10 w-auto sm:block" />
-
-      <div className="flex min-w-0 flex-auto">
-        <div className="flex-auto font-semibold leading-6">
+      <div className="min-w-0 flex-auto">
+        <div className="flex items-center space-x-1 font-semibold leading-6">
           <Link href={`/entities/${entity.id}`}>
             <span className="absolute inset-x-0 -top-px bottom-0" />
             {entity.name}
           </Link>
         </div>
-        <div className="flex gap-x-2">
-          {entity.type.map((t) => (
-            <Chip key={t} size="small" color="highlight">
-              {t}
-            </Chip>
-          ))}
+        <div className="text-light mt-1 flex gap-x-1 truncate text-sm leading-5">
+          {entity.shortName}
         </div>
+      </div>
+      <div className="hidden items-end gap-x-1 lg:flex">
+        {entity.type.map((t) => (
+          <Chip key={t} size="small" color="highlight">
+            {t}
+          </Chip>
+        ))}
       </div>
     </>
   );

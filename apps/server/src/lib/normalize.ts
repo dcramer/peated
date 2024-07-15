@@ -32,17 +32,33 @@ export const normalizeBottleName = (
   // try to ease UX and normalize common name components
   if (age && name == `${age}`) return [`${age}${ageSuffix}`, age];
 
-  name = name.replace(/\n/, " ").replace(/\s{2,}/, " ");
-
   // "years old" type patterns
   name = name
-    .replace(/(\d+)[\s-]?years?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
-    .replace(/(\d+)[\s-]?years?($|\s)/i, `$1${ageSuffix}$2`);
+    .replace(
+      /(\d{1,2}|ten|twelve|fifteen|twenty)[\s-]?years?[\s-]old($|\s)/i,
+      `$1${ageSuffix}$2`,
+    )
+    .replace(
+      /(\d{1,2}|ten|twelve|fifteen|twenty)[\s-]?years?($|\s)/i,
+      `$1${ageSuffix}$2`,
+    );
 
   // abberviated yr
   name = name
-    .replace(/(\d+)\s?yrs?\.?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
-    .replace(/(\d+)\s?yrs?\.?($|\s)/i, `$1${ageSuffix}$2`);
+    .replace(
+      /(\d{1,2}|ten|twelve|fifteen|twenty)\s?yrs?\.?[\s-]old($|\s)/i,
+      `$1${ageSuffix}$2`,
+    )
+    .replace(
+      /(\d{1,2}|ten|twelve|fifteen|twenty)\s?yrs?\.?($|\s)/i,
+      `$1${ageSuffix}$2`,
+    );
+
+  // TODO: this needs subbed in search too...
+  name = name.replace(/ten-year-old/i, "10-year-old");
+  name = name.replace(/twelve-year-old/i, "12-year-old");
+  name = name.replace(/fifteen-year-old/i, "15-year-old");
+  name = name.replace(/twenty-year-old/i, "20-year-old");
 
   if (name.startsWith(`${age} `)) {
     name = name.replace(`${age} `, `${age}${ageSuffix} `);
@@ -59,10 +75,13 @@ export const normalizeBottleName = (
   // replace mid-string age
   name = name.replace(` ${age} `, ` ${age}${ageSuffix} `);
 
-  const match = name.match(/(\d+)-year-old($|\s)/i);
+  const match = name.match(/(\d{1,2})-year-old($|\s)/i);
   if (!age && match) {
     age = parseInt(match[1], 10);
   }
+
+  // replace various whitespace
+  name = name.replace(/\n/, " ").replace(/\s{2,}/, " ");
 
   return [normalizeString(name), age];
 };

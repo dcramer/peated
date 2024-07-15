@@ -45,6 +45,7 @@ export class Point {
 
 export function geometry_point(name: string) {
   return customType<{ data: LatLng; driverData: string }>({
+    // this should be sql``
     dataType() {
       return "geometry(Point, 4326)";
     },

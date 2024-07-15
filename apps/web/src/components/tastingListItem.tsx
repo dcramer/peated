@@ -6,17 +6,18 @@ import {
   ChatBubbleLeftRightIcon,
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
-
 import { COLOR_SCALE } from "@peated/server/src/constants";
 import { formatColor, formatServingStyle } from "@peated/server/src/lib/format";
 import type { Tasting } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc";
-import { useEffect, type ComponentPropsWithoutRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
+import { getAuthRedirect } from "../lib/auth";
 import BottleCard from "./bottleCard";
 import Button from "./button";
+import Counter from "./counter";
 import DefinitionList from "./definitionList";
 import { ImageModal } from "./imageModal";
 import { StaticRating } from "./rating";
@@ -78,6 +79,10 @@ export default function TastingListItem({
   const { bottle } = tasting;
   const { user } = useAuth();
 
+  const pathname = usePathname();
+
+  const router = useRouter();
+
   const tastingDeleteMutation = trpc.tastingDelete.useMutation();
   const toastCreateMutation = trpc.toastCreate.useMutation();
 
@@ -87,6 +92,8 @@ export default function TastingListItem({
   const isTaster = user?.id === tasting.createdBy.id;
   const totalToasts =
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
+
+  const canToast = !hasToasted && !isTaster && user;
 
   return (
     <li className="overflow-hidden bg-slate-950 ring-1 ring-inset ring-slate-800">
@@ -186,32 +193,34 @@ export default function TastingListItem({
           )}
         </div>
 
-        <aside className="flex items-center space-x-3 py-3 sm:px-5 sm:pb-4">
-          {!hasToasted && !isTaster && user ? (
-            <Button
-              icon={
-                <HandThumbUpIcon
-                  className="-ml-0.5 h-5 w-5"
-                  aria-hidden="true"
-                />
-              }
-              onClick={async () => {
-                await toastCreateMutation.mutateAsync(tasting.id);
-                setHasToasted(true);
-                onToast && onToast(tasting);
-              }}
-            >
-              Toast
-            </Button>
-          ) : (
-            <Button
-              icon={<HandThumbUpIcon className="-ml-0.5 h-5 w-5" />}
-              active={hasToasted}
-              disabled
-            >
-              {totalToasts.toLocaleString()}
-            </Button>
-          )}
+        <aside className="flex items-center space-x-3 px-3 py-3 sm:px-5 sm:pb-4">
+          <Button
+            icon={
+              <HandThumbUpIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+            }
+            active={hasToasted}
+            disabled={!canToast}
+            onClick={
+              canToast
+                ? () => {
+                    setHasToasted(true);
+                    toastCreateMutation.mutate(tasting.id, {
+                      onError: () => {
+                        setHasToasted(false);
+                      },
+                      onSuccess: () => {
+                        onToast && onToast(tasting);
+                      },
+                    });
+                  }
+                : () => {
+                    router.push(getAuthRedirect({ pathname }));
+                  }
+            }
+          >
+            <Counter value={totalToasts} />
+          </Button>
+
           {user && !noCommentAction && (
             <Button
               icon={
@@ -225,12 +234,10 @@ export default function TastingListItem({
               {tasting.comments.toLocaleString()}
             </Button>
           )}
-
           <ShareButton
             title={`${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`}
             url={`/tastings/${tasting.id}`}
           />
-
           {(user?.admin || isTaster) && (
             <Menu as="div" className="menu">
               <MenuButton as={Button}>

@@ -28,7 +28,7 @@ export default async function EntityTastings({
   return (
     <>
       {tastingList.results.length ? (
-        <TastingList values={tastingList.results} noBottle />
+        <TastingList values={tastingList.results} />
       ) : (
         <EmptyActivity href={`/search?tasting`}>
           <span className="mt-2 block font-semibold ">

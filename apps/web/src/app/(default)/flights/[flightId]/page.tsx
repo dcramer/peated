@@ -69,6 +69,7 @@ export default async function Page({
                     bottle={bottle}
                     flightId={flight.id}
                     className="absolute inset-0"
+                    withPanel
                   />
                   <div className="flex items-center gap-x-1 group-hover:underline">
                     <div className="font-semibold">{bottle.fullName}</div>

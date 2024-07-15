@@ -150,7 +150,7 @@ export async function bottleList({
           message: "Cannot sort by brand without entity filter.",
         });
       }
-      orderBy = asc(entities.name);
+      orderBy = sql`${entities.name} ASC, ${bottles.name} ASC`;
       break;
     case "created":
       orderBy = asc(bottles.createdAt);

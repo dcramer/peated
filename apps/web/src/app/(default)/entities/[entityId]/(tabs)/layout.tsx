@@ -28,7 +28,7 @@ export default async function Layout({
           Tastings ({entity.totalTastings.toLocaleString()})
         </TabItem>
         {entity.shortName === "SMWS" && (
-          <TabItem as={Link} href={`${baseUrl}/codes`} controlled>
+          <TabItem as={Link} href={`${baseUrl}/codes`} controlled desktopOnly>
             Distillery Codes
           </TabItem>
         )}

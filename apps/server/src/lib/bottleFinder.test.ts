@@ -6,20 +6,20 @@ test("findBottle matches exact", async ({ fixtures }) => {
   expect(result).toBe(bottle.id);
 });
 
-test("findBottle matches fullName as prefix", async ({ fixtures }) => {
-  const bottle = await fixtures.Bottle();
-  const result = await findBottleId(bottle.fullName + " Single Grain");
-  expect(result).toBe(bottle.id);
-});
+// test("findBottle matches fullName as prefix", async ({ fixtures }) => {
+//   const bottle = await fixtures.Bottle();
+//   const result = await findBottleId(bottle.fullName + " Single Grain");
+//   expect(result).toBe(bottle.id);
+// });
 
-test("findBottle matches partial fullName", async ({ fixtures }) => {
+test("findBottle will not wrongly match a suffix", async ({ fixtures }) => {
   const brand = await fixtures.Entity({ name: "The Macallan" });
   const bottle = await fixtures.Bottle({
     brandId: brand.id,
     name: "12-year-old Double Cask",
   });
   const result = await findBottleId("The Macallan 12-year-old");
-  expect(result).toBe(bottle.id);
+  expect(result).toEqual(null);
 });
 
 test("findBottle doesnt match random junk", async ({ fixtures }) => {
@@ -36,6 +36,23 @@ test("findBottle matches alias", async ({ fixtures }) => {
   });
   const result = await findBottleId("Something Silly");
   expect(result).toBe(bottle.id);
+});
+
+test("findBottle prioritizes correct prefix", async ({ fixtures }) => {
+  const entity = await fixtures.Entity({ name: "Aberfeldy" });
+  const bottle = await fixtures.Bottle({
+    brandId: entity.id,
+    name: "18-year-old",
+  });
+  const bottle2 = await fixtures.Bottle({
+    brandId: entity.id,
+    name: "18-year-old Port Cask",
+  });
+  const result = await findBottleId("Aberfeldy 18-year-old Port Cask");
+  expect(result).toBe(bottle2.id);
+
+  const result2 = await findBottleId("Aberfeldy 18-year-old");
+  expect(result2).toBe(bottle.id);
 });
 
 test("findEntity matches exact", async ({ fixtures }) => {

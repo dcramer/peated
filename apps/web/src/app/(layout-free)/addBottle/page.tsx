@@ -15,6 +15,7 @@ export default function AddBottle() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const name = toTitleCase(searchParams.get("name") || "");
+  const returnTo = searchParams.get("returnTo");
 
   const distiller = searchParams.get("distiller") || null;
   const brand = searchParams.get("brand") || null;
@@ -76,10 +77,12 @@ export default function AddBottle() {
     <BottleForm
       onSubmit={async (data) => {
         const newBottle = await bottleCreateMutation.mutateAsync(data);
-        router.replace(`/bottles/${newBottle.id}/addTasting`);
+        if (returnTo) router.push(returnTo);
+        else router.replace(`/bottles/${newBottle.id}/addTasting`);
       }}
       initialData={initialData}
       title="Add Bottle"
+      returnTo={returnTo}
     />
   );
 }

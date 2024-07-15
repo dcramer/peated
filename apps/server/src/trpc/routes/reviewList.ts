@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, ilike } from "drizzle-orm";
+import { and, asc, eq, ilike, isNull } from "drizzle-orm";
 
 import { db } from "@peated/server/db";
 import { externalSites, reviews } from "@peated/server/db/schema";
@@ -17,6 +17,7 @@ export default publicProcedure
         site: ExternalSiteTypeEnum.optional(),
         bottle: z.number().optional(),
         query: z.string().default(""),
+        onlyUnknown: z.boolean().optional(),
         cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(100),
       })
@@ -41,6 +42,10 @@ export default publicProcedure
         });
       }
       where.push(eq(reviews.externalSiteId, site.id));
+    }
+
+    if (input.onlyUnknown) {
+      where.push(isNull(reviews.bottleId));
     }
 
     if (input.bottle) {

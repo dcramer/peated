@@ -4,7 +4,7 @@ import { trpc } from "@peated/web/lib/trpc";
 import { DistributionChart } from "./distributionChart";
 
 export function BottleTagDistributionSkeleton() {
-  return <div className="animate-pulse bg-slate-800" style={{ height: 200 }} />;
+  return <div className="animate-pulse bg-slate-800" style={{ height: 120 }} />;
 }
 
 export default function BottleTagDistribution({

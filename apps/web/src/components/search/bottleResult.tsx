@@ -29,7 +29,7 @@ export default function BottleResultRow({
             }
           >
             <span className="absolute inset-x-0 -top-px bottom-0" />
-            {bottle.name}
+            {bottle.fullName}
           </Link>
           {bottle.vintageYear && (
             <>
@@ -44,8 +44,10 @@ export default function BottleResultRow({
             <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
           )}
         </div>
-        <div className="text-light mt-1 flex truncate text-sm leading-5">
-          {bottle.brand.name}
+        <div className="text-light mt-1 flex gap-x-1 truncate text-sm leading-5">
+          {bottle.distillers.length
+            ? bottle.distillers.map((d) => <span key={d.id}>{d.name}</span>)
+            : null}
         </div>
       </div>
       <div className="flex items-center gap-x-4">

@@ -15,7 +15,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { type BottlePreviewResult } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { coerceToUpsert, upsertEntity } from "../../lib/db";
@@ -96,6 +96,9 @@ export async function bottleUpdate({
       (input.description && input.description !== null ? "user" : null);
   }
 
+  const newAliases: string[] = [];
+  const newEntityIds: Set<number> = new Set();
+
   const newBottle = await db.transaction(async (tx) => {
     let brand: Entity | null = null;
     if (bottleData.brand) {
@@ -119,6 +122,7 @@ export async function bottleUpdate({
           bottleData.brandId = brandUpsert.id;
         }
         brand = brandUpsert.result;
+        if (brandUpsert.created) newEntityIds.add(brandUpsert.id);
       }
     }
 
@@ -143,6 +147,7 @@ export async function bottleUpdate({
         if (bottlerUpsert.id !== bottle.bottlerId) {
           bottleData.bottlerId = bottlerUpsert.id;
         }
+        if (bottlerUpsert.created) newEntityIds.add(bottlerUpsert.id);
       }
     }
 
@@ -178,6 +183,7 @@ export async function bottleUpdate({
               code: "INTERNAL_SERVER_ERROR",
             });
           }
+          if (distUpsert.created) newEntityIds.add(distUpsert.id);
 
           await tx.insert(bottlesToDistillers).values({
             bottleId: bottle.id,
@@ -213,7 +219,7 @@ export async function bottleUpdate({
     if (bottleData.name || bottleData.brandId) {
       if (!brand) {
         brand =
-          (await db.query.entities.findFirst({
+          (await tx.query.entities.findFirst({
             where: eq(entities.id, bottle.brandId),
           })) || null;
         if (!brand) throw new Error("Unexpected");
@@ -264,9 +270,21 @@ export async function bottleUpdate({
         ? `${newBottle.fullName} (${newBottle.vintageYear})`
         : newBottle.fullName;
       const existingAlias = await tx.query.bottleAliases.findFirst({
-        where: ilike(bottleAliases.name, aliasName),
+        where: eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()),
       });
       if (existingAlias?.bottleId === newBottle.id) {
+        if (existingAlias.name !== aliasName) {
+          // case change
+          await tx
+            .update(bottleAliases)
+            .set({ name: aliasName })
+            .where(
+              eq(
+                sql`LOWER(${bottleAliases.name})`,
+                existingAlias.name.toLowerCase(),
+              ),
+            );
+        }
         // we're good - likely renaming to an alias that already existed
       } else if (!existingAlias) {
         await tx.insert(bottleAliases).values({
@@ -274,13 +292,19 @@ export async function bottleUpdate({
           bottleId: newBottle.id,
           createdAt: newBottle.createdAt,
         });
+        newAliases.push(aliasName);
       } else if (!existingAlias.bottleId) {
         await tx
           .update(bottleAliases)
           .set({
             bottleId: newBottle.id,
           })
-          .where(and(eq(bottleAliases.name, aliasName)));
+          .where(
+            eq(
+              sql`LOWER(${bottleAliases.name})`,
+              existingAlias.name.toLowerCase(),
+            ),
+          );
       } else {
         throw new Error(
           `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
@@ -318,6 +342,30 @@ export async function bottleUpdate({
         id: bottle.id,
       },
     });
+  }
+
+  for (const aliasName of newAliases) {
+    try {
+      pushJob("OnBottleAliasChange", { name: aliasName });
+    } catch (err) {
+      logError(err, {
+        bottle: {
+          id: bottle.id,
+        },
+      });
+    }
+  }
+
+  for (const entityId of newEntityIds.values()) {
+    try {
+      pushJob("OnEntityChange", { entityId });
+    } catch (err) {
+      logError(err, {
+        entity: {
+          id: entityId,
+        },
+      });
+    }
   }
 
   return await serialize(BottleSerializer, newBottle, ctx.user);

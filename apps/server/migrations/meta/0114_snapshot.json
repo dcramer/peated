@@ -1,10 +1,8 @@
 {
-  "id": "1d011aa5-5ab1-4a11-bd71-d8b44b0dafa2",
-  "prevId": "54c7051c-113c-4993-8f1a-a15ecb5be455",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "badge_award": {
+    "public.badge_award": {
       "name": "badge_award",
       "schema": "",
       "columns": {
@@ -50,46 +48,59 @@
       },
       "indexes": {
         "badge_award_unq": {
-          "name": "badge_award_unq",
           "columns": [
-            "badge_id",
-            "user_id"
+            {
+              "expression": "badge_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "badge_award_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "badge_award_badge_id_badges_id_fk": {
           "name": "badge_award_badge_id_badges_id_fk",
           "tableFrom": "badge_award",
-          "tableTo": "badges",
           "columnsFrom": [
             "badge_id"
           ],
+          "tableTo": "badges",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "badge_award_user_id_user_id_fk": {
           "name": "badge_award_user_id_user_id_fk",
           "tableFrom": "badge_award",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "badges": {
+    "public.badges": {
       "name": "badges",
       "schema": "",
       "columns": {
@@ -121,18 +132,26 @@
       },
       "indexes": {
         "badge_name_unq": {
-          "name": "badge_name_unq",
           "columns": [
-            "name"
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "badge_name_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "bottle_alias": {
+    "public.bottle_alias": {
       "name": "bottle_alias",
       "schema": "",
       "columns": {
@@ -151,26 +170,34 @@
       },
       "indexes": {
         "bottle_alias_bottle_idx": {
-          "name": "bottle_alias_bottle_idx",
           "columns": [
-            "bottle_id"
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "bottle_alias_bottle_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "bottle_alias_bottle_id_bottle_id_fk": {
           "name": "bottle_alias_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_alias",
-          "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
           ],
+          "tableTo": "bottle",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -183,7 +210,7 @@
       },
       "uniqueConstraints": {}
     },
-    "bottle_flavor_profile": {
+    "public.bottle_flavor_profile": {
       "name": "bottle_flavor_profile",
       "schema": "",
       "columns": {
@@ -212,15 +239,15 @@
         "bottle_flavor_profile_bottle_id_bottle_id_fk": {
           "name": "bottle_flavor_profile_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_flavor_profile",
-          "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
           ],
+          "tableTo": "bottle",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -234,7 +261,7 @@
       },
       "uniqueConstraints": {}
     },
-    "bottle_tag": {
+    "public.bottle_tag": {
       "name": "bottle_tag",
       "schema": "",
       "columns": {
@@ -263,15 +290,15 @@
         "bottle_tag_bottle_id_bottle_id_fk": {
           "name": "bottle_tag_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_tag",
-          "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
           ],
+          "tableTo": "bottle",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -285,7 +312,7 @@
       },
       "uniqueConstraints": {}
     },
-    "bottle_tombstone": {
+    "public.bottle_tombstone": {
       "name": "bottle_tombstone",
       "schema": "",
       "columns": {
@@ -307,7 +334,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "bottle": {
+    "public.bottle": {
       "name": "bottle",
       "schema": "",
       "columns": {
@@ -462,115 +489,192 @@
       },
       "indexes": {
         "bottle_brand_unq": {
-          "name": "bottle_brand_unq",
           "columns": [
-            "name",
-            "brand_id"
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "brand_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "bottle_brand_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "bottle_full_name_unq": {
-          "name": "bottle_full_name_unq",
           "columns": [
-            "full_name"
+            {
+              "expression": "full_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "bottle_full_name_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "bottle_uniq_hash": {
-          "name": "bottle_uniq_hash",
           "columns": [
-            "uniq_hash"
+            {
+              "expression": "uniq_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "bottle_uniq_hash",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "bottle_search_idx": {
-          "name": "bottle_search_idx",
           "columns": [
-            "search_vector"
+            {
+              "expression": "search_vector",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "bottle_search_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "bottle_brand_idx": {
-          "name": "bottle_brand_idx",
           "columns": [
-            "brand_id"
+            {
+              "expression": "brand_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "bottle_brand_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "bottle_bottler_idx": {
-          "name": "bottle_bottler_idx",
           "columns": [
-            "bottler_id"
+            {
+              "expression": "bottler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "bottle_bottler_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "bottle_created_by_idx": {
-          "name": "bottle_created_by_idx",
           "columns": [
-            "created_by_id"
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "bottle_created_by_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "bottle_category_idx": {
-          "name": "bottle_category_idx",
           "columns": [
-            "category"
+            {
+              "expression": "category",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "bottle_category_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "bottle_flavor_profile_idx": {
-          "name": "bottle_flavor_profile_idx",
           "columns": [
-            "flavor_profile"
+            {
+              "expression": "flavor_profile",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "bottle_flavor_profile_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "bottle_brand_id_entity_id_fk": {
           "name": "bottle_brand_id_entity_id_fk",
           "tableFrom": "bottle",
-          "tableTo": "entity",
           "columnsFrom": [
             "brand_id"
           ],
+          "tableTo": "entity",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "bottle_bottler_id_entity_id_fk": {
           "name": "bottle_bottler_id_entity_id_fk",
           "tableFrom": "bottle",
-          "tableTo": "entity",
           "columnsFrom": [
             "bottler_id"
           ],
+          "tableTo": "entity",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "bottle_created_by_id_user_id_fk": {
           "name": "bottle_created_by_id_user_id_fk",
           "tableFrom": "bottle",
-          "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "bottle_distiller": {
+    "public.bottle_distiller": {
       "name": "bottle_distiller",
       "schema": "",
       "columns": {
@@ -592,28 +696,28 @@
         "bottle_distiller_bottle_id_bottle_id_fk": {
           "name": "bottle_distiller_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_distiller",
-          "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
           ],
+          "tableTo": "bottle",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "bottle_distiller_distiller_id_entity_id_fk": {
           "name": "bottle_distiller_distiller_id_entity_id_fk",
           "tableFrom": "bottle_distiller",
-          "tableTo": "entity",
           "columnsFrom": [
             "distiller_id"
           ],
+          "tableTo": "entity",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -627,7 +731,7 @@
       },
       "uniqueConstraints": {}
     },
-    "change": {
+    "public.change": {
       "name": "change",
       "schema": "",
       "columns": {
@@ -685,32 +789,40 @@
       },
       "indexes": {
         "change_created_by_idx": {
-          "name": "change_created_by_idx",
           "columns": [
-            "created_by_id"
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "change_created_by_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "change_created_by_id_user_id_fk": {
           "name": "change_created_by_id_user_id_fk",
           "tableFrom": "change",
-          "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "collection_bottle": {
+    "public.collection_bottle": {
       "name": "collection_bottle",
       "schema": "",
       "columns": {
@@ -742,53 +854,74 @@
       },
       "indexes": {
         "collection_bottle_unq": {
-          "name": "collection_bottle_unq",
           "columns": [
-            "collection_id",
-            "bottle_id"
+            {
+              "expression": "collection_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "collection_bottle_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "collection_bottle_bottle_idx": {
-          "name": "collection_bottle_bottle_idx",
           "columns": [
-            "bottle_id"
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "collection_bottle_bottle_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "collection_bottle_collection_id_collection_id_fk": {
           "name": "collection_bottle_collection_id_collection_id_fk",
           "tableFrom": "collection_bottle",
-          "tableTo": "collection",
           "columnsFrom": [
             "collection_id"
           ],
+          "tableTo": "collection",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "collection_bottle_bottle_id_bottle_id_fk": {
           "name": "collection_bottle_bottle_id_bottle_id_fk",
           "tableFrom": "collection_bottle",
-          "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
           ],
+          "tableTo": "bottle",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "collection": {
+    "public.collection": {
       "name": "collection",
       "schema": "",
       "columns": {
@@ -827,40 +960,61 @@
       },
       "indexes": {
         "collection_name_unq": {
-          "name": "collection_name_unq",
           "columns": [
-            "name",
-            "created_by_id"
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "collection_name_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "collection_created_by_idx": {
-          "name": "collection_created_by_idx",
           "columns": [
-            "created_by_id"
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "collection_created_by_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "collection_created_by_id_user_id_fk": {
           "name": "collection_created_by_id_user_id_fk",
           "tableFrom": "collection",
-          "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "comments": {
+    "public.comments": {
       "name": "comments",
       "schema": "",
       "columns": {
@@ -898,47 +1052,65 @@
       },
       "indexes": {
         "comment_unq": {
-          "name": "comment_unq",
           "columns": [
-            "tasting_id",
-            "created_by_id",
-            "created_at"
+            {
+              "expression": "tasting_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "comment_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "comments_tasting_id_tasting_id_fk": {
           "name": "comments_tasting_id_tasting_id_fk",
           "tableFrom": "comments",
-          "tableTo": "tasting",
           "columnsFrom": [
             "tasting_id"
           ],
+          "tableTo": "tasting",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "comments_created_by_id_user_id_fk": {
           "name": "comments_created_by_id_user_id_fk",
           "tableFrom": "comments",
-          "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "country": {
+    "public.country": {
       "name": "country",
       "schema": "",
       "columns": {
@@ -995,25 +1167,41 @@
       },
       "indexes": {
         "country_name_unq": {
-          "name": "country_name_unq",
           "columns": [
-            "name"
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "country_name_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "country_slug_unq": {
-          "name": "country_slug_unq",
           "columns": [
-            "slug"
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "country_slug_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "entity": {
+    "public.entity": {
       "name": "entity",
       "schema": "",
       "columns": {
@@ -1138,66 +1326,98 @@
       },
       "indexes": {
         "entity_name_unq": {
-          "name": "entity_name_unq",
           "columns": [
-            "name"
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "entity_name_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "entity_search_idx": {
-          "name": "entity_search_idx",
           "columns": [
-            "search_vector"
+            {
+              "expression": "search_vector",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "entity_search_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "entity_country_by_idx": {
-          "name": "entity_country_by_idx",
           "columns": [
-            "country_id"
+            {
+              "expression": "country_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "entity_country_by_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "entity_created_by_idx": {
-          "name": "entity_created_by_idx",
           "columns": [
-            "created_by_id"
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "entity_created_by_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "entity_country_id_country_id_fk": {
           "name": "entity_country_id_country_id_fk",
           "tableFrom": "entity",
-          "tableTo": "country",
           "columnsFrom": [
             "country_id"
           ],
+          "tableTo": "country",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "entity_created_by_id_user_id_fk": {
           "name": "entity_created_by_id_user_id_fk",
           "tableFrom": "entity",
-          "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "entity_alias": {
+    "public.entity_alias": {
       "name": "entity_alias",
       "schema": "",
       "columns": {
@@ -1216,26 +1436,34 @@
       },
       "indexes": {
         "entity_alias_entity_idx": {
-          "name": "entity_alias_entity_idx",
           "columns": [
-            "entity_id"
+            {
+              "expression": "entity_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "entity_alias_entity_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "entity_alias_entity_id_entity_id_fk": {
           "name": "entity_alias_entity_id_entity_id_fk",
           "tableFrom": "entity_alias",
-          "tableTo": "entity",
           "columnsFrom": [
             "entity_id"
           ],
+          "tableTo": "entity",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -1248,7 +1476,7 @@
       },
       "uniqueConstraints": {}
     },
-    "entity_tombstone": {
+    "public.entity_tombstone": {
       "name": "entity_tombstone",
       "schema": "",
       "columns": {
@@ -1270,7 +1498,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "external_site_config": {
+    "public.external_site_config": {
       "name": "external_site_config",
       "schema": "",
       "columns": {
@@ -1312,15 +1540,15 @@
         "external_site_config_external_site_id_external_site_id_fk": {
           "name": "external_site_config_external_site_id_external_site_id_fk",
           "tableFrom": "external_site_config",
-          "tableTo": "external_site",
           "columnsFrom": [
             "external_site_id"
           ],
+          "tableTo": "external_site",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -1334,7 +1562,7 @@
       },
       "uniqueConstraints": {}
     },
-    "external_site": {
+    "public.external_site": {
       "name": "external_site",
       "schema": "",
       "columns": {
@@ -1385,18 +1613,26 @@
       },
       "indexes": {
         "external_site_type": {
-          "name": "external_site_type",
           "columns": [
-            "type"
+            {
+              "expression": "type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "external_site_type",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "flight_bottle": {
+    "public.flight_bottle": {
       "name": "flight_bottle",
       "schema": "",
       "columns": {
@@ -1418,28 +1654,28 @@
         "flight_bottle_flight_id_flight_id_fk": {
           "name": "flight_bottle_flight_id_flight_id_fk",
           "tableFrom": "flight_bottle",
-          "tableTo": "flight",
           "columnsFrom": [
             "flight_id"
           ],
+          "tableTo": "flight",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "flight_bottle_bottle_id_bottle_id_fk": {
           "name": "flight_bottle_bottle_id_bottle_id_fk",
           "tableFrom": "flight_bottle",
-          "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
           ],
+          "tableTo": "bottle",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -1453,7 +1689,7 @@
       },
       "uniqueConstraints": {}
     },
-    "flight": {
+    "public.flight": {
       "name": "flight",
       "schema": "",
       "columns": {
@@ -1504,32 +1740,40 @@
       },
       "indexes": {
         "flight_public_id": {
-          "name": "flight_public_id",
           "columns": [
-            "public_id"
+            {
+              "expression": "public_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "flight_public_id",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "flight_created_by_id_user_id_fk": {
           "name": "flight_created_by_id_user_id_fk",
           "tableFrom": "flight",
-          "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "follow": {
+    "public.follow": {
       "name": "follow",
       "schema": "",
       "columns": {
@@ -1568,53 +1812,74 @@
       },
       "indexes": {
         "follow_unq": {
-          "name": "follow_unq",
           "columns": [
-            "from_user_id",
-            "to_user_id"
+            {
+              "expression": "from_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "to_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "follow_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "follow_to_user_idx": {
-          "name": "follow_to_user_idx",
           "columns": [
-            "to_user_id"
+            {
+              "expression": "to_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "follow_to_user_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "follow_from_user_id_user_id_fk": {
           "name": "follow_from_user_id_user_id_fk",
           "tableFrom": "follow",
-          "tableTo": "user",
           "columnsFrom": [
             "from_user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "follow_to_user_id_user_id_fk": {
           "name": "follow_to_user_id_user_id_fk",
           "tableFrom": "follow",
-          "tableTo": "user",
           "columnsFrom": [
             "to_user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "identity": {
+    "public.identity": {
       "name": "identity",
       "schema": "",
       "columns": {
@@ -1645,40 +1910,61 @@
       },
       "indexes": {
         "identity_unq": {
-          "name": "identity_unq",
           "columns": [
-            "provider",
-            "external_id"
+            {
+              "expression": "provider",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "external_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "identity_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "identity_user_idx": {
-          "name": "identity_user_idx",
           "columns": [
-            "user_id"
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "identity_user_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "identity_user_id_user_id_fk": {
           "name": "identity_user_id_user_id_fk",
           "tableFrom": "identity",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "notifications": {
+    "public.notifications": {
       "name": "notifications",
       "schema": "",
       "columns": {
@@ -1728,48 +2014,71 @@
       },
       "indexes": {
         "notifications_unq": {
-          "name": "notifications_unq",
           "columns": [
-            "user_id",
-            "object_id",
-            "type",
-            "created_at"
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "object_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "notifications_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "notifications_user_id_user_id_fk": {
           "name": "notifications_user_id_user_id_fk",
           "tableFrom": "notifications",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "notifications_from_user_id_user_id_fk": {
           "name": "notifications_from_user_id_user_id_fk",
           "tableFrom": "notifications",
-          "tableTo": "user",
           "columnsFrom": [
             "from_user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "review": {
+    "public.review": {
       "name": "review",
       "schema": "",
       "columns": {
@@ -1832,62 +2141,88 @@
       },
       "indexes": {
         "review_unq_name": {
-          "name": "review_unq_name",
           "columns": [
-            "external_site_id",
-            "name",
-            "issue"
+            {
+              "expression": "external_site_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "issue",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "review_unq_name",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "review_bottle_idx": {
-          "name": "review_bottle_idx",
           "columns": [
-            "bottle_id"
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "review_bottle_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "review_external_site_id_external_site_id_fk": {
           "name": "review_external_site_id_external_site_id_fk",
           "tableFrom": "review",
-          "tableTo": "external_site",
           "columnsFrom": [
             "external_site_id"
           ],
+          "tableTo": "external_site",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "review_bottle_id_bottle_id_fk": {
           "name": "review_bottle_id_bottle_id_fk",
           "tableFrom": "review",
-          "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
           ],
+          "tableTo": "bottle",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "review_url_unique": {
           "name": "review_url_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "url"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
-    "store_price_history": {
+    "public.store_price_history": {
       "name": "store_price_history",
       "schema": "",
       "columns": {
@@ -1932,34 +2267,52 @@
       },
       "indexes": {
         "store_price_history_unq": {
-          "name": "store_price_history_unq",
           "columns": [
-            "price_id",
-            "volume",
-            "date"
+            {
+              "expression": "price_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "volume",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "store_price_history_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "store_price_history_price_id_store_price_id_fk": {
           "name": "store_price_history_price_id_store_price_id_fk",
           "tableFrom": "store_price_history",
-          "tableTo": "store_price",
           "columnsFrom": [
             "price_id"
           ],
+          "tableTo": "store_price",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "store_price": {
+    "public.store_price": {
       "name": "store_price",
       "schema": "",
       "columns": {
@@ -2028,62 +2381,88 @@
       },
       "indexes": {
         "store_price_unq_name": {
-          "name": "store_price_unq_name",
           "columns": [
-            "external_site_id",
-            "name",
-            "volume"
+            {
+              "expression": "external_site_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "volume",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "store_price_unq_name",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "store_price_bottle_idx": {
-          "name": "store_price_bottle_idx",
           "columns": [
-            "bottle_id"
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "store_price_bottle_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "store_price_external_site_id_external_site_id_fk": {
           "name": "store_price_external_site_id_external_site_id_fk",
           "tableFrom": "store_price",
-          "tableTo": "external_site",
           "columnsFrom": [
             "external_site_id"
           ],
+          "tableTo": "external_site",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "store_price_bottle_id_bottle_id_fk": {
           "name": "store_price_bottle_id_bottle_id_fk",
           "tableFrom": "store_price",
-          "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
           ],
+          "tableTo": "bottle",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "store_price_url_unique": {
           "name": "store_price_url_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "url"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
-    "tag": {
+    "public.tag": {
       "name": "tag",
       "schema": "",
       "columns": {
@@ -2119,7 +2498,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "tasting": {
+    "public.tasting": {
       "name": "tasting",
       "schema": "",
       "columns": {
@@ -2215,81 +2594,123 @@
       },
       "indexes": {
         "tasting_unq": {
-          "name": "tasting_unq",
           "columns": [
-            "bottle_id",
-            "created_by_id",
-            "created_at"
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "tasting_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "tasting_bottle_idx": {
-          "name": "tasting_bottle_idx",
           "columns": [
-            "bottle_id"
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "tasting_bottle_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "tasting_flight_idx": {
-          "name": "tasting_flight_idx",
           "columns": [
-            "flight_id"
+            {
+              "expression": "flight_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "tasting_flight_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "tasting_created_by_idx": {
-          "name": "tasting_created_by_idx",
           "columns": [
-            "created_by_id"
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "tasting_created_by_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "tasting_bottle_id_bottle_id_fk": {
           "name": "tasting_bottle_id_bottle_id_fk",
           "tableFrom": "tasting",
-          "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
           ],
+          "tableTo": "bottle",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "tasting_flight_id_flight_id_fk": {
           "name": "tasting_flight_id_flight_id_fk",
           "tableFrom": "tasting",
-          "tableTo": "flight",
           "columnsFrom": [
             "flight_id"
           ],
+          "tableTo": "flight",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "tasting_created_by_id_user_id_fk": {
           "name": "tasting_created_by_id_user_id_fk",
           "tableFrom": "tasting",
-          "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "toasts": {
+    "public.toasts": {
       "name": "toasts",
       "schema": "",
       "columns": {
@@ -2321,46 +2742,59 @@
       },
       "indexes": {
         "toast_unq": {
-          "name": "toast_unq",
           "columns": [
-            "tasting_id",
-            "created_by_id"
+            {
+              "expression": "tasting_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "toast_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "toasts_tasting_id_tasting_id_fk": {
           "name": "toasts_tasting_id_tasting_id_fk",
           "tableFrom": "toasts",
-          "tableTo": "tasting",
           "columnsFrom": [
             "tasting_id"
           ],
+          "tableTo": "tasting",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "toasts_created_by_id_user_id_fk": {
           "name": "toasts_created_by_id_user_id_fk",
           "tableFrom": "toasts",
-          "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "user": {
+    "public.user": {
       "name": "user",
       "schema": "",
       "columns": {
@@ -2438,18 +2872,34 @@
       },
       "indexes": {
         "user_email_unq": {
-          "name": "user_email_unq",
           "columns": [
-            "email"
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "user_email_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         },
         "user_username_unq": {
-          "name": "user_username_unq",
           "columns": [
-            "username"
+            {
+              "expression": "username",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "user_username_unq",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -2458,145 +2908,161 @@
     }
   },
   "enums": {
-    "badge_type": {
+    "public.badge_type": {
       "name": "badge_type",
-      "values": {
-        "bottle": "bottle",
-        "region": "region",
-        "category": "category"
-      }
+      "schema": "public",
+      "values": [
+        "bottle",
+        "region",
+        "category"
+      ]
     },
-    "type": {
+    "public.type": {
       "name": "type",
-      "values": {
-        "add": "add",
-        "update": "update",
-        "delete": "delete"
-      }
+      "schema": "public",
+      "values": [
+        "add",
+        "update",
+        "delete"
+      ]
     },
-    "entity_type": {
+    "public.entity_type": {
       "name": "entity_type",
-      "values": {
-        "brand": "brand",
-        "distiller": "distiller",
-        "bottler": "bottler"
-      }
+      "schema": "public",
+      "values": [
+        "brand",
+        "distiller",
+        "bottler"
+      ]
     },
-    "category": {
+    "public.category": {
       "name": "category",
-      "values": {
-        "blend": "blend",
-        "bourbon": "bourbon",
-        "rye": "rye",
-        "single_grain": "single_grain",
-        "single_malt": "single_malt",
-        "single_pot_still": "single_pot_still",
-        "spirit": "spirit"
-      }
+      "schema": "public",
+      "values": [
+        "blend",
+        "bourbon",
+        "rye",
+        "single_grain",
+        "single_malt",
+        "single_pot_still",
+        "spirit"
+      ]
     },
-    "content_source": {
+    "public.content_source": {
       "name": "content_source",
-      "values": {
-        "generated": "generated",
-        "user": "user"
-      }
+      "schema": "public",
+      "values": [
+        "generated",
+        "user"
+      ]
     },
-    "flavor_profile": {
+    "public.flavor_profile": {
       "name": "flavor_profile",
-      "values": {
-        "young_spritely": "young_spritely",
-        "sweet_fruit_mellow": "sweet_fruit_mellow",
-        "spicy_sweet": "spicy_sweet",
-        "spicy_dry": "spicy_dry",
-        "deep_rich_dried_fruit": "deep_rich_dried_fruit",
-        "old_dignified": "old_dignified",
-        "light_delicate": "light_delicate",
-        "juicy_oak_vanilla": "juicy_oak_vanilla",
-        "oily_coastal": "oily_coastal",
-        "lightly_peated": "lightly_peated",
-        "peated": "peated",
-        "heavily_peated": "heavily_peated"
-      }
+      "schema": "public",
+      "values": [
+        "young_spritely",
+        "sweet_fruit_mellow",
+        "spicy_sweet",
+        "spicy_dry",
+        "deep_rich_dried_fruit",
+        "old_dignified",
+        "light_delicate",
+        "juicy_oak_vanilla",
+        "oily_coastal",
+        "lightly_peated",
+        "peated",
+        "heavily_peated"
+      ]
     },
-    "object_type": {
+    "public.object_type": {
       "name": "object_type",
-      "values": {
-        "bottle": "bottle",
-        "comment": "comment",
-        "entity": "entity",
-        "tasting": "tasting",
-        "toast": "toast",
-        "follow": "follow"
-      }
+      "schema": "public",
+      "values": [
+        "bottle",
+        "comment",
+        "entity",
+        "tasting",
+        "toast",
+        "follow"
+      ]
     },
-    "tag_category": {
+    "public.tag_category": {
       "name": "tag_category",
-      "values": {
-        "cereal": "cereal",
-        "fruity": "fruity",
-        "floral": "floral",
-        "peaty": "peaty",
-        "feinty": "feinty",
-        "sulphury": "sulphury",
-        "woody": "woody",
-        "winey": "winey"
-      }
+      "schema": "public",
+      "values": [
+        "cereal",
+        "fruity",
+        "floral",
+        "peaty",
+        "feinty",
+        "sulphury",
+        "woody",
+        "winey"
+      ]
     },
-    "external_site_type": {
+    "public.external_site_type": {
       "name": "external_site_type",
-      "values": {
-        "astorwines": "astorwines",
-        "healthyspirits": "healthyspirits",
-        "smws": "smws",
-        "smwsa": "smwsa",
-        "totalwine": "totalwine",
-        "woodencork": "woodencork",
-        "whiskyadvocate": "whiskyadvocate"
-      }
+      "schema": "public",
+      "values": [
+        "astorwines",
+        "healthyspirits",
+        "smws",
+        "smwsa",
+        "totalwine",
+        "woodencork",
+        "whiskyadvocate"
+      ]
     },
-    "follow_status": {
+    "public.follow_status": {
       "name": "follow_status",
-      "values": {
-        "none": "none",
-        "pending": "pending",
-        "following": "following"
-      }
+      "schema": "public",
+      "values": [
+        "none",
+        "pending",
+        "following"
+      ]
     },
-    "identity_provider": {
+    "public.identity_provider": {
       "name": "identity_provider",
-      "values": {
-        "google": "google"
-      }
+      "schema": "public",
+      "values": [
+        "google"
+      ]
     },
-    "notification_type": {
+    "public.notification_type": {
       "name": "notification_type",
-      "values": {
-        "comment": "comment",
-        "toast": "toast",
-        "friend_request": "friend_request"
-      }
+      "schema": "public",
+      "values": [
+        "comment",
+        "toast",
+        "friend_request"
+      ]
     },
-    "currency": {
+    "public.currency": {
       "name": "currency",
-      "values": {
-        "usd": "usd",
-        "gbp": "gbp",
-        "eur": "eur"
-      }
+      "schema": "public",
+      "values": [
+        "usd",
+        "gbp",
+        "eur"
+      ]
     },
-    "servingStyle": {
+    "public.servingStyle": {
       "name": "servingStyle",
-      "values": {
-        "neat": "neat",
-        "rocks": "rocks",
-        "splash": "splash"
-      }
+      "schema": "public",
+      "values": [
+        "neat",
+        "rocks",
+        "splash"
+      ]
     }
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "1d011aa5-5ab1-4a11-bd71-d8b44b0dafa2",
+  "prevId": "54c7051c-113c-4993-8f1a-a15ecb5be455"
 }

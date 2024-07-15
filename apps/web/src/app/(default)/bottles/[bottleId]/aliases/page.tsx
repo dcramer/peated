@@ -46,12 +46,7 @@ export default function BottleAliases({
           value: (item) =>
             !item.isCanonical && (
               <ConfirmationButton
-                onContinue={() =>
-                  deleteAliasMutation.mutate({
-                    bottle: Number(bottleId),
-                    name: item.name,
-                  })
-                }
+                onContinue={() => deleteAliasMutation.mutate(item.name)}
               >
                 Delete
               </ConfirmationButton>

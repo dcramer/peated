@@ -32,12 +32,16 @@ export const regions = pgTable(
   },
   (table) => {
     return {
-      nameUnique: uniqueIndex("region_name_unq")
-        .on(table.name)
-        .using(sql`btree (countryId, LOWER(name))`),
-      slugUnique: uniqueIndex("region_slug_unq")
-        .on(table.slug)
-        .using(sql`btree (countryId, LOWER(slug))`),
+      nameUnique: uniqueIndex("region_name_unq").using(
+        "btree",
+        table.countryId,
+        sql`LOWER(${table.name})`,
+      ),
+      slugUnique: uniqueIndex("region_slug_unq").using(
+        "btree",
+        table.countryId,
+        sql`LOWER(${table.slug})`,
+      ),
       countryId: index("region_country_idx").on(table.countryId),
     };
   },

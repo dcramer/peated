@@ -1,6 +1,6 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { bottles, reviews } from "@peated/server/db/schema";
+import { bottleAliases, bottles, reviews } from "@peated/server/db/schema";
 import { findEntity } from "@peated/server/lib/bottleFinder";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { createCaller } from "@peated/server/trpc/router";
@@ -213,6 +213,32 @@ subcommand
       for (const { id } of query) {
         console.log(`Indexing search vectors for Bottle ${id}.`);
         await runJob("IndexBottleSearchVectors", { bottleId: id });
+        hasResults = true;
+      }
+      offset += step;
+    }
+  });
+
+subcommand
+  .command("index-aliases")
+  .description("Update bottle alias indexes")
+  .option("--only-missing")
+  .action(async (options) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({ name: bottleAliases.name })
+      .from(bottleAliases)
+      .where(options.onlyMissing ? isNull(bottleAliases.embedding) : undefined)
+      .orderBy(asc(bottleAliases.createdAt));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { name } of query) {
+        console.log(`Indexing embeddings for alias ${name}.`);
+        await runJob("IndexBottleAlias", { name });
         hasResults = true;
       }
       offset += step;

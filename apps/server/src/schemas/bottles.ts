@@ -47,7 +47,7 @@ export const BottleSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 
-  createdBy: UserSchema.optional(),
+  createdBy: UserSchema.nullish(),
 
   isFavorite: z.boolean().optional(),
   hasTasted: z.boolean().optional(),
@@ -81,6 +81,12 @@ export const BottleInputSchema = z.object({
 });
 
 export const BottleMergeSchema = z.object({
+  // TODO: rename to bottle
   bottleId: z.number(),
   direction: z.enum(["mergeInto", "mergeFrom"]),
+});
+
+export const BottleAliasSchema = z.object({
+  bottle: z.number(),
+  name: z.string(),
 });

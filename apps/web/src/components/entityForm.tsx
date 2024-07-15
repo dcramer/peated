@@ -127,7 +127,6 @@ export default function EntityForm({
           <TextField
             {...register("shortName")}
             error={errors.name}
-            autoFocus
             label="Short Name"
             type="text"
             placeholder="e.g. MC"
@@ -213,7 +212,6 @@ export default function EntityForm({
           <TextAreaField
             {...register("address")}
             error={errors.description}
-            autoFocus
             label="Address"
             helpText="The address of the entity. This should be the location of the distiller or tasting room."
             placeholder="e.g. 132 Whisky Ln, Islay, Scotland, PA42 7DU"
@@ -242,7 +240,6 @@ export default function EntityForm({
               setValueAs: (v) => (v === "" || !v ? null : v),
             })}
             error={errors.website}
-            autoFocus
             label="Website"
             type="text"
             placeholder="e.g. https://example.com"
@@ -253,7 +250,6 @@ export default function EntityForm({
               setValueAs: (v) => (v === "" || !v ? null : Number(v)),
             })}
             error={errors.yearEstablished}
-            autoFocus
             label="Year Established"
             type="number"
             placeholder="e.g. 1969"
@@ -268,7 +264,6 @@ export default function EntityForm({
                 },
               })}
               error={errors.description}
-              autoFocus
               label="Description"
               rows={8}
             />

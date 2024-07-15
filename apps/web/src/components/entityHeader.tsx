@@ -51,7 +51,7 @@ export default function EntityHeader({
               size="small"
               color="highlight"
               as={Link}
-              href={`${getEntityTypeSearchUrl(t)}?type=${encodeURIComponent(t)}`}
+              href={`${getEntityTypeSearchUrl(t)}`}
             >
               {t}
             </Chip>

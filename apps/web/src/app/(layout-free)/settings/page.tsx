@@ -16,6 +16,7 @@ import TextField from "@peated/web/components/textField";
 import useApi from "@peated/web/hooks/useApi";
 import useAuth from "@peated/web/hooks/useAuth";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { updateSession } from "@peated/web/lib/auth.actions";
 import { toBlob } from "@peated/web/lib/blobs";
 import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
 import { redirect, useRouter } from "next/navigation";
@@ -57,6 +58,7 @@ export default function Page() {
       } else {
         newAvatar = {};
       }
+      await updateSession();
       setUser({
         ...newUser,
         ...newAvatar,

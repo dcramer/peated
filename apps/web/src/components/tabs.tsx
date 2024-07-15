@@ -7,16 +7,20 @@ import classNames from "../lib/classNames";
 
 type Props = {
   fullWidth?: boolean;
+  noMargin?: boolean;
   border?: boolean;
 } & React.ComponentPropsWithoutRef<"nav">;
 
-const Tabs = ({ fullWidth, border, ...props }: Props) => {
+const Tabs = ({ fullWidth, border, noMargin, ...props }: Props) => {
   return (
     <nav
       className={classNames(
-        "-mb-px flex space-x-8",
-        fullWidth ? "[&>*]:flex-auto [&>*]:justify-center" : "",
+        "flex space-x-8",
+        fullWidth
+          ? "[&>*]:flex-auto [&>*]:justify-center"
+          : "max-lg:[&>*]:flex-auto max-lg:[&>*]:justify-center",
         border ? "border-b border-slate-700" : "",
+        noMargin ? "-mb-px" : "mb-4",
       )}
       aria-label="Tabs"
       {...props}
@@ -28,6 +32,7 @@ type ItemProps = {
   active?: boolean;
   count?: number;
   controlled?: boolean;
+  desktopOnly?: boolean;
 };
 
 const defaultElement = "button";
@@ -38,6 +43,7 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
   count,
   children,
   controlled,
+  desktopOnly,
   ...props
 }: PolymorphicProps<E, ItemProps>) {
   const Component = as ?? defaultElement;
@@ -54,7 +60,8 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
 
   const className = classNames(
     active ? activeStyles : inactiveStyles,
-    "flex whitespace-nowrap border-b-4 px-3 py-4 text-sm font-medium",
+    "whitespace-nowrap border-b-4 px-3 py-4 text-sm font-medium",
+    desktopOnly ? "hidden lg:flex" : "flex",
   );
 
   return (

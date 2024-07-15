@@ -33,22 +33,22 @@ export default function SearchPanel({
 }: Props) {
   const { user } = useAuth();
   const qs = useSearchParams();
-
   const directToTasting = qs.has("tasting");
 
   const router = useRouter();
 
-  const [query, setQuery] = useState(initialValue || value || "");
+  const [query, setQuery] = useState(initialValue ?? value ?? "");
   const [state, setState] = useState<"loading" | "ready">("loading");
-
   const [results, setResults] = useState<readonly Result[]>([]);
-  const isUserQuery = query.indexOf("@") !== -1 && user;
 
   const trpcUtils = trpc.useUtils();
+  const isUserQuery = query.indexOf("@") !== -1 && user;
 
   // TODO: handle errors
   const onQuery = useDebounceCallback(async (query: string) => {
     setState("loading");
+
+    const isUserQuery = query.indexOf("@") !== -1 && user;
 
     const include: ("bottles" | "entities" | "users")[] = [];
     if (directToTasting || !isUserQuery) include.push("bottles");
@@ -63,23 +63,15 @@ export default function SearchPanel({
     });
 
     setResults(results);
-
-    setQuery(query);
-    if (onQueryChange) onQueryChange(query);
     setState("ready");
   });
 
   useEffect(() => {
-    setQuery(value || "");
-    if (onQueryChange) onQueryChange(value || "");
-    onQuery(value || "");
-  }, [value]);
-
-  useEffect(() => {
-    setQuery(initialValue || "");
-    if (onQueryChange) onQueryChange(initialValue || "");
-    onQuery(initialValue || "");
-  }, [initialValue]);
+    const curValue = initialValue ?? value ?? "";
+    setQuery(curValue);
+    if (onQueryChange) onQueryChange(curValue);
+    onQuery(curValue);
+  }, [initialValue, value]);
 
   return (
     <Layout
@@ -92,8 +84,9 @@ export default function SearchPanel({
             placeholder="Search for bottles, brands, and people"
             value={query}
             onChange={(value) => {
+              setQuery(value);
+              if (onQueryChange) onQueryChange(value);
               onQuery(value);
-              if (onQueryChange) onQueryChange(query);
             }}
             onSubmit={(value) => {
               router.replace(
@@ -120,7 +113,9 @@ export default function SearchPanel({
 
             <div className="min-w-0 flex-auto">
               <div className="font-semibold leading-6">
-                <Link href="/addBottle">
+                <Link
+                  href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}`}
+                >
                   <span className="absolute inset-x-0 -top-px bottom-0" />
                   {"Can't find a bottle?"}
                 </Link>

@@ -8,6 +8,7 @@ import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
 import bottleAliasDelete from "./routes/bottleAliasDelete";
 import bottleAliasList from "./routes/bottleAliasList";
+import bottleAliasUpsert from "./routes/bottleAliasUpsert";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
@@ -108,6 +109,7 @@ export const appRouter = router({
   bottleList,
   bottleAliasDelete,
   bottleAliasList,
+  bottleAliasUpsert,
   bottleGenerateDetails,
   bottleMerge,
   bottlePriceHistory,

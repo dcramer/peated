@@ -5,11 +5,12 @@ import {
   reviews,
 } from "@peated/server/db/schema";
 import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
+import { upsertBottleAlias } from "@peated/server/lib/db";
 import { ReviewInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import { TRPCError } from "@trpc/server";
-import { eq, isNull, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { adminProcedure } from "..";
 import { bottleCreate } from "./bottleCreate";
 
@@ -66,19 +67,7 @@ export default adminProcedure
         .returning();
 
       if (bottleId) {
-        await tx
-          .insert(bottleAliases)
-          .values({
-            bottleId,
-            name: input.name,
-          })
-          .onConflictDoUpdate({
-            target: [bottleAliases.name],
-            set: {
-              bottleId,
-            },
-            where: isNull(bottleAliases.bottleId),
-          });
+        await upsertBottleAlias(tx, bottleId, input.name);
       } else {
         await db
           .insert(bottleAliases)

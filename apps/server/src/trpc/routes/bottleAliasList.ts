@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottleAliases, bottles } from "@peated/server/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -24,8 +24,9 @@ export default publicProcedure
       });
     }
 
+    const { embedding, ...columns } = getTableColumns(bottleAliases);
     const results = await db
-      .select()
+      .select(columns)
       .from(bottleAliases)
       .where(and(eq(bottleAliases.bottleId, bottle.id)));
 

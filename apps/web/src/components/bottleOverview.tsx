@@ -13,16 +13,11 @@ import DefinitionList from "./definitionList";
 import Heading from "./heading";
 import Markdown from "./markdown";
 import TimeSince from "./timeSince";
+import UserAvatar from "./userAvatar";
 
 export default function BottleOverview({ bottle }: { bottle: Bottle }) {
   return (
     <>
-      <div className="my-6 px-3 md:px-0">
-        <Suspense fallback={<BottleTagDistributionSkeleton />}>
-          <BottleTagDistribution bottleId={bottle.id} />
-        </Suspense>
-      </div>
-
       <div className="my-6 px-3 md:px-0">
         <div className="flex space-x-4">
           <div className="max-w-none flex-auto">
@@ -40,6 +35,11 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
             {bottle.tastingNotes && (
               <>
                 <Heading as="h3">Tasting Notes</Heading>
+                <div className="my-6 px-3 md:px-0">
+                  <Suspense fallback={<BottleTagDistributionSkeleton />}>
+                    <BottleTagDistribution bottleId={bottle.id} />
+                  </Suspense>
+                </div>
                 <DefinitionList>
                   <DefinitionList.Term>Nose</DefinitionList.Term>
                   <DefinitionList.Details>
@@ -102,11 +102,15 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
               </DefinitionList.Details>
               <DefinitionList.Term>Cask Details</DefinitionList.Term>
               <DefinitionList.Details>
-                <CaskDetails
-                  caskFill={bottle.caskFill}
-                  caskSize={bottle.caskSize}
-                  caskType={bottle.caskType}
-                />
+                {bottle.caskFill || bottle.caskSize || bottle.caskType ? (
+                  <CaskDetails
+                    caskFill={bottle.caskFill}
+                    caskSize={bottle.caskSize}
+                    caskType={bottle.caskType}
+                  />
+                ) : (
+                  <em>unknown</em>
+                )}
               </DefinitionList.Details>
               {!!bottle.vintageYear && (
                 <>
@@ -124,28 +128,37 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                   </DefinitionList.Details>
                 </>
               )}
+              <>
+                <DefinitionList.Term>Added By</DefinitionList.Term>
+                <DefinitionList.Details>
+                  {bottle.createdBy ? (
+                    <>
+                      <Link
+                        href={`/users/${bottle.createdBy.username}`}
+                        className="flex items-center gap-x-2 truncate hover:underline"
+                      >
+                        <UserAvatar size={16} user={bottle.createdBy} />
+                        {bottle.createdBy.username}
+                      </Link>
+                      {bottle.createdAt && (
+                        <TimeSince date={bottle.createdAt} />
+                      )}
+                    </>
+                  ) : (
+                    <em>unknown</em>
+                  )}
+                </DefinitionList.Details>
+              </>
             </DefinitionList>
           </div>
           <img
             src={RobotImage.src}
             className="hidden h-40 w-40 sm:block"
             alt="peated robot"
+            aria-hidden="true"
           />
         </div>
       </div>
-
-      {bottle.createdBy && (
-        <div className="text-light mt-8 text-center text-sm sm:text-left">
-          This bottle was first added by{" "}
-          <Link
-            href={`/users/${bottle.createdBy.username}`}
-            className="font-medium hover:underline"
-          >
-            {bottle.createdBy.displayName}
-          </Link>{" "}
-          {bottle.createdAt && <TimeSince date={bottle.createdAt} />}
-        </div>
-      )}
     </>
   );
 }

@@ -57,13 +57,20 @@ export const StorePriceWithSiteSerializer = serializer({
     attrs: Record<string, any>,
     currentUser?: User,
   ): z.infer<typeof StorePriceSchema> => {
+    // add a referrer marker to the URL in case upstream sites want to track
+    // where the traffic is coming from
+    const affUrl =
+      item.url.indexOf("?") !== -1
+        ? `${item.url}&utm=peated`
+        : `${item.url}?utm=peated`;
+
     return {
       id: item.id,
       name: item.name,
       price: item.price,
       volume: item.volume,
       currency: item.currency,
-      url: item.url,
+      url: affUrl,
       site: attrs.site,
       updatedAt: item.updatedAt.toISOString(),
     };

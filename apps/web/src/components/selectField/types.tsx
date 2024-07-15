@@ -3,11 +3,11 @@ import type { ReactNode } from "react";
 export type Option = {
   id?: string | number | null;
   name: string;
-};
+} & Record<string, any>;
 
 export type CreateFormOptions<T extends Option> = {
   data: T;
-  onFieldChange: (arg0: Partial<T>) => void;
+  onFieldChange: (arg0: T) => void;
   onSubmit: (newOption: T) => void;
   onClose: () => void;
 };

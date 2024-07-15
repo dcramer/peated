@@ -108,7 +108,7 @@ export default function ErrorPage({
           {error && (
             <div className="mt-12">
               {error instanceof ApiError && (
-                <div className="prose mx-auto mb-4">
+                <div className="prose prose-invert mx-auto mb-4">
                   <h3 className="text-white">Remote Stack</h3>
                   <pre className="max-h-full overflow-y-auto whitespace-pre-wrap break-all text-left">
                     {error.remoteStack}
@@ -116,7 +116,7 @@ export default function ErrorPage({
                 </div>
               )}
               {error.stack && (
-                <div className="prose mx-auto mb-4">
+                <div className="prose prose-invert mx-auto mb-4">
                   <h3 className="text-white">Local Stack</h3>
                   <pre className="max-h-full overflow-y-auto whitespace-pre-wrap break-all text-left">
                     {error.stack}

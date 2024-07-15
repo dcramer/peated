@@ -73,17 +73,19 @@ export default function SidePanel({
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={() => {
-        onClose && onClose();
-      }}
-      className="absolute bottom-0 left-0 right-0 top-0 z-50 h-full overflow-auto border-l border-l-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 to-20% lg:fixed lg:left-1/3 lg:px-6 lg:py-4"
-      {...props}
-    >
-      <SidePanelContext.Provider value={context}>
-        <DialogPanel>{children}</DialogPanel>
-      </SidePanelContext.Provider>
-    </Dialog>
+    <div>
+      <Dialog
+        open={open}
+        onClose={() => {
+          onClose && onClose();
+        }}
+        className="absolute bottom-0 left-0 right-0 top-0 z-50 h-full overflow-auto border-l border-l-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 to-20% lg:fixed lg:left-1/3 lg:px-6 lg:py-4"
+        {...props}
+      >
+        <SidePanelContext.Provider value={context}>
+          <DialogPanel>{children}</DialogPanel>
+        </SidePanelContext.Provider>
+      </Dialog>
+    </div>
   );
 }

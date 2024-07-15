@@ -17,7 +17,7 @@ import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike, ne, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 
@@ -152,16 +152,31 @@ export default modProcedure
           newAliases.push(data.name.substring(4));
         }
 
-        for (const newAlias of newAliases) {
+        for (const aliasName of newAliases) {
           const existingAlias = await tx.query.entityAliases.findFirst({
-            where: ilike(entityAliases.name, newAlias),
+            where: eq(
+              sql`LOWER(${entityAliases.name})`,
+              aliasName.toLowerCase(),
+            ),
           });
 
           if (existingAlias?.entityId === newEntity.id) {
+            if (existingAlias.name !== aliasName) {
+              // case change
+              await tx
+                .update(entityAliases)
+                .set({ name: aliasName })
+                .where(
+                  eq(
+                    sql`LOWER(${entityAliases.name})`,
+                    existingAlias.name.toLowerCase(),
+                  ),
+                );
+            }
             // we're good - likely renaming to an alias that already existed
           } else if (!existingAlias) {
             await tx.insert(entityAliases).values({
-              name: newAlias,
+              name: aliasName,
               entityId: newEntity.id,
               createdAt: newEntity.createdAt,
             });
@@ -171,7 +186,12 @@ export default modProcedure
               .set({
                 entityId: newEntity.id,
               })
-              .where(and(eq(entityAliases.name, newAlias)));
+              .where(
+                eq(
+                  sql`LOWER(${entityAliases.name})`,
+                  existingAlias.name.toLowerCase(),
+                ),
+              );
           } else {
             throw new Error(
               `Duplicate alias found (${existingAlias.entityId}). Not implemented.`,
@@ -199,13 +219,24 @@ export default modProcedure
               ),
             ),
           );
+
+        // we do insert vs update to handle the ON CONFLICT scenario
         await tx.execute(sql`
-          UPDATE ${bottleAliases}
-          SET "name" = ${bottles.fullName}
-          FROM ${bottles}
-          WHERE ${bottles.id} = ${bottleAliases.bottleId}
-            AND ${bottles.brandId} = ${newEntity.id}
-            AND ${bottleAliases.name} = ${entity.name} || ' ' || ${bottles.name}`);
+            INSERT INTO ${bottleAliases} (name, bottle_id)
+            SELECT ${bottles.fullName}, ${bottles.id} FROM ${bottles}
+            WHERE ${bottles.brandId} = ${newEntity.id}
+            ON CONFLICT (LOWER(${bottleAliases.name}))
+            DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL
+        `);
+
+        await tx.execute(sql`
+            DELETE FROM ${bottleAliases}
+            WHERE ${bottleAliases.bottleId} IN (
+              SELECT ${bottles.id} FROM ${bottles}
+               WHERE ${bottles.brandId} = ${newEntity.id}
+                 AND LOWER(${bottleAliases.name}) = LOWER(${entity.name} || ' ' || ${bottles.name})
+            )
+        `);
       }
 
       await tx.insert(changes).values({
