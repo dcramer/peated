@@ -31,7 +31,7 @@
     "pg": "^8.12.0",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.16.0",
-    "typescript": "~5.4.5"
+    "typescript": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"
