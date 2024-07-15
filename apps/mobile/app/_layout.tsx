@@ -4,13 +4,30 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import * as Sentry from "@sentry/react-native";
+import { isRunningInExpoGo } from "expo";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useNavigationContainerRef } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@peated/mobile/components/useColorScheme";
+
+// Construct a new instrumentation instance. This is needed to communicate between the integration and React
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
+
+Sentry.init({
+  enableSpotlight: true,
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      // Pass instrumentation to be used as `routingInstrumentation`
+      routingInstrumentation,
+      enableNativeFramesTracking: !isRunningInExpoGo(),
+      // ...
+    }),
+  ],
+});
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -25,7 +42,16 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayout() {
+  // Capture the NavigationContainer ref and register it with the instrumentation.
+  const ref = useNavigationContainerRef();
+
+  useEffect(() => {
+    if (ref) {
+      routingInstrumentation.registerNavigationContainer(ref);
+    }
+  }, [ref]);
+
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
@@ -61,3 +87,5 @@ function RootLayoutNav() {
     </ThemeProvider>
   );
 }
+
+export default Sentry.wrap(RootLayout);
