@@ -278,7 +278,12 @@ export async function bottleUpdate({
           await tx
             .update(bottleAliases)
             .set({ name: aliasName })
-            .where(eq(bottleAliases.name, existingAlias.name));
+            .where(
+              eq(
+                sql`LOWER(${bottleAliases.name})`,
+                existingAlias.name.toLowerCase(),
+              ),
+            );
         }
         // we're good - likely renaming to an alias that already existed
       } else if (!existingAlias) {
@@ -294,7 +299,12 @@ export async function bottleUpdate({
           .set({
             bottleId: newBottle.id,
           })
-          .where(and(eq(bottleAliases.name, existingAlias.name)));
+          .where(
+            eq(
+              sql`LOWER(${bottleAliases.name})`,
+              existingAlias.name.toLowerCase(),
+            ),
+          );
       } else {
         throw new Error(
           `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
