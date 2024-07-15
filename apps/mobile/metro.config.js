@@ -3,10 +3,7 @@ const path = require("path");
 const { FileStore } = require("metro-cache");
 
 module.exports = withTurborepoManagedCache(
-  withMonorepoPaths(getSentryExpoConfig(__dirname), {
-    input: "./src/styles.css",
-    configPath: "./tailwind.config.ts",
-  }),
+  withMonorepoPaths(getSentryExpoConfig(__dirname)),
 );
 
 /**
