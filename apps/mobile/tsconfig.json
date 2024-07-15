@@ -2,11 +2,13 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "checkJs": false,
     "paths": {
-      "@peated/mobile/*": ["./*"],
+      "@peated/mobile/*": ["./src/*"],
       "@peated/design/*": ["../../packages/design/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "exclude": ["node_modules"]
 }
