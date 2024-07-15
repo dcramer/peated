@@ -3,7 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": ["./*"]
+      "@peated/mobile/*": ["./*"],
+      "@peated/design/*": ["../../packages/design/*"],
+      "@peated/server/*": ["../../apps/server/src/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
