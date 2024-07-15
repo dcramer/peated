@@ -3,7 +3,7 @@ import * as dbSchema from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { type ExternalSiteType } from "@peated/server/types";
 import slugify from "@sindresorhus/slugify";
-import { eq, inArray, sql } from "drizzle-orm";
+import { eq, inArray, or, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
 import {
@@ -101,12 +101,13 @@ export const Country = async (
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Country> => {
   if (!data.name) data.name = faker.location.country();
+  data.slug = slugify(data.name as string);
   let [result] = await db.transaction(async (tx) => {
     return await tx
       .insert(countries)
       .values({
         name: "", // cant be asked to fix TS
-        slug: slugify(data.name as string),
+        slug: "",
         ...data,
       })
       .onConflictDoNothing()
@@ -116,9 +117,17 @@ export const Country = async (
     [result] = await db
       .select()
       .from(countries)
-      .where(eq(countries.name, data.name));
+      .where(
+        or(
+          eq(sql`LOWER(${countries.name})`, data.name.toLowerCase()),
+          eq(sql`LOWER(${countries.slug})`, data.slug),
+        ),
+      );
   }
-  if (!result) throw new Error("Unable to create Country fixture");
+  if (!result)
+    throw new Error(
+      `Unable to create Country fixture: ${data.name} - ${data.slug}`,
+    );
   return result;
 };
 

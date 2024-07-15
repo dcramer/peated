@@ -206,10 +206,17 @@ const loadDefaultBottles = async (
           bottleId: bottle.id,
         }));
 
-      await Fixtures.Review({
-        externalSiteId: site.id,
-        bottleId: bottle.id,
-      });
+      (await db.query.reviews.findFirst({
+        where: (reviews, { eq, and }) =>
+          and(
+            eq(reviews.externalSiteId, site.id),
+            eq(reviews.bottleId, bottle.id),
+          ),
+      })) ||
+        (await Fixtures.Review({
+          externalSiteId: site.id,
+          bottleId: bottle.id,
+        }));
 
       await Fixtures.Review({
         externalSiteId: site.id,
