@@ -124,6 +124,11 @@ export async function bottleNormalize({
     rv.name = stripSuffix(rv.name, ` (${rv.vintageYear} Release)`);
   }
 
+  const match = rv.name.match(/(\d{1,2})-year-old($|\s)/i);
+  if (match) {
+    rv.name = `${match[1]}-year-old ${rv.name.replace(/(\b\d{1,2}-year-old)($|\s)/i, "")}`;
+  }
+
   return rv;
 }
 

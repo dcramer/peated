@@ -80,10 +80,6 @@ export const normalizeBottleName = (
     age = parseInt(match[1], 10);
   }
 
-  if (match) {
-    name = `${match[1]}-year-old ${name.replace(/(\b\d{1,2}-year-old)($|\s)/i, "")}`;
-  }
-
   // replace various whitespace
   name = name.replace(/\n/, " ").replace(/\s{2,}/, " ");
 

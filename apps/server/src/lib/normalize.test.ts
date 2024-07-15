@@ -9,7 +9,7 @@ describe("normalizeBottleName", () => {
 
   test("age suffix", async () => {
     const [rv, age] = normalizeBottleName("Delicious 10", 10);
-    expect(rv).toMatchInlineSnapshot(`"10-year-old Delicious "`);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 10-year-old"`);
     expect(age).toBe(10);
   });
 
@@ -49,49 +49,49 @@ describe("normalizeBottleName", () => {
 
   test("Name 12yr", async () => {
     const [rv, age] = normalizeBottleName("Delicious 12yr");
-    expect(rv).toMatchInlineSnapshot(`"12-year-old Delicious "`);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 12-year-old"`);
     expect(age).toBe(12);
   });
 
   test("Name 12yr.", async () => {
     const [rv, age] = normalizeBottleName("Delicious 12yr.");
-    expect(rv).toMatchInlineSnapshot(`"12-year-old Delicious "`);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 12-year-old"`);
     expect(age).toBe(12);
   });
 
   test("Name 12yrs", async () => {
     const [rv, age] = normalizeBottleName("Delicious 12yrs");
-    expect(rv).toMatchInlineSnapshot(`"12-year-old Delicious "`);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 12-year-old"`);
     expect(age).toBe(12);
   });
 
   test("Name 12 year", async () => {
     const [rv, age] = normalizeBottleName("Delicious 12 year");
-    expect(rv).toMatchInlineSnapshot(`"12-year-old Delicious "`);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 12-year-old"`);
     expect(age).toBe(12);
   });
 
   test("Name 12 year thing", async () => {
     const [rv, age] = normalizeBottleName("Delicious 12 Year thing");
-    expect(rv).toMatchInlineSnapshot(`"12-year-old Delicious thing"`);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 12-year-old thing"`);
     expect(age).toBe(12);
   });
 
   test("Name twelve year thing", async () => {
     const [rv, age] = normalizeBottleName("Delicious twelve Year thing");
-    expect(rv).toMatchInlineSnapshot(`"12-year-old Delicious thing"`);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 12-year-old thing"`);
     expect(age).toBe(12);
   });
 
   test("Name ten year thing", async () => {
     const [rv, age] = normalizeBottleName("Delicious ten Year thing");
-    expect(rv).toMatchInlineSnapshot(`"10-year-old Delicious thing"`);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 10-year-old thing"`);
     expect(age).toBe(10);
   });
 
   test("Name fifteen year thing", async () => {
     const [rv, age] = normalizeBottleName("Delicious fifteen Year thing");
-    expect(rv).toMatchInlineSnapshot(`"15-year-old Delicious thing"`);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 15-year-old thing"`);
     expect(age).toBe(15);
   });
 
