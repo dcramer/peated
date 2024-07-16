@@ -24,10 +24,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: "#ffffff",
     },
   },
-  web: {
-    output: "static",
-    favicon: "./src/assets/images/favicon.png",
-  },
   experiments: {
     tsconfigPaths: true,
     typedRoutes: true,
