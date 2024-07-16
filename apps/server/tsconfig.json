@@ -1,12 +1,16 @@
 {
-  "extends": "@peated/tsconfig/tsconfig.json",
+  "extends": "@peated/tsconfig/base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "types": ["node", "vitest/globals", "./src/global.d.ts"],
-    "baseUrl": "./",
+    "module": "ES2022",
+    // "moduleResolution": "Node",
+    "composite": true,
     "paths": {
       "@peated/server/*": ["src/*"]
     }
   },
-  "include": ["src"],
-  "exclude": ["src/test/setup-test-env.ts"]
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["src/test/setup-test-env.ts", "node_modules"]
 }

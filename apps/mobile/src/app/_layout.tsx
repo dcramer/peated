@@ -1,3 +1,5 @@
+import theme from "@peated/design";
+import { TRPCProvider } from "@peated/mobile/lib/trpc";
 import * as Sentry from "@sentry/react-native";
 import { isRunningInExpoGo } from "expo";
 import { useFonts } from "expo-font";
@@ -5,8 +7,7 @@ import { Stack, useNavigationContainerRef } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
-
-import theme from "@peated/design/index";
+import config from "../config";
 
 // Construct a new instrumentation instance. This is needed to communicate between the integration and React
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
@@ -69,22 +70,29 @@ function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const accessToken = undefined;
   return (
-    <Stack
-      screenOptions={{
-        headerBlurEffect: "light",
-        headerStyle: {
-          backgroundColor: theme.colors.slate[950],
-        },
-        headerTintColor: theme.colors.light,
-        headerTitleStyle: {
-          fontWeight: "bold",
-        },
-      }}
+    <TRPCProvider
+      apiServer={config.API_SERVER}
+      accessToken={accessToken}
+      key={accessToken}
     >
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-    </Stack>
+      <Stack
+        screenOptions={{
+          headerBlurEffect: "light",
+          headerStyle: {
+            backgroundColor: theme.colors.slate[950],
+          },
+          headerTintColor: theme.colors.light,
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+        }}
+      >
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+      </Stack>
+    </TRPCProvider>
   );
 }
 

@@ -1,11 +1,19 @@
-import { isTRPCClientError } from "@peated/server/lib/trpc";
+"use client";
+
+import { getLinks } from "@peated/server/trpc/links";
+import { getQueryClient } from "@peated/server/trpc/query";
 import { type AppRouter } from "@peated/server/trpc/router";
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
   createTRPCReact,
   type CreateTRPCReact,
   type inferReactQueryProcedureOptions,
 } from "@trpc/react-query";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
+import type { ComponentProps } from "react";
+import { useState } from "react";
+
+export { isTRPCClientError } from "@peated/server/trpc/client";
 
 export const trpc: CreateTRPCReact<AppRouter, unknown> =
   createTRPCReact<AppRouter>({
@@ -29,8 +37,35 @@ export const trpc: CreateTRPCReact<AppRouter, unknown> =
     },
   });
 
-export { isTRPCClientError };
-
 export type ReactQueryOptions = inferReactQueryProcedureOptions<AppRouter>;
 export type RouterInputs = inferRouterInputs<AppRouter>;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
+
+export function TRPCProvider({
+  accessToken,
+  apiServer,
+  ...props
+}: { accessToken?: string | null; apiServer: string } & Omit<
+  ComponentProps<typeof trpc.Provider>,
+  "client"
+>) {
+  const queryClient = getQueryClient(false);
+
+  const [trpcClient] = useState(() =>
+    trpc.createClient({
+      links: getLinks({
+        apiServer,
+        accessToken,
+        batch: true,
+      }),
+    }),
+  );
+
+  return (
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        {props.children}
+      </QueryClientProvider>
+    </trpc.Provider>
+  );
+}

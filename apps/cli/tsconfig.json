@@ -1,13 +1,13 @@
 {
-  "extends": "@peated/tsconfig/tsconfig.json",
+  "extends": "@peated/tsconfig/base.json",
   "compilerOptions": {
-    "types": [],
     "baseUrl": "./",
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "paths": {
       "@peated/cli/*": ["src/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     }
   },
   "include": ["src"],
-  "exclude": ["src/test/setup-test-env.ts"]
+  "exclude": ["node_modules"]
 }

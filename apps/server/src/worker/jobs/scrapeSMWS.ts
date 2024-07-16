@@ -5,12 +5,13 @@ import {
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
-import { isTRPCClientError } from "@peated/server/lib/trpc";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
+import { isTRPCClientError } from "@peated/server/trpc/client";
+
 import { type z } from "zod";
 
 export default async function scrapeSMWS() {
@@ -104,7 +105,9 @@ export async function scrapeBottles(
         });
         const flavorProfile = flavorProfileRaw
           ? parseFlavorProfile(
-              flavorProfileRaw.split("All Whisky/Flavour Profiles/")[1],
+              flavorProfileRaw.split(
+                "All Whisky/Flavour Profiles/",
+              )[1] as unknown as string,
             )
           : null;
 

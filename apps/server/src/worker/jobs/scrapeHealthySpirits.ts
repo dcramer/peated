@@ -13,10 +13,10 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import { load as cheerio } from "cheerio";
 
-function extractVolume(name: string) {
+function extractVolume(name: string): [string, string] | [string] {
   const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
   if (!match) return [name];
-  return match.slice(1, 3);
+  return match.slice(1, 3) as [string, string];
 }
 
 export async function scrapeProducts(

@@ -1,10 +1,9 @@
-import { sentryLink } from "@peated/server/src/lib/trpc";
 import { type AppRouter } from "@peated/server/src/trpc/router";
+import { getLinks } from "@peated/server/trpc/links";
+import { getQueryClient } from "@peated/server/trpc/query";
 import config from "@peated/web/config";
-import { httpBatchLink } from "@trpc/client";
 import { createTRPCQueryUtils } from "@trpc/react-query";
 import { type CreateQueryUtils } from "@trpc/react-query/shared";
-import getQueryClient from "./getQueryClient";
 import { getSession } from "./session.server";
 import { trpc } from "./trpc";
 
@@ -13,17 +12,11 @@ export async function getTrpcClient(): Promise<CreateQueryUtils<AppRouter>> {
   const accessToken = session.accessToken;
 
   const client = trpc.createClient({
-    links: [
-      sentryLink<AppRouter>(),
-      httpBatchLink({
-        url: `${config.API_SERVER}/trpc`,
-        async headers() {
-          return {
-            authorization: accessToken ? `Bearer ${accessToken}` : "",
-          };
-        },
-      }),
-    ],
+    links: getLinks({
+      apiServer: config.API_SERVER,
+      accessToken,
+      batch: true,
+    }),
   });
 
   const queryClient = getQueryClient();

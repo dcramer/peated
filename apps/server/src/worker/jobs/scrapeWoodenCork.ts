@@ -18,19 +18,19 @@ function extractVolume(name: string) {
   return match.slice(1, 3);
 }
 
-function getLargestImage(srcset: string) {
-  const srcList = srcset
-    .split(", ")
-    .map((data) => {
-      const [src, size] = data.split(" ");
-      return {
-        src,
-        size: parseInt(size.replace(/^[\d+]/, ""), 10),
-      };
-    })
-    .sort((a, b) => b.size - a.size);
-  return srcList.length ? srcList[0].src : null;
-}
+// function getLargestImage(srcset: string) {
+//   const srcList = srcset
+//     .split(", ")
+//     .map((data) => {
+//       const [src, size] = data.split(" ");
+//       return {
+//         src,
+//         size: size ? parseInt(size.replace(/^[\d+]/, ""), 10) : 0,
+//       };
+//     })
+//     .sort((a, b) => b.size - a.size);
+//   return srcList.length ? srcList[0].src : null;
+// }
 
 export async function scrapeProducts(
   url: string,

@@ -3,7 +3,8 @@ import {
   defaultShouldDehydrateQuery,
   isServer,
 } from "@tanstack/react-query";
-import { cache } from "react";
+// TODO: only in react 19
+// import { cache } from "react";
 
 // https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr
 const makeQueryClient = () => {
@@ -26,13 +27,15 @@ const makeQueryClient = () => {
   });
 };
 
-const getServerQueryClient = cache(() => makeQueryClient());
+// TODO:
+// const getServerQueryClient = cache(() => makeQueryClient());
+const getServerQueryClient = makeQueryClient;
 
 let browserQueryClient: QueryClient | undefined = undefined;
 
 // isServerComponent must be true for any server component
 // and false for any client component (even if server rendered)
-function getQueryClient(isServerComponent = true) {
+export function getQueryClient(isServerComponent = true) {
   // react.cache only works for server components
   if (isServerComponent) return getServerQueryClient();
 
@@ -43,5 +46,3 @@ function getQueryClient(isServerComponent = true) {
   }
   return browserQueryClient;
 }
-
-export default getQueryClient;

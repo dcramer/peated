@@ -5,12 +5,13 @@ import {
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
-import { isTRPCClientError } from "@peated/server/lib/trpc";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
+import { isTRPCClientError } from "@peated/server/trpc/client";
+
 import { load as cheerio } from "cheerio";
 import { type z } from "zod";
 
@@ -115,7 +116,7 @@ export async function scrapeBottles(
       .first()
       .attr("href");
     if (!url) {
-      console.error(`Cannot find url: ${name}`);
+      console.error(`Cannot find url: ${caskName}`);
       continue;
     }
 

@@ -35,7 +35,8 @@ export default publicProcedure
         totalTastings: sql<string>`COUNT(${tastings.bottleId})`,
       })
       .from(tastings)
-      .where(eq(tastings.createdById, user.id));
+      .where(eq(tastings.createdById, user.id))
+      .limit(1);
 
     const [{ collectedBottles }] = await db
       .select({
@@ -46,14 +47,16 @@ export default publicProcedure
         collectionBottles,
         eq(collections.id, collectionBottles.collectionId),
       )
-      .where(eq(collections.createdById, user.id));
+      .where(eq(collections.createdById, user.id))
+      .limit(1);
 
     const [{ totalContributions }] = await db
       .select({
         totalContributions: sql<string>`COUNT(${changes.createdById})`,
       })
       .from(changes)
-      .where(eq(changes.createdById, user.id));
+      .where(eq(changes.createdById, user.id))
+      .limit(1);
 
     return {
       ...(await serialize(UserSerializer, user, ctx.user)),

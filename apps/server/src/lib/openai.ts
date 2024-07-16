@@ -2,7 +2,7 @@ import config from "@peated/server/config";
 import { logError } from "@peated/server/lib/log";
 import { metrics, startSpan } from "@sentry/node";
 import OpenAI from "openai";
-import type { ChatCompletionMessageParam } from "openai/resources";
+import { type ChatCompletionMessageParam } from "openai/resources";
 import { type ZodSchema, type z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 

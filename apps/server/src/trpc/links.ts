@@ -1,27 +1,13 @@
 import { type AppRouter } from "@peated/server/trpc/router";
 import { captureException } from "@sentry/core";
-import { createTRPCProxyClient, httpLink, type TRPCLink } from "@trpc/client";
+import {
+  httpBatchLink,
+  httpLink,
+  loggerLink,
+  type TRPCLink,
+} from "@trpc/client";
 import { type AnyRouter } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
-
-export function makeTRPCClient(
-  apiServer: string,
-  accessToken?: string | null | undefined,
-) {
-  return createTRPCProxyClient<AppRouter>({
-    links: [
-      sentryLink<AppRouter>(),
-      httpLink({
-        url: `${apiServer}/trpc`,
-        async headers() {
-          return {
-            authorization: accessToken ? `Bearer ${accessToken}` : "",
-          };
-        },
-      }),
-    ],
-  });
-}
 
 export function sentryLink<TRouter extends AnyRouter>(): TRPCLink<TRouter> {
   return () => {
@@ -55,4 +41,31 @@ export function sentryLink<TRouter extends AnyRouter>(): TRPCLink<TRouter> {
       });
     };
   };
+}
+
+export function getLinks({
+  apiServer,
+  accessToken,
+  batch = true,
+}: {
+  apiServer: string;
+  accessToken?: string | null | undefined;
+  batch: boolean;
+}) {
+  return [
+    loggerLink({
+      enabled: (opts) =>
+        opts.direction === "down" && opts.result instanceof Error,
+      colorMode: "ansi",
+    }),
+    sentryLink<AppRouter>(),
+    (batch ? httpBatchLink : httpLink)({
+      url: `${apiServer}/trpc`,
+      async headers() {
+        return {
+          authorization: accessToken ? `Bearer ${accessToken}` : "",
+        };
+      },
+    }),
+  ];
 }

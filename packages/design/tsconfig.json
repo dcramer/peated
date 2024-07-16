@@ -1,12 +1,13 @@
 {
-  "extends": "@peated/tsconfig/tsconfig.json",
+  "extends": "@peated/tsconfig/internal.json",
   "compilerOptions": {
-    "outDir": "dist",
     "baseUrl": ".",
+    "outDir": "dist",
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "paths": {
-      "@peated/design/*": ["./*"]
+      "@peated/design/*": ["./src/*"]
     }
   },
-  "include": ["."],
+  "include": ["src"],
   "exclude": ["dist", "node_modules"]
 }

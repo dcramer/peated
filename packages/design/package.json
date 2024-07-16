@@ -1,20 +1,23 @@
 {
   "private": true,
   "name": "@peated/design",
-  "main": "index.ts",
-  "scripts": {
-    "build": "tsc"
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    }
   },
-  "files": [
-    "index.ts",
-    "tailwind/base.ts",
-    "tailwind/web.ts"
-  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
   "dependencies": {
     "@peated/tsconfig": "workspace:*",
-    "@tailwindcss/forms": "^0.5.7",
-    "@tailwindcss/typography": "^0.5.12",
-    "prettier-plugin-tailwindcss": "^0.5.13",
+    "@tailwindcss/forms": "catalog:",
+    "@tailwindcss/typography": "catalog:",
+    "prettier-plugin-tailwindcss": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
   },

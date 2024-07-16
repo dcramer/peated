@@ -44,8 +44,13 @@ export default async ({ bottleId }: { bottleId: number }) => {
     : [];
 
   const searchVector =
-    buildBottleSearchVector(bottle, brand, aliasList, bottler, distillerList) ||
-    null;
+    buildBottleSearchVector(
+      bottle,
+      brand!,
+      aliasList,
+      bottler,
+      distillerList,
+    ) || null;
 
   console.log(`Updating index for Bottle ${bottle.id}`);
 

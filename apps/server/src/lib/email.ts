@@ -115,8 +115,7 @@ export function buildCommentHtml(comment: CommentWithRelations): string {
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td><b style="color:${theme.colors.highlight};">${escapeHtml(
-                  comment.createdBy.displayName ||
-                    comment.createdBy.email.split("@")[0],
+                  comment.createdBy.displayName || comment.createdBy.username,
                 )}</b></td>
               </tr>
               <tr>

@@ -1,11 +1,13 @@
 {
-  "extends": "expo/tsconfig.base",
+  "extends": "@peated/tsconfig/base.json",
   "compilerOptions": {
-    "strict": true,
+    "baseUrl": ".",
+    "jsx": "react-native",
     "checkJs": false,
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "paths": {
       "@peated/mobile/*": ["./src/*"],
-      "@peated/design/*": ["../../packages/design/*"],
+      "@peated/tsconfig/*": ["../../packages/tsconfig/src/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     }
   },
