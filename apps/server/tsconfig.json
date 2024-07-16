@@ -4,8 +4,7 @@
     "baseUrl": ".",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "types": ["node", "vitest/globals", "./src/global.d.ts"],
-    "module": "ES2022",
-    // "moduleResolution": "Node",
+    "moduleResolution": "Node",
     "composite": true,
     "paths": {
       "@peated/server/*": ["src/*"]

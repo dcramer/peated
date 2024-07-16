@@ -2,7 +2,6 @@ import config from "@peated/server/config";
 import { logError } from "@peated/server/lib/log";
 import { metrics, startSpan } from "@sentry/node";
 import OpenAI from "openai";
-import { type ChatCompletionMessageParam } from "openai/resources";
 import { type ZodSchema, type z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
@@ -54,7 +53,10 @@ export async function getStructuredResponse<
       name: "getStructuredResponse",
     },
     async (span) => {
-      const messages: ChatCompletionMessageParam[] = [
+      const messages: {
+        role: "system" | "user";
+        content: string;
+      }[] = [
         {
           role: "system",
           content: [

@@ -10,13 +10,17 @@
   },
   "scripts": {
     "build": "tsc",
+    "clean": "rm -rf .turbo dist node_modules",
     "dev": "tsc --watch",
+    "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
     "@peated/tsconfig": "workspace:*",
     "@tailwindcss/forms": "catalog:",
     "@tailwindcss/typography": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
