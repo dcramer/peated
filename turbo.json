@@ -10,7 +10,8 @@
       "cache": false,
       "persistent": true,
       "passThroughEnv": ["DATABASE_URL", "JWT_SECRET", "SESSION_SECRET"]
-    }
+    },
+    "typecheck": {}
   },
   "globalEnv": [
     "DEBUG",

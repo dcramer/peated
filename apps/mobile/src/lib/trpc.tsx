@@ -47,7 +47,7 @@ export function TRPCProvider({
   ...props
 }: { accessToken?: string | null; apiServer: string } & Omit<
   ComponentProps<typeof trpc.Provider>,
-  "client"
+  "client" | "queryClient"
 >) {
   const queryClient = getQueryClient(false);
 
