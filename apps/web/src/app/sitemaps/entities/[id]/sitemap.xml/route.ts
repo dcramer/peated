@@ -1,6 +1,8 @@
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 
+export const dynamic = "force-dynamic";
+
 export const revalidate = 86400;
 
 const PAGE_LIMIT = 1000;
