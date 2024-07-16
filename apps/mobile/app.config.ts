@@ -22,8 +22,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     package: "com.peated.app",
     adaptiveIcon: {
-      foregroundImage: "./src/assets/images/adaptive-icon.png",
-      backgroundColor: "#ffffff",
+      foregroundImage: "./src/assets/images/glyph.png",
+      backgroundColor: "#020617",
     },
   },
   web: {
