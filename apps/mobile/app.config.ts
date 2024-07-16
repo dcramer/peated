@@ -16,9 +16,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   jsEngine: "hermes",
   ios: {
+    bundleIdentifier: "com.peated.app",
     supportsTablet: true,
   },
   android: {
+    package: "com.peated.app",
     adaptiveIcon: {
       foregroundImage: "./src/assets/images/adaptive-icon.png",
       backgroundColor: "#ffffff",
