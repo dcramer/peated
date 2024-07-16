@@ -68,7 +68,7 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.name).toEqual("Delicious Wood 12-year-old");
+  expect(bottle.name).toEqual("12-year-old Delicious Wood");
   expect(bottle.brandId).toEqual(brand.id);
   expect(bottle.statedAge).toEqual(12);
   expect(bottle.flavorProfile).toEqual(FLAVOR_PROFILES[0]);
