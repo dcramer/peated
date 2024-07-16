@@ -1,29 +1,33 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "tasks": {
-    "lint": {
-      "outputs": []
-    },
     "test": {
       "dependsOn": ["build"],
-      "inputs": ["**/*.{ts,tsx,js,jsx}"]
+      "inputs": ["**/*.{ts,tsx,js,jsx}"],
+      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET", "SESSION_SECRET"]
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "build/**", "node_modules/.cache/metro/**"]
+      "outputs": [".next/**", "build/**", "node_modules/.cache/metro/**"],
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"]
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET", "SESSION_SECRET"]
     }
   },
   "globalEnv": [
-    "DATABASE_URL",
-    "JWT_SECRET",
+    "DEBUG",
+    "HOST",
+    "PORT",
+    "CORS_HOST",
+    "API_SERVER",
+    "URL_PREFIX",
+    "VERSION",
     "GOOGLE_CLIENT_ID",
-    "SENTRY_AUTH_TOKEN",
     "SENTRY_DSN",
-    "SESSION_SECRET"
+    "FATHOM_SITE_ID"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
