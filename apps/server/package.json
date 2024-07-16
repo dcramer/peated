@@ -3,8 +3,10 @@
   "name": "@peated/server",
   "scripts": {
     "build": "tsc",
+    "dev": "concurrently 'npm:dev:api' 'npm:dev:worker'",
     "dev:api": "tsx watch --require dotenv/config ./src/server.ts",
     "dev:worker": "tsx watch --require dotenv/config ./src/faktory-worker.ts",
+    "start": "concurrently 'npm:start:api' 'npm:start:worker'",
     "start:api": "tsx --require dotenv/config ./src/server.ts",
     "start:worker": "tsx --require dotenv/config ./src/faktory-worker.ts",
     "typecheck": "tsc --noEmit",
@@ -46,6 +48,7 @@
     "bcrypt": "^5.1.1",
     "cheerio": "1.0.0-rc.12",
     "commander": "^12.1.0",
+    "concurrently": "^8.2.2",
     "core-js": "^3.37.1",
     "croner": "^7.0.7",
     "dotenv": "^16.4.5",

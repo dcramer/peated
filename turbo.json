@@ -16,5 +16,21 @@
       "cache": false,
       "persistent": true
     }
-  }
+  },
+  "globalEnv": [
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "GOOGLE_CLIENT_ID",
+    "SENTRY_AUTH_TOKEN",
+    "SENTRY_DSN",
+    "SESSION_SECRET"
+  ],
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "CI",
+    "VERCEL",
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "npm_lifecycle_event"
+  ]
 }
