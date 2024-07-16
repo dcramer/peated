@@ -10,9 +10,17 @@ catalog:
   tailwindcss: ^3.4.1
   zod: ^3.23.8
 
-# catalogs:
-#   react18:
-#     react: 18.3.1
-#     react-dom: 18.3.1
-#     "@types/react": ^18.3.3
-#     "@types/react-dom": ^18.3.0
+catalogs:
+  react19:
+    react: 19.0.0-rc-8b08e99e-20240713
+    react-dom: 19.0.0-rc-8b08e99e-20240713
+    react-native: 0.75.0-rc.5
+    "@types/react": ^18.3.3
+    "@types/react-dom": ^18.3.0
+
+  react18:
+    react: 18.3.1
+    react-dom: 18.3.1
+    react-native: 0.74.0
+    "@types/react": ^18.3.3
+    "@types/react-dom": ^18.3.0
