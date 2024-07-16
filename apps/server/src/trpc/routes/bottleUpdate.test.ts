@@ -141,7 +141,7 @@ test("manipulates name to conform with age", async ({ fixtures }) => {
     ),
   );
   expect(bottle2.statedAge).toBe(10);
-  expect(bottle2.name).toBe("Delicious 10-year-old");
+  expect(bottle2.name).toBe("10-year-old Delicious");
   expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
 });
 
