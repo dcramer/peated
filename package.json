@@ -52,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@spotlightjs/spotlight": "^2.0.0",
-    "eslint": "^8.57.0",
+    "eslint": "catalog:",
     "eslint-plugin-react": "^7.34.3",
     "lint-staged": "^14.0.1",
     "prettier": "catalog:",
