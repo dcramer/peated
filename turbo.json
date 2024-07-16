@@ -6,11 +6,6 @@
       "inputs": ["**/*.{ts,tsx,js,jsx}"],
       "passThroughEnv": ["DATABASE_URL", "JWT_SECRET", "SESSION_SECRET"]
     },
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "build/**", "node_modules/.cache/metro/**"],
-      "passThroughEnv": ["SENTRY_AUTH_TOKEN"]
-    },
     "dev": {
       "cache": false,
       "persistent": true,
