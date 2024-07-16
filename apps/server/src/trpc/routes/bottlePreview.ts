@@ -126,10 +126,8 @@ export async function bottleNormalize({
 
   const match = rv.name.match(/(\d{1,2})-year-old($|\s)/i);
   if (match) {
-    rv.name = `${match[1]}-year-old ${rv.name.replace(/(\b\d{1,2}-year-old)($|\s)/i, "")}`;
+    rv.name = `${match[1]}-year-old ${rv.name.replace(/(\s?\d{1,2}-year-old\s?)($|\s)/i, "")}`;
   }
-
-  rv.name = rv.name.replace(/\n/, " ").replace(/\s{2,}/, " ");
 
   return rv;
 }
