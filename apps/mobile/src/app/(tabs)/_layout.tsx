@@ -25,7 +25,7 @@ export default function TabLayout() {
         borderColor: theme.colors.slate[700],
       }}
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.highlight.DEFAULT,
+        tabBarActiveTintColor: theme.colors.highlight,
         tabBarInactiveTintColor: theme.colors.light,
         tabBarStyle: {
           backgroundColor: theme.colors.slate[950],

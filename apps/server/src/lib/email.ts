@@ -93,7 +93,7 @@ export function buildCommentHtml(comment: CommentWithRelations): string {
   const titleLine = `${escapeHtml(
     comment.createdBy.displayName || comment.createdBy.email,
   )} commented on your tasting`;
-  const reasonLine = `You are being notified because you are subscribed to comments. <a href="${settingsUrl}" style="color:${theme.colors.highlight.DEFAULT}">Settings</a>`;
+  const reasonLine = `You are being notified because you are subscribed to comments. <a href="${settingsUrl}" style="color:${theme.colors.highlight}">Settings</a>`;
 
   return `
   <!DOCTYPE html>
@@ -102,9 +102,9 @@ export function buildCommentHtml(comment: CommentWithRelations): string {
       <title>New Comment</title>
       <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
     </head>
-    <body style="background:${theme.colors.background.DEFAULT}">
+    <body style="background:${theme.colors.background}">
       <h2 style="margin-top:0;margin-bottom:15px;color:${
-        theme.colors.highlight.DEFAULT
+        theme.colors.highlight
       };">${titleLine}</h2>
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -114,9 +114,7 @@ export function buildCommentHtml(comment: CommentWithRelations): string {
           <td style="padding-left:15px">
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td><b style="color:${
-                  theme.colors.highlight.DEFAULT
-                };">${escapeHtml(
+                <td><b style="color:${theme.colors.highlight};">${escapeHtml(
                   comment.createdBy.displayName ||
                     comment.createdBy.email.split("@")[0],
                 )}</b></td>
@@ -128,7 +126,7 @@ export function buildCommentHtml(comment: CommentWithRelations): string {
             </tr>
             <tr>
               <td style="padding-top:15px;"><a href="${commentUrl}" style="color:${
-                theme.colors.highlight.DEFAULT
+                theme.colors.highlight
               };">View this Comment</a></td>
             </tr>
             </table>

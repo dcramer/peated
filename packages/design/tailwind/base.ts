@@ -14,14 +14,9 @@ export default {
         transparent: "transparent",
         current: "currentColor",
         light: colors.slate[400],
-        highlight: {
-          DEFAULT: colors.amber[400],
-          dark: colors.amber[800],
-        },
-        background: {
-          DEFAULT: "#111111",
-          alt: "#1F1F1F",
-        },
+        highlight: colors.amber[400],
+        highlightDark: colors.amber[800],
+        background: "#111111",
       },
       fontFamily: {
         sans: ["Raleway", ...defaultTheme.fontFamily.sans],

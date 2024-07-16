@@ -8,7 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@fontsource/raleway": "^5.0.19",
+    "@fontsource/raleway": "catalog:",
     "@headlessui/react": "^2.1.2",
     "@heroicons/react": "^2.1.4",
     "@hookform/resolvers": "^3.6.0",

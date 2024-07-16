@@ -1,12 +1,14 @@
 {
   "private": true,
   "name": "@peated/design",
+  "main": "index.ts",
   "scripts": {
     "build": "tsc"
   },
   "files": [
     "index.ts",
-    "tailwind.config.ts"
+    "tailwind/base.ts",
+    "tailwind/web.ts"
   ],
   "dependencies": {
     "@peated/tsconfig": "workspace:*",
