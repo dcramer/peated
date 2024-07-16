@@ -10,9 +10,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./src/assets/images/icon.png",
   userInterfaceStyle: "automatic",
   splash: {
-    image: "./src/assets/images/splash.png",
+    image: "./src/assets/images/glyph.png",
     resizeMode: "contain",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#020617",
   },
   jsEngine: "hermes",
   ios: {
