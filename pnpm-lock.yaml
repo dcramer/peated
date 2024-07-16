@@ -6,12 +6,48 @@ settings:
 
 catalogs:
   default:
+    '@sentry/core':
+      specifier: ^8.16.0
+      version: 8.16.0
+    '@sentry/nextjs':
+      specifier: ^8.16.0
+      version: 8.16.0
+    '@sentry/node':
+      specifier: ^8.16.0
+      version: 8.16.0
+    '@sentry/utils':
+      specifier: ^8.16.0
+      version: 8.16.0
+    '@trpc/client':
+      specifier: 11.0.0-rc.334
+      version: 11.0.0-rc.334
+    '@trpc/next':
+      specifier: 11.0.0-rc.334
+      version: 11.0.0-rc.334
+    '@trpc/react-query':
+      specifier: 11.0.0-rc.334
+      version: 11.0.0-rc.334
+    '@trpc/server':
+      specifier: 11.0.0-rc.334
+      version: 11.0.0-rc.334
+    drizzle-kit:
+      specifier: ^0.23.0
+      version: 0.23.0
+    drizzle-orm:
+      specifier: ^0.32.0
+      version: 0.32.0
+    pg:
+      specifier: ^8.12.0
+      version: 8.12.0
     prettier:
       specifier: ^3.3.2
       version: 3.3.3
     tailwindcss:
       specifier: ^3.4.1
       version: 3.4.4
+    tsx:
+      specifier: ^4.16.0
+      version: 4.16.0
     typescript:
       specifier: ^5.5.3
       version: 5.5.3
@@ -52,36 +88,15 @@ importers:
 
   .:
     dependencies:
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^5.62.0
-        version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.3))(eslint@8.57.0)(typescript@5.5.3)
-      '@typescript-eslint/parser':
-        specifier: ^5.62.0
-        version: 5.62.0(eslint@8.57.0)(typescript@5.5.3)
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
       dotenv-cli:
         specifier: ^7.4.2
         version: 7.4.2
-      eslint:
-        specifier: ^8.57.0
-        version: 8.57.0
-      eslint-plugin-react:
-        specifier: ^7.34.3
-        version: 7.34.3(eslint@8.57.0)
-      foreman:
-        specifier: ^3.0.1
-        version: 3.0.1
-      lint-staged:
-        specifier: ^14.0.1
-        version: 14.0.1
       pnpm:
         specifier: ^9.5.0
         version: 9.5.0
-      simple-git-hooks:
-        specifier: ^2.11.1
-        version: 2.11.1
       typescript:
         specifier: 'catalog:'
         version: 5.5.3
@@ -89,6 +104,21 @@ importers:
       '@spotlightjs/spotlight':
         specifier: ^2.0.0
         version: 2.0.0
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^5.62.0
+        version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.3))(eslint@8.57.0)(typescript@5.5.3)
+      '@typescript-eslint/parser':
+        specifier: ^5.62.0
+        version: 5.62.0(eslint@8.57.0)(typescript@5.5.3)
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
+      eslint-plugin-react:
+        specifier: ^7.34.3
+        version: 7.34.3(eslint@8.57.0)
+      lint-staged:
+        specifier: ^14.0.1
+        version: 14.0.1
       prettier:
         specifier: 'catalog:'
         version: 3.3.3
@@ -98,6 +128,9 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.5.14
         version: 0.5.14(prettier-plugin-organize-imports@3.2.4(prettier@3.3.3)(typescript@5.5.3))(prettier@3.3.3)
+      simple-git-hooks:
+        specifier: ^2.11.1
+        version: 2.11.1
       turbo:
         specifier: ^2.0.6
         version: 2.0.6
@@ -111,16 +144,16 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@sentry/node':
-        specifier: ^8.16.0
+        specifier: 'catalog:'
         version: 8.16.0
       '@sindresorhus/slugify':
         specifier: ^2.2.1
         version: 2.2.1
       '@trpc/client':
-        specifier: 11.0.0-rc.334
+        specifier: 'catalog:'
         version: 11.0.0-rc.334(@trpc/server@11.0.0-rc.334)
       '@trpc/server':
-        specifier: 11.0.0-rc.334
+        specifier: 'catalog:'
         version: 11.0.0-rc.334
       '@types/bcrypt':
         specifier: ^5.0.2
@@ -144,19 +177,16 @@ importers:
         specifier: ^7.4.2
         version: 7.4.2
       drizzle-kit:
-        specifier: ^0.23.0
+        specifier: 'catalog:'
         version: 0.23.0
       drizzle-orm:
-        specifier: ^0.32.0
+        specifier: 'catalog:'
         version: 0.32.0(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(@types/react@18.3.3)(pg@8.12.0)(react@18.3.1)
       pg:
-        specifier: ^8.12.0
+        specifier: 'catalog:'
         version: 8.12.0
-      tsconfig-paths:
-        specifier: ^4.2.0
-        version: 4.2.0
       tsx:
-        specifier: ^4.16.0
+        specifier: 'catalog:'
         version: 4.16.0
       typescript:
         specifier: 'catalog:'
@@ -295,22 +325,22 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@sentry/core':
-        specifier: ^8.16.0
+        specifier: 'catalog:'
         version: 8.16.0
       '@sentry/node':
-        specifier: ^8.16.0
+        specifier: 'catalog:'
         version: 8.16.0
       '@sentry/utils':
-        specifier: ^8.16.0
+        specifier: 'catalog:'
         version: 8.16.0
       '@sindresorhus/slugify':
         specifier: ^2.2.1
         version: 2.2.1
       '@trpc/client':
-        specifier: 11.0.0-rc.334
+        specifier: 'catalog:'
         version: 11.0.0-rc.334(@trpc/server@11.0.0-rc.334)
       '@trpc/server':
-        specifier: 11.0.0-rc.334
+        specifier: 'catalog:'
         version: 11.0.0-rc.334
       '@types/bcrypt':
         specifier: ^5.0.2
@@ -367,10 +397,10 @@ importers:
         specifier: ^7.4.2
         version: 7.4.2
       drizzle-kit:
-        specifier: ^0.23.0
+        specifier: 'catalog:'
         version: 0.23.0
       drizzle-orm:
-        specifier: ^0.32.0
+        specifier: 'catalog:'
         version: 0.32.0(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(@types/react@18.3.3)(pg@8.12.0)(react@19.0.0-rc-8b08e99e-20240713)
       error-cause:
         specifier: ^1.0.8
@@ -409,7 +439,7 @@ importers:
         specifier: ^4.52.2
         version: 4.52.2
       pg:
-        specifier: ^8.12.0
+        specifier: 'catalog:'
         version: 8.12.0
       pino-pretty:
         specifier: ^10.3.1
@@ -420,11 +450,8 @@ importers:
       toad-scheduler:
         specifier: ^3.0.1
         version: 3.0.1
-      tsconfig-paths:
-        specifier: ^4.2.0
-        version: 4.2.0
       tsx:
-        specifier: ^4.16.0
+        specifier: 'catalog:'
         version: 4.16.0
       typescript:
         specifier: 'catalog:'
@@ -469,7 +496,7 @@ importers:
         specifier: ^0.11.1
         version: 0.11.1(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)
       '@sentry/nextjs':
-        specifier: ^8.16.0
+        specifier: 'catalog:'
         version: 8.16.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.25.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.25.1(@opentelemetry/api@1.9.0))(next@15.0.0-rc.0(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)(webpack@5.93.0)
       '@tanstack/react-query':
         specifier: ^5.45.1
@@ -478,17 +505,17 @@ importers:
         specifier: ^5.48.0
         version: 5.48.0(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(next@15.0.0-rc.0(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)
       '@trpc/client':
-        specifier: 11.0.0-rc.413
-        version: 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
+        specifier: 'catalog:'
+        version: 11.0.0-rc.334(@trpc/server@11.0.0-rc.334)
       '@trpc/next':
-        specifier: 11.0.0-rc.413
-        version: 11.0.0-rc.413(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(@trpc/server@11.0.0-rc.413)(next@15.0.0-rc.0(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)
+        specifier: 'catalog:'
+        version: 11.0.0-rc.334(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.334(@trpc/server@11.0.0-rc.334))(@trpc/react-query@11.0.0-rc.334(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.334(@trpc/server@11.0.0-rc.334))(@trpc/server@11.0.0-rc.334)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(@trpc/server@11.0.0-rc.334)(next@15.0.0-rc.0(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)
       '@trpc/react-query':
-        specifier: 11.0.0-rc.413
-        version: 11.0.0-rc.413(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)
+        specifier: 'catalog:'
+        version: 11.0.0-rc.334(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.334(@trpc/server@11.0.0-rc.334))(@trpc/server@11.0.0-rc.334)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)
       '@trpc/server':
-        specifier: 11.0.0-rc.413
-        version: 11.0.0-rc.413
+        specifier: 'catalog:'
+        version: 11.0.0-rc.334
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.19(postcss@8.4.38)
@@ -613,18 +640,12 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.4
-      tsconfig-paths:
-        specifier: ^4.2.0
-        version: 4.2.0
       typescript:
         specifier: 'catalog:'
         version: 5.5.3
 
   packages/tsconfig:
     dependencies:
-      tsconfig-paths:
-        specifier: '*'
-        version: 4.2.0
       typescript:
         specifier: '*'
         version: 5.4.4
@@ -3338,18 +3359,13 @@ packages:
     peerDependencies:
       '@trpc/server': 11.0.0-rc.334+fdf26e552
 
-  '@trpc/client@11.0.0-rc.413':
-    resolution: {integrity: sha512-+5WRP5gK2OLHWSCkNDkrEeO0EmLScytUPU0jhp3gdKrpyx1AkVqCXUDioofkNXCmQd/WNUrWF35tkVfY3kYwlQ==}
+  '@trpc/next@11.0.0-rc.334':
+    resolution: {integrity: sha512-9cOIlH+784FpLOs/lRDTfb5llJbI9xwNw2ridnWWTCagG88Lo4T4w825TddcSpkKZhMqrvFCMCTauSjMpOC2zQ==}
     peerDependencies:
-      '@trpc/server': 11.0.0-rc.413+87f0cbc94
-
-  '@trpc/next@11.0.0-rc.413':
-    resolution: {integrity: sha512-EV0t8Ba+DwQ6DShJBRWL12c66up2wWuW/4fU8Pd1RuWIke1NImowD7Xv3IEfRVKIxd1OHUoWoZWK86lqbpPWyw==}
-    peerDependencies:
-      '@tanstack/react-query': ^5.40.0
-      '@trpc/client': 11.0.0-rc.413+87f0cbc94
-      '@trpc/react-query': 11.0.0-rc.413+87f0cbc94
-      '@trpc/server': 11.0.0-rc.413+87f0cbc94
+      '@tanstack/react-query': ^5.25.0
+      '@trpc/client': 11.0.0-rc.334+fdf26e552
+      '@trpc/react-query': 11.0.0-rc.334+fdf26e552
+      '@trpc/server': 11.0.0-rc.334+fdf26e552
       next: '*'
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -3359,20 +3375,17 @@ packages:
       '@trpc/react-query':
         optional: true
 
-  '@trpc/react-query@11.0.0-rc.413':
-    resolution: {integrity: sha512-b+mmkhmdijEFa3vEoUwgpcq36ha7U5f/1w2RW/UQGMFrEJyZJn3lFQpEXQSvn23AEnE0ckDBJo+y/TDrleMCNQ==}
+  '@trpc/react-query@11.0.0-rc.334':
+    resolution: {integrity: sha512-DvhU7qMfQkLyrhQoDlrtMAGIgJyin9I8WCsF0oGlAD95ygoJcviD8D+lQzSCUttul9rPcNqWDuGhm5laS7V43A==}
     peerDependencies:
-      '@tanstack/react-query': ^5.40.0
-      '@trpc/client': 11.0.0-rc.413+87f0cbc94
-      '@trpc/server': 11.0.0-rc.413+87f0cbc94
+      '@tanstack/react-query': ^5.25.0
+      '@trpc/client': 11.0.0-rc.334+fdf26e552
+      '@trpc/server': 11.0.0-rc.334+fdf26e552
       react: '>=18.2.0'
       react-dom: '>=18.2.0'
 
   '@trpc/server@11.0.0-rc.334':
     resolution: {integrity: sha512-ckg+f4z3Lc0wYvm1Cx8Zjz8b2hguNlUFQeF8vLrtWYBL8HEolshmxOHMG9MLc6WDE6T1R7DZrG+xEwjI44XH9w==}
-
-  '@trpc/server@11.0.0-rc.413':
-    resolution: {integrity: sha512-fQl7/69pSfk+7+Emm5eOCoAW6f2anxKV/3mUObQfFe0NLH0d4XwGyJuYV+sK7NBy1oit0Qwg12B0EXdsIryDuw==}
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -5236,9 +5249,6 @@ packages:
     resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
     engines: {node: '>=6'}
 
-  eventemitter3@4.0.7:
-    resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
-
   eventemitter3@5.0.1:
     resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
 
@@ -5519,11 +5529,6 @@ packages:
   foreground-child@3.2.1:
     resolution: {integrity: sha512-PXUUyLqrR2XCWICfv6ukppP96sdFwWbNEnfEMt7jNsISjMsvaLNinAHNDYyvkyU+SZG2BTSbT5NjG+vZslfGTA==}
     engines: {node: '>=14'}
-
-  foreman@3.0.1:
-    resolution: {integrity: sha512-ek/qoM0vVKpxzkBUQN9k4Fs7l0XsHv4bqxuEW6oqIS4s0ouYKsQ19YjBzUJKTFRumFiSpUv7jySkrI6lfbhjlw==}
-    engines: {node: '>=6'}
-    hasBin: true
 
   form-data-encoder@1.7.2:
     resolution: {integrity: sha512-qfqtYan3rxrnCk1VYaA4H+Ms9xdpPqvLZa6xmMgFvhO32x7/3J/ExcTd6qpxM0vH2GdMI+poehyBZvqfMTto8A==}
@@ -5857,10 +5862,6 @@ packages:
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
     engines: {node: '>= 14'}
-
-  http-proxy@1.18.1:
-    resolution: {integrity: sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==}
-    engines: {node: '>=8.0.0'}
 
   https-proxy-agent@5.0.1:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
@@ -7018,11 +7019,6 @@ packages:
 
   multimath@2.0.0:
     resolution: {integrity: sha512-toRx66cAMJ+Ccz7pMIg38xSIrtnbozk0dchXezwQDMgQmbGpfxjtv68H+L00iFL8hxDaVjrmwAFSb3I6bg8Q2g==}
-
-  mustache@2.3.2:
-    resolution: {integrity: sha512-KpMNwdQsYz3O/SBS1qJ/o3sqUJ5wSb8gb0pul8CO0S56b9Y2ALm8zCfsjPXsqGFfoNBkDwZuZIAjhsZI03gYVQ==}
-    engines: {npm: '>=1.4.0'}
-    hasBin: true
 
   mv@2.1.1:
     resolution: {integrity: sha512-at/ZndSy3xEGJ8i0ygALh8ru9qy7gWW1cmkaqBN29JmMlIvM//MEO9y1sk/avxuwnPcfhkejkLsuPxH81BrkSg==}
@@ -8846,10 +8842,6 @@ packages:
 
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
-
-  tsconfig-paths@4.2.0:
-    resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
-    engines: {node: '>=6'}
 
   tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
@@ -12923,32 +12915,26 @@ snapshots:
     dependencies:
       '@trpc/server': 11.0.0-rc.334
 
-  '@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413)':
+  '@trpc/next@11.0.0-rc.334(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.334(@trpc/server@11.0.0-rc.334))(@trpc/react-query@11.0.0-rc.334(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.334(@trpc/server@11.0.0-rc.334))(@trpc/server@11.0.0-rc.334)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(@trpc/server@11.0.0-rc.334)(next@15.0.0-rc.0(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)':
     dependencies:
-      '@trpc/server': 11.0.0-rc.413
-
-  '@trpc/next@11.0.0-rc.413(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(@trpc/server@11.0.0-rc.413)(next@15.0.0-rc.0(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713))(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)':
-    dependencies:
-      '@trpc/client': 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
-      '@trpc/server': 11.0.0-rc.413
+      '@trpc/client': 11.0.0-rc.334(@trpc/server@11.0.0-rc.334)
+      '@trpc/server': 11.0.0-rc.334
       next: 15.0.0-rc.0(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)
       react: 19.0.0-rc-8b08e99e-20240713
       react-dom: 19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713)
     optionalDependencies:
       '@tanstack/react-query': 5.45.1(react@19.0.0-rc-8b08e99e-20240713)
-      '@trpc/react-query': 11.0.0-rc.413(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)
+      '@trpc/react-query': 11.0.0-rc.334(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.334(@trpc/server@11.0.0-rc.334))(@trpc/server@11.0.0-rc.334)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)
 
-  '@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)':
+  '@trpc/react-query@11.0.0-rc.334(@tanstack/react-query@5.45.1(react@19.0.0-rc-8b08e99e-20240713))(@trpc/client@11.0.0-rc.334(@trpc/server@11.0.0-rc.334))(@trpc/server@11.0.0-rc.334)(react-dom@19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713))(react@19.0.0-rc-8b08e99e-20240713)':
     dependencies:
       '@tanstack/react-query': 5.45.1(react@19.0.0-rc-8b08e99e-20240713)
-      '@trpc/client': 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
-      '@trpc/server': 11.0.0-rc.413
+      '@trpc/client': 11.0.0-rc.334(@trpc/server@11.0.0-rc.334)
+      '@trpc/server': 11.0.0-rc.334
       react: 19.0.0-rc-8b08e99e-20240713
       react-dom: 19.0.0-rc-8b08e99e-20240713(react@19.0.0-rc-8b08e99e-20240713)
 
   '@trpc/server@11.0.0-rc.334': {}
-
-  '@trpc/server@11.0.0-rc.413': {}
 
   '@trysound/sax@0.2.0': {}
 
@@ -12988,7 +12974,7 @@ snapshots:
 
   '@types/connect@3.4.36':
     dependencies:
-      '@types/node': 20.12.5
+      '@types/node': 20.14.10
 
   '@types/connect@3.4.38':
     dependencies:
@@ -13093,7 +13079,7 @@ snapshots:
       '@types/http-errors': 2.0.4
       '@types/keygrip': 1.0.6
       '@types/koa-compose': 3.2.8
-      '@types/node': 20.12.14
+      '@types/node': 20.14.10
 
   '@types/koa__router@12.0.3':
     dependencies:
@@ -13109,7 +13095,7 @@ snapshots:
 
   '@types/mysql@2.15.22':
     dependencies:
-      '@types/node': 20.12.5
+      '@types/node': 20.14.10
 
   '@types/node-fetch@2.6.11':
     dependencies:
@@ -13146,7 +13132,7 @@ snapshots:
 
   '@types/pg-pool@2.0.4':
     dependencies:
-      '@types/pg': 8.6.1
+      '@types/pg': 8.11.6
 
   '@types/pg@8.11.6':
     dependencies:
@@ -13156,7 +13142,7 @@ snapshots:
 
   '@types/pg@8.6.1':
     dependencies:
-      '@types/node': 20.12.5
+      '@types/node': 20.14.10
       pg-protocol: 1.6.1
       pg-types: 2.2.0
 
@@ -13525,14 +13511,10 @@ snapshots:
       acorn: 8.12.1
       acorn-walk: 8.3.3
 
-  acorn-import-assertions@1.9.0(acorn@8.12.0):
+  acorn-import-assertions@1.9.0(acorn@8.12.1):
     dependencies:
-      acorn: 8.12.0
+      acorn: 8.12.1
     optional: true
-
-  acorn-import-attributes@1.9.5(acorn@8.12.0):
-    dependencies:
-      acorn: 8.12.0
 
   acorn-import-attributes@1.9.5(acorn@8.12.1):
     dependencies:
@@ -15198,8 +15180,6 @@ snapshots:
 
   event-target-shim@5.0.1: {}
 
-  eventemitter3@4.0.7: {}
-
   eventemitter3@5.0.1: {}
 
   events@3.3.0: {}
@@ -15630,15 +15610,6 @@ snapshots:
       cross-spawn: 7.0.3
       signal-exit: 4.1.0
 
-  foreman@3.0.1:
-    dependencies:
-      commander: 2.20.3
-      http-proxy: 1.18.1
-      mustache: 2.3.2
-      shell-quote: 1.8.1
-    transitivePeerDependencies:
-      - debug
-
   form-data-encoder@1.7.2: {}
 
   form-data-encoder@3.0.1: {}
@@ -16019,14 +15990,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  http-proxy@1.18.1:
-    dependencies:
-      eventemitter3: 4.0.7
-      follow-redirects: 1.15.6
-      requires-port: 1.0.0
-    transitivePeerDependencies:
-      - debug
-
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
@@ -16083,16 +16046,16 @@ snapshots:
 
   import-in-the-middle@1.4.2:
     dependencies:
-      acorn: 8.12.0
-      acorn-import-assertions: 1.9.0(acorn@8.12.0)
+      acorn: 8.12.1
+      acorn-import-assertions: 1.9.0(acorn@8.12.1)
       cjs-module-lexer: 1.3.1
       module-details-from-path: 1.0.3
     optional: true
 
   import-in-the-middle@1.8.1:
     dependencies:
-      acorn: 8.12.0
-      acorn-import-attributes: 1.9.5(acorn@8.12.0)
+      acorn: 8.12.1
+      acorn-import-attributes: 1.9.5(acorn@8.12.1)
       cjs-module-lexer: 1.3.1
       module-details-from-path: 1.0.3
 
@@ -17541,8 +17504,6 @@ snapshots:
     dependencies:
       glur: 1.1.2
       object-assign: 4.1.1
-
-  mustache@2.3.2: {}
 
   mv@2.1.1:
     dependencies:
@@ -19429,12 +19390,6 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsconfig-paths@4.2.0:
-    dependencies:
-      json5: 2.2.3
-      minimist: 1.2.8
-      strip-bom: 3.0.0
-
   tslib@1.14.1: {}
 
   tslib@2.6.3: {}
@@ -19604,7 +19559,7 @@ snapshots:
 
   unplugin@1.0.1:
     dependencies:
-      acorn: 8.12.0
+      acorn: 8.12.1
       chokidar: 3.6.0
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.5.0
