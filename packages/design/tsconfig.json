@@ -3,10 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist",
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "paths": {
-      "@peated/design/*": ["./src/*"]
-    }
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
   "include": ["src"],
   "exclude": ["node_modules"]
