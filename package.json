@@ -81,14 +81,5 @@
     "{apps,packages}/**/*.{ts,tsx}": [
       "eslint --cache --fix"
     ]
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "@babel/*",
-        "expo-modules-*",
-        "typescript"
-      ]
-    }
   }
 }
