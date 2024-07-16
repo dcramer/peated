@@ -3,7 +3,7 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "build": "expo export --output-dir ./build --platform all",
+    "_build": "expo export --output-dir ./build --platform all",
     "dev": "expo start",
     "dev:android": "expo start --android",
     "dev:ios": "expo start --ios",

@@ -21,19 +21,17 @@ ENV SENTRY_DSN=$SENTRY_DSN \
     GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
     FATHOM_SITE_ID=$FATHOM_SITE_ID
 
-ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
+ADD .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
 ADD apps/cli/package.json ./apps/cli/package.json
+ADD apps/mobile/package.json ./apps/mobile/package.json
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/server/package.json ./apps/server/package.json
 ADD packages/tsconfig/package.json ./packages/tsconfig/package.json
 ADD packages/design/package.json ./packages/design/package.json
 
-FROM base-env as prod-deps
+FROM base-env as build
 WORKDIR /app
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
-
-FROM base-env AS build
-WORKDIR /app
+ADD .npmrc .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 ADD . .
 
@@ -48,11 +46,7 @@ ENV VERSION=$VERSION \
     SENTRY_PROJECT=$SENTRY_PROJECT \
     SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 
-RUN pnpm build:docker
-
-FROM base-env as server
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ /app/
+RUN pnpm build
 
 ENV HOST=0.0.0.0 \
     PORT=4000
