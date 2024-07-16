@@ -26,6 +26,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: "#ffffff",
     },
   },
+  web: {
+    bundler: "metro",
+    output: "static",
+  },
   experiments: {
     tsconfigPaths: true,
     typedRoutes: true,
