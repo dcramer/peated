@@ -8,6 +8,7 @@ import {
 } from "@trpc/client";
 import { type AnyRouter } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
+import SuperJSON from "superjson";
 
 export function sentryLink<TRouter extends AnyRouter>(): TRPCLink<TRouter> {
   return () => {
@@ -60,6 +61,7 @@ export function getLinks({
     }),
     sentryLink<AppRouter>(),
     (batch ? httpBatchLink : httpLink)({
+      transformer: SuperJSON,
       url: `${apiServer}/trpc`,
       async headers() {
         return {
