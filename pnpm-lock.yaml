@@ -96,6 +96,12 @@ importers:
       pnpm:
         specifier: ^9.5.0
         version: 9.5.0
+      simple-git-hooks:
+        specifier: ^2.11.1
+        version: 2.11.1
+      turbo:
+        specifier: ^2.0.6
+        version: 2.0.6
       typescript:
         specifier: 'catalog:'
         version: 5.5.3
@@ -127,12 +133,6 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.5.14
         version: 0.5.14(prettier-plugin-organize-imports@3.2.4(prettier@3.3.3)(typescript@5.5.3))(prettier@3.3.3)
-      simple-git-hooks:
-        specifier: ^2.11.1
-        version: 2.11.1
-      turbo:
-        specifier: ^2.0.6
-        version: 2.0.6
 
   apps/cli:
     dependencies:

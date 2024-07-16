@@ -48,7 +48,7 @@ ENV VERSION=$VERSION \
     SENTRY_PROJECT=$SENTRY_PROJECT \
     SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 
-RUN pnpm build
+RUN pnpm build:docker
 
 FROM base-env as server
 COPY --from=prod-deps /app/node_modules /app/node_modules
