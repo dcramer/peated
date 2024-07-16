@@ -7,6 +7,7 @@
     "dev": "expo start",
     "dev:android": "expo start --android",
     "dev:ios": "expo start --ios",
+    "dev:web": "expo start --web",
     "test": "jest --watchAll",
     "typecheck": "tsc --noEmit"
   },
@@ -15,6 +16,7 @@
   },
   "dependencies": {
     "@expo/metro-config": "~0.18.8",
+    "@expo/metro-runtime": "^3.2.1",
     "@expo/vector-icons": "^14.0.2",
     "@peated/design": "workspace:*",
     "@peated/server": "workspace:*",
