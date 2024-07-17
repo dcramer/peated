@@ -1,4 +1,4 @@
-import config from "@peated/server/src/config";
+import config from "@peated/server/config";
 
 export type Sitemap = {
   url: string;

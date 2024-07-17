@@ -9,7 +9,7 @@ import {
   formatCategoryName,
   formatFlavorProfile,
 } from "@peated/server/lib/format";
-import { toTitleCase } from "@peated/server/src/lib/strings";
+import { toTitleCase } from "@peated/server/lib/strings";
 import Button from "@peated/web/components/button";
 import FilterSidebarSection from "@peated/web/components/filterListSection";
 import { useSearchParams } from "next/navigation";

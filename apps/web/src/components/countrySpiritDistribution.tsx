@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCategoryName } from "@peated/server/src/lib/format";
+import { formatCategoryName } from "@peated/server/lib/format";
 import { trpc } from "../lib/trpc";
 import { DistributionChart } from "./distributionChart";
 

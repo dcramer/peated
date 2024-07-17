@@ -1,6 +1,6 @@
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { ArrowsPointingOutIcon, StarIcon } from "@heroicons/react/24/outline";
-import { formatCategoryName } from "@peated/server/src/lib/format";
+import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import Button from "@peated/web/components/button";
 import { summarize } from "@peated/web/lib/markdown";

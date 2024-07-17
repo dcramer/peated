@@ -1,6 +1,6 @@
 import Link from "@peated/web/components/link";
 
-import { toTitleCase } from "@peated/server/src/lib/strings";
+import { toTitleCase } from "@peated/server/lib/strings";
 import type { PagingRel, Tag } from "@peated/server/types";
 import PaginationButtons from "../paginationButtons";
 

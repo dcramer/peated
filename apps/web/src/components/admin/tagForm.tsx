@@ -2,9 +2,9 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FLAVOR_PROFILES, TAG_CATEGORIES } from "@peated/server/constants";
+import { formatFlavorProfile } from "@peated/server/lib/format";
+import { toTitleCase } from "@peated/server/lib/strings";
 import { TagInputSchema } from "@peated/server/schemas";
-import { formatFlavorProfile } from "@peated/server/src/lib/format";
-import { toTitleCase } from "@peated/server/src/lib/strings";
 import { type Tag } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";

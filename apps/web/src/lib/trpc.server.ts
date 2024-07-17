@@ -1,6 +1,6 @@
-import { type AppRouter } from "@peated/server/src/trpc/router";
 import { getLinks } from "@peated/server/trpc/links";
 import { getQueryClient } from "@peated/server/trpc/query";
+import { type AppRouter } from "@peated/server/trpc/router";
 import config from "@peated/web/config";
 import { createTRPCQueryUtils } from "@trpc/react-query";
 import { type CreateQueryUtils } from "@trpc/react-query/shared";

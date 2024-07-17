@@ -1,4 +1,4 @@
-import { type User } from "@peated/server/src/types";
+import { type User } from "@peated/server/types";
 import { getIronSession, type SessionOptions } from "iron-session";
 import { cookies } from "next/headers";
 

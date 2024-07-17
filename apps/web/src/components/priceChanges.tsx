@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
-import { formatCategoryName } from "@peated/server/src/lib/format";
+import { formatCategoryName } from "@peated/server/lib/format";
 import { type Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
 import Link from "@peated/web/components/link";

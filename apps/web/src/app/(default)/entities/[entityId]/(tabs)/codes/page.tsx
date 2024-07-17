@@ -1,7 +1,7 @@
 import {
   SMWS_CATEGORY_LIST,
   SMWS_DISTILLERY_CODES,
-} from "@peated/server/src/lib/smws";
+} from "@peated/server/lib/smws";
 import Heading from "@peated/web/components/heading";
 import { getTrpcClient } from "@peated/web/lib/trpc.server";
 import Link from "next/link";

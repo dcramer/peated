@@ -1,6 +1,6 @@
 "use client";
 
-import { toTitleCase } from "@peated/server/src/lib/strings";
+import { toTitleCase } from "@peated/server/lib/strings";
 import { type EntityType } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import FilterSidebarSection from "@peated/web/components/filterListSection";

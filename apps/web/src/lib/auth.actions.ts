@@ -1,6 +1,6 @@
 "use server";
 
-import { makeTRPCClient } from "@peated/server/src/lib/trpc";
+import { makeTRPCClient } from "@peated/server/trpc/client";
 import config from "@peated/web/config";
 import { isTRPCClientError } from "@peated/web/lib/trpc";
 import { redirect } from "next/navigation";

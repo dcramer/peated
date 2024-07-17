@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityInputSchema } from "@peated/server/schemas";
-import { type EntityType } from "@peated/server/src/types";
+import { type EntityType } from "@peated/server/types";
 import { trpc } from "@peated/web/lib/trpc";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
