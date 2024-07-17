@@ -8,6 +8,7 @@
     "paths": {
       "@peated/mobile/*": ["./src/*"],
       "@peated/tsconfig/*": ["../../packages/tsconfig/src/*"],
+      "@peated/design/*": ["../../packages/design/src/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     }
   },
