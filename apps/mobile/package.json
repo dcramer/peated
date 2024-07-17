@@ -23,6 +23,7 @@
     "@peated/tsconfig": "workspace:*",
     "@react-navigation/native": "^6.1.17",
     "@sentry/react-native": "~5.26.0",
+    "@shopify/flash-list": "^1.7.0",
     "@trpc/client": "catalog:",
     "@trpc/react-query": "catalog:",
     "@trpc/server": "catalog:",

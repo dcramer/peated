@@ -2,9 +2,13 @@ const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const path = require("path");
 const { FileStore } = require("metro-cache");
 
-module.exports = withTurborepoManagedCache(
+const config = withTurborepoManagedCache(
   withMonorepoPaths(getSentryExpoConfig(__dirname)),
 );
+
+config.resolver.unstable_enablePackageExports = true;
+
+module.exports = config;
 
 /**
  * Add the monorepo paths to the Metro config.

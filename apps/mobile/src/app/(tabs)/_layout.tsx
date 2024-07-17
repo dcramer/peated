@@ -76,13 +76,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <StarIcon color={color} />,
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="addTasting"
         options={{
           title: "Add Tasting",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="friends"
         options={{
