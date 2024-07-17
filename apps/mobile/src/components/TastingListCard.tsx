@@ -1,88 +1,134 @@
-import theme from "@peated/design";
 import { type RouterOutputs } from "@peated/mobile/lib/trpc";
+import { formatColor, formatServingStyle } from "@peated/server/lib/format";
+import { COLOR_SCALE } from "@peated/server/src/constants";
 import { type ListRenderItemInfo } from "@shopify/flash-list";
 import { Link } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Pressable, View } from "react-native";
+import {
+  ChatBubbleLeftRightIcon,
+  HandThumbUpIcon,
+} from "react-native-heroicons/solid";
+import BottleCard from "./BottleCard";
+import Button from "./Button";
+import DefinitionList from "./DefinitionList";
+import { Text } from "./StyledText";
+import TimeSince from "./TimeSince";
 
 export default function TastingListCard({
   item: { item },
 }: {
   item: ListRenderItemInfo<RouterOutputs["tastingList"]["results"][number]>;
 }) {
+  const user: { id: number } | null = null;
+  const [hasToasted, setHasToasted] = useState(item.hasToasted);
+  const isTaster = user?.id === item.createdBy.id;
+  const totalToasts = item.toasts + (hasToasted && !item.hasToasted ? 1 : 0);
+
+  const canToast = !hasToasted && !isTaster && user;
+
   return (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <View style={styles.author}>
-          <Link
-            asChild
-            href={{
-              pathname: "/users/[username]",
-              params: { id: item.createdBy.username },
-            }}
-          >
-            <Pressable>
-              <Text style={styles.username}>{item.createdBy.username}</Text>
-            </Pressable>
-          </Link>
+    <View className="bg-slate-950 ring-1 ring-inset ring-slate-800">
+      <View className="border-x border-slate-800 bg-slate-900 bg-gradient-to-r from-slate-950 to-slate-900">
+        <View className="flex flex-row items-center space-x-4 p-3">
+          <View className="flex-auto space-y-1">
+            <Link
+              asChild
+              href={{
+                pathname: "/users/[username]",
+                params: { id: item.createdBy.username },
+              }}
+            >
+              <Pressable>
+                <Text className="font-semibold">{item.createdBy.username}</Text>
+              </Pressable>
+            </Link>
+          </View>
+          <View>
+            <TimeSince variant="muted" date={item.createdAt} />
+          </View>
         </View>
-        <View style={styles.metadata}>
-          <Text style={styles.date}>{item.createdAt}</Text>
+        <BottleCard bottle={item.bottle} />
+      </View>
+      <View>
+        {/* {!!item.imageUrl && (
+          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mr-4">
+            <ImageWithSkeleton
+              src={item.imageUrl}
+              className="h-full cursor-pointer"
+              alt=""
+              onClick={() => setImageOpen(true)}
+            />
+            <ImageModal
+              image={item.imageUrl}
+              open={imageOpen}
+              setOpen={setImageOpen}
+            />
+          </div>
+        )} */}
+        {!!item.notes && (
+          <View className="p-3">
+            <Text variant="muted">{item.notes}</Text>
+          </View>
+        )}
+        {(item.servingStyle ||
+          item.color ||
+          item.rating ||
+          item.tags.length > 0) && (
+          <DefinitionList className="grid-cols grid grid-cols-2 gap-y-4 p-3">
+            {item.rating && (
+              <View>
+                <DefinitionList.Term text="Rating" />
+                <DefinitionList.Details>
+                  <Text>{item.rating}</Text>
+                </DefinitionList.Details>
+              </View>
+            )}
+            {item.tags.length > 0 && (
+              <View>
+                <DefinitionList.Term text="Notes" />
+                <DefinitionList.Details
+                  text={item.tags.join(", ")}
+                ></DefinitionList.Details>
+              </View>
+            )}
+            {item.servingStyle && (
+              <View>
+                <DefinitionList.Term text="Style" />
+                <DefinitionList.Details
+                  text={formatServingStyle(item.servingStyle)}
+                />
+              </View>
+            )}
+            {item.color && (
+              <View>
+                <DefinitionList.Term text="Color" />
+                <DefinitionList.Details>
+                  <View
+                    className="h-4 w-4"
+                    style={{ backgroundColor: COLOR_SCALE[item.color][2] }}
+                  />
+                  <Text variant="muted">{formatColor(item.color)}</Text>
+                </DefinitionList.Details>
+              </View>
+            )}
+          </DefinitionList>
+        )}
+
+        <View className="flex flex-row items-center space-x-3 p-3">
+          <Button
+            icon={HandThumbUpIcon}
+            active={hasToasted}
+            disabled={!canToast}
+          >
+            {totalToasts}
+          </Button>
+
+          <Button icon={ChatBubbleLeftRightIcon}>
+            {item.comments.toLocaleString()}
+          </Button>
         </View>
       </View>
     </View>
   );
 }
-
-// <li className="overflow-hidden bg-slate-950 ring-1 ring-inset ring-slate-800">
-// <div className="border-x border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
-//   <div className="flex items-center space-x-4 p-3 sm:px-5 sm:py-4">
-//     <UserAvatar size={32} user={tasting.createdBy} />
-//     <div className="flex-auto space-y-1 font-semibold">
-//       <Link
-//         href={`/users/${tasting.createdBy.username}`}
-//         className="truncate hover:underline"
-//       >
-//         {tasting.createdBy.username}
-//       </Link>
-//     </div>
-//     <div className="flex flex-col items-end gap-y-2">
-//       <Link href={`/tastings/${tasting.id}`} className="hover:underline">
-//         <TimeSince
-//           className="block text-sm font-light"
-//           date={tasting.createdAt}
-//         />
-//       </Link>
-//     </div>
-//   </div>
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: theme.colors.slate[950],
-    borderWidth: 1,
-    borderColor: theme.colors.slate[800],
-  },
-  header: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-  },
-  author: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: "auto",
-  },
-  username: {
-    fontWeight: "bold",
-    color: theme.colors.white,
-  },
-  metadata: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-  },
-  date: {
-    color: theme.colors.light,
-    fontSize: 12,
-  },
-});

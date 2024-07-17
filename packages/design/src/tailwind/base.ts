@@ -15,7 +15,7 @@ export default {
         current: "currentColor",
         light: colors.slate[400],
         highlight: colors.amber[400],
-        highlightDark: colors.amber[800],
+        "highlight-dark": colors.amber[800],
         background: "#111111",
       },
       fontFamily: {

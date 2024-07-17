@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import config from "../config";
 
+import "@peated/mobile/global.css";
+
 // Construct a new instrumentation instance. This is needed to communicate between the integration and React
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 

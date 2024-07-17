@@ -1,9 +1,15 @@
 const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const path = require("path");
 const { FileStore } = require("metro-cache");
+const { withNativeWind } = require("nativewind/metro");
 
 const config = withTurborepoManagedCache(
-  withMonorepoPaths(getSentryExpoConfig(__dirname)),
+  withMonorepoPaths(
+    withNativeWind(getSentryExpoConfig(__dirname), {
+      input: "./src/global.css",
+      configPath: "./tailwind.config.ts",
+    }),
+  ),
 );
 
 config.resolver.unstable_enablePackageExports = true;

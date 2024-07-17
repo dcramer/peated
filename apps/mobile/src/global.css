@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: white;
+
+  background-color: theme("colors.slate.900");
+  background-image: linear-gradient(
+    to right,
+    theme("colors.slate.900"),
+    theme("colors.slate.950"),
+    theme("colors.slate.900")
+  );
+}
