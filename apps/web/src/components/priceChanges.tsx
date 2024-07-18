@@ -35,7 +35,9 @@ export function PriceChangesSkeleton() {
 }
 
 export default function PriceChanges() {
-  const [data] = trpc.priceChangeList.useSuspenseQuery();
+  const [data] = trpc.priceChangeList.useSuspenseQuery({
+    limit: 25,
+  });
 
   return (
     <div className="mt-4">
