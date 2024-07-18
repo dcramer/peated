@@ -21,21 +21,18 @@ ENV SENTRY_DSN=$SENTRY_DSN \
     GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
     FATHOM_SITE_ID=$FATHOM_SITE_ID
 
-ADD package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
+ADD .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml .
 ADD apps/cli/package.json ./apps/cli/package.json
+ADD apps/mobile/package.json ./apps/mobile/package.json
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/server/package.json ./apps/server/package.json
-ADD packages/tsconfig/package.json ./packages/tsconfig/package.json
-ADD packages/design/package.json ./packages/design/package.json
+# given packages are mostly universally shared code, this simplifies our logic
+ADD packages .
 
-FROM base-env as prod-deps
-WORKDIR /app
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
-
-FROM base-env AS build
-WORKDIR /app
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store NODE_ENV=development pnpm install --frozen-lockfile
 ADD . .
+# We run this again as Docker seems to wipe our node_modules, but they're cached
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store NODE_ENV=development pnpm install --frozen-lockfile
 
 # needs bound before build
 ARG VERSION
@@ -48,11 +45,13 @@ ENV VERSION=$VERSION \
     SENTRY_PROJECT=$SENTRY_PROJECT \
     SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 
-RUN pnpm build
+RUN pnpm build:docker
 
-FROM base-env as server
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/ /app/
+# TODO: it'd be nice to optimize the build, but we're beholden with a ton of node_modules from having to use hoisting
+# Prune node_modules to prod deps
+# RUN --mount=type=cache,id=pnpm,target=/pnpm/store NODE_ENV=development pnpm install --prod --frozen-lockfile
+# Wipe the store
+# RUN rm -rf /pnpm/store
 
 ENV HOST=0.0.0.0 \
     PORT=4000

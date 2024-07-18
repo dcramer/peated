@@ -21,9 +21,9 @@ export function logError(
 
   const eventId = withScope((scope) => {
     if (attachments) {
-      for (const key in attachments) {
+      for (const [key, data] of Object.entries(attachments)) {
         scope.addAttachment({
-          data: attachments[key],
+          data,
           filename: key,
         });
       }

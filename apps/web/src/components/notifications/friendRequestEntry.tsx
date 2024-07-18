@@ -1,7 +1,7 @@
 "use client";
 
 import type { FriendStatus } from "@peated/server/types";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import type { FriendRequestNotification } from "../../types";
 import Button from "../button";
 

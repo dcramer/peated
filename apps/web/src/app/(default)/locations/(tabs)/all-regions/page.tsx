@@ -1,7 +1,7 @@
 "use client";
 
 import Table from "@peated/web/components/table";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export default function Page() {
   const [countryList] = trpc.countryList.useSuspenseQuery({

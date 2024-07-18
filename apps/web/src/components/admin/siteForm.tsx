@@ -12,7 +12,7 @@ import Layout from "@peated/web/components/layout";
 import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError } from "@peated/web/lib/trpc";
+import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";

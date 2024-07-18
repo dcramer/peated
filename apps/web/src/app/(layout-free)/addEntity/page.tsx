@@ -3,7 +3,7 @@
 import { type EntityType } from "@peated/server/types";
 import EntityForm from "@peated/web/components/entityForm";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AddEntity() {

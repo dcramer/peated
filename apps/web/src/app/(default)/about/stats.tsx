@@ -1,6 +1,6 @@
 "use client";
 
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export function StatsSkeleton() {
   return (

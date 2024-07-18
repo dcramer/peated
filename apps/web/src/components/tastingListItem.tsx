@@ -6,12 +6,12 @@ import {
   ChatBubbleLeftRightIcon,
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
-import { COLOR_SCALE } from "@peated/server/src/constants";
-import { formatColor, formatServingStyle } from "@peated/server/src/lib/format";
+import { COLOR_SCALE } from "@peated/server/constants";
+import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Tasting } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 import { getAuthRedirect } from "../lib/auth";

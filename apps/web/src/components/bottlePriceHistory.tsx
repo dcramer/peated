@@ -1,6 +1,6 @@
 "use client";
 
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { RangeBarChart } from "./rangeBarChart.client";
 
 export function BottlePriceHistorySkeleton() {

@@ -1,5 +1,5 @@
 import { buildSitemapIndex } from "@peated/web/lib/sitemaps";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 const PAGE_LIMIT = 1000;
 

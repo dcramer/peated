@@ -1,7 +1,7 @@
 "use client";
 
+import { COLOR_SCALE } from "@peated/server/constants";
 import { formatColor } from "@peated/server/lib/format";
-import { COLOR_SCALE } from "@peated/server/src/constants";
 import type { ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import type { FieldError } from "react-hook-form";

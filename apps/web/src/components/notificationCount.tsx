@@ -1,7 +1,7 @@
 "use client";
 
 import useAuth from "@peated/web/hooks/useAuth";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
+import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
 
 function NotificationCountAuthentciated() {
   let unreadNotificationCount;

@@ -4,7 +4,7 @@ import Button from "@peated/web/components/button";
 import PageHeader from "@peated/web/components/pageHeader";
 import Table from "@peated/web/components/table";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export default function Page() {
   useAuthRequired();

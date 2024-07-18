@@ -1,8 +1,19 @@
 import { trpcMiddleware } from "@sentry/node";
 import { TRPCError, initTRPC } from "@trpc/server";
+import SuperJSON from "superjson";
+import { ZodError } from "zod";
 import { type Context } from "./context";
 
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.context<Context>().create({
+  transformer: SuperJSON,
+  errorFormatter: ({ shape, error }) => ({
+    ...shape,
+    data: {
+      ...shape.data,
+      zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
+    },
+  }),
+});
 
 const isAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.user) {

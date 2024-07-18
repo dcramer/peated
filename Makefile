@@ -26,3 +26,6 @@ create-db-dev:
 
 create-db-test:
 	$(PG_CONTAINER) createdb -E utf-8 -h 127.0.0.1 -p 5432 -U postgres test_peated || exit 0
+
+wipe-node-modules:
+	find . | grep node_modules$ | xargs rm -rf

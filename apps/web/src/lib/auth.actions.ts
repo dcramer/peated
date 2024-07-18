@@ -1,11 +1,11 @@
 "use server";
 
-import { makeTRPCClient } from "@peated/server/src/lib/trpc";
+import { makeTRPCClient } from "@peated/server/trpc/client";
 import config from "@peated/web/config";
+import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
 import { getSession } from "./session.server";
-import { isTRPCClientError } from "./trpc";
 
 export async function logout(prevState?: any, formData?: FormData) {
   const redirectTo = getSafeRedirect(

@@ -1,7 +1,7 @@
 "use client";
 
 import ActivityFeed from "@peated/web/components/activityFeed";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export const fetchCache = "default-no-store";
 

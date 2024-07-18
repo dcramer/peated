@@ -1,12 +1,12 @@
 "use client";
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
-import { formatCategoryName } from "@peated/server/src/lib/format";
+import { formatCategoryName } from "@peated/server/lib/format";
 import { type Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import BottleLink from "./bottleLink";
 import Price from "./price";
 
@@ -35,7 +35,9 @@ export function PriceChangesSkeleton() {
 }
 
 export default function PriceChanges() {
-  const [data] = trpc.priceChangeList.useSuspenseQuery();
+  const [data] = trpc.priceChangeList.useSuspenseQuery({
+    limit: 25,
+  });
 
   return (
     <div className="mt-4">

@@ -8,7 +8,7 @@ import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import TimeSince from "@peated/web/components/timeSince";
 import { formatDuration } from "@peated/web/lib/format";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useState, type ReactNode } from "react";
 import { type z } from "zod";
 

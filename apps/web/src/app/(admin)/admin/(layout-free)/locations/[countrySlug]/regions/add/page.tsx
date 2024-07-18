@@ -1,7 +1,7 @@
 "use client";
 
 import RegionForm from "@peated/web/components/admin/regionForm";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
 export default function Page() {

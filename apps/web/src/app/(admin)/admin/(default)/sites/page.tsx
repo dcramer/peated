@@ -5,7 +5,7 @@ import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useSearchParams } from "next/navigation";
 
 export default function Page() {

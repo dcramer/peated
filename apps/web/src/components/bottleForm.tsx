@@ -14,8 +14,8 @@ import {
   formatFlavorProfile,
   notesForProfile,
 } from "@peated/server/lib/format";
+import { toTitleCase } from "@peated/server/lib/strings";
 import { BottleInputSchema } from "@peated/server/schemas";
-import { toTitleCase } from "@peated/server/src/lib/strings";
 import type { Bottle, Entity, FlavorProfile } from "@peated/server/types";
 import { PreviewBottleCard } from "@peated/web/components/bottleCard";
 import EntityField from "@peated/web/components/entityField";
@@ -34,7 +34,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import useAuth from "../hooks/useAuth";
-import { isTRPCClientError, trpc } from "../lib/trpc";
+import { isTRPCClientError, trpc } from "../lib/trpc/client";
 import Button from "./button";
 import Collapsable from "./collapsable";
 import { classesForProfile } from "./flavorProfile";

@@ -49,7 +49,7 @@ export default publicProcedure
         AND array_length(${tastings.tags}, 1) > 0
       `,
         )
-      ).rows[0].count,
+      ).rows[0]!.count,
     );
 
     return {

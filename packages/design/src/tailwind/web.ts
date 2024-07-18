@@ -4,33 +4,14 @@ import tailwindForms from "@tailwindcss/forms";
 import tailwindTypography from "@tailwindcss/typography";
 
 import colors from "tailwindcss/colors";
-import defaultTheme from "tailwindcss/defaultTheme";
+
+import baseConfig from "./base";
 
 export default {
-  content: ["./app/**/*.{js,ts,jsx,tsx}"],
-  future: {
-    hoverOnlyWhenSupported: true,
-  },
+  content: baseConfig.content,
+  presets: [baseConfig],
   theme: {
-    colors: {
-      ...colors,
-      transparent: "transparent",
-      current: "currentColor",
-      light: colors.slate[400],
-      highlight: {
-        DEFAULT: colors.amber[400],
-        dark: colors.amber[800],
-      },
-      background: {
-        DEFAULT: "#111111",
-        alt: "#1F1F1F",
-      },
-    },
     extend: {
-      fontFamily: {
-        sans: ["Raleway", ...defaultTheme.fontFamily.sans],
-      },
-
       animation: {
         fadeIn: "0.5s fadeIn forwards",
         fadeOut: "0.5s fadeOut forwards",

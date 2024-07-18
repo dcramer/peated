@@ -1,10 +1,10 @@
 "use client";
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
-import { formatCategoryName } from "@peated/server/src/lib/format";
+import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import Link from "@peated/web/components/link";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export function NewBottlesSkeleton() {
   const Row = () => (

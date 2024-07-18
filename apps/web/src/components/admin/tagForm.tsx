@@ -2,9 +2,9 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FLAVOR_PROFILES, TAG_CATEGORIES } from "@peated/server/constants";
+import { formatFlavorProfile } from "@peated/server/lib/format";
+import { toTitleCase } from "@peated/server/lib/strings";
 import { TagInputSchema } from "@peated/server/schemas";
-import { formatFlavorProfile } from "@peated/server/src/lib/format";
-import { toTitleCase } from "@peated/server/src/lib/strings";
 import { type Tag } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
@@ -14,7 +14,7 @@ import Layout from "@peated/web/components/layout";
 import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError } from "@peated/web/lib/trpc";
+import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";

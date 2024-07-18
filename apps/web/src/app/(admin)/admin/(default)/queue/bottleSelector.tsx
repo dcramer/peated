@@ -10,7 +10,7 @@ import ListItem from "@peated/web/components/listItem";
 import { Modal } from "@peated/web/components/modal";
 import SearchHeader from "@peated/web/components/searchHeader";
 import Spinner from "@peated/web/components/spinner";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";

@@ -1,6 +1,6 @@
 "use client";
 
-import { toTitleCase } from "@peated/server/src/lib/strings";
+import { toTitleCase } from "@peated/server/lib/strings";
 import type { PagingRel } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";

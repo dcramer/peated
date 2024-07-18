@@ -5,7 +5,7 @@ import type { Entity } from "@peated/server/types";
 import BottleForm from "@peated/web/components/bottleForm";
 import Spinner from "@peated/web/components/spinner";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 

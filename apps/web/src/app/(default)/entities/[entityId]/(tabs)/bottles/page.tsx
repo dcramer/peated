@@ -1,7 +1,7 @@
 "use client";
 
 import BottleTable from "@peated/web/components/bottleTable";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useSearchParams } from "next/navigation";
 
 export default function EntityTastings({

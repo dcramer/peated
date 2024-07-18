@@ -82,6 +82,12 @@ export default authedProcedure
         .set(data)
         .where(eq(users.id, user.id))
         .returning();
+      if (!newUser) {
+        throw new TRPCError({
+          message: "Unable to update user.",
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
 
       return await serialize(UserSerializer, newUser, ctx.user);
     } catch (err: any) {

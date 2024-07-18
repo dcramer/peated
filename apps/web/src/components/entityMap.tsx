@@ -1,4 +1,4 @@
-import { type Entity } from "@peated/server/src/types";
+import { type Entity } from "@peated/server/types";
 import Map from "./map";
 
 export default function EntityMap({

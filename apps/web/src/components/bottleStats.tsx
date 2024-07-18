@@ -1,4 +1,4 @@
-import { type RouterOutputs } from "../lib/trpc";
+import { type RouterOutputs } from "../lib/trpc/client";
 import Price from "./price";
 
 export default function BottleStats({

@@ -1,9 +1,9 @@
 "use client";
 
-import { toTitleCase } from "@peated/server/src/lib/strings";
+import { toTitleCase } from "@peated/server/lib/strings";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export default function Page({
   params: { tagId },

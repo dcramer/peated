@@ -2,7 +2,7 @@
 
 import ChangeList from "@peated/web/components/changeList";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export default function Page() {
   const [changeList] = trpc.changeList.useSuspenseQuery();

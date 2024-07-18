@@ -1,5 +1,5 @@
 import { TrophyIcon } from "@heroicons/react/24/outline";
-import { trpc } from "../lib/trpc";
+import { trpc } from "../lib/trpc/client";
 import Heading from "./heading";
 
 function RatingIcon({ rating }: { rating: number }) {

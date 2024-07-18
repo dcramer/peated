@@ -5,7 +5,7 @@ import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export default function EntityAliases({
   params: { entityId },

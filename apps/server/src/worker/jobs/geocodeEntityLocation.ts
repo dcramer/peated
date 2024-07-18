@@ -105,6 +105,9 @@ export default async ({
     : await locateAddress(entity);
 
   const match = result.data.results[0];
+  if (!match) {
+    throw new Error("Unable to identify address");
+  }
   if (!match.formatted_address) {
     throw new Error("Unable to identify address");
   }

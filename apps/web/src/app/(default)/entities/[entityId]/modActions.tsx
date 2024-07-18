@@ -7,7 +7,7 @@ import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
 export default function ModActions({ entity }: { entity: Entity }) {

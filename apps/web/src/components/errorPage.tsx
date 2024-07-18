@@ -1,5 +1,7 @@
 "use client";
 
+import { isTRPCClientError } from "@peated/server/trpc/client";
+
 import { type AppRouter } from "@peated/server/trpc/router";
 import Button from "@peated/web/components/button";
 import config from "@peated/web/config";
@@ -7,7 +9,6 @@ import { ApiError, ApiUnauthorized, ApiUnavailable } from "@peated/web/lib/api";
 import { type TRPCClientError } from "@trpc/client";
 import { type ComponentProps, type ReactNode } from "react";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
-import { isTRPCClientError } from "../lib/trpc";
 
 const DEFAULT_TITLE = "Error";
 const DEFAULT_SUBTITLE = "Sorry, an unexpected error has occurred.";
@@ -44,9 +45,9 @@ export default function ErrorPage({
   // i hate all of this
   if (error && (!title || !subtitle)) {
     if (error instanceof ApiUnavailable) {
-      title = title ?? isOnline ? "Server Unreachable" : "Connection Offline";
+      title = (title ?? isOnline) ? "Server Unreachable" : "Connection Offline";
       subtitle =
-        subtitle ?? isOnline
+        (subtitle ?? isOnline)
           ? "It looks like Peated's API is unreachable right now. Please try again shortly."
           : "It looks like your network is offline.";
     } else if (error instanceof ApiUnauthorized) {
@@ -74,9 +75,9 @@ export default function ErrorPage({
       isTRPCClientError(error) &&
       error.message === "Failed to fetch"
     ) {
-      title = title ?? isOnline ? "Server Unreachable" : "Connection Offline";
+      title = (title ?? isOnline) ? "Server Unreachable" : "Connection Offline";
       subtitle =
-        subtitle ?? isOnline
+        (subtitle ?? isOnline)
           ? "It looks like Peated's API is unreachable right now. Please try again shortly."
           : "It looks like your network is offline.";
     }

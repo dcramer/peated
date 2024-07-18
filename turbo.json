@@ -1,0 +1,36 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "tasks": {
+    "test": {
+      "dependsOn": ["build"],
+      "inputs": ["**/*.{ts,tsx,js,jsx}"],
+      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET", "SESSION_SECRET"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET", "SESSION_SECRET"]
+    },
+    "typecheck": {}
+  },
+  "globalEnv": [
+    "DEBUG",
+    "HOST",
+    "PORT",
+    "CORS_HOST",
+    "API_SERVER",
+    "URL_PREFIX",
+    "VERSION",
+    "GOOGLE_CLIENT_ID",
+    "SENTRY_DSN",
+    "FATHOM_SITE_ID"
+  ],
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "CI",
+    "VERCEL",
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "npm_lifecycle_event"
+  ]
+}

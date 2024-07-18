@@ -1,7 +1,7 @@
 "use client";
 
-import { formatCategoryName } from "@peated/server/src/lib/format";
-import { trpc } from "../lib/trpc";
+import { formatCategoryName } from "@peated/server/lib/format";
+import { trpc } from "../lib/trpc/client";
 import { DistributionChart } from "./distributionChart";
 
 export default function CountrySpiritDistribution({

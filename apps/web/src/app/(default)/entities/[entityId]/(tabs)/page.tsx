@@ -4,7 +4,7 @@ import EntityMap from "@peated/web/components/entityMap";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import { summarize } from "@peated/web/lib/markdown";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { parseDomain } from "@peated/web/lib/urls";
 
 export async function generateMetadata({

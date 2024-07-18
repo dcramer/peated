@@ -1,7 +1,7 @@
 import BetaNotice from "@peated/web/components/betaNotice";
 import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 export async function generateMetadata({
   params: { bottleId },

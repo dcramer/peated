@@ -18,7 +18,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { updateSession } from "@peated/web/lib/auth.actions";
 import { toBlob } from "@peated/web/lib/blobs";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
+import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";

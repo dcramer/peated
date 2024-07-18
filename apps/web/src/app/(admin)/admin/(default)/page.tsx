@@ -2,7 +2,7 @@
 
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 function FaktoryStats() {
   const [data] = trpc.faktoryInfo.useSuspenseQuery(undefined, {
