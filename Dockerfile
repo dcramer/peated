@@ -21,17 +21,14 @@ ENV SENTRY_DSN=$SENTRY_DSN \
     GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
     FATHOM_SITE_ID=$FATHOM_SITE_ID
 
-ADD .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml packages .
+ADD .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml .
 ADD apps/cli/package.json ./apps/cli/package.json
 ADD apps/mobile/package.json ./apps/mobile/package.json
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/server/package.json ./apps/server/package.json
-ADD packages/tsconfig/package.json ./packages/tsconfig/package.json
-ADD packages/design/package.json ./packages/design/package.json
+# given packages are mostly universally shared code, this simplifies our logic
+ADD packages .
 
-FROM base-env as build
-WORKDIR /app
-ADD .npmrc .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 ADD . .
 
