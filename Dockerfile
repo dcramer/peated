@@ -29,8 +29,10 @@ ADD apps/server/package.json ./apps/server/package.json
 # given packages are mostly universally shared code, this simplifies our logic
 ADD packages .
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store NODE_ENV=development pnpm install --frozen-lockfile
 ADD . .
+# We run this again as Docker seems to wipe our node_modules, but they're cached
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store NODE_ENV=development pnpm install --frozen-lockfile
 
 # needs bound before build
 ARG VERSION
@@ -43,7 +45,13 @@ ENV VERSION=$VERSION \
     SENTRY_PROJECT=$SENTRY_PROJECT \
     SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 
-RUN pnpm build
+RUN pnpm build:docker
+
+# TODO: it'd be nice to optimize the build, but we're beholden with a ton of node_modules from having to use hoisting
+# Prune node_modules to prod deps
+# RUN --mount=type=cache,id=pnpm,target=/pnpm/store NODE_ENV=development pnpm install --prod --frozen-lockfile
+# Wipe the store
+# RUN rm -rf /pnpm/store
 
 ENV HOST=0.0.0.0 \
     PORT=4000

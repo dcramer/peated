@@ -5,6 +5,7 @@
   "description": "",
   "scripts": {
     "build": "pnpm -r run build",
+    "build:docker": "pnpm --filter='!./apps/mobile' --filter='!./apps/web' build",
     "build:packages": "pnpm -r --filter='./packages/*' build",
     "build:mobile": "pnpm build --filter='./apps/mobile'",
     "build:server": "pnpm build --filter='./apps/server'",
