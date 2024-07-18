@@ -1,7 +1,7 @@
 "use client";
 
 import TagForm from "@peated/web/components/admin/tagForm";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
 export default function Page() {

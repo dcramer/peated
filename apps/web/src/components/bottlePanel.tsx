@@ -3,7 +3,7 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { type Bottle } from "@peated/server/types";
 import { Suspense, type ComponentPropsWithoutRef } from "react";
-import { trpc } from "../lib/trpc";
+import { trpc } from "../lib/trpc/client";
 import BottleHeader from "./bottleHeader";
 import BottleOverview from "./bottleOverview";
 import BottleStats from "./bottleStats";

@@ -1,7 +1,7 @@
 import BottleOverview from "@peated/web/components/bottleOverview";
 import BottleStats from "@peated/web/components/bottleStats";
 import { summarize } from "@peated/web/lib/markdown";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 // export const sitemap: SitemapFunction = async ({
 //   config: sitemapConfig,

@@ -6,7 +6,7 @@ import { type Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import BottleLink from "./bottleLink";
 import Price from "./price";
 

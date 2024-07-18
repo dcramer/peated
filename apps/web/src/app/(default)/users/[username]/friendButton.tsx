@@ -2,7 +2,7 @@
 
 import { type User } from "@peated/server/types";
 import Button from "@peated/web/components/button";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
 
 export default function FriendButton({ user }: { user: User }) {

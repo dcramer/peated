@@ -3,7 +3,7 @@
 import { type ExternalSiteType } from "@peated/server/types";
 import ReviewTable from "@peated/web/components/admin/reviewTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useSearchParams } from "next/navigation";
 
 export default function Page({

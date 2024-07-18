@@ -1,4 +1,4 @@
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 export { default } from "@peated/web/components/defaultLayout";
 

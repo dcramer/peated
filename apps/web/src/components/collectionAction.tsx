@@ -3,7 +3,7 @@
 import { StarIcon as StarIconFilled } from "@heroicons/react/20/solid";
 import { StarIcon } from "@heroicons/react/24/outline";
 import type { Bottle } from "@peated/server/types";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
+import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
 import useAuth from "../hooks/useAuth";
 import Button from "./button";
 

@@ -2,7 +2,7 @@
 
 import CountryForm from "@peated/web/components/admin/countryForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
 export default function Page({

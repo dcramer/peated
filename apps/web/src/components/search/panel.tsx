@@ -4,7 +4,7 @@ import { PlusIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";

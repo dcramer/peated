@@ -3,7 +3,7 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import NotificationList from "@peated/web/components/notifications/list";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useSearchParams } from "next/navigation";
 
 export default function Page() {

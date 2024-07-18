@@ -1,5 +1,5 @@
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 export const dynamic = "force-dynamic";
 

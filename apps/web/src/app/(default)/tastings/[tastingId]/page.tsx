@@ -1,6 +1,6 @@
 import TastingComments from "@peated/web/components/tastingComments";
 import TastingListItem from "@peated/web/components/tastingListItem";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 export async function generateMetadata({
   params: { tastingId },

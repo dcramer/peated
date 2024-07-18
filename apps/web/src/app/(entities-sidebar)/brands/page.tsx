@@ -2,7 +2,7 @@
 
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import EntityTable from "@peated/web/components/entityTable";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useSearchParams } from "next/navigation";
 
 const DEFAULT_SORT = "-tastings";

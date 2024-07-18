@@ -1,6 +1,6 @@
 "use client";
 
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import SelectField from "./selectField";
 
 export default function BottleField({

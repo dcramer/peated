@@ -11,7 +11,7 @@ import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";

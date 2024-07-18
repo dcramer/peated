@@ -2,7 +2,7 @@
 
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useSearchParams } from "next/navigation";
 
 const DEFAULT_SORT = "-tastings";

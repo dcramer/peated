@@ -4,7 +4,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import Button from "@peated/web/components/button";
 import { summarize } from "@peated/web/lib/markdown";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import ModActions from "./modActions";
 
 export async function generateMetadata({

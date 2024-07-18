@@ -3,7 +3,7 @@
 import BottleLink from "@peated/web/components/bottleLink";
 import { Distillers } from "@peated/web/components/bottleMetadata";
 import LayoutSplash from "@peated/web/components/layoutSplash";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export default function Page({
   params: { flightId },

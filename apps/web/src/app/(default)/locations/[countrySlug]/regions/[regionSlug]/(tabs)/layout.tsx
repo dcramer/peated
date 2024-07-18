@@ -5,7 +5,7 @@ import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({

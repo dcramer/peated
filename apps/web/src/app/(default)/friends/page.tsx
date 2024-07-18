@@ -3,7 +3,7 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import FriendListItem from "./friendListItem";
 
 export const fetchCache = "default-no-store";

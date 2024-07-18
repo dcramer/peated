@@ -5,7 +5,7 @@ import useApi from "@peated/web/hooks/useApi";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Page({

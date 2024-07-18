@@ -1,7 +1,7 @@
 "use client";
 
 import type { Comment, User } from "@peated/server/types";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
 import Button from "./button";
 import Fieldset from "./fieldset";

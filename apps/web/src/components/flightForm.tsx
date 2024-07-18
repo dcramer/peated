@@ -9,7 +9,7 @@ import FormHeader from "@peated/web/components/formHeader";
 import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
+import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";

@@ -11,7 +11,7 @@ import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Tasting } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 import { getAuthRedirect } from "../lib/auth";

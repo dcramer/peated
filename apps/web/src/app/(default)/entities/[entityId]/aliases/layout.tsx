@@ -1,5 +1,5 @@
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({

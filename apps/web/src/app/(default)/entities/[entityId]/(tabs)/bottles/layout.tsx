@@ -1,4 +1,4 @@
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { type ReactNode } from "react";
 
 export const fetchCache = "default-no-store";

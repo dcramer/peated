@@ -5,7 +5,7 @@ import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { type User } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 
 export default function ModActions({ user }: { user: User }) {
   const { user: currentUser } = useAuth();

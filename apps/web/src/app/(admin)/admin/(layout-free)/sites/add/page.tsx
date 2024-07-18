@@ -1,7 +1,7 @@
 "use client";
 
 import SiteForm from "@peated/web/components/admin/siteForm";
-import { trpc } from "@peated/web/lib/trpc";
+import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
 export default function Page() {

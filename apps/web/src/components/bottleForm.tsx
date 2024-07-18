@@ -34,7 +34,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import useAuth from "../hooks/useAuth";
-import { isTRPCClientError, trpc } from "../lib/trpc";
+import { isTRPCClientError, trpc } from "../lib/trpc/client";
 import Button from "./button";
 import Collapsable from "./collapsable";
 import { classesForProfile } from "./flavorProfile";

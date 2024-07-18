@@ -7,7 +7,7 @@ import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UserAvatar from "@peated/web/components/userAvatar";
 import UserTagDistribution from "@peated/web/components/userTagDistribution";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { Suspense, type ReactNode } from "react";
 import FriendButton from "./friendButton";
 import LogoutButton from "./logoutButton";

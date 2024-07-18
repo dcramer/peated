@@ -5,7 +5,7 @@ import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import Table from "@peated/web/components/table";
-import { trpc, type RouterOutputs } from "@peated/web/lib/trpc";
+import { trpc, type RouterOutputs } from "@peated/web/lib/trpc/client";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import BottleSelector from "./bottleSelector";

@@ -4,7 +4,7 @@ import CollectionAction from "@peated/web/components/collectionAction";
 import FlavorProfile from "@peated/web/components/flavorProfile";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import ModActions from "./modActions";

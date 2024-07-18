@@ -24,7 +24,7 @@ import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import TextAreaField from "@peated/web/components/textAreaField";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc";
+import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";

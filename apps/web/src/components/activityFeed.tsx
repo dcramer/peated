@@ -5,7 +5,7 @@ import Alert from "@peated/web/components/alert";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Spinner from "@peated/web/components/spinner";
 import TastingList from "@peated/web/components/tastingList";
-import { trpc, type RouterOutputs } from "@peated/web/lib/trpc";
+import { trpc, type RouterOutputs } from "@peated/web/lib/trpc/client";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 

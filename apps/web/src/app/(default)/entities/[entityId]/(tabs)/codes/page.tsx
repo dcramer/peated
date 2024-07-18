@@ -3,7 +3,7 @@ import {
   SMWS_DISTILLERY_CODES,
 } from "@peated/server/lib/smws";
 import Heading from "@peated/web/components/heading";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 

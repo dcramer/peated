@@ -1,5 +1,5 @@
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
-import { getTrpcClient } from "@peated/web/lib/trpc.server";
+import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import type { Metadata } from "next";
 import Link from "next/link";
 
