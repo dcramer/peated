@@ -8,6 +8,7 @@
     "dev:android": "expo start --android",
     "dev:ios": "expo start --ios",
     "dev:web": "expo start --web",
+    "prebuild": "npx tailwindcss -i ./src/global.css -o ./node_modules/.cache/nativewind/global.css",
     "test": "jest --watchAll",
     "typecheck": "tsc --noEmit"
   },
@@ -37,7 +38,7 @@
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
-    "nativewind": "^4",
+    "nativewind": "^4.0.35",
     "react": "catalog:react18",
     "react-dom": "catalog:react18",
     "react-native": "catalog:react18",

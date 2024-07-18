@@ -5,14 +5,20 @@ const { withNativeWind } = require("nativewind/metro");
 
 const config = withTurborepoManagedCache(
   withMonorepoPaths(
-    withNativeWind(getSentryExpoConfig(__dirname), {
-      input: "./src/global.css",
-      configPath: "./tailwind.config.ts",
-    }),
+    withNativeWind(
+      getSentryExpoConfig(__dirname, {
+        isCSSEnabled: true,
+      }),
+      {
+        input: "./src/global.css",
+        configPath: "./tailwind.config.ts",
+      },
+    ),
   ),
 );
 
 config.resolver.unstable_enablePackageExports = true;
+config.resolver.assetExts.push("woff", "woff2");
 
 module.exports = config;
 
