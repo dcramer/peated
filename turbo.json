@@ -1,14 +1,38 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "tasks": {
-    "test": {
-      "dependsOn": ["build"],
-      "inputs": ["**/*.{ts,tsx,js,jsx}"],
-      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET", "SESSION_SECRET"]
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "build/**",
+        "node_modules/.cache/metro/**",
+        "dist/**"
+      ]
+    },
+    "mobile#build": {
+      "env": ["API_SERVER"]
+    },
+    "web#build": {
+      "env": ["API_SERVER", "FATHOM_SITE_ID", "SESSION_SECRET"]
     },
     "dev": {
       "cache": false,
-      "persistent": true,
+      "persistent": true
+    },
+    "cli#dev": {
+      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET"]
+    },
+    "server#dev": {
+      "passThroughEnv": ["CORS_HOST", "DATABASE_URL", "JWT_SECRET"]
+    },
+    "web#dev": {
+      "passThroughEnv": ["SESSION_SECRET"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "inputs": ["**/*.{ts,tsx,js,jsx}"],
       "passThroughEnv": ["DATABASE_URL", "JWT_SECRET", "SESSION_SECRET"]
     },
     "typecheck": {}
@@ -17,13 +41,11 @@
     "DEBUG",
     "HOST",
     "PORT",
-    "CORS_HOST",
     "API_SERVER",
     "URL_PREFIX",
     "VERSION",
     "GOOGLE_CLIENT_ID",
-    "SENTRY_DSN",
-    "FATHOM_SITE_ID"
+    "SENTRY_DSN"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
