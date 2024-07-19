@@ -1,4 +1,6 @@
-import { eq, sql } from "drizzle-orm";
+import type { InferSelectModel, Table } from "drizzle-orm";
+import { eq, getTableColumns, sql } from "drizzle-orm";
+import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { type z } from "zod";
 import type { DatabaseType, TransactionType } from "../db";
 import type { Entity, EntityType } from "../db/schema";
@@ -124,7 +126,7 @@ export async function upsertBottleAlias(
   await db.execute(
     sql`INSERT INTO ${bottleAliases} (bottle_id, name)
       VALUES (${bottleId}, ${name})
-      ON CONFLICT (LOWER(${bottleAliases.name}))
+      ON CONFLICT (LOWER(name))
       DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL`,
   );
 
@@ -144,4 +146,25 @@ export async function upsertBottleAlias(
   //     },
   //     setWhere: isNull(bottleAliases.bottleId),
   //   });
+}
+
+export function mapRows<T extends TableConfig>(
+  rows: Record<string, unknown>[],
+  table: PgTableWithColumns<T>,
+): InferSelectModel<Table<T>>[] {
+  const cols = Object.fromEntries(
+    Object.entries(getTableColumns(table)).map(([attr, col]) => [
+      col.name,
+      { col, attr },
+    ]),
+  );
+
+  return rows.map((r) =>
+    Object.fromEntries(
+      Object.entries(r).map(([k, v]) => {
+        const r = cols[k];
+        return [r ? r.attr : k, r ? r.col.mapFromDriverValue(v) : v];
+      }),
+    ),
+  ) as unknown as InferSelectModel<Table<T>>[];
 }

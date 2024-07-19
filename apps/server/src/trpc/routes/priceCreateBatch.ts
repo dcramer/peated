@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import type { StorePrice } from "@peated/server/db/schema";
 import {
   bottleAliases,
   externalSites,
@@ -39,33 +40,21 @@ export default adminProcedure
       const bottleId = await findBottleId(sp.name);
       await db.transaction(async (tx) => {
         // XXX: maybe we should constrain on URL?
-        const [{ priceId }] = await tx
-          .insert(storePrices)
-          .values({
-            bottleId,
-            externalSiteId: site.id,
-            name: sp.name,
-            price: sp.price,
-            currency: sp.currency,
-            volume: sp.volume,
-            url: sp.url,
-          })
-          .onConflictDoUpdate({
-            target: [
-              storePrices.externalSiteId,
-              storePrices.name,
-              storePrices.volume,
-            ],
-            set: {
-              bottleId,
-              price: sp.price,
-              currency: sp.currency,
-              url: sp.url,
-              volume: sp.volume,
-              updatedAt: sql`NOW()`,
-            },
-          })
-          .returning({ priceId: storePrices.id });
+
+        const {
+          rows: [{ id: priceId }],
+        } = await db.execute<Pick<StorePrice, "id">>(sql`
+          INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url)
+          VALUES (${bottleId}, ${site.id}, ${sp.name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
+          ON CONFLICT (external_site_id, LOWER(name), volume)
+          DO UPDATE
+          SET bottle_id = COALESCE(excluded.bottle_id, ${storePrices.bottleId}),
+              price = excluded.price,
+              currency = excluded.currency,
+              url = excluded.url,
+              updated_at = NOW()
+          RETURNING id
+        `);
 
         await tx
           .insert(storePriceHistories)

@@ -5,7 +5,7 @@ import {
   reviews,
 } from "@peated/server/db/schema";
 import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
-import { upsertBottleAlias } from "@peated/server/lib/db";
+import { mapRows, upsertBottleAlias } from "@peated/server/lib/db";
 import { ReviewInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
@@ -45,26 +45,19 @@ export default adminProcedure
     }
 
     const review = await db.transaction(async (tx) => {
-      const [review] = await tx
-        .insert(reviews)
-        .values({
-          bottleId,
-          externalSiteId: site.id,
-          name: input.name,
-          issue: input.issue,
-          rating: input.rating,
-          url: input.url,
-        })
-        .onConflictDoUpdate({
-          target: [reviews.externalSiteId, reviews.name, reviews.issue],
-          set: {
-            bottleId,
-            rating: input.rating,
-            url: input.url,
-            updatedAt: sql`NOW()`,
-          },
-        })
-        .returning();
+      const { rows } = await db.execute(
+        sql`INSERT INTO ${reviews} (bottle_id, external_site_id, name, issue, rating, url)
+            VALUES (${bottleId}, ${site.id}, ${input.name}, ${input.issue}, ${input.rating}, ${input.url})
+            ON CONFLICT (external_site_id, LOWER(name), issue)
+            DO UPDATE
+            SET bottle_id = COALESCE(excluded.bottle_id, ${reviews.bottleId}),
+                rating = excluded.rating,
+                url = excluded.url,
+                updated_at = NOW()
+            RETURNING *`,
+      );
+
+      const [review] = mapRows(rows, reviews);
 
       if (bottleId) {
         await upsertBottleAlias(tx, bottleId, input.name);

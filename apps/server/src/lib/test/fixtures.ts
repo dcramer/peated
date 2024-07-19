@@ -38,6 +38,7 @@ import {
 } from "../../db/schema";
 import { createAccessToken } from "../auth";
 import { generateUniqHash } from "../bottleHash";
+import { mapRows } from "../db";
 import { choose, random, sample } from "../rand";
 import { buildBottleSearchVector, buildEntitySearchVector } from "../search";
 import { toTitleCase } from "../strings";
@@ -557,34 +558,29 @@ export const StorePrice = async (
         parseInt(faker.finance.amount({ min: 50, max: 200, dec: 0 }), 10) * 100;
     if (!data.url) data.url = faker.internet.url();
 
-    const [price] = await tx
-      .insert(storePrices)
-      .values({
-        // lazy fix for tsc
-        name: "",
-        price: 0,
-        volume: 750,
-        url: "",
-        currency: "usd",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        ...data,
-        externalSiteId: data.externalSiteId || (await ExternalSite({}, tx)).id,
-      })
-      .onConflictDoUpdate({
-        target: [
-          storePrices.externalSiteId,
-          storePrices.name,
-          storePrices.volume,
-        ],
-        set: {
-          bottleId: data.bottleId,
-          price: data.price,
-          url: data.url,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
+    if (!data.externalSiteId)
+      data.externalSiteId = (await ExternalSite({}, tx)).id;
+
+    if (!data.volume) data.volume = 750;
+
+    if (!data.currency) data.currency = "usd";
+
+    const { rows } = await tx.execute<dbSchema.StorePrice>(
+      sql`
+        INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url)
+        VALUES (${data.bottleId}, ${data.externalSiteId}, ${data.name}, ${data.volume}, ${data.price}, ${data.currency}, ${data.url})
+        ON CONFLICT (external_site_id, LOWER(name), volume)
+        DO UPDATE
+        SET bottle_id = COALESCE(excluded.bottle_id, ${storePrices.bottleId}),
+            price = excluded.price,
+            currency = excluded.currency,
+            url = excluded.url,
+            updated_at = NOW()
+        RETURNING *
+      `,
+    );
+
+    const [price] = mapRows(rows, storePrices);
 
     if (!price) throw new Error("Unable to create StorePrice fixture");
 

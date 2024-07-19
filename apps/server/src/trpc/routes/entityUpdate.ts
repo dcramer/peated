@@ -225,7 +225,7 @@ export default modProcedure
             INSERT INTO ${bottleAliases} (name, bottle_id)
             SELECT ${bottles.fullName}, ${bottles.id} FROM ${bottles}
             WHERE ${bottles.brandId} = ${newEntity.id}
-            ON CONFLICT (LOWER(${bottleAliases.name}))
+            ON CONFLICT (LOWER(name))
             DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL
         `);
 
