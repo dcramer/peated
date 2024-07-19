@@ -11,29 +11,14 @@
         "dist/**"
       ]
     },
-    "mobile#build": {
-      "env": ["API_SERVER"]
-    },
-    "web#build": {
-      "env": ["API_SERVER", "FATHOM_SITE_ID", "SESSION_SECRET"]
-    },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "cli#dev": {
-      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET"]
-    },
-    "server#dev": {
-      "passThroughEnv": ["CORS_HOST", "DATABASE_URL", "JWT_SECRET"]
-    },
-    "web#dev": {
-      "passThroughEnv": ["SESSION_SECRET"]
-    },
     "test": {
       "dependsOn": ["build"],
       "inputs": ["**/*.{ts,tsx,js,jsx}"],
-      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET", "SESSION_SECRET"]
+      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET"]
     },
     "typecheck": {}
   },
@@ -45,7 +30,10 @@
     "URL_PREFIX",
     "VERSION",
     "GOOGLE_CLIENT_ID",
-    "SENTRY_DSN"
+    "SENTRY_DSN",
+    "FATHOM_SITE_ID",
+    "API_SERVER",
+    "FATHOM_SITE_ID"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
@@ -53,6 +41,10 @@
     "VERCEL",
     "VERCEL_ENV",
     "VERCEL_URL",
+    "CORS_HOST",
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "SESSION_SECRET",
     "npm_lifecycle_event"
   ]
 }
