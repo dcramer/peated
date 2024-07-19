@@ -96,180 +96,179 @@ export default function TastingListItem({
   const canToast = !hasToasted && !isTaster && user;
 
   return (
-    <li className="overflow-hidden bg-slate-950 ring-1 ring-inset ring-slate-800">
-      <div className="border-x border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
-        <div className="flex items-center space-x-4 p-3 sm:px-5 sm:py-4">
-          <UserAvatar size={32} user={tasting.createdBy} />
-          <div className="flex-auto space-y-1 font-semibold">
-            <Link
-              href={`/users/${tasting.createdBy.username}`}
-              className="truncate hover:underline"
-            >
-              {tasting.createdBy.username}
-            </Link>
-          </div>
-          <div className="flex flex-col items-end gap-y-2">
-            <Link href={`/tastings/${tasting.id}`} className="hover:underline">
-              <TimeSince
-                className="block text-sm font-light"
-                date={tasting.createdAt}
-              />
-            </Link>
-          </div>
+    <li className="-mt-1 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
+      <div className="flex items-center space-x-4 p-3 sm:px-5 sm:py-4">
+        <UserAvatar size={32} user={tasting.createdBy} />
+        <div className="flex-auto space-y-1 font-semibold">
+          <Link
+            href={`/users/${tasting.createdBy.username}`}
+            className="truncate hover:underline"
+          >
+            {tasting.createdBy.username}
+          </Link>
         </div>
+        <div className="flex flex-col items-end gap-y-2">
+          <Link href={`/tastings/${tasting.id}`} className="hover:underline">
+            <TimeSince
+              className="block text-sm font-light"
+              date={tasting.createdAt}
+            />
+          </Link>
+        </div>
+      </div>
 
-        {!noBottle && (
-          <div className="p-3 sm:px-5">
-            <BottleCard color="inherit" noGutter bottle={bottle} />
-          </div>
+      {!noBottle && (
+        <div className="p-3 sm:px-5">
+          <BottleCard color="inherit" noGutter bottle={bottle} />
+        </div>
+      )}
+
+      {!!tasting.imageUrl && (
+        <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mr-4">
+          <ImageWithSkeleton
+            src={tasting.imageUrl}
+            className="h-full cursor-pointer"
+            alt=""
+            onClick={() => setImageOpen(true)}
+          />
+          <ImageModal
+            image={tasting.imageUrl}
+            open={imageOpen}
+            setOpen={setImageOpen}
+          />
+        </div>
+      )}
+
+      {!!tasting.notes && (
+        <p className="text-peated p-3 text-sm sm:px-5">{tasting.notes}</p>
+      )}
+
+      <div className="text-light p-3 text-sm sm:px-5">
+        {(tasting.servingStyle ||
+          tasting.color ||
+          tasting.rating ||
+          tasting.tags.length > 0) && (
+          <DefinitionList className="grid-cols grid grid-cols-2 gap-y-4 sm:grid-cols-2">
+            {tasting.rating && (
+              <div>
+                <DefinitionList.Term>Rating</DefinitionList.Term>
+                <DefinitionList.Details>
+                  <StaticRating value={tasting.rating} size="small" />
+                </DefinitionList.Details>
+              </div>
+            )}
+            {tasting.tags.length > 0 && (
+              <div>
+                <DefinitionList.Term>Notes</DefinitionList.Term>
+                <DefinitionList.Details>
+                  <Tags tags={tasting.tags} />
+                </DefinitionList.Details>
+              </div>
+            )}
+            {tasting.servingStyle && (
+              <div>
+                <DefinitionList.Term>Style</DefinitionList.Term>
+                <DefinitionList.Details>
+                  <ServingStyleIcon
+                    servingStyle={tasting.servingStyle}
+                    size={4}
+                  />
+                  {formatServingStyle(tasting.servingStyle)}
+                </DefinitionList.Details>
+              </div>
+            )}
+            {tasting.color && (
+              <div>
+                <DefinitionList.Term>Color</DefinitionList.Term>
+                <DefinitionList.Details>
+                  <div
+                    className="h-4 w-4"
+                    style={{ background: COLOR_SCALE[tasting.color][2] }}
+                  />
+                  {formatColor(tasting.color)}
+                </DefinitionList.Details>
+              </div>
+            )}
+          </DefinitionList>
         )}
       </div>
-      <div>
-        {!!tasting.imageUrl && (
-          <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mr-4">
-            <ImageWithSkeleton
-              src={tasting.imageUrl}
-              className="h-full cursor-pointer"
-              alt=""
-              onClick={() => setImageOpen(true)}
-            />
-            <ImageModal
-              image={tasting.imageUrl}
-              open={imageOpen}
-              setOpen={setImageOpen}
-            />
-          </div>
-        )}
-        {!!tasting.notes && (
-          <p className="text-peated p-3 text-sm sm:px-5">{tasting.notes}</p>
-        )}
-        <div className="text-light p-3 text-sm sm:px-5">
-          {(tasting.servingStyle ||
-            tasting.color ||
-            tasting.rating ||
-            tasting.tags.length > 0) && (
-            <DefinitionList className="grid-cols grid grid-cols-2 gap-y-4 sm:grid-cols-2">
-              {tasting.rating && (
-                <div>
-                  <DefinitionList.Term>Rating</DefinitionList.Term>
-                  <DefinitionList.Details>
-                    <StaticRating value={tasting.rating} size="small" />
-                  </DefinitionList.Details>
-                </div>
-              )}
-              {tasting.tags.length > 0 && (
-                <div>
-                  <DefinitionList.Term>Notes</DefinitionList.Term>
-                  <DefinitionList.Details>
-                    <Tags tags={tasting.tags} />
-                  </DefinitionList.Details>
-                </div>
-              )}
-              {tasting.servingStyle && (
-                <div>
-                  <DefinitionList.Term>Style</DefinitionList.Term>
-                  <DefinitionList.Details>
-                    <ServingStyleIcon
-                      servingStyle={tasting.servingStyle}
-                      size={4}
-                    />
-                    {formatServingStyle(tasting.servingStyle)}
-                  </DefinitionList.Details>
-                </div>
-              )}
-              {tasting.color && (
-                <div>
-                  <DefinitionList.Term>Color</DefinitionList.Term>
-                  <DefinitionList.Details>
-                    <div
-                      className="h-4 w-4"
-                      style={{ background: COLOR_SCALE[tasting.color][2] }}
-                    />
-                    {formatColor(tasting.color)}
-                  </DefinitionList.Details>
-                </div>
-              )}
-            </DefinitionList>
-          )}
-        </div>
 
-        <aside className="flex items-center space-x-3 px-3 py-3 sm:px-5 sm:pb-4">
+      <aside className="flex items-center space-x-3 px-3 py-3 sm:px-5 sm:pb-4">
+        <Button
+          icon={
+            <HandThumbUpIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+          }
+          active={hasToasted}
+          disabled={!canToast}
+          onClick={
+            canToast
+              ? () => {
+                  setHasToasted(true);
+                  toastCreateMutation.mutate(tasting.id, {
+                    onError: () => {
+                      setHasToasted(false);
+                    },
+                    onSuccess: () => {
+                      onToast && onToast(tasting);
+                    },
+                  });
+                }
+              : () => {
+                  router.push(getAuthRedirect({ pathname }));
+                }
+          }
+        >
+          <Counter value={totalToasts} />
+        </Button>
+
+        {user && !noCommentAction && (
           <Button
             icon={
-              <HandThumbUpIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+              <ChatBubbleLeftRightIcon
+                className="-ml-0.5 h-5 w-5"
+                aria-hidden="true"
+              />
             }
-            active={hasToasted}
-            disabled={!canToast}
-            onClick={
-              canToast
-                ? () => {
-                    setHasToasted(true);
-                    toastCreateMutation.mutate(tasting.id, {
-                      onError: () => {
-                        setHasToasted(false);
-                      },
-                      onSuccess: () => {
-                        onToast && onToast(tasting);
-                      },
-                    });
-                  }
-                : () => {
-                    router.push(getAuthRedirect({ pathname }));
-                  }
-            }
+            href={`/tastings/${tasting.id}`}
           >
-            <Counter value={totalToasts} />
+            {tasting.comments.toLocaleString()}
           </Button>
-
-          {user && !noCommentAction && (
-            <Button
-              icon={
-                <ChatBubbleLeftRightIcon
-                  className="-ml-0.5 h-5 w-5"
-                  aria-hidden="true"
-                />
-              }
-              href={`/tastings/${tasting.id}`}
-            >
-              {tasting.comments.toLocaleString()}
-            </Button>
-          )}
-          <ShareButton
-            title={`${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`}
-            url={`/tastings/${tasting.id}`}
-          />
-          {(user?.admin || isTaster) && (
-            <Menu as="div" className="menu">
-              <MenuButton as={Button}>
-                <EllipsisVerticalIcon className="h-5 w-5" />
-              </MenuButton>
-              <MenuItems className="absolute inset-x-0 bottom-10 right-0 z-40 w-44 origin-bottom-right">
-                {(user?.admin || isTaster) && (
-                  <>
-                    {isTaster && (
-                      <MenuItem as={Link} href={`/tastings/${tasting.id}/edit`}>
-                        Edit Tasting
-                      </MenuItem>
-                    )}
-                    <MenuItem
-                      as="button"
-                      onClick={async () => {
-                        await tastingDeleteMutation.mutateAsync(tasting.id);
-                        if (onDelete) onDelete(tasting);
-                        else {
-                          location.reload();
-                        }
-                      }}
-                    >
-                      Delete Tasting
+        )}
+        <ShareButton
+          title={`${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`}
+          url={`/tastings/${tasting.id}`}
+        />
+        {(user?.admin || isTaster) && (
+          <Menu as="div" className="menu">
+            <MenuButton as={Button}>
+              <EllipsisVerticalIcon className="h-5 w-5" />
+            </MenuButton>
+            <MenuItems className="absolute inset-x-0 bottom-10 right-0 z-40 w-44 origin-bottom-right">
+              {(user?.admin || isTaster) && (
+                <>
+                  {isTaster && (
+                    <MenuItem as={Link} href={`/tastings/${tasting.id}/edit`}>
+                      Edit Tasting
                     </MenuItem>
-                  </>
-                )}
-              </MenuItems>
-            </Menu>
-          )}
-        </aside>
-      </div>
+                  )}
+                  <MenuItem
+                    as="button"
+                    onClick={async () => {
+                      await tastingDeleteMutation.mutateAsync(tasting.id);
+                      if (onDelete) onDelete(tasting);
+                      else {
+                        location.reload();
+                      }
+                    }}
+                  >
+                    Delete Tasting
+                  </MenuItem>
+                </>
+              )}
+            </MenuItems>
+          </Menu>
+        )}
+      </aside>
     </li>
   );
 }

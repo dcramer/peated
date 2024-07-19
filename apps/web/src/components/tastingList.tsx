@@ -2,15 +2,18 @@
 
 import type { Tasting } from "@peated/server/types";
 import { AnimatePresence } from "framer-motion";
+import type { ComponentPropsWithoutRef } from "react";
 import { useState } from "react";
 import TastingListItem from "./tastingListItem";
 
 export default function TastingList({
   values,
-  noBottle,
-}: {
+  ...props
+}: Omit<
+  ComponentPropsWithoutRef<typeof TastingListItem>,
+  "tasting" | "onDelete"
+> & {
   values: Tasting[];
-  noBottle?: boolean;
 }) {
   const [deletedValues, setDeletedValues] = useState<number[]>([]);
 
@@ -19,7 +22,7 @@ export default function TastingList({
   };
 
   return (
-    <ul className="mt-1 sm:rounded">
+    <ul className="mt-1">
       <AnimatePresence>
         {values
           .filter((t) => !deletedValues.includes(t.id))
@@ -28,7 +31,7 @@ export default function TastingList({
               key={tasting.id}
               tasting={tasting}
               onDelete={onDelete}
-              noBottle={noBottle}
+              {...props}
             />
           ))}
       </AnimatePresence>

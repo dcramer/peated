@@ -1,5 +1,5 @@
 import TastingComments from "@peated/web/components/tastingComments";
-import TastingListItem from "@peated/web/components/tastingListItem";
+import TastingList from "@peated/web/components/tastingList";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 export async function generateMetadata({
@@ -43,10 +43,9 @@ export default async function Page({
 
   return (
     <>
-      <ul className="mb-4">
-        <TastingListItem tasting={tasting} noCommentAction />
-      </ul>
-
+      <div className="mb-4">
+        <TastingList values={[tasting]} noCommentAction />
+      </div>
       <TastingComments tastingId={tasting.id} />
     </>
   );
