@@ -32,6 +32,8 @@ export const normalizeBottleName = (
   // try to ease UX and normalize common name components
   if (age && name == `${age}`) return [`${age}${ageSuffix}`, age];
 
+  name = name.replace("®", "");
+
   // "years old" type patterns
   name = name
     .replace(
