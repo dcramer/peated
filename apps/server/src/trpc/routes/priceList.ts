@@ -29,6 +29,7 @@ export default adminProcedure
   .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
     const where: (SQL<unknown> | undefined)[] = [
       sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
+      eq(storePrices.hidden, false),
     ];
 
     if (input.site) {

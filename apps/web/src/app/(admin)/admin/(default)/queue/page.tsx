@@ -1,6 +1,7 @@
 "use client";
 
 import { type Bottle } from "@peated/server/types";
+import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
 import SimpleHeader from "@peated/web/components/simpleHeader";
@@ -24,7 +25,7 @@ export default function Page() {
   // this isnt useful as the upsert wipes the cache but we dont totally want that
   const [assignments, setAssignments] = useState<Record<string, Bottle>>({});
 
-  // lets create bottle alias
+  const priceUpdateMutation = trpc.priceUpdate.useMutation();
   const bottleAliasUpsertMutation = trpc.bottleAliasUpsert.useMutation();
 
   const { flash } = useFlashMessages();
@@ -69,8 +70,35 @@ export default function Page() {
               <>
                 [
                 <Link href={item.url} className="hover:underline">
-                  View Source
+                  Source
                 </Link>
+                ]
+              </>
+            ),
+          },
+          {
+            name: "action",
+            value: (item) => (
+              <>
+                [
+                <Button
+                  onClick={async () => {
+                    await priceUpdateMutation.mutateAsync({
+                      price: item.id,
+                      hidden: true,
+                    });
+                    flash(
+                      <div>
+                        Marked{" "}
+                        <strong className="font-bold">{item.name}</strong> as
+                        hidden
+                      </div>,
+                    );
+                  }}
+                  className="hover:underline"
+                >
+                  Hide
+                </Button>
                 ]
               </>
             ),

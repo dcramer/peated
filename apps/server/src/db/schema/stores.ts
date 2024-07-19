@@ -1,7 +1,8 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  boolean,
   date,
   index,
   integer,
@@ -27,6 +28,7 @@ export const storePrices = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
+    hidden: boolean("hidden").default(false),
     price: integer("price").notNull(),
     currency: currencyEnum("currency").notNull(),
     volume: integer("volume").notNull(),
@@ -34,14 +36,16 @@ export const storePrices = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (storePrices) => {
+  (table) => {
     return {
-      storeName: uniqueIndex("store_price_unq_name").on(
-        storePrices.externalSiteId,
-        storePrices.name,
-        storePrices.volume,
+      nameUnique: uniqueIndex("store_price_unq_name").using(
+        "btree",
+        // @ts-expect-error: drizzle doesnt seem to understand its own types yet
+        table.externalSiteId,
+        sql`LOWER(${table.name})`,
+        table.volume,
       ),
-      bottleIdx: index("store_price_bottle_idx").on(storePrices.bottleId),
+      bottleIdx: index("store_price_bottle_idx").on(table.bottleId),
     };
   },
 );

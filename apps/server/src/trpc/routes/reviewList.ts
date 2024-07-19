@@ -28,7 +28,7 @@ export default publicProcedure
       }),
   )
   .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
-    const where: (SQL<unknown> | undefined)[] = [];
+    const where: (SQL<unknown> | undefined)[] = [eq(reviews.hidden, false)];
 
     if (input.site) {
       const site = await db.query.externalSites.findFirst({
