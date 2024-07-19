@@ -13,7 +13,7 @@ type Props =
 
 export default function EmptyActivity({ href, children }: Props) {
   const baseStyles =
-    "border-light text-light m-3 sm:my-4 flex flex-col items-center rounded-lg border border-dashed p-12 font-light";
+    "border-slate-700 text-light m-3 sm:my-4 flex flex-col items-center rounded-lg border border-dashed p-12 font-light";
 
   if (href) {
     return (
