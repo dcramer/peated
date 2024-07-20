@@ -84,9 +84,7 @@ export default async function Page({
 
       {region.description && (
         <>
-          <Heading as="h3">
-            Whisky in {region.name}, {region.country.name}
-          </Heading>
+          <Heading as="h3">Whisky in {region.name}</Heading>
           <div className="flex">
             <div className="prose prose-invert -mt-1 max-w-none flex-auto">
               <Markdown content={region.description} />
