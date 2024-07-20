@@ -71,6 +71,7 @@ import priceList from "./routes/priceList";
 import priceUpdate from "./routes/priceUpdate";
 import regionBySlug from "./routes/regionBySlug";
 import regionCreate from "./routes/regionCreate";
+import regionDelete from "./routes/regionDelete";
 import regionGenerateDetails from "./routes/regionGenerateDetails";
 import regionList from "./routes/regionList";
 import regionUpdate from "./routes/regionUpdate";
@@ -166,6 +167,7 @@ export const appRouter = router({
   priceChangeList,
   regionBySlug,
   regionCreate,
+  regionDelete,
   regionGenerateDetails,
   regionList,
   regionUpdate,
