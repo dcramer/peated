@@ -4,14 +4,11 @@ import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import PageHeader from "@peated/web/components/pageHeader";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { type ReactNode } from "react";
 
 export default function Page({
   params: { countrySlug, regionSlug },
-  children,
 }: {
   params: { countrySlug: string; regionSlug: string };
-  children: ReactNode;
 }) {
   const [country] = trpc.countryBySlug.useSuspenseQuery(countrySlug);
   const [region] = trpc.regionBySlug.useSuspenseQuery({
