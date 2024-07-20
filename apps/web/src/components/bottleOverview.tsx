@@ -120,11 +120,11 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                   </DefinitionList.Details>
                 </>
               )}
-              {!!bottle.releaseDate && (
+              {!!bottle.releaseYear && (
                 <>
-                  <DefinitionList.Term>Release Date</DefinitionList.Term>
+                  <DefinitionList.Term>Release Year</DefinitionList.Term>
                   <DefinitionList.Details>
-                    {bottle.releaseDate}
+                    {bottle.releaseYear}
                   </DefinitionList.Details>
                 </>
               )}

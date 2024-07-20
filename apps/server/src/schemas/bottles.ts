@@ -35,7 +35,7 @@ export const BottleSchema = z.object({
   caskType: CaskTypeEnum.nullable(),
   caskSize: CaskSizeEnum.nullable(),
   caskFill: CaskFillEnum.nullable(),
-  releaseDate: z.string().date().nullable(),
+  releaseYear: z.number().gte(1800).lte(new Date().getFullYear()).nullable(),
 
   brand: EntitySchema,
   distillers: z.array(EntitySchema),
@@ -74,7 +74,7 @@ export const BottleInputSchema = z.object({
   caskType: CaskTypeEnum.nullish(),
   caskSize: CaskSizeEnum.nullish(),
   caskFill: CaskFillEnum.nullish(),
-  releaseDate: z.string().date().nullish(),
+  releaseYear: z.number().gte(1800).lte(new Date().getFullYear()).nullish(),
 
   description: z.string().nullish(),
   descriptionSrc: ContentSourceEnum.nullish(),

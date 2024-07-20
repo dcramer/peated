@@ -433,13 +433,13 @@ test("saves vintage information", async ({ defaults, fixtures }) => {
   expect(newBottle.vintageYear).toEqual(2024);
 });
 
-test("saves release date", async ({ defaults, fixtures }) => {
+test("saves release year", async ({ defaults, fixtures }) => {
   const bottle = await fixtures.Bottle();
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleUpdate({
     bottle: bottle.id,
-    releaseDate: "2024-01-02",
+    releaseYear: 2024,
   });
 
   expect(data.id).toBeDefined();
@@ -449,5 +449,5 @@ test("saves release date", async ({ defaults, fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(newBottle.releaseDate).toEqual("2024-01-02");
+  expect(newBottle.releaseYear).toEqual(2024);
 });

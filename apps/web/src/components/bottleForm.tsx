@@ -504,14 +504,14 @@ export default function BottleForm({
             )}
 
             <TextField
-              {...register("releaseDate", {
-                setValueAs: (v) => (v === "" || !v ? null : v),
+              {...register("releaseYear", {
+                setValueAs: (v) => (v === "" || !v ? null : Number(v)),
               })}
-              error={errors.releaseDate}
-              type="date"
-              label="Release Date"
-              placeholder="e.g. 2024-05-01"
-              helpText="The date this labeling was released."
+              error={errors.releaseYear}
+              type="number"
+              label="Release Year"
+              placeholder="e.g. 2024"
+              helpText="The year this labeling was released."
             />
           </Collapsable>
         </Fieldset>

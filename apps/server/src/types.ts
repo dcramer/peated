@@ -131,7 +131,7 @@ export type BottlePreviewResult = {
   caskType?: CaskType | null;
   caskFill?: CaskFill | null;
   vintageYear?: number | null;
-  releaseDate?: string | null;
+  releaseYear?: number | null;
 };
 
 // blame theo for this monstrosity

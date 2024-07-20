@@ -2,7 +2,6 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
-  date,
   doublePrecision,
   index,
   integer,
@@ -59,7 +58,7 @@ export const bottles = pgTable(
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
-    releaseDate: date("release_date"),
+    releaseYear: smallint("release_year"),
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),

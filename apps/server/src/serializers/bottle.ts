@@ -160,7 +160,7 @@ export const BottleSerializer = serializer({
       caskType: item.caskType,
       caskFill: item.caskFill,
       caskSize: item.caskSize,
-      releaseDate: item.releaseDate ? item.releaseDate.split(" ", 1)[0] : null,
+      releaseYear: item.releaseYear,
 
       brand: attrs.brand,
       distillers: attrs.distillers,
