@@ -51,7 +51,10 @@ export default async function Page({
         title={
           <>
             {region.name},{" "}
-            <Link href={`/locations/${region.country.slug}`}>
+            <Link
+              href={`/locations/${region.country.slug}`}
+              className="hover:underline"
+            >
               {region.country.name}
             </Link>
           </>
