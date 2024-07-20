@@ -41,9 +41,9 @@ export default function Page({
             slug: country.slug,
           },
           {
-            onSuccess: () => {
+            onSuccess: (result) => {
               if (returnTo) router.push(returnTo);
-              else router.replace(`/locations/${result.country.slug}`);
+              else router.replace(`/locations/${result.slug}`);
             },
           },
         );
