@@ -27,7 +27,7 @@ async function locateAddress(
   const result = await client.textSearch({
     params: {
       key: config.GOOGLE_MAPS_API_KEY,
-      query: `${entity.name}, ${entity.country.name}`,
+      query: `${entity.name}, ${entity.region ? `${entity.region.name}, ` : ""}${entity.country.name}`,
     },
   });
 
@@ -95,6 +95,12 @@ export default async ({
   }
 
   if (entity.location && !force) {
+    return;
+  }
+
+  // since we have no way override this, lets short circuit for now
+  // as sometimes we're getting wrong addresses
+  if (!entity.address) {
     return;
   }
 
