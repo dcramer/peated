@@ -4,7 +4,7 @@ import { RegionInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { RegionSerializer } from "@peated/server/serializers/region";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { type Context } from "../context";
@@ -42,7 +42,12 @@ export async function regionUpdate({
   const [region] = await db
     .select()
     .from(regions)
-    .where(eq(regions.slug, input.slug));
+    .where(
+      and(
+        eq(regions.countryId, countryId),
+        eq(sql`LOWER(${regions.slug})`, input.slug.toLowerCase()),
+      ),
+    );
 
   if (!region) {
     throw new TRPCError({
@@ -69,7 +74,12 @@ export async function regionUpdate({
   const [newRegion] = await db
     .update(regions)
     .set(data)
-    .where(eq(regions.slug, region.slug))
+    .where(
+      and(
+        eq(regions.countryId, countryId),
+        eq(sql`LOWER(${regions.slug})`, region.slug),
+      ),
+    )
     .returning();
 
   if (!newRegion) {
