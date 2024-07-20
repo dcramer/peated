@@ -3,7 +3,7 @@
 import RegionForm from "@peated/web/components/admin/regionForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Page({
   params: { countrySlug, regionSlug },
@@ -17,6 +17,8 @@ export default function Page({
     slug: regionSlug,
   });
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
 
   const trpcUtils = trpc.useUtils();
 
@@ -53,9 +55,11 @@ export default function Page({
           },
           {
             onSuccess: (result) => {
-              router.push(
-                `/locations/${result.country.slug}/regions/${result.slug}`,
-              );
+              if (returnTo) router.push(returnTo);
+              else
+                router.replace(
+                  `/locations/${result.country.slug}/regions/${result.slug}`,
+                );
             },
           },
         );

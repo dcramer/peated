@@ -1,9 +1,10 @@
 import Button from "@peated/web/components/button";
-import CountryMapIcon from "@peated/web/components/countryMapIcon";
 import Heading from "@peated/web/components/heading";
+import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
+import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { type ReactNode } from "react";
@@ -47,12 +48,19 @@ export default async function Page({
   return (
     <>
       <PageHeader
-        title={`${region.name}, ${region.country.name}`}
+        title={
+          <>
+            {region.name},{" "}
+            <Link href={`/locations/${region.country.slug}`}>
+              {region.country.name}
+            </Link>
+          </>
+        }
         metadata={
           user?.mod && (
             <Button
               color="primary"
-              href={`/admin/locations/${countrySlug}/regions/${regionSlug}/edit`}
+              href={`/admin/locations/${countrySlug}/regions/${regionSlug}/edit?returnTo=/locations/${countrySlug}/regions/${regionSlug}`}
             >
               Edit Location
             </Button>
@@ -80,10 +88,12 @@ export default async function Page({
             <div className="prose prose-invert -mt-1 max-w-none flex-auto">
               <Markdown content={region.description} />
             </div>
-            <CountryMapIcon
-              slug={region.country.slug}
-              className="text-light ml-8 hidden max-h-64 max-w-64 lg:block"
-            />
+            {region.country.slug === "united-states" ? (
+              <UsStateMapIcon
+                slug={region.slug}
+                className="text-light ml-8 hidden max-h-64 max-w-64 lg:block"
+              />
+            ) : null}
           </div>
         </>
       )}

@@ -47,7 +47,7 @@ export default async function Page({
           user?.mod && (
             <Button
               color="primary"
-              href={`/admin/locations/${country.slug}/edit`}
+              href={`/admin/locations/${country.slug}/edit?returnTo=/locations/${country.slug}`}
             >
               Edit Location
             </Button>
