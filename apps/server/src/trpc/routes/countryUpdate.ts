@@ -4,7 +4,7 @@ import { CountryInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { type Context } from "../context";
@@ -23,7 +23,7 @@ export async function countryUpdate({
   const [country] = await db
     .select()
     .from(countries)
-    .where(eq(countries.slug, input.slug));
+    .where(eq(sql`LOWER(${countries.slug})`, input.slug.toLowerCase()));
 
   if (!country) {
     throw new TRPCError({
@@ -54,7 +54,7 @@ export async function countryUpdate({
   const [newCountry] = await db
     .update(countries)
     .set(data)
-    .where(eq(countries.slug, country.slug))
+    .where(eq(sql`LOWER(${countries.slug})`, country.slug))
     .returning();
 
   if (!newCountry) {

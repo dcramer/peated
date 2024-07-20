@@ -3,7 +3,7 @@ import { countries, regions } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { RegionSerializer } from "@peated/server/serializers/region";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 import { type Context } from "../context";
@@ -39,7 +39,12 @@ export async function regionBySlug({
   const [region] = await db
     .select()
     .from(regions)
-    .where(eq(regions.slug, input.slug));
+    .where(
+      and(
+        eq(regions.countryId, countryId),
+        eq(sql`LOWER(${regions.slug})`, input.slug),
+      ),
+    );
 
   if (!region) {
     throw new TRPCError({
