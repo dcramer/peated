@@ -5,7 +5,7 @@ import { z } from "zod";
 import { adminProcedure } from "..";
 import { db } from "../../db";
 
-const InputSchema = RegionInputSchema.partial().extend({
+const InputSchema = z.object({
   country: z.union([z.string(), z.number()]),
   slug: z.string(),
 });
