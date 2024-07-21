@@ -34,59 +34,117 @@ export const normalizeBottleName = (
 
   name = name.replace("®", "");
 
-  // "years old" type patterns
-  name = name
-    .replace(
-      /(\d{1,2}|ten|twelve|fifteen|twenty)[\s-]?years?[\s-]old($|\s)/i,
-      `$1${ageSuffix}$2`,
-    )
-    .replace(
-      /(\d{1,2}|ten|twelve|fifteen|twenty)[\s-]?years?($|\s)/i,
-      `$1${ageSuffix}$2`,
-    );
-
-  // abberviated yr
-  name = name
-    .replace(
-      /(\d{1,2}|ten|twelve|fifteen|twenty)\s?yrs?\.?[\s-]old($|\s)/i,
-      `$1${ageSuffix}$2`,
-    )
-    .replace(
-      /(\d{1,2}|ten|twelve|fifteen|twenty)\s?yrs?\.?($|\s)/i,
-      `$1${ageSuffix}$2`,
-    );
-
-  // TODO: this needs subbed in search too...
-  name = name.replace(/ten-year-old/i, "10-year-old");
-  name = name.replace(/twelve-year-old/i, "12-year-old");
-  name = name.replace(/fifteen-year-old/i, "15-year-old");
-  name = name.replace(/twenty-year-old/i, "20-year-old");
-
-  if (name.startsWith(`${age} `)) {
-    name = name.replace(`${age} `, `${age}${ageSuffix} `);
-  }
-  if (name.endsWith(` ${age}`)) {
-    name = `${name}${ageSuffix}`;
-  }
+  [name, age] = normalizeBottleAge(name, age);
 
   // this is primarily targeting Scotch Malt Whiskey Society bottles
-  if (name.startsWith("Cask No. ")) {
-    name = name.substring(9);
-  }
+  // "Cask No. X"
+  name = name.replace(/\bCask No\.? \b/i, "");
 
-  // replace mid-string age
-  name = name.replace(` ${age} `, ` ${age}${ageSuffix} `);
-
-  const match = name.match(/(\d{1,2})-year-old($|\s)/i);
-  if (!age && match) {
-    age = parseInt(match[1], 10);
-  }
+  name = normalizeBottleBatchNumber(name);
 
   // replace various whitespace
   name = name.replace(/\n/, " ").replace(/\s{2,}/, " ");
 
   return [normalizeString(name), age];
 };
+
+export function normalizeBottleAge(
+  name: string,
+  age: number | null = null,
+): [string, number | null] {
+  // "years old" type patterns
+  name = name
+    .replace(/\b(\d{1,2}|\w+)[\s-]?years?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
+    .replace(/(\d{1,2}|\w+)[\s-]?years?($|\s)/i, `$1${ageSuffix}$2`);
+
+  // abberviated yr
+  name = name
+    .replace(/\b(\d{1,2}|\w+)\s?yrs?\.?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
+    .replace(/\b(\d{1,2}|\w+)\s?yrs?\.?($|\s)/i, `$1${ageSuffix}$2`);
+
+  // TODO: this needs subbed in search too...
+  name = name.replace(/(\w+)-year-old/i, (match, p1) => {
+    return convertWordToNumber(p1) + "-year-old";
+  });
+
+  // normalize prefix/suffix numbers
+  if (age) {
+    name = name.replace(
+      new RegExp(`\\b(${age})($|\\s)`),
+      `${age}${ageSuffix}$2`,
+    );
+  }
+
+  // identify age from [number]-year-old
+  const match = name.match(/\b(\d{1,2})-year-old($|\s)/i);
+  if (!age && match) {
+    age = parseInt(match[1], 10);
+  }
+
+  return [name, age];
+}
+
+/**
+ * Replace variants of `Batch [Number]` with standarded form of `Batch [number]`.
+ *
+ * @param name
+ * @returns
+ */
+export function normalizeBottleBatchNumber(name: string) {
+  return name.replace(
+    /\b(\()?batch (no.?\s|number\s|#)?(.+)($|\s)(\))?/i,
+    (match, p1, p2, p3, p4, p5) => {
+      return `(Batch ${convertWordToNumber(p3)})`;
+    },
+  );
+}
+
+function convertWordToNumber(word: string) {
+  switch (word.toLowerCase()) {
+    case "one":
+      return "1";
+    case "two":
+      return "2";
+    case "three":
+      return "3";
+    case "four":
+      return "4";
+    case "five":
+      return "5";
+    case "six":
+      return "6";
+    case "seven":
+      return "7";
+    case "eight":
+      return "8";
+    case "nine":
+      return "9";
+    case "ten":
+      return "10";
+    case "eleven":
+      return "11";
+    case "twelve":
+      return "12";
+    case "thirteen":
+      return "13";
+    case "fourteen":
+      return "14";
+    case "fifteen":
+      return "15";
+    case "sixteen":
+      return "16";
+    case "seventeen":
+      return "17";
+    case "eighteen":
+      return "18";
+    case "nineteen":
+      return "19";
+    case "twenty":
+      return "20";
+    default:
+      return word;
+  }
+}
 
 /* Normalize volume to milliliters */
 export function normalizeVolume(volume: string): number | null {

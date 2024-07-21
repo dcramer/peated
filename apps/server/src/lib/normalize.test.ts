@@ -100,6 +100,36 @@ describe("normalizeBottleName", () => {
     expect(rv).toMatchInlineSnapshot(`"1.285 Hello World"`);
     expect(age).toBeNull();
   });
+
+  test("Traigh Bhan 19-year-old Scotch Batch No. 5", async () => {
+    const [rv, age] = normalizeBottleName(
+      "Traigh Bhan 19-year-old Scotch Batch No. 5",
+    );
+    expect(rv).toMatchInlineSnapshot(
+      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`,
+    );
+    expect(age).toEqual(19);
+  });
+
+  test("Traigh Bhan 19-year-old Scotch Batch #5", async () => {
+    const [rv, age] = normalizeBottleName(
+      "Traigh Bhan 19-year-old Scotch Batch #5",
+    );
+    expect(rv).toMatchInlineSnapshot(
+      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`,
+    );
+    expect(age).toEqual(19);
+  });
+
+  test("Traigh Bhan 19-year-old Scotch Batch 5", async () => {
+    const [rv, age] = normalizeBottleName(
+      "Traigh Bhan 19-year-old Scotch Batch 5",
+    );
+    expect(rv).toMatchInlineSnapshot(
+      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`,
+    );
+    expect(age).toEqual(19);
+  });
 });
 
 describe("normalizeVolume", () => {
