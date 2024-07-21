@@ -94,7 +94,9 @@ export function normalizeBottleBatchNumber(name: string) {
   if (name.toLowerCase().indexOf("small batch") !== -1) return name;
   return name.replace(
     /(?:,)?(^|\s)?(?:\()?(?!small )batch (no.?\s|number\s|#)?([^)]+)(?:\))?($|\s)?/i,
-    (fullmatch, ...match) => {
+    (fullMatch, ...match: string[]) => {
+      console.log(name, fullMatch);
+      if (name == fullMatch) return `Batch ${convertWordToNumber(match[2])}`;
       return `${match[0] || ""}(Batch ${convertWordToNumber(match[2])})${match[3] || ""}`;
     },
   );

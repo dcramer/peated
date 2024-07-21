@@ -179,6 +179,12 @@ describe("normalizeBottleName", () => {
     expect(age).toEqual(19);
   });
 
+  test("Batch A", async () => {
+    const [rv, age] = normalizeBottleName("Batch A");
+    expect(rv).toMatchInlineSnapshot(`"Batch A"`);
+    expect(age).toBeNull();
+  });
+
   test("Small Batch Bourbon", async () => {
     const [rv, age] = normalizeBottleName("Small Batch Bourbon");
     expect(rv).toMatchInlineSnapshot(`"Small Batch Bourbon"`);
