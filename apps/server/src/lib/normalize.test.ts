@@ -130,6 +130,16 @@ describe("normalizeBottleName", () => {
     );
     expect(age).toEqual(19);
   });
+
+  test("Traigh Bhan 19-year-old Scotch Batch A", async () => {
+    const [rv, age] = normalizeBottleName(
+      "Traigh Bhan 19-year-old Scotch Batch A",
+    );
+    expect(rv).toMatchInlineSnapshot(
+      `"Traigh Bhan 19-year-old Scotch (Batch A)"`,
+    );
+    expect(age).toEqual(19);
+  });
 });
 
 describe("normalizeVolume", () => {
