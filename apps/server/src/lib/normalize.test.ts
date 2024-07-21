@@ -196,6 +196,13 @@ describe("normalizeBottleName", () => {
     expect(rv).toMatchInlineSnapshot(`"Old Synergies #12"`);
     expect(age).toBeNull();
   });
+
+  // TODO: combine w/ bottleUpdate/bottleCreate logic (brand prefix)
+  test("Batch #1, 10-year-old", async () => {
+    const [rv, age] = normalizeBottleName("Batch #1, 10-year-old");
+    expect(rv).toMatchInlineSnapshot(`"Batch 1, 10-year-old"`);
+    expect(age).toEqual(10);
+  });
 });
 
 describe("normalizeVolume", () => {

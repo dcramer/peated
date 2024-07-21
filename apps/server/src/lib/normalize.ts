@@ -53,13 +53,16 @@ export function normalizeBottleAge(
 ): [string, number | null] {
   // "years old" type patterns
   name = name
-    .replace(/\b(\d{1,2}|\w+)[\s-]?years?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
-    .replace(/(\d{1,2}|\w+)[\s-]?years?($|\s)/i, `$1${ageSuffix}$2`);
+    .replace(
+      /\b(\d{1,2}|\w+)[\s-]?years?[\s-]old($|[\s,])/i,
+      `$1${ageSuffix}$2`,
+    )
+    .replace(/(\d{1,2}|\w+)[\s-]?years?($|[\s,])/i, `$1${ageSuffix}$2`);
 
   // abberviated yr
   name = name
-    .replace(/\b(\d{1,2}|\w+)\s?yrs?\.?[\s-]old($|\s)/i, `$1${ageSuffix}$2`)
-    .replace(/\b(\d{1,2}|\w+)\s?yrs?\.?($|\s)/i, `$1${ageSuffix}$2`);
+    .replace(/\b(\d{1,2}|\w+)\s?yrs?\.?[\s-]old($|[\s,])/i, `$1${ageSuffix}$2`)
+    .replace(/\b(\d{1,2}|\w+)\s?yrs?\.?($|[\s,])/i, `$1${ageSuffix}$2`);
 
   // TODO: this needs subbed in search too...
   name = name.replace(/(\w+)-year-old/i, (match, p1) => {
@@ -75,7 +78,7 @@ export function normalizeBottleAge(
   }
 
   // identify age from [number]-year-old
-  const match = name.match(/\b(\d{1,2})-year-old($|\s)/i);
+  const match = name.match(/\b(\d{1,2})-year-old($|\s|,)/i);
   if (!age && match) {
     age = parseInt(match[1], 10);
   }
@@ -93,9 +96,8 @@ export function normalizeBottleBatchNumber(name: string) {
   // TODO: regexp
   if (name.toLowerCase().indexOf("small batch") !== -1) return name;
   return name.replace(
-    /(?:,)?(^|\s)?(?:\()?(?!small )batch (no.?\s|number\s|#)?([^)]+)(?:\))?($|\s)?/i,
+    /(?:,)?(^|\s)?(?:\()?(?!small )batch (no.?\s|number\s|#)?([^)]+)(?:\))?($|[\s,])?/i,
     (fullMatch, ...match: string[]) => {
-      console.log(name, fullMatch);
       if (name == fullMatch) return `Batch ${convertWordToNumber(match[2])}`;
       return `${match[0] || ""}(Batch ${convertWordToNumber(match[2])})${match[3] || ""}`;
     },
