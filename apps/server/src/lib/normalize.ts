@@ -91,9 +91,9 @@ export function normalizeBottleAge(
  */
 export function normalizeBottleBatchNumber(name: string) {
   return name.replace(
-    /\b(\()?batch (no.?\s|number\s|#)?(.+)($|\s)(\))?/i,
-    (match, p1, p2, p3, p4, p5) => {
-      return `(Batch ${convertWordToNumber(p3)})`;
+    /(^|\s)?(\()?batch (no.?\s|number\s|#)?([^)]+)(\))?($|\s)?/i,
+    (match, p1, p2, p3, p4, p5, p6 = "") => {
+      return `${p1}(Batch ${convertWordToNumber(p4)})${p6}`;
     },
   );
 }
