@@ -13,10 +13,22 @@ describe("normalizeBottleName", () => {
     expect(age).toBe(10);
   });
 
+  test("age suffix not age", async () => {
+    const [rv, age] = normalizeBottleName("Delicious 10", null);
+    expect(rv).toMatchInlineSnapshot(`"Delicious 10"`);
+    expect(age).toBeNull();
+  });
+
   test("age prefix", async () => {
     const [rv, age] = normalizeBottleName("10 Wood", 10);
     expect(rv).toMatchInlineSnapshot(`"10-year-old Wood"`);
     expect(age).toBe(10);
+  });
+
+  test("age prefix not age", async () => {
+    const [rv, age] = normalizeBottleName("10 Wood", null);
+    expect(rv).toMatchInlineSnapshot(`"10 Wood"`);
+    expect(age).toBeNull();
   });
 
   test("casing", async () => {
@@ -144,6 +156,16 @@ describe("normalizeBottleName", () => {
   test("Traigh Bhan 19-year-old Scotch Batch A", async () => {
     const [rv, age] = normalizeBottleName(
       "Traigh Bhan 19-year-old Scotch Batch A",
+    );
+    expect(rv).toMatchInlineSnapshot(
+      `"Traigh Bhan 19-year-old Scotch (Batch A)"`,
+    );
+    expect(age).toEqual(19);
+  });
+
+  test("Traigh Bhan 19-year-old Scotch, Batch A", async () => {
+    const [rv, age] = normalizeBottleName(
+      "Traigh Bhan 19-year-old Scotch, Batch A",
     );
     expect(rv).toMatchInlineSnapshot(
       `"Traigh Bhan 19-year-old Scotch (Batch A)"`,

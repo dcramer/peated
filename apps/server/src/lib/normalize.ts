@@ -93,7 +93,7 @@ export function normalizeBottleBatchNumber(name: string) {
   // TODO: regexp
   if (name.toLowerCase().indexOf("small batch") !== -1) return name;
   return name.replace(
-    /(^|\s)?(?:\()?(?!small )batch (no.?\s|number\s|#)?([^)]+)(?:\))?($|\s)?/i,
+    /(?:,)?(^|\s)?(?:\()?(?!small )batch (no.?\s|number\s|#)?([^)]+)(?:\))?($|\s)?/i,
     (fullmatch, ...match) => {
       return `${match[0] || ""}(Batch ${convertWordToNumber(match[2])})${match[3] || ""}`;
     },
