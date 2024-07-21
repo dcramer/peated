@@ -1,4 +1,5 @@
 import { logError } from "@peated/server/lib/log";
+import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { chunked, getUrl } from "@peated/server/lib/scraper";
 import {
   parseCaskType,
@@ -87,9 +88,6 @@ export async function scrapeBottles(
           console.warn(`Cannot find cask name for product`);
           return;
         }
-
-        const statedAge = item.age;
-
         const details = parseDetailsFromName(`${item.cask_no} ${caskName}`);
         if (!details?.distiller) {
           console.error(`Cannot find distiller: ${item.cask_no} ${caskName}`);
@@ -111,12 +109,18 @@ export async function scrapeBottles(
             )
           : null;
 
+        const { name, statedAge } = normalizeBottleName({
+          name: details.name,
+          statedAge: item.age,
+          isFullName: false,
+        });
+
         const [caskFill, caskType, caskSize] = parseCaskType(item.cask_type);
         // "2nd fill ex-bourbon hogshead"
 
         await cb(
           {
-            name: details.name,
+            name,
             category: details.category,
             statedAge,
             brand: {

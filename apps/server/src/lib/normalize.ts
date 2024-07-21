@@ -1,6 +1,7 @@
 import { CATEGORY_LIST } from "../constants";
 import { type Category } from "../types";
 import { formatCategoryName } from "./format";
+import { stripSuffix } from "./strings";
 
 const ageSuffix = "-year-old";
 
@@ -24,66 +25,147 @@ export function normalizeEntityName(name: string): string {
   return name;
 }
 
-export function normalizeBottleName(
-  name: string,
-  age: number | null = null,
-): [string, number | null] {
+type NormalizedBottle = {
+  name: string;
+  statedAge: number | null;
+  vintageYear: number | null;
+};
+
+export function normalizeBottleName({
+  name,
+  statedAge = null,
+  vintageYear = null,
+  isFullName = true,
+}: {
+  name: string;
+  statedAge?: number | null;
+  vintageYear?: number | null;
+  isFullName?: boolean;
+}): NormalizedBottle {
   // try to ease UX and normalize common name components
-  if (age && name == `${age}`) return [`${age}${ageSuffix}`, age];
+  if (statedAge && name == `${statedAge}`)
+    return { name: `${statedAge}${ageSuffix}`, statedAge, vintageYear };
 
-  name = name.replace("®", "");
-
-  [name, age] = normalizeBottleAge(name, age);
+  ({ name, statedAge } = normalizeBottleAge({ name, statedAge, isFullName }));
 
   // this is primarily targeting Scotch Malt Whiskey Society bottles
   // "Cask No. X"
-  name = name.replace(/^Cask No\.? \b/i, "");
+  if (!isFullName) {
+    name = name.replace(/^Cask No\.? \b/i, "");
+  }
 
   name = normalizeBottleBatchNumber(name);
 
   // replace various whitespace
   name = name.replace(/\n/, " ").replace(/\s{2,}/, " ");
 
-  return [normalizeString(name), age];
+  // identify age from [number]-year-old
+  const match = name.match(/\b(\d{1,2})-year-old($|\s|,)/i);
+  if (!statedAge && match) {
+    statedAge = parseInt(match[1], 10);
+  }
+
+  // TODO: we want to remove the year from the name in mid-match
+  const vintageYearMatch = name.match(
+    /(\b(\d{4})\b)|(\((\d{4})(?: release)?\))/i,
+  );
+  if (vintageYearMatch) {
+    if (!vintageYear) {
+      vintageYear = parseInt(vintageYearMatch[1] || vintageYearMatch[4], 10);
+      if (vintageYear < 1900 || vintageYear > new Date().getFullYear())
+        vintageYear = null;
+    }
+  }
+  if (vintageYear) {
+    // TODO: regex this
+    name = stripSuffix(name, ` ${vintageYear}`);
+    name = stripSuffix(name, ` (${vintageYear})`);
+    name = stripSuffix(name, ` (${vintageYear} release)`);
+    name = stripSuffix(name, ` (${vintageYear} Release)`);
+  }
+
+  name = normalizeString(name);
+
+  return { name, statedAge, vintageYear };
 }
 
-export function normalizeBottleAge(
-  name: string,
-  age: number | null = null,
-): [string, number | null] {
-  // "years old" type patterns
-  name = name
-    .replace(
-      /\b(\d{1,2}|\w+)[\s-]?years?[\s-]old($|[\s,])/i,
-      `$1${ageSuffix}$2`,
-    )
-    .replace(/(\d{1,2}|\w+)[\s-]?years?($|[\s,])/i, `$1${ageSuffix}$2`);
+const NUMBERS: Record<string, string> = {
+  one: "1",
+  two: "2",
+  three: "3",
+  four: "4",
+  five: "5",
+  six: "6",
+  seven: "7",
+  eight: "8",
+  nine: "9",
+  ten: "10",
+  eleven: "11",
+  twelve: "12",
+  thirteen: "13",
+  fourteen: "14",
+  fifteen: "15",
+  sixteen: "16",
+  seventeen: "17",
+  eighteen: "18",
+  nineteen: "19",
+  twenty: "20",
+};
 
-  // abberviated yr
-  name = name
-    .replace(/\b(\d{1,2}|\w+)\s?yrs?\.?[\s-]old($|[\s,])/i, `$1${ageSuffix}$2`)
-    .replace(/\b(\d{1,2}|\w+)\s?yrs?\.?($|[\s,])/i, `$1${ageSuffix}$2`);
+function convertWordToNumber(word: string) {
+  return NUMBERS[word.toLowerCase()] || word;
+}
+
+const AGE_NORM_REGEXP = new RegExp(
+  `\\b(\\d{1,2}|${Object.keys(NUMBERS).join("|")})(?:[\\s-]?(?:years?|yrs?.?))(?:[\\s-]old)?($|[\\s,])`,
+  "i",
+);
+
+const AGE_EXTRACT_REGEXP = new RegExp(
+  `(${Object.keys(NUMBERS).join("|")})-year-old`,
+  "i",
+);
+
+export function normalizeBottleAge({
+  name,
+  statedAge = null,
+  isFullName = true,
+}: {
+  name: string;
+  statedAge?: number | null;
+  isFullName?: boolean;
+}): { name: string; statedAge: number | null } {
+  // "years old" type patterns
+  name = name.replace(AGE_NORM_REGEXP, `$1${ageSuffix}$2`);
 
   // TODO: this needs subbed in search too...
-  name = name.replace(/(\w+)-year-old/i, (match, p1) => {
+  name = name.replace(AGE_EXTRACT_REGEXP, (match, p1) => {
     return convertWordToNumber(p1) + "-year-old";
   });
 
   // normalize prefix/suffix numbers
-  if (age) {
+  if (statedAge) {
     name = name.replace(
-      new RegExp(`(^|\\s)(${age})($|\\s)`),
-      `$1${age}${ageSuffix}$3`,
+      new RegExp(`(^|\\s)(${statedAge})($|\\s)`),
+      `$1${statedAge}${ageSuffix}$3`,
     );
   }
 
   // identify age from [number]-year-old
   const match = name.match(/\b(\d{1,2})-year-old($|\s|,)/i);
-  if (!age && match) {
-    age = parseInt(match[1], 10);
+  if (!statedAge && match) {
+    statedAge = parseInt(match[1], 10);
   }
 
-  return [name, age];
+  // move age to the beginning of the bottle name if brandPrefix is available,
+  if (!isFullName) {
+    const ageMatch = name.match(/(\d{1,2})-year-old($|\s)/i);
+    if (ageMatch) {
+      name = `${ageMatch[1]}-year-old${ageMatch[2] || ""} ${name.replace(/(\s?\d{1,2}-year-old\s?)($|\s)/i, "$2")}`;
+    }
+  }
+
+  return { name, statedAge };
 }
 
 /**
@@ -96,59 +178,12 @@ export function normalizeBottleBatchNumber(name: string) {
   // TODO: regexp
   if (name.toLowerCase().indexOf("small batch") !== -1) return name;
   return name.replace(
-    /(?:,)?(^|\s)?(?:\()?(?!small )batch (no.?\s|number\s|#)?([^)]+)(?:\))?($|[\s,])?/i,
+    /(?:,)?(^|\s)?(?:\()?(?!small )batch (no.?\s|number\s|#)?([^),\s]+)(?:\))?(?:,)?($|\s)?/i,
     (fullMatch, ...match: string[]) => {
       if (name == fullMatch) return `Batch ${convertWordToNumber(match[2])}`;
       return `${match[0] || ""}(Batch ${convertWordToNumber(match[2])})${match[3] || ""}`;
     },
   );
-}
-
-function convertWordToNumber(word: string) {
-  switch (word.toLowerCase()) {
-    case "one":
-      return "1";
-    case "two":
-      return "2";
-    case "three":
-      return "3";
-    case "four":
-      return "4";
-    case "five":
-      return "5";
-    case "six":
-      return "6";
-    case "seven":
-      return "7";
-    case "eight":
-      return "8";
-    case "nine":
-      return "9";
-    case "ten":
-      return "10";
-    case "eleven":
-      return "11";
-    case "twelve":
-      return "12";
-    case "thirteen":
-      return "13";
-    case "fourteen":
-      return "14";
-    case "fifteen":
-      return "15";
-    case "sixteen":
-      return "16";
-    case "seventeen":
-      return "17";
-    case "eighteen":
-      return "18";
-    case "nineteen":
-      return "19";
-    case "twenty":
-      return "20";
-    default:
-      return word;
-  }
 }
 
 /* Normalize volume to milliliters */

@@ -108,12 +108,12 @@ export async function scrapeReviews(
       console.warn("Unable to identify bottle name");
       continue;
     }
-    const [name] = normalizeBottleName(
-      rawName
+    const { name } = normalizeBottleName({
+      name: rawName
         .replaceAll(/\n/gi, "")
         .trim()
         .replace(/,\s[\d.]+%,?$/, ""),
-    );
+    });
 
     const reviewUrl = $("a.postsItemLink", el).first().attr("href");
     if (!reviewUrl) {

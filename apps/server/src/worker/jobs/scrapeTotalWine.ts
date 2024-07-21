@@ -24,7 +24,7 @@ export async function scrapeProducts(
       console.warn("Unable to identify Product Name");
       return;
     }
-    const [name] = normalizeBottleName(rawName);
+    const { name } = normalizeBottleName({ name: rawName });
 
     const volumeRaw = $("h2.title__2RoYeYuO > span", el).first().text();
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;

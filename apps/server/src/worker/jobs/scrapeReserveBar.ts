@@ -36,7 +36,7 @@ export async function scrapeProducts(
       return;
     }
 
-    const [name] = normalizeBottleName(bottle.text());
+    const { name } = normalizeBottleName({ name: bottle.text() });
 
     const volumeRaw = $(".product-tile__volume", el).first().text();
     if (!volumeRaw) {

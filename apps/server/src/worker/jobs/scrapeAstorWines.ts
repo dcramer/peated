@@ -25,7 +25,7 @@ export async function scrapeProducts(
       return;
     }
 
-    const [name] = normalizeBottleName(rawName);
+    const { name } = normalizeBottleName({ name: rawName });
 
     const productUrl = $("a.item-name", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");

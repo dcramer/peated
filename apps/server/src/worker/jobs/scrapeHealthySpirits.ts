@@ -26,7 +26,7 @@ export async function scrapeProducts(
   const data = await getUrl(url);
   const $ = cheerio(data);
   $(".collection-products-row .product-block").each((_, el) => {
-    const brand = $("div.brand", el).first().text().trim();
+    const brand = toTitleCase($("div.brand", el).first().text().trim());
     const bottle = $("a.title", el).first().text().trim();
     if (!bottle || !brand) {
       console.warn("Unable to identify Product Name");
@@ -34,7 +34,10 @@ export async function scrapeProducts(
     }
 
     const [name, volumeRaw] = extractVolume(
-      normalizeBottleName(toTitleCase(`${brand} ${bottle}`))[0],
+      normalizeBottleName({
+        name: toTitleCase(`${bottle}`),
+        isFullName: false,
+      }).name,
     );
 
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;
@@ -55,10 +58,12 @@ export async function scrapeProducts(
       console.warn(`Invalid price: ${priceRaw}`);
       return;
     }
-    console.log(`${name} - ${(price / 100).toFixed(2)}`);
+
+    const fullName = `${brand} ${name}`;
+    console.log(`${fullName} - ${(price / 100).toFixed(2)}`);
 
     cb({
-      name,
+      name: fullName,
       price,
       currency: "usd",
       volume,

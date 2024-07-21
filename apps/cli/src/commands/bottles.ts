@@ -23,6 +23,7 @@ subcommand
         id: bottles.id,
         name: bottles.name,
         statedAge: bottles.statedAge,
+        vintageYear: bottles.vintageYear,
       })
       .from(bottles)
       .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
@@ -33,14 +34,23 @@ subcommand
     while (hasResults) {
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
-      for (const { id, name, statedAge } of query) {
-        const [newName, newAge] = normalizeBottleName(name, statedAge);
-        if (newName !== name || newAge !== statedAge) {
-          console.log(`M: ${name} -> ${newName} (${statedAge} -> ${newAge})`);
+      for (const { id, ...bottle } of query) {
+        const { name, statedAge, vintageYear } = normalizeBottleName({
+          ...bottle,
+          isFullName: false,
+        });
+        if (
+          bottle.name !== name ||
+          bottle.statedAge !== statedAge ||
+          bottle.vintageYear !== vintageYear
+        ) {
+          console.log(`M: ${bottle.name} -> ${name}`);
           if (!options.dryRun) {
             const values: Record<string, any> = {};
-            if (newName !== name) values.name = newName;
-            if (newAge !== statedAge && newAge) values.statedAge = newAge;
+            if (bottle.name !== name) values.name = name;
+            if (bottle.statedAge !== statedAge) values.statedAge = statedAge;
+            if (bottle.vintageYear !== vintageYear)
+              values.vintageYear = vintageYear;
             await db.update(bottles).set(values).where(eq(bottles.id, id));
           }
         }

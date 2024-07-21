@@ -1,5 +1,6 @@
 import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
+import { stripPrefix } from "@peated/server/lib/strings";
 import {
   BottleInputSchema,
   type EntityInputSchema,
@@ -96,54 +97,12 @@ export async function bottleNormalize({
   }
 
   if (rv.name) {
-    const [name, statedAge] = normalizeBottleName(rv.name, rv.statedAge);
+    const normBottle = normalizeBottleName({ ...rv, isFullName: false });
 
-    rv.name = name;
-    rv.statedAge = statedAge;
-  }
-
-  // TODO: we want to remove the year from the name in mid-match
-  const vintageYearMatch = rv.name.match(
-    /(\b(\d{4})\b)|(\((\d{4})(?: release)?\))/i,
-  );
-  if (vintageYearMatch) {
-    if (!rv.vintageYear) {
-      const vintageYear = parseInt(
-        vintageYearMatch[1] || vintageYearMatch[4],
-        10,
-      );
-      if (vintageYear > 1900 && vintageYear < new Date().getFullYear() + 1)
-        rv.vintageYear = vintageYear;
-    }
-  }
-  if (rv.vintageYear) {
-    // TODO: regex this
-    rv.name = stripSuffix(rv.name, ` ${rv.vintageYear}`);
-    rv.name = stripSuffix(rv.name, ` (${rv.vintageYear})`);
-    rv.name = stripSuffix(rv.name, ` (${rv.vintageYear} release)`);
-    rv.name = stripSuffix(rv.name, ` (${rv.vintageYear} Release)`);
-  }
-
-  const match = rv.name.match(/(\d{1,2})-year-old($|\s)/i);
-  if (match) {
-    rv.name = `${match[1]}-year-old ${rv.name.replace(/(\s?\d{1,2}-year-old\s?)($|\s)/i, "")}`;
+    Object.assign(rv, normBottle);
   }
 
   return rv;
-}
-
-function stripSuffix(value: string, suffix: string) {
-  if (value.endsWith(suffix)) {
-    return value.substring(0, value.length - suffix.length);
-  }
-  return value;
-}
-
-function stripPrefix(value: string, prefix: string) {
-  if (value.startsWith(prefix)) {
-    return value.substring(prefix.length);
-  }
-  return value;
 }
 
 export default authedProcedure.input(BottleInputSchema).query(bottleNormalize);

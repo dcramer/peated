@@ -1,4 +1,5 @@
 import { logError } from "@peated/server/lib/log";
+import { normalizeBottleName } from "@peated/server/lib/normalize";
 import { getUrl } from "@peated/server/lib/scraper";
 import {
   parseCaskType,
@@ -121,7 +122,7 @@ export async function scrapeBottles(
     }
 
     const ageSpec = specList.find(([name]) => name === "Age:");
-    const statedAge = ageSpec ? Number(ageSpec[1].split(" ")[0]) : null;
+    let statedAge = ageSpec ? Number(ageSpec[1].split(" ")[0]) : null;
 
     const flavorSpec = specList.find(([name]) => name === "Flavour:");
     const flavorProfile = flavorSpec ? parseFlavorProfile(flavorSpec[1]) : null;
@@ -141,9 +142,17 @@ export async function scrapeBottles(
       continue;
     }
 
+    let name = details.name;
+
+    ({ name, statedAge } = normalizeBottleName({
+      name,
+      statedAge,
+      isFullName: false,
+    }));
+
     await cb(
       {
-        name: details.name,
+        name,
         category: details.category,
         statedAge,
         brand: {
