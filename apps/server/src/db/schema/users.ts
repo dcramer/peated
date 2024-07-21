@@ -22,6 +22,9 @@ export const users = pgTable(
     active: boolean("active").default(true).notNull(),
     admin: boolean("admin").default(false).notNull(),
     mod: boolean("mod").default(false).notNull(),
+
+    notifyComments: boolean("notify_comments").default(true),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (users) => {

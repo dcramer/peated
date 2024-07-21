@@ -37,17 +37,9 @@ export default function BooleanField<T extends FieldValues>({
       className={className}
       error={error}
     >
-      <Switch.Group as="div" className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <span className="flex flex-grow flex-col">
-          <Switch.Label as="span" className="font-semibold" passive>
-            {label}
-          </Switch.Label>
-          <Switch.Description
-            as="span"
-            className="mt-2 text-sm leading-6 text-gray-400"
-          >
-            {helpText}
-          </Switch.Description>
+          <span className="font-semibold">{label}</span>
         </span>
         <Switch
           checked={Boolean(value)}
@@ -66,7 +58,7 @@ export default function BooleanField<T extends FieldValues>({
             )}
           />
         </Switch>
-      </Switch.Group>
+      </div>
     </FormField>
   );
 }

@@ -57,6 +57,7 @@ export const UserSerializer = serializer({
             createdAt: item.createdAt.toISOString(),
             admin: item.admin,
             mod: item.admin || item.mod,
+            notifyComments: item.notifyComments,
           }
         : {}),
     };

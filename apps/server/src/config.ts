@@ -11,7 +11,7 @@ export default {
   URL_PREFIX: process.env.URL_PREFIX || "http://localhost:3000",
   FAKTORY_URL: process.env.FAKTORY_URL,
 
-  SMTP_FROM: process.env.SMTP_FROM,
+  SMTP_FROM: process.env.SMTP_FROM || "no-reply@peated.com",
   SMTP_HOST: process.env.SMTP_HOST || "localhost",
   SMTP_PORT: Number(process.env.SMTP_PORT || "465"),
   SMTP_USER: process.env.SMTP_USER,

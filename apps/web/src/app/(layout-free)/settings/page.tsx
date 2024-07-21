@@ -12,6 +12,7 @@ import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import ImageField from "@peated/web/components/imageField";
 import Layout from "@peated/web/components/layout";
+import Legend from "@peated/web/components/legend";
 import TextField from "@peated/web/components/textField";
 import useApi from "@peated/web/hooks/useApi";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -134,7 +135,17 @@ export default function Page() {
             label="Private"
             helpText="Limit visibility of your activity to friends-only."
             name="private"
-            defaultValue={user.private}
+          />
+        </Fieldset>
+
+        <Fieldset>
+          <Legend title="Notifications" />
+
+          <BooleanField
+            control={control}
+            label="Comments"
+            helpText="Receive email notifications for new comments in threads you're participating in."
+            name="notifyComments"
           />
         </Fieldset>
       </Form>

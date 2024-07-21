@@ -21,4 +21,5 @@ export const UserInputSchema = z.object({
   private: z.boolean().optional(),
   admin: z.boolean().optional(),
   mod: z.boolean().optional(),
+  notifyComments: z.boolean().optional(),
 });

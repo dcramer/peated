@@ -2,11 +2,20 @@ import config from "@peated/server/config";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
-import type { Bottle, Comment, Tasting, User } from "../db/schema";
+import {
+  comments,
+  users,
+  type Bottle,
+  type Comment,
+  type Tasting,
+  type User,
+} from "../db/schema";
 import { logError } from "../lib/log";
 import { escapeHtml } from "./html";
 
 import theme from "@peated/design";
+import { and, eq, inArray, ne } from "drizzle-orm";
+import { db } from "../db";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
 
@@ -49,6 +58,7 @@ const createMailTransport = () => {
   } satisfies SMTPTransport.Options);
 };
 
+// TODO: this should be an abstraction of the notification system
 export async function notifyComment({
   comment,
   transport = mailTransport,
@@ -60,6 +70,37 @@ export async function notifyComment({
 
   // dont notify self
   if (comment.createdById === comment.tasting.createdById) return;
+
+  const userIds =
+    comment.createdById === comment.tasting.createdById
+      ? []
+      : [comment.createdById, comment.tasting.createdById];
+  userIds.push(
+    ...(
+      await db
+        .selectDistinct({ id: comments.createdById })
+        .from(comments)
+        .where(
+          and(
+            eq(comments.tastingId, comment.tasting.id),
+            ne(comments.createdById, comment.tasting.createdById),
+            ne(comments.createdById, comment.createdById),
+          ),
+        )
+    ).map((r) => r.id),
+  );
+
+  const emailList = (
+    await db
+      .select({ email: users.email })
+      .from(users)
+      .where(
+        and(
+          inArray(users.id, Array.from(new Set(userIds))),
+          eq(users.notifyComments, true),
+        ),
+      )
+  ).map((r) => r.email);
 
   if (!transport) {
     if (!mailTransport) mailTransport = createMailTransport();
@@ -73,16 +114,18 @@ export async function notifyComment({
     `Sending email notification for comment ${comment.id} to ${comment.tasting.createdBy.email}`,
   );
 
-  try {
-    await transport.sendMail({
-      from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
-      to: comment.tasting.createdBy.email,
-      subject: "New Comment on Tasting",
-      text: `View this comment on Peated: ${commentUrl}\n\n${comment.comment}`,
-      html,
-    });
-  } catch (err) {
-    logError("email notification failed");
+  for (const email of emailList) {
+    try {
+      await transport.sendMail({
+        from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+        to: comment.tasting.createdBy.email,
+        subject: "New Comment on Tasting",
+        text: `View this comment on Peated: ${commentUrl}\n\n${comment.comment}`,
+        html,
+      });
+    } catch (err) {
+      logError(err);
+    }
   }
 }
 
