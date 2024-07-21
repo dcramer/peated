@@ -69,8 +69,8 @@ export function normalizeBottleAge(
   // normalize prefix/suffix numbers
   if (age) {
     name = name.replace(
-      new RegExp(`\\b(${age})($|\\s)`),
-      `${age}${ageSuffix}$2`,
+      new RegExp(`(^|\\s)(${age})($|\\s)`),
+      `$1${age}${ageSuffix}$3`,
     );
   }
 

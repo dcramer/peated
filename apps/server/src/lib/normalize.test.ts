@@ -140,6 +140,12 @@ describe("normalizeBottleName", () => {
     );
     expect(age).toEqual(19);
   });
+
+  test("Old Synergies #12", async () => {
+    const [rv, age] = normalizeBottleName("Old Synergies #12");
+    expect(rv).toMatchInlineSnapshot(`"Old Synergies #12"`);
+    expect(age).toBeNull();
+  });
 });
 
 describe("normalizeVolume", () => {
