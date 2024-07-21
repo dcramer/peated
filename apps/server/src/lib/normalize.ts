@@ -37,7 +37,7 @@ export function normalizeBottleName(
 
   // this is primarily targeting Scotch Malt Whiskey Society bottles
   // "Cask No. X"
-  name = name.replace(/\bCask No\.? \b/i, "");
+  name = name.replace(/^Cask No\.? \b/i, "");
 
   name = normalizeBottleBatchNumber(name);
 

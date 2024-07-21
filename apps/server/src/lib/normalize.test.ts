@@ -113,6 +113,12 @@ describe("normalizeBottleName", () => {
     expect(age).toBeNull();
   });
 
+  test("Hello World Cask No. 1.285", async () => {
+    const [rv, age] = normalizeBottleName("Hello World Cask No. 1.285");
+    expect(rv).toMatchInlineSnapshot(`"Hello World Cask No. 1.285"`);
+    expect(age).toBeNull();
+  });
+
   test("Traigh Bhan 19-year-old Scotch Batch No. 5", async () => {
     const [rv, age] = normalizeBottleName(
       "Traigh Bhan 19-year-old Scotch Batch No. 5",
