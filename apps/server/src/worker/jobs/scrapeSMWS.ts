@@ -109,18 +109,20 @@ export async function scrapeBottles(
             )
           : null;
 
-        const { name, statedAge } = normalizeBottleName({
-          name: details.name,
-          statedAge: item.age,
-          isFullName: false,
-        });
+        let vintageYear, releaseYear;
+        const { name, statedAge, vintageYear, releaseYear } =
+          normalizeBottleName({
+            name: details.name,
+            statedAge: item.age,
+            isFullName: false,
+          });
 
         const [caskFill, caskType, caskSize] = parseCaskType(item.cask_type);
         // "2nd fill ex-bourbon hogshead"
 
         await cb(
           {
-            name,
+            name: `${name}${vintageYear ? ` (${vintageYear}) Vintage)` : ""}${releaseYear ? ` (${releaseYear}) Release)` : ""}`,
             category: details.category,
             statedAge,
             brand: {

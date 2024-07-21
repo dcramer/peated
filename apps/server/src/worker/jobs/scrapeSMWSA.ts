@@ -143,8 +143,9 @@ export async function scrapeBottles(
     }
 
     let name = details.name;
+    let vintageYear, releaseYear;
 
-    ({ name, statedAge } = normalizeBottleName({
+    ({ name, statedAge, vintageYear, releaseYear } = normalizeBottleName({
       name,
       statedAge,
       isFullName: false,
@@ -152,7 +153,7 @@ export async function scrapeBottles(
 
     await cb(
       {
-        name,
+        name: `${name}${vintageYear ? ` (${vintageYear}) Vintage)` : ""}${releaseYear ? ` (${releaseYear}) Release)` : ""}`,
         category: details.category,
         statedAge,
         brand: {

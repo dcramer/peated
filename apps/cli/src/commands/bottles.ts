@@ -35,14 +35,16 @@ subcommand
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id, ...bottle } of query) {
-        const { name, statedAge, vintageYear } = normalizeBottleName({
-          ...bottle,
-          isFullName: false,
-        });
+        const { name, statedAge, vintageYear, releaseYear } =
+          normalizeBottleName({
+            ...bottle,
+            isFullName: false,
+          });
         if (
           bottle.name !== name ||
           bottle.statedAge !== statedAge ||
-          bottle.vintageYear !== vintageYear
+          bottle.vintageYear !== vintageYear ||
+          bottle.releaseYear !== releaseYear
         ) {
           console.log(`M: ${bottle.name} -> ${name}`);
           if (!options.dryRun) {
@@ -51,6 +53,8 @@ subcommand
             if (bottle.statedAge !== statedAge) values.statedAge = statedAge;
             if (bottle.vintageYear !== vintageYear)
               values.vintageYear = vintageYear;
+            if (bottle.releaseYear !== releaseYear)
+              values.releaseYear = releaseYear;
             await db.update(bottles).set(values).where(eq(bottles.id, id));
           }
         }

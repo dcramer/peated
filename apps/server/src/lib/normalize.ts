@@ -29,22 +29,30 @@ type NormalizedBottle = {
   name: string;
   statedAge: number | null;
   vintageYear: number | null;
+  releaseYear: number | null;
 };
 
 export function normalizeBottleName({
   name,
   statedAge = null,
   vintageYear = null,
+  releaseYear = null,
   isFullName = true,
 }: {
   name: string;
   statedAge?: number | null;
   vintageYear?: number | null;
+  releaseYear?: number | null;
   isFullName?: boolean;
 }): NormalizedBottle {
   // try to ease UX and normalize common name components
   if (statedAge && name == `${statedAge}`)
-    return { name: `${statedAge}${ageSuffix}`, statedAge, vintageYear };
+    return {
+      name: `${statedAge}${ageSuffix}`,
+      statedAge,
+      vintageYear,
+      releaseYear,
+    };
 
   ({ name, statedAge } = normalizeBottleAge({ name, statedAge, isFullName }));
 
@@ -66,12 +74,10 @@ export function normalizeBottleName({
   }
 
   // TODO: we want to remove the year from the name in mid-match
-  const vintageYearMatch = name.match(
-    /(\b(\d{4})\b)|(\((\d{4})(?: release)?\))/i,
-  );
+  const vintageYearMatch = name.match(/\((\d{4}) vintage\)|(\d{4}) vintage/i);
   if (vintageYearMatch) {
     if (!vintageYear) {
-      vintageYear = parseInt(vintageYearMatch[1] || vintageYearMatch[4], 10);
+      vintageYear = parseInt(vintageYearMatch[1] || vintageYearMatch[2], 10);
       if (vintageYear < 1900 || vintageYear > new Date().getFullYear())
         vintageYear = null;
     }
@@ -80,13 +86,34 @@ export function normalizeBottleName({
     // TODO: regex this
     name = stripSuffix(name, ` ${vintageYear}`);
     name = stripSuffix(name, ` (${vintageYear})`);
-    name = stripSuffix(name, ` (${vintageYear} release)`);
-    name = stripSuffix(name, ` (${vintageYear} Release)`);
+    name = stripSuffix(name, ` (${vintageYear} vintage)`);
+    name = stripSuffix(name, ` (${vintageYear} Vintage)`);
+  }
+
+  const releaseYearMatch = name.match(/\((\d{4}) release\)|(\d{4}) release/i);
+  if (releaseYearMatch) {
+    if (!releaseYear) {
+      releaseYear = parseInt(releaseYearMatch[1] || releaseYearMatch[2], 10);
+      if (releaseYear < 1900 || releaseYear > new Date().getFullYear())
+        releaseYear = null;
+    }
+  }
+  if (releaseYear) {
+    // TODO: regex this
+    name = stripSuffix(name, ` ${releaseYear}`);
+    name = stripSuffix(name, ` (${releaseYear})`);
+    name = stripSuffix(name, ` (${releaseYear} release)`);
+    name = stripSuffix(name, ` (${releaseYear} Release)`);
   }
 
   name = normalizeString(name);
 
-  return { name, statedAge, vintageYear };
+  // vintage is likely wrong
+  if (releaseYear === vintageYear) {
+    vintageYear = null;
+  }
+
+  return { name, statedAge, vintageYear, releaseYear };
 }
 
 const NUMBERS: Record<string, string> = {

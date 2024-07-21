@@ -259,6 +259,7 @@ describe("normalizeBottleName", () => {
     expect(rv).toMatchInlineSnapshot(`
       {
         "name": "1993 Vintage",
+        "releaseYear": null,
         "statedAge": null,
         "vintageYear": 1993,
       }
@@ -272,8 +273,9 @@ describe("normalizeBottleName", () => {
     expect(rv).toMatchInlineSnapshot(`
       {
         "name": "1993 Release",
+        "releaseYear": 1993,
         "statedAge": null,
-        "vintageYear": 1993,
+        "vintageYear": null,
       }
     `);
   });
