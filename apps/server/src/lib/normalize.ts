@@ -90,10 +90,12 @@ export function normalizeBottleAge(
  * @returns
  */
 export function normalizeBottleBatchNumber(name: string) {
+  // TODO: regexp
+  if (name.toLowerCase().indexOf("small batch") !== -1) return name;
   return name.replace(
-    /(^|\s)?(\()?batch (no.?\s|number\s|#)?([^)]+)(\))?($|\s)?/i,
-    (match, p1, p2, p3, p4, p5, p6 = "") => {
-      return `${p1}(Batch ${convertWordToNumber(p4)})${p6}`;
+    /(^|\s)?(?:\()?(?!small )batch (no.?\s|number\s|#)?([^)]+)(?:\))?($|\s)?/i,
+    (fullmatch, ...match) => {
+      return `${match[0] || ""}(Batch ${convertWordToNumber(match[2])})${match[3] || ""}`;
     },
   );
 }
