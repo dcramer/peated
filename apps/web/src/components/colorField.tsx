@@ -88,7 +88,7 @@ export default forwardRef<HTMLInputElement, Props>(
             id={`f-${name}`}
             value={value}
             onChange={(e) => {
-              const value = Number(e.target.value);
+              const value = parseInt(e.target.value, 10);
               setValue(value);
               onChange && onChange(value);
             }}

@@ -110,7 +110,7 @@ export default function SiteForm({
 
           <TextField
             {...register("runEvery", {
-              setValueAs: (v) => (v === "" || !v ? null : Number(v)),
+              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
             })}
             label="Frequency"
             type="number"

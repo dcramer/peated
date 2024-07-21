@@ -232,7 +232,7 @@ export default function BottleForm({
 
           <TextField
             {...register("statedAge", {
-              setValueAs: (v) => (v === "" || !v ? null : Number(v)),
+              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
             })}
             error={errors.statedAge}
             type="number"
@@ -297,7 +297,7 @@ export default function BottleForm({
 
           <TextField
             {...register("vintageYear", {
-              setValueAs: (v) => (v === "" || !v ? null : Number(v)),
+              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
             })}
             error={errors.vintageYear}
             type="number"
@@ -505,7 +505,7 @@ export default function BottleForm({
 
             <TextField
               {...register("releaseYear", {
-                setValueAs: (v) => (v === "" || !v ? null : Number(v)),
+                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
               })}
               error={errors.releaseYear}
               type="number"

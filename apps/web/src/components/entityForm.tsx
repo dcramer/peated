@@ -247,7 +247,7 @@ export default function EntityForm({
           />
           <TextField
             {...register("yearEstablished", {
-              setValueAs: (v) => (v === "" || !v ? null : Number(v)),
+              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
             })}
             error={errors.yearEstablished}
             label="Year Established"
