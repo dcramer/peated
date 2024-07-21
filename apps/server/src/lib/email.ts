@@ -122,6 +122,7 @@ export async function notifyComment({
         subject: "New Comment on Tasting",
         text: `View this comment on Peated: ${commentUrl}\n\n${comment.comment}`,
         html,
+        replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
       });
     } catch (err) {
       logError(err);
