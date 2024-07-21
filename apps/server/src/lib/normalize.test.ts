@@ -252,6 +252,32 @@ describe("normalizeBottleName", () => {
     expect(statedAge).toBeNull();
   });
 
+  test("1993 Vintage", async () => {
+    const rv = normalizeBottleName({
+      name: "1993 Vintage",
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "1993 Vintage",
+        "statedAge": null,
+        "vintageYear": 1993,
+      }
+    `);
+  });
+
+  test("1993 Release", async () => {
+    const rv = normalizeBottleName({
+      name: "1993 Release",
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "1993 Release",
+        "statedAge": null,
+        "vintageYear": 1993,
+      }
+    `);
+  });
+
   describe("isFullName = false", () => {
     test("Black Art 1992 Edition 9.1 29-year-old Single Malt", async () => {
       const { name, statedAge } = normalizeBottleName({
