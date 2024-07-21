@@ -74,7 +74,7 @@ export async function notifyComment({
   const userIds =
     comment.createdById === comment.tasting.createdById
       ? []
-      : [comment.createdById, comment.tasting.createdById];
+      : [comment.tasting.createdById];
   userIds.push(
     ...(
       await db
