@@ -26,7 +26,12 @@ export default function Page({
   return (
     <>
       {topEntityList.results.length ? (
-        <EntityTable entityList={topEntityList.results} type="distiller" />
+        <EntityTable
+          entityList={topEntityList.results}
+          type="distiller"
+          defaultSort="-bottles"
+          withSearch
+        />
       ) : (
         <EmptyActivity>
           {"It looks like we don't know of any distilleries in the area."}

@@ -3,134 +3,122 @@
 import type { Entity, EntityType, PagingRel } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
-import { useSearchParams } from "next/navigation";
+import type { ComponentProps } from "react";
+import { toTitleCase } from "../../../server/src/lib/strings";
 import { getEntityTypeSearchUrl } from "../lib/urls";
 import Chip from "./chip";
-import PaginationButtons from "./paginationButtons";
-import SortParam from "./sortParam";
+import type { Column } from "./table";
+import Table from "./table";
 
 export default function EntityTable({
   entityList,
   rel,
   withLocations = false,
   withTastings = false,
-  sort: initialSort,
   type,
-}: {
+  ...props
+}: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
   entityList: Entity[];
   withTastings?: boolean;
   withLocations?: boolean;
   rel?: PagingRel;
-  sort?: string;
   type: EntityType;
 }) {
-  const searchParams = useSearchParams();
-  const sort = initialSort ?? searchParams.get("sort");
-
   const link = getEntityTypeSearchUrl(type);
 
   return (
-    <>
-      <table className="min-w-full">
-        <colgroup>
-          <col
-            className={classNames(
-              "min-w-full",
-              withTastings && withLocations ? "sm:w-1/2" : "",
-              withTastings && !withLocations ? "sm:w-4/5" : "",
-              !withTastings && withLocations ? "sm:w-3/5" : "",
-              !withTastings && !withLocations ? "sm:w-4/5" : "",
-            )}
-          />
-          <col className="sm:w-1/10" />
-          {withTastings && <col className="sm:w-1/10" />}
-          {withLocations && <col className="sm:w-3/10" />}
-        </colgroup>
-        <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
-          <tr>
-            <th scope="col" className="px-3 py-2.5 text-left">
-              <SortParam name="name" label="Entity" sort={sort} />
-            </th>
-            <th scope="col" className="px-3 py-2.5 text-center sm:table-cell">
-              <SortParam name="bottles" sort={sort} defaultOrder="desc" />
-            </th>
-            {withTastings && (
-              <th scope="col" className="px-3 py-2.5 text-center sm:table-cell">
-                <SortParam name="tastings" sort={sort} defaultOrder="desc" />
-              </th>
-            )}
-            {withLocations && (
-              <th
-                scope="col"
-                className="hidden px-3 py-2.5 text-right sm:table-cell"
-              >
-                Location
-              </th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {entityList.map((entity) => {
+    <Table<Entity>
+      items={entityList}
+      rel={rel}
+      columns={[
+        {
+          name: "name",
+          title: type ? toTitleCase(type) : "Entity",
+          sort: "name",
+          sortDefaultOrder: "asc",
+          className: classNames(
+            "min-w-full",
+            withTastings && withLocations ? "sm:w-1/2" : "",
+            withTastings && !withLocations ? "sm:w-4/5" : "",
+            !withTastings && withLocations ? "sm:w-3/5" : "",
+            !withTastings && !withLocations ? "sm:w-4/5" : "",
+          ),
+          value: (item) => {
             return (
-              <tr key={entity.id} className="border-b border-slate-800 text-sm">
-                <td className="max-w-0 px-3 py-3">
-                  <Link
-                    href={`/entities/${entity.id}`}
-                    className="font-medium hover:underline"
-                  >
-                    {entity.name}
-                  </Link>
-                  <div className="mt-2 space-x-2">
-                    {entity.type.sort().map((t) => (
-                      <Chip
-                        key={t}
-                        size="small"
-                        as={Link}
-                        href={`${link}?type=${encodeURIComponent(t)}`}
-                      >
-                        {t}
-                      </Chip>
-                    ))}
-                  </div>
-                </td>
-                <td className="hidden px-3 py-3 text-center sm:table-cell">
-                  {entity.totalBottles.toLocaleString()}
-                </td>
-                {withTastings && (
-                  <td className="hidden px-3 py-3 text-center sm:table-cell">
-                    {entity.totalTastings.toLocaleString()}
-                  </td>
-                )}
-                {withLocations && (
-                  <td className="hidden space-y-2 px-3 py-3 text-right sm:table-cell">
-                    {!!entity.country && (
+              <>
+                <Link
+                  href={`/entities/${item.id}`}
+                  className="font-medium hover:underline"
+                >
+                  {item.name}
+                </Link>
+                <div className="mt-2 space-x-2">
+                  {item.type.sort().map((t) => (
+                    <Chip
+                      key={t}
+                      size="small"
+                      as={Link}
+                      href={`${link}?type=${encodeURIComponent(t)}`}
+                    >
+                      {t}
+                    </Chip>
+                  ))}
+                </div>
+              </>
+            );
+          },
+        },
+        {
+          name: "bottles",
+          value: (item) => item.totalBottles.toLocaleString(),
+          className: "sm:w-1/10",
+          sortDefaultOrder: "desc",
+        },
+        ...(withTastings
+          ? ([
+              {
+                name: "tastings",
+                value: (item) => item.totalTastings.toLocaleString(),
+                className: "sm:w-1/10",
+                sortDefaultOrder: "desc",
+              },
+            ] as Column<Entity>[])
+          : []),
+        ...(withLocations
+          ? ([
+              {
+                name: "location",
+                value: (item) => (
+                  <>
+                    {!!item.country && (
                       <div>
                         <Link
-                          href={`/locations/${entity.country.slug}`}
+                          href={`/locations/${item.country.slug}`}
                           className="hover:underline"
                         >
-                          {entity.country.name}
+                          {item.country.name}
                         </Link>
                       </div>
                     )}
-                    {entity.region && entity.country && (
+                    {item.region && item.country && (
                       <div>
                         <Link
-                          href={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
+                          href={`/locations/${item.country.slug}/regions/${item.region.slug}`}
                           className="text-light hover:underline"
                         >
-                          {entity.region.name}
+                          {item.region.name}
                         </Link>
                       </div>
                     )}
-                  </td>
-                )}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <PaginationButtons rel={rel} />
-    </>
+                  </>
+                ),
+                className: "sm:w-3/10",
+                sortDefaultOrder: "desc",
+              },
+            ] as Column<Entity>[])
+          : []),
+      ]}
+      {...props}
+    />
   );
 }

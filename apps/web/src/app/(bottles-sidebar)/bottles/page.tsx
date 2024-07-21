@@ -2,32 +2,28 @@
 
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useSearchParams } from "next/navigation";
 
 const DEFAULT_SORT = "-tastings";
 
-const numericFields = new Set([
-  "cursor",
-  "limit",
-  "age",
-  "entity",
-  "distiller",
-  "bottler",
-  "entity",
-]);
-
 export default function BottleList() {
-  const searchParams = useSearchParams();
-
-  const [bottleList] = trpc.bottleList.useSuspenseQuery({
-    ...Object.fromEntries(
-      Array.from(searchParams.entries()).map(([k, v]) =>
-        numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
-      ),
-    ),
-    limit: 100,
+  const queryParams = useApiQueryParams({
+    numericFields: [
+      "cursor",
+      "limit",
+      "age",
+      "entity",
+      "distiller",
+      "bottler",
+      "entity",
+    ],
+    overrides: {
+      limit: 100,
+    },
   });
+
+  const [bottleList] = trpc.bottleList.useSuspenseQuery(queryParams);
 
   return (
     <>
@@ -35,7 +31,7 @@ export default function BottleList() {
         <BottleTable
           bottleList={bottleList.results}
           rel={bottleList.rel}
-          sort={searchParams.get("sort") || DEFAULT_SORT}
+          defaultSort={DEFAULT_SORT}
         />
       ) : (
         <EmptyActivity>

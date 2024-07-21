@@ -2,24 +2,20 @@
 
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import EntityTable from "@peated/web/components/entityTable";
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useSearchParams } from "next/navigation";
 
 const DEFAULT_SORT = "-tastings";
 
 export default function Page() {
-  const searchParams = useSearchParams();
-
-  const numericFields = new Set(["cursor", "limit", "country", "region"]);
-
-  const [entityList] = trpc.entityList.useSuspenseQuery({
-    ...Object.fromEntries(
-      Array.from(searchParams.entries()).map(([k, v]) =>
-        numericFields.has(k) ? [k, Number(v)] : [k, v === "" ? null : v],
-      ),
-    ),
-    type: "distiller",
+  const queryParams = useApiQueryParams({
+    numericFields: ["cursor", "limit", "country", "region"],
+    overrides: {
+      type: "distiller",
+    },
   });
+
+  const [entityList] = trpc.entityList.useSuspenseQuery(queryParams);
 
   return (
     <>
@@ -27,9 +23,10 @@ export default function Page() {
         <EntityTable
           entityList={entityList.results}
           rel={entityList.rel}
-          sort={searchParams.get("sort") || DEFAULT_SORT}
+          defaultSort={DEFAULT_SORT}
           type="distiller"
           withLocations
+          withSearch
         />
       ) : (
         <EmptyActivity>
