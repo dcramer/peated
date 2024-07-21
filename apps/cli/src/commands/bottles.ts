@@ -7,9 +7,48 @@ import { createCaller } from "@peated/server/trpc/router";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 import { generateUniqHash } from "../../../server/src/lib/bottleHash";
+import { normalizeBottleName } from "../../../server/src/lib/normalize";
 import { mergeBottlesInto } from "../../../server/src/trpc/routes/bottleMerge";
 
 const subcommand = program.command("bottles");
+
+subcommand
+  .command("normalize-names")
+  .argument("[bottleIds...]")
+  .option("--dry-run")
+  .action(async (bottleIds, options) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({
+        id: bottles.id,
+        name: bottles.name,
+        statedAge: bottles.statedAge,
+      })
+      .from(bottles)
+      .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
+      .orderBy(asc(bottles.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id, name, statedAge } of query) {
+        const [newName, newAge] = normalizeBottleName(name, statedAge);
+        if (newName !== name || newAge !== statedAge) {
+          console.log(`M: ${name} -> ${newName} (${statedAge} -> ${newAge})`);
+          if (!options.dryRun) {
+            const values: Record<string, any> = {};
+            if (newName !== name) values.name = newName;
+            if (newAge !== statedAge && newAge) values.statedAge = newAge;
+            await db.update(bottles).set(values).where(eq(bottles.id, id));
+          }
+        }
+        hasResults = true;
+      }
+      offset += step;
+    }
+  });
 
 subcommand
   .command("generate-descriptions")
