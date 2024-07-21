@@ -118,7 +118,7 @@ export async function notifyComment({
     try {
       await transport.sendMail({
         from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
-        to: comment.tasting.createdBy.email,
+        to: email,
         subject: "New Comment on Tasting",
         text: `View this comment on Peated: ${commentUrl}\n\n${comment.comment}`,
         html,
