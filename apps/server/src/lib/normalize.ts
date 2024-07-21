@@ -4,7 +4,7 @@ import { formatCategoryName } from "./format";
 
 const ageSuffix = "-year-old";
 
-export const normalizeCategory = (name: string): Category | null => {
+export function normalizeCategory(name: string): Category | null {
   const nameLower = name.toLowerCase();
   if (CATEGORY_LIST.includes(nameLower as Category))
     return nameLower as Category;
@@ -16,19 +16,18 @@ export const normalizeCategory = (name: string): Category | null => {
     }
   }
   return null;
-};
+}
 
-export const normalizeEntityName = (name: string): string => {
-  if (name.toLowerCase().endsWith(" distillery")) {
-    name = name.replace(/ distillery$/i, "");
-  }
+// TODO: this is still semi problematic
+export function normalizeEntityName(name: string): string {
+  name = name.replace(/ (distillery|distillerie)$/i, "");
   return name;
-};
+}
 
-export const normalizeBottleName = (
+export function normalizeBottleName(
   name: string,
   age: number | null = null,
-): [string, number | null] => {
+): [string, number | null] {
   // try to ease UX and normalize common name components
   if (age && name == `${age}`) return [`${age}${ageSuffix}`, age];
 
@@ -46,7 +45,7 @@ export const normalizeBottleName = (
   name = name.replace(/\n/, " ").replace(/\s{2,}/, " ");
 
   return [normalizeString(name), age];
-};
+}
 
 export function normalizeBottleAge(
   name: string,
