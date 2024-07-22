@@ -69,11 +69,21 @@ subcommand
                       ),
                     )
                     .limit(1);
+                  const histories = await tx
+                    .select()
+                    .from(storePriceHistories)
+                    .where(eq(storePriceHistories.priceId, price.id));
+                  for (const history of histories) {
+                    await tx
+                      .insert(storePriceHistories)
+                      .values({
+                        ...history,
+                        priceId: match.id,
+                      })
+                      .onConflictDoNothing();
+                  }
                   await tx
-                    .update(storePriceHistories)
-                    .set({
-                      priceId: match.id,
-                    })
+                    .delete(storePriceHistories)
                     .where(eq(storePriceHistories.priceId, price.id));
                   await tx
                     .delete(storePrices)
