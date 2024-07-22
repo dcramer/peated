@@ -5,6 +5,29 @@ import { stripSuffix } from "./strings";
 
 const ageSuffix = "-year-old";
 
+const NUMBERS: Record<string, string> = {
+  one: "1",
+  two: "2",
+  three: "3",
+  four: "4",
+  five: "5",
+  six: "6",
+  seven: "7",
+  eight: "8",
+  nine: "9",
+  ten: "10",
+  eleven: "11",
+  twelve: "12",
+  thirteen: "13",
+  fourteen: "14",
+  fifteen: "15",
+  sixteen: "16",
+  seventeen: "17",
+  eighteen: "18",
+  nineteen: "19",
+  twenty: "20",
+};
+
 export function normalizeCategory(name: string): Category | null {
   const nameLower = name.toLowerCase();
   if (CATEGORY_LIST.includes(nameLower as Category))
@@ -54,10 +77,12 @@ export function normalizeBottleName({
       releaseYear,
     };
 
+  const currentYear = new Date().getFullYear();
+
   // any extraneous characters
   name = normalizeString(name);
 
-  ({ name, statedAge } = normalizeBottleAge({ name, statedAge, isFullName }));
+  ({ name, statedAge } = normalizeBottleAge({ name, statedAge }));
 
   // this is primarily targeting Scotch Malt Whiskey Society bottles
   // "Cask No. X"
@@ -78,8 +103,7 @@ export function normalizeBottleName({
   if (vintageYearMatch) {
     if (!vintageYear) {
       vintageYear = parseInt(vintageYearMatch[1] || vintageYearMatch[2], 10);
-      if (vintageYear < 1900 || vintageYear > new Date().getFullYear())
-        vintageYear = null;
+      if (vintageYear < 1900 || vintageYear > currentYear) vintageYear = null;
     }
   }
   if (vintageYear) {
@@ -94,8 +118,7 @@ export function normalizeBottleName({
   if (releaseYearMatch) {
     if (!releaseYear) {
       releaseYear = parseInt(releaseYearMatch[1] || releaseYearMatch[2], 10);
-      if (releaseYear < 1900 || releaseYear > new Date().getFullYear())
-        releaseYear = null;
+      if (releaseYear < 1900 || releaseYear > currentYear) releaseYear = null;
     }
   }
   if (releaseYear) {
@@ -104,6 +127,20 @@ export function normalizeBottleName({
     name = stripSuffix(name, ` (${releaseYear})`);
     name = stripSuffix(name, ` (${releaseYear} release)`);
     name = stripSuffix(name, ` (${releaseYear} Release)`);
+  }
+
+  // TODO: these would be nice to simply move to form validation
+  if (statedAge && vintageYear && vintageYear + statedAge > currentYear) {
+    // invalid vintage - probably confused w/ release
+    vintageYear = null;
+  }
+
+  // TODO: these would be nice to simply move to form validation
+  if (statedAge && vintageYear && releaseYear) {
+    if (releaseYear < vintageYear + statedAge) {
+      // invalid release year
+      releaseYear = null;
+    }
   }
 
   // move any segment thats enclaosed in quotations to the end
@@ -122,29 +159,6 @@ export function normalizeBottleName({
   return { name, statedAge, vintageYear, releaseYear };
 }
 
-const NUMBERS: Record<string, string> = {
-  one: "1",
-  two: "2",
-  three: "3",
-  four: "4",
-  five: "5",
-  six: "6",
-  seven: "7",
-  eight: "8",
-  nine: "9",
-  ten: "10",
-  eleven: "11",
-  twelve: "12",
-  thirteen: "13",
-  fourteen: "14",
-  fifteen: "15",
-  sixteen: "16",
-  seventeen: "17",
-  eighteen: "18",
-  nineteen: "19",
-  twenty: "20",
-};
-
 function convertWordToNumber(word: string) {
   return NUMBERS[word.toLowerCase()] || word;
 }
@@ -162,11 +176,9 @@ const AGE_EXTRACT_REGEXP = new RegExp(
 export function normalizeBottleAge({
   name,
   statedAge = null,
-  isFullName = true,
 }: {
   name: string;
   statedAge?: number | null;
-  isFullName?: boolean;
 }): { name: string; statedAge: number | null } {
   // "years old" type patterns
   name = name.replace(AGE_NORM_REGEXP, `$1${ageSuffix}$2`);

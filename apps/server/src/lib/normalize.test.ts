@@ -280,6 +280,55 @@ describe("normalizeBottleName", () => {
     `);
   });
 
+  test("Invalid Vintage", async () => {
+    const rv = normalizeBottleName({
+      name: "Invalid Vintage",
+      statedAge: 23,
+      vintageYear: 2013,
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "Invalid Vintage",
+        "releaseYear": null,
+        "statedAge": 23,
+        "vintageYear": null,
+      }
+    `);
+  });
+
+  test("Invalid Release due to Vintage", async () => {
+    const rv = normalizeBottleName({
+      name: "Invalid Release",
+      vintageYear: 2013,
+      releaseYear: 2013,
+      statedAge: 10,
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "Invalid Release",
+        "releaseYear": null,
+        "statedAge": 10,
+        "vintageYear": 2013,
+      }
+    `);
+  });
+
+  test("Invalid Release and Vintage", async () => {
+    const rv = normalizeBottleName({
+      name: "Invalid Release",
+      vintageYear: 2013,
+      releaseYear: 2013,
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "Invalid Release",
+        "releaseYear": 2013,
+        "statedAge": null,
+        "vintageYear": null,
+      }
+    `);
+  });
+
   test("(Distilled at Ardbeg) 1990, 8-year-old", async () => {
     const rv = normalizeBottleName({
       name: "(Distilled at Ardbeg) 1990, 8-year-old",
