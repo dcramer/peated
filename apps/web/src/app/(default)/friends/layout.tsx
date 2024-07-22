@@ -1,4 +1,4 @@
-import PageHeader from "@peated/web/components/pageHeader";
+import SimpleHeader from "@peated/web/components/simpleHeader";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { type Metadata } from "next";
@@ -16,7 +16,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <PageHeader title="Friends" />
+      <SimpleHeader>Friends</SimpleHeader>
       {children}
     </>
   );

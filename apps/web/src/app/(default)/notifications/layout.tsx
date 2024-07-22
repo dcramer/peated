@@ -15,7 +15,7 @@ export default async function DefaultLayout({
 }>) {
   return (
     <>
-      <Tabs fullWidth border>
+      <Tabs border>
         <TabItem as={Link} controlled href="/notifications">
           Unread
         </TabItem>
