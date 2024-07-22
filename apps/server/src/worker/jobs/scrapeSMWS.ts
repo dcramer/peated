@@ -109,7 +109,6 @@ export async function scrapeBottles(
             )
           : null;
 
-        let vintageYear, releaseYear;
         const { name, statedAge, vintageYear, releaseYear } =
           normalizeBottleName({
             name: details.name,
