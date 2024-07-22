@@ -244,6 +244,20 @@ describe("normalizeBottle", () => {
     expect(statedAge).toBeNull();
   });
 
+  test("Redbreast Small Batch Cask Strength (Batch A)", async () => {
+    const rv = normalizeBottle({
+      name: "Redbreast Small Batch Cask Strength (Batch A)",
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "Redbreast Small Batch Cask Strength (Batch A)",
+        "releaseYear": null,
+        "statedAge": null,
+        "vintageYear": null,
+      }
+    `);
+  });
+
   test("Old Synergies #12", async () => {
     const { name, statedAge } = normalizeBottle({
       name: "Old Synergies #12",
