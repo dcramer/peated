@@ -46,15 +46,15 @@ subcommand
           bottle.vintageYear !== vintageYear ||
           bottle.releaseYear !== releaseYear
         ) {
+          const values: Record<string, any> = {};
+          if (bottle.name !== name) values.name = name;
+          if (bottle.statedAge !== statedAge) values.statedAge = statedAge;
+          if (bottle.vintageYear !== vintageYear)
+            values.vintageYear = vintageYear;
+          if (bottle.releaseYear !== releaseYear)
+            values.releaseYear = releaseYear;
           console.log(`M: ${bottle.name} -> ${JSON.stringify(values)}`);
           if (!options.dryRun) {
-            const values: Record<string, any> = {};
-            if (bottle.name !== name) values.name = name;
-            if (bottle.statedAge !== statedAge) values.statedAge = statedAge;
-            if (bottle.vintageYear !== vintageYear)
-              values.vintageYear = vintageYear;
-            if (bottle.releaseYear !== releaseYear)
-              values.releaseYear = releaseYear;
             await db.update(bottles).set(values).where(eq(bottles.id, id));
           }
         }
