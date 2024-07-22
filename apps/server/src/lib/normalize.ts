@@ -54,6 +54,9 @@ export function normalizeBottleName({
       releaseYear,
     };
 
+  // any extraneous characters
+  name = normalizeString(name);
+
   ({ name, statedAge } = normalizeBottleAge({ name, statedAge, isFullName }));
 
   // this is primarily targeting Scotch Malt Whiskey Society bottles
@@ -63,9 +66,6 @@ export function normalizeBottleName({
   }
 
   name = normalizeBottleBatchNumber(name);
-
-  // replace various whitespace
-  name = name.replace(/\n/, " ").replace(/\s{2,}/, " ");
 
   // identify age from [number]-year-old
   const match = name.match(/\b(\d{1,2})-year-old($|\s|,)/i);
@@ -106,7 +106,13 @@ export function normalizeBottleName({
     name = stripSuffix(name, ` (${releaseYear} Release)`);
   }
 
-  name = normalizeString(name);
+  // move any segment thats enclaosed in quotations to the end
+  name = name.replaceAll(/(^|\s)(\([^)]+\))\s(.+)$/gi, "$1 $3 $2");
+
+  // replace various whitespace
+  name = name.replaceAll(/\n+|\s{2,}/g, " ");
+
+  name = name.replace(/^\s|\s$/g, "");
 
   // vintage is likely wrong
   if (releaseYear === vintageYear) {

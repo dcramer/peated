@@ -280,6 +280,20 @@ describe("normalizeBottleName", () => {
     `);
   });
 
+  test("(Distilled at Ardbeg) 1990, 8-year-old", async () => {
+    const rv = normalizeBottleName({
+      name: "(Distilled at Ardbeg) 1990, 8-year-old",
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "1990, 8-year-old (Distilled at Ardbeg)",
+        "releaseYear": null,
+        "statedAge": 8,
+        "vintageYear": null,
+      }
+    `);
+  });
+
   describe("isFullName = false", () => {
     test("Black Art 1992 Edition 9.1 29-year-old Single Malt", async () => {
       const { name, statedAge } = normalizeBottleName({
@@ -306,7 +320,7 @@ describe("normalizeBottleName", () => {
         name: "Batch #1, 10-year-old",
         isFullName: false,
       });
-      expect(name).toMatchInlineSnapshot(`"(Batch 1) 10-year-old"`);
+      expect(name).toMatchInlineSnapshot(`"10-year-old (Batch 1)"`);
       expect(statedAge).toEqual(10);
     });
   });
