@@ -12,37 +12,45 @@ subcommand
   .option("--dry-run")
   .action(async (options) => {
     const step = 1000;
-    const baseQuery = db
-      .select({
-        id: reviews.id,
-        bottleId: reviews.bottleId,
-        name: reviews.name,
-      })
-      .from(reviews)
-      .orderBy(asc(reviews.id));
+    const baseQuery = db.select().from(reviews).orderBy(asc(reviews.id));
 
     let hasResults = true;
     let offset = 0;
     while (hasResults) {
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
-      for (const { id, ...price } of query) {
+      for (const review of query) {
         const { name } = normalizeBottle({
-          name: price.name,
+          name: review.name,
           isFullName: true,
         });
-        if (price.name !== name) {
+        if (review.name !== name) {
           const values: Record<string, any> = {};
-          if (price.name !== name) values.name = name;
+          if (review.name !== name) values.name = name;
 
-          if (!price.bottleId) {
-            const bottleId = await findBottleId(price.name);
-            if (bottleId) price.bottleId = bottleId;
+          if (!review.bottleId) {
+            const bottleId = await findBottleId(review.name);
+            if (bottleId) review.bottleId = bottleId;
           }
 
-          console.log(`M: ${price.name} -> ${JSON.stringify(values)}`);
+          console.log(`M: ${review.name} -> ${JSON.stringify(values)}`);
           if (!options.dryRun) {
-            await db.update(reviews).set(values).where(eq(reviews.id, id));
+            // TODO: move this code
+            try {
+              await db.transaction(async (tx) => {
+                return await tx
+                  .update(reviews)
+                  .set(values)
+                  .where(eq(reviews.id, review.id));
+              });
+            } catch (err: any) {
+              if (
+                err?.code === "23505" &&
+                err?.constraint === "review_unq_name"
+              ) {
+                await db.delete(reviews).where(eq(reviews.id, review.id));
+              }
+            }
           }
         }
         hasResults = true;
