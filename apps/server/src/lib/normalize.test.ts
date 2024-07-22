@@ -236,6 +236,20 @@ describe("normalizeBottle", () => {
     expect(statedAge).toBeNull();
   });
 
+  test("Booker's Springfield Batch Kentucky Straight Bourbon Whiskey", async () => {
+    const rv = normalizeBottle({
+      name: "Booker's Springfield Batch Kentucky Straight Bourbon Whiskey",
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "Booker's Springfield Batch Kentucky Straight Bourbon Whiskey",
+        "releaseYear": null,
+        "statedAge": null,
+        "vintageYear": null,
+      }
+    `);
+  });
+
   test("Small Batch Bourbon", async () => {
     const { name, statedAge } = normalizeBottle({
       name: "Small Batch Bourbon",
