@@ -185,12 +185,12 @@ export function normalizeBottleAge({
   }
 
   // move age to the beginning of the bottle name if brandPrefix is available,
-  if (!isFullName) {
-    const ageMatch = name.match(/(\d{1,2})-year-old($|\s)/i);
-    if (ageMatch) {
-      name = `${ageMatch[1]}-year-old${ageMatch[2] || ""} ${name.replace(/(\s?\d{1,2}-year-old\s?)($|\s)/i, "$2")}`;
-    }
-  }
+  // if (!isFullName) {
+  //   const ageMatch = name.match(/(\d{1,2})-year-old($|\s)/i);
+  //   if (ageMatch) {
+  //     name = `${ageMatch[1]}-year-old${ageMatch[2] || ""} ${name.replace(/(\s?\d{1,2}-year-old\s?)($|\s)/i, "$2")}`;
+  //   }
+  // }
 
   return { name, statedAge };
 }

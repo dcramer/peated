@@ -18,7 +18,7 @@ test("simple", async ({ axiosMock }) => {
 
   expect(items.length).toBe(5);
   expect(items[0]).toEqual({
-    name: "Bruichladdich 29-year-old Black Art 1992 Edition 9.1 Single Malt",
+    name: "Bruichladdich Black Art 1992 Edition 9.1 29-year-old Single Malt",
     price: 69999,
     currency: "usd",
     volume: 750,

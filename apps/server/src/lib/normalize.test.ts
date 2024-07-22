@@ -287,7 +287,7 @@ describe("normalizeBottleName", () => {
         isFullName: false,
       });
       expect(name).toMatchInlineSnapshot(
-        `"29-year-old Black Art 1992 Edition 9.1 Single Malt"`,
+        `"Black Art 1992 Edition 9.1 29-year-old Single Malt"`,
       );
       expect(statedAge).toEqual(29);
     });
@@ -306,7 +306,7 @@ describe("normalizeBottleName", () => {
         name: "Batch #1, 10-year-old",
         isFullName: false,
       });
-      expect(name).toMatchInlineSnapshot(`"10-year-old (Batch 1)"`);
+      expect(name).toMatchInlineSnapshot(`"(Batch 1) 10-year-old"`);
       expect(statedAge).toEqual(10);
     });
   });
