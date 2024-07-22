@@ -1,5 +1,6 @@
-export default function classNames(
-  ...classes: (string | undefined | boolean | null)[]
-) {
-  return classes.filter(Boolean).join(" ");
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export default function classNames(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }

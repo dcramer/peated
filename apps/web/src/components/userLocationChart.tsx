@@ -11,9 +11,9 @@ import DistributionChart, {
   DistributionChartSkeleton,
 } from "./distributionChart";
 
-function BottleTagDistributionElement({ bottleId }: { bottleId: number }) {
-  const [data] = trpc.bottleTagList.useSuspenseQuery({
-    bottle: bottleId,
+function UserLocationChartElement({ userId }: { userId: number }) {
+  const [data] = trpc.userRegionList.useSuspenseQuery({
+    user: userId,
   });
 
   const { results, totalCount } = data;
@@ -21,25 +21,28 @@ function BottleTagDistributionElement({ bottleId }: { bottleId: number }) {
   return (
     <DistributionChart
       items={results.map((t) => ({
-        name: t.tag,
+        ...t,
+        name: t.region ? t.region.name : t.country.name,
         count: t.count,
       }))}
       totalCount={totalCount}
-      href={(item) => `/bottles?tag=${encodeURIComponent(item.name)}`}
+      href={(item) =>
+        `/locations/${item.country.slug}${item.region ? `/regions${item.region.slug}` : ""}`
+      }
     />
   );
 }
 
-export default function BottleTagDistribution(
-  props: ComponentProps<typeof BottleTagDistributionElement>,
+export default function UserLocationChart(
+  props: ComponentProps<typeof UserLocationChartElement>,
 ) {
   return (
     <div>
-      <DistributionChartLegend>Common Notes</DistributionChartLegend>
+      <DistributionChartLegend>Top Regions</DistributionChartLegend>
 
       <ErrorBoundary fallback={<DistributionChartError />} onError={logError}>
         <Suspense fallback={<DistributionChartSkeleton />}>
-          <BottleTagDistributionElement {...props} />
+          <UserLocationChartElement {...props} />
         </Suspense>
       </ErrorBoundary>
     </div>

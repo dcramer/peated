@@ -95,6 +95,7 @@ import tastingUpdate from "./routes/tastingUpdate";
 import toastCreate from "./routes/toastCreate";
 import userById from "./routes/userById";
 import userList from "./routes/userList";
+import userRegionList from "./routes/userRegionList";
 import userTagList from "./routes/userTagList";
 import userUpdate from "./routes/userUpdate";
 import version from "./routes/version";
@@ -194,6 +195,7 @@ export const appRouter = router({
   toastCreate,
   userById,
   userList,
+  userRegionList,
   userTagList,
   userUpdate,
   version,

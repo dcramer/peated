@@ -5,10 +5,11 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UserAvatar from "@peated/web/components/userAvatar";
+import UserLocationChart from "@peated/web/components/userLocationChart";
 import UserTagDistribution from "@peated/web/components/userTagDistribution";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import FriendButton from "./friendButton";
 import LogoutButton from "./logoutButton";
 import ModActions from "./modActions";
@@ -111,28 +112,25 @@ export default async function Layout({
         <EmptyActivity>This users profile is private.</EmptyActivity>
       ) : (
         <>
-          <Suspense
-            fallback={
-              <div
-                className="mb-4 animate-pulse rounded bg-slate-800"
-                style={{ height: 100 }}
-              />
-            }
-          >
+          <div className="grid-cols mb-4 hidden grid-cols-1 gap-4 px-3 sm:grid-cols-2 sm:px-0 lg:grid">
+            <UserLocationChart userId={user.id} />
             <UserTagDistribution userId={user.id} />
-          </Suspense>
-          <Tabs fullWidth border>
-            <TabItem as={Link} href={`/users/${user.username}`} controlled>
-              Activity
-            </TabItem>
-            <TabItem
-              as={Link}
-              href={`/users/${user.username}/favorites`}
-              controlled
-            >
-              Favorites
-            </TabItem>
-          </Tabs>
+          </div>
+          <div className="hidden lg:block">
+            <Tabs fullWidth border>
+              <TabItem as={Link} href={`/users/${user.username}`} controlled>
+                Activity
+              </TabItem>
+              <TabItem
+                as={Link}
+                href={`/users/${user.username}/favorites`}
+                controlled
+                desktopOnly
+              >
+                Favorites
+              </TabItem>
+            </Tabs>
+          </div>
           {children}
         </>
       )}

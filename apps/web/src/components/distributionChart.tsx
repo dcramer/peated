@@ -1,4 +1,5 @@
 import Link from "@peated/web/components/link";
+import type { ComponentProps } from "react";
 
 type Item = {
   name: string;
@@ -6,7 +7,54 @@ type Item = {
   [key: string]: any;
 };
 
-export function DistributionChart({
+export function DistributionChartSkeleton() {
+  return (
+    <div
+      className="animate-pulse rounded bg-slate-900"
+      style={{ height: 100 }}
+    />
+  );
+}
+
+export function DistributionChartError() {
+  return (
+    <div
+      className="text-light flex items-center justify-center rounded bg-slate-900 p-3 text-center text-sm"
+      style={{ height: 100 }}
+    >
+      There was an error loading this chart.
+    </div>
+  );
+}
+
+export function DistributionChartEmpty() {
+  return (
+    <div
+      className="text-light flex items-center justify-center rounded bg-slate-900 p-3 text-center text-sm"
+      style={{ height: 100 }}
+    >
+      No information available for this chart.
+    </div>
+  );
+}
+
+const colorNames = [
+  // "bg-slate-100 text-black border-slate-700 border",
+  "bg-slate-200 text-black border-slate-700 border",
+  "bg-slate-300 text-black border-slate-700 border",
+  "bg-slate-400 text-black border-slate-700 border",
+  "bg-slate-500 text-white border-slate-700 border",
+  "bg-slate-600 text-white border-slate-700 border",
+  "bg-slate-700 text-white border-slate-700 border",
+  "bg-slate-800 text-white border-slate-700 border",
+  "bg-slate-900 text-white border-slate-700 border",
+];
+
+export function DistributionChartLegend(props: ComponentProps<"div">) {
+  return <div className="text-light mb-2 text-xs font-semibold" {...props} />;
+}
+
+export default function DistributionChart({
   items,
   totalCount,
   href,
@@ -15,17 +63,9 @@ export function DistributionChart({
   totalCount: number;
   href?: (item: Item) => string;
 }) {
-  const colorNames = [
-    // "bg-slate-100 text-black border-slate-700 border",
-    "bg-slate-200 text-black border-slate-700 border",
-    "bg-slate-300 text-black border-slate-700 border",
-    "bg-slate-400 text-black border-slate-700 border",
-    "bg-slate-500 text-white border-slate-700 border",
-    "bg-slate-600 text-white border-slate-700 border",
-    "bg-slate-700 text-white border-slate-700 border",
-    "bg-slate-800 text-white border-slate-700 border",
-    "bg-slate-900 text-white border-slate-700 border",
-  ];
+  if (!items.length) {
+    return <DistributionChartEmpty />;
+  }
 
   const visibleItems = items.slice(0, 7);
 

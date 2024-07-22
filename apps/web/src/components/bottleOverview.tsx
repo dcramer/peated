@@ -5,9 +5,7 @@ import RobotImage from "@peated/web/assets/robot.png";
 import Link from "@peated/web/components/link";
 import { Suspense } from "react";
 import BottleReviews from "./bottleReviews";
-import BottleTagDistribution, {
-  BottleTagDistributionSkeleton,
-} from "./bottleTagDistribution";
+import BottleTagDistribution from "./bottleTagDistribution";
 import CaskDetails from "./caskDetails";
 import DefinitionList from "./definitionList";
 import Heading from "./heading";
@@ -32,14 +30,12 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                 </div>
               </>
             )}
+            <div className="my-6 hidden px-3 md:px-0 lg:block">
+              <BottleTagDistribution bottleId={bottle.id} />
+            </div>
             {bottle.tastingNotes && (
               <>
                 <Heading as="h3">Tasting Notes</Heading>
-                <div className="my-6 px-3 md:px-0">
-                  <Suspense fallback={<BottleTagDistributionSkeleton />}>
-                    <BottleTagDistribution bottleId={bottle.id} />
-                  </Suspense>
-                </div>
                 <DefinitionList>
                   <DefinitionList.Term>Nose</DefinitionList.Term>
                   <DefinitionList.Details>

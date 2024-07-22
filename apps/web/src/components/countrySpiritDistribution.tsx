@@ -2,7 +2,7 @@
 
 import { formatCategoryName } from "@peated/server/lib/format";
 import { trpc } from "../lib/trpc/client";
-import { DistributionChart } from "./distributionChart";
+import DistributionChart from "./distributionChart";
 
 export default function CountrySpiritDistribution({
   countrySlug,
