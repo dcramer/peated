@@ -47,7 +47,7 @@ subcommand
           bottle.vintageYear !== vintageYear ||
           bottle.releaseYear !== releaseYear
         ) {
-          console.log(`M: ${bottle.name} -> ${name}`);
+          console.log(`M: ${bottle.name} -> ${JSON.stringify(values)}`);
           if (!options.dryRun) {
             const values: Record<string, any> = {};
             if (bottle.name !== name) values.name = name;
