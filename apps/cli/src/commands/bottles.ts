@@ -24,6 +24,7 @@ subcommand
         name: bottles.name,
         statedAge: bottles.statedAge,
         vintageYear: bottles.vintageYear,
+        releaseYear: bottles.releaseYear,
       })
       .from(bottles)
       .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
