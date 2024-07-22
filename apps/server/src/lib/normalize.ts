@@ -255,5 +255,8 @@ export function normalizeVolume(volume: string): number | null {
 
 export function normalizeString(value: string): string {
   // remove smart quotes
-  return value.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
+  return value
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u00ae\u2122]/g, "");
 }

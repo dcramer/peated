@@ -400,6 +400,34 @@ describe("normalizeBottle", () => {
     `);
   });
 
+  test("Kentucky Owl® Batch #12 Kentucky Straight Bourbon Whiskey", async () => {
+    const rv = normalizeBottle({
+      name: "Kentucky Owl® Batch #12 Kentucky Straight Bourbon Whiskey",
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "Kentucky Owl Kentucky Straight Bourbon Whiskey (Batch 12)",
+        "releaseYear": null,
+        "statedAge": null,
+        "vintageYear": null,
+      }
+    `);
+  });
+
+  test('Whiskey JYPSI ™ Legacy Batch 001, "The Journey"', async () => {
+    const rv = normalizeBottle({
+      name: 'Whiskey JYPSI ™ Legacy Batch 001, "The Journey"',
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "Whiskey JYPSI Legacy "The Journey" (Batch 001)",
+        "releaseYear": null,
+        "statedAge": null,
+        "vintageYear": null,
+      }
+    `);
+  });
+
   describe("isFullName = false", () => {
     test("Black Art 1992 Edition 9.1 29-year-old Single Malt", async () => {
       const { name, statedAge } = normalizeBottle({
