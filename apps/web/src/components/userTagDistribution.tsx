@@ -25,7 +25,6 @@ function UserTagDistributionElement({ userId }: { userId: number }) {
         count: t.count,
         tag: t.tag,
       }))}
-      legend="Frequent Flavors"
       totalCount={totalCount}
       href={(item) => `/bottles?tag=${encodeURIComponent(item.name)}`}
     />
