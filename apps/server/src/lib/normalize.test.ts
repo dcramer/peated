@@ -1,8 +1,8 @@
-import { normalizeBottleName, normalizeVolume } from "./normalize";
+import { normalizeBottle, normalizeVolume } from "./normalize";
 
-describe("normalizeBottleName", () => {
+describe("normalizeBottle", () => {
   test("just the age", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "10",
       statedAge: 10,
     });
@@ -11,7 +11,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("age suffix", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious 10",
       statedAge: 10,
     });
@@ -20,7 +20,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("age suffix not age", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious 10",
       statedAge: null,
     });
@@ -29,7 +29,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("age prefix", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "10 Wood",
       statedAge: 10,
     });
@@ -38,7 +38,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("age prefix not age", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "10 Wood",
       statedAge: null,
     });
@@ -47,7 +47,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("casing", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "10-YEAR-OLD Wood",
       statedAge: 10,
     });
@@ -56,7 +56,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("plural to singular", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "10-years-old Wood",
       statedAge: 10,
     });
@@ -65,14 +65,14 @@ describe("normalizeBottleName", () => {
   });
 
   test("spacing", async () => {
-    let { name, statedAge } = normalizeBottleName({
+    let { name, statedAge } = normalizeBottle({
       name: "10 years old Wood",
       statedAge: 10,
     });
     expect(name).toMatchInlineSnapshot(`"10-year-old Wood"`);
     expect(statedAge).toBe(10);
 
-    ({ name, statedAge } = normalizeBottleName({
+    ({ name, statedAge } = normalizeBottle({
       name: "10 year old Wood",
       statedAge: 10,
     }));
@@ -81,7 +81,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("12", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "10",
     });
     expect(name).toMatchInlineSnapshot(`"10"`);
@@ -89,7 +89,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Name 12yr", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious 12yr",
     });
     expect(name).toMatchInlineSnapshot(`"Delicious 12-year-old"`);
@@ -97,7 +97,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Name 12yr.", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious 12yr.",
     });
     expect(name).toMatchInlineSnapshot(`"Delicious 12-year-old"`);
@@ -105,7 +105,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Name 12yrs", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious 12yrs",
     });
     expect(name).toMatchInlineSnapshot(`"Delicious 12-year-old"`);
@@ -113,7 +113,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Name 12 year", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious 12 year",
     });
     expect(name).toMatchInlineSnapshot(`"Delicious 12-year-old"`);
@@ -121,7 +121,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Name 12 year thing", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious 12 Year thing",
     });
     expect(name).toMatchInlineSnapshot(`"Delicious 12-year-old thing"`);
@@ -129,7 +129,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Name twelve year thing", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious twelve Year thing",
     });
     expect(name).toMatchInlineSnapshot(`"Delicious 12-year-old thing"`);
@@ -137,7 +137,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Name ten year thing", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious ten Year thing",
     });
     expect(name).toMatchInlineSnapshot(`"Delicious 10-year-old thing"`);
@@ -145,7 +145,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Name fifteen year thing", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Delicious fifteen Year thing",
     });
     expect(name).toMatchInlineSnapshot(`"Delicious 15-year-old thing"`);
@@ -153,7 +153,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Cask No. 1.285 Hello World", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Cask No. 1.285 Hello World",
     });
     expect(name).toMatchInlineSnapshot(`"Cask No. 1.285 Hello World"`);
@@ -161,7 +161,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Hello World Cask No. 1.285", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Hello World Cask No. 1.285",
     });
     expect(name).toMatchInlineSnapshot(`"Hello World Cask No. 1.285"`);
@@ -169,7 +169,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Traigh Bhan 19-year-old Scotch Batch No. 5", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Traigh Bhan 19-year-old Scotch Batch No. 5",
     });
     expect(name).toMatchInlineSnapshot(
@@ -179,7 +179,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Traigh Bhan 19-year-old Scotch (Batch No. 5)", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Traigh Bhan 19-year-old Scotch (Batch No. 5)",
     });
     expect(name).toMatchInlineSnapshot(
@@ -189,7 +189,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Traigh Bhan 19-year-old Scotch Batch #5", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Traigh Bhan 19-year-old Scotch Batch #5",
     });
     expect(name).toMatchInlineSnapshot(
@@ -199,7 +199,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Traigh Bhan 19-year-old Scotch Batch 5", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Traigh Bhan 19-year-old Scotch Batch 5",
     });
     expect(name).toMatchInlineSnapshot(
@@ -209,7 +209,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Traigh Bhan 19-year-old Scotch Batch A", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Traigh Bhan 19-year-old Scotch Batch A",
     });
     expect(name).toMatchInlineSnapshot(
@@ -219,7 +219,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Traigh Bhan 19-year-old Scotch, Batch A", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Traigh Bhan 19-year-old Scotch, Batch A",
     });
     expect(name).toMatchInlineSnapshot(
@@ -229,7 +229,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Batch A", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Batch A",
     });
     expect(name).toMatchInlineSnapshot(`"Batch A"`);
@@ -237,7 +237,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Small Batch Bourbon", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Small Batch Bourbon",
     });
     expect(name).toMatchInlineSnapshot(`"Small Batch Bourbon"`);
@@ -245,7 +245,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Old Synergies #12", async () => {
-    const { name, statedAge } = normalizeBottleName({
+    const { name, statedAge } = normalizeBottle({
       name: "Old Synergies #12",
     });
     expect(name).toMatchInlineSnapshot(`"Old Synergies #12"`);
@@ -253,7 +253,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("1993 Vintage", async () => {
-    const rv = normalizeBottleName({
+    const rv = normalizeBottle({
       name: "1993 Vintage",
     });
     expect(rv).toMatchInlineSnapshot(`
@@ -267,7 +267,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("1993 Release", async () => {
-    const rv = normalizeBottleName({
+    const rv = normalizeBottle({
       name: "1993 Release",
     });
     expect(rv).toMatchInlineSnapshot(`
@@ -281,7 +281,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Invalid Vintage", async () => {
-    const rv = normalizeBottleName({
+    const rv = normalizeBottle({
       name: "Invalid Vintage",
       statedAge: 23,
       vintageYear: 2013,
@@ -297,7 +297,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Invalid Release due to Vintage", async () => {
-    const rv = normalizeBottleName({
+    const rv = normalizeBottle({
       name: "Invalid Release",
       vintageYear: 2013,
       releaseYear: 2013,
@@ -314,7 +314,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("Invalid Release and Vintage", async () => {
-    const rv = normalizeBottleName({
+    const rv = normalizeBottle({
       name: "Invalid Release",
       vintageYear: 2013,
       releaseYear: 2013,
@@ -330,7 +330,7 @@ describe("normalizeBottleName", () => {
   });
 
   test("(Distilled at Ardbeg) 1990, 8-year-old", async () => {
-    const rv = normalizeBottleName({
+    const rv = normalizeBottle({
       name: "(Distilled at Ardbeg) 1990, 8-year-old",
     });
     expect(rv).toMatchInlineSnapshot(`
@@ -345,7 +345,7 @@ describe("normalizeBottleName", () => {
 
   describe("isFullName = false", () => {
     test("Black Art 1992 Edition 9.1 29-year-old Single Malt", async () => {
-      const { name, statedAge } = normalizeBottleName({
+      const { name, statedAge } = normalizeBottle({
         name: "Black Art 1992 Edition 9.1 29-year-old Single Malt",
         isFullName: false,
       });
@@ -356,7 +356,7 @@ describe("normalizeBottleName", () => {
     });
 
     test("Cask No. 1.285 Hello World", async () => {
-      const { name, statedAge } = normalizeBottleName({
+      const { name, statedAge } = normalizeBottle({
         name: "Cask No. 1.285 Hello World",
         isFullName: false,
       });
@@ -365,7 +365,7 @@ describe("normalizeBottleName", () => {
     });
 
     test("Batch #1, 10-year-old", async () => {
-      const { name, statedAge } = normalizeBottleName({
+      const { name, statedAge } = normalizeBottle({
         name: "Batch #1, 10-year-old",
         isFullName: false,
       });

@@ -1,5 +1,5 @@
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottleName } from "@peated/server/lib/normalize";
+import { normalizeBottle } from "@peated/server/lib/normalize";
 import { getUrl } from "@peated/server/lib/scraper";
 import {
   parseCaskType,
@@ -145,7 +145,7 @@ export async function scrapeBottles(
     let name = details.name;
     let vintageYear, releaseYear;
 
-    ({ name, statedAge, vintageYear, releaseYear } = normalizeBottleName({
+    ({ name, statedAge, vintageYear, releaseYear } = normalizeBottle({
       name,
       statedAge,
       isFullName: false,

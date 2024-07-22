@@ -1,4 +1,4 @@
-import { normalizeBottleName } from "@peated/server/lib/normalize";
+import { normalizeBottle } from "@peated/server/lib/normalize";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { stripPrefix } from "@peated/server/lib/strings";
 import {
@@ -97,7 +97,7 @@ export async function bottleNormalize({
   }
 
   if (rv.name) {
-    const normBottle = normalizeBottleName({ ...rv, isFullName: false });
+    const normBottle = normalizeBottle({ ...rv, isFullName: false });
 
     Object.assign(rv, normBottle);
   }

@@ -1,7 +1,4 @@
-import {
-  normalizeBottleName,
-  normalizeVolume,
-} from "@peated/server/lib/normalize";
+import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
 import {
   absoluteUrl,
@@ -34,7 +31,7 @@ export async function scrapeProducts(
     }
 
     const [name, volumeRaw] = extractVolume(
-      normalizeBottleName({
+      normalizeBottle({
         name: toTitleCase(`${bottle}`),
         isFullName: false,
       }).name,

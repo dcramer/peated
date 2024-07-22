@@ -1,5 +1,5 @@
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottleName } from "@peated/server/lib/normalize";
+import { normalizeBottle } from "@peated/server/lib/normalize";
 import { chunked, getUrl } from "@peated/server/lib/scraper";
 import {
   parseCaskType,
@@ -109,12 +109,11 @@ export async function scrapeBottles(
             )
           : null;
 
-        const { name, statedAge, vintageYear, releaseYear } =
-          normalizeBottleName({
-            name: details.name,
-            statedAge: item.age,
-            isFullName: false,
-          });
+        const { name, statedAge, vintageYear, releaseYear } = normalizeBottle({
+          name: details.name,
+          statedAge: item.age,
+          isFullName: false,
+        });
 
         const [caskFill, caskType, caskSize] = parseCaskType(item.cask_type);
         // "2nd fill ex-bourbon hogshead"

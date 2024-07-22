@@ -1,7 +1,4 @@
-import {
-  normalizeBottleName,
-  normalizeVolume,
-} from "@peated/server/lib/normalize";
+import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
 import {
   absoluteUrl,
@@ -25,7 +22,7 @@ export async function scrapeProducts(
       return;
     }
 
-    const { name } = normalizeBottleName({ name: rawName });
+    const { name } = normalizeBottle({ name: rawName });
 
     const productUrl = $("a.item-name", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");

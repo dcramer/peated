@@ -55,7 +55,7 @@ type NormalizedBottle = {
   releaseYear: number | null;
 };
 
-export function normalizeBottleName({
+export function normalizeBottle({
   name,
   statedAge = null,
   vintageYear = null,

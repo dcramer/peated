@@ -1,7 +1,4 @@
-import {
-  normalizeBottleName,
-  normalizeVolume,
-} from "@peated/server/lib/normalize";
+import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
 import {
   absoluteUrl,
@@ -24,7 +21,7 @@ export async function scrapeProducts(
       console.warn("Unable to identify Product Name");
       return;
     }
-    const { name } = normalizeBottleName({ name: rawName });
+    const { name } = normalizeBottle({ name: rawName });
 
     const volumeRaw = $("h2.title__2RoYeYuO > span", el).first().text();
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;

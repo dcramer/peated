@@ -1,6 +1,6 @@
 import { logError } from "@peated/server/lib/log";
 import {
-  normalizeBottleName,
+  normalizeBottle,
   normalizeCategory,
 } from "@peated/server/lib/normalize";
 import {
@@ -108,7 +108,7 @@ export async function scrapeReviews(
       console.warn("Unable to identify bottle name");
       continue;
     }
-    const { name } = normalizeBottleName({
+    const { name } = normalizeBottle({
       name: rawName
         .replaceAll(/\n/gi, "")
         .trim()

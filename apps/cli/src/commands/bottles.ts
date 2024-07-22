@@ -7,7 +7,7 @@ import { createCaller } from "@peated/server/trpc/router";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 import { generateUniqHash } from "../../../server/src/lib/bottleHash";
-import { normalizeBottleName } from "../../../server/src/lib/normalize";
+import { normalizeBottle } from "../../../server/src/lib/normalize";
 import { mergeBottlesInto } from "../../../server/src/trpc/routes/bottleMerge";
 
 const subcommand = program.command("bottles");
@@ -36,11 +36,10 @@ subcommand
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id, ...bottle } of query) {
-        const { name, statedAge, vintageYear, releaseYear } =
-          normalizeBottleName({
-            ...bottle,
-            isFullName: false,
-          });
+        const { name, statedAge, vintageYear, releaseYear } = normalizeBottle({
+          ...bottle,
+          isFullName: false,
+        });
         if (
           bottle.name !== name ||
           bottle.statedAge !== statedAge ||

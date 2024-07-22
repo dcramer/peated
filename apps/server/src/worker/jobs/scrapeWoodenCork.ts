@@ -1,7 +1,4 @@
-import {
-  normalizeBottleName,
-  normalizeVolume,
-} from "@peated/server/lib/normalize";
+import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
 import {
   absoluteUrl,
@@ -46,7 +43,7 @@ export async function scrapeProducts(
     }
 
     const [nameRaw, volumeRaw] = extractVolume(bottle);
-    const { name } = normalizeBottleName({ name: nameRaw });
+    const { name } = normalizeBottle({ name: nameRaw });
 
     const productUrl = $("a.grid-item__link", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");
