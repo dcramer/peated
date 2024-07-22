@@ -6,6 +6,7 @@ import {
 } from "@peated/server/db/schema";
 import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
 import { mapRows, upsertBottleAlias } from "@peated/server/lib/db";
+import { normalizeBottle } from "@peated/server/lib/normalize";
 import { ReviewInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
@@ -28,13 +29,15 @@ export default adminProcedure
       });
     }
 
-    let bottleId = await findBottleId(input.name);
+    const { name } = normalizeBottle({ name: input.name });
+
+    let bottleId = await findBottleId(name);
     if (!bottleId) {
-      const entity = await findEntity(input.name);
+      const entity = await findEntity(name);
       if (entity) {
         const result = await bottleCreate({
           input: {
-            name: input.name,
+            name,
             brand: entity.id,
             category: input.category,
           },
@@ -47,7 +50,7 @@ export default adminProcedure
     const review = await db.transaction(async (tx) => {
       const { rows } = await db.execute(
         sql`INSERT INTO ${reviews} (bottle_id, external_site_id, name, issue, rating, url)
-            VALUES (${bottleId}, ${site.id}, ${input.name}, ${input.issue}, ${input.rating}, ${input.url})
+            VALUES (${bottleId}, ${site.id}, ${name}, ${input.issue}, ${input.rating}, ${input.url})
             ON CONFLICT (external_site_id, LOWER(name), issue)
             DO UPDATE
             SET bottle_id = COALESCE(excluded.bottle_id, ${reviews.bottleId}),
@@ -60,12 +63,12 @@ export default adminProcedure
       const [review] = mapRows(rows, reviews);
 
       if (bottleId) {
-        await upsertBottleAlias(tx, bottleId, input.name);
+        await upsertBottleAlias(tx, bottleId, name);
       } else {
         await db
           .insert(bottleAliases)
           .values({
-            name: input.name,
+            name,
           })
           .onConflictDoNothing();
       }

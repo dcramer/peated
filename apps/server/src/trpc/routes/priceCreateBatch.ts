@@ -8,6 +8,7 @@ import {
 } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
+import { normalizeBottle } from "@peated/server/lib/normalize";
 import {
   ExternalSiteTypeEnum,
   StorePriceInputSchema,
@@ -37,15 +38,15 @@ export default adminProcedure
     }
 
     for (const sp of input.prices) {
-      const bottleId = await findBottleId(sp.name);
+      const { name } = normalizeBottle({ name: sp.name });
+      const bottleId = await findBottleId(name);
       await db.transaction(async (tx) => {
         // XXX: maybe we should constrain on URL?
-
         const {
           rows: [{ id: priceId }],
         } = await db.execute<Pick<StorePrice, "id">>(sql`
           INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url)
-          VALUES (${bottleId}, ${site.id}, ${sp.name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
+          VALUES (${bottleId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
           ON CONFLICT (external_site_id, LOWER(name), volume)
           DO UPDATE
           SET bottle_id = COALESCE(excluded.bottle_id, ${storePrices.bottleId}),
@@ -68,12 +69,12 @@ export default adminProcedure
           .onConflictDoNothing();
 
         if (bottleId) {
-          await upsertBottleAlias(tx, bottleId, sp.name);
+          await upsertBottleAlias(tx, bottleId, name);
         } else {
           await db
             .insert(bottleAliases)
             .values({
-              name: sp.name,
+              name,
             })
             .onConflictDoNothing();
         }
