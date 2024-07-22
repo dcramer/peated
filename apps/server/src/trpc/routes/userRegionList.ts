@@ -39,60 +39,56 @@ export default publicProcedure
       region_id: number;
       count: string;
     }>(
-      sql`SELECT country_id, region_id, COUNT(*) as count
-    FROM (
-      SELECT ${entities.countryId}, ${entities.regionId}
+      sql`
+      SELECT ${entities.countryId}, ${entities.regionId}, COUNT(*) as count
       FROM ${entities}
       INNER JOIN ${bottles}
         ON ${bottles.brandId} = ${entities.id}
       INNER JOIN ${tastings}
         ON ${tastings.bottleId} = ${bottles.id}
       WHERE ${tastings.createdById} = ${user.id}
-    ) as t
-    GROUP BY country_id, region_id
-    ORDER BY count DESC
-    LIMIT 25`,
+      GROUP BY country_id, region_id
+      ORDER BY COUNT(*) DESC
+      LIMIT 25`,
     );
 
-    const countriesById = Object.fromEntries(
-      (
-        await db
-          .select()
-          .from(countries)
-          .where(
-            inArray(
-              countries.id,
-              results.rows.map((r) => r.country_id),
-            ),
-          )
-      ).map((r) => [
-        r.id,
-        {
-          name: r.name,
-          slug: r.slug,
-        },
-      ]),
+    const countryIds = Array.from(
+      new Set(results.rows.map((r) => r.country_id)),
     );
+    const countriesById = countryIds.length
+      ? Object.fromEntries(
+          (
+            await db
+              .select()
+              .from(countries)
+              .where(inArray(countries.id, countryIds))
+          ).map((r) => [
+            r.id,
+            {
+              name: r.name,
+              slug: r.slug,
+            },
+          ]),
+        )
+      : {};
 
-    const regionsById = Object.fromEntries(
-      (
-        await db
-          .select()
-          .from(regions)
-          .where(
-            inArray(
-              regions.id,
-              results.rows.map((r) => r.region_id),
-            ),
-          )
-      ).map((r) => [
-        r.id,
-        {
-          name: r.name,
-          slug: r.slug,
-        },
-      ]),
-    );
+    const regionIds = Array.from(new Set(results.rows.map((r) => r.region_id)));
+    const regionsById = regionIds.length
+      ? Object.fromEntries(
+          (
+            await db
+              .select()
+              .from(regions)
+              .where(inArray(regions.id, regionIds))
+          ).map((r) => [
+            r.id,
+            {
+              name: r.name,
+              slug: r.slug,
+            },
+          ]),
+        )
+      : {};
 
     const totalCount = Number(
       (
