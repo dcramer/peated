@@ -20,6 +20,7 @@ import Button from "./button";
 import Counter from "./counter";
 import DefinitionList from "./definitionList";
 import { ImageModal } from "./imageModal";
+import Markdown from "./markdown";
 import { StaticRating } from "./rating";
 import ServingStyleIcon from "./servingStyleIcon";
 import ShareButton from "./shareButton";
@@ -140,14 +141,16 @@ export default function TastingListItem({
       )}
 
       {!!tasting.notes && (
-        <p className="text-peated p-3 text-sm sm:px-5">{tasting.notes}</p>
+        <div className="prose prose-invert -my-2 max-w-none px-3 text-sm sm:px-5">
+          <Markdown content={tasting.notes} noLinks />
+        </div>
       )}
 
-      <div className="text-light p-3 text-sm sm:px-5">
-        {(tasting.servingStyle ||
-          tasting.color ||
-          tasting.rating ||
-          tasting.tags.length > 0) && (
+      {(tasting.servingStyle ||
+        tasting.color ||
+        tasting.rating ||
+        tasting.tags.length > 0) && (
+        <div className="text-light p-3 text-sm sm:px-5">
           <DefinitionList className="grid-cols grid grid-cols-2 gap-y-4 sm:grid-cols-2">
             {tasting.rating && (
               <div>
@@ -190,8 +193,8 @@ export default function TastingListItem({
               </div>
             )}
           </DefinitionList>
-        )}
-      </div>
+        </div>
+      )}
 
       <aside className="flex items-center space-x-3 px-3 py-3 sm:px-5 sm:pb-4">
         <Button

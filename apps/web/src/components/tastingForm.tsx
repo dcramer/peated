@@ -212,6 +212,7 @@ export default function TastingForm({
           <TextAreaField
             {...register("notes")}
             error={errors.notes}
+            rows={6}
             label="Comments"
             placeholder="Tell us how you really feel."
           />

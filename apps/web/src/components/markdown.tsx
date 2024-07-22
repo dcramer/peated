@@ -23,7 +23,27 @@ const parseMarkdown = (content: string, options = {}): string => {
   });
 };
 
-export default function Markdown({ content, ...props }: { content: string }) {
-  const html = sanitize(parseMarkdown(content));
+const ALLOWED_TAGS = [
+  "#text",
+  "strong",
+  "b",
+  "em",
+  "i",
+  "blockquote",
+  "q",
+  "p",
+];
+
+export default function Markdown({
+  content,
+  noLinks = false,
+  ...props
+}: {
+  content: string;
+  noLinks?: boolean;
+}) {
+  const html = sanitize(parseMarkdown(content), {
+    ALLOWED_TAGS: noLinks ? ALLOWED_TAGS : ["a", ...ALLOWED_TAGS],
+  });
   return <div dangerouslySetInnerHTML={{ __html: html }} {...props} />;
 }
