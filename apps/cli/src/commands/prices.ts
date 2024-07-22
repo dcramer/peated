@@ -51,7 +51,7 @@ subcommand
                 err?.code === "23505" &&
                 err?.constraint === "store_price_unq_name"
               ) {
-                await tx.transaction(async (tx) => {
+                await db.transaction(async (tx) => {
                   const [match] = await db
                     .select({
                       id: storePrices.id,
