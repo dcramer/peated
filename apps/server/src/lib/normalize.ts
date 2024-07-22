@@ -146,10 +146,11 @@ export function normalizeBottle({
   // move any segment thats enclaosed in quotations to the end
   name = name.replaceAll(/(^|\s)(\([^)]+\))\s(.+)$/gi, "$1 $3 $2");
 
-  // replace various whitespace
-  name = name.replaceAll(/\n+|\s{2,}/g, " ");
+  // trailing/leading whitespace
+  name = name.replace(/^\s*|\s*$/g, "");
 
-  name = name.replace(/^\s|\s$/g, "");
+  // replace various whitespace
+  name = name.replaceAll(/\n\s+|\n+|\s{2,}/gi, " ");
 
   // vintage is likely wrong
   if (releaseYear === vintageYear) {

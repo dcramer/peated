@@ -141,7 +141,7 @@ test("manipulates name to conform with age", async ({ fixtures }) => {
     ),
   );
   expect(bottle2.statedAge).toBe(10);
-  expect(bottle2.name).toBe("10-year-old Delicious");
+  expect(bottle2.name).toBe("Delicious 10-year-old");
   expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
 });
 
@@ -420,7 +420,8 @@ test("saves vintage information", async ({ defaults, fixtures }) => {
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleUpdate({
     bottle: bottle.id,
-    vintageYear: 2024,
+    statedAge: null,
+    vintageYear: 2023,
   });
 
   expect(data.id).toBeDefined();
@@ -430,7 +431,7 @@ test("saves vintage information", async ({ defaults, fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(newBottle.vintageYear).toEqual(2024);
+  expect(newBottle.vintageYear).toEqual(2023);
 });
 
 test("saves release year", async ({ defaults, fixtures }) => {
