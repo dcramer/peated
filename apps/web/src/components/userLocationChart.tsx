@@ -27,7 +27,7 @@ function UserLocationChartElement({ userId }: { userId: number }) {
       }))}
       totalCount={totalCount}
       href={(item) =>
-        `/locations/${item.country.slug}${item.region ? `/regions${item.region.slug}` : ""}`
+        `/locations/${item.country.slug}${item.region ? `/regions/${item.region.slug}` : ""}`
       }
     />
   );
