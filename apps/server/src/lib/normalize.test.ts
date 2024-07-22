@@ -329,6 +329,21 @@ describe("normalizeBottle", () => {
     `);
   });
 
+  test("13-year-old Bottled in Bond (Batch VVS 2024)", async () => {
+    const rv = normalizeBottle({
+      name: "13-year-old Bottled in Bond (Batch VVS 2024)",
+      releaseYear: 2024,
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "13-year-old Bottled in Bond (Batch VVS 2024)",
+        "releaseYear": 2024,
+        "statedAge": 13,
+        "vintageYear": null,
+      }
+    `);
+  });
+
   test("(Distilled at Ardbeg) 1990, 8-year-old", async () => {
     const rv = normalizeBottle({
       name: "(Distilled at Ardbeg) 1990, 8-year-old",

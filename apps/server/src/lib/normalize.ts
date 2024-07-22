@@ -224,10 +224,14 @@ export function normalizeBottleBatchNumber(name: string) {
   // TODO: regexp
   if (name.toLowerCase().indexOf("small batch") !== -1) return name;
   return name.replace(
-    /(?:,)?(^|\s)?(?:\()?(?!small )batch (no.?\s|number\s|#)?([^),\s]+)(?:\))?(?:,)?($|\s)?/i,
+    /(?:,)?(^|\s)?(?:(?:\()batch (no.?\s|number\s|#)?([^)]+)(?:\))|batch (no.?\s|number\s|#)?([^,\s]+))(?:,)?($|\s)?/i,
     (fullMatch, ...match: string[]) => {
-      if (name == fullMatch) return `Batch ${convertWordToNumber(match[2])}`;
-      return `${match[0] || ""}(Batch ${convertWordToNumber(match[2])})${match[3] || ""}`;
+      if (name == fullMatch)
+        return `Batch ${convertWordToNumber(match[2] || match[4])}`;
+      if (match[2])
+        return `${match[0] || ""}(Batch ${convertWordToNumber(match[2])})${match[5] || ""}`;
+      else
+        return `${match[0] || ""}(Batch ${convertWordToNumber(match[4])})${match[5] || ""}`;
     },
   );
 }
