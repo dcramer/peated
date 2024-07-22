@@ -440,6 +440,21 @@ describe("normalizeBottle", () => {
       expect(statedAge).toEqual(29);
     });
 
+    test("Wolves Spring Run, Batch 2", async () => {
+      const rv = normalizeBottle({
+        name: "Spring Run, Batch 2",
+        isFullName: false,
+      });
+      expect(rv).toMatchInlineSnapshot(`
+        {
+          "name": "Spring Run (Batch 2)",
+          "releaseYear": null,
+          "statedAge": null,
+          "vintageYear": null,
+        }
+      `);
+    });
+
     test("Cask No. 1.285 Hello World", async () => {
       const { name, statedAge } = normalizeBottle({
         name: "Cask No. 1.285 Hello World",
