@@ -344,6 +344,20 @@ describe("normalizeBottle", () => {
     `);
   });
 
+  test("(distilled at Inchgower), 26-year-old old, 1976 vintage", async () => {
+    const rv = normalizeBottle({
+      name: "(distilled at Inchgower), 26-year-old old, 1976 vintage",
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "26-year-old old, 1976 vintage (distilled at Inchgower)",
+        "releaseYear": null,
+        "statedAge": 26,
+        "vintageYear": 1976,
+      }
+    `);
+  });
+
   test("(Distilled at Ardbeg) 1990, 8-year-old", async () => {
     const rv = normalizeBottle({
       name: "(Distilled at Ardbeg) 1990, 8-year-old",

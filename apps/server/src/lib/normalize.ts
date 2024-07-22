@@ -144,7 +144,7 @@ export function normalizeBottle({
   }
 
   // move any segment thats enclaosed in quotations to the end
-  name = name.replaceAll(/(^|\s)(\([^)]+\))\s(.+)$/gi, "$1 $3 $2");
+  name = name.replaceAll(/(^|[\s,])(\([^)]+\)),?\s(.+)$/gi, "$1 $3 $2");
 
   // trailing/leading whitespace
   name = name.replace(/^\s*|\s*$/g, "");
