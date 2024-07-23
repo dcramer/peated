@@ -10,6 +10,8 @@ export type JobName =
   | "IndexBottleAlias"
   | "IndexBottleSearchVectors"
   | "IndexEntitySearchVectors"
+  | "MergeBottle"
+  | "MergeEntity"
   | "NotifyDiscordOnTasting"
   | "OnBottleChange"
   | "OnBottleAliasChange"

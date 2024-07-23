@@ -11,6 +11,8 @@ import geocodeRegionLocation from "./geocodeRegionLocation";
 import indexBottleAlias from "./indexBottleAlias";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
 import indexEntitySearchVectors from "./indexEntitySearchVectors";
+import mergeBottle from "./mergeBottle";
+import mergeEntity from "./mergeEntity";
 import notifyDiscordOnTasting from "./notifyDiscordOnTasting";
 import onBottleAliasChange from "./onBottleAliasChange";
 import onBottleChange from "./onBottleChange";
@@ -47,6 +49,8 @@ registerJob(
   "IndexEntitySearchVectors",
   indexEntitySearchVectors as JobFunction,
 );
+registerJob("MergeBottle", mergeBottle as JobFunction);
+registerJob("MergeEntity", mergeEntity as JobFunction);
 registerJob("NotifyDiscordOnTasting", notifyDiscordOnTasting as JobFunction);
 registerJob("OnBottleAliasChange", onBottleAliasChange as JobFunction);
 registerJob("OnBottleChange", onBottleChange as JobFunction);
@@ -65,6 +69,7 @@ registerJob("UpdateCountryStats", updateCountryStats as JobFunction);
 registerJob("UpdateEntityStats", updateEntityStats as JobFunction);
 registerJob("UpdateRegionStats", updateRegionStats as JobFunction);
 
+// TODO: type this
 export async function runJob(jobName: JobName, args?: any) {
   const jobFn = faktory.registry[jobName];
   if (!jobFn) throw new Error(`Unknown job: ${jobName}`);

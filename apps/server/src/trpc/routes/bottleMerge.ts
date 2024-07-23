@@ -1,131 +1,12 @@
 import { db } from "@peated/server/db";
-import {
-  bottleAliases,
-  bottleTags,
-  bottleTombstones,
-  bottles,
-  bottlesToDistillers,
-  collectionBottles,
-  flightBottles,
-  reviews,
-  storePrices,
-  tastings,
-  type Bottle,
-} from "@peated/server/db/schema";
-import { logError } from "@peated/server/lib/log";
+import { bottles } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { eq, inArray, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
-
-// TODO: this should happen async
-export async function mergeBottlesInto(
-  toBottle: Bottle,
-  ...fromBottles: Bottle[]
-): Promise<Bottle> {
-  const fromBottleIds = fromBottles.map((e) => e.id);
-  console.log(
-    `Merging bottles ${fromBottleIds.join(", ")} into ${toBottle.id}.`,
-  );
-
-  // TODO: this doesnt handle duplicate bottles
-  const newBottle = await db.transaction(async (tx) => {
-    await tx
-      .update(tastings)
-      .set({
-        bottleId: toBottle.id,
-      })
-      .where(inArray(tastings.bottleId, fromBottleIds));
-
-    await tx
-      .update(storePrices)
-      .set({
-        bottleId: toBottle.id,
-      })
-      .where(inArray(storePrices.bottleId, fromBottleIds));
-
-    await tx
-      .update(reviews)
-      .set({
-        bottleId: toBottle.id,
-      })
-      .where(inArray(reviews.bottleId, fromBottleIds));
-
-    await tx
-      .update(flightBottles)
-      .set({
-        bottleId: toBottle.id,
-      })
-      .where(inArray(flightBottles.bottleId, fromBottleIds));
-
-    await tx
-      .update(collectionBottles)
-      .set({
-        bottleId: toBottle.id,
-      })
-      .where(inArray(collectionBottles.bottleId, fromBottleIds));
-
-    // TODO: handle conflicts
-    await tx
-      .update(bottleAliases)
-      .set({
-        bottleId: toBottle.id,
-      })
-      .where(inArray(bottleAliases.bottleId, fromBottleIds));
-
-    for (const id of fromBottleIds) {
-      await tx.insert(bottleTombstones).values({
-        bottleId: id,
-        newBottleId: toBottle.id,
-      });
-    }
-
-    const existingTags = await tx.query.bottleTags.findMany({
-      where: inArray(bottleTags.bottleId, fromBottleIds),
-    });
-    for (const row of existingTags) {
-      await tx
-        .insert(bottleTags)
-        .values({
-          bottleId: toBottle.id,
-          tag: row.tag,
-          count: row.count,
-        })
-        .onConflictDoUpdate({
-          target: [bottleTags.bottleId, bottleTags.tag],
-          set: {
-            count: sql<number>`${bottleTags.count} + 1`,
-          },
-        });
-    }
-
-    // wipe old bottles
-    await tx
-      .delete(bottleTags)
-      .where(inArray(bottleTags.bottleId, fromBottleIds));
-    await tx
-      .delete(bottlesToDistillers)
-      .where(inArray(bottlesToDistillers.bottleId, fromBottleIds));
-    await tx.delete(bottles).where(inArray(bottles.id, fromBottleIds));
-
-    return toBottle;
-  });
-
-  try {
-    await pushJob("OnBottleChange", { bottleId: newBottle.id });
-  } catch (err) {
-    logError(err, {
-      bottle: {
-        id: newBottle.id,
-      },
-    });
-  }
-
-  return newBottle;
-}
 
 export default modProcedure
   .input(
@@ -172,7 +53,10 @@ export default modProcedure
       input.direction === "mergeInto" ? rootBottle : otherBottle;
     const toBottle = input.direction === "mergeInto" ? otherBottle : rootBottle;
 
-    const newBottle = await mergeBottlesInto(toBottle, fromBottle);
+    await pushJob("MergeBottle", {
+      toBottleId: toBottle.id,
+      fromBottleIds: [fromBottle.id],
+    });
 
-    return await serialize(BottleSerializer, newBottle, ctx.user);
+    return await serialize(BottleSerializer, toBottle, ctx.user);
   });

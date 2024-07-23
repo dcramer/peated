@@ -8,7 +8,6 @@ import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 import { generateUniqHash } from "../../../server/src/lib/bottleHash";
 import { normalizeBottle } from "../../../server/src/lib/normalize";
-import { mergeBottlesInto } from "../../../server/src/trpc/routes/bottleMerge";
 
 const subcommand = program.command("bottles");
 
@@ -199,9 +198,15 @@ subcommand
               .from(bottles)
               .where(eq(bottles.uniqHash, uniqHash));
             if (existingBottle.id > bottle.id) {
-              mergeBottlesInto(existingBottle, bottle);
+              runJob("MergeBottle", {
+                toBottleId: bottle.id,
+                fromBottleIds: [existingBottle.id],
+              });
             } else {
-              mergeBottlesInto(bottle, existingBottle);
+              runJob("MergeBottle", {
+                toBottleId: existingBottle.id,
+                fromBottleIds: [bottle.id],
+              });
             }
           }
         }
