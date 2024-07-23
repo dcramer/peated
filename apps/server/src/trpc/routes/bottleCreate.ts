@@ -201,7 +201,7 @@ export async function bottleCreate({
 
   for (const aliasName of newAliases) {
     try {
-      pushJob("OnBottleAliasChange", { name: aliasName });
+      await pushJob("OnBottleAliasChange", { name: aliasName });
     } catch (err) {
       logError(err, {
         bottle: {
@@ -213,7 +213,7 @@ export async function bottleCreate({
 
   for (const entityId of newEntityIds.values()) {
     try {
-      pushJob("OnEntityChange", { entityId });
+      await pushJob("OnEntityChange", { entityId });
     } catch (err) {
       logError(err, {
         entity: {

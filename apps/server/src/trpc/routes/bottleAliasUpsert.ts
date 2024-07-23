@@ -77,7 +77,7 @@ export default modProcedure.input(BottleAliasSchema).mutation(async function ({
 
   if (newAlias) {
     try {
-      pushJob("OnBottleAliasChange", { name: newAlias });
+      await pushJob("OnBottleAliasChange", { name: newAlias });
     } catch (err) {
       logError(err, {
         bottle: {
