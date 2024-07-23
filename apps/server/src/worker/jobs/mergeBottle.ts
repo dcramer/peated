@@ -28,7 +28,7 @@ export default async function mergeBottle({
   );
 
   // TODO: this doesnt handle duplicate bottles
-  const newBottle = await db.transaction(async (tx) => {
+  await db.transaction(async (tx) => {
     await tx
       .update(tastings)
       .set({
@@ -117,6 +117,4 @@ export default async function mergeBottle({
       },
     });
   }
-
-  return newBottle;
 }

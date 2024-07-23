@@ -30,7 +30,7 @@ export default async function mergeEntity({
     .from(entities)
     .where(eq(entities.id, toEntityId));
 
-  const newEntity = await db.transaction(async (tx) => {
+  await db.transaction(async (tx) => {
     const bottleList = await tx
       .select()
       .from(bottles)
@@ -117,16 +117,14 @@ export default async function mergeEntity({
     }
 
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
-
-    return toEntity;
   });
 
   try {
-    await pushJob("OnEntityChange", { entityId: newEntity.id });
+    await pushJob("OnEntityChange", { entityId: toEntityId });
   } catch (err) {
     logError(err, {
       entity: {
-        id: newEntity.id,
+        id: toEntityId,
       },
     });
   }

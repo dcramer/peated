@@ -30,5 +30,5 @@ export default async ({ name }: { name: string }) => {
     ]);
   }
 
-  runJob("IndexBottleAlias", { name });
+  await runJob("IndexBottleAlias", { name });
 };

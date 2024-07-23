@@ -37,6 +37,6 @@ export default async ({ bottleId }: { bottleId: number }) => {
   );
 
   for (const entityId of allEntityIds) {
-    runJob("UpdateEntityStats", { entityId });
+    await runJob("UpdateEntityStats", { entityId });
   }
 };

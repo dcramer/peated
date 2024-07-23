@@ -198,12 +198,12 @@ subcommand
               .from(bottles)
               .where(eq(bottles.uniqHash, uniqHash));
             if (existingBottle.id > bottle.id) {
-              runJob("MergeBottle", {
+              await runJob("MergeBottle", {
                 toBottleId: bottle.id,
                 fromBottleIds: [existingBottle.id],
               });
             } else {
-              runJob("MergeBottle", {
+              await runJob("MergeBottle", {
                 toBottleId: existingBottle.id,
                 fromBottleIds: [bottle.id],
               });

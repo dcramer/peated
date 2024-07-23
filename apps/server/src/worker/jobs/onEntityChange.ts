@@ -1,8 +1,8 @@
 import { runJob } from "./";
 
 export default async ({ entityId }: { entityId: number }) => {
-  runJob("GenerateEntityDetails", { entityId });
-  runJob("IndexEntitySearchVectors", { entityId });
-  runJob("GeocodeEntityLocation", { entityId });
-  runJob("UpdateEntityStats", { entityId });
+  await runJob("GenerateEntityDetails", { entityId });
+  await runJob("IndexEntitySearchVectors", { entityId });
+  await runJob("GeocodeEntityLocation", { entityId });
+  await runJob("UpdateEntityStats", { entityId });
 };

@@ -75,9 +75,9 @@ export default async ({ entityId }: { entityId: number }) => {
   });
 
   if (entity.countryId) {
-    runJob("UpdateCountryStats", { countryId: entity.countryId });
+    await runJob("UpdateCountryStats", { countryId: entity.countryId });
   }
   if (entity.regionId) {
-    runJob("UpdateRegionStats", { regionId: entity.regionId });
+    await runJob("UpdateRegionStats", { regionId: entity.regionId });
   }
 };
