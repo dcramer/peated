@@ -6,7 +6,7 @@ import type { JobFunction } from "faktory-worker";
 import faktory from "faktory-worker";
 import { type JobName } from "./types";
 
-export async function runJob(jobName: JobName, args?: any) {
+export async function runJob<T>(jobName: JobName, args?: any) {
   const jobFn = faktory.registry[jobName];
   if (!jobFn) throw new Error(`Unknown job: ${jobName}`);
   return await jobFn(args);
@@ -31,7 +31,7 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
         ? (args[1] as { traceContext: TraceContext }).traceContext
         : {};
 
-    return Sentry.continueTrace(
+    return await Sentry.continueTrace(
       {
         sentryTrace: activeContext["sentry-trace"],
         baggage: activeContext.baggage,

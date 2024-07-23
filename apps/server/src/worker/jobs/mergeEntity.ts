@@ -34,6 +34,8 @@ export default async function mergeEntity({
     return;
   }
 
+  const updatedBottleIds: number[] = [];
+
   await db.transaction(async (tx) => {
     const bottleList = await tx
       .select()
@@ -55,7 +57,7 @@ export default async function mergeEntity({
             })
             .where(eq(bottles.id, bottle.id));
         });
-        await pushJob("IndexBottleSearchVectors", { bottleId: bottle.id });
+        updatedBottleIds.push(bottle.id);
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "bottle_uniq_hash") {
           // merge the bottle with its duplicate
@@ -85,6 +87,7 @@ export default async function mergeEntity({
           await runJob("MergeBottle", {
             toBottleId: toBottle.id,
             fromBottleIds: [bottle.id],
+            db: tx,
           });
         } else {
           throw err;
@@ -122,6 +125,18 @@ export default async function mergeEntity({
 
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
   });
+
+  for (const bottleId of updatedBottleIds) {
+    try {
+      await pushJob("IndexBottleSearchVectors", { bottleId: bottleId });
+    } catch (err) {
+      logError(err, {
+        bottle: {
+          id: bottleId,
+        },
+      });
+    }
+  }
 
   try {
     await pushJob("OnEntityChange", { entityId: toEntityId });

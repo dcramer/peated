@@ -1,4 +1,8 @@
-import { db } from "@peated/server/db";
+import {
+  db as defaultDb,
+  type DatabaseType,
+  type TransactionType,
+} from "@peated/server/db";
 import {
   bottleAliases,
   bottleTags,
@@ -19,9 +23,11 @@ import { inArray, sql } from "drizzle-orm";
 export default async function mergeBottle({
   toBottleId,
   fromBottleIds,
+  db = defaultDb,
 }: {
   toBottleId: number;
   fromBottleIds: number[];
+  db: DatabaseType | TransactionType;
 }) {
   console.log(
     `Merging bottles ${fromBottleIds.join(", ")} into ${toBottleId}.`,
