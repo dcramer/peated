@@ -51,7 +51,7 @@ export default async function mergeEntity({
             })
             .where(eq(bottles.id, bottle.id));
         });
-        pushJob("IndexBottleSearchVectors", { bottleId: bottle.id });
+        await pushJob("IndexBottleSearchVectors", { bottleId: bottle.id });
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "bottle_uniq_hash") {
           // merge the bottle with its duplicate
