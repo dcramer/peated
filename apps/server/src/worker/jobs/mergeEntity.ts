@@ -49,10 +49,10 @@ export default async function mergeEntity({
             .update(bottles)
             .set({
               brandId: toEntity.id,
-              fullName: `${toEntity.name} ${bottle.name}`,
+              fullName: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
               uniqHash: generateUniqHash({
                 ...bottle,
-                fullName: `${toEntity.name} ${bottle.name}`,
+                fullName: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
               }),
             })
             .where(eq(bottles.id, bottle.id));
