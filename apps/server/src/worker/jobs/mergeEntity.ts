@@ -29,6 +29,10 @@ export default async function mergeEntity({
     .select()
     .from(entities)
     .where(eq(entities.id, toEntityId));
+  if (!toEntity) {
+    console.warn(`Entity not found: ${toEntityId}`);
+    return;
+  }
 
   await db.transaction(async (tx) => {
     const bottleList = await tx
