@@ -27,7 +27,7 @@ export default async function mergeBottle({
 }: {
   toBottleId: number;
   fromBottleIds: number[];
-  db: DatabaseType | TransactionType;
+  db?: DatabaseType | TransactionType;
 }) {
   console.log(
     `Merging bottles ${fromBottleIds.join(", ")} into ${toBottleId}.`,
