@@ -30,11 +30,11 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
           return await Sentry.startSpan(
             {
               op: "process",
-              name: `faktory.${jobName.toLowerCase()}`,
+              name: `bullmq.${jobName.toLowerCase()}`,
             },
             async (span) => {
               span.setAttribute("messaging.operation", "process");
-              span.setAttribute("messaging.system", "faktory");
+              span.setAttribute("messaging.system", "bullmq");
 
               console.log(`Running job [${jobName} - ${jobId}]`);
               const start = new Date().getTime();

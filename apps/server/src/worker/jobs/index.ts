@@ -29,7 +29,6 @@ import updateCountryStats from "./updateCountryStats";
 import updateEntityStats from "./updateEntityStats";
 import updateRegionStats from "./updateRegionStats";
 
-// faktory does not have correct types
 registry.add("GenerateBottleDetails", generateBottleDetails);
 registry.add("GenerateCountryDetails", generateCountryDetails);
 registry.add("GenerateEntityDetails", generateEntityDetails);

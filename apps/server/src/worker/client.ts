@@ -55,13 +55,12 @@ export async function pushJob(
   await Sentry.startSpan(
     {
       op: "publish",
-      name: `faktory.${jobName.toLowerCase()}`,
+      name: `bullmq.${jobName.toLowerCase()}`,
     },
     async (span) => {
       span.setAttribute("messaging.operation", "publish");
-      span.setAttribute("messaging.system", "faktory");
+      span.setAttribute("messaging.system", "bullmq");
 
-      // pull out traceparent to forward to faktory job
       const activeContext = {};
       propagation.inject(context.active(), activeContext);
 
