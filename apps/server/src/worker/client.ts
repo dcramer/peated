@@ -36,7 +36,9 @@ export async function runJob<T>(jobName: JobName, args?: Record<string, any>) {
 export async function pushUniqueJob(
   jobName: JobName,
   args?: any,
-  opts?: JobsOptions,
+  opts: JobsOptions = {
+    delay: 5000,
+  },
 ) {
   opts = {
     ...(opts || {}),
