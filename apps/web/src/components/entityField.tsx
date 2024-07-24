@@ -40,7 +40,7 @@ export default function EntityField({
       onRenderOption={(item) => (
         <div className="flex flex-col items-start">
           <div>{item.name}</div>
-          <div className="text-light font-normal">{item.shortName || null}</div>
+          <div className="text-muted font-normal">{item.shortName || null}</div>
         </div>
       )}
       createForm={(props) => {
@@ -79,7 +79,7 @@ function CreateForm({
   return (
     <>
       <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
-        <div className="prose prose-invert text-light max-w-full text-sm leading-6">
+        <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
           {createDialogHelpText}
         </div>
       </div>

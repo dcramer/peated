@@ -64,7 +64,7 @@ export default function PriceChanges() {
                       {bottle.vintageYear && (
                         <>
                           {" "}
-                          <span className="text-light">
+                          <span className="text-muted">
                             ({bottle.vintageYear})
                           </span>
                         </>
@@ -80,7 +80,7 @@ export default function PriceChanges() {
                       )}
                     </div>
                     {!!bottle.category && (
-                      <div className="text-light text-sm">
+                      <div className="text-muted text-sm">
                         <Link
                           href={`/bottles/?category=${bottle.category}`}
                           className="hover:underline"
@@ -91,7 +91,7 @@ export default function PriceChanges() {
                     )}
                   </td>
                   <td className="py-2 pl-3 pr-4 text-right sm:table-cell sm:pr-3">
-                    <div className="text-light flex flex-col items-end text-xs">
+                    <div className="text-muted flex flex-col items-end text-xs">
                       <span>
                         <Price value={price.price} currency={price.currency} />
                       </span>

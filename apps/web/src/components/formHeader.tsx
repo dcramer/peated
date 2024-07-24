@@ -31,7 +31,7 @@ export default function FormHeader({
       <div className="-mx-3 flex justify-center">
         <button
           onClick={() => (onClose ? onClose() : router.back())}
-          className={`${blockStyles} text-light group`}
+          className={`${blockStyles} text-muted group`}
         >
           <div className="sr-only">Back</div>
           <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
@@ -44,7 +44,7 @@ export default function FormHeader({
       >
         <h1 className="text-lg">{title}</h1>
         {subtitle && (
-          <h2 className="text-light hidden truncate text-sm sm:block">
+          <h2 className="text-muted hidden truncate text-sm sm:block">
             {subtitle}
           </h2>
         )}
@@ -53,7 +53,7 @@ export default function FormHeader({
         <button
           onClick={!saveDisabled ? onSave : undefined}
           className={classNames(
-            `text-light group hover:text-white`,
+            `text-muted group hover:text-white`,
             blockStyles,
             saveDisabled ? "cursor-auto" : "",
           )}

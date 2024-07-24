@@ -53,7 +53,7 @@ export function ProfileDropdown() {
               "relative flex max-w-xs items-center p-2 text-sm hover:bg-slate-800 hover:text-white focus:outline-none",
               open
                 ? "rounded-b-none rounded-t bg-slate-800 text-white"
-                : "text-light rounded",
+                : "text-muted rounded",
             )}
             onClick={openMenu}
             as={Link}

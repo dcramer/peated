@@ -33,19 +33,19 @@ export default function BottleHeader({
             </div>
           )}
           {bottle.vintageYear && (
-            <span className="text-light">({bottle.vintageYear})</span>
+            <span className="text-muted">({bottle.vintageYear})</span>
           )}
         </div>
       }
       titleExtra={
         <BottleMetadata
           data={bottle}
-          className="text-light w-full truncate text-center lg:text-left"
+          className="text-muted w-full truncate text-center lg:text-left"
         />
       }
       metadata={
         (bottle.category || bottle.statedAge) && (
-          <div className="text-light flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 lg:w-auto lg:items-end">
+          <div className="text-muted flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 lg:w-auto lg:items-end">
             <div>
               {bottle.category && (
                 <Link

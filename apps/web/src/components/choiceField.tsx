@@ -68,7 +68,7 @@ export default function ChoiceField<T extends FieldValues>({
                         <CheckIcon
                           className={classNames(
                             "h-full w-full group-hover:block",
-                            checked ? "block" : "text-light hidden",
+                            checked ? "block" : "text-muted hidden",
                           )}
                         />
                       </div>
@@ -79,7 +79,7 @@ export default function ChoiceField<T extends FieldValues>({
                             className={`font-mediumbold  ${
                               checked
                                 ? "text-highlight"
-                                : "text-light hover:text-white"
+                                : "text-muted hover:text-white"
                             }`}
                           >
                             {choice.name}
@@ -88,7 +88,7 @@ export default function ChoiceField<T extends FieldValues>({
                             className={`inline ${
                               checked
                                 ? "text-highlight"
-                                : "text-light hover:text-white"
+                                : "text-muted hover:text-white"
                             }`}
                           >
                             {choice.helpText}

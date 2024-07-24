@@ -53,7 +53,7 @@ export default function Page() {
                     {item.name}
                   </a>
                   {match && (
-                    <div className="text-light">
+                    <div className="text-muted">
                       Matched to{" "}
                       <Link href={`/bottle/${match.id}`} className="underline">
                         {match.fullName}

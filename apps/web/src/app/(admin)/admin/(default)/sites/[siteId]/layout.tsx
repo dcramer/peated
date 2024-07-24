@@ -81,7 +81,7 @@ export default function Layout({
           <h3 className="self-center text-4xl font-semibold text-white sm:self-start">
             {site.name}
           </h3>
-          <div className="text-light flex flex-col items-center self-center sm:flex-row sm:self-start lg:mb-8">
+          <div className="text-muted flex flex-col items-center self-center sm:flex-row sm:self-start lg:mb-8">
             {site.type}
           </div>
           <div className="flex justify-center sm:justify-start">
@@ -93,7 +93,7 @@ export default function Layout({
                   <>&mdash;</>
                 )}
               </span>
-              <span className="text-light text-sm">Last Run</span>
+              <span className="text-muted text-sm">Last Run</span>
             </div>
             <div className="mb-4 px-3 text-center">
               <span className="block text-xl font-bold tracking-wide text-white">
@@ -103,7 +103,7 @@ export default function Layout({
                   <>&mdash;</>
                 )}
               </span>
-              <span className="text-light text-sm">Next Run</span>
+              <span className="text-muted text-sm">Next Run</span>
             </div>
             <div className="mb-4 px-3 text-center">
               <span className="block text-xl font-bold tracking-wide text-white">
@@ -113,7 +113,7 @@ export default function Layout({
                   <>&mdash;</>
                 )}
               </span>
-              <span className="text-light text-sm">Schedule</span>
+              <span className="text-muted text-sm">Schedule</span>
             </div>
           </div>
         </div>

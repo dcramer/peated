@@ -35,7 +35,7 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
       break;
     case "default":
     default:
-      colorClass = " border-slate-700 text-light";
+      colorClass = " border-slate-700 text-muted";
   }
 
   const moreProps = Component === defaultElement ? { layout: true } : {};

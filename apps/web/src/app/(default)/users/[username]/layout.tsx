@@ -43,7 +43,7 @@ export default async function Layout({
           <h3 className="self-center text-4xl font-semibold leading-normal text-white sm:self-start">
             {user.username}
           </h3>
-          <div className="text-light flex flex-col items-center gap-x-2 gap-y-2 self-center sm:flex-row sm:self-start">
+          <div className="text-muted flex flex-col items-center gap-x-2 gap-y-2 self-center sm:flex-row sm:self-start">
             <div>
               {user.admin ? (
                 <Chip size="small" color="highlight">
@@ -61,25 +61,25 @@ export default async function Layout({
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.tastings.toLocaleString()}
               </span>
-              <span className="text-light text-sm">Tastings</span>
+              <span className="text-muted text-sm">Tastings</span>
             </div>
             <div className="mb-4 px-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.bottles.toLocaleString()}
               </span>
-              <span className="text-light text-sm">Bottles</span>
+              <span className="text-muted text-sm">Bottles</span>
             </div>
             <div className="mb-4 px-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.collected.toLocaleString()}
               </span>
-              <span className="text-light text-sm">Collected</span>
+              <span className="text-muted text-sm">Collected</span>
             </div>
             <div className="mb-4 pl-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.contributions.toLocaleString()}
               </span>
-              <span className="text-light text-sm">Contributions</span>
+              <span className="text-muted text-sm">Contributions</span>
             </div>
           </div>
         </div>

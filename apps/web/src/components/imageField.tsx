@@ -148,7 +148,7 @@ export default forwardRef<HTMLInputElement, Props>(
               />
             ) : (
               <em
-                className={`text-light flex flex-col items-center justify-center`}
+                className={`text-muted flex flex-col items-center justify-center`}
                 style={{
                   maxHeight: imageHeight,
                 }}

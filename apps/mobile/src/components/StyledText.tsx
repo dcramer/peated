@@ -9,7 +9,7 @@ export function MonoText(props: ComponentProps<typeof NativeText>) {
 
 const variantStyles = {
   default: "text-white",
-  muted: "text-light",
+  muted: "text-muted",
   highlight: "text-highlight",
 };
 

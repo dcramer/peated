@@ -11,7 +11,7 @@ export default forwardRef<HTMLInputElement, Props>(function TextInput(
 ) {
   const baseStyles = "bg-inherit p-0 border-0 sm:leading-6";
   const inputStyles =
-    "placeholder:text-light outline-none focus:ring-0 sm:leading-6";
+    "placeholder:text-muted outline-none focus:ring-0 sm:leading-6";
   if (suffixLabel) {
     return (
       <div className={`flex ${baseStyles}`}>

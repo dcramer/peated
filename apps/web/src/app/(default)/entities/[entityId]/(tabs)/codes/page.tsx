@@ -122,7 +122,7 @@ export default async function Page({
                             distillerName
                           )}
                         </td>
-                        <td className="text-light hidden border-b border-slate-800 p-3 text-center text-sm sm:table-cell">
+                        <td className="text-muted hidden border-b border-slate-800 p-3 text-center text-sm sm:table-cell">
                           {distiller && distiller.country ? (
                             <Link
                               href={`/countries/${distiller.country.slug}`}

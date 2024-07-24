@@ -19,7 +19,7 @@ export function DistributionChartSkeleton() {
 export function DistributionChartError() {
   return (
     <div
-      className="text-light flex items-center justify-center rounded bg-slate-900 p-3 text-center text-sm"
+      className="text-muted flex items-center justify-center rounded bg-slate-900 p-3 text-center text-sm"
       style={{ height: 100 }}
     >
       There was an error loading this chart.
@@ -30,7 +30,7 @@ export function DistributionChartError() {
 export function DistributionChartEmpty() {
   return (
     <div
-      className="text-light flex items-center justify-center rounded bg-slate-900 p-3 text-center text-sm"
+      className="text-muted flex items-center justify-center rounded bg-slate-900 p-3 text-center text-sm"
       style={{ height: 100 }}
     >
       No information available for this chart.
@@ -51,7 +51,7 @@ const colorNames = [
 ];
 
 export function DistributionChartLegend(props: ComponentProps<"div">) {
-  return <div className="text-light mb-2 text-xs font-semibold" {...props} />;
+  return <div className="text-muted mb-2 text-xs font-semibold" {...props} />;
 }
 
 export default function DistributionChart({

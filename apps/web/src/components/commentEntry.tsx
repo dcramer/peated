@@ -51,7 +51,7 @@ export default function CommentEntry<
                 {createdBy.username}
               </Link>
             </div>
-            <div className="text-light text-sm">
+            <div className="text-muted text-sm">
               <TimeSince date={createdAt} />
             </div>
           </div>

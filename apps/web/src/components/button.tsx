@@ -85,7 +85,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
     if (active) {
       textColor = "text-highlight";
     } else if (disabled) {
-      textColor = color === "highlight" ? "text-highlight-dark" : "text-light";
+      textColor = color === "highlight" ? "text-highlight-dark" : "text-muted";
     }
 
     if (href) {

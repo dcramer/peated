@@ -36,7 +36,7 @@ export default function Page() {
                 <div className="font-bold group-hover:underline">
                   {item.name}
                 </div>
-                <div className="text-light">{item.description ?? ""}</div>
+                <div className="text-muted">{item.description ?? ""}</div>
               </>
             ),
           },

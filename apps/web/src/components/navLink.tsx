@@ -15,7 +15,7 @@ export default function NavLink(props: ComponentProps<typeof Link>) {
         baseClassNames,
         pathname === props.href
           ? "text-highlight"
-          : "text-light hover:text-white",
+          : "text-muted hover:text-white",
       )}
       {...props}
     />

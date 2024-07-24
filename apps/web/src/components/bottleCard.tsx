@@ -63,7 +63,7 @@ function BottleScaffold({
         <div
           className={classNames(
             "text-sm",
-            color === "highlight" ? "" : "text-light",
+            color === "highlight" ? "" : "text-muted",
           )}
         >
           {distillers}
@@ -71,7 +71,7 @@ function BottleScaffold({
       </div>
       <div
         className={classNames(
-          color === "highlight" ? "" : "text-light",
+          color === "highlight" ? "" : "text-muted",
           "hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex",
         )}
       >
@@ -129,7 +129,7 @@ export default function BottleCard({
                 {" "}
                 <span
                   className={
-                    color === "highlight" ? "text-black" : "text-light"
+                    color === "highlight" ? "text-black" : "text-muted"
                   }
                 >
                   ({bottle.vintageYear})

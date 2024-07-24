@@ -26,7 +26,7 @@ type Props = {
 
 export default function BottleMetadata({ data, ...props }: Props) {
   return (
-    <div {...props} className="text-light flex gap-x-2">
+    <div {...props} className="text-muted flex gap-x-2">
       {data.distillers.map((d) => {
         return (
           <Link

@@ -24,7 +24,7 @@ export default function SearchHeader({
       <div className="-mx-3 flex items-center">
         <button
           onClick={() => (onClose ? onClose() : router.back())}
-          className={`${blockStyles} text-light group flex justify-center`}
+          className={`${blockStyles} text-muted group flex justify-center`}
         >
           <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
             {closeIcon}
@@ -38,7 +38,7 @@ export default function SearchHeader({
             onClick={onDone}
             className={`group min-h-full ${blockStyles}`}
           >
-            <span className="text-light rounded bg-slate-800 p-2.5 font-semibold group-hover:bg-slate-700 group-hover:text-white">
+            <span className="text-muted rounded bg-slate-800 p-2.5 font-semibold group-hover:bg-slate-700 group-hover:text-white">
               Done
             </span>
           </button>

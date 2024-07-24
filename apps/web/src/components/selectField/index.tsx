@@ -192,7 +192,7 @@ export default function SelectField<T extends Option>({
           </Chip>
         ))}
         {visibleValues.length === 0 && placeholder && (
-          <div className="text-light sm:leading-6">{placeholder}</div>
+          <div className="text-muted sm:leading-6">{placeholder}</div>
         )}
         {visibleValues.length > 0 &&
           value.length < targetOptions &&

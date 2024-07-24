@@ -34,7 +34,7 @@ export default function BottleResultRow({
           {bottle.vintageYear && (
             <>
               {" "}
-              <span className="text-light">({bottle.vintageYear})</span>
+              <span className="text-muted">({bottle.vintageYear})</span>
             </>
           )}
           {bottle.isFavorite && (
@@ -44,7 +44,7 @@ export default function BottleResultRow({
             <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
           )}
         </div>
-        <div className="text-light mt-1 flex gap-x-1 truncate text-sm leading-5">
+        <div className="text-muted mt-1 flex gap-x-1 truncate text-sm leading-5">
           {bottle.distillers.length
             ? bottle.distillers.map((d) => <span key={d.id}>{d.name}</span>)
             : null}
@@ -52,10 +52,10 @@ export default function BottleResultRow({
       </div>
       <div className="flex items-center gap-x-4">
         <div className="hidden sm:flex sm:flex-col sm:items-end">
-          <div className="text-light leading-6">
+          <div className="text-muted leading-6">
             {bottle.category && formatCategoryName(bottle.category)}
           </div>
-          <div className="text-light mt-1 text-sm leading-5">
+          <div className="text-muted mt-1 text-sm leading-5">
             {bottle.statedAge ? `${bottle.statedAge} years` : null}
           </div>
         </div>

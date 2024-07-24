@@ -18,7 +18,7 @@ export default function TagTable({
           <col className="min-w-full sm:w-1/2" />
           <col className="sm:w-1/2" />
         </colgroup>
-        <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
+        <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left">
               Tag

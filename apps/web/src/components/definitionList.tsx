@@ -6,7 +6,7 @@ export function DefinitionTerm(props: ComponentPropsWithoutRef<"dt">) {
 
 export function DefinitionDetails(props: ComponentPropsWithoutRef<"dd">) {
   return (
-    <dd className="text-light flex items-center gap-x-2 leading-6" {...props} />
+    <dd className="text-muted flex items-center gap-x-2 leading-6" {...props} />
   );
 }
 

@@ -52,7 +52,7 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
 
   const activeStyles = "text-highlight border-highlight";
   const inactiveStyles =
-    "border-transparent text-light hover:border-light hover:text-slate-400";
+    "border-transparent text-muted hover:border-muted hover:text-slate-400";
 
   if ("href" in props) {
     if (controlled) active = pathname === props.href;
@@ -70,7 +70,7 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
       {count !== undefined && (
         <span
           className={classNames(
-            "text-light bg-slate-700",
+            "text-muted bg-slate-700",
             "ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block",
           )}
         >

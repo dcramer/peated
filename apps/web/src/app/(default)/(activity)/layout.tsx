@@ -38,7 +38,7 @@ export default async function Layout({
         <div className="ml-4 hidden w-4/12 lg:block">
           {!user && (
             <div className="flex flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800">
-              <p className="text-light mb-4 text-sm">
+              <p className="text-muted mb-4 text-sm">
                 Create a profile to record tastings, track your favorite
                 bottles, and more.
               </p>
