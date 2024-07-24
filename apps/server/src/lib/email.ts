@@ -205,7 +205,7 @@ export function buildCommentHtml(comment: {
         </mj-section>
 
         <mj-section padding="20px 10px" >
-          <mj-text color="${theme.colors.light}">
+          <mj-text color="${theme.colors.muted}">
             You are being notified because you are subscribed to comments. <a href="${settingsUrl}" style="color:${theme.colors.highlight};text-decoration:underline">Settings</a>
           </mj-text>
         </mj-section>
