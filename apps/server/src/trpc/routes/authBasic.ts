@@ -5,7 +5,7 @@ import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { TRPCError } from "@trpc/server";
 import { compareSync } from "bcrypt";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -17,7 +17,10 @@ export default publicProcedure
     }),
   )
   .mutation(async function ({ input: { email, password } }) {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(sql`LOWER(${users.email})`, email.toLowerCase()));
     if (!user) {
       console.log("user not found");
       throw new TRPCError({

@@ -3,7 +3,6 @@ import { createUser } from "./auth";
 
 test("creates user with no username conflict", async () => {
   const data = {
-    displayName: "Bert McCracken",
     username: "thebert",
     email: "bert@example.com",
   };
@@ -11,7 +10,6 @@ test("creates user with no username conflict", async () => {
   const user = await createUser(db, data);
   expect(user.id).toBeDefined();
   expect(user.username).toEqual("thebert");
-  expect(user.displayName).toEqual("Bert McCracken");
   expect(user.email).toEqual("bert@example.com");
 });
 
@@ -21,7 +19,6 @@ test("creates user with username conflict", async ({ fixtures }) => {
   });
 
   const data = {
-    displayName: "Bert McCracken",
     username: "thebert",
     email: "bert@example.com",
   };

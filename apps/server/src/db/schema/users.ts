@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   bigserial,
   boolean,
@@ -15,7 +16,6 @@ export const users = pgTable(
     username: text("username").notNull(),
     email: text("email").notNull(),
     passwordHash: varchar("password_hash", { length: 256 }),
-    displayName: text("display_name"),
     pictureUrl: text("picture_url"),
 
     private: boolean("private").default(false).notNull(),
@@ -27,10 +27,16 @@ export const users = pgTable(
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (users) => {
+  (table) => {
     return {
-      emailIndex: uniqueIndex("user_email_unq").on(users.email),
-      usernameIndex: uniqueIndex("user_username_unq").on(users.username),
+      email: uniqueIndex("user_email_unq").using(
+        "btree",
+        sql`LOWER(${table.email})`,
+      ),
+      username: uniqueIndex("user_username_unq").using(
+        "btree",
+        sql`LOWER(${table.username})`,
+      ),
     };
   },
 );

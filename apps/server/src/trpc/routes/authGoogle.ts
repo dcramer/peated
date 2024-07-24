@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
 
 import config from "@peated/server/config";
@@ -67,7 +67,7 @@ export default publicProcedure
       const [foundUser] = await db
         .select()
         .from(users)
-        .where(eq(users.email, payload.email));
+        .where(eq(sql`LOWER(${users.email})`, payload.email.toLowerCase()));
       if (foundUser) {
         // TODO: handle race condition
         await db.insert(identities).values({
@@ -80,8 +80,9 @@ export default publicProcedure
         // create new account
       } else {
         const userData = {
-          displayName: payload.given_name,
-          username: payload.email.split("@", 1)[0],
+          // displayName: payload.given_name,
+          // TODO: handle conflicts
+          username: payload.email.split("@", 1)[0].toLowerCase(),
           email: payload.email,
         };
 

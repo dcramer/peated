@@ -4,6 +4,7 @@ import type { Context } from "./context";
 import auth from "./routes/auth";
 import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
+import authRegister from "./routes/authRegister";
 import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
 import bottleAliasDelete from "./routes/bottleAliasDelete";
@@ -104,6 +105,7 @@ export const appRouter = router({
   auth,
   authBasic,
   authGoogle,
+  authRegister,
   badgeCreate,
   badgeList,
   bottleById,

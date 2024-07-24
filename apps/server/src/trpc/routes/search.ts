@@ -36,10 +36,7 @@ function sortResults(query: string, unsortedResults: Result[]) {
         exactMatches.push(index);
       }
     } else if (value.type === "user") {
-      if (
-        value.ref.displayName?.toLowerCase() === lowerQuery ||
-        value.ref.username.toLowerCase() === lowerQuery
-      ) {
+      if (value.ref.username.toLowerCase() === lowerQuery) {
         exactMatches.push(index);
       }
     } else {

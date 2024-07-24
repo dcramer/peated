@@ -7,7 +7,7 @@ export class ConflictError extends TRPCError {
 
   constructor(row: ConflictMatch, err: Error) {
     super({
-      message: `Bottle with already exists (ID=${row.id}).`,
+      message: `Conflicting object already exists (ID=${row.id}).`,
       code: "CONFLICT",
       cause: err,
     });

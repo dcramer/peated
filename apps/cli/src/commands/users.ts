@@ -1,8 +1,11 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
-import { createAccessToken, createUser } from "@peated/server/lib/auth";
-import { hashSync } from "bcrypt";
+import {
+  createAccessToken,
+  createUser,
+  generatePasswordHash,
+} from "@peated/server/lib/auth";
 import { eq } from "drizzle-orm";
 
 const subcommand = program.command("users");
@@ -13,13 +16,11 @@ subcommand
   .argument("<email>")
   .argument("<password>")
   .option("-a, --admin")
-  .option("--display-name <displayName>")
   .action(async (email, password, options) => {
     const user = await createUser(db, {
-      displayName: options.displayName || email.split("@")[0],
       email,
       username: email.split("@")[0],
-      passwordHash: hashSync(password, 8),
+      passwordHash: generatePasswordHash(password),
       admin: options.admin || false,
     });
 
@@ -35,7 +36,7 @@ subcommand
     const [user] = await db.select().from(users).where(eq(users.email, email));
     await db
       .update(users)
-      .set({ passwordHash: hashSync(password, 8) })
+      .set({ passwordHash: generatePasswordHash(password) })
       .where(eq(users.id, user.id));
 
     console.log(`${user.email} password changed`);

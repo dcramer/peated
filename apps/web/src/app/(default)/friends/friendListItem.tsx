@@ -52,13 +52,13 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
       >
         <UserAvatar size={48} user={user} />
         <div className="flex-auto space-y-1 font-medium">
-          <Link href={`/users/${user.username}`} className="hover:underline">
-            {user.displayName}
-          </Link>
-          <div className="text-light flex items-center text-sm">
+          <Link
+            href={`/users/${user.username}`}
+            className="inline-flex items-center hover:underline"
+          >
             <AtSymbolIcon className="inline h-3 w-3" />
             {user.username}
-          </div>
+          </Link>
         </div>
         <div className="flex items-center gap-x-4">
           <Menu as="div" className="menu">

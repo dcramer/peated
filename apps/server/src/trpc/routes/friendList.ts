@@ -46,7 +46,7 @@ export default authedProcedure
 
     if (query) {
       where.push(
-        or(ilike(users.displayName, `%${query}%`), ilike(users.email, query)),
+        or(ilike(users.username, `%${query}%`), ilike(users.email, query)),
       );
     }
 

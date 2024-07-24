@@ -41,14 +41,11 @@ export default async function Layout({
           <UserAvatar user={user} size={150} />
         </div>
         <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-auto sm:gap-y-2">
-          <h3 className="self-center text-4xl font-semibold leading-normal text-white sm:self-start">
-            {user.displayName}
+          <h3 className="flex items-center self-center text-4xl font-semibold leading-normal text-white sm:self-start">
+            <AtSymbolIcon className="inline h-3 w-3" />
+            {user.username}
           </h3>
           <div className="text-light flex flex-col items-center gap-x-2 gap-y-2 self-center sm:flex-row sm:self-start">
-            <div>
-              <AtSymbolIcon className="inline h-3 w-3" />
-              {user.username}
-            </div>
             <div>
               {user.admin ? (
                 <Chip size="small" color="highlight">

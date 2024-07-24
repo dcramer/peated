@@ -77,7 +77,6 @@ export default function Page() {
     resolver: zodResolver(UserInputSchema),
     defaultValues: {
       ...user,
-      displayName: user.displayName ?? user.username,
     },
   });
 
@@ -112,12 +111,6 @@ export default function Page() {
         )}
 
         <Fieldset>
-          <TextField
-            {...register("displayName")}
-            error={errors.displayName}
-            label="Name"
-            required
-          />
           <TextField
             {...register("username")}
             error={errors.username}

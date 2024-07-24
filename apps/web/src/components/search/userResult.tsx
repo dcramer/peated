@@ -24,15 +24,11 @@ export default function UserResultRow({
         <div className="flex-auto">
           <Link
             href={`/users/${user.username}`}
-            className="font-semibold leading-6"
+            className="inline-flex items-center font-semibold leading-6"
           >
-            <span className="absolute inset-x-0 -top-px bottom-0" />
-            {user.displayName}
-          </Link>
-          <div className="text-light flex items-center text-sm">
             <AtSymbolIcon className="inline h-3 w-3" />
             {user.username}
-          </div>
+          </Link>
         </div>
         <div className="flex gap-x-2">
           {user.admin ? (

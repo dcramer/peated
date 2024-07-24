@@ -27,22 +27,6 @@ test("cannot update another user", async ({ fixtures }) => {
   expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot edit another user.]`);
 });
 
-test("can change displayName", async ({ defaults, fixtures }) => {
-  const caller = createCaller({ user: defaults.user });
-  const data = await caller.userUpdate({
-    user: defaults.user.id,
-    displayName: "Joe",
-  });
-
-  expect(data.id).toBeDefined();
-
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, defaults.user.id));
-  expect(user?.displayName).toEqual("Joe");
-});
-
 test("can change username", async ({ defaults, fixtures }) => {
   const caller = createCaller({ user: defaults.user });
   const data = await caller.userUpdate({

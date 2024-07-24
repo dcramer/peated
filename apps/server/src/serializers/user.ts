@@ -42,7 +42,6 @@ export const UserSerializer = serializer({
   item: (item: User, attrs, currentUser): z.infer<typeof UserSchema> => {
     return {
       id: item.id,
-      displayName: item.displayName,
       username: item.username,
       pictureUrl: item.pictureUrl
         ? `${config.API_SERVER}${item.pictureUrl}`

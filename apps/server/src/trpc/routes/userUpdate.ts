@@ -33,15 +33,9 @@ export default authedProcedure
     }
 
     const data: { [name: string]: any } = {};
-    if (
-      input.displayName !== undefined &&
-      input.displayName !== user.displayName
-    ) {
-      data.displayName = input.displayName;
-    }
 
     if (input.username !== undefined && input.username !== user.username) {
-      data.username = input.username.toLowerCase();
+      data.username = input.username;
       if (data.username === "me") {
         throw new TRPCError({
           message: "Invalid username.",

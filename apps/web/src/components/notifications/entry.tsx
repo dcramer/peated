@@ -47,13 +47,13 @@ export default function NotificationEntry({
                 {notification.fromUser && (
                   <Link
                     href={`/users/${notification.fromUser.username}`}
-                    className="mr-1 font-semibold hover:underline"
+                    className="mr-1 inline-flex items-center font-semibold hover:underline"
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(`/users/${notification.fromUser?.username}`);
                     }}
                   >
-                    {notification.fromUser.displayName}
+                    {notification.fromUser.username}
                   </Link>
                 )}
                 {getStatusMessage({ notification })}

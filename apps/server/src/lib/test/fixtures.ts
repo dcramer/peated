@@ -23,7 +23,6 @@ import {
   changes,
   collections,
   comments,
-  countries,
   entities,
   externalSites,
   flightBottles,
@@ -36,7 +35,7 @@ import {
   toasts,
   users,
 } from "../../db/schema";
-import { createAccessToken } from "../auth";
+import { createAccessToken, generatePasswordHash } from "../auth";
 import { generateUniqHash } from "../bottleHash";
 import { mapRows } from "../db";
 import { choose, random, sample } from "../rand";
@@ -51,26 +50,34 @@ export async function loadFixture(...paths: string[]) {
 }
 
 export const User = async (
-  { ...data }: Partial<Omit<dbSchema.NewUser, "id">> = {},
+  {
+    password,
+    ...data
+  }: {
+    password?: string;
+  } & Partial<Omit<dbSchema.NewUser, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.User> => {
-  const firstName = data.displayName?.split(" ")[0] || faker.person.firstName();
+  if (!data.username)
+    data.username = `${faker.internet.userName().toLowerCase()}${faker.number.int(
+      10000,
+    )}`;
 
+  if (password) {
+    data.passwordHash = generatePasswordHash(password);
+  }
   const [result] = await db
     .insert(users)
     .values({
-      displayName: firstName,
+      username: "",
       email: faker.internet.email({
-        firstName,
+        firstName: data.username || undefined,
       }),
-      username: `${faker.internet.userName().toLowerCase()}${faker.number.int(
-        10000,
-      )}`,
       admin: false,
       mod: false,
       active: true,
       createdAt: new Date(),
-      ...data,
+      ...(data as Record<string, any>),
     })
     .returning();
   if (!result) throw new Error("Unable to create User fixture");
@@ -96,7 +103,6 @@ export const Follow = async (
   if (!result) throw new Error("Unable to create Follow fixture");
   return result;
 };
-
 export const Country = async (
   { ...data }: Partial<dbSchema.NewCountry> = {},
   db: DatabaseType = dbConn,
@@ -105,7 +111,7 @@ export const Country = async (
   data.slug = slugify(data.name as string);
   let [result] = await db.transaction(async (tx) => {
     return await tx
-      .insert(countries)
+      .insert(dbSchema.countries)
       .values({
         name: "", // cant be asked to fix TS
         slug: "",
@@ -117,11 +123,11 @@ export const Country = async (
   if (!result) {
     [result] = await db
       .select()
-      .from(countries)
+      .from(dbSchema.countries)
       .where(
         or(
-          eq(sql`LOWER(${countries.name})`, data.name.toLowerCase()),
-          eq(sql`LOWER(${countries.slug})`, data.slug),
+          eq(sql`LOWER(${dbSchema.countries.name})`, data.name.toLowerCase()),
+          eq(sql`LOWER(${dbSchema.countries.slug})`, data.slug),
         ),
       );
   }

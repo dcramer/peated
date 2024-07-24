@@ -21,7 +21,7 @@ test("lists users needs a query", async ({ defaults, fixtures }) => {
 });
 
 test("lists users needs a query", async ({ defaults, fixtures }) => {
-  const user2 = await fixtures.User({ displayName: "David George" });
+  const user2 = await fixtures.User({ username: "david.george" });
 
   const caller = createCaller({ user: defaults.user });
   const { results } = await caller.userList({
