@@ -7,6 +7,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
   spotlight: config.ENV === "development",
+  includeLocalVariables: true,
 });
 
 Sentry.setTag("service", config.SENTRY_SERVICE);
