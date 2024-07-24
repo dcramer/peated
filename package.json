@@ -49,7 +49,6 @@
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "catalog:",
     "eslint-plugin-react": "^7.34.3",
-    "foreman": "^3.0.1",
     "lint-staged": "^14.0.1",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "^3.2.4",
