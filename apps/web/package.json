@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@peated/tsconfig": "workspace:*",
-    "@spotlightjs/spotlight": "2.0.0",
+    "@spotlightjs/spotlight": "catalog:",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/forms": "catalog:",
     "@tailwindcss/typography": "catalog:",

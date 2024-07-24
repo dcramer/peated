@@ -40,11 +40,10 @@
     "dotenv-cli": "^7.4.2",
     "pnpm": "^9.5.0",
     "simple-git-hooks": "^2.11.1",
-    "typescript": "catalog:",
-    "turbo": "^2.0.6"
+    "turbo": "^2.0.6",
+    "typescript": "catalog:"
   },
   "devDependencies": {
-    "@spotlightjs/spotlight": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "catalog:",

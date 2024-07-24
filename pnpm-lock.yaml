@@ -21,6 +21,9 @@ catalogs:
     '@sentry/utils':
       specifier: ^8.16.0
       version: 8.16.0
+    '@spotlightjs/spotlight':
+      specifier: ^2.1.1
+      version: 2.1.1
     '@tailwindcss/forms':
       specifier: ^0.5.7
       version: 0.5.7
@@ -124,9 +127,6 @@ importers:
         specifier: 'catalog:'
         version: 5.5.3
     devDependencies:
-      '@spotlightjs/spotlight':
-        specifier: ^2.0.0
-        version: 2.0.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.62.0
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.3))(eslint@8.57.0)(typescript@5.5.3)
@@ -673,8 +673,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@spotlightjs/spotlight':
-        specifier: 2.0.0
-        version: 2.0.0
+        specifier: 'catalog:'
+        version: 2.1.1
       '@svgr/webpack':
         specifier: ^8.1.0
         version: 8.1.0(typescript@5.5.3)
@@ -3390,15 +3390,15 @@ packages:
   '@sinonjs/fake-timers@10.3.0':
     resolution: {integrity: sha512-V4BG07kuYSUkTCSBHG8G8TNhM+F19jXFWnQtzj+we8DrkpSBCee9Z3Ms8yiGer/dlmhe35/Xdgyo3/0rQKg7YA==}
 
-  '@spotlightjs/overlay@2.0.0':
-    resolution: {integrity: sha512-6P2Kwko9NPxat+Z5/QxWHr9+PLZtbXb/Bi2bdFmKc1yWTBVTJcbvntU9Xy+Qd8L4tFFFfqSORiXg7L4Bk6z4Jw==}
+  '@spotlightjs/overlay@2.1.0':
+    resolution: {integrity: sha512-4A718MNG81N1q81lH45BppN/Z94lEHa9U8dUtfjpBdnSngJnwz6Ku3gmFhQQfEOcei+xtPdLgCVP3ODfu0etsg==}
 
-  '@spotlightjs/sidecar@1.4.0':
-    resolution: {integrity: sha512-onj/phrNtDI8a79zc8jfxJ5BITQk5klO4xSoQXxiYeQWTZcegVeO8VftOVfWPBnMY/axnh+ltxJm/cHaV5SP6Q==}
+  '@spotlightjs/sidecar@1.5.0':
+    resolution: {integrity: sha512-ASGHrRKQ40+kN/SAVEVD5GY3tt7gJM4lziEALHKb5rBXKHKIDqCckgEY4n8FhzpTo1N8azVFVHEIriPtpWTEsg==}
     hasBin: true
 
-  '@spotlightjs/spotlight@2.0.0':
-    resolution: {integrity: sha512-V06WN7DxaihaAXp815DGdMINZEA2+Te3eeYdXJpXfJKiv57e8rwyyD7dqtQsTiTlbcCqXwNgaZp4fwTyuOyJCA==}
+  '@spotlightjs/spotlight@2.1.1':
+    resolution: {integrity: sha512-i67sfCEIXvsHMtGMfE7U0F0MQMcrMRc54ToyaqvzZZ4aRCcUpPdl50KChcixY1ksuI7KiiP0q4h+NbjOzrrX7w==}
     hasBin: true
 
   '@svgr/babel-plugin-add-jsx-attribute@8.0.0':
@@ -3650,8 +3650,8 @@ packages:
   '@types/eslint-scope@3.7.7':
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
 
-  '@types/eslint@8.56.10':
-    resolution: {integrity: sha512-Shavhk87gCtY2fhXDctcfS3e6FdxWkCx1iUZ9eEUbh7rTqlZT0/IzOkCOVt0fCjcFuZ9FPYfuezTBImfHCDBGQ==}
+  '@types/eslint@9.6.0':
+    resolution: {integrity: sha512-gi6WQJ7cHRgZxtkQEoyHMppPjq9Kxo5Tjn2prSKDSmZrCz8TZ3jSRCeTJm+WoM+oB0WG37bRqLzaaU3q7JypGg==}
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
@@ -3745,6 +3745,9 @@ packages:
 
   '@types/node@20.14.11':
     resolution: {integrity: sha512-kprQpL8MMeszbz6ojB5/tU8PLN4kesnN8Gjzw349rDlNgsSzg90lAVj3llK99Dh7JON+t9AuscPPFW6mPbTnSA==}
+
+  '@types/node@20.14.12':
+    resolution: {integrity: sha512-r7wNXakLeSsGT0H1AU863vS2wa5wBOK4bWMjZz2wj+8nBx+m5PeIn0k8AloSLpRuiwdRQZwarZqHE4FNArPuJQ==}
 
   '@types/nodemailer@6.4.15':
     resolution: {integrity: sha512-0EBJxawVNjPkng1zm2vopRctuWVCxk34JcIlRuXSf54habUWdz1FB7wHDqOqvDa8Mtpt0Q3LTXQkAs2LNyK5jQ==}
@@ -5363,6 +5366,10 @@ packages:
     resolution: {integrity: sha512-dwDPwZL0dmye8Txp2gzFmA6sxALaSvdRDjPH0viLcKrtlOL3tw62nWWweVD1SdILDTJrbrL6tdWVN58Wo6U3eA==}
     engines: {node: '>=10.13.0'}
 
+  enhanced-resolve@5.17.1:
+    resolution: {integrity: sha512-LMHl3dXhTcfv8gM4kEzIUeTQ+7fpdA0l2tUf34BddXPkz2A5xJ5L/Pchd5BL6rdccM9QGvu0sWZzK1Z1t4wwyg==}
+    engines: {node: '>=10.13.0'}
+
   ent@2.2.1:
     resolution: {integrity: sha512-QHuXVeZx9d+tIQAz/XztU0ZwZf2Agg9CcXcgE1rurqvdBeDBrpSwjl8/6XUqMg7tw2Y7uAdKb2sRv+bSEFqQ5A==}
     engines: {node: '>= 0.4'}
@@ -6312,6 +6319,9 @@ packages:
     resolution: {integrity: sha512-ASB07uLtnDs1o6EHjKpX34BKYDSqnFerfTOJL2HvMqF70LnxpjkzDB8J44oT9pu4AMPkQwf8jl6szgvNd2tRIg==}
     engines: {node: '>=8'}
     hasBin: true
+
+  import-meta-resolve@4.1.0:
+    resolution: {integrity: sha512-I6fiaX09Xivtk+THaMfAwnA3MVA5Big1WHF1Dfx9hFuvNIWpXnorlkzhcQf6ehrqQiiZECRt1poOAkPmer3ruw==}
 
   imurmurhash@0.1.4:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
@@ -13532,14 +13542,16 @@ snapshots:
     dependencies:
       '@sinonjs/commons': 3.0.1
 
-  '@spotlightjs/overlay@2.0.0': {}
+  '@spotlightjs/overlay@2.1.0': {}
 
-  '@spotlightjs/sidecar@1.4.0': {}
+  '@spotlightjs/sidecar@1.5.0': {}
 
-  '@spotlightjs/spotlight@2.0.0':
+  '@spotlightjs/spotlight@2.1.1':
     dependencies:
-      '@spotlightjs/overlay': 2.0.0
-      '@spotlightjs/sidecar': 1.4.0
+      '@spotlightjs/overlay': 2.1.0
+      '@spotlightjs/sidecar': 1.5.0
+      import-meta-resolve: 4.1.0
+      source-map: 0.7.4
 
   '@svgr/babel-plugin-add-jsx-attribute@8.0.0(@babel/core@7.24.9)':
     dependencies:
@@ -13820,10 +13832,10 @@ snapshots:
 
   '@types/eslint-scope@3.7.7':
     dependencies:
-      '@types/eslint': 8.56.10
+      '@types/eslint': 9.6.0
       '@types/estree': 1.0.5
 
-  '@types/eslint@8.56.10':
+  '@types/eslint@9.6.0':
     dependencies:
       '@types/estree': 1.0.5
       '@types/json-schema': 7.0.15
@@ -13944,6 +13956,10 @@ snapshots:
       undici-types: 5.26.5
 
   '@types/node@20.14.11':
+    dependencies:
+      undici-types: 5.26.5
+
+  '@types/node@20.14.12':
     dependencies:
       undici-types: 5.26.5
 
@@ -15700,6 +15716,11 @@ snapshots:
       graceful-fs: 4.2.11
       tapable: 2.2.1
 
+  enhanced-resolve@5.17.1:
+    dependencies:
+      graceful-fs: 4.2.11
+      tapable: 2.2.1
+
   ent@2.2.1:
     dependencies:
       punycode: 1.4.1
@@ -17063,6 +17084,8 @@ snapshots:
       pkg-dir: 4.2.0
       resolve-cwd: 3.0.0
 
+  import-meta-resolve@4.1.0: {}
+
   imurmurhash@0.1.4: {}
 
   indent-string@4.0.0: {}
@@ -17732,7 +17755,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 20.14.12
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -21457,7 +21480,7 @@ snapshots:
       acorn-import-attributes: 1.9.5(acorn@8.12.1)
       browserslist: 4.23.2
       chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.17.0
+      enhanced-resolve: 5.17.1
       es-module-lexer: 1.5.4
       eslint-scope: 5.1.1
       events: 3.3.0
