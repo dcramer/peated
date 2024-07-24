@@ -29,6 +29,7 @@ export default function Page({
 
   const [entity] = trpc.entityById.useSuspenseQuery(Number(entityId));
   const trpcUtils = trpc.useUtils();
+  const { flash } = useFlashMessages();
 
   const router = useRouter();
 
@@ -65,7 +66,14 @@ export default function Page({
         direction: data.direction,
       },
       {
-        onSuccess: (newEntity) => router.push(`/entities/${newEntity.id}`),
+        onSuccess: (newEntity) => {
+          flash(
+            <div>
+              Performing merge asynchronously. Updates may take a few minutes.
+            </div>,
+          );
+          router.push(`/entities/${newEntity.id}`);
+        },
       },
     );
   };

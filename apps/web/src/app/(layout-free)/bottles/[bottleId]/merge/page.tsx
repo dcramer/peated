@@ -5,6 +5,7 @@ import { BottleMergeSchema } from "@peated/server/schemas";
 import BottleField from "@peated/web/components/bottleField";
 import ChoiceField from "@peated/web/components/choiceField";
 import Fieldset from "@peated/web/components/fieldset";
+import { useFlashMessages } from "@peated/web/components/flash";
 import Form from "@peated/web/components/form";
 import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
@@ -29,6 +30,7 @@ export default function MergeBottle({
 
   const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
   const trpcUtils = trpc.useUtils();
+  const { flash } = useFlashMessages();
 
   const router = useRouter();
 
@@ -65,7 +67,14 @@ export default function MergeBottle({
         direction: data.direction,
       },
       {
-        onSuccess: (newBottle) => router.push(`/bottles/${newBottle.id}`),
+        onSuccess: (newBottle) => {
+          flash(
+            <div>
+              Performing merge asynchronously. Updates may take a few minutes.
+            </div>,
+          );
+          router.push(`/bottles/${newBottle.id}`);
+        },
       },
     );
   };
