@@ -8,7 +8,7 @@ import config from "../config";
 import { logError } from "../lib/log";
 import "./jobs";
 import scheduleScrapers from "./jobs/scheduleScrapers";
-import { defaultQueue } from "./queues";
+import { defaultConnection, defaultQueue } from "./queues";
 import registry from "./registry";
 import { type JobName } from "./types";
 
@@ -95,8 +95,6 @@ export async function runWorker() {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
   }
 
-  const connection = await getConnection();
-
   const worker = new Worker(
     defaultQueue.name,
     async (job) => {
@@ -104,7 +102,7 @@ export async function runWorker() {
       const { args, context } = job.data;
       jobFn(args, context);
     },
-    { connection, autorun: false },
+    { connection: defaultConnection, autorun: false },
   );
 
   worker.on("failed", (job, error) => {

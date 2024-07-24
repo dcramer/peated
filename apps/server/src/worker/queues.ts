@@ -9,6 +9,8 @@ export async function getConnection() {
   });
 }
 
-const connection = await getConnection();
+export const defaultConnection = await getConnection();
 
-export const defaultQueue = new Queue("default", { connection });
+export const defaultQueue = new Queue("default", {
+  connection: defaultConnection,
+});
