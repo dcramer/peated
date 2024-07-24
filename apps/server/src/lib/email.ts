@@ -178,8 +178,8 @@ export function buildCommentHtml(comment: {
         </mj-section>
         
         <mj-section>
-          <mj-column width="20%" padding-right="20px">
-            <mj-image src=${avatarUrl}" width="64px" />
+          <mj-column width="64px" padding-right="20px">
+            <mj-image src=${avatarUrl}" />
           </mj-column>
           <mj-column width="80%">
             <mj-text align="left" font-size="24px" line-height="28px">
