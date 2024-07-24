@@ -1,4 +1,3 @@
-import { shutdownClient } from "@peated/server/worker/client";
 import { startInactiveSpan } from "@sentry/node";
 import { Command } from "commander";
 import { basename } from "path";
@@ -44,7 +43,6 @@ const program = new Command();
       span.setAttribute("process.runtime.version", process.version);
     })
     .hook("postAction", async (thisCommand, actionCommand) => {
-      await shutdownClient();
       // TODO: we need status...
       if (span) {
         span.end();

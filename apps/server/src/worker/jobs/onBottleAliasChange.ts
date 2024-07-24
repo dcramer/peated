@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { reviews, storePrices } from "@peated/server/db/schema";
+import { runJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
-import { runJob } from ".";
 
 export default async ({ name }: { name: string }) => {
   // sync any new matches

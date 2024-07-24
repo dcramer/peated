@@ -16,7 +16,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
-import { pushJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { inArray, sql } from "drizzle-orm";
 
 // TODO: this should happen async
@@ -115,7 +115,11 @@ export default async function mergeBottle({
   });
 
   try {
-    await pushJob("OnBottleChange", { bottleId: toBottleId });
+    await pushUniqueJob(
+      "OnBottleChange",
+      { bottleId: toBottleId },
+      { delay: 5000 },
+    );
   } catch (err) {
     logError(err, {
       bottle: {

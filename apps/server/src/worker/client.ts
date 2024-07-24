@@ -1,44 +1,56 @@
 import { context, propagation } from "@opentelemetry/api";
 import { scheduledJob, scheduler } from "@peated/server/lib/cron";
 import * as Sentry from "@sentry/node";
-import faktory, { type Client } from "faktory-worker";
+import type { JobsOptions } from "bullmq";
+import { Worker } from "bullmq";
+import IORedis from "ioredis";
 import config from "../config";
 import { logError } from "../lib/log";
 import "./jobs";
-import { runJob } from "./jobs";
 import scheduleScrapers from "./jobs/scheduleScrapers";
-import { type JobName } from "./jobs/types";
+import { defaultQueue } from "./queues";
+import registry from "./registry";
+import { type JobName } from "./types";
 
-let client: Client | null = null;
+import { createHash } from "crypto";
 
-// process.on("SIGTERM", () => shutdownClient());
-// process.on("SIGINT", () => shutdownClient());
-// process.on("SIGUSR1", () => shutdownClient());
-// process.on("SIGUSR2", () => shutdownClient());
-// process.on("uncaughtException", () => shutdownClient());
-// process.on("beforeExit", () => shutdownClient());
-
-export async function getClient() {
-  if (!client) {
-    client = await faktory.connect();
+export function generateUniqIdentifier(
+  name: string,
+  args?: Record<string, any>,
+) {
+  let hash = createHash("md5");
+  if (args) {
+    for (const item of Object.entries(args).sort()) {
+      hash = hash.update(JSON.stringify(item));
+    }
   }
-  return client;
+  return `${name}-${hash.digest("hex")}`;
 }
 
-export async function hasActiveClient() {
-  return !!client;
+export async function runJob<T>(jobName: JobName, args?: Record<string, any>) {
+  const jobFn = registry.get(jobName);
+  if (!jobFn) throw new Error(`Unknown job: ${jobName}`);
+  return await jobFn(args);
 }
 
-export async function shutdownClient() {
-  if (!client) return;
-  await client.close();
-  client = null;
+export async function pushUniqueJob(
+  jobName: JobName,
+  args?: any,
+  opts?: JobsOptions,
+) {
+  opts = {
+    ...(opts || {}),
+    jobId: generateUniqIdentifier(jobName, args),
+  };
+
+  return await pushJob(jobName, args, opts);
 }
 
-export { runJob };
-
-export async function pushJob(jobName: JobName, args?: any) {
-  const client = await getClient();
+export async function pushJob(
+  jobName: JobName,
+  args?: Record<string, any>,
+  opts?: JobsOptions,
+) {
   await Sentry.startSpan(
     {
       op: "publish",
@@ -52,7 +64,14 @@ export async function pushJob(jobName: JobName, args?: any) {
       const activeContext = {};
       propagation.inject(context.active(), activeContext);
       try {
-        await client.job(jobName, args, { traceContext: activeContext }).push();
+        await defaultQueue.add(
+          jobName,
+          {
+            args,
+            context: { traceContext: activeContext },
+          },
+          opts,
+        );
       } catch (e) {
         span.setStatus({
           code: 2, // ERROR
@@ -69,21 +88,29 @@ export async function runWorker() {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
   }
 
-  const worker = await faktory.work().catch((error) => {
-    console.error(`worker failed to start`, error);
-    Sentry.captureException(error);
-    process.exit(1);
+  const connection = new IORedis(config.REDIS_URL, {
+    maxRetriesPerRequest: null,
   });
 
-  worker.on("fail", ({ job, error }) => {
+  const worker = new Worker(
+    defaultQueue.name,
+    async (job) => {
+      const jobFn = registry.get(job.name);
+      const { args, context } = job.data;
+      jobFn(args, context);
+    },
+    { connection, autorun: false },
+  );
+
+  worker.on("failed", (job, error) => {
     logError(error, {
       extra: {
-        job: job.jid,
+        job: job?.id,
       },
     });
   });
 
-  worker.on("error", ({ error }) => {
+  worker.on("error", (error) => {
     logError(error);
   });
 
@@ -91,5 +118,6 @@ export async function runWorker() {
     scheduler.stop();
   });
 
+  worker.run();
   console.log("Worker Running...");
 }

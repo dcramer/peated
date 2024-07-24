@@ -5,7 +5,7 @@ import SimpleHeader from "@peated/web/components/simpleHeader";
 import { trpc } from "@peated/web/lib/trpc/client";
 
 function FaktoryStats() {
-  const [data] = trpc.faktoryInfo.useSuspenseQuery(undefined, {
+  const [data] = trpc.queueInfo.useSuspenseQuery(undefined, {
     refetchInterval: 5000,
   });
 
@@ -13,8 +13,7 @@ function FaktoryStats() {
     <>
       <SimpleHeader>Faktory</SimpleHeader>
       <div className="my-6 grid grid-cols-4 items-center gap-3 text-center">
-        {Object.entries(data.faktory).map(([name, count]) => {
-          if (!name.startsWith("total_")) return null;
+        {Object.entries(data.stats).map(([name, count]) => {
           return (
             <div className="mr-4 pr-3 text-center" key={name}>
               <span className="block text-xl font-bold uppercase tracking-wide text-white">

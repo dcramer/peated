@@ -4,7 +4,6 @@ import "./sentry";
 import FastifyCors from "@fastify/cors";
 import FastifyHelmet from "@fastify/helmet";
 import FastifyMultipart from "@fastify/multipart";
-import { shutdownClient } from "@peated/server/worker/client";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { fastify } from "fastify";
 import { setTimeout } from "node:timers/promises";
@@ -97,9 +96,9 @@ export default async function buildFastify(options = {}) {
   app.register(FastifySentry);
 
   app.addHook("preHandler", injectAuth);
-  app.addHook("onClose", async () => {
-    await shutdownClient();
-  });
+  // app.addHook("onClose", async () => {
+  //   await shutdownClient();
+  // });
 
   app.setErrorHandler(function (error, request, reply) {
     const { validation, validationContext } = error;

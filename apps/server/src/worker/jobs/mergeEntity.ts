@@ -8,10 +8,9 @@ import {
 } from "@peated/server/db/schema";
 import { generateUniqHash } from "@peated/server/lib/bottleHash";
 import { logError } from "@peated/server/lib/log";
-import { pushJob } from "@peated/server/worker/client";
+import { pushUniqueJob, runJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, isNull } from "drizzle-orm";
-import { runJob } from "./utils";
 
 // TODO: this should happen async
 export default async function mergeEntity({
@@ -128,7 +127,11 @@ export default async function mergeEntity({
 
   for (const bottleId of updatedBottleIds) {
     try {
-      await pushJob("IndexBottleSearchVectors", { bottleId: bottleId });
+      await pushUniqueJob(
+        "IndexBottleSearchVectors",
+        { bottleId: bottleId },
+        { delay: 5000 },
+      );
     } catch (err) {
       logError(err, {
         bottle: {
@@ -139,7 +142,11 @@ export default async function mergeEntity({
   }
 
   try {
-    await pushJob("OnEntityChange", { entityId: toEntityId });
+    await pushUniqueJob(
+      "OnEntityChange",
+      { entityId: toEntityId },
+      { delay: 5000 },
+    );
   } catch (err) {
     logError(err, {
       entity: {

@@ -1,40 +1,22 @@
 import cuid2 from "@paralleldrive/cuid2";
 import { logError } from "@peated/server/lib/log";
-import type { ExternalSiteType } from "@peated/server/types";
 import * as Sentry from "@sentry/node";
-import type { JobFunction } from "faktory-worker";
-import faktory from "faktory-worker";
-import { type JobName } from "./types";
-
-export async function runJob<T>(jobName: JobName, args?: any) {
-  const jobFn = faktory.registry[jobName];
-  if (!jobFn) throw new Error(`Unknown job: ${jobName}`);
-  return await jobFn(args);
-}
-
-type TraceContext = {
-  "sentry-trace"?: string;
-  baggage?: any;
-};
-
-export async function registerJob(jobName: JobName, jobFn: JobFunction) {
-  faktory.register(jobName, instrumentedJob(jobName, jobFn));
-}
+import { type JobFunction } from "./types";
 
 // instrument a job with Sentry
 function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
-  return async (...args: unknown[]) => {
+  const wrappedJob: JobFunction = async function wrappedJob(
+    params,
+    context = {},
+  ) {
     const jobId = cuid2.createId();
 
-    const activeContext: TraceContext =
-      args.length > 1
-        ? (args[1] as { traceContext: TraceContext }).traceContext
-        : {};
+    const { traceContext } = context;
 
     return await Sentry.continueTrace(
       {
-        sentryTrace: activeContext["sentry-trace"],
-        baggage: activeContext.baggage,
+        sentryTrace: traceContext ? traceContext["sentry-trace"] : undefined,
+        baggage: traceContext?.baggage,
       },
       async () => {
         return Sentry.withScope(async function (scope) {
@@ -58,7 +40,7 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
               const start = new Date().getTime();
               let success = false;
               try {
-                await jobFn(...args);
+                await jobFn(params, context);
                 success = true;
                 span.setStatus({
                   code: 1, // OK
@@ -83,27 +65,23 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
       },
     );
   };
+  return wrappedJob;
 }
 
-export function getJobForSite(site: ExternalSiteType): [JobName, ...unknown[]] {
-  switch (site) {
-    case "totalwine":
-      return ["ScrapeTotalWine"];
-    case "astorwines":
-      return ["ScrapeAstorWines"];
-    case "reservebar":
-      return ["ScrapeReserveBar"];
-    case "smws":
-      return ["ScrapeSMWS"];
-    case "smwsa":
-      return ["ScrapeSMWSA"];
-    case "whiskyadvocate":
-      return ["ScrapeWhiskyAdvocate"];
-    case "woodencork":
-      return ["ScrapeWoodenCork"];
-    case "healthyspirits":
-      return ["ScrapeHealthySpirits"];
-    default:
-      throw new Error("Unknown site");
+class Registry {
+  private jobs: Record<string, JobFunction> = {};
+
+  add(name: string, fn: JobFunction) {
+    this.jobs[name] = instrumentedJob(name, fn);
+  }
+
+  get(name: string) {
+    const rv = this.jobs[name];
+    if (typeof rv === undefined) {
+      throw new Error(`Unknown job: ${name}`);
+    }
+    return rv;
   }
 }
+
+export default new Registry();

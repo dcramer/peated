@@ -52,7 +52,6 @@ import externalSiteCreate from "./routes/externalSiteCreate";
 import externalSiteList from "./routes/externalSiteList";
 import externalSiteTriggerJob from "./routes/externalSiteTriggerJob";
 import externalSiteUpdate from "./routes/externalSiteUpdate";
-import faktoryInfo from "./routes/faktoryInfo";
 import flightById from "./routes/flightById";
 import flightCreate from "./routes/flightCreate";
 import flightDelete from "./routes/flightDelete";
@@ -69,6 +68,7 @@ import priceChangeList from "./routes/priceChangeList";
 import priceCreateBatch from "./routes/priceCreateBatch";
 import priceList from "./routes/priceList";
 import priceUpdate from "./routes/priceUpdate";
+import queueInfo from "./routes/queueInfo";
 import regionBySlug from "./routes/regionBySlug";
 import regionCreate from "./routes/regionCreate";
 import regionDelete from "./routes/regionDelete";
@@ -152,7 +152,7 @@ export const appRouter = router({
   externalSiteUpdate,
   externalSiteConfigGet,
   externalSiteConfigSet,
-  faktoryInfo,
+  queueInfo,
   flightById,
   flightCreate,
   flightDelete,

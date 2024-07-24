@@ -16,7 +16,7 @@ import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { BottlePreviewResult } from "@peated/server/types";
-import { pushJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import type { z } from "zod";
@@ -190,7 +190,11 @@ export async function bottleCreate({
   }
 
   try {
-    await pushJob("OnBottleChange", { bottleId: bottle.id });
+    await pushUniqueJob(
+      "OnBottleChange",
+      { bottleId: bottle.id },
+      { delay: 5000 },
+    );
   } catch (err) {
     logError(err, {
       bottle: {
@@ -201,7 +205,11 @@ export async function bottleCreate({
 
   for (const aliasName of newAliases) {
     try {
-      await pushJob("OnBottleAliasChange", { name: aliasName });
+      await pushUniqueJob(
+        "OnBottleAliasChange",
+        { name: aliasName },
+        { delay: 5000 },
+      );
     } catch (err) {
       logError(err, {
         bottle: {
@@ -213,7 +221,7 @@ export async function bottleCreate({
 
   for (const entityId of newEntityIds.values()) {
     try {
-      await pushJob("OnEntityChange", { entityId });
+      await pushUniqueJob("OnEntityChange", { entityId }, { delay: 5000 });
     } catch (err) {
       logError(err, {
         entity: {

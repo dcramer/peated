@@ -5,8 +5,8 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { notEmpty, uniq } from "@peated/server/lib/filter";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
-import { runJob } from "./";
 
 export default async ({ bottleId }: { bottleId: number }) => {
   const bottle = await db.query.bottles.findFirst({
@@ -37,6 +37,6 @@ export default async ({ bottleId }: { bottleId: number }) => {
   );
 
   for (const entityId of allEntityIds) {
-    await runJob("UpdateEntityStats", { entityId });
+    await pushUniqueJob("UpdateEntityStats", { entityId }, { delay: 5000 });
   }
 };
