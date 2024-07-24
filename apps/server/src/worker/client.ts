@@ -8,10 +8,10 @@ import config from "../config";
 import { logError } from "../lib/log";
 import "./jobs";
 import scheduleScrapers from "./jobs/scheduleScrapers";
-import { defaultConnection, defaultQueue } from "./queues";
 import registry from "./registry";
 import { type JobName } from "./types";
 
+import { Queue } from "bullmq";
 import { createHash } from "crypto";
 
 export function generateUniqIdentifier(
@@ -64,6 +64,8 @@ export async function pushJob(
       // pull out traceparent to forward to faktory job
       const activeContext = {};
       propagation.inject(context.active(), activeContext);
+
+      const defaultQueue = await getQueue("default");
       try {
         await defaultQueue.add(
           jobName,
@@ -83,7 +85,20 @@ export async function pushJob(
   );
 }
 
+let connection: IORedis | null = null;
+
+export async function getQueue(
+  name = "default",
+  connection: Awaited<ReturnType<typeof getConnection>> | null = null,
+) {
+  return new Queue(name, {
+    connection: connection || (await getConnection()),
+  });
+}
+
 export async function getConnection() {
+  if (connection) return connection;
+
   return new IORedis(config.REDIS_URL, {
     maxRetriesPerRequest: null,
   });
@@ -93,15 +108,9 @@ export async function gracefulShutdown(
   signal?: string | undefined,
   worker?: Worker | undefined,
 ) {
-  if (signal) {
-    console.log(`Received ${signal}, closing server...`);
-  }
   scheduler.stop();
-  if (worker) await worker.close();
-  await defaultQueue.close();
-  if (signal) {
-    process.exit(0);
-  }
+  if (connection) connection.disconnect();
+  connection = null;
 }
 
 export async function runWorker() {
@@ -110,6 +119,8 @@ export async function runWorker() {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
   }
 
+  const connection = await getConnection();
+  const defaultQueue = await getQueue("default", connection);
   const worker = new Worker(
     defaultQueue.name,
     async (job) => {
@@ -117,7 +128,7 @@ export async function runWorker() {
       const { args, context } = job.data;
       jobFn(args, context);
     },
-    { connection: defaultConnection, autorun: false },
+    { connection, autorun: false },
   );
 
   worker.on("failed", (job, error) => {
@@ -132,9 +143,18 @@ export async function runWorker() {
     logError(error);
   });
 
-  process.on("SIGINT", () => gracefulShutdown("SIGINT", worker));
+  async function termProcess(signal: string) {
+    console.log(`Received ${signal}, closing server...`);
 
-  process.on("SIGTERM", () => gracefulShutdown("SIGTERM", worker));
+    await worker.close();
+    await defaultQueue.close();
+    await gracefulShutdown();
+    process.exit(0);
+  }
+
+  process.on("SIGINT", () => termProcess("SIGINT"));
+
+  process.on("SIGTERM", () => termProcess("SIGTERM"));
 
   worker.run();
   console.log("Worker Running...");
