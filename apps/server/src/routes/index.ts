@@ -1,5 +1,4 @@
 import type { FastifyInstance, FastifyPluginCallback } from "fastify";
-import config from "../config";
 import previewCommentEmail from "./debug/previewCommentEmail";
 import triggerSentry from "./debug/triggerSentry";
 import root from "./root";
@@ -43,7 +42,7 @@ export const router: FastifyPluginCallback = (
   fastify.route(updateUserAvatar);
   fastify.route(uploads);
 
-  if (config.ENV === "development") {
+  if (process.env.NODE_ENV !== "production") {
     registerDebugRoutes(fastify);
   }
 

@@ -155,7 +155,7 @@ export function buildCommentHtml(comment: {
   );
   const avatarUrl =
     comment.createdBy.pictureUrl ||
-    `${config.URL_PREFIX}/assets/placeholder-avatar.png`;
+    `${config.URL_PREFIX}/assets/default-avatar.png`;
 
   const input = `
   <mjml>
