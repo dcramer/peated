@@ -2,14 +2,10 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { formatColor } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
+import { absoluteUri } from "@peated/server/lib/urls";
 
 if (!config.DISCORD_WEBHOOK) {
   console.error("DISCORD_WEBHOOK is not configured");
-}
-
-function absoluteUri(url: string, host: string) {
-  if (url.indexOf("https://") === 0 || url.indexOf("http://") === 0) return url;
-  return `${host}${url}`;
 }
 
 export default async function ({ tastingId }: { tastingId: number }) {

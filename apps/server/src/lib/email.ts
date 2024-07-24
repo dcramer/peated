@@ -16,6 +16,7 @@ import { escapeHtml } from "./html";
 import theme from "@peated/design";
 import { and, eq, inArray, ne } from "drizzle-orm";
 import { db } from "../db";
+import { absoluteUri } from "./urls";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
 
@@ -130,13 +131,38 @@ export async function notifyComment({
   }
 }
 
-export function buildCommentHtml(comment: CommentWithRelations): string {
-  const commentUrl = `${config.URL_PREFIX}/tastings/${comment.tasting.id}#c_${comment.id}`;
-  const settingsUrl = `${process.env.BASE_URL}/settings`;
+export function buildCommentHtml(comment: {
+  id: number;
+  comment: string;
+  tasting: {
+    id: number;
+    bottle: {
+      fullName: string;
+    };
+  };
+  createdBy: {
+    username: string;
+    pictureUrl: string | null;
+  };
+}): string {
+  const commentUrl = absoluteUri(
+    `/tastings/${comment.tasting.id}#c_${comment.id}`,
+    config.URL_PREFIX,
+  );
+  const settingsUrl = absoluteUri(`/settings`, config.URL_PREFIX);
+  const profileUrl = absoluteUri(
+    `/users/${encodeURIComponent(comment.createdBy.username)}`,
+    config.URL_PREFIX,
+  );
+  const avatarUrl = absoluteUri(
+    comment.createdBy.pictureUrl ||
+      `${config.URL_PREFIX}/assets/placeholder-avatar.png`,
+    config.API_SERVER,
+  );
 
   const titleLine = `${escapeHtml(
-    comment.createdBy.displayName || comment.createdBy.email,
-  )} commented on your tasting`;
+    comment.createdBy.username,
+  )} commented on ${comment.tasting.bottle.fullName}`;
   const reasonLine = `You are being notified because you are subscribed to comments. <a href="${settingsUrl}" style="color:${theme.colors.highlight}">Settings</a>`;
 
   return `
@@ -146,21 +172,22 @@ export function buildCommentHtml(comment: CommentWithRelations): string {
       <title>New Comment</title>
       <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
     </head>
-    <body style="background:${theme.colors.background}">
+    <body style="width:100%">
+    <table style="width:100%;">
+    <tr><td style="width:100%;text-align:center;">
+    <table style="width:600px;margin:0 auto;"><tr><td style="text-align:left;background:${theme.colors.background};border-radius:8px;padding:12px 16px;border:1px solid ${theme.colors.slate[900]};">
       <h2 style="margin-top:0;margin-bottom:15px;color:${
         theme.colors.highlight
       };">${titleLine}</h2>
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="vertical-align:top"><img src="${config.URL_PREFIX}${
-            comment.createdBy.pictureUrl || `/img/placeholder-avatar.png`
-          }" width="36" height="36" style="border-radius:36px;display:block;" /></td>
+          <td style="vertical-align:top"><img src="${avatarUrl}" width="36" height="36" style="border-radius:36px;display:block;" /></td>
           <td style="padding-left:15px">
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td><b style="color:${theme.colors.highlight};">${escapeHtml(
-                  comment.createdBy.displayName || comment.createdBy.username,
-                )}</b></td>
+                <td><b style="color:${theme.colors.highlight};"><a href="${profileUrl}" style="color:${theme.colors.highlight};">${escapeHtml(
+                  comment.createdBy.username,
+                )}</a></b></td>
               </tr>
               <tr>
               <td style="color:${theme.colors.light};">${escapeHtml(
@@ -176,6 +203,8 @@ export function buildCommentHtml(comment: CommentWithRelations): string {
         </tr>
       </table>
       <p style="color:${theme.colors.light};margin:15px 0 0;">${reasonLine}</p>
+      </td></tr></table>
+      </td></tr></table>
     </body>
   </html>
   `;

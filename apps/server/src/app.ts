@@ -9,6 +9,7 @@ import { fastify } from "fastify";
 import { setTimeout } from "node:timers/promises";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
+import debugRoutes from "./debug/routes";
 import { injectAuth } from "./middleware/auth";
 import { router } from "./routes";
 import FastifySentry from "./sentryPlugin";
@@ -100,6 +101,11 @@ export default async function buildFastify(options = {}) {
   app.addHook("onClose", async () => {
     await gracefulShutdown();
   });
+
+  if (process.env.NODE_ENV !== "production") {
+    console.info("Register debug routes at /debug");
+    app.register(debugRoutes);
+  }
 
   app.setErrorHandler(function (error, request, reply) {
     const { validation, validationContext } = error;
