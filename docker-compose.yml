@@ -21,6 +21,11 @@ services:
     restart: on-failure
     ports:
       - "6379:6379"
+  spotlight:
+    image: ghcr.io/getsentry/spotlight:latest
+    restart: on-failure
+    ports:
+      - "8969:8969"
 
 volumes:
   postgis-data:
