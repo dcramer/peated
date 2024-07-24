@@ -29,7 +29,7 @@ export default function Layout({
           style={{ backgroundColor: theme.colors.slate[900] }}
         >
           <Container className="max-w-[540px]">
-            <Container className="rounded border-solid border-slate-700 bg-slate-900 lg:border">
+            <Container className="rounded border-solid border-slate-700 bg-slate-900 pb-[32px] lg:border">
               <Section className="bg-highlight mb-[16px] rounded-t border border-solid border-slate-900 px-[16px] py-[16px]">
                 <Column className="text-center">
                   <Link
