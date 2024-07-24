@@ -1,4 +1,3 @@
-import { AtSymbolIcon } from "@heroicons/react/20/solid";
 import Button from "@peated/web/components/button";
 import Chip from "@peated/web/components/chip";
 import EmptyActivity from "@peated/web/components/emptyActivity";
@@ -41,8 +40,7 @@ export default async function Layout({
           <UserAvatar user={user} size={150} />
         </div>
         <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-auto sm:gap-y-2">
-          <h3 className="flex items-center self-center text-4xl font-semibold leading-normal text-white sm:self-start">
-            <AtSymbolIcon className="inline h-3 w-3" />
+          <h3 className="self-center text-4xl font-semibold leading-normal text-white sm:self-start">
             {user.username}
           </h3>
           <div className="text-light flex flex-col items-center gap-x-2 gap-y-2 self-center sm:flex-row sm:self-start">
