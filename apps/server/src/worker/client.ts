@@ -115,9 +115,17 @@ export async function runWorker() {
     logError(error);
   });
 
-  process.on("SIGINT", function () {
+  async function gracefulShutdown(signal: string) {
+    console.log(`Received ${signal}, closing server...`);
+
     scheduler.stop();
-  });
+    await worker.close();
+    process.exit(0);
+  }
+
+  process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
+  process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 
   worker.run();
   console.log("Worker Running...");
