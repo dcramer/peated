@@ -4,14 +4,14 @@ import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-function FaktoryStats() {
+function QueueStats() {
   const [data] = trpc.queueInfo.useSuspenseQuery(undefined, {
     refetchInterval: 5000,
   });
 
   return (
     <>
-      <SimpleHeader>Faktory</SimpleHeader>
+      <SimpleHeader>Queue</SimpleHeader>
       <div className="my-6 grid grid-cols-4 items-center gap-3 text-center">
         {Object.entries(data.stats).map(([name, count]) => {
           return (
@@ -41,7 +41,7 @@ export default function Admin() {
       />
 
       <div>
-        <FaktoryStats />
+        <QueueStats />
       </div>
     </>
   );
