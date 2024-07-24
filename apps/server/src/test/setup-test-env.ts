@@ -29,6 +29,7 @@ vi.mock("../worker/client", async (importOriginal) => {
     pushJob: vi.fn(() => Promise<void>),
     pushUniqueJob: vi.fn(() => Promise<void>),
     runJob: oJobs.runJob,
+    gracefulShutdown: vi.fn(() => Promise<void>),
   };
 });
 
