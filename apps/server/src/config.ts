@@ -9,7 +9,6 @@ export default {
   JWT_SECRET: process.env.JWT_SECRET || "",
   API_SERVER: process.env.API_SERVER || "http://localhost:4000",
   URL_PREFIX: process.env.URL_PREFIX || "http://localhost:3000",
-  FAKTORY_URL: process.env.FAKTORY_URL,
   REDIS_URL: process.env.REDIS_URL || "redis://@localhost:6379",
 
   SMTP_FROM: process.env.SMTP_FROM || "no-reply@peated.com",
