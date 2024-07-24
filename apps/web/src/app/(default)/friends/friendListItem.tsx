@@ -1,5 +1,5 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { AtSymbolIcon, EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { type Friend, type FriendStatus } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
@@ -52,11 +52,7 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
       >
         <UserAvatar size={48} user={user} />
         <div className="flex-auto space-y-1 font-medium">
-          <Link
-            href={`/users/${user.username}`}
-            className="inline-flex items-center hover:underline"
-          >
-            <AtSymbolIcon className="inline h-3 w-3" />
+          <Link href={`/users/${user.username}`} className="hover:underline">
             {user.username}
           </Link>
         </div>

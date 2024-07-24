@@ -1,4 +1,3 @@
-import { AtSymbolIcon } from "@heroicons/react/20/solid";
 import type { User } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import Chip from "../chip";
@@ -24,9 +23,8 @@ export default function UserResultRow({
         <div className="flex-auto">
           <Link
             href={`/users/${user.username}`}
-            className="inline-flex items-center font-semibold leading-6"
+            className="font-semibold leading-6"
           >
-            <AtSymbolIcon className="inline h-3 w-3" />
             {user.username}
           </Link>
         </div>
