@@ -161,19 +161,19 @@ export function buildCommentHtml(comment: {
   <mjml>
   <mj-head>
     <mj-attributes>
-      <mj-text align="center" font-size="14px" line-height="24px" color="${theme.colors.black}" padding="0" />
+      <mj-text align="center" font-size="14px" line-height="24px" color="${theme.colors.white}" padding="0" />
       <mj-button font-size="14px" color="${theme.colors.white}" background-color="${theme.colors.slate[700]}" />
-      <mj-section background-color="${theme.colors.white}" margin-bottom="24px" full-width="full-width" text-align="center" padding="24px 16px 0" vertical-align="center" />
+      <mj-section background-color="${theme.colors.slate[900]}" margin-bottom="24px" full-width="full-width" text-align="center" padding="24px 16px 0" vertical-align="center" />
       <mj-image padding="0" />
     </mj-attributes>
   </mj-head>
 
-  <mj-body background-color="${theme.colors.slate[100]}" color="${theme.colors.black}" font-family="Arial, sans-serif">
-    <mj-wrapper padding="40px 0">  
-      <mj-wrapper padding="0" full-width="full-width" text-align="center">
-        <mj-section background-color="${theme.colors.slate[800]}" padding="32px 16px">
+  <mj-body background-color="#10192e" color="${theme.colors.white}" font-family="Arial, sans-serif">
+    <mj-wrapper padding="40px 0" border-radius="8px">  
+      <mj-wrapper padding="0" full-width="full-width" text-align="center" border="1px solid ${theme.colors.slate[700]}">
+        <mj-section background-color="${theme.colors.highlight}" padding="32px 16px">
           <mj-column vertical-align="center" width="96px">
-            <mj-image href="${config.URL_PREFIX}" src="${config.URL_PREFIX}/assets/glyph.png" />
+            <mj-image href="${config.URL_PREFIX}" src="${config.URL_PREFIX}/assets/glyph-black.png" />
           </mj-column>
         </mj-section>
         
@@ -190,7 +190,7 @@ export function buildCommentHtml(comment: {
 
         <mj-section>
           <mj-column>
-            <mj-text align="justify">${comment.comment}</mj-text>
+            <mj-text align="justify" color="${theme.colors.slate[300]}">${comment.comment}</mj-text>
           </mj-column>
         </mj-section>
 
@@ -201,12 +201,12 @@ export function buildCommentHtml(comment: {
         </mj-section>
 
         <mj-section>
-          <mj-divider border-wdith="1px" border-style="solid" border-color="${theme.colors.slate[100]}" />
+          <mj-divider border-wdith="1px" border-style="solid" border-color="${theme.colors.slate[700]}" />
         </mj-section>
 
         <mj-section padding="20px 10px" >
-          <mj-text color="${theme.colors.slate[500]}">
-            You are being notified because you are subscribed to comments. <a href="${settingsUrl}" style="color:${theme.colors.slate[800]};text-decoration:underline">Settings</a>
+          <mj-text color="${theme.colors.light}">
+            You are being notified because you are subscribed to comments. <a href="${settingsUrl}" style="color:${theme.colors.highlight};text-decoration:underline">Settings</a>
           </mj-text>
         </mj-section>
       </mj-wrapper>
