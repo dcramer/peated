@@ -5,6 +5,7 @@ import { EntityMergeSchema } from "@peated/server/schemas";
 import ChoiceField from "@peated/web/components/choiceField";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
+import { useFlashMessages } from "@peated/web/components/flash";
 import Form from "@peated/web/components/form";
 import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
