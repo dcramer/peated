@@ -6,7 +6,6 @@ import classNames from "@peated/web/lib/classNames";
 import type { ComponentProps } from "react";
 import { toTitleCase } from "../../../server/src/lib/strings";
 import { getEntityTypeSearchUrl } from "../lib/urls";
-import Chip from "./chip";
 import type { Column } from "./table";
 import Table from "./table";
 
@@ -45,26 +44,12 @@ export default function EntityTable({
           ),
           value: (item) => {
             return (
-              <>
-                <Link
-                  href={`/entities/${item.id}`}
-                  className="font-medium hover:underline"
-                >
-                  {item.name}
-                </Link>
-                <div className="mt-2 space-x-2">
-                  {item.type.sort().map((t) => (
-                    <Chip
-                      key={t}
-                      size="small"
-                      as={Link}
-                      href={`${link}?type=${encodeURIComponent(t)}`}
-                    >
-                      {t}
-                    </Chip>
-                  ))}
-                </div>
-              </>
+              <Link
+                href={`/entities/${item.id}`}
+                className="font-medium hover:underline"
+              >
+                {item.name}
+              </Link>
             );
           },
         },
