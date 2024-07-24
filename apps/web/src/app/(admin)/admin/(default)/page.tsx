@@ -19,7 +19,7 @@ function FaktoryStats() {
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {count.toLocaleString()}
               </span>
-              <span className="text-light text-sm">{name.slice(6)}</span>
+              <span className="text-light text-sm">{name}</span>
             </div>
           );
         })}
