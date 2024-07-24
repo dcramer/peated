@@ -14,6 +14,7 @@ import { router } from "./routes";
 import FastifySentry from "./sentryPlugin";
 import { createContext } from "./trpc/context";
 import { appRouter } from "./trpc/router";
+import { gracefulShutdown } from "./worker/client";
 
 const envToLogger: {
   [env: string]: any;
@@ -96,9 +97,9 @@ export default async function buildFastify(options = {}) {
   app.register(FastifySentry);
 
   app.addHook("preHandler", injectAuth);
-  // app.addHook("onClose", async () => {
-  //   await shutdownClient();
-  // });
+  app.addHook("onClose", async () => {
+    await gracefulShutdown();
+  });
 
   app.setErrorHandler(function (error, request, reply) {
     const { validation, validationContext } = error;

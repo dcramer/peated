@@ -89,6 +89,21 @@ export async function getConnection() {
   });
 }
 
+export async function gracefulShutdown(
+  signal?: string | undefined,
+  worker?: Worker | undefined,
+) {
+  if (signal) {
+    console.log(`Received ${signal}, closing server...`);
+  }
+  scheduler.stop();
+  if (worker) await worker.close();
+  await defaultQueue.close();
+  if (signal) {
+    process.exit(0);
+  }
+}
+
 export async function runWorker() {
   // dont run the scraper in dev
   if (config.ENV === "production") {
@@ -117,17 +132,9 @@ export async function runWorker() {
     logError(error);
   });
 
-  async function gracefulShutdown(signal: string) {
-    console.log(`Received ${signal}, closing server...`);
+  process.on("SIGINT", () => gracefulShutdown("SIGINT", worker));
 
-    scheduler.stop();
-    await worker.close();
-    process.exit(0);
-  }
-
-  process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-
-  process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+  process.on("SIGTERM", () => gracefulShutdown("SIGTERM", worker));
 
   worker.run();
   console.log("Worker Running...");
