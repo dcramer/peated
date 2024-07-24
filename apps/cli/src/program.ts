@@ -45,7 +45,7 @@ const program = new Command();
     })
     .hook("postAction", async (thisCommand, actionCommand) => {
       // TODO: we need status...
-      gracefulShutdown();
+      await gracefulShutdown();
 
       if (span) {
         span.end();
