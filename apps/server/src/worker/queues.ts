@@ -1,3 +1,14 @@
 import { Queue } from "bullmq";
 
-export const defaultQueue = new Queue("default");
+import IORedis from "ioredis";
+import config from "../config";
+
+export async function getConnection() {
+  return new IORedis(config.REDIS_URL, {
+    maxRetriesPerRequest: null,
+  });
+}
+
+const connection = await getConnection();
+
+export const defaultQueue = new Queue("default", { connection });

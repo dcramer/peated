@@ -83,15 +83,19 @@ export async function pushJob(
   );
 }
 
+export async function getConnection() {
+  return new IORedis(config.REDIS_URL, {
+    maxRetriesPerRequest: null,
+  });
+}
+
 export async function runWorker() {
   // dont run the scraper in dev
   if (config.ENV === "production") {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
   }
 
-  const connection = new IORedis(config.REDIS_URL, {
-    maxRetriesPerRequest: null,
-  });
+  const connection = await getConnection();
 
   const worker = new Worker(
     defaultQueue.name,
