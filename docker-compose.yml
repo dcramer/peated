@@ -16,6 +16,11 @@ services:
       - postgis-data:/var/lib/postgresql
     healthcheck:
       test: "PGPASSWORD=postgres pg_isready -h 127.0.0.1 -U postgres -d postgres"
+  redis:
+    image: redis
+    restart: on-failure
+    ports:
+      - "6379:6379"
   faktory:
     image: contribsys/faktory
     restart: on-failure

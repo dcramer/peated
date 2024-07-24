@@ -46,15 +46,3 @@ declare module "vitest" {
     fixtures: typeof fixtures;
   }
 }
-
-declare module "faktory-worker/lib/faktory" {
-  export declare type JobFunctionContextWrapper = {
-    (...args: any[]): ContextProvider;
-  };
-  export declare type UnWrappedJobFunction = {
-    (...args: any[]): unknown;
-  };
-  export declare type JobFunction =
-    | JobFunctionContextWrapper
-    | UnWrappedJobFunction;
-}

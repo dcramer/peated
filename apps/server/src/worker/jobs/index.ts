@@ -1,5 +1,4 @@
-import type { JobFunction } from "faktory-worker";
-import faktory from "faktory-worker";
+import registry from "../registry";
 import createMissingBottles from "./createMissingBottles";
 import generateBottleDetails from "./generateBottleDetails";
 import generateCountryDetails from "./generateCountryDetails";
@@ -25,55 +24,38 @@ import scrapeSMWSA from "./scrapeSMWSA";
 import scrapeTotalWine from "./scrapeTotalWine";
 import scrapeWhiskeyAdvocate from "./scrapeWhiskyAdvocate";
 import scrapeWoodenCork from "./scrapeWoodenCork";
-import { type JobName } from "./types";
 import updateBottleStats from "./updateBottleStats";
 import updateCountryStats from "./updateCountryStats";
 import updateEntityStats from "./updateEntityStats";
 import updateRegionStats from "./updateRegionStats";
-import { registerJob } from "./utils";
 
 // faktory does not have correct types
-registerJob("GenerateBottleDetails", generateBottleDetails as JobFunction);
-registerJob("GenerateCountryDetails", generateCountryDetails as JobFunction);
-registerJob("GenerateEntityDetails", generateEntityDetails as JobFunction);
-registerJob("GenerateRegionDetails", generateRegionDetails as JobFunction);
-registerJob("GeocodeCountryLocation", geocodeCountryLocation as JobFunction);
-registerJob("GeocodeRegionLocation", geocodeRegionLocation as JobFunction);
-registerJob("GeocodeEntityLocation", geocodeEntityLocation as JobFunction);
-registerJob("IndexBottleAlias", indexBottleAlias as JobFunction);
-registerJob(
-  "IndexBottleSearchVectors",
-  indexBottleSearchVectors as JobFunction,
-);
-registerJob(
-  "IndexEntitySearchVectors",
-  indexEntitySearchVectors as JobFunction,
-);
-registerJob("MergeBottle", mergeBottle as JobFunction);
-registerJob("MergeEntity", mergeEntity as JobFunction);
-registerJob("NotifyDiscordOnTasting", notifyDiscordOnTasting as JobFunction);
-registerJob("OnBottleAliasChange", onBottleAliasChange as JobFunction);
-registerJob("OnBottleChange", onBottleChange as JobFunction);
-registerJob("OnEntityChange", onEntityChange as JobFunction);
-registerJob("ScrapeAstorWines", scrapeAstorWines);
-registerJob("ScrapeHealthySpirits", scrapeHealthySpirits);
-registerJob("ScrapeReserveBar", scrapeReserveBar);
-registerJob("ScrapeSMWS", scrapeSMWS);
-registerJob("ScrapeSMWSA", scrapeSMWSA);
-registerJob("ScrapeTotalWine", scrapeTotalWine);
-registerJob("ScrapeWoodenCork", scrapeWoodenCork);
-registerJob("ScrapeWhiskyAdvocate", scrapeWhiskeyAdvocate);
-registerJob("CreateMissingBottles", createMissingBottles);
-registerJob("UpdateBottleStats", updateBottleStats as JobFunction);
-registerJob("UpdateCountryStats", updateCountryStats as JobFunction);
-registerJob("UpdateEntityStats", updateEntityStats as JobFunction);
-registerJob("UpdateRegionStats", updateRegionStats as JobFunction);
-
-// TODO: type this
-export async function runJob(jobName: JobName, args?: any) {
-  const jobFn = faktory.registry[jobName];
-  if (!jobFn) throw new Error(`Unknown job: ${jobName}`);
-  return await jobFn(args);
-}
-
-export { registerJob };
+registry.add("GenerateBottleDetails", generateBottleDetails);
+registry.add("GenerateCountryDetails", generateCountryDetails);
+registry.add("GenerateEntityDetails", generateEntityDetails);
+registry.add("GenerateRegionDetails", generateRegionDetails);
+registry.add("GeocodeCountryLocation", geocodeCountryLocation);
+registry.add("GeocodeRegionLocation", geocodeRegionLocation);
+registry.add("GeocodeEntityLocation", geocodeEntityLocation);
+registry.add("IndexBottleAlias", indexBottleAlias);
+registry.add("IndexBottleSearchVectors", indexBottleSearchVectors);
+registry.add("IndexEntitySearchVectors", indexEntitySearchVectors);
+registry.add("MergeBottle", mergeBottle);
+registry.add("MergeEntity", mergeEntity);
+registry.add("NotifyDiscordOnTasting", notifyDiscordOnTasting);
+registry.add("OnBottleAliasChange", onBottleAliasChange);
+registry.add("OnBottleChange", onBottleChange);
+registry.add("OnEntityChange", onEntityChange);
+registry.add("ScrapeAstorWines", scrapeAstorWines);
+registry.add("ScrapeHealthySpirits", scrapeHealthySpirits);
+registry.add("ScrapeReserveBar", scrapeReserveBar);
+registry.add("ScrapeSMWS", scrapeSMWS);
+registry.add("ScrapeSMWSA", scrapeSMWSA);
+registry.add("ScrapeTotalWine", scrapeTotalWine);
+registry.add("ScrapeWoodenCork", scrapeWoodenCork);
+registry.add("ScrapeWhiskyAdvocate", scrapeWhiskeyAdvocate);
+registry.add("CreateMissingBottles", createMissingBottles);
+registry.add("UpdateBottleStats", updateBottleStats);
+registry.add("UpdateCountryStats", updateCountryStats);
+registry.add("UpdateEntityStats", updateEntityStats);
+registry.add("UpdateRegionStats", updateRegionStats);

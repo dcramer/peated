@@ -5,8 +5,8 @@ import {
   entities,
   tastings,
 } from "@peated/server/db/schema";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
-import { runJob } from "./";
 
 export default async ({ entityId }: { entityId: number }) => {
   const entity = await db.query.entities.findFirst({
@@ -75,9 +75,17 @@ export default async ({ entityId }: { entityId: number }) => {
   });
 
   if (entity.countryId) {
-    await runJob("UpdateCountryStats", { countryId: entity.countryId });
+    await pushUniqueJob(
+      "UpdateCountryStats",
+      { countryId: entity.countryId },
+      { delay: 5000 },
+    );
   }
   if (entity.regionId) {
-    await runJob("UpdateRegionStats", { regionId: entity.regionId });
+    await pushUniqueJob(
+      "UpdateRegionStats",
+      { regionId: entity.regionId },
+      { delay: 5000 },
+    );
   }
 };

@@ -26,10 +26,8 @@ vi.mock("../worker/client", async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const oJobs = await importOriginal<typeof import("../worker/client.js")>();
   return {
-    getClient: vi.fn(async () => vi.fn()),
-    hasActiveClient: vi.fn(async () => true),
-    shutdownClient: vi.fn(async () => undefined),
     pushJob: vi.fn(() => Promise<void>),
+    pushUniqueJob: vi.fn(() => Promise<void>),
     runJob: oJobs.runJob,
   };
 });

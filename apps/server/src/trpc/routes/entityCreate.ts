@@ -13,7 +13,7 @@ import { buildEntitySearchVector } from "@peated/server/lib/search";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
-import { pushJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { authedProcedure } from "..";
@@ -141,7 +141,11 @@ export default authedProcedure
     }
 
     try {
-      await pushJob("OnEntityChange", { entityId: entity.id });
+      await pushUniqueJob(
+        "OnEntityChange",
+        { entityId: entity.id },
+        { delay: 5000 },
+      );
     } catch (err) {
       logError(err, {
         entity: {

@@ -29,3 +29,15 @@ export type JobName =
   | "UpdateCountryStats"
   | "UpdateEntityStats"
   | "UpdateRegionStats";
+
+type TraceContext = {
+  "sentry-trace"?: string;
+  baggage?: any;
+};
+
+type JobContext = { traceContext?: TraceContext };
+
+export type JobFunction = (
+  args?: any,
+  context?: JobContext,
+) => Promise<unknown>;
