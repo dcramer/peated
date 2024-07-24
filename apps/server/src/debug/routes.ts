@@ -18,6 +18,7 @@ export default async function routes(fastify: FastifyInstance) {
         pictureUrl: null,
       },
     });
+
     reply.header("Content-Type", "text/html");
     reply.send(html);
   });

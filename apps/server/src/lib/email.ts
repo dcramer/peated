@@ -1,7 +1,11 @@
+import theme from "@peated/design";
 import config from "@peated/server/config";
+import { and, eq, inArray, ne } from "drizzle-orm";
+import mjml2html from "mjml";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
+import { db } from "../db";
 import {
   comments,
   users,
@@ -11,11 +15,6 @@ import {
   type User,
 } from "../db/schema";
 import { logError } from "../lib/log";
-import { escapeHtml } from "./html";
-
-import theme from "@peated/design";
-import { and, eq, inArray, ne } from "drizzle-orm";
-import { db } from "../db";
 import { absoluteUri } from "./urls";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
@@ -154,58 +153,68 @@ export function buildCommentHtml(comment: {
     `/users/${encodeURIComponent(comment.createdBy.username)}`,
     config.URL_PREFIX,
   );
-  const avatarUrl = absoluteUri(
+  const avatarUrl =
     comment.createdBy.pictureUrl ||
-      `${config.URL_PREFIX}/assets/placeholder-avatar.png`,
-    config.API_SERVER,
-  );
+    `${config.URL_PREFIX}/assets/placeholder-avatar.png`;
 
-  const titleLine = `${escapeHtml(
-    comment.createdBy.username,
-  )} commented on ${comment.tasting.bottle.fullName}`;
-  const reasonLine = `You are being notified because you are subscribed to comments. <a href="${settingsUrl}" style="color:${theme.colors.highlight}">Settings</a>`;
+  const input = `
+  <mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-text align="center" font-size="14px" line-height="24px" color="${theme.colors.black}" padding="0" />
+      <mj-button font-size="14px" color="${theme.colors.white}" background-color="${theme.colors.slate[700]}" />
+      <mj-section background-color="${theme.colors.white}" margin-bottom="24px" full-width="full-width" text-align="center" padding="24px 16px 0" vertical-align="center" />
+      <mj-image padding="0" />
+    </mj-attributes>
+  </mj-head>
 
-  return `
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <title>New Comment</title>
-      <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
-    </head>
-    <body style="width:100%">
-    <table style="width:100%;">
-    <tr><td style="width:100%;text-align:center;">
-    <table style="width:600px;margin:0 auto;"><tr><td style="text-align:left;background:${theme.colors.background};border-radius:8px;padding:12px 16px;border:1px solid ${theme.colors.slate[900]};">
-      <h2 style="margin-top:0;margin-bottom:15px;color:${
-        theme.colors.highlight
-      };">${titleLine}</h2>
-      <table cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="vertical-align:top"><img src="${avatarUrl}" width="36" height="36" style="border-radius:36px;display:block;" /></td>
-          <td style="padding-left:15px">
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td><b style="color:${theme.colors.highlight};"><a href="${profileUrl}" style="color:${theme.colors.highlight};">${escapeHtml(
-                  comment.createdBy.username,
-                )}</a></b></td>
-              </tr>
-              <tr>
-              <td style="color:${theme.colors.light};">${escapeHtml(
-                comment.comment,
-              )}</td>
-            </tr>
-            <tr>
-              <td style="padding-top:15px;"><a href="${commentUrl}" style="color:${
-                theme.colors.highlight
-              };">View this Comment</a></td>
-            </tr>
-            </table>
-        </tr>
-      </table>
-      <p style="color:${theme.colors.light};margin:15px 0 0;">${reasonLine}</p>
-      </td></tr></table>
-      </td></tr></table>
-    </body>
-  </html>
+  <mj-body background-color="${theme.colors.slate[100]}" color="${theme.colors.black}" font-family="Arial, sans-serif">
+    <mj-wrapper padding="40px 0">  
+      <mj-wrapper padding="0" full-width="full-width" text-align="center">
+        <mj-section background-color="${theme.colors.slate[800]}" padding="32px 16px">
+          <mj-column vertical-align="center" width="96px">
+            <mj-image href="${config.URL_PREFIX}" src="${config.URL_PREFIX}/assets/glyph.png" />
+          </mj-column>
+        </mj-section>
+        
+        <mj-section>
+          <mj-column width="20%" padding-right="20px">
+            <mj-image src=${avatarUrl}" width="64px" />
+          </mj-column>
+          <mj-column width="80%">
+            <mj-text align="left" font-size="24px" line-height="28px">
+              <a href="${profileUrl}" style="color:inherit;text-decoration:none;"><strong>${comment.createdBy.username}</strong></a> commented on <a href="${commentUrl}" style="color:inherit;text-decoration:none;"><strong>${comment.tasting.bottle.fullName}</strong></a>
+            </mj-text>
+          </mj-column>
+        </mj-section>
+
+        <mj-section>
+          <mj-column>
+            <mj-text align="justify">${comment.comment}</mj-text>
+          </mj-column>
+        </mj-section>
+
+        <mj-section>
+          <mj-column>
+            <mj-button align="center" href="${commentUrl}">View Comment</mj-button>
+          </mj-column>
+        </mj-section>
+
+        <mj-section>
+          <mj-divider border-wdith="1px" border-style="solid" border-color="${theme.colors.slate[100]}" />
+        </mj-section>
+
+        <mj-section padding="20px 10px" >
+          <mj-text color="${theme.colors.slate[500]}">
+            You are being notified because you are subscribed to comments. <a href="${settingsUrl}" style="color:${theme.colors.slate[800]};text-decoration:underline">Settings</a>
+          </mj-text>
+        </mj-section>
+      </mj-wrapper>
+    </mj-wrapper>
+  </mj-body>
+</mjml>
   `;
+
+  const { html } = mjml2html(input);
+  return html;
 }
