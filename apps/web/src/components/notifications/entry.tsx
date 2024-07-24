@@ -24,7 +24,7 @@ export default function NotificationEntry({
     <div
       className={classNames(
         "bg-slate-950 p-3",
-        notification.read ? "text-light" : "text-white",
+        notification.read ? "text-muted" : "text-white",
         link ? "group cursor-pointer rounded hover:bg-slate-700" : "",
       )}
       onClick={
@@ -70,7 +70,7 @@ export default function NotificationEntry({
                   e.stopPropagation();
                   onArchive();
                 }}
-                className="group-hover:text-light block h-full w-full rounded bg-inherit p-2 px-1 text-slate-600 hover:bg-slate-800 hover:text-slate-400"
+                className="group-hover:text-muted block h-full w-full rounded bg-inherit p-2 px-1 text-slate-600 hover:bg-slate-800 hover:text-slate-400"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>

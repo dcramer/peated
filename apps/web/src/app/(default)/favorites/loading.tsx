@@ -18,7 +18,7 @@ export default function Loading() {
           <col className="sm:w-1/6" />
           <col className="sm:w-1/6" />
         </colgroup>
-        <thead className="text-light hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group"></thead>
+        <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group"></thead>
         <tbody>
           <BottleTableRowSkeleton />
           <BottleTableRowSkeleton />

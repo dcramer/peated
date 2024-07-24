@@ -19,7 +19,7 @@ function QueueStats() {
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {count.toLocaleString()}
               </span>
-              <span className="text-light text-sm">{name}</span>
+              <span className="text-muted text-sm">{name}</span>
             </div>
           );
         })}

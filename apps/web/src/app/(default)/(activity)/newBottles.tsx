@@ -13,7 +13,7 @@ export function NewBottlesSkeleton() {
         <div className="flex animate-pulse items-center overflow-hidden bg-slate-800 -indent-96">
           Bottle
         </div>
-        <div className="text-light w-2/5 animate-pulse bg-slate-800 -indent-96 text-sm">
+        <div className="text-muted w-2/5 animate-pulse bg-slate-800 -indent-96 text-sm">
           Category
         </div>
       </td>
@@ -61,7 +61,7 @@ export default function NewBottles() {
                     {bottle.vintageYear && (
                       <>
                         {" "}
-                        <span className="text-light">
+                        <span className="text-muted">
                           ({bottle.vintageYear})
                         </span>
                       </>
@@ -74,7 +74,7 @@ export default function NewBottles() {
                     )}
                   </div>
                   {!!bottle.category && (
-                    <div className="text-light text-sm">
+                    <div className="text-muted text-sm">
                       <Link
                         href={`/bottles/?category=${bottle.category}`}
                         className="hover:underline"

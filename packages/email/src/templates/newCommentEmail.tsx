@@ -126,7 +126,7 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
         </Button>
       </Section>
 
-      <Section className="mb-[16px] px-[24px] pt-[16px] text-center">
+      <Section className="mb-[8px] px-[24px] pt-[8px] text-center">
         <Hr
           disableDefaultStyle
           className="w-full border border-solid border-slate-700"
@@ -136,7 +136,7 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
       <Section className="mb-[16px] px-[24px] pt-[16px] text-center">
         <Text
           disableDefaultStyle
-          className="text-light m-0 text-[12px] leading-[24px]"
+          className="text-muted m-0 text-[12px] leading-[24px]"
         >
           You are being notified because you are subscribed to comments.{" "}
           <Link

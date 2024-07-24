@@ -36,7 +36,7 @@ export default function UserAvatar({
 
   return (
     <DefaultAvatar
-      className="text-light h-full w-full rounded bg-slate-900"
+      className="text-muted h-full w-full rounded bg-slate-900"
       style={{
         width: size,
         height: size,

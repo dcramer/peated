@@ -26,7 +26,7 @@ export default function Page({
               {flight.name}
             </h1>
             {flight.description && (
-              <div className="text-light text-center sm:text-left">
+              <div className="text-muted text-center sm:text-left">
                 {flight.description}
               </div>
             )}
@@ -49,7 +49,7 @@ export default function Page({
                         <div className="flex items-center gap-x-1 text-2xl group-hover:underline">
                           <div className="font-semibold">{bottle.fullName}</div>
                         </div>
-                        <div className="text-light flex flex-row items-start space-x-1 truncate">
+                        <div className="text-muted flex flex-row items-start space-x-1 truncate">
                           <Distillers data={bottle} />
                         </div>
                         {bottle.description}

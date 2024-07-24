@@ -35,7 +35,7 @@ export default async function BottleTastings({
             Are you enjoying a dram?
           </span>
 
-          <span className="mt-2 block font-light">
+          <span className="font-muted mt-2 block">
             Looks like no ones recorded this spirit. You could be the first!
           </span>
         </EmptyActivity>

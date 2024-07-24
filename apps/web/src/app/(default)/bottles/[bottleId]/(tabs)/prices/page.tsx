@@ -43,7 +43,7 @@ export default async function BottlePrices({
                     <Price value={price.price} currency={price.currency} />
                   </span>
                 </a>
-                <span className="text-light text-xs">
+                <span className="text-muted text-xs">
                   {price.volume}mL &mdash; <TimeSince date={price.updatedAt} />
                 </span>
               </li>

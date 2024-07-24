@@ -11,7 +11,7 @@ export default function CaskDetails({
   caskType: CaskType | null;
 }) {
   return (
-    <div className="text-light">
+    <div className="text-muted">
       {caskFill ? toTitleCase(caskFill) : ""}{" "}
       {caskType ? toTitleCase(caskType) : ""}{" "}
       {caskSize ? toTitleCase(caskSize) : ""}

@@ -97,7 +97,7 @@ export default function ChangeList({
                       displayName={change.displayName}
                     />
                   </div>
-                  <div className="text-light">
+                  <div className="text-muted">
                     <TimeSince date={change.createdAt} />
                   </div>
                 </div>

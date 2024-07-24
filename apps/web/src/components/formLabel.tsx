@@ -28,7 +28,7 @@ export default function FormLabel<
       }`}
     >
       <div>{children}</div>
-      <span className="text-light text-xs leading-6">
+      <span className="text-muted text-xs leading-6">
         {labelNote || (!required && "Optional")}
       </span>
     </Component>

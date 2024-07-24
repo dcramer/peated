@@ -37,7 +37,7 @@ export default function Page({
           <h3 className="self-center text-4xl font-semibold text-white sm:self-start">
             {toTitleCase(tag.name)}
           </h3>
-          <div className="text-light flex flex-col items-center self-center sm:flex-row sm:self-start lg:mb-8">
+          <div className="text-muted flex flex-col items-center self-center sm:flex-row sm:self-start lg:mb-8">
             {toTitleCase(tag.tagCategory)}
           </div>
         </div>

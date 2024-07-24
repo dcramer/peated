@@ -89,7 +89,7 @@ export default function EntityTable({
                       <div>
                         <Link
                           href={`/locations/${item.country.slug}/regions/${item.region.slug}`}
-                          className="text-light hover:underline"
+                          className="text-muted hover:underline"
                         >
                           {item.region.name}
                         </Link>

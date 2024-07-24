@@ -111,7 +111,7 @@ export default function TastingListItem({
         <div className="flex flex-col items-end gap-y-2">
           <Link href={`/tastings/${tasting.id}`} className="hover:underline">
             <TimeSince
-              className="block text-sm font-light"
+              className="font-muted block text-sm"
               date={tasting.createdAt}
             />
           </Link>
@@ -150,7 +150,7 @@ export default function TastingListItem({
         tasting.color ||
         tasting.rating ||
         tasting.tags.length > 0) && (
-        <div className="text-light p-3 text-sm sm:px-5">
+        <div className="text-muted p-3 text-sm sm:px-5">
           <DefinitionList className="grid-cols grid grid-cols-2 gap-y-4 sm:grid-cols-2">
             {tasting.rating && (
               <div>

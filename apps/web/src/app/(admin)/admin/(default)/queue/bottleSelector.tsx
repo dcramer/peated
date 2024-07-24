@@ -75,7 +75,7 @@ export default function BottleSelector({
       >
         <div className="relative mx-auto lg:px-8">
           {(name || source) && (
-            <div className="prose prose-invert text-light max-w-none bg-slate-800 p-6">
+            <div className="prose prose-invert text-muted max-w-none bg-slate-800 p-6">
               {name && (
                 <p>
                   Select the bottle that is identified as{" "}
@@ -120,13 +120,13 @@ export default function BottleSelector({
                       {bottle.vintageYear && (
                         <>
                           {" "}
-                          <span className="text-light">
+                          <span className="text-muted">
                             ({bottle.vintageYear})
                           </span>
                         </>
                       )}
                     </div>
-                    <div className="text-light flex space-x-2">
+                    <div className="text-muted flex space-x-2">
                       {bottle.distillers.map((distiller) => distiller.name)}
                     </div>
                   </button>

@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+import { en, Faker } from "@faker-js/faker";
 import * as dbSchema from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { type ExternalSiteType } from "@peated/server/types";
@@ -17,9 +17,9 @@ import { db as dbConn } from "../../db";
 import {
   badges,
   bottleAliases,
-  bottleTags,
   bottles,
   bottlesToDistillers,
+  bottleTags,
   changes,
   collections,
   comments,
@@ -41,6 +41,11 @@ import { mapRows } from "../db";
 import { choose, random, sample } from "../rand";
 import { buildBottleSearchVector, buildEntitySearchVector } from "../search";
 import { toTitleCase } from "../strings";
+
+const faker = new Faker({
+  locale: [en],
+});
+faker.seed(1337);
 
 export async function loadFixture(...paths: string[]) {
   const data = await readFile(
@@ -72,6 +77,7 @@ export const User = async (
       username: "",
       email: faker.internet.email({
         firstName: data.username || undefined,
+        lastName: "example",
       }),
       admin: false,
       mod: false,

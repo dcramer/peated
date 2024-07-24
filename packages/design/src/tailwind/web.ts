@@ -5,11 +5,15 @@ import tailwindTypography from "@tailwindcss/typography";
 
 import colors from "tailwindcss/colors";
 
+import defaultTheme from "tailwindcss/defaultTheme";
 import baseConfig from "./base";
 
 export default {
   content: baseConfig.content,
   presets: [baseConfig],
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     extend: {
       animation: {
@@ -28,6 +32,10 @@ export default {
           "100%": { opacity: "0", transform: "translate(-20px, 0)" },
         },
       }),
+
+      fontFamily: {
+        sans: ["Raleway", ...defaultTheme.fontFamily.sans],
+      },
 
       typography: {
         DEFAULT: {

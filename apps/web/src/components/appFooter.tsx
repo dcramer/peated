@@ -16,7 +16,7 @@ export default function AppFooter() {
 
       <NavLink
         href="/search?tasting"
-        className="focus:ring-highlight text-light relative -mt-5 flex max-w-xs items-center rounded border-t border-t-slate-700 bg-slate-950 text-sm hover:bg-slate-700 focus:outline-none focus:ring"
+        className="focus:ring-highlight text-muted relative -mt-5 flex max-w-xs items-center rounded border-t border-t-slate-700 bg-slate-950 text-sm hover:bg-slate-700 focus:outline-none focus:ring"
       >
         <PeatedGlyph className="m-5 h-9 w-9" />
       </NavLink>

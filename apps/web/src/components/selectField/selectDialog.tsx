@@ -123,7 +123,7 @@ export default function SelectDialog<T extends Option>({
                           (i) => i.id == option.id && i.name == option.name,
                         )
                           ? "bg-highlight text-black"
-                          : "text-light bg-slate-900 group-hover:bg-slate-700",
+                          : "text-muted bg-slate-900 group-hover:bg-slate-700",
                       )}
                     />
 

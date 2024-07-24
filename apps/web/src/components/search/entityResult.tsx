@@ -23,7 +23,7 @@ export default function EntityResultRow({
             {entity.name}
           </Link>
         </div>
-        <div className="text-light mt-1 flex gap-x-1 truncate text-sm leading-5">
+        <div className="text-muted mt-1 flex gap-x-1 truncate text-sm leading-5">
           {entity.shortName}
         </div>
       </div>

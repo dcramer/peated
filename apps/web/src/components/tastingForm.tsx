@@ -181,7 +181,7 @@ export default function TastingForm({
                   return (
                     <div className="flex flex-col items-start">
                       <div>{option.name}</div>
-                      <div className="text-light font-normal">
+                      <div className="text-muted font-normal">
                         {toTitleCase(option.tag.tagCategory)}
                       </div>
                     </div>

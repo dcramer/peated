@@ -49,7 +49,7 @@ export default async function Page({
             <ModActions flight={flight} />
           </div>
           {flight.description && (
-            <div className="text-light truncate text-center sm:text-left">
+            <div className="text-muted truncate text-center sm:text-left">
               {flight.description}
             </div>
           )}
@@ -80,7 +80,7 @@ export default async function Page({
                       <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
                     )}
                   </div>
-                  <div className="text-light text-sm">
+                  <div className="text-muted text-sm">
                     {formatCategoryName(bottle.category)}
                   </div>
                 </td>

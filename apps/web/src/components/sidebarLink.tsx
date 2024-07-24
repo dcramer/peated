@@ -34,7 +34,7 @@ export default forwardRef(function SidebarLink<
         className={classNames(
           active
             ? "text-highlight border-highlight"
-            : "text-light border-transparent hover:border-slate-400 hover:text-slate-400",
+            : "text-muted border-transparent hover:border-slate-400 hover:text-slate-400",
           "relative cursor-pointer border-l-4",
           "group flex gap-x-3 text-sm font-semibold leading-6",
           size === "default" ? "p-2" : "px-2",
@@ -47,7 +47,7 @@ export default forwardRef(function SidebarLink<
             className={classNames(
               active
                 ? "text-highlight"
-                : "text-light group-hover:text-slate-400",
+                : "text-muted group-hover:text-slate-400",
               "h-6 w-6 shrink-0",
             )}
             aria-hidden="true"

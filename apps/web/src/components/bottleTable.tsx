@@ -39,7 +39,7 @@ export default function BottleTable({
                 </BottleLink>
                 {item.vintageYear && (
                   <>
-                    <span className="text-light">({item.vintageYear})</span>
+                    <span className="text-muted">({item.vintageYear})</span>
                   </>
                 )}
                 {item.isFavorite && (

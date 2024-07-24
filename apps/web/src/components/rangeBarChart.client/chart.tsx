@@ -85,7 +85,7 @@ export default function Chart({
         );
       })}
       {activeItem && (
-        <text x="5" y="16" className="fill-light text-xs">
+        <text x="5" y="16" className="fill-muted text-xs">
           <tspan x="5" y="16">
             ${(activeItem.avg / 100).toFixed(2)} per mL
           </tspan>

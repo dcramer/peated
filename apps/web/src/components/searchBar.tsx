@@ -9,7 +9,7 @@ export default function SearchBar({ name = "query" }: { name?: string }) {
   return (
     <Form>
       <div className="my-2 flex items-center gap-x-2 px-3 py-2">
-        <MagnifyingGlassIcon className="text-light h-5 w-5 " />
+        <MagnifyingGlassIcon className="text-muted h-5 w-5 " />
         <div className="flex-grow">
           <TextInput
             type="text"
