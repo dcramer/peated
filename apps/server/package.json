@@ -45,7 +45,6 @@
     "@vitest/coverage-v8": "^1.6.0",
     "ai": "^3.2.19",
     "axios": "~1.6.8",
-    "axios-mock-adapter": "~1.22.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.10.3",
     "cheerio": "1.0.0-rc.12",
@@ -60,8 +59,6 @@
     "error-cause": "^1.0.8",
     "fastify": "^4.28.1",
     "fastify-plugin": "^4.5.1",
-    "form-data-encoder": "^3.0.1",
-    "formdata-node": "^5.0.1",
     "google-auth-library": "^8.9.0",
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
@@ -71,17 +68,21 @@
     "nodemailer": "^6.9.14",
     "openai": "^4.52.2",
     "pg": "catalog:",
-    "pino-pretty": "^10.3.1",
     "sharp": "^0.33.4",
     "superjson": "catalog:",
     "toad-scheduler": "^3.0.1",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "~1.4.0",
     "wkx": "^0.5.0",
     "zod": "catalog:",
     "zod-to-json-schema": "^3.23.1"
+  },
+  "devDependencies": {
+    "axios-mock-adapter": "~1.22.0",
+    "form-data-encoder": "^4.0.2",
+    "formdata-node": "^6.0.3",
+    "vitest": "~1.4.0"
   },
   "volta": {
     "extends": "../../package.json"
