@@ -1,4 +1,4 @@
-import { en, Faker } from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 import * as dbSchema from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { type ExternalSiteType } from "@peated/server/types";
@@ -41,11 +41,6 @@ import { mapRows } from "../db";
 import { choose, random, sample } from "../rand";
 import { buildBottleSearchVector, buildEntitySearchVector } from "../search";
 import { toTitleCase } from "../strings";
-
-const faker = new Faker({
-  locale: [en],
-});
-faker.seed(1337);
 
 export async function loadFixture(...paths: string[]) {
   const data = await readFile(
