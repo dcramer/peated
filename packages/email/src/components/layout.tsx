@@ -21,10 +21,6 @@ body {
     "Noto Color Emoji";
 }
 
-.rounded {
-  border-adius: 4px;
-}
-
 @media (min-width: 1024px) {
   body {
     padding: 8px;
