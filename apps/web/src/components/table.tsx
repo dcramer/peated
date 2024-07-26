@@ -5,7 +5,7 @@ import type { PagingRel } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import { useSearchParams } from "next/navigation";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import PaginationButtons from "./paginationButtons";
 import SearchBar from "./searchBar";
 import SortParam from "./sortParam";
@@ -35,6 +35,7 @@ export default function Table<
   defaultSort,
   groupBy,
   groupTo,
+  groupItem = (item: T) => item.name,
   withSearch = false,
   noHeaders = false,
 }: {
@@ -46,6 +47,7 @@ export default function Table<
   defaultSort?: string;
   groupBy?: (item: T) => G;
   groupTo?: (group: G) => string;
+  groupItem?: (item: T) => ReactNode;
   withSearch?: boolean;
   noHeaders?: boolean;
 }) {
@@ -130,7 +132,7 @@ export default function Table<
                     className="bg-slate-800 py-2 pl-4 pr-3 text-left text-sm font-semibold sm:pl-3"
                   >
                     {groupTo ? (
-                      <Link href={groupTo(group)}>{group.name}</Link>
+                      <Link href={groupTo(group)}>{groupItem(group)}</Link>
                     ) : (
                       group.name
                     )}

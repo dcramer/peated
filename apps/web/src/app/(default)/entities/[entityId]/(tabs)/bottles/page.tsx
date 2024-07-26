@@ -38,6 +38,7 @@ export default function EntityTastings({
         bottleList={bottleList.results}
         rel={bottleList.rel}
         groupBy={(item) => item.brand}
+        groupItem={(item) => item.shortName || item.name}
         groupTo={(group) => `/entities/${group.id}`}
         withSearch
       />
