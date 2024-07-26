@@ -29,13 +29,13 @@ export default function Table<
 >({
   items,
   columns,
-  primaryKey = (item: T) => String(item.id),
-  url = (item: T) => null,
+  primaryKey = (item) => String(item.id),
+  url = (item) => null,
   rel,
   defaultSort,
   groupBy,
   groupTo,
-  groupItem = (item: T) => item.name,
+  groupItem = (item) => item.name,
   withSearch = false,
   noHeaders = false,
 }: {
