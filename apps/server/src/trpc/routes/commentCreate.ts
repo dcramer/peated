@@ -1,11 +1,16 @@
 import { db } from "@peated/server/db";
-import type { Comment, NewComment } from "@peated/server/db/schema";
+import type {
+  Comment,
+  NewComment,
+  Notification,
+} from "@peated/server/db/schema";
 import { comments, tastings } from "@peated/server/db/schema";
-import { notifyComment } from "@peated/server/lib/email";
+import { logError } from "@peated/server/lib/log";
 import { createNotification } from "@peated/server/lib/notifications";
 import { CommentInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CommentSerializer } from "@peated/server/serializers/comment";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -42,8 +47,7 @@ export default authedProcedure
       data.createdAt = new Date(input.createdAt);
     }
 
-    const user = ctx.user;
-    const comment = await db.transaction(async (tx) => {
+    const [comment, notif] = await db.transaction(async (tx) => {
       let comment: Comment | undefined;
       try {
         [comment] = await tx
@@ -61,32 +65,25 @@ export default authedProcedure
         }
         throw err;
       }
-      if (!comment) return;
+      if (!comment) return [];
 
       await tx
         .update(tastings)
         .set({ comments: sql`${tastings.comments} + 1` })
         .where(eq(tastings.id, tasting.id));
 
+      let notif: Notification | null = null;
       if (comment.createdById !== tasting.createdById) {
-        createNotification(tx, {
+        notif = await createNotification(tx, {
           fromUserId: comment.createdById,
           type: "comment",
           objectId: comment.id,
           createdAt: comment.createdAt,
           userId: tasting.createdById,
         });
-
-        await notifyComment({
-          comment: {
-            ...comment,
-            createdBy: user,
-            tasting,
-          },
-        });
       }
 
-      return comment;
+      return [comment, notif];
     });
 
     if (!comment) {
@@ -94,6 +91,18 @@ export default authedProcedure
         code: "INTERNAL_SERVER_ERROR",
         message: "Unable to create comment.",
       });
+    }
+
+    if (notif) {
+      try {
+        await pushJob("ProcessNotification", { notificationId: notif.id });
+      } catch (err) {
+        logError(err, {
+          notification: {
+            id: notif.id,
+          },
+        });
+      }
     }
 
     return await serialize(CommentSerializer, comment, ctx.user);

@@ -17,9 +17,9 @@ import { db as dbConn } from "../../db";
 import {
   badges,
   bottleAliases,
-  bottleTags,
   bottles,
   bottlesToDistillers,
+  bottleTags,
   changes,
   collections,
   comments,
@@ -72,6 +72,7 @@ export const User = async (
       username: "",
       email: faker.internet.email({
         firstName: data.username || undefined,
+        lastName: "example",
       }),
       admin: false,
       mod: false,

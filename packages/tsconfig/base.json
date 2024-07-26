@@ -9,6 +9,7 @@
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
+    "jsx": "react-jsx",
 
     /** Keep TSC performant in monorepos */
     "incremental": true,

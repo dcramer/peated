@@ -1,5 +1,4 @@
 import type { FastifyInstance, FastifyPluginCallback } from "fastify";
-import previewCommentEmail from "./debug/previewCommentEmail";
 import triggerSentry from "./debug/triggerSentry";
 import root from "./root";
 import updateTastingImage from "./updateTastingImage";
@@ -51,5 +50,4 @@ export const router: FastifyPluginCallback = (
 
 function registerDebugRoutes(fastify: FastifyInstance) {
   fastify.route(triggerSentry);
-  fastify.route(previewCommentEmail);
 }

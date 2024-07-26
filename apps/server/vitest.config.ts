@@ -11,8 +11,11 @@ export default defineConfig({
       reporter: ["json"],
     },
     maxConcurrency: 0,
-    // pool: "forks",
+    pool: "forks",
     poolOptions: {
+      forks: {
+        singleFork: true,
+      },
       threads: {
         singleThread: true,
       },

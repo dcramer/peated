@@ -1,18 +1,18 @@
 // make sure to import this _before_ all other code
 import "../sentry";
 
+import "error-cause/auto";
+
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { and, eq, sql } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { Client } from "pg";
-import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, vi } from "vitest";
 import { db, pool } from "../db";
 import { migrate } from "../db/migrate";
 import "../lib/test/expects";
 import * as fixtures from "../lib/test/fixtures";
-
-import "error-cause/auto";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
@@ -35,8 +35,6 @@ vi.mock("../worker/client", async (importOriginal) => {
 
 // force registration of all jobs
 import "../worker/jobs";
-
-global.DefaultFixtures = {};
 
 const pgTables = pgTable("pg_tables", {
   schemaname: text("schemaname").notNull(),
@@ -139,8 +137,21 @@ beforeAll(async () => {
   try {
     await migrate({ db });
   } catch (err) {
+    await pool.end();
     throw new Error("Unable to run db migrations", { cause: err });
   }
+
+  return async () => {
+    await pool.end();
+  };
+});
+
+beforeEach(async (ctx) => {
+  ctx.axiosMock = axiosMock;
+
+  return () => {
+    axiosMock.reset();
+  };
 });
 
 beforeEach(async (ctx) => {
@@ -148,24 +159,9 @@ beforeEach(async (ctx) => {
 
   const user = await createDefaultUser();
 
-  ctx.axiosMock = axiosMock;
-
   ctx.defaults = {
     user,
     authHeaders: await fixtures.AuthenticatedHeaders({ user }),
   };
   ctx.fixtures = fixtures;
-
-  global.DefaultFixtures = {
-    user,
-    authHeaders: ctx.defaultAuthHeaders,
-  };
-});
-
-afterEach(() => {
-  axiosMock.reset();
-});
-
-afterAll(async () => {
-  await pool.end();
 });
