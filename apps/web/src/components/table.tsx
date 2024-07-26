@@ -47,7 +47,7 @@ export default function Table<
   defaultSort?: string;
   groupBy?: (item: T) => G;
   groupTo?: (group: G) => string;
-  groupItem?: (item: T) => ReactNode;
+  groupItem?: (item: G) => ReactNode;
   withSearch?: boolean;
   noHeaders?: boolean;
 }) {
