@@ -12,6 +12,7 @@ import {
 } from "jsx-email";
 import Layout from "../components/layout";
 
+import theme from "@peated/design";
 import {
   defaulted,
   nullable,
@@ -73,11 +74,21 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
     <Layout baseUrl={baseUrl}>
       <Preview>{previewText}</Preview>
 
-      <Section className="mb-[16px] px-[24px] pt-[16px]">
+      <Section
+        style={{
+          marginBottom: "16px",
+          padding: "16px 24px 0",
+        }}
+      >
         <Row>
-          <Column className="w-[64px] pr-[20px]">
+          <Column
+            style={{
+              width: "64px",
+              paddingRight: "16px",
+            }}
+          >
             <Img
-              className="rounded-full"
+              style={{ borderRadius: "9999px" }}
               src={avatarUrl}
               width="64px"
               height="64px"
@@ -85,13 +96,21 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
           </Column>
           <Column>
             <Heading
-              className="m-0 text-[24px] font-normal text-white"
-              disableDefaultStyle
+              style={{
+                margin: 0,
+                fontSize: "24px",
+                fontWeight: "normal",
+                color: theme.colors.white,
+              }}
             >
               <Link
                 href={profileUrl}
                 disableDefaultStyle
-                className="font-bold text-white no-underline"
+                style={{
+                  fontWeight: "bold",
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
               >
                 {comment.createdBy.username}
               </Link>{" "}
@@ -99,7 +118,11 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
               <Link
                 href={tastingUrl}
                 disableDefaultStyle
-                className="font-bold text-white no-underline"
+                style={{
+                  fontWeight: "bold",
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
               >
                 {comment.tasting.bottle.fullName}
               </Link>
@@ -108,41 +131,92 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
         </Row>
       </Section>
 
-      <Section className="mb-[16px] px-[24px] pt-[16px]">
+      <Section
+        style={{
+          marginBottom: "16px",
+          padding: "16px 24px 0",
+        }}
+      >
         <Text
-          disableDefaultStyle
-          className="m-0 text-[14px] leading-[24px] text-white"
+          style={{
+            margin: 0,
+            padding: 0,
+            fontSize: "14px",
+            lineHeight: "24px",
+            color: theme.colors.white,
+          }}
         >
           {comment.comment}
         </Text>
       </Section>
 
-      <Section className="mb-[16px] px-[24px] pt-[16px] text-center">
+      <Section
+        style={{
+          marginBottom: "16px",
+          padding: "16px 24px 0",
+          textAlign: "center",
+        }}
+      >
         <Button
-          className="border-highlight bg-highlight rounded px-5 py-3 text-center text-[12px] font-semibold text-black no-underline"
+          style={{
+            border: `1px solid ${theme.colors.highlight}`,
+            backgroundColor: theme.colors.highlight,
+            borderRadius: "4px",
+            padding: "12px",
+            textAlign: "center",
+            fontSize: "14px",
+            fontWeight: "500",
+            color: theme.colors.black,
+            textDecoration: "none",
+          }}
           href={commentUrl}
         >
           View Comment
         </Button>
       </Section>
 
-      <Section className="mb-[8px] px-[24px] pt-[8px] text-center">
+      <Section
+        style={{
+          marginBottom: "8px",
+          padding: "16px 24px 0",
+          textAlign: "center",
+        }}
+      >
         <Hr
           disableDefaultStyle
-          className="w-full border border-solid border-slate-700"
+          style={{
+            width: "100%",
+            margin: 0,
+            border: `1px solid ${theme.colors.slate[700]}`,
+          }}
         />
       </Section>
 
-      <Section className="mb-[16px] px-[24px] pt-[16px] text-center">
+      <Section
+        style={{
+          marginBottom: "16px",
+          padding: "16px 24px 0",
+          textAlign: "center",
+        }}
+      >
         <Text
           disableDefaultStyle
-          className="text-muted m-0 text-[12px] leading-[24px]"
+          style={{
+            margin: 0,
+            padding: 0,
+            fontSize: "14px",
+            lineHeight: "24px",
+            color: theme.colors.muted,
+          }}
         >
           You are being notified because you are subscribed to comments.{" "}
           <Link
             disableDefaultStyle
             href={settingsUrl}
-            className="text-white underline"
+            style={{
+              color: theme.colors.muted,
+              textDecoration: "underline",
+            }}
           >
             Settings
           </Link>

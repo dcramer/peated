@@ -1,7 +1,40 @@
 import theme from "@peated/design";
-import tailwindConfig from "@peated/design/tailwind/base";
-import { Body, Container, Head, Html, Img, Section, Tailwind } from "jsx-email";
+import { Body, Container, Head, Html, Img, Section } from "jsx-email";
 import type { ReactNode } from "react";
+
+const styles = `
+body {
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    "Noto Sans",
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji";
+}
+
+.rounded {
+  border-adius: 4px;
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding: 8px;
+  }
+
+  .main {
+    border-width: 2px;
+  }
+}
+`;
 
 export default function Layout({
   baseUrl,
@@ -12,28 +45,50 @@ export default function Layout({
 }) {
   return (
     <Html>
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
       <Head />
-      <Tailwind config={tailwindConfig} production>
-        <Body
-          className="m-auto bg-white font-sans lg:p-2"
-          style={{ backgroundColor: theme.colors.slate[900] }}
+      <Body
+        style={{
+          margin: "auto",
+          backgroundColor: theme.colors.slate[900],
+        }}
+      >
+        <Container
+          style={{
+            maxWidth: "540px",
+          }}
         >
-          <Container className="max-w-[540px]">
-            <Container className="rounded border-solid border-slate-700 bg-slate-900 lg:border">
-              <Section className="bg-highlight rounded-t border border-solid border-slate-900 px-[20px] py-[10px]">
-                <Img
-                  src={`${baseUrl}/assets/glyph-black.png`}
-                  width="96"
-                  height="96"
-                  alt="Peated"
-                  className="mx-auto my-0"
-                />
-              </Section>
-              {children}
-            </Container>
+          <Container
+            style={{
+              borderStyle: "solid",
+              borderColor: theme.colors.slate[800],
+              paddingBottom: "16px",
+              borderRadius: "0 0 4px 4px",
+            }}
+            className="main"
+          >
+            <Section
+              style={{
+                backgroundColor: theme.colors.highlight,
+                borderRadius: "4px 4px 0 0",
+                padding: "10px 24px",
+                marginBottom: "16px",
+              }}
+            >
+              <Img
+                src={`${baseUrl}/assets/glyph-black.png`}
+                width="96"
+                height="96"
+                alt="Peated"
+                style={{
+                  margin: "0 auto",
+                }}
+              />
+            </Section>
+            {children}
           </Container>
-        </Body>
-      </Tailwind>
+        </Container>
+      </Body>
     </Html>
   );
 }
