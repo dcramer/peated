@@ -142,12 +142,22 @@ test("creates a new bottle with existing brand name", async ({
   expect(changeList.length).toBe(0);
 });
 
-test("creates a new bottle with new brand name", async ({ defaults }) => {
+test("creates a new bottle with new brand name", async ({
+  defaults,
+  fixtures,
+}) => {
   const caller = createCaller({ user: defaults.user });
+  const country = await fixtures.Country({ name: "United States" });
+  const region = await fixtures.Region({
+    countryId: country.id,
+    name: "Kentucky",
+  });
   const data = await caller.bottleCreate({
     name: "Delicious Wood",
     brand: {
       name: "Hard Knox",
+      country: country.id,
+      region: region.id,
     },
   });
 
@@ -163,6 +173,8 @@ test("creates a new bottle with new brand name", async ({ defaults }) => {
   expect(bottle.brandId).toBeDefined();
   expect(brand.name).toBe("Hard Knox");
   expect(brand.createdById).toBe(defaults.user.id);
+  expect(brand.countryId).toEqual(country.id);
+  expect(brand.regionId).toEqual(region.id);
 
   // it should create a change entry for the brand
   const changeList = await db

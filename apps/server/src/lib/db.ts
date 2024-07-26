@@ -16,17 +16,25 @@ export type UpsertOutcome<T> =
     }
   | undefined;
 
-export function coerceToUpsert(
-  data: z.infer<typeof EntityInputSchema> | z.infer<typeof EntitySchema>,
-): EntityInput {
+export function coerceToUpsert({
+  country,
+  region,
+  ...data
+}:
+  | z.infer<typeof EntityInputSchema>
+  | z.infer<typeof EntitySchema>): EntityInput {
   const rv: EntityInput = { ...data };
-  if (data.country instanceof Object) {
-    rv.countryId = data.country.id;
+  if (country instanceof Object) {
+    rv.countryId = country.id;
+  } else if (country) {
+    rv.countryId = country;
   }
-  if (data.region instanceof Object) {
-    rv.regionId = data.region.id;
+  if (region instanceof Object) {
+    rv.regionId = region.id;
+  } else if (region) {
+    rv.regionId = region;
   }
-  return data;
+  return rv;
 }
 
 export const upsertEntity = async ({
@@ -60,9 +68,7 @@ export const upsertEntity = async ({
   const [result] = await db
     .insert(entities)
     .values({
-      name: data.name,
-      countryId: data.countryId,
-      regionId: data.regionId,
+      ...data,
       type: Array.from(
         new Set([...(type ? [type] : []), ...(data.type || [])]),
       ),
