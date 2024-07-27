@@ -1,4 +1,5 @@
 import program from "@peated/cli/program";
+import { MAJOR_COUNTRIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type {
   Bottle,
@@ -13,12 +14,40 @@ import {
   users,
 } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
-import { random, sample } from "@peated/server/lib/rand";
+import { choose, random, sample } from "@peated/server/lib/rand";
 import { SMWS_DISTILLERY_CODES } from "@peated/server/lib/smws";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
+import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { type Category } from "@peated/server/types";
 import { and, eq, ne, sql } from "drizzle-orm";
-import { MAJOR_COUNTRIES } from "../../../server/src/constants";
+import { readdir, readFile } from "fs/promises";
+import path, { basename } from "path";
+import { Readable } from "stream";
+
+const TASTING_IMAGES_DIR = path.join(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "server",
+  "__fixtures__",
+  "tasting-images",
+);
+
+let _tasting_images: string[] | null = null;
+
+const pickTastingImage = async () => {
+  if (_tasting_images === null) {
+    _tasting_images = await readdir(TASTING_IMAGES_DIR);
+  }
+  const filename = choose(_tasting_images);
+  return {
+    filename: basename(filename),
+    file: Readable.from(
+      await readFile(path.join(TASTING_IMAGES_DIR, filename)),
+    ),
+  };
+};
 
 const loadDefaultSites = async () => {
   const store1 =
@@ -276,7 +305,19 @@ subcommand
     const bottleList = await loadDefaultBottles(entityList, siteList);
 
     for (let i = 0; i < options.tastings; i++) {
+      const imageUrl =
+        random(1, 2) === 1
+          ? await storeFile({
+              data: await pickTastingImage(),
+              namespace: `tastings`,
+              urlPrefix: "/uploads",
+              onProcess: (...args) =>
+                compressAndResizeImage(...args, undefined, 1024),
+            })
+          : null;
+
       const tasting = await Fixtures.Tasting({
+        imageUrl,
         bottleId: (
           await db
             .select()
@@ -330,6 +371,7 @@ subcommand
           createdById: toUserId,
         })
         .returning();
+
       for (const { id: fromUserId } of userList) {
         const toast = await Fixtures.Toast({
           tastingId: lastTasting.id,

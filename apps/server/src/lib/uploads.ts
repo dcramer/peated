@@ -43,7 +43,12 @@ export const storeFile = async ({
   urlPrefix,
   onProcess,
 }: {
-  data: MultipartFile;
+  data:
+    | MultipartFile
+    | {
+        filename: string;
+        file: Readable;
+      };
   namespace: string;
   urlPrefix: string;
   onProcess?: ProcessCallback;

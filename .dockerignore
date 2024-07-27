@@ -37,3 +37,4 @@ postgres-data
 *.md
 
 /terraform
+/__fixtures__
