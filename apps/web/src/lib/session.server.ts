@@ -9,11 +9,13 @@ if (!process.env.SESSION_SECRET) {
 export interface SessionData {
   user: User | null;
   accessToken: string | null;
+  ts: number | null;
 }
 
 export const defaultSession: SessionData = {
   user: null,
   accessToken: null,
+  ts: null,
 };
 
 export const sessionOptions: SessionOptions = {

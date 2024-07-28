@@ -13,6 +13,7 @@ import Header from "@peated/web/components/header";
 import ImageField from "@peated/web/components/imageField";
 import Layout from "@peated/web/components/layout";
 import Legend from "@peated/web/components/legend";
+import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
 import TextField from "@peated/web/components/textField";
 import useApi from "@peated/web/hooks/useApi";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -105,6 +106,12 @@ export default function Page() {
         </Header>
       }
     >
+      {!user.verified && (
+        <div className="p-3 lg:mb-8 lg:p-0">
+          <PendingVerificationAlert />
+        </div>
+      )}
+
       <Form onSubmit={handleSubmit(onSubmit)}>
         {userUpdateMutation.isError && (
           <FormError values={[userUpdateMutation.error.message]} />
@@ -116,6 +123,14 @@ export default function Page() {
             error={errors.username}
             label="Username"
             required
+          />
+          <TextField
+            readOnly
+            disabled
+            type="email"
+            label="Email"
+            required
+            value={user.email}
           />
           <ImageField
             name="picture"

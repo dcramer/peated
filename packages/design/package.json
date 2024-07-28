@@ -23,6 +23,7 @@
     "@peated/tsconfig": "workspace:*",
     "@tailwindcss/forms": "catalog:",
     "@tailwindcss/typography": "catalog:",
+    "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:",

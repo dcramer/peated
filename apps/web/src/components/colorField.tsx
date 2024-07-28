@@ -55,21 +55,26 @@ export default forwardRef<HTMLInputElement, Props>(
         className={className}
       >
         <div className="flex flex-1 items-center gap-x-1 sm:gap-x-2">
-          <div
-            className="cursor h-4 flex-1"
+          <button
+            className={classNames(
+              "pointer text-muted border-muted h-8 flex-1 border",
+              value === -1 ? "h-12 px-2" : "",
+            )}
             onClick={(e) => {
               e.preventDefault();
               onChange && onChange(undefined);
               setValue(-1);
             }}
-          ></div>
+          >
+            ?
+          </button>
           {COLOR_SCALE.map(([num, _, hexColor]) => {
             return (
               <button
                 key={num}
                 className={classNames(
-                  "pointer h-4 flex-1",
-                  num === value ? "h-8 px-2" : "",
+                  "pointer h-8 flex-1",
+                  num === value ? "h-12 px-2" : "",
                 )}
                 onClick={(e) => {
                   e.preventDefault();

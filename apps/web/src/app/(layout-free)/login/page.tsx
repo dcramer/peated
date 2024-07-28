@@ -1,12 +1,6 @@
-import PeatedLogo from "@peated/web/assets/logo.svg";
 import LayoutSplash from "@peated/web/components/layoutSplash";
-import Link from "@peated/web/components/link";
 import LoginForm from "@peated/web/components/loginForm";
 import { type Metadata } from "next";
-
-// export const sitemap: SitemapFunction = () => ({
-//   exclude: true,
-// });
 
 export const metadata: Metadata = {
   title: "Login",
@@ -15,19 +9,13 @@ export const metadata: Metadata = {
 export default function Login() {
   return (
     <LayoutSplash>
-      <div className="flex flex-grow items-center justify-center px-4">
-        <Link href="/" className="max-w-xs">
-          <PeatedLogo className="text-highlight h-auto w-full" />
-        </Link>
+      <div className="mb-16 flex flex-col items-center">
+        <h1 className="mb-4 text-2xl font-semibold">Welcome Back</h1>
+        <p className="text-muted text-center">
+          Continue with Google or enter your credentials.
+        </p>
       </div>
-
       <LoginForm />
-
-      <div className="mt-6 text-center text-xs">
-        <Link href="/about" className="text-highlight underline">
-          About Peated
-        </Link>
-      </div>
     </LayoutSplash>
   );
 }

@@ -27,25 +27,23 @@ catalog:
   "@trpc/next": 11.0.0-rc.461
   "@trpc/react-query": 11.0.0-rc.461
   "@trpc/server": 11.0.0-rc.461
-  tsx: ^4.16.0
+  tsx: ^4.16.2
   typescript: ^5.5.3
   "@types/node": ^20.14.9
   "@types/pg": ^8.11.6
+  vitest: "~1.4.0"
   zod: ^3.23.8
+
+  react: ^18.2.0
+  react-dom: ^18.2.0
+  react-native: ^0.74.3
+  "@types/react": ^18.2.0
+  "@types/react-dom": ^18.2.0
 
 catalogs:
   react19:
     react: 19.0.0-rc-8b08e99e-20240713
     react-dom: 19.0.0-rc-8b08e99e-20240713
     react-native: 0.75.0-rc.5
-    "@types/react": ^18.3.3
-    "@types/react-dom": ^18.3.0
-
-  react18:
-    react: 18.3.1
-    react-dom: 18.3.1
-    react-email: 2.1.6
-    "@react-email/components": 0.0.22
-    react-native: 0.74.3
     "@types/react": ^18.3.3
     "@types/react-dom": ^18.3.0

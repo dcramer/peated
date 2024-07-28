@@ -29,11 +29,14 @@ export function useFlashMessages() {
   return useContext(FlashContext);
 }
 
-function Message({ message, type }: Pick<FlashMessage, "message" | "type">) {
+export function Message({
+  message,
+  type,
+}: Pick<FlashMessage, "message" | "type">) {
   return (
     <div
       className={classNames(
-        "rounded-md bg-green-700 p-3 font-semibold text-green-50 opacity-90",
+        "rounded-md p-3 font-semibold opacity-90",
         type === "success" ? "bg-green-700 text-green-50" : "",
         type === "error" ? "bg-red-700 text-red-50" : "",
       )}

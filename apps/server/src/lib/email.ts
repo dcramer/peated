@@ -1,10 +1,12 @@
 import { Template as NewCommentTemplate } from "@peated/email/templates/newCommentEmail";
+import { Template as VerifyEmailTemplate } from "@peated/email/templates/verifyEmail";
 import config from "@peated/server/config";
 import { and, eq, inArray, ne } from "drizzle-orm";
 import { render } from "jsx-email";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
+import type { z } from "zod";
 import { db } from "../db";
 import {
   comments,
@@ -14,6 +16,8 @@ import {
   type Tasting,
   type User,
 } from "../db/schema";
+import type { EmailVerifySchema } from "../schemas";
+import { signPayload } from "./auth";
 import { logError } from "./log";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
@@ -97,6 +101,7 @@ export async function notifyComment({
         and(
           inArray(users.id, Array.from(new Set(userIds))),
           eq(users.notifyComments, true),
+          eq(users.verified, true),
         ),
       )
   ).map((r) => r.email);
@@ -109,7 +114,7 @@ export async function notifyComment({
   const commentUrl = `${config.URL_PREFIX}/tastings/${comment.tasting.id}#c_${comment.id}`;
 
   const html = await render(
-    <NewCommentTemplate baseUrl={config.URL_PREFIX} comment={comment} />,
+    NewCommentTemplate({ baseUrl: config.URL_PREFIX, comment }),
   );
 
   console.log(
@@ -129,5 +134,45 @@ export async function notifyComment({
     } catch (err) {
       logError(err);
     }
+  }
+}
+
+export async function sendVerificationEmail({
+  user,
+  transport = mailTransport,
+}: {
+  user: User;
+  transport?: Transporter<SMTPTransport.SentMessageInfo>;
+}) {
+  if (!hasEmailSupport()) return;
+
+  if (!transport) {
+    if (!mailTransport) mailTransport = createMailTransport();
+    transport = mailTransport;
+  }
+
+  const token = await signPayload({
+    email: user.email,
+    id: user.id,
+  } satisfies z.infer<typeof EmailVerifySchema>);
+
+  const verifyUrl = `${config.URL_PREFIX}/verify?token=${token}`;
+
+  const html = await render(
+    VerifyEmailTemplate({ baseUrl: config.URL_PREFIX, verifyUrl }),
+  );
+
+  try {
+    await transport.sendMail({
+      from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+      to: user.email,
+      subject: "Account Verification",
+      // TODO:
+      text: `Your account requires verification: ${verifyUrl}`,
+      html,
+      replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
+    });
+  } catch (err) {
+    logError(err);
   }
 }

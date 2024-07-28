@@ -3,7 +3,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist",
-    "jsx": "react-jsx",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "paths": {
       "@peated/email": ["src/*"]

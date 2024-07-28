@@ -3,6 +3,7 @@
     "prettier-plugin-organize-imports",
     "prettier-plugin-tailwindcss"
   ],
+  "organizeImportsSkipDestructiveCodeActions": true,
   "semi": true,
   "tabWidth": 2,
   "singleQuote": false,

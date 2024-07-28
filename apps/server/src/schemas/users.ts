@@ -8,6 +8,8 @@ export const UserSchema = z.object({
   private: z.boolean(),
 
   email: z.string().email().optional(),
+  verified: z.boolean().optional(),
+
   admin: z.boolean().optional(),
   mod: z.boolean().optional(),
   createdAt: z.string().datetime().optional(),
@@ -16,6 +18,7 @@ export const UserSchema = z.object({
 
 export const UserInputSchema = z.object({
   username: z.string().toLowerCase().trim().min(1, "Required"),
+  password: z.string().trim().min(8, "At least 8 characters.").nullish(),
   private: z.boolean().optional(),
   admin: z.boolean().optional(),
   mod: z.boolean().optional(),

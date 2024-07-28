@@ -9,22 +9,27 @@ export default forwardRef<HTMLInputElement, Props>(function TextInput(
   { suffixLabel, className, ...props },
   ref,
 ) {
-  const baseStyles = "bg-inherit p-0 border-0 sm:leading-6";
+  const { disabled, readOnly } = props;
+  const baseStyles = classNames(
+    "rounded px-4 py-2 sm:leading-6 border-0 focus:ring-0",
+    disabled || readOnly ? "bg-slate-900 text-slate-300" : "",
+    "bg-slate-800",
+  );
   const inputStyles =
-    "placeholder:text-muted outline-none focus:ring-0 sm:leading-6";
+    "block outline-none focus:ring-0 sm:leading-6 placeholder:text-slate-400";
   if (suffixLabel) {
     return (
-      <div className={`flex ${baseStyles}`}>
+      <div className={classNames("flex", baseStyles)}>
         <input
           className={classNames(
-            "block flex-auto border-0 bg-transparent p-0",
+            "flex-auto border-0 bg-transparent p-0",
             inputStyles,
-            className || "",
+            className,
           )}
           ref={ref}
           {...props}
         />
-        <span className="flex select-none items-center text-slate-700 sm:text-sm">
+        <span className="flex select-none items-center text-slate-300 sm:text-sm">
           {suffixLabel}
         </span>
       </div>
@@ -34,7 +39,7 @@ export default forwardRef<HTMLInputElement, Props>(function TextInput(
   return (
     <input
       className={classNames(
-        "block min-w-full",
+        "min-w-full",
         baseStyles,
         inputStyles,
         className || "",

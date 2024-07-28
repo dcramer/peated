@@ -81,9 +81,10 @@ export default publicProcedure
       } else {
         const userData = {
           // displayName: payload.given_name,
-          // TODO: handle conflicts
+          // TODO: handle conflicts on username
           username: payload.email.split("@", 1)[0].toLowerCase(),
           email: payload.email,
+          verified: true, // emails are verified when coming from Google
         };
 
         user = await db.transaction(async (tx) => {

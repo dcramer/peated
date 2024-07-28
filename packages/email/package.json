@@ -4,14 +4,14 @@
   "type": "module",
   "exports": {
     "./templates/*": {
-      "types": "./dist/templates/*.d.tsx",
+      "types": "./dist/templates/*.d.ts",
       "default": "./src/templates/*.tsx"
     }
   },
   "scripts": {
     "build": "tsc",
     "create": "email create",
-    "dev": "email preview --port=5000 ./src/templates",
+    "dev": "email preview --port=5000 ./src/templates --no-open",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
@@ -20,8 +20,8 @@
   "devDependencies": {
     "@peated/design": "workspace:",
     "@peated/tsconfig": "workspace:",
-    "@types/react": "catalog:react18",
-    "react": "catalog:react18",
+    "@types/react": "catalog:",
+    "react": "catalog:",
     "superstruct": "^2.0.2",
     "typescript": "catalog:"
   },

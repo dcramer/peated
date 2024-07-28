@@ -4,6 +4,7 @@ import {
   createAccessToken,
   generatePasswordHash,
 } from "@peated/server/lib/auth";
+import { sendVerificationEmail } from "@peated/server/lib/email";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { eq, sql } from "drizzle-orm";
@@ -22,7 +23,7 @@ export default publicProcedure
   .mutation(async function ({ input: { username, email, password } }) {
     const [user] = await db.transaction(async (tx) => {
       try {
-        return db
+        return await db
           .insert(users)
           .values({
             username,
@@ -31,6 +32,7 @@ export default publicProcedure
           })
           .returning();
       } catch (err: any) {
+        console.log(err?.code, err?.constraint);
         if (
           err?.code === "23505" &&
           (err?.constraint === "user_username_unq" ||
@@ -49,6 +51,8 @@ export default publicProcedure
         throw err;
       }
     });
+
+    await sendVerificationEmail({ user });
 
     return {
       user: await serialize(UserSerializer, user, user),

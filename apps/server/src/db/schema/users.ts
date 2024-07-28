@@ -18,6 +18,7 @@ export const users = pgTable(
     passwordHash: varchar("password_hash", { length: 256 }),
     pictureUrl: text("picture_url"),
 
+    verified: boolean("verified").default(false).notNull(),
     private: boolean("private").default(false).notNull(),
     active: boolean("active").default(true).notNull(),
     admin: boolean("admin").default(false).notNull(),

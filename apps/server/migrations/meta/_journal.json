@@ -932,6 +932,13 @@
       "when": 1721841518975,
       "tag": "0132_whole_eternals",
       "breakpoints": false
+    },
+    {
+      "idx": 133,
+      "version": "7",
+      "when": 1722144501757,
+      "tag": "0133_glorious_eternity",
+      "breakpoints": false
     }
   ]
 }

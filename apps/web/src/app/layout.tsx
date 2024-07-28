@@ -62,6 +62,7 @@ export default async function RootLayout({
           session={{
             user: session.user,
             accessToken: session.accessToken,
+            ts: session.ts,
           }}
         >
           {children}

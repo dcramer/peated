@@ -43,7 +43,7 @@
     "@types/mjml": "^4.7.4",
     "@types/node": "catalog:",
     "@types/nodemailer": "^6.4.15",
-    "@types/react": "catalog:react18",
+    "@types/react": "catalog:",
     "@types/pg": "catalog:",
     "@vitest/coverage-v8": "^1.6.0",
     "ai": "^3.2.19",
@@ -71,13 +71,12 @@
     "nodemailer": "^6.9.14",
     "openai": "^4.52.2",
     "pg": "catalog:",
-    "react": "catalog:react18",
+    "react": "catalog:",
     "sharp": "^0.33.4",
     "superjson": "catalog:",
     "toad-scheduler": "^3.0.1",
     "tsx": "catalog:",
     "typescript": "catalog:",
-    "vite-tsconfig-paths": "^4.3.2",
     "wkx": "^0.5.0",
     "zod": "catalog:",
     "zod-to-json-schema": "^3.23.1"
@@ -86,7 +85,8 @@
     "axios-mock-adapter": "~1.22.0",
     "form-data-encoder": "^4.0.2",
     "formdata-node": "^6.0.3",
-    "vitest": "~1.4.0"
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"
