@@ -5,10 +5,12 @@ import { default as config } from "@peated/web/config";
 import { ApiProvider } from "@peated/web/hooks/useApi";
 import { AuthProvider } from "@peated/web/hooks/useAuth";
 import { OnlineStatusProvider } from "@peated/web/hooks/useOnlineStatus";
+import { ensureSessionSynced } from "@peated/web/lib/auth.actions";
 import TRPCProvider from "@peated/web/lib/trpc/provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
+import { useInterval } from "usehooks-ts";
 import { type SessionData } from "../../lib/session.server";
 
 export default function Providers({
@@ -27,6 +29,10 @@ export default function Providers({
         }
       : null,
   );
+
+  useInterval(async () => {
+    ({ user, accessToken } = await ensureSessionSynced());
+  }, 60000);
 
   return (
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>

@@ -6,6 +6,7 @@ import type { RouterInputs } from "@peated/web/lib/trpc/client";
 import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
+import type { SessionData } from "./session.server";
 import { getSession } from "./session.server";
 
 export async function logoutForm(
@@ -200,7 +201,7 @@ export async function passwordResetConfirmForm(
   return { ok: true };
 }
 
-export async function updateSession() {
+export async function updateSession(): Promise<SessionData> {
   "use server";
 
   const session = await getSession();
@@ -213,5 +214,28 @@ export async function updateSession() {
   // session.accessToken = data.accessToken;
   await session.save();
 
-  return session;
+  return {
+    ...session,
+  };
+}
+
+const SESSION_REFRESH = 60;
+
+export async function ensureSessionSynced(): Promise<SessionData> {
+  "use server";
+
+  let session = await getSession();
+  if (!session.user) return;
+
+  if (
+    !session.ts ||
+    session.ts < new Date().getTime() / 1000 - SESSION_REFRESH
+  ) {
+    console.log(`Refreshing session for user_id='${session.user.id}'`);
+    session = await updateSession();
+  }
+
+  return {
+    ...session,
+  };
 }
