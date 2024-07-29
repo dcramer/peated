@@ -7,7 +7,6 @@ export type Option = {
 
 export type CreateFormOptions<T extends Option> = {
   data: T;
-  onFieldChange: (arg0: T) => void;
   onSubmit: (newOption: T) => void;
   onClose: () => void;
 };
@@ -16,7 +15,6 @@ export type CreateForm<T extends Option> = ({
   onSubmit,
   onClose,
   data,
-  onFieldChange,
 }: CreateFormOptions<T>) => ReactNode;
 
 export type OnResults<T extends Option> = (results: any[]) => T[];

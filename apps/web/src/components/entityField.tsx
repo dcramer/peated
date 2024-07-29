@@ -3,11 +3,14 @@ import { EntityInputSchema } from "@peated/server/schemas";
 import { type EntityType } from "@peated/server/types";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
+import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import CountryField from "./countryField";
 import Fieldset from "./fieldset";
 import Form from "./form";
+import FormHeader from "./formHeader";
+import LayoutModal from "./layoutModal";
 import RegionField from "./regionField";
 import SelectField from "./selectField";
 import { type CreateFormOptions, type Option } from "./selectField/types";
@@ -56,7 +59,6 @@ export default function EntityField({
 function CreateForm({
   createDialogHelpText,
   data,
-  onFieldChange,
   onSubmit,
   onClose,
 }: CreateFormOptions<Option> & {
@@ -77,7 +79,16 @@ function CreateForm({
   const [regionValue, setRegionValue] = useState<Option | undefined>();
 
   return (
-    <>
+    <LayoutModal
+      header={
+        <FormHeader
+          title="Add Entity"
+          onSave={handleSubmit(onSubmit)}
+          saveDisabled={isSubmitting}
+          onClose={onClose}
+        />
+      }
+    >
       <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
         <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
           {createDialogHelpText}
@@ -88,8 +99,9 @@ function CreateForm({
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          return handleSubmit(onSubmit)(e);
+          handleSubmit(onSubmit)(e);
         }}
+        isSubmitting={isSubmitting}
       >
         <Fieldset>
           <TextField
@@ -146,6 +158,6 @@ function CreateForm({
           />
         </Fieldset>
       </Form>
-    </>
+    </LayoutModal>
   );
 }
