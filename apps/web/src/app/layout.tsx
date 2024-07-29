@@ -6,10 +6,7 @@ import "@peated/web/styles/index.css";
 import { setUser } from "@sentry/nextjs";
 import type { Metadata, Viewport } from "next";
 import React from "react";
-import { updateSession } from "../lib/auth.actions";
 import Providers from "./providers/providers";
-
-const SESSION_REFRESH = 60;
 
 // default behavior is to disable cache, as it breaks quite a few flows
 // which are fairly dynamic (e.g. add tasting, add bottle, etc)
@@ -45,13 +42,6 @@ export default async function RootLayout({
   // auth: React.ReactNode;
 }>) {
   let session = await getSession();
-  if (
-    session.user &&
-    (!session.ts || session.ts < new Date().getTime() / 1000 - SESSION_REFRESH)
-  ) {
-    console.log(`Refreshing session for user_id='${session.user.id}'`);
-    session = await updateSession();
-  }
 
   // we need to bind the user on the server, but we also do this in providers
   // so it stays updated on the client appropriately
