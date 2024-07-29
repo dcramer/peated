@@ -57,7 +57,7 @@ export default forwardRef<HTMLInputElement, Props>(
         <div className="flex flex-1 items-center gap-x-1 sm:gap-x-2">
           <button
             className={classNames(
-              "pointer text-muted border-muted h-8 flex-1 border",
+              "pointer text-muted h-8 flex-1 border border-slate-700",
               value === -1 ? "h-12 px-2" : "",
             )}
             onClick={(e) => {
