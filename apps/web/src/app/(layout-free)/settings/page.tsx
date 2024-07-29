@@ -112,11 +112,11 @@ export default function Page() {
         </div>
       )}
 
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        {userUpdateMutation.isError && (
-          <FormError values={[userUpdateMutation.error.message]} />
-        )}
+      {userUpdateMutation.isError && (
+        <FormError values={[userUpdateMutation.error.message]} />
+      )}
 
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <Fieldset>
           <TextField
             {...register("username")}

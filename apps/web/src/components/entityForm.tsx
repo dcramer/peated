@@ -107,12 +107,12 @@ export default function EntityForm({
       }
       footer={null}
     >
+      {error && <FormError values={[error]} />}
+
       <Form
         onSubmit={handleSubmit(onSubmitHandler)}
         isSubmitting={isSubmitting}
       >
-        {error && <FormError values={[error]} />}
-
         <Fieldset>
           <TextField
             {...register("name")}

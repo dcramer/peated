@@ -131,12 +131,12 @@ export default function TastingForm({
         <BottleCard bottle={initialData.bottle} color="highlight" />
       </div>
 
+      {error && <FormError values={[error]} />}
+
       <Form
         onSubmit={handleSubmit(onSubmitHandler)}
         isSubmitting={isSubmitting}
       >
-        {error && <FormError values={[error]} />}
-
         <Fieldset>
           <Controller
             name="rating"

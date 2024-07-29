@@ -186,12 +186,12 @@ export default function BottleForm({
         />
       </div>
 
+      {error && <FormError values={[error]} />}
+
       <Form
         onSubmit={handleSubmit(onSubmitHandler)}
         isSubmitting={isSubmitting}
       >
-        {error && <FormError values={[error]} />}
-
         <Fieldset>
           <Controller
             name="brand"
