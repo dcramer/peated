@@ -7,7 +7,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDebounceCallback } from "usehooks-ts";
+import { useDebounceCallback, useDebounceValue } from "usehooks-ts";
 import Header from "../header";
 import Layout from "../layout";
 import ListItem from "../listItem";

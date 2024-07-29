@@ -57,14 +57,18 @@ export default function SelectDialog<T extends Option>({
 
   const [createOpen, setCreateOpen] = useState(false);
 
+  let pendingQuery = "";
+
   const onSearch = useDebounceCallback(async (query = "") => {
-    setLoading(true);
+    if (pendingQuery !== query) return;
+    if (!isLoading) setLoading(true);
     const results = onQuery
       ? await onQuery(query, options)
       : options.filter(
           (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1,
         );
     if (results === undefined) throw new Error("Invalid results returned");
+    if (pendingQuery !== query) return;
     setResults(onResults ? onResults(results) : results);
     setQuery(query);
     setLoading(false);
@@ -93,6 +97,8 @@ export default function SelectDialog<T extends Option>({
             <SearchHeader
               onClose={() => setOpen(false)}
               onChange={(value) => {
+                setLoading(true);
+                pendingQuery = value;
                 onSearch(value);
               }}
               onDone={multiple ? () => setOpen(false) : undefined}
