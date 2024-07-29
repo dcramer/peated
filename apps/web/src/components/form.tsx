@@ -15,7 +15,7 @@ export default function Form({
       )}
 
       <form
-        className="mb-8 self-center rounded border-x border-slate-800 bg-slate-900 lg:mb-0"
+        className="mb-8 self-center rounded border-x border-slate-800 lg:mb-0"
         {...props}
       />
     </>
