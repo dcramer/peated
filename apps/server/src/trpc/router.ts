@@ -4,6 +4,8 @@ import type { Context } from "./context";
 import auth from "./routes/auth";
 import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
+import authPasswordReset from "./routes/authPasswordReset";
+import authPasswordResetConfirm from "./routes/authPasswordResetConfirm";
 import authRegister from "./routes/authRegister";
 import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
@@ -108,6 +110,8 @@ export const appRouter = router({
   authBasic,
   authGoogle,
   authRegister,
+  authPasswordReset,
+  authPasswordResetConfirm,
   badgeCreate,
   badgeList,
   bottleById,

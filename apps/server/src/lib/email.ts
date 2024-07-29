@@ -1,6 +1,9 @@
+import cuid2 from "@paralleldrive/cuid2";
 import { Template as NewCommentTemplate } from "@peated/email/templates/newCommentEmail";
+import { Template as PasswordResetEmailTemplate } from "@peated/email/templates/passwordResetEmail";
 import { Template as VerifyEmailTemplate } from "@peated/email/templates/verifyEmail";
 import config from "@peated/server/config";
+import { createHash } from "crypto";
 import { and, eq, inArray, ne } from "drizzle-orm";
 import { render } from "jsx-email";
 import type { Transporter } from "nodemailer";
@@ -16,7 +19,7 @@ import {
   type Tasting,
   type User,
 } from "../db/schema";
-import type { EmailVerifySchema } from "../schemas";
+import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
 import { signPayload } from "./auth";
 import { logError } from "./log";
 
@@ -171,6 +174,54 @@ export async function sendVerificationEmail({
       text: `Your account requires verification: ${verifyUrl}`,
       html,
       replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
+    });
+  } catch (err) {
+    logError(err);
+  }
+}
+
+export async function sendPasswordResetEmail({
+  user,
+  transport = mailTransport,
+}: {
+  user: User;
+  transport?: Transporter<SMTPTransport.SentMessageInfo>;
+}) {
+  if (!hasEmailSupport()) return;
+
+  if (!transport) {
+    if (!mailTransport) mailTransport = createMailTransport();
+    transport = mailTransport;
+  }
+  const digest = createHash("md5")
+    .update(user.passwordHash || "")
+    .digest("hex");
+
+  const token = await signPayload({
+    email: user.email,
+    id: user.id,
+    createdAt: new Date().toISOString(),
+    digest,
+  } satisfies z.infer<typeof PasswordResetSchema>);
+
+  const resetUrl = `${config.URL_PREFIX}/password-reset?token=${token}`;
+
+  const html = await render(
+    PasswordResetEmailTemplate({ baseUrl: config.URL_PREFIX, resetUrl }),
+  );
+
+  try {
+    await transport.sendMail({
+      from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+      to: user.email,
+      subject: "Reset Password",
+      // TODO:
+      text: `A password reset was requested for your account.\n\nIf you don't recognize this request, you can ignore this.\n\nTo continue: ${resetUrl}`,
+      html,
+      replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
+      headers: {
+        References: `${cuid2.createId()}@peated.com`,
+      },
     });
   } catch (err) {
     logError(err);

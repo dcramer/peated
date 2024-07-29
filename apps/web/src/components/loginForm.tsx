@@ -10,7 +10,7 @@ import { useSearchParams } from "next/navigation";
 import { useFormState, useFormStatus } from "react-dom";
 import Alert from "./alert";
 
-function BasicLogin() {
+function FormComponent() {
   const { pending } = useFormStatus();
 
   const searchParams = useSearchParams();
@@ -30,7 +30,7 @@ function BasicLogin() {
           autoComplete="email"
           required
           placeholder="you@example.com"
-          color="dark"
+          autoFocus
         />
         <TextField
           name="password"
@@ -39,7 +39,6 @@ function BasicLogin() {
           autoComplete="current-password"
           required
           placeholder="************"
-          color="dark"
         />
       </div>
       <div className="flex justify-center gap-x-2">
@@ -76,14 +75,22 @@ export default function LoginForm() {
       )}
 
       <form action={formAction}>
-        <BasicLogin />
+        <FormComponent />
       </form>
 
-      <p className="mt-4 text-center text-sm">
-        Don't have an account yet?{" "}
-        <Link href="/register" className="text-highlight underline">
-          Sign Up
-        </Link>
+      <p className="mt-4 flex items-center justify-center gap-x-3 text-sm">
+        <div>
+          Don't have an account yet?{" "}
+          <Link href="/register" className="text-highlight underline">
+            Sign Up
+          </Link>
+        </div>
+        <div>&middot;</div>
+        <div>
+          <Link href="/password-reset" className="text-highlight underline">
+            Password Reset
+          </Link>
+        </div>
       </p>
     </div>
   );

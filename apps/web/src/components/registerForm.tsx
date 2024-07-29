@@ -9,7 +9,7 @@ import config from "../config";
 import Alert from "./alert";
 import GoogleLoginButton from "./googleLoginButton";
 
-function SignupForm() {
+function FormComponent() {
   const { pending } = useFormStatus();
 
   return (
@@ -22,7 +22,7 @@ function SignupForm() {
           autoComplete="email"
           required
           placeholder="you@example.com"
-          color="dark"
+          autoFocus
         />
         <TextField
           name="username"
@@ -30,7 +30,6 @@ function SignupForm() {
           autoComplete="username"
           required
           placeholder="you99"
-          color="dark"
         />
         <TextField
           name="password"
@@ -40,7 +39,6 @@ function SignupForm() {
           required
           min={8}
           placeholder="************"
-          color="dark"
         />
       </div>
       <div className="flex justify-center gap-x-2">
@@ -80,7 +78,7 @@ export default function RegisterForm() {
       )}
 
       <form action={formAction}>
-        <SignupForm />
+        <FormComponent />
       </form>
 
       <p className="mt-4 text-center text-sm">

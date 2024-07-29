@@ -2,6 +2,7 @@
 
 import { makeTRPCClient } from "@peated/server/trpc/client";
 import config from "@peated/web/config";
+import type { RouterInputs } from "@peated/web/lib/trpc/client";
 import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
@@ -129,6 +130,7 @@ export async function register(formData: FormData) {
 
   session.user = data.user;
   session.accessToken = data.accessToken;
+  session.ts = new Date().getTime();
 
   await session.save();
 
@@ -138,12 +140,12 @@ export async function register(formData: FormData) {
   return redirect("/verify");
 }
 
-type ResendResult = {
+type GenericResult = {
   ok: boolean;
 };
 
 export async function resendVerificationForm(
-  prevState?: ResendResult | undefined,
+  prevState?: GenericResult | undefined,
   formData?: FormData,
 ) {
   "use server";
@@ -156,6 +158,48 @@ export async function resendVerificationForm(
   return { ok: true };
 }
 
+export async function passwordResetForm(
+  prevState: GenericResult | undefined,
+  formData: FormData,
+) {
+  "use server";
+
+  const email = (formData.get("email") || "") as string;
+
+  const session = await getSession();
+
+  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  await trpcClient.authPasswordReset.mutate({ email });
+
+  return { ok: true };
+}
+
+export async function passwordResetConfirmForm(
+  prevState: GenericResult | undefined,
+  formData: FormData,
+) {
+  "use server";
+
+  const token = (formData.get("token") || "") as string;
+  const password = (formData.get("password") || "") as string;
+
+  const session = await getSession();
+
+  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  const data = await trpcClient.authPasswordResetConfirm.mutate({
+    token,
+    password,
+  });
+
+  session.user = data.user;
+  session.accessToken = data.accessToken;
+  session.ts = new Date().getTime();
+
+  await session.save();
+
+  return { ok: true };
+}
+
 export async function updateSession() {
   "use server";
 
@@ -164,9 +208,10 @@ export async function updateSession() {
 
   const user = await trpcClient.userById.query("me");
   session.user = user;
+  session.ts = new Date().getTime();
   // should rotate access token too
   // session.accessToken = data.accessToken;
-  session.save();
+  await session.save();
 
   return session;
 }
