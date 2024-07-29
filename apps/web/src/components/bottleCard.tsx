@@ -40,7 +40,7 @@ function BottleScaffold({
   return (
     <div
       className={classNames(
-        "flex items-center space-x-2 overflow-hidden rounded sm:space-x-3",
+        "flex items-center space-x-2 overflow-hidden sm:space-x-3 sm:rounded",
         color === "highlight"
           ? "bg-highlight text-black"
           : color === "inherit"

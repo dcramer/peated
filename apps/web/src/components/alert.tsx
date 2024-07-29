@@ -14,7 +14,7 @@ export default function Alert({
   return (
     <div
       className={classNames(
-        "gap-x-3 rounded p-3 font-semibold opacity-90",
+        "gap-x-3 p-3 font-semibold opacity-90 sm:rounded",
         type === "success" ? "text-l-50 bg-lime-700" : "",
         type === "warn" ? "bg-amber-700 text-amber-50" : "",
         type === "error" ? "bg-red-700 text-red-50" : "",
