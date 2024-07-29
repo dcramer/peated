@@ -224,8 +224,8 @@ const SESSION_REFRESH = 60;
 export async function ensureSessionSynced(): Promise<SessionData> {
   "use server";
 
-  let session = await getSession();
-  if (!session.user) return;
+  let session: SessionData = { ...(await getSession()) };
+  if (!session.user) return session;
 
   if (
     !session.ts ||
