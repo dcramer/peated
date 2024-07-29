@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
+import { compareSync } from "bcrypt";
 import { eq } from "drizzle-orm";
 import { createCaller } from "../router";
 
@@ -119,5 +120,5 @@ test("can change password", async ({ defaults, fixtures }) => {
     .select()
     .from(users)
     .where(eq(users.id, defaults.user.id));
-  expect(compareSync("testpassword", user.passwordHash)).toBe(true);
+  expect(compareSync("testpassword", user.passwordHash || "")).toBe(true);
 });
