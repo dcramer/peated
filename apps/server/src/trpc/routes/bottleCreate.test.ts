@@ -155,6 +155,7 @@ test("creates a new bottle with new brand name", async ({
   const data = await caller.bottleCreate({
     name: "Delicious Wood",
     brand: {
+      id: null,
       name: "Hard Knox",
       country: country.id,
       region: region.id,

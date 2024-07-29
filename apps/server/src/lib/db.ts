@@ -63,6 +63,8 @@ export const upsertEntity = async ({
         .where(eq(entities.id, result.id));
     }
     return result ? { id: result.id, result, created: false } : undefined;
+  } else if (data.id === null) {
+    data.id = undefined;
   }
 
   const [result] = await db
