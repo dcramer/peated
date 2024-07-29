@@ -7,7 +7,18 @@ import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
 import { getSession } from "./session.server";
 
-export async function logout(prevState?: any, formData?: FormData) {
+export async function logoutForm(
+  prevState: void | undefined,
+  formData: FormData,
+) {
+  "use server";
+
+  return await logout(formData);
+}
+
+export async function logout(formData?: FormData) {
+  "use server";
+
   const redirectTo = getSafeRedirect(
     formData ? ((formData.get("redirectTo") || "/") as string) : null,
   );
@@ -17,10 +28,16 @@ export async function logout(prevState?: any, formData?: FormData) {
   redirect(redirectTo);
 }
 
-export async function authenticate(
+export async function authenticateForm(
   prevState: string | undefined,
   formData: FormData,
 ) {
+  "use server";
+
+  return await authenticate(formData);
+}
+
+export async function authenticate(formData: FormData) {
   "use server";
 
   const session = await getSession();
@@ -38,8 +55,9 @@ export async function authenticate(
 
   const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
 
+  let data;
   try {
-    const data = code
+    data = code
       ? await trpcClient.authGoogle.mutate({
           code,
         })
@@ -63,7 +81,79 @@ export async function authenticate(
     throw err;
   }
 
-  redirect(redirectTo);
+  if (!data.user.verified) {
+    redirect("/verify");
+  } else {
+    redirect(redirectTo);
+  }
+}
+
+export async function registerForm(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  "use server";
+
+  return await register(formData);
+}
+
+export async function register(formData: FormData) {
+  "use server";
+
+  const session = await getSession();
+
+  // const url = new URL(request.url);
+  // const redirectTo = url.searchParams.get("redirectTo");
+  // const form = await request.formData();
+
+  const email = (formData.get("email") || "") as string;
+  const password = (formData.get("password") || "") as string;
+  const username = formData.get("username") as string;
+
+  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+
+  let data;
+  try {
+    data = await trpcClient.authRegister.mutate({
+      email,
+      password,
+      username,
+    });
+  } catch (err) {
+    if (isTRPCClientError(err) && err.data?.code === "CONFLICT") {
+      return "An account already exists matching that username or email address.";
+    }
+
+    throw err;
+  }
+
+  session.user = data.user;
+  session.accessToken = data.accessToken;
+
+  await session.save();
+
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
+  // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
+
+  return redirect("/verify");
+}
+
+type ResendResult = {
+  ok: boolean;
+};
+
+export async function resendVerificationForm(
+  prevState?: ResendResult | undefined,
+  formData?: FormData,
+) {
+  "use server";
+
+  const session = await getSession();
+
+  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  await trpcClient.emailResendVerification.mutate();
+
+  return { ok: true };
 }
 
 export async function updateSession() {
@@ -77,4 +167,6 @@ export async function updateSession() {
   // should rotate access token too
   // session.accessToken = data.accessToken;
   session.save();
+
+  return session;
 }

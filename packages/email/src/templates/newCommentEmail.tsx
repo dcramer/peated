@@ -1,18 +1,6 @@
-import {
-  Button,
-  Column,
-  Heading,
-  Hr,
-  Img,
-  Link,
-  Preview,
-  Row,
-  Section,
-  Text,
-} from "jsx-email";
-import Layout from "../components/layout";
-
 import theme from "@peated/design";
+import { Column, Heading, Img, Preview, Row } from "jsx-email";
+import React from "react";
 import {
   defaulted,
   nullable,
@@ -21,6 +9,9 @@ import {
   string,
   type Infer,
 } from "superstruct";
+import { Button, Hr, Link, Section, Text } from "../components/core";
+import Layout from "../components/layout";
+import ReasonFooter, { Reason } from "../components/reasonFooter";
 
 export const TemplateName = "NewCommentEmail";
 
@@ -63,7 +54,6 @@ export type TemplateProps = Infer<typeof TemplateStruct>;
 export const Template = ({ comment, baseUrl }: TemplateProps) => {
   const tastingUrl = `${baseUrl}/tastings/${comment.tasting.id}`;
   const commentUrl = `${tastingUrl}#c_${comment.id}`;
-  const settingsUrl = `${baseUrl}/settings`;
   const profileUrl = `${baseUrl}/users/${encodeURIComponent(comment.createdBy.username)}`;
   const avatarUrl =
     comment.createdBy.pictureUrl || `${baseUrl}/assets/default-avatar.png`;
@@ -74,12 +64,7 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
     <Layout baseUrl={baseUrl}>
       <Preview>{previewText}</Preview>
 
-      <Section
-        style={{
-          marginBottom: "16px",
-          padding: "16px 24px 0",
-        }}
-      >
+      <Section>
         <Row>
           <Column
             style={{
@@ -87,12 +72,14 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
               paddingRight: "16px",
             }}
           >
-            <Img
-              style={{ borderRadius: "9999px" }}
-              src={avatarUrl}
-              width="64px"
-              height="64px"
-            />
+            <Link href={profileUrl}>
+              <Img
+                style={{ borderRadius: "9999px" }}
+                src={avatarUrl}
+                width="64px"
+                height="64px"
+              />
+            </Link>
           </Column>
           <Column>
             <Heading
@@ -101,11 +88,11 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
                 fontSize: "24px",
                 fontWeight: "normal",
                 color: theme.colors.white,
+                textAlign: "left",
               }}
             >
               <Link
                 href={profileUrl}
-                disableDefaultStyle
                 style={{
                   fontWeight: "bold",
                   color: "inherit",
@@ -114,10 +101,19 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
               >
                 {comment.createdBy.username}
               </Link>{" "}
-              commented on{" "}
+              commented on
+            </Heading>
+            <Heading
+              style={{
+                margin: 0,
+                fontSize: "24px",
+                fontWeight: "normal",
+                color: theme.colors.white,
+                textAlign: "left",
+              }}
+            >
               <Link
                 href={tastingUrl}
-                disableDefaultStyle
                 style={{
                   fontWeight: "bold",
                   color: "inherit",
@@ -131,97 +127,19 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
         </Row>
       </Section>
 
-      <Section
-        style={{
-          marginBottom: "16px",
-          padding: "16px 24px 0",
-        }}
-      >
-        <Text
-          style={{
-            margin: 0,
-            padding: 0,
-            fontSize: "14px",
-            lineHeight: "24px",
-            color: theme.colors.white,
-          }}
-        >
-          {comment.comment}
-        </Text>
+      <Section>
+        <Text>{comment.comment}</Text>
       </Section>
 
-      <Section
-        style={{
-          marginBottom: "16px",
-          padding: "16px 24px 0",
-          textAlign: "center",
-        }}
-      >
-        <Button
-          style={{
-            border: `1px solid ${theme.colors.highlight}`,
-            backgroundColor: theme.colors.highlight,
-            borderRadius: "4px",
-            padding: "12px",
-            textAlign: "center",
-            fontSize: "14px",
-            fontWeight: "500",
-            color: theme.colors.black,
-            textDecoration: "none",
-          }}
-          href={commentUrl}
-        >
-          View Comment
-        </Button>
+      <Section>
+        <Button href={commentUrl}>View Comment</Button>
       </Section>
 
-      <Section
-        style={{
-          marginBottom: "8px",
-          padding: "16px 24px 0",
-          textAlign: "center",
-        }}
-      >
-        <Hr
-          disableDefaultStyle
-          style={{
-            width: "100%",
-            margin: 0,
-            border: `1px solid ${theme.colors.slate[700]}`,
-          }}
-        />
+      <Section>
+        <Hr />
       </Section>
 
-      <Section
-        style={{
-          marginBottom: "16px",
-          padding: "16px 24px 0",
-          textAlign: "center",
-        }}
-      >
-        <Text
-          disableDefaultStyle
-          style={{
-            margin: 0,
-            padding: 0,
-            fontSize: "14px",
-            lineHeight: "24px",
-            color: theme.colors.muted,
-          }}
-        >
-          You are being notified because you are subscribed to comments.{" "}
-          <Link
-            disableDefaultStyle
-            href={settingsUrl}
-            style={{
-              color: theme.colors.muted,
-              textDecoration: "underline",
-            }}
-          >
-            Settings
-          </Link>
-        </Text>
-      </Section>
+      <ReasonFooter reason={Reason.comments} baseUrl={baseUrl} />
     </Layout>
   );
 };

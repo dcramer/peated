@@ -2,7 +2,7 @@
 
 import BottleLink from "@peated/web/components/bottleLink";
 import { Distillers } from "@peated/web/components/bottleMetadata";
-import LayoutSplash from "@peated/web/components/layoutSplash";
+import LayoutEmpty from "@peated/web/components/layoutEmpty";
 import { trpc } from "@peated/web/lib/trpc/client";
 
 export default function Page({
@@ -18,7 +18,7 @@ export default function Page({
   ]);
 
   return (
-    <LayoutSplash fullWidth>
+    <LayoutEmpty fullWidth>
       <div className="mx-auto max-w-3xl">
         <div className="mb-8 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
           <div className="w-full flex-auto flex-col items-center space-y-1 sm:w-auto sm:items-start">
@@ -63,6 +63,6 @@ export default function Page({
           <div className="hidden p-4 pl-12 lg:block lg:w-4/12"></div>
         </div>
       </div>
-    </LayoutSplash>
+    </LayoutEmpty>
   );
 }

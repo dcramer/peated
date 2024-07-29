@@ -14,11 +14,10 @@ export default function Legend({
 }) {
   return (
     <legend
-      className="-mb-1 flex w-full items-center bg-slate-900 px-4 py-6 font-bold text-white"
+      className="relative -mb-1 flex w-full items-center bg-slate-800 px-4 py-6 font-bold text-white"
       {...props}
     >
-      <div className="flex-grow">{title}</div>
-      {children}
+      <div className="flex-grow text-lg">{title}</div>
       {isCollapsed !== undefined && onCollapse && (
         <button
           onClick={(e) => {
@@ -26,15 +25,17 @@ export default function Legend({
             e.stopPropagation();
             onCollapse();
           }}
-          className="ml-3"
-        >
-          {isCollapsed ? (
-            <ArrowUpIcon className="h-5 w-5" />
-          ) : (
-            <ArrowDownIcon className="h-5 w-5" />
-          )}
-        </button>
+          className="absolute inset-0 z-10 cursor-pointer"
+        />
       )}
+      <div className="z-20 inline-block">{children}</div>
+      {isCollapsed !== undefined &&
+        onCollapse &&
+        (isCollapsed ? (
+          <ArrowUpIcon className="ml-3 h-5 w-5" />
+        ) : (
+          <ArrowDownIcon className="ml-3 h-5 w-5" />
+        ))}
     </legend>
   );
 }

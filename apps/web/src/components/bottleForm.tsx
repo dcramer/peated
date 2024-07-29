@@ -155,43 +155,42 @@ export default function BottleForm({
       }
       footer={null}
     >
+      <div className="border-slate-700 p-4 lg:mb-8 lg:border">
+        <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
+          <p>
+            It can be tricky to find the right information, so if you&apos;re
+            struggling, just try to fill in the components that you're confident
+            about. The brand will almost always have multiple bottles (e.g.{" "}
+            <em>Hibiki</em>), and the bottle name, if nothing else, you can use
+            the full bottle label.
+          </p>
+          <p>
+            Have any suggestions for making it easier to enter correct data?{" "}
+            <a href={config.GITHUB_REPO}>Open an Issue on GitHub</a> or{" "}
+            <a href={config.DISCORD_LINK}>drop a note on Discord</a> if you have
+            feedback. We'll update the bottle preview as you enter information.
+          </p>
+        </div>
+      </div>
+
+      <div className="lg:mb-8 lg:p-0">
+        <PreviewBottleCard
+          data={{
+            name: watch("name"),
+            category: watch("category"),
+            statedAge: watch("statedAge"),
+            distillers: distillersValue,
+            brand: brandValue,
+            vintageYear: watch("vintageYear"),
+          }}
+        />
+      </div>
+
       <Form
         onSubmit={handleSubmit(onSubmitHandler)}
         isSubmitting={isSubmitting}
       >
         {error && <FormError values={[error]} />}
-
-        <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
-          <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
-            <p>
-              It can be tricky to find the right information, so if you&apos;re
-              struggling, just try to fill in the components that you're
-              confident about. The brand will almost always have multiple
-              bottles (e.g. <em>Hibiki</em>), and the bottle name, if nothing
-              else, you can use the full bottle label.
-            </p>
-            <p>
-              Have any suggestions for making it easier to enter correct data?{" "}
-              <a href={config.GITHUB_REPO}>Open an Issue on GitHub</a> or{" "}
-              <a href={config.DISCORD_LINK}>drop a note on Discord</a> if you
-              have feedback. We'll update the bottle preview as you enter
-              information.
-            </p>
-          </div>
-        </div>
-
-        <div className="sm:mb-4">
-          <PreviewBottleCard
-            data={{
-              name: watch("name"),
-              category: watch("category"),
-              statedAge: watch("statedAge"),
-              distillers: distillersValue,
-              brand: brandValue,
-              vintageYear: watch("vintageYear"),
-            }}
-          />
-        </div>
 
         <Fieldset>
           <Controller

@@ -127,15 +127,15 @@ export default function TastingForm({
       }
       footer={null}
     >
+      <div className="lg:mb-8 lg:p-0">
+        <BottleCard bottle={initialData.bottle} color="highlight" />
+      </div>
+
       <Form
         onSubmit={handleSubmit(onSubmitHandler)}
         isSubmitting={isSubmitting}
       >
         {error && <FormError values={[error]} />}
-
-        <div className="sm:mb-4">
-          <BottleCard bottle={initialData.bottle} color="highlight" />
-        </div>
 
         <Fieldset>
           <Controller

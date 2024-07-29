@@ -12,7 +12,17 @@ import { serialize } from "../serializers";
 import { UserSerializer } from "../serializers/user";
 import { logError } from "./log";
 
-export function verifyToken(
+export function signPayload(payload: string | object): Promise<string> {
+  return new Promise<string>((res, rej) => {
+    sign(payload, config.JWT_SECRET, {}, (err, token) => {
+      if (err) rej(err);
+      if (!token) throw new Error("Unknown error signing token.");
+      res(token);
+    });
+  });
+}
+
+export function verifyPayload(
   token: string | undefined,
 ): Promise<string | JwtPayload | undefined> {
   return new Promise((res, rej) => {
@@ -34,13 +44,15 @@ export function verifyToken(
   });
 }
 
+export { verifyPayload as verifyToken };
+
 export async function getUserFromHeader(
   authorizationHeader: string | undefined,
 ) {
   const token = authorizationHeader?.replace(/^Bearer /i, "");
   if (!token) return null;
 
-  const { id } = (await verifyToken(token)) as any;
+  const { id } = (await verifyPayload(token)) as any;
   if (!id) {
     console.warn(`Invalid Bearer token`);
     return null;
@@ -61,13 +73,7 @@ export async function getUserFromHeader(
 
 export async function createAccessToken(user: User): Promise<string> {
   const payload = await serialize(UserSerializer, user, user);
-  return new Promise<string>((res, rej) => {
-    sign(payload, config.JWT_SECRET, {}, (err, token) => {
-      if (err) rej(err);
-      if (!token) throw new Error("Unknown error signing token.");
-      res(token);
-    });
-  });
+  return await signPayload(payload);
 }
 
 export function generatePasswordHash(password: string) {

@@ -6,11 +6,10 @@
     "types": ["node", "vitest/globals", "./src/global.d.ts"],
     "moduleResolution": "Node",
     "composite": true,
-    "jsx": "react-jsx",
     "paths": {
       "@peated/server/*": ["src/*"]
     }
   },
-  "include": ["src", "vite.config.ts"],
+  "include": ["src"],
   "exclude": ["src/test/setup-test-env.ts", "node_modules"]
 }

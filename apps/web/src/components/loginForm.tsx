@@ -1,75 +1,90 @@
 "use client";
 
 import Button from "@peated/web/components/button";
-import Form from "@peated/web/components/form";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
-import { authenticate } from "@peated/web/lib/auth.actions";
+import { authenticate, authenticateForm } from "@peated/web/lib/auth.actions";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useFormState, useFormStatus } from "react-dom";
 import Alert from "./alert";
 
-function BasicLogin({ action }: { action: any }) {
+function BasicLogin() {
   const { pending } = useFormStatus();
 
   const searchParams = useSearchParams();
 
   return (
-    <Form action={action}>
-      <input
-        type="hidden"
-        name="redirectTo"
-        value={searchParams.get("redirectTo") ?? "/"}
-      />
-      <TextField
-        name="email"
-        type="email"
-        autoComplete="email"
-        required
-        placeholder="you@example.com"
-        className="mb-2 rounded"
-      />
-      <TextField
-        name="password"
-        type="password"
-        autoComplete="current-password"
-        required
-        placeholder="password"
-        className="mb-2 rounded"
-      />
-      <div className="flex justify-center">
+    <>
+      <div className="-mx-4 -mt-4">
+        <input
+          type="hidden"
+          name="redirectTo"
+          value={searchParams.get("redirectTo") ?? "/"}
+        />
+        <TextField
+          name="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          required
+          placeholder="you@example.com"
+          color="dark"
+        />
+        <TextField
+          name="password"
+          label="Password"
+          type="password"
+          autoComplete="current-password"
+          required
+          placeholder="************"
+          color="dark"
+        />
+      </div>
+      <div className="flex justify-center gap-x-2">
         <Button type="submit" color="highlight" fullWidth loading={pending}>
           Sign in
         </Button>
       </div>
-    </Form>
+    </>
   );
 }
 
 export default function LoginForm() {
-  const [error, formAction] = useFormState(authenticate, undefined);
+  const [error, formAction] = useFormState(authenticateForm, undefined);
 
   return (
-    <div className="min-w-sm mt-8 flex-auto">
+    <div className="min-w-sm flex flex-auto flex-col gap-y-4">
       {error ? <Alert>{error}</Alert> : null}
+
       {config.GOOGLE_CLIENT_ID && (
         <>
-          <GoogleLoginButton action={formAction} />
-          <div className="relative my-4 text-slate-700">
+          <GoogleLoginButton action={authenticate} />
+          <div className="relative my-4 font-bold text-slate-500 opacity-60">
             <div
               className="absolute inset-0 flex items-center"
               aria-hidden="true"
             >
-              <div className="min-w-full border-t border-slate-800" />
+              <div className="min-w-full border-t-2 border-slate-700" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-slate-950 px-2 text-sm">Or</span>
+              <span className="bg-slate-900 px-2 text-lg uppercase">Or</span>
             </div>
           </div>
         </>
       )}
-      <BasicLogin action={formAction} />
+
+      <form action={formAction}>
+        <BasicLogin />
+      </form>
+
+      <p className="mt-4 text-center text-sm">
+        Don't have an account yet?{" "}
+        <Link href="/register" className="text-highlight underline">
+          Sign Up
+        </Link>
+      </p>
     </div>
   );
 }

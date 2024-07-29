@@ -54,6 +54,7 @@ export const UserSerializer = serializer({
         ? {
             email: item.email,
             createdAt: item.createdAt.toISOString(),
+            verified: item.verified,
             admin: item.admin,
             mod: item.admin || item.mod,
             notifyComments: item.notifyComments,

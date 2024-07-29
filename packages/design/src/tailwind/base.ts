@@ -10,6 +10,7 @@ export default {
         transparent: "transparent",
         current: "currentColor",
         muted: colors.slate[400],
+        "muted-dark": colors.slate[500],
         highlight: colors.amber[400],
         "highlight-dark": colors.amber[800],
       },

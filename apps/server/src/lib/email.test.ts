@@ -60,6 +60,7 @@ describe("notifyComment", () => {
   test("doesnt notify author", async ({ fixtures }) => {
     const author = await fixtures.User({
       email: "joe@example.com",
+      verified: true,
     });
     const bottle = await fixtures.Bottle();
     const tasting = await fixtures.Tasting({
@@ -87,9 +88,12 @@ describe("notifyComment", () => {
   });
 
   test("constructs appropriate email", async ({ fixtures }) => {
-    const otherAuthor = await fixtures.User();
+    const otherAuthor = await fixtures.User({
+      verified: true,
+    });
     const author = await fixtures.User({
       email: "joe@example.com",
+      verified: true,
     });
     const bottle = await fixtures.Bottle();
     const tasting = await fixtures.Tasting({

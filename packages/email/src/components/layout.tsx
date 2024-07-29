@@ -1,6 +1,7 @@
 import theme from "@peated/design";
 import { Body, Container, Head, Html, Img, Section } from "jsx-email";
 import type { ReactNode } from "react";
+import React from "react";
 
 const styles = `
 body {
@@ -27,6 +28,7 @@ body {
   }
 
   .main {
+    margin: 8px 0;
     border-width: 2px;
   }
 }

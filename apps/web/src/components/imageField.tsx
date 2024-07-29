@@ -134,7 +134,7 @@ export default forwardRef<HTMLInputElement, Props>(
         }}
       >
         <div className="col-span-full mt-2 flex min-w-full items-center gap-x-4">
-          <div className="flex min-w-full items-center justify-center overflow-hidden rounded bg-slate-900 object-contain">
+          <div className="flex min-w-full items-center justify-center overflow-hidden rounded bg-slate-800 object-contain">
             {imageSrc || finalImage ? (
               <img
                 src={
@@ -148,7 +148,7 @@ export default forwardRef<HTMLInputElement, Props>(
               />
             ) : (
               <em
-                className={`text-muted flex flex-col items-center justify-center`}
+                className={`text-muted-dark flex flex-col items-center justify-center`}
                 style={{
                   maxHeight: imageHeight,
                 }}

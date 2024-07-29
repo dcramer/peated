@@ -34,7 +34,7 @@ export default function FormField({
   return (
     <div
       className={classNames(
-        `relative block bg-slate-950 px-4 py-5 text-white focus-within:z-10 focus-within:bg-slate-900 hover:bg-slate-900`,
+        `relative block px-4 py-4 text-white focus-within:z-10`,
         className,
         onClick ? "cursor-pointer" : "",
         error ? "border border-red-500" : "",

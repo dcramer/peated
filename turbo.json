@@ -45,6 +45,14 @@
     "DATABASE_URL",
     "JWT_SECRET",
     "SESSION_SECRET",
+    "GOOGLE_CLIENT_SECRET",
+    "OPENAI_API_KEY",
+    "GOOGLE_MAPS_API_KEY",
+    "SMTP_HOST",
+    "SMTP_USER",
+    "SMTP_PASS",
+    "SMTP_FROM",
+    "SMTP_REPLY_TO",
     "npm_lifecycle_event"
   ]
 }
