@@ -22,11 +22,11 @@ test("valid token", async ({ fixtures }) => {
   const caller = createCaller({ user: null });
   await caller.authPasswordResetConfirm({
     token,
-    password: "test",
+    password: "testpassword",
   });
 
   const [newUser] = await db.select().from(users).where(eq(users.id, user.id));
-  expect(compareSync("test", newUser.passwordHash || "")).toBe(true);
+  expect(compareSync("testpassword", newUser.passwordHash || "")).toBe(true);
 });
 
 test("invalid digest", async ({ fixtures }) => {
@@ -43,14 +43,14 @@ test("invalid digest", async ({ fixtures }) => {
   const err = await waitError(
     caller.authPasswordResetConfirm({
       token,
-      password: "test",
+      password: "testpassword",
     }),
   );
 
   expect(err).toMatchInlineSnapshot(`[TRPCError: Invalid verification token.]`);
 
   const [newUser] = await db.select().from(users).where(eq(users.id, user.id));
-  expect(compareSync("test", newUser.passwordHash || "")).toBe(false);
+  expect(compareSync("testpassword", newUser.passwordHash || "")).toBe(false);
 });
 
 test("expired token", async ({ fixtures }) => {
@@ -69,12 +69,12 @@ test("expired token", async ({ fixtures }) => {
   const err = await waitError(
     caller.authPasswordResetConfirm({
       token,
-      password: "test",
+      password: "testpassword",
     }),
   );
 
   expect(err).toMatchInlineSnapshot(`[TRPCError: Invalid verification token.]`);
 
   const [newUser] = await db.select().from(users).where(eq(users.id, user.id));
-  expect(compareSync("test", newUser.passwordHash || "")).toBe(false);
+  expect(compareSync("testpassword", newUser.passwordHash || "")).toBe(false);
 });

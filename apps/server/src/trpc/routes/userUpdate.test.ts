@@ -104,3 +104,20 @@ test("cannot change admin as user", async ({ defaults }) => {
   );
   expect(err).toMatchInlineSnapshot(`[TRPCError: FORBIDDEN]`);
 });
+
+test("can change password", async ({ defaults, fixtures }) => {
+  const caller = createCaller({ user: defaults.user });
+  const data = await caller.userUpdate({
+    user: defaults.user.id,
+    username: "JoeBlow",
+    password: "testpassword",
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, defaults.user.id));
+  expect(compareSync("testpassword", user.passwordHash)).toBe(true);
+});

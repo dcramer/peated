@@ -123,15 +123,18 @@ export default function Page() {
             error={errors.username}
             label="Username"
             required
+            placeholder="you99"
           />
           <TextField
             readOnly
             disabled
             type="email"
             label="Email"
+            placeholder="you@example.com"
             required
             value={user.email}
           />
+          <TextField type="password" label="Password" />
           <ImageField
             name="picture"
             label="Picture"

@@ -20,7 +20,7 @@ export default publicProcedure
   .input(
     z.object({
       token: z.string(),
-      password: z.string(),
+      password: z.string().trim().min(8, "At least 8 characters."),
     }),
   )
   .mutation(async function ({ input }) {

@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
+import { generatePasswordHash } from "@peated/server/lib/auth";
 import { UserInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
@@ -64,6 +65,11 @@ export default authedProcedure
         });
       }
       data.mod = input.mod;
+    }
+
+    if (input.password) {
+      const passwordHash = generatePasswordHash(input.password);
+      if (passwordHash !== user.passwordHash) data.passwordHash = passwordHash;
     }
 
     if (!Object.values(data).length) {
