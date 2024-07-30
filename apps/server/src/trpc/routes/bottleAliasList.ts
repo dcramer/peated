@@ -2,7 +2,15 @@ import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { bottleAliases, bottles } from "@peated/server/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, asc, eq, getTableColumns, isNull, type SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  getTableColumns,
+  ilike,
+  isNull,
+  type SQL,
+} from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -63,11 +71,14 @@ export default publicProcedure
     return {
       results: results.map((a) => ({
         name: a.name,
-        isCanonical: bottle
-          ? `${bottle.fullName}${bottle.vintageYear ? ` (${bottle.vintageYear})` : ""}` ==
-            a.name
-          : undefined,
         createdAt: a.createdAt.toISOString(),
+        ...(bottle
+          ? {
+              isCanonical:
+                `${bottle.fullName}${bottle.vintageYear ? ` (${bottle.vintageYear})` : ""}` ==
+                a.name,
+            }
+          : {}),
       })),
     };
   });

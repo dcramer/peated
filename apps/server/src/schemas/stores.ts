@@ -3,6 +3,8 @@ import { BottleSchema } from "./bottles";
 import { CurrencyEnum } from "./common";
 import { ExternalSiteSchema } from "./externalSites";
 
+const ALLOWED_VOLUMES = [500, 750, 1000];
+
 export const StorePriceSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -18,7 +20,9 @@ export const StorePriceInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),
   price: z.number(),
   currency: CurrencyEnum,
-  volume: z.number(),
+  volume: z.number().refine((val) => ALLOWED_VOLUMES.includes(val), {
+    message: `Volume must be one of: ${ALLOWED_VOLUMES.join(", ")}`,
+  }),
   url: z.string().trim().min(1, "Required"),
 });
 
