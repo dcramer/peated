@@ -55,6 +55,11 @@ export async function scrapeProducts(
       return;
     }
 
+    if (volume < 500) {
+      console.warn(`Invalid size: ${volume}`);
+      return;
+    }
+
     const priceRaw = $(
       "span.grid-product__price--current > span.visually-hidden",
       el,

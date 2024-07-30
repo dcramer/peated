@@ -47,6 +47,11 @@ export async function scrapeProducts(
       return;
     }
 
+    if (volume < 500) {
+      console.warn(`Invalid size: ${volume}`);
+      return;
+    }
+
     const priceRaw = $(".sales > .value", el).first().text();
     const price = parsePrice(priceRaw);
     if (!price) {

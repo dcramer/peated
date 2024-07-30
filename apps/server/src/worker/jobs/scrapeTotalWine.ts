@@ -30,6 +30,11 @@ export async function scrapeProducts(
       return;
     }
 
+    if (volume < 500) {
+      console.warn(`Invalid size: ${volume}`);
+      return;
+    }
+
     const productUrl = $("h2.title__2RoYeYuO > a", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");
 
