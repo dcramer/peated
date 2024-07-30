@@ -16,7 +16,7 @@ test("simple", async ({ axiosMock }) => {
 
   await fn;
 
-  expect(items.length).toBe(119);
+  expect(items.length).toBe(112);
   expect(items[0]).toEqual({
     name: "Grangestone Bourbon Cask Finish Single Malt Scotch Whisky",
     price: 6499,

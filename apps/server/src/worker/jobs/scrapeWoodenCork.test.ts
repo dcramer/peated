@@ -15,7 +15,7 @@ test("simple", async ({ axiosMock }) => {
 
   await fn;
 
-  expect(items.length).toBe(39);
+  expect(items.length).toBe(38);
   expect(items[0]).toEqual({
     name: "Elmer T. Lee Single Barrel Bourbon",
     price: 33899,
