@@ -13,7 +13,20 @@ export default function ResendVerificationForm() {
 
   return (
     <form action={resendVerificationAction}>
-      {state?.ok ? <div></div> : <ResendVerificationButton />}
+      {state?.ok ? (
+        state.alreadyVerified ? (
+          <p className="mb-8 text-center">
+            Oops, it looks like you already verified your account. Nothing to
+            see here!
+          </p>
+        ) : (
+          <p className="mb-8 text-center">
+            Follow the instructions in your inbox to continue.
+          </p>
+        )
+      ) : (
+        <ResendVerificationButton />
+      )}
     </form>
   );
 }

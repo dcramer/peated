@@ -5,7 +5,7 @@ import { authedProcedure } from "..";
 export default authedProcedure.mutation(async function ({ ctx: { user } }) {
   if (user.verified) {
     throw new TRPCError({
-      code: "BAD_REQUEST",
+      code: "CONFLICT",
       message: "Account already verified",
     });
   }

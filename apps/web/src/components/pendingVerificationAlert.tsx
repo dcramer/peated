@@ -3,12 +3,19 @@
 import { resendVerificationForm } from "@peated/web/lib/auth.actions";
 import { useFormState, useFormStatus } from "react-dom";
 import Alert from "./alert";
+import { useFlashMessages } from "./flash";
 
 export default function PendingVerificationAlert() {
   const [state, resendVerificationAction] = useFormState(
     resendVerificationForm,
     undefined,
   );
+
+  const { flash } = useFlashMessages();
+
+  if (state?.alreadyVerified) {
+    flash("Oops, looks like you already verified your account.", "success");
+  }
 
   return (
     <Alert type="default" noMargin>

@@ -146,7 +146,11 @@ type GenericResult = {
 };
 
 export async function resendVerificationForm(
-  prevState?: GenericResult | undefined,
+  prevState?:
+    | (GenericResult & {
+        alreadyVerified?: boolean;
+      })
+    | undefined,
   formData?: FormData,
 ) {
   "use server";
@@ -154,7 +158,15 @@ export async function resendVerificationForm(
   const session = await getSession();
 
   const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
-  await trpcClient.emailResendVerification.mutate();
+  try {
+    await trpcClient.emailResendVerification.mutate();
+  } catch (err) {
+    if (isTRPCClientError(err) && err.data?.code === "CONFLICT") {
+      return { ok: true, alreadyVerified: true };
+    }
+
+    throw err;
+  }
 
   return { ok: true };
 }
