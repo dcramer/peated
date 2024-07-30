@@ -75,7 +75,10 @@ export default adminProcedure.input(z.number()).mutation(async function ({
     await tx
       .delete(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
-    await tx.delete(bottleAliases).where(eq(bottleAliases.bottleId, bottle.id));
+    await tx
+      .update(bottleAliases)
+      .set({ bottleId: null })
+      .where(eq(bottleAliases.bottleId, bottle.id));
     await tx
       .update(reviews)
       .set({ bottleId: null })
