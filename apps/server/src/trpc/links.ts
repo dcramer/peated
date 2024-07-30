@@ -20,9 +20,21 @@ export function sentryLink<TRouter extends AnyRouter>(): TRPCLink<TRouter> {
             observer.next(value);
           },
           error(err) {
+            const messageList: null | { code: "string"; message: "string" }[] =
+              err.shape?.message instanceof Array ? err.shape.message : null;
+            const code = err.shape?.data.code;
+            const path = err.shape?.data.path;
             try {
               captureException(err, (scope) => {
-                scope.setFingerprint([err.message]);
+                scope.setFingerprint(
+                  messageList
+                    ? [
+                        code,
+                        path,
+                        ...Array.from(new Set(messageList.map((m) => m.code))),
+                      ]
+                    : [err.message],
+                );
                 scope.setExtras({
                   data: err.data,
                   meta: err.meta,
