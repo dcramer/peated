@@ -40,7 +40,10 @@ function sortResults(query: string, unsortedResults: Result[]) {
         exactMatches.push(index);
       }
     } else {
-      if (value.ref.name.toLowerCase() === lowerQuery) {
+      if (
+        value.ref.fullName.toLowerCase() === lowerQuery ||
+        value.ref.name.toLowerCase() === lowerQuery
+      ) {
         exactMatches.push(index);
       }
     }
