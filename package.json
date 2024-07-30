@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "",
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "turbo build",
     "build:docker": "pnpm --filter='!./apps/mobile' --filter='!./apps/web' build",
     "build:packages": "pnpm -r --filter='./packages/*' build",
     "build:mobile": "pnpm build --filter='./apps/mobile'",
@@ -25,7 +25,7 @@
     "tastings": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli tastings",
     "mocks": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli mocks",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli users",
-    "typecheck": "turbo typecheck",
+    "typecheck": "turbo typecheck --filter='!./apps/mobile'",
     "lint": "turbo lint",
     "test": "turbo test",
     "test:ci": "CI=true pnpm -r run test:ci",

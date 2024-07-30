@@ -88,7 +88,11 @@ test("new review with new bottle matching entity", async ({ fixtures }) => {
 
 test("new review with existing bottle", async ({ fixtures }) => {
   const site = await fixtures.ExternalSite();
-  const bottle = await fixtures.Bottle();
+  const bottle = await fixtures.Bottle({
+    name: "Delicious",
+    vintageYear: null,
+    releaseYear: null,
+  });
 
   const caller = createCaller({
     user: await fixtures.User({ admin: true }),

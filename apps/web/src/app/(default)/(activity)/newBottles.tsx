@@ -58,14 +58,6 @@ export default function NewBottles() {
                     >
                       {bottle.fullName}
                     </BottleLink>
-                    {bottle.vintageYear && (
-                      <>
-                        {" "}
-                        <span className="text-muted">
-                          ({bottle.vintageYear})
-                        </span>
-                      </>
-                    )}
                     {bottle.isFavorite && (
                       <StarIcon className="h-4 w-4" aria-hidden="true" />
                     )}
@@ -73,16 +65,21 @@ export default function NewBottles() {
                       <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
                     )}
                   </div>
-                  {!!bottle.category && (
-                    <div className="text-muted text-sm">
+                  <div className="text-muted flex gap-x-1 text-sm">
+                    {bottle.category && (
                       <Link
                         href={`/bottles/?category=${bottle.category}`}
                         className="hover:underline"
                       >
                         {formatCategoryName(bottle.category)}
                       </Link>
-                    </div>
-                  )}
+                    )}
+                    {bottle.releaseYear ? (
+                      <span>({bottle.releaseYear} Release)</span>
+                    ) : bottle.vintageYear ? (
+                      <span>({bottle.vintageYear} Vintage)</span>
+                    ) : null}
+                  </div>
                 </td>
               </tr>
             );

@@ -9,6 +9,7 @@ import { Text } from "./StyledText";
 type BottleFormData = {
   name: string;
   vintageYear?: number | null;
+  releaseYear?: number | null;
   brand?:
     | {
         id: number;
@@ -71,7 +72,7 @@ export const PreviewBottleCard = ({
   return (
     <BottleCardScaffold
       name={
-        <Text>{`${brand ? `${brand.shortName || brand.name} ${data.name}` : data.name}${data.vintageYear ? ` (${data.vintageYear})` : ""}`}</Text>
+        <Text>{`${brand ? `${brand.shortName || brand.name} ${data.name}` : data.name}${data.releaseYear ? ` (${data.releaseYear})` : ""}`}</Text>
       }
       distillers={
         data.distillers?.length ? (
@@ -108,9 +109,9 @@ export default function BottleCard({
               <Text className="font-bold">{bottle.fullName}</Text>
             </Pressable>
           </Link>
-          {bottle.vintageYear && (
+          {bottle.releaseYear && (
             <Text variant={variant === "highlight" ? "highlight" : "muted"}>
-              ({bottle.vintageYear})
+              ({bottle.releaseYear})
             </Text>
           )}
           {bottle.isFavorite && (

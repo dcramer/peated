@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
+import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle, CollectionBottle, PagingRel } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentProps } from "react";
@@ -30,25 +31,37 @@ export default function BottleTable({
           className: "min-w-full sm:w-1/2",
           value: (item) => {
             return (
-              <>
-                <BottleLink
-                  bottle={item}
-                  className="font-medium hover:underline"
-                >
-                  {item.fullName}
-                </BottleLink>
-                {item.vintageYear && (
-                  <>
-                    <span className="text-muted">({item.vintageYear})</span>
-                  </>
-                )}
-                {item.isFavorite && (
-                  <StarIcon className="h-4 w-4" aria-hidden="true" />
-                )}
-                {item.hasTasted && (
-                  <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
-                )}
-              </>
+              <div className="flex flex-col justify-center">
+                <div>
+                  <BottleLink
+                    bottle={item}
+                    className="font-medium hover:underline"
+                  >
+                    {item.fullName}
+                  </BottleLink>
+                  {item.isFavorite && (
+                    <StarIcon className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  {item.hasTasted && (
+                    <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
+                  )}
+                </div>
+                <div className="text-muted flex gap-x-1 text-sm">
+                  {item.category && (
+                    <Link
+                      href={`/bottles/?category=${item.category}`}
+                      className="hover:underline"
+                    >
+                      {formatCategoryName(item.category)}
+                    </Link>
+                  )}
+                  {item.releaseYear ? (
+                    <span>({item.releaseYear} Release)</span>
+                  ) : item.vintageYear ? (
+                    <span>({item.vintageYear} Vintage)</span>
+                  ) : null}
+                </div>
+              </div>
             );
           },
         },

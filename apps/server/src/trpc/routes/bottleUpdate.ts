@@ -8,6 +8,7 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { generateUniqHash } from "@peated/server/lib/bottleHash";
+import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -81,6 +82,7 @@ export async function bottleUpdate({
           name: d.distiller.name,
         })),
         vintageYear: bottle.vintageYear,
+        releaseYear: bottle.releaseYear,
         ...input,
       },
       ctx,
@@ -244,6 +246,7 @@ export async function bottleUpdate({
                 uniqHash: generateUniqHash({
                   fullName: bottle.fullName,
                   vintageYear: bottle.vintageYear,
+                  releaseYear: bottle.releaseYear,
                   ...bottleUpdateData,
                 }),
                 updatedAt: sql`NOW()`,
@@ -266,9 +269,7 @@ export async function bottleUpdate({
     if (!newBottle) return;
 
     if (bottleData.name) {
-      const aliasName = newBottle.vintageYear
-        ? `${newBottle.fullName} (${newBottle.vintageYear})`
-        : newBottle.fullName;
+      const aliasName = formatBottleName(newBottle);
       const existingAlias = await tx.query.bottleAliases.findFirst({
         where: eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()),
       });

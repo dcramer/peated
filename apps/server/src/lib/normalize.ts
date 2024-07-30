@@ -98,7 +98,7 @@ export function normalizeBottle({
     statedAge = parseInt(match[1], 10);
   }
 
-  // TODO: we want to remove the year from the name in mid-match
+  // remove vintage first
   const vintageYearMatch = name.match(/\((\d{4}) vintage\)|(\d{4}) vintage/i);
   if (vintageYearMatch) {
     if (!vintageYear) {
@@ -107,13 +107,17 @@ export function normalizeBottle({
     }
   }
   if (vintageYear) {
-    // TODO: regex this
-    name = stripSuffix(name, ` ${vintageYear}`);
-    name = stripSuffix(name, ` (${vintageYear})`);
-    name = stripSuffix(name, ` (${vintageYear} vintage)`);
-    name = stripSuffix(name, ` (${vintageYear} Vintage)`);
+    name =
+      name.replace(
+        new RegExp(
+          `(\\s${vintageYear}$|\\(${vintageYear}\\)($|\\s)|\\(${vintageYear} vintage\\)($|\\s)|${vintageYear} vintage($|\\s))`,
+          "i",
+        ),
+        "",
+      ) || name;
   }
 
+  // release is removed last, that way if its the only thing present, its still visible
   const releaseYearMatch = name.match(/\((\d{4}) release\)|(\d{4}) release/i);
   if (releaseYearMatch) {
     if (!releaseYear) {
@@ -122,16 +126,22 @@ export function normalizeBottle({
     }
   }
   if (releaseYear) {
-    // TODO: regex this
-    name = stripSuffix(name, ` ${releaseYear}`);
-    name = stripSuffix(name, ` (${releaseYear})`);
-    name = stripSuffix(name, ` (${releaseYear} release)`);
-    name = stripSuffix(name, ` (${releaseYear} Release)`);
+    name =
+      name.replace(
+        new RegExp(
+          `(\\s${releaseYear}$|\\(${releaseYear}\\)($|\\s)|\\(${releaseYear} release\\)($|\\s)|${releaseYear} release($|\\s))`,
+          "i",
+        ),
+        "",
+      ) || name;
   }
 
   // TODO: these would be nice to simply move to form validation
   if (statedAge && vintageYear && vintageYear + statedAge > currentYear) {
     // invalid vintage - probably confused w/ release
+    console.warn(
+      "Invalid vintageYear (vintageYear must be less than the currentYear - statedAge).",
+    );
     vintageYear = null;
   }
 
@@ -146,10 +156,13 @@ export function normalizeBottle({
   // move any segment thats enclaosed in quotations to the end
   name = name.replaceAll(/(^|[\s,])(\([^)]+\)),?\s(.+)$/gi, "$1 $3 $2");
 
-  // trailing/leading whitespace
-  name = name.replace(/^\s*|\s*$/g, "");
+  // remove invalid commas (", (foo)")
+  name = name.replaceAll(/,\s+\(/g, " (");
 
-  // replace various whitespace
+  // trailing/leading whitespace
+  name = name.replaceAll(/^\s*|\s*$/g, "");
+
+  // replace excessive whitespace
   name = name.replaceAll(/\n\s+|\n+|\s{2,}/gi, " ");
 
   // vintage is likely wrong

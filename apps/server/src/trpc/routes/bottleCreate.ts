@@ -11,6 +11,7 @@ import {
   upsertBottleAlias,
   upsertEntity,
 } from "@peated/server/lib/db";
+import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -150,9 +151,7 @@ export async function bottleCreate({
       return;
     }
 
-    const aliasName = bottle.vintageYear
-      ? `${bottle.fullName} (${bottle.vintageYear})`
-      : bottle.fullName;
+    const aliasName = formatBottleName(bottle);
 
     await upsertBottleAlias(tx, bottle.id, aliasName);
 

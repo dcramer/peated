@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { bottleAliases, bottles } from "@peated/server/db/schema";
+import { formatBottleName } from "@peated/server/lib/format";
 import { TRPCError } from "@trpc/server";
 import {
   and,
@@ -70,15 +71,15 @@ export default publicProcedure
       .offset(offset)
       .orderBy(asc(bottleAliases.name));
 
+    const canonicalName = bottle ? formatBottleName(bottle) : null;
+
     return {
       results: results.slice(0, limit).map((a) => ({
         name: a.name,
         createdAt: a.createdAt.toISOString(),
         ...(bottle
           ? {
-              isCanonical:
-                `${bottle.fullName}${bottle.vintageYear ? ` (${bottle.vintageYear})` : ""}` ==
-                a.name,
+              isCanonical: canonicalName == a.name,
             }
           : {}),
       })),

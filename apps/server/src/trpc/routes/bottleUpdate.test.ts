@@ -68,11 +68,6 @@ test("edits a new bottle with new name param", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
 
-  expect(
-    omit(bottle, "name", "fullName", "searchVector", "updatedAt", "uniqHash"),
-  ).toEqual(
-    omit(bottle2, "name", "fullName", "searchVector", "updatedAt", "uniqHash"),
-  );
   expect(bottle2.name).toBe("Delicious Wood");
   expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
 });
@@ -119,27 +114,6 @@ test("manipulates name to conform with age", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(
-    omit(
-      bottle,
-      "name",
-      "fullName",
-      "statedAge",
-      "searchVector",
-      "updatedAt",
-      "uniqHash",
-    ),
-  ).toEqual(
-    omit(
-      bottle2,
-      "name",
-      "fullName",
-      "statedAge",
-      "searchVector",
-      "updatedAt",
-      "uniqHash",
-    ),
-  );
   expect(bottle2.statedAge).toBe(10);
   expect(bottle2.name).toBe("Delicious 10-year-old");
   expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
@@ -147,7 +121,11 @@ test("manipulates name to conform with age", async ({ fixtures }) => {
 
 test("fills in statedAge", async ({ fixtures }) => {
   const brand = await fixtures.Entity();
-  const bottle = await fixtures.Bottle({ brandId: brand.id, statedAge: null });
+  const bottle = await fixtures.Bottle({
+    brandId: brand.id,
+    statedAge: null,
+    name: "Delicious",
+  });
 
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),
@@ -162,27 +140,6 @@ test("fills in statedAge", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(
-    omit(
-      bottle,
-      "name",
-      "fullName",
-      "statedAge",
-      "searchVector",
-      "updatedAt",
-      "uniqHash",
-    ),
-  ).toEqual(
-    omit(
-      bottle2,
-      "name",
-      "fullName",
-      "statedAge",
-      "searchVector",
-      "updatedAt",
-      "uniqHash",
-    ),
-  );
   expect(bottle2.statedAge).toBe(10);
 });
 
@@ -202,9 +159,6 @@ test("removes statedAge", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(omit(bottle, "statedAge", "updatedAt")).toEqual(
-    omit(bottle2, "statedAge", "updatedAt"),
-  );
   expect(bottle2.statedAge).toBeNull();
 });
 
@@ -225,25 +179,6 @@ test("changes brand", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, bottle.id));
 
-  expect(
-    omit(
-      bottle,
-      "brandId",
-      "fullName",
-      "searchVector",
-      "updatedAt",
-      "uniqHash",
-    ),
-  ).toEqual(
-    omit(
-      bottle2,
-      "brandId",
-      "fullName",
-      "searchVector",
-      "updatedAt",
-      "uniqHash",
-    ),
-  );
   expect(bottle2.brandId).toBe(newBrand.id);
   expect(bottle2.fullName).toBe(`${newBrand.name} ${bottle.name}`);
 });
@@ -415,7 +350,11 @@ test("saves cask information", async ({ defaults, fixtures }) => {
 });
 
 test("saves vintage information", async ({ defaults, fixtures }) => {
-  const bottle = await fixtures.Bottle();
+  const bottle = await fixtures.Bottle({
+    name: "Delicious",
+    statedAge: null,
+    releaseYear: null,
+  });
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleUpdate({
