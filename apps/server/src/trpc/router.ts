@@ -11,6 +11,7 @@ import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
 import bottleAliasDelete from "./routes/bottleAliasDelete";
 import bottleAliasList from "./routes/bottleAliasList";
+import bottleAliasUpdate from "./routes/bottleAliasUpdate";
 import bottleAliasUpsert from "./routes/bottleAliasUpsert";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
@@ -121,6 +122,7 @@ export const appRouter = router({
   bottleList,
   bottleAliasDelete,
   bottleAliasList,
+  bottleAliasUpdate,
   bottleAliasUpsert,
   bottleGenerateDetails,
   bottleMerge,

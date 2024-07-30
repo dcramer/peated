@@ -14,18 +14,18 @@ import BottleSelector from "./bottleSelector";
 export default function Page() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [priceList] = trpc.priceList.useSuspenseQuery({
+  const [aliasList] = trpc.bottleAliasList.useSuspenseQuery({
     ...Object.fromEntries(searchParams.entries()),
     onlyUnknown: true,
   });
   const [unmatchedBottle, setUnmatchedBottle] = useState<
-    null | RouterOutputs["priceList"]["results"][number]
+    null | RouterOutputs["bottleAliasList"]["results"][number]
   >(null);
 
   // this isnt useful as the upsert wipes the cache but we dont totally want that
   const [assignments, setAssignments] = useState<Record<string, Bottle>>({});
 
-  const priceUpdateMutation = trpc.priceUpdate.useMutation();
+  const bottleAliasUpdateMutation = trpc.bottleAliasUpdate.useMutation();
   const bottleAliasUpsertMutation = trpc.bottleAliasUpsert.useMutation();
 
   const { flash } = useFlashMessages();
@@ -34,9 +34,9 @@ export default function Page() {
     <>
       <SimpleHeader>Discovered Bottles</SimpleHeader>
       <Table
-        items={priceList.results}
-        rel={priceList.rel}
-        primaryKey={(item) => String(item.id)}
+        items={aliasList.results}
+        rel={aliasList.rel}
+        primaryKey={(item) => String(item.name)}
         columns={[
           {
             name: "name",
@@ -65,27 +65,14 @@ export default function Page() {
             },
           },
           {
-            name: "source",
-            value: (item) => (
-              <>
-                [
-                <Link href={item.url} className="hover:underline">
-                  Source
-                </Link>
-                ]
-              </>
-            ),
-          },
-          {
             name: "action",
             value: (item) => (
               <>
-                [
                 <Button
                   onClick={async () => {
-                    await priceUpdateMutation.mutateAsync({
-                      price: item.id,
-                      hidden: true,
+                    await bottleAliasUpdateMutation.mutateAsync({
+                      name: item.name,
+                      ignored: true,
                     });
                     flash(
                       <div>
@@ -97,9 +84,8 @@ export default function Page() {
                   }}
                   className="hover:underline"
                 >
-                  Hide
+                  Ignore
                 </Button>
-                ]
               </>
             ),
           },
@@ -108,7 +94,6 @@ export default function Page() {
 
       <BottleSelector
         open={!!unmatchedBottle}
-        source={unmatchedBottle?.url}
         name={unmatchedBottle?.name}
         returnTo={pathname}
         onClose={() => {

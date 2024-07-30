@@ -31,7 +31,9 @@ export default publicProcedure
       }),
   )
   .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
-    const where: (SQL<unknown> | undefined)[] = [];
+    const where: (SQL<unknown> | undefined)[] = [
+      eq(bottleAliases.ignored, false),
+    ];
 
     let bottle: Bottle | null = null;
     if (input.bottle) {
@@ -69,7 +71,7 @@ export default publicProcedure
       .orderBy(asc(bottleAliases.name));
 
     return {
-      results: results.map((a) => ({
+      results: results.slice(0, limit).map((a) => ({
         name: a.name,
         createdAt: a.createdAt.toISOString(),
         ...(bottle
@@ -80,5 +82,9 @@ export default publicProcedure
             }
           : {}),
       })),
+      rel: {
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
+      },
     };
   });

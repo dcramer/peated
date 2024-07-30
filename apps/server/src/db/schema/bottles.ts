@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  boolean,
   doublePrecision,
   index,
   integer,
@@ -188,6 +189,8 @@ export const bottleAliases = pgTable(
     ),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),
+    // ignored is used to hide this alias from matches
+    ignored: boolean("ignored").default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => {

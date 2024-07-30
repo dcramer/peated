@@ -222,7 +222,7 @@ export const EntityAlias = async (
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.EntityAlias> => {
   const [result] = await db.transaction(async (tx) => {
-    return await db
+    return await tx
       .insert(dbSchema.entityAliases)
       .values({
         entityId: data.entityId || (await Entity({}, tx)).id,
@@ -360,7 +360,7 @@ export const BottleAlias = async (
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.BottleAlias> => {
   const [result] = await db.transaction(async (tx) => {
-    return await db
+    return await tx
       .insert(bottleAliases)
       .values({
         bottleId: data.bottleId || (await Bottle({}, tx)).id,
