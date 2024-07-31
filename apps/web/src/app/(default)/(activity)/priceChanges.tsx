@@ -4,11 +4,11 @@ import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { type Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
+import BottleLink from "@peated/web/components/bottleLink";
 import Link from "@peated/web/components/link";
+import Price from "@peated/web/components/price";
 import classNames from "@peated/web/lib/classNames";
 import { trpc } from "@peated/web/lib/trpc/client";
-import BottleLink from "./bottleLink";
-import Price from "./price";
 
 function PriceDelta({
   price,
@@ -30,7 +30,7 @@ function PriceDelta({
 
 export function PriceChangesSkeleton() {
   return (
-    <div className="mt-4 animate-pulse bg-slate-800" style={{ height: 200 }} />
+    <div className="mb-8 animate-pulse bg-slate-800" style={{ height: 200 }} />
   );
 }
 
@@ -40,7 +40,7 @@ export default function PriceChanges() {
   });
 
   return (
-    <div className="mt-4">
+    <div className="mb-8">
       <BetaNotice>This is a work in progress.</BetaNotice>
       {data.results.length ? (
         <table className="my-2 min-w-full text-sm">
@@ -125,7 +125,9 @@ export default function PriceChanges() {
           </tbody>
         </table>
       ) : (
-        <p className="mt-4 text-center text-sm">No price history found.</p>
+        <p className="text-muted mb-8 text-center text-sm">
+          No price history found.
+        </p>
       )}
     </div>
   );

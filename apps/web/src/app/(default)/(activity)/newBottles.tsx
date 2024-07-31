@@ -8,7 +8,7 @@ import { trpc } from "@peated/web/lib/trpc/client";
 
 export function NewBottlesSkeleton() {
   const Row = () => (
-    <tr className=" border-b border-slate-800">
+    <tr className="border-b border-slate-800">
       <td className="max-w-0 space-y-1 overflow-hidden px-4 py-1 text-sm sm:px-3">
         <div className="flex animate-pulse items-center overflow-hidden bg-slate-800 -indent-96">
           Bottle
@@ -20,7 +20,7 @@ export function NewBottlesSkeleton() {
     </tr>
   );
   return (
-    <table className="my-2 min-w-full">
+    <table className="mb-4 min-w-full">
       <tbody>
         <Row />
         <Row />
@@ -44,7 +44,7 @@ export default function NewBottles() {
   });
 
   return (
-    <table className="my-2 min-w-full">
+    <table className="mb-4 min-w-full">
       <tbody>
         {newBottleList &&
           newBottleList.results.map((bottle) => {

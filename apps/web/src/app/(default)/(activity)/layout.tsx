@@ -1,13 +1,12 @@
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
-import PriceChanges, {
-  PriceChangesSkeleton,
-} from "@peated/web/components/priceChanges";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { Suspense, type ReactNode } from "react";
 import NewBottles, { NewBottlesSkeleton } from "./newBottles";
+import PriceChanges, { PriceChangesSkeleton } from "./priceChanges";
+import UpcomingEvents, { UpcomingEventsSkeleton } from "./upcomingEvents";
 // import { PriceChanges, PriceChangesSkeleton } from "./content";
 
 export default async function Layout({
@@ -51,9 +50,15 @@ export default async function Layout({
           )}
           <div>
             <Tabs fullWidth>
+              <TabItem active>Upcoming Events</TabItem>
+            </Tabs>
+            <Suspense fallback={<UpcomingEventsSkeleton />}>
+              <UpcomingEvents />
+            </Suspense>
+
+            <Tabs fullWidth>
               <TabItem active>Newest Bottles</TabItem>
             </Tabs>
-
             <Suspense fallback={<NewBottlesSkeleton />}>
               <NewBottles />
             </Suspense>
