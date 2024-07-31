@@ -17,7 +17,7 @@ export function formatBottleName({
 } & Record<string, any>) {
   const bits = [fullName];
   if (releaseYear) bits.push(`(${releaseYear} Release)`);
-  else if (vintageYear) bits.push(`(${releaseYear} Vintage)`);
+  else if (vintageYear) bits.push(`(${vintageYear} Vintage)`);
   return bits.join(" ");
 }
 
