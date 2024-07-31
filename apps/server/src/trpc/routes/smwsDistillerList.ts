@@ -13,7 +13,10 @@ export default publicProcedure.query(async function ({ ctx }) {
     .select()
     .from(entities)
     .where(
-      sql`${entities.id} IN (SELECT ${entityAliases.entityId} FROM ${entityAliases} WHERE ${entityAliases.name} IN ${Object.values(SMWS_DISTILLERY_CODES)})`,
+      sql`${entities.id} IN (
+        SELECT ${entityAliases.entityId} FROM ${entityAliases}
+        WHERE LOWER(${entityAliases.name}) IN ${Object.values(SMWS_DISTILLERY_CODES).map((s) => s.toLowerCase())}
+      )`,
     );
 
   return {
