@@ -4,17 +4,21 @@ import { eq } from "drizzle-orm";
 import updateCountryStats from "./updateCountryStats";
 
 test("updates totalBottles", async ({ fixtures }) => {
-  const country1 = await fixtures.Country();
-  const country2 = await fixtures.Country();
+  const country1 = await fixtures.Country({ name: "United States" });
+  const country2 = await fixtures.Country({ name: "Canada" });
 
-  const entity1 = await fixtures.Entity({ countryId: country1.id });
-  const entity2 = await fixtures.Entity({ countryId: country1.id });
-  const entity3 = await fixtures.Entity({ countryId: country2.id });
+  const entity1 = await fixtures.Entity({ name: "A", countryId: country1.id });
+  const entity2 = await fixtures.Entity({ name: "B", countryId: country1.id });
+  const entity3 = await fixtures.Entity({ name: "C", countryId: country2.id });
 
-  await fixtures.Bottle({ brandId: entity1.id });
-  await fixtures.Bottle({ brandId: entity2.id, bottlerId: entity1.id });
-  await fixtures.Bottle({ brandId: entity3.id });
-  await fixtures.Bottle({ distillerIds: [entity1.id, entity2.id] });
+  await fixtures.Bottle({ name: "A", brandId: entity1.id });
+  await fixtures.Bottle({
+    name: "B",
+    brandId: entity2.id,
+    bottlerId: entity1.id,
+  });
+  await fixtures.Bottle({ name: "C", brandId: entity3.id });
+  await fixtures.Bottle({ name: "D", distillerIds: [entity1.id, entity2.id] });
 
   updateCountryStats({ countryId: country1.id });
 
