@@ -198,6 +198,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   B5: "Cascade Hollow",
   B6: "Finger Lakes Distilling",
   B7: "Midwest Grain Products",
+  B8: "Woodinville Whiskey Co.",
 
   // Rye
   RW1: "FEW Spirits",
@@ -210,6 +211,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
 
   // Corn
   CW1: "Heaven Hill",
+  CW2: "Baclones",
 
   // Rum
   R1: "Monymusk",
@@ -255,6 +257,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   GN4: "Boatyard Distillery",
   GN5: "Scottish Gin",
   GN6: "Holyrood Distillery",
+  GN7: "Cotswolds",
 };
 
 export const SMWS_CATEGORY_LIST = [
