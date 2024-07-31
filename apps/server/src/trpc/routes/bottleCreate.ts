@@ -169,7 +169,7 @@ export async function bottleCreate({
       .returning();
 
     // someone beat us to it?
-    if (newAlias.bottleId !== bottle.id) {
+    if (newAlias.bottleId && newAlias.bottleId !== bottle.id) {
       const [existingBottle] = await tx
         .select()
         .from(bottles)

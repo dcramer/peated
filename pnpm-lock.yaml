@@ -3453,6 +3453,9 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@babel/core': '*'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
 
   '@react-native/codegen@0.74.85':
     resolution: {integrity: sha512-N7QwoS4Hq/uQmoH83Ewedy6D0M7xbQsOU3OMcQf0eY3ltQ7S2hd9/R4UTalQWRn1OUJfXR6OG12QJ4FStKgV6Q==}
@@ -9986,6 +9989,7 @@ packages:
 
   shikiji-core@0.9.19:
     resolution: {integrity: sha512-AFJu/vcNT21t0e6YrfadZ+9q86gvPum6iywRyt1OtIPjPFe25RQnYJyxHQPMLKCCWA992TPxmEmbNcOZCAJclw==}
+    deprecated: Shikiji is merged back to Shiki v1.0, please migrate over to get the latest updates
 
   shikiji@0.8.7:
     resolution: {integrity: sha512-j5usxwI0yHkDTHOuhuSJl9+wT5CNYeYO82dJMSJBlJ/NYT5SIebGcPoL6y9QOyH15wGrJC4LOP2nz5k8mUDGRQ==}
@@ -14538,7 +14542,6 @@ snapshots:
 
   '@react-native/babel-preset@0.74.85(@babel/core@7.24.9)(@babel/preset-env@7.24.7(@babel/core@7.24.9))':
     dependencies:
-      '@babel/core': 7.24.9
       '@babel/plugin-proposal-async-generator-functions': 7.20.7(@babel/core@7.24.9)
       '@babel/plugin-proposal-class-properties': 7.18.6(@babel/core@7.24.9)
       '@babel/plugin-proposal-export-default-from': 7.24.7(@babel/core@7.24.9)
@@ -14581,6 +14584,8 @@ snapshots:
       '@react-native/babel-plugin-codegen': 0.74.85(@babel/preset-env@7.24.7(@babel/core@7.24.9))
       babel-plugin-transform-flow-enums: 0.0.2(@babel/core@7.24.9)
       react-refresh: 0.14.2
+    optionalDependencies:
+      '@babel/core': 7.24.9
     transitivePeerDependencies:
       - '@babel/preset-env'
       - supports-color
