@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { CountrySchema } from "./countries";
+import { PointSchema } from "./shared";
 
 export const EventSchema = z.object({
   id: z.number(),
@@ -8,6 +10,10 @@ export const EventSchema = z.object({
   repeats: z.boolean().default(false),
   website: z.string().url().nullable().default(null),
   description: z.string().nullable().default(null),
+  country: CountrySchema.nullable().default(null),
+  location: PointSchema.nullable().default(null),
 });
 
-export const EventInputSchema = EventSchema.omit({ id: true });
+export const EventInputSchema = EventSchema.omit({ id: true }).extend({
+  country: z.number().nullable().default(null),
+});

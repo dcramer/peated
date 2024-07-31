@@ -1,11 +1,11 @@
 import { db } from "@peated/server/db";
 import type { Event } from "@peated/server/db/schema";
-import { events } from "@peated/server/db/schema";
+import { countries, events } from "@peated/server/db/schema";
 import { EventInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EventSerializer } from "@peated/server/serializers/event";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { adminProcedure } from "..";
 
@@ -15,7 +15,10 @@ export default adminProcedure
       id: z.number(),
     }),
   )
-  .mutation(async function ({ input: { id, ...input }, ctx }) {
+  .mutation(async function ({
+    input: { id, country: countryId, ...input },
+    ctx,
+  }) {
     const [event] = await db.select().from(events).where(eq(events.id, id));
     if (!event) {
       throw new TRPCError({
@@ -30,9 +33,14 @@ export default adminProcedure
       }
     });
 
+    if (countryId) {
+      data.countryId = countryId;
+    }
+
     if (Object.values(data).length === 0) {
       return await serialize(EventSerializer, event, ctx.user);
     }
+
     const newEvent = await db.transaction(async (tx) => {
       let newEvent: Event | undefined;
       try {

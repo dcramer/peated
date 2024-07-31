@@ -122,7 +122,9 @@ export default function SelectField<T extends Option>({
   const [previousValues, setPreviousValues] = useState<T[]>(value);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  if (!suggestedOptions) suggestedOptions = options.slice(0, targetOptions);
+  if (readOnly) suggestedOptions = [];
+  else if (!suggestedOptions)
+    suggestedOptions = options.slice(0, targetOptions);
 
   const toggleOption = (option: T) => {
     setPreviousValues(filterDupes([option], previousValues));

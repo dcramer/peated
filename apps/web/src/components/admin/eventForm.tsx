@@ -12,10 +12,12 @@ import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
 import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
 import BooleanField from "../booleanField";
+import CountryField from "../countryField";
 import Form from "../form";
+import type { Option } from "../selectField";
 import TextAreaField from "../textAreaField";
 import AdminSidebar from "./sidebar";
 
@@ -32,6 +34,8 @@ export default function EventForm({
   title?: string;
   edit?: boolean;
 }) {
+  const { country, ...defaultValues } = initialData;
+
   const {
     register,
     control,
@@ -39,10 +43,22 @@ export default function EventForm({
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(EventInputSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      country: country ? country.id : null,
+      ...defaultValues,
+    },
   });
 
   const [error, setError] = useState<string | undefined>();
+
+  const [countryValue, setCountryValue] = useState<Option | undefined>(
+    country
+      ? {
+          id: country.id,
+          name: country.name,
+        }
+      : undefined,
+  );
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
@@ -121,6 +137,25 @@ export default function EventForm({
             {...register("description")}
             label="description"
             error={errors.description}
+            rows={6}
+          />
+
+          <Controller
+            control={control}
+            name="country"
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <CountryField
+                {...field}
+                error={errors.country}
+                label="Country"
+                placeholder="e.g. Scotland"
+                onChange={(value) => {
+                  onChange(value?.id);
+                  setCountryValue(value);
+                }}
+                value={countryValue}
+              />
+            )}
           />
         </Fieldset>
       </Form>
