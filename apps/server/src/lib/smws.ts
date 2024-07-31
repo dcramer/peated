@@ -192,7 +192,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
 
   // Bourbon
   B1: "Heaven Hill",
-  B2: "New Bernheim",
+  B2: "Bernheim",
   B3: "Rock Town",
   B4: "FEW Spirits",
   B5: "Cascade Hollow",
