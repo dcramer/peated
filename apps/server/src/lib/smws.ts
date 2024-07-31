@@ -197,7 +197,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   B4: "FEW Spirits",
   B5: "Cascade Hollow",
   B6: "Finger Lakes Distilling",
-  B7: "Midwest Grain Products",
+  B7: "Ross & Squibb",
   B8: "Woodinville Whiskey Co.",
 
   // Rye
