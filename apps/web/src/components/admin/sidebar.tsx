@@ -30,12 +30,10 @@ export default function AdminSidebar() {
                   >
                     Queue
                   </SidebarLink>
-                  <SidebarLink
-                    href="/admin/sites"
-                    active={pathname.startsWith("/admin/sites")}
-                  >
-                    Sites
-                  </SidebarLink>
+                </ul>
+              </li>
+              <li>
+                <ul role="list" className="-mx-2 space-y-1">
                   <SidebarLink
                     href="/admin/badges"
                     active={pathname.startsWith("/admin/badges")}
@@ -43,10 +41,22 @@ export default function AdminSidebar() {
                     Badges
                   </SidebarLink>
                   <SidebarLink
+                    href="/admin/events"
+                    active={pathname.startsWith("/admin/events")}
+                  >
+                    Events
+                  </SidebarLink>
+                  <SidebarLink
                     href="/admin/locations"
                     active={pathname.startsWith("/admin/locations")}
                   >
                     Locations
+                  </SidebarLink>
+                  <SidebarLink
+                    href="/admin/sites"
+                    active={pathname.startsWith("/admin/sites")}
+                  >
+                    Sites
                   </SidebarLink>
                   <SidebarLink
                     href="/admin/tags"

@@ -7,6 +7,7 @@ export * from "./comments";
 export * from "./common";
 export * from "./countries";
 export * from "./entities";
+export * from "./events";
 export * from "./externalSites";
 export * from "./flights";
 export * from "./follows";

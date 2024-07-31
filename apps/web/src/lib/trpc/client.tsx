@@ -5,6 +5,7 @@ import {
   type inferReactQueryProcedureOptions,
 } from "@trpc/react-query";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
+import { bustAppCache } from "../cache.actions";
 
 export { isTRPCClientError } from "@peated/server/trpc/client";
 
@@ -25,6 +26,9 @@ export const trpc: CreateTRPCReact<AppRouter, unknown> =
           await opts.originalFn();
           // Invalidate all queries in the react-query cache:
           await opts.queryClient.invalidateQueries();
+
+          // call a server action to bust our global cache
+          await bustAppCache();
         },
       },
     },

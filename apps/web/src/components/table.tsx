@@ -132,7 +132,9 @@ export default function Table<
                     className="bg-slate-800 py-2 pl-4 pr-3 text-left text-sm font-semibold sm:pl-3"
                   >
                     {groupTo ? (
-                      <Link href={groupTo(group)}>{groupItem(group)}</Link>
+                      <Link href={groupTo(group)} className="hover:underline">
+                        {groupItem(group)}
+                      </Link>
                     ) : (
                       group.name
                     )}

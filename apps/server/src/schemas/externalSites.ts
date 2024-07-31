@@ -12,7 +12,7 @@ export const ExternalSiteSchema = z.object({
   runEvery: z.number().nullable(),
 });
 
-export const ExternalSiteSchemaInputSchema = z.object({
+export const ExternalSiteInputSchema = z.object({
   type: ExternalSiteTypeEnum,
   name: z.string().trim().min(1, "Required"),
   runEvery: z.number().nullable().default(null),

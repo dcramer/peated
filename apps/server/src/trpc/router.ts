@@ -51,6 +51,10 @@ import entityGenerateDetails from "./routes/entityGenerateDetails";
 import entityList from "./routes/entityList";
 import entityMerge from "./routes/entityMerge";
 import entityUpdate from "./routes/entityUpdate";
+import eventById from "./routes/eventById";
+import eventCreate from "./routes/eventCreate";
+import eventList from "./routes/eventList";
+import eventUpdate from "./routes/eventUpdate";
 import externalSiteByType from "./routes/externalSiteByType";
 import externalSiteConfigGet from "./routes/externalSiteConfigGet";
 import externalSiteConfigSet from "./routes/externalSiteConfigSet";
@@ -157,6 +161,10 @@ export const appRouter = router({
   entityUpdate,
   emailResendVerification,
   emailVerify,
+  eventById,
+  eventCreate,
+  eventList,
+  eventUpdate,
   externalSiteCreate,
   externalSiteByType,
   externalSiteList,

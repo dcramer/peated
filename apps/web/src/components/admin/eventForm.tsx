@@ -1,9 +1,8 @@
 "use client";
 
-import { BoltIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CountryInputSchema } from "@peated/server/schemas";
-import { type Country } from "@peated/server/types";
+import { EventInputSchema } from "@peated/server/schemas";
+import { type Event } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
@@ -11,41 +10,37 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
+import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
-import Button from "../button";
+import BooleanField from "../booleanField";
 import Form from "../form";
-import Legend from "../legend";
 import TextAreaField from "../textAreaField";
 import AdminSidebar from "./sidebar";
 
-type FormSchemaType = z.infer<typeof CountryInputSchema>;
+type FormSchemaType = z.infer<typeof EventInputSchema>;
 
-export default function CountryForm({
+export default function EventForm({
   onSubmit,
   initialData = {},
+  title = "Add Event",
   edit = false,
-  title = "Add Country",
 }: {
   onSubmit: SubmitHandler<FormSchemaType>;
-  initialData?: Partial<Country>;
-  edit?: boolean;
+  initialData?: Partial<Event>;
   title?: string;
+  edit?: boolean;
 }) {
   const {
-    getValues,
-    setValue,
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(CountryInputSchema),
+    resolver: zodResolver(EventInputSchema),
     defaultValues: initialData,
   });
-
-  const generateDataMutation = trpc.countryGenerateDetails.useMutation();
 
   const [error, setError] = useState<string | undefined>();
 
@@ -86,54 +81,46 @@ export default function CountryForm({
           <TextField
             {...register("name")}
             label="Name"
-            placeholder="e.g. United States"
-            readOnly={edit}
+            placeholder="e.g. Fèis Ìle"
             error={errors.name}
-            required
           />
-        </Fieldset>
 
-        <Fieldset>
-          <Legend title="Additional Details">
-            <Button
-              color="default"
-              onClick={async () => {
-                const result =
-                  await generateDataMutation.mutateAsync(getValues());
+          <TextField
+            {...register("dateStart")}
+            label="Start Date"
+            type="date"
+            error={errors.dateStart}
+          />
 
-                const currentValues = getValues();
-                if (result && result.description && !currentValues.description)
-                  setValue("description", result.description);
-                setValue("descriptionSrc", "generated");
-                if (result && result.summary && !currentValues.summary)
-                  setValue("summary", result.summary);
-              }}
-              disabled={generateDataMutation.isPending}
-              icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
-            >
-              Help me fill this in [Beta]
-            </Button>
-          </Legend>
-          <TextAreaField
-            {...register("description", {
+          <TextField
+            {...register("dateEnd", {
               setValueAs: (v) => (v === "" || !v ? null : v),
-              onChange: () => {
-                setValue("descriptionSrc", "user");
-              },
             })}
-            error={errors.description}
-            autoFocus
-            label="Description"
-            rows={8}
+            label="End Date"
+            type="date"
+            error={errors.dateEnd}
+          />
+
+          <BooleanField
+            control={control}
+            {...register("repeats")}
+            label="Repeats"
+            error={errors.repeats}
+            helpText="Does this event repeat on the same date every year?"
+          />
+
+          <TextField
+            {...register("website", {
+              setValueAs: (v) => (v === "" || !v ? null : v),
+            })}
+            label="Website"
+            error={errors.website}
           />
 
           <TextAreaField
-            {...register("summary")}
+            {...register("description")}
+            label="description"
             error={errors.description}
-            autoFocus
-            helpText="One or two sentences describing the rules for whisky in this region."
-            label="Summary"
-            rows={8}
           />
         </Fieldset>
       </Form>

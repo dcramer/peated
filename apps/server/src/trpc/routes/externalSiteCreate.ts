@@ -1,13 +1,13 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { ExternalSiteSchemaInputSchema } from "@peated/server/schemas";
+import { ExternalSiteInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteSerializer } from "@peated/server/serializers/externalSite";
 import { TRPCError } from "@trpc/server";
 import { adminProcedure } from "..";
 
 export default adminProcedure
-  .input(ExternalSiteSchemaInputSchema)
+  .input(ExternalSiteInputSchema)
   .mutation(async function ({ input, ctx }) {
     const site = await db.transaction(async (tx) => {
       try {

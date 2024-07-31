@@ -22,6 +22,7 @@ import type {
   EntityInputSchema,
   EntitySchema,
   EntityTypeEnum,
+  EventSchema,
   ExternalSiteSchema,
   FlightSchema,
   FollowSchema,
@@ -63,6 +64,7 @@ export type Collection = z.infer<typeof CollectionSchema>;
 export type CollectionBottle = z.infer<typeof CollectionBottleSchema>;
 export type Comment = z.infer<typeof CommentSchema>;
 export type Country = z.infer<typeof CountrySchema>;
+export type Event = z.infer<typeof EventSchema>;
 export type Region = z.infer<typeof RegionSchema>;
 export type ExternalSite = z.infer<typeof ExternalSiteSchema>;
 export type Entity = z.infer<typeof EntitySchema>;

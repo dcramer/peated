@@ -1,6 +1,10 @@
 "use client";
 
-import { resendVerificationForm } from "@peated/web/lib/auth.actions";
+import {
+  resendVerificationForm,
+  updateSession,
+} from "@peated/web/lib/auth.actions";
+import { useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Alert from "./alert";
 import { useFlashMessages } from "./flash";
@@ -13,9 +17,12 @@ export default function PendingVerificationAlert() {
 
   const { flash } = useFlashMessages();
 
-  if (state?.alreadyVerified) {
-    flash("Oops, looks like you already verified your account.", "success");
-  }
+  useEffect(() => {
+    if (state?.alreadyVerified) {
+      flash("Oops, looks like you already verified your account.", "success");
+      updateSession();
+    }
+  }, [state?.alreadyVerified]);
 
   return (
     <Alert type="default" noMargin>

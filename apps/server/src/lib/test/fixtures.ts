@@ -578,6 +578,22 @@ export const Badge = async (
   return result;
 };
 
+export const Event = async (
+  { ...data }: Partial<Omit<dbSchema.NewEvent, "id">> = {},
+  db: DatabaseType = dbConn,
+): Promise<dbSchema.Event> => {
+  const [result] = await db
+    .insert(dbSchema.events)
+    .values({
+      name: faker.music.songName(),
+      dateStart: faker.date.future().toISOString(),
+      ...(data as Omit<dbSchema.NewEvent, "name" | "dateStart">),
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create Event fixture");
+  return result;
+};
+
 export const ExternalSite = async (
   { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
   db: DatabaseType = dbConn,

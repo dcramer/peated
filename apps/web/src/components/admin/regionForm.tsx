@@ -91,13 +91,12 @@ export default function RegionForm({
       }
       footer={null}
     >
+      {error && <FormError values={[error]} />}
+
       <Form
-        className="sm:mx-16"
         onSubmit={handleSubmit(onSubmitHandler)}
         isSubmitting={isSubmitting}
       >
-        {error && <FormError values={[error]} />}
-
         <Fieldset>
           <TextField
             {...register("name")}

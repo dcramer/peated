@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EXTERNAL_SITE_TYPE_LIST } from "@peated/server/constants";
-import { ExternalSiteSchemaInputSchema } from "@peated/server/schemas";
+import { ExternalSiteInputSchema } from "@peated/server/schemas";
 import { type ExternalSite } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
@@ -19,7 +19,7 @@ import type { z } from "zod";
 import Form from "../form";
 import AdminSidebar from "./sidebar";
 
-type FormSchemaType = z.infer<typeof ExternalSiteSchemaInputSchema>;
+type FormSchemaType = z.infer<typeof ExternalSiteInputSchema>;
 
 const SITE_TYPES = EXTERNAL_SITE_TYPE_LIST.map((t) => ({ id: t, name: t }));
 
@@ -40,7 +40,7 @@ export default function SiteForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(ExternalSiteSchemaInputSchema),
+    resolver: zodResolver(ExternalSiteInputSchema),
     defaultValues: initialData,
   });
 
@@ -73,13 +73,12 @@ export default function SiteForm({
       }
       footer={null}
     >
+      {error && <FormError values={[error]} />}
+
       <Form
-        className="sm:mx-16"
         onSubmit={handleSubmit(onSubmitHandler)}
         isSubmitting={isSubmitting}
       >
-        {error && <FormError values={[error]} />}
-
         <Fieldset>
           <TextField
             {...register("name")}
