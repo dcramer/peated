@@ -2,6 +2,7 @@
 
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
+import DateRange from "@peated/web/components/dateRange";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Table from "@peated/web/components/table";
 import { trpc } from "@peated/web/lib/trpc/client";
@@ -47,8 +48,7 @@ export default function Page() {
             {
               name: "dateStart",
               title: "When",
-              value: (v) =>
-                `${v.dateStart}${v.dateEnd ? ` - ${v.dateEnd}` : ""}`,
+              value: (v) => <DateRange start={v.dateStart} end={v.dateEnd} />,
             },
           ]}
         />

@@ -1,20 +1,15 @@
 "use client";
 
-import { type ExternalSiteSchema } from "@peated/server/schemas";
-import { type ExternalSiteType } from "@peated/server/types";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
+import DateRange from "@peated/web/components/dateRange";
 import DefinitionList from "@peated/web/components/definitionList";
 import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
-import TimeSince from "@peated/web/components/timeSince";
-import { formatDuration } from "@peated/web/lib/format";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useState, type ReactNode } from "react";
-import { type z } from "zod";
 
 export default function Page({
   params: { eventId },
@@ -70,12 +65,7 @@ export default function Page({
       <DefinitionList>
         <DefinitionList.Term>Dates</DefinitionList.Term>
         <DefinitionList.Details>
-          {event.dateStart}
-          {event.dateEnd ? (
-            <>
-              <span>&mdash;</span> {event.dateEnd}
-            </>
-          ) : null}
+          <DateRange start={event.dateStart} end={event.dateEnd} />
           {event.repeats && <> (repeats annually)</>}
         </DefinitionList.Details>
         <DefinitionList.Term>Country</DefinitionList.Term>
