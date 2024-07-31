@@ -63,7 +63,7 @@ export default adminProcedure
       const [review] = mapRows(rows, reviews);
 
       if (bottleId) {
-        await upsertBottleAlias(tx, bottleId, name);
+        await upsertBottleAlias(tx, name, bottleId);
       } else {
         await db
           .insert(bottleAliases)

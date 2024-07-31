@@ -5,9 +5,13 @@ type ConflictMatch = { id: any } & Record<string, any>;
 export class ConflictError extends TRPCError {
   public existingRow: ConflictMatch;
 
-  constructor(row: ConflictMatch, err: Error) {
+  constructor(
+    row: ConflictMatch,
+    err: Error | undefined = undefined,
+    message: string | undefined = undefined,
+  ) {
     super({
-      message: `Conflicting object already exists (ID=${row.id}).`,
+      message: message ?? `Conflicting object already exists (ID=${row.id}).`,
       code: "CONFLICT",
       cause: err,
     });

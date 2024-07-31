@@ -946,6 +946,13 @@
       "when": 1722316873533,
       "tag": "0134_nebulous_hellfire_club",
       "breakpoints": false
+    },
+    {
+      "idx": 135,
+      "version": "7",
+      "when": 1722394206592,
+      "tag": "0135_perfect_eddie_brock",
+      "breakpoints": false
     }
   ]
 }

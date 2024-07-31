@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { createCaller } from "../router";
 
-test("deletes alias", async ({ fixtures }) => {
+test("unbinds alias", async ({ fixtures }) => {
   const user = await fixtures.User({ mod: true });
   const entity = await fixtures.Entity();
   const alias = await fixtures.EntityAlias({ entityId: entity.id });
@@ -17,7 +17,8 @@ test("deletes alias", async ({ fixtures }) => {
     .select()
     .from(entityAliases)
     .where(eq(entityAliases.name, alias.name));
-  expect(newAlias).toBeUndefined();
+  expect(newAlias).toBeDefined();
+  expect(newAlias.entityId).toBeNull();
 });
 
 test("cannot delete without mod", async ({ fixtures }) => {

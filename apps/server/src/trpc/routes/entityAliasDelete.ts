@@ -32,7 +32,13 @@ export default modProcedure.input(z.string()).mutation(async function ({
       message: "Cannot delete canonical name",
     });
 
-  await db.delete(entityAliases).where(eq(entityAliases.name, alias.name));
+  // we dont actually delete aliases, just unassociate them
+  await db
+    .update(entityAliases)
+    .set({
+      entityId: null,
+    })
+    .where(eq(sql`LOWER(${entityAliases.name})`, alias.name.toLowerCase()));
 
   return {};
 });

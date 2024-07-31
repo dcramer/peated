@@ -83,7 +83,6 @@ export const bottles = pgTable(
   },
   (table) => {
     return {
-      uniqHash: uniqueIndex("bottle_uniq_hash").on(table.uniqHash),
       searchVectorIndex: index("bottle_search_idx").using(
         "gin",
         table.searchVector,

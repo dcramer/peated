@@ -19,8 +19,9 @@ import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
-import { coerceToUpsert, upsertEntity } from "../../lib/db";
+import { coerceToUpsert, upsertBottleAlias, upsertEntity } from "../../lib/db";
 import { type Context } from "../context";
+import { ConflictError } from "../errors";
 import { bottleNormalize } from "./bottlePreview";
 
 const InputSchema = BottleInputSchema.partial().extend({
@@ -235,83 +236,44 @@ export async function bottleUpdate({
       ...bottleData,
     };
 
-    let newBottle: Bottle | undefined;
-    try {
-      newBottle = Object.values(bottleData).length
-        ? (
-            await tx
-              .update(bottles)
-              .set({
-                ...bottleData,
-                uniqHash: generateUniqHash({
-                  fullName: bottle.fullName,
-                  vintageYear: bottle.vintageYear,
-                  releaseYear: bottle.releaseYear,
-                  ...bottleUpdateData,
-                }),
-                updatedAt: sql`NOW()`,
-              })
-              .where(eq(bottles.id, bottle.id))
-              .returning()
-          )[0]
-        : bottle;
-    } catch (err: any) {
-      if (err?.code === "23505" && err?.constraint === "bottle_uniq_hash") {
-        throw new TRPCError({
-          message: "Bottle already exists.",
-          code: "CONFLICT",
-          cause: err,
-        });
-      }
-      throw err;
+    // bottles ae unique on aliases, so if an alias exists that is bound to
+    // another bottle, that means this bottle already exists
+    //
+    // 1. look for an existing hash
+    // 2. if it doesnt exist, or it doesnt have a bottleId, we can create this bottle
+    // 3. finally persist the bottleId to the new hash
+    //
+    // in all of these scenarios we need to run constraint checks
+
+    const aliasName = formatBottleName({ ...bottle, ...bottleData });
+    const alias = await upsertBottleAlias(tx, aliasName, bottle.id);
+    // alias.bottleId is always set, but I don't want to deal w/ TS
+    if (alias.bottleId && alias.bottleId !== bottle.id) {
+      const [existingBottle] = await tx
+        .select()
+        .from(bottles)
+        .where(eq(bottles.id, alias.bottleId));
+      throw new ConflictError(existingBottle);
     }
 
-    if (!newBottle) return;
-
-    if (bottleData.name) {
-      const aliasName = formatBottleName(newBottle);
-      const existingAlias = await tx.query.bottleAliases.findFirst({
-        where: eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()),
-      });
-      if (existingAlias?.bottleId === newBottle.id) {
-        if (existingAlias.name !== aliasName) {
-          // case change
+    const newBottle = Object.values(bottleData).length
+      ? (
           await tx
-            .update(bottleAliases)
-            .set({ name: aliasName })
-            .where(
-              eq(
-                sql`LOWER(${bottleAliases.name})`,
-                existingAlias.name.toLowerCase(),
-              ),
-            );
-        }
-        // we're good - likely renaming to an alias that already existed
-      } else if (!existingAlias) {
-        await tx.insert(bottleAliases).values({
-          name: aliasName,
-          bottleId: newBottle.id,
-          createdAt: newBottle.createdAt,
-        });
-        newAliases.push(aliasName);
-      } else if (!existingAlias.bottleId) {
-        await tx
-          .update(bottleAliases)
-          .set({
-            bottleId: newBottle.id,
-          })
-          .where(
-            eq(
-              sql`LOWER(${bottleAliases.name})`,
-              existingAlias.name.toLowerCase(),
-            ),
-          );
-      } else {
-        throw new Error(
-          `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
-        );
-      }
-    }
+            .update(bottles)
+            .set({
+              ...bottleData,
+              uniqHash: generateUniqHash({
+                fullName: bottle.fullName,
+                vintageYear: bottle.vintageYear,
+                releaseYear: bottle.releaseYear,
+                ...bottleUpdateData,
+              }),
+              updatedAt: sql`NOW()`,
+            })
+            .where(eq(bottles.id, bottle.id))
+            .returning()
+        )[0]
+      : bottle;
 
     await tx.insert(changes).values({
       objectType: "bottle",

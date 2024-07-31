@@ -3,7 +3,7 @@ import { eq, getTableColumns, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { type z } from "zod";
 import type { DatabaseType, TransactionType } from "../db";
-import type { Entity, EntityType } from "../db/schema";
+import type { BottleAlias, Entity, EntityType } from "../db/schema";
 import { bottleAliases, changes, collections, entities } from "../db/schema";
 import { type EntityInputSchema, type EntitySchema } from "../schemas";
 import { type EntityInput } from "../types";
@@ -128,15 +128,31 @@ export const getDefaultCollection = async (
 
 export async function upsertBottleAlias(
   db: DatabaseType | TransactionType,
-  bottleId: number,
   name: string,
+  bottleId: number | null = null,
 ) {
-  await db.execute(
-    sql`INSERT INTO ${bottleAliases} (bottle_id, name)
+  // both of these force a useless update so RETURNING works
+  const query = bottleId
+    ? await db.execute<BottleAlias>(
+        sql`INSERT INTO ${bottleAliases} (bottle_id, name)
       VALUES (${bottleId}, ${name})
       ON CONFLICT (LOWER(name))
-      DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL`,
-  );
+      DO UPDATE SET bottle_id = 
+        CASE WHEN ${bottleAliases.bottleId} IS NULL
+          THEN EXCLUDED.bottle_id
+          ELSE ${bottleAliases.bottleId}
+        END
+      RETURNING *`,
+      )
+    : await db.execute<BottleAlias>(
+        sql`INSERT INTO ${bottleAliases} (bottle_id, name)
+      VALUES (${bottleId}, ${name})
+      ON CONFLICT (LOWER(name))
+      DO UPDATE SET name = ${bottleAliases.name} 
+      RETURNING *`,
+      );
+
+  return mapRows(query.rows, bottleAliases)[0];
 
   // TODO: target does not yet support our constraint ref
   // await tx
@@ -171,7 +187,10 @@ export function mapRows<T extends TableConfig>(
     Object.fromEntries(
       Object.entries(r).map(([k, v]) => {
         const r = cols[k];
-        return [r ? r.attr : k, r ? r.col.mapFromDriverValue(v) : v];
+        return [
+          r ? r.attr : k,
+          r ? (v !== null ? r.col.mapFromDriverValue(v) : v) : v,
+        ];
       }),
     ),
   ) as unknown as InferSelectModel<Table<T>>[];

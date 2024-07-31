@@ -26,7 +26,8 @@ test("deletes alias", async ({ fixtures }) => {
     .select()
     .from(bottleAliases)
     .where(eq(bottleAliases.name, alias.name));
-  expect(newAlias).toBeUndefined();
+  expect(newAlias).toBeDefined();
+  expect(newAlias.bottleId).toBeNull();
 
   const [newReview] = await db
     .select()

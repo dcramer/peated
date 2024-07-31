@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import type { Bottle, Entity, NewBottle } from "@peated/server/db/schema";
 import {
+  bottleAliases,
   bottles,
   bottlesToDistillers,
   changes,
@@ -19,7 +20,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
@@ -128,35 +129,53 @@ export async function bottleCreate({
 
     const uniqHash = generateUniqHash(bottleInsertData);
 
-    let bottle: Bottle | undefined;
-    try {
-      [bottle] = await tx
-        .insert(bottles)
-        .values({
-          ...bottleInsertData,
-          uniqHash,
-        })
-        .returning();
-    } catch (err: any) {
-      if (err?.code === "23505" && err?.constraint === "bottle_uniq_hash") {
-        const [existingBottle] = await db
-          .select()
-          .from(bottles)
-          .where(eq(bottles.uniqHash, uniqHash));
-        throw new ConflictError(existingBottle, err);
-      }
-      throw err;
-    }
-    if (!bottle) {
-      return;
+    // bottles ae unique on aliases, so if an alias exists that is bound to
+    // another bottle, that means this bottle already exists
+    //
+    // 1. look for an existing hash
+    // 2. if it doesnt exist, or it doesnt have a bottleId, we can create this bottle
+    // 3. finally persist the bottleId to the new hash
+    //
+    // in all of these scenarios we need to run constraint checks
+    const aliasName = formatBottleName(bottleInsertData);
+    const alias = await upsertBottleAlias(tx, aliasName);
+    if (alias.bottleId) {
+      const [existingBottle] = await tx
+        .select()
+        .from(bottles)
+        .where(eq(bottles.id, alias.bottleId));
+      throw new ConflictError(existingBottle);
     }
 
-    const aliasName = formatBottleName(bottle);
+    const [bottle] = await tx
+      .insert(bottles)
+      .values({
+        ...bottleInsertData,
+        uniqHash,
+      })
+      .returning();
 
-    await upsertBottleAlias(tx, bottle.id, aliasName);
+    const [newAlias] = await tx
+      .update(bottleAliases)
+      .set({
+        bottleId: bottle.id,
+      })
+      .where(
+        and(
+          eq(sql`LOWER(${alias.name})`, alias.name.toLowerCase()),
+          isNull(bottleAliases.bottleId),
+        ),
+      )
+      .returning();
 
-    // TODO: not entirely accurate
-    newAliases.push(aliasName);
+    // someone beat us to it?
+    if (newAlias.bottleId !== bottle.id) {
+      const [existingBottle] = await tx
+        .select()
+        .from(bottles)
+        .where(eq(bottles.id, newAlias.bottleId));
+      throw new ConflictError(existingBottle);
+    }
 
     for (const distillerId of distillerIds) {
       await tx.insert(bottlesToDistillers).values({

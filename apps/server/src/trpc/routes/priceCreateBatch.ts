@@ -69,7 +69,7 @@ export default adminProcedure
           .onConflictDoNothing();
 
         if (bottleId) {
-          await upsertBottleAlias(tx, bottleId, name);
+          await upsertBottleAlias(tx, name, bottleId);
         } else {
           await db
             .insert(bottleAliases)

@@ -49,7 +49,12 @@ export default modProcedure.input(z.string()).mutation(async function ({
           bottleId: null,
         })
         .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase())),
-      tx.delete(bottleAliases).where(eq(bottleAliases.name, alias.name)),
+
+      // we dont actually delete aliases, just unassociate them
+      tx
+        .update(bottleAliases)
+        .set({ bottleId: null })
+        .where(eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase())),
     ]);
   });
 
