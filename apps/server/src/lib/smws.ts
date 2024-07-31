@@ -205,7 +205,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   RW2: "Finger Lakes Distilling",
   RW3: "New York Distilling Co.",
   RW4: "Peerless Distillery",
-  RW5: "MGP",
+  RW5: "Lux Row Distillers",
   RW6: "Kyrö Distillery",
   RW7: "Journeyman Distillery",
 
