@@ -31,11 +31,20 @@ export default function BottleResultRow({
             <span className="absolute inset-x-0 -top-px bottom-0" />
             {bottle.fullName}
           </Link>
-          {bottle.vintageYear && (
+          {bottle.releaseYear ? (
             <>
               {" "}
-              <span className="text-muted">({bottle.vintageYear})</span>
+              <span className="text-muted">({bottle.releaseYear} Release)</span>
             </>
+          ) : (
+            bottle.vintageYear && (
+              <>
+                {" "}
+                <span className="text-muted">
+                  ({bottle.vintageYear} Vintage)
+                </span>
+              </>
+            )
           )}
           {bottle.isFavorite && (
             <StarIcon className="h-4 w-4" aria-hidden="true" />

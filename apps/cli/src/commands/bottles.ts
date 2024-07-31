@@ -2,10 +2,13 @@ import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { bottleAliases, bottles, reviews } from "@peated/server/db/schema";
 import { findEntity } from "@peated/server/lib/bottleFinder";
-import { formatCategoryName } from "@peated/server/lib/format";
+import {
+  formatBottleName,
+  formatCategoryName,
+} from "@peated/server/lib/format";
 import { createCaller } from "@peated/server/trpc/router";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 import { generateUniqHash } from "../../../server/src/lib/bottleHash";
 import { normalizeBottle } from "../../../server/src/lib/normalize";
 
@@ -21,6 +24,7 @@ subcommand
       .select({
         id: bottles.id,
         name: bottles.name,
+        fullName: bottles.fullName,
         statedAge: bottles.statedAge,
         vintageYear: bottles.vintageYear,
         releaseYear: bottles.releaseYear,
@@ -41,7 +45,16 @@ subcommand
         });
 
         const values: Record<string, any> = {};
-        if (bottle.name !== name) values.name = name;
+        if (bottle.name !== name) {
+          values.name = name;
+          console.log(
+            bottle.fullName.substring(
+              0,
+              bottle.fullName.length - bottle.name.length,
+            ),
+          );
+          values.fullName = `${bottle.fullName.substring(0, bottle.fullName.length - bottle.name.length)}${name}`;
+        }
         if (bottle.statedAge !== statedAge) values.statedAge = statedAge;
         if (bottle.vintageYear !== vintageYear)
           values.vintageYear = vintageYear;
@@ -49,9 +62,26 @@ subcommand
           values.releaseYear = releaseYear;
 
         if (Object.values(values).length !== 0) {
-          console.log(`M: ${bottle.name} -> ${JSON.stringify(values)}`);
+          values.uniqHash = generateUniqHash({
+            vintageYear,
+            releaseYear,
+            fullName: bottle.fullName,
+            ...values,
+          });
+          console.log(`M: ${bottle.fullName} -> ${JSON.stringify(values)}`);
           if (!options.dryRun) {
             await db.update(bottles).set(values).where(eq(bottles.id, id));
+            if (values.fullName || values.vintageYear || values.releaseYear) {
+              const aliasName = formatBottleName({
+                vintageYear,
+                releaseYear,
+                fullName: bottle.fullName,
+                ...values,
+              });
+              await db
+                .insert(bottleAliases)
+                .values({ name: aliasName, bottleId: id });
+            }
           }
         }
         hasResults = true;

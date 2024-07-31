@@ -4,14 +4,18 @@ import { eq } from "drizzle-orm";
 import updateEntityStats from "./updateEntityStats";
 
 test("updates totalBottles", async ({ fixtures }) => {
-  const entity1 = await fixtures.Entity();
-  const entity2 = await fixtures.Entity();
-  const entity3 = await fixtures.Entity();
+  const entity1 = await fixtures.Entity({ name: "A" });
+  const entity2 = await fixtures.Entity({ name: "B" });
+  const entity3 = await fixtures.Entity({ name: "C" });
 
-  await fixtures.Bottle({ brandId: entity1.id });
-  await fixtures.Bottle({ brandId: entity2.id, bottlerId: entity1.id });
-  await fixtures.Bottle({ brandId: entity3.id });
-  await fixtures.Bottle({ distillerIds: [entity1.id, entity2.id] });
+  await fixtures.Bottle({ brandId: entity1.id, name: "A" });
+  await fixtures.Bottle({
+    brandId: entity2.id,
+    name: "B",
+    bottlerId: entity1.id,
+  });
+  await fixtures.Bottle({ brandId: entity3.id, name: "C" });
+  await fixtures.Bottle({ distillerIds: [entity1.id, entity2.id], name: "D" });
 
   updateEntityStats({ entityId: entity1.id });
 

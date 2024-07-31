@@ -357,6 +357,20 @@ describe("normalizeBottle", () => {
     `);
   });
 
+  test("synergies (1993 Vintage) (2012 Release)", async () => {
+    const rv = normalizeBottle({
+      name: "synergies (1993 Vintage) (2012 Release)",
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "name": "synergies",
+        "releaseYear": 2012,
+        "statedAge": null,
+        "vintageYear": 1993,
+      }
+    `);
+  });
+
   test("13-year-old Bottled in Bond (Batch VVS 2024)", async () => {
     const rv = normalizeBottle({
       name: "13-year-old Bottled in Bond (Batch VVS 2024)",
@@ -378,7 +392,7 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
-        "name": "26-year-old old, 1976 vintage (distilled at Inchgower)",
+        "name": "26-year-old old (distilled at Inchgower)",
         "releaseYear": null,
         "statedAge": 26,
         "vintageYear": 1976,

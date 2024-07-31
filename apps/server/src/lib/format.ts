@@ -6,6 +6,21 @@ import type {
 } from "@peated/server/types";
 import { COLOR_SCALE } from "../constants";
 
+export function formatBottleName({
+  fullName,
+  vintageYear,
+  releaseYear,
+}: {
+  fullName: string;
+  vintageYear?: number | null | undefined;
+  releaseYear?: number | null | undefined;
+} & Record<string, any>) {
+  const bits = [fullName];
+  if (releaseYear) bits.push(`(${releaseYear} Release)`);
+  else if (vintageYear) bits.push(`(${releaseYear} Vintage)`);
+  return bits.join(" ");
+}
+
 export function formatCategoryName(
   value: Category | string | undefined | null,
 ) {

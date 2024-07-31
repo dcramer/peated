@@ -1,5 +1,8 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
-import { formatCategoryName } from "@peated/server/lib/format";
+import {
+  formatBottleName,
+  formatCategoryName,
+} from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
@@ -14,6 +17,7 @@ type EntityOption = Option & {
 type BottleFormData = {
   name: string;
   vintageYear?: number | null;
+  releaseYear?: number | null;
   brand?: EntityOption | null | undefined;
   distillers?: EntityOption[] | null | undefined;
   statedAge?: number | null | undefined;
@@ -90,7 +94,10 @@ export const PreviewBottleCard = ({
   const { brand } = data;
   return (
     <BottleScaffold
-      name={`${brand ? `${brand.shortName || brand.name} ${data.name}` : data.name}${data.vintageYear ? ` (${data.vintageYear})` : ""}`}
+      name={formatBottleName({
+        ...data,
+        fullName: `${brand ? `${brand.shortName || brand.name} ` : ""}${data.name}`,
+      })}
       category={data.category ? formatCategoryName(data.category) : null}
       distillers={
         data.distillers?.length
@@ -120,21 +127,32 @@ export default function BottleCard({
       onClick={onClick ? () => onClick(bottle) : undefined}
       name={
         <>
-          <h4 className="truncate font-bold">
+          <h4 className="flex items-center gap-x-1 truncate font-bold">
             <BottleLink bottle={bottle} className="hover:underline">
               {bottle.fullName}
             </BottleLink>
-            {bottle.vintageYear && (
+            {bottle.releaseYear ? (
               <>
-                {" "}
                 <span
                   className={
                     color === "highlight" ? "text-black" : "text-muted"
                   }
                 >
-                  ({bottle.vintageYear})
+                  ({bottle.releaseYear} Release)
                 </span>
               </>
+            ) : (
+              bottle.vintageYear && (
+                <>
+                  <span
+                    className={
+                      color === "highlight" ? "text-black" : "text-muted"
+                    }
+                  >
+                    ({bottle.vintageYear} Vintage)
+                  </span>
+                </>
+              )
             )}
           </h4>
           {bottle.isFavorite && (

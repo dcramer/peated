@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
+import { formatBottleName } from "@peated/server/lib/format";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -25,7 +26,7 @@ export default modProcedure.input(z.string()).mutation(async function ({
 
   if (alias.bottle) {
     const { bottle } = alias;
-    const canonicalName = `${bottle.fullName}${bottle.vintageYear ? ` (${bottle.vintageYear})` : ""}`;
+    const canonicalName = formatBottleName(bottle);
     if (alias.name.toLowerCase() === canonicalName.toLowerCase())
       throw new TRPCError({
         code: "BAD_REQUEST",

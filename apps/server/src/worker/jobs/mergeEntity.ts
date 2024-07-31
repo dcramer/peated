@@ -42,6 +42,11 @@ export default async function mergeEntity({
       .where(inArray(bottles.brandId, fromEntityIds));
 
     for (const bottle of bottleList) {
+      const uniqHash = generateUniqHash({
+        ...bottle,
+        fullName: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
+      });
+
       try {
         await tx.transaction(async (btx) => {
           await btx
@@ -49,10 +54,7 @@ export default async function mergeEntity({
             .set({
               brandId: toEntity.id,
               fullName: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
-              uniqHash: generateUniqHash({
-                ...bottle,
-                fullName: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
-              }),
+              uniqHash,
             })
             .where(eq(bottles.id, bottle.id));
         });
@@ -65,13 +67,8 @@ export default async function mergeEntity({
             .from(bottles)
             .where(
               and(
-                eq(bottles.name, bottle.name),
+                eq(bottles.uniqHash, uniqHash),
                 eq(bottles.brandId, toEntity.id),
-                ...[
-                  bottle.vintageYear
-                    ? eq(bottles.vintageYear, bottle.vintageYear)
-                    : isNull(bottles.vintageYear),
-                ],
               ),
             );
           if (!toBottle) {

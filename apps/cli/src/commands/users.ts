@@ -34,6 +34,10 @@ subcommand
   .argument("<password>")
   .action(async (email, password) => {
     const [user] = await db.select().from(users).where(eq(users.email, email));
+    if (!user) {
+      throw new Error(`Unknown user: ${email}.`);
+    }
+
     await db
       .update(users)
       .set({ passwordHash: generatePasswordHash(password) })
@@ -48,6 +52,10 @@ subcommand
   .argument("<email>")
   .action(async (email) => {
     const [user] = await db.select().from(users).where(eq(users.email, email));
+    if (!user) {
+      throw new Error(`Unknown user: ${email}.`);
+    }
+
     await db
       .update(users)
       .set({ mod: true, admin: true })
@@ -62,6 +70,9 @@ subcommand
   .argument("<email>")
   .action(async (email) => {
     const [user] = await db.select().from(users).where(eq(users.email, email));
+    if (!user) {
+      throw new Error(`Unknown user: ${email}.`);
+    }
 
     const token = await createAccessToken(user);
 

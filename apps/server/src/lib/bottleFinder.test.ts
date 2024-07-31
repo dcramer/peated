@@ -1,7 +1,11 @@
 import { findBottleId, findEntity } from "./bottleFinder";
 
 test("findBottle matches exact", async ({ fixtures }) => {
-  const bottle = await fixtures.Bottle();
+  const bottle = await fixtures.Bottle({
+    name: "Test",
+    vintageYear: null,
+    releaseYear: null,
+  });
   const result = await findBottleId(bottle.fullName);
   expect(result).toBe(bottle.id);
 });

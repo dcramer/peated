@@ -29,7 +29,9 @@ export function buildBottleSearchVector(
   if (bottle.category)
     values.push(new TSVector(formatCategoryName(bottle.category), "C"));
   if (bottle.vintageYear)
-    values.push(new TSVector(`${bottle.vintageYear}`, "B"));
+    values.push(new TSVector(`${bottle.vintageYear} Vintage`, "B"));
+  if (bottle.releaseYear)
+    values.push(new TSVector(`${bottle.releaseYear} Release`, "B"));
   if (bottler) values.push(new TSVector(bottler.name, "C"));
   aliasList?.forEach((a) => values.push(new TSVector(a.name, "A")));
   distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));

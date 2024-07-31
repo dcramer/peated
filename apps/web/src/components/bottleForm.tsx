@@ -182,6 +182,7 @@ export default function BottleForm({
             distillers: distillersValue,
             brand: brandValue,
             vintageYear: watch("vintageYear"),
+            releaseYear: watch("releaseYear"),
           }}
         />
       </div>
@@ -292,6 +293,17 @@ export default function BottleForm({
                 multiple
               />
             )}
+          />
+
+          <TextField
+            {...register("releaseYear", {
+              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+            })}
+            error={errors.releaseYear}
+            type="number"
+            label="Release Year"
+            placeholder="e.g. 2024"
+            helpText="The year this labeling was released,."
           />
 
           <TextField
@@ -501,17 +513,6 @@ export default function BottleForm({
                 rows={8}
               />
             )}
-
-            <TextField
-              {...register("releaseYear", {
-                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-              })}
-              error={errors.releaseYear}
-              type="number"
-              label="Release Year"
-              placeholder="e.g. 2024"
-              helpText="The year this labeling was released."
-            />
           </Collapsable>
         </Fieldset>
       </Form>

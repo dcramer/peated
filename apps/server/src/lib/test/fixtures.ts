@@ -38,9 +38,77 @@ import {
 import { createAccessToken, generatePasswordHash } from "../auth";
 import { generateUniqHash } from "../bottleHash";
 import { mapRows } from "../db";
+import { formatBottleName } from "../format";
+import { normalizeBottle } from "../normalize";
 import { choose, random, sample } from "../rand";
 import { buildBottleSearchVector, buildEntitySearchVector } from "../search";
+import { SMWS_DISTILLERY_CODES } from "../smws";
 import { toTitleCase } from "../strings";
+
+function getDistilleryNames() {
+  const distilleryNames = [];
+
+  for (
+    let i = 1, distilleryName;
+    (distilleryName = SMWS_DISTILLERY_CODES[i]);
+    i++
+  ) {
+    distilleryNames.push(distilleryName);
+  }
+
+  return distilleryNames;
+}
+
+const distilleryNames = getDistilleryNames();
+
+const bottleNames = [
+  "12-year-old",
+  "15-year-old",
+  "18-year-old",
+  "25-year-old",
+];
+
+const bottleFlavors = [
+  "Port Cask Finish",
+  "Tequila Cask Finish",
+  "Cabbernet Sauvignon Cask Finish",
+  "Cask Strength",
+  "Batch Strength",
+  "Barrel Strength",
+  "Single Barrel",
+  "Small Batch",
+  "French Oak",
+  "Double Oak",
+  "Bottle in Bond",
+  "Peated",
+  "Midnight",
+  "Bourbon",
+  "Single Malt",
+  "American Single Malt",
+  "American Prairie Bourbon",
+  "Kentucky Straight Bourbon",
+  "Blend",
+  "Rye",
+  "Pure Malt",
+];
+
+function chooseBottleName() {
+  const baseName = choose([
+    `${choose(bottleNames)}`,
+    `${choose(bottleNames)}`,
+    `${choose(bottleNames)}`,
+    `${choose(bottleNames)} ${choose(bottleFlavors)}`,
+    `${choose(bottleNames)} ${choose(bottleFlavors)}`,
+    `${choose(bottleNames)} ${choose(bottleFlavors)}`,
+  ]);
+  return choose([
+    `${baseName} (Batch ${faker.number.int(100)})`,
+    `${baseName} (Cask No. ${faker.number.int(100)})`,
+    `${baseName} (${faker.number.int({ min: 1980, max: 2024 })} Release)`,
+    `${baseName} (${faker.number.int({ min: 1980, max: 2017 })} Vintage)`,
+    `${baseName} (${faker.number.int({ min: 1980, max: 2000 })} Vintage) (${faker.number.int({ min: 2005, max: 2024 })} Release)`,
+  ]);
+}
 
 export async function loadFixture(...paths: string[]) {
   const data = await readFile(
@@ -170,7 +238,7 @@ export const Entity = async (
   { ...data }: Partial<Omit<dbSchema.NewEntity, "id">> = {},
   db: DatabaseType = dbConn,
 ): Promise<dbSchema.Entity> => {
-  const name = data.name || faker.company.name();
+  const name = data.name || choose(distilleryNames);
   // XXX(dcramer): not ideal
   const existing = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.name, name),
@@ -226,12 +294,7 @@ export const EntityAlias = async (
       .insert(dbSchema.entityAliases)
       .values({
         entityId: data.entityId || (await Entity({}, tx)).id,
-        name: `${toTitleCase(
-          choose([
-            faker.company.buzzNoun(),
-            `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
-          ]),
-        )} #${faker.number.int(100)}`,
+        name: choose(distilleryNames),
         createdAt: new Date(),
         ...data,
       })
@@ -265,14 +328,7 @@ export const Bottle = async (
           )
     ) as dbSchema.Entity;
 
-    const name =
-      data.name ??
-      `${toTitleCase(
-        choose([
-          faker.company.buzzNoun(),
-          `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
-        ]),
-      )} #${faker.number.int(100)}`;
+    const name = data.name ?? chooseBottleName();
 
     const bottleData: Omit<dbSchema.NewBottle, "uniqHash"> = {
       category: choose([...CATEGORY_LIST, null, null]),
@@ -306,6 +362,13 @@ export const Bottle = async (
       distillerList,
     );
 
+    Object.assign(
+      bottleData,
+      normalizeBottle({ ...bottleData, isFullName: false }),
+    );
+
+    bottleData.fullName = `${brand.name} ${bottleData.name}`;
+
     const [bottle] = await tx
       .insert(bottles)
       .values({
@@ -337,7 +400,7 @@ export const Bottle = async (
 
     await tx.insert(bottleAliases).values({
       bottleId: bottle.id,
-      name: bottle.fullName,
+      name: formatBottleName(bottle),
       createdAt: bottle.createdAt,
     });
 
@@ -364,12 +427,8 @@ export const BottleAlias = async (
       .insert(bottleAliases)
       .values({
         bottleId: data.bottleId || (await Bottle({}, tx)).id,
-        name: `${toTitleCase(
-          choose([
-            faker.company.buzzNoun(),
-            `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
-          ]),
-        )} #${faker.number.int(100)}`,
+        // TODO: this is using the wrong brand name by default
+        name: `${toTitleCase(faker.word.noun())} ${chooseBottleName()}`,
         createdAt: new Date(),
         ...data,
       })
@@ -672,7 +731,7 @@ export const Collection = async (
   const [result] = await db
     .insert(collections)
     .values({
-      name: faker.company.name(),
+      name: faker.commerce.product(),
       createdAt: new Date(),
       ...(data as Omit<dbSchema.NewCollection, "name">),
     })
