@@ -363,7 +363,7 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
-        "name": "synergies",
+        "name": "synergies (1993 Vintage)",
         "releaseYear": 2012,
         "statedAge": null,
         "vintageYear": 1993,
@@ -392,7 +392,7 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
-        "name": "26-year-old old (distilled at Inchgower)",
+        "name": "26-year-old old, 1976 vintage (distilled at Inchgower)",
         "releaseYear": null,
         "statedAge": 26,
         "vintageYear": 1976,

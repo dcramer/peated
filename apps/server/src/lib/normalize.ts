@@ -98,23 +98,14 @@ export function normalizeBottle({
     statedAge = parseInt(match[1], 10);
   }
 
-  // remove vintage first
+  // detect vintage - always keep this in the bottle name as its key to the identity
+  // TODO: normalize?
   const vintageYearMatch = name.match(/\((\d{4}) vintage\)|(\d{4}) vintage/i);
   if (vintageYearMatch) {
     if (!vintageYear) {
       vintageYear = parseInt(vintageYearMatch[1] || vintageYearMatch[2], 10);
       if (vintageYear < 1900 || vintageYear > currentYear) vintageYear = null;
     }
-  }
-  if (vintageYear) {
-    name =
-      name.replace(
-        new RegExp(
-          `(\\s${vintageYear}$|\\(${vintageYear}\\)($|\\s)|\\(${vintageYear} vintage\\)($|\\s)|${vintageYear} vintage($|\\s))`,
-          "i",
-        ),
-        "",
-      ) || name;
   }
 
   // release is removed last, that way if its the only thing present, its still visible
