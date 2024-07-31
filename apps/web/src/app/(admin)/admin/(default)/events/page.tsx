@@ -49,7 +49,7 @@ export default function Page() {
               name: "dateStart",
               title: "When",
               value: (v) => <DateRange start={v.dateStart} end={v.dateEnd} />,
-              className: "w-96",
+              className: "w-64",
             },
           ]}
         />
