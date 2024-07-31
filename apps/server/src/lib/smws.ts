@@ -168,7 +168,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   155: "Milk & Honey Distillery",
   156: "Glasgow Distillery",
   157: "Armorik",
-  158: "Yuza Distillery",
+  158: "Yuza",
   159: "Komagatake",
   160: "Tsunuki",
 
