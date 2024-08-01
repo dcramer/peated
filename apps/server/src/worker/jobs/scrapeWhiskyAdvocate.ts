@@ -3,12 +3,9 @@ import {
   normalizeBottle,
   normalizeCategory,
 } from "@peated/server/lib/normalize";
-import {
-  absoluteUrl,
-  getUrl,
-  type BottleReview,
-} from "@peated/server/lib/scraper";
+import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
 import { trpcClient } from "@peated/server/lib/trpc/server";
+import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
 
 export default async function scrapeWhiskeyAdvocate() {
@@ -145,7 +142,7 @@ export async function scrapeReviews(
       category,
       rating,
       issue,
-      url: absoluteUrl(reviewUrl, url),
+      url: absoluteUrl(url, reviewUrl),
     });
   }
 }

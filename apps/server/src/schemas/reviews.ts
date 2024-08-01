@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { BottleSchema, CategoryEnum } from "./bottles";
+import { BottleSchema } from "./bottles";
+import { CategoryEnum } from "./common";
 import { ExternalSiteSchema, ExternalSiteTypeEnum } from "./externalSites";
 
 export const ReviewSchema = z.object({

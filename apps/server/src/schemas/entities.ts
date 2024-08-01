@@ -1,13 +1,10 @@
 import { z } from "zod";
 
-import { ENTITY_TYPE_LIST } from "../constants";
-import { ContentSourceEnum } from "./common";
+import { ContentSourceEnum, EntityTypeEnum } from "./common";
 import { CountrySchema } from "./countries";
 import { RegionSchema } from "./regions";
 import { PointSchema } from "./shared";
 import { UserSchema } from "./users";
-
-export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
 
 export const EntityInputSchema = z.object({
   name: z.string().trim().min(1, "Required"),

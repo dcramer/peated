@@ -15,6 +15,7 @@ import { trpc } from "@peated/web/lib/trpc/client";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 import { getAuthRedirect } from "../lib/auth";
+import BadgeImage from "./badgeImage";
 import BottleCard from "./bottleCard";
 import Button from "./button";
 import Counter from "./counter";
@@ -141,7 +142,7 @@ export default function TastingListItem({
       )}
 
       {!!tasting.notes && (
-        <div className="prose prose-invert -my-2 max-w-none px-3 text-sm sm:px-5">
+        <div className="prose prose-invert -my-4 max-w-none px-3 text-sm sm:px-5">
           <Markdown content={tasting.notes} noLinks />
         </div>
       )}
@@ -194,6 +195,29 @@ export default function TastingListItem({
             )}
           </DefinitionList>
         </div>
+      )}
+
+      {!!tasting.awards.length && (
+        <ul className="flex flex-col gap-y-2 sm:px-3">
+          {tasting.awards.map((award) => {
+            return (
+              <li
+                key={award.id}
+                title={award.badge.name}
+                className="group relative flex items-center gap-x-1 rounded px-2 py-2 text-sm"
+              >
+                <Link
+                  href={`/badges/${award.badge.id}`}
+                  className="absolute inset-0"
+                />
+                <BadgeImage badge={award.badge} size={16} />
+                <div className="text-muted inline-block text-xs group-hover:underline">
+                  <strong>{award.badge.name}</strong> level {award.level}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
 
       <aside className="flex items-center space-x-3 px-3 py-3 sm:px-5 sm:pb-4">

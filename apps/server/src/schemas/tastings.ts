@@ -1,10 +1,8 @@
 import { z } from "zod";
-import { SERVING_STYLE_LIST } from "../constants";
+import { BadgeAwardSchema } from "./badges";
 import { BottleSchema } from "./bottles";
-import { zDatetime, zTag } from "./common";
+import { ServingStyleEnum, zDatetime, zTag } from "./common";
 import { UserSchema } from "./users";
-
-export const ServiceStyleEnum = z.enum(SERVING_STYLE_LIST);
 
 export const TastingSchema = z.object({
   id: z.number(),
@@ -14,8 +12,10 @@ export const TastingSchema = z.object({
   rating: z.number().gte(0).lte(5).nullable(),
   tags: z.array(z.string()),
   color: z.number().gte(0).lte(20).nullable(),
-  servingStyle: ServiceStyleEnum.nullable(),
+  servingStyle: ServingStyleEnum.nullable(),
   friends: z.array(UserSchema),
+
+  awards: z.array(BadgeAwardSchema),
 
   comments: z.number().gte(0),
   toasts: z.number().gte(0),
@@ -31,7 +31,7 @@ export const TastingInputSchema = z.object({
   tags: z.array(zTag).max(15).nullish(),
   color: z.number().gte(0).lte(20).nullish(),
 
-  servingStyle: ServiceStyleEnum.nullish(),
+  servingStyle: ServingStyleEnum.nullish(),
   friends: z.array(z.number()).optional(),
   flight: z.string().nullish(),
 
@@ -43,7 +43,7 @@ export const TastingUpdateSchema = z.object({
   rating: z.number().gte(0).lte(5).nullish(),
   tags: z.array(zTag).max(15).nullish(),
   color: z.number().gte(0).lte(20).nullish(),
-  servingStyle: ServiceStyleEnum.nullish(),
+  servingStyle: ServingStyleEnum.nullish(),
   friends: z.array(z.number()).optional(),
   flight: z.string().nullish(),
 });

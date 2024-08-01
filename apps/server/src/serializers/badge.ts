@@ -1,6 +1,8 @@
 import { type z } from "zod";
 import { serializer } from ".";
+import config from "../config";
 import type { Badge, User } from "../db/schema";
+import { absoluteUrl } from "../lib/urls";
 import { type BadgeSchema } from "../schemas";
 
 export const BadgeSerializer = serializer({
@@ -12,8 +14,11 @@ export const BadgeSerializer = serializer({
     return {
       id: item.id,
       name: item.name,
-      type: item.type,
-      config: item.config,
+      maxLevel: item.maxLevel,
+      imageUrl: item.imageUrl
+        ? absoluteUrl(config.API_SERVER, item.imageUrl)
+        : null,
+      checks: item.checks,
     };
   },
 });

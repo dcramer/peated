@@ -2,7 +2,7 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { formatColor } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
-import { absoluteUri } from "@peated/server/lib/urls";
+import { absoluteUrl } from "@peated/server/lib/urls";
 
 if (!config.DISCORD_WEBHOOK) {
   console.error("DISCORD_WEBHOOK is not configured");
@@ -70,7 +70,7 @@ export default async function ({ tastingId }: { tastingId: number }) {
             tasting.createdBy.username,
           )}`,
           icon_url: tasting.createdBy.pictureUrl
-            ? absoluteUri(tasting.createdBy.pictureUrl, config.API_SERVER)
+            ? absoluteUrl(config.API_SERVER, tasting.createdBy.pictureUrl)
             : null,
         },
         title: tasting.bottle.fullName,
@@ -79,7 +79,7 @@ export default async function ({ tastingId }: { tastingId: number }) {
         fields,
         image: tasting.imageUrl
           ? {
-              url: absoluteUri(tasting.imageUrl, config.API_SERVER),
+              url: absoluteUrl(config.API_SERVER, tasting.imageUrl),
             }
           : null,
       },

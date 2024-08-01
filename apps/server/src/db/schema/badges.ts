@@ -1,11 +1,14 @@
-import { relations } from "drizzle-orm";
+import type { BadgeCheck } from "@peated/server/types";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
   smallint,
+  text,
   timestamp,
   uniqueIndex,
   varchar,
@@ -20,12 +23,17 @@ export const badges = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
-    type: badgeTypeEnum("type").notNull(),
-    config: jsonb("config").$type<Record<string, any>>().default({}).notNull(),
+    imageUrl: text("image_url"),
+    maxLevel: integer("max_level").default(50).notNull(),
+    // TODO: config can be mapped to all badge type configs
+    checks: jsonb("checks").$type<BadgeCheck[]>().default([]).notNull(),
   },
-  (badges) => {
+  (table) => {
     return {
-      name: uniqueIndex("badge_name_unq").on(badges.name),
+      name: uniqueIndex("badge_name_unq").using(
+        "btree",
+        sql`LOWER(${table.name})`,
+      ),
     };
   },
 );
@@ -43,15 +51,15 @@ export const badgeAwards = pgTable(
     userId: bigint("user_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
-    xp: smallint("points").default(0),
-    level: smallint("level").default(0),
+    xp: smallint("xp").default(0).notNull(),
+    level: smallint("level").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (badgeAwards) => {
+  (table) => {
     return {
       constraint: uniqueIndex("badge_award_unq").on(
-        badgeAwards.badgeId,
-        badgeAwards.userId,
+        table.badgeId,
+        table.userId,
       ),
     };
   },
@@ -70,3 +78,45 @@ export const badgeAwardsRelations = relations(badgeAwards, ({ one }) => ({
 
 export type BadgeAward = typeof badgeAwards.$inferSelect;
 export type NewBadgeAward = typeof badgeAwards.$inferInsert;
+
+export const badgeAwardTrackedObjectType = pgEnum("badge_award_object_type", [
+  "bottle",
+  "entity",
+]);
+
+export const badgeAwardTrackedObjects = pgTable(
+  "badge_award_tracked_object",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    awardId: bigint("award_id", { mode: "number" })
+      .references(() => badgeAwards.id)
+      .notNull(),
+
+    objectType: badgeAwardTrackedObjectType("object_type").notNull(),
+    objectId: bigint("object_id", { mode: "number" }),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      constraint: uniqueIndex("badge_award_tracked_object_unq").on(
+        table.awardId,
+        table.objectType,
+        table.objectId,
+      ),
+    };
+  },
+);
+
+export const badgeAwardTrackedObjectsRelations = relations(
+  badgeAwardTrackedObjects,
+  ({ one }) => ({
+    award: one(badgeAwards, {
+      fields: [badgeAwardTrackedObjects.awardId],
+      references: [badgeAwards.id],
+    }),
+  }),
+);
+
+export type BadgeAwardTrackedObject = typeof badgeAwards.$inferSelect;
+export type NewBadgeAwardTrackedObject = typeof badgeAwards.$inferInsert;

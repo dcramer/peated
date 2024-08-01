@@ -1,12 +1,12 @@
 import { type ComponentPropsWithoutRef } from "react";
 
 export function DefinitionTerm(props: ComponentPropsWithoutRef<"dt">) {
-  return <dt className="mfont-semibold" {...props} />;
+  return <dt className="font-semibold" {...props} />;
 }
 
 export function DefinitionDetails(props: ComponentPropsWithoutRef<"dd">) {
   return (
-    <dd className="text-muted mb-4 flex items-center gap-x-2" {...props} />
+    <dd className="text-muted mb-2 flex items-center gap-x-2" {...props} />
   );
 }
 

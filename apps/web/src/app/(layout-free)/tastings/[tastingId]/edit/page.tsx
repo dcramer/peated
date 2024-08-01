@@ -1,5 +1,6 @@
 "use client";
 
+import { useFlashMessages } from "@peated/web/components/flash";
 import TastingForm from "@peated/web/components/tastingForm";
 import useApi from "@peated/web/hooks/useApi";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
@@ -26,10 +27,7 @@ export default function Page({
 
   const tastingUpdateMutation = trpc.tastingUpdate.useMutation();
   const api = useApi();
-
-  // capture this on initial load as its utilized to prevent
-  // duplicate tasting submissions
-  const createdAt = new Date().toISOString();
+  const { flash } = useFlashMessages();
 
   return (
     <TastingForm
@@ -40,7 +38,6 @@ export default function Page({
         await tastingUpdateMutation.mutateAsync({
           tasting: tasting.id,
           ...data,
-          createdAt,
         });
 
         if (picture) {
@@ -54,7 +51,10 @@ export default function Page({
             });
           } catch (err) {
             logError(err);
-            // TODO show some kind of alert, ask them to reusubmit image
+            flash(
+              "There was an error uploading your image, but the tasting was saved.",
+              "error",
+            );
           }
         }
         if (tasting) {

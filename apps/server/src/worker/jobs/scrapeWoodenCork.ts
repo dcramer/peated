@@ -1,12 +1,8 @@
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
-import {
-  absoluteUrl,
-  chunked,
-  getUrl,
-  parsePrice,
-} from "@peated/server/lib/scraper";
+import { chunked, getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { trpcClient } from "@peated/server/lib/trpc/server";
+import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
 
 function extractVolume(name: string) {
@@ -92,7 +88,7 @@ export async function scrapeProducts(
       currency: "usd",
       volume,
       // image,
-      url: absoluteUrl(productUrl, url),
+      url: absoluteUrl(url, productUrl),
     });
   });
 }

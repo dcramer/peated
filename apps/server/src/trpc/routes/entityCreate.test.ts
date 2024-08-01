@@ -49,6 +49,7 @@ test("updates existing entity with new type", async ({
   defaults,
 }) => {
   const entity = await fixtures.Entity({
+    name: "A",
     type: ["distiller"],
   });
 

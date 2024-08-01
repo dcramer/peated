@@ -1,6 +1,7 @@
 import Link from "@peated/web/components/link";
 
 import type { Badge, PagingRel } from "@peated/server/types";
+import BadgeImage from "../badgeImage";
 import PaginationButtons from "../paginationButtons";
 
 export default function BadgeTable({
@@ -29,13 +30,20 @@ export default function BadgeTable({
             return (
               <tr key={badge.id} className="border-b border-slate-800 text-sm">
                 <td className="max-w-0 px-3 py-3">
-                  <Link
-                    href={`/admin/badges/${badge.id}`}
-                    className="font-medium hover:underline"
-                  >
-                    {badge.name}
-                  </Link>
-                  <div className="mt-2 space-x-2">{badge.type}</div>
+                  <div className="flex items-center gap-x-4">
+                    <BadgeImage badge={badge} size={48} />
+                    <div>
+                      <Link
+                        href={`/admin/badges/${badge.id}`}
+                        className="font-medium hover:underline"
+                      >
+                        {badge.name}
+                      </Link>
+                      <div className="text-muted mt-2 space-x-2">
+                        {badge.checks.length} check(s)
+                      </div>
+                    </div>
+                  </div>
                 </td>
               </tr>
             );

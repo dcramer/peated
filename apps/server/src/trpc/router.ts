@@ -7,8 +7,10 @@ import authGoogle from "./routes/authGoogle";
 import authPasswordReset from "./routes/authPasswordReset";
 import authPasswordResetConfirm from "./routes/authPasswordResetConfirm";
 import authRegister from "./routes/authRegister";
+import badgeById from "./routes/badgeById";
 import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
+import badgeUpdate from "./routes/badgeUpdate";
 import bottleAliasDelete from "./routes/bottleAliasDelete";
 import bottleAliasList from "./routes/bottleAliasList";
 import bottleAliasUpdate from "./routes/bottleAliasUpdate";
@@ -103,6 +105,7 @@ import tastingImageDelete from "./routes/tastingImageDelete";
 import tastingList from "./routes/tastingList";
 import tastingUpdate from "./routes/tastingUpdate";
 import toastCreate from "./routes/toastCreate";
+import userBadgeList from "./routes/userBadgeList";
 import userById from "./routes/userById";
 import userList from "./routes/userList";
 import userRegionList from "./routes/userRegionList";
@@ -117,8 +120,10 @@ export const appRouter = router({
   authRegister,
   authPasswordReset,
   authPasswordResetConfirm,
+  badgeById,
   badgeCreate,
   badgeList,
+  badgeUpdate,
   bottleById,
   bottleCreate,
   bottleDelete,
@@ -213,6 +218,7 @@ export const appRouter = router({
   tastingImageDelete,
   tastingUpdate,
   toastCreate,
+  userBadgeList,
   userById,
   userList,
   userRegionList,

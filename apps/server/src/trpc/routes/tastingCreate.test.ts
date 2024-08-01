@@ -30,12 +30,12 @@ test("creates a new tasting with minimal params", async ({
     rating: 3.5,
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.tasting.id).toBeDefined();
 
   const [tasting] = await db
     .select()
     .from(tastings)
-    .where(eq(tastings.id, data.id));
+    .where(eq(tastings.id, data.tasting.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(defaults.user.id);
@@ -76,12 +76,12 @@ test("creates a new tasting with tags", async ({ defaults, fixtures }) => {
     tags: [tags[0].name, tags[1].name],
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.tasting.id).toBeDefined();
 
   const [tasting] = await db
     .select()
     .from(tastings)
-    .where(eq(tastings.id, data.id));
+    .where(eq(tastings.id, data.tasting.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(defaults.user.id);
@@ -110,12 +110,12 @@ test("creates a new tasting with notes", async ({ defaults, fixtures }) => {
     notes: "hello world",
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.tasting.id).toBeDefined();
 
   const [tasting] = await db
     .select()
     .from(tastings)
-    .where(eq(tastings.id, data.id));
+    .where(eq(tastings.id, data.tasting.id));
 
   expect(tasting.notes).toEqual("hello world");
 });
@@ -133,12 +133,12 @@ test("creates a new tasting with empty rating", async ({
     bottle: bottle.id,
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.tasting.id).toBeDefined();
 
   const [tasting] = await db
     .select()
     .from(tastings)
-    .where(eq(tastings.id, data.id));
+    .where(eq(tastings.id, data.tasting.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(defaults.user.id);
@@ -159,12 +159,12 @@ test("creates a new tasting with empty friends", async ({
     friends: [],
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.tasting.id).toBeDefined();
 
   const [tasting] = await db
     .select()
     .from(tastings)
-    .where(eq(tastings.id, data.id));
+    .where(eq(tastings.id, data.tasting.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(defaults.user.id);
@@ -185,12 +185,12 @@ test("creates a new tasting with zero rating", async ({
     rating: 0,
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.tasting.id).toBeDefined();
 
   const [tasting] = await db
     .select()
     .from(tastings)
-    .where(eq(tastings.id, data.id));
+    .where(eq(tastings.id, data.tasting.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(defaults.user.id);
@@ -226,14 +226,73 @@ test("creates a new tasting with flight", async ({ defaults, fixtures }) => {
     flight: flight.publicId,
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.tasting.id).toBeDefined();
 
   const [tasting] = await db
     .select()
     .from(tastings)
-    .where(eq(tastings.id, data.id));
+    .where(eq(tastings.id, data.tasting.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
   expect(tasting.createdById).toEqual(defaults.user.id);
   expect(tasting.flightId).toEqual(flight.id);
+});
+
+test("creates a new tasting with badge award", async ({
+  defaults,
+  fixtures,
+}) => {
+  const badge = await fixtures.Badge({
+    checks: [
+      {
+        type: "age",
+        config: {
+          minAge: 5,
+          maxAge: 10,
+        },
+      },
+    ],
+    name: "Consistency",
+    maxLevel: 10,
+    imageUrl: "/images/foobar.png",
+  });
+
+  const bottle = await fixtures.Bottle({ statedAge: 5 });
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+  });
+
+  expect(data.tasting.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.tasting.id));
+
+  expect(tasting.bottleId).toEqual(bottle.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
+
+  expect(data.awards).toBeDefined();
+  expect(data.awards.length).toEqual(1);
+  expect(data.awards[0].badge).toMatchInlineSnapshot(`
+    {
+      "checks": [
+        {
+          "config": {
+            "maxAge": 10,
+            "minAge": 5,
+          },
+          "type": "age",
+        },
+      ],
+      "id": 1,
+      "imageUrl": "http://localhost:4000/images/foobar.png",
+      "maxLevel": 10,
+      "name": "Consistency",
+    }
+  `);
 });

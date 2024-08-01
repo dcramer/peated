@@ -960,6 +960,27 @@
       "when": 1722444185273,
       "tag": "0136_clear_fantastic_four",
       "breakpoints": false
+    },
+    {
+      "idx": 137,
+      "version": "7",
+      "when": 1722488519951,
+      "tag": "0137_sleepy_captain_universe",
+      "breakpoints": false
+    },
+    {
+      "idx": 138,
+      "version": "7",
+      "when": 1722527005224,
+      "tag": "0138_curious_deathbird",
+      "breakpoints": false
+    },
+    {
+      "idx": 139,
+      "version": "7",
+      "when": 1722563264938,
+      "tag": "0139_many_miss_america",
+      "breakpoints": false
     }
   ]
 }
