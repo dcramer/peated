@@ -9,7 +9,7 @@ const subcommand = program.command("badges");
 subcommand
   .command("rescan")
   .description("Rescan a badge to fill in missing XP.")
-  .argument("[badgeId]")
+  .argument("<badgeId>")
   .action(async (badgeId, options) => {
     const [badge] = await db
       .select()
@@ -25,11 +25,13 @@ subcommand
 subcommand
   .command("fix-levels")
   .description("Recalculate all levels.")
-  .action(async (options) => {
+  .argument("[badgeId]")
+  .action(async (badgeId, options) => {
     const awardQuery = await db.query.badgeAwards.findMany({
       with: {
         badge: true,
       },
+      where: badgeId ? eq(badgeAwards.badgeId, badgeId) : undefined,
     });
 
     for (const award of awardQuery) {
