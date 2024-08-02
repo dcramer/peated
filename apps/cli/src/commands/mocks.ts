@@ -97,18 +97,23 @@ const loadDefaultEntities = async () => {
   const majorCountries = await db.query.countries.findMany({
     where: (countries, { inArray }) =>
       inArray(
-        countries.name,
-        MAJOR_COUNTRIES.map(([name]) => name),
+        sql`LOWER(${countries.name})`,
+        MAJOR_COUNTRIES.map(([name]) => name.toLowerCase()),
       ),
   });
 
   const results: Entity[] = [];
 
   for (const data of mocks) {
+    const existingMatch = await db.query.entityAliases.findFirst({
+      where: (entityAliases, { eq }) =>
+        eq(sql`LOWER(${entityAliases.name})`, data.name.toLowerCase()),
+      with: {
+        entity: true,
+      },
+    });
     results.push(
-      (await db.query.entities.findFirst({
-        where: (entities, { eq }) => eq(entities.name, data.name),
-      })) ||
+      existingMatch?.entity ??
         (await Fixtures.Entity({
           ...data,
           countryId: sample(majorCountries, 1)[0].id,
@@ -262,6 +267,15 @@ const loadDefaultBottles = async (
       });
       await Fixtures.StorePrice({
         externalSiteId: site.id,
+        bottleId: null,
+      });
+      await Fixtures.BottleAlias({
+        bottleId: null,
+      });
+      await Fixtures.BottleAlias({
+        bottleId: null,
+      });
+      await Fixtures.BottleAlias({
         bottleId: null,
       });
 
