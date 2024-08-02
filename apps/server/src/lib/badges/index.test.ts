@@ -1,6 +1,10 @@
 import { db } from "../../db";
 
-import { badgeAwards, tastingBadgeAwards } from "@peated/server/db/schema";
+import {
+  badgeAwards,
+  badgeAwardTrackedObjects,
+  tastingBadgeAwards,
+} from "@peated/server/db/schema";
 import { awardAllBadgeXp, rescanBadge } from ".";
 import { createTastingForBadge } from "./testHelpers";
 
@@ -98,6 +102,7 @@ describe("awardAllBadgeXp", () => {
     const badge = await fixtures.Badge({
       name: "Test",
       formula: "linear",
+      tracker: "region",
       checks: [
         {
           type: "region",
@@ -110,10 +115,10 @@ describe("awardAllBadgeXp", () => {
       maxLevel: 10,
     });
 
-    for (const region of [regionKy, regionTn, regionTx, regionHi, null]) {
+    for (const region of [regionKy, regionTn, regionTx, regionHi]) {
       const brand = await fixtures.Entity({
-        regionId: region ? region.id : null,
-        countryId: region ? region.countryId : countryUs.id,
+        regionId: region.id,
+        countryId: region.countryId,
       });
       const tasting = await createTastingForBadge(
         fixtures,
@@ -127,9 +132,42 @@ describe("awardAllBadgeXp", () => {
       await awardAllBadgeXp(db, tasting);
     }
 
+    // now record one with a country without region, to make sure
+    // somehow 'null' isnt bubbling up...
+    const brand = await fixtures.Entity({
+      regionId: null,
+      countryId: countryUs.id,
+    });
+    // protect ourselves from ourselves
+    expect(brand.regionId).toBeNull();
+    const tasting = await createTastingForBadge(
+      fixtures,
+      {
+        name: faker.word.noun(),
+        brand,
+      },
+      user.id,
+    );
+
+    await awardAllBadgeXp(db, tasting);
+
     const awardList = await db.select().from(badgeAwards);
     expect(awardList.length).toEqual(1);
     expect(awardList[0].badgeId).toEqual(badge.id);
+
+    // test our tracked objects so its easier to debug failures
+    const trackedList = await db
+      .select()
+      .from(badgeAwardTrackedObjects)
+      .orderBy(asc(badgeAwardTrackedObjects.id));
+    expect(trackedList[0].objectType === "region");
+    expect(trackedList[0].objectId === regionKy.id);
+    expect(trackedList[1].objectType === "region");
+    expect(trackedList[1].objectId === regionTn.id);
+    expect(trackedList[2].objectType === "region");
+    expect(trackedList[2].objectId === regionTx.id);
+    expect(trackedList.length).toEqual(3);
+
     expect(awardList[0].xp).toEqual(3);
     expect(awardList[0].level).toEqual(0);
   });
@@ -249,6 +287,7 @@ describe("defaultCalculateLevel", () => {
 });
 
 import { faker } from "@faker-js/faker";
+import { asc } from "drizzle-orm";
 import { linearCalculateLevel } from ".";
 
 describe("linearCalculateLevel", () => {
