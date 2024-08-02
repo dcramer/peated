@@ -35,7 +35,6 @@ export default async function Layout({
           Local
         </TabItem> */}
           </Tabs>
-          <Spinner />
           {children}
         </div>
         <div className="ml-4 hidden w-4/12 lg:block">
