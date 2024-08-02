@@ -62,6 +62,7 @@ describe("awardAllBadgeXp", () => {
             "type": "everyTasting",
           },
         ],
+        "formula": "default",
         "id": 1,
         "imageUrl": null,
         "maxLevel": 1,
@@ -182,5 +183,29 @@ describe("defaultCalculateLevel", () => {
     expect(defaultCalculateLevel(250, 50)).toMatchInlineSnapshot(`20`);
     expect(defaultCalculateLevel(500, 50)).toMatchInlineSnapshot(`28`);
     expect(defaultCalculateLevel(1000, 50)).toMatchInlineSnapshot(`39`);
+  });
+});
+
+import { linearCalculateLevel } from ".";
+
+describe("linearCalculateLevel", () => {
+  test("basic tests", () => {
+    expect(linearCalculateLevel(1, 50)).toMatchInlineSnapshot(`0`);
+    expect(linearCalculateLevel(5, 50)).toMatchInlineSnapshot(`1`);
+    expect(linearCalculateLevel(10, 50)).toMatchInlineSnapshot(`2`);
+    expect(linearCalculateLevel(15, 50)).toMatchInlineSnapshot(`3`);
+    expect(linearCalculateLevel(20, 50)).toMatchInlineSnapshot(`4`);
+    expect(linearCalculateLevel(25, 50)).toMatchInlineSnapshot(`5`);
+    expect(linearCalculateLevel(30, 50)).toMatchInlineSnapshot(`6`);
+    expect(linearCalculateLevel(35, 50)).toMatchInlineSnapshot(`7`);
+    expect(linearCalculateLevel(40, 50)).toMatchInlineSnapshot(`8`);
+    expect(linearCalculateLevel(45, 50)).toMatchInlineSnapshot(`9`);
+    expect(linearCalculateLevel(50, 50)).toMatchInlineSnapshot(`10`);
+    expect(linearCalculateLevel(75, 50)).toMatchInlineSnapshot(`15`);
+    expect(linearCalculateLevel(100, 50)).toMatchInlineSnapshot(`20`);
+    expect(linearCalculateLevel(150, 50)).toMatchInlineSnapshot(`30`);
+    expect(linearCalculateLevel(250, 50)).toMatchInlineSnapshot(`50`);
+    expect(linearCalculateLevel(500, 50)).toMatchInlineSnapshot(`50`);
+    expect(linearCalculateLevel(1000, 50)).toMatchInlineSnapshot(`50`);
   });
 });

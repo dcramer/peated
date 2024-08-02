@@ -988,6 +988,13 @@
       "when": 1722622684309,
       "tag": "0140_outgoing_bruce_banner",
       "breakpoints": false
+    },
+    {
+      "idx": 141,
+      "version": "7",
+      "when": 1722636029748,
+      "tag": "0141_messy_gauntlet",
+      "breakpoints": false
     }
   ]
 }

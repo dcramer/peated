@@ -10,6 +10,7 @@ test("requires admin", async ({ defaults }) => {
     caller.badgeCreate({
       name: "Single Malts",
       tracker: "bottle",
+      formula: "default",
       checks: [{ type: "category", config: { category: ["single_malt"] } }],
     }),
   );
@@ -24,6 +25,7 @@ test("creates badge", async ({ fixtures }) => {
   const data = await caller.badgeCreate({
     name: "Single Malts",
     tracker: "bottle",
+    formula: "default",
     checks: [{ type: "category", config: { category: ["single_malt"] } }],
   });
 

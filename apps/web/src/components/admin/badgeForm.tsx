@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   BADGE_CHECK_TYPE_LIST,
+  BADGE_FORMULA_LIST,
   BADGE_TRACKER_LIST,
 } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
@@ -156,6 +157,7 @@ export default function BadgeForm({
               <SelectField
                 {...field}
                 label="Tracker"
+                helpText="The tracker determines which attributes are recorded for XP. Only new unique items grant XP."
                 onChange={(value) => onChange(value?.id)}
                 value={
                   value
@@ -170,6 +172,31 @@ export default function BadgeForm({
                   name: toTitleCase(t),
                 }))}
                 simple
+              />
+            )}
+          />
+          <Controller
+            name="formula"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                label="Formula"
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: toTitleCase(value),
+                      }
+                    : undefined
+                }
+                options={BADGE_FORMULA_LIST.map((t) => ({
+                  id: t,
+                  name: toTitleCase(t),
+                }))}
+                simple
+                helpText="The XP formula to apply."
               />
             )}
           />

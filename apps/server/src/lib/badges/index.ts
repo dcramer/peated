@@ -13,7 +13,7 @@ import {
   tastings,
   type Badge,
 } from "../../db/schema";
-import type { BadgeCheckType, BadgeTracker } from "../../types";
+import type { BadgeCheckType, BadgeFormula, BadgeTracker } from "../../types";
 import { AgeCheck } from "./checks/ageCheck";
 import type { Check } from "./checks/base";
 import { BottleCheck } from "./checks/bottleCheck";
@@ -58,6 +58,19 @@ export function getTrackerImpl(type: BadgeTracker): Tracker {
       return new RegionTracker();
     case "country":
       return new CountryTracker();
+    default:
+      throw new Error(`Invalid type: ${type}`);
+  }
+}
+
+export function getFormulaImpl(
+  type: BadgeFormula,
+): (totalXp: number, maxLevel: number) => number | null {
+  switch (type) {
+    case "default":
+      return defaultCalculateLevel;
+    case "linear":
+      return linearCalculateLevel;
     default:
       throw new Error(`Invalid type: ${type}`);
   }
@@ -271,8 +284,8 @@ async function awardXp(
     // The amount of XP for a given level is defined as:
     // 0.02 * LEVEL**2 + 0.5 * LEVEL + 4
 
-    const newLevel =
-      defaultCalculateLevel(award.xp, badge.maxLevel) ?? award.level;
+    const formula = getFormulaImpl(badge.formula);
+    const newLevel = formula(award.xp, badge.maxLevel) ?? award.level;
 
     if (newLevel !== award.level) {
       const result = await tx
@@ -302,6 +315,9 @@ async function awardXp(
 }
 
 // TODO: use math here so perf is better
+/**
+ * Quadratic formula with increasing difficulty for future levels.
+ */
 export function defaultCalculateLevel(
   totalXp: number,
   maxLevel: number,
@@ -318,4 +334,15 @@ export function defaultCalculateLevel(
   }
 
   return level - 1;
+}
+
+/**
+ * Linear formula with fixed difficulty for each level.
+ */
+export function linearCalculateLevel(
+  totalXp: number,
+  maxLevel: number,
+): number | null {
+  const xpPerLevel = 5;
+  return Math.min(Math.floor(totalXp / xpPerLevel), maxLevel);
 }

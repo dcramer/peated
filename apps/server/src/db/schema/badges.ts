@@ -13,15 +13,15 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
-import { BADGE_CHECK_TYPE_LIST, BADGE_TRACKER_LIST } from "../../constants";
+import { BADGE_FORMULA_LIST, BADGE_TRACKER_LIST } from "../../constants";
 import { users } from "./users";
-
-export const badgeCheckTypeEnum = pgEnum("badge_type", BADGE_CHECK_TYPE_LIST);
 
 export const badgeAwardTrackedObjectType = pgEnum(
   "badge_award_object_type",
   BADGE_TRACKER_LIST,
 );
+
+export const badgeFormulaEnum = pgEnum("badge_formula", BADGE_FORMULA_LIST);
 
 export const badges = pgTable(
   "badges",
@@ -31,6 +31,7 @@ export const badges = pgTable(
     imageUrl: text("image_url"),
     maxLevel: integer("max_level").default(50).notNull(),
     tracker: badgeAwardTrackedObjectType("tracker").default("bottle").notNull(),
+    formula: badgeFormulaEnum("formula").default("default").notNull(),
     checks: jsonb("checks").$type<BadgeCheck[]>().default([]).notNull(),
   },
   (table) => {

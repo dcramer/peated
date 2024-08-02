@@ -76,7 +76,9 @@ export default function Page({
       <DefinitionList>
         <DefinitionList.Term>Tracker</DefinitionList.Term>
         <DefinitionList.Details>{badge.tracker}</DefinitionList.Details>
-        <DefinitionList.Term>Config</DefinitionList.Term>
+        <DefinitionList.Term>Formula</DefinitionList.Term>
+        <DefinitionList.Details>{badge.formula}</DefinitionList.Details>
+        <DefinitionList.Term>Checks</DefinitionList.Term>
         <DefinitionList.Details>
           <pre className="font-mono">
             {JSON.stringify(badge.checks, undefined, 2)}

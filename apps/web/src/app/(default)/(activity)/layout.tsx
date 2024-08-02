@@ -1,6 +1,7 @@
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
+import Spinner from "@peated/web/components/spinner";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { Suspense, type ReactNode } from "react";
@@ -34,6 +35,7 @@ export default async function Layout({
           Local
         </TabItem> */}
           </Tabs>
+          <Spinner />
           {children}
         </div>
         <div className="ml-4 hidden w-4/12 lg:block">

@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { BADGE_CHECK_TYPE_LIST, BADGE_TRACKER_LIST } from "../constants";
+import {
+  BADGE_CHECK_TYPE_LIST,
+  BADGE_FORMULA_LIST,
+  BADGE_TRACKER_LIST,
+} from "../constants";
 import { AgeCheckConfigSchema } from "../lib/badges/checks/ageCheck";
 import { BottleCheckConfigSchema } from "../lib/badges/checks/bottleCheck";
 import { CategoryCheckConfigSchema } from "../lib/badges/checks/categoryCheck";
@@ -10,6 +14,8 @@ import { RegionCheckConfigSchema } from "../lib/badges/checks/regionCheck";
 export const BadgeCheckTypeEnum = z.enum(BADGE_CHECK_TYPE_LIST);
 
 export const BadgeTrackerEnum = z.enum(BADGE_TRACKER_LIST);
+
+export const BadgeFormulaEnum = z.enum(BADGE_FORMULA_LIST);
 
 // const BaseSchema = z.object({
 //   id: z.number(),
@@ -83,6 +89,7 @@ export const BadgeSchema = z.object({
     .min(1, "At least one check is required.")
     .optional(),
   tracker: BadgeTrackerEnum.optional(),
+  formula: BadgeFormulaEnum.optional(),
 });
 
 export const BadgeInputSchema = BadgeSchema.omit({
@@ -91,6 +98,7 @@ export const BadgeInputSchema = BadgeSchema.omit({
 }).required({
   checks: true,
   tracker: true,
+  formula: true,
 });
 
 export const BadgeAwardSchema = z.object({
