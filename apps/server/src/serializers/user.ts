@@ -5,6 +5,7 @@ import config from "../config";
 import { db } from "../db";
 import type { User } from "../db/schema";
 import { follows } from "../db/schema";
+import { absoluteUrl } from "../lib/urls";
 import { type UserSchema } from "../schemas";
 
 export const UserSerializer = serializer({
@@ -44,7 +45,7 @@ export const UserSerializer = serializer({
       id: item.id,
       username: item.username,
       pictureUrl: item.pictureUrl
-        ? `${config.API_SERVER}${item.pictureUrl}`
+        ? absoluteUrl(config.API_SERVER, item.pictureUrl)
         : null,
       friendStatus:
         attrs.friendStatus === "following" ? "friends" : attrs.friendStatus,

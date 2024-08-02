@@ -38,7 +38,7 @@ export const events = pgTable(
   },
   (table) => {
     return {
-      email: uniqueIndex("event_name_unq").using(
+      name: uniqueIndex("event_name_unq").using(
         "btree",
         table.dateStart,
         sql`LOWER(${table.name})`,

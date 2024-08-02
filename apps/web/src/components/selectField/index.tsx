@@ -31,6 +31,7 @@ type BaseProps = {
   className?: string;
   simple?: boolean;
   readOnly?: boolean;
+  disabled?: boolean;
 };
 
 type MultiProps<T extends Option> =
@@ -95,6 +96,7 @@ export default function SelectField<T extends Option>({
   onChange,
   noDialog = false,
   error,
+  disabled = false,
   readOnly = false,
   rememberValues = true,
   ...props
@@ -170,13 +172,17 @@ export default function SelectField<T extends Option>({
       className={className}
       error={error}
       labelAction={
-        !noDialog && !readOnly
+        !noDialog && !readOnly && !disabled
           ? () => {
               setDialogOpen(true);
             }
           : undefined
       }
-      onClick={!noDialog && !readOnly ? () => setDialogOpen(true) : undefined}
+      onClick={
+        !noDialog && !readOnly && !disabled
+          ? () => setDialogOpen(true)
+          : undefined
+      }
     >
       <div className="mt-1 flex flex-wrap gap-2 overflow-x-auto sm:leading-6">
         {visibleValues.map((option) => (
@@ -184,11 +190,15 @@ export default function SelectField<T extends Option>({
             as="button"
             key={`${option.id}-${option.name}`}
             active={value.includes(option)}
-            onClick={(e: MouseEvent<HTMLElement>) => {
-              e.preventDefault();
-              e.stopPropagation();
-              !readOnly && toggleOption(option);
-            }}
+            onClick={
+              readOnly || disabled
+                ? undefined
+                : (e: MouseEvent<HTMLElement>) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    !readOnly && toggleOption(option);
+                  }
+            }
           >
             {onRenderChip ? onRenderChip(option) : option.name}
           </Chip>
@@ -202,17 +212,21 @@ export default function SelectField<T extends Option>({
           multiple && (
             <Chip
               as="button"
-              onClick={(e: MouseEvent<HTMLElement>) => {
-                e.preventDefault();
-                e.stopPropagation();
-                !noDialog && !readOnly && setDialogOpen(true);
-              }}
+              onClick={
+                readOnly || disabled
+                  ? undefined
+                  : (e: MouseEvent<HTMLElement>) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      !noDialog && setDialogOpen(true);
+                    }
+              }
             >
               <PlusIcon className="text-peated h-6 w-6" />
             </Chip>
           )}
       </div>
-      {!noDialog && !readOnly && (
+      {!noDialog && !readOnly && !disabled && (
         <SelectDialog<T>
           open={dialogOpen}
           setOpen={setDialogOpen}

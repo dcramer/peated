@@ -1,29 +1,27 @@
 import type { z } from "zod";
 import type {
-  BADGE_TYPE_LIST,
-  CASK_FILLS,
-  CASK_SIZE_IDS,
-  CASK_TYPE_IDS,
-  CATEGORY_LIST,
-  CURRENCY_LIST,
-  EXTERNAL_SITE_TYPE_LIST,
-  FLAVOR_PROFILES,
-  SERVING_STYLE_LIST,
-  TAG_CATEGORIES,
-} from "./constants";
-import type {
+  BadgeAwardSchema,
+  BadgeCheckSchema,
   BadgeSchema,
+  BadgeTypeEnum,
   BottleSchema,
+  CaskFillEnum,
+  CaskSizeEnum,
+  CaskTypeEnum,
+  CategoryEnum,
   ChangeSchema,
   CollectionBottleSchema,
   CollectionSchema,
   CommentSchema,
   CountrySchema,
+  CurrencyEnum,
   EntityInputSchema,
   EntitySchema,
   EntityTypeEnum,
   EventSchema,
   ExternalSiteSchema,
+  ExternalSiteTypeEnum,
+  FlavorProfileEnum,
   FlightSchema,
   FollowSchema,
   FollowStatusEnum,
@@ -34,22 +32,24 @@ import type {
   PointSchema,
   RegionSchema,
   ReviewSchema,
+  ServingStyleEnum,
   StorePriceSchema,
+  TagCategoryEnum,
   TastingSchema,
   UserSchema,
 } from "./schemas";
 
-export type Category = (typeof CATEGORY_LIST)[number];
-export type ServingStyle = (typeof SERVING_STYLE_LIST)[number];
-export type FlavorProfile = (typeof FLAVOR_PROFILES)[number];
-export type TagCategory = (typeof TAG_CATEGORIES)[number];
-export type Currency = (typeof CURRENCY_LIST)[number];
-export type CaskType = (typeof CASK_TYPE_IDS)[number];
-export type CaskSize = (typeof CASK_SIZE_IDS)[number];
-export type CaskFill = (typeof CASK_FILLS)[number];
+export type Category = z.infer<typeof CategoryEnum>;
+export type ServingStyle = z.infer<typeof ServingStyleEnum>;
+export type FlavorProfile = z.infer<typeof FlavorProfileEnum>;
+export type TagCategory = z.infer<typeof TagCategoryEnum>;
+export type Currency = z.infer<typeof CurrencyEnum>;
+export type CaskType = z.infer<typeof CaskTypeEnum>;
+export type CaskSize = z.infer<typeof CaskSizeEnum>;
+export type CaskFill = z.infer<typeof CaskFillEnum>;
 
-export type ExternalSiteType = (typeof EXTERNAL_SITE_TYPE_LIST)[number];
-export type BadgeType = (typeof BADGE_TYPE_LIST)[number];
+export type ExternalSiteType = z.infer<typeof ExternalSiteTypeEnum>;
+export type BadgeType = z.infer<typeof BadgeTypeEnum>;
 
 export type EntityType = z.infer<typeof EntityTypeEnum>;
 export type ObjectType = z.infer<typeof ObjectTypeEnum>;
@@ -58,6 +58,8 @@ export type FriendStatus = z.infer<typeof FriendStatusEnum>;
 export type Point = z.infer<typeof PointSchema>;
 
 export type Badge = z.infer<typeof BadgeSchema>;
+export type BadgeAward = z.infer<typeof BadgeAwardSchema>;
+export type BadgeCheck = z.infer<typeof BadgeCheckSchema>;
 export type Bottle = z.infer<typeof BottleSchema>;
 export type Change = z.infer<typeof ChangeSchema>;
 export type Collection = z.infer<typeof CollectionSchema>;

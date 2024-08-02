@@ -1,21 +1,21 @@
-import { XP_PER_LEVEL } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
 import {
-  badgeAwards,
-  bottleTags,
   bottles,
+  bottleTags,
   entities,
   flightBottles,
   flights,
   follows,
   tastings,
 } from "@peated/server/db/schema";
-import { checkBadges } from "@peated/server/lib/badges";
+import { awardAllBadgeXp } from "@peated/server/lib/badges";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { TastingInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
+import { BadgeSerializer } from "@peated/server/serializers/badge";
+import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
@@ -102,7 +102,7 @@ export default authedProcedure
       data.friends = input.friends;
     }
 
-    const tasting = await db.transaction(async (tx) => {
+    const [tasting, awards] = await db.transaction(async (tx) => {
       let tasting: Tasting | undefined;
       try {
         [tasting] = await tx.insert(tastings).values(data).returning();
@@ -116,7 +116,7 @@ export default authedProcedure
         }
         throw err;
       }
-      if (!tasting) return;
+      if (!tasting) return [];
 
       await tx
         .update(bottles)
@@ -160,30 +160,18 @@ export default authedProcedure
           });
       }
 
-      const badgeList = await checkBadges(tx, {
+      const awards = await awardAllBadgeXp(tx, {
         ...tasting,
         bottle,
       });
 
-      for (const badge of badgeList) {
-        await tx
-          .insert(badgeAwards)
-          .values({
-            badgeId: badge.id,
-            userId: tasting.createdById,
-            xp: 1,
-            level: 1,
-          })
-          .onConflictDoUpdate({
-            target: [badgeAwards.badgeId, badgeAwards.userId],
-            set: {
-              xp: sql`${badgeAwards.xp} + 1`,
-              level: sql`(${badgeAwards.xp} + 1) / ${XP_PER_LEVEL} + 1`,
-            },
-          });
+      for (const award of awards) {
+        Object.assign(award, {
+          badge: await serialize(BadgeSerializer, award.badge, ctx.user),
+        });
       }
 
-      return tasting;
+      return [tasting, awards];
     });
 
     if (!tasting) {
@@ -205,5 +193,9 @@ export default authedProcedure
       }
     }
 
-    return await serialize(TastingSerializer, tasting, ctx.user);
+    return {
+      tasting: await serialize(TastingSerializer, tasting, ctx.user),
+      // TODO:
+      awards: await serialize(BadgeAwardSerializer, awards || [], ctx.user),
+    };
   });

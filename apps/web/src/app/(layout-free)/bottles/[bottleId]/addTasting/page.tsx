@@ -1,5 +1,8 @@
 "use client";
 
+import BadgeImage from "@peated/web/components/badgeImage";
+import { useFlashMessages } from "@peated/web/components/flash";
+import Link from "@peated/web/components/link";
 import TastingForm from "@peated/web/components/tastingForm";
 import useApi from "@peated/web/hooks/useApi";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
@@ -32,13 +35,15 @@ export default function AddTasting({
   // duplicate tasting submissions
   const createdAt = new Date().toISOString();
 
+  const { flash } = useFlashMessages();
+
   return (
     <TastingForm
       title="Record Tasting"
       initialData={{ bottle }}
       suggestedTags={suggestedTags}
       onSubmit={async ({ picture, ...data }) => {
-        const tasting = await tastingCreateMutation.mutateAsync({
+        const { tasting, awards } = await tastingCreateMutation.mutateAsync({
           ...data,
           createdAt,
         });
@@ -54,10 +59,33 @@ export default function AddTasting({
             });
           } catch (err) {
             logError(err);
-            // TODO show some kind of alert, ask them to reusubmit image
+            flash(
+              "There was an error uploading your image, but the tasting was saved.",
+              "error",
+            );
           }
         }
         if (tasting) {
+          for (const award of awards) {
+            if (award.level != award.prevLevel) {
+              flash(
+                <div className="relative flex flex-row items-center gap-x-3">
+                  <Link
+                    href={`/badges/${award.badge.id}`}
+                    className="absolute inset-0"
+                  />
+                  <BadgeImage badge={award.badge} size={48} />
+                  <div className="flex flex-col">
+                    <h5 className="font-semibold">{award.badge.name}</h5>
+                    <p className="font-normal">
+                      You've reached level {award.level}!
+                    </p>
+                  </div>
+                </div>,
+                "info",
+              );
+            }
+          }
           if (flight) {
             router.push(`/flights/${flight}`);
           } else {

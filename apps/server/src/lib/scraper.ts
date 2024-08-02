@@ -79,6 +79,7 @@ export async function cacheUrl(
   return { data, status };
 }
 
+// TODO: move this function
 export function absoluteUrl(url: string, baseUrl: string) {
   if (url.indexOf("https://") === 0) return url;
   const urlParts = new URL(baseUrl);

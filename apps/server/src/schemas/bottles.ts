@@ -1,16 +1,14 @@
 import { z } from "zod";
-import { CATEGORY_LIST } from "../constants";
 import {
   CaskFillEnum,
   CaskSizeEnum,
   CaskTypeEnum,
+  CategoryEnum,
   ContentSourceEnum,
   FlavorProfileEnum,
 } from "./common";
 import { EntityInputSchema, EntitySchema } from "./entities";
 import { UserSchema } from "./users";
-
-export const CategoryEnum = z.enum(CATEGORY_LIST);
 
 export const BottleSchema = z.object({
   id: z.number(),
@@ -30,7 +28,7 @@ export const BottleSchema = z.object({
   suggestedTags: z.array(z.string()).optional(),
   flavorProfile: FlavorProfileEnum.nullable(),
 
-  statedAge: z.number().nullable(),
+  statedAge: z.number().min(0).max(100).nullish(),
   vintageYear: z.number().gte(1800).lte(new Date().getFullYear()).nullable(),
   caskType: CaskTypeEnum.nullable(),
   caskSize: CaskSizeEnum.nullable(),
@@ -69,7 +67,7 @@ export const BottleInputSchema = z.object({
   distillers: z.array(EntityChoice).nullish(),
   bottler: EntityChoice.nullish(),
 
-  statedAge: z.number().nullish(),
+  statedAge: z.number().min(0).max(100).nullish(),
   vintageYear: z.number().gte(1800).lte(new Date().getFullYear()).nullish(),
   caskType: CaskTypeEnum.nullish(),
   caskSize: CaskSizeEnum.nullish(),

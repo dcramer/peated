@@ -7,6 +7,7 @@ import {
   integer,
   pgEnum,
   pgTable,
+  smallint,
   text,
   timestamp,
   uniqueIndex,
@@ -14,6 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { SERVING_STYLE_LIST } from "../../constants";
+import { badgeAwards } from "./badges";
 import { bottles } from "./bottles";
 import { flights } from "./flights";
 import { users } from "./users";
@@ -80,3 +82,40 @@ export const tastingsRelations = relations(tastings, ({ one }) => ({
 
 export type Tasting = typeof tastings.$inferSelect;
 export type NewTasting = typeof tastings.$inferInsert;
+
+export const tastingBadgeAwards = pgTable(
+  "tasting_badge_award",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    tastingId: bigint("tasting_id", { mode: "number" })
+      .references(() => tastings.id)
+      .notNull(),
+    awardId: bigint("award_id", { mode: "number" })
+      .references(() => badgeAwards.id)
+      .notNull(),
+    level: smallint("level").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      constraint: uniqueIndex("tasting_badge_award_key").on(
+        table.tastingId,
+        table.awardId,
+      ),
+      award: index("tasting_badge_award_award_id").on(table.awardId),
+    };
+  },
+);
+
+export const tastingBadgeAwardsRelations = relations(
+  tastingBadgeAwards,
+  ({ one }) => ({
+    award: one(badgeAwards, {
+      fields: [tastingBadgeAwards.awardId],
+      references: [badgeAwards.id],
+    }),
+  }),
+);
+
+export type TastingBadgeAward = typeof tastingBadgeAwards.$inferSelect;
+export type NewTastingBadgeAward = typeof tastingBadgeAwards.$inferInsert;

@@ -2,7 +2,7 @@
 
 import type { PolymorphicProps } from "@peated/web/types";
 import { motion } from "framer-motion";
-import type { ElementType } from "react";
+import type { ElementType, MouseEventHandler } from "react";
 import classNames from "../lib/classNames";
 
 type ChipSize = "small" | "base";
@@ -28,6 +28,10 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
 }: PolymorphicProps<E, Props>) {
   const Component = as ?? defaultElement;
 
+  const defaultOnClick = (e: any) => {
+    e.preventDefault();
+  };
+
   let colorClass = "";
   switch (color) {
     case "highlight":
@@ -52,7 +56,7 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
           ? "min-h-[24px] px-[6px] text-sm"
           : "min-h-[32px] px-[12px]",
       )}
-      onClick={onClick}
+      onClick={onClick || defaultOnClick}
       {...props}
       {...moreProps}
     >

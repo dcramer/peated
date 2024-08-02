@@ -3,6 +3,7 @@ import {
   bottleTags,
   bottles,
   notifications,
+  tastingBadgeAwards,
   tastings,
   toasts,
 } from "@peated/server/db/schema";
@@ -49,6 +50,10 @@ export default authedProcedure.input(z.number()).mutation(async function ({
 
     await tx.delete(toasts).where(eq(toasts.tastingId, tasting.id));
     await tx.delete(tastings).where(eq(tastings.id, tasting.id));
+    // TODO: this probably should undo the badges...
+    await tx
+      .delete(tastingBadgeAwards)
+      .where(eq(tastingBadgeAwards.tastingId, tasting.id));
 
     // update aggregates after tasting row is removed
     for (const tag of tasting.tags) {

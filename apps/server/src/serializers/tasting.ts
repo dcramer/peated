@@ -4,9 +4,17 @@ import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { Tasting, User } from "../db/schema";
-import { bottles, tastings, toasts, users } from "../db/schema";
+import {
+  bottles,
+  tastingBadgeAwards,
+  tastings,
+  toasts,
+  users,
+} from "../db/schema";
 import { notEmpty } from "../lib/filter";
+import { absoluteUrl } from "../lib/urls";
 import { type TastingSchema } from "../schemas";
+import { BadgeAwardSerializer } from "./badgeAward";
 import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
 
@@ -15,6 +23,7 @@ type TastingAttrs = {
   createdBy: ReturnType<(typeof UserSerializer)["item"]>;
   bottle: ReturnType<(typeof BottleSerializer)["item"]>;
   friends: ReturnType<(typeof UserSerializer)["item"]>[];
+  awards: ReturnType<(typeof BadgeAwardSerializer)["item"]>[];
 };
 
 export const TastingSerializer = serializer({
@@ -84,6 +93,40 @@ export const TastingSerializer = serializer({
         )
       : {};
 
+    // this is extremely inefficient, especially without response compression
+    const tastingAwardList = await db.query.tastingBadgeAwards.findMany({
+      where: inArray(tastingBadgeAwards.tastingId, itemIds),
+      with: {
+        award: {
+          with: {
+            badge: true,
+          },
+        },
+      },
+    });
+
+    const awardsByRef = Object.fromEntries(
+      (
+        await serialize(
+          BadgeAwardSerializer,
+          tastingAwardList.map((t) => t.award),
+          currentUser,
+        )
+      ).map((data, index) => [tastingAwardList[index].award.id, data]),
+    );
+
+    const awardsByTasting: Record<
+      string,
+      ReturnType<(typeof BadgeAwardSerializer)["item"]>[]
+    > = {};
+    for (const tastingAward of tastingAwardList) {
+      if (!awardsByTasting[tastingAward.tastingId])
+        awardsByTasting[tastingAward.tastingId] = [];
+      awardsByTasting[tastingAward.tastingId].push(
+        awardsByRef[tastingAward.award.id],
+      );
+    }
+
     return Object.fromEntries(
       itemList.map((item) => {
         return [
@@ -93,6 +136,7 @@ export const TastingSerializer = serializer({
             createdBy: usersByRef[item.id],
             bottle: bottlesByRef[item.id],
             friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
+            awards: awardsByTasting[item.id] || [],
           },
         ];
       }),
@@ -106,7 +150,9 @@ export const TastingSerializer = serializer({
   ): z.infer<typeof TastingSchema> => {
     return {
       id: item.id,
-      imageUrl: item.imageUrl ? `${config.API_SERVER}${item.imageUrl}` : null,
+      imageUrl: item.imageUrl
+        ? absoluteUrl(config.API_SERVER, item.imageUrl)
+        : null,
       notes: item.notes,
       tags: item.tags || [],
       color: item.color,
@@ -118,6 +164,8 @@ export const TastingSerializer = serializer({
 
       comments: item.comments,
       toasts: item.toasts,
+
+      awards: attrs.awards,
 
       bottle: attrs.bottle,
       createdBy: attrs.createdBy,

@@ -3,8 +3,11 @@ import {
   CASK_FILLS,
   CASK_SIZE_IDS,
   CASK_TYPE_IDS,
+  CATEGORY_LIST,
   CURRENCY_LIST,
+  ENTITY_TYPE_LIST,
   FLAVOR_PROFILES,
+  SERVING_STYLE_LIST,
 } from "../constants";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 
@@ -36,8 +39,6 @@ export const zDatetime = z
     return value;
   });
 
-export const FlavorProfileEnum = z.enum(FLAVOR_PROFILES);
-
 export const ContentSourceEnum = z.enum(["generated", "user"]);
 
 export const CurrencyEnum = z.enum(CURRENCY_LIST);
@@ -47,3 +48,11 @@ export const CaskFillEnum = z.enum(CASK_FILLS);
 export const CaskTypeEnum = z.enum(CASK_TYPE_IDS);
 
 export const CaskSizeEnum = z.enum(CASK_SIZE_IDS);
+
+export const CategoryEnum = z.enum(CATEGORY_LIST);
+
+export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
+
+export const FlavorProfileEnum = z.enum(FLAVOR_PROFILES);
+
+export const ServingStyleEnum = z.enum(SERVING_STYLE_LIST);

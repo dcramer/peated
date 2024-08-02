@@ -32,7 +32,7 @@ export default function BottleTable({
           value: (item) => {
             return (
               <div className="flex flex-col justify-center">
-                <div>
+                <div className="flex items-center gap-x-1">
                   <BottleLink
                     bottle={item}
                     className="font-medium hover:underline"

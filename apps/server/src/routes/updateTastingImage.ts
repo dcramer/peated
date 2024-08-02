@@ -9,6 +9,7 @@ import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
 import config from "../config";
 import { compressAndResizeImage, storeFile } from "../lib/uploads";
+import { absoluteUrl } from "../lib/urls";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -93,7 +94,7 @@ export default {
       .where(eq(tastings.id, tasting.id));
 
     res.send({
-      imageUrl: imageUrl ? `${config.API_SERVER}${imageUrl}` : null,
+      imageUrl: absoluteUrl(config.API_SERVER, imageUrl),
     });
   },
 } as RouteOptions<

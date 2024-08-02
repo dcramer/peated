@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 import * as dbSchema from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
+import type { BadgeCheck, BadgeType, Category } from "@peated/server/types";
 import { type ExternalSiteType } from "@peated/server/types";
 import slugify from "@sindresorhus/slugify";
 import { eq, inArray, or, sql } from "drizzle-orm";
@@ -567,11 +568,15 @@ export const Badge = async (
     .insert(badges)
     .values({
       name: faker.word.noun(),
-      type: "category",
-      config: {
-        category: "single_malt",
-      },
-      ...data,
+      checks: [
+        {
+          type: "category",
+          config: {
+            category: "single_malt",
+          },
+        } as any, // fuck it
+      ],
+      ...(data as Omit<dbSchema.NewBadge, "name" | "checks">),
     })
     .returning();
   if (!result) throw new Error("Unable to create Badge fixture");

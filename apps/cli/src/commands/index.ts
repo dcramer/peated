@@ -1,3 +1,4 @@
+export * from "./badges";
 export * from "./bottles";
 export * from "./countries";
 export * from "./data";

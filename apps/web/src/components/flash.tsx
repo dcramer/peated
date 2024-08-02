@@ -8,7 +8,7 @@ const ALIVE_TIME = 8000; // 8 seconds
 
 let messageNum = 0;
 
-type FlashType = "success" | "error";
+type FlashType = "success" | "error" | "info";
 
 type FlashMessage = {
   id: number;
@@ -39,6 +39,7 @@ export function Message({
         "rounded-md p-3 font-semibold opacity-90",
         type === "success" ? "bg-green-700 text-green-50" : "",
         type === "error" ? "bg-red-700 text-red-50" : "",
+        type === "info" ? "bg-slate-700 text-slate-50" : "",
       )}
     >
       {message}

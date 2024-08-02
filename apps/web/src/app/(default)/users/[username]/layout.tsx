@@ -12,6 +12,7 @@ import { type ReactNode } from "react";
 import FriendButton from "./friendButton";
 import LogoutButton from "./logoutButton";
 import ModActions from "./modActions";
+import { UserBadgeList } from "./userBadgeList";
 
 export const fetchCache = "default-no-store";
 
@@ -35,7 +36,7 @@ export default async function Layout({
 
   return (
     <>
-      <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
+      <div className="mb-4 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap lg:mb-8">
         <div className="flex w-full justify-center sm:w-auto sm:justify-start">
           <UserAvatar user={user} size={150} />
         </div>
@@ -107,6 +108,9 @@ export default async function Layout({
         <EmptyActivity>This users profile is private.</EmptyActivity>
       ) : (
         <>
+          <div className="mb-4 px-3 sm:px-0 lg:mb-8">
+            <UserBadgeList userId={user.id} />
+          </div>
           <div className="grid-cols mb-4 hidden grid-cols-1 gap-4 px-3 sm:grid-cols-2 sm:px-0 lg:grid">
             <UserLocationChart userId={user.id} />
             <UserTagDistribution userId={user.id} />

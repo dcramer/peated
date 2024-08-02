@@ -9,6 +9,7 @@ import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import config from "../config";
 import { compressAndResizeImage, storeFile } from "../lib/uploads";
+import { absoluteUrl } from "../lib/urls";
 import { requireAuth } from "../middleware/auth";
 
 export default {
@@ -92,7 +93,7 @@ export default {
     await db.update(users).set({ pictureUrl }).where(eq(users.id, user.id));
 
     res.send({
-      pictureUrl: pictureUrl ? `${config.API_SERVER}${pictureUrl}` : null,
+      pictureUrl: absoluteUrl(config.API_SERVER, pictureUrl),
     });
   },
 } as RouteOptions<
