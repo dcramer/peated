@@ -142,7 +142,7 @@ export default function TastingListItem({
       )}
 
       {!!tasting.notes && (
-        <div className="prose prose-invert -my-4 max-w-none px-3 text-sm sm:px-5">
+        <div className="prose prose-invert max-w-none px-3 text-sm sm:px-5">
           <Markdown content={tasting.notes} noLinks />
         </div>
       )}
