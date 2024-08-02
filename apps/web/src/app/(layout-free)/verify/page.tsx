@@ -32,6 +32,7 @@ export default function Verify() {
   }
 
   useEffect(() => {
+    if (!token) return;
     emailVerifyMutation.mutate(token, {
       onError: (err) => {
         if (isTRPCClientError(err)) {
