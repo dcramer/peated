@@ -153,30 +153,6 @@ export default authedProcedure
         }
       }
 
-      // TODO;
-      //   const badgeList = await checkBadges(tx, {
-      //     ...tasting,
-      //     bottle,
-      //   });
-
-      //   for (const badge of badgeList) {
-      //     await tx
-      //       .insert(badgeAwards)
-      //       .values({
-      //         badgeId: badge.id,
-      //         userId: tasting.createdById,
-      //         xp: 1,
-      //         level: 1,
-      //       })
-      //       .onConflictDoUpdate({
-      //         target: [badgeAwards.badgeId, badgeAwards.userId],
-      //         set: {
-      //           xp: sql`${badgeAwards.xp} + 1`,
-      //           level: sql`(${badgeAwards.xp} + 1) / ${XP_PER_LEVEL} + 1`,
-      //         },
-      //       });
-      //   }
-
       return newTasting;
     });
 
