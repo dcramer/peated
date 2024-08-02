@@ -100,7 +100,7 @@ export async function rescanBadge(badge: Badge) {
     .innerJoin(bottles, eq(bottles.id, tastings.bottleId))
     .innerJoin(brandT, eq(brandT.id, bottles.brandId))
     .leftJoin(bottlerT, eq(bottlerT.id, bottles.bottlerId))
-    .where(where ? and(...where) : where)
+    .where(where.length ? and(...where) : undefined)
     .orderBy(tastings.id);
 
   const distillerT = alias(entities, "distiller");
