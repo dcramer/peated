@@ -77,11 +77,8 @@ export default publicProcedure
       results: results.slice(0, limit).map((a) => ({
         name: a.name,
         createdAt: a.createdAt.toISOString(),
-        ...(bottle
-          ? {
-              isCanonical: canonicalName == a.name,
-            }
-          : { bottleId: a.bottleId }),
+        bottleId: a.bottleId,
+        isCanonical: bottle ? canonicalName == a.name : undefined,
       })),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,
