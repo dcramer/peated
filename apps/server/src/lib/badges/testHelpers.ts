@@ -13,6 +13,7 @@ export async function createTastingForBadge(
     bottler?: Entity | null;
     brand?: Entity;
   } = {},
+  userId: number | null = null,
 ) {
   if (!brand) brand = await fixtures.Entity({ type: ["brand"] });
   const bottle = await fixtures.Bottle({
@@ -24,6 +25,7 @@ export async function createTastingForBadge(
   });
   const tasting = await fixtures.Tasting({
     bottleId: bottle.id,
+    createdById: userId ?? undefined,
   });
   return {
     ...tasting,

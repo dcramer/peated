@@ -71,6 +71,67 @@ describe("awardAllBadgeXp", () => {
       }
     `);
   });
+
+  test("test 50 states example", async ({ fixtures }) => {
+    const user = await fixtures.User();
+
+    const countrySc = await fixtures.Country({ name: "Scotland" });
+    const regionHi = await fixtures.Region({
+      countryId: countrySc.id,
+      name: "Highland",
+    });
+    const countryUs = await fixtures.Country({ name: "United States" });
+    const regionKy = await fixtures.Region({
+      countryId: countryUs.id,
+      name: "Kentucky",
+    });
+    const regionTn = await fixtures.Region({
+      countryId: countryUs.id,
+      name: "Tennessee",
+    });
+    const regionTx = await fixtures.Region({
+      countryId: countryUs.id,
+      name: "Texas",
+    });
+
+    const badge = await fixtures.Badge({
+      name: "Test",
+      formula: "linear",
+      checks: [
+        {
+          type: "region",
+          config: {
+            country: countryUs.id,
+            region: null,
+          },
+        },
+      ],
+      maxLevel: 10,
+    });
+
+    for (const region of [regionKy, regionTn, regionTx, regionHi]) {
+      const brand = await fixtures.Entity({
+        regionId: region.id,
+        countryId: region.countryId,
+      });
+      const tasting = await createTastingForBadge(
+        fixtures,
+        {
+          name: faker.word.noun(),
+          brand,
+        },
+        user.id,
+      );
+
+      await awardAllBadgeXp(db, tasting);
+    }
+
+    const awardList = await db.select().from(badgeAwards);
+    expect(awardList.length).toEqual(1);
+    expect(awardList[0].badgeId).toEqual(badge.id);
+    expect(awardList[0].xp).toEqual(3);
+    expect(awardList[0].level).toEqual(0);
+  });
 });
 
 describe("rescanBadge", () => {
@@ -186,6 +247,7 @@ describe("defaultCalculateLevel", () => {
   });
 });
 
+import { faker } from "@faker-js/faker";
 import { linearCalculateLevel } from ".";
 
 describe("linearCalculateLevel", () => {
