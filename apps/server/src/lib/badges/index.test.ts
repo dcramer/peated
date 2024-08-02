@@ -11,6 +11,7 @@ describe("awardAllBadgeXp", () => {
 
     await fixtures.Badge({
       name: "Test",
+      tracker: "bottle",
       checks: [
         {
           type: "everyTasting",
@@ -109,10 +110,10 @@ describe("awardAllBadgeXp", () => {
       maxLevel: 10,
     });
 
-    for (const region of [regionKy, regionTn, regionTx, regionHi]) {
+    for (const region of [regionKy, regionTn, regionTx, regionHi, null]) {
       const brand = await fixtures.Entity({
-        regionId: region.id,
-        countryId: region.countryId,
+        regionId: region ? region.id : null,
+        countryId: region ? region.countryId : countryUs.id,
       });
       const tasting = await createTastingForBadge(
         fixtures,

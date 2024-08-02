@@ -225,6 +225,11 @@ async function awardXp(
     }
   }
 
+  if (!trackedObjects.length) {
+    console.info(`[badges] Badge ${badge.id} did not track any objects.`);
+    return;
+  }
+
   return await db.transaction(async (tx) => {
     let [award] = await tx
       .insert(badgeAwards)
@@ -244,25 +249,21 @@ async function awardXp(
       .returning();
 
     let count = 0;
-    if (trackedObjects.length) {
-      for (const target of trackedObjects) {
-        const query = await tx
-          .insert(badgeAwardTrackedObjects)
-          .values({
-            awardId: award.id,
-            objectType: target.type,
-            objectId: target.id,
-          })
-          .onConflictDoNothing();
-        if (query.rowCount) {
-          count += query.rowCount;
-          if (query.rowCount > 1) {
-            throw new Error("wtf");
-          }
+    for (const target of trackedObjects) {
+      const query = await tx
+        .insert(badgeAwardTrackedObjects)
+        .values({
+          awardId: award.id,
+          objectType: target.type,
+          objectId: target.id,
+        })
+        .onConflictDoNothing();
+      if (query.rowCount) {
+        count += query.rowCount;
+        if (query.rowCount > 1) {
+          throw new Error("wtf");
         }
       }
-    } else {
-      count += 1;
     }
 
     // there were no new entries
