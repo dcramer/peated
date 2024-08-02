@@ -15,17 +15,13 @@ import {
   tastings,
   type Badge,
 } from "../../db/schema";
-import { AgeCheck } from "./ageCheck";
-import {
-  defaultCalculateLevel,
-  type TastingWithRelations,
-  type TrackedObject,
-} from "./base";
-import { BottleCheck } from "./bottleCheck";
-import { CategoryCheck } from "./categoryCheck";
-import { EntityCheck } from "./entityCheck";
-import { EveryTastingCheck } from "./everyTastingCheck";
-import { RegionCheck } from "./regionCheck";
+import { AgeCheck } from "./checks/ageCheck";
+import { BottleCheck } from "./checks/bottleCheck";
+import { CategoryCheck } from "./checks/categoryCheck";
+import { EntityCheck } from "./checks/entityCheck";
+import { EveryTastingCheck } from "./checks/everyTastingCheck";
+import { RegionCheck } from "./checks/regionCheck";
+import { type TastingWithRelations, type TrackedObject } from "./types";
 
 export function getBadgeImpl(type: BadgeType) {
   switch (type) {
@@ -281,4 +277,23 @@ async function awardXp(
       prevLevel: award.level,
     };
   });
+}
+
+// TODO: use math here so perf is better
+export function defaultCalculateLevel(
+  totalXp: number,
+  maxLevel: number,
+): number | null {
+  const a = 0.02;
+  const b = 0.5;
+  const c = 4;
+
+  let level = 0;
+  let requiredXp = 0;
+  while (requiredXp <= totalXp && level < maxLevel + 1) {
+    level++;
+    requiredXp += a * Math.pow(level, 2) + b * level + c;
+  }
+
+  return level - 1;
 }

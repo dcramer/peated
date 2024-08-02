@@ -36,15 +36,15 @@ export default async function Layout({
 
   return (
     <>
-      <div className="mb-4 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap lg:mb-8">
-        <div className="flex w-full justify-center sm:w-auto sm:justify-start">
+      <div className="mb-4 flex min-w-full flex-wrap gap-y-4 lg:mb-8 lg:flex-nowrap">
+        <div className="flex w-full justify-center lg:w-auto lg:justify-start">
           <UserAvatar user={user} size={150} />
         </div>
-        <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-auto sm:gap-y-2">
-          <h3 className="self-center text-4xl font-semibold leading-normal text-white sm:self-start">
+        <div className="flex w-full flex-col justify-center gap-y-4 px-4 lg:w-auto lg:flex-auto lg:gap-y-2">
+          <h3 className="self-center text-4xl font-semibold leading-normal text-white lg:self-start">
             {user.username}
           </h3>
-          <div className="text-muted flex flex-col items-center gap-x-2 gap-y-2 self-center sm:flex-row sm:self-start">
+          <div className="text-muted flex flex-col items-center gap-x-2 gap-y-2 self-center lg:flex-row lg:self-start">
             <div>
               {user.admin ? (
                 <Chip size="small" color="highlight">
@@ -57,7 +57,7 @@ export default async function Layout({
               ) : null}
             </div>
           </div>
-          <div className="flex justify-center sm:justify-start">
+          <div className="flex justify-center lg:justify-start">
             <div className="mr-4 pr-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.tastings.toLocaleString()}
@@ -84,7 +84,7 @@ export default async function Layout({
             </div>
           </div>
         </div>
-        <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
+        <div className="flex w-full flex-col items-center justify-center lg:w-auto lg:items-end">
           {currentUser && (
             <div className="flex gap-x-2">
               {user.id !== currentUser.id ? (
@@ -108,10 +108,10 @@ export default async function Layout({
         <EmptyActivity>This users profile is private.</EmptyActivity>
       ) : (
         <>
-          <div className="mb-4 px-3 sm:px-0 lg:mb-8">
+          <div className="mb-4 px-3 lg:mb-8">
             <UserBadgeList userId={user.id} />
           </div>
-          <div className="grid-cols mb-4 hidden grid-cols-1 gap-4 px-3 sm:grid-cols-2 sm:px-0 lg:grid">
+          <div className="grid-cols mb-4 hidden grid-cols-1 gap-4 px-3 lg:grid lg:grid-cols-2 lg:px-0">
             <UserLocationChart userId={user.id} />
             <UserTagDistribution userId={user.id} />
           </div>

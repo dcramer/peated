@@ -1,8 +1,8 @@
 import type { z } from "zod";
-import { Region } from "../test/fixtures";
-import waitError from "../test/waitError";
+import { Region } from "../../test/fixtures";
+import waitError from "../../test/waitError";
+import { createTastingForBadge } from "../testHelpers";
 import { RegionCheck } from "./regionCheck";
-import { createTastingForBadge } from "./testHelpers";
 
 describe("parseConfig", () => {
   test("valid params", async () => {

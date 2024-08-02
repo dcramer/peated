@@ -52,7 +52,7 @@ describe("awardAllBadgeXp", () => {
     });
     expect(results.length).toBe(1);
     expect(results[0].xp).toEqual(1);
-    expect(results[0].level).toEqual(1);
+    expect(results[0].level).toEqual(0);
     expect(results[0].prevLevel).toEqual(0);
     expect(results[0].badge).toMatchInlineSnapshot(`
       {
@@ -111,16 +111,16 @@ describe("rescanBadge", () => {
 
     const awardList = await db.select().from(badgeAwards);
     expect(awardList.length).toEqual(1);
-    expect(awardList[0].level).toEqual(1);
+    expect(awardList[0].level).toEqual(0);
     expect(awardList[0].xp).toEqual(1);
     expect(awardList[0].badgeId).toEqual(badge.id);
     expect(awardList[0].userId).toEqual(user1.id);
 
     const tastingAwardList = await db.select().from(tastingBadgeAwards);
-    expect(tastingAwardList.length).toEqual(1);
-    expect(tastingAwardList[0].tastingId).toEqual(tasting1.id);
-    expect(tastingAwardList[0].awardId).toEqual(awardList[0].id);
-    expect(tastingAwardList[0].level).toEqual(1);
+    expect(tastingAwardList.length).toEqual(0);
+    // expect(tastingAwardList[0].tastingId).toEqual(tasting1.id);
+    // expect(tastingAwardList[0].awardId).toEqual(awardList[0].id);
+    // expect(tastingAwardList[0].level).toEqual(0);
   });
 
   test("rescans age with existing tastings", async ({ fixtures }) => {
@@ -148,14 +148,38 @@ describe("rescanBadge", () => {
 
     const awardList = await db.select().from(badgeAwards);
     expect(awardList.length).toEqual(1);
-    expect(awardList[0].level).toEqual(1);
+    expect(awardList[0].level).toEqual(0);
     expect(awardList[0].xp).toEqual(1);
     expect(awardList[0].badgeId).toEqual(badge.id);
 
     const tastingAwardList = await db.select().from(tastingBadgeAwards);
-    expect(tastingAwardList.length).toEqual(1);
-    expect(tastingAwardList[0].tastingId).toEqual(tasting1.id);
-    expect(tastingAwardList[0].awardId).toEqual(awardList[0].id);
-    expect(tastingAwardList[0].level).toEqual(1);
+    expect(tastingAwardList.length).toEqual(0);
+    // expect(tastingAwardList[0].tastingId).toEqual(tasting1.id);
+    // expect(tastingAwardList[0].awardId).toEqual(awardList[0].id);
+    // expect(tastingAwardList[0].level).toEqual(0);
+  });
+});
+
+import { defaultCalculateLevel } from ".";
+
+describe("defaultCalculateLevel", () => {
+  test("basic tests", () => {
+    expect(defaultCalculateLevel(1, 50)).toMatchInlineSnapshot(`0`);
+    expect(defaultCalculateLevel(5, 50)).toMatchInlineSnapshot(`1`);
+    expect(defaultCalculateLevel(10, 50)).toMatchInlineSnapshot(`2`);
+    expect(defaultCalculateLevel(15, 50)).toMatchInlineSnapshot(`2`);
+    expect(defaultCalculateLevel(20, 50)).toMatchInlineSnapshot(`3`);
+    expect(defaultCalculateLevel(25, 50)).toMatchInlineSnapshot(`4`);
+    expect(defaultCalculateLevel(30, 50)).toMatchInlineSnapshot(`5`);
+    expect(defaultCalculateLevel(35, 50)).toMatchInlineSnapshot(`5`);
+    expect(defaultCalculateLevel(40, 50)).toMatchInlineSnapshot(`6`);
+    expect(defaultCalculateLevel(45, 50)).toMatchInlineSnapshot(`7`);
+    expect(defaultCalculateLevel(50, 50)).toMatchInlineSnapshot(`7`);
+    expect(defaultCalculateLevel(75, 50)).toMatchInlineSnapshot(`9`);
+    expect(defaultCalculateLevel(100, 50)).toMatchInlineSnapshot(`12`);
+    expect(defaultCalculateLevel(150, 50)).toMatchInlineSnapshot(`15`);
+    expect(defaultCalculateLevel(250, 50)).toMatchInlineSnapshot(`20`);
+    expect(defaultCalculateLevel(500, 50)).toMatchInlineSnapshot(`28`);
+    expect(defaultCalculateLevel(1000, 50)).toMatchInlineSnapshot(`39`);
   });
 });

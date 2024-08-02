@@ -32,7 +32,7 @@ export default function Layout({
 
       <div className="flex">
         <main className="w-full max-w-7xl flex-auto lg:pl-64">
-          <div className="mx-auto lg:p-8">{children}</div>
+          <div className="mx-auto py-4 lg:p-8">{children}</div>
         </main>
 
         {rightSidebar ? (

@@ -1,9 +1,19 @@
 import { type Badge } from "@peated/server/types";
+import classNames from "../lib/classNames";
 
-export function PlaceholderBadgeImage({ size = 64 }: { size?: number }) {
+export function PlaceholderBadgeImage({
+  size = 64,
+  isMaxLevel = false,
+}: {
+  size?: number;
+  isMaxLevel?: boolean;
+}) {
   return (
     <div
-      className="rounded border-4 border-slate-800"
+      className={classNames(
+        "rounded ring-2 ring-inset",
+        isMaxLevel ? "ring-highlight" : "ring-slate-800",
+      )}
       style={{
         width: size,
         height: size,
@@ -14,17 +24,25 @@ export function PlaceholderBadgeImage({ size = 64 }: { size?: number }) {
 
 export default function BadgeImage({
   badge,
+  level,
   size = 64,
 }: {
   badge: Badge;
+  level?: number;
   size?: number;
 }) {
-  if (!badge.imageUrl) return <PlaceholderBadgeImage size={size} />;
+  const isMaxLevel = true || level === badge.maxLevel;
+
+  if (!badge.imageUrl)
+    return <PlaceholderBadgeImage size={size} isMaxLevel={isMaxLevel} />;
   return (
     <img
       src={badge.imageUrl}
       alt={badge.name}
-      className="rounded"
+      className={classNames(
+        "rounded",
+        isMaxLevel ? "ring-highlight ring-1 ring-inset" : "",
+      )}
       style={{
         width: size,
         height: size,

@@ -1,15 +1,15 @@
 import { bottles } from "@peated/server/db/schema";
 import { gte, lte } from "drizzle-orm";
 import { z } from "zod";
-import type { TastingWithRelations } from "./base";
-import { Check } from "./base";
+import type { TastingWithRelations } from "../types";
+import { BaseBottleCheck } from "./base";
 
 export const AgeCheckConfigSchema = z.object({
   minAge: z.number().min(0).max(100),
   maxAge: z.number().min(0).max(100),
 });
 
-export class AgeCheck extends Check {
+export class AgeCheck extends BaseBottleCheck {
   schema = AgeCheckConfigSchema;
 
   buildWhereClause(config: z.infer<typeof AgeCheckConfigSchema>) {

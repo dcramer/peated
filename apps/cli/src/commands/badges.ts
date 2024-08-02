@@ -1,8 +1,8 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { badges } from "@peated/server/db/schema";
-import { rescanBadge } from "@peated/server/lib/badges";
-import { eq } from "drizzle-orm";
+import { badgeAwards, badges } from "@peated/server/db/schema";
+import { defaultCalculateLevel, rescanBadge } from "@peated/server/lib/badges";
+import { and, eq } from "drizzle-orm";
 
 const subcommand = program.command("badges");
 
@@ -20,4 +20,31 @@ subcommand
     }
 
     await rescanBadge(badge);
+  });
+
+subcommand
+  .command("fix-levels")
+  .description("Recalculate all levels.")
+  .action(async (options) => {
+    const awardQuery = await db.query.badgeAwards.findMany({
+      with: {
+        badge: true,
+      },
+    });
+
+    for (const award of awardQuery) {
+      const level =
+        defaultCalculateLevel(award.xp, award.badge.maxLevel) ?? award.level;
+      if (award.level !== level) {
+        console.log(
+          `Updating level on award ${award.id} from ${award.level} to ${level}`,
+        );
+        await db
+          .update(badgeAwards)
+          .set({ level })
+          .where(
+            and(eq(badgeAwards.id, award.id), eq(badgeAwards.xp, award.xp)),
+          );
+      }
+    }
   });

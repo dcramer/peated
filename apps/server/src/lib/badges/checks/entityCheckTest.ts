@@ -1,7 +1,7 @@
 import type { z } from "zod";
-import waitError from "../test/waitError";
+import waitError from "../../test/waitError";
+import { createTastingForBadge } from "../testHelpers";
 import { EntityCheck } from "./entityCheck";
-import { createTastingForBadge } from "./testHelpers";
 
 describe("parseConfig", () => {
   test("valid params", async () => {

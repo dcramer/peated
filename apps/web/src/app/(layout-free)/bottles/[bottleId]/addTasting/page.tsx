@@ -75,7 +75,11 @@ export default function AddTasting({
                     href={`/badges/${award.badge.id}`}
                     className="absolute inset-0"
                   />
-                  <BadgeImage badge={award.badge} size={48} />
+                  <BadgeImage
+                    badge={award.badge}
+                    size={48}
+                    level={award.level}
+                  />
                   <div className="flex flex-col">
                     <h5 className="font-semibold">{award.badge.name}</h5>
                     <p className="font-normal">

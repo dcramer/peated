@@ -5,8 +5,8 @@ import {
 } from "@peated/server/db/schema";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
-import type { TastingWithRelations } from "./base";
-import { Check } from "./base";
+import type { TastingWithRelations } from "../types";
+import { BaseBottleCheck } from "./base";
 
 // TODO: validate params
 export const RegionCheckConfigSchema = z.object({
@@ -14,7 +14,7 @@ export const RegionCheckConfigSchema = z.object({
   region: z.number().nullable().default(null),
 });
 
-export class RegionCheck extends Check {
+export class RegionCheck extends BaseBottleCheck {
   schema = RegionCheckConfigSchema;
 
   buildWhereClause(config: z.infer<typeof RegionCheckConfigSchema>) {
@@ -24,7 +24,7 @@ export class RegionCheck extends Check {
         SELECT FROM
         ${entities}
         WHERE (
-          ${entities.id} = ${bottles.brandId} 
+          ${entities.id} = ${bottles.brandId}
           OR ${entities.id} IN (
             SELECT ${bottlesToDistillers.distillerId} FROM ${bottlesToDistillers}
             WHERE ${bottlesToDistillers.distillerId} = ${entities.id}
@@ -36,7 +36,7 @@ export class RegionCheck extends Check {
       SELECT FROM
       ${entities}
       WHERE (
-        ${entities.id} = ${bottles.brandId} 
+        ${entities.id} = ${bottles.brandId}
         OR ${entities.id} IN (
           SELECT ${bottlesToDistillers.distillerId} FROM ${bottlesToDistillers}
           WHERE ${bottlesToDistillers.distillerId} = ${entities.id}

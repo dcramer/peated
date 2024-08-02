@@ -210,7 +210,7 @@ export default function TastingListItem({
                   href={`/badges/${award.badge.id}`}
                   className="absolute inset-0"
                 />
-                <BadgeImage badge={award.badge} size={16} />
+                <BadgeImage badge={award.badge} level={award.level} size={16} />
                 <div className="text-muted inline-block text-xs group-hover:underline">
                   <strong>{award.badge.name}</strong> level {award.level}
                 </div>

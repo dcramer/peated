@@ -1,4 +1,4 @@
-import type { TastingWithRelations, TrackedObject } from "./base";
+import type { TastingWithRelations, TrackedObject } from "../types";
 import { Check } from "./base";
 
 export class EveryTastingCheck extends Check {
@@ -10,7 +10,7 @@ export class EveryTastingCheck extends Check {
     return true;
   }
 
-  track(config: unknown, tasting: TastingWithRelations): TrackedObject[] {
+  track(config: unknown, tasting: TastingWithRelations) {
     return [];
   }
 }

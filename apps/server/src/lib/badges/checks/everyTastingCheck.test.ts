@@ -1,5 +1,5 @@
+import { createTastingForBadge } from "../testHelpers";
 import { EveryTastingCheck } from "./everyTastingCheck";
-import { createTastingForBadge } from "./testHelpers";
 
 describe("parseConfig", () => {
   test("valid params", async () => {

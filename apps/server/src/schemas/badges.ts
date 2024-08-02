@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 import { BADGE_TYPE_LIST } from "../constants";
-import { AgeCheckConfigSchema } from "../lib/badges/ageCheck";
-import { BottleCheckConfigSchema } from "../lib/badges/bottleCheck";
-import { CategoryCheckConfigSchema } from "../lib/badges/categoryCheck";
-import { EntityCheckConfigSchema } from "../lib/badges/entityCheck";
-import { RegionCheckConfigSchema } from "../lib/badges/regionCheck";
+import { AgeCheckConfigSchema } from "../lib/badges/checks/ageCheck";
+import { BottleCheckConfigSchema } from "../lib/badges/checks/bottleCheck";
+import { CategoryCheckConfigSchema } from "../lib/badges/checks/categoryCheck";
+import { EntityCheckConfigSchema } from "../lib/badges/checks/entityCheck";
+import { RegionCheckConfigSchema } from "../lib/badges/checks/regionCheck";
 
 export const BadgeTypeEnum = z.enum(BADGE_TYPE_LIST);
 

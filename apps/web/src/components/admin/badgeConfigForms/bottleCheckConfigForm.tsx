@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BottleCheckConfigSchema } from "@peated/server/lib/badges/bottleCheck";
+import { BottleCheckConfigSchema } from "@peated/server/lib/badges/checks/bottleCheck";
 import BottleField from "@peated/web/components/bottleField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";

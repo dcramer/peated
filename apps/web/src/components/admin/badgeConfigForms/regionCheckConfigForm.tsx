@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RegionCheckConfigSchema } from "@peated/server/lib/badges/regionCheck";
+import { RegionCheckConfigSchema } from "@peated/server/lib/badges/checks/regionCheck";
 import CountryField from "@peated/web/components/countryField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
@@ -10,11 +10,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
 type FormSchema = z.infer<typeof RegionCheckConfigSchema>;
-const entityTypes = [
-  { id: "brand", name: "Brand" },
-  { id: "distiller", name: "Distiller" },
-  { id: "bottler", name: "Bottler" },
-];
+
 export default function RegionCheckConfigForm({
   onChange,
   initialData = {},
