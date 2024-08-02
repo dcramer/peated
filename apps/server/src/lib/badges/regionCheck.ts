@@ -31,7 +31,7 @@ export class RegionCheck extends Check {
             AND ${bottlesToDistillers.bottleId} = ${bottles.id}
           )
         ) AND ${entities.countryId} = ${config.country}
-         AND ${entities.regionId} = ${config.region}`
+         AND ${entities.regionId} = ${config.region})`
         : sql`EXISTS (
       SELECT FROM
       ${entities}
@@ -42,7 +42,7 @@ export class RegionCheck extends Check {
           WHERE ${bottlesToDistillers.distillerId} = ${entities.id}
           AND ${bottlesToDistillers.bottleId} = ${bottles.id}
         )
-      ) AND ${entities.countryId} = ${config.country}`,
+      ) AND ${entities.countryId} = ${config.country})`,
     ];
   }
 
