@@ -81,7 +81,7 @@ export default publicProcedure
           ? {
               isCanonical: canonicalName == a.name,
             }
-          : {}),
+          : { bottleId: a.bottleId }),
       })),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,
