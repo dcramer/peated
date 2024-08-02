@@ -32,7 +32,10 @@ export default function Verify() {
   }
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     emailVerifyMutation.mutate(token, {
       onError: (err) => {
         if (isTRPCClientError(err)) {
