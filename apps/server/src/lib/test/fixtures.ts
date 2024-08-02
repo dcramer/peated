@@ -572,9 +572,9 @@ export const Badge = async (
         {
           type: "category",
           config: {
-            category: "single_malt",
+            category: ["single_malt"],
           },
-        } as any, // fuck it
+        },
       ],
       ...(data as Omit<dbSchema.NewBadge, "name" | "checks">),
     })
