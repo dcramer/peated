@@ -19,7 +19,7 @@ export const BadgeSerializer = serializer({
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
       ...(currentUser?.admin
-        ? { checks: item.checks, tracker: item.tracker }
+        ? { checks: item.checks, tracker: item.tracker, formula: item.formula }
         : {}),
     };
   },
