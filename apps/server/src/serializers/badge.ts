@@ -3,7 +3,7 @@ import { serializer } from ".";
 import config from "../config";
 import type { Badge, User } from "../db/schema";
 import { absoluteUrl } from "../lib/urls";
-import { type BadgeSchema } from "../schemas";
+import type { BadgeSchema } from "../schemas";
 
 export const BadgeSerializer = serializer({
   item: (
@@ -18,7 +18,7 @@ export const BadgeSerializer = serializer({
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
-      checks: item.checks,
+      ...(currentUser?.admin ? { checks: item.checks } : {}),
     };
   },
 });

@@ -40,7 +40,7 @@ export default function BadgeTable({
                         {badge.name}
                       </Link>
                       <div className="text-muted mt-2 space-x-2">
-                        {badge.checks.length} check(s)
+                        {badge.checks!.length} check(s)
                       </div>
                     </div>
                   </div>

@@ -73,13 +73,18 @@ export const BadgeSchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
   maxLevel: z.number().min(1).max(100).default(25),
-  checks: z.array(BadgeCheckSchema).min(1, "At least one check is required."),
+  checks: z
+    .array(BadgeCheckSchema)
+    .min(1, "At least one check is required.")
+    .optional(),
   imageUrl: z.string().nullable().default(null),
 });
 
 export const BadgeInputSchema = BadgeSchema.omit({
   id: true,
   imageUrl: true,
+}).required({
+  checks: true,
 });
 
 export const BadgeAwardSchema = z.object({
