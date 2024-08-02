@@ -27,6 +27,7 @@
     "eslint": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:",
+    "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
   },

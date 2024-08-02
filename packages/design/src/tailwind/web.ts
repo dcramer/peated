@@ -2,6 +2,7 @@ import type { Config } from "tailwindcss";
 
 import tailwindForms from "@tailwindcss/forms";
 import tailwindTypography from "@tailwindcss/typography";
+import tailwindScrollbar from "tailwind-scrollbar";
 
 import colors from "tailwindcss/colors";
 
@@ -77,5 +78,5 @@ export default {
       },
     },
   },
-  plugins: [tailwindForms, tailwindTypography],
+  plugins: [tailwindForms, tailwindTypography, tailwindScrollbar],
 } satisfies Config;

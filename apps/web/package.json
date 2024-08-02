@@ -57,6 +57,7 @@
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/forms": "catalog:",
     "@tailwindcss/typography": "catalog:",
+    "tailwind-scrollbar": "^3.1.0",
     "@types/leaflet": "^1.9.12",
     "@types/node": "catalog:",
     "@types/pica": "^9.0.4",

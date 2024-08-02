@@ -726,6 +726,9 @@ importers:
       postcss:
         specifier: ^8
         version: 8.4.38
+      tailwind-scrollbar:
+        specifier: ^3.1.0
+        version: 3.1.0(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.3)))
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.4(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.3))
@@ -756,6 +759,9 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: 'catalog:'
         version: 0.5.14(prettier-plugin-organize-imports@3.2.4(prettier@3.3.3)(typescript@5.5.3))(prettier@3.3.3)
+      tailwind-scrollbar:
+        specifier: ^3.1.0
+        version: 3.1.0(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.3)))
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.4(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.3))
@@ -3453,9 +3459,6 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@babel/core': '*'
-    peerDependenciesMeta:
-      '@babel/core':
-        optional: true
 
   '@react-native/codegen@0.74.85':
     resolution: {integrity: sha512-N7QwoS4Hq/uQmoH83Ewedy6D0M7xbQsOU3OMcQf0eY3ltQ7S2hd9/R4UTalQWRn1OUJfXR6OG12QJ4FStKgV6Q==}
@@ -10386,6 +10389,12 @@ packages:
   tailwind-merge@2.4.0:
     resolution: {integrity: sha512-49AwoOQNKdqKPd9CViyH5wJoSKsCDjUlzL8DxuGp3P1FsGY36NJDAa18jLZcaHAUUuTj+JB8IAo8zWgBNvBF7A==}
 
+  tailwind-scrollbar@3.1.0:
+    resolution: {integrity: sha512-pmrtDIZeHyu2idTejfV59SbaJyvp1VRjYxAjZBH0jnyrPRo6HL1kD5Glz8VPagasqr6oAx6M05+Tuw429Z8jxg==}
+    engines: {node: '>=12.13.0'}
+    peerDependencies:
+      tailwindcss: 3.x
+
   tailwindcss-animate@1.0.7:
     resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
     peerDependencies:
@@ -14542,6 +14551,7 @@ snapshots:
 
   '@react-native/babel-preset@0.74.85(@babel/core@7.24.9)(@babel/preset-env@7.24.7(@babel/core@7.24.9))':
     dependencies:
+      '@babel/core': 7.24.9
       '@babel/plugin-proposal-async-generator-functions': 7.20.7(@babel/core@7.24.9)
       '@babel/plugin-proposal-class-properties': 7.18.6(@babel/core@7.24.9)
       '@babel/plugin-proposal-export-default-from': 7.24.7(@babel/core@7.24.9)
@@ -14584,8 +14594,6 @@ snapshots:
       '@react-native/babel-plugin-codegen': 0.74.85(@babel/preset-env@7.24.7(@babel/core@7.24.9))
       babel-plugin-transform-flow-enums: 0.0.2(@babel/core@7.24.9)
       react-refresh: 0.14.2
-    optionalDependencies:
-      '@babel/core': 7.24.9
     transitivePeerDependencies:
       - '@babel/preset-env'
       - supports-color
@@ -23015,6 +23023,10 @@ snapshots:
   tabbable@6.2.0: {}
 
   tailwind-merge@2.4.0: {}
+
+  tailwind-scrollbar@3.1.0(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.3))):
+    dependencies:
+      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.3))
 
   tailwindcss-animate@1.0.7(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.3))):
     dependencies:
