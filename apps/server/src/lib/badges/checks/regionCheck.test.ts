@@ -54,34 +54,6 @@ describe("parseConfig", () => {
   });
 });
 
-describe("track", () => {
-  test("tracks bottle", async ({ fixtures }) => {
-    const region = await fixtures.Region();
-    const brand = await fixtures.Entity({
-      name: "Brand",
-      countryId: region.countryId,
-      regionId: region.id,
-    });
-    const tasting = await createTastingForBadge(fixtures, {
-      brand,
-    });
-
-    const badgeImpl = new RegionCheck();
-    const config = {
-      country: region.countryId,
-      region: region.id,
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
-    expect(badgeImpl.track(config, tasting)).toMatchInlineSnapshot(`
-      [
-        {
-          "id": 1,
-          "type": "bottle",
-        },
-      ]
-    `);
-  });
-});
-
 describe("test", () => {
   test("matches bottle with regionId on brand", async ({ fixtures }) => {
     const region = await fixtures.Region();

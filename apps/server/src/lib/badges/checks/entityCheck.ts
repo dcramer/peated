@@ -4,14 +4,14 @@ import type { SQL } from "drizzle-orm";
 import { eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { TastingWithRelations } from "../types";
-import { BaseBottleCheck } from "./base";
+import { Check } from "./base";
 
 export const EntityCheckConfigSchema = z.object({
   entity: z.number(),
   type: EntityTypeEnum.nullable().default(null),
 });
 
-export class EntityCheck extends BaseBottleCheck {
+export class EntityCheck extends Check {
   schema = EntityCheckConfigSchema;
 
   buildWhereClause(config: z.infer<typeof EntityCheckConfigSchema>) {

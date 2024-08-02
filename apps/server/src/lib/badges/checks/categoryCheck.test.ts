@@ -72,27 +72,6 @@ describe("parseConfig", () => {
   });
 });
 
-describe("track", () => {
-  test("tracks bottle", async ({ fixtures }) => {
-    const tasting = await createTastingForBadge(fixtures, {
-      category: "single_malt",
-    });
-
-    const badgeImpl = new CategoryCheck();
-    const config = {
-      category: ["single_malt"],
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
-    expect(badgeImpl.track(config, tasting)).toMatchInlineSnapshot(`
-      [
-        {
-          "id": 1,
-          "type": "bottle",
-        },
-      ]
-    `);
-  });
-});
-
 describe("test", () => {
   test("matches bottle", async ({ fixtures }) => {
     const tasting = await createTastingForBadge(fixtures, {

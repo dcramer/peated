@@ -55,26 +55,6 @@ describe("parseConfig", () => {
   });
 });
 
-describe("track", () => {
-  test("tracks bottle", async ({ fixtures }) => {
-    const tasting = await createTastingForBadge(fixtures);
-
-    const badgeImpl = new EntityCheck();
-    const config = {
-      entity: tasting.bottle.brand.id,
-      type: null,
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
-    expect(badgeImpl.track(config, tasting)).toMatchInlineSnapshot(`
-      [
-        {
-          "id": 1,
-          "type": "bottle",
-        },
-      ]
-    `);
-  });
-});
-
 describe("test", () => {
   test("matches bottle with entityId on brand with any type", async ({
     fixtures,

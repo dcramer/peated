@@ -41,25 +41,6 @@ describe("parseConfig", () => {
   });
 });
 
-describe("track", () => {
-  test("tracks bottle", async ({ fixtures }) => {
-    const tasting = await createTastingForBadge(fixtures, { statedAge: 5 });
-
-    const badgeImpl = new BottleCheck();
-    const config = {
-      bottle: [1],
-    };
-    expect(badgeImpl.track(config, tasting)).toMatchInlineSnapshot(`
-      [
-        {
-          "id": 1,
-          "type": "bottle",
-        },
-      ]
-    `);
-  });
-});
-
 describe("test", () => {
   test("matches bottle", async ({ fixtures }) => {
     const tasting = await createTastingForBadge(fixtures, { statedAge: 5 });
