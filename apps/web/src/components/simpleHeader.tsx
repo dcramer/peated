@@ -11,7 +11,7 @@ export default function SimpleHeader<
   return (
     <div className="mb-4 flex space-x-8 border-b border-slate-700">
       <Component
-        className="text-highlight border-highlight flex justify-center whitespace-nowrap border-b-4 px-1 py-4 text-sm font-medium"
+        className="text-highlight border-highlight flex justify-center whitespace-nowrap border-b-4 px-3 py-4 text-sm font-medium"
         {...props}
       />
     </div>
