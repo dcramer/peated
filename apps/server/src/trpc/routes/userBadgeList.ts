@@ -3,7 +3,7 @@ import { badgeAwards } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 import { getUserFromId, profileVisible } from "../../lib/api";
@@ -40,7 +40,10 @@ export default publicProcedure
       .where(and(eq(badgeAwards.userId, user.id), gte(badgeAwards.xp, 0)))
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(desc(badgeAwards.createdAt));
+      .orderBy(
+        sql`CASE WHEN ${badgeAwards.level} = 0 THEN 1 ELSE 0 END`,
+        desc(badgeAwards.createdAt),
+      );
 
     return {
       results: await serialize(
