@@ -98,8 +98,8 @@ export default function TastingListItem({
   const canToast = !hasToasted && !isTaster && user;
 
   return (
-    <li className="-mt-1 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
-      <div className="flex items-center space-x-4 p-3 sm:px-5 sm:py-4">
+    <li className="-mt-1 flex flex-col gap-y-2 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
+      <div className="flex items-center space-x-4 px-3 sm:px-5 sm:py-4">
         <UserAvatar size={32} user={tasting.createdBy} />
         <div className="flex-auto space-y-1 font-semibold">
           <Link
@@ -120,7 +120,7 @@ export default function TastingListItem({
       </div>
 
       {!noBottle && (
-        <div className="p-3 sm:px-5">
+        <div className="px-3 sm:px-5">
           <BottleCard color="inherit" noGutter bottle={bottle} />
         </div>
       )}
@@ -142,7 +142,7 @@ export default function TastingListItem({
       )}
 
       {!!tasting.notes && (
-        <div className="prose prose-invert max-w-none px-3 text-sm sm:px-5">
+        <div className="prose prose-invert -my-1 max-w-none px-3 text-sm sm:px-5">
           <Markdown content={tasting.notes} noLinks />
         </div>
       )}
@@ -151,7 +151,7 @@ export default function TastingListItem({
         tasting.color ||
         tasting.rating ||
         tasting.tags.length > 0) && (
-        <div className="text-muted p-3 text-sm sm:px-5">
+        <div className="text-muted px-3 text-sm sm:px-5">
           <DefinitionList className="grid-cols grid grid-cols-2 gap-y-4 sm:grid-cols-2">
             {tasting.rating && (
               <div>
