@@ -1,13 +1,15 @@
 import { z } from "zod";
 
-import { BADGE_TYPE_LIST } from "../constants";
+import { BADGE_CHECK_TYPE_LIST, BADGE_TRACKER_LIST } from "../constants";
 import { AgeCheckConfigSchema } from "../lib/badges/checks/ageCheck";
 import { BottleCheckConfigSchema } from "../lib/badges/checks/bottleCheck";
 import { CategoryCheckConfigSchema } from "../lib/badges/checks/categoryCheck";
 import { EntityCheckConfigSchema } from "../lib/badges/checks/entityCheck";
 import { RegionCheckConfigSchema } from "../lib/badges/checks/regionCheck";
 
-export const BadgeTypeEnum = z.enum(BADGE_TYPE_LIST);
+export const BadgeCheckTypeEnum = z.enum(BADGE_CHECK_TYPE_LIST);
+
+export const BadgeTrackerEnum = z.enum(BADGE_TRACKER_LIST);
 
 // const BaseSchema = z.object({
 //   id: z.number(),
@@ -73,11 +75,14 @@ export const BadgeSchema = z.object({
   id: z.number(),
   name: z.string().trim().min(1, "Required"),
   maxLevel: z.number().min(1).max(100).default(25),
+  imageUrl: z.string().nullable().default(null),
+
+  // only shown to admin so badges are 'secret' to users
   checks: z
     .array(BadgeCheckSchema)
     .min(1, "At least one check is required.")
     .optional(),
-  imageUrl: z.string().nullable().default(null),
+  tracker: BadgeTrackerEnum.optional(),
 });
 
 export const BadgeInputSchema = BadgeSchema.omit({
@@ -85,6 +90,7 @@ export const BadgeInputSchema = BadgeSchema.omit({
   imageUrl: true,
 }).required({
   checks: true,
+  tracker: true,
 });
 
 export const BadgeAwardSchema = z.object({

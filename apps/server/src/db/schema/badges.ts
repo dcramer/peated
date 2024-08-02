@@ -13,10 +13,15 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
-import { BADGE_TYPE_LIST } from "../../constants";
+import { BADGE_CHECK_TYPE_LIST, BADGE_TRACKER_LIST } from "../../constants";
 import { users } from "./users";
 
-export const badgeTypeEnum = pgEnum("badge_type", BADGE_TYPE_LIST);
+export const badgeCheckTypeEnum = pgEnum("badge_type", BADGE_CHECK_TYPE_LIST);
+
+export const badgeAwardTrackedObjectType = pgEnum(
+  "badge_award_object_type",
+  BADGE_TRACKER_LIST,
+);
 
 export const badges = pgTable(
   "badges",
@@ -25,7 +30,7 @@ export const badges = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     imageUrl: text("image_url"),
     maxLevel: integer("max_level").default(50).notNull(),
-    // TODO: config can be mapped to all badge type configs
+    tracker: badgeAwardTrackedObjectType("tracker").default("bottle").notNull(),
     checks: jsonb("checks").$type<BadgeCheck[]>().default([]).notNull(),
   },
   (table) => {
@@ -78,11 +83,6 @@ export const badgeAwardsRelations = relations(badgeAwards, ({ one }) => ({
 
 export type BadgeAward = typeof badgeAwards.$inferSelect;
 export type NewBadgeAward = typeof badgeAwards.$inferInsert;
-
-export const badgeAwardTrackedObjectType = pgEnum("badge_award_object_type", [
-  "bottle",
-  "entity",
-]);
 
 export const badgeAwardTrackedObjects = pgTable(
   "badge_award_tracked_object",

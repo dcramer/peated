@@ -66,6 +66,7 @@ describe("awardAllBadgeXp", () => {
         "imageUrl": null,
         "maxLevel": 1,
         "name": "Test",
+        "tracker": "bottle",
       }
     `);
   });

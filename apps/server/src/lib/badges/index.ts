@@ -1,5 +1,3 @@
-import type { BadgeType } from "../../types";
-
 import type { SQL } from "drizzle-orm";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -15,15 +13,22 @@ import {
   tastings,
   type Badge,
 } from "../../db/schema";
+import type { BadgeCheckType, BadgeTracker } from "../../types";
 import { AgeCheck } from "./checks/ageCheck";
+import type { Check } from "./checks/base";
 import { BottleCheck } from "./checks/bottleCheck";
 import { CategoryCheck } from "./checks/categoryCheck";
 import { EntityCheck } from "./checks/entityCheck";
 import { EveryTastingCheck } from "./checks/everyTastingCheck";
 import { RegionCheck } from "./checks/regionCheck";
+import type { Tracker } from "./trackers/base";
+import { BottleTracker } from "./trackers/bottle";
+import { CountryTracker } from "./trackers/country";
+import { EntityTracker } from "./trackers/entity";
+import { RegionTracker } from "./trackers/region";
 import { type TastingWithRelations, type TrackedObject } from "./types";
 
-export function getBadgeImpl(type: BadgeType) {
+export function getCheckImpl(type: BadgeCheckType): Check {
   switch (type) {
     case "age":
       return new AgeCheck();
@@ -39,7 +44,22 @@ export function getBadgeImpl(type: BadgeType) {
       return new EveryTastingCheck();
 
     default:
-      throw new Error(`Invalid badge type: ${type}`);
+      throw new Error(`Invalid type: ${type}`);
+  }
+}
+
+export function getTrackerImpl(type: BadgeTracker): Tracker {
+  switch (type) {
+    case "bottle":
+      return new BottleTracker();
+    case "entity":
+      return new EntityTracker();
+    case "region":
+      return new RegionTracker();
+    case "country":
+      return new CountryTracker();
+    default:
+      throw new Error(`Invalid type: ${type}`);
   }
 }
 
@@ -73,7 +93,7 @@ export async function rescanBadge(badge: Badge) {
 
   const checks = await Promise.all(
     badge.checks.map(async ({ type, config }) => {
-      const impl = getBadgeImpl(type);
+      const impl = getCheckImpl(type);
       return {
         impl,
         type,
@@ -154,8 +174,8 @@ export async function rescanBadge(badge: Badge) {
 }
 
 // TODO: make this type safe
-export async function checkBadgeConfig(type: BadgeType, config: unknown) {
-  const impl = getBadgeImpl(type);
+export async function checkBadgeConfig(type: BadgeCheckType, config: unknown) {
+  const impl = getCheckImpl(type);
   return await impl.parseConfig(config);
 }
 
@@ -168,7 +188,7 @@ async function awardXp(
 
   const checks = await Promise.all(
     badge.checks.map(async ({ type, config }) => {
-      const impl = getBadgeImpl(type);
+      const impl = getCheckImpl(type);
       return {
         impl,
         type,
@@ -183,10 +203,12 @@ async function awardXp(
       console.info(`[badges] Badge ${badge.id} did not test successfully.`);
       return;
     }
-    for (const t of check.impl.track(check.config, tasting)) {
-      if (!trackedObjects.find((o) => o.type === t.type && o.id === t.id)) {
-        trackedObjects.push(t);
-      }
+  }
+
+  const tracker = getTrackerImpl(badge.tracker);
+  for (const t of tracker.track(tasting)) {
+    if (!trackedObjects.find((o) => o.type === t.type && o.id === t.id)) {
+      trackedObjects.push(t);
     }
   }
 

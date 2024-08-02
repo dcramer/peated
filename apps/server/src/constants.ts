@@ -37,13 +37,20 @@ export const EXTERNAL_SITE_TYPE_LIST = [
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
 
-export const BADGE_TYPE_LIST = [
+export const BADGE_CHECK_TYPE_LIST = [
   "age",
   "bottle",
   "entity",
   "region",
   "category",
   "everyTasting",
+] as const;
+
+export const BADGE_TRACKER_LIST = [
+  "bottle",
+  "entity",
+  "country",
+  "region",
 ] as const;
 
 // https://whiskeytrends.com/whiskey-tasting-terminology/

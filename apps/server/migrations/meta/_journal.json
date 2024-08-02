@@ -981,6 +981,13 @@
       "when": 1722563264938,
       "tag": "0139_many_miss_america",
       "breakpoints": false
+    },
+    {
+      "idx": 140,
+      "version": "7",
+      "when": 1722622684309,
+      "tag": "0140_outgoing_bruce_banner",
+      "breakpoints": false
     }
   ]
 }

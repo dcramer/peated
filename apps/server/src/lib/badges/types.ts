@@ -15,4 +15,7 @@ export type TastingWithRelations = Tasting & {
   };
 };
 
-export type TrackedObject = { type: "bottle" | "entity"; id: number };
+export type TrackedObject = {
+  type: "bottle" | "entity" | "country" | "region";
+  id: number;
+};

@@ -1,11 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BADGE_TYPE_LIST } from "@peated/server/constants";
+import {
+  BADGE_CHECK_TYPE_LIST,
+  BADGE_TRACKER_LIST,
+} from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { BadgeCheckInputSchema } from "@peated/server/schemas";
 import { BadgeCheckSchema, BadgeInputSchema } from "@peated/server/schemas";
-import type { BadgeCheck, BadgeType } from "@peated/server/types";
+import type { BadgeCheck, BadgeCheckType } from "@peated/server/types";
 import { type Badge } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
@@ -16,12 +19,13 @@ import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
 import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
 import Button from "../button";
 import Form from "../form";
 import ImageField from "../imageField";
 import Legend from "../legend";
+import SelectField from "../selectField";
 import AgeCheckConfigForm from "./badgeConfigForms/ageCheckConfigForm";
 import BottleCheckConfigForm from "./badgeConfigForms/bottleCheckConfigForm";
 import CategoryCheckConfigForm from "./badgeConfigForms/categoryCheckConfigForm";
@@ -51,6 +55,7 @@ export default function BadgeForm({
   edit?: boolean;
 }) {
   const {
+    control,
     register,
     handleSubmit,
     setValue,
@@ -142,13 +147,40 @@ export default function BadgeForm({
             error={errors.maxLevel}
           />
         </Fieldset>
+
+        <Fieldset>
+          <Controller
+            name="tracker"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                label="Tracker"
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: toTitleCase(value),
+                      }
+                    : undefined
+                }
+                options={BADGE_TRACKER_LIST.map((t) => ({
+                  id: t,
+                  name: toTitleCase(t),
+                }))}
+                simple
+              />
+            )}
+          />
+        </Fieldset>
       </Form>
 
       <div className="mb-4 mt-4 border-y border-slate-800 sm:rounded sm:border">
         <Legend title="Checks" />
         <div className="mb-8 mt-4 flex flex-wrap items-center gap-2 px-5">
           <div className="font-bold">Add:</div>
-          {BADGE_TYPE_LIST.map((t) => {
+          {BADGE_CHECK_TYPE_LIST.map((t) => {
             return (
               <Button
                 color="primary"
@@ -249,7 +281,7 @@ export default function BadgeForm({
                       </div>
                     </div>
                     {renderBadgeConfig({
-                      badgeType: check.type,
+                      checkType: check.type,
                       onChange: (data) => {
                         setValue(
                           "checks",
@@ -286,15 +318,15 @@ export default function BadgeForm({
 }
 
 function renderBadgeConfig({
-  badgeType,
+  checkType,
   initialData,
   onChange,
 }: {
-  badgeType: BadgeType;
+  checkType: BadgeCheckType;
   onChange: (data: Record<string, any>) => void;
   initialData: Record<string, any>;
 }) {
-  switch (badgeType) {
+  switch (checkType) {
     case "age":
       return (
         <AgeCheckConfigForm onChange={onChange} initialData={initialData} />
