@@ -280,15 +280,6 @@ test("creates a new tasting with badge award", async ({
   expect(data.awards.length).toEqual(1);
   expect(data.awards[0].badge).toMatchInlineSnapshot(`
     {
-      "checks": [
-        {
-          "config": {
-            "maxAge": 10,
-            "minAge": 5,
-          },
-          "type": "age",
-        },
-      ],
       "id": 1,
       "imageUrl": "http://localhost:4000/images/foobar.png",
       "maxLevel": 10,

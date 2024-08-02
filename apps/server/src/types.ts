@@ -2,8 +2,9 @@ import type { z } from "zod";
 import type {
   BadgeAwardSchema,
   BadgeCheckSchema,
+  BadgeCheckTypeEnum,
   BadgeSchema,
-  BadgeTypeEnum,
+  BadgeTrackerEnum,
   BottleSchema,
   CaskFillEnum,
   CaskSizeEnum,
@@ -49,7 +50,8 @@ export type CaskSize = z.infer<typeof CaskSizeEnum>;
 export type CaskFill = z.infer<typeof CaskFillEnum>;
 
 export type ExternalSiteType = z.infer<typeof ExternalSiteTypeEnum>;
-export type BadgeType = z.infer<typeof BadgeTypeEnum>;
+export type BadgeCheckType = z.infer<typeof BadgeCheckTypeEnum>;
+export type BadgeTracker = z.infer<typeof BadgeTrackerEnum>;
 
 export type EntityType = z.infer<typeof EntityTypeEnum>;
 export type ObjectType = z.infer<typeof ObjectTypeEnum>;

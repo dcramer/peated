@@ -74,6 +74,8 @@ export default function Page({
       <Heading as="h3">Implementation</Heading>
 
       <DefinitionList>
+        <DefinitionList.Term>Tracker</DefinitionList.Term>
+        <DefinitionList.Details>{badge.tracker}</DefinitionList.Details>
         <DefinitionList.Term>Config</DefinitionList.Term>
         <DefinitionList.Details>
           <pre className="font-mono">

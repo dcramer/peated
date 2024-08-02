@@ -18,7 +18,9 @@ export const BadgeSerializer = serializer({
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
-      ...(currentUser?.admin ? { checks: item.checks } : {}),
+      ...(currentUser?.admin
+        ? { checks: item.checks, tracker: item.tracker }
+        : {}),
     };
   },
 });
