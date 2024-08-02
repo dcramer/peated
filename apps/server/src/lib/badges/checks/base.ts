@@ -6,8 +6,6 @@ export type CheckConfigSchema = Record<string, any>;
 export abstract class Check {
   schema: null | CheckConfigSchema = null;
 
-  maxLevel = 25;
-
   abstract track(
     config: CheckConfigSchema,
     tasting: TastingWithRelations,
