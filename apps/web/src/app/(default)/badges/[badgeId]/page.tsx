@@ -1,6 +1,8 @@
 import BadgeImage from "@peated/web/components/badgeImage";
 import BetaNotice from "@peated/web/components/betaNotice";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { Suspense } from "react";
+import Leaderboard from "./leaderboard";
 
 export async function generateMetadata({
   params: { badgeId },
@@ -40,6 +42,10 @@ export default async function Page({
         </div>
       </div>
       <BetaNotice>This page is under construction.</BetaNotice>
+
+      <Suspense>
+        <Leaderboard badgeId={badge.id} />
+      </Suspense>
     </>
   );
 }

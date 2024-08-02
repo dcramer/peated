@@ -11,6 +11,7 @@ import badgeById from "./routes/badgeById";
 import badgeCreate from "./routes/badgeCreate";
 import badgeList from "./routes/badgeList";
 import badgeUpdate from "./routes/badgeUpdate";
+import badgeUserList from "./routes/badgeUserList";
 import bottleAliasDelete from "./routes/bottleAliasDelete";
 import bottleAliasList from "./routes/bottleAliasList";
 import bottleAliasUpdate from "./routes/bottleAliasUpdate";
@@ -124,6 +125,7 @@ export const appRouter = router({
   badgeCreate,
   badgeList,
   badgeUpdate,
+  badgeUserList,
   bottleById,
   bottleCreate,
   bottleDelete,
