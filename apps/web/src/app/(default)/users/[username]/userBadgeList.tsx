@@ -14,7 +14,7 @@ export function UserBadgeList({ userId }: { userId: number }) {
 
   return (
     <div className="flex justify-center lg:justify-start">
-      <ul className="scrollbar-none flex gap-2 overflow-x-scroll">
+      <ul className="scrollbar-none flex gap-2 overflow-x-scroll lg:flex-wrap lg:overflow-x-auto">
         {awardList.results.map((award) => {
           return (
             <li
