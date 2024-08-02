@@ -567,6 +567,7 @@ export const Badge = async (
     .insert(badges)
     .values({
       name: faker.word.noun(),
+      tracker: "bottle",
       checks: [
         {
           type: "category",
@@ -575,7 +576,7 @@ export const Badge = async (
           },
         },
       ],
-      ...(data as Omit<dbSchema.NewBadge, "name" | "checks">),
+      ...(data as Omit<dbSchema.NewBadge, "name" | "checks" | "bottle">),
     })
     .returning();
   if (!result) throw new Error("Unable to create Badge fixture");
