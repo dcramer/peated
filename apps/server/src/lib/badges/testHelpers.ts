@@ -5,10 +5,12 @@ export async function createTastingForBadge(
   fixtures: typeof Fixtures,
   {
     brand,
+    bottler,
     distillers = [],
     ...bottleData
   }: Omit<Partial<NewBottle>, "id" | "brandId"> & {
     distillers?: Entity[];
+    bottler?: Entity | null;
     brand?: Entity;
   } = {},
 ) {
@@ -17,6 +19,7 @@ export async function createTastingForBadge(
     name: "A",
     ...bottleData,
     brandId: brand.id,
+    bottlerId: bottler ? bottler.id : null,
     distillerIds: distillers.map((d) => d.id),
   });
   const tasting = await fixtures.Tasting({

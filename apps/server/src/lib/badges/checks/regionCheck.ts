@@ -6,7 +6,7 @@ import {
 import { sql } from "drizzle-orm";
 import { z } from "zod";
 import type { TastingWithRelations } from "../types";
-import { BaseBottleCheck } from "./base";
+import { Check } from "./base";
 
 // TODO: validate params
 export const RegionCheckConfigSchema = z.object({
@@ -14,7 +14,7 @@ export const RegionCheckConfigSchema = z.object({
   region: z.number().nullable().default(null),
 });
 
-export class RegionCheck extends BaseBottleCheck {
+export class RegionCheck extends Check {
   schema = RegionCheckConfigSchema;
 
   buildWhereClause(config: z.infer<typeof RegionCheckConfigSchema>) {
