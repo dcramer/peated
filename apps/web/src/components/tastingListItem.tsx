@@ -98,8 +98,8 @@ export default function TastingListItem({
   const canToast = !hasToasted && !isTaster && user;
 
   return (
-    <li className="-mt-1 flex flex-col gap-y-2 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
-      <div className="flex items-center space-x-4 px-3 sm:px-5 sm:py-4">
+    <li className="-mt-1 flex flex-col gap-y-4 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
+      <div className="flex items-center space-x-4 px-3 pt-3 lg:px-5 lg:pt-5">
         <UserAvatar size={32} user={tasting.createdBy} />
         <div className="flex-auto space-y-1 font-semibold">
           <Link
@@ -109,7 +109,7 @@ export default function TastingListItem({
             {tasting.createdBy.username}
           </Link>
         </div>
-        <div className="flex flex-col items-end gap-y-2">
+        <div className="flex flex-col items-end">
           <Link href={`/tastings/${tasting.id}`} className="hover:underline">
             <TimeSince
               className="font-muted block text-sm"
@@ -152,7 +152,7 @@ export default function TastingListItem({
         tasting.rating ||
         tasting.tags.length > 0) && (
         <div className="text-muted px-3 text-sm sm:px-5">
-          <DefinitionList className="grid-cols grid grid-cols-2 gap-y-4 sm:grid-cols-2">
+          <DefinitionList className="grid-cols grid grid-cols-2 sm:grid-cols-2">
             {tasting.rating && (
               <div>
                 <DefinitionList.Term>Rating</DefinitionList.Term>
@@ -221,7 +221,7 @@ export default function TastingListItem({
         </ul>
       )}
 
-      <aside className="flex items-center space-x-3 px-3 py-3 sm:px-5 sm:pb-4">
+      <aside className="flex items-center space-x-3 px-3 pb-3 lg:px-5 lg:pb-5">
         <Button
           icon={
             <HandThumbUpIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />

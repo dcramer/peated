@@ -53,7 +53,7 @@ export default function TastingCommentForm({
           }}
         >
           <Fieldset>
-            <FormField className="border border-slate-700">
+            <FormField className="border border-slate-800">
               <label htmlFor="comment" className="sr-only">
                 Add your comment
               </label>
@@ -82,7 +82,7 @@ export default function TastingCommentForm({
             </FormField>
           </Fieldset>
 
-          <div className="absolute inset-x-0 bottom-0 z-10 flex justify-between py-2 pl-3 pr-2">
+          <div className="absolute inset-x-0 bottom-0 z-10 flex justify-between px-4 py-3">
             <div className="flex-shrink-0">
               <Button type="submit" color="primary" disabled={saving}>
                 Post Comment
