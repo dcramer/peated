@@ -12,7 +12,7 @@ export function UserBadgeList({ userId }: { userId: number }) {
   if (!awardList.results) return null;
 
   return (
-    <ul className="flex gap-2">
+    <ul className="flex flex-wrap gap-2">
       {awardList.results.map((award) => {
         return (
           <li
