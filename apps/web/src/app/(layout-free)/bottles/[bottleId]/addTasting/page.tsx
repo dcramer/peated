@@ -67,7 +67,8 @@ export default function AddTasting({
         }
         if (tasting) {
           for (const award of awards) {
-            if (award.level != award.prevLevel) {
+            // TODO: show "Youve discovered" flow for level 0 badges
+            if (award.level != award.prevLevel && award.level) {
               flash(
                 <div className="relative flex flex-row items-center gap-x-3">
                   <Link

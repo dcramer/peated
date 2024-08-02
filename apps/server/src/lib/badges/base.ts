@@ -62,5 +62,5 @@ export function defaultCalculateLevel(
     requiredXp += a * Math.pow(level, 2) + b * level + c;
   }
 
-  return level;
+  return level - 1;
 }
