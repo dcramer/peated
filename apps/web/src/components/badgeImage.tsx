@@ -31,7 +31,7 @@ export default function BadgeImage({
   level?: number;
   size?: number;
 }) {
-  const isMaxLevel = true || level === badge.maxLevel;
+  const isMaxLevel = level === badge.maxLevel;
 
   if (!badge.imageUrl)
     return <PlaceholderBadgeImage size={size} isMaxLevel={isMaxLevel} />;

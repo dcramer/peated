@@ -108,7 +108,7 @@ export default async function Layout({
         <EmptyActivity>This users profile is private.</EmptyActivity>
       ) : (
         <>
-          <div className="mb-4 px-3 lg:mb-8">
+          <div className="mb-4 px-3 lg:mb-8 lg:px-0">
             <UserBadgeList userId={user.id} />
           </div>
           <div className="grid-cols mb-4 hidden grid-cols-1 gap-4 px-3 lg:grid lg:grid-cols-2 lg:px-0">

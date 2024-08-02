@@ -212,7 +212,8 @@ export default function TastingListItem({
                 />
                 <BadgeImage badge={award.badge} level={award.level} size={16} />
                 <div className="text-muted inline-block text-xs group-hover:underline">
-                  <strong>{award.badge.name}</strong> level {award.level}
+                  <strong className="font-bold">{award.badge.name}</strong>{" "}
+                  level {award.level}
                 </div>
               </li>
             );
