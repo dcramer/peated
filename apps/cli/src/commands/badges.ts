@@ -1,7 +1,8 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { badgeAwards, badges } from "@peated/server/db/schema";
-import { getFormulaImpl, rescanBadge } from "@peated/server/lib/badges";
+import { rescanBadge } from "@peated/server/lib/badges";
+import { getFormula } from "@peated/server/lib/badges/formula";
 import { and, eq } from "drizzle-orm";
 
 const subcommand = program.command("badges");
@@ -35,7 +36,7 @@ subcommand
     });
 
     for (const award of awardQuery) {
-      const formula = getFormulaImpl(award.badge.formula);
+      const formula = getFormula(award.badge.formula);
       const level = formula(award.xp, award.badge.maxLevel) ?? award.level;
       if (award.level !== level) {
         console.log(

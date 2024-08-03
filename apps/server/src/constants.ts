@@ -37,7 +37,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
 
-export const BADGE_FORMULA_LIST = ["default", "linear"] as const;
+export const BADGE_FORMULA_LIST = ["default", "linear", "fibonacci"] as const;
 
 export const BADGE_CHECK_TYPE_LIST = [
   "age",
