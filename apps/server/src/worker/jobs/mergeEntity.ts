@@ -71,6 +71,12 @@ export default async function mergeEntity({
           fromBottleIds: [bottle.id],
           db: tx,
         });
+      } else {
+        // there was no conflict so lets udate it
+        await tx
+          .update(bottles)
+          .set({ brandId: toEntity.id })
+          .where(eq(bottles.id, bottle.id));
       }
     }
 

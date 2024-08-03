@@ -89,3 +89,37 @@ test("merge duplicate bottle", async ({ fixtures }) => {
   expect(newBottleB).toBeDefined();
   expect(newBottleB.name).toEqual("Duplicate");
 });
+
+test("merge unique bottle", async ({ fixtures }) => {
+  const entityA = await fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
+  const bottleA = await fixtures.Bottle({
+    brandId: entityA.id,
+    name: "Unique",
+  });
+  const entityB = await fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
+  const bottleB = await fixtures.Bottle({
+    brandId: entityB.id,
+    name: "More Unique",
+  });
+
+  await mergeEntity({
+    fromEntityIds: [entityA.id],
+    toEntityId: entityB.id,
+  });
+
+  const [newBottleA] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottleA.id));
+  expect(newBottleA).toBeDefined();
+  expect(newBottleA.brandId).toEqual(entityB.id);
+  expect(newBottleA.name).toEqual("Unique");
+
+  const [newBottleB] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottleB.id));
+  expect(newBottleB).toBeDefined();
+  expect(newBottleB.brandId).toEqual(entityB.id);
+  expect(newBottleB.name).toEqual("More Unique");
+});
