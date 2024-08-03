@@ -115,7 +115,7 @@ export default function BottleSelector({
                     }}
                     className="flex min-w-0 flex-auto flex-col justify-center text-left font-semibold text-white"
                   >
-                    <div className="font-bold">
+                    <div className="flex items-center gap-x-1 font-bold">
                       {bottle.fullName}
                       {bottle.releaseYear ? (
                         <span className="text-muted">
