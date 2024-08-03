@@ -52,12 +52,6 @@ export async function bottleAliasUpdate({
     });
   }
 
-  if (newAlias.bottleId && data.name) {
-    await pushUniqueJob("IndexBottleSearchVectors", {
-      bottleId: newAlias.bottleId,
-    });
-  }
-
   return {
     name: newAlias.name,
     createdAt: newAlias.createdAt.toISOString(),
