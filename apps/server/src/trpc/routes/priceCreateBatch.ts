@@ -68,6 +68,8 @@ export default adminProcedure
           })
           .onConflictDoNothing();
 
+        const ignored = !!name.match(/ (bundle|gifting set)$/i);
+
         if (bottleId) {
           await upsertBottleAlias(tx, name, bottleId);
         } else {
@@ -75,7 +77,7 @@ export default adminProcedure
             .insert(bottleAliases)
             .values({
               name,
-              ignored: name.toLowerCase().endsWith(" bundle"),
+              ignored,
             })
             .onConflictDoNothing();
         }
