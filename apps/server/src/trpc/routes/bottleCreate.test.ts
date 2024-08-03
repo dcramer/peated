@@ -1,13 +1,14 @@
 import { FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
   bottles,
   bottlesToDistillers,
   changes,
   entities,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -556,4 +557,38 @@ test("saves release year", async ({ defaults, fixtures }) => {
     .where(eq(bottles.id, data.id));
 
   expect(newBottle.releaseYear).toEqual(2024);
+});
+
+test("creating a new bottle with a new alias does not mess with unrelated aliases", async ({
+  fixtures,
+  defaults,
+}) => {
+  const otherAlias = await fixtures.BottleAlias({ name: "A", bottleId: null });
+
+  const caller = createCaller({ user: defaults.user });
+  const data = await caller.bottleCreate({
+    name: "Delicious Wood",
+    brand: {
+      name: "Cool Cats",
+    },
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [{ bottle, brand }] = await db
+    .select({ bottle: bottles, brand: entities })
+    .from(bottles)
+    .innerJoin(entities, eq(entities.id, bottles.brandId))
+    .where(eq(bottles.id, data.id));
+
+  expect(bottle.name).toEqual("Delicious Wood");
+
+  const [newOtherAlias] = await db
+    .select()
+    .from(bottleAliases)
+    .where(
+      eq(sql`LOWER(${bottleAliases.name})`, otherAlias.name.toLowerCase()),
+    );
+  expect(newOtherAlias).toBeDefined();
+  expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
 });

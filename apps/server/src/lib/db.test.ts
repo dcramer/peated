@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { bottleAliases } from "../db/schema";
 import { upsertBottleAlias } from "./db";
@@ -19,7 +19,7 @@ describe("upsertBottleAlias", () => {
       .select()
       .from(bottleAliases)
       .where(
-        sql`LOWER(${bottleAliases.name}) = ${otherAlias.name.toLowerCase()}`,
+        eq(sql`LOWER(${bottleAliases.name})`, otherAlias.name.toLowerCase()),
       );
     expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
   });
@@ -38,7 +38,7 @@ describe("upsertBottleAlias", () => {
       .select()
       .from(bottleAliases)
       .where(
-        sql`LOWER(${bottleAliases.name}) = ${otherAlias.name.toLowerCase()}`,
+        eq(sql`LOWER(${bottleAliases.name})`, otherAlias.name.toLowerCase()),
       );
     expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
   });
@@ -57,7 +57,7 @@ describe("upsertBottleAlias", () => {
       .select()
       .from(bottleAliases)
       .where(
-        sql`LOWER(${bottleAliases.name}) = ${otherAlias.name.toLowerCase()}`,
+        eq(sql`LOWER(${bottleAliases.name})`, otherAlias.name.toLowerCase()),
       );
     expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
   });
@@ -76,7 +76,7 @@ describe("upsertBottleAlias", () => {
       .select()
       .from(bottleAliases)
       .where(
-        sql`LOWER(${bottleAliases.name}) = ${otherAlias.name.toLowerCase()}`,
+        eq(sql`LOWER(${bottleAliases.name})`, otherAlias.name.toLowerCase()),
       );
     expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
   });
@@ -97,7 +97,7 @@ describe("upsertBottleAlias", () => {
       .select()
       .from(bottleAliases)
       .where(
-        sql`LOWER(${bottleAliases.name}) = ${otherAlias.name.toLowerCase()}`,
+        eq(sql`LOWER(${bottleAliases.name})`, otherAlias.name.toLowerCase()),
       );
     expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
   });
