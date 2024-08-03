@@ -162,7 +162,7 @@ export async function bottleCreate({
       })
       .where(
         and(
-          eq(sql`LOWER(${alias.name})`, alias.name.toLowerCase()),
+          eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
           isNull(bottleAliases.bottleId),
         ),
       )
