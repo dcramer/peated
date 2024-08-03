@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import type { BottleAlias } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottles,
@@ -28,32 +29,39 @@ export default modProcedure.input(BottleAliasSchema).mutation(async function ({
     });
   }
 
-  const newAlias = await db.transaction(async (tx) => {
+  const [newAlias, isNew] = await db.transaction(async (tx) => {
     const existingAlias = await tx.query.bottleAliases.findFirst({
       where: eq(sql`LOWER(${bottleAliases.name})`, input.name.toLowerCase()),
     });
+    let newAlias: BottleAlias | undefined = undefined;
+    let isNew = false;
     if (existingAlias?.bottleId === input.bottle) {
       if (existingAlias.name !== input.name) {
         // case change
-        await tx
+        [newAlias] = await tx
           .update(bottleAliases)
           .set({ name: input.name })
-          .where(eq(bottleAliases.name, existingAlias.name));
+          .where(eq(bottleAliases.name, existingAlias.name))
+          .returning();
       }
       // we're good - likely renaming to an alias that already existed
     } else if (!existingAlias) {
-      await tx.insert(bottleAliases).values({
-        name: input.name,
-        bottleId: input.bottle,
-      });
-      return input.name;
+      [newAlias] = await tx
+        .insert(bottleAliases)
+        .values({
+          name: input.name,
+          bottleId: input.bottle,
+        })
+        .returning();
+      isNew = true;
     } else if (!existingAlias.bottleId) {
-      await tx
+      [newAlias] = await tx
         .update(bottleAliases)
         .set({
           bottleId: input.bottle,
         })
-        .where(and(eq(bottleAliases.name, existingAlias.name)));
+        .where(and(eq(bottleAliases.name, existingAlias.name)))
+        .returning();
     } else {
       throw new Error(
         `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
@@ -73,11 +81,20 @@ export default modProcedure.input(BottleAliasSchema).mutation(async function ({
         bottleId: input.bottle,
       })
       .where(eq(sql`LOWER(${reviews.name})`, input.name.toLowerCase()));
+
+    return [newAlias, isNew];
   });
 
-  if (newAlias) {
+  if (!newAlias) {
+    throw new TRPCError({
+      message: "Failed to save alias.",
+      code: "INTERNAL_SERVER_ERROR",
+    });
+  }
+
+  if (isNew) {
     try {
-      await pushJob("OnBottleAliasChange", { name: newAlias });
+      await pushJob("OnBottleAliasChange", { name: newAlias.name });
     } catch (err) {
       logError(err, {
         bottle: {
@@ -85,6 +102,12 @@ export default modProcedure.input(BottleAliasSchema).mutation(async function ({
         },
       });
     }
+  }
+
+  if (newAlias.bottleId) {
+    await pushJob("IndexBottleSearchVectors", {
+      bottleId: newAlias.bottleId,
+    });
   }
 
   return {};
