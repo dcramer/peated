@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { entityAliases } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -42,7 +42,9 @@ export default modProcedure.input(z.string()).mutation(async function ({
     .where(eq(sql`LOWER(${entityAliases.name})`, alias.name.toLowerCase()));
 
   if (alias.entity) {
-    await pushJob("IndexEntitySearchVectors", { entityId: alias.entity.id });
+    await pushUniqueJob("IndexEntitySearchVectors", {
+      entityId: alias.entity.id,
+    });
   }
 
   return {};

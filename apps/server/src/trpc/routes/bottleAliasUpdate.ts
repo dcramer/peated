@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleAliases } from "@peated/server/db/schema";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -48,6 +49,12 @@ export async function bottleAliasUpdate({
     throw new TRPCError({
       message: "Failed to update alias.",
       code: "INTERNAL_SERVER_ERROR",
+    });
+  }
+
+  if (newAlias.bottleId && data.name) {
+    await pushUniqueJob("IndexBottleSearchVectors", {
+      bottleId: newAlias.bottleId,
     });
   }
 

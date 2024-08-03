@@ -8,7 +8,7 @@ import {
 } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
 import { BottleAliasSchema } from "@peated/server/schemas";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { modProcedure } from "..";
@@ -105,7 +105,7 @@ export default modProcedure.input(BottleAliasSchema).mutation(async function ({
   }
 
   if (newAlias.bottleId) {
-    await pushJob("IndexBottleSearchVectors", {
+    await pushUniqueJob("IndexBottleSearchVectors", {
       bottleId: newAlias.bottleId,
     });
   }
