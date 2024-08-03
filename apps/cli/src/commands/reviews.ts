@@ -1,9 +1,10 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { reviews } from "@peated/server/db/schema";
+import { bottleAliases, reviews } from "@peated/server/db/schema";
+import { findBottleId } from "@peated/server/lib/bottleFinder";
+import { upsertBottleAlias } from "@peated/server/lib/db";
+import { normalizeBottle } from "@peated/server/lib/normalize";
 import { asc, eq } from "drizzle-orm";
-import { findBottleId } from "../../../server/src/lib/bottleFinder";
-import { normalizeBottle } from "../../../server/src/lib/normalize";
 
 const subcommand = program.command("reviews");
 
@@ -58,3 +59,29 @@ subcommand
       offset += step;
     }
   });
+
+subcommand.command("backfill-aliases").action(async (options) => {
+  const step = 1000;
+  const baseQuery = db.select().from(reviews).orderBy(asc(reviews.id));
+
+  let hasResults = true;
+  let offset = 0;
+  while (hasResults) {
+    hasResults = false;
+    const query = await baseQuery.offset(offset).limit(step);
+    for (const price of query) {
+      if (price.bottleId) {
+        await upsertBottleAlias(db, price.name, price.bottleId);
+      } else {
+        await db
+          .insert(bottleAliases)
+          .values({
+            name: price.name,
+          })
+          .onConflictDoNothing();
+      }
+      hasResults = true;
+    }
+    offset += step;
+  }
+});
