@@ -111,7 +111,7 @@ export default function Page() {
               Assigned{" "}
               <strong className="font-bold">{unmatchedBottle.name}</strong> to{" "}
               <Link href={`/bottles/${bottle.id}`} className="underline">
-                {bottle.name}
+                {bottle.fullName}
               </Link>
             </div>,
           );
