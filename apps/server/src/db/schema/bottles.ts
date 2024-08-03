@@ -33,6 +33,14 @@ type TastingNotes = {
   finish: string;
 };
 
+/**
+ * A bottle represents a series of a specific bottling. For example, Laphroaig 10
+ * would have a single bottle representing it and all editions (such as a limited release)
+ *
+ * As another example, a bottle that has an annual release has a single bottle representation
+ * such as My Cool Whisky, and then a bottleEdition for each unique release, such as My Cool
+ * Whisky 2020, My Cool Whisky 2021, etc.
+ */
 export const bottles = pgTable(
   "bottle",
   {
@@ -50,13 +58,18 @@ export const bottles = pgTable(
       () => entities.id,
     ),
     statedAge: smallint("stated_age"),
+    caskStrength: boolean("cask_strength"),
+    singleCask: boolean("single_cask"),
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
+    // TODO: all of this is going into editions
+    // Editions
     vintageYear: smallint("vintage_year"),
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
     releaseYear: smallint("release_year"),
+    // /Editions
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
@@ -150,6 +163,74 @@ export const bottlesToDistillersRelations = relations(
 
 export type BottlesToDistillers = typeof bottlesToDistillers.$inferSelect;
 export type NewBottlesToDistillers = typeof bottlesToDistillers.$inferInsert;
+
+export const bottleEditions = pgTable(
+  "bottle_edition",
+  {
+    // these are identical in use to the bottle table
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    searchVector: tsvector("search_vector"),
+
+    vintageYear: smallint("vintage_year"),
+    caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
+    caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
+    caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
+    releaseYear: smallint("release_year"),
+    bottleYear: smallint("bottle_year"),
+    // naturalColor: boolean("natural_color"),
+    // chillFiltered: boolean("chill_filtered"),
+    // availability
+
+    tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
+    suggestedTags: varchar("suggested_tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
+
+    avgRating: doublePrecision("avg_rating"),
+    totalTastings: bigint("total_tastings", { mode: "number" })
+      .default(0)
+      .notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+  },
+  (table) => {
+    return {
+      searchVectorIndex: index("bottle_search_idx").using(
+        "gin",
+        table.searchVector,
+      ),
+      createdById: index("bottle_created_by_idx").on(table.createdById),
+    };
+  },
+);
+
+export const bottleEditionsRelations = relations(
+  bottleEditions,
+  ({ one, many }) => ({
+    bottle: one(bottles, {
+      fields: [bottleEditions.bottleId],
+      references: [bottles.id],
+    }),
+    bottlesToDistillers: many(bottlesToDistillers),
+    createdBy: one(users, {
+      fields: [bottleEditions.createdById],
+      references: [users.id],
+    }),
+  }),
+);
+
+export type BottleEdition = typeof bottleEditions.$inferSelect;
+export type NewBottleEdition = typeof bottleEditions.$inferInsert;
 
 export const bottleTags = pgTable(
   "bottle_tag",
