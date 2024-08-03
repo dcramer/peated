@@ -40,9 +40,6 @@ export const bottles = pgTable(
     fullName: varchar("full_name", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
 
-    // md5(lower(fullName), vintageYear)
-    uniqHash: varchar("uniq_hash", { length: 32 }).notNull(),
-
     searchVector: tsvector("search_vector"),
 
     category: categoryEnum("category"),

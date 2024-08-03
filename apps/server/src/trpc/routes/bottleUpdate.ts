@@ -1,13 +1,11 @@
 import { db } from "@peated/server/db";
-import type { Bottle, Entity } from "@peated/server/db/schema";
+import type { Entity } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottles,
   bottlesToDistillers,
   changes,
   entities,
 } from "@peated/server/db/schema";
-import { generateUniqHash } from "@peated/server/lib/bottleHash";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
@@ -232,10 +230,6 @@ export async function bottleUpdate({
       }`;
     }
 
-    const bottleUpdateData: Omit<Partial<Bottle>, "uniqHash"> = {
-      ...bottleData,
-    };
-
     // bottles ae unique on aliases, so if an alias exists that is bound to
     // another bottle, that means this bottle already exists
     //
@@ -262,12 +256,6 @@ export async function bottleUpdate({
             .update(bottles)
             .set({
               ...bottleData,
-              uniqHash: generateUniqHash({
-                fullName: bottle.fullName,
-                vintageYear: bottle.vintageYear,
-                releaseYear: bottle.releaseYear,
-                ...bottleUpdateData,
-              }),
               updatedAt: sql`NOW()`,
             })
             .where(eq(bottles.id, bottle.id))

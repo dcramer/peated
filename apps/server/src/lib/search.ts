@@ -15,7 +15,7 @@ export function buildEntitySearchVector(
 }
 
 export function buildBottleSearchVector(
-  bottle: Omit<NewBottle, "uniqHash">,
+  bottle: NewBottle,
   brand: NewEntity,
   aliasList?: NewBottleAlias[],
   bottler?: NewEntity,

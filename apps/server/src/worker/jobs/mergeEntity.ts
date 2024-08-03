@@ -6,14 +6,12 @@ import {
   entityAliases,
   entityTombstones,
 } from "@peated/server/db/schema";
-import { generateUniqHash } from "@peated/server/lib/bottleHash";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { ConflictError } from "@peated/server/trpc/errors";
 import { pushUniqueJob, runJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 // TODO: this should happen async
 export default async function mergeEntity({

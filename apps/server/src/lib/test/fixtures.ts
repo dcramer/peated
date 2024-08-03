@@ -36,7 +36,6 @@ import {
   users,
 } from "../../db/schema";
 import { createAccessToken, generatePasswordHash } from "../auth";
-import { generateUniqHash } from "../bottleHash";
 import { mapRows } from "../db";
 import { formatBottleName } from "../format";
 import { normalizeBottle } from "../normalize";
@@ -330,7 +329,7 @@ export const Bottle = async (
 
     const name = data.name ?? chooseBottleName();
 
-    const bottleData: Omit<dbSchema.NewBottle, "uniqHash"> = {
+    const bottleData: dbSchema.NewBottle = {
       category: choose([...CATEGORY_LIST, null, null]),
       statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
       createdAt: new Date(),
@@ -374,7 +373,6 @@ export const Bottle = async (
       .values({
         ...bottleData,
         searchVector,
-        uniqHash: generateUniqHash(bottleData),
       })
       .returning();
 

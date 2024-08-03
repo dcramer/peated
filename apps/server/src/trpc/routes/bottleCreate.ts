@@ -6,7 +6,6 @@ import {
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
-import { generateUniqHash } from "@peated/server/lib/bottleHash";
 import {
   coerceToUpsert,
   upsertBottleAlias,
@@ -119,15 +118,13 @@ export async function bottleCreate({
         distillerIds.push(distUpsert.id);
       }
 
-    const bottleInsertData: Omit<NewBottle, "uniqHash"> = {
+    const bottleInsertData: NewBottle = {
       ...bottleData,
       brandId: brand.id,
       bottlerId: bottler?.id || null,
       createdById: user.id,
       fullName: `${brand.shortName || brand.name} ${bottleData.name}`,
     };
-
-    const uniqHash = generateUniqHash(bottleInsertData);
 
     // bottles ae unique on aliases, so if an alias exists that is bound to
     // another bottle, that means this bottle already exists
@@ -149,10 +146,7 @@ export async function bottleCreate({
 
     const [bottle] = await tx
       .insert(bottles)
-      .values({
-        ...bottleInsertData,
-        uniqHash,
-      })
+      .values(bottleInsertData)
       .returning();
 
     const [newAlias] = await tx
@@ -199,13 +193,6 @@ export async function bottleCreate({
 
     return bottle;
   });
-
-  if (!bottle) {
-    throw new TRPCError({
-      message: "Failed to create bottle.",
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  }
 
   try {
     await pushJob("OnBottleChange", { bottleId: bottle.id });

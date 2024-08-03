@@ -9,7 +9,6 @@ import {
 import { createCaller } from "@peated/server/trpc/router";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
-import { generateUniqHash } from "../../../server/src/lib/bottleHash";
 import { normalizeBottle } from "../../../server/src/lib/normalize";
 
 const subcommand = program.command("bottles");
@@ -62,26 +61,23 @@ subcommand
           values.releaseYear = releaseYear;
 
         if (Object.values(values).length !== 0) {
-          values.uniqHash = generateUniqHash({
-            vintageYear,
-            releaseYear,
-            fullName: bottle.fullName,
-            ...values,
-          });
           console.log(`M: ${bottle.fullName} -> ${JSON.stringify(values)}`);
           if (!options.dryRun) {
-            await db.update(bottles).set(values).where(eq(bottles.id, id));
-            if (values.fullName || values.vintageYear || values.releaseYear) {
-              const aliasName = formatBottleName({
-                vintageYear,
-                releaseYear,
-                fullName: bottle.fullName,
-                ...values,
-              });
-              await db
-                .insert(bottleAliases)
-                .values({ name: aliasName, bottleId: id });
-            }
+            // TODO: doesnt handle conflicts - maybe this should just call bottleUpdate
+            await db.transaction(async (tx) => {
+              await tx.update(bottles).set(values).where(eq(bottles.id, id));
+              if (values.fullName || values.vintageYear || values.releaseYear) {
+                const aliasName = formatBottleName({
+                  vintageYear,
+                  releaseYear,
+                  fullName: bottle.fullName,
+                  ...values,
+                });
+                await tx
+                  .insert(bottleAliases)
+                  .values({ name: aliasName, bottleId: id });
+              }
+            });
           }
         }
         hasResults = true;
@@ -185,64 +181,6 @@ subcommand
           });
         }
       }
-    }
-  });
-
-subcommand
-  .command("fix-hashes")
-  .argument("[bottleIds...]")
-  .description("Fix bottle unique hashes")
-  .action(async (bottleIds) => {
-    const step = 1000;
-    const baseQuery = db
-      .select()
-      .from(bottles)
-      .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
-      .orderBy(asc(bottles.id));
-
-    let hasResults = true;
-    let offset = 0;
-    while (hasResults) {
-      hasResults = false;
-      const query = await baseQuery.offset(offset).limit(step);
-      for (const bottle of query) {
-        const uniqHash = generateUniqHash(bottle);
-        if (bottle.uniqHash !== uniqHash) {
-          console.log(`Updating hash for Bottle ${bottle.id}.`);
-          try {
-            await db.transaction(async (tx) => {
-              await tx
-                .update(bottles)
-                .set({
-                  uniqHash,
-                })
-                .where(eq(bottles.id, bottle.id));
-            });
-          } catch (err) {
-            console.error(
-              `Unable to update hash for ${bottle.id}. Merging instead.`,
-              err,
-            );
-            const [existingBottle] = await db
-              .select()
-              .from(bottles)
-              .where(eq(bottles.uniqHash, uniqHash));
-            if (existingBottle.id > bottle.id) {
-              await runJob("MergeBottle", {
-                toBottleId: bottle.id,
-                fromBottleIds: [existingBottle.id],
-              });
-            } else {
-              await runJob("MergeBottle", {
-                toBottleId: existingBottle.id,
-                fromBottleIds: [bottle.id],
-              });
-            }
-          }
-        }
-        hasResults = true;
-      }
-      offset += step;
     }
   });
 
