@@ -68,7 +68,7 @@ export default adminProcedure
           })
           .onConflictDoNothing();
 
-        const ignored = !!name.match(/ (bundle|gifting set)$/i);
+        const ignored = !!name.match(/ (bundle|gifting set|\d+ pack)$/i);
 
         if (bottleId) {
           await upsertBottleAlias(tx, name, bottleId);
