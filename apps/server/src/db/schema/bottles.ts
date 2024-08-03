@@ -60,7 +60,12 @@ export const bottles = pgTable(
     statedAge: smallint("stated_age"),
     caskStrength: boolean("cask_strength"),
     singleCask: boolean("single_cask"),
+
+    // TODO: tbd on if this needs to go into edition
     flavorProfile: flavorProfileEnum("flavor_profile"),
+
+    description: text("description"),
+    descriptionSrc: contentSourceEnum("description_src"),
 
     // TODO: all of this is going into editions
     // Editions
@@ -69,12 +74,9 @@ export const bottles = pgTable(
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
     releaseYear: smallint("release_year"),
+    tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
     // /Editions
 
-    description: text("description"),
-    descriptionSrc: contentSourceEnum("description_src"),
-
-    tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
     suggestedTags: varchar("suggested_tags", { length: 64 })
       .array()
       .default(sql`array[]::varchar[]`)
@@ -176,6 +178,9 @@ export const bottleEditions = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     searchVector: tsvector("search_vector"),
 
+    // the suffix, if available, for this edition
+    editionName: varchar("edition_name"),
+
     vintageYear: smallint("vintage_year"),
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
@@ -205,11 +210,12 @@ export const bottleEditions = pgTable(
   },
   (table) => {
     return {
-      searchVectorIndex: index("bottle_search_idx").using(
+      bottleId: index("bottle_edition_bottle_idx").on(table.bottleId),
+      searchVectorIndex: index("bottle_edition_search_idx").using(
         "gin",
         table.searchVector,
       ),
-      createdById: index("bottle_created_by_idx").on(table.createdById),
+      createdById: index("bottle_edition_created_by_idx").on(table.createdById),
     };
   },
 );
@@ -264,6 +270,9 @@ export const bottleAliases = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
+    editionId: bigint("edition_id", { mode: "number" }).references(
+      () => bottleEditions.id,
+    ),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),
     // ignored is used to hide this alias from matches
@@ -277,6 +286,7 @@ export const bottleAliases = pgTable(
         sql`LOWER(${table.name})`,
       ),
       bottleIdx: index("bottle_alias_bottle_idx").on(table.bottleId),
+      editionIdx: index("bottle_alias_edition_idx").on(table.editionId),
     };
   },
 );

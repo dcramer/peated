@@ -53,6 +53,8 @@ type NormalizedBottle = {
   statedAge: number | null;
   vintageYear: number | null;
   releaseYear: number | null;
+  caskStrength?: boolean | null;
+  singleCask?: boolean | null;
 };
 
 export function normalizeBottle({
@@ -60,12 +62,16 @@ export function normalizeBottle({
   statedAge = null,
   vintageYear = null,
   releaseYear = null,
+  caskStrength = null,
+  singleCask = null,
   isFullName = true,
 }: {
   name: string;
   statedAge?: number | null;
   vintageYear?: number | null;
   releaseYear?: number | null;
+  caskStrength?: boolean | null;
+  singleCask?: boolean | null;
   isFullName?: boolean;
 }): NormalizedBottle {
   // try to ease UX and normalize common name components
@@ -75,6 +81,8 @@ export function normalizeBottle({
       statedAge,
       vintageYear,
       releaseYear,
+      caskStrength,
+      singleCask,
     };
 
   const currentYear = new Date().getFullYear();
@@ -96,6 +104,22 @@ export function normalizeBottle({
   const match = name.match(/\b(\d{1,2})-year-old($|\s|,)/i);
   if (!statedAge && match) {
     statedAge = parseInt(match[1], 10);
+  }
+
+  if (
+    name.match(
+      /\bCask Strength|Barrel Strength|Barrel Proof|Full Proof|Natural Strength|Original Strength|Undiluted\b/i,
+    )
+  ) {
+    caskStrength = true;
+  }
+
+  if (
+    name.match(
+      /\Single Cask|Single Barrel|Cask No.?|Cask Number|Barrel No.?|Barrel Number|Selected Cask\b/i,
+    )
+  ) {
+    singleCask = true;
   }
 
   // detect vintage - always keep this in the bottle name as its key to the identity
