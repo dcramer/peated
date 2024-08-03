@@ -65,7 +65,7 @@ export default adminProcedure
       if (bottleId) {
         await upsertBottleAlias(tx, name, bottleId);
       } else {
-        await db
+        await tx
           .insert(bottleAliases)
           .values({
             name,
