@@ -121,6 +121,7 @@ subcommand.command("backfill-aliases").action(async (options) => {
           .insert(bottleAliases)
           .values({
             name: price.name,
+            ignored: price.hidden,
           })
           .onConflictDoNothing();
       }
