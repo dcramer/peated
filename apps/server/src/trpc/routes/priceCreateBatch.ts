@@ -75,6 +75,7 @@ export default adminProcedure
             .insert(bottleAliases)
             .values({
               name,
+              ignored: name.toLowerCase().endsWith(" bundle"),
             })
             .onConflictDoNothing();
         }
