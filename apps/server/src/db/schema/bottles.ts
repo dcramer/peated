@@ -166,25 +166,39 @@ export const bottlesToDistillersRelations = relations(
 export type BottlesToDistillers = typeof bottlesToDistillers.$inferSelect;
 export type NewBottlesToDistillers = typeof bottlesToDistillers.$inferInsert;
 
+/**
+ * Bottle Editions can be thought of as instances of bottles. That is, a bottle is
+ * the primary grouping mechanism, and all actual versions of a bottle exist as an
+ * edition.
+ *
+ * Their uniqueness is tied to BottleAlias, but its effectively the editionName, which
+ * within aliases will also include the releaseYear or vintageYear. Different bottlings in
+ * the same year should have different names if they're truly different.
+ *
+ * They are _not_ unique on cask information (as that should be described with edition name).
+ */
 export const bottleEditions = pgTable(
   "bottle_edition",
   {
-    // these are identical in use to the bottle table
     id: bigserial("id", { mode: "number" }).primaryKey(),
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    fullName: varchar("full_name", { length: 255 }).notNull(),
+    // TODO: see if we cant remove name...
+    // identical in use to the bottle table
     name: varchar("name", { length: 255 }).notNull(),
-    searchVector: tsvector("search_vector"),
-
     // the suffix, if available, for this edition
     editionName: varchar("edition_name"),
+    // [branndName] [bottleName] [editionName]
+    fullName: varchar("full_name", { length: 255 }).notNull(),
 
-    vintageYear: smallint("vintage_year"),
+    searchVector: tsvector("search_vector"),
+
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
+
+    vintageYear: smallint("vintage_year"),
     releaseYear: smallint("release_year"),
     bottleYear: smallint("bottle_year"),
     // naturalColor: boolean("natural_color"),

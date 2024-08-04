@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import type { Bottle, Entity, NewBottle } from "@peated/server/db/schema";
+import type {
+  Bottle,
+  Entity,
+  NewBottle,
+  NewBottleEdition,
+} from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottles,
@@ -26,6 +31,13 @@ import { type Context } from "../context";
 import { ConflictError } from "../errors";
 import { bottleNormalize } from "./bottlePreview";
 
+/**
+ * Creating a bottle is a somewhat complex process, as it also manages the specific editions of
+ * the bottle.
+ *
+ * That is, effectively this endpoint is "bottleEditionCreate", but it implicitly creates that
+ * entry and keeps the root bottle in sync as needed.
+ */
 export async function bottleCreate({
   input,
   ctx,
@@ -117,6 +129,12 @@ export async function bottleCreate({
         distillerList.push(distUpsert.result);
         distillerIds.push(distUpsert.id);
       }
+
+    const bottleEditionData: Omit<NewBottleEdition, "bottleId"> = {
+      ...bottleData,
+      createdById: user.id,
+      fullName: `${brand.shortName || brand.name} ${bottleData.name}${bottleData.editionName || ""}`,
+    };
 
     const bottleInsertData: NewBottle = {
       ...bottleData,
