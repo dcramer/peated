@@ -7,6 +7,7 @@ import type {
 } from "@peated/server/db/schema";
 import {
   bottleAliases,
+  bottleEditions,
   bottles,
   bottlesToDistillers,
   changes,
@@ -144,22 +145,21 @@ export async function bottleCreate({
       fullName: `${brand.shortName || brand.name} ${bottleData.name}`,
     };
 
-    // bottles ae unique on aliases, so if an alias exists that is bound to
-    // another bottle, that means this bottle already exists
-    //
-    // 1. look for an existing hash
-    // 2. if it doesnt exist, or it doesnt have a bottleId, we can create this bottle
-    // 3. finally persist the bottleId to the new hash
-    //
-    // in all of these scenarios we need to run constraint checks
+    // bottles editions are unique on aliases
+
+    // 1. find an existing alias matching this _full edition name_
+    // 2. or find an existing alias matching this _bottle name_ without the edition
+    // 3. or create a new bottle, as well as the edition, and the two related aliases
     const aliasName = formatBottleName(bottleInsertData);
     const alias = await upsertBottleAlias(tx, aliasName);
-    if (alias.bottleId) {
-      const [existingBottle] = await tx
+    if (alias.editionId) {
+      const [existingBottlEdition] = await tx
         .select()
-        .from(bottles)
-        .where(eq(bottles.id, alias.bottleId));
-      throw new ConflictError(existingBottle);
+        .from(bottleEditions)
+        .where(eq(bottleEditions.id, alias.editionId));
+      throw new ConflictError(existingBottlEdition);
+    } else if (alias.bottleId) {
+      throw new Error("Not Implemented");
     }
 
     const [bottle] = await tx
