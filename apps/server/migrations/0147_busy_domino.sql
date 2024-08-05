@@ -1,0 +1,1 @@
+ALTER TABLE "bottle_edition" DROP COLUMN IF EXISTS "name";

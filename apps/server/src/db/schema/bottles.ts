@@ -184,9 +184,6 @@ export const bottleEditions = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    // TODO: see if we cant remove name...
-    // identical in use to the bottle table
-    name: varchar("name", { length: 255 }).notNull(),
     // the suffix, if available, for this edition
     editionName: varchar("edition_name"),
     // [branndName] [bottleName] [editionName]

@@ -1,5 +1,5 @@
 import { formatCategoryName } from "@peated/server/lib/format";
-import type { Bottle } from "@peated/server/types";
+import type { Bottle, BottleEdition } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import Link from "@peated/web/components/link";
 import BottleMetadata from "./bottleMetadata";
@@ -7,9 +7,11 @@ import PageHeader from "./pageHeader";
 
 export default function BottleHeader({
   bottle,
+  edition,
   href,
 }: {
   bottle: Bottle;
+  edition?: BottleEdition;
   href?: string;
 }) {
   return (
@@ -32,16 +34,16 @@ export default function BottleHeader({
               {bottle.name}
             </div>
           )}
-          {bottle.releaseYear ? (
-            <span className="text-muted">({bottle.releaseYear} Release)</span>
-          ) : bottle.vintageYear ? (
-            <span className="text-muted">({bottle.vintageYear} Vintage)</span>
+          {edition?.releaseYear ? (
+            <span className="text-muted">({edition?.releaseYear} Release)</span>
+          ) : edition?.vintageYear ? (
+            <span className="text-muted">({edition?.vintageYear} Vintage)</span>
           ) : null}
         </div>
       }
       titleExtra={
         <BottleMetadata
-          data={bottle}
+          data={{ ...bottle, ...edition }}
           className="text-muted w-full truncate text-center lg:text-left"
         />
       }

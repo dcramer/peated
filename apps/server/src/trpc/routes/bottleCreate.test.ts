@@ -2,14 +2,27 @@ import { FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleEditions,
   bottles,
   bottlesToDistillers,
   changes,
   entities,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
+import type { ObjectType } from "@peated/server/types";
 import { and, eq, sql } from "drizzle-orm";
 import { createCaller } from "../router";
+
+async function expectChange(objectType: ObjectType, objectId: number) {
+  const changeList = await db
+    .select()
+    .from(changes)
+    .where(
+      and(eq(changes.objectType, objectType), eq(changes.objectId, objectId)),
+    );
+  expect(changeList.length).toBe(1);
+  return changeList[0];
+}
 
 test("requires authentication", async () => {
   const caller = createCaller({ user: null });
@@ -33,12 +46,12 @@ test("creates a new bottle with minimal params", async ({
     brand: brand.id,
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toBeDefined();
   expect(bottle.statedAge).toBeNull();
@@ -63,12 +76,11 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
     flavorProfile: FLAVOR_PROFILES[0],
   });
 
-  expect(data.id).toBeDefined();
-
+  expect(data.bottle.id).toBeDefined();
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
   expect(bottle.name).toEqual("Delicious Wood 12-year-old");
   expect(bottle.brandId).toEqual(brand.id);
   expect(bottle.statedAge).toEqual(12);
@@ -81,13 +93,19 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
   expect(distillers.length).toBe(1);
   expect(distillers[0].distillerId).toEqual(distiller.id);
 
-  const changeList = await db
-    .select({ change: changes })
-    .from(changes)
-    .where(eq(changes.createdById, defaults.user.id));
+  expect(data.edition.id).toBeDefined();
+  const [edition] = await db
+    .select()
+    .from(bottleEditions)
+    .where(eq(bottleEditions.id, data.edition.id));
+  expect(edition.editionName).toBeNull();
+  expect(edition.createdById).toBe(defaults.user.id);
 
-  expect(changeList.length).toBe(1);
-  expect(changeList[0].change.objectId).toBe(bottle.id);
+  const bottleChange = await expectChange("bottle", bottle.id);
+  expect(bottleChange.createdById).toEqual(defaults.user.id);
+
+  const editionChange = await expectChange("bottle_edition", edition.id);
+  expect(editionChange.createdById).toEqual(defaults.user.id);
 });
 
 test("does not create a new bottle with invalid brandId", async ({
@@ -118,13 +136,13 @@ test("creates a new bottle with existing brand name", async ({
     },
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
-  const [{ bottle, brand }] = await db
+  const [{ bottle }] = await db
     .select({ bottle: bottles, brand: entities })
     .from(bottles)
     .innerJoin(entities, eq(entities.id, bottles.brandId))
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
 
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toEqual(existingBrand.id);
@@ -163,13 +181,13 @@ test("creates a new bottle with new brand name", async ({
     },
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
   const [{ bottle, brand }] = await db
     .select({ bottle: bottles, brand: entities })
     .from(bottles)
     .innerJoin(entities, eq(entities.id, bottles.brandId))
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
 
   expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toBeDefined();
@@ -234,12 +252,12 @@ test("creates a new bottle with existing distiller name", async ({
     ],
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
   expect(bottle.name).toEqual("Delicious Wood");
 
   const distillers = await db
@@ -285,12 +303,12 @@ test("creates a new bottle with new distiller name", async ({
     ],
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
   expect(bottle.name).toEqual("Delicious Wood");
 
   const distillers = await db
@@ -337,12 +355,12 @@ test("creates a new bottle with new distiller name and brand name", async ({
     ],
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
   expect(bottle.name).toEqual("Delicious Wood");
 
   const distillers = await db
@@ -395,12 +413,12 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
     ],
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
   expect(bottle.name).toEqual("Delicious Wood");
 
   const distillers = await db
@@ -446,12 +464,12 @@ test("updates statedAge bottle w/ age signal", async ({
     brand: brand.id,
     distillers: [distiller.id],
   });
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
   expect(bottle.statedAge).toEqual(12);
 });
 
@@ -463,12 +481,12 @@ test("removes duplicated brand name", async ({ defaults, fixtures }) => {
     brand: brand.id,
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id));
   expect(bottle.name).toEqual("Yum Yum");
 });
 
@@ -485,12 +503,12 @@ test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {
     brand: brand.id,
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
   const dList = await db
     .select()
     .from(bottlesToDistillers)
-    .where(eq(bottlesToDistillers.bottleId, data.id));
+    .where(eq(bottlesToDistillers.bottleId, data.bottle.id));
   expect(dList.length).toEqual(1);
   expect(dList[0].distillerId).toEqual(distiller.id);
 });
@@ -507,16 +525,16 @@ test("saves cask information", async ({ defaults, fixtures }) => {
     caskFill: "1st_fill",
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.edition.id).toBeDefined();
 
-  const [newBottle] = await db
+  const [newEdition] = await db
     .select()
-    .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .from(bottleEditions)
+    .where(eq(bottleEditions.id, data.edition.id));
 
-  expect(newBottle.caskType).toEqual("bourbon");
-  expect(newBottle.caskSize).toEqual("hogshead");
-  expect(newBottle.caskFill).toEqual("1st_fill");
+  expect(newEdition.caskType).toEqual("bourbon");
+  expect(newEdition.caskSize).toEqual("hogshead");
+  expect(newEdition.caskFill).toEqual("1st_fill");
 });
 
 test("saves vintage information", async ({ defaults, fixtures }) => {
@@ -529,14 +547,14 @@ test("saves vintage information", async ({ defaults, fixtures }) => {
     vintageYear: 2024,
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.edition.id).toBeDefined();
 
-  const [newBottle] = await db
+  const [newEdition] = await db
     .select()
-    .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .from(bottleEditions)
+    .where(eq(bottleEditions.id, data.edition.id));
 
-  expect(newBottle.vintageYear).toEqual(2024);
+  expect(newEdition.vintageYear).toEqual(2024);
 });
 
 test("saves release year", async ({ defaults, fixtures }) => {
@@ -549,14 +567,14 @@ test("saves release year", async ({ defaults, fixtures }) => {
     releaseYear: 2024,
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.edition.id).toBeDefined();
 
-  const [newBottle] = await db
+  const [newEdition] = await db
     .select()
-    .from(bottles)
-    .where(eq(bottles.id, data.id));
+    .from(bottleEditions)
+    .where(eq(bottleEditions.id, data.edition.id));
 
-  expect(newBottle.releaseYear).toEqual(2024);
+  expect(newEdition.releaseYear).toEqual(2024);
 });
 
 test("creating a new bottle with a new alias does not mess with unrelated aliases", async ({
@@ -573,13 +591,13 @@ test("creating a new bottle with a new alias does not mess with unrelated aliase
     },
   });
 
-  expect(data.id).toBeDefined();
+  expect(data.bottle.id).toBeDefined();
 
-  const [{ bottle, brand }] = await db
-    .select({ bottle: bottles, brand: entities })
+  const [bottle] = await db
+    .select()
     .from(bottles)
-    .innerJoin(entities, eq(entities.id, bottles.brandId))
-    .where(eq(bottles.id, data.id));
+    .where(eq(bottles.id, data.bottle.id))
+    .limit(1);
 
   expect(bottle.name).toEqual("Delicious Wood");
 
@@ -590,5 +608,5 @@ test("creating a new bottle with a new alias does not mess with unrelated aliase
       eq(sql`LOWER(${bottleAliases.name})`, otherAlias.name.toLowerCase()),
     );
   expect(newOtherAlias).toBeDefined();
-  expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
+  expect(newOtherAlias.bottleId).toBeNull();
 });

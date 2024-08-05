@@ -227,7 +227,16 @@ export default function BottleForm({
             label="Bottle"
             required
             helpText="The name of the bottle."
-            placeholder="e.g. 12-year-old"
+            placeholder="e.g. Twelve"
+          />
+
+          <TextField
+            {...register("editionName")}
+            error={errors.editionName}
+            type="text"
+            label="Edition"
+            helpText="The edition name of the bottle, if applicable."
+            placeholder="e.g. 225th Anniversary or 2015 Release"
           />
 
           <TextField

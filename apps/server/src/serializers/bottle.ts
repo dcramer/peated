@@ -2,7 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import type { Bottle, Flight, User } from "../db/schema";
+import type { Bottle, BottleEdition, Flight, User } from "../db/schema";
 import {
   bottlesToDistillers,
   collectionBottles,
@@ -11,6 +11,7 @@ import {
   tastings,
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
+import type { BottleEditionSchema } from "../schemas";
 import { type BottleSchema } from "../schemas";
 import { EntitySerializer } from "./entity";
 
@@ -151,20 +152,120 @@ export const BottleSerializer = serializer({
       fullName: item.fullName,
 
       category: item.category,
-      description: item.description,
-      flavorProfile: item.flavorProfile,
-      tastingNotes: item.tastingNotes,
-
       statedAge: item.statedAge,
-      vintageYear: item.vintageYear,
-      caskType: item.caskType,
-      caskFill: item.caskFill,
-      caskSize: item.caskSize,
-      releaseYear: item.releaseYear,
+      caskStrength: item.caskStrength,
+      singleCask: item.singleCask,
 
       brand: attrs.brand,
       distillers: attrs.distillers,
       bottler: attrs.bottler,
+
+      description: item.description,
+      flavorProfile: item.flavorProfile,
+      tastingNotes: item.tastingNotes,
+
+      avgRating: item.avgRating,
+      totalTastings: item.totalTastings,
+      suggestedTags: item.suggestedTags,
+      isFavorite: attrs.isFavorite,
+      hasTasted: attrs.hasTasted,
+
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.createdAt.toISOString(),
+    };
+  },
+});
+
+export const BottleEditionSerializer = serializer({
+  attrs: async (
+    itemList: BottleEdition[],
+    currentUser?: User,
+    context?: Context,
+  ): Promise<Record<number, Attrs>> => {
+    const itemIds = itemList.map((t) => t.id);
+
+    const favoriteSet = currentUser
+      ? new Set(
+          (
+            await db
+              .selectDistinct({ id: collectionBottles.bottleId })
+              .from(collectionBottles)
+              .innerJoin(
+                collections,
+                eq(collectionBottles.collectionId, collections.id),
+              )
+              .where(
+                and(
+                  inArray(collectionBottles.bottleId, itemIds),
+                  eq(collections.name, "Default"),
+                  eq(collections.createdById, currentUser.id),
+                ),
+              )
+          ).map((r) => r.id),
+        )
+      : new Set();
+
+    // identify bottles which have a tasting recorded for the current user
+    // note: this is contextual based on the query - if they're asking for a flight,
+    // said flight should be available in the context and this will reflect
+    // if they've recorded a tasting _in that context_
+    const tastedSet = currentUser
+      ? new Set(
+          (context?.flight
+            ? await db
+                .selectDistinct({ id: tastings.bottleId })
+                .from(tastings)
+                .where(
+                  and(
+                    inArray(tastings.bottleId, itemIds),
+                    eq(tastings.flightId, context.flight.id),
+                    eq(tastings.createdById, currentUser.id),
+                  ),
+                )
+            : await db
+                .selectDistinct({ id: tastings.bottleId })
+                .from(tastings)
+                .where(
+                  and(
+                    inArray(tastings.bottleId, itemIds),
+                    eq(tastings.createdById, currentUser.id),
+                  ),
+                )
+          ).map((r) => r.id),
+        )
+      : new Set();
+
+    return Object.fromEntries(
+      itemList.map((item) => {
+        return [
+          item.id,
+          {
+            isFavorite: favoriteSet.has(item.id),
+            hasTasted: tastedSet.has(item.id),
+          },
+        ];
+      }),
+    );
+  },
+
+  item: (
+    item: BottleEdition,
+    attrs: Attrs,
+    currentUser?: User,
+    context?: Context,
+  ): z.infer<typeof BottleEditionSchema> => {
+    return {
+      id: item.id,
+      editionName: item.editionName,
+      fullName: item.fullName,
+
+      caskType: item.caskType,
+      caskFill: item.caskFill,
+      caskSize: item.caskSize,
+      vintageYear: item.vintageYear,
+      releaseYear: item.releaseYear,
+      bottleYear: item.bottleYear,
+
       avgRating: item.avgRating,
       totalTastings: item.totalTastings,
       suggestedTags: item.suggestedTags,

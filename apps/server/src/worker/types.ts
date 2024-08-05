@@ -15,6 +15,7 @@ export type JobName =
   | "NotifyDiscordOnTasting"
   | "OnBottleChange"
   | "OnBottleAliasChange"
+  | "OnBottleEditionChange"
   | "OnEntityChange"
   | "ProcessNotification"
   | "ScrapeAstorWines"

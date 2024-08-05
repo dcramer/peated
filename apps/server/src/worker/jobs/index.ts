@@ -14,7 +14,10 @@ import mergeBottle from "./mergeBottle";
 import mergeEntity from "./mergeEntity";
 import notifyDiscordOnTasting from "./notifyDiscordOnTasting";
 import onBottleAliasChange from "./onBottleAliasChange";
-import onBottleChange from "./onBottleChange";
+import {
+  default as onBottleChange,
+  default as onBottleEditionChange,
+} from "./onBottleChange";
 import onEntityChange from "./onEntityChange";
 import processNotification from "./processNotification";
 import scrapeAstorWines from "./scrapeAstorWines";
@@ -43,8 +46,9 @@ registry.add("IndexEntitySearchVectors", indexEntitySearchVectors);
 registry.add("MergeBottle", mergeBottle);
 registry.add("MergeEntity", mergeEntity);
 registry.add("NotifyDiscordOnTasting", notifyDiscordOnTasting);
-registry.add("OnBottleAliasChange", onBottleAliasChange);
 registry.add("OnBottleChange", onBottleChange);
+registry.add("OnBottleAliasChange", onBottleAliasChange);
+registry.add("OnBottleEditionChange", onBottleEditionChange);
 registry.add("OnEntityChange", onEntityChange);
 registry.add("ProcessNotification", processNotification);
 registry.add("ScrapeAstorWines", scrapeAstorWines);

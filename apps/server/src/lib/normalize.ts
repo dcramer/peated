@@ -114,6 +114,8 @@ export function normalizeBottle({
     caskStrength = true;
   }
 
+  // TODO: remove this descriptor as its not interesting to the bottle name
+  // except when its the only descriptor
   if (
     name.match(
       /\Single Cask|Single Barrel|Cask No.?|Cask Number|Barrel No.?|Barrel Number|Selected Cask\b/i,

@@ -13,7 +13,6 @@ import { UserSchema } from "./users";
 export const BottleSchema = z.object({
   id: z.number().readonly(),
   name: z.string().trim().min(1, "Required"),
-  fullName: z.string().readonly(),
 
   category: CategoryEnum.nullable().default(null),
   statedAge: z.number().min(0).max(100).nullable().default(null),
@@ -45,6 +44,8 @@ export const BottleSchema = z.object({
 
   createdBy: UserSchema.nullish().readonly(),
 
+  fullName: z.string().readonly(),
+
   isFavorite: z.boolean().optional().readonly(),
   hasTasted: z.boolean().optional().readonly(),
 });
@@ -53,9 +54,7 @@ export const BottleEditionSchema = z.object({
   id: z.number().readonly(),
   bottle: BottleSchema.optional(),
 
-  name: z.string().trim().min(1, "Required"),
   editionName: z.string().trim().nullable().default(null),
-  fullName: z.string().readonly(),
 
   caskType: CaskTypeEnum.nullable().default(null),
   caskSize: CaskSizeEnum.nullable().default(null),
@@ -79,6 +78,8 @@ export const BottleEditionSchema = z.object({
     .lte(new Date().getFullYear())
     .nullable()
     .default(null),
+
+  fullName: z.string().readonly(),
 
   avgRating: z.number().gte(0).lte(5).nullable().readonly(),
   totalTastings: z.number().gte(0).readonly(),
