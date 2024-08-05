@@ -42,4 +42,6 @@ export type TransactionType = PgTransaction<
   ExtractTablesWithRelations<typeof schema>
 >;
 
+export type AnyTransaction = TransactionType;
+
 export type AnyDatabase = DatabaseType | TransactionType;

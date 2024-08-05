@@ -11,9 +11,9 @@ import { EntityInputSchema, EntitySchema } from "./entities";
 import { UserSchema } from "./users";
 
 export const BottleSchema = z.object({
-  id: z.number(),
+  id: z.number().readonly(),
   name: z.string().trim().min(1, "Required"),
-  fullName: z.string(),
+  fullName: z.string().readonly(),
 
   category: CategoryEnum.nullable().default(null),
   statedAge: z.number().min(0).max(100).nullable().default(null),
@@ -25,8 +25,8 @@ export const BottleSchema = z.object({
   distillers: z.array(EntitySchema).default([]),
   bottler: EntitySchema.nullable().default(null),
 
-  avgRating: z.number().gte(0).lte(5).nullable(),
-  totalTastings: z.number().gte(0),
+  avgRating: z.number().gte(0).lte(5).nullable().readonly(),
+  totalTastings: z.number().gte(0).readonly(),
 
   flavorProfile: FlavorProfileEnum.nullable().default(null),
   description: z.string().nullish(),
@@ -37,8 +37,7 @@ export const BottleSchema = z.object({
       palate: z.string(),
       finish: z.string(),
     })
-    .nullable()
-    .optional(),
+    .nullish(),
   suggestedTags: z.array(z.string()).optional().readonly(),
 
   createdAt: z.string().datetime().readonly(),
@@ -51,7 +50,7 @@ export const BottleSchema = z.object({
 });
 
 export const BottleEditionSchema = z.object({
-  id: z.number(),
+  id: z.number().readonly(),
   bottle: BottleSchema.optional(),
 
   name: z.string().trim().min(1, "Required"),
@@ -90,8 +89,7 @@ export const BottleEditionSchema = z.object({
       palate: z.string(),
       finish: z.string(),
     })
-    .nullable()
-    .optional(),
+    .nullish(),
   suggestedTags: z.array(z.string()).optional().readonly(),
 
   createdAt: z.string().datetime().readonly(),
@@ -130,13 +128,24 @@ const EntityChoice = z.union([
 //   descriptionSrc: ContentSourceEnum.nullish(),
 // });
 
-export const BottleInputSchema = BottleSchema.merge(BottleEditionSchema).extend(
-  {
+export const BottleInputSchema = BottleSchema.merge(BottleEditionSchema)
+  .extend({
     brand: EntityChoice,
     distillers: z.array(EntityChoice).nullish().default(null),
     bottler: EntityChoice.nullish().default(null),
-  },
-);
+  })
+  .omit({
+    id: true,
+    fullName: true,
+    avgRating: true,
+    totalTastings: true,
+    suggestedTags: true,
+    isFavorite: true,
+    hasTasted: true,
+    createdBy: true,
+    createdAt: true,
+    updatedAt: true,
+  });
 
 //  z.object({
 //   name: z.string().trim().min(1, "Required"),

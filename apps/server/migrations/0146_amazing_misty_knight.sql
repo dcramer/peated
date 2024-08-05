@@ -1,0 +1,1 @@
+ALTER TYPE "object_type" ADD VALUE 'bottle_edition';
