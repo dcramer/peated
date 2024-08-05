@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import type { DatabaseType, TransactionType } from "../db";
+import type { AnyDatabase } from "../db";
 import type { User } from "../db/schema";
 import { follows, users } from "../db/schema";
 
@@ -19,7 +19,7 @@ import { follows, users } from "../db/schema";
 //   currentUser?: User | null | undefined,
 // ): Promise<User | null>;
 export async function getUserFromId(
-  db: DatabaseType | TransactionType,
+  db: AnyDatabase,
   userId: string | number | "me",
   currentUser?: User | null | undefined,
 ): Promise<User | null> {
@@ -43,7 +43,7 @@ export async function getUserFromId(
 }
 
 export const profileVisible = async (
-  db: DatabaseType | TransactionType,
+  db: AnyDatabase,
   user: User,
   currentUser?: User | null,
 ) => {

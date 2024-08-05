@@ -1,5 +1,5 @@
-import type { AnyDatabase, AnyTransaction } from "@peated/server/db";
-import { db as defaultDb } from "@peated/server/db";
+import type { AnyTransaction } from "@peated/server/db";
+import { db } from "@peated/server/db";
 import type {
   Bottle,
   BottleEdition,
@@ -52,13 +52,13 @@ async function createBottleAndEdition(
   userId: number,
   tx: AnyTransaction,
 ): Promise<[Bottle, BottleEdition]> {
-  const bottleEditionData: Omit<NewBottleEdition, "bottleId"> = {
+  const editionData: Omit<NewBottleEdition, "bottleId"> = {
     ...data,
     createdById: userId,
     fullName: `${brand.shortName || brand.name} ${data.name}${data.editionName || ""}`,
   };
 
-  const bottleRootData: NewBottle = {
+  const bottleData: NewBottle = {
     ...data,
     brandId: brand.id,
     bottlerId: bottler?.id || null,
@@ -72,11 +72,11 @@ async function createBottleAndEdition(
   // 2. or find an existing alias matching this _bottle name_ without the edition
   // 3. or create a new bottle, as well as the edition, and the two related aliases
   const editionAliasName = formatBottleName({
-    ...bottleRootData,
-    ...bottleEditionData,
+    ...bottleData,
+    ...editionData,
   });
-  const rootAliasName = bottleEditionData.editionName
-    ? formatBottleName(bottleRootData)
+  const rootAliasName = editionData.editionName
+    ? formatBottleName(bottleData)
     : editionAliasName;
 
   // First, test to see if this edition already exists via aliases.
@@ -94,7 +94,7 @@ async function createBottleAndEdition(
   // Edition appears new, lets see if we need to create the bottle
   // or if it exists due to another edition/alias.
   let bottleId;
-  if (bottleEditionData.editionName) {
+  if (editionData.editionName) {
     const alias = await upsertBottleAlias(tx, rootAliasName);
     bottleId = alias.bottleId;
     // TODO: should we test that the edition has no suffix here?
@@ -123,7 +123,7 @@ async function createBottleAndEdition(
     });
   }
 
-  if (bottleEditionData.editionName) {
+  if (editionData.editionName) {
     // persist root alias
     const [newAlias] = await tx
       .update(bottleAliases)
@@ -152,7 +152,7 @@ async function createBottleAndEdition(
     .insert(bottleEditions)
     .values({
       bottleId: bottle.id,
-      ...bottleEditionData,
+      ...editionData,
     })
     .returning();
 
