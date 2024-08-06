@@ -75,6 +75,8 @@ export async function bottleUpdate({
             }
           : null,
         statedAge: bottle.statedAge,
+        caskStrength: bottle.caskStrength,
+        singleCask: bottle.singleCask,
         category: bottle.category,
         distillers: bottle.bottlesToDistillers.map((d) => ({
           id: d.distiller.id,

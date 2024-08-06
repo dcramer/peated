@@ -72,8 +72,8 @@ export const BottleInputSchema = z.object({
   bottler: EntityChoice.nullish(),
 
   statedAge: z.number().min(0).max(100).nullish(),
-  caskStrength: z.boolean().nullish().default(null),
-  singleCask: z.boolean().nullish().default(null),
+  caskStrength: z.boolean().nullish(),
+  singleCask: z.boolean().nullish(),
 
   vintageYear: z.number().gte(1800).lte(new Date().getFullYear()).nullish(),
   releaseYear: z.number().gte(1800).lte(new Date().getFullYear()).nullish(),
