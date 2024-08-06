@@ -1,13 +1,13 @@
 import { sql } from "drizzle-orm";
 import { readMigrationFiles } from "drizzle-orm/migrator";
-import type { DatabaseType } from ".";
+import type { AnyConnection } from ".";
 
 export const migrate = async function ({
   db,
   fake = false,
   migrationsFolder = __dirname + "/../../migrations",
 }: {
-  db: DatabaseType;
+  db: AnyConnection;
   fake?: boolean;
   migrationsFolder?: string;
 }) {

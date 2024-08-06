@@ -12,7 +12,7 @@ import {
   FLAVOR_PROFILES,
   TAG_CATEGORIES,
 } from "../../constants";
-import type { DatabaseType } from "../../db";
+import type { AnyDatabase } from "../../db";
 import { db as dbConn } from "../../db";
 import {
   badges,
@@ -123,7 +123,7 @@ export const User = async (
   }: {
     password?: string;
   } & Partial<Omit<dbSchema.NewUser, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.User> => {
   if (!data.username)
     data.username = `${faker.internet.userName().toLowerCase()}${faker.number.int(
@@ -154,7 +154,7 @@ export const User = async (
 
 export const Follow = async (
   { ...data }: Partial<dbSchema.NewFollow> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Follow> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
@@ -173,7 +173,7 @@ export const Follow = async (
 };
 export const Country = async (
   { ...data }: Partial<dbSchema.NewCountry> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Country> => {
   if (!data.name) data.name = faker.location.country();
   data.slug = slugify(data.name as string);
@@ -208,7 +208,7 @@ export const Country = async (
 
 export const Region = async (
   { ...data }: Partial<dbSchema.NewRegion> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Region> => {
   if (!data.name) data.name = faker.location.state();
   let [result] = await db.transaction(async (tx) => {
@@ -235,7 +235,7 @@ export const Region = async (
 
 export const Entity = async (
   { ...data }: Partial<Omit<dbSchema.NewEntity, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Entity> => {
   const name = data.name || choose(distilleryNames);
   // XXX(dcramer): not ideal
@@ -286,7 +286,7 @@ export const Entity = async (
 
 export const EntityAlias = async (
   { ...data }: Partial<dbSchema.NewEntityAlias> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.EntityAlias> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
@@ -310,7 +310,7 @@ export const Bottle = async (
   }: Partial<Omit<dbSchema.NewBottle, "id">> & {
     distillerIds?: number[];
   } = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Bottle> => {
   return await db.transaction(async (tx) => {
     const brand = (
@@ -418,7 +418,7 @@ export const Bottle = async (
 
 export const BottleAlias = async (
   { ...data }: Partial<dbSchema.NewBottleAlias> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.BottleAlias> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
@@ -438,7 +438,7 @@ export const BottleAlias = async (
 
 export const Tasting = async (
   { ...data }: Partial<Omit<dbSchema.NewTasting, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Tasting> => {
   return await db.transaction(async (tx) => {
     const tags = [];
@@ -482,7 +482,7 @@ export const Tasting = async (
 
 export const Toast = async (
   { ...data }: Partial<Omit<dbSchema.NewToast, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Toast> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
@@ -501,7 +501,7 @@ export const Toast = async (
 
 export const Comment = async (
   { ...data }: Partial<Omit<dbSchema.NewComment, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Comment> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
@@ -531,7 +531,7 @@ export const Flight = async (
       "id"
     >
   > = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Flight> => {
   return await db.transaction(async (tx) => {
     const [flight] = await tx
@@ -559,7 +559,7 @@ export const Flight = async (
 
 export const Badge = async (
   { ...data }: Partial<Omit<dbSchema.NewBadge, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Badge> => {
   const [result] = await db
     .insert(badges)
@@ -587,7 +587,7 @@ export const Badge = async (
 
 export const Event = async (
   { ...data }: Partial<Omit<dbSchema.NewEvent, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Event> => {
   const [result] = await db
     .insert(dbSchema.events)
@@ -603,7 +603,7 @@ export const Event = async (
 
 export const ExternalSite = async (
   { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
   if (!data.type) data.type = choose(EXTERNAL_SITE_TYPE_LIST);
   // XXX(dcramer): not ideal
@@ -626,7 +626,7 @@ export const ExternalSite = async (
 
 export const StorePrice = async (
   { ...data }: Partial<Omit<dbSchema.NewStorePrice, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.StorePrice> => {
   return await db.transaction(async (tx) => {
     if (!data.name) {
@@ -691,7 +691,7 @@ export const StorePrice = async (
 
 export const StorePriceHistory = async (
   { ...data }: Partial<Omit<dbSchema.NewStorePriceHistory, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.StorePriceHistory> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
@@ -714,7 +714,7 @@ export const StorePriceHistory = async (
 
 export const Review = async (
   { ...data }: Partial<Omit<dbSchema.NewReview, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Review> => {
   const [result] = await db.transaction(async (tx) => {
     if (!data.name) {
@@ -749,7 +749,7 @@ export const Review = async (
 
 export const Collection = async (
   { ...data }: Partial<Omit<dbSchema.NewCollection, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Collection> => {
   const [result] = await db
     .insert(collections)
@@ -765,7 +765,7 @@ export const Collection = async (
 
 export const Tag = async (
   { ...data }: Partial<Omit<dbSchema.NewTag, "id">> = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Tag> => {
   const name = data.name || faker.word.adjective().toLowerCase();
 
@@ -793,7 +793,7 @@ export const Tag = async (
 
 export const AuthToken = async (
   { user }: { user?: dbSchema.User | null } = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ): Promise<string> => {
   return await createAccessToken(user ?? (await User({}, db)));
 };
@@ -808,7 +808,7 @@ export const AuthenticatedHeaders = async (
     mod?: boolean;
     admin?: boolean;
   } = {},
-  db: DatabaseType = dbConn,
+  db: AnyDatabase = dbConn,
 ) => {
   if (!user && admin) {
     user = await User({ admin: true });

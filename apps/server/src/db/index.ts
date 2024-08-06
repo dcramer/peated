@@ -34,12 +34,12 @@ export const db = drizzle(pool, {
   logger: config.DEBUG,
 });
 
-export type DatabaseType = typeof db;
+export type AnyConnection = typeof db;
 
-export type TransactionType = PgTransaction<
+export type AnyTransaction = PgTransaction<
   NodePgQueryResultHKT,
   typeof schema,
   ExtractTablesWithRelations<typeof schema>
 >;
 
-export type AnyDatabase = DatabaseType | TransactionType;
+export type AnyDatabase = AnyTransaction | AnyConnection;

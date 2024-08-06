@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import type { JwtPayload } from "jsonwebtoken";
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
-import type { DatabaseType, TransactionType } from "../db";
+import type { AnyDatabase } from "../db";
 import { db } from "../db";
 import type { NewUser, User } from "../db/schema";
 import { users } from "../db/schema";
@@ -81,7 +81,7 @@ export function generatePasswordHash(password: string) {
 }
 
 export async function createUser(
-  db: DatabaseType | TransactionType,
+  db: AnyDatabase,
   data: NewUser,
 ): Promise<User> {
   let user: User | undefined;

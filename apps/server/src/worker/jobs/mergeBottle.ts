@@ -1,8 +1,4 @@
-import {
-  db as defaultDb,
-  type DatabaseType,
-  type TransactionType,
-} from "@peated/server/db";
+import { db as defaultDb, type AnyDatabase } from "@peated/server/db";
 import {
   bottleAliases,
   bottleTags,
@@ -27,7 +23,7 @@ export default async function mergeBottle({
 }: {
   toBottleId: number;
   fromBottleIds: number[];
-  db?: DatabaseType | TransactionType;
+  db?: AnyDatabase;
 }) {
   console.log(
     `Merging bottles ${fromBottleIds.join(", ")} into ${toBottleId}.`,

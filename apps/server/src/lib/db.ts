@@ -2,7 +2,7 @@ import type { InferSelectModel, Table } from "drizzle-orm";
 import { eq, getTableColumns, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { type z } from "zod";
-import type { DatabaseType, TransactionType } from "../db";
+import type { AnyDatabase } from "../db";
 import type { BottleAlias, Entity, EntityType } from "../db/schema";
 import { bottleAliases, changes, collections, entities } from "../db/schema";
 import { type EntityInputSchema, type EntitySchema } from "../schemas";
@@ -43,7 +43,7 @@ export const upsertEntity = async ({
   userId,
   type,
 }: {
-  db: DatabaseType | TransactionType;
+  db: AnyDatabase;
   data: EntityInput;
   userId: number;
   type?: EntityType;
@@ -102,10 +102,7 @@ export const upsertEntity = async ({
   throw new Error("We should never hit this case in upsert");
 };
 
-export const getDefaultCollection = async (
-  db: DatabaseType | TransactionType,
-  userId: number,
-) => {
+export const getDefaultCollection = async (db: AnyDatabase, userId: number) => {
   return (
     (await db.query.collections.findFirst({
       where: (collections, { eq }) => eq(collections.createdById, userId),
@@ -127,7 +124,7 @@ export const getDefaultCollection = async (
 };
 
 export async function upsertBottleAlias(
-  db: DatabaseType | TransactionType,
+  db: AnyDatabase,
   name: string,
   bottleId: number | null = null,
 ) {
