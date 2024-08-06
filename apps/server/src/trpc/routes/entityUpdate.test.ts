@@ -108,6 +108,33 @@ test("can change country", async ({ fixtures }) => {
   expect(newEntity.countryId).toBe(country.id);
 });
 
+test("can remove country", async ({ fixtures }) => {
+  const region = await fixtures.Region();
+  const entity = await fixtures.Entity({
+    regionId: region.id,
+    countryId: region.countryId,
+  });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    country: null,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(newEntity.countryId).toBeNull();
+  expect(newEntity.regionId).toBeNull();
+});
+
 test("can change region", async ({ fixtures }) => {
   const entity = await fixtures.Entity();
 
@@ -135,6 +162,33 @@ test("can change region", async ({ fixtures }) => {
     omit(newEntity, "countryId", "regionId", "searchVector", "updatedAt"),
   );
   expect(newEntity.regionId).toBe(region.id);
+});
+
+test("can remove region", async ({ fixtures }) => {
+  const region = await fixtures.Region();
+  const entity = await fixtures.Entity({
+    regionId: region.id,
+    countryId: region.countryId,
+  });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    country: region.countryId,
+    region: null,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(newEntity.regionId).toBeNull();
 });
 
 test("can change type", async ({ fixtures }) => {

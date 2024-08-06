@@ -48,23 +48,33 @@ export default modProcedure
     if (input.shortName !== undefined && input.shortName !== entity.shortName) {
       data.shortName = input.shortName;
     }
-    if (input.country !== undefined && input.country) {
-      const [country] = await db
-        .select()
-        .from(countries)
-        .where(eq(countries.id, input.country))
-        .limit(1);
-      if (!country) {
-        throw new TRPCError({
-          message: "Country not found.",
-          code: "NOT_FOUND",
-        });
+
+    if (input.country) {
+      if (input.country) {
+        const [country] = await db
+          .select()
+          .from(countries)
+          .where(eq(countries.id, input.country))
+          .limit(1);
+        if (!country) {
+          throw new TRPCError({
+            message: "Country not found.",
+            code: "NOT_FOUND",
+          });
+        }
+        if (country.id !== entity.countryId) {
+          data.countryId = country.id;
+          data.regionId = null;
+        }
       }
-      if (country.id !== entity.countryId) {
-        data.countryId = country.id;
+    } else if (input.country === null) {
+      if (entity.countryId) {
+        data.countryId = null;
+        data.regionId = null;
       }
     }
-    if (input.region !== undefined && input.region) {
+
+    if (input.region) {
       const [region] = await db
         .select()
         .from(regions)
@@ -82,11 +92,17 @@ export default modProcedure
       if (region.id !== entity.regionId) {
         data.regionId = region.id;
       }
+    } else if (input.region === null) {
+      if (entity.regionId) {
+        data.regionId = null;
+      }
     }
+
     if (input.address !== undefined && input.address !== entity.address) {
       data.address = input.address;
       data.location = null;
     }
+
     if (
       input.location !== undefined &&
       (!input.location ||
