@@ -610,3 +610,25 @@ test("creating a new bottle with a new alias does not mess with unrelated aliase
   expect(newOtherAlias).toBeDefined();
   expect(newOtherAlias.bottleId).toBeNull();
 });
+
+test("tries to create a new root bottle", async ({ fixtures, defaults }) => {
+  const caller = createCaller({ user: defaults.user });
+  const brand = await fixtures.Entity();
+  await fixtures.Bottle({
+    name: "Delicious Wood",
+    brandId: brand.id,
+    category: "single_malt",
+  });
+
+  const err = await waitError(
+    caller.bottleCreate({
+      name: "Delicious Wood",
+      brand: brand.id,
+      category: "bourbon",
+    }),
+  );
+  console.error(err);
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Conflicting object already exists (ID=1).]`,
+  );
+});

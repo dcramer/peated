@@ -71,7 +71,11 @@ async function createEdition(
       .where(eq(bottleEditions.id, alias.editionId));
     throw new ConflictError(existingBottleEdition);
   } else if (alias.bottleId && alias.bottleId !== bottleId) {
-    throw new Error("Not Implemented");
+    const [existingBottle] = await tx
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, alias.bottleId));
+    throw new ConflictError(existingBottle);
   }
 
   const [edition] = await tx
@@ -222,6 +226,8 @@ async function createBottleAndEdition(
     });
   }
 
+  // determine if we're actually trying to create a child edition or not
+  // given we forced ourselves to create the parent if it didnt exist
   if (!data.editionName) {
     if (rootEditionIfNew) {
       return {
@@ -242,6 +248,13 @@ async function createBottleAndEdition(
           isNull(bottleEditions.editionName),
         ),
       );
+
+    if (!existingEdition) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Missing core edition for bottle (this is a serious bug!)",
+      });
+    }
 
     throw new ConflictError(existingEdition);
   }

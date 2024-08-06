@@ -396,6 +396,12 @@ export const Bottle = async (
       }
     }
 
+    await tx.insert(dbSchema.bottleEditions).values({
+      bottleId: bottle.id,
+      fullName: bottle.fullName,
+      createdById: bottle.createdById,
+    });
+
     await tx.insert(bottleAliases).values({
       bottleId: bottle.id,
       name: formatBottleName(bottle),
