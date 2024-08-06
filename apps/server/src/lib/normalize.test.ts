@@ -535,13 +535,13 @@ describe("normalizeBottle", () => {
 
   test("Barrel Strength Bourbon", async () => {
     const rv = normalizeBottle({
-      name: "Batch Strength Bourbon",
+      name: "Barrel Strength Bourbon",
       isFullName: false,
     });
     expect(rv).toMatchInlineSnapshot(`
       {
-        "caskStrength": null,
-        "name": "Bourbon (Batch Strength)",
+        "caskStrength": true,
+        "name": "Barrel Strength Bourbon",
         "releaseYear": null,
         "singleCask": null,
         "statedAge": null,
