@@ -64,8 +64,8 @@ export default async function scrapeSMWSA() {
 export async function scrapeBottles(
   url: string,
   cb: (
-    bottle: z.infer<typeof BottleInputSchema>,
-    price: z.infer<typeof StorePriceInputSchema> | null,
+    bottle: z.input<typeof BottleInputSchema>,
+    price: z.input<typeof StorePriceInputSchema> | null,
   ) => Promise<void>,
 ) {
   const data = await getUrl(url);
@@ -153,7 +153,9 @@ export async function scrapeBottles(
 
     await cb(
       {
-        name: `${name}${vintageYear ? ` (${vintageYear}) Vintage)` : ""}${releaseYear ? ` (${releaseYear}) Release)` : ""}`,
+        name,
+        vintageYear,
+        releaseYear,
         category: details.category,
         statedAge,
         brand: {

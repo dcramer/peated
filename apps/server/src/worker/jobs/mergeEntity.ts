@@ -45,11 +45,11 @@ export default async function mergeEntity({
     for (const bottle of bottleList) {
       // bottles are unique on alias, so we need to attempt to bind the alias,
       // and on conflict we're going to merge
-      const aliasName = formatBottleName({
+      const fullName = formatBottleName({
         ...bottle,
-        fullName: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
+        name: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
       });
-      const alias = await upsertBottleAlias(tx, aliasName, bottle.id);
+      const alias = await upsertBottleAlias(tx, fullName, bottle.id);
       // alias.bottleId is always set, but I don't want to deal w/ TS
       if (alias.bottleId && alias.bottleId !== bottle.id) {
         const [existingBottle] = await tx
@@ -73,7 +73,7 @@ export default async function mergeEntity({
         // there was no conflict so lets udate it
         await tx
           .update(bottles)
-          .set({ brandId: toEntity.id })
+          .set({ brandId: toEntity.id, fullName })
           .where(eq(bottles.id, bottle.id));
       }
     }

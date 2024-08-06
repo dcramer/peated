@@ -9,7 +9,7 @@ export const ReviewSchema = z.object({
   rating: z.number(),
   url: z.string(),
   site: ExternalSiteSchema,
-  bottle: BottleSchema.nullish(),
+  bottle: BottleSchema.nullish().default(null),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -17,7 +17,7 @@ export const ReviewSchema = z.object({
 export const ReviewInputSchema = z.object({
   site: ExternalSiteTypeEnum,
   name: z.string().trim().min(1, "Required"),
-  category: CategoryEnum.nullable().optional(),
+  category: CategoryEnum.nullable().default(null),
   rating: z.number(),
   issue: z.string().trim().min(1, "Required"),
   url: z.string().trim().min(1, "Required"),

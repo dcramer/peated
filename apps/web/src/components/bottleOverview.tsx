@@ -1,9 +1,9 @@
 "use client";
 
-import type { Bottle } from "@peated/server/types";
 import RobotImage from "@peated/web/assets/robot.png";
 import Link from "@peated/web/components/link";
 import { Suspense } from "react";
+import type { RouterOutputs } from "../lib/trpc/client";
 import BottleReviews from "./bottleReviews";
 import BottleTagDistribution from "./bottleTagDistribution";
 import CaskDetails from "./caskDetails";
@@ -13,7 +13,11 @@ import Markdown from "./markdown";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
-export default function BottleOverview({ bottle }: { bottle: Bottle }) {
+export default function BottleOverview({
+  bottle: { createdBy, ...bottle },
+}: {
+  bottle: RouterOutputs["bottleById"];
+}) {
   return (
     <>
       <div className="my-6 px-3 md:px-0">
@@ -66,7 +70,7 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
               </DefinitionList.Details>{" "}
               <DefinitionList.Term>Distilled At</DefinitionList.Term>
               <DefinitionList.Details>
-                {bottle.distillers.length > 0 ? (
+                {bottle.distillers && bottle.distillers.length > 0 ? (
                   <div className="flex space-x-2">
                     {bottle.distillers.map((d) => (
                       <Link
@@ -135,14 +139,14 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
               <>
                 <DefinitionList.Term>Added By</DefinitionList.Term>
                 <DefinitionList.Details>
-                  {bottle.createdBy ? (
+                  {createdBy ? (
                     <>
                       <Link
-                        href={`/users/${bottle.createdBy.username}`}
+                        href={`/users/${createdBy.username}`}
                         className="flex items-center gap-x-2 truncate hover:underline"
                       >
-                        <UserAvatar size={16} user={bottle.createdBy} />
-                        {bottle.createdBy.username}
+                        <UserAvatar size={16} user={createdBy} />
+                        {createdBy.username}
                       </Link>
                       {bottle.createdAt && (
                         <TimeSince date={bottle.createdAt} />
@@ -167,7 +171,7 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
   );
 }
 
-function YesNo({ value }: { value: boolean | null }) {
+function YesNo({ value }: { value: boolean | null | undefined }) {
   if (value) return "Yes";
   if (value === false) return "No";
   return <em>n/a</em>;

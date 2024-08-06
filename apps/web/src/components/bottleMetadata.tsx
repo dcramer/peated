@@ -9,25 +9,25 @@ import Tooltip from "./tooltip";
 
 type Props = {
   data: {
-    flavorProfile: string | undefined | null;
     brand: {
       id: string | number | undefined | null;
       name: string;
     };
-    distillers: {
+    distillers?: {
       id: string | number | undefined | null;
       name: string;
     }[];
-    caskFill: CaskFill | null;
-    caskSize: CaskSize | null;
-    caskType: CaskType | null;
+    caskFill?: CaskFill | null;
+    caskSize?: CaskSize | null;
+    caskType?: CaskType | null;
+    flavorProfile?: string | undefined | null;
   };
 } & ComponentPropsWithoutRef<"p">;
 
 export default function BottleMetadata({ data, ...props }: Props) {
   return (
     <div {...props} className="text-muted flex gap-x-2">
-      {data.distillers.map((d) => {
+      {data.distillers?.map((d) => {
         return (
           <Link
             key={d.id}

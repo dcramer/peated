@@ -1016,6 +1016,13 @@
       "when": 1722964094969,
       "tag": "0144_strong_tomorrow_man",
       "breakpoints": false
+    },
+    {
+      "idx": 145,
+      "version": "7",
+      "when": 1722974590404,
+      "tag": "0145_giant_silver_centurion",
+      "breakpoints": false
     }
   ]
 }

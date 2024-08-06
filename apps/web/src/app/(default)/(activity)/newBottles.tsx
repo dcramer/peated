@@ -56,7 +56,7 @@ export default function NewBottles() {
                       bottle={bottle}
                       className="font-medium hover:underline"
                     >
-                      {bottle.fullName}
+                      {bottle.brand.shortName || bottle.brand.name}
                     </BottleLink>
                     {bottle.isFavorite && (
                       <StarIcon className="h-4 w-4" aria-hidden="true" />
@@ -74,11 +74,7 @@ export default function NewBottles() {
                         {formatCategoryName(bottle.category)}
                       </Link>
                     )}
-                    {bottle.releaseYear ? (
-                      <span>({bottle.releaseYear} Release)</span>
-                    ) : bottle.vintageYear ? (
-                      <span>({bottle.vintageYear} Vintage)</span>
-                    ) : null}
+                    {!!bottle.edition && <span>({bottle.edition})</span>}
                   </div>
                 </td>
               </tr>

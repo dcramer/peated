@@ -37,7 +37,7 @@ export default function BottleTable({
                     bottle={item}
                     className="font-medium hover:underline"
                   >
-                    {item.fullName}
+                    {item.brand.shortName || item.brand.name} {item.name}
                   </BottleLink>
                   {item.isFavorite && (
                     <StarIcon className="h-4 w-4" aria-hidden="true" />
@@ -55,11 +55,7 @@ export default function BottleTable({
                       {formatCategoryName(item.category)}
                     </Link>
                   )}
-                  {item.releaseYear ? (
-                    <span>({item.releaseYear} Release)</span>
-                  ) : item.vintageYear ? (
-                    <span>({item.vintageYear} Vintage)</span>
-                  ) : null}
+                  {!!item.edition && <span>{item.edition}</span>}
                 </div>
               </div>
             );

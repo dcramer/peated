@@ -73,8 +73,8 @@ type SMWSPayload = {
 export async function scrapeBottles(
   url: string,
   cb: (
-    bottle: z.infer<typeof BottleInputSchema>,
-    price: z.infer<typeof StorePriceInputSchema>,
+    bottle: z.input<typeof BottleInputSchema>,
+    price: z.input<typeof StorePriceInputSchema>,
   ) => Promise<void>,
 ) {
   const body = await getUrl(url);
@@ -120,7 +120,9 @@ export async function scrapeBottles(
 
         await cb(
           {
-            name: `${name}${vintageYear ? ` (${vintageYear}) Vintage)` : ""}${releaseYear ? ` (${releaseYear}) Release)` : ""}`,
+            name,
+            vintageYear,
+            releaseYear,
             category: details.category,
             statedAge,
             brand: {
