@@ -11,7 +11,7 @@ test("updates totalTastings", async ({ fixtures }) => {
   await fixtures.Tasting({ bottleId: bottle1.id });
   await fixtures.Tasting({ bottleId: bottle2.id });
 
-  updateBottleStats({ bottleId: bottle1.id });
+  await updateBottleStats({ bottleId: bottle1.id });
 
   const [newBottle1] = await db
     .select()

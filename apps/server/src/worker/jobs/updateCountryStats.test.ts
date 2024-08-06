@@ -20,7 +20,7 @@ test("updates totalBottles", async ({ fixtures }) => {
   await fixtures.Bottle({ name: "C", brandId: entity3.id });
   await fixtures.Bottle({ name: "D", distillerIds: [entity1.id, entity2.id] });
 
-  updateCountryStats({ countryId: country1.id });
+  await updateCountryStats({ countryId: country1.id });
 
   const [newCountry1] = await db
     .select()
