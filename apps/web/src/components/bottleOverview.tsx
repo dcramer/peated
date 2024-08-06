@@ -96,6 +96,14 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
                   <em>unknown</em>
                 )}
               </DefinitionList.Details>
+              <DefinitionList.Term>Cask Strength?</DefinitionList.Term>
+              <DefinitionList.Details>
+                <YesNo value={bottle.caskStrength} />
+              </DefinitionList.Details>
+              <DefinitionList.Term>Single Cask?</DefinitionList.Term>
+              <DefinitionList.Details>
+                <YesNo value={bottle.singleCask} />
+              </DefinitionList.Details>
               <DefinitionList.Term>Cask Details</DefinitionList.Term>
               <DefinitionList.Details>
                 {bottle.caskFill || bottle.caskSize || bottle.caskType ? (
@@ -157,4 +165,10 @@ export default function BottleOverview({ bottle }: { bottle: Bottle }) {
       </div>
     </>
   );
+}
+
+function YesNo({ value }: { value: boolean | null }) {
+  if (value) return "Yes";
+  if (value === false) return "No";
+  return <em>n/a</em>;
 }
