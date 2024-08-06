@@ -35,6 +35,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import useAuth from "../hooks/useAuth";
 import { isTRPCClientError, trpc } from "../lib/trpc/client";
+import BooleanField from "./booleanField";
 import Button from "./button";
 import Collapsable from "./collapsable";
 import { classesForProfile } from "./flavorProfile";
@@ -351,6 +352,20 @@ export default function BottleForm({
             onCollapse={() => setShowCaskDetails(!showCaskDetails)}
           />
           <Collapsable open={showCaskDetails}>
+            <BooleanField
+              control={control}
+              label="Single Cask"
+              helpText="Is this spirit bottled from a single cask?"
+              name="singleCask"
+            />
+
+            <BooleanField
+              control={control}
+              label="Cask Strength"
+              helpText="Is this spirit bottled at Cask Strength, usually ranging from 60-65% abv?"
+              name="caskStrength"
+            />
+
             <Controller
               name="caskFill"
               control={control}
