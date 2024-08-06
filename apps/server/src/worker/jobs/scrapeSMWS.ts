@@ -138,6 +138,7 @@ export async function scrapeBottles(
             caskFill,
             caskSize,
             caskType,
+            singleCask: true,
           },
           {
             name: `SMWS ${details.name}`,

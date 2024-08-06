@@ -52,11 +52,15 @@ export const bottles = pgTable(
     statedAge: smallint("stated_age"),
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
+    singleCask: boolean("single_cask"),
+    caskStrength: boolean("cask_strength"),
+
     vintageYear: smallint("vintage_year"),
+    releaseYear: smallint("release_year"),
+
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
-    releaseYear: smallint("release_year"),
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),

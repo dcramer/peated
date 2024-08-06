@@ -29,11 +29,15 @@ export const BottleSchema = z.object({
   flavorProfile: FlavorProfileEnum.nullable(),
 
   statedAge: z.number().min(0).max(100).nullish(),
+  caskStrength: z.boolean().nullish().default(null),
+  singleCask: z.boolean().nullish().default(null),
+
+  releaseYear: z.number().gte(1800).lte(new Date().getFullYear()).nullable(),
   vintageYear: z.number().gte(1800).lte(new Date().getFullYear()).nullable(),
+
   caskType: CaskTypeEnum.nullable(),
   caskSize: CaskSizeEnum.nullable(),
   caskFill: CaskFillEnum.nullable(),
-  releaseYear: z.number().gte(1800).lte(new Date().getFullYear()).nullable(),
 
   brand: EntitySchema,
   distillers: z.array(EntitySchema),
@@ -68,11 +72,15 @@ export const BottleInputSchema = z.object({
   bottler: EntityChoice.nullish(),
 
   statedAge: z.number().min(0).max(100).nullish(),
+  caskStrength: z.boolean().nullish().default(null),
+  singleCask: z.boolean().nullish().default(null),
+
   vintageYear: z.number().gte(1800).lte(new Date().getFullYear()).nullish(),
+  releaseYear: z.number().gte(1800).lte(new Date().getFullYear()).nullish(),
+
   caskType: CaskTypeEnum.nullish(),
   caskSize: CaskSizeEnum.nullish(),
   caskFill: CaskFillEnum.nullish(),
-  releaseYear: z.number().gte(1800).lte(new Date().getFullYear()).nullish(),
 
   description: z.string().nullish(),
   descriptionSrc: ContentSourceEnum.nullish(),

@@ -167,6 +167,7 @@ export async function scrapeBottles(
         caskFill,
         caskType,
         caskSize,
+        singleCask: true,
       },
       price
         ? {
