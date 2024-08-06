@@ -48,11 +48,14 @@ export function normalizeEntityName(name: string): string {
   return name;
 }
 
+// TODO: this is no longer normalizing a bottle name, lets rethink this code
 type NormalizedBottle = {
   name: string;
   statedAge: number | null;
   vintageYear: number | null;
   releaseYear: number | null;
+  caskStrength?: boolean | null;
+  singleCask?: boolean | null;
 };
 
 export function normalizeBottle({
@@ -60,12 +63,16 @@ export function normalizeBottle({
   statedAge = null,
   vintageYear = null,
   releaseYear = null,
+  caskStrength = null,
+  singleCask = null,
   isFullName = true,
 }: {
   name: string;
   statedAge?: number | null;
   vintageYear?: number | null;
   releaseYear?: number | null;
+  caskStrength?: boolean | null;
+  singleCask?: boolean | null;
   isFullName?: boolean;
 }): NormalizedBottle {
   // try to ease UX and normalize common name components
@@ -75,6 +82,8 @@ export function normalizeBottle({
       statedAge,
       vintageYear,
       releaseYear,
+      caskStrength,
+      singleCask,
     };
 
   const currentYear = new Date().getFullYear();
@@ -144,6 +153,24 @@ export function normalizeBottle({
     }
   }
 
+  if (
+    name.match(
+      /\bCask Strength|Barrel Strength|Barrel Proof|Full Proof|Natural Strength|Original Strength|Undiluted\b/i,
+    )
+  ) {
+    caskStrength = true;
+  }
+
+  // TODO: remove this descriptor as its not interesting to the bottle name
+  // except when its the only descriptor
+  if (
+    name.match(
+      /\Single Cask|Single Barrel|Cask No.?|Cask Number|Barrel No.?|Barrel Number|Selected Cask\b/i,
+    )
+  ) {
+    singleCask = true;
+  }
+
   // move any segment thats enclaosed in quotations to the end
   name = name.replaceAll(/(^|[\s,])(\([^)]+\)),?\s(.+)$/gi, "$1 $3 $2");
 
@@ -161,7 +188,14 @@ export function normalizeBottle({
     vintageYear = null;
   }
 
-  return { name, statedAge, vintageYear, releaseYear };
+  return {
+    name,
+    statedAge,
+    vintageYear,
+    releaseYear,
+    caskStrength,
+    singleCask,
+  };
 }
 
 function convertWordToNumber(word: string) {

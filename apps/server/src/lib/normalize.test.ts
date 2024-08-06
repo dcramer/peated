@@ -242,8 +242,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "Booker's Springfield Batch Kentucky Straight Bourbon Whiskey",
         "releaseYear": null,
+        "singleCask": null,
         "statedAge": null,
         "vintageYear": null,
       }
@@ -264,8 +266,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": true,
         "name": "Redbreast Small Batch Cask Strength (Batch A)",
         "releaseYear": null,
+        "singleCask": null,
         "statedAge": null,
         "vintageYear": null,
       }
@@ -286,8 +290,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "1993 Vintage",
         "releaseYear": null,
+        "singleCask": null,
         "statedAge": null,
         "vintageYear": 1993,
       }
@@ -300,8 +306,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "1993 Release",
         "releaseYear": 1993,
+        "singleCask": null,
         "statedAge": null,
         "vintageYear": null,
       }
@@ -316,8 +324,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "Invalid Vintage",
         "releaseYear": null,
+        "singleCask": null,
         "statedAge": 23,
         "vintageYear": null,
       }
@@ -333,8 +343,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "Invalid Release",
         "releaseYear": null,
+        "singleCask": null,
         "statedAge": 10,
         "vintageYear": 2013,
       }
@@ -349,8 +361,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "Invalid Release",
         "releaseYear": 2013,
+        "singleCask": null,
         "statedAge": null,
         "vintageYear": null,
       }
@@ -363,8 +377,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "synergies (1993 Vintage)",
         "releaseYear": 2012,
+        "singleCask": null,
         "statedAge": null,
         "vintageYear": 1993,
       }
@@ -378,8 +394,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "13-year-old Bottled in Bond (Batch VVS 2024)",
         "releaseYear": 2024,
+        "singleCask": null,
         "statedAge": 13,
         "vintageYear": null,
       }
@@ -392,8 +410,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "26-year-old old, 1976 vintage (distilled at Inchgower)",
         "releaseYear": null,
+        "singleCask": null,
         "statedAge": 26,
         "vintageYear": 1976,
       }
@@ -406,8 +426,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "1990, 8-year-old (Distilled at Ardbeg)",
         "releaseYear": null,
+        "singleCask": null,
         "statedAge": 8,
         "vintageYear": null,
       }
@@ -420,8 +442,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "Kentucky Owl Kentucky Straight Bourbon Whiskey (Batch 12)",
         "releaseYear": null,
+        "singleCask": null,
         "statedAge": null,
         "vintageYear": null,
       }
@@ -434,8 +458,10 @@ describe("normalizeBottle", () => {
     });
     expect(rv).toMatchInlineSnapshot(`
       {
+        "caskStrength": null,
         "name": "Whiskey JYPSI Legacy "The Journey" (Batch 001)",
         "releaseYear": null,
+        "singleCask": null,
         "statedAge": null,
         "vintageYear": null,
       }
@@ -461,8 +487,10 @@ describe("normalizeBottle", () => {
       });
       expect(rv).toMatchInlineSnapshot(`
         {
+          "caskStrength": null,
           "name": "Spring Run (Batch 2)",
           "releaseYear": null,
+          "singleCask": null,
           "statedAge": null,
           "vintageYear": null,
         }
@@ -486,6 +514,40 @@ describe("normalizeBottle", () => {
       expect(name).toMatchInlineSnapshot(`"10-year-old (Batch 1)"`);
       expect(statedAge).toEqual(10);
     });
+  });
+
+  test("Single Cask Rye Batch A", async () => {
+    const rv = normalizeBottle({
+      name: "Single Cask Rye Batch A",
+      isFullName: false,
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "caskStrength": null,
+        "name": "Single Cask Rye (Batch A)",
+        "releaseYear": null,
+        "singleCask": true,
+        "statedAge": null,
+        "vintageYear": null,
+      }
+    `);
+  });
+
+  test("Barrel Strength Bourbon", async () => {
+    const rv = normalizeBottle({
+      name: "Batch Strength Bourbon",
+      isFullName: false,
+    });
+    expect(rv).toMatchInlineSnapshot(`
+      {
+        "caskStrength": null,
+        "name": "Bourbon (Batch Strength)",
+        "releaseYear": null,
+        "singleCask": null,
+        "statedAge": null,
+        "vintageYear": null,
+      }
+    `);
   });
 });
 
