@@ -41,21 +41,21 @@ export default authedProcedure
         });
       }
       data.countryId = country.id;
-    }
 
-    if (input.region) {
-      const [region] = await db
-        .select()
-        .from(regions)
-        .where(eq(regions.id, input.region))
-        .limit(1);
-      if (!region || region.countryId !== data.countryId) {
-        throw new TRPCError({
-          message: "Region not found.",
-          code: "NOT_FOUND",
-        });
+      if (input.region) {
+        const [region] = await db
+          .select()
+          .from(regions)
+          .where(eq(regions.id, input.region))
+          .limit(1);
+        if (!region || region.countryId !== data.countryId) {
+          throw new TRPCError({
+            message: "Region not found.",
+            code: "NOT_FOUND",
+          });
+        }
+        data.regionId = region.id;
       }
-      data.regionId = region.id;
     }
 
     if (data.description && data.description !== "") {
