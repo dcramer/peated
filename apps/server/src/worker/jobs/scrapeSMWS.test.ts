@@ -37,6 +37,7 @@ test("bottle list", async ({ axiosMock }) => {
       ],
       "flavorProfile": null,
       "name": "RW3.6 Truly a flavour bomb",
+      "singleCask": true,
       "statedAge": 5,
     }
   `);
@@ -59,6 +60,7 @@ test("bottle list", async ({ axiosMock }) => {
       ],
       "flavorProfile": "lightly_peated",
       "name": "3.350 Gladrags of yesteryear",
+      "singleCask": true,
       "statedAge": 19,
     }
   `);
