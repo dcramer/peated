@@ -2,8 +2,8 @@ import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("lists entities", async ({ fixtures }) => {
-  await fixtures.Entity();
-  await fixtures.Entity();
+  await fixtures.Entity({ name: "A" });
+  await fixtures.Entity({ name: "B" });
 
   const caller = createCaller({ user: null });
   const { results } = await caller.entityList();
