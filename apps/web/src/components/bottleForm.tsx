@@ -237,7 +237,7 @@ export default function BottleForm({
             error={errors.edition}
             type="text"
             label="Edition"
-            helpText="If applicable, the edition of the bottling series."
+            helpText="If applicable, the edition of the bottling series. This may be the release year, the batch number, or a special limited edition of a bottling."
             placeholder="e.g. 225th Anniversary"
           />
 
