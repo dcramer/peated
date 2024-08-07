@@ -139,8 +139,8 @@ export default function BottleForm({
     initialData.bottler ? entityToOption(initialData.bottler) : undefined,
   );
 
-  const [showCaskDetails, setShowCaskDetails] = useState(false);
-  const [showAddDetails, setShowAddDetails] = useState(false);
+  const [showCaskDetails, setShowCaskDetails] = useState(true);
+  const [showAddDetails, setShowAddDetails] = useState(true);
 
   return (
     <Layout
@@ -239,6 +239,13 @@ export default function BottleForm({
             label="Edition"
             helpText="If applicable, the edition of the bottling series. This may be the release year, the batch number, or a special limited edition of a bottling."
             placeholder="e.g. 225th Anniversary"
+          />
+        </Fieldset>
+        <Fieldset>
+          <Legend
+            title="Core Data"
+            isCollapsed={showCaskDetails}
+            onCollapse={() => setShowCaskDetails(!showCaskDetails)}
           />
 
           <TextField
@@ -357,7 +364,7 @@ export default function BottleForm({
 
         <Fieldset>
           <Legend
-            title="Cask Details"
+            title="Cask Specifics"
             isCollapsed={showCaskDetails}
             onCollapse={() => setShowCaskDetails(!showCaskDetails)}
           />
@@ -450,13 +457,13 @@ export default function BottleForm({
           </Collapsable>
         </Fieldset>
 
-        <Fieldset>
-          <Legend
-            title="Additional Details"
-            isCollapsed={showAddDetails}
-            onCollapse={() => setShowAddDetails(!showAddDetails)}
-          >
-            {user && (user.mod || user.admin) && (
+        {user && (user.mod || user.admin) && (
+          <Fieldset>
+            <Legend
+              title="Additional Details"
+              isCollapsed={showAddDetails}
+              onCollapse={() => setShowAddDetails(!showAddDetails)}
+            >
               <Button
                 color="primary"
                 onClick={async () => {
@@ -481,65 +488,65 @@ export default function BottleForm({
               >
                 Help me fill this in [Beta]
               </Button>
-            )}
-          </Legend>
-          <Collapsable open={showAddDetails}>
-            <Controller
-              name="flavorProfile"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  error={errors.flavorProfile}
-                  placeholder="The flavor profile of the spirit."
-                  suggestedOptions={[]}
-                  label="Flavor Profile"
-                  onRenderOption={(option) => {
-                    const classes = classesForProfile(
-                      option.id as FlavorProfile,
-                    );
-                    return (
-                      <div className="flex flex-col items-start justify-start gap-y-2 text-left">
-                        <h4
-                          className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
-                        >
-                          {option.name}
-                        </h4>
-                        <div className="text-muted text-sm font-normal">
-                          {notesForProfile(option.id as FlavorProfile)}
+            </Legend>
+            <Collapsable open={showAddDetails}>
+              <Controller
+                name="flavorProfile"
+                control={control}
+                render={({ field: { onChange, value, ref, ...field } }) => (
+                  <SelectField
+                    {...field}
+                    error={errors.flavorProfile}
+                    placeholder="The flavor profile of the spirit."
+                    suggestedOptions={[]}
+                    label="Flavor Profile"
+                    onRenderOption={(option) => {
+                      const classes = classesForProfile(
+                        option.id as FlavorProfile,
+                      );
+                      return (
+                        <div className="flex flex-col items-start justify-start gap-y-2 text-left">
+                          <h4
+                            className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
+                          >
+                            {option.name}
+                          </h4>
+                          <div className="text-muted text-sm font-normal">
+                            {notesForProfile(option.id as FlavorProfile)}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  }}
-                  options={flavorProfileList}
-                  onChange={(value) => onChange(value?.id)}
-                  value={
-                    value
-                      ? {
-                          id: value,
-                          name: formatFlavorProfile(value),
-                        }
-                      : undefined
-                  }
+                      );
+                    }}
+                    options={flavorProfileList}
+                    onChange={(value) => onChange(value?.id)}
+                    value={
+                      value
+                        ? {
+                            id: value,
+                            name: formatFlavorProfile(value),
+                          }
+                        : undefined
+                    }
+                  />
+                )}
+              />
+
+              {user && (user.mod || user.admin) && (
+                <TextAreaField
+                  {...register("description", {
+                    setValueAs: (v) => (v === "" || !v ? null : v),
+                    onChange: () => {
+                      setValue("descriptionSrc", "user");
+                    },
+                  })}
+                  error={errors.description}
+                  label="Description"
+                  rows={8}
                 />
               )}
-            />
-
-            {user && (user.mod || user.admin) && (
-              <TextAreaField
-                {...register("description", {
-                  setValueAs: (v) => (v === "" || !v ? null : v),
-                  onChange: () => {
-                    setValue("descriptionSrc", "user");
-                  },
-                })}
-                error={errors.description}
-                label="Description"
-                rows={8}
-              />
-            )}
-          </Collapsable>
-        </Fieldset>
+            </Collapsable>
+          </Fieldset>
+        )}
       </Form>
     </Layout>
   );
