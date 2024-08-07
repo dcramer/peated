@@ -35,8 +35,10 @@ test("bottle list", async ({ axiosMock }) => {
       ],
       "flavorProfile": "juicy_oak_vanilla",
       "name": "41.176 Baristaliscious",
+      "releaseYear": null,
       "singleCask": true,
       "statedAge": 17,
+      "vintageYear": null,
     }
   `);
   expect(items[1]).toMatchInlineSnapshot(`
@@ -58,8 +60,10 @@ test("bottle list", async ({ axiosMock }) => {
       ],
       "flavorProfile": "deep_rich_dried_fruit",
       "name": "94.45 Sultans of Swig",
+      "releaseYear": null,
       "singleCask": true,
       "statedAge": 14,
+      "vintageYear": null,
     }
   `);
 });
