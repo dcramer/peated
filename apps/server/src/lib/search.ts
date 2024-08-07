@@ -23,9 +23,16 @@ export function buildBottleSearchVector(
 ): TSVector[] {
   const values: TSVector[] = [
     new TSVector(bottle.fullName, "A"),
-    new TSVector(bottle.name, "B"),
     new TSVector(brand.name, "B"),
   ];
+  if (brand.shortName)
+    values.push(
+      new TSVector(`${brand.name} ${bottle.name} ${bottle.edition || ""}`, "B"),
+    );
+  if (bottle.edition)
+    values.push(new TSVector(`${bottle.name} ${bottle.edition}`, "B"));
+  else values.push(new TSVector(bottle.name, "B"));
+
   if (bottle.category)
     values.push(new TSVector(formatCategoryName(bottle.category), "C"));
   if (bottle.vintageYear)
@@ -33,7 +40,9 @@ export function buildBottleSearchVector(
   if (bottle.releaseYear)
     values.push(new TSVector(`${bottle.releaseYear} Release`, "B"));
   if (bottler) values.push(new TSVector(bottler.name, "C"));
-  aliasList?.forEach((a) => values.push(new TSVector(a.name, "A")));
+  aliasList
+    ?.filter((a) => a.name !== bottle.fullName)
+    .forEach((a) => values.push(new TSVector(a.name, "A")));
   distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));
   return values;
 }
