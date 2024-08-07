@@ -56,7 +56,7 @@ export default function NewBottles() {
                       bottle={bottle}
                       className="font-medium hover:underline"
                     >
-                      {bottle.brand.shortName || bottle.brand.name}
+                      {`${bottle.brand.shortName || bottle.brand.name} ${bottle.name}`}
                     </BottleLink>
                     {bottle.isFavorite && (
                       <StarIcon className="h-4 w-4" aria-hidden="true" />
