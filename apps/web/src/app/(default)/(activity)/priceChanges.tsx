@@ -61,23 +61,6 @@ export default function PriceChanges() {
                       >
                         {bottle.fullName}
                       </BottleLink>
-                      {bottle.releaseYear ? (
-                        <>
-                          {" "}
-                          <span className="text-muted">
-                            ({bottle.releaseYear} Release)
-                          </span>
-                        </>
-                      ) : (
-                        bottle.vintageYear && (
-                          <>
-                            {" "}
-                            <span className="text-muted">
-                              ({bottle.vintageYear} Vintage)
-                            </span>
-                          </>
-                        )
-                      )}
                       {bottle.isFavorite && (
                         <StarIcon className="h-4 w-4" aria-hidden="true" />
                       )}

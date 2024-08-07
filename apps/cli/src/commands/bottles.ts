@@ -46,13 +46,10 @@ subcommand
         const values: Record<string, any> = {};
         if (bottle.name !== name) {
           values.name = name;
-          console.log(
-            bottle.fullName.substring(
-              0,
-              bottle.fullName.length - bottle.name.length,
-            ),
-          );
-          values.fullName = `${bottle.fullName.substring(0, bottle.fullName.length - bottle.name.length)}${name}`;
+          values.fullName = formatBottleName({
+            ...bottle,
+            name: `${bottle.fullName.substring(0, bottle.fullName.length - bottle.name.length)}${name}`,
+          });
         }
         if (bottle.statedAge !== statedAge) values.statedAge = statedAge;
         if (bottle.vintageYear !== vintageYear)
@@ -66,13 +63,8 @@ subcommand
             // TODO: doesnt handle conflicts - maybe this should just call bottleUpdate
             await db.transaction(async (tx) => {
               await tx.update(bottles).set(values).where(eq(bottles.id, id));
-              if (values.fullName || values.vintageYear || values.releaseYear) {
-                const aliasName = formatBottleName({
-                  vintageYear,
-                  releaseYear,
-                  fullName: bottle.fullName,
-                  ...values,
-                });
+              if (values.fullName) {
+                const aliasName = values.fullName;
                 await tx
                   .insert(bottleAliases)
                   .values({ name: aliasName, bottleId: id });

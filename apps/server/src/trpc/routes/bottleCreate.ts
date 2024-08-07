@@ -118,12 +118,17 @@ export async function bottleCreate({
         distillerIds.push(distUpsert.id);
       }
 
+    const fullName = formatBottleName({
+      ...bottleData,
+      name: `${brand.shortName || brand.name} ${bottleData.name}`,
+    });
+
     const bottleInsertData: NewBottle = {
       ...bottleData,
       brandId: brand.id,
       bottlerId: bottler?.id || null,
       createdById: user.id,
-      fullName: `${brand.shortName || brand.name} ${bottleData.name}`,
+      fullName,
     };
 
     // bottles ae unique on aliases, so if an alias exists that is bound to
@@ -134,8 +139,7 @@ export async function bottleCreate({
     // 3. finally persist the bottleId to the new hash
     //
     // in all of these scenarios we need to run constraint checks
-    const aliasName = formatBottleName(bottleInsertData);
-    const alias = await upsertBottleAlias(tx, aliasName);
+    const alias = await upsertBottleAlias(tx, bottleInsertData.fullName);
     if (alias.bottleId) {
       const [existingBottle] = await tx
         .select()
@@ -170,6 +174,8 @@ export async function bottleCreate({
         .where(eq(bottles.id, newAlias.bottleId));
       throw new ConflictError(existingBottle);
     }
+
+    newAliases.push(alias.name);
 
     for (const distillerId of distillerIds) {
       await tx.insert(bottlesToDistillers).values({

@@ -7,7 +7,7 @@ import {
 import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
 import { mapRows, upsertBottleAlias } from "@peated/server/lib/db";
 import { normalizeBottle } from "@peated/server/lib/normalize";
-import { ReviewInputSchema } from "@peated/server/schemas";
+import { BottleInputSchema, ReviewInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import { TRPCError } from "@trpc/server";
@@ -36,11 +36,12 @@ export default adminProcedure
       const entity = await findEntity(name);
       if (entity) {
         const result = await bottleCreate({
-          input: {
+          input: BottleInputSchema.parse({
             name,
+            edition: null,
             brand: entity.id,
             category: input.category,
-          },
+          }),
           ctx,
         });
         bottleId = result.id;

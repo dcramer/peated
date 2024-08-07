@@ -117,15 +117,6 @@ export default function BottleSelector({
                   >
                     <div className="flex items-center gap-x-1 font-bold">
                       {bottle.fullName}
-                      {bottle.releaseYear ? (
-                        <span className="text-muted">
-                          ({bottle.releaseYear} Release)
-                        </span>
-                      ) : bottle.vintageYear ? (
-                        <span className="text-muted">
-                          ({bottle.vintageYear} Vintage)
-                        </span>
-                      ) : null}
                     </div>
                     <div className="text-muted flex space-x-2">
                       {bottle.distillers.map((distiller) => distiller.name)}

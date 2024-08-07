@@ -7,17 +7,27 @@ import type {
 import { COLOR_SCALE } from "../constants";
 
 export function formatBottleName({
-  fullName,
+  name,
+  edition,
   vintageYear,
   releaseYear,
 }: {
-  fullName: string;
+  // Name should include brand prefix
+  name: string;
+  edition?: string | null | undefined;
   vintageYear?: number | null | undefined;
   releaseYear?: number | null | undefined;
 } & Record<string, any>) {
-  const bits = [fullName];
-  if (releaseYear) bits.push(`(${releaseYear} Release)`);
-  else if (vintageYear) bits.push(`(${vintageYear} Vintage)`);
+  const bits = [name];
+  if (edition) bits.push(edition);
+  // TODO: this is kind of a mess - we should just try to strip these and push them into edition maybe?
+  if (releaseYear) {
+    if (!name.match(new RegExp(`\\b${releaseYear}\\b`, "i")))
+      bits.push(`(${releaseYear} Release)`);
+  } else if (vintageYear) {
+    if (!name.match(new RegExp(`\\b${vintageYear}\\b`, "i")))
+      bits.push(`(${vintageYear} Vintage)`);
+  }
   return bits.join(" ");
 }
 

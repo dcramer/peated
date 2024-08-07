@@ -1,16 +1,6 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "@peated/server/trpc/router";
 
-test("lists entities", async ({ fixtures }) => {
-  await fixtures.Entity();
-  await fixtures.Entity();
-
-  const caller = createCaller({ user: null });
-  const { results } = await caller.entityList();
-
-  expect(results.length).toBe(2);
-});
-
 test("cannot list private without friend", async ({ defaults, fixtures }) => {
   const otherUser = await fixtures.User({ private: true });
 

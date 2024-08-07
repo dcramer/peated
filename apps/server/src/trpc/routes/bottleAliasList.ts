@@ -71,14 +71,12 @@ export default publicProcedure
       .offset(offset)
       .orderBy(asc(bottleAliases.name));
 
-    const canonicalName = bottle ? formatBottleName(bottle) : null;
-
     return {
       results: results.slice(0, limit).map((a) => ({
         name: a.name,
         createdAt: a.createdAt.toISOString(),
         bottleId: a.bottleId,
-        isCanonical: bottle ? canonicalName == a.name : undefined,
+        isCanonical: bottle ? bottle.fullName == a.name : undefined,
       })),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
-import { formatBottleName } from "@peated/server/lib/format";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
@@ -27,8 +26,7 @@ export default modProcedure.input(z.string()).mutation(async function ({
 
   if (alias.bottle) {
     const { bottle } = alias;
-    const canonicalName = formatBottleName(bottle);
-    if (alias.name.toLowerCase() === canonicalName.toLowerCase())
+    if (alias.name.toLowerCase() === bottle.fullName.toLowerCase())
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: "Cannot delete canonical name",

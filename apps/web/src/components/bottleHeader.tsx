@@ -32,11 +32,9 @@ export default function BottleHeader({
               {bottle.name}
             </div>
           )}
-          {bottle.releaseYear ? (
-            <span className="text-muted">({bottle.releaseYear} Release)</span>
-          ) : bottle.vintageYear ? (
-            <span className="text-muted">({bottle.vintageYear} Vintage)</span>
-          ) : null}
+          {!!bottle.edition && (
+            <span className="text-muted">{bottle.edition}</span>
+          )}
         </div>
       }
       titleExtra={

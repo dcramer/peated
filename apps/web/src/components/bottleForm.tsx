@@ -178,6 +178,7 @@ export default function BottleForm({
         <PreviewBottleCard
           data={{
             name: watch("name"),
+            edition: watch("edition"),
             category: watch("category"),
             statedAge: watch("statedAge"),
             distillers: distillersValue,
@@ -204,7 +205,7 @@ export default function BottleForm({
                 error={errors.brand}
                 label="Brand"
                 helpText="The brand, or main label of the bottle."
-                placeholder="e.g. Angel's Envy, Hibiki"
+                placeholder="e.g. Laphroiag"
                 createDialogHelpText="The brand is the label the spirit is bottled under. Sometimes this is
                 the same as the distiller."
                 searchContext={{
@@ -232,6 +233,15 @@ export default function BottleForm({
           />
 
           <TextField
+            {...register("edition")}
+            error={errors.edition}
+            type="text"
+            label="Edition"
+            helpText="If applicable, the edition of the bottling series."
+            placeholder="e.g. 225th Anniversary"
+          />
+
+          <TextField
             {...register("statedAge", {
               setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
             })}
@@ -239,7 +249,7 @@ export default function BottleForm({
             type="number"
             label="Stated Age"
             placeholder="e.g. 12"
-            helpText="The number of years the spirit was aged."
+            helpText="The number of years the spirit was aged, as stated on the bottle."
             suffixLabel="years"
           />
 
@@ -304,7 +314,7 @@ export default function BottleForm({
             type="number"
             label="Release Year"
             placeholder="e.g. 2024"
-            helpText="The year this labeling was released,."
+            helpText="The year this bottling was released."
           />
 
           <TextField
@@ -372,7 +382,7 @@ export default function BottleForm({
               render={({ field: { onChange, value, ref, ...field } }) => (
                 <SelectField
                   {...field}
-                  error={errors.category}
+                  error={errors.caskFill}
                   label="Cask Fill"
                   placeholder="e.g. 1st Fill"
                   simple
@@ -396,7 +406,7 @@ export default function BottleForm({
               render={({ field: { onChange, value, ref, ...field } }) => (
                 <SelectField
                   {...field}
-                  error={errors.category}
+                  error={errors.caskType}
                   label="Cask Type"
                   placeholder="e.g. Bourbon"
                   simple
@@ -420,7 +430,7 @@ export default function BottleForm({
               render={({ field: { onChange, value, ref, ...field } }) => (
                 <SelectField
                   {...field}
-                  error={errors.category}
+                  error={errors.caskSize}
                   label="Cask Size"
                   placeholder="e.g. Hogshead"
                   simple

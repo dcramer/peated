@@ -147,8 +147,11 @@ export const BottleSerializer = serializer({
   ): z.infer<typeof BottleSchema> => {
     return {
       id: item.id,
-      name: item.name,
+
+      // fullName is brand + name + edition
       fullName: item.fullName,
+      name: item.name,
+      edition: item.edition,
 
       category: item.category,
       description: item.description,

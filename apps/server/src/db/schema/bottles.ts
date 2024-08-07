@@ -39,6 +39,7 @@ export const bottles = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     fullName: varchar("full_name", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
+    edition: varchar("edition", { length: 255 }),
 
     searchVector: tsvector("search_vector"),
 

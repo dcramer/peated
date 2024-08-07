@@ -329,6 +329,11 @@ export const Bottle = async (
 
     const name = data.name ?? chooseBottleName();
 
+    const fullName = formatBottleName({
+      ...data,
+      name: `${brand.name} ${name}`,
+    });
+
     const bottleData: dbSchema.NewBottle = {
       category: choose([...CATEGORY_LIST, null, null]),
       statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
@@ -336,7 +341,7 @@ export const Bottle = async (
       updatedAt: new Date(),
       ...data,
       name,
-      fullName: `${brand.name} ${name}`,
+      fullName,
       brandId: brand.id,
       createdById: data.createdById || (await User({}, tx)).id,
     };
@@ -365,8 +370,6 @@ export const Bottle = async (
       bottleData,
       normalizeBottle({ ...bottleData, isFullName: false }),
     );
-
-    bottleData.fullName = `${brand.name} ${bottleData.name}`;
 
     const [bottle] = await tx
       .insert(bottles)
@@ -398,7 +401,7 @@ export const Bottle = async (
 
     await tx.insert(bottleAliases).values({
       bottleId: bottle.id,
-      name: formatBottleName(bottle),
+      name: bottle.fullName,
       createdAt: bottle.createdAt,
     });
 

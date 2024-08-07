@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
+  bottleAliases,
   bottles,
   bottlesToDistillers,
   changes,
@@ -14,7 +15,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { type BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { modProcedure } from "..";
 import { coerceToUpsert, upsertBottleAlias, upsertEntity } from "../../lib/db";
@@ -62,7 +63,7 @@ export async function bottleUpdate({
 
   const bottleData: BottlePreviewResult & Record<string, any> =
     await bottleNormalize({
-      input: {
+      input: BottleInputSchema.parse({
         name: bottle.name,
         brand: {
           id: bottle.brand.id,
@@ -85,7 +86,7 @@ export async function bottleUpdate({
         vintageYear: bottle.vintageYear,
         releaseYear: bottle.releaseYear,
         ...input,
-      },
+      }),
       ctx,
     });
 
@@ -227,9 +228,11 @@ export async function bottleUpdate({
           })) || null;
         if (!brand) throw new Error("Unexpected");
       }
-      bottleData.fullName = `${brand.shortName || brand.name} ${
-        bottleData.name ?? bottle.name
-      }`;
+      bottleData.fullName = formatBottleName({
+        ...bottle,
+        ...bottleData,
+        name: `${brand.shortName || brand.name} ${bottleData.name ?? bottle.name}`,
+      });
     }
 
     // bottles ae unique on aliases, so if an alias exists that is bound to
@@ -241,15 +244,17 @@ export async function bottleUpdate({
     //
     // in all of these scenarios we need to run constraint checks
 
-    const aliasName = formatBottleName({ ...bottle, ...bottleData });
-    const alias = await upsertBottleAlias(tx, aliasName, bottle.id);
-    // alias.bottleId is always set, but I don't want to deal w/ TS
-    if (alias.bottleId && alias.bottleId !== bottle.id) {
-      const [existingBottle] = await tx
-        .select()
-        .from(bottles)
-        .where(eq(bottles.id, alias.bottleId));
-      throw new ConflictError(existingBottle);
+    let alias;
+    if (bottleData.fullName) {
+      alias = await upsertBottleAlias(tx, bottleData.fullName, bottle.id);
+      // alias.bottleId is always set, but I don't want to deal w/ TS
+      if (alias.bottleId && alias.bottleId !== bottle.id) {
+        const [existingBottle] = await tx
+          .select()
+          .from(bottles)
+          .where(eq(bottles.id, alias.bottleId));
+        throw new ConflictError(existingBottle);
+      }
     }
 
     const newBottle = Object.values(bottleData).length
@@ -264,6 +269,32 @@ export async function bottleUpdate({
             .returning()
         )[0]
       : bottle;
+
+    if (alias && !alias.bottleId) {
+      const [newAlias] = await tx
+        .update(bottleAliases)
+        .set({
+          bottleId: bottle.id,
+        })
+        .where(
+          and(
+            eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
+            isNull(bottleAliases.bottleId),
+          ),
+        )
+        .returning();
+
+      // someone beat us to it?
+      if (newAlias.bottleId && newAlias.bottleId !== bottle.id) {
+        const [existingBottle] = await tx
+          .select()
+          .from(bottles)
+          .where(eq(bottles.id, newAlias.bottleId));
+        throw new ConflictError(existingBottle);
+      }
+
+      newAliases.push(alias.name);
+    }
 
     await tx.insert(changes).values({
       objectType: "bottle",

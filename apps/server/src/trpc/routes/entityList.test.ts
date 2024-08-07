@@ -1,8 +1,8 @@
 import { createCaller } from "../router";
 
 test("lists entities", async ({ fixtures }) => {
-  await fixtures.Entity();
-  await fixtures.Entity();
+  await fixtures.Entity({ name: "A" });
+  await fixtures.Entity({ name: "B" });
 
   const caller = createCaller({ user: null });
   const { results } = await caller.entityList();
@@ -11,12 +11,13 @@ test("lists entities", async ({ fixtures }) => {
 });
 
 test("bias shared distillers", async ({ fixtures }) => {
-  const brand = await fixtures.Entity({ type: ["brand"] });
+  const brand = await fixtures.Entity({ name: "A", type: ["brand"] });
   const dist1 = await fixtures.Entity({
+    name: "B",
     type: ["distiller"],
     totalTastings: 0,
   });
-  await fixtures.Entity({ totalTastings: 1 });
+  await fixtures.Entity({ name: "C", totalTastings: 1 });
   await fixtures.Bottle({ brandId: brand.id, distillerIds: [dist1.id] });
 
   const caller = createCaller({ user: null });
@@ -32,12 +33,13 @@ test("bias shared distillers", async ({ fixtures }) => {
 });
 
 test("bias shared bottlers", async ({ fixtures }) => {
-  const brand = await fixtures.Entity({ type: ["brand"] });
+  const brand = await fixtures.Entity({ name: "A", type: ["brand"] });
   const bottler1 = await fixtures.Entity({
+    name: "B",
     type: ["bottler"],
     totalTastings: 0,
   });
-  await fixtures.Entity({ totalTastings: 1 });
+  await fixtures.Entity({ name: "C", totalTastings: 1 });
   await fixtures.Bottle({ brandId: brand.id, bottlerId: bottler1.id });
 
   const caller = createCaller({ user: null });
