@@ -10,7 +10,9 @@ export function buildEntitySearchVector(
     new TSVector(entity.name, "A"),
     ...(entity.shortName ? [new TSVector(entity.shortName, "A")] : []),
   ];
-  aliasList?.forEach((a) => values.push(new TSVector(a.name, "B")));
+  aliasList
+    ?.filter((a) => a.name !== entity.name)
+    .forEach((a) => values.push(new TSVector(a.name, "B")));
   return values;
 }
 
