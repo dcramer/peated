@@ -55,7 +55,7 @@ export default function BottleTable({
                       {formatCategoryName(item.category)}
                     </Link>
                   )}
-                  {!!item.edition && <span>{item.edition}</span>}
+                  {!!item.edition && <span>({item.edition})</span>}
                 </div>
               </div>
             );
