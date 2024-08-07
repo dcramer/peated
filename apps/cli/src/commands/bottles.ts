@@ -7,14 +7,15 @@ import {
   reviews,
 } from "@peated/server/db/schema";
 import { findEntity } from "@peated/server/lib/bottleFinder";
+import { upsertBottleAlias } from "@peated/server/lib/db";
 import {
   formatBottleName,
   formatCategoryName,
 } from "@peated/server/lib/format";
+import { normalizeBottle } from "@peated/server/lib/normalize";
 import { createCaller } from "@peated/server/trpc/router";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
-import { normalizeBottle } from "../../../server/src/lib/normalize";
+import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 
 const subcommand = program.command("bottles");
 
@@ -299,15 +300,12 @@ subcommand
               .update(bottles)
               .set({ fullName })
               .where(eq(bottles.id, bottle.id));
-            await tx
-              .update(bottleAliases)
-              .set({ name: fullName })
-              .where(
-                eq(
-                  sql`LOWER(${bottleAliases.name})`,
-                  bottle.fullName.toLowerCase(),
-                ),
+            const alias = await upsertBottleAlias(tx, fullName, bottle.id);
+            if (alias.bottleId !== bottle.id) {
+              throw new Error(
+                `Alias mismatch: bottle ${bottle.id} != ${alias.bottleId}`,
               );
+            }
           });
         }
 
