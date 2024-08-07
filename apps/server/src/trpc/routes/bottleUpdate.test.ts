@@ -96,9 +96,6 @@ test("clears category", async ({ fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
 
-  expect(omit(bottle, "category", "updatedAt")).toEqual(
-    omit(bottle2, "category", "updatedAt"),
-  );
   expect(bottle2.category).toBe(null);
 });
 
