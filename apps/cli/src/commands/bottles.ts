@@ -1,6 +1,11 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { bottleAliases, bottles, reviews } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottles,
+  entities,
+  reviews,
+} from "@peated/server/db/schema";
 import { findEntity } from "@peated/server/lib/bottleFinder";
 import {
   formatBottleName,
@@ -14,7 +19,7 @@ import { normalizeBottle } from "../../../server/src/lib/normalize";
 const subcommand = program.command("bottles");
 
 subcommand
-  .command("normalize-names")
+  .command("normalize")
   .argument("[bottleIds...]")
   .option("--dry-run")
   .action(async (bottleIds, options) => {
@@ -46,6 +51,8 @@ subcommand
         const values: Record<string, any> = {};
         if (bottle.name !== name) {
           values.name = name;
+          // XXX: this _could_ be wrong if the name did not have the brand in it
+          // but that shouldn't happen
           values.fullName = formatBottleName({
             ...bottle,
             name: `${bottle.fullName.substring(0, bottle.fullName.length - bottle.name.length)}${name}`,
@@ -254,6 +261,56 @@ subcommand
       for (const { name } of query) {
         console.log(`Indexing embeddings for alias ${name}.`);
         await runJob("IndexBottleAlias", { name });
+        hasResults = true;
+      }
+      offset += step;
+    }
+  });
+
+subcommand
+  .command("fix-names")
+  .description("Update bottle aliases")
+  .action(async (options) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({
+        bottle: bottles,
+        brand: entities,
+      })
+      .from(bottles)
+      .innerJoin(entities, eq(bottles.brandId, entities.id))
+      .orderBy(asc(bottles.createdAt));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+
+      for (const { brand, bottle } of query) {
+        const fullName = formatBottleName({
+          ...bottle,
+          name: `${brand.shortName || brand.name} ${bottle.name}`,
+        });
+        if (bottle.fullName !== fullName) {
+          console.log(`Updating name for bottle ${bottle.id}: ${fullName}`);
+          await db.transaction(async (tx) => {
+            await tx
+              .update(bottles)
+              .set({ fullName })
+              .where(eq(bottles.id, bottle.id));
+            await tx
+              .update(bottleAliases)
+              .set({ name: fullName })
+              .where(
+                eq(
+                  sql`LOWER(${bottleAliases.name})`,
+                  bottle.fullName.toLowerCase(),
+                ),
+              );
+          });
+        }
+
         hasResults = true;
       }
       offset += step;
