@@ -26,14 +26,7 @@ subcommand
   .action(async (bottleIds, options) => {
     const step = 1000;
     const baseQuery = db
-      .select({
-        id: bottles.id,
-        name: bottles.name,
-        fullName: bottles.fullName,
-        statedAge: bottles.statedAge,
-        vintageYear: bottles.vintageYear,
-        releaseYear: bottles.releaseYear,
-      })
+      .select()
       .from(bottles)
       .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
       .orderBy(asc(bottles.id));
@@ -44,7 +37,7 @@ subcommand
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id, ...bottle } of query) {
-        const { name, statedAge, vintageYear, releaseYear } = normalizeBottle({
+        const { name, ...normalizedData } = normalizeBottle({
           ...bottle,
           isFullName: false,
         });
@@ -59,11 +52,16 @@ subcommand
             name: `${bottle.fullName.substring(0, bottle.fullName.length - bottle.name.length)}${name}`,
           });
         }
-        if (bottle.statedAge !== statedAge) values.statedAge = statedAge;
-        if (bottle.vintageYear !== vintageYear)
-          values.vintageYear = vintageYear;
-        if (bottle.releaseYear !== releaseYear)
-          values.releaseYear = releaseYear;
+        if (bottle.singleCask !== normalizedData.singleCask)
+          values.singleCask = normalizedData.singleCask;
+        if (bottle.caskStrength !== normalizedData.caskStrength)
+          values.caskStrength = normalizedData.caskStrength;
+        if (bottle.statedAge !== normalizedData.statedAge)
+          values.statedAge = normalizedData.statedAge;
+        if (bottle.vintageYear !== normalizedData.vintageYear)
+          values.vintageYear = normalizedData.vintageYear;
+        if (bottle.releaseYear !== normalizedData.releaseYear)
+          values.releaseYear = normalizedData.releaseYear;
 
         if (Object.values(values).length !== 0) {
           console.log(`M: ${bottle.fullName} -> ${JSON.stringify(values)}`);
