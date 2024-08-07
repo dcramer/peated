@@ -155,7 +155,7 @@ export function normalizeBottle({
 
   if (
     name.match(
-      /\bCask Strength|Barrel Strength|Barrel Proof|Full Proof|Natural Strength|Original Strength|Undiluted\b/i,
+      /\bCask Strength|Barrel Strength|Barrel Proof|Full Proof|Natural Strength|Original Strength|Undiluted|Cask Bottling\b/i,
     )
   ) {
     caskStrength = true;
