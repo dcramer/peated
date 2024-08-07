@@ -4,44 +4,45 @@ import { ContentSourceEnum, EntityTypeEnum } from "./common";
 import { CountrySchema } from "./countries";
 import { RegionSchema } from "./regions";
 import { PointSchema } from "./shared";
-import { UserSchema } from "./users";
-
-export const EntityInputSchema = z.object({
-  name: z.string().trim().min(1, "Required"),
-  shortName: z.string().trim().nullish(),
-  type: z.array(EntityTypeEnum).optional(),
-  country: z.number().nullish(),
-  region: z.number().nullish(),
-  address: z.string().trim().nullish(),
-  location: PointSchema.nullish(),
-  description: z.string().trim().nullish(),
-  descriptionSrc: ContentSourceEnum.nullish(),
-  yearEstablished: z.number().lte(new Date().getFullYear()).nullish(),
-  website: z.string().url().nullish(),
-});
 
 export const EntitySchema = z.object({
-  id: z.number(),
+  id: z.number().readonly(),
   name: z.string().trim().min(1, "Required"),
-  shortName: z.string().trim().nullable(),
-  type: z.array(EntityTypeEnum),
-  description: z.string().nullish(),
-  yearEstablished: z.number().lte(new Date().getFullYear()).nullable(),
-  website: z.string().url().nullable(),
-  country: CountrySchema.nullable(),
-  region: RegionSchema.nullable(),
-  address: z.string().trim().nullish(),
-  location: PointSchema.nullable(),
+  shortName: z.string().trim().nullable().default(null),
+  type: z.array(EntityTypeEnum).default([]),
+  description: z.string().nullish().default(null),
+  descriptionSrc: ContentSourceEnum.nullable().default(null).optional(),
+  yearEstablished: z
+    .number()
+    .lte(new Date().getFullYear())
+    .nullable()
+    .default(null),
+  website: z.string().url().nullable().default(null),
+  country: CountrySchema.nullable().default(null),
+  region: RegionSchema.nullable().default(null),
+  address: z.string().trim().nullish().default(null),
+  location: PointSchema.nullable().default(null),
 
-  totalTastings: z.number(),
-  totalBottles: z.number(),
+  totalTastings: z.number().readonly(),
+  totalBottles: z.number().readonly(),
 
-  createdAt: z.string().datetime().optional(),
-  updatedAt: z.string().datetime().optional(),
-  createdBy: UserSchema.optional(),
+  createdAt: z.string().datetime().readonly(),
+  updatedAt: z.string().datetime().readonly(),
+});
+
+export const EntityInputSchema = EntitySchema.omit({
+  id: true,
+  totalTastings: true,
+  totalBottles: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  country: z.number().nullish().default(null),
+  region: z.number().nullish().default(null),
 });
 
 export const EntityMergeSchema = z.object({
+  // TODO: rename to entity
   entityId: z.number(),
   direction: z.enum(["mergeInto", "mergeFrom"]),
 });

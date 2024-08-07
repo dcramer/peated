@@ -1,10 +1,7 @@
 import { normalizeBottle } from "@peated/server/lib/normalize";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { stripPrefix } from "@peated/server/lib/strings";
-import {
-  BottleInputSchema,
-  type EntityInputSchema,
-} from "@peated/server/schemas";
+import { BottleInputSchema, EntityInputSchema } from "@peated/server/schemas";
 import { type BottlePreviewResult } from "@peated/server/types";
 import { TRPCError } from "@trpc/server";
 import { type z } from "zod";
@@ -13,7 +10,7 @@ import { type Context } from "../context";
 import { entityById } from "./entityById";
 
 async function getEntity(
-  input: number | z.infer<typeof EntityInputSchema>,
+  input: number | z.input<typeof EntityInputSchema>,
   ctx: Context,
 ) {
   if (typeof input === "number") {
@@ -27,7 +24,7 @@ async function getEntity(
       });
     }
   }
-  return input;
+  return EntityInputSchema.parse(input);
 }
 
 export async function bottleNormalize({

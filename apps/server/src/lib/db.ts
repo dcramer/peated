@@ -134,7 +134,7 @@ export async function upsertBottleAlias(
         sql`INSERT INTO ${bottleAliases} (bottle_id, name)
       VALUES (${bottleId}, ${name})
       ON CONFLICT (LOWER(name))
-      DO UPDATE SET bottle_id = 
+      DO UPDATE SET bottle_id =
         CASE WHEN ${bottleAliases.bottleId} IS NULL
           THEN EXCLUDED.bottle_id
           ELSE ${bottleAliases.bottleId}
@@ -145,7 +145,7 @@ export async function upsertBottleAlias(
         sql`INSERT INTO ${bottleAliases} (bottle_id, name)
       VALUES (${bottleId}, ${name})
       ON CONFLICT (LOWER(name))
-      DO UPDATE SET name = ${bottleAliases.name} 
+      DO UPDATE SET name = ${bottleAliases.name}
       RETURNING *`,
       );
 
