@@ -31,6 +31,7 @@
     "VERSION",
     "GOOGLE_CLIENT_ID",
     "SENTRY_DSN",
+    "SENTRY_AUTH_TOKEN",
     "FATHOM_SITE_ID",
     "API_SERVER",
     "FATHOM_SITE_ID"
