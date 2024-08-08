@@ -8,7 +8,7 @@ type Props = React.ComponentPropsWithoutRef<"div"> & {
   label?: string;
   labelNote?: ReactNode;
   htmlFor?: string;
-  helpText?: string;
+  helpText?: ReactNode;
   required?: boolean;
   children?: ReactNode;
   error?: {

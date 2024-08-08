@@ -4,16 +4,8 @@ import { forwardRef } from "react";
 import FormField from "./formField";
 import TextInput from "./textInput";
 
-type Props = {
-  label?: string;
-  helpText?: string;
-  required?: boolean;
-  children?: ReactNode;
-  error?: {
-    message?: string;
-  };
-  className?: string;
-} & React.ComponentProps<typeof TextInput>;
+type Props = React.ComponentProps<typeof TextInput> &
+  React.ComponentProps<typeof FormField>;
 
 export default forwardRef<HTMLInputElement, Props>(function TextField(
   { name, helpText, label, required, className, error, ...props },

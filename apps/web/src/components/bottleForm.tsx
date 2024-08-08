@@ -228,7 +228,34 @@ export default function BottleForm({
             type="text"
             label="Bottle"
             required
-            helpText="The name of the bottle."
+            helpText={
+              <div className="flex flex-col gap-y-2">
+                <p>
+                  The name of the bottle. We'll do our best to clean this up for
+                  you, but generally speaking there's a few things to think
+                  about:
+                </p>
+                <ul className="ml-6 flex list-disc flex-col gap-y-1">
+                  <li>
+                    The unique series name is the focus. For example,{" "}
+                    <strong>do include</strong> <em>2010 Spring Release</em>.
+                  </li>
+                  <li>
+                    Flavor text should be avoided whenever possible. For
+                    example, <strong>Do not include</strong>{" "}
+                    <em>Scotch Malt Whisky</em>.
+                  </li>
+                  <li>
+                    If there is no other identifying series information use core
+                    data. For example, <em>10-year-old Single Malt</em>...
+                  </li>
+                  <li>
+                    However, if the series is clearly identifying,{" "}
+                    <em>do not include</em> the stated age or the spirit type.
+                  </li>
+                </ul>
+              </div>
+            }
             placeholder="e.g. 12-year-old"
           />
 
@@ -237,7 +264,29 @@ export default function BottleForm({
             error={errors.edition}
             type="text"
             label="Edition"
-            helpText="If applicable, the edition of the bottling series. This may be the release year, the batch number, or a special limited edition of a bottling."
+            helpText={
+              <div className="flex flex-col gap-y-2">
+                <p>
+                  If applicable, the edition of the bottling series. This field
+                  should particularly be utilized when a specific bottle may
+                  have multiple editions.
+                </p>
+                <ul className="ml-6 flex list-disc flex-col gap-y-1">
+                  <li>
+                    This may be the release year, the batch number, or a special
+                    limited edition of a bottling.
+                  </li>
+                  <li>
+                    This <strong>should not be</strong> extremely specific
+                    bottling information, such as an individual cask number.
+                  </li>
+                  <li>
+                    This will often be something like <em>6th Edition</em>,{" "}
+                    <em>2010 Release</em>, or <em>Batch 3</em>.
+                  </li>
+                </ul>
+              </div>
+            }
             placeholder="e.g. 225th Anniversary"
           />
         </Fieldset>
