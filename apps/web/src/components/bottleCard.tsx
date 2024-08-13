@@ -62,7 +62,7 @@ function BottleScaffold({
       onClick={onClick}
     >
       <div className="flex-1 overflow-hidden">
-        <div className="flex w-full items-center space-x-1 truncate font-bold">
+        <div className="flex w-full items-center space-x-1 font-bold">
           {name}
         </div>
         <div
@@ -128,7 +128,7 @@ export default function BottleCard({
       onClick={onClick ? () => onClick(bottle) : undefined}
       name={
         <>
-          <h4 className="flex items-center gap-x-1 truncate font-bold">
+          <h4 className="flex items-center gap-x-1 font-bold">
             <BottleLink bottle={bottle} className="hover:underline">
               {bottle.fullName}
             </BottleLink>
