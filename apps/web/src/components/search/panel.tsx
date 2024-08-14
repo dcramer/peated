@@ -109,7 +109,7 @@ export default function SearchPanel({
       )}
       <ul
         role="list"
-        className="divide-y divide-slate-800 border-slate-800 lg:border-r"
+        className="divide-y divide-slate-800 border-slate-800 lg:border-b lg:border-r"
       >
         {query && !isUserQuery && (results.length < maxResults || query) && (
           <ListItem color="highlight">
