@@ -64,6 +64,7 @@ type OptionProps<T extends Option> = {
 };
 
 type CreateProps<T extends Option> = {
+  emptyListItem?: (query: string) => ReactNode;
   canCreate?: boolean;
   createForm?: CreateForm<T>;
 };
@@ -85,6 +86,7 @@ export default function SelectField<T extends Option>({
   targetOptions = 5,
   suggestedOptions,
   simple = false,
+  emptyListItem,
   canCreate,
   createForm,
   placeholder,
@@ -243,6 +245,7 @@ export default function SelectField<T extends Option>({
           onResults={onResults}
           options={options}
           onRenderOption={onRenderOption}
+          emptyListItem={emptyListItem}
         />
       )}
     </FormField>
