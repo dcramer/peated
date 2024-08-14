@@ -28,7 +28,7 @@ catalog:
   "@trpc/react-query": 11.0.0-rc.461
   "@trpc/server": 11.0.0-rc.461
   tsx: ^4.16.2
-  typescript: ^5.5.3
+  typescript: ^5.5.4
   "@types/node": ^20.14.9
   "@types/pg": ^8.11.6
   vitest: "~1.4.0"
