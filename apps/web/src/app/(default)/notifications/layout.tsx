@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Notifications",
 };
 
-export default async function DefaultLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;

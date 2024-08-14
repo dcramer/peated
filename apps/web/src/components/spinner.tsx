@@ -18,7 +18,7 @@ export default function Spinner() {
   }, [ref]);
 
   return (
-    <div className="m-8 flex min-h-full items-center justify-center text-slate-800">
+    <div className="m-8 flex items-center justify-center text-slate-800">
       <svg
         viewBox="0 0 135 133"
         fill="transparent"
