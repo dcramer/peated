@@ -1,6 +1,9 @@
+import Header from "@peated/web/components/header";
+import Layout from "@peated/web/components/layout";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { type Metadata } from "next";
+import SearchHeader from "./header";
 import SearchResults from "./results";
 
 const maxResults = 50;
@@ -34,10 +37,24 @@ export default async function Page({
   });
 
   return (
-    <SearchResults
-      results={results}
-      query={query}
-      directToTasting={directToTasting}
-    />
+    <Layout
+      footer={null}
+      header={
+        <Header>
+          <SearchHeader
+            name="q"
+            autoFocus
+            placeholder="Search for bottles, brands, and people"
+            value={query}
+          />
+        </Header>
+      }
+    >
+      <SearchResults
+        results={results}
+        query={query}
+        directToTasting={directToTasting}
+      />
+    </Layout>
   );
 }
