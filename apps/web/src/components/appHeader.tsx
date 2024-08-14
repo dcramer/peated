@@ -28,7 +28,7 @@ export default function AppHeader() {
   }, [pathname]);
 
   return (
-    <div className="flex flex-auto items-center gap-x-2 sm:gap-x-4">
+    <div className="flex flex-auto items-center gap-x-2">
       <SearchHeaderForm
         placeholder="Search for bottles, brands, and people"
         value={query}
