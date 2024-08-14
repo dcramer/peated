@@ -65,7 +65,7 @@ export default function AppHeader() {
           </div>
           <div className="block sm:hidden">
             <NavLink href={`/users/${user.username}`}>
-              <div className="h-8 w-8 sm:h-8 sm:w-8">
+              <div className="h-8 w-8">
                 <UserAvatar user={user} />
               </div>
             </NavLink>
@@ -80,7 +80,7 @@ export default function AppHeader() {
               searchParams,
             })}
           >
-            <div className="h-8 w-8 sm:h-8 sm:w-8">
+            <div className="h-8 w-8">
               <UserAvatar />
             </div>
           </NavLink>
