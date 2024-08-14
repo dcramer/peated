@@ -120,8 +120,8 @@ importers:
         specifier: ^7.4.2
         version: 7.4.2
       pnpm:
-        specifier: ^9.6.0
-        version: 9.6.0
+        specifier: ^9.7.1
+        version: 9.7.1
       simple-git-hooks:
         specifier: ^2.11.1
         version: 2.11.1
@@ -661,7 +661,7 @@ importers:
         version: 4.2.1(leaflet@1.9.4)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       react-qr-code:
         specifier: ^2.0.14
-        version: 2.0.14(react-native-svg@15.4.0(react@18.3.1))(react@18.3.1)
+        version: 2.0.14(react-native-svg@15.4.0(react-native@0.74.3(@babel/core@7.24.9)(@babel/preset-env@7.24.7(@babel/core@7.24.9))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       recharts:
         specifier: ^2.12.7
         version: 2.12.7(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
@@ -9025,8 +9025,8 @@ packages:
     resolution: {integrity: sha512-NCrCHhWmnQklfH4MtJMRjZ2a8c80qXeMlQMv2uVp9ISJMTt562SbGd6n2oq0PaPgKm7Z6pL9E2UlLIhC+SHL3w==}
     engines: {node: '>=4.0.0'}
 
-  pnpm@9.6.0:
-    resolution: {integrity: sha512-ONxvuo26NbOTQLlwARLC/h4S8QsXE0cVpKqYzPe7A152/Zgc8Ls4TfqY+NavVIHCvvL0Jmokv6IMNOtxR84LXg==}
+  pnpm@9.7.1:
+    resolution: {integrity: sha512-+vNEry1splxMXIwiJOp3qBpeiFnLxOBrFRHdzi8BUVEkMd0Z5q/zHyxqj18qztm9InPh/tfdTeGGiYQFnSxCRw==}
     engines: {node: '>=18.12'}
     hasBin: true
 
@@ -21514,7 +21514,7 @@ snapshots:
 
   pngjs@3.4.0: {}
 
-  pnpm@9.6.0: {}
+  pnpm@9.7.1: {}
 
   possible-typed-array-names@1.0.0: {}
 
@@ -21948,7 +21948,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  react-qr-code@2.0.14(react-native-svg@15.4.0(react@18.3.1))(react@18.3.1):
+  react-qr-code@2.0.14(react-native-svg@15.4.0(react-native@0.74.3(@babel/core@7.24.9)(@babel/preset-env@7.24.7(@babel/core@7.24.9))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       prop-types: 15.8.1
       qr.js: 0.0.0
