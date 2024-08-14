@@ -102,8 +102,8 @@ export default function SearchPanel({
       }
     >
       {state === "loading" && (
-        <div className="fixed inset-0 z-10">
-          <div className="absolute inset-0 bg-slate-800 opacity-50" />
+        <div className="z-1 fixed inset-0">
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-800 opacity-50" />
           <Spinner />
         </div>
       )}
