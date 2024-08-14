@@ -20,7 +20,7 @@ export default function SearchHeader({
   const blockStyles = `p-3`;
 
   return (
-    <nav className="flex min-w-full items-stretch justify-between text-white lg:mx-3 lg:gap-x-3">
+    <nav className="flex min-w-full items-stretch justify-between text-white lg:gap-x-3">
       <div className="-mx-3 flex items-center">
         <button
           onClick={() => (onClose ? onClose() : router.back())}

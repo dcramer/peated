@@ -75,6 +75,7 @@ export default function SearchPanel({
 
   return (
     <Layout
+      noMargin
       footer={null}
       header={
         <Header>
@@ -106,7 +107,10 @@ export default function SearchPanel({
           <Spinner />
         </div>
       )}
-      <ul role="list" className="divide-y divide-slate-800">
+      <ul
+        role="list"
+        className="divide-y divide-slate-800 border-slate-800 lg:border-r"
+      >
         {query && !isUserQuery && (results.length < maxResults || query) && (
           <ListItem color="highlight">
             <PlusIcon className="hidden h-12 w-12 flex-none rounded p-2 sm:block" />
