@@ -31,6 +31,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import ColorField from "./colorField";
 import Form from "./form";
+import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
 import ServingStyleIcon from "./servingStyleIcon";
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
@@ -283,6 +284,17 @@ export default function TastingForm({
                 onChange={(value) => {
                   onChange(value.map((t: any) => t.id || t));
                   setFriendsValue(value);
+                }}
+                emptyListItem={(query) => {
+                  return (
+                    <NoResultsFoundEntry
+                      message={
+                        query
+                          ? "We couldn't find anyone matching your query."
+                          : "It looks like you don't have any friends yet."
+                      }
+                    />
+                  );
                 }}
                 value={friendsValue}
               />

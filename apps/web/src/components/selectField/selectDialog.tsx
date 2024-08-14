@@ -3,6 +3,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import config from "@peated/web/config";
 import classNames from "@peated/web/lib/classNames";
 import { motion } from "framer-motion";
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import LayoutModal from "../layoutModal";
@@ -26,6 +27,7 @@ export default function SelectDialog<T extends Option>({
   onSelect,
   selectedValues = [],
   searchPlaceholder,
+  emptyListItem,
   canCreate = false,
   createForm,
   multiple = false,
@@ -39,6 +41,7 @@ export default function SelectDialog<T extends Option>({
   onSelect?: (value: T) => void;
   selectedValues?: T[];
   searchPlaceholder?: string;
+  emptyListItem?: (query: string) => ReactNode;
   canCreate?: boolean;
   multiple?: boolean;
   createForm?: CreateForm<T>;
@@ -150,56 +153,61 @@ export default function SelectDialog<T extends Option>({
                   </ListItem>
                 );
               })}
-              {(results.length < 10 || query !== "") &&
-                (canCreate && createForm ? (
-                  <ListItem as={motion.li} className={listItemClasses}>
-                    <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+              {(results.length < 10 || query !== "") && !isLoading && (
+                <ListItem as={motion.li} className={listItemClasses}>
+                  {emptyListItem ? (
+                    emptyListItem(query)
+                  ) : canCreate && createForm ? (
+                    <>
+                      <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
-                    <div className="min-w-0 flex-auto">
-                      <div className="font-semibold">
-                        <button onClick={() => setCreateOpen(true)}>
-                          <span className="absolute inset-x-0 -top-px bottom-0" />
-                          Can't find what you're looking for?
-                        </button>
+                      <div className="min-w-0 flex-auto">
+                        <div className="font-semibold">
+                          <button onClick={() => setCreateOpen(true)}>
+                            <span className="absolute inset-x-0 -top-px bottom-0" />
+                            Can't find what you're looking for?
+                          </button>
+                        </div>
+                        <div className="mt-1 flex gap-x-1 text-sm">
+                          {query !== "" ? (
+                            <span>
+                              Tap here to add{" "}
+                              <strong className="truncate font-bold">
+                                {toTitleCase(query)}
+                              </strong>{" "}
+                              to the database.
+                            </span>
+                          ) : (
+                            <span>
+                              Tap here to add a new entry to the database.
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="mt-1 flex gap-x-1 text-sm">
-                        {query !== "" ? (
-                          <span>
-                            Tap here to add{" "}
-                            <strong className="truncate font-bold">
-                              {toTitleCase(query)}
-                            </strong>{" "}
-                            to the database.
-                          </span>
-                        ) : (
-                          <span>
-                            Tap here to add a new entry to the database.
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </ListItem>
-                ) : (
-                  <ListItem as={motion.li} className={listItemClasses}>
-                    <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+                    </>
+                  ) : (
+                    <>
+                      <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
-                    <div className="min-w-0 flex-auto">
-                      <div className="font-semibold">
-                        <a
-                          href={config.GITHUB_REPO}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <span className="absolute inset-x-0 -top-px bottom-0" />
-                          Can't find what you're looking for?
-                        </a>
+                      <div className="min-w-0 flex-auto">
+                        <div className="font-semibold">
+                          <a
+                            href={config.GITHUB_REPO}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <span className="absolute inset-x-0 -top-px bottom-0" />
+                            Can't find what you're looking for?
+                          </a>
+                        </div>
+                        <div className="mt-1 flex gap-x-1 text-sm">
+                          Well, that stinks. Maybe open an issue on GitHub?
+                        </div>
                       </div>
-                      <div className="mt-1 flex gap-x-1 text-sm">
-                        Well, that stinks. Maybe open an issue on GitHub?
-                      </div>
-                    </div>
-                  </ListItem>
-                ))}
+                    </>
+                  )}
+                </ListItem>
+              )}
             </ul>
           </div>
         </LayoutModal>

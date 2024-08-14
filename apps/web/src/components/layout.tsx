@@ -1,4 +1,5 @@
 import { Suspense, type ReactNode } from "react";
+import classNames from "../lib/classNames";
 import AppFooter from "./appFooter";
 import AppHeader from "./appHeader";
 import Footer from "./footer";
@@ -11,12 +12,14 @@ export default function Layout({
   footer,
   sidebar,
   rightSidebar,
+  noMargin,
 }: {
   children: ReactNode;
   header?: ReactNode;
   footer?: ReactNode;
   sidebar?: ReactNode;
   rightSidebar?: ReactNode;
+  noMargin?: boolean;
 }) {
   return (
     <>
@@ -32,7 +35,9 @@ export default function Layout({
 
       <div className="flex">
         <main className="w-full max-w-7xl flex-auto lg:pl-64">
-          <div className="mx-auto py-4 lg:p-8">{children}</div>
+          <div className={classNames("mx-auto", noMargin ? "" : "py-4 lg:p-8")}>
+            {children}
+          </div>
         </main>
 
         {rightSidebar ? (
