@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import useAutofocus from "../hooks/useAutofocus";
+import Spinner from "./spinner";
 
 export default function SearchHeaderForm({
   name = "q",
@@ -11,6 +12,7 @@ export default function SearchHeaderForm({
   onFocus,
   autoFocus,
   children,
+  loading,
   ...props
 }: {
   value?: string;
@@ -20,6 +22,7 @@ export default function SearchHeaderForm({
   onSubmit?: (value: string) => void;
   onFocus?: () => void;
   autoFocus?: boolean;
+  loading?: boolean;
   children?: ReactNode;
 }) {
   const [value, setValue] = useState(props.value ?? "");
@@ -43,7 +46,7 @@ export default function SearchHeaderForm({
 
   return (
     <form
-      className={`flex flex-auto flex-col items-stretch justify-center pl-3 pr-2 lg:pr-7`}
+      className="relative flex flex-auto flex-col items-stretch justify-center"
       action="/search"
       method="get"
       onSubmit={(e) => {
@@ -64,9 +67,17 @@ export default function SearchHeaderForm({
           setValue(e.target.value);
           if (onChange) onChange(e.target.value);
         }}
-        className="block transform rounded border-transparent bg-slate-800 px-2 py-1.5 text-white placeholder:text-slate-400 focus:border-transparent focus:outline focus:outline-slate-700 focus:ring-0 sm:px-3 sm:py-1.5"
+        className="block transform rounded border-slate-800 bg-slate-800 px-2 py-1 text-white outline outline-slate-800 placeholder:text-slate-400 focus:border-slate-800 focus:outline-slate-700 focus:ring-0 sm:px-3"
         ref={ref}
       />
+      {loading && (
+        <div className="absolute bottom-0 right-0 top-0 z-10 p-1">
+          <Spinner
+            className="m-0 h-7 w-7 text-white"
+            pathClassName="stroke-white"
+          />
+        </div>
+      )}
       {children}
     </form>
   );

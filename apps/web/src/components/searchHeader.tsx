@@ -17,11 +17,11 @@ export default function SearchHeader({
 }) {
   const router = useRouter();
 
-  const blockStyles = `p-3`;
+  const blockStyles = ``;
 
   return (
-    <nav className="flex min-w-full items-stretch justify-between text-white lg:gap-x-3">
-      <div className="-mx-3 flex items-center">
+    <nav className="flex min-w-full items-stretch justify-between gap-x-4 text-white">
+      <div className="flex items-center">
         <button
           onClick={() => (onClose ? onClose() : router.back())}
           className={`${blockStyles} text-muted group flex justify-center`}

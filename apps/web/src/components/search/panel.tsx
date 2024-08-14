@@ -12,7 +12,6 @@ import Header from "../header";
 import Layout from "../layout";
 import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";
-import Spinner from "../spinner";
 import type { Result } from "./result";
 import ResultRow from "./result";
 
@@ -96,17 +95,12 @@ export default function SearchPanel({
                 }`,
               );
             }}
+            loading={state === "loading"}
             onClose={onClose}
           />
         </Header>
       }
     >
-      {state === "loading" && (
-        <div className="z-1 fixed inset-0">
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-800 opacity-50" />
-          <Spinner />
-        </div>
-      )}
       <ul
         role="list"
         className="divide-y divide-slate-800 border-slate-800 lg:border-b lg:border-r"
