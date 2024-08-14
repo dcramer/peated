@@ -6,7 +6,7 @@ import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounceCallback, useDebounceValue } from "usehooks-ts";
 import Header from "../header";
 import Layout from "../layout";
@@ -43,8 +43,7 @@ export default function SearchPanel({
   const trpcUtils = trpc.useUtils();
   const isUserQuery = query.indexOf("@") !== -1 && user;
 
-  // TODO: handle errors
-  const onQuery = useDebounceCallback(async (query: string) => {
+  const _onQuery = useCallback(async (query: string) => {
     setState("loading");
 
     const isUserQuery = query.indexOf("@") !== -1 && user;
@@ -63,7 +62,10 @@ export default function SearchPanel({
 
     setResults(results);
     setState("ready");
-  });
+  }, []);
+
+  // TODO: handle errors
+  const onQuery = useDebounceCallback(_onQuery);
 
   useEffect(() => {
     const curValue = initialValue ?? value ?? "";
