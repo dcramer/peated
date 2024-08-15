@@ -4,7 +4,7 @@ import config from "@peated/web/config";
 import classNames from "@peated/web/lib/classNames";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import LayoutModal from "../layoutModal";
 import ListItem from "../listItem";
@@ -62,7 +62,7 @@ export default function SelectDialog<T extends Option>({
 
   let pendingQuery = "";
 
-  const onSearch = useDebounceCallback(async (query = "") => {
+  const unsafe_onSearch = useCallback(async (query = "") => {
     if (pendingQuery !== query) return;
     if (!isLoading) setLoading(true);
     const results = onQuery
@@ -75,7 +75,9 @@ export default function SelectDialog<T extends Option>({
     setResults(onResults ? onResults(results) : results);
     setQuery(query);
     setLoading(false);
-  });
+  }, []);
+
+  const onSearch = useDebounceCallback(unsafe_onSearch);
 
   const selectOption = async (option: T) => {
     setPreviousValues(filterDupes([option], previousValues));

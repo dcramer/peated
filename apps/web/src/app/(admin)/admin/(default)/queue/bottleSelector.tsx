@@ -12,7 +12,7 @@ import SearchHeader from "@peated/web/components/searchHeader";
 import Spinner from "@peated/web/components/spinner";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
 export default function BottleSelector({
@@ -36,16 +36,18 @@ export default function BottleSelector({
 
   const trpcUtils = trpc.useUtils();
 
-  const onSearch = useDebounceCallback(async (query = "") => {
+  const unsafe_onSearch = useCallback(async (query = "") => {
     setLoading(true);
     const { results } = await trpcUtils.bottleList.fetch({ query });
     setResults(results);
     setLoading(false);
-  });
+  }, []);
+
+  const onSearch = useDebounceCallback(unsafe_onSearch);
 
   useEffect(() => {
     if (!open) return;
-    onSearch(name);
+    onSearch(name ?? "");
     setQuery(name ?? "");
   }, [name, open]);
 

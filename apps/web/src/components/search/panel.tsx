@@ -43,7 +43,7 @@ export default function SearchPanel({
   const trpcUtils = trpc.useUtils();
   const isUserQuery = query.indexOf("@") !== -1 && user;
 
-  const _onQuery = useCallback(async (query: string) => {
+  const unsafe_onQuery = useCallback(async (query: string) => {
     setState("loading");
 
     const isUserQuery = query.indexOf("@") !== -1 && user;
@@ -65,7 +65,7 @@ export default function SearchPanel({
   }, []);
 
   // TODO: handle errors
-  const onQuery = useDebounceCallback(_onQuery);
+  const onQuery = useDebounceCallback(unsafe_onQuery);
 
   useEffect(() => {
     const curValue = initialValue ?? value ?? "";
