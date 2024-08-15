@@ -1,8 +1,5 @@
 "use client";
 
-import { PlusIcon } from "@heroicons/react/20/solid";
-import { toTitleCase } from "@peated/server/lib/strings";
-import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,10 +7,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import Header from "../header";
 import Layout from "../layout";
-import ListItem from "../listItem";
 import SearchHeader from "../searchHeader";
 import type { Result } from "./result";
-import ResultRow from "./result";
+import SearchResults from "./searchResults";
+import { SkeletonItem } from "./skeletonItem";
 
 const maxResults = 50;
 
@@ -36,9 +33,12 @@ export default function SearchPanel({
 
   const router = useRouter();
 
+  const [initialState, setInitialState] = useState<"loading" | "ready">(
+    "loading",
+  );
   const [query, setQuery] = useState(initialValue ?? value ?? "");
   const [state, setState] = useState<"loading" | "ready">("loading");
-  const [results, setResults] = useState<readonly Result[]>([]);
+  const [results, setResults] = useState<Result[]>([]);
 
   const trpcUtils = trpc.useUtils();
   const isUserQuery = query.indexOf("@") !== -1 && user;
@@ -62,6 +62,7 @@ export default function SearchPanel({
 
     setResults(results);
     setState("ready");
+    setInitialState("ready");
   }, []);
 
   // TODO: handle errors
@@ -103,45 +104,16 @@ export default function SearchPanel({
         </Header>
       }
     >
-      <ul
-        role="list"
-        className="divide-y divide-slate-800 border-slate-800 lg:border-b lg:border-r"
-      >
-        {query && !isUserQuery && (results.length < maxResults || query) && (
-          <ListItem color="highlight">
-            <PlusIcon className="hidden h-12 w-12 flex-none rounded p-2 sm:block" />
-
-            <div className="min-w-0 flex-auto">
-              <div className="font-semibold leading-6">
-                <Link
-                  href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}`}
-                >
-                  <span className="absolute inset-x-0 -top-px bottom-0" />
-                  {"Can't find a bottle?"}
-                </Link>
-              </div>
-              <div className="text-highlight-dark mt-1 flex gap-x-1 leading-5">
-                {query !== "" ? (
-                  <span>
-                    Tap here to add{" "}
-                    <strong className="truncate">{toTitleCase(query)}</strong>{" "}
-                    to the database.
-                  </span>
-                ) : (
-                  <span>Tap here to add a new entry to the database.</span>
-                )}
-              </div>
-            </div>
-          </ListItem>
-        )}
-        {results.map((result) => {
-          return (
-            <ListItem key={`${result.type}-${result.ref.id}`}>
-              <ResultRow result={result} directToTasting={directToTasting} />
-            </ListItem>
-          );
-        })}
-      </ul>
+      {initialState === "loading" ? (
+        [...Array(maxResults).keys()].map((i) => <SkeletonItem key={i} />)
+      ) : (
+        <SearchResults
+          query={query}
+          results={results}
+          canSuggestAdd={!isUserQuery}
+          directToTasting={directToTasting}
+        />
+      )}
     </Layout>
   );
 }

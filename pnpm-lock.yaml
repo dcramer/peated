@@ -661,7 +661,7 @@ importers:
         version: 4.2.1(leaflet@1.9.4)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       react-qr-code:
         specifier: ^2.0.14
-        version: 2.0.14(react-native-svg@15.4.0(react-native@0.74.3(@babel/core@7.24.9)(@babel/preset-env@7.24.7(@babel/core@7.24.9))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 2.0.14(react-native-svg@15.4.0(react@18.3.1))(react@18.3.1)
       recharts:
         specifier: ^2.12.7
         version: 2.12.7(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
@@ -22180,7 +22180,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  react-qr-code@2.0.14(react-native-svg@15.4.0(react-native@0.74.3(@babel/core@7.24.9)(@babel/preset-env@7.24.7(@babel/core@7.24.9))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  react-qr-code@2.0.14(react-native-svg@15.4.0(react@18.3.1))(react@18.3.1):
     dependencies:
       prop-types: 15.8.1
       qr.js: 0.0.0
