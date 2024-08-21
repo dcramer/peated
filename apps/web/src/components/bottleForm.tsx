@@ -343,7 +343,7 @@ export default function BottleForm({
                 error={errors.distillers}
                 searchContext={{
                   type: "distiller",
-                  brand: brandValue ? Number(brandValue.id) : null,
+                  brand: brandValue?.id ? Number(brandValue.id) : null,
                   bottleName: watch("name"),
                 }}
                 label="Distiller"
@@ -397,7 +397,7 @@ export default function BottleForm({
                 suggestedOptions={brandValue ? [brandValue] : []}
                 searchContext={{
                   type: "bottler",
-                  brand: brandValue ? Number(brandValue.id) : null,
+                  brand: brandValue?.id ? Number(brandValue.id) : null,
                   bottleName: watch("name"),
                 }}
                 onChange={(value) => {
