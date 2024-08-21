@@ -16,9 +16,9 @@ import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import { authedProcedure } from "..";
+import { verifiedProcedure } from "..";
 
-export default authedProcedure
+export default verifiedProcedure
   .input(EntityInputSchema)
   .mutation(async function ({ input, ctx }) {
     const data: NewEntity = {

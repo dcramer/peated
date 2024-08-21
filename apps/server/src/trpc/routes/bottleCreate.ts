@@ -21,7 +21,7 @@ import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
-import { authedProcedure } from "..";
+import { verifiedProcedure } from "..";
 import { type Context } from "../context";
 import { ConflictError } from "../errors";
 import { bottleNormalize } from "./bottlePreview";
@@ -237,4 +237,6 @@ export async function bottleCreate({
   return await serialize(BottleSerializer, bottle, ctx.user);
 }
 
-export default authedProcedure.input(BottleInputSchema).mutation(bottleCreate);
+export default verifiedProcedure
+  .input(BottleInputSchema)
+  .mutation(bottleCreate);

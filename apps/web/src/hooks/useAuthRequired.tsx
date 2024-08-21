@@ -50,3 +50,20 @@ export function useAdminRequired() {
     redirect("/errors/unauthorized");
   }
 }
+
+export function useVerifiedRequired() {
+  const { user } = useAuth();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  if (!user) {
+    redirectToAuth({
+      pathname,
+      searchParams,
+    });
+  }
+
+  if (!user?.verified) {
+    redirect("/verify");
+  }
+}

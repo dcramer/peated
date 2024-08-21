@@ -4,13 +4,13 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity } from "@peated/server/types";
 import BottleForm from "@peated/web/components/bottleForm";
 import Spinner from "@peated/web/components/spinner";
-import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AddBottle() {
-  useAuthRequired();
+  useVerifiedRequired();
 
   const router = useRouter();
   const searchParams = useSearchParams();

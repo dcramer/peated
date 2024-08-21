@@ -144,6 +144,7 @@ export const User = async (
       admin: false,
       mod: false,
       active: true,
+      verified: true,
       createdAt: new Date(),
       ...(data as Record<string, any>),
     })

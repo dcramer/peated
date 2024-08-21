@@ -2,7 +2,7 @@ import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("initiates email", async ({ fixtures }) => {
-  const user = await fixtures.User();
+  const user = await fixtures.User({ verified: false });
   const caller = createCaller({ user });
 
   await caller.emailResendVerification();

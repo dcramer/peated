@@ -27,6 +27,18 @@ const isAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
+const isVerified = t.middleware(({ ctx, next }) => {
+  if (!ctx.user?.verified) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+    },
+  });
+});
+
 const isAdmin = t.middleware(({ ctx, next }) => {
   if (!ctx.user?.admin) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -57,5 +69,6 @@ export const createCallerFactory = t.createCallerFactory;
 export const middleware = t.middleware;
 export const publicProcedure = t.procedure.use(trpcMiddleware());
 export const authedProcedure = publicProcedure.use(isAuthed);
+export const verifiedProcedure = publicProcedure.use(isVerified);
 export const adminProcedure = publicProcedure.use(isAdmin);
 export const modProcedure = publicProcedure.use(isMod);
