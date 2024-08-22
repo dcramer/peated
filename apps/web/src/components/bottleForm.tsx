@@ -22,6 +22,7 @@ import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
+import ImageField from "@peated/web/components/imageField";
 import Layout from "@peated/web/components/layout";
 import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
@@ -84,7 +85,11 @@ export default function BottleForm({
   title,
   returnTo,
 }: {
-  onSubmit: SubmitHandler<FormSchemaType>;
+  onSubmit: SubmitHandler<
+    FormSchemaType & {
+      image: HTMLCanvasElement | null;
+    }
+  >;
   initialData: Partial<Bottle>;
   title: string;
   returnTo?: string | null;
@@ -112,13 +117,14 @@ export default function BottleForm({
   const { user } = useAuth();
 
   const [error, setError] = useState<string | undefined>();
+  const [image, setImage] = useState<HTMLCanvasElement | null>(null);
   const router = useRouter();
 
   const generateDataMutation = trpc.bottleGenerateDetails.useMutation();
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
-      await onSubmit(data);
+      await onSubmit({ image, ...data });
     } catch (err) {
       if (isTRPCClientError(err)) {
         setError(err.message);
@@ -581,17 +587,28 @@ export default function BottleForm({
               />
 
               {user && (user.mod || user.admin) && (
-                <TextAreaField
-                  {...register("description", {
-                    setValueAs: (v) => (v === "" || !v ? null : v),
-                    onChange: () => {
-                      setValue("descriptionSrc", "user");
-                    },
-                  })}
-                  error={errors.description}
-                  label="Description"
-                  rows={8}
-                />
+                <>
+                  <ImageField
+                    name="image"
+                    label="Image"
+                    value={initialData.imageUrl}
+                    onChange={(value) => setImage(value)}
+                    imageWidth={1024 / 2}
+                    imageHeight={768 / 2}
+                  />
+
+                  <TextAreaField
+                    {...register("description", {
+                      setValueAs: (v) => (v === "" || !v ? null : v),
+                      onChange: () => {
+                        setValue("descriptionSrc", "user");
+                      },
+                    })}
+                    error={errors.description}
+                    label="Description"
+                    rows={8}
+                  />
+                </>
               )}
             </Collapsable>
           </Fieldset>

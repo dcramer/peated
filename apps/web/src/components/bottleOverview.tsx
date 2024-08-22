@@ -22,7 +22,7 @@ export default function BottleOverview({
     <>
       <div className="my-6 px-3 md:px-0">
         <div className="flex space-x-4">
-          <div className="max-w-none flex-auto">
+          <div className="flex-1">
             <Suspense>
               <BottleReviews bottleId={bottle.id} />
             </Suspense>
@@ -159,12 +159,22 @@ export default function BottleOverview({
               </>
             </DefinitionList>
           </div>
-          <img
-            src={RobotImage.src}
-            className="hidden h-40 w-40 sm:block"
-            alt="peated robot"
-            aria-hidden="true"
-          />
+          <div className="hidden w-64 sm:block">
+            {bottle.imageUrl ? (
+              <img
+                src={bottle.imageUrl}
+                className="block w-64"
+                aria-hidden="true"
+              />
+            ) : (
+              <img
+                src={RobotImage.src}
+                className="block h-64 w-64"
+                alt="peated robot"
+                aria-hidden="true"
+              />
+            )}
+          </div>
         </div>
       </div>
     </>

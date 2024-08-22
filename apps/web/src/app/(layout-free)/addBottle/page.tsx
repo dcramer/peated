@@ -3,8 +3,12 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity } from "@peated/server/types";
 import BottleForm from "@peated/web/components/bottleForm";
+import { useFlashMessages } from "@peated/web/components/flash";
 import Spinner from "@peated/web/components/spinner";
+import useApi from "@peated/web/hooks/useApi";
 import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
+import { toBlob } from "@peated/web/lib/blobs";
+import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -68,6 +72,8 @@ export default function AddBottle() {
   }, [initialQueries.find((q) => q.isLoading)]);
 
   const bottleCreateMutation = trpc.bottleCreate.useMutation();
+  const api = useApi();
+  const { flash } = useFlashMessages();
 
   if (loading) {
     return <Spinner />;
@@ -75,8 +81,26 @@ export default function AddBottle() {
 
   return (
     <BottleForm
-      onSubmit={async (data) => {
+      onSubmit={async ({ image, ...data }) => {
         const newBottle = await bottleCreateMutation.mutateAsync(data);
+        if (image) {
+          const blob = await toBlob(image);
+          try {
+            // TODO: switch to fetch maybe?
+            await api.post(`/bottles/${newBottle.id}/image`, {
+              data: {
+                image: blob,
+              },
+            });
+          } catch (err) {
+            logError(err);
+            flash(
+              "There was an error uploading your image, but the bottle was saved.",
+              "error",
+            );
+          }
+        }
+
         if (returnTo) router.push(returnTo);
         else router.replace(`/bottles/${newBottle.id}/addTasting`);
       }}
