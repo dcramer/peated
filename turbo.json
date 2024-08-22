@@ -11,14 +11,18 @@
         "dist/**"
       ]
     },
+    "start": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "persistent": true
+    },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "test": {
       "dependsOn": ["build"],
-      "inputs": ["**/*.{ts,tsx,js,jsx}"],
-      "passThroughEnv": ["DATABASE_URL", "JWT_SECRET"]
+      "inputs": ["**/*.{ts,tsx,js,jsx}"]
     },
     "typecheck": {}
   },

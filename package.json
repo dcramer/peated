@@ -25,6 +25,7 @@
     "tastings": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli tastings",
     "mocks": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli mocks",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli users",
+    "start": "dotenv -e .env.local -- turbo start --filter=\"!./apps/mobile\"",
     "typecheck": "turbo typecheck --filter='!./apps/mobile'",
     "lint": "turbo lint",
     "test": "turbo test",
