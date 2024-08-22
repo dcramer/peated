@@ -64,7 +64,11 @@ export default function Page() {
     },
   });
 
-  const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
+  const onSubmit: SubmitHandler<
+    FormSchemaType & {
+      picture: HTMLCanvasElement | null | undefined;
+    }
+  > = async (data) => {
     const newUser = await userUpdateMutation.mutateAsync({
       ...data,
       picture: picture === null ? null : undefined,

@@ -95,7 +95,11 @@ export default function TastingForm({
 
   const trpcUtils = trpc.useUtils();
 
-  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
+  const onSubmitHandler: SubmitHandler<
+    FormSchemaType & {
+      image: HTMLCanvasElement | null | undefined;
+    }
+  > = async (data) => {
     try {
       await onSubmit({ ...data, image });
     } catch (err) {

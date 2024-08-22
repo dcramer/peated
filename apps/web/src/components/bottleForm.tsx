@@ -124,7 +124,11 @@ export default function BottleForm({
 
   const generateDataMutation = trpc.bottleGenerateDetails.useMutation();
 
-  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
+  const onSubmitHandler: SubmitHandler<
+    FormSchemaType & {
+      image: HTMLCanvasElement | null | undefined;
+    }
+  > = async (data) => {
     try {
       await onSubmit({ image, ...data });
     } catch (err) {
