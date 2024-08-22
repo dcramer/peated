@@ -60,14 +60,14 @@ export default {
       return res.status(400).send({ error: "Bad request", code: "no_file" });
     }
 
+    // TODO: this is upsampling images...
     let imageUrl: string;
     try {
       imageUrl = await storeFile({
         data: fileData,
         namespace: `bottles`,
         urlPrefix: "/uploads",
-        onProcess: (...args) =>
-          compressAndResizeImage(...args, undefined, 1024),
+        onProcess: (...args) => compressAndResizeImage(...args, undefined, 512),
       });
     } catch (err) {
       if (fileData.file.truncated) {
