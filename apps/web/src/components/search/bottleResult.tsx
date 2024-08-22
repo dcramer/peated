@@ -3,6 +3,8 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import Link from "@peated/web/components/link";
+import { Fragment, type ReactNode } from "react";
+import Join from "../join";
 export type BottleResult = {
   type: "bottle";
   ref: Bottle;
@@ -15,6 +17,22 @@ export default function BottleResultRow({
   result: BottleResult;
   directToTasting: boolean;
 }) {
+  const metadata: ReactNode[] = [];
+  if (bottle.distillers.length)
+    metadata.push(
+      <span>
+        <Join divider=", ">
+          {bottle.distillers.map((d) => (
+            <span key={d.id}>{d.name}</span>
+          ))}
+        </Join>
+      </span>,
+    );
+  if (bottle.vintageYear)
+    metadata.push(<span>{bottle.vintageYear} Vintage</span>);
+  if (bottle.releaseYear)
+    metadata.push(<span>{bottle.releaseYear} Release</span>);
+
   return (
     <>
       <BottleIcon className="m-2 hidden h-10 w-auto sm:block" />
@@ -39,9 +57,9 @@ export default function BottleResultRow({
           )}
         </div>
         <div className="text-muted mt-1 flex gap-x-1 truncate text-sm leading-5">
-          {bottle.distillers.length
-            ? bottle.distillers.map((d) => <span key={d.id}>{d.name}</span>)
-            : null}
+          {metadata.length ? (
+            <Join divider={<>&middot;</>}>{metadata}</Join>
+          ) : null}
         </div>
       </div>
       <div className="flex items-center gap-x-4">
