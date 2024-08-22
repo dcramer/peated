@@ -34,7 +34,7 @@ export default function BottleOverview({
                 </div>
               </>
             )}
-            <div className="my-6 hidden px-3 md:px-0 lg:block">
+            <div className="mb-4 hidden px-3 md:px-0 lg:block">
               <BottleTagDistribution bottleId={bottle.id} />
             </div>
             {bottle.tastingNotes && (
