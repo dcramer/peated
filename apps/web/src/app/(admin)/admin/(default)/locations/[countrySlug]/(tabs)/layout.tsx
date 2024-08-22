@@ -2,10 +2,10 @@
 
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
+import Link from "@peated/web/components/link";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { trpc } from "@peated/web/lib/trpc/client";
-import Link from "next/link";
 import { type ReactNode } from "react";
 
 export default function Page({

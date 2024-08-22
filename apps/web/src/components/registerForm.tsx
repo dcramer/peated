@@ -1,9 +1,9 @@
 "use client";
 
 import Button from "@peated/web/components/button";
+import Link from "@peated/web/components/link";
 import TextField from "@peated/web/components/textField";
 import { authenticate, registerForm } from "@peated/web/lib/auth.actions";
-import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 import config from "../config";
 import Alert from "./alert";

@@ -3,8 +3,8 @@ import {
   SMWS_DISTILLERY_CODES,
 } from "@peated/server/lib/smws";
 import Heading from "@peated/web/components/heading";
+import Link from "@peated/web/components/link";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-static";

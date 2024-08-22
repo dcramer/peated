@@ -1,7 +1,7 @@
+import Link from "@peated/web/components/link";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { type ReactNode } from "react";
 
 export const metadata: Metadata = {

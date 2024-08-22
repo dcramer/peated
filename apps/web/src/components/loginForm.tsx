@@ -2,10 +2,10 @@
 
 import Button from "@peated/web/components/button";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
+import Link from "@peated/web/components/link";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { authenticate, authenticateForm } from "@peated/web/lib/auth.actions";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useFormState, useFormStatus } from "react-dom";
 import Alert from "./alert";
