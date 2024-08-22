@@ -44,6 +44,7 @@ export const BottleSchema = z.object({
 
   description: z.string().nullable().default(null),
   descriptionSrc: ContentSourceEnum.nullable().default(null).optional(),
+  imageUrl: z.string().url().nullable().default(null),
   flavorProfile: FlavorProfileEnum.nullable().default(null),
   tastingNotes: z
     .object({
@@ -75,6 +76,7 @@ const EntityChoice = z.union([
 export const BottleInputSchema = BottleSchema.omit({
   id: true,
   fullName: true,
+  imageUrl: true,
   suggestedTags: true,
   avgRating: true,
   totalTastings: true,

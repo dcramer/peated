@@ -15,6 +15,10 @@ if (!existsSync(CACHE)) {
 
 export class PageNotFound extends Error {}
 
+export function downloadFileAsBlob(url: string) {
+  return fetch(url).then((res) => res.blob());
+}
+
 export async function getUrl(
   url: string,
   noCache = !!process.env.DISABLE_HTTP_CACHE,

@@ -1,6 +1,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
+import config from "../config";
 import { db } from "../db";
 import type { Bottle, Flight, User } from "../db/schema";
 import {
@@ -11,6 +12,7 @@ import {
   tastings,
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
+import { absoluteUrl } from "../lib/urls";
 import { type BottleSchema } from "../schemas";
 import { EntitySerializer } from "./entity";
 
@@ -161,6 +163,10 @@ export const BottleSerializer = serializer({
       statedAge: item.statedAge,
       caskStrength: item.caskStrength,
       singleCask: item.singleCask,
+
+      imageUrl: item.imageUrl
+        ? absoluteUrl(config.API_SERVER, item.imageUrl)
+        : null,
 
       vintageYear: item.vintageYear,
       releaseYear: item.releaseYear,

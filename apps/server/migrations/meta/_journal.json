@@ -1023,6 +1023,13 @@
       "when": 1722974590404,
       "tag": "0145_giant_silver_centurion",
       "breakpoints": false
+    },
+    {
+      "idx": 146,
+      "version": "7",
+      "when": 1724352788475,
+      "tag": "0146_lowly_kronos",
+      "breakpoints": false
     }
   ]
 }

@@ -1,6 +1,11 @@
+import { ApiClient } from "@peated/server/lib/apiClient";
 import { logError } from "@peated/server/lib/log";
 import { normalizeBottle } from "@peated/server/lib/normalize";
-import { chunked, getUrl } from "@peated/server/lib/scraper";
+import {
+  chunked,
+  downloadFileAsBlob,
+  getUrl,
+} from "@peated/server/lib/scraper";
 import {
   parseCaskType,
   parseDetailsFromName,
@@ -12,39 +17,54 @@ import {
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { isTRPCClientError } from "@peated/server/trpc/client";
-
 import { type z } from "zod";
 
 export default async function scrapeSMWS() {
+  const apiClient = new ApiClient();
+
   await scrapeBottles(
     `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
-    async (bottle, price) => {
+    async (bottleData, priceData, imageUrl) => {
       if (process.env.ACCESS_TOKEN) {
-        console.log(`Submitting [${bottle.name}]`);
+        console.log(`Submitting [${bottleData.name}]`);
 
+        let bottle;
         try {
-          await trpcClient.bottleUpsert.mutate({
-            ...bottle,
+          bottle = await trpcClient.bottleUpsert.mutate({
+            ...bottleData,
           });
         } catch (err) {
           if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
-            logError(err, { bottle });
+            logError(err, { bottle: bottleData });
             return;
+          }
+        }
+
+        if (bottle && !bottle.imageUrl && imageUrl) {
+          try {
+            const blob = await downloadFileAsBlob(imageUrl);
+            await apiClient.post(`/bottles/${bottle.id}/image`, {
+              data: {
+                image: blob,
+              },
+            });
+          } catch (err) {
+            logError(err, { bottle: bottleData, price: priceData });
           }
         }
 
         try {
           await trpcClient.priceCreateBatch.mutate({
             site: "smws",
-            prices: [price],
+            prices: [priceData],
           });
         } catch (err) {
           if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
-            logError(err, { bottle, price });
+            logError(err, { bottle: bottleData, price: priceData });
           }
         }
       } else {
-        console.log(`Dry Run [${bottle.name}]`);
+        console.log(`Dry Run [${bottleData.name}]`);
       }
     },
   );
@@ -67,6 +87,9 @@ type SMWSPayload = {
     categories: string[];
     price: number;
     url: string;
+    release_date: string; // seems to be iso
+    distilleddate: string; // needs parsed
+    image: string;
   }[];
 };
 
@@ -75,6 +98,7 @@ export async function scrapeBottles(
   cb: (
     bottle: z.input<typeof BottleInputSchema>,
     price: z.input<typeof StorePriceInputSchema>,
+    imageUrl?: string | null,
   ) => Promise<void>,
 ) {
   const body = await getUrl(url);
@@ -112,6 +136,9 @@ export async function scrapeBottles(
         const { name, statedAge, vintageYear, releaseYear } = normalizeBottle({
           name: details.name,
           statedAge: item.age,
+          releaseYear: item.release_date
+            ? new Date(item.release_date).getFullYear()
+            : null,
           isFullName: false,
         });
 
@@ -149,6 +176,7 @@ export async function scrapeBottles(
             volume: 750,
             url: `https://smws.com${item.url}`,
           },
+          item.image,
         );
       }),
     );

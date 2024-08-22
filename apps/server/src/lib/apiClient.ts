@@ -1,4 +1,4 @@
-import config from "@peated/web/config";
+import config from "../config";
 
 export type ApiRequestOptions = {
   method?: "GET" | "POST" | "DELETE" | "PUT";
@@ -47,12 +47,12 @@ export class ApiClient {
   accessToken: string | null;
 
   constructor({
-    server,
+    server = config.API_SERVER,
     accessToken = null,
   }: {
-    server: string;
+    server?: string;
     accessToken?: string | null;
-  }) {
+  } = {}) {
     this.server = server;
     this.accessToken = accessToken;
   }
@@ -142,9 +142,3 @@ export class ApiClient {
     });
   }
 }
-
-const createDefaultClient = () => {
-  return new ApiClient({
-    server: config.API_SERVER,
-  });
-};

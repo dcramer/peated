@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyPluginCallback } from "fastify";
 import triggerSentry from "./debug/triggerSentry";
 import root from "./root";
 import updateBadgeImage from "./updateBadgeImage";
+import updateBottleImage from "./updateBottleImage";
 import updateTastingImage from "./updateTastingImage";
 import updateUserAvatar from "./updateUserAvatar";
 import uploads from "./uploads";
@@ -39,6 +40,7 @@ export const router: FastifyPluginCallback = (
 
   fastify.route(root);
   fastify.route(updateBadgeImage);
+  fastify.route(updateBottleImage);
   fastify.route(updateTastingImage);
   fastify.route(updateUserAvatar);
   fastify.route(uploads);

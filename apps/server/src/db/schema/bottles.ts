@@ -65,6 +65,7 @@ export const bottles = pgTable(
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
+    imageUrl: text("image_url"),
 
     tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
     suggestedTags: varchar("suggested_tags", { length: 64 })
