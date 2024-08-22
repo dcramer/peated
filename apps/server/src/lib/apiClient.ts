@@ -1,5 +1,3 @@
-import config from "../config";
-
 export type ApiRequestOptions = {
   method?: "GET" | "POST" | "DELETE" | "PUT";
   data?: { [name: string]: any } | undefined;
@@ -47,12 +45,12 @@ export class ApiClient {
   accessToken: string | null;
 
   constructor({
-    server = config.API_SERVER,
+    server,
     accessToken = null,
   }: {
-    server?: string;
+    server: string;
     accessToken?: string | null;
-  } = {}) {
+  }) {
     this.server = server;
     this.accessToken = accessToken;
   }

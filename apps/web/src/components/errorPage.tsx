@@ -2,10 +2,14 @@
 
 import { isTRPCClientError } from "@peated/server/trpc/client";
 
+import {
+  ApiError,
+  ApiUnauthorized,
+  ApiUnavailable,
+} from "@peated/server/lib/apiClient";
 import { type AppRouter } from "@peated/server/trpc/router";
 import Button from "@peated/web/components/button";
 import config from "@peated/web/config";
-import { ApiError, ApiUnauthorized, ApiUnavailable } from "@peated/web/lib/api";
 import { type TRPCClientError } from "@trpc/client";
 import { type ComponentProps, type ReactNode } from "react";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";

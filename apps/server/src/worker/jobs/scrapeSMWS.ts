@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import { ApiClient } from "@peated/server/lib/apiClient";
 import { logError } from "@peated/server/lib/log";
 import { normalizeBottle } from "@peated/server/lib/normalize";
@@ -20,7 +21,10 @@ import { isTRPCClientError } from "@peated/server/trpc/client";
 import { type z } from "zod";
 
 export default async function scrapeSMWS() {
-  const apiClient = new ApiClient({ accessToken: process.env.ACCESS_TOKEN });
+  const apiClient = new ApiClient({
+    server: config.API_SERVER,
+    accessToken: process.env.ACCESS_TOKEN,
+  });
 
   await scrapeBottles(
     `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
