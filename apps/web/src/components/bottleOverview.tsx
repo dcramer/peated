@@ -161,11 +161,13 @@ export default function BottleOverview({
           </div>
           <div className="hidden w-64 sm:block">
             {bottle.imageUrl ? (
-              <img
-                src={bottle.imageUrl}
-                className="block w-64"
-                aria-hidden="true"
-              />
+              <div className="rounded border border-slate-900 bg-slate-900 p-2">
+                <img
+                  src={bottle.imageUrl}
+                  className="block w-64 rounded"
+                  aria-hidden="true"
+                />
+              </div>
             ) : (
               <img
                 src={RobotImage.src}
