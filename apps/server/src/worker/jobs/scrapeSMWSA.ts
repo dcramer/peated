@@ -32,7 +32,7 @@ export async function scrapeBottles(
   url: string,
   cb: (
     bottle: z.input<typeof BottleInputSchema>,
-    price: z.input<typeof StorePriceInputSchema> | null,
+    price?: z.input<typeof StorePriceInputSchema> | null,
     imageUrl?: string | null,
   ) => Promise<void>,
 ) {

@@ -1,4 +1,6 @@
 import { defaultHeaders } from "@peated/server/constants";
+import { ApiClient } from "@peated/server/lib/apiClient";
+import { logError } from "@peated/server/lib/log";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import { isTRPCClientError } from "@peated/server/trpc/client";
 import type { Currency } from "@peated/server/types";
@@ -9,8 +11,6 @@ import { open } from "fs/promises";
 import type { z } from "zod";
 import config from "../config";
 import type { BottleInputSchema, StorePriceInputSchema } from "../schemas";
-import { ApiClient } from "./apiClient";
-import { logError } from "./log";
 
 const CACHE = ".cache";
 
@@ -150,7 +150,7 @@ export type BottleReview = {
 
 export async function handleBottle(
   bottle: z.input<typeof BottleInputSchema>,
-  price?: z.input<typeof StorePriceInputSchema>,
+  price?: z.input<typeof StorePriceInputSchema> | null,
   imageUrl?: string | null,
 ) {
   const apiClient = new ApiClient({
@@ -163,9 +163,7 @@ export async function handleBottle(
 
     let bottleResult;
     try {
-      bottleResult = await trpcClient.bottleUpsert.mutate({
-        ...bottle,
-      });
+      bottleResult = await trpcClient.bottleUpsert.mutate(bottle);
     } catch (err) {
       if (!isTRPCClientError(err) || (err as any).data?.httpStatus !== 409) {
         logError(err, { bottle });
@@ -182,7 +180,7 @@ export async function handleBottle(
           },
         });
       } catch (err) {
-        logError(err, { bottle, price });
+        logError(err, { bottle });
       }
     }
 
