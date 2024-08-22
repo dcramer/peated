@@ -182,7 +182,15 @@ export async function passwordResetForm(
   const session = await getSession();
 
   const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
-  await trpcClient.authPasswordReset.mutate({ email });
+  try {
+    await trpcClient.authPasswordReset.mutate({ email });
+  } catch (err) {
+    if (isTRPCClientError(err)) {
+      return { ok: false, error: err.message };
+    }
+
+    throw err;
+  }
 
   return { ok: true };
 }
@@ -199,10 +207,20 @@ export async function passwordResetConfirmForm(
   const session = await getSession();
 
   const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
-  const data = await trpcClient.authPasswordResetConfirm.mutate({
-    token,
-    password,
-  });
+
+  let data;
+  try {
+    data = await trpcClient.authPasswordResetConfirm.mutate({
+      token,
+      password,
+    });
+  } catch (err) {
+    if (isTRPCClientError(err)) {
+      return { ok: false, error: err.message };
+    }
+
+    throw err;
+  }
 
   session.user = data.user;
   session.accessToken = data.accessToken;

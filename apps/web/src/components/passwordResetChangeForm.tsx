@@ -4,6 +4,7 @@ import Button from "@peated/web/components/button";
 import TextField from "@peated/web/components/textField";
 import { passwordResetConfirmForm } from "@peated/web/lib/auth.actions";
 import { useFormState, useFormStatus } from "react-dom";
+import Alert from "./alert";
 
 function FormComponent({ token }: { token: string }) {
   const { pending } = useFormStatus();
@@ -39,6 +40,7 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
 
   return (
     <div className="min-w-sm flex flex-auto flex-col gap-y-4">
+      {result?.error && <Alert>{result.error}</Alert>}
       {result?.ok ? (
         <>
           <p className="mb-8 text-center">Your password has been changed.</p>
