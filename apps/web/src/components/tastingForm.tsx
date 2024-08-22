@@ -59,7 +59,7 @@ export default function TastingForm({
   suggestedTags,
 }: {
   onSubmit: SubmitHandler<
-    FormSchemaType & {
+    Omit<FormSchemaType, "image"> & {
       image: HTMLCanvasElement | null | undefined;
     }
   >;
@@ -95,11 +95,7 @@ export default function TastingForm({
 
   const trpcUtils = trpc.useUtils();
 
-  const onSubmitHandler: SubmitHandler<
-    FormSchemaType & {
-      image: HTMLCanvasElement | null | undefined;
-    }
-  > = async (data) => {
+  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit({ ...data, image });
     } catch (err) {
