@@ -221,7 +221,7 @@ export default function TastingForm({
           <ImageField
             name="image"
             label="Picture"
-            value={initialData.pictureUrl}
+            value={initialData.imageUrl}
             onChange={(value) => setPicture(value)}
             imageWidth={1024 / 2}
             imageHeight={768 / 2}
