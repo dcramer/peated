@@ -159,7 +159,7 @@ export default function BottleOverview({
               </>
             </DefinitionList>
           </div>
-          <div className="hidden w-64 sm:block">
+          <div className="hidden w-64 lg:block">
             {bottle.imageUrl ? (
               <div className="rounded border border-slate-900 bg-slate-900 p-2">
                 <img
