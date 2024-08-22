@@ -20,7 +20,7 @@ import { isTRPCClientError } from "@peated/server/trpc/client";
 import { type z } from "zod";
 
 export default async function scrapeSMWS() {
-  const apiClient = new ApiClient();
+  const apiClient = new ApiClient({ accessToken: process.env.ACCESS_TOKEN });
 
   await scrapeBottles(
     `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
