@@ -150,7 +150,7 @@ export type BottleReview = {
 
 export async function handleBottle(
   bottle: z.input<typeof BottleInputSchema>,
-  price: z.input<typeof StorePriceInputSchema>,
+  price?: z.input<typeof StorePriceInputSchema>,
   imageUrl?: string | null,
 ) {
   const apiClient = new ApiClient({
@@ -186,14 +186,16 @@ export async function handleBottle(
       }
     }
 
-    try {
-      await trpcClient.priceCreateBatch.mutate({
-        site: "smws",
-        prices: [price],
-      });
-    } catch (err) {
-      if (!isTRPCClientError(err) || (err as any).data?.httpStatus !== 409) {
-        logError(err, { bottle, price });
+    if (price) {
+      try {
+        await trpcClient.priceCreateBatch.mutate({
+          site: "smws",
+          prices: [price],
+        });
+      } catch (err) {
+        if (!isTRPCClientError(err) || (err as any).data?.httpStatus !== 409) {
+          logError(err, { bottle, price });
+        }
       }
     }
   } else {
