@@ -1,17 +1,14 @@
-import { logError } from "@peated/server/lib/log";
 import { normalizeBottle } from "@peated/server/lib/normalize";
-import { getUrl } from "@peated/server/lib/scraper";
+import { getUrl, handleBottle } from "@peated/server/lib/scraper";
 import {
   parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
-import { trpcClient } from "@peated/server/lib/trpc/server";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
-import { isTRPCClientError } from "@peated/server/trpc/client";
 
 import { load as cheerio } from "cheerio";
 import { type z } from "zod";
@@ -19,37 +16,7 @@ import { type z } from "zod";
 export default async function scrapeSMWSA() {
   await scrapeBottles(
     `https://newmake.smwsa.com/collections/all-products`,
-    async (bottle, price) => {
-      if (process.env.ACCESS_TOKEN) {
-        console.log(`Submitting [${bottle.name}]`);
-
-        try {
-          await trpcClient.bottleUpsert.mutate({
-            ...bottle,
-          });
-        } catch (err) {
-          if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
-            logError(err, { bottle });
-            return;
-          }
-        }
-
-        if (price) {
-          try {
-            await trpcClient.priceCreateBatch.mutate({
-              site: "smwsa",
-              prices: [price],
-            });
-          } catch (err) {
-            if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
-              logError(err, { bottle, price });
-            }
-          }
-        }
-      } else {
-        console.log(`Dry Run [${bottle.name}]`);
-      }
-    },
+    handleBottle,
   );
 
   // if (process.env.ACCESS_TOKEN) {
@@ -66,6 +33,7 @@ export async function scrapeBottles(
   cb: (
     bottle: z.input<typeof BottleInputSchema>,
     price: z.input<typeof StorePriceInputSchema> | null,
+    imageUrl?: string | null,
   ) => Promise<void>,
 ) {
   const data = await getUrl(url);
@@ -151,6 +119,11 @@ export async function scrapeBottles(
       isFullName: false,
     }));
 
+    const imageUrl =
+      $("img.product-collection-module__grid-item-image", el)
+        .first()
+        .attr("src") ?? null;
+
     await cb(
       {
         name,
@@ -180,6 +153,7 @@ export async function scrapeBottles(
             url,
           }
         : null,
+      imageUrl,
     );
   }
 }

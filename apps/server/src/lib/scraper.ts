@@ -1,9 +1,16 @@
 import { defaultHeaders } from "@peated/server/constants";
+import { trpcClient } from "@peated/server/lib/trpc/server";
+import { isTRPCClientError } from "@peated/server/trpc/client";
 import type { Currency } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
 import { existsSync, mkdirSync, statSync } from "fs";
 import { open } from "fs/promises";
+import type { z } from "zod";
+import config from "../config";
+import type { BottleInputSchema, StorePriceInputSchema } from "../schemas";
+import { ApiClient } from "./apiClient";
+import { logError } from "./log";
 
 const CACHE = ".cache";
 
@@ -140,3 +147,56 @@ export type BottleReview = {
   issue: string;
   publishedAt?: Date;
 };
+
+export async function handleBottle(
+  bottle: z.input<typeof BottleInputSchema>,
+  price: z.input<typeof StorePriceInputSchema>,
+  imageUrl?: string | null,
+) {
+  const apiClient = new ApiClient({
+    server: config.API_SERVER,
+    accessToken: process.env.ACCESS_TOKEN,
+  });
+
+  if (process.env.ACCESS_TOKEN) {
+    console.log(`Submitting [${bottle.name}]`);
+
+    let bottleResult;
+    try {
+      bottleResult = await trpcClient.bottleUpsert.mutate({
+        ...bottle,
+      });
+    } catch (err) {
+      if (!isTRPCClientError(err) || (err as any).data?.httpStatus !== 409) {
+        logError(err, { bottle });
+        return;
+      }
+    }
+
+    if (bottleResult && !bottleResult.imageUrl && imageUrl) {
+      try {
+        const blob = await downloadFileAsBlob(imageUrl);
+        await apiClient.post(`/bottles/${bottleResult.id}/image`, {
+          data: {
+            image: blob,
+          },
+        });
+      } catch (err) {
+        logError(err, { bottle, price });
+      }
+    }
+
+    try {
+      await trpcClient.priceCreateBatch.mutate({
+        site: "smws",
+        prices: [price],
+      });
+    } catch (err) {
+      if (!isTRPCClientError(err) || (err as any).data?.httpStatus !== 409) {
+        logError(err, { bottle, price });
+      }
+    }
+  } else {
+    console.log(`Dry Run [${bottle.name}]`);
+  }
+}

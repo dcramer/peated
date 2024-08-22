@@ -1,76 +1,20 @@
-import config from "@peated/server/config";
-import { ApiClient } from "@peated/server/lib/apiClient";
-import { logError } from "@peated/server/lib/log";
 import { normalizeBottle } from "@peated/server/lib/normalize";
-import {
-  chunked,
-  downloadFileAsBlob,
-  getUrl,
-} from "@peated/server/lib/scraper";
+import { chunked, getUrl, handleBottle } from "@peated/server/lib/scraper";
 import {
   parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
-import { trpcClient } from "@peated/server/lib/trpc/server";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
-import { isTRPCClientError } from "@peated/server/trpc/client";
 import { type z } from "zod";
 
 export default async function scrapeSMWS() {
-  const apiClient = new ApiClient({
-    server: config.API_SERVER,
-    accessToken: process.env.ACCESS_TOKEN,
-  });
-
   await scrapeBottles(
     `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
-    async (bottleData, priceData, imageUrl) => {
-      if (process.env.ACCESS_TOKEN) {
-        console.log(`Submitting [${bottleData.name}]`);
-
-        let bottle;
-        try {
-          bottle = await trpcClient.bottleUpsert.mutate({
-            ...bottleData,
-          });
-        } catch (err) {
-          if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
-            logError(err, { bottle: bottleData });
-            return;
-          }
-        }
-
-        if (bottle && !bottle.imageUrl && imageUrl) {
-          try {
-            const blob = await downloadFileAsBlob(imageUrl);
-            await apiClient.post(`/bottles/${bottle.id}/image`, {
-              data: {
-                image: blob,
-              },
-            });
-          } catch (err) {
-            logError(err, { bottle: bottleData, price: priceData });
-          }
-        }
-
-        try {
-          await trpcClient.priceCreateBatch.mutate({
-            site: "smws",
-            prices: [priceData],
-          });
-        } catch (err) {
-          if (!isTRPCClientError(err) || err.data?.httpStatus !== 409) {
-            logError(err, { bottle: bottleData, price: priceData });
-          }
-        }
-      } else {
-        console.log(`Dry Run [${bottleData.name}]`);
-      }
-    },
+    handleBottle,
   );
 
   // if (process.env.ACCESS_TOKEN) {
