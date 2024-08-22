@@ -595,8 +595,7 @@ export default function BottleForm({
                     label="Image"
                     value={initialData.imageUrl}
                     onChange={(value) => setImage(value)}
-                    imageWidth={1024 / 2}
-                    imageHeight={768 / 2}
+                    noEditor
                   />
 
                   <TextAreaField

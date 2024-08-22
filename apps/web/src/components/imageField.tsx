@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { forwardRef, useEffect, useRef, useState } from "react";
 
 import { PhotoIcon } from "@heroicons/react/20/solid";
+import { rejects } from "assert";
 import setRef from "../lib/setRef";
 import Button from "./button";
 import FormField from "./formField";
@@ -26,6 +27,7 @@ type Props = Omit<
   onChange: (value: HTMLCanvasElement | null) => void;
   imageWidth?: number;
   imageHeight?: number;
+  noEditor?: boolean;
 };
 
 const fileToDataUrl = (file: File): Promise<string> => {
@@ -45,6 +47,27 @@ const fileToDataUrl = (file: File): Promise<string> => {
   });
 };
 
+function fileDataToCanvas(file: File): Promise<HTMLCanvasElement> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = function (e) {
+      if (!e.target?.result) return reject(new Error("Unable to read file"));
+      const image = new Image();
+      image.src = e.target.result as any;
+      image.onload = function (ev) {
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("Unable to get 2d context"));
+        ctx.drawImage(image, 0, 0);
+        resolve(canvas);
+      };
+    };
+  });
+}
+
 export default forwardRef<HTMLInputElement, Props>(
   (
     {
@@ -56,8 +79,9 @@ export default forwardRef<HTMLInputElement, Props>(
       value,
       error,
       onChange,
-      imageWidth = 250,
-      imageHeight = 250,
+      imageWidth = 600,
+      imageHeight = 600,
+      noEditor,
     },
     ref,
   ) => {
@@ -80,12 +104,13 @@ export default forwardRef<HTMLInputElement, Props>(
         (async () => {
           const imageSrc = await fileToDataUrl(file);
           setImageSrc(imageSrc);
-          setEditorOpen(true);
+          if (noEditor) onSave(await fileDataToCanvas(file));
+          else setEditorOpen(true);
         })();
       } else {
         if (imageRef.current) imageRef.current.src = "";
         setImageSrc("");
-        setEditorOpen(true);
+        onSave(null);
       }
     };
 
@@ -169,6 +194,7 @@ export default forwardRef<HTMLInputElement, Props>(
                     e.stopPropagation();
                     if (fileRef.current) fileRef.current.value = "";
                     setImageSrc("");
+                    setFinalImage(null);
                     onChange(null);
                   }}
                 >
@@ -209,14 +235,16 @@ export default forwardRef<HTMLInputElement, Props>(
             <HelpText>JPG, GIF or PNG. 1MB max.</HelpText>
           </div> */}
         </div>
-        <ImageEditorModal
-          image={imageSrc}
-          open={editorOpen}
-          setOpen={setEditorOpen}
-          onSave={onSave}
-          width={imageWidth}
-          height={imageHeight}
-        />
+        {!noEditor && (
+          <ImageEditorModal
+            image={imageSrc}
+            open={editorOpen}
+            setOpen={setEditorOpen}
+            onSave={onSave}
+            width={imageWidth}
+            height={imageHeight}
+          />
+        )}
       </FormField>
     );
   },

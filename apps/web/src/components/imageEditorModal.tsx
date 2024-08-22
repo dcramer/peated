@@ -88,7 +88,7 @@ export default function ImageEditorModal({
                 border={20}
                 scale={scale}
                 width={Math.min(600, windowSize.width) - 40}
-                height={Math.min(600, windowSize.width) - 40}
+                height={Math.min(600, windowSize.height) - 40}
                 rotate={rotate}
               />
             </div>

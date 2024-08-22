@@ -23,6 +23,7 @@ export const compressAndResizeImage = (
       position: sharp.strategy.entropy,
       withoutEnlargement: true,
     })
+    .trim()
     .webp({ quality: 80 });
 
   return {
