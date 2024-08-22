@@ -6,44 +6,35 @@ import { UserSchema } from "./users";
 
 export const TastingSchema = z.object({
   id: z.number(),
-  imageUrl: z.string().nullable(),
-  notes: z.string().nullable(),
+  imageUrl: z.string().nullable().default(null).readonly(),
+  notes: z.string().nullable().default(null),
   bottle: BottleSchema,
-  rating: z.number().gte(0).lte(5).nullable(),
-  tags: z.array(z.string()),
-  color: z.number().gte(0).lte(20).nullable(),
-  servingStyle: ServingStyleEnum.nullable(),
-  friends: z.array(UserSchema),
+  rating: z.number().gte(0).lte(5).nullable().default(null),
+  tags: z.array(z.string()).default([]),
+  color: z.number().gte(0).lte(20).nullable().default(null),
+  servingStyle: ServingStyleEnum.nullable().default(null),
+  friends: z.array(UserSchema).default([]),
 
-  awards: z.array(BadgeAwardSchema),
+  awards: z.array(BadgeAwardSchema).readonly(),
+  comments: z.number().gte(0).readonly(),
+  toasts: z.number().gte(0).readonly(),
+  hasToasted: z.boolean().optional().readonly(),
 
-  comments: z.number().gte(0),
-  toasts: z.number().gte(0),
-  hasToasted: z.boolean().optional(),
-  createdAt: z.string().datetime(),
-  createdBy: UserSchema,
+  createdAt: z.string().datetime().readonly(),
+  createdBy: UserSchema.readonly(),
 });
 
-export const TastingInputSchema = z.object({
+export const TastingInputSchema = TastingSchema.omit({
+  id: true,
+  awards: true,
+  comments: true,
+  toasts: true,
+  hasToasted: true,
+  createdBy: true,
+}).extend({
   bottle: z.number(),
-  notes: z.string().nullish(),
-  rating: z.number().gte(0).lte(5).nullish(),
-  tags: z.array(zTag).max(15).nullish(),
-  color: z.number().gte(0).lte(20).nullish(),
-
-  servingStyle: ServingStyleEnum.nullish(),
-  friends: z.array(z.number()).optional(),
   flight: z.string().nullish(),
-
-  createdAt: zDatetime.optional(),
-});
-
-export const TastingUpdateSchema = z.object({
-  notes: z.string().nullish(),
-  rating: z.number().gte(0).lte(5).nullish(),
-  tags: z.array(zTag).max(15).nullish(),
-  color: z.number().gte(0).lte(20).nullish(),
-  servingStyle: ServingStyleEnum.nullish(),
-  friends: z.array(z.number()).optional(),
-  flight: z.string().nullish(),
+  createdAt: zDatetime.nullish(),
+  image: z.null().optional(),
+  friends: z.array(z.number()).default([]),
 });

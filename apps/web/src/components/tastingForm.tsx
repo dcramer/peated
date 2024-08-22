@@ -60,7 +60,7 @@ export default function TastingForm({
 }: {
   onSubmit: SubmitHandler<
     FormSchemaType & {
-      picture: HTMLCanvasElement | null;
+      image: HTMLCanvasElement | null | undefined;
     }
   >;
   initialData: Partial<Tasting> & Pick<Tasting, "bottle">;
@@ -86,7 +86,9 @@ export default function TastingForm({
   });
 
   const [error, setError] = useState<string | undefined>();
-  const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
+  const [image, setImage] = useState<HTMLCanvasElement | null | undefined>(
+    null,
+  );
   const [friendsValue, setFriendsValue] = useState<Option[]>(
     initialData.friends ? initialData.friends.map(userToOption) : [],
   );
@@ -95,7 +97,7 @@ export default function TastingForm({
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
-      await onSubmit({ ...data, picture });
+      await onSubmit({ ...data, image });
     } catch (err) {
       if (isTRPCClientError(err)) {
         setError(err.message);
@@ -222,7 +224,7 @@ export default function TastingForm({
             name="image"
             label="Picture"
             value={initialData.imageUrl}
-            onChange={(value) => setPicture(value)}
+            onChange={(value) => setImage(value)}
             imageWidth={1024 / 2}
             imageHeight={768 / 2}
           />

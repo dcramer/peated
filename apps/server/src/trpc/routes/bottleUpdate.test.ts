@@ -30,7 +30,12 @@ test("requires mod", async ({ defaults }) => {
 });
 
 test("no changes", async ({ fixtures }) => {
-  const bottle = await fixtures.Bottle();
+  const bottle = await fixtures.Bottle({
+    name: "Cool Bottle",
+    releaseYear: null,
+    vintageYear: null,
+    edition: null,
+  });
 
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),

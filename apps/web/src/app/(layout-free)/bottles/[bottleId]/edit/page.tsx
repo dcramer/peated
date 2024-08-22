@@ -27,15 +27,15 @@ export default function Page({
       onSubmit={async ({ image, ...data }) => {
         await bottleUpdateMutation.mutateAsync({
           bottle: bottle.id,
+          image: image === null ? null : undefined,
           ...data,
         });
 
         if (image) {
-          const blob = await toBlob(image);
           try {
             await api.post(`/bottles/${bottle.id}/image`, {
               data: {
-                image: blob,
+                image: image ? await toBlob(image) : null,
               },
             });
           } catch (err) {

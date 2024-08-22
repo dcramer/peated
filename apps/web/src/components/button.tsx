@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import { type UrlObject } from "url";
 import classNames from "../lib/classNames";
 
-type ButtonColor = "primary" | "default" | "highlight" | undefined;
+type ButtonColor = "primary" | "default" | "highlight" | "danger" | undefined;
 
 type ButtonSize = "small" | "base";
 
@@ -67,6 +67,14 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
         );
         textColor = "text-black";
         break;
+      case "danger":
+        colorClassName = classNames(
+          disabled
+            ? "bg-red-900 border-red-900"
+            : "bg-red-700 border-red-700 hover:bg-red-600",
+        );
+        textColor = "text-black";
+        break;
       case "primary":
         colorClassName = classNames(
           disabled
@@ -82,7 +90,9 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
         );
     }
 
-    if (active) {
+    if (color === "danger") {
+      textColor = "text-white";
+    } else if (active) {
       textColor = "text-highlight";
     } else if (disabled) {
       textColor = color === "highlight" ? "text-highlight-dark" : "text-muted";

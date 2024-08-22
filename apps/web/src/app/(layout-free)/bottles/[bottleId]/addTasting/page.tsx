@@ -42,14 +42,14 @@ export default function AddTasting({
       title="Record Tasting"
       initialData={{ bottle }}
       suggestedTags={suggestedTags}
-      onSubmit={async ({ picture, ...data }) => {
+      onSubmit={async ({ image, ...data }) => {
         const { tasting, awards } = await tastingCreateMutation.mutateAsync({
           ...data,
           createdAt,
         });
 
-        if (picture) {
-          const blob = await toBlob(picture);
+        if (image) {
+          const blob = await toBlob(image);
           try {
             // TODO: switch to fetch maybe?
             await api.post(`/tastings/${tasting.id}/image`, {

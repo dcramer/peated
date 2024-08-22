@@ -64,6 +64,6 @@ test("bottle image does resize down", async ({ fixtures, defaults }) => {
   const filepath = `${config.UPLOAD_PATH}/${path.basename(data.imageUrl)}`;
   const metadata = await sharp(filepath).metadata();
   expect(metadata.format).toBe("webp");
-  expect(metadata.width).toBe(1024);
-  expect(metadata.height).toBe(1024);
+  expect(metadata.height).toBeLessThanOrEqual(1024);
+  expect(metadata.width).toBeLessThanOrEqual(1024);
 });

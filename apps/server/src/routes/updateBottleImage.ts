@@ -67,7 +67,8 @@ export default {
         data: fileData,
         namespace: `bottles`,
         urlPrefix: "/uploads",
-        onProcess: (...args) => compressAndResizeImage(...args, undefined, 512),
+        onProcess: (...args) =>
+          compressAndResizeImage(...args, undefined, 1024),
       });
     } catch (err) {
       if (fileData.file.truncated) {

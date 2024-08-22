@@ -87,7 +87,7 @@ export default function BottleForm({
 }: {
   onSubmit: SubmitHandler<
     FormSchemaType & {
-      image: HTMLCanvasElement | null;
+      image: HTMLCanvasElement | null | undefined;
     }
   >;
   initialData: Partial<Bottle>;
@@ -117,7 +117,9 @@ export default function BottleForm({
   const { user } = useAuth();
 
   const [error, setError] = useState<string | undefined>();
-  const [image, setImage] = useState<HTMLCanvasElement | null>(null);
+  const [image, setImage] = useState<HTMLCanvasElement | null | undefined>(
+    undefined,
+  );
   const router = useRouter();
 
   const generateDataMutation = trpc.bottleGenerateDetails.useMutation();

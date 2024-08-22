@@ -100,6 +100,13 @@ export async function bottleUpdate({
       (input.description && input.description !== null ? "user" : null);
   }
 
+  if (
+    input.image === null &&
+    (user?.admin || user?.mod || user?.id === bottle.createdById)
+  ) {
+    bottleData.imageUrl = null;
+  }
+
   const newAliases: string[] = [];
   const newEntityIds: Set<number> = new Set();
 

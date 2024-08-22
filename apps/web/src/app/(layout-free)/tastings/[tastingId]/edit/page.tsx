@@ -34,19 +34,18 @@ export default function Page({
       title="Edit Tasting"
       initialData={tasting}
       suggestedTags={suggestedTags}
-      onSubmit={async ({ picture, ...data }) => {
+      onSubmit={async ({ image, ...data }) => {
         await tastingUpdateMutation.mutateAsync({
           tasting: tasting.id,
+          image: image === null ? null : undefined,
           ...data,
         });
 
-        if (picture) {
-          const blob = await toBlob(picture);
+        if (image) {
           try {
-            // TODO: switch to fetch maybe?
             await api.post(`/tastings/${tasting.id}/image`, {
               data: {
-                image: blob,
+                image: image ? await toBlob(image) : null,
               },
             });
           } catch (err) {

@@ -47,28 +47,11 @@ export default function Page() {
     throw err;
   }
 
-  const userUpdateMutation = trpc.userUpdate.useMutation({
-    onSuccess: async (newUser) => {
-      let newAvatar: any;
-      if (picture) {
-        const blob = await toBlob(picture, 0.8);
-        newAvatar = await api.post("/users/me/avatar", {
-          data: {
-            picture: blob,
-          },
-        });
-      } else {
-        newAvatar = {};
-      }
-      await updateSession();
-      setUser({
-        ...newUser,
-        ...newAvatar,
-      });
-    },
-  });
+  const userUpdateMutation = trpc.userUpdate.useMutation();
 
-  const [picture, setPicture] = useState<HTMLCanvasElement | null>(null);
+  const [picture, setPicture] = useState<HTMLCanvasElement | null | undefined>(
+    undefined,
+  );
   const {
     control,
     register,
@@ -82,14 +65,32 @@ export default function Page() {
   });
 
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    await userUpdateMutation.mutateAsync(
-      { ...data, user: "me" },
-      {
-        onSuccess: (newUser) => {
-          router.push(`/users/${newUser.username}`);
+    const newUser = await userUpdateMutation.mutateAsync({
+      ...data,
+      picture: picture === null ? null : undefined,
+      user: "me",
+    });
+
+    let newAvatar: any;
+
+    if (picture) {
+      newAvatar = await api.post(`/users/me/avatar`, {
+        data: {
+          picture: picture ? await toBlob(picture) : null,
         },
-      },
-    );
+      });
+    } else {
+      newAvatar = {};
+    }
+
+    await updateSession();
+
+    setUser({
+      ...newUser,
+      ...newAvatar,
+    });
+
+    router.push(`/users/${newUser.username}`);
   };
 
   return (

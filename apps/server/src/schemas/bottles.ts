@@ -44,7 +44,7 @@ export const BottleSchema = z.object({
 
   description: z.string().nullable().default(null),
   descriptionSrc: ContentSourceEnum.nullable().default(null).optional(),
-  imageUrl: z.string().url().nullable().default(null),
+  imageUrl: z.string().url().nullable().default(null).readonly(),
   flavorProfile: FlavorProfileEnum.nullable().default(null),
   tastingNotes: z
     .object({
@@ -76,7 +76,6 @@ const EntityChoice = z.union([
 export const BottleInputSchema = BottleSchema.omit({
   id: true,
   fullName: true,
-  imageUrl: true,
   suggestedTags: true,
   avgRating: true,
   totalTastings: true,
@@ -88,6 +87,7 @@ export const BottleInputSchema = BottleSchema.omit({
   brand: EntityChoice,
   distillers: z.array(EntityChoice).default([]).optional(),
   bottler: EntityChoice.nullable().default(null).optional(),
+  image: z.null().optional(),
 });
 
 export const BottleMergeSchema = z.object({

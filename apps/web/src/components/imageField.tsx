@@ -5,6 +5,7 @@ import { forwardRef, useEffect, useRef, useState } from "react";
 
 import { PhotoIcon } from "@heroicons/react/20/solid";
 import setRef from "../lib/setRef";
+import Button from "./button";
 import FormField from "./formField";
 import ImageEditorModal from "./imageEditorModal";
 import type TextInput from "./textInput";
@@ -133,31 +134,47 @@ export default forwardRef<HTMLInputElement, Props>(
           updateImageSrc();
         }}
       >
-        <div className="col-span-full mt-2 flex min-w-full items-center gap-x-4">
-          <div className="flex min-w-full items-center justify-center overflow-hidden rounded bg-slate-800 object-contain">
+        <div className="col-span-full mt-2 flex min-w-full items-center gap-x-4 border border-slate-800">
+          <div className="group flex min-w-full flex-col items-center gap-4 overflow-hidden rounded bg-slate-800 object-contain p-3">
             {imageSrc || finalImage ? (
               <img
                 src={
                   (finalImage ? finalImage.toDataURL() : imageSrc) || undefined
                 }
                 ref={imageRef}
-                className={`"rounded object-contain`}
+                alt="uploaded image"
+                className="rounded object-contain"
                 style={{
                   maxHeight: imageHeight,
                 }}
               />
             ) : (
-              <em
-                className={`text-muted flex flex-col items-center justify-center`}
+              <div className="flex w-full flex-col items-center justify-center p-4 text-sm group-hover:bg-slate-700">
+                <PhotoIcon className="h-12 w-12" />
+                Tap to upload an Image
+              </div>
+            )}
+            {(imageSrc || finalImage) && (
+              <div
+                className={`text-muted flex items-center justify-center gap-x-4`}
                 style={{
                   maxHeight: imageHeight,
                 }}
               >
-                <div className="flex flex-col items-center justify-center p-4 text-sm">
-                  <PhotoIcon className="h-12 w-12" />
-                  Tap to upload an Image
-                </div>
-              </em>
+                <Button color="highlight">Change Image</Button>
+                <Button
+                  color="danger"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (fileRef.current) fileRef.current.value = "";
+                    setImageSrc("");
+                    onChange(null);
+                  }}
+                >
+                  Remove Image
+                </Button>
+              </div>
             )}
           </div>
           <input
