@@ -19,8 +19,9 @@ export const compressAndResizeImage = (
     .resize({
       width: maxWidth,
       height: maxHeight,
-      fit: sharp.fit.inside,
+      fit: sharp.fit.cover,
       position: sharp.strategy.entropy,
+      withoutEnlargement: true,
     })
     .webp({ quality: 80 });
 
