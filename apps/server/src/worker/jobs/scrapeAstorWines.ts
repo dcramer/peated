@@ -106,7 +106,7 @@ export default async function scrapeAstorWines() {
     console.log("Pushing new price data to API");
     await chunked(
       products,
-      20,
+      5,
       async (items) =>
         await trpcClient.priceCreateBatch.mutate({
           site: "astorwines",

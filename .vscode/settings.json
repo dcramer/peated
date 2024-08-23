@@ -8,5 +8,6 @@
     "**/app/**/page.tsx": "${dirname} - Page",
     "**/app/**/layout.tsx": "${dirname} - Layout",
     "**/component/**/index.tsx": "${dirname} - Component"
-  }
+  },
+  "scm.showHistoryGraph": false
 }
