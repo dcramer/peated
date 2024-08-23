@@ -34,6 +34,7 @@ test("processes new price", async ({ fixtures }) => {
         currency: "usd",
         volume: 750,
         url: "http://example.com",
+        imageUrl: "http://example.com/foo.jpg",
       },
     ],
   });
