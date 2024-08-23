@@ -8,6 +8,7 @@ import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
 import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
+import Join from "./join";
 import type { Option } from "./selectField";
 
 type EntityOption = Option & {
@@ -101,9 +102,13 @@ export const PreviewBottleCard = ({
       })}
       category={data.category ? formatCategoryName(data.category) : null}
       distillers={
-        data.distillers?.length
-          ? data.distillers.map((d) => d.name).join(" ")
-          : null
+        data.distillers?.length ? (
+          <Join divider=", ">
+            {data.distillers.map((d) => (
+              <span key={d.id}>{d.name}</span>
+            ))}
+          </Join>
+        ) : null
       }
       statedAge={data.statedAge ? `Aged ${data.statedAge} years` : null}
       color="highlight"
@@ -158,8 +163,9 @@ export default function BottleCard({
         </div>
       }
       distillers={
-        bottle.distillers.length
-          ? bottle.distillers.map((d) => (
+        bottle.distillers.length ? (
+          <Join divider=", ">
+            {bottle.distillers.map((d) => (
               <Link
                 key={d.id}
                 href={`/entities/${d.id}`}
@@ -167,8 +173,9 @@ export default function BottleCard({
               >
                 {d.name}
               </Link>
-            ))
-          : null
+            ))}
+          </Join>
+        ) : null
       }
       statedAge={bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
       color={color}
