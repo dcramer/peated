@@ -1,9 +1,8 @@
 import { z } from "zod";
+import { ALLOWED_VOLUMES } from "../constants";
 import { BottleSchema } from "./bottles";
 import { CurrencyEnum } from "./common";
 import { ExternalSiteSchema } from "./externalSites";
-
-const ALLOWED_VOLUMES = [500, 750, 1000];
 
 export const StorePriceSchema = z.object({
   id: z.number(),

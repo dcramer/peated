@@ -1,3 +1,4 @@
+import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
 import { chunked, getUrl, parsePrice } from "@peated/server/lib/scraper";
@@ -26,7 +27,7 @@ export async function scrapeProducts(
       return;
     }
 
-    if (volume < 500) {
+    if (!ALLOWED_VOLUMES.includes(volume)) {
       console.warn(`Invalid size: ${volume}`);
       return;
     }
