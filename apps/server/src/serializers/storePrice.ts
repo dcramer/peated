@@ -1,7 +1,9 @@
 import type { z } from "zod";
 import { serialize, serializer } from ".";
+import config from "../config";
 import { db } from "../db";
 import type { ExternalSite, StorePrice, User } from "../db/schema";
+import { absoluteUrl } from "../lib/urls";
 import type { BottlePriceChangeSchema, StorePriceSchema } from "../schemas";
 import type { Currency } from "../types";
 import { BottleSerializer } from "./bottle";
@@ -20,7 +22,9 @@ export const StorePriceSerializer = serializer({
       volume: item.volume,
       currency: item.currency,
       url: item.url,
-      imageUrl: item.imageUrl,
+      imageUrl: item.imageUrl
+        ? absoluteUrl(config.API_SERVER, item.imageUrl)
+        : null,
       updatedAt: item.updatedAt.toISOString(),
     };
   },
@@ -72,7 +76,9 @@ export const StorePriceWithSiteSerializer = serializer({
       volume: item.volume,
       currency: item.currency,
       url: affUrl,
-      imageUrl: item.imageUrl,
+      imageUrl: item.imageUrl
+        ? absoluteUrl(config.API_SERVER, item.imageUrl)
+        : null,
       site: attrs.site,
       updatedAt: item.updatedAt.toISOString(),
     };
