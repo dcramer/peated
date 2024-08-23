@@ -35,6 +35,7 @@ function asyncGet(url: string): Promise<IncomingMessage> {
 async function fetchAndStoreImage(imageUrl: string): Promise<string | null> {
   const filename = imageUrl.split("/").pop() || "image";
 
+  console.log(`Fetching image [${imageUrl}]`);
   const file = await asyncGet(imageUrl);
 
   if (!file) return null;
