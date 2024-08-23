@@ -24,6 +24,7 @@ export const compressAndResizeImage = (
       withoutEnlargement: true,
     })
     .trim()
+    .unflatten()
     .webp({ quality: 80 });
 
   return {
