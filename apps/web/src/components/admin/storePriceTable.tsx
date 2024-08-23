@@ -18,8 +18,9 @@ export default function StorePriceTable({
       <table className="min-w-full">
         <colgroup>
           <col className="min-w-full sm:w-1/12" />
-          <col className="min-w-full sm:w-8/12" />
-          <col className="sm:w-3/12" />
+          <col className="min-w-full sm:w-7/12" />
+          <col className="sm:w-2/12" />
+          <col className="sm:w-2/12" />
         </colgroup>
         <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
           <tr>
