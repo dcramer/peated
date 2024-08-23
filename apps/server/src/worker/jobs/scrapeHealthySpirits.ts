@@ -102,7 +102,7 @@ export default async function scrapeHealthySpirits() {
     console.log("Pushing new price data to API");
     await chunked(
       products,
-      100,
+      20,
       async (items) =>
         await trpcClient.priceCreateBatch.mutate({
           site: "healthyspirits",

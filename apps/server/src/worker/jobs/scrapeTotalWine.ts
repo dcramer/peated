@@ -79,7 +79,7 @@ export default async function scrapeTotalWine() {
 
     await chunked(
       products,
-      100,
+      20,
       async (items) =>
         await trpcClient.priceCreateBatch.mutate({
           site: "totalwine",

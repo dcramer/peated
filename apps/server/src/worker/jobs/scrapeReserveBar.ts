@@ -102,7 +102,7 @@ export default async function scrapeReserveBar() {
 
     await chunked(
       products,
-      100,
+      20,
       async (items) =>
         await trpcClient.priceCreateBatch.mutate({
           site: "reservebar",
