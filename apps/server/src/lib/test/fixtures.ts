@@ -177,7 +177,7 @@ export const Country = async (
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Country> => {
   if (!data.name) data.name = faker.location.country();
-  data.slug = slugify(data.name as string);
+  if (!data.slug) data.slug = slugify(data.name as string);
   let [result] = await db.transaction(async (tx) => {
     return await tx
       .insert(dbSchema.countries)

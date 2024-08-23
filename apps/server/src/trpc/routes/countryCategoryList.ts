@@ -70,6 +70,6 @@ export default publicProcedure
         count: Number(count),
         category,
       })),
-      totalCount: totalBottles,
+      totalCount: Number(totalBottles),
     };
   });
