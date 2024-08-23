@@ -1,15 +1,15 @@
+import { defaultHeaders } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { eq } from "drizzle-orm";
-import { get } from "http";
 import { Readable } from "stream";
 
 async function fetchAndStoreImage(imageUrl: string): Promise<string | null> {
   const filename = imageUrl.split("/").pop() || "image";
 
   console.log(`Fetching image [${imageUrl}]`);
-  const req = await fetch(imageUrl);
+  const req = await fetch(imageUrl, { headers: defaultHeaders(imageUrl) });
   if (!req.body) return null;
   const file = Readable.fromWeb(req.body as any);
 
