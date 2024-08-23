@@ -16,8 +16,8 @@ export default function StorePriceTable({
     <>
       <table className="min-w-full">
         <colgroup>
-          <col className="min-w-full sm:w-2/12" />
-          <col className="min-w-full sm:w-7/12" />
+          <col className="min-w-full sm:w-1/12" />
+          <col className="min-w-full sm:w-8/12" />
           <col className="sm:w-3/12" />
         </colgroup>
         <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
@@ -43,7 +43,7 @@ export default function StorePriceTable({
               >
                 <td>
                   {price.imageUrl && (
-                    <img src={price.imageUrl} className="max-w-full" />
+                    <img src={price.imageUrl} className="max-h-16 max-w-full" />
                   )}
                 </td>
                 <td className="max-w-0 px-3 py-3">
