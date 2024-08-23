@@ -2,24 +2,16 @@ import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { eq } from "drizzle-orm";
-import type { IncomingMessage } from "http";
 import { get } from "http";
-
-function asyncGet(url: string): Promise<IncomingMessage> {
-  return new Promise((resolve, reject) => {
-    get(url, (res) => {
-      resolve(res);
-    }).on("error", (err) => {
-      reject(err);
-    });
-  });
-}
+import { Readable } from "stream";
 
 async function fetchAndStoreImage(imageUrl: string): Promise<string | null> {
   const filename = imageUrl.split("/").pop() || "image";
 
   console.log(`Fetching image [${imageUrl}]`);
-  const file = await asyncGet(imageUrl);
+  const req = await fetch(imageUrl);
+  if (!req.body) return null;
+  const file = Readable.fromWeb(req.body as any);
 
   if (!file) return null;
   const fileData = {
@@ -49,11 +41,17 @@ export default async ({
     throw new Error(`Unknown price: ${priceId}`);
   }
 
+  const newImageUrl = await fetchAndStoreImage(imageUrl);
+  if (!newImageUrl) {
+    console.error(`Failed to fetch image at ${imageUrl}`);
+    return;
+  }
+
   // TODO: we likely want to validate the image is something we'd expect
   await db
     .update(storePrices)
     .set({
-      imageUrl: await fetchAndStoreImage(imageUrl),
+      imageUrl: newImageUrl,
     })
     .where(eq(storePrices.id, priceId));
 };
