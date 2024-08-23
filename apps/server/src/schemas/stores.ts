@@ -23,7 +23,8 @@ export const StorePriceInputSchema = z.object({
   volume: z.number().refine((val) => ALLOWED_VOLUMES.includes(val), {
     message: `Volume must be one of: ${ALLOWED_VOLUMES.join(", ")}`,
   }),
-  url: z.string().trim().min(1, "Required"),
+  url: z.string().trim().url().min(1, "Required"),
+  imageUrl: z.string().trim().url().nullable().default(null),
 });
 
 export const BottlePriceChangeSchema = z.object({

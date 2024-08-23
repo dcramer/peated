@@ -17,11 +17,14 @@ test("simple", async ({ axiosMock }) => {
   await fn;
 
   expect(items.length).toBe(12);
-  expect(items[0]).toEqual({
-    name: "Aberfeldy 12-year-old Single Malt Scotch Whisky",
-    price: 4496,
-    currency: "usd",
-    volume: 750,
-    url: "https://www.astorwines.com/item/16747",
-  });
+  expect(items[0]).toMatchInlineSnapshot(`
+    {
+      "currency": "usd",
+      "imageUrl": "https://www.astorwines.com/images/items/16747.jpg",
+      "name": "Aberfeldy 12-year-old Single Malt Scotch Whisky",
+      "price": 4496,
+      "url": "https://www.astorwines.com/item/16747",
+      "volume": 750,
+    }
+  `);
 });

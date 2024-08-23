@@ -3,11 +3,13 @@ import type { StorePrice } from "@peated/server/lib/scraper";
 import { chunked, getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import type { StorePriceInputSchema } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
+import type { z } from "zod";
 
 export async function scrapeProducts(
   url: string,
-  cb: (product: StorePrice) => Promise<void>,
+  cb: (product: z.infer<typeof StorePriceInputSchema>) => Promise<void>,
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
@@ -41,6 +43,9 @@ export async function scrapeProducts(
       console.warn(`Invalid price: ${priceRaw}`);
       return;
     }
+
+    const imageUrl = $(".item-image img", el).first().attr("src")?.trim();
+
     console.log(`${name} - ${(price / 100).toFixed(2)}`);
 
     cb({
@@ -49,6 +54,7 @@ export async function scrapeProducts(
       currency: "usd",
       volume,
       url: absoluteUrl(url, productUrl),
+      imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
     });
   });
 }

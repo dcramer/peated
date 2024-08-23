@@ -16,11 +16,13 @@ test("simple", async ({ axiosMock }) => {
   await fn;
 
   expect(items.length).toBe(38);
-  expect(items[0]).toEqual({
-    name: "Elmer T. Lee Single Barrel Bourbon",
-    price: 33899,
-    currency: "usd",
-    volume: 750,
-    url: "https://woodencork.com/collections/whiskey/products/elmer-t-lee-bourbon",
-  });
+  expect(items[0]).toMatchInlineSnapshot(`
+    {
+      "currency": "usd",
+      "name": "Elmer T. Lee Single Barrel Bourbon",
+      "price": 33899,
+      "url": "https://woodencork.com/collections/whiskey/products/elmer-t-lee-bourbon",
+      "volume": 750,
+    }
+  `);
 });

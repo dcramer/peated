@@ -1030,6 +1030,13 @@
       "when": 1724352788475,
       "tag": "0146_lowly_kronos",
       "breakpoints": false
+    },
+    {
+      "idx": 147,
+      "version": "7",
+      "when": 1724438534690,
+      "tag": "0147_strong_tombstone",
+      "breakpoints": false
     }
   ]
 }

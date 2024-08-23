@@ -17,11 +17,13 @@ test("simple", async ({ axiosMock }) => {
   await fn;
 
   expect(items.length).toBe(112);
-  expect(items[0]).toEqual({
-    name: "Grangestone Bourbon Cask Finish Single Malt Scotch Whisky",
-    price: 6499,
-    currency: "usd",
-    volume: 1750,
-    url: "https://www.totalwine.com/spirits/scotch/single-malt/grangestone-bourbon-cask-finish-single-malt-scotch-whisky/p/135113175?s=1203&igrules=true",
-  });
+  expect(items[0]).toMatchInlineSnapshot(`
+    {
+      "currency": "usd",
+      "name": "Grangestone Bourbon Cask Finish Single Malt Scotch Whisky",
+      "price": 6499,
+      "url": "https://www.totalwine.com/spirits/scotch/single-malt/grangestone-bourbon-cask-finish-single-malt-scotch-whisky/p/135113175?s=1203&igrules=true",
+      "volume": 1750,
+    }
+  `);
 });

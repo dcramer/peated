@@ -25,6 +25,7 @@ export const storePrices = pgTable(
       .references(() => externalSites.id)
       .notNull(),
     name: text("name").notNull(),
+    imageUrl: text("image_url"),
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
