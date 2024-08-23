@@ -132,23 +132,19 @@ export default function BottleCard({
     <BottleScaffold
       onClick={onClick ? () => onClick(bottle) : undefined}
       name={
-        <>
-          <h4 className="flex items-center gap-x-1 font-bold">
+        <div className="space-x-1">
+          <h4 className="inline font-bold" title={bottle.fullName}>
             <BottleLink bottle={bottle} className="hover:underline">
               {bottle.fullName}
             </BottleLink>
           </h4>
           {bottle.isFavorite && (
-            <div className="w-4">
-              <StarIcon className="w-4" aria-hidden="true" />
-            </div>
+            <StarIcon className="inline w-4" aria-hidden="true" />
           )}
           {bottle.hasTasted && (
-            <div className="w-4">
-              <CheckBadgeIcon className="w-4" aria-hidden="true" />
-            </div>
+            <CheckBadgeIcon className="inline w-4" aria-hidden="true" />
           )}
-        </>
+        </div>
       }
       category={
         <div>
