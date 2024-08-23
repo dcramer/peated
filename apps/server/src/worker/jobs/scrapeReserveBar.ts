@@ -92,6 +92,10 @@ export default async function scrapeReserveBar() {
     );
   }
 
+  if (products.length === 0) {
+    throw new Error("Failed to scrape any products.");
+  }
+
   if (process.env.ACCESS_TOKEN) {
     console.log("Pushing new price data to API");
 
