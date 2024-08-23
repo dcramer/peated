@@ -14,6 +14,7 @@ export const StorePriceSchema = z.object({
   volume: z.number(),
   site: ExternalSiteSchema.optional(),
   updatedAt: z.string().datetime(),
+  imageUrl: z.string().trim().url().nullable().default(null).readonly(),
 });
 
 export const StorePriceInputSchema = z.object({

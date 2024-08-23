@@ -16,11 +16,13 @@ export default function StorePriceTable({
     <>
       <table className="min-w-full">
         <colgroup>
-          <col className="min-w-full sm:w-1/2" />
-          <col className="sm:w-1/2" />
+          <col className="min-w-full sm:w-2/12" />
+          <col className="min-w-full sm:w-7/12" />
+          <col className="sm:w-3/12" />
         </colgroup>
         <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
           <tr>
+            <th scope="col" className="px-3 py-2.5 text-left" />
             <th scope="col" className="px-3 py-2.5 text-left">
               Name
             </th>
@@ -39,6 +41,11 @@ export default function StorePriceTable({
                 key={price.name}
                 className="border-b border-slate-800 text-sm"
               >
+                <td>
+                  {price.imageUrl && (
+                    <img src={price.imageUrl} className="max-w-full" />
+                  )}
+                </td>
                 <td className="max-w-0 px-3 py-3">
                   <Link
                     href={price.url}

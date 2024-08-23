@@ -117,6 +117,7 @@ export default adminProcedure
               / (bundle|gifting set|gift set|\d+ pack)$/i,
             );
 
+            // TODO: sync image
             if (bottleId) {
               await upsertBottleAlias(tx, name, bottleId);
             } else {

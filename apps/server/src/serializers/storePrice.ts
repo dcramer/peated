@@ -20,6 +20,7 @@ export const StorePriceSerializer = serializer({
       volume: item.volume,
       currency: item.currency,
       url: item.url,
+      imageUrl: item.imageUrl,
       updatedAt: item.updatedAt.toISOString(),
     };
   },
@@ -71,6 +72,7 @@ export const StorePriceWithSiteSerializer = serializer({
       volume: item.volume,
       currency: item.currency,
       url: affUrl,
+      imageUrl: item.imageUrl,
       site: attrs.site,
       updatedAt: item.updatedAt.toISOString(),
     };

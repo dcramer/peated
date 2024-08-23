@@ -39,6 +39,74 @@ type ProcessCallback = (
   filename: string,
 ) => { stream: Readable; filename: string };
 
+export async function copyFile({
+  input,
+  output,
+  namespace,
+  urlPrefix,
+}: {
+  input: string;
+  output: string;
+  namespace: string;
+  urlPrefix: string;
+}) {
+  return await startSpan(
+    {
+      op: "peated.copy-file",
+      name: input,
+    },
+    async (span) => {
+      span?.setAttributes({
+        input,
+        output,
+        namespace,
+      });
+
+      if (process.env.USE_GCS_STORAGE) {
+        const bucketName = config.GCS_BUCKET_NAME as string;
+        const bucketPath = config.GCS_BUCKET_PATH
+          ? `${config.GCS_BUCKET_PATH}/`
+          : "";
+
+        span?.setAttributes({
+          bucketName,
+        });
+
+        const cloudStorage = new Storage({
+          credentials: config.GCP_CREDENTIALS,
+        });
+
+        const dest = cloudStorage
+          .bucket(bucketName)
+          .file(`${bucketPath}${output}`);
+
+        cloudStorage
+          .bucket(bucketName)
+          .file(`${bucketPath}${input}`)
+          .copy(dest);
+      } else {
+        throw new Error();
+        // const uploadPath = `${config.UPLOAD_PATH}/${input}`;
+
+        // await startSpan(
+        //   {
+        //     op: "file.write-stream",
+        //     name: newFilename,
+        //   },
+        //   async () => {
+        //     const writeStream = createWriteStream(uploadPath);
+        //     await pipeline(stream, writeStream);
+        //   },
+        // );
+
+        // console.info(`File written to ${uploadPath}`);
+      }
+
+      return `${urlPrefix}/${output}`;
+    },
+  );
+}
+
 export const storeFile = async ({
   data,
   namespace,
