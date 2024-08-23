@@ -1,4 +1,7 @@
-import { ALLOWED_VOLUMES } from "@peated/server/constants";
+import {
+  ALLOWED_VOLUMES,
+  SCRAPER_PRICE_BATCH_SIZE,
+} from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
 import { chunked, getUrl, parsePrice } from "@peated/server/lib/scraper";
@@ -106,7 +109,7 @@ export default async function scrapeAstorWines() {
     console.log("Pushing new price data to API");
     await chunked(
       products,
-      5,
+      SCRAPER_PRICE_BATCH_SIZE,
       async (items) =>
         await trpcClient.priceCreateBatch.mutate({
           site: "astorwines",
