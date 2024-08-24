@@ -44,9 +44,11 @@ export async function generateMetadata({
     openGraph: {
       title: bottle.fullName,
       description: description,
+      image: bottle.imageUrl,
     },
     twitter: {
       card: "product",
+      image: bottle.imageUrl,
     },
   };
 }
