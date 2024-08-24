@@ -68,12 +68,30 @@ export default modProcedure.input(BottleAliasSchema).mutation(async function ({
       );
     }
 
-    await tx
+    const [price] = await tx
       .update(storePrices)
       .set({
         bottleId: input.bottle,
       })
-      .where(eq(sql`LOWER(${storePrices.name})`, input.name.toLowerCase()));
+      .where(eq(sql`LOWER(${storePrices.name})`, input.name.toLowerCase()))
+      .returning();
+
+    if (price?.imageUrl && input.bottle) {
+      // determine if we've got an image we can use
+      const [bottle] = await tx
+        .select()
+        .from(bottles)
+        .where(eq(bottles.id, input.bottle));
+
+      if (bottle && !bottle.imageUrl) {
+        await tx
+          .update(bottles)
+          .set({
+            imageUrl: price.imageUrl,
+          })
+          .where(eq(bottles.id, input.bottle));
+      }
+    }
 
     await tx
       .update(reviews)

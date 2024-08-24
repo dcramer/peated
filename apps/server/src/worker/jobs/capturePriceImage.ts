@@ -1,7 +1,11 @@
 import { defaultHeaders } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { storePrices } from "@peated/server/db/schema";
-import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
+import { bottles, storePrices } from "@peated/server/db/schema";
+import {
+  compressAndResizeImage,
+  copyFile,
+  storeFile,
+} from "@peated/server/lib/uploads";
 import { eq } from "drizzle-orm";
 import { Readable } from "stream";
 
@@ -54,4 +58,20 @@ export default async ({
       imageUrl: newImageUrl,
     })
     .where(eq(storePrices.id, priceId));
+
+  if (price.bottleId) {
+    const [bottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, price.bottleId));
+
+    if (bottle && !bottle.imageUrl) {
+      await db
+        .update(bottles)
+        .set({
+          imageUrl: newImageUrl,
+        })
+        .where(eq(bottles.id, price.bottleId));
+    }
+  }
 };

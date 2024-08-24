@@ -650,6 +650,7 @@ export const StorePrice = async (
     if (!data.price)
       data.price =
         parseInt(faker.finance.amount({ min: 50, max: 200, dec: 0 }), 10) * 100;
+
     if (!data.url) data.url = faker.internet.url();
 
     if (!data.externalSiteId)
@@ -659,10 +660,14 @@ export const StorePrice = async (
 
     if (!data.currency) data.currency = "usd";
 
+    if (data.hidden === undefined) data.hidden = false;
+
+    if (data.bottleId === undefined) data.bottleId = (await Bottle({}, tx)).id;
+
     const { rows } = await tx.execute<dbSchema.StorePrice>(
       sql`
-        INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url)
-        VALUES (${data.bottleId}, ${data.externalSiteId}, ${data.name}, ${data.volume}, ${data.price}, ${data.currency}, ${data.url})
+        INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url, hidden, image_url)
+        VALUES (${data.bottleId}, ${data.externalSiteId}, ${data.name}, ${data.volume}, ${data.price}, ${data.currency}, ${data.url}, ${data.hidden}, ${data.imageUrl ?? null})
         ON CONFLICT (external_site_id, LOWER(name), volume)
         DO UPDATE
         SET bottle_id = COALESCE(excluded.bottle_id, ${storePrices.bottleId}),
