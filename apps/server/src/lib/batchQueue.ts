@@ -24,8 +24,9 @@ export default class BatchQueue<T> {
   }
 
   private async checkBatchSize(): Promise<void> {
-    if (this.queue.length >= this.batchSize && !this.processingBatch) {
+    while (this.queue.length >= this.batchSize && !this.processingBatch) {
       this.processBatch();
+      await this.checkBatchSize(); // Check again in case more items were added
     }
   }
 
@@ -38,7 +39,6 @@ export default class BatchQueue<T> {
       console.error("Error processing batch:", error);
     } finally {
       this.processingBatch = false;
-      await this.checkBatchSize(); // Check again in case more items were added
     }
   }
 }
