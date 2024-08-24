@@ -41,6 +41,7 @@ export async function generateMetadata({
   return {
     title: bottle.fullName,
     description,
+    image: bottle.imageUrl,
     openGraph: {
       title: bottle.fullName,
       description: description,
