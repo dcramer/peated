@@ -2,6 +2,7 @@ import {
   ALLOWED_VOLUMES,
   SCRAPER_PRICE_BATCH_SIZE,
 } from "@peated/server/constants";
+import BatchQueue from "@peated/server/lib/batchQueue";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
 import { chunked, getUrl, parsePrice } from "@peated/server/lib/scraper";
@@ -64,10 +65,18 @@ export async function scrapeProducts(
 }
 
 export default async function scrapeAstorWines() {
-  // TODO: support pagination
-  const products: StorePrice[] = [];
-
   const uniqueProducts = new Set();
+
+  const workQueue = new BatchQueue<StorePrice>(
+    SCRAPER_PRICE_BATCH_SIZE,
+    async (items) => {
+      console.log("Pushing new price data to API");
+      await trpcClient.priceCreateBatch.mutate({
+        site: "astorwines",
+        prices: items,
+      });
+    },
+  );
 
   let hasProducts = true;
   let page = 1;
@@ -77,7 +86,7 @@ export default async function scrapeAstorWines() {
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=3_41&srt=1&instockonly=True&Page=${page}`,
       async (product) => {
         if (uniqueProducts.has(product.name)) return;
-        products.push(product);
+        workQueue.push(product);
         uniqueProducts.add(product.name);
         hasProducts = true;
       },
@@ -93,7 +102,7 @@ export default async function scrapeAstorWines() {
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=2_32&srt=1&instockonly=True&Page=${page}`,
       async (product) => {
         if (uniqueProducts.has(product.name)) return;
-        products.push(product);
+        workQueue.push(product);
         uniqueProducts.add(product.name);
         hasProducts = true;
       },
@@ -101,22 +110,12 @@ export default async function scrapeAstorWines() {
     page += 1;
   }
 
+  const products = Array.from(uniqueProducts.values());
   if (products.length === 0) {
     throw new Error("Failed to scrape any products.");
   }
 
-  if (process.env.ACCESS_TOKEN) {
-    console.log("Pushing new price data to API");
-    await chunked(
-      products,
-      SCRAPER_PRICE_BATCH_SIZE,
-      async (items) =>
-        await trpcClient.priceCreateBatch.mutate({
-          site: "astorwines",
-          prices: items,
-        }),
-    );
-  } else {
-    console.log(`Dry Run Complete - ${products.length} products found`);
-  }
+  await workQueue.processRemaining();
+
+  console.log(`Dry Run Complete - ${products.length} products found`);
 }
