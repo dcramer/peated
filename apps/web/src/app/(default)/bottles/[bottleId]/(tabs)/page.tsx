@@ -47,7 +47,7 @@ export async function generateMetadata({
       image: bottle.imageUrl,
     },
     twitter: {
-      card: "product",
+      card: "summary",
       image: bottle.imageUrl,
     },
   };
