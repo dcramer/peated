@@ -28,9 +28,10 @@ describe("priceList", () => {
   test("filters prices by site", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const caller = createCaller({ user: admin });
-    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    const price1 = await fixtures.StorePrice({ externalSiteId: site.id });
-    await fixtures.StorePrice(); // Different site
+    const site1 = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const price1 = await fixtures.StorePrice({ externalSiteId: site1.id });
+    const site2 = await fixtures.ExternalSite({ type: "healthyspirits" });
+    await fixtures.StorePrice({ externalSiteId: site2.id }); // Different site
 
     const result = await caller.priceList({ site: "whiskyadvocate" });
 
