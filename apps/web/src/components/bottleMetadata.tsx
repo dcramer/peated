@@ -5,6 +5,7 @@ import {
 } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
+import Join from "./join";
 import Tooltip from "./tooltip";
 
 type Props = {
@@ -27,17 +28,21 @@ type Props = {
 export default function BottleMetadata({ data, ...props }: Props) {
   return (
     <div {...props} className="text-muted flex gap-x-2">
-      {data.distillers?.map((d) => {
-        return (
-          <Link
-            key={d.id}
-            href={`/entities/${d.id}`}
-            className="hover:underline"
-          >
-            {d.name}
-          </Link>
-        );
-      })}
+      {data.distillers?.length ? (
+        <Join divider=", ">
+          {data.distillers.map((d) => {
+            return (
+              <Link
+                key={d.id}
+                href={`/entities/${d.id}`}
+                className="hover:underline"
+              >
+                {d.name}
+              </Link>
+            );
+          })}
+        </Join>
+      ) : null}
     </div>
   );
 }
