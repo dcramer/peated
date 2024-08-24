@@ -3,31 +3,6 @@ import BottleStats from "@peated/web/components/bottleStats";
 import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
-// export const sitemap: SitemapFunction = async ({
-//   config: sitemapConfig,
-//   request,
-// }) => {
-//   const trpcClient = makeTRPCClient(config.API_SERVER, null, captureException);
-
-//   let cursor: number | null = 1;
-//   const output = [];
-//   while (cursor) {
-//     const { results, rel } = await trpcClient.bottleList.query({
-//       cursor,
-//     });
-
-//     output.push(
-//       ...results.map((bottle) => ({
-//         loc: `/bottles/${bottle.id}`,
-//         lastmod: bottle.createdAt, // not correct
-//       })),
-//     );
-
-//     cursor = rel?.nextCursor || null;
-//   }
-//   return output;
-// };
-
 export async function generateMetadata({
   params: { bottleId },
 }: {
