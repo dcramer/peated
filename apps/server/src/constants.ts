@@ -185,6 +185,6 @@ export const defaultHeaders = (url: string) => {
 
 export const BOT_USER_AGENT = "PeatedBot/1.0 (https://peated.com)";
 
-export const ALLOWED_VOLUMES = [500, 750, 1000, 1500];
+export const ALLOWED_VOLUMES = [500, 750, 1000, 1500, 1750];
 
 export const SCRAPER_PRICE_BATCH_SIZE = 5;
