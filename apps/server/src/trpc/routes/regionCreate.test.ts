@@ -83,8 +83,9 @@ test("handles duplicate name", async ({ fixtures }) => {
     }),
   );
 
-  expect(err).toBeInstanceOf(Error);
-  expect(err.message).toContain("Conflict");
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Conflicting object already exists (ID=1).]`,
+  );
 });
 
 test("creates region with minimal data", async ({ fixtures }) => {

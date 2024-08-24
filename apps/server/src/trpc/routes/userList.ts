@@ -3,7 +3,7 @@ import { users } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, ilike, or } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
@@ -45,7 +45,10 @@ export async function userList({
   const where: (SQL<unknown> | undefined)[] = [];
   if (query) {
     where.push(
-      or(ilike(users.username, `%${query}%`), ilike(users.email, query)),
+      or(
+        ilike(users.username, `%${query}%`),
+        eq(sql`LOWER(${users.email})`, query.toLowerCase()),
+      ),
     );
   } else if (!ctx.user.admin) {
     return {

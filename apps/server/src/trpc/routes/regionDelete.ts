@@ -53,7 +53,7 @@ export default adminProcedure.input(InputSchema).mutation(async function ({
     .where(
       and(
         eq(regions.countryId, countryId),
-        eq(sql`LOWER(${regions.slug})`, region.slug),
+        eq(sql`LOWER(${regions.slug})`, region.slug.toLowerCase()),
       ),
     );
 
