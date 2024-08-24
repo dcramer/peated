@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { createCaller } from "../router";
 
-test("lists categories for a country by id", async ({ fixtures }) => {
+test("lists categories for a country by id", async ({ fixtures, expect }) => {
   const country = await fixtures.Country();
   const distiller = await fixtures.Entity({
     countryId: country.id,
@@ -21,17 +21,22 @@ test("lists categories for a country by id", async ({ fixtures }) => {
     country: country.id,
   });
 
-  expect(results.length).toBe(2);
+  expect(results).toMatchInlineSnapshot(`
+    [
+      {
+        "category": "bourbon",
+        "count": 1,
+      },
+      {
+        "category": "single_malt",
+        "count": 1,
+      },
+    ]
+  `);
   expect(totalCount).toBe(2);
-  expect(results.some((r) => r.category === "bourbon" && r.count === 1)).toBe(
-    true,
-  );
-  expect(
-    results.some((r) => r.category === "single_malt" && r.count === 1),
-  ).toBe(true);
 });
 
-test("lists categories for a country by slug", async ({ fixtures }) => {
+test("lists categories for a country by slug", async ({ fixtures, expect }) => {
   const country = await fixtures.Country({ slug: "scotland" });
   const distiller = await fixtures.Entity({
     countryId: country.id,
@@ -47,14 +52,20 @@ test("lists categories for a country by slug", async ({ fixtures }) => {
     country: "scotland",
   });
 
-  expect(results.length).toBe(1);
+  expect(results).toMatchInlineSnapshot(`
+    [
+      {
+        "category": "single_malt",
+        "count": 1,
+      },
+    ]
+  `);
   expect(totalCount).toBe(1);
-  expect(results[0].category).toBe("single_malt");
-  expect(results[0].count).toBe(1);
 });
 
 test("returns empty results for a country with no bottles", async ({
   fixtures,
+  expect,
 }) => {
   const country = await fixtures.Country();
 
@@ -63,12 +74,13 @@ test("returns empty results for a country with no bottles", async ({
     country: country.id,
   });
 
-  expect(results.length).toBe(0);
+  expect(results).toMatchInlineSnapshot(`[]`);
   expect(totalCount).toBe(0);
 });
 
 test("aggregates counts correctly for multiple bottles in the same category", async ({
   fixtures,
+  expect,
 }) => {
   const country = await fixtures.Country();
   const distiller = await fixtures.Entity({
@@ -87,10 +99,19 @@ test("aggregates counts correctly for multiple bottles in the same category", as
     country: country.id,
   });
 
-  expect(results.length).toBe(2);
+  expect(results).toMatchInlineSnapshot(`
+    [
+      {
+        "category": "bourbon",
+        "count": 2,
+      },
+      {
+        "category": "single_malt",
+        "count": 1,
+      },
+    ]
+  `);
   expect(totalCount).toBe(3);
-  expect(results.find((r) => r.category === "bourbon")?.count).toBe(2);
-  expect(results.find((r) => r.category === "single_malt")?.count).toBe(1);
 });
 
 // TODO:
