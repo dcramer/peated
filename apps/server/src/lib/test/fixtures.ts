@@ -15,6 +15,7 @@ import {
 import type { AnyDatabase } from "../../db";
 import { db as dbConn } from "../../db";
 import {
+  badgeAwards,
   badges,
   bottleAliases,
   bottles,
@@ -792,6 +793,27 @@ export const Tag = async (
     })
     .returning();
   if (!result) throw new Error("Unable to create Tag fixture");
+  return result;
+};
+
+export const BadgeAward = async (
+  { ...data }: Partial<Omit<dbSchema.NewBadgeAward, "id">> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.BadgeAward> => {
+  const [result] = await db.transaction(async (tx) => {
+    return await tx
+      .insert(badgeAwards)
+      .values({
+        badgeId: data.badgeId || (await Badge({}, tx)).id,
+        userId: data.userId || (await User({}, tx)).id,
+        xp: data.xp || faker.number.int({ min: 1, max: 1000 }),
+        level: data.level || faker.number.int({ min: 1, max: 10 }),
+        createdAt: data.createdAt || new Date(),
+        ...data,
+      })
+      .returning();
+  });
+  if (!result) throw new Error("Unable to create BadgeAward fixture");
   return result;
 };
 
