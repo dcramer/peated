@@ -86,7 +86,7 @@ export default async function scrapeAstorWines() {
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=3_41&srt=1&instockonly=True&Page=${page}`,
       async (product) => {
         if (uniqueProducts.has(product.name)) return;
-        workQueue.push(product);
+        await workQueue.push(product);
         uniqueProducts.add(product.name);
         hasProducts = true;
       },
@@ -102,7 +102,7 @@ export default async function scrapeAstorWines() {
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=2_32&srt=1&instockonly=True&Page=${page}`,
       async (product) => {
         if (uniqueProducts.has(product.name)) return;
-        workQueue.push(product);
+        await workQueue.push(product);
         uniqueProducts.add(product.name);
         hasProducts = true;
       },
