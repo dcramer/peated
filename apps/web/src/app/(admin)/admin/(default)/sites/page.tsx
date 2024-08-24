@@ -7,7 +7,6 @@ import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useSearchParams } from "next/navigation";
 
 export default function Page() {
   const queryParams = useApiQueryParams({
