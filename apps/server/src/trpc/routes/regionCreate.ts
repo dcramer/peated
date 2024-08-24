@@ -5,7 +5,7 @@ import { serialize } from "@peated/server/serializers";
 import { RegionSerializer } from "@peated/server/serializers/region";
 import slugify from "@sindresorhus/slugify";
 import { TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { type z } from "zod";
 import { modProcedure } from "..";
 import { type Context } from "../context";
@@ -52,7 +52,21 @@ export async function regionCreate({
           .from(regions)
           .where(
             and(
-              eq(regions.slug, data.slug),
+              eq(sql`LOWER(${regions.slug})`, data.slug.toLowerCase()),
+              eq(regions.countryId, data.countryId),
+            ),
+          );
+        throw new ConflictError(existingRegion, err);
+      } else if (
+        err?.code === "23505" &&
+        err?.constraint === "region_name_unq"
+      ) {
+        const [existingRegion] = await db
+          .select()
+          .from(regions)
+          .where(
+            and(
+              eq(sql`LOWER(${regions.name})`, data.name.toLowerCase()),
               eq(regions.countryId, data.countryId),
             ),
           );
