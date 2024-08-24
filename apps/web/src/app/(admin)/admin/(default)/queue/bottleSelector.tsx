@@ -4,6 +4,7 @@ import { PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { type Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
+import Join from "@peated/web/components/join";
 import LayoutModal from "@peated/web/components/layoutModal";
 import Link from "@peated/web/components/link";
 import ListItem from "@peated/web/components/listItem";
@@ -121,7 +122,11 @@ export default function BottleSelector({
                       {bottle.fullName}
                     </div>
                     <div className="text-muted flex space-x-2">
-                      {bottle.distillers.map((distiller) => distiller.name)}
+                      {bottle.distillers.length ? (
+                        <Join divider=", ">
+                          {bottle.distillers.map((distiller) => distiller.name)}
+                        </Join>
+                      ) : null}
                     </div>
                   </button>
                 </ListItem>
