@@ -16,15 +16,15 @@ export async function generateMetadata({
   return {
     title: bottle.fullName,
     description,
-    image: bottle.imageUrl,
+    images: [bottle.imageUrl],
     openGraph: {
       title: bottle.fullName,
       description: description,
-      image: bottle.imageUrl,
+      images: [bottle.imageUrl],
     },
     twitter: {
       card: "summary",
-      image: bottle.imageUrl,
+      images: [bottle.imageUrl],
     },
   };
 }
