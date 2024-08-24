@@ -5,15 +5,19 @@ import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useSearchParams } from "next/navigation";
 
 export default function Page() {
-  const searchParams = useSearchParams();
-  const [siteList] = trpc.externalSiteList.useSuspenseQuery({
-    sort: "name",
-    ...Object.fromEntries(searchParams.entries()),
+  const queryParams = useApiQueryParams({
+    defaults: {
+      sort: "name",
+    },
+    numericFields: ["cursor", "limit"],
   });
+
+  const [siteList] = trpc.externalSiteList.useSuspenseQuery(queryParams);
 
   return (
     <div>

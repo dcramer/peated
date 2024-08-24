@@ -8,13 +8,12 @@ import SimpleHeader from "@peated/web/components/simpleHeader";
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc, type RouterOutputs } from "@peated/web/lib/trpc/client";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import BottleSelector from "./bottleSelector";
 
 export default function Page() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
