@@ -2,13 +2,14 @@ import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottles,
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { normalizeBottle } from "@peated/server/lib/normalize";
-import { and, asc, eq, ne, sql } from "drizzle-orm";
+import { and, asc, eq, isNotNull, isNull, ne, sql } from "drizzle-orm";
 
 const subcommand = program.command("prices");
 
@@ -129,4 +130,13 @@ subcommand.command("backfill-aliases").action(async (options) => {
     }
     offset += step;
   }
+});
+
+subcommand.command("backfill-images").action(async (options) => {
+  await db
+    .update(bottles)
+    .set({
+      imageUrl: sql`(SELECT ${storePrices.imageUrl} FROM ${storePrices} WHERE ${storePrices.bottleId} = ${bottles.id} AND ${storePrices.imageUrl} IS NOT NULL LIMIT 1)`,
+    })
+    .where(isNull(bottles.imageUrl));
 });
