@@ -2,9 +2,10 @@ import {
   ALLOWED_VOLUMES,
   SCRAPER_PRICE_BATCH_SIZE,
 } from "@peated/server/constants";
+import BatchQueue from "@peated/server/lib/batchQueue";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
-import { chunked, getUrl, parsePrice } from "@peated/server/lib/scraper";
+import { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
@@ -74,7 +75,16 @@ export async function scrapeProducts(
 
 export default async function scrapeReserveBar() {
   // TODO: support pagination
-  const products: Array<StorePrice> = [];
+  const workQueue = new BatchQueue<StorePrice>(
+    SCRAPER_PRICE_BATCH_SIZE,
+    async (items) => {
+      console.log("Pushing new price data to API");
+      await trpcClient.priceCreateBatch.mutate({
+        site: "reservebar",
+        prices: items,
+      });
+    },
+  );
   const productNames: Set<string> = new Set();
 
   const limit = 36;
@@ -88,7 +98,7 @@ export default async function scrapeReserveBar() {
       async (product) => {
         if (!productNames.has(product.name)) {
           productNames.add(product.name);
-          products.push(product);
+          await workQueue.push(product);
           hasProducts = true;
         }
         offset += 1;
@@ -96,23 +106,12 @@ export default async function scrapeReserveBar() {
     );
   }
 
+  const products = Array.from(productNames.values());
   if (products.length === 0) {
     throw new Error("Failed to scrape any products.");
   }
 
-  if (process.env.ACCESS_TOKEN) {
-    console.log("Pushing new price data to API");
+  await workQueue.processRemaining();
 
-    await chunked(
-      products,
-      SCRAPER_PRICE_BATCH_SIZE,
-      async (items) =>
-        await trpcClient.priceCreateBatch.mutate({
-          site: "reservebar",
-          prices: items,
-        }),
-    );
-  } else {
-    console.log(`Dry Run Complete - ${products.length} products found`);
-  }
+  console.log(`Complete - ${products.length} products found`);
 }

@@ -117,5 +117,5 @@ export default async function scrapeAstorWines() {
 
   await workQueue.processRemaining();
 
-  console.log(`Dry Run Complete - ${products.length} products found`);
+  console.log(`Complete - ${products.length} products found`);
 }
