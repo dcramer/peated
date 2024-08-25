@@ -383,16 +383,7 @@ export const Bottle = async (
 
     if (!bottle) throw new Error("Unable to create Bottle fixture");
 
-    if (!distillerIds.length) {
-      for (let i = 0; i < choose([0, 1, 1, 1, 2]); i++) {
-        await tx.insert(bottlesToDistillers).values({
-          bottleId: bottle.id,
-          distillerId: (
-            await Entity({ type: ["distiller"], totalBottles: 1 }, tx)
-          ).id,
-        });
-      }
-    } else {
+    if (distillerIds.length) {
       for (const d of distillerIds) {
         await tx.insert(bottlesToDistillers).values({
           bottleId: bottle.id,
