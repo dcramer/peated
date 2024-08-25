@@ -88,7 +88,7 @@ export default publicProcedure
         };
 
         user = await db.transaction(async (tx) => {
-          const user = await createUser(db, userData);
+          const user = await createUser(tx, userData);
 
           await tx.insert(identities).values({
             provider: "google",
