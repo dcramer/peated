@@ -11,6 +11,7 @@ import { random } from "../lib/rand";
 import { serialize } from "../serializers";
 import { UserSerializer } from "../serializers/user";
 import { logError } from "./log";
+import { absoluteUrl } from "./urls";
 
 export function signPayload(payload: string | object): Promise<string> {
   return new Promise<string>((res, rej) => {
@@ -115,4 +116,23 @@ export async function createUser(
   }
   if (!user) throw new Error("Unable to create user");
   return user;
+}
+
+export async function generateMagicLink(user: User) {
+  const token = {
+    id: user.id,
+    email: user.email,
+    createdAt: new Date().toISOString(),
+  };
+
+  const signedToken = await signPayload(token);
+  const url = absoluteUrl(
+    config.URL_PREFIX,
+    `/auth/magic-link?token=${signedToken}`,
+  );
+
+  return {
+    token: signedToken,
+    url,
+  };
 }
