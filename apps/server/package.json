@@ -85,7 +85,7 @@
     "axios-mock-adapter": "~1.22.0",
     "form-data-encoder": "^4.0.2",
     "formdata-node": "^6.0.3",
-    "vite-tsconfig-paths": "^4.3.2",
+    "vite-tsconfig-paths": "^5.0.1",
     "vitest": "catalog:"
   },
   "volta": {
