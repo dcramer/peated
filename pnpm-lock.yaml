@@ -550,7 +550,7 @@ importers:
         version: 6.0.3
       vite-tsconfig-paths:
         specifier: ^4.3.2
-        version: 4.3.2(typescript@5.5.4)(vite@4.5.3(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.31.6))
+        version: 4.3.2(typescript@5.5.4)(vite@5.3.2(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.31.6))
       vitest:
         specifier: 'catalog:'
         version: 1.4.0(@types/node@20.14.12)(jsdom@24.1.0)(lightningcss@1.22.0)(terser@5.31.6)
@@ -599,6 +599,9 @@ importers:
       '@trpc/server':
         specifier: 'catalog:'
         version: 11.0.0-rc.461
+      '@vercel/speed-insights':
+        specifier: ^1.0.12
+        version: 1.0.12(next@14.2.5(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.18)(vue@3.4.31(typescript@5.5.4))
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.19(postcss@8.4.38)
@@ -658,7 +661,7 @@ importers:
         version: 4.2.1(leaflet@1.9.4)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       react-qr-code:
         specifier: ^2.0.14
-        version: 2.0.14(react-native-svg@15.4.0(react@18.3.1))(react@18.3.1)
+        version: 2.0.14(react-native-svg@15.4.0(react-native@0.74.3(@babel/core@7.24.9)(@babel/preset-env@7.24.7(@babel/core@7.24.9))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       recharts:
         specifier: ^2.12.7
         version: 2.12.7(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
@@ -4531,6 +4534,29 @@ packages:
     resolution: {integrity: sha512-hHqer2mcdVC0eYnVNbWyi28AlGOPb2vjH3lP3/Bc8Lc8BjhMsDwFMm7WhoP5C1+cfbr/QJ6Er3H/L08wznXxfg==}
     peerDependencies:
       graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
+
+  '@vercel/speed-insights@1.0.12':
+    resolution: {integrity: sha512-ZGQ+a7bcfWJD2VYEp2R1LHvRAMyyaFBYytZXsfnbOMkeOvzGNVxUL7aVUvisIrTZjXTSsxG45DKX7yiw6nq2Jw==}
+    peerDependencies:
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      react: ^18 || ^19
+      svelte: ^4
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
 
   '@vitejs/plugin-react@4.3.1':
     resolution: {integrity: sha512-m/V2syj5CuVnaxcUJOQRel/Wr31FFXRFlnOoq1TVtkCxsY5veGMTEmpWHndrhB2U8ScHtCQB1e+4hWYExQc6Lg==}
@@ -15999,6 +16025,13 @@ snapshots:
       graphql: 15.8.0
       wonka: 4.0.15
 
+  '@vercel/speed-insights@1.0.12(next@14.2.5(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.18)(vue@3.4.31(typescript@5.5.4))':
+    optionalDependencies:
+      next: 14.2.5(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      svelte: 4.2.18
+      vue: 3.4.31(typescript@5.5.4)
+
   '@vitejs/plugin-react@4.3.1(vite@4.5.3(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.31.6))':
     dependencies:
       '@babel/core': 7.24.9
@@ -22170,7 +22203,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  react-qr-code@2.0.14(react-native-svg@15.4.0(react@18.3.1))(react@18.3.1):
+  react-qr-code@2.0.14(react-native-svg@15.4.0(react-native@0.74.3(@babel/core@7.24.9)(@babel/preset-env@7.24.7(@babel/core@7.24.9))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       prop-types: 15.8.1
       qr.js: 0.0.0
@@ -23934,13 +23967,13 @@ snapshots:
     transitivePeerDependencies:
       - rollup
 
-  vite-tsconfig-paths@4.3.2(typescript@5.5.4)(vite@4.5.3(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.31.6)):
+  vite-tsconfig-paths@4.3.2(typescript@5.5.4)(vite@5.3.2(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.31.6)):
     dependencies:
       debug: 4.3.5
       globrex: 0.1.2
       tsconfck: 3.1.1(typescript@5.5.4)
     optionalDependencies:
-      vite: 4.5.3(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.31.6)
+      vite: 5.3.2(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.31.6)
     transitivePeerDependencies:
       - supports-color
       - typescript
