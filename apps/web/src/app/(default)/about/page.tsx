@@ -21,7 +21,7 @@ export default function About() {
         <div className="prose prose-invert w-9/12 py-6">
           <h1>The Mission</h1>
           <p>
-            Peated, inspired by apps like Untapped and Vivino, aims to create a
+            Peated, inspired by apps like Untappd and Vivino, aims to create a
             rich social experience around tasting and collecting Whiskey. We
             leverage modern and open source technology to go beyond the typical
             experiences you see elsewhere.
