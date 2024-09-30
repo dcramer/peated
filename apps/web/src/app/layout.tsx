@@ -4,6 +4,7 @@ import config from "@peated/web/config";
 import { getSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
 import { setUser } from "@sentry/nextjs";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import Providers from "./providers/providers";
@@ -66,6 +67,8 @@ export default async function RootLayout({
           }}
         >
           {children}
+
+          <SpeedInsights />
 
           {config.FATHOM_SITE_ID && (
             <Fathom

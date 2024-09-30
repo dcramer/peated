@@ -92,7 +92,7 @@ const bottleFlavors = [
   "Pure Malt",
 ];
 
-function chooseBottleName() {
+function chooseBottleName(extraDetail = false) {
   const baseName = choose([
     `${choose(bottleNames)}`,
     `${choose(bottleNames)}`,
@@ -101,13 +101,16 @@ function chooseBottleName() {
     `${choose(bottleNames)} ${choose(bottleFlavors)}`,
     `${choose(bottleNames)} ${choose(bottleFlavors)}`,
   ]);
-  return choose([
-    `${baseName} (Batch ${faker.number.int(100)})`,
-    `${baseName} (Cask No. ${faker.number.int(100)})`,
-    `${baseName} (${faker.number.int({ min: 1980, max: 2024 })} Release)`,
-    `${baseName} (${faker.number.int({ min: 1980, max: 2017 })} Vintage)`,
-    `${baseName} (${faker.number.int({ min: 1980, max: 2000 })} Vintage) (${faker.number.int({ min: 2005, max: 2024 })} Release)`,
-  ]);
+  if (extraDetail) {
+    return choose([
+      `${baseName} (Batch ${faker.number.int(100)})`,
+      `${baseName} (Cask No. ${faker.number.int(100)})`,
+      `${baseName} (${faker.number.int({ min: 1980, max: 2024 })} Release)`,
+      `${baseName} (${faker.number.int({ min: 1980, max: 2017 })} Vintage)`,
+      `${baseName} (${faker.number.int({ min: 1980, max: 2000 })} Vintage) (${faker.number.int({ min: 2005, max: 2024 })} Release)`,
+    ]);
+  }
+  return baseName;
 }
 
 export async function loadFixture(...paths: string[]) {
