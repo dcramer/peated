@@ -46,7 +46,7 @@
     "@types/nodemailer": "^6.4.15",
     "@types/react": "catalog:",
     "@types/pg": "catalog:",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "catalog:",
     "ai": "^3.2.19",
     "axios": "~1.6.8",
     "bcrypt": "^5.1.1",
