@@ -39,7 +39,7 @@
     "@trpc/server": "catalog:",
     "@types/bcrypt": "^5.0.2",
     "@types/error-cause": "^1.0.4",
-    "@types/jsonwebtoken": "^9.0.6",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/mime-types": "^2.1.4",
     "@types/mjml": "^4.7.4",
     "@types/node": "catalog:",

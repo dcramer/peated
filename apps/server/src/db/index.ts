@@ -2,9 +2,12 @@ import type { ExtractTablesWithRelations } from "drizzle-orm";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
-import { Pool } from "pg";
 import config from "../config";
 import * as schema from "./schema";
+
+// I love to ESM.
+import { default as pg } from "pg";
+const { Pool } = pg;
 
 declare global {
   interface BigInt {

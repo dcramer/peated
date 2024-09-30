@@ -1,7 +1,6 @@
 import { hashSync } from "bcrypt";
 import { eq } from "drizzle-orm";
-import type { JwtPayload } from "jsonwebtoken";
-import { sign, verify } from "jsonwebtoken";
+
 import config from "../config";
 import type { AnyDatabase } from "../db";
 import { db } from "../db";
@@ -11,6 +10,11 @@ import { random } from "../lib/rand";
 import { serialize } from "../serializers";
 import { UserSerializer } from "../serializers/user";
 import { logError } from "./log";
+
+// I love to ESM.
+import type { JwtPayload } from "jsonwebtoken";
+import { default as jsonwebtoken } from "jsonwebtoken";
+const { sign, verify } = jsonwebtoken;
 
 export function signPayload(payload: string | object): Promise<string> {
   return new Promise<string>((res, rej) => {
