@@ -1,16 +1,19 @@
-/// <reference types="vitest" />
-
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
+  server: {
+    watch: {
+      ignored: ["**/node_modules/**", "**/dist/**", "**/postgres-data/**"],
+    },
+  },
   test: {
     coverage: {
       provider: "v8",
       reporter: ["json"],
     },
-    maxConcurrency: 0,
+    maxConcurrency: 1,
     pool: "forks",
     poolOptions: {
       forks: {
@@ -24,11 +27,6 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup-test-env.ts"],
     include: ["./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    watchExclude: [
-      ".*\\/node_modules\\/.*",
-      ".*\\/dist\\/.*",
-      ".*\\/postgres-data\\/.*",
-    ],
     restoreMocks: true,
   },
 });

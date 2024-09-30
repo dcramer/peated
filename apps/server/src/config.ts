@@ -1,7 +1,12 @@
 import { tmpdir } from "node:os";
 
 export default {
-  ENV: process.env.NODE_ENV === "production" ? "production" : "development",
+  ENV:
+    process.env.NODE_ENV === "production"
+      ? "production"
+      : process.env.NODE_ENV !== "test"
+        ? "development"
+        : "test",
   DEBUG: !!process.env.DEBUG,
   PORT: process.env.PORT || 4000,
   HOST: process.env.HOST || "localhost",
