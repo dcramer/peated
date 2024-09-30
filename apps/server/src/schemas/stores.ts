@@ -24,7 +24,7 @@ export const StorePriceInputSchema = z.object({
     message: `Volume must be one of: ${ALLOWED_VOLUMES.join(", ")}`,
   }),
   url: z.string().trim().url().min(1, "Required"),
-  imageUrl: z.string().trim().url().nullable().default(null),
+  imageUrl: z.string().trim().url().nullable().default(null).optional(),
 });
 
 export const BottlePriceChangeSchema = z.object({

@@ -33,8 +33,9 @@ vi.mock("../worker/client", async (importOriginal) => {
   };
 });
 
+// XXX: doing this causes the module to catch and more or less all mocks to break
 // force registration of all jobs
-import "../worker/jobs";
+// import "../worker/jobs";
 
 const pgTables = pgTable("pg_tables", {
   schemaname: text("schemaname").notNull(),
