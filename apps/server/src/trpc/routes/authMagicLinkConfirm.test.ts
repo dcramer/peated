@@ -5,7 +5,7 @@ import { createCaller } from "../router";
 
 // Mock the auth functions
 vi.mock("@peated/server/lib/auth", () => ({
-  createAccessToken: vi.fn().mockResolvedValue("mocked-access-token"),
+  createAccessToken: vi.fn(),
   verifyPayload: vi.fn(),
 }));
 
@@ -24,6 +24,8 @@ describe("authMagicLinkConfirm", () => {
       email: user.email,
       createdAt: new Date().toISOString(),
     });
+
+    vi.mocked(createAccessToken).mockResolvedValue("mocked-access-token");
 
     const result = await caller.authMagicLinkConfirm({ token });
 
