@@ -5,16 +5,19 @@ import Button from "@peated/web/components/button";
 import DateRange from "@peated/web/components/dateRange";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Table from "@peated/web/components/table";
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useSearchParams } from "next/navigation";
 
 export default function Page() {
-  const searchParams = useSearchParams();
-  const [eventList] = trpc.eventList.useSuspenseQuery({
-    sort: "name",
-    onlyUpcoming: false,
-    ...Object.fromEntries(searchParams.entries()),
+  const queryParams = useApiQueryParams({
+    defaults: {
+      sort: "date",
+      onlyUpcoming: false,
+    },
+    numericFields: ["cursor", "limit"],
   });
+
+  const [eventList] = trpc.eventList.useSuspenseQuery(queryParams);
 
   return (
     <div>
