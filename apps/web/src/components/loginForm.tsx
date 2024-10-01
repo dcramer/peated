@@ -57,8 +57,8 @@ export default function LoginForm() {
       {result?.error ? <Alert>{result.error}</Alert> : null}
 
       {result?.magicLink ? (
-        <p className="mb-8 text-center">
-          Please check your email address to continue logging in.
+        <p className="mb-8 text-center font-bold">
+          Please check your email to continue.
         </p>
       ) : (
         <>

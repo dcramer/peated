@@ -61,12 +61,14 @@ export async function authenticate(formData: FormData) {
     try {
       await trpcClient.authMagicLinkSend.mutate({ email });
     } catch (err) {
-      if (isTRPCClientError(err) && err.data?.code === "CONFLICT") {
+      if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
         return {
           magicLink: null,
           error: "Invalid credentials",
         };
       }
+
+      throw err;
     }
 
     return {
