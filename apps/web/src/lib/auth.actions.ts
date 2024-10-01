@@ -57,6 +57,24 @@ export async function authenticate(formData: FormData) {
 
   const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
 
+  if (!password) {
+    try {
+      await trpcClient.authMagicLinkSend.mutate({ email });
+    } catch (err) {
+      if (isTRPCClientError(err) && err.data?.code === "CONFLICT") {
+        return {
+          magicLink: null,
+          error: "Invalid credentials",
+        };
+      }
+    }
+
+    return {
+      magicLink: true,
+      error: null,
+    };
+  }
+
   let data;
   try {
     data = code
@@ -77,7 +95,10 @@ export async function authenticate(formData: FormData) {
     // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
   } catch (err) {
     if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
-      return "Invalid credentials";
+      return {
+        magicLink: null,
+        error: "Invalid credentials",
+      };
     }
 
     throw err;
