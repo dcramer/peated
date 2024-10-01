@@ -1,9 +1,12 @@
-import { defaultHeaders } from "@peated/server/constants";
+import {
+  defaultHeaders,
+  SCRAPER_PRICE_BATCH_SIZE,
+} from "@peated/server/constants";
 import { ApiClient } from "@peated/server/lib/apiClient";
 import { logError } from "@peated/server/lib/log";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import { isTRPCClientError } from "@peated/server/trpc/client";
-import type { Currency } from "@peated/server/types";
+import type { Currency, ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
 import { existsSync, mkdirSync, statSync } from "fs";
@@ -11,6 +14,7 @@ import { open } from "fs/promises";
 import type { z } from "zod";
 import config from "../config";
 import type { BottleInputSchema, StorePriceInputSchema } from "../schemas";
+import BatchQueue from "./batchQueue";
 
 const CACHE = ".cache";
 
@@ -199,4 +203,50 @@ export async function handleBottle(
   } else {
     console.log(`Dry Run [${bottle.name}]`);
   }
+}
+
+export type ScrapePricesCallback = (
+  product: z.infer<typeof StorePriceInputSchema>,
+) => Promise<void>;
+
+export default async function scrapePrices(
+  site: ExternalSiteType,
+  urlFn: (page: number) => string,
+  scrapeProducts: (url: string, cb: ScrapePricesCallback) => Promise<void>,
+) {
+  const workQueue = new BatchQueue<StorePrice>(
+    SCRAPER_PRICE_BATCH_SIZE,
+    async (prices) => {
+      console.log("Pushing new price data to API");
+      await trpcClient.priceCreateBatch.mutate({
+        site,
+        prices,
+      });
+    },
+  );
+
+  const uniqueProducts = new Set<string>();
+
+  let hasProducts = true;
+  let page = 1;
+  while (hasProducts) {
+    hasProducts = false;
+    await scrapeProducts(urlFn(page), async (product) => {
+      console.log(`${product.name} - ${(product.price / 100).toFixed(2)}`);
+      if (uniqueProducts.has(product.name)) return;
+      await workQueue.push(product);
+      uniqueProducts.add(product.name);
+      hasProducts = true;
+    });
+    page += 1;
+  }
+
+  const products = Array.from(uniqueProducts.values());
+  if (products.length === 0) {
+    throw new Error("Failed to scrape any products.");
+  }
+
+  await workQueue.processRemaining();
+
+  console.log(`Complete - ${products.length} products found`);
 }

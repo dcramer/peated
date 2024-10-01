@@ -1,9 +1,9 @@
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
-import type { StorePrice } from "@peated/server/lib/scraper";
-import { chunked, getUrl, parsePrice } from "@peated/server/lib/scraper";
-import { trpcClient } from "@peated/server/lib/trpc/server";
+import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import type { StorePriceInputSchema } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
+import type { z } from "zod";
 
 function extractVolume(name: string) {
   const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
@@ -27,7 +27,7 @@ function extractVolume(name: string) {
 
 export async function scrapeProducts(
   url: string,
-  cb: (product: StorePrice) => Promise<void>,
+  cb: (product: z.input<typeof StorePriceInputSchema>) => Promise<void>,
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
@@ -94,41 +94,9 @@ export async function scrapeProducts(
 }
 
 export default async function scrapeWoodenCork() {
-  // TODO: support pagination
-  const products: Array<StorePrice> = [];
-  const productNames: Set<string> = new Set();
-
-  let hasProducts = true;
-  let page = 1;
-  while (hasProducts) {
-    hasProducts = false;
-    await scrapeProducts(
-      `https://woodencork.com/collections/whiskey?cursor=${page}`,
-      async (product) => {
-        if (!productNames.has(product.name)) {
-          productNames.add(product.name);
-          products.push(product);
-          hasProducts = true;
-        }
-      },
-    );
-
-    page += 1;
-  }
-
-  if (process.env.ACCESS_TOKEN) {
-    console.log("Pushing new price data to API");
-
-    await chunked(
-      products,
-      100,
-      async (items) =>
-        await trpcClient.priceCreateBatch.mutate({
-          site: "woodencork",
-          prices: items,
-        }),
-    );
-  } else {
-    console.log(`Dry Run Complete - ${products.length} products found`);
-  }
+  await scrapePrices(
+    "woodencork",
+    (page) => `https://woodencork.com/collections/whiskey?cursor=${page}`,
+    scrapeProducts,
+  );
 }

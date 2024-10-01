@@ -1,11 +1,7 @@
-import {
-  ALLOWED_VOLUMES,
-  SCRAPER_PRICE_BATCH_SIZE,
-} from "@peated/server/constants";
+import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
-import { chunked, getUrl, parsePrice } from "@peated/server/lib/scraper";
-import { trpcClient } from "@peated/server/lib/trpc/server";
+import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
 
@@ -58,38 +54,17 @@ export async function scrapeProducts(
 }
 
 export default async function scrapeTotalWine() {
-  const products: StorePrice[] = [];
-  await scrapeProducts(
-    "https://www.totalwine.com/spirits/scotch/c/000887?viewall=true&pageSize=120&aty=0,0,0,0",
-    async (product) => {
-      products.push(product);
-    },
+  await scrapePrices(
+    "totalwine",
+    (page) =>
+      `https://www.totalwine.com/spirits/scotch/c/000887?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
+    scrapeProducts,
   );
 
-  await scrapeProducts(
-    "https://www.totalwine.com/spirits/whiskey/c/9238919?viewall=true&pageSize=120&aty=0,0,0,0",
-    async (product) => {
-      products.push(product);
-    },
+  await scrapePrices(
+    "totalwine",
+    (page) =>
+      `https://www.totalwine.com/spirits/whiskey/c/9238919?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
+    scrapeProducts,
   );
-
-  if (products.length === 0) {
-    throw new Error("Failed to scrape any products.");
-  }
-
-  if (process.env.ACCESS_TOKEN) {
-    console.log("Pushing new price data to API");
-
-    await chunked(
-      products,
-      SCRAPER_PRICE_BATCH_SIZE,
-      async (items) =>
-        await trpcClient.priceCreateBatch.mutate({
-          site: "totalwine",
-          prices: items,
-        }),
-    );
-  } else {
-    console.log(`Dry Run Complete - ${products.length} products found`);
-  }
 }

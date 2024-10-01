@@ -1,12 +1,7 @@
-import {
-  ALLOWED_VOLUMES,
-  SCRAPER_PRICE_BATCH_SIZE,
-} from "@peated/server/constants";
-import BatchQueue from "@peated/server/lib/batchQueue";
+import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { StorePrice } from "@peated/server/lib/scraper";
-import { getUrl, parsePrice } from "@peated/server/lib/scraper";
-import { trpcClient } from "@peated/server/lib/trpc/server";
+import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
 
@@ -74,44 +69,12 @@ export async function scrapeProducts(
 }
 
 export default async function scrapeReserveBar() {
-  // TODO: support pagination
-  const workQueue = new BatchQueue<StorePrice>(
-    SCRAPER_PRICE_BATCH_SIZE,
-    async (items) => {
-      console.log("Pushing new price data to API");
-      await trpcClient.priceCreateBatch.mutate({
-        site: "reservebar",
-        prices: items,
-      });
-    },
-  );
-  const productNames: Set<string> = new Set();
-
   const limit = 36;
 
-  let hasProducts = true;
-  let offset = 0;
-  while (hasProducts) {
-    hasProducts = false;
-    await scrapeProducts(
-      `https://www.reservebar.com/collections/whiskey?start=${offset}&sz=${limit}`,
-      async (product) => {
-        if (!productNames.has(product.name)) {
-          productNames.add(product.name);
-          await workQueue.push(product);
-          hasProducts = true;
-        }
-        offset += 1;
-      },
-    );
-  }
-
-  const products = Array.from(productNames.values());
-  if (products.length === 0) {
-    throw new Error("Failed to scrape any products.");
-  }
-
-  await workQueue.processRemaining();
-
-  console.log(`Complete - ${products.length} products found`);
+  await scrapePrices(
+    "reservebar",
+    (page) =>
+      `https://www.reservebar.com/collections/whiskey?start=${page * limit}&sz=${limit}`,
+    scrapeProducts,
+  );
 }
