@@ -78,7 +78,7 @@ export default function LoginForm() {
         <FormComponent />
       </form>
 
-      <p className="mt-4 flex items-center justify-center gap-x-3 text-sm">
+      <div className="mt-4 flex items-center justify-center gap-x-3 text-sm">
         <div>
           Don't have an account yet?{" "}
           <Link href="/register" className="text-highlight underline">
@@ -91,7 +91,7 @@ export default function LoginForm() {
             Password Reset
           </Link>
         </div>
-      </p>
+      </div>
     </div>
   );
 }
