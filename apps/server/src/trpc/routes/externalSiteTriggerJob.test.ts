@@ -1,6 +1,8 @@
 import waitError from "@peated/server/lib/test/waitError";
-import * as jobs from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/client";
 import { createCaller } from "../router";
+
+vi.mock("@peated/server/worker/client");
 
 test("requires admin", async ({ fixtures }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
@@ -16,11 +18,12 @@ test("triggers job", async ({ fixtures }) => {
   const caller = createCaller({
     user: await fixtures.User({ admin: true }),
   });
+
   const newSite = await caller.externalSiteTriggerJob(site.type);
   expect(newSite.lastRunAt).toBeTruthy();
   expect(new Date(newSite.lastRunAt || "").getTime()).toBeGreaterThan(
     new Date().getTime() - 5000,
   );
 
-  expect(jobs.pushJob).toHaveBeenCalledOnce();
+  expect(pushJob).toHaveBeenCalledOnce();
 });

@@ -205,9 +205,14 @@ export async function handleBottle(
   }
 }
 
+export type ScrapePricesCallback = (
+  product: z.infer<typeof StorePriceInputSchema>,
+) => Promise<void>;
+
 export default async function scrapePrices(
   site: ExternalSiteType,
-  scrapeProducts: (product: StorePrice) => Promise<void>,
+  urlFn: (page: number) => string,
+  scrapeProducts: (url: string, cb: ScrapePricesCallback) => Promise<void>,
 ) {
   const workQueue = new BatchQueue<StorePrice>(
     SCRAPER_PRICE_BATCH_SIZE,
@@ -220,22 +225,19 @@ export default async function scrapePrices(
     },
   );
 
-  const uniqueProducts = new Set();
+  const uniqueProducts = new Set<string>();
 
   let hasProducts = true;
   let page = 1;
   while (hasProducts) {
     hasProducts = false;
-    await scrapeProducts(
-      `https://www.healthyspirits.com/spirits/whiskey/page${page}.html?limit=72`,
-      async (product) => {
-        console.log(`${product.name} - ${(product.price / 100).toFixed(2)}`);
-        if (uniqueProducts.has(product.name)) return;
-        await workQueue.push(product);
-        uniqueProducts.add(product.name);
-        hasProducts = true;
-      },
-    );
+    await scrapeProducts(urlFn(page), async (product) => {
+      console.log(`${product.name} - ${(product.price / 100).toFixed(2)}`);
+      if (uniqueProducts.has(product.name)) return;
+      await workQueue.push(product);
+      uniqueProducts.add(product.name);
+      hasProducts = true;
+    });
     page += 1;
   }
 

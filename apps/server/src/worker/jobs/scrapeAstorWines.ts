@@ -1,12 +1,6 @@
-import {
-  ALLOWED_VOLUMES,
-  SCRAPER_PRICE_BATCH_SIZE,
-} from "@peated/server/constants";
-import BatchQueue from "@peated/server/lib/batchQueue";
+import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
-import type { StorePrice } from "@peated/server/lib/scraper";
-import { chunked, getUrl, parsePrice } from "@peated/server/lib/scraper";
-import { trpcClient } from "@peated/server/lib/trpc/server";
+import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import type { StorePriceInputSchema } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
@@ -65,57 +59,17 @@ export async function scrapeProducts(
 }
 
 export default async function scrapeAstorWines() {
-  const uniqueProducts = new Set();
-
-  const workQueue = new BatchQueue<StorePrice>(
-    SCRAPER_PRICE_BATCH_SIZE,
-    async (items) => {
-      console.log("Pushing new price data to API");
-      await trpcClient.priceCreateBatch.mutate({
-        site: "astorwines",
-        prices: items,
-      });
-    },
+  await scrapePrices(
+    "astorwines",
+    (page) =>
+      `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=3_41&srt=1&instockonly=True&Page=${page}`,
+    scrapeProducts,
   );
 
-  let hasProducts = true;
-  let page = 1;
-  while (hasProducts) {
-    hasProducts = false;
-    await scrapeProducts(
-      `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=3_41&srt=1&instockonly=True&Page=${page}`,
-      async (product) => {
-        if (uniqueProducts.has(product.name)) return;
-        await workQueue.push(product);
-        uniqueProducts.add(product.name);
-        hasProducts = true;
-      },
-    );
-    page += 1;
-  }
-
-  hasProducts = true;
-  page = 1;
-  while (hasProducts) {
-    hasProducts = false;
-    await scrapeProducts(
+  await scrapePrices(
+    "astorwines",
+    (page) =>
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=2_32&srt=1&instockonly=True&Page=${page}`,
-      async (product) => {
-        if (uniqueProducts.has(product.name)) return;
-        await workQueue.push(product);
-        uniqueProducts.add(product.name);
-        hasProducts = true;
-      },
-    );
-    page += 1;
-  }
-
-  const products = Array.from(uniqueProducts.values());
-  if (products.length === 0) {
-    throw new Error("Failed to scrape any products.");
-  }
-
-  await workQueue.processRemaining();
-
-  console.log(`Complete - ${products.length} products found`);
+    scrapeProducts,
+  );
 }

@@ -1,6 +1,7 @@
 {
   "private": true,
   "name": "@peated/server",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "concurrently 'npm:dev:api' 'npm:dev:worker'",
@@ -38,14 +39,14 @@
     "@trpc/server": "catalog:",
     "@types/bcrypt": "^5.0.2",
     "@types/error-cause": "^1.0.4",
-    "@types/jsonwebtoken": "^9.0.6",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/mime-types": "^2.1.4",
     "@types/mjml": "^4.7.4",
     "@types/node": "catalog:",
     "@types/nodemailer": "^6.4.15",
     "@types/react": "catalog:",
     "@types/pg": "catalog:",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "catalog:",
     "ai": "^3.2.19",
     "axios": "~1.6.8",
     "bcrypt": "^5.1.1",
@@ -85,7 +86,7 @@
     "axios-mock-adapter": "~1.22.0",
     "form-data-encoder": "^4.0.2",
     "formdata-node": "^6.0.3",
-    "vite-tsconfig-paths": "^5.0.1",
+    "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
   },
   "volta": {

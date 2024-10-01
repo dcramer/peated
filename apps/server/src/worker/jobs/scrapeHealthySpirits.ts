@@ -1,17 +1,12 @@
-import {
-  ALLOWED_VOLUMES,
-  SCRAPER_PRICE_BATCH_SIZE,
-} from "@peated/server/constants";
-import BatchQueue from "@peated/server/lib/batchQueue";
+import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
-import type { StorePrice } from "@peated/server/lib/scraper";
-import { getUrl, parsePrice } from "@peated/server/lib/scraper";
+import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { toTitleCase } from "@peated/server/lib/strings";
-import { trpcClient } from "@peated/server/lib/trpc/server";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import type { StorePriceInputSchema } from "@peated/server/schemas";
 import type { ExternalSiteType } from "@peated/server/types";
-import { ExternalSite } from "@peated/server/types";
 import { load as cheerio } from "cheerio";
+import type { z } from "zod";
 
 function extractVolume(name: string): [string, string] | [string] {
   const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
@@ -21,7 +16,7 @@ function extractVolume(name: string): [string, string] | [string] {
 
 export async function scrapeProducts(
   url: string,
-  cb: (product: StorePrice) => Promise<void>,
+  cb: (product: z.infer<typeof StorePriceInputSchema>) => Promise<void>,
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
@@ -77,43 +72,11 @@ export async function scrapeProducts(
   });
 }
 
-export default async function scrapePrices(site: ExternalSiteType) {
-  const workQueue = new BatchQueue<StorePrice>(
-    SCRAPER_PRICE_BATCH_SIZE,
-    async (prices) => {
-      console.log("Pushing new price data to API");
-      await trpcClient.priceCreateBatch.mutate({
-        site,
-        prices,
-      });
-    },
-  );
-
-  const uniqueProducts = new Set<string>();
-
-  let hasProducts = true;
-  let page = 1;
-  while (hasProducts) {
-    hasProducts = false;
-    await scrapeProducts(
+export default async function scrapeHealthySpirits() {
+  await scrapePrices(
+    "healthyspirits",
+    (page) =>
       `https://www.healthyspirits.com/spirits/whiskey/page${page}.html?limit=72`,
-      async (product) => {
-        console.log(`${product.name} - ${(product.price / 100).toFixed(2)}`);
-        if (uniqueProducts.has(product.name)) return;
-        await workQueue.push(product);
-        uniqueProducts.add(product.name);
-        hasProducts = true;
-      },
-    );
-    page += 1;
-  }
-
-  const products = Array.from(uniqueProducts.values());
-  if (products.length === 0) {
-    throw new Error("Failed to scrape any products.");
-  }
-
-  await workQueue.processRemaining();
-
-  console.log(`Complete - ${products.length} products found`);
+    scrapeProducts,
+  );
 }

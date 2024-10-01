@@ -9,7 +9,7 @@ catalog:
   eslint: ^8.57.0
   "@fontsource/raleway": ^5.0.19
   jsx-email: ^1.10.11
-  pg: ^8.12.0
+  pg: ^8.13.0
   prettier: ^3.3.2
   "@sentry/core": ^8.16.0
   "@sentry/nextjs": ^8.16.0
@@ -31,7 +31,9 @@ catalog:
   typescript: ^5.5.4
   "@types/node": ^20.14.9
   "@types/pg": ^8.11.6
-  vitest: "~2.0.5"
+  vitest: "~2.1.1"
+  "@vitest/coverage-v8": "~2.1.1"
+  "vite-tsconfig-paths": "^5.0.1"
   zod: ^3.23.8
 
   react: ^18.2.0
