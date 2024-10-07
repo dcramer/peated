@@ -18,30 +18,8 @@ export function ProfileDropdown() {
   const { user } = useAuth();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const timeoutDuration = 200;
-  let timeoutId: ReturnType<typeof setTimeout>;
 
   if (!user) return null;
-
-  const openMenu = () => buttonRef?.current?.click();
-  const closeMenu = () =>
-    dropdownRef?.current?.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "Escape",
-        bubbles: true,
-        cancelable: true,
-      }),
-    );
-
-  const onMouseEnter = (closed?: boolean) => {
-    if (timeoutId) clearTimeout(timeoutId);
-    if (closed) openMenu();
-  };
-  const onMouseLeave = (open: boolean) => {
-    if (open) {
-      timeoutId = setTimeout(() => closeMenu(), timeoutDuration);
-    }
-  };
 
   return (
     <Menu as="div" className="menu hidden sm:block">
@@ -55,14 +33,11 @@ export function ProfileDropdown() {
                 ? "rounded-b-none rounded-t bg-slate-800 text-white"
                 : "text-muted rounded",
             )}
-            onClick={openMenu}
             as={Link}
             href={`/users/${user.username}`}
-            onMouseEnter={() => onMouseEnter(!open)}
-            onMouseLeave={() => onMouseLeave(open)}
           >
             <span className="sr-only">Open user menu</span>
-            <div className="h-8 w-8 sm:h-8 sm:w-8">
+            <div className="h-8 w-8">
               <UserAvatar user={user} />
             </div>
           </MenuButton>
@@ -77,8 +52,6 @@ export function ProfileDropdown() {
           >
             <MenuItems
               ref={dropdownRef}
-              onMouseEnter={() => onMouseEnter()}
-              onMouseLeave={() => onMouseLeave(open)}
               static
               className="absolute right-0 z-40 mt-0 w-48 origin-top-right divide-y divide-slate-700"
             >
