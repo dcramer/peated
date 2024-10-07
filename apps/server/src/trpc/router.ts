@@ -231,8 +231,6 @@ export const appRouter = router({
   userTagList,
   userUpdate,
   version,
-  authMagicLinkSend,
-  authMagicLinkConfirm,
 });
 
 export type AppRouter = typeof appRouter;

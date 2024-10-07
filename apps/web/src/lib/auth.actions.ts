@@ -2,7 +2,6 @@
 
 import { makeTRPCClient } from "@peated/server/trpc/client";
 import config from "@peated/web/config";
-import type { RouterInputs } from "@peated/web/lib/trpc/client";
 import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";

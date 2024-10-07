@@ -122,7 +122,7 @@ export async function createUser(
   return user;
 }
 
-export async function generateMagicLink(user: User) {
+export async function generateMagicLink(user: User, redirectTo = "/") {
   const token = {
     id: user.id,
     email: user.email,
@@ -132,7 +132,7 @@ export async function generateMagicLink(user: User) {
   const signedToken = await signPayload(token);
   const url = absoluteUrl(
     config.URL_PREFIX,
-    `/auth/magic-link?token=${signedToken}`,
+    `/auth/magic-link?token=${signedToken}&redirectTo=${encodeURIComponent(redirectTo)}`,
   );
 
   return {
