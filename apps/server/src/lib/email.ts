@@ -22,7 +22,6 @@ import {
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
 import { generateMagicLink, signPayload } from "./auth";
-import { sendMagicLinkEmail } from "./email";
 import { logError } from "./log";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
@@ -129,12 +128,11 @@ export async function notifyComment({
   for (const email of emailList) {
     try {
       await transport.sendMail({
-        from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+        ...getMailDefaults(),
         to: email,
         subject: "New Comment on Tasting",
         text: `View this comment on Peated: ${commentUrl}\n\n${comment.comment}`,
         html,
-        replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
       });
     } catch (err) {
       logError(err);
@@ -170,13 +168,12 @@ export async function sendVerificationEmail({
 
   try {
     await transport.sendMail({
-      from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+      ...getMailDefaults(),
       to: user.email,
       subject: "Account Verification",
       // TODO:
       text: `Your account requires verification: ${verifyUrl}`,
       html,
-      replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
     });
   } catch (err) {
     logError(err);
@@ -215,13 +212,12 @@ export async function sendPasswordResetEmail({
   );
 
   await transport.sendMail({
-    from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+    ...getMailDefaults(),
     to: user.email,
     subject: "Reset Password",
     // TODO:
     text: `A password reset was requested for your account.\n\nIf you don't recognize this request, you can ignore this.\n\nTo continue: ${resetUrl}`,
     html,
-    replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
     headers: {
       References: `${cuid2.createId()}@peated.com`,
     },
@@ -253,9 +249,17 @@ export async function sendMagicLinkEmail({
   );
 
   await transport.sendMail({
+    ...getMailDefaults(),
     to: user.email,
     subject: "Magic Link for Peated",
     text: `Click the following link to log in to Peated: ${magicLink.url}`,
     html: html,
   });
+}
+
+function getMailDefaults() {
+  return {
+    from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+    replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
+  };
 }
