@@ -1,19 +1,25 @@
 "use client";
 
 import Table from "@peated/web/components/table";
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useSearchParams } from "next/navigation";
 
 export default function Page({
   params: { countrySlug },
 }: {
   params: { countrySlug: string };
 }) {
-  const searchParams = useSearchParams();
-  const [regionList] = trpc.regionList.useSuspenseQuery({
-    country: countrySlug,
-    ...Object.fromEntries(searchParams.entries()),
+  const queryParams = useApiQueryParams({
+    defaults: {
+      sort: "-created",
+    },
+    numericFields: ["cursor", "limit"],
+    overrides: {
+      country: countrySlug,
+    },
   });
+
+  const [regionList] = trpc.regionList.useSuspenseQuery(queryParams);
   return (
     <div>
       <Table

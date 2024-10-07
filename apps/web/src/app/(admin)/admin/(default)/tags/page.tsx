@@ -4,14 +4,14 @@ import TagTable from "@peated/web/components/admin/tagTable";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useSearchParams } from "next/navigation";
 
 export default function Page() {
-  const searchParams = useSearchParams();
-  const [tagList] = trpc.tagList.useSuspenseQuery({
-    ...Object.fromEntries(searchParams.entries()),
+  const queryParams = useApiQueryParams({
+    numericFields: ["cursor", "limit"],
   });
+  const [tagList] = trpc.tagList.useSuspenseQuery(queryParams);
 
   return (
     <div>
