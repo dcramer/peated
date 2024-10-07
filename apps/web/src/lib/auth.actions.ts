@@ -29,8 +29,13 @@ export async function logout(formData?: FormData) {
   redirect(redirectTo);
 }
 
+type AuthenticateFormResult = {
+  magicLink: boolean;
+  error: string | null;
+};
+
 export async function authenticateForm(
-  prevState: string | undefined,
+  prevState: AuthenticateFormResult | undefined,
   formData: FormData,
 ) {
   "use server";
@@ -38,7 +43,9 @@ export async function authenticateForm(
   return await authenticate(formData);
 }
 
-export async function authenticate(formData: FormData) {
+export async function authenticate(
+  formData: FormData,
+): Promise<AuthenticateFormResult | undefined> {
   "use server";
 
   const session = await getSession();
