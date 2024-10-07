@@ -69,7 +69,7 @@ export async function authenticate(
     } catch (err) {
       if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
         return {
-          magicLink: null,
+          magicLink: false,
           error: "Invalid credentials",
         };
       }
@@ -104,7 +104,7 @@ export async function authenticate(
   } catch (err) {
     if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
       return {
-        magicLink: null,
+        magicLink: false,
         error: "Invalid credentials",
       };
     }
