@@ -51,6 +51,8 @@ Follow these rules when you write tests:
 - When you are testing for errors, use `waitError` to wait for the error to be thrown. For example:
 
 ```
+import waitError from "@peated/server/lib/test/waitError";
+
 const err = await waitError(
   caller.authPasswordResetConfirm({
     token,
@@ -59,7 +61,7 @@ const err = await waitError(
 );
 ```
 
-- In addition to using `waitError`, utilize snapshots for the resulting error. For example, ```expect(err).toMatchInlineSnapshot();``
+- In addition to using `waitError`, utilize snapshots for the resulting error. For example, ``expect(err).toMatchInlineSnapshot();`
 - Prefer dependency injection over mocking when the called functions make it possible.
 - When calling tRPC endpoints that are not expected to error, await on the caller. Do not test the Promise directly. For example:
 
