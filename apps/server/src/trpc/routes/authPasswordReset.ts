@@ -9,7 +9,7 @@ import { publicProcedure } from "..";
 export default publicProcedure
   .input(
     z.object({
-      email: z.string(),
+      email: z.string().email(),
     }),
   )
   .mutation(async function ({ input }) {
