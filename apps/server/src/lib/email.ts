@@ -1,4 +1,5 @@
 import cuid2 from "@paralleldrive/cuid2";
+import { Template as MagicLinkEmailTemplate } from "@peated/email/templates/magicLinkEmail";
 import { Template as NewCommentTemplate } from "@peated/email/templates/newCommentEmail";
 import { Template as PasswordResetEmailTemplate } from "@peated/email/templates/passwordResetEmail";
 import { Template as VerifyEmailTemplate } from "@peated/email/templates/verifyEmail";
@@ -20,7 +21,7 @@ import {
   type User,
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
-import { signPayload } from "./auth";
+import { generateMagicLink, signPayload } from "./auth";
 import { logError } from "./log";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
@@ -127,12 +128,11 @@ export async function notifyComment({
   for (const email of emailList) {
     try {
       await transport.sendMail({
-        from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+        ...getMailDefaults(),
         to: email,
         subject: "New Comment on Tasting",
         text: `View this comment on Peated: ${commentUrl}\n\n${comment.comment}`,
         html,
-        replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
       });
     } catch (err) {
       logError(err);
@@ -147,6 +147,7 @@ export async function sendVerificationEmail({
   user: User;
   transport?: Transporter<SMTPTransport.SentMessageInfo>;
 }) {
+  // TODO: error out
   if (!hasEmailSupport()) return;
 
   if (!transport) {
@@ -167,13 +168,12 @@ export async function sendVerificationEmail({
 
   try {
     await transport.sendMail({
-      from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+      ...getMailDefaults(),
       to: user.email,
       subject: "Account Verification",
       // TODO:
       text: `Your account requires verification: ${verifyUrl}`,
       html,
-      replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
     });
   } catch (err) {
     logError(err);
@@ -187,6 +187,7 @@ export async function sendPasswordResetEmail({
   user: User;
   transport?: Transporter<SMTPTransport.SentMessageInfo>;
 }) {
+  // TODO: error out
   if (!hasEmailSupport()) return;
 
   if (!transport) {
@@ -210,20 +211,55 @@ export async function sendPasswordResetEmail({
     PasswordResetEmailTemplate({ baseUrl: config.URL_PREFIX, resetUrl }),
   );
 
-  try {
-    await transport.sendMail({
-      from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
-      to: user.email,
-      subject: "Reset Password",
-      // TODO:
-      text: `A password reset was requested for your account.\n\nIf you don't recognize this request, you can ignore this.\n\nTo continue: ${resetUrl}`,
-      html,
-      replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
-      headers: {
-        References: `${cuid2.createId()}@peated.com`,
-      },
-    });
-  } catch (err) {
-    logError(err);
+  await transport.sendMail({
+    ...getMailDefaults(),
+    to: user.email,
+    subject: "Reset Password",
+    // TODO:
+    text: `A password reset was requested for your account.\n\nIf you don't recognize this request, you can ignore this.\n\nTo continue: ${resetUrl}`,
+    html,
+    headers: {
+      References: `${cuid2.createId()}@peated.com`,
+    },
+  });
+}
+
+export async function sendMagicLinkEmail({
+  user,
+  transport = mailTransport,
+}: {
+  user: User;
+  transport?: Transporter<SMTPTransport.SentMessageInfo>;
+}) {
+  // TODO: error out
+  if (!hasEmailSupport()) return;
+
+  if (!transport) {
+    if (!mailTransport) mailTransport = createMailTransport();
+    transport = mailTransport;
   }
+
+  const magicLink = await generateMagicLink(user);
+
+  const html = await render(
+    MagicLinkEmailTemplate({
+      baseUrl: config.URL_PREFIX,
+      magicLinkUrl: magicLink.url,
+    }),
+  );
+
+  await transport.sendMail({
+    ...getMailDefaults(),
+    to: user.email,
+    subject: "Magic Link for Peated",
+    text: `Click the following link to log in to Peated: ${magicLink.url}`,
+    html: html,
+  });
+}
+
+function getMailDefaults() {
+  return {
+    from: `"${config.SMTP_FROM_NAME}" <${config.SMTP_FROM}>`,
+    replyTo: `"${config.SMTP_FROM_NAME}" <${config.SMTP_REPLY_TO || config.SMTP_FROM}>`,
+  };
 }

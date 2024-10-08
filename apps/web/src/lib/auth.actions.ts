@@ -2,7 +2,6 @@
 
 import { makeTRPCClient } from "@peated/server/trpc/client";
 import config from "@peated/web/config";
-import type { RouterInputs } from "@peated/web/lib/trpc/client";
 import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
@@ -30,8 +29,13 @@ export async function logout(formData?: FormData) {
   redirect(redirectTo);
 }
 
+type AuthenticateFormResult = {
+  magicLink: boolean;
+  error: string | null;
+};
+
 export async function authenticateForm(
-  prevState: string | undefined,
+  prevState: AuthenticateFormResult | undefined,
   formData: FormData,
 ) {
   "use server";
@@ -39,7 +43,9 @@ export async function authenticateForm(
   return await authenticate(formData);
 }
 
-export async function authenticate(formData: FormData) {
+export async function authenticate(
+  formData: FormData,
+): Promise<AuthenticateFormResult | undefined> {
   "use server";
 
   const session = await getSession();
@@ -56,6 +62,26 @@ export async function authenticate(formData: FormData) {
   );
 
   const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+
+  if (!password) {
+    try {
+      await trpcClient.authMagicLinkSend.mutate({ email });
+    } catch (err) {
+      if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
+        return {
+          magicLink: false,
+          error: "Invalid credentials",
+        };
+      }
+
+      throw err;
+    }
+
+    return {
+      magicLink: true,
+      error: null,
+    };
+  }
 
   let data;
   try {
@@ -77,7 +103,10 @@ export async function authenticate(formData: FormData) {
     // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
   } catch (err) {
     if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
-      return "Invalid credentials";
+      return {
+        magicLink: false,
+        error: "Invalid credentials",
+      };
     }
 
     throw err;

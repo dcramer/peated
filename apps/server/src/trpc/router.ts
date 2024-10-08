@@ -4,6 +4,8 @@ import type { Context } from "./context";
 import auth from "./routes/auth";
 import authBasic from "./routes/authBasic";
 import authGoogle from "./routes/authGoogle";
+import authMagicLinkConfirm from "./routes/authMagicLinkConfirm";
+import authMagicLinkSend from "./routes/authMagicLinkSend";
 import authPasswordReset from "./routes/authPasswordReset";
 import authPasswordResetConfirm from "./routes/authPasswordResetConfirm";
 import authRegister from "./routes/authRegister";
@@ -118,6 +120,8 @@ export const appRouter = router({
   auth,
   authBasic,
   authGoogle,
+  authMagicLinkConfirm,
+  authMagicLinkSend,
   authRegister,
   authPasswordReset,
   authPasswordResetConfirm,

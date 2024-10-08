@@ -10,6 +10,7 @@ import { random } from "../lib/rand";
 import { serialize } from "../serializers";
 import { UserSerializer } from "../serializers/user";
 import { logError } from "./log";
+import { absoluteUrl } from "./urls";
 
 // I love to ESM.
 import type { JwtPayload } from "jsonwebtoken";
@@ -119,4 +120,23 @@ export async function createUser(
   }
   if (!user) throw new Error("Unable to create user");
   return user;
+}
+
+export async function generateMagicLink(user: User, redirectTo = "/") {
+  const token = {
+    id: user.id,
+    email: user.email,
+    createdAt: new Date().toISOString(),
+  };
+
+  const signedToken = await signPayload(token);
+  const url = absoluteUrl(
+    config.URL_PREFIX,
+    `/auth/magic-link?token=${signedToken}&redirectTo=${encodeURIComponent(redirectTo)}`,
+  );
+
+  return {
+    token: signedToken,
+    url,
+  };
 }

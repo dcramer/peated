@@ -12,6 +12,7 @@ export * from "./externalSites";
 export * from "./flights";
 export * from "./follows";
 export * from "./friends";
+export * from "./magicLink";
 export * from "./notifications";
 export * from "./regions";
 export * from "./reviews";

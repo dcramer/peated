@@ -9,5 +9,6 @@
     "**/app/**/layout.tsx": "${dirname} - Layout",
     "**/component/**/index.tsx": "${dirname} - Component"
   },
-  "scm.showHistoryGraph": false
+  "scm.showHistoryGraph": false,
+  "makefile.configureOnOpen": false
 }

@@ -1,5 +1,4 @@
-import theme from "@peated/design";
-import { Column, Heading, Img, Preview, Row } from "jsx-email";
+import { Column, Img, Preview, Row } from "jsx-email";
 import React from "react";
 import {
   defaulted,
@@ -9,7 +8,7 @@ import {
   string,
   type Infer,
 } from "superstruct";
-import { Button, Hr, Link, Section, Text } from "../components/core";
+import { Button, Heading, Hr, Link, Section, Text } from "../components/core";
 import Layout from "../components/layout";
 import ReasonFooter, { Reason } from "../components/reasonFooter";
 
@@ -82,15 +81,7 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
             </Link>
           </Column>
           <Column>
-            <Heading
-              style={{
-                margin: 0,
-                fontSize: "24px",
-                fontWeight: "normal",
-                color: theme.colors.white,
-                textAlign: "left",
-              }}
-            >
+            <Heading>
               <Link
                 href={profileUrl}
                 style={{
@@ -103,15 +94,7 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
               </Link>{" "}
               commented on
             </Heading>
-            <Heading
-              style={{
-                margin: 0,
-                fontSize: "24px",
-                fontWeight: "normal",
-                color: theme.colors.white,
-                textAlign: "left",
-              }}
-            >
+            <Heading>
               <Link
                 href={tastingUrl}
                 style={{

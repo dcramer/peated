@@ -1,6 +1,7 @@
 import theme from "@peated/design";
 import {
   Button as DefaultButton,
+  Heading as DefaultHeading,
   Hr as DefaultHr,
   Link as DefaultLink,
   Section as DefaultSection,
@@ -93,6 +94,25 @@ export function Link({
       style={{
         color: theme.colors.highlight,
         textDecoration: "underline",
+        ...style,
+      }}
+      {...props}
+    />
+  );
+}
+
+export function Heading({
+  style = {},
+  ...props
+}: ComponentProps<typeof DefaultHeading>) {
+  return (
+    <DefaultHeading
+      style={{
+        margin: 0,
+        fontSize: "24px",
+        fontWeight: "normal",
+        color: theme.colors.white,
+        textAlign: "left",
         ...style,
       }}
       {...props}
