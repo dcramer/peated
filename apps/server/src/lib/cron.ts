@@ -37,6 +37,9 @@ export function scheduledJob(
             name: `cron.${jobName}`,
           },
           async (span) => {
+            span.setAttribute("checkin.id", checkInId);
+            span.setAttribute("checkin.slug", jobName);
+
             console.log(`Running job [${jobName} - ${jobId}]`);
             const start = new Date().getTime();
             let success = false;
