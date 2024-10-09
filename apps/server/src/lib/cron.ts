@@ -14,7 +14,13 @@ export function scheduledJob(
     Sentry.withIsolationScope(async (scope) => {
       Sentry.continueTrace(
         { sentryTrace: undefined, baggage: undefined },
-        () => {
+        async () => {
+          const jobId = cuid2.createId();
+
+          scope.setContext("monitor", {
+            slug: jobName,
+          });
+
           const checkInId = Sentry.captureCheckIn(
             {
               monitorSlug: jobName,
@@ -27,11 +33,6 @@ export function scheduledJob(
               },
             },
           );
-
-          const jobId = cuid2.createId();
-          scope.setContext("monitor", {
-            slug: jobName,
-          });
 
           return await Sentry.startSpan(
             {
