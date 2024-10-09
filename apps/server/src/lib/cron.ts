@@ -1,3 +1,4 @@
+import cuid2 from "@paralleldrive/cuid2";
 import { logError } from "@peated/server/lib/log";
 import * as Sentry from "@sentry/node";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
@@ -6,13 +7,13 @@ export const scheduler = new ToadScheduler();
 
 export function scheduledJob(
   schedule: string,
-  name: string,
+  jobName: string,
   cb: () => Promise<void>,
 ) {
-  const task = new AsyncTask(name, async () => {
+  const task = new AsyncTask(jobName, async () => {
     const checkInId = Sentry.captureCheckIn(
       {
-        monitorSlug: name,
+        monitorSlug: jobName,
         status: "in_progress",
       },
       {
@@ -24,6 +25,7 @@ export function scheduledJob(
     );
 
     return Sentry.withScope(async (scope) => {
+      const jobId = cuid2.createId();
       scope.setContext("monitor", {
         slug: name,
       });
@@ -34,28 +36,41 @@ export function scheduledJob(
           name: `cron.${name}`,
         },
         async (span) => {
+          console.log(`Running job [${jobName} - ${jobId}]`);
+          const start = new Date().getTime();
+          let success = false;
+
           try {
-            const rv = await cb();
+            await cb();
+            success = true;
             Sentry.captureCheckIn({
               checkInId,
-              monitorSlug: name,
+              monitorSlug: jobName,
               status: "ok",
             });
             span.setStatus({
               code: 1, // OK
             });
-            return rv;
           } catch (e) {
             span.setStatus({
               code: 2, // ERROR
             });
             logError(e);
-            Sentry.captureCheckIn({
-              checkInId,
-              monitorSlug: name,
-              status: "error",
-            });
           }
+
+          Sentry.captureCheckIn({
+            checkInId,
+            monitorSlug: jobName,
+            status: success ? "ok" : "error",
+          });
+
+          const duration = new Date().getTime() - start;
+
+          console.log(
+            `Job ${
+              success ? "succeeded" : "failed"
+            } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`,
+          );
         },
       );
     });
