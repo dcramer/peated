@@ -1,6 +1,6 @@
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
-import type { StorePrice } from "@peated/server/lib/scraper";
+import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
 import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
@@ -8,14 +8,13 @@ import { load as cheerio } from "cheerio";
 const cookieValue =
   'priceBookisIsSet=true; persisted="{\\"address\\":\\"301 Mission St, San Francisco, CA 94105, USA\\",\\"address1\\":\\"301 Mission St\\",\\"city\\":\\"SF\\",\\"postalCode\\":\\"94105\\",\\"place_id\\":\\"ChIJ68ImfGOAhYARGxkajD7cq9M\\",\\"lat\\":\\"37.7904705\\",\\"long\\":\\"-122.3961641\\",\\"state_code\\":\\"CA\\",\\"is_gift\\":false}"';
 
-export async function scrapeProducts(
-  url: string,
-  cb: (product: StorePrice) => Promise<void>,
-) {
+export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url, false, {
     Cookie: cookieValue,
   });
   const $ = cheerio(data);
+  const promises: Promise<void>[] = [];
+
   $(".product-grid .b-product-grid__item").each((_, el) => {
     const bottle = $("div.pdp-link > a", el).first();
     if (!bottle) {
@@ -57,15 +56,19 @@ export async function scrapeProducts(
 
     console.log(`${name} - ${(price / 100).toFixed(2)}`);
 
-    cb({
-      name,
-      price,
-      currency: "usd",
-      volume,
-      // image,
-      url: absoluteUrl(url, productUrl),
-    });
+    promises.push(
+      cb({
+        name,
+        price,
+        currency: "usd",
+        volume,
+        // image,
+        url: absoluteUrl(url, productUrl),
+      }),
+    );
   });
+
+  await Promise.all(promises);
 }
 
 export default async function scrapeReserveBar() {

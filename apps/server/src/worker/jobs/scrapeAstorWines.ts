@@ -1,17 +1,15 @@
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
+import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
 import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
-import type { StorePriceInputSchema } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
-import type { z } from "zod";
 
-export async function scrapeProducts(
-  url: string,
-  cb: (product: z.infer<typeof StorePriceInputSchema>) => Promise<void>,
-) {
+export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
   const $ = cheerio(data);
+
+  const promises: Promise<void>[] = [];
   $("#search-results .item-teaser").each((_, el) => {
     const rawName = ($(".header > h2", el).first().attr("title") || "").trim();
     if (!rawName) {
@@ -47,15 +45,19 @@ export async function scrapeProducts(
 
     console.log(`${name} - ${(price / 100).toFixed(2)}`);
 
-    cb({
-      name,
-      price,
-      currency: "usd",
-      volume,
-      url: absoluteUrl(url, productUrl),
-      imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
-    });
+    promises.push(
+      cb({
+        name,
+        price,
+        currency: "usd",
+        volume,
+        url: absoluteUrl(url, productUrl),
+        imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
+      }),
+    );
   });
+
+  await Promise.all(promises);
 }
 
 export default async function scrapeAstorWines() {

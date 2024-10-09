@@ -1,12 +1,10 @@
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
+import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
 import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { absoluteUrl } from "@peated/server/lib/urls";
-import type { StorePriceInputSchema } from "@peated/server/schemas";
-import type { ExternalSiteType } from "@peated/server/types";
 import { load as cheerio } from "cheerio";
-import type { z } from "zod";
 
 function extractVolume(name: string): [string, string] | [string] {
   const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
@@ -14,12 +12,11 @@ function extractVolume(name: string): [string, string] | [string] {
   return match.slice(1, 3) as [string, string];
 }
 
-export async function scrapeProducts(
-  url: string,
-  cb: (product: z.infer<typeof StorePriceInputSchema>) => Promise<void>,
-) {
+export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
   const $ = cheerio(data);
+
+  const promises: Promise<void>[] = [];
   $(".collection-products-row .product-block").each((_, el) => {
     const brand = toTitleCase($("div.brand", el).first().text().trim());
     const bottle = $("a.title", el).first().text().trim();
@@ -62,14 +59,18 @@ export async function scrapeProducts(
     const fullName = `${brand} ${name}`;
     console.log(`${fullName} - ${(price / 100).toFixed(2)}`);
 
-    cb({
-      name: fullName,
-      price,
-      currency: "usd",
-      volume,
-      url: absoluteUrl(url, productUrl),
-    });
+    promises.push(
+      cb({
+        name: fullName,
+        price,
+        currency: "usd",
+        volume,
+        url: absoluteUrl(url, productUrl),
+      }),
+    );
   });
+
+  await Promise.all(promises);
 }
 
 export default async function scrapeHealthySpirits() {

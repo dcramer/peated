@@ -1,9 +1,8 @@
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
+import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
 import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
-import type { StorePriceInputSchema } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
-import type { z } from "zod";
 
 function extractVolume(name: string) {
   const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
@@ -25,12 +24,11 @@ function extractVolume(name: string) {
 //   return srcList.length ? srcList[0].src : null;
 // }
 
-export async function scrapeProducts(
-  url: string,
-  cb: (product: z.input<typeof StorePriceInputSchema>) => Promise<void>,
-) {
+export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
   const $ = cheerio(data);
+
+  const promises: Promise<void>[] = [];
   $("#CollectionAjaxContent div.grid-item").each((_, el) => {
     const bottle = $("div.grid-product__title", el).first().text();
     if (!bottle) {
@@ -82,15 +80,19 @@ export async function scrapeProducts(
 
     console.log(`${name} - ${(price / 100).toFixed(2)}`);
 
-    cb({
-      name,
-      price,
-      currency: "usd",
-      volume,
-      // image,
-      url: absoluteUrl(url, productUrl),
-    });
+    promises.push(
+      cb({
+        name,
+        price,
+        currency: "usd",
+        volume,
+        // image,
+        url: absoluteUrl(url, productUrl),
+      }),
+    );
   });
+
+  await Promise.all(promises);
 }
 
 export default async function scrapeWoodenCork() {

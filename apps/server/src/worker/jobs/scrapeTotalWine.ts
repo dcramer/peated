@@ -1,16 +1,15 @@
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
-import type { StorePrice } from "@peated/server/lib/scraper";
+import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
 import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
 
-export async function scrapeProducts(
-  url: string,
-  cb: (product: StorePrice) => Promise<void>,
-) {
+export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
   const $ = cheerio(data);
+
+  const promises: Promise<void>[] = [];
   $("#main article").each((_, el) => {
     const rawName = $("h2.title__2RoYeYuO > a", el).first().text();
     if (!rawName) {
@@ -43,14 +42,18 @@ export async function scrapeProducts(
       return;
     }
     console.log(`${name} - ${(price / 100).toFixed(2)}`);
-    cb({
-      name,
-      price,
-      currency: "usd",
-      volume,
-      url: absoluteUrl(url, productUrl),
-    });
+    promises.push(
+      cb({
+        name,
+        price,
+        currency: "usd",
+        volume,
+        url: absoluteUrl(url, productUrl),
+      }),
+    );
   });
+
+  await Promise.all(promises);
 }
 
 export default async function scrapeTotalWine() {
