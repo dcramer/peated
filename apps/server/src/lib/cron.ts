@@ -12,23 +12,23 @@ export function scheduledJob(
 ) {
   const task = new AsyncTask(jobName, async () => {
     Sentry.continueTrace({ sentryTrace: undefined, baggage: undefined }, () => {
-      const checkInId = Sentry.captureCheckIn(
-        {
-          monitorSlug: jobName,
-          status: "in_progress",
-        },
-        {
-          schedule: {
-            type: "crontab",
-            value: schedule,
-          },
-        },
-      );
-
       return Sentry.withScope(async (scope) => {
+        const checkInId = Sentry.captureCheckIn(
+          {
+            monitorSlug: jobName,
+            status: "in_progress",
+          },
+          {
+            schedule: {
+              type: "crontab",
+              value: schedule,
+            },
+          },
+        );
+
         const jobId = cuid2.createId();
         scope.setContext("monitor", {
-          slug: name,
+          slug: jobName,
         });
 
         return await Sentry.startSpan(
