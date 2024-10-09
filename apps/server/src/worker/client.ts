@@ -28,9 +28,12 @@ export function generateUniqIdentifier(
 }
 
 export async function runJob<T>(jobName: JobName, args?: Record<string, any>) {
+  const activeContext = {};
+  propagation.inject(context.active(), activeContext);
+
   const jobFn = registry.get(jobName);
   if (!jobFn) throw new Error(`Unknown job: ${jobName}`);
-  return await jobFn(args);
+  return await jobFn(args, { traceContext: activeContext });
 }
 
 export async function pushUniqueJob(

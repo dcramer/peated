@@ -11,68 +11,70 @@ export function scheduledJob(
   cb: () => Promise<void>,
 ) {
   const task = new AsyncTask(jobName, async () => {
-    const checkInId = Sentry.captureCheckIn(
-      {
-        monitorSlug: jobName,
-        status: "in_progress",
-      },
-      {
-        schedule: {
-          type: "crontab",
-          value: schedule,
-        },
-      },
-    );
-
-    return Sentry.withScope(async (scope) => {
-      const jobId = cuid2.createId();
-      scope.setContext("monitor", {
-        slug: name,
-      });
-
-      return await Sentry.startSpan(
+    Sentry.continueTrace({ sentryTrace: undefined, baggage: undefined }, () => {
+      const checkInId = Sentry.captureCheckIn(
         {
-          op: `execute`,
-          name: `cron.${name}`,
+          monitorSlug: jobName,
+          status: "in_progress",
         },
-        async (span) => {
-          console.log(`Running job [${jobName} - ${jobId}]`);
-          const start = new Date().getTime();
-          let success = false;
+        {
+          schedule: {
+            type: "crontab",
+            value: schedule,
+          },
+        },
+      );
 
-          try {
-            await cb();
-            success = true;
+      return Sentry.withScope(async (scope) => {
+        const jobId = cuid2.createId();
+        scope.setContext("monitor", {
+          slug: name,
+        });
+
+        return await Sentry.startSpan(
+          {
+            op: `execute`,
+            name: `cron.${name}`,
+          },
+          async (span) => {
+            console.log(`Running job [${jobName} - ${jobId}]`);
+            const start = new Date().getTime();
+            let success = false;
+
+            try {
+              await cb();
+              success = true;
+              Sentry.captureCheckIn({
+                checkInId,
+                monitorSlug: jobName,
+                status: "ok",
+              });
+              span.setStatus({
+                code: 1, // OK
+              });
+            } catch (e) {
+              span.setStatus({
+                code: 2, // ERROR
+              });
+              logError(e);
+            }
+
             Sentry.captureCheckIn({
               checkInId,
               monitorSlug: jobName,
-              status: "ok",
+              status: success ? "ok" : "error",
             });
-            span.setStatus({
-              code: 1, // OK
-            });
-          } catch (e) {
-            span.setStatus({
-              code: 2, // ERROR
-            });
-            logError(e);
-          }
 
-          Sentry.captureCheckIn({
-            checkInId,
-            monitorSlug: jobName,
-            status: success ? "ok" : "error",
-          });
+            const duration = new Date().getTime() - start;
 
-          const duration = new Date().getTime() - start;
-
-          console.log(
-            `Job ${
-              success ? "succeeded" : "failed"
-            } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`,
-          );
-        },
-      );
+            console.log(
+              `Job ${
+                success ? "succeeded" : "failed"
+              } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`,
+            );
+          },
+        );
+      });
     });
   });
 
