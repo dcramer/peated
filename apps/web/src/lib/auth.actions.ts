@@ -63,7 +63,7 @@ export async function authenticate(
 
   const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
 
-  if (!password) {
+  if (!email && !password) {
     try {
       await trpcClient.authMagicLinkSend.mutate({ email });
     } catch (err) {
