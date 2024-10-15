@@ -151,7 +151,7 @@ export default function TastingForm({
                   onChange(
                     e.target.value === ""
                       ? undefined
-                      : parseInt(e.target.value, 10),
+                      : parseFloat(e.target.value),
                   )
                 }
                 error={errors.rating}
