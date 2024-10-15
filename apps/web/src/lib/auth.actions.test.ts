@@ -51,7 +51,7 @@ describe("authenticate", () => {
     expect(redirect).toHaveBeenCalledWith("/");
   });
 
-  it("should authenticate successfully with Google code", async () => {
+  it("should authenticate successfully with Google code when no email is present", async () => {
     const mockUser = { id: "1", email: "test@example.com", verified: true };
     const mockSession = { save: vi.fn() };
     const mockTrpcClient = {
@@ -116,6 +116,23 @@ describe("authenticate", () => {
       magicLink: true,
       error: null,
     });
+  });
+
+  it("should not generate a magic link when no email is provided", async () => {
+    const mockTrpcClient = {
+      authMagicLinkSend: { mutate: vi.fn() },
+      authGoogle: {
+        mutate: vi.fn().mockRejectedValue(new Error("Google auth failed")),
+      },
+    };
+
+    vi.mocked(makeTRPCClient).mockReturnValue(mockTrpcClient as any);
+
+    const formData = createFormData({});
+
+    await expect(authenticate(formData)).rejects.toThrow("Google auth failed");
+
+    expect(mockTrpcClient.authMagicLinkSend.mutate).not.toHaveBeenCalled();
   });
 
   it("should redirect to /verify for unverified users", async () => {
