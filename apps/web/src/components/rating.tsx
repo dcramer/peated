@@ -17,6 +17,7 @@ export const StaticRating = ({ value, size, className }: Props) => {
         size === "small" ? "rating-sm" : "",
         className,
       )}
+      title={`Rated ${value} out of 5`}
     >
       {[5, 4, 3, 2, 1].map((item) => {
         return [
