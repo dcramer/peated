@@ -7,11 +7,13 @@ import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { parseDomain } from "@peated/web/lib/urls";
 
-export async function generateMetadata({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = await props.params;
+
+  const { entityId } = params;
+
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 
@@ -30,11 +32,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function EntityDetails({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export default async function EntityDetails(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = await props.params;
+
+  const { entityId } = params;
+
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 

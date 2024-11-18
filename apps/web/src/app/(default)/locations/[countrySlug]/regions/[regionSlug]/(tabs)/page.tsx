@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import EntityTable from "@peated/web/components/entityTable";
@@ -6,11 +7,13 @@ import PaginationButtons from "@peated/web/components/paginationButtons";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function Page({
-  params: { countrySlug, regionSlug },
-}: {
-  params: { countrySlug: string; regionSlug: string };
+export default function Page(props: {
+  params: Promise<{ countrySlug: string; regionSlug: string }>;
 }) {
+  const params = use(props.params);
+
+  const { countrySlug, regionSlug } = params;
+
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
     overrides: {

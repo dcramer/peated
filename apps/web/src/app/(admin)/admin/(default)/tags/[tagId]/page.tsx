@@ -1,15 +1,16 @@
 "use client";
+import { use } from "react";
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function Page({
-  params: { tagId },
-}: {
-  params: { tagId: string };
-}) {
+export default function Page(props: { params: Promise<{ tagId: string }> }) {
+  const params = use(props.params);
+
+  const { tagId } = params;
+
   const [tag] = trpc.tagByName.useSuspenseQuery(tagId);
 
   return (

@@ -1,15 +1,18 @@
 "use client";
+import { use } from "react";
 
 import CountryForm from "@peated/web/components/admin/countryForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Page({
-  params: { countrySlug },
-}: {
-  params: { countrySlug: string };
+export default function Page(props: {
+  params: Promise<{ countrySlug: string }>;
 }) {
+  const params = use(props.params);
+
+  const { countrySlug } = params;
+
   useModRequired();
 
   const [country] = trpc.countryBySlug.useSuspenseQuery(countrySlug);

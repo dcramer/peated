@@ -3,11 +3,13 @@ import { type ReactNode } from "react";
 
 export const fetchCache = "default-no-store";
 
-export async function generateMetadata({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = await props.params;
+
+  const { entityId } = params;
+
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 

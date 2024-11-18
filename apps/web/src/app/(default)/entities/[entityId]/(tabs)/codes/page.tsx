@@ -9,11 +9,13 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-static";
 
-export async function generateMetadata({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = await props.params;
+
+  const { entityId } = params;
+
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 
@@ -26,11 +28,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export default async function Page(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = await props.params;
+
+  const { entityId } = params;
+
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 

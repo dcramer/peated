@@ -9,13 +9,14 @@ import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import ModActions from "./modActions";
 
-export default async function Layout({
-  params,
-  children,
-}: {
-  params: Record<string, any>;
+export default async function Layout(props: {
+  params: Promise<Record<string, any>>;
   children: ReactNode;
 }) {
+  const params = await props.params;
+
+  const { children } = props;
+
   const bottleId = Number(params.bottleId);
   const trpcClient = await getTrpcClient();
   const bottle = await trpcClient.bottleById.fetch(bottleId);

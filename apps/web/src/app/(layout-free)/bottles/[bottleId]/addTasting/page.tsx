@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import BadgeImage from "@peated/web/components/badgeImage";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -11,11 +12,13 @@ import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function AddTasting({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
+export default function AddTasting(props: {
+  params: Promise<{ bottleId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { bottleId } = params;
+
   useAuthRequired();
 
   const router = useRouter();
