@@ -5,8 +5,7 @@ import { notEmpty } from "@peated/server/lib/filter";
 import { serialize, serializer } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { TRPCError } from "@trpc/server";
-import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, ne, or } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 import { type Context } from "../context";
@@ -56,7 +55,7 @@ const InputSchema = z.object({
   limit: z.number().gte(1).lte(100).default(25),
 });
 
-export async function userList({
+export async function badgeUserList({
   input: { cursor, limit, ...input },
   ctx,
 }: {
@@ -111,4 +110,4 @@ export async function userList({
   };
 }
 
-export default authedProcedure.input(InputSchema).query(userList);
+export default authedProcedure.input(InputSchema).query(badgeUserList);
