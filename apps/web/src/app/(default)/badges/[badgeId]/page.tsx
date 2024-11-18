@@ -1,5 +1,7 @@
 import BadgeImage from "@peated/web/components/badgeImage";
 import BetaNotice from "@peated/web/components/betaNotice";
+import { redirectToAuth } from "@peated/web/lib/auth";
+import { getCurrentUser, isLoggedIn } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { Suspense } from "react";
 import Leaderboard from "./leaderboard";
@@ -22,6 +24,10 @@ export default async function Page({
 }: {
   params: { badgeId: string };
 }) {
+  if (!(await isLoggedIn())) {
+    return redirectToAuth({ pathname: `/badges/${badgeId}` });
+  }
+
   const trpcClient = await getTrpcClient();
   const [badge] = await Promise.all([
     trpcClient.badgeById.fetch(parseInt(badgeId, 10)),
