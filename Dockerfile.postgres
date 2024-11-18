@@ -1,9 +1,9 @@
-ARG PG_MAJOR=15
+ARG PG_MAJOR=17
 
 # Use the PostGIS image as the base
-FROM postgis/postgis:$PG_MAJOR-3.4
+FROM postgis/postgis:$PG_MAJOR-3.5
 ARG PG_MAJOR
-ARG PG_VECTOR=0.7.2
+ARG PG_VECTOR=0.8.0
 
 # Install necessary packages
 RUN apt-get update && \
