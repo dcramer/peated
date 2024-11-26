@@ -23,7 +23,6 @@ ENV SENTRY_DSN=$SENTRY_DSN \
 
 ADD .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml .
 ADD apps/cli/package.json ./apps/cli/package.json
-ADD apps/mobile/package.json ./apps/mobile/package.json
 ADD apps/web/package.json ./apps/web/package.json
 ADD apps/server/package.json ./apps/server/package.json
 # given packages are mostly universally shared code, this simplifies our logic
