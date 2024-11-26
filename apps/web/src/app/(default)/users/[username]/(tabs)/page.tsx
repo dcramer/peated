@@ -4,13 +4,11 @@ import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 export const fetchCache = "default-no-store";
 
-export async function generateMetadata(props: {
-  params: Promise<{ username: string }>;
+export async function generateMetadata({
+  params: { username },
+}: {
+  params: { username: string };
 }) {
-  const params = await props.params;
-
-  const { username } = params;
-
   const trpcClient = await getTrpcClient();
   const user = await trpcClient.userById.fetch(username);
 
@@ -25,13 +23,11 @@ export async function generateMetadata(props: {
   };
 }
 
-export default async function UserTastings(props: {
-  params: Promise<{ username: string }>;
+export default async function UserTastings({
+  params: { username },
+}: {
+  params: { username: string };
 }) {
-  const params = await props.params;
-
-  const { username } = params;
-
   const trpcClient = await getTrpcClient();
   const user = await trpcClient.userById.fetch(username);
   const tastingList = await trpcClient.tastingList.fetch({

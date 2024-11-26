@@ -14,20 +14,18 @@ import Layout from "@peated/web/components/layout";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
-import { use, useState } from "react";
+import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof BottleMergeSchema>;
 
-export default function MergeBottle(props: {
-  params: Promise<{ bottleId: string }>;
+export default function MergeBottle({
+  params: { bottleId },
+}: {
+  params: { bottleId: string };
 }) {
-  const params = use(props.params);
-
-  const { bottleId } = params;
-
   useModRequired();
 
   const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));

@@ -9,7 +9,7 @@ import Tabs, { TabItem } from "@peated/web/components/tabs";
 import TimeSince from "@peated/web/components/timeSince";
 import { formatDuration } from "@peated/web/lib/format";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { use, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { type z } from "zod";
 
 type UpdateSiteFn = (data: z.infer<typeof ExternalSiteSchema>) => void;
@@ -43,16 +43,13 @@ function TriggerJobButton({
   );
 }
 
-export default function Layout(props: {
-  params: Promise<{ siteId: string }>;
+export default function Layout({
+  params: { siteId },
+  children,
+}: {
+  params: { siteId: string };
   children: ReactNode;
 }) {
-  const params = use(props.params);
-
-  const { siteId } = params;
-
-  const { children } = props;
-
   const [initialSite] = trpc.externalSiteByType.useSuspenseQuery(
     siteId as ExternalSiteType,
   );

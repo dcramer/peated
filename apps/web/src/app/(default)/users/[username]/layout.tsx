@@ -16,16 +16,13 @@ import { UserBadgeList } from "./userBadgeList";
 
 export const fetchCache = "default-no-store";
 
-export default async function Layout(props: {
-  params: Promise<{ username: string }>;
+export default async function Layout({
+  params: { username },
+  children,
+}: {
+  params: { username: string };
   children: ReactNode;
 }) {
-  const params = await props.params;
-
-  const { username } = params;
-
-  const { children } = props;
-
   const trpcClient = await getTrpcClient();
   const user = await trpcClient.userById.fetch(username);
 

@@ -6,14 +6,13 @@ import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
 import ModActions from "./modActions";
 
-export default async function Layout(props: {
-  params: Promise<Record<string, any>>;
+export default async function Layout({
+  params,
+  children,
+}: {
+  params: Record<string, any>;
   children: ReactNode;
 }) {
-  const params = await props.params;
-
-  const { children } = props;
-
   const entityId = Number(params.entityId);
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(entityId);

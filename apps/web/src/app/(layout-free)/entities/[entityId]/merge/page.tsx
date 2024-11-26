@@ -14,18 +14,18 @@ import Layout from "@peated/web/components/layout";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
-import { use, useState } from "react";
+import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 
-export default function Page(props: { params: Promise<{ entityId: string }> }) {
-  const params = use(props.params);
-
-  const { entityId } = params;
-
+export default function Page({
+  params: { entityId },
+}: {
+  params: { entityId: string };
+}) {
   useModRequired();
 
   const [entity] = trpc.entityById.useSuspenseQuery(Number(entityId));
