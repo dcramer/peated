@@ -614,6 +614,12 @@ importers:
 
   apps/web-tan:
     dependencies:
+      '@peated/design':
+        specifier: workspace:*
+        version: link:../../packages/design
+      '@peated/server':
+        specifier: workspace:*
+        version: link:../server
       '@tanstack/react-query':
         specifier: ^5.61.3
         version: 5.61.4(react@18.3.1)
@@ -648,6 +654,9 @@ importers:
         specifier: 0.4.3
         version: 0.4.3(@types/node@22.10.0)(drizzle-orm@0.32.0(@types/react@18.3.3)(react@18.3.1))(ioredis@5.4.1)(lightningcss@1.22.0)(terser@5.36.0)(typescript@5.5.4)
     devDependencies:
+      '@peated/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       '@types/node':
         specifier: ^22.5.4
         version: 22.10.0
@@ -12276,7 +12285,7 @@ snapshots:
       '@radix-ui/react-select': 2.1.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot': 1.0.2(@types/react@18.3.3)(react@18.3.1)
       '@radix-ui/react-toggle-group': 1.0.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
-      '@vitejs/plugin-react': 4.3.1(vite@4.5.3(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.36.0))
+      '@vitejs/plugin-react': 4.3.4(vite@4.5.3(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.36.0))
       classnames: 2.3.2
       framer-motion: 10.16.16(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       react: 18.3.1
@@ -12311,7 +12320,7 @@ snapshots:
       '@radix-ui/react-select': 2.1.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot': 1.0.2(@types/react@18.3.3)(react@18.3.1)
       '@radix-ui/react-toggle-group': 1.0.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
-      '@vitejs/plugin-react': 4.3.1(vite@4.5.3(@types/node@22.10.0)(lightningcss@1.22.0)(terser@5.36.0))
+      '@vitejs/plugin-react': 4.3.4(vite@4.5.3(@types/node@22.10.0)(lightningcss@1.22.0)(terser@5.36.0))
       classnames: 2.3.2
       framer-motion: 10.16.16(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       react: 18.3.1
@@ -14265,11 +14274,11 @@ snapshots:
   '@types/eslint-scope@3.7.7':
     dependencies:
       '@types/eslint': 9.6.0
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
 
   '@types/eslint@9.6.0':
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       '@types/json-schema': 7.0.15
 
   '@types/estree@1.0.5': {}
@@ -14638,6 +14647,28 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@vitejs/plugin-react@4.3.4(vite@4.5.3(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.36.0))':
+    dependencies:
+      '@babel/core': 7.26.0
+      '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.0)
+      '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.0)
+      '@types/babel__core': 7.20.5
+      react-refresh: 0.14.2
+      vite: 4.5.3(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.36.0)
+    transitivePeerDependencies:
+      - supports-color
+
+  '@vitejs/plugin-react@4.3.4(vite@4.5.3(@types/node@22.10.0)(lightningcss@1.22.0)(terser@5.36.0))':
+    dependencies:
+      '@babel/core': 7.26.0
+      '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.0)
+      '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.0)
+      '@types/babel__core': 7.20.5
+      react-refresh: 0.14.2
+      vite: 4.5.3(@types/node@22.10.0)(lightningcss@1.22.0)(terser@5.36.0)
+    transitivePeerDependencies:
+      - supports-color
+
   '@vitejs/plugin-react@4.3.4(vite@5.3.2(@types/node@22.10.0)(lightningcss@1.22.0)(terser@5.36.0))':
     dependencies:
       '@babel/core': 7.26.0
@@ -14713,7 +14744,7 @@ snapshots:
       '@vue/shared': 3.4.31
       entities: 4.5.0
       estree-walker: 2.0.2
-      source-map-js: 1.2.0
+      source-map-js: 1.2.1
 
   '@vue/compiler-dom@3.4.31':
     dependencies:
@@ -14728,9 +14759,9 @@ snapshots:
       '@vue/compiler-ssr': 3.4.31
       '@vue/shared': 3.4.31
       estree-walker: 2.0.2
-      magic-string: 0.30.11
-      postcss: 8.4.41
-      source-map-js: 1.2.0
+      magic-string: 0.30.14
+      postcss: 8.4.49
+      source-map-js: 1.2.1
 
   '@vue/compiler-ssr@3.4.31':
     dependencies:
@@ -15599,7 +15630,7 @@ snapshots:
   code-red@1.0.4:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.0
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       acorn: 8.14.0
       estree-walker: 3.0.3
       periscopic: 3.1.0
@@ -17698,7 +17729,7 @@ snapshots:
 
   is-reference@3.0.2:
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
 
   is-regex@1.1.4:
     dependencies:
@@ -19048,7 +19079,7 @@ snapshots:
 
   periscopic@3.1.0:
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       estree-walker: 3.0.3
       is-reference: 3.0.2
 
@@ -19183,10 +19214,22 @@ snapshots:
       read-cache: 1.0.0
       resolve: 1.22.8
 
+  postcss-import@15.1.0(postcss@8.4.49):
+    dependencies:
+      postcss: 8.4.49
+      postcss-value-parser: 4.2.0
+      read-cache: 1.0.0
+      resolve: 1.22.8
+
   postcss-js@4.0.1(postcss@8.4.41):
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.4.41
+
+  postcss-js@4.0.1(postcss@8.4.49):
+    dependencies:
+      camelcase-css: 2.0.1
+      postcss: 8.4.49
 
   postcss-load-config@4.0.2(postcss@8.4.41)(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.4)):
     dependencies:
@@ -19204,9 +19247,30 @@ snapshots:
       postcss: 8.4.41
       ts-node: 10.9.2(@types/node@22.10.0)(typescript@5.5.4)
 
+  postcss-load-config@4.0.2(postcss@8.4.49)(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.4)):
+    dependencies:
+      lilconfig: 3.1.2
+      yaml: 2.4.5
+    optionalDependencies:
+      postcss: 8.4.49
+      ts-node: 10.9.2(@types/node@20.14.12)(typescript@5.5.4)
+
+  postcss-load-config@4.0.2(postcss@8.4.49)(ts-node@10.9.2(@types/node@22.10.0)(typescript@5.5.4)):
+    dependencies:
+      lilconfig: 3.1.2
+      yaml: 2.4.5
+    optionalDependencies:
+      postcss: 8.4.49
+      ts-node: 10.9.2(@types/node@22.10.0)(typescript@5.5.4)
+
   postcss-nested@6.2.0(postcss@8.4.41):
     dependencies:
       postcss: 8.4.41
+      postcss-selector-parser: 6.1.2
+
+  postcss-nested@6.2.0(postcss@8.4.49):
+    dependencies:
+      postcss: 8.4.49
       postcss-selector-parser: 6.1.2
 
   postcss-selector-parser@6.0.10:
@@ -20358,7 +20422,7 @@ snapshots:
       '@ampproject/remapping': 2.3.0
       '@jridgewell/sourcemap-codec': 1.5.0
       '@jridgewell/trace-mapping': 0.3.25
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       acorn: 8.14.0
       aria-query: 5.3.0
       axobject-query: 4.1.0
@@ -20367,7 +20431,7 @@ snapshots:
       estree-walker: 3.0.3
       is-reference: 3.0.2
       locate-character: 3.0.0
-      magic-string: 0.30.11
+      magic-string: 0.30.14
       periscopic: 3.1.0
 
   svg-parser@2.0.4: {}
@@ -20423,15 +20487,15 @@ snapshots:
       is-glob: 4.0.3
       jiti: 1.21.6
       lilconfig: 2.1.0
-      micromatch: 4.0.7
+      micromatch: 4.0.8
       normalize-path: 3.0.0
       object-hash: 3.0.0
       picocolors: 1.1.1
-      postcss: 8.4.41
-      postcss-import: 15.1.0(postcss@8.4.41)
-      postcss-js: 4.0.1(postcss@8.4.41)
-      postcss-load-config: 4.0.2(postcss@8.4.41)(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.4))
-      postcss-nested: 6.2.0(postcss@8.4.41)
+      postcss: 8.4.49
+      postcss-import: 15.1.0(postcss@8.4.49)
+      postcss-js: 4.0.1(postcss@8.4.49)
+      postcss-load-config: 4.0.2(postcss@8.4.49)(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.5.4))
+      postcss-nested: 6.2.0(postcss@8.4.49)
       postcss-selector-parser: 6.1.2
       resolve: 1.22.8
       sucrase: 3.35.0
@@ -20450,15 +20514,15 @@ snapshots:
       is-glob: 4.0.3
       jiti: 1.21.6
       lilconfig: 2.1.0
-      micromatch: 4.0.7
+      micromatch: 4.0.8
       normalize-path: 3.0.0
       object-hash: 3.0.0
       picocolors: 1.1.1
-      postcss: 8.4.41
-      postcss-import: 15.1.0(postcss@8.4.41)
-      postcss-js: 4.0.1(postcss@8.4.41)
-      postcss-load-config: 4.0.2(postcss@8.4.41)(ts-node@10.9.2(@types/node@22.10.0)(typescript@5.5.4))
-      postcss-nested: 6.2.0(postcss@8.4.41)
+      postcss: 8.4.49
+      postcss-import: 15.1.0(postcss@8.4.49)
+      postcss-js: 4.0.1(postcss@8.4.49)
+      postcss-load-config: 4.0.2(postcss@8.4.49)(ts-node@10.9.2(@types/node@22.10.0)(typescript@5.5.4))
+      postcss-nested: 6.2.0(postcss@8.4.49)
       postcss-selector-parser: 6.1.2
       resolve: 1.22.8
       sucrase: 3.35.0
@@ -21325,7 +21389,7 @@ snapshots:
   webpack@5.93.0:
     dependencies:
       '@types/eslint-scope': 3.7.7
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       '@webassemblyjs/ast': 1.14.1
       '@webassemblyjs/wasm-edit': 1.12.1
       '@webassemblyjs/wasm-parser': 1.12.1
