@@ -80,6 +80,7 @@ export function getLinks({
       async headers() {
         return {
           authorization: accessToken ? `Bearer ${accessToken}` : "",
+          "user-agent": "@peated/web (trpc)",
         };
       },
     }),
