@@ -20,6 +20,7 @@ export default function TRPCProvider({
         apiServer,
         accessToken,
         batch: true,
+        userAgent: "@peated/web (trpc/react)",
       }),
     }),
   );

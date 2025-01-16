@@ -62,10 +62,12 @@ export function getLinks({
   apiServer,
   accessToken,
   batch = true,
+  userAgent = "peated (trpc/unknown)",
 }: {
   apiServer: string;
   accessToken?: string | null | undefined;
   batch: boolean;
+  userAgent: string;
 }) {
   return [
     loggerLink({
@@ -80,7 +82,7 @@ export function getLinks({
       async headers() {
         return {
           authorization: accessToken ? `Bearer ${accessToken}` : "",
-          "user-agent": "peated (trpc)",
+          "user-agent": userAgent,
         };
       },
     }),

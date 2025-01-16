@@ -11,6 +11,7 @@ export function makeTRPCClient(
       apiServer,
       accessToken,
       batch: false,
+      userAgent: "@peated (trpc/proxy)",
     }),
   });
 }

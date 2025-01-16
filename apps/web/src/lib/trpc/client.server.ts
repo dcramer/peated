@@ -19,6 +19,7 @@ export async function getTrpcClient(): Promise<CreateQueryUtils<AppRouter>> {
       apiServer: config.API_SERVER,
       accessToken,
       batch: true,
+      userAgent: "@peated/web (trpc)",
     }),
   });
 
@@ -39,6 +40,7 @@ export async function getUnsafeTrpcClient(): Promise<
       apiServer: config.API_SERVER,
       accessToken,
       batch: true,
+      userAgent: "@peated/web (trpc/unsafe)",
     }),
   });
 }
