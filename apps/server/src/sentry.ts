@@ -9,6 +9,7 @@ if (config.ENV !== "test") {
     profilesSampleRate: 1.0,
     spotlight: config.ENV === "development",
     includeLocalVariables: true,
+    sendDefaultPii: true,
   });
 
   Sentry.setTag("service", config.SENTRY_SERVICE);

@@ -21,6 +21,7 @@ export const SharedSentryConfig = {
   ignoreTransactions: ["/%2Fhealth"],
   tracesSampleRate: 1,
   debug: false,
+  sendDefaultPii: true,
 };
 
 export default config;
