@@ -472,9 +472,6 @@ importers:
       '@trpc/server':
         specifier: 'catalog:'
         version: 11.0.0-rc.461
-      '@vercel/speed-insights':
-        specifier: ^1.1.0
-        version: 1.1.0(next@14.2.23(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.18)(vue@3.4.31(typescript@5.5.4))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.5.1)
@@ -3755,29 +3752,6 @@ packages:
 
   '@unocss/transformer-variant-group@0.58.9':
     resolution: {integrity: sha512-3A6voHSnFcyw6xpcZT6oxE+KN4SHRnG4z862tdtWvRGcN+jGyNr20ylEZtnbk4xj0VNMeGHHQRZ0WLvmrAwvOQ==}
-
-  '@vercel/speed-insights@1.1.0':
-    resolution: {integrity: sha512-rAXxuhhO4mlRGC9noa5F7HLMtGg8YF1zAN6Pjd1Ny4pII4cerhtwSG4vympbCl+pWkH7nBS9kVXRD4FAn54dlg==}
-    peerDependencies:
-      '@sveltejs/kit': ^1 || ^2
-      next: '>= 13'
-      react: ^18 || ^19 || ^19.0.0-rc
-      svelte: '>= 4'
-      vue: ^3
-      vue-router: ^4
-    peerDependenciesMeta:
-      '@sveltejs/kit':
-        optional: true
-      next:
-        optional: true
-      react:
-        optional: true
-      svelte:
-        optional: true
-      vue:
-        optional: true
-      vue-router:
-        optional: true
 
   '@vitejs/plugin-react@4.3.1':
     resolution: {integrity: sha512-m/V2syj5CuVnaxcUJOQRel/Wr31FFXRFlnOoq1TVtkCxsY5veGMTEmpWHndrhB2U8ScHtCQB1e+4hWYExQc6Lg==}
@@ -12360,13 +12334,6 @@ snapshots:
   '@unocss/transformer-variant-group@0.58.9':
     dependencies:
       '@unocss/core': 0.58.9
-
-  '@vercel/speed-insights@1.1.0(next@14.2.23(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.18)(vue@3.4.31(typescript@5.5.4))':
-    optionalDependencies:
-      next: 14.2.23(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
-      react: 18.3.1
-      svelte: 4.2.18
-      vue: 3.4.31(typescript@5.5.4)
 
   '@vitejs/plugin-react@4.3.1(vite@4.5.3(@types/node@20.14.12)(lightningcss@1.22.0)(terser@5.37.0))':
     dependencies:
