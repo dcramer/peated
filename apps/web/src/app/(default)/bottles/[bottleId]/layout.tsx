@@ -4,9 +4,11 @@ import CollectionAction from "@peated/web/components/collectionAction";
 import FlavorProfile from "@peated/web/components/flavorProfile";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
+import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
+import type { Product, WithContext } from "schema-dts";
 import ModActions from "./modActions";
 
 export default async function Layout({
@@ -30,8 +32,40 @@ export default async function Layout({
     return redirect(`/bottles/${bottle.id}/`);
   }
 
+  const jsonLd: WithContext<Product> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: bottle.fullName,
+    image: bottle.imageUrl ?? undefined,
+    description: summarize(bottle.description || "", 200),
+    brand: {
+      "@type": "Brand",
+      name: bottle.brand?.name,
+    },
+    aggregateRating: bottle.totalTastings
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: bottle.avgRating ?? 0,
+          reviewCount: bottle.totalTastings ?? 0,
+        }
+      : undefined,
+    offers: bottle.lastPrice
+      ? {
+          "@type": "AggregateOffer",
+          offerCount: 1,
+          lowPrice: bottle.lastPrice?.price,
+          highPrice: bottle.lastPrice?.price,
+          priceCurrency: bottle.lastPrice?.currency,
+        }
+      : undefined,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="w-full p-3 lg:py-0">
         <BottleHeader bottle={bottle} />
 

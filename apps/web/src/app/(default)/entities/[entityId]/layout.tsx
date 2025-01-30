@@ -4,6 +4,7 @@ import ShareButton from "@peated/web/components/shareButton";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
+import type { Organization, WithContext } from "schema-dts";
 import ModActions from "./modActions";
 
 export default async function Layout({
@@ -27,8 +28,29 @@ export default async function Layout({
     return redirect(`/entities/${entity.id}/`);
   }
 
+  const jsonLd: WithContext<Organization> = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: entity.name,
+    description: entity.description ?? undefined,
+    // url: `/entities/${entity.id}`,
+    address: entity.country
+      ? [
+          {
+            "@type": "PostalAddress",
+            streetAddress: entity.address ?? undefined,
+            addressCountry: entity.country.name ?? undefined,
+          },
+        ]
+      : [],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="w-full p-3 lg:py-0">
         <EntityHeader entity={entity} />
 

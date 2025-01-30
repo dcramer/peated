@@ -9,6 +9,7 @@ import UserTagDistribution from "@peated/web/components/userTagDistribution";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { type ReactNode } from "react";
+import type { ProfilePage, WithContext } from "schema-dts";
 import FriendButton from "./friendButton";
 import LogoutButton from "./logoutButton";
 import ModActions from "./modActions";
@@ -34,8 +35,23 @@ export default async function Layout({
     user.id !== currentUser.id &&
     user.friendStatus !== "friends";
 
+  const jsonLd: WithContext<ProfilePage> = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    mainEntity: {
+      "@type": "Person",
+      name: user.username,
+      image: user.pictureUrl ?? undefined,
+      identifier: `${user.id}`,
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mb-4 flex min-w-full flex-wrap gap-y-4 lg:mb-8 lg:flex-nowrap">
         <div className="flex w-full justify-center lg:w-auto lg:justify-start">
           <UserAvatar user={user} size={150} />

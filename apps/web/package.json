@@ -45,6 +45,7 @@
     "react-leaflet": "^4.2.1",
     "react-qr-code": "^2.0.15",
     "recharts": "^2.15.0",
+    "schema-dts": "^1.1.2",
     "superjson": "catalog:",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
