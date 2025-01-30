@@ -18,8 +18,8 @@
     "jsx-email": "catalog:"
   },
   "devDependencies": {
-    "@peated/design": "workspace:",
-    "@peated/tsconfig": "workspace:",
+    "@peated/design": "workspace:^",
+    "@peated/tsconfig": "workspace:^",
     "@types/react": "catalog:",
     "react": "catalog:",
     "superstruct": "^2.0.2",
