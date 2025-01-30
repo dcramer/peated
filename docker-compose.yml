@@ -24,7 +24,6 @@ services:
   spotlight:
     image: ghcr.io/getsentry/spotlight:latest
     restart: on-failure
-    pull_policy: always
     ports:
       - "8969:8969"
 
