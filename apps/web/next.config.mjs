@@ -4,7 +4,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   reactStrictMode: false,
   env: {
-    DEBUG: process.env.DEBUG ? "true" : "",
+    // DEBUG: process.env.DEBUG ? "true" : "false",
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
     SENTRY_DSN: process.env.SENTRY_DSN,
     API_SERVER: process.env.API_SERVER || "http://localhost:4000",

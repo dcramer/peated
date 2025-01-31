@@ -1,12 +1,11 @@
 "use client";
 
-import { isTRPCClientError } from "@peated/server/trpc/client";
-
 import {
   ApiError,
   ApiUnauthorized,
   ApiUnavailable,
 } from "@peated/server/lib/apiClient";
+import { isTRPCClientError } from "@peated/server/trpc/client";
 import { type AppRouter } from "@peated/server/trpc/router";
 import Button from "@peated/web/components/button";
 import config from "@peated/web/config";
