@@ -1,15 +1,16 @@
 "use client";
+import { use } from "react";
 
 import BottleLink from "@peated/web/components/bottleLink";
 import { Distillers } from "@peated/web/components/bottleMetadata";
 import LayoutEmpty from "@peated/web/components/layoutEmpty";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function Page({
-  params: { flightId },
-}: {
-  params: { flightId: string };
-}) {
+export default function Page(props: { params: Promise<{ flightId: string }> }) {
+  const params = use(props.params);
+
+  const { flightId } = params;
+
   const [[flight, bottles]] = trpc.useSuspenseQueries((t) => [
     t.flightById(flightId),
     t.bottleList({

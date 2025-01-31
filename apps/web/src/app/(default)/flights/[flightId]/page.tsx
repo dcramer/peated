@@ -7,11 +7,13 @@ import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import ModActions from "./modActions";
 
-export async function generateMetadata({
-  params: { flightId },
-}: {
-  params: { flightId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ flightId: string }>;
 }) {
+  const params = await props.params;
+
+  const { flightId } = params;
+
   const trpcClient = await getTrpcClient();
   const flight = await trpcClient.flightById.fetch(flightId);
   const description = summarize(flight.description || "", 200);
@@ -22,11 +24,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({
-  params: { flightId },
-}: {
-  params: { flightId: string };
+export default async function Page(props: {
+  params: Promise<{ flightId: string }>;
 }) {
+  const params = await props.params;
+
+  const { flightId } = params;
+
   const trpcClient = await getTrpcClient();
   const [flight, bottleList] = await Promise.all([
     trpcClient.flightById.fetch(flightId),

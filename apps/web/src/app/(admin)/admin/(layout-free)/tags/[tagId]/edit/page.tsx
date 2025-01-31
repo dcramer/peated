@@ -1,14 +1,15 @@
 "use client";
+import { use } from "react";
 
 import TagForm from "@peated/web/components/admin/tagForm";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
-export default function Page({
-  params: { tagId },
-}: {
-  params: { tagId: string };
-}) {
+export default function Page(props: { params: Promise<{ tagId: string }> }) {
+  const params = use(props.params);
+
+  const { tagId } = params;
+
   const [tag] = trpc.tagByName.useSuspenseQuery(tagId);
 
   const router = useRouter();

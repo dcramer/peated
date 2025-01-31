@@ -7,11 +7,10 @@ export const metadata: Metadata = {
   title: "Password Reset",
 };
 
-export default function PasswordReset({
-  searchParams,
-}: {
-  searchParams: Record<string, any>;
+export default async function PasswordReset(props: {
+  searchParams: Promise<Record<string, any>>;
 }) {
+  const searchParams = await props.searchParams;
   const token = searchParams.token;
 
   return (

@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import Chip from "@peated/web/components/chip";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
@@ -7,11 +8,13 @@ import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function BottleAliases({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
+export default function BottleAliases(props: {
+  params: Promise<{ bottleId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { bottleId } = params;
+
   const { user } = useAuth();
   const [aliasList] = trpc.bottleAliasList.useSuspenseQuery({
     bottle: Number(bottleId),

@@ -9,8 +9,12 @@ const PAGE_LIMIT = 1000;
 
 export async function GET(
   request: Request,
-  { params: { id } }: { params: { id: string } },
+  props: { params: Promise<{ id: string }> },
 ) {
+  const params = await props.params;
+
+  const { id } = params;
+
   const startCursor = (Number(id) - 1) * (PAGE_LIMIT / 100) + 1;
   const trpcClient = await getTrpcClient();
 
