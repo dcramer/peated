@@ -17,7 +17,7 @@ export default function BottleStats({
     { name: "Tastings", value: bottle.totalTastings.toLocaleString() },
     { name: "People", value: bottle.people.toLocaleString() },
     {
-      name: "Price",
+      name: "Last Price",
       value: bottle.lastPrice ? (
         <a
           href={bottle.lastPrice.url}

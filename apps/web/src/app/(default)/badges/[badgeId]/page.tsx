@@ -1,7 +1,7 @@
 import BadgeImage from "@peated/web/components/badgeImage";
 import BetaNotice from "@peated/web/components/betaNotice";
 import { redirectToAuth } from "@peated/web/lib/auth";
-import { getCurrentUser, isLoggedIn } from "@peated/web/lib/auth.server";
+import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { Suspense } from "react";
 import Leaderboard from "./leaderboard";

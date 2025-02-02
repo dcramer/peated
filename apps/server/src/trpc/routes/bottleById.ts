@@ -44,12 +44,7 @@ export default publicProcedure.input(z.number()).query(async function ({
   const [lastPrice] = await db
     .select()
     .from(storePrices)
-    .where(
-      and(
-        eq(storePrices.bottleId, bottle.id),
-        sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
-      ),
-    )
+    .where(and(eq(storePrices.bottleId, bottle.id)))
     .orderBy(desc(storePrices.updatedAt))
     .limit(1);
 

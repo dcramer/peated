@@ -9,6 +9,12 @@ import type { Currency } from "../types";
 import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
+const ONE_DAY_MS = 1000 * 60 * 60 * 24;
+
+function priceIsValid(price: StorePrice) {
+  return price.updatedAt > new Date(Date.now() - ONE_DAY_MS);
+}
+
 export const StorePriceSerializer = serializer({
   item: (
     item: StorePrice,
@@ -22,6 +28,7 @@ export const StorePriceSerializer = serializer({
       volume: item.volume,
       currency: item.currency,
       url: item.url,
+      isValid: priceIsValid(item),
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
@@ -76,6 +83,7 @@ export const StorePriceWithSiteSerializer = serializer({
       volume: item.volume,
       currency: item.currency,
       url: affUrl,
+      isValid: priceIsValid(item),
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
