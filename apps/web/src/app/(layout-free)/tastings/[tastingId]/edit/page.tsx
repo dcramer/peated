@@ -1,5 +1,4 @@
 "use client";
-import { use } from "react";
 
 import { useFlashMessages } from "@peated/web/components/flash";
 import TastingForm from "@peated/web/components/tastingForm";
@@ -10,13 +9,11 @@ import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Page(props: {
-  params: Promise<{ tastingId: string }>;
+export default function Page({
+  params: { tastingId },
+}: {
+  params: { tastingId: string };
 }) {
-  const params = use(props.params);
-
-  const { tastingId } = params;
-
   useAuthRequired();
 
   const [tasting] = trpc.tastingById.useSuspenseQuery(Number(tastingId));

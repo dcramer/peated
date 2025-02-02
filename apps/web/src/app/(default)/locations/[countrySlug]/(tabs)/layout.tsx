@@ -9,13 +9,11 @@ import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { type ReactNode } from "react";
 
-export async function generateMetadata(props: {
-  params: Promise<{ countrySlug: string }>;
+export async function generateMetadata({
+  params: { countrySlug },
+}: {
+  params: { countrySlug: string };
 }) {
-  const params = await props.params;
-
-  const { countrySlug } = params;
-
   const trpcClient = await getTrpcClient();
   const country = await trpcClient.countryBySlug.fetch(countrySlug);
 
@@ -25,16 +23,13 @@ export async function generateMetadata(props: {
   };
 }
 
-export default async function Page(props: {
-  params: Promise<{ countrySlug: string }>;
+export default async function Page({
+  params: { countrySlug },
+  children,
+}: {
+  params: { countrySlug: string };
   children: ReactNode;
 }) {
-  const params = await props.params;
-
-  const { countrySlug } = params;
-
-  const { children } = props;
-
   const trpcClient = await getTrpcClient();
   const country = await trpcClient.countryBySlug.fetch(countrySlug);
   const user = await getCurrentUser();

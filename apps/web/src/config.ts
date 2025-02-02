@@ -1,6 +1,6 @@
 const config = {
   ENV: process.env.NODE_ENV === "production" ? "production" : "development",
-  DEBUG: false,
+  DEBUG: !!process.env.DEBUG,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
   SENTRY_DSN: process.env.SENTRY_DSN,
   API_SERVER: process.env.API_SERVER || "http://localhost:4000",

@@ -1,5 +1,4 @@
 "use client";
-import { use } from "react";
 
 import BottleForm from "@peated/web/components/bottleForm";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -10,11 +9,11 @@ import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
-export default function Page(props: { params: Promise<{ bottleId: string }> }) {
-  const params = use(props.params);
-
-  const { bottleId } = params;
-
+export default function Page({
+  params: { bottleId },
+}: {
+  params: { bottleId: string };
+}) {
   useModRequired();
 
   const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));

@@ -1,5 +1,4 @@
 "use client";
-import { use } from "react";
 
 import BadgeForm from "@peated/web/components/admin/badgeForm";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -9,11 +8,11 @@ import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
-export default function Page(props: { params: Promise<{ badgeId: string }> }) {
-  const params = use(props.params);
-
-  const { badgeId } = params;
-
+export default function Page({
+  params: { badgeId },
+}: {
+  params: { badgeId: string };
+}) {
   const [badge] = trpc.badgeById.useSuspenseQuery(parseInt(badgeId, 10));
 
   const router = useRouter();

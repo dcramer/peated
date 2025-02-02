@@ -2,13 +2,11 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
-export async function generateMetadata(props: {
-  params: Promise<{ entityId: string }>;
+export async function generateMetadata({
+  params: { entityId },
+}: {
+  params: { entityId: string };
 }) {
-  const params = await props.params;
-
-  const { entityId } = params;
-
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 
@@ -17,13 +15,11 @@ export async function generateMetadata(props: {
   };
 }
 
-export default async function EntityTastings(props: {
-  params: Promise<{ entityId: string }>;
+export default async function EntityTastings({
+  params: { entityId },
+}: {
+  params: { entityId: string };
 }) {
-  const params = await props.params;
-
-  const { entityId } = params;
-
   const trpcClient = await getTrpcClient();
   const tastingList = await trpcClient.tastingList.fetch({
     entity: Number(entityId),

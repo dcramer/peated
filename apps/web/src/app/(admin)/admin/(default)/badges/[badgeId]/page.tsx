@@ -1,5 +1,4 @@
 "use client";
-import { use } from "react";
 
 import BadgeImage from "@peated/web/components/badgeImage";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
@@ -12,11 +11,11 @@ import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function Page(props: { params: Promise<{ badgeId: string }> }) {
-  const params = use(props.params);
-
-  const { badgeId } = params;
-
+export default function Page({
+  params: { badgeId },
+}: {
+  params: { badgeId: string };
+}) {
   const [badge] = trpc.badgeById.useSuspenseQuery(parseInt(badgeId, 10));
 
   return (

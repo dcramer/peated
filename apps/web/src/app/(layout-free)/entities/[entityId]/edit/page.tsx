@@ -1,16 +1,15 @@
 "use client";
-import { use } from "react";
 
 import EntityForm from "@peated/web/components/entityForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
-export default function Page(props: { params: Promise<{ entityId: string }> }) {
-  const params = use(props.params);
-
-  const { entityId } = params;
-
+export default function Page({
+  params: { entityId },
+}: {
+  params: { entityId: string };
+}) {
   useModRequired();
 
   const [entity] = trpc.entityById.useSuspenseQuery(Number(entityId));

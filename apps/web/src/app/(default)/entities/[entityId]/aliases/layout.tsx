@@ -2,13 +2,11 @@ import SimpleHeader from "@peated/web/components/simpleHeader";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { type ReactNode } from "react";
 
-export async function generateMetadata(props: {
-  params: Promise<{ entityId: string }>;
+export async function generateMetadata({
+  params: { entityId },
+}: {
+  params: { entityId: string };
 }) {
-  const params = await props.params;
-
-  const { entityId } = params;
-
   const trpcClient = await getTrpcClient();
   const entity = await trpcClient.entityById.fetch(Number(entityId));
 

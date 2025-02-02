@@ -1,5 +1,4 @@
 "use client";
-import { use } from "react";
 
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -12,11 +11,11 @@ import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function Page(props: { params: Promise<{ eventId: string }> }) {
-  const params = use(props.params);
-
-  const { eventId } = params;
-
+export default function Page({
+  params: { eventId },
+}: {
+  params: { eventId: string };
+}) {
   const [event] = trpc.eventById.useSuspenseQuery(parseInt(eventId, 10));
 
   return (

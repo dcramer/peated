@@ -1,17 +1,14 @@
 "use client";
-import { use } from "react";
 
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function Page(props: {
-  params: Promise<{ countrySlug: string }>;
+export default function Page({
+  params: { countrySlug },
+}: {
+  params: { countrySlug: string };
 }) {
-  const params = use(props.params);
-
-  const { countrySlug } = params;
-
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
     overrides: {

@@ -1,18 +1,15 @@
 "use client";
-import { use } from "react";
 
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import PageHeader from "@peated/web/components/pageHeader";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function Page(props: {
-  params: Promise<{ countrySlug: string; regionSlug: string }>;
+export default function Page({
+  params: { countrySlug, regionSlug },
+}: {
+  params: { countrySlug: string; regionSlug: string };
 }) {
-  const params = use(props.params);
-
-  const { countrySlug, regionSlug } = params;
-
   const [country] = trpc.countryBySlug.useSuspenseQuery(countrySlug);
   const [region] = trpc.regionBySlug.useSuspenseQuery({
     country: countrySlug,

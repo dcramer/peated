@@ -1,17 +1,14 @@
 "use client";
-import { use } from "react";
 
 import BottleTable from "@peated/web/components/bottleTable";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function EntityTastings(props: {
-  params: Promise<{ entityId: string }>;
+export default function EntityTastings({
+  params: { entityId },
+}: {
+  params: { entityId: string };
 }) {
-  const params = use(props.params);
-
-  const { entityId } = params;
-
   const queryParams = useApiQueryParams({
     defaults: {
       sort: "brand",

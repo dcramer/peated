@@ -7,7 +7,7 @@ export default {
       : process.env.NODE_ENV !== "test"
         ? "development"
         : "test",
-  DEBUG: false,
+  DEBUG: !!process.env.DEBUG,
   PORT: process.env.PORT || 4000,
   HOST: process.env.HOST || "localhost",
   CORS_HOST: process.env.CORS_HOST || "http://localhost:3000",

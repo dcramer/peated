@@ -1,15 +1,14 @@
 "use client";
-import { use } from "react";
 
 import FlightForm from "@peated/web/components/flightForm";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter } from "next/navigation";
 
-export default function Page(props: { params: Promise<{ flightId: string }> }) {
-  const params = use(props.params);
-
-  const { flightId } = params;
-
+export default function Page({
+  params: { flightId },
+}: {
+  params: { flightId: string };
+}) {
   const [[flight, bottles]] = trpc.useSuspenseQueries((t) => [
     t.flightById(flightId),
     t.bottleList({

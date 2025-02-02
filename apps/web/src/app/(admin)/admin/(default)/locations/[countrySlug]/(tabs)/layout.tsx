@@ -6,18 +6,15 @@ import Link from "@peated/web/components/link";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { type ReactNode, use } from "react";
+import { type ReactNode } from "react";
 
-export default function Page(props: {
-  params: Promise<{ countrySlug: string }>;
+export default function Page({
+  params: { countrySlug },
+  children,
+}: {
+  params: { countrySlug: string };
   children: ReactNode;
 }) {
-  const params = use(props.params);
-
-  const { countrySlug } = params;
-
-  const { children } = props;
-
   const [country] = trpc.countryBySlug.useSuspenseQuery(countrySlug);
 
   return (
