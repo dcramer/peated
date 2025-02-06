@@ -32,7 +32,6 @@
     "@peated/tsconfig": "workspace:*",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
-    "@sentry/utils": "catalog:",
     "@sindresorhus/slugify": "^2.2.1",
     "@tanstack/react-query": "catalog:",
     "@trpc/client": "catalog:",

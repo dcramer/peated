@@ -1,5 +1,5 @@
+import { normalize } from "@sentry/core";
 import * as Sentry from "@sentry/node";
-import { isString, normalize } from "@sentry/utils";
 import fastifyPlugin from "fastify-plugin";
 
 export default fastifyPlugin(async (fastify, options) => {
@@ -13,7 +13,7 @@ export default fastifyPlugin(async (fastify, options) => {
         // upgrade the request w/ body
         event.request.data =
           request.body !== undefined
-            ? isString(request.body)
+            ? typeof request.body === "string"
               ? request.body
               : JSON.stringify(normalize(request.body))
             : undefined;
