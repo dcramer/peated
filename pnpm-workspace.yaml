@@ -11,10 +11,9 @@ catalog:
   jsx-email: ^1.10.11
   pg: ^8.13.0
   prettier: ^3.3.2
-  "@sentry/core": 8.53.0
-  "@sentry/nextjs": 8.53.0
-  "@sentry/node": 8.53.0
-  "@sentry/utils": 8.53.0
+  "@sentry/core": 9.0.0-alpha.2
+  "@sentry/nextjs": 9.0.0-alpha.2
+  "@sentry/node": 9.0.0-alpha.2
   "@spotlightjs/spotlight": ^2.1.1
   superjson: ^2.2.1
   tailwindcss: ^3.4.1
