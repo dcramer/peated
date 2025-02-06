@@ -1,6 +1,6 @@
 import config from "@peated/server/config";
 import { logError } from "@peated/server/lib/log";
-import { metrics, startSpan } from "@sentry/node";
+import { startSpan } from "@sentry/node";
 import OpenAI from "openai";
 import { type ZodSchema, type z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
@@ -92,9 +92,9 @@ export async function getStructuredResponse<
       );
 
       if (result.usage) {
-        metrics.increment("ai.total_tokens.used", result.usage.total_tokens);
-        metrics.increment("ai.prompt_tokens.used", result.usage.prompt_tokens);
-        metrics.increment(
+        span.setAttribute("ai.total_tokens.used", result.usage.total_tokens);
+        span.setAttribute("ai.prompt_tokens.used", result.usage.prompt_tokens);
+        span.setAttribute(
           "ai.completion_tokens.used",
           result.usage.completion_tokens,
         );
