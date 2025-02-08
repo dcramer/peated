@@ -53,9 +53,9 @@ export default async function Layout({
       ? {
           "@type": "AggregateOffer",
           offerCount: 1,
-          lowPrice: bottle.lastPrice?.price,
-          highPrice: bottle.lastPrice?.price,
-          priceCurrency: bottle.lastPrice?.currency,
+          lowPrice: bottle.lastPrice.price / 100,
+          highPrice: bottle.lastPrice.price / 100,
+          priceCurrency: bottle.lastPrice.currency,
         }
       : undefined,
   };
