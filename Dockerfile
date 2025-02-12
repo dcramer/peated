@@ -1,4 +1,4 @@
-FROM node:20-slim as base
+FROM node:22-slim as base
 # set for base and all layer that inherit from it
 ENV NODE_ENV="production" \
     PNPM_HOME="/pnpm" \
@@ -27,6 +27,9 @@ ADD apps/web/package.json ./apps/web/package.json
 ADD apps/server/package.json ./apps/server/package.json
 # given packages are mostly universally shared code, this simplifies our logic
 ADD packages .
+
+# ensure latest corepack otherwise we could hit cert issues
+RUN npm i -g corepack@latest
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store NODE_ENV=development pnpm install --frozen-lockfile
 ADD . .

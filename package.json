@@ -52,11 +52,11 @@
     "prettier-plugin-tailwindcss": "catalog:"
   },
   "engines": {
-    "node": ">=20.18.0 <21.0.0"
+    "node": ">=22.14.0 <23.0.0"
   },
   "packageManager": "pnpm@10.3.0",
   "volta": {
-    "node": "20.18.3",
+    "node": "22.14.0",
     "pnpm": "10.3.0"
   },
   "simple-git-hooks": {
