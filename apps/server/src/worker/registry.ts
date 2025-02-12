@@ -29,11 +29,16 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
           // this is sentry's wrapper
           return await Sentry.startSpan(
             {
-              op: "process",
+              op: "consume default",
               name: `bullmq.${jobName.toLowerCase()}`,
             },
             async (span) => {
-              span.setAttribute("messaging.operation", "process");
+              span.setAttribute("messaging.operation.type", "process");
+              span.setAttribute("messaging.operation.name", "consume");
+              // TODO: THIS IS WRONG - it should set from the worker itself but idk that
+              // we have that data
+              span.setAttribute("messaging.destination.name", "default");
+              span.setAttribute("messaging.message.id", jobId);
               span.setAttribute("messaging.system", "bullmq");
 
               console.log(`Running job [${jobName} - ${jobId}]`);

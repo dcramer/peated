@@ -57,11 +57,18 @@ export async function pushJob(
 ) {
   await Sentry.startSpan(
     {
-      op: "publish",
+      op: "publish default",
       name: `bullmq.${jobName.toLowerCase()}`,
     },
     async (span) => {
-      span.setAttribute("messaging.operation", "publish");
+      span.setAttribute("messaging.system", "bullmq");
+      span.setAttribute("messaging.operation.type", "send");
+      span.setAttribute("messaging.operation.name", "publish");
+      // TODO: THIS IS WRONG - it should set from the worker itself but idk that
+      // we have that data
+      span.setAttribute("messaging.destination.name", "default");
+      // TODO:
+      // span.setAttribute("messaging.message.id", jobId);
       span.setAttribute("messaging.system", "bullmq");
 
       const activeContext = {};
