@@ -36,7 +36,6 @@ export const reviews = pgTable(
     return {
       nameUnique: uniqueIndex("review_unq_name").using(
         "btree",
-        // @ts-expect-error: drizzle doesnt seem to understand its own types yet
         table.externalSiteId,
         sql`LOWER(${table.name})`,
         table.issue,

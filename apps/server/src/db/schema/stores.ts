@@ -41,7 +41,6 @@ export const storePrices = pgTable(
     return {
       nameUnique: uniqueIndex("store_price_unq_name").using(
         "btree",
-        // @ts-expect-error: drizzle doesnt seem to understand its own types yet
         table.externalSiteId,
         sql`LOWER(${table.name})`,
         table.volume,
