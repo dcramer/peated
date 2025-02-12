@@ -28,7 +28,7 @@ catalog:
   "@trpc/server": 11.0.0-rc.461
   tsx: ^4.16.2
   typescript: ^5.5.4
-  "@types/node": ^20.14.9
+  "@types/node": ^22.13.1
   "@types/pg": ^8.11.6
   vitest: "~2.1.1"
   "@vitest/coverage-v8": "~2.1.1"
