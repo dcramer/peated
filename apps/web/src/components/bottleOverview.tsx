@@ -161,7 +161,7 @@ export default function BottleOverview({
           </div>
           <div className="hidden w-64 lg:block">
             {bottle.imageUrl ? (
-              <div className="flex w-full justify-center rounded border border-slate-900 bg-slate-900 p-3">
+              <div className="flex w-full justify-center rounded border border-slate-900 bg-white p-3 opacity-80">
                 <img
                   src={bottle.imageUrl}
                   className="block max-w-full rounded"
