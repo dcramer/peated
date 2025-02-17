@@ -1,7 +1,7 @@
 import BetaNotice from "@peated/web/components/betaNotice";
 import Price from "@peated/web/components/price";
-import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
+import classNames from "@peated/web/lib/classNames";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 export async function generateMetadata({
@@ -35,10 +35,20 @@ export default async function BottlePrices({
         <ul className="mt-4 space-y-2 text-sm">
           {priceList.results.map((price) => {
             return (
-              <li key={price.id}>
-                <a href={price.url} className="flex hover:underline">
+              <li
+                key={price.id}
+                className={classNames({
+                  "opacity-50": !price.isValid,
+                })}
+              >
+                <a
+                  href={price.isValid ? price.url : undefined}
+                  className={classNames("flex hover:underline", {
+                    "opacity-50": !price.isValid,
+                  })}
+                >
                   <span className="flex-auto">
-                    {price.site?.name} &mdash; {price.name}
+                    <strong>{price.site?.name}</strong> &mdash; {price.name}
                   </span>
                   <span>
                     <Price value={price.price} currency={price.currency} />
