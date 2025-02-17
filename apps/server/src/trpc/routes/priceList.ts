@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, ilike, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 
 import { db } from "@peated/server/db";
 import { externalSites, storePrices } from "@peated/server/db/schema";
@@ -17,6 +17,7 @@ export default adminProcedure
         site: ExternalSiteTypeEnum.optional(),
         query: z.string().default(""),
         onlyUnknown: z.boolean().optional(),
+        onlyValid: z.boolean().optional(),
         cursor: z.number().gte(1).default(1),
         limit: z.number().gte(1).lte(100).default(100),
       })
@@ -27,10 +28,7 @@ export default adminProcedure
       }),
   )
   .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
-    const where: (SQL<unknown> | undefined)[] = [
-      sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
-      eq(storePrices.hidden, false),
-    ];
+    const where: (SQL<unknown> | undefined)[] = [eq(storePrices.hidden, false)];
 
     if (input.site) {
       const site = await db.query.externalSites.findFirst({
@@ -44,6 +42,10 @@ export default adminProcedure
         });
       }
       where.push(eq(storePrices.externalSiteId, site.id));
+    }
+
+    if (input.onlyValid) {
+      where.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
     }
 
     if (input.onlyUnknown) {
@@ -62,7 +64,10 @@ export default adminProcedure
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(storePrices.name));
+      .orderBy(
+        desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
+        asc(storePrices.name),
+      );
 
     return {
       results: await serialize(

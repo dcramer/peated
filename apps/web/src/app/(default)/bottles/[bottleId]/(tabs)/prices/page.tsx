@@ -1,5 +1,6 @@
 import BetaNotice from "@peated/web/components/betaNotice";
 import Price from "@peated/web/components/price";
+import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 

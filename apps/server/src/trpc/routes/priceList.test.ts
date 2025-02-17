@@ -92,21 +92,32 @@ describe("priceList", () => {
     expect(result.results[0].id).toBe(visiblePrice.id);
   });
 
-  test("only includes prices updated within the last week", async ({
+  test("includes prices older than a week by default", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+    const caller = createCaller({ user: admin });
+    const recentPrice = await fixtures.StorePrice();
+    const oldPrice = await fixtures.StorePrice({
+      updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+    });
+
+    const result = await caller.priceList({});
+
+    expect(result.results.length).toBe(2);
+    expect(result.results.map((p) => p.id)).toContain(recentPrice.id);
+    expect(result.results.map((p) => p.id)).toContain(oldPrice.id);
+  });
+
+  test("excludes prices older than a week when onlyValid is true", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
     const caller = createCaller({ user: admin });
     const recentPrice = await fixtures.StorePrice();
-    const oldPrice = await fixtures.StorePrice();
+    const oldPrice = await fixtures.StorePrice({
+      updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+    });
 
-    // Manually update the oldPrice to be older than a week
-    await db
-      .update(storePrices)
-      .set({ updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000) })
-      .where(eq(storePrices.id, oldPrice.id));
-
-    const result = await caller.priceList({});
+    const result = await caller.priceList({ onlyValid: true });
 
     expect(result.results.length).toBe(1);
     expect(result.results[0].id).toBe(recentPrice.id);

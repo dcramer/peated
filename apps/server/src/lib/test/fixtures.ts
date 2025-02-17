@@ -660,15 +660,15 @@ export const StorePrice = async (
 
     const { rows } = await tx.execute<dbSchema.StorePrice>(
       sql`
-        INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url, hidden, image_url)
-        VALUES (${data.bottleId}, ${data.externalSiteId}, ${data.name}, ${data.volume}, ${data.price}, ${data.currency}, ${data.url}, ${data.hidden}, ${data.imageUrl ?? null})
+        INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url, hidden, image_url, updated_at)
+        VALUES (${data.bottleId}, ${data.externalSiteId}, ${data.name}, ${data.volume}, ${data.price}, ${data.currency}, ${data.url}, ${data.hidden}, ${data.imageUrl ?? null}, ${data.updatedAt || sql`NOW()`})
         ON CONFLICT (external_site_id, LOWER(name), volume)
         DO UPDATE
         SET bottle_id = COALESCE(excluded.bottle_id, ${storePrices.bottleId}),
             price = excluded.price,
             currency = excluded.currency,
             url = excluded.url,
-            updated_at = NOW()
+            updated_at = ${data.updatedAt || sql`NOW()`}
         RETURNING *
       `,
     );
@@ -684,8 +684,7 @@ export const StorePrice = async (
         price: price.price,
         volume: price.volume,
         currency: price.currency,
-        // TODO: mock
-        date: sql`CURRENT_DATE`,
+        date: price.updatedAt.toISOString().substring(0, 10),
       })
       .onConflictDoNothing();
 
