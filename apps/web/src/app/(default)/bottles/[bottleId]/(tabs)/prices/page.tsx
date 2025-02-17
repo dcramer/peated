@@ -38,13 +38,13 @@ export default async function BottlePrices({
               <li
                 key={price.id}
                 className={classNames({
-                  "opacity-50": !price.isValid,
+                  "opacity-70": !price.isValid,
                 })}
               >
                 <a
                   href={price.isValid ? price.url : undefined}
-                  className={classNames("flex hover:underline", {
-                    "opacity-50": !price.isValid,
+                  className={classNames("flex", {
+                    "hover:underline": price.isValid,
                   })}
                 >
                   <span className="flex-auto">
