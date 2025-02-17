@@ -95,8 +95,19 @@ describe("priceList", () => {
   test("includes prices older than a week by default", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const caller = createCaller({ user: admin });
-    const recentPrice = await fixtures.StorePrice();
+    const recentPrice = await fixtures.StorePrice({
+      externalSiteId: (
+        await fixtures.ExternalSite({
+          type: "astorwines",
+        })
+      ).id,
+    });
     const oldPrice = await fixtures.StorePrice({
+      externalSiteId: (
+        await fixtures.ExternalSite({
+          type: "totalwine",
+        })
+      ).id,
       updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
     });
 
@@ -112,8 +123,19 @@ describe("priceList", () => {
   }) => {
     const admin = await fixtures.User({ admin: true });
     const caller = createCaller({ user: admin });
-    const recentPrice = await fixtures.StorePrice();
+    const recentPrice = await fixtures.StorePrice({
+      externalSiteId: (
+        await fixtures.ExternalSite({
+          type: "astorwines",
+        })
+      ).id,
+    });
     const oldPrice = await fixtures.StorePrice({
+      externalSiteId: (
+        await fixtures.ExternalSite({
+          type: "totalwine",
+        })
+      ).id,
       updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
     });
 
