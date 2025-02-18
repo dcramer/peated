@@ -1,5 +1,5 @@
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
-import { type ReactNode } from "react";
+export { default } from "@peated/web/components/defaultLayout";
 
 export const fetchCache = "default-no-store";
 
@@ -14,8 +14,4 @@ export async function generateMetadata({
   return {
     title: `Whiskies from ${entity.name}`,
   };
-}
-
-export default function DefaultLayout({ children }: { children: ReactNode }) {
-  return <>{children}</>;
 }

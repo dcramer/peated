@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Locations",
 };
 
-export default async function Page({ children }: { children: ReactNode }) {
+export default async function Layout({ children }: { children: ReactNode }) {
   return (
     <>
       <PageHeader title="Locations" />

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Admin",
 };
 
-export default async function DefaultLayout({
+export default async function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
