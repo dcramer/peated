@@ -560,6 +560,10 @@ describe("normalizeVolume", () => {
     const rv = normalizeVolume("1.75L");
     expect(rv).toBe(1750);
   });
+  test("50 mL", async () => {
+    const rv = normalizeVolume("50 mL");
+    expect(rv).toBe(50);
+  });
   test("invalid", async () => {
     const rv = normalizeVolume("1.75");
     expect(rv).toBe(null);
