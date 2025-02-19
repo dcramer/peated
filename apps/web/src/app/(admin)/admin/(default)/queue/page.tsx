@@ -22,9 +22,9 @@ export default function Page() {
     },
   });
 
-  const [aliasList] = trpc.bottleAliasList.useSuspenseQuery(queryParams);
+  const [aliasList] = trpc.unmatchedBottleList.useSuspenseQuery(queryParams);
   const [unmatchedBottle, setUnmatchedBottle] = useState<
-    null | RouterOutputs["bottleAliasList"]["results"][number]
+    null | RouterOutputs["unmatchedBottleList"]["results"][number]
   >(null);
 
   // this isnt useful as the upsert wipes the cache but we dont totally want that
@@ -46,7 +46,6 @@ export default function Page() {
           {
             name: "name",
             value: (item) => {
-              const match = assignments[item.name];
               return (
                 <div>
                   <a
@@ -57,11 +56,15 @@ export default function Page() {
                   >
                     {item.name}
                   </a>
-                  {match && (
+                  {item.exampleListing && (
                     <div className="text-muted">
-                      Matched to{" "}
-                      <Link href={`/bottle/${match.id}`} className="underline">
-                        {match.fullName}
+                      {" "}
+                      <Link
+                        href={item.exampleListing.url}
+                        target="_blank"
+                        className="underline"
+                      >
+                        {item.exampleListing.site.name}
                       </Link>
                     </div>
                   )}
@@ -100,6 +103,7 @@ export default function Page() {
       <BottleSelector
         open={!!unmatchedBottle}
         name={unmatchedBottle?.name}
+        source={unmatchedBottle?.exampleListing?.url}
         returnTo={pathname}
         onClose={() => {
           setUnmatchedBottle(null);

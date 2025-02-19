@@ -108,6 +108,7 @@ import tastingImageDelete from "./routes/tastingImageDelete";
 import tastingList from "./routes/tastingList";
 import tastingUpdate from "./routes/tastingUpdate";
 import toastCreate from "./routes/toastCreate";
+import unmatchedBottleList from "./routes/unmatchedBottleList";
 import userBadgeList from "./routes/userBadgeList";
 import userById from "./routes/userById";
 import userList from "./routes/userList";
@@ -224,6 +225,7 @@ export const appRouter = router({
   tastingImageDelete,
   tastingUpdate,
   toastCreate,
+  unmatchedBottleList,
   userBadgeList,
   userById,
   userList,

@@ -4,7 +4,11 @@ import config from "../config";
 import { db } from "../db";
 import type { ExternalSite, StorePrice, User } from "../db/schema";
 import { absoluteUrl } from "../lib/urls";
-import type { BottlePriceChangeSchema, StorePriceSchema } from "../schemas";
+import type {
+  BottlePriceChangeSchema,
+  ExternalSiteSchema,
+  StorePriceSchema,
+} from "../schemas";
 import type { Currency } from "../types";
 import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
@@ -68,7 +72,9 @@ export const StorePriceWithSiteSerializer = serializer({
     item: StorePrice & { externalSite: ExternalSite },
     attrs: Record<string, any>,
     currentUser?: User,
-  ): z.infer<typeof StorePriceSchema> => {
+  ): z.infer<typeof StorePriceSchema> & {
+    site: z.infer<typeof ExternalSiteSchema>;
+  } => {
     // add a referrer marker to the URL in case upstream sites want to track
     // where the traffic is coming from
     const affUrl =
