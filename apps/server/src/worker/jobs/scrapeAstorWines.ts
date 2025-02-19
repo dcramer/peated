@@ -22,7 +22,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
     const productUrl = $("a.item-name", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");
 
-    const volumeRaw = $(".teaser__item__meta__2 > div").last().text();
+    const volumeRaw = $(".teaser__item__meta__2 > div", el).last().text();
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;
     if (!volume) {
       console.warn(`Invalid size: ${volumeRaw}`);
