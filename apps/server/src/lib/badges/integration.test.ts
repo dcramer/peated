@@ -162,13 +162,13 @@ describe("badge integration test", () => {
       .select()
       .from(badgeAwardTrackedObjects)
       .orderBy(asc(badgeAwardTrackedObjects.id));
+    expect(trackedList.length).toEqual(3);
     expect(trackedList[0].objectType === "region");
     expect(trackedList[0].objectId === regionKy.id);
     expect(trackedList[1].objectType === "region");
     expect(trackedList[1].objectId === regionTn.id);
     expect(trackedList[2].objectType === "region");
     expect(trackedList[2].objectId === regionTx.id);
-    expect(trackedList.length).toEqual(3);
 
     expect(awardList[0].xp).toEqual(3);
     expect(awardList[0].level).toEqual(0);
