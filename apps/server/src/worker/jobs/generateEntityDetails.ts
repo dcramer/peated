@@ -70,7 +70,7 @@ Its valid to include all three values in 'type' if they are accurate, but at lea
 
 export const OpenAIEntityDetailsSchema = z.object({
   description: z.string().nullable().optional(),
-  yearEstablished: z.number().nullable().optional(),
+  yearEstablished: z.string().nullable().optional(),
   website: z.string().url().nullable().optional(),
   type: z.array(z.string()).optional(),
 });
@@ -154,7 +154,7 @@ export default async ({
   }
 
   if (!entity.yearEstablished && result.yearEstablished)
-    data.yearEstablished = result.yearEstablished;
+    data.yearEstablished = parseInt(result.yearEstablished, 10);
 
   if (!entity.website && result.website) data.website = result.website;
 
