@@ -13,7 +13,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { bottles, bottlesToDistillers, countries } from ".";
 import { tsvector } from "../columns";
-import { geometry_point } from "../columns/geoemetry";
+import { geometry_point } from "../columns/geometry";
 import { contentSourceEnum } from "./enums";
 import { regions } from "./regions";
 import { users } from "./users";

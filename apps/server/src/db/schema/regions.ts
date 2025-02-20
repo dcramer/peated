@@ -7,7 +7,7 @@ import {
   text,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { geometry_point } from "../columns/geoemetry";
+import { geometry_point } from "../columns/geometry";
 import { countries } from "./countries";
 import { contentSourceEnum } from "./enums";
 

@@ -6,7 +6,7 @@ type LatLng = [number, number];
 
 type GeometryPointType = Point | LatLng | string;
 
-type GeoemetryPointGeoJson = {
+type GeometryPointGeoJson = {
   type: "Point";
   coordinates: {
     lat: number;
@@ -50,7 +50,7 @@ export function geometry_point(name: string) {
       return "geometry(Point, 4326)";
     },
 
-    fromDriver(value: string | GeoemetryPointGeoJson): LatLng {
+    fromDriver(value: string | GeometryPointGeoJson): LatLng {
       if (typeof value === "string") {
         const parsed = wkx.Geometry.parse(
           Buffer.from(value, "hex"),

@@ -1,2 +1,2 @@
-export * from "./geoemetry";
+export * from "./geometry";
 export * from "./tsvector";
