@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import Chip from "@peated/web/components/chip";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
@@ -7,11 +8,13 @@ import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { trpc } from "@peated/web/lib/trpc/client";
 
-export default function EntityAliases({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export default function EntityAliases(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { entityId } = params;
+
   const { user } = useAuth();
   const [aliasList] = trpc.entityAliasList.useSuspenseQuery({
     entity: Number(entityId),

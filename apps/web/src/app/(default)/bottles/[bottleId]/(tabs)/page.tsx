@@ -3,11 +3,13 @@ import BottleStats from "@peated/web/components/bottleStats";
 import { summarize } from "@peated/web/lib/markdown";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
-export async function generateMetadata({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ bottleId: string }>;
 }) {
+  const params = await props.params;
+
+  const { bottleId } = params;
+
   const trpcClient = await getTrpcClient();
   const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
@@ -29,11 +31,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function BottleDetails({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
+export default async function BottleDetails(props: {
+  params: Promise<{ bottleId: string }>;
 }) {
+  const params = await props.params;
+
+  const { bottleId } = params;
+
   const trpcClient = await getTrpcClient();
   const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
