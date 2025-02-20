@@ -68,14 +68,21 @@ Its valid to include all three values in 'type' if they are accurate, but at lea
 `;
 }
 
+
 export const OpenAIEntityDetailsSchema = z.object({
   description: z.string().nullable().optional(),
-  yearEstablished: z.string().nullable().optional(),
+  yearEstablished: z.preprocess(
+    (val) => (typeof val === 'string' && val ? parseInt(val, 10) : val),
+    z.number().nullable().optional()
+  ),
   website: z.string().url().nullable().optional(),
   type: z.array(z.string()).optional(),
 });
 
-const OpenAIEntityDetailsValidationSchema = OpenAIEntityDetailsSchema.extend({
+const OpenAIEntityDetailsValidationSchema = z.object({
+  description: z.string().nullable().optional(),
+  yearEstablished: z.number().nullable().optional(),
+  website: z.string().url().nullable().optional(),
   type: z.array(EntityTypeEnum).optional(),
 });
 
@@ -154,7 +161,7 @@ export default async ({
   }
 
   if (!entity.yearEstablished && result.yearEstablished)
-    data.yearEstablished = parseInt(result.yearEstablished, 10);
+    data.yearEstablished = result.yearEstablished; // Now already a number from schema conversion
 
   if (!entity.website && result.website) data.website = result.website;
 
