@@ -14,6 +14,7 @@ import BottleIcon from "@peated/web/assets/bottle.svg";
 import BottlerIcon from "@peated/web/assets/bottler.svg";
 import BrandIcon from "@peated/web/assets/brand.svg";
 import DistillerIcon from "@peated/web/assets/distiller.svg";
+import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import config from "@peated/web/config";
 import { usePathname } from "next/navigation";
 import Button from "./button";
@@ -47,7 +48,7 @@ export default function Sidebar() {
                       pathname === "/" || pathname.startsWith("/activity/")
                     }
                   >
-                    Activity
+                    Home
                   </SidebarLink>
                   <SidebarLink
                     href="/favorites"
@@ -55,6 +56,13 @@ export default function Sidebar() {
                     active={pathname.startsWith("/favorites")}
                   >
                     Favorites
+                  </SidebarLink>
+                  <SidebarLink
+                    href="/tastings"
+                    icon={PeatedGlyph}
+                    active={pathname.startsWith("/tastings")}
+                  >
+                    Tastings
                   </SidebarLink>
                   <SidebarLink
                     href="/friends"
