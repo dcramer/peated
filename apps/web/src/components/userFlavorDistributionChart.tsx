@@ -27,7 +27,9 @@ function UserFlavorDistributionElement({ userId }: { userId: number }) {
         flavorProfile: t.flavorProfile,
       }))}
       totalCount={totalCount}
-      href={(item) => `/bottles?flavorProfile=${encodeURIComponent(item.name)}`}
+      href={(item) =>
+        `/bottles?flavorProfile=${encodeURIComponent(item.flavorProfile)}`
+      }
     />
   );
 }
