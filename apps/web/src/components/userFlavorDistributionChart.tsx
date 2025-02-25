@@ -17,16 +17,16 @@ function UserFlavorDistributionElement({ userId }: { userId: number }) {
     user: userId,
   });
 
-  const { results, totalScore } = data;
+  const { results, totalCount } = data;
 
   return (
     <DistributionChart
       items={results.map((t) => ({
         name: formatFlavorProfile(t.flavorProfile),
-        count: t.score,
+        count: t.count,
         flavorProfile: t.flavorProfile,
       }))}
-      totalCount={totalScore}
+      totalCount={totalCount}
       href={(item) =>
         `/bottles?flavorProfile=${encodeURIComponent(item.flavorProfile)}`
       }
