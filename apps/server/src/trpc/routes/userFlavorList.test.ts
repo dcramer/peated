@@ -37,15 +37,26 @@ test("lists flavor profiles", async ({ defaults, fixtures }) => {
   });
 
   const caller = createCaller({ user: defaults.user });
-  const { results, totalCount } = await caller.userFlavorList({
+  const { results, totalCount, totalScore } = await caller.userFlavorList({
     user: "me",
   });
 
   expect(totalCount).toEqual(3);
-  expect(results).toEqual([
-    { flavorProfile: "peated", count: 2 },
-    { flavorProfile: "juicy_oak_vanilla", count: 1 },
-  ]);
+  expect(totalScore).toEqual(12);
+  expect(results).toMatchInlineSnapshot(`
+    [
+      {
+        "count": 2,
+        "flavorProfile": "peated",
+        "score": 8,
+      },
+      {
+        "count": 1,
+        "flavorProfile": "juicy_oak_vanilla",
+        "score": 4,
+      },
+    ]
+  `);
 });
 
 test("cannot list private without friend", async ({ fixtures }) => {
@@ -110,11 +121,20 @@ test("handles null flavor profiles", async ({ defaults, fixtures }) => {
   });
 
   const caller = createCaller({ user: defaults.user });
-  const { results, totalCount } = await caller.userFlavorList({
+  const { results, totalCount, totalScore } = await caller.userFlavorList({
     user: "me",
   });
 
   expect(totalCount).toEqual(2);
+  expect(totalScore).toEqual(9);
   // Only the non-null flavor profile should be counted
-  expect(results).toEqual([{ flavorProfile: "lightly_peated", count: 1 }]);
+  expect(results).toMatchInlineSnapshot(`
+    [
+      {
+        "count": 1,
+        "flavorProfile": "lightly_peated",
+        "score": 5,
+      },
+    ]
+  `);
 });

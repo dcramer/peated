@@ -28,39 +28,46 @@ export default publicProcedure
       });
     }
 
-    const results = await db.execute<{ flavor: string; count: string }>(
+    const results = await db.execute<{
+      flavor: string;
+      count: string;
+      score: string;
+    }>(
       sql<{
         flavor: string;
         count: string;
-      }>`SELECT flavor, COUNT(flavor) as count
+      }>`SELECT flavor, COUNT(flavor) as count, SUM(rating) as score
     FROM (
-      SELECT ${bottles.flavorProfile} as flavor
+      SELECT ${bottles.flavorProfile} as flavor, ${tastings.rating} as rating
       FROM ${bottles}
       JOIN ${tastings} ON ${bottles.id} = ${tastings.bottleId}
       WHERE ${tastings.createdById} = ${user.id}
       AND ${bottles.flavorProfile} IS NOT NULL
     ) as t
     GROUP BY flavor
-    ORDER BY count DESC
+    ORDER BY score DESC, count DESC
     LIMIT 25`,
     );
 
-    const totalCount = Number(
-      (
-        await db.execute<{ count: string }>(
-          sql<{ count: number }>`SELECT COUNT(*) as count
+    const { count: totalCount, score: totalScore } = (
+      await db.execute<{ count: string; score: string }>(
+        sql<{
+          count: number;
+          score: number;
+        }>`SELECT COUNT(*) as count, SUM(${tastings.rating}) as score
         FROM ${tastings}
         WHERE ${tastings.createdById} = ${user.id}
       `,
-        )
-      ).rows[0]!.count,
-    );
+      )
+    ).rows[0];
 
     return {
-      results: results.rows.map(({ flavor, count }) => ({
+      results: results.rows.map(({ flavor, count, score }) => ({
         flavorProfile: flavor,
         count: Number(count),
+        score: Number(score),
       })),
-      totalCount,
+      totalScore: Number(totalScore),
+      totalCount: Number(totalCount),
     };
   });
