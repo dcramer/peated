@@ -1,5 +1,6 @@
 "use client";
 
+import { formatFlavorProfile } from "@peated/server/lib/format";
 import { trpc } from "@peated/web/lib/trpc/client";
 import type { ComponentProps } from "react";
 import { Suspense } from "react";
@@ -21,7 +22,7 @@ function UserFlavorDistributionElement({ userId }: { userId: number }) {
   return (
     <DistributionChart
       items={results.map((t) => ({
-        name: t.flavorProfile,
+        name: formatFlavorProfile(t.flavorProfile),
         count: t.count,
         flavorProfile: t.flavorProfile,
       }))}
