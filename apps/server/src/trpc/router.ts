@@ -111,6 +111,7 @@ import toastCreate from "./routes/toastCreate";
 import unmatchedBottleList from "./routes/unmatchedBottleList";
 import userBadgeList from "./routes/userBadgeList";
 import userById from "./routes/userById";
+import userFlavorList from "./routes/userFlavorList";
 import userList from "./routes/userList";
 import userRegionList from "./routes/userRegionList";
 import userTagList from "./routes/userTagList";
@@ -228,6 +229,7 @@ export const appRouter = router({
   unmatchedBottleList,
   userBadgeList,
   userById,
+  userFlavorList,
   userList,
   userRegionList,
   userTagList,

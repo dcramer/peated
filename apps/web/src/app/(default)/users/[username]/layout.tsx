@@ -4,6 +4,7 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UserAvatar from "@peated/web/components/userAvatar";
+import UserFlavorDistributionChart from "@peated/web/components/userFlavorDistributionChart";
 import UserLocationChart from "@peated/web/components/userLocationChart";
 import UserTagDistribution from "@peated/web/components/userTagDistribution";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
@@ -129,7 +130,7 @@ export default async function Layout({
           </div>
           <div className="grid-cols mb-4 hidden grid-cols-1 gap-4 px-3 lg:grid lg:grid-cols-2 lg:px-0">
             <UserLocationChart userId={user.id} />
-            <UserTagDistribution userId={user.id} />
+            <UserFlavorDistributionChart userId={user.id} />
           </div>
           <div className="hidden lg:block">
             <Tabs fullWidth border>
