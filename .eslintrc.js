@@ -19,7 +19,7 @@ module.exports = {
   rules: {
     "react/no-unescaped-entities": "off",
     "react/jsx-uses-react": 1,
-    "react/react-in-jsx-scope": 1,
+    "react/react-in-jsx-scope": "off",
     "react/display-name": "off",
     "react-hooks/exhaustive-deps": "off",
     "@typescript-eslint/consistent-type-imports": "error",

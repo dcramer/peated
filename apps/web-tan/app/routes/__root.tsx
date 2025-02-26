@@ -1,138 +1,161 @@
-import { DefaultCatchBoundary } from "@peated/web/components/DefaultCatchBoundary.js";
-import { NotFound } from "@peated/web/components/NotFound.js";
-import appCss from "@peated/web/styles/app.css?url";
-import { seo } from "@peated/web/utils/seo.js";
-import { useAppSession } from "@peated/web/utils/session.js";
+import "@fontsource/raleway/index.css";
+import { type User } from "@peated/server/types";
+import config from "@peated/web/config";
+import "@peated/web/styles/index.css";
+import { setUser } from "@sentry/browser";
 import {
-  Link,
-  Outlet,
-  ScrollRestoration,
   createRootRoute,
+  HeadContent,
+  Outlet,
+  Scripts,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { Meta, Scripts, createServerFn } from "@tanstack/start";
-import * as React from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
-const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
-  // We need to auth on the server so we have access to secure cookies
-  const session = await useAppSession();
+// Import providers and other components
+import FlashMessages from "@peated/web/components/flash";
+import { ApiProvider } from "@peated/web/hooks/useApi";
+import { AuthProvider } from "@peated/web/hooks/useAuth";
+import { OnlineStatusProvider } from "@peated/web/hooks/useOnlineStatus";
+import TRPCProvider from "@peated/web/lib/trpc/provider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Fathom from "../components/Fathom";
 
-  if (!session.data.userEmail) {
-    return null;
-  }
+// Session type definition
+interface SessionData {
+  user: User | null;
+  accessToken: string | null;
+  ts: number | null;
+}
 
-  return {
-    email: session.data.userEmail,
-  };
-});
+// Providers component
+function Providers({
+  children,
+  session,
+}: {
+  children: React.ReactNode;
+  session: SessionData;
+}) {
+  const { user, accessToken } = session;
+
+  // Create a new QueryClient instance
+  const [queryClient] = useState(() => new QueryClient());
+
+  setUser(
+    user
+      ? {
+          id: `${user?.id}`,
+          username: user?.username,
+          email: user?.email,
+        }
+      : null,
+  );
+
+  // Note: Session syncing would need to be implemented differently in TanStack
+  // useInterval(() => {
+  //   // Implement session syncing logic here
+  // }, 60000);
+
+  return (
+    <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
+      <TRPCProvider
+        apiServer={config.API_SERVER}
+        accessToken={accessToken}
+        key={accessToken}
+      >
+        <QueryClientProvider client={queryClient}>
+          <OnlineStatusProvider>
+            <AuthProvider user={user}>
+              <ApiProvider accessToken={accessToken} server={config.API_SERVER}>
+                <FlashMessages>{children}</FlashMessages>
+              </ApiProvider>
+            </AuthProvider>
+          </OnlineStatusProvider>
+        </QueryClientProvider>
+      </TRPCProvider>
+    </GoogleOAuthProvider>
+  );
+}
 
 export const Route = createRootRoute({
   head: () => ({
+    title: "Peated",
     meta: [
       {
         charSet: "utf-8",
       },
       {
         name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      ...seo({
-        title:
-          "TanStack Start | Type-Safe, Client-First, Full-Stack React Framework",
-        description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
-      }),
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      {
-        rel: "apple-touch-icon",
-        sizes: "180x180",
-        href: "/apple-touch-icon.png",
+        content: `width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=false`,
       },
       {
-        rel: "icon",
-        type: "image/png",
-        sizes: "32x32",
-        href: "/favicon-32x32.png",
+        name: "description",
+        content: config.DESCRIPTION,
       },
       {
-        rel: "icon",
-        type: "image/png",
-        sizes: "16x16",
-        href: "/favicon-16x16.png",
+        name: "theme-color",
+        content: config.THEME_COLOR,
       },
-      { rel: "manifest", href: "/site.webmanifest", color: "#fffff" },
-      { rel: "icon", href: "/favicon.ico" },
+      {
+        property: "og:site_name",
+        content: "Peated",
+      },
     ],
   }),
-  beforeLoad: async () => {
-    const user = await fetchUser();
-
-    return {
-      user,
-    };
-  },
-  errorComponent: (props) => {
-    return (
-      <RootDocument>
-        <DefaultCatchBoundary {...props} />
-      </RootDocument>
-    );
-  },
-  notFoundComponent: () => <NotFound />,
   component: RootComponent,
 });
 
 function RootComponent() {
+  // In TanStack Router, we need to handle session client-side
+  // This is a simplified version - you'll need to implement actual session fetching
+  const [session, setSession] = useState<SessionData>({
+    user: null,
+    accessToken: null,
+    ts: null,
+  });
+
+  // Fetch session on mount
+  useEffect(() => {
+    async function fetchSession() {
+      try {
+        // Replace this with your actual session fetching logic
+        const response = await fetch("/api/session");
+        if (response.ok) {
+          const sessionData = await response.json();
+          setSession(sessionData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch session:", error);
+      }
+    }
+
+    fetchSession();
+  }, []);
+
   return (
     <RootDocument>
-      <Outlet />
+      <Providers session={session}>
+        <Outlet />
+
+        {config.FATHOM_SITE_ID && (
+          <Fathom
+            siteId={config.FATHOM_SITE_ID}
+            includedDomains={["peated.com"]}
+          />
+        )}
+      </Providers>
     </RootDocument>
   );
 }
 
-function RootDocument({ children }: { children: React.ReactNode }) {
-  const { user } = Route.useRouteContext();
-
+function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html>
+    <html lang="en">
       <head>
-        <Meta />
+        <HeadContent />
       </head>
-      <body>
-        <div className="flex gap-2 p-2 text-lg">
-          <Link
-            to="/"
-            activeProps={{
-              className: "font-bold",
-            }}
-            activeOptions={{ exact: true }}
-          >
-            Home
-          </Link>{" "}
-          <Link
-            to="/posts"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Posts
-          </Link>
-          <div className="ml-auto">
-            {user ? (
-              <>
-                <span className="mr-2">{user.email}</span>
-                <Link to="/logout">Logout</Link>
-              </>
-            ) : (
-              <Link to="/login">Login</Link>
-            )}
-          </div>
-        </div>
-        <hr />
+      <body className="h-full">
         {children}
-        <ScrollRestoration />
-        <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
       </body>
     </html>

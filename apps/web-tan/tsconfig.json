@@ -11,12 +11,14 @@
     "isolatedModules": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "strictNullChecks": true,
     "target": "ES2022",
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@peated/web/*": ["./app/*"],
+      "@peated/web-tan/*": ["./app/*"],
+      "@peated/web/*": ["../../apps/web/src/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     },
     "noEmit": true
