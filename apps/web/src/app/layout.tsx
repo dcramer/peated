@@ -6,6 +6,7 @@ import "@peated/web/styles/index.css";
 import { setUser } from "@sentry/nextjs";
 import type { Metadata, Viewport } from "next";
 import React from "react";
+import { ReactScan } from "../components/reactScan";
 import Providers from "./providers/providers";
 
 // default behavior is to disable cache, as it breaks quite a few flows
@@ -57,6 +58,11 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <ReactScan
+        enabled={
+          !!session.user?.admin || process.env.NODE_ENV === "development"
+        }
+      />
       <body className="h-full">
         <Providers
           session={{
