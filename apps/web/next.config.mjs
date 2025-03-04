@@ -31,6 +31,13 @@ export default withSentryConfig(nextConfig, {
   // org: "peated",
   // project: "peated",
 
+  release: {
+    create: true,
+    setCommits: {
+      auto: true,
+    },
+  },
+
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 
