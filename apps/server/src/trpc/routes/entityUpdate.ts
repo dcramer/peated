@@ -50,6 +50,22 @@ export default modProcedure
     }
 
     if (input.parent !== undefined && input.parent !== entity.parentId) {
+      // Check for circular reference
+      let parentId = input.parent;
+      while (parentId) {
+        const [parent] = await db
+          .select()
+          .from(entities)
+          .where(eq(entities.id, parentId));
+        if (!parent) break;
+        if (parent.id === entity.id) {
+          throw new TRPCError({
+            message: "Cannot create circular reference in entity hierarchy.",
+            code: "BAD_REQUEST",
+          });
+        }
+        parentId = parent.parentId;
+      }
       data.parentId = input.parent;
     }
 
