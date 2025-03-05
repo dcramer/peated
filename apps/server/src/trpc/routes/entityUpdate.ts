@@ -70,21 +70,20 @@ export default modProcedure
     }
 
     if (input.country) {
-        const [country] = await db
-          .select()
-          .from(countries)
-          .where(eq(countries.id, input.country))
-          .limit(1);
-        if (!country) {
-          throw new TRPCError({
-            message: "Country not found.",
-            code: "NOT_FOUND",
-          });
-        }
-        if (country.id !== entity.countryId) {
-          data.countryId = country.id;
-          data.regionId = null;
-        }
+      const [country] = await db
+        .select()
+        .from(countries)
+        .where(eq(countries.id, input.country))
+        .limit(1);
+      if (!country) {
+        throw new TRPCError({
+          message: "Country not found.",
+          code: "NOT_FOUND",
+        });
+      }
+      if (country.id !== entity.countryId) {
+        data.countryId = country.id;
+        data.regionId = null;
       }
     } else if (input.country === null) {
       if (entity.countryId) {
