@@ -4,7 +4,7 @@ packages:
   - '!**/test/**'
 
 catalog:
-  drizzle-kit: ^0.23.0
+  drizzle-kit: ^0.30.5
   drizzle-orm: ^0.39.3
   eslint: ^8.57.0
   "@fontsource/raleway": ^5.0.19

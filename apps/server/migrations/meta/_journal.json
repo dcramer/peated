@@ -1037,6 +1037,13 @@
       "when": 1724438534690,
       "tag": "0147_strong_tombstone",
       "breakpoints": false
+    },
+    {
+      "idx": 148,
+      "version": "7",
+      "when": 1741136710751,
+      "tag": "0148_bitter_synch",
+      "breakpoints": false
     }
   ]
 }

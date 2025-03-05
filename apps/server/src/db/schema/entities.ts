@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  foreignKey,
   index,
   pgEnum,
   pgTable,
@@ -33,6 +34,8 @@ export const entities = pgTable(
 
     name: text("name").notNull(),
     shortName: text("short_name"),
+
+    parentId: bigint("parent_id", { mode: "number" }),
 
     searchVector: tsvector("search_vector"),
 
@@ -73,6 +76,11 @@ export const entities = pgTable(
         "btree",
         sql`LOWER(${table.name})`,
       ),
+      parentReference: foreignKey({
+        name: "entity_parent_fk",
+        columns: [table.parentId],
+        foreignColumns: [table.id],
+      }),
       searchVectorIndex: index("entity_search_idx").using(
         "gin",
         table.searchVector,
