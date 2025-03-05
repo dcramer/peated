@@ -99,6 +99,7 @@ export default async function mergeEntity({
       })
       .where(inArray(bottlesToDistillers.distillerId, fromEntityIds));
 
+    // Create tombstones before deleting entities
     for (const id of fromEntityIds) {
       await tx.insert(entityTombstones).values({
         entityId: id,
@@ -106,6 +107,22 @@ export default async function mergeEntity({
       });
     }
 
+    // Check for any remaining entity aliases and update them before deleting entities
+    const remainingAliases = await tx
+      .select()
+      .from(entityAliases)
+      .where(inArray(entityAliases.entityId, fromEntityIds));
+
+    if (remainingAliases.length > 0) {
+      await tx
+        .update(entityAliases)
+        .set({
+          entityId: toEntity.id,
+        })
+        .where(inArray(entityAliases.entityId, fromEntityIds));
+    }
+
+    // Now it's safe to delete the entities
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
   });
 
