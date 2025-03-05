@@ -70,7 +70,6 @@ export default modProcedure
     }
 
     if (input.country) {
-      if (input.country) {
         const [country] = await db
           .select()
           .from(countries)
