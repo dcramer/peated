@@ -7,11 +7,16 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 // type Model = "gpt-3.5-turbo" | "gpt-4";
 
+type Message = {
+  role: "system" | "user";
+  content: string;
+};
+
 const DEFAULT_MODEL: string = config.OPENAI_MODEL;
 
 export async function getStructuredResponse<Schema extends ZodSchema<any>>(
   pipelineName: string,
-  prompt: string,
+  prompt: string | Message[],
   schema: Schema,
   fullSchema?: undefined | null,
   model?: string,
@@ -22,7 +27,7 @@ export async function getStructuredResponse<
   FullSchema extends ZodSchema<any>,
 >(
   pipelineName: string,
-  prompt: string,
+  prompt: string | Message[],
   schema: Schema,
   fullSchema: FullSchema,
   model?: string,
@@ -33,7 +38,7 @@ export async function getStructuredResponse<
   FullSchema extends ZodSchema<any>,
 >(
   pipelineName: string,
-  prompt: string,
+  prompt: string | Message[],
   schema: Schema,
   fullSchema: FullSchema | null = null,
   model = DEFAULT_MODEL,
@@ -46,6 +51,26 @@ export async function getStructuredResponse<
     project: config.OPENAI_PROJECT,
   });
 
+  const messages: Message[] = [
+    {
+      role: "system",
+      content: [
+        "Your job is to accurately describe information about the whiskey industry as if you were a whisky sommelier. You do not embellish descriptions, and instead focus on concise, professional responses.",
+        `The output format should strictly follow JSON schema:\n${zodToJsonSchema(
+          schema,
+        )}`,
+      ].join("\n"),
+    },
+  ];
+  if (typeof prompt === "string") {
+    messages.push({
+      role: "user",
+      content: prompt,
+    });
+  } else {
+    messages.push(...prompt);
+  }
+
   // https://wundergraph.com/blog/return_json_from_openai
   const completion = await startSpan(
     {
@@ -53,25 +78,6 @@ export async function getStructuredResponse<
       name: "getStructuredResponse",
     },
     async (span) => {
-      const messages: {
-        role: "system" | "user";
-        content: string;
-      }[] = [
-        {
-          role: "system",
-          content: [
-            "Your job is to accurately describe information about the whiskey industry as if you were a whisky sommelier. You do not embellish descriptions, and instead focus on concise, professional responses.",
-            `The output format should strictly follow JSON schema:\n${zodToJsonSchema(
-              schema,
-            )}`,
-          ].join("\n"),
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ];
-
       span.setAttribute("ai.pipeline.name", pipelineName);
       span.setAttribute("ai.input_messages", JSON.stringify(messages));
       span.setAttribute("ai.model_id", model);
@@ -117,14 +123,14 @@ export async function getStructuredResponse<
     logError(
       err,
       {
-        ...logContext,
+        ...(logContext || {}),
         openai: {
           completionId: completion.id,
           ...completion.usage,
         },
       },
       {
-        "prompt.txt": prompt,
+        "messages.json": JSON.stringify(messages),
         "output.txt": output,
       },
     );
@@ -137,14 +143,14 @@ export async function getStructuredResponse<
     logError(
       err,
       {
-        ...logContext,
+        ...(logContext || {}),
         openai: {
           completionId: completion.id,
           ...completion.usage,
         },
       },
       {
-        "prompt.txt": prompt,
+        "messages.json": JSON.stringify(messages),
         "output.json": output,
       },
     );
