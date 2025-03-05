@@ -31,13 +31,6 @@ export default withSentryConfig(nextConfig, {
   // org: "peated",
   // project: "peated",
 
-  release: {
-    create: true,
-    setCommits: {
-      auto: true,
-    },
-  },
-
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
