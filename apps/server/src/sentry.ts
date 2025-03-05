@@ -10,6 +10,10 @@ if (config.ENV !== "test") {
     spotlight: config.ENV === "development",
     includeLocalVariables: true,
     sendDefaultPii: true,
+
+    _experiments: {
+      enableLogs: true,
+    },
   });
 
   Sentry.setTag("service", config.SENTRY_SERVICE);

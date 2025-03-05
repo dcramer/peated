@@ -1,18 +1,17 @@
 import { defaultHeaders } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { bottles, storePrices } from "@peated/server/db/schema";
-import {
-  compressAndResizeImage,
-  copyFile,
-  storeFile,
-} from "@peated/server/lib/uploads";
+import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
+import * as Sentry from "@sentry/core";
 import { eq } from "drizzle-orm";
 import { Readable } from "stream";
+
+const { info, fmt } = Sentry._experiment_log; // Temporary destructuring while this is experimental
 
 async function fetchAndStoreImage(imageUrl: string): Promise<string | null> {
   const filename = imageUrl.split("/").pop() || "image";
 
-  console.log(`Fetching image [${imageUrl}]`);
+  info(fmt`Fetching image [${imageUrl}]`);
   const req = await fetch(imageUrl, { headers: defaultHeaders(imageUrl) });
   if (!req.body) return null;
   const file = Readable.fromWeb(req.body as any);

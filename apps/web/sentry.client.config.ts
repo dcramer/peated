@@ -23,6 +23,10 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
+
+  _experiments: {
+    enableLogs: true,
+  },
 });
 
 Sentry.setTag("service", "@peated/web");

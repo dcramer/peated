@@ -9,6 +9,10 @@ Sentry.init({
   ...SharedSentryConfig,
 
   spotlight: process.env.NODE_ENV === "development",
+
+  _experiments: {
+    enableLogs: true,
+  },
 });
 
 Sentry.setTag("service", "@peated/web");
