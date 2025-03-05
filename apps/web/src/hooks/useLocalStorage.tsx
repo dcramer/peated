@@ -17,7 +17,7 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // If error also return initialValue
-      info(error);
+      info(error as string);
       return initialValue;
     }
   });
@@ -36,7 +36,7 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
       }
     } catch (error) {
       // A more advanced implementation would handle the error case
-      console.error(error);
+      info(error as string);
     }
   };
   return [storedValue, setValue] as const;
