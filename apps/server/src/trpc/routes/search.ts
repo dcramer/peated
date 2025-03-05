@@ -25,7 +25,7 @@ export type Result = BottleResult | UserResult | EntityResult;
 const INCLUDE_LIST = ["bottles", "entities", "users"] as const;
 
 function sortResults(query: string, unsortedResults: Result[]) {
-  const exactMatches: number[] = [];
+  const exactMatches: { index: number; type: string }[] = [];
   const lowerQuery = query.toLowerCase();
   unsortedResults.forEach((value, index) => {
     if (value.type === "entity") {
@@ -33,27 +33,36 @@ function sortResults(query: string, unsortedResults: Result[]) {
         value.ref.name.toLowerCase() === lowerQuery ||
         value.ref.shortName?.toLowerCase() === lowerQuery
       ) {
-        exactMatches.push(index);
+        exactMatches.push({ index, type: "entity" });
       }
     } else if (value.type === "user") {
       if (value.ref.username.toLowerCase() === lowerQuery) {
-        exactMatches.push(index);
+        exactMatches.push({ index, type: "user" });
       }
     } else {
       if (
         value.ref.fullName.toLowerCase() === lowerQuery ||
         value.ref.name.toLowerCase() === lowerQuery
       ) {
-        exactMatches.push(index);
+        exactMatches.push({ index, type: "bottle" });
       }
     }
   });
 
-  const results = [...unsortedResults];
-  exactMatches.forEach((resultIndex, index) => {
-    const item = results.splice(resultIndex, 1);
-    results.unshift(...item);
+  // Sort exact matches to prioritize bottles first
+  exactMatches.sort((a, b) => {
+    if (a.type === "bottle" && b.type !== "bottle") return -1;
+    if (a.type !== "bottle" && b.type === "bottle") return 1;
+    return 0;
   });
+
+  const results = [...unsortedResults];
+  // Process in reverse order to maintain correct positions after splicing
+  for (let i = exactMatches.length - 1; i >= 0; i--) {
+    const { index } = exactMatches[i];
+    const item = results.splice(index, 1);
+    results.unshift(...item);
+  }
   return results;
 }
 
