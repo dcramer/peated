@@ -395,15 +395,11 @@ export const Bottle = async (
       }
     }
 
-    // Use onConflictDoNothing to handle potential duplicate bottle aliases
-    await tx
-      .insert(bottleAliases)
-      .values({
-        bottleId: bottle.id,
-        name: bottle.fullName,
-        createdAt: bottle.createdAt,
-      })
-      .onConflictDoNothing();
+    await tx.insert(bottleAliases).values({
+      bottleId: bottle.id,
+      name: bottle.fullName,
+      createdAt: bottle.createdAt,
+    });
 
     await tx.insert(changes).values({
       objectId: bottle.id,
