@@ -20,7 +20,7 @@ export default async function scrapeWhiskeyAdvocate() {
     return;
   }
 
-  info(fmt`Found ${issueList.length} issues`);
+  info(fmt`Found ${String(issueList.length)} issues`);
 
   const processedIssues = process.env.ACCESS_TOKEN
     ? await trpcClient.externalSiteConfigGet.query({
@@ -36,7 +36,7 @@ export default async function scrapeWhiskeyAdvocate() {
     return;
   }
 
-  info(fmt`Found ${issueList.length} new issues`);
+  info(fmt`Found ${String(issueList.length)} new issues`);
 
   for (const issueName of newIssues) {
     info(fmt`Fetching reviews for issue [${issueName}]`);
