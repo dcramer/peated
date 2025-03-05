@@ -46,7 +46,13 @@ export const EntityInputSchema = EntitySchema.omit({
 }).extend({
   country: z.number().nullish().default(null),
   region: z.number().nullish().default(null),
-  parent: z.number().nullish().default(null),
+  parent: z
+    .number()
+    .nullish()
+    .default(null)
+    .refine((val) => val === null || val === undefined || val > 0, {
+      message: "Parent entity ID must be a positive number",
+    }),
 });
 
 export const EntityMergeSchema = z.object({

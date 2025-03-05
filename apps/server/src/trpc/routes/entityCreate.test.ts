@@ -90,3 +90,19 @@ test("creates a new entity with parent", async ({ fixtures }) => {
 
   expect(childEntity.parentId).toEqual(parentEntity.id);
 });
+
+test("fails with invalid parent entity ID", async ({ fixtures }) => {
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+
+  const nonExistentParentId = 999999; // A parent ID that doesn't exist
+
+  const err = await waitError(
+    caller.entityCreate({
+      name: "Child Entity",
+      parent: nonExistentParentId,
+    }),
+  );
+
+  expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+  expect(err.message).toContain("Parent entity not found");
+});

@@ -445,6 +445,17 @@ test("can change parent", async ({ fixtures }) => {
     omit(newEntity, "parentId", "searchVector", "updatedAt"),
   );
   expect(newEntity.parentId).toBe(parentEntity.id);
+
+  // Verify that the change is recorded in the changes table
+  const [change] = await db
+    .select()
+    .from(changes)
+    .where(eq(changes.objectId, newEntity.id))
+    .orderBy(desc(changes.id))
+    .limit(1);
+
+  expect(change).toBeDefined();
+  expect(change.data).toHaveProperty("parentId", parentEntity.id);
 });
 
 test("can remove parent", async ({ fixtures }) => {
@@ -516,4 +527,23 @@ test("prevents deep circular parent references", async ({ fixtures }) => {
 
   expect(err).toMatchInlineSnapshot(`[TRPCError: BAD_REQUEST]`);
   expect(err.message).toContain("circular reference");
+});
+
+test("fails with invalid parent entity ID", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+  const nonExistentParentId = 999999; // A parent ID that doesn't exist
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  const err = await waitError(
+    caller.entityUpdate({
+      entity: entity.id,
+      parent: nonExistentParentId,
+    }),
+  );
+
+  expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+  expect(err.message).toContain("Parent entity not found");
 });

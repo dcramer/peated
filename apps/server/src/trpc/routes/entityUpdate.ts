@@ -57,7 +57,12 @@ export default modProcedure
           .select()
           .from(entities)
           .where(eq(entities.id, parentId));
-        if (!parent) break;
+        if (!parent) {
+          throw new TRPCError({
+            message: "Parent entity not found.",
+            code: "NOT_FOUND",
+          });
+        }
         if (parent.id === entity.id) {
           throw new TRPCError({
             message: "Cannot create circular reference in entity hierarchy.",
