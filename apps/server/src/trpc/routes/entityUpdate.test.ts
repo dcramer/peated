@@ -417,3 +417,103 @@ test("updates existing conflicting alias", async ({ fixtures }) => {
   expect(newAlias.name).toEqual("Cool Cats Single Barrel Bourbon");
   expect(newAlias.bottleId).toEqual(newBottle.id);
 });
+
+test("can change parent", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+  const parentEntity = await fixtures.Entity();
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    parent: parentEntity.id,
+  });
+
+  expect(data.id).toBeDefined();
+  expect(data.parent).toBeDefined();
+  expect(data.parent?.id).toEqual(parentEntity.id);
+  expect(data.parent?.name).toEqual(parentEntity.name);
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(omit(entity, "parentId", "searchVector", "updatedAt")).toEqual(
+    omit(newEntity, "parentId", "searchVector", "updatedAt"),
+  );
+  expect(newEntity.parentId).toBe(parentEntity.id);
+});
+
+test("can remove parent", async ({ fixtures }) => {
+  const parentEntity = await fixtures.Entity();
+  const entity = await fixtures.Entity({
+    parentId: parentEntity.id,
+  });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    parent: null,
+  });
+
+  expect(data.id).toBeDefined();
+  expect(data.parent).toBeNull();
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(newEntity.parentId).toBeNull();
+});
+
+test("prevents circular parent references", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+  const childEntity = await fixtures.Entity({
+    parentId: entity.id,
+  });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  const err = await waitError(
+    caller.entityUpdate({
+      entity: entity.id,
+      parent: childEntity.id,
+    }),
+  );
+
+  expect(err).toMatchInlineSnapshot(`[TRPCError: BAD_REQUEST]`);
+  expect(err.message).toContain("circular reference");
+});
+
+test("prevents deep circular parent references", async ({ fixtures }) => {
+  const rootEntity = await fixtures.Entity();
+  const midEntity = await fixtures.Entity({
+    parentId: rootEntity.id,
+  });
+  const leafEntity = await fixtures.Entity({
+    parentId: midEntity.id,
+  });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  const err = await waitError(
+    caller.entityUpdate({
+      entity: rootEntity.id,
+      parent: leafEntity.id,
+    }),
+  );
+
+  expect(err).toMatchInlineSnapshot(`[TRPCError: BAD_REQUEST]`);
+  expect(err.message).toContain("circular reference");
+});

@@ -68,3 +68,25 @@ test("updates existing entity with new type", async ({
   expect(brand.id).toEqual(entity.id);
   expect(brand.type).toEqual(["distiller", "brand"]);
 });
+
+test("creates a new entity with parent", async ({ fixtures }) => {
+  const parentEntity = await fixtures.Entity();
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+
+  const data = await caller.entityCreate({
+    name: "Child Entity",
+    parent: parentEntity.id,
+  });
+
+  expect(data.id).toBeDefined();
+  expect(data.parent).toBeDefined();
+  expect(data.parent?.id).toEqual(parentEntity.id);
+  expect(data.parent?.name).toEqual(parentEntity.name);
+
+  const [childEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(childEntity.parentId).toEqual(parentEntity.id);
+});
