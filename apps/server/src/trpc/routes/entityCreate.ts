@@ -26,6 +26,7 @@ export default verifiedProcedure
       name: normalizeEntityName(input.name),
       type: input.type || [],
       createdById: ctx.user.id,
+      parentId: input.parent || null,
     };
 
     if (input.country) {

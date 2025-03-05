@@ -49,6 +49,10 @@ export default modProcedure
       data.shortName = input.shortName;
     }
 
+    if (input.parent !== undefined && input.parent !== entity.parentId) {
+      data.parentId = input.parent;
+    }
+
     if (input.country) {
       if (input.country) {
         const [country] = await db
