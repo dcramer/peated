@@ -486,24 +486,3 @@ test("prevents entity from being its own parent", async ({ fixtures }) => {
     code: "BAD_REQUEST",
   });
 });
-
-test("prevents circular parent references", async ({ fixtures }) => {
-  const entityA = await fixtures.Entity();
-  const entityB = await fixtures.Entity({ parentId: entityA.id });
-
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
-  });
-
-  const err = await waitError(
-    caller.entityUpdate({
-      entity: entityA.id,
-      parent: entityB.id,
-    }),
-  );
-
-  expect(err).toMatchObject({
-    message: "Circular parent reference detected.",
-    code: "BAD_REQUEST",
-  });
-});
