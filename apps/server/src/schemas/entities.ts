@@ -22,6 +22,10 @@ export const EntitySchema = z.object({
   region: RegionSchema.nullable().default(null),
   address: z.string().trim().nullish().default(null),
   location: PointSchema.nullable().default(null),
+  parent: z
+    .object({ id: z.number(), name: z.string() })
+    .nullable()
+    .default(null),
 
   totalTastings: z.number().readonly(),
   totalBottles: z.number().readonly(),
@@ -39,6 +43,7 @@ export const EntityInputSchema = EntitySchema.omit({
 }).extend({
   country: z.number().nullish().default(null),
   region: z.number().nullish().default(null),
+  parent: z.number().nullish().default(null),
 });
 
 export const EntityMergeSchema = z.object({

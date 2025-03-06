@@ -417,3 +417,93 @@ test("updates existing conflicting alias", async ({ fixtures }) => {
   expect(newAlias.name).toEqual("Cool Cats Single Barrel Bourbon");
   expect(newAlias.bottleId).toEqual(newBottle.id);
 });
+
+test("can update entity parent", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+  const parent = await fixtures.Entity();
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    parent: parent.id,
+  });
+
+  expect(data.id).toBeDefined();
+  expect(data.parent).toEqual({
+    id: parent.id,
+    name: parent.name,
+  });
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(newEntity.parentId).toBe(parent.id);
+});
+
+test("can clear entity parent", async ({ fixtures }) => {
+  const parent = await fixtures.Entity();
+  const entity = await fixtures.Entity({ parentId: parent.id });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+  const data = await caller.entityUpdate({
+    entity: entity.id,
+    parent: null,
+  });
+
+  expect(data.id).toBeDefined();
+  expect(data.parent).toBeNull();
+
+  const [newEntity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(newEntity.parentId).toBeNull();
+});
+
+test("prevents entity from being its own parent", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  const err = await waitError(
+    caller.entityUpdate({
+      entity: entity.id,
+      parent: entity.id,
+    }),
+  );
+
+  expect(err).toMatchObject({
+    message: "An entity cannot be its own parent.",
+    code: "BAD_REQUEST",
+  });
+});
+
+test("prevents circular parent references", async ({ fixtures }) => {
+  const entityA = await fixtures.Entity();
+  const entityB = await fixtures.Entity({ parentId: entityA.id });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  const err = await waitError(
+    caller.entityUpdate({
+      entity: entityA.id,
+      parent: entityB.id,
+    }),
+  );
+
+  expect(err).toMatchObject({
+    message: "Circular parent reference detected.",
+    code: "BAD_REQUEST",
+  });
+});

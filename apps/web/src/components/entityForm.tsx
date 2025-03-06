@@ -4,6 +4,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { type Entity } from "@peated/server/types";
 import CountryField from "@peated/web/components/countryField";
+import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import FormError from "@peated/web/components/formError";
@@ -54,6 +55,7 @@ export default function EntityForm({
       ...initialData,
       country: initialData.country ? initialData.country.id : null,
       region: initialData.region ? initialData.region.id : null,
+      parent: initialData.parent ? initialData.parent.id : null,
     },
   });
 
@@ -75,6 +77,15 @@ export default function EntityForm({
       ? {
           id: initialData.region.id,
           name: initialData.region.name,
+        }
+      : undefined,
+  );
+
+  const [parentValue, setParentValue] = useState<Option | undefined>(
+    initialData.parent
+      ? {
+          id: initialData.parent.id,
+          name: initialData.parent.name,
         }
       : undefined,
   );
@@ -254,6 +265,25 @@ export default function EntityForm({
             type="number"
             placeholder="e.g. 1969"
             autoComplete="off"
+          />
+          <Controller
+            control={control}
+            name="parent"
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <EntityField
+                {...field}
+                error={errors.parent}
+                label="Parent Entity"
+                placeholder="e.g. Diageo"
+                searchContext={{}}
+                onChange={(value) => {
+                  onChange(value?.id || value);
+                  setParentValue(value);
+                }}
+                value={parentValue}
+                canCreate
+              />
+            )}
           />
           {user && (user.mod || user.admin) && (
             <TextAreaField

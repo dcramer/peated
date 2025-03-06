@@ -77,6 +77,7 @@ function CreateForm({
 
   const [countryValue, setCountryValue] = useState<Option | undefined>();
   const [regionValue, setRegionValue] = useState<Option | undefined>();
+  const [parentValue, setParentValue] = useState<Option | undefined>();
 
   return (
     <LayoutModal
@@ -153,6 +154,25 @@ function CreateForm({
                 }}
                 value={regionValue}
                 rememberValues={false}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="parent"
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <EntityField
+                {...field}
+                error={errors.parent}
+                label="Parent Entity"
+                placeholder="e.g. Diageo"
+                searchContext={{}}
+                onChange={(value) => {
+                  onChange(value?.id);
+                  setParentValue(value);
+                }}
+                value={parentValue}
               />
             )}
           />

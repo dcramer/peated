@@ -133,6 +133,55 @@ export default modProcedure
     if (input.website !== undefined && input.website !== entity.website) {
       data.website = input.website;
     }
+    if (input.parent !== undefined && input.parent !== entity.parentId) {
+      if (input.parent) {
+        const [parent] = await db
+          .select()
+          .from(entities)
+          .where(eq(entities.id, input.parent))
+          .limit(1);
+        if (!parent) {
+          throw new TRPCError({
+            message: "Parent entity not found.",
+            code: "NOT_FOUND",
+          });
+        }
+
+        // Check for direct recursion (can't set itself as parent)
+        if (parent.id === entity.id) {
+          throw new TRPCError({
+            message: "An entity cannot be its own parent.",
+            code: "BAD_REQUEST",
+          });
+        }
+
+        // Check for circular references
+        let currentParent = parent;
+        const visitedParents = new Set([entity.id]);
+        while (currentParent.parentId) {
+          if (visitedParents.has(currentParent.parentId)) {
+            throw new TRPCError({
+              message: "Circular parent reference detected.",
+              code: "BAD_REQUEST",
+            });
+          }
+          visitedParents.add(currentParent.id);
+
+          const [nextParent] = await db
+            .select()
+            .from(entities)
+            .where(eq(entities.id, currentParent.parentId))
+            .limit(1);
+
+          if (!nextParent) break;
+          currentParent = nextParent;
+        }
+
+        data.parentId = parent.id;
+      } else {
+        data.parentId = null;
+      }
+    }
     if (Object.values(data).length === 0) {
       return await serialize(EntitySerializer, entity, ctx.user);
     }

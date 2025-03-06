@@ -28,6 +28,53 @@ export default verifiedProcedure
       createdById: ctx.user.id,
     };
 
+    if (input.parent) {
+      const [parent] = await db
+        .select()
+        .from(entities)
+        .where(eq(entities.id, input.parent))
+        .limit(1);
+      if (!parent) {
+        throw new TRPCError({
+          message: "Parent entity not found.",
+          code: "NOT_FOUND",
+        });
+      }
+
+      // Check for direct recursion (can't set itself as parent)
+      // This shouldn't be possible in create, but we'll check anyway for safety
+      if (parent.id === input.parent) {
+        throw new TRPCError({
+          message: "An entity cannot be its own parent.",
+          code: "BAD_REQUEST",
+        });
+      }
+
+      // Check for circular references
+      let currentParent = parent;
+      const visitedParents = new Set([input.parent]);
+      while (currentParent.parentId) {
+        if (visitedParents.has(currentParent.parentId)) {
+          throw new TRPCError({
+            message: "Circular parent reference detected.",
+            code: "BAD_REQUEST",
+          });
+        }
+        visitedParents.add(currentParent.id);
+
+        const [nextParent] = await db
+          .select()
+          .from(entities)
+          .where(eq(entities.id, currentParent.parentId))
+          .limit(1);
+
+        if (!nextParent) break;
+        currentParent = nextParent;
+      }
+
+      data.parentId = parent.id;
+    }
+
     if (input.country) {
       const [country] = await db
         .select()
