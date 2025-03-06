@@ -16,11 +16,11 @@ export default async function scrapeWhiskeyAdvocate() {
     "https://whiskyadvocate.com/ratings-reviews",
   );
   if (issueList.length === 0) {
-    logError("No issues found for Whisky Advocate.");
+    logError("[Whisky Advocate] No issues found");
     return;
   }
 
-  info(fmt`Found ${String(issueList.length)} issues`);
+  info(fmt`[Whisky Advocate] Found ${String(issueList.length)} issues`);
 
   const processedIssues = process.env.ACCESS_TOKEN
     ? await trpcClient.externalSiteConfigGet.query({
@@ -32,21 +32,21 @@ export default async function scrapeWhiskeyAdvocate() {
 
   const newIssues = issueList.filter((i) => !processedIssues.includes(i));
   if (newIssues.length === 0) {
-    info(fmt`No unprocessed issues found`);
+    info(fmt`[Whisky Advocate] No unprocessed issues found`);
     return;
   }
 
-  info(fmt`Found ${String(issueList.length)} new issues`);
+  info(fmt`[Whisky Advocate] Found ${String(newIssues.length)} new issues`);
 
   for (const issueName of newIssues) {
-    info(fmt`Fetching reviews for issue [${issueName}]`);
+    info(fmt`[Whisky Advocate] Fetching reviews for issue [${issueName}]`);
     await scrapeReviews(
       `https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=${encodeURIComponent(
         issueName,
       )}&order_by=published_desc`,
       async (item) => {
         if (process.env.ACCESS_TOKEN) {
-          info(fmt`Submitting [${item.name}]`);
+          info(fmt`[Whisky Advocate] Submitting [${item.name}]`);
 
           try {
             await trpcClient.reviewCreate.mutate({
@@ -57,13 +57,13 @@ export default async function scrapeWhiskeyAdvocate() {
             console.error(err);
           }
         } else {
-          info(fmt`Dry Run [${item.name}]`);
+          info(fmt`[Whisky Advocate] Dry Run [${item.name}]`);
         }
       },
     );
 
     processedIssues.push(issueName);
-    info(fmt`Done processing issue [${issueName}]`);
+    info(fmt`[Whisky Advocate] Done processing issue [${issueName}]`);
 
     if (process.env.ACCESS_TOKEN) {
       await trpcClient.externalSiteConfigSet.mutate({
@@ -105,7 +105,7 @@ export async function scrapeReviews(
     // <h5>Claxton’s Mannochmore 7 year old Oloroso Hogshead, 50% </h5>
     const rawName = $(".postsItemContent > h5", el).first().text().trim();
     if (!rawName) {
-      warn(fmt`Unable to identify bottle name`);
+      warn(fmt`[Whisky Advocate] Unable to identify bottle name`);
       continue;
     }
     const { name } = normalizeBottle({
@@ -117,20 +117,22 @@ export async function scrapeReviews(
 
     const reviewUrl = $("a.postsItemLink", el).first().attr("href");
     if (!reviewUrl) {
-      warn(fmt`Unable to identify review URL: ${rawName}`);
+      warn(fmt`[Whisky Advocate] Unable to identify review URL: ${rawName}`);
       continue;
     }
 
     const rawRating = $(".postsItemRanking > h2", el).first().text().trim();
     if (!rawRating || Number(rawRating) < 1 || Number(rawRating) > 100) {
-      warn(fmt`Unable to identify valid rating: ${rawName} (${rawRating})`);
+      warn(
+        fmt`[Whisky Advocate] Unable to identify valid rating: ${rawName} (${rawRating})`,
+      );
       continue;
     }
     const rating = Number(rawRating);
 
     const issue = $(".postsItemIssue", el).first().text().trim();
     if (!issue) {
-      warn(fmt`Unable to identify issue name: ${rawName}`);
+      warn(fmt`[Whisky Advocate] Unable to identify issue name: ${rawName}`);
       continue;
     }
 
