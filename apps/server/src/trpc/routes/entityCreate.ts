@@ -16,6 +16,7 @@ import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 import { verifiedProcedure } from "..";
 
 export default verifiedProcedure
@@ -44,6 +45,14 @@ export default verifiedProcedure
         });
       }
 
+      // Check for direct recursion (can't set itself as parent)
+      // This shouldn't be possible in create, but we'll check anyway for safety
+      if (parent.id === parentId) {
+        throw new TRPCError({
+          message: "An entity cannot be its own parent.",
+          code: "BAD_REQUEST",
+        });
+      }
       data.parentId = parent.id;
     }
 

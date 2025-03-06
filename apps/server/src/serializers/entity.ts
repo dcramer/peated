@@ -55,7 +55,6 @@ export const EntitySerializer = serializer({
       ? await db.select().from(entities).where(inArray(entities.id, parentIds))
       : [];
 
-    // Use a simplified approach to avoid circular reference
     const parentsById: Record<number, { id: number; name: string }> = {};
 
     for (const parent of parentList) {

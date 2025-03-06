@@ -93,3 +93,34 @@ test("creates entity with parent", async ({ defaults, fixtures }) => {
 
   expect(entity.parentId).toBe(parent.id);
 });
+
+test("creates entity with nested parent object", async ({
+  defaults,
+  fixtures,
+}) => {
+  const parent = await fixtures.Entity();
+  const caller = createCaller({ user: defaults.user });
+
+  const data = await caller.entityCreate({
+    name: "Child Entity with Object Parent",
+    type: ["brand"],
+    parent: {
+      id: parent.id,
+      name: parent.name,
+    },
+  });
+
+  expect(data.name).toBe("Child Entity with Object Parent");
+  expect(data.parent).toEqual({
+    id: parent.id,
+    name: parent.name,
+  });
+
+  // Verify in database
+  const [entity] = await db
+    .select()
+    .from(entities)
+    .where(eq(entities.id, data.id));
+
+  expect(entity.parentId).toBe(parent.id);
+});
