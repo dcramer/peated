@@ -43,7 +43,10 @@ export const EntityInputSchema = EntitySchema.omit({
 }).extend({
   country: z.number().nullish().default(null),
   region: z.number().nullish().default(null),
-  parent: z.number().nullish().default(null),
+  parent: z
+    .union([z.number(), z.object({ id: z.number(), name: z.string() })])
+    .nullish()
+    .default(null),
 });
 
 export const EntityMergeSchema = z.object({
