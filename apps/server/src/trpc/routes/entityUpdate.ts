@@ -135,10 +135,13 @@ export default modProcedure
     }
     if (input.parent !== undefined && input.parent !== entity.parentId) {
       if (input.parent) {
+        const parentId =
+          typeof input.parent === "object" ? input.parent.id : input.parent;
+
         const [parent] = await db
           .select()
           .from(entities)
-          .where(eq(entities.id, input.parent))
+          .where(eq(entities.id, parentId))
           .limit(1);
         if (!parent) {
           throw new TRPCError({
@@ -153,28 +156,6 @@ export default modProcedure
             message: "An entity cannot be its own parent.",
             code: "BAD_REQUEST",
           });
-        }
-
-        // Check for circular references
-        let currentParent = parent;
-        const visitedParents = new Set([entity.id]);
-        while (currentParent.parentId) {
-          if (visitedParents.has(currentParent.parentId)) {
-            throw new TRPCError({
-              message: "Circular parent reference detected.",
-              code: "BAD_REQUEST",
-            });
-          }
-          visitedParents.add(currentParent.id);
-
-          const [nextParent] = await db
-            .select()
-            .from(entities)
-            .where(eq(entities.id, currentParent.parentId))
-            .limit(1);
-
-          if (!nextParent) break;
-          currentParent = nextParent;
         }
 
         data.parentId = parent.id;
