@@ -30,11 +30,7 @@ export const externalSites = pgTable(
     runEvery: integer("run_every").default(60),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (externalSites) => {
-    return {
-      type: uniqueIndex("external_site_type").on(externalSites.type),
-    };
-  },
+  (table) => [uniqueIndex("external_site_type").on(table.type)],
 );
 
 export type ExternalSite = typeof externalSites.$inferSelect;
@@ -51,11 +47,7 @@ export const externalSiteConfig = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (externalSiteConfig) => {
-    return {
-      pk: primaryKey(externalSiteConfig.externalSiteId, externalSiteConfig.key),
-    };
-  },
+  (table) => [primaryKey({ columns: [table.externalSiteId, table.key] })],
 );
 
 export type ExternalSiteConfig = typeof externalSiteConfig.$inferSelect;

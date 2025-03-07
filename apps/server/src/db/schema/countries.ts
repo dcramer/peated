@@ -30,18 +30,10 @@ export const countries = pgTable(
       .default(0)
       .notNull(),
   },
-  (table) => {
-    return {
-      nameUnique: uniqueIndex("country_name_unq").using(
-        "btree",
-        sql`LOWER(${table.name})`,
-      ),
-      slugUnique: uniqueIndex("country_slug_unq").using(
-        "btree",
-        sql`LOWER(${table.slug})`,
-      ),
-    };
-  },
+  (table) => [
+    uniqueIndex("country_name_unq").using("btree", sql`LOWER(${table.name})`),
+    uniqueIndex("country_slug_unq").using("btree", sql`LOWER(${table.slug})`),
+  ],
 );
 
 export type Country = typeof countries.$inferSelect;

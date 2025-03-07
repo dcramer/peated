@@ -19,21 +19,17 @@ export const changes = pgTable(
   "change",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-
     objectId: bigint("object_id", { mode: "number" }).notNull(),
     objectType: objectTypeEnum("object_type").notNull(),
     type: changeTypeEnum("type").default("add").notNull(),
     displayName: text("display_name"),
     data: jsonb("data").default({}).notNull().$type<Record<string, any>>(),
-
     createdAt: timestamp("created_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
   },
-  (changes) => ({
-    createdByIdx: index("change_created_by_idx").on(changes.createdById),
-  }),
+  (table) => [index("change_created_by_idx").on(table.createdById)],
 );
 
 export const changesRelations = relations(changes, ({ one }) => ({

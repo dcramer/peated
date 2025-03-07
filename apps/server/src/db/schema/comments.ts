@@ -25,15 +25,13 @@ export const comments = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (comments) => {
-    return {
-      comment: uniqueIndex("comment_unq").on(
-        comments.tastingId,
-        comments.createdById,
-        comments.createdAt,
-      ),
-    };
-  },
+  (table) => [
+    uniqueIndex("comment_unq").on(
+      table.tastingId,
+      table.createdById,
+      table.createdAt,
+    ),
+  ],
 );
 
 export const commentsRelations = relations(comments, ({ one }) => ({

@@ -37,17 +37,15 @@ export const storePrices = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      nameUnique: uniqueIndex("store_price_unq_name").using(
-        "btree",
-        table.externalSiteId,
-        sql`LOWER(${table.name})`,
-        table.volume,
-      ),
-      bottleIdx: index("store_price_bottle_idx").on(table.bottleId),
-    };
-  },
+  (table) => [
+    uniqueIndex("store_price_unq_name").using(
+      "btree",
+      table.externalSiteId,
+      sql`LOWER(${table.name})`,
+      table.volume,
+    ),
+    index("store_price_bottle_idx").on(table.bottleId),
+  ],
 );
 
 export const storePricesRelations = relations(storePrices, ({ one }) => ({
@@ -68,7 +66,6 @@ export const storePriceHistories = pgTable(
   "store_price_history",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-
     priceId: bigint("price_id", { mode: "number" })
       .references(() => storePrices.id)
       .notNull(),
@@ -77,15 +74,13 @@ export const storePriceHistories = pgTable(
     volume: integer("volume").notNull(),
     date: date("date").defaultNow().notNull(),
   },
-  (storePriceHistories) => {
-    return {
-      priceDate: uniqueIndex("store_price_history_unq").on(
-        storePriceHistories.priceId,
-        storePriceHistories.volume,
-        storePriceHistories.date,
-      ),
-    };
-  },
+  (table) => [
+    uniqueIndex("store_price_history_unq").on(
+      table.priceId,
+      table.volume,
+      table.date,
+    ),
+  ],
 );
 
 export const storePriceHistoriesRelations = relations(

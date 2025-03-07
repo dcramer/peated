@@ -70,26 +70,18 @@ export const entities = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (table) => {
-    return {
-      nameIndex: uniqueIndex("entity_name_unq").using(
-        "btree",
-        sql`LOWER(${table.name})`,
-      ),
-      parentReference: foreignKey({
-        name: "entity_parent_fk",
-        columns: [table.parentId],
-        foreignColumns: [table.id],
-      }),
-      searchVectorIndex: index("entity_search_idx").using(
-        "gin",
-        table.searchVector,
-      ),
-      countryId: index("entity_country_by_idx").on(table.countryId),
-      regionId: index("entity_region_idx").on(table.regionId),
-      createdById: index("entity_created_by_idx").on(table.createdById),
-    };
-  },
+  (table) => [
+    uniqueIndex("entity_name_unq").using("btree", sql`LOWER(${table.name})`),
+    foreignKey({
+      name: "entity_parent_fk",
+      columns: [table.parentId],
+      foreignColumns: [table.id],
+    }),
+    index("entity_search_idx").using("gin", table.searchVector),
+    index("entity_country_by_idx").on(table.countryId),
+    index("entity_region_idx").on(table.regionId),
+    index("entity_created_by_idx").on(table.createdById),
+  ],
 );
 
 export const entitiesRelations = relations(entities, ({ one, many }) => ({
@@ -121,15 +113,13 @@ export const entityAliases = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      entityIdx: index("entity_alias_entity_idx").on(table.entityId),
-      nameIdx: uniqueIndex("entity_alias_name_idx").using(
-        "btree",
-        sql`LOWER(${table.name})`,
-      ),
-    };
-  },
+  (table) => [
+    index("entity_alias_entity_idx").on(table.entityId),
+    uniqueIndex("entity_alias_name_idx").using(
+      "btree",
+      sql`LOWER(${table.name})`,
+    ),
+  ],
 );
 
 export const entityAliasesRelations = relations(entityAliases, ({ one }) => ({

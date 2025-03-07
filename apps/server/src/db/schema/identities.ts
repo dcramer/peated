@@ -17,23 +17,16 @@ export const identities = pgTable(
   "identity",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-
     provider: identityProviderEnum("provider").notNull(),
     externalId: text("external_id").notNull(),
-
     userId: bigint("user_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
   },
-  (identities) => {
-    return {
-      emailIndex: uniqueIndex("identity_unq").on(
-        identities.provider,
-        identities.externalId,
-      ),
-      userIdx: index("identity_user_idx").on(identities.userId),
-    };
-  },
+  (table) => [
+    uniqueIndex("identity_unq").on(table.provider, table.externalId),
+    index("identity_user_idx").on(table.userId),
+  ],
 );
 
 export const identitiesRelations = relations(identities, ({ one }) => ({

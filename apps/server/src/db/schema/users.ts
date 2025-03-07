@@ -28,18 +28,13 @@ export const users = pgTable(
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      email: uniqueIndex("user_email_unq").using(
-        "btree",
-        sql`LOWER(${table.email})`,
-      ),
-      username: uniqueIndex("user_username_unq").using(
-        "btree",
-        sql`LOWER(${table.username})`,
-      ),
-    };
-  },
+  (table) => [
+    uniqueIndex("user_email_unq").using("btree", sql`LOWER(${table.email})`),
+    uniqueIndex("user_username_unq").using(
+      "btree",
+      sql`LOWER(${table.username})`,
+    ),
+  ],
 );
 
 export type User = typeof users.$inferSelect;

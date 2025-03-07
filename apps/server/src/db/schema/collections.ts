@@ -25,17 +25,10 @@ export const collections = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (collections) => {
-    return {
-      collectionIndex: uniqueIndex("collection_name_unq").on(
-        collections.name,
-        collections.createdById,
-      ),
-      createdByIdx: index("collection_created_by_idx").on(
-        collections.createdById,
-      ),
-    };
-  },
+  (table) => [
+    uniqueIndex("collection_name_unq").on(table.name, table.createdById),
+    index("collection_created_by_idx").on(table.createdById),
+  ],
 );
 
 export const collectionsRelations = relations(collections, ({ one, many }) => ({
@@ -59,20 +52,12 @@ export const collectionBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (collectionBottles) => {
-    return {
-      collectionDistillerId: uniqueIndex("collection_bottle_unq").on(
-        collectionBottles.collectionId,
-        collectionBottles.bottleId,
-      ),
-      bottleIdx: index("collection_bottle_bottle_idx").on(
-        collectionBottles.bottleId,
-      ),
-    };
-  },
+  (table) => [
+    uniqueIndex("collection_bottle_unq").on(table.collectionId, table.bottleId),
+    index("collection_bottle_bottle_idx").on(table.bottleId),
+  ],
 );
 
 export const collectionBottlesRelations = relations(
