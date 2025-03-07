@@ -33,6 +33,30 @@ type TastingNotes = {
   finish: string;
 };
 
+/**
+ * Represents a unique bottle/expression from a brand.
+ * This is the parent table that contains the core information about a bottle.
+ * Each bottle can have multiple editions (vintages, releases, etc.) which are stored in bottle_edition.
+ *
+ * Some fields (description, imageUrl, etc.) are materialized from the editions,
+ * meaning they represent an aggregate or selected value from the editions.
+ *
+ * Examples:
+ * 1. Ardbeg Supernova
+ *    - Brand: Ardbeg
+ *    - Name: Supernova
+ *    - Multiple editions released in 2009, 2010, 2014, 2015, 2019
+ *
+ * 2. Octomore
+ *    - Brand: Bruichladdich
+ *    - Name: Octomore
+ *    - Multiple editions like 13.1, 13.2, 13.3, etc.
+ *
+ * 3. Macallan 18
+ *    - Brand: Macallan
+ *    - Name: 18-year-old
+ *    - Multiple editions by vintage year (1993, 1994, etc.)
+ */
 export const bottles = pgTable(
   "bottle",
   {
@@ -50,30 +74,36 @@ export const bottles = pgTable(
     bottlerId: bigint("bottler_id", { mode: "number" }).references(
       () => entities.id,
     ),
-    statedAge: smallint("stated_age"),
     flavorProfile: flavorProfileEnum("flavor_profile"),
+
+    // @deprecated - being migrated to bottle_edition table
+    statedAge: smallint("stated_age"),
+    // @deprecated - being migrated to bottle_edition table
     abv: doublePrecision("abv"),
-
+    // @deprecated - being migrated to bottle_edition table
     singleCask: boolean("single_cask"),
+    // @deprecated - being migrated to bottle_edition table
     caskStrength: boolean("cask_strength"),
-
+    // @deprecated - being migrated to bottle_edition table
     vintageYear: smallint("vintage_year"),
+    // @deprecated - being migrated to bottle_edition table
     releaseYear: smallint("release_year"),
-
+    // @deprecated - being migrated to bottle_edition table
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
+    // @deprecated - being migrated to bottle_edition table
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
+    // @deprecated - being migrated to bottle_edition table
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
 
+    // Materialized fields from editions
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
     imageUrl: text("image_url"),
-
     tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
     suggestedTags: varchar("suggested_tags", { length: 64 })
       .array()
       .default(sql`array[]::varchar[]`)
       .notNull(),
-
     avgRating: doublePrecision("avg_rating"),
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
@@ -102,6 +132,90 @@ export const bottles = pgTable(
   },
 );
 
+export type Bottle = typeof bottles.$inferSelect;
+export type NewBottle = typeof bottles.$inferInsert;
+
+/**
+ * Represents a specific edition/release/vintage of a bottle.
+ * This contains all the specific details about a particular release,
+ * such as ABV, cask details, vintage year, etc.
+ *
+ * Each edition belongs to a parent bottle and inherits its core attributes,
+ * while adding edition-specific details.
+ *
+ * Examples:
+ * 1. Ardbeg Supernova 2019 Release
+ *    - Bottle: Ardbeg Supernova
+ *    - Release Year: 2019
+ *    - ABV: 53.8%
+ *    - Edition-specific details: ppm, cask types, etc.
+ *
+ * 2. Octomore 13.1
+ *    - Bottle: Octomore
+ *    - Name: 13.1
+ *    - Release Year: 2022
+ *    - ABV: 59.2%
+ *    - Edition-specific details: 137.3 ppm, 5 years old, ex-American oak
+ *
+ * 3. Macallan 18 Year Old 1993
+ *    - Bottle: Macallan 18
+ *    - Vintage Year: 1993
+ *    - Release Year: 2011
+ *    - ABV: 43%
+ *    - Edition-specific details: Sherry oak casks
+ */
+export const bottleEditions = pgTable(
+  "bottle_edition",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id, { onDelete: "cascade" })
+      .notNull(),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+
+    // Edition-specific fields
+    vintageYear: smallint("vintage_year"),
+    releaseYear: smallint("release_year"),
+    abv: doublePrecision("abv"),
+    singleCask: boolean("single_cask"),
+    caskStrength: boolean("cask_strength"),
+    statedAge: smallint("stated_age"),
+
+    // Cask details
+    caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
+    caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
+    caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
+
+    // Edition-specific content
+    description: text("description"),
+    descriptionSrc: contentSourceEnum("description_src"),
+    imageUrl: text("image_url"),
+    tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
+    suggestedTags: varchar("suggested_tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
+
+    // Edition-specific stats
+    avgRating: doublePrecision("avg_rating"),
+    totalTastings: bigint("total_tastings", { mode: "number" })
+      .default(0)
+      .notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+  },
+  (table) => [
+    index("bottle_edition_bottle_idx").on(table.bottleId),
+    index("bottle_edition_created_by_idx").on(table.createdById),
+    uniqueIndex("bottle_edition_full_name_idx").on(table.fullName),
+  ],
+);
+
 export const bottlesRelations = relations(bottles, ({ one, many }) => ({
   brand: one(entities, {
     fields: [bottles.brandId],
@@ -112,14 +226,26 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
     references: [entities.id],
   }),
   bottlesToDistillers: many(bottlesToDistillers),
+  editions: many(bottleEditions),
   createdBy: one(users, {
     fields: [bottles.createdById],
     references: [users.id],
   }),
 }));
 
-export type Bottle = typeof bottles.$inferSelect;
-export type NewBottle = typeof bottles.$inferInsert;
+export const bottleEditionsRelations = relations(bottleEditions, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [bottleEditions.bottleId],
+    references: [bottles.id],
+  }),
+  createdBy: one(users, {
+    fields: [bottleEditions.createdById],
+    references: [users.id],
+  }),
+}));
+
+export type BottleEdition = typeof bottleEditions.$inferSelect;
+export type NewBottleEdition = typeof bottleEditions.$inferInsert;
 
 export const bottlesToDistillers = pgTable(
   "bottle_distiller",
