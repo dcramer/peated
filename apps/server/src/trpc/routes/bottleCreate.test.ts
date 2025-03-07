@@ -592,3 +592,51 @@ test("creating a new bottle with a new alias does not mess with unrelated aliase
   expect(newOtherAlias).toBeDefined();
   expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
 });
+
+test("saves ABV information", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleCreate({
+    brand: brand.id,
+    name: "Old Whisky",
+    abv: 40.5,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(newBottle.abv).toEqual(40.5);
+});
+
+test("rejects invalid ABV values", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const err = await waitError(
+    caller.bottleCreate({
+      brand: brand.id,
+      name: "Old Whisky",
+      abv: 101, // Invalid: above 100
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`
+    [TRPCError: [
+      {
+        "code": "too_big",
+        "maximum": 100,
+        "type": "number",
+        "inclusive": true,
+        "exact": false,
+        "message": "Number must be less than or equal to 100",
+        "path": [
+          "abv"
+        ]
+      }
+    ]]
+  `);
+});

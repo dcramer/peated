@@ -411,3 +411,68 @@ test("saves release year", async ({ defaults, fixtures }) => {
 
   expect(newBottle.releaseYear).toEqual(2024);
 });
+
+test("saves ABV information", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
+    abv: 43.0,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(newBottle.abv).toEqual(43.0);
+});
+
+test("removes ABV information", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle({ abv: 40.0 });
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const data = await caller.bottleUpdate({
+    bottle: bottle.id,
+    abv: null,
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(newBottle.abv).toBeNull();
+});
+
+test("rejects invalid ABV values", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+
+  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const err = await waitError(
+    caller.bottleUpdate({
+      bottle: bottle.id,
+      abv: 101, // Invalid: above 100
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`
+    [TRPCError: [
+      {
+        "code": "too_big",
+        "maximum": 100,
+        "type": "number",
+        "inclusive": true,
+        "exact": false,
+        "message": "Number must be less than or equal to 100",
+        "path": [
+          "abv"
+        ]
+      }
+    ]]
+  `);
+});

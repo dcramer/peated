@@ -20,6 +20,7 @@ export const BottleSchema = z.object({
   statedAge: z.number().min(0).max(100).nullable().default(null),
   caskStrength: z.boolean().nullable().default(null),
   singleCask: z.boolean().nullable().default(null),
+  abv: z.number().min(0).max(100).nullable().default(null),
 
   vintageYear: z
     .number()
@@ -88,6 +89,7 @@ export const BottleInputSchema = BottleSchema.omit({
   distillers: z.array(EntityChoice).default([]).optional(),
   bottler: EntityChoice.nullable().default(null).optional(),
   image: z.null().optional(),
+  abv: z.number().min(0).max(100).nullable().default(null).optional(),
 });
 
 export const BottleMergeSchema = z.object({

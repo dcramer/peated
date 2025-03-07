@@ -100,6 +100,10 @@ export default function BottleOverview({
                   <em>unknown</em>
                 )}
               </DefinitionList.Details>
+              <DefinitionList.Term>ABV</DefinitionList.Term>
+              <DefinitionList.Details>
+                {bottle.abv ? `${bottle.abv.toFixed(1)}%` : <em>unknown</em>}
+              </DefinitionList.Details>
               <DefinitionList.Term>Cask Strength?</DefinitionList.Term>
               <DefinitionList.Details>
                 <YesNo value={bottle.caskStrength} />
