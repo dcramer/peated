@@ -52,6 +52,7 @@ export const bottles = pgTable(
     ),
     statedAge: smallint("stated_age"),
     flavorProfile: flavorProfileEnum("flavor_profile"),
+    abv: doublePrecision("abv"),
 
     singleCask: boolean("single_cask"),
     caskStrength: boolean("cask_strength"),

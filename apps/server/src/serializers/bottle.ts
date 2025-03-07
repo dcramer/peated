@@ -163,6 +163,7 @@ export const BottleSerializer = serializer({
       statedAge: item.statedAge,
       caskStrength: item.caskStrength,
       singleCask: item.singleCask,
+      abv: item.abv,
 
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)

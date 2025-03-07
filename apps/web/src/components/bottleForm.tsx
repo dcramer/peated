@@ -317,6 +317,21 @@ export default function BottleForm({
             suffixLabel="years"
           />
 
+          <TextField
+            {...register("abv", {
+              setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
+            })}
+            error={errors.abv}
+            type="number"
+            label="ABV"
+            placeholder="e.g. 40.5"
+            helpText="The Alcohol By Volume percentage of the spirit."
+            suffixLabel="%"
+            step="0.1"
+            min="0"
+            max="100"
+          />
+
           <Controller
             name="category"
             control={control}
