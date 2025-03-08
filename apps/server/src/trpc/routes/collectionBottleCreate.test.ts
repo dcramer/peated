@@ -37,3 +37,62 @@ test("new bottle in default", async ({ fixtures, defaults }) => {
 
   expect(bottleList.length).toBe(1);
 });
+
+test("new bottle with edition in default", async ({ fixtures, defaults }) => {
+  const bottle = await fixtures.Bottle();
+  const edition = await fixtures.BottleEdition({ bottleId: bottle.id });
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  await caller.collectionBottleCreate({
+    user: "me",
+    collection: "default",
+    bottle: bottle.id,
+    edition: edition.id,
+  });
+
+  const bottleList = await db
+    .select()
+    .from(collectionBottles)
+    .where(eq(collectionBottles.bottleId, bottle.id));
+
+  expect(bottleList.length).toBe(1);
+  expect(bottleList[0].editionId).toBe(edition.id);
+});
+
+test("fails with invalid edition", async ({ fixtures, defaults }) => {
+  const bottle = await fixtures.Bottle();
+  const otherBottle = await fixtures.Bottle();
+  const edition = await fixtures.BottleEdition({ bottleId: otherBottle.id });
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const err = await waitError(
+    caller.collectionBottleCreate({
+      user: "me",
+      collection: "default",
+      bottle: bottle.id,
+      edition: edition.id,
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify edition.]`);
+});
+
+test("fails with nonexistent edition", async ({ fixtures, defaults }) => {
+  const bottle = await fixtures.Bottle();
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const err = await waitError(
+    caller.collectionBottleCreate({
+      user: "me",
+      collection: "default",
+      bottle: bottle.id,
+      edition: 12345,
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify edition.]`);
+});
