@@ -72,9 +72,9 @@ test("can change name", async ({ fixtures }) => {
 });
 
 test("can change bottles", async ({ fixtures }) => {
-  const bottle1 = await fixtures.Bottle();
-  const bottle2 = await fixtures.Bottle();
-  const bottle3 = await fixtures.Bottle();
+  const bottle1 = await fixtures.Bottle({ name: "Bottle 1" });
+  const bottle2 = await fixtures.Bottle({ name: "Bottle 2" });
+  const bottle3 = await fixtures.Bottle({ name: "Bottle 3" });
   const flight = await fixtures.Flight({ bottles: [bottle1.id, bottle2.id] });
 
   const caller = createCaller({
