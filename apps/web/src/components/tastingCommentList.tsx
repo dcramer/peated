@@ -146,7 +146,7 @@ export default function TastingCommentList({
                             commentDeleteMutation.mutate(reply.id)
                           }
                           onReply={
-                            user ? () => handleReply(comment.id) : undefined
+                            user ? () => handleReply(reply.id) : undefined
                           }
                         />
                       );
