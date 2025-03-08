@@ -90,8 +90,11 @@ export default authedProcedure
           }
         } catch (err) {
           console.error("Error checking parent comment:", err);
-          // Continue without the replyToId if there's an error
-          input.replyToId = null;
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid parent comment ID",
+            cause: err,
+          });
         }
       }
 
