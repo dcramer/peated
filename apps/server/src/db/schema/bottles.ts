@@ -298,6 +298,9 @@ export const bottleAliases = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
+    editionId: bigint("edition_id", { mode: "number" }).references(
+      () => bottleEditions.id,
+    ),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),
     // ignored is used to hide this alias from matches
@@ -310,6 +313,7 @@ export const bottleAliases = pgTable(
       sql`LOWER(${table.name})`,
     ),
     index("bottle_alias_bottle_idx").on(table.bottleId),
+    index("bottle_alias_edition_idx").on(table.editionId),
   ],
 );
 
