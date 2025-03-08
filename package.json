@@ -9,7 +9,6 @@
     "build:packages": "pnpm -r --filter='./packages/*' build",
     "build:server": "pnpm build --filter='./apps/server'",
     "build:web": "pnpm build --filter='./apps/web'",
-    "setup": "pnpm install && npm run db:migrate",
     "dev": "dotenv -e .env.local -- turbo dev",
     "dev:web": "dotenv -e .env.local -- turbo dev --filter=\"./apps/web\"",
     "dev:server": "dotenv -e .env.local -- turbo dev --filter=\"./apps/server\"",

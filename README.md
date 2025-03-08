@@ -2,22 +2,22 @@
 
 The application that powers peated.com.
 
-For more details, take a look at https://peated.com/about
+For more details, take a look at <https://peated.com/about>
 
-A Discord is available if you want to contribute: https://discord.gg/d7GFPfy88Z
+A Discord is available if you want to contribute: <https://discord.gg/d7GFPfy88Z>
 
 ## Dev
 
 Setup the required frameworks:
 
-1. (pnpm)[https://pnpm.io/installation]
-2. (Docker)[https://docs.docker.com/get-docker/] (with Docker Compose)
+1. [pnpm](https://pnpm.io/installation)
+2. [Docker](https://docs.docker.com/get-docker/) (with Docker Compose)
 
 Bootstrap the environment:
 
 ```
 docker compose up -d
-pnpm setup
+pnpm install
 ```
 
 Note: If you need to tweak default settings, `cp .env.example .env` and go to town.
@@ -51,7 +51,7 @@ npm run dev
 
 ### Configure GCP CLI
 
-https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl
+<https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl>
 
 ```shell
 # bind default project
