@@ -347,3 +347,246 @@ test("fails with nonexistent edition", async ({ defaults, fixtures }) => {
   );
   expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify edition.]`);
 });
+
+test("creates a new tasting with serving style and color", async ({
+  defaults,
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    servingStyle: "neat",
+    color: 5,
+  });
+
+  expect(data.tasting.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.tasting.id));
+
+  expect(tasting.servingStyle).toEqual("neat");
+  expect(tasting.color).toEqual(5);
+});
+
+test("creates a new tasting with custom date", async ({
+  defaults,
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
+  const customDate = new Date(Date.now() - 1000 * 60 * 60 * 24); // 1 day ago
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    createdAt: customDate.toISOString(),
+  });
+
+  expect(data.tasting.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.tasting.id));
+
+  expect(tasting.createdAt.toISOString()).toEqual(customDate.toISOString());
+});
+
+test("fails with date too far in past", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const oldDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * 8); // 8 days ago
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const err = await waitError(
+    caller.tastingCreate({
+      bottle: bottle.id,
+      createdAt: oldDate.toISOString(),
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`
+    [TRPCError: [
+      {
+        "code": "custom",
+        "message": "Value too far in the past.",
+        "path": [
+          "createdAt"
+        ]
+      }
+    ]]
+  `);
+});
+
+test("fails with future date", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const futureDate = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes in future
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const err = await waitError(
+    caller.tastingCreate({
+      bottle: bottle.id,
+      createdAt: futureDate.toISOString(),
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`
+    [TRPCError: [
+      {
+        "code": "custom",
+        "message": "Value too far in future.",
+        "path": [
+          "createdAt"
+        ]
+      }
+    ]]
+  `);
+});
+
+test("fails with non-following friends", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const nonFriend = await fixtures.User();
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const err = await waitError(
+    caller.tastingCreate({
+      bottle: bottle.id,
+      friends: [nonFriend.id],
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Friends must all be active relationships.]`,
+  );
+});
+
+test("creates a new tasting with friends", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const friend = await fixtures.User();
+  await fixtures.Follow({
+    fromUserId: defaults.user.id,
+    toUserId: friend.id,
+    status: "following",
+  });
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    friends: [friend.id],
+  });
+
+  expect(data.tasting.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.tasting.id));
+
+  expect(tasting.friends).toEqual([friend.id]);
+});
+
+test("prevents duplicate tastings", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const caller = createCaller({
+    user: defaults.user,
+  });
+
+  const createdAt = new Date().toISOString();
+
+  await caller.tastingCreate({
+    bottle: bottle.id,
+    createdAt,
+  });
+
+  const err = await waitError(
+    caller.tastingCreate({
+      bottle: bottle.id,
+      createdAt,
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Tasting already exists.]`);
+});
+
+test("updates entity stats correctly", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity({ type: ["brand"] });
+  const distiller = await fixtures.Entity({ type: ["distiller"] });
+  const bottler = await fixtures.Entity({ type: ["bottler"] });
+
+  const bottle = await fixtures.Bottle({
+    brandId: brand.id,
+    bottlerId: bottler.id,
+    distillerIds: [distiller.id],
+  });
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  await caller.tastingCreate({
+    bottle: bottle.id,
+    rating: 4.5,
+  });
+
+  const updatedBrand = await db.query.entities.findFirst({
+    where: eq(entities.id, brand.id),
+  });
+  const updatedDistiller = await db.query.entities.findFirst({
+    where: eq(entities.id, distiller.id),
+  });
+  const updatedBottler = await db.query.entities.findFirst({
+    where: eq(entities.id, bottler.id),
+  });
+
+  expect(updatedBrand?.totalTastings).toBe(1);
+  expect(updatedDistiller?.totalTastings).toBe(1);
+  expect(updatedBottler?.totalTastings).toBe(1);
+
+  const [updatedBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+  expect(updatedBottle.totalTastings).toBe(1);
+  expect(updatedBottle.avgRating).toBe(4.5);
+});
+
+test("creates a new tasting with both flight and edition", async ({
+  defaults,
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
+  const edition = await fixtures.BottleEdition({ bottleId: bottle.id });
+  const flight = await fixtures.Flight({ bottles: [bottle.id] });
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    edition: edition.id,
+    flight: flight.publicId,
+    rating: 4.0,
+  });
+
+  expect(data.tasting.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.tasting.id));
+
+  expect(tasting.bottleId).toEqual(bottle.id);
+  expect(tasting.editionId).toEqual(edition.id);
+  expect(tasting.flightId).toEqual(flight.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
+  expect(tasting.rating).toEqual(4.0);
+});
