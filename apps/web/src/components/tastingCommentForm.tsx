@@ -154,6 +154,7 @@ export default function TastingCommentForm({
   };
 
   // Extract mentioned usernames from the comment text
+  // This should match the server-side extractMentions function
   const extractMentionedUsernames = (text: string): string[] => {
     const mentionRegex = /@(\w+)/g;
     const matches = text.match(mentionRegex) || [];
@@ -194,20 +195,15 @@ export default function TastingCommentForm({
 
       // If this is a reply, add the replyToId and modify the comment text
       if (isReply && replyToComment) {
-        // Add a marker in the comment text to identify it as a reply
-        data.comment = `[Reply to #${replyToComment.id}] ${data.comment}`;
+        // Add the replyToId to the data
+        data.replyToId = replyToComment.id;
 
         // Check if the modified comment exceeds the maximum length
         if (data.comment.length > MAX_COMMENT_LENGTH) {
-          setError(
-            `Comment with reply prefix cannot exceed ${MAX_COMMENT_LENGTH} characters`,
-          );
+          setError(`Comment cannot exceed ${MAX_COMMENT_LENGTH} characters`);
           setSaving(false);
           return;
         }
-
-        // Add the replyToId to the data
-        data.replyToId = replyToComment.id;
       }
 
       const newComment = await commentCreateMutation.mutateAsync(data);

@@ -19,6 +19,9 @@ import { authedProcedure } from "..";
 // Maximum length for the mentions field in the database
 const MAX_MENTIONS_LENGTH = 500;
 
+// Maximum number of mentions allowed in a single comment
+const MAX_MENTIONS = 20;
+
 // Helper function to extract mentions from comment text
 function extractMentions(text: string): string[] {
   const mentionRegex = /@(\w+)/g;
@@ -32,7 +35,7 @@ export default authedProcedure
       tasting: z.number(),
       mentionedUsernames: z
         .array(z.string())
-        .max(20, "Maximum of 20 mentions allowed")
+        .max(MAX_MENTIONS, "Maximum of 20 mentions allowed")
         .optional(),
     }),
   )
@@ -86,13 +89,48 @@ export default authedProcedure
         }
       }
 
-      // Get mentioned users
-      let mentionedUsers: { id: number; username: string }[] = [];
+      // Get mentioned usernames from input or extract from comment text
+      let mentionedUsernames: string[] = [];
+
       if (input.mentionedUsernames && input.mentionedUsernames.length > 0) {
+        // Use the provided mentionedUsernames
+        mentionedUsernames = input.mentionedUsernames;
+      } else {
+        // Extract mentions from the comment text as a fallback
+        mentionedUsernames = extractMentions(input.comment);
+      }
+
+      // Validate that the extracted mentions match the provided ones
+      const extractedMentions = extractMentions(input.comment);
+      if (
+        input.mentionedUsernames &&
+        JSON.stringify(extractedMentions.sort()) !==
+          JSON.stringify([...new Set(input.mentionedUsernames)].sort())
+      ) {
+        console.warn(
+          "Mismatch between provided mentionedUsernames and those extracted from text",
+          {
+            provided: input.mentionedUsernames,
+            extracted: extractedMentions,
+          },
+        );
+      }
+
+      // Enforce the maximum number of mentions
+      if (mentionedUsernames.length > MAX_MENTIONS) {
+        throw new TRPCError({
+          message: `Maximum of ${MAX_MENTIONS} mentions allowed.`,
+          code: "BAD_REQUEST",
+        });
+      }
+
+      // Get mentioned users from the database
+      let mentionedUsers: { id: number; username: string }[] = [];
+      if (mentionedUsernames.length > 0) {
         mentionedUsers = await db
           .select({ id: users.id, username: users.username })
           .from(users)
-          .where(inArray(users.username, input.mentionedUsernames));
+          .where(inArray(users.username, mentionedUsernames));
       }
 
       const data: Partial<NewComment> = {
