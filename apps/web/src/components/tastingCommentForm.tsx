@@ -10,6 +10,9 @@ import MentionSuggestions from "./mentionSuggestions";
 import TextArea from "./textArea";
 import UserAvatar from "./userAvatar";
 
+// Maximum number of mentions allowed in a single comment
+const MAX_MENTIONS = 20;
+
 export default function TastingCommentForm({
   tastingId,
   user,
@@ -88,6 +91,21 @@ export default function TastingCommentForm({
       mentionState.searchPosition + 1 + mentionState.searchQuery.length,
     );
 
+    // Check if adding this mention would exceed the maximum
+    const currentMentions = extractMentionedUsernames(comment);
+    if (
+      currentMentions.length >= MAX_MENTIONS &&
+      !currentMentions.includes(username)
+    ) {
+      setError(`Maximum of ${MAX_MENTIONS} mentions allowed per comment.`);
+      setMentionState({
+        isSearching: false,
+        searchPosition: 0,
+        searchQuery: "",
+      });
+      return;
+    }
+
     // Replace the partial @mention with the full username
     const newComment = `${beforeMention}@${username}${afterMention}`;
 
@@ -123,12 +141,19 @@ export default function TastingCommentForm({
     setError(null);
 
     if (saving || !formData.comment.trim()) return;
+
+    // Extract mentioned usernames
+    const mentionedUsernames = extractMentionedUsernames(formData.comment);
+
+    // Validate the number of mentions
+    if (mentionedUsernames.length > MAX_MENTIONS) {
+      setError(`Maximum of ${MAX_MENTIONS} mentions allowed per comment.`);
+      return;
+    }
+
     setSaving(true);
 
     try {
-      // Extract mentioned usernames
-      const mentionedUsernames = extractMentionedUsernames(formData.comment);
-
       // Prepare the comment data
       const data: any = {
         comment: formData.comment,

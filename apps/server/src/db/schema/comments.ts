@@ -6,6 +6,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  varchar,
 } from "drizzle-orm/pg-core";
 
 import { tastings } from "./tastings";
@@ -29,8 +30,8 @@ export const comments = pgTable(
       () => comments.id,
       { onDelete: "cascade" },
     ),
-    // Add mentions field to store mentioned usernames
-    mentions: text("mentions"),
+    // Add mentions field to store mentioned usernames with a length constraint
+    mentions: varchar("mentions", { length: 500 }),
   },
   (table) => [
     uniqueIndex("comment_unq").on(

@@ -16,6 +16,9 @@ import { eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 
+// Maximum length for the mentions field in the database
+const MAX_MENTIONS_LENGTH = 500;
+
 // Helper function to extract mentions from comment text
 function extractMentions(text: string): string[] {
   const mentionRegex = /@(\w+)/g;
@@ -27,7 +30,10 @@ export default authedProcedure
   .input(
     CommentInputSchema.extend({
       tasting: z.number(),
-      mentionedUsernames: z.array(z.string()).optional(),
+      mentionedUsernames: z
+        .array(z.string())
+        .max(20, "Maximum of 20 mentions allowed")
+        .optional(),
     }),
   )
   .mutation(async function ({ input, ctx }) {
@@ -98,7 +104,17 @@ export default authedProcedure
 
       // Store mentioned usernames in the mentions field
       if (mentionedUsers.length > 0) {
-        data.mentions = mentionedUsers.map((u) => u.username).join(",");
+        const mentionsString = mentionedUsers.map((u) => u.username).join(",");
+
+        // Validate the length of the mentions field
+        if (mentionsString.length > MAX_MENTIONS_LENGTH) {
+          throw new TRPCError({
+            message: `Mentions exceed maximum allowed length of ${MAX_MENTIONS_LENGTH} characters.`,
+            code: "BAD_REQUEST",
+          });
+        }
+
+        data.mentions = mentionsString;
       }
 
       if (input.createdAt) {
@@ -114,7 +130,8 @@ export default authedProcedure
             .onConflictDoNothing()
             .returning();
 
-          if (result && result.length > 0) {
+          // Fix for linter errors - check if result is an array
+          if (Array.isArray(result) && result.length > 0) {
             comment = result[0];
           }
         } catch (err: any) {
