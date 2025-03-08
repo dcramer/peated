@@ -13,6 +13,9 @@ import UserAvatar from "./userAvatar";
 // Maximum number of mentions allowed in a single comment
 const MAX_MENTIONS = 20;
 
+// Maximum length for comment text
+const MAX_COMMENT_LENGTH = 2000;
+
 export default function TastingCommentForm({
   tastingId,
   user,
@@ -34,6 +37,7 @@ export default function TastingCommentForm({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [charCount, setCharCount] = useState(0);
 
   // State for @ mention suggestions
   const [mentionState, setMentionState] = useState({
@@ -60,7 +64,15 @@ export default function TastingCommentForm({
   // Handle text changes and detect @ mentions
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
+
+    // Check if the comment exceeds the maximum length
+    if (value.length > MAX_COMMENT_LENGTH) {
+      setError(`Comment cannot exceed ${MAX_COMMENT_LENGTH} characters`);
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, comment: value }));
+    setCharCount(value.length);
     setError(null);
 
     // Check for @ mentions
@@ -109,7 +121,19 @@ export default function TastingCommentForm({
     // Replace the partial @mention with the full username
     const newComment = `${beforeMention}@${username}${afterMention}`;
 
+    // Check if the new comment would exceed the maximum length
+    if (newComment.length > MAX_COMMENT_LENGTH) {
+      setError(`Comment cannot exceed ${MAX_COMMENT_LENGTH} characters`);
+      setMentionState({
+        isSearching: false,
+        searchPosition: 0,
+        searchQuery: "",
+      });
+      return;
+    }
+
     setFormData({ comment: newComment });
+    setCharCount(newComment.length);
     setMentionState({
       isSearching: false,
       searchPosition: 0,
@@ -142,6 +166,12 @@ export default function TastingCommentForm({
 
     if (saving || !formData.comment.trim()) return;
 
+    // Validate comment length
+    if (formData.comment.length > MAX_COMMENT_LENGTH) {
+      setError(`Comment cannot exceed ${MAX_COMMENT_LENGTH} characters`);
+      return;
+    }
+
     // Extract mentioned usernames
     const mentionedUsernames = extractMentionedUsernames(formData.comment);
 
@@ -166,6 +196,16 @@ export default function TastingCommentForm({
       if (isReply && replyToComment) {
         // Add a marker in the comment text to identify it as a reply
         data.comment = `[Reply to #${replyToComment.id}] ${data.comment}`;
+
+        // Check if the modified comment exceeds the maximum length
+        if (data.comment.length > MAX_COMMENT_LENGTH) {
+          setError(
+            `Comment with reply prefix cannot exceed ${MAX_COMMENT_LENGTH} characters`,
+          );
+          setSaving(false);
+          return;
+        }
+
         // Add the replyToId to the data
         data.replyToId = replyToComment.id;
       }
@@ -177,6 +217,7 @@ export default function TastingCommentForm({
         createdBy: user,
       });
       setFormData({ comment: "" });
+      setCharCount(0);
 
       if (onCancel) {
         onCancel();
@@ -213,6 +254,7 @@ export default function TastingCommentForm({
                   placeholder={placeholder}
                   value={formData.comment}
                   onChange={handleTextChange}
+                  maxLength={MAX_COMMENT_LENGTH}
                 />
 
                 {/* Mention suggestions */}
@@ -226,6 +268,13 @@ export default function TastingCommentForm({
               {error && (
                 <div className="mt-2 text-sm text-red-500">{error}</div>
               )}
+
+              {/* Character counter */}
+              <div
+                className={`mt-1 text-right text-xs ${charCount > MAX_COMMENT_LENGTH * 0.9 ? "text-amber-500" : "text-slate-400"}`}
+              >
+                {charCount}/{MAX_COMMENT_LENGTH}
+              </div>
 
               {/* Spacer element to match the height of the toolbar */}
               <div className="py-2" aria-hidden="true">

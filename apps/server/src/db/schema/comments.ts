@@ -12,6 +12,9 @@ import {
 import { tastings } from "./tastings";
 import { users } from "./users";
 
+// Maximum length for comment text
+const MAX_COMMENT_LENGTH = 2000;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const comments = pgTable(
   "comments",
@@ -20,7 +23,7 @@ export const comments = pgTable(
     tastingId: bigint("tasting_id", { mode: "number" })
       .references(() => tastings.id)
       .notNull(),
-    comment: text("comment").notNull(),
+    comment: varchar("comment", { length: MAX_COMMENT_LENGTH }).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
