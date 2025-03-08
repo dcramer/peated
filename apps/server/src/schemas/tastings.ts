@@ -33,6 +33,7 @@ export const TastingInputSchema = TastingSchema.omit({
   createdBy: true,
 }).extend({
   bottle: z.number(),
+  edition: z.number().nullish(),
   flight: z.string().nullish(),
   createdAt: zDatetime.nullish(),
   image: z.null().optional(),

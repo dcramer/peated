@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
 import {
+  bottleEditions,
   bottles,
   bottleTags,
   entities,
@@ -45,6 +46,21 @@ export default authedProcedure
       });
     }
 
+    if (input.edition) {
+      const edition = await db.query.bottleEditions.findFirst({
+        where: and(
+          eq(bottleEditions.id, input.edition),
+          eq(bottleEditions.bottleId, bottle.id),
+        ),
+      });
+      if (!edition) {
+        throw new TRPCError({
+          message: "Cannot identify edition.",
+          code: "BAD_REQUEST",
+        });
+      }
+    }
+
     let flight: Flight | null = null;
     if (input.flight) {
       const flightResults = await db
@@ -69,6 +85,7 @@ export default authedProcedure
 
     const data: NewTasting = {
       bottleId: bottle.id,
+      editionId: input.edition || null,
       notes: input.notes || null,
       rating: input.rating || null,
       flightId: flight ? flight.id : null,

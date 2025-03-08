@@ -851,3 +851,100 @@ export const SampleSquareImage = async () => {
 export const SampleSquareImagePath = async () => {
   return path.join(__dirname, "assets", "sample-square-image.jpg");
 };
+
+export const BottleEdition = async (
+  { ...data }: Partial<Omit<dbSchema.NewBottleEdition, "id">> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.BottleEdition> => {
+  const [result] = await db.transaction(async (tx) => {
+    const bottle = data.bottleId
+      ? await db.query.bottles.findFirst({
+          where: eq(bottles.id, data.bottleId),
+        })
+      : await Bottle({}, tx);
+    if (!bottle) throw new Error("Unable to find bottle");
+
+    const bottleBrand = await tx.query.entities.findFirst({
+      where: eq(entities.id, bottle.brandId),
+    });
+    if (!bottleBrand) throw new Error("Unable to find bottle brand");
+
+    const name = data.name || chooseBottleName(true);
+    const fullName =
+      data.fullName ||
+      formatBottleName({
+        ...data,
+        name: `${bottleBrand.name} ${name}`,
+      });
+
+    const editionData: dbSchema.NewBottleEdition = {
+      bottleId: bottle.id,
+      name,
+      fullName,
+      statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
+      abv: choose([null, null, 40, 43, 46, 48.6, 50, 55.8, 58.9, 63.5]),
+      singleCask: choose([null, null, true, false]),
+      caskStrength: choose([null, null, true, false]),
+      vintageYear: choose([
+        null,
+        null,
+        null,
+        ...Array.from({ length: 20 }, (_, i) => 1990 + i),
+      ]),
+      releaseYear: choose([
+        null,
+        null,
+        null,
+        ...Array.from({ length: 20 }, (_, i) => 2000 + i),
+      ]),
+      caskSize: choose([
+        null,
+        null,
+        "quarter_cask",
+        "barrel",
+        "hogshead",
+        "barrique",
+        "puncheon",
+        "butt",
+        "port_pipe",
+        "madeira_drum",
+      ]),
+      caskType: choose([
+        null,
+        null,
+        "bourbon",
+        "amontilado",
+        "fino",
+        "oloroso",
+        "pedro_ximenez",
+        "madeira",
+        "tawny_port",
+        "ruby_port",
+      ]),
+      caskFill: choose([null, null, "1st_fill", "2nd_fill", "refill", "other"]),
+      description: choose([null, null, faker.lorem.paragraph()]),
+      descriptionSrc: choose([null, null, "user", "generated"]),
+      tastingNotes: choose([
+        null,
+        null,
+        {
+          nose: faker.lorem.sentence(),
+          palate: faker.lorem.sentence(),
+          finish: faker.lorem.sentence(),
+        },
+      ]),
+      suggestedTags: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      createdById: data.createdById || (await User({}, tx)).id,
+      ...data,
+    };
+
+    return await tx
+      .insert(dbSchema.bottleEditions)
+      .values(editionData)
+      .returning();
+  });
+  if (!result) throw new Error("Unable to create BottleEdition fixture");
+  return result;
+};
