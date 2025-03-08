@@ -20,10 +20,17 @@ test("updates totalBottles", async ({ fixtures }) => {
     regionId: region2.id,
   });
 
-  await fixtures.Bottle({ brandId: entity1.id });
-  await fixtures.Bottle({ brandId: entity2.id, bottlerId: entity1.id });
-  await fixtures.Bottle({ brandId: entity3.id });
-  await fixtures.Bottle({ distillerIds: [entity1.id, entity2.id] });
+  await fixtures.Bottle({ name: "Bottle 1", brandId: entity1.id });
+  await fixtures.Bottle({
+    name: "Bottle 2",
+    brandId: entity2.id,
+    bottlerId: entity1.id,
+  });
+  await fixtures.Bottle({ name: "Bottle 3", brandId: entity3.id });
+  await fixtures.Bottle({
+    name: "Bottle 4",
+    distillerIds: [entity1.id, entity2.id],
+  });
 
   await updateRegionStats({ regionId: region1.id });
 
