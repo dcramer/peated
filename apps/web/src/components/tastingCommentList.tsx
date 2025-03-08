@@ -8,6 +8,7 @@ import CommentEntry from "./commentEntry";
 import TastingCommentForm from "./tastingCommentForm";
 
 // Helper function to extract mentioned usernames from comment text
+// Used as a fallback if mentionedUsernames is not available from the API
 function extractMentionedUsernames(text: string): string[] {
   const mentionRegex = /@(\w+)/g;
   const matches = text.match(mentionRegex) || [];
@@ -97,10 +98,10 @@ export default function TastingCommentList({
                 new Date(b.createdAt).getTime(),
             );
 
-            // Extract mentioned usernames from the comment text
-            const mentionedUsernames = extractMentionedUsernames(
-              comment.comment,
-            );
+            // Get mentioned usernames from the API or extract from text as fallback
+            const mentionedUsernames =
+              comment.mentionedUsernames ||
+              extractMentionedUsernames(comment.comment);
 
             return (
               <React.Fragment key={comment.id}>
@@ -124,9 +125,10 @@ export default function TastingCommentList({
                   <div className="ml-12 mt-2 space-y-2">
                     {replies.map((reply) => {
                       const isReplyAuthor = user?.id === reply.createdBy.id;
-                      const replyMentionedUsernames = extractMentionedUsernames(
-                        reply.comment,
-                      );
+                      // Get mentioned usernames from the API or extract from text as fallback
+                      const replyMentionedUsernames =
+                        reply.mentionedUsernames ||
+                        extractMentionedUsernames(reply.comment);
 
                       return (
                         <CommentEntry

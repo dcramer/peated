@@ -45,14 +45,17 @@ export const CommentSerializer = serializer({
     attrs: Record<string, any>,
     currentUser?: User,
   ): z.infer<typeof CommentSchema> => {
+    // Extract mentioned usernames from the mentions field
+    const mentionedUsernames = item.mentions ? item.mentions.split(",") : [];
+
     // Create a basic comment object
     return {
       id: item.id,
       comment: item.comment,
       createdAt: item.createdAt.toISOString(),
       createdBy: attrs.createdBy,
-      replyToId: null, // This will be overridden in the commentCreate procedure if needed
-      mentions: [],
+      replyToId: item.parentId || null,
+      mentionedUsernames: mentionedUsernames,
     };
   },
 });

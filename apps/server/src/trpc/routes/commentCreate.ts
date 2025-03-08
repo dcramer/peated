@@ -93,7 +93,13 @@ export default authedProcedure
         comment: input.comment,
         tastingId: tasting.id,
         createdById: ctx.user.id,
+        parentId: input.replyToId ? Number(input.replyToId) : null,
       };
+
+      // Store mentioned usernames in the mentions field
+      if (mentionedUsers.length > 0) {
+        data.mentions = mentionedUsers.map((u) => u.username).join(",");
+      }
 
       if (input.createdAt) {
         data.createdAt = new Date(input.createdAt);
