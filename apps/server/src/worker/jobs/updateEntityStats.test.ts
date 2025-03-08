@@ -8,10 +8,10 @@ test("updates totalBottles", async ({ fixtures }) => {
   const entity2 = await fixtures.Entity({ name: "B" });
   const entity3 = await fixtures.Entity({ name: "C" });
 
-  await fixtures.Bottle({ brandId: entity1.id, name: "A" });
+  await fixtures.Bottle({ name: "A", brandId: entity1.id });
   await fixtures.Bottle({
-    brandId: entity2.id,
     name: "B",
+    brandId: entity2.id,
     bottlerId: entity1.id,
   });
   await fixtures.Bottle({ brandId: entity3.id, name: "C" });
