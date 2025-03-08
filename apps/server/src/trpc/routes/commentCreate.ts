@@ -90,11 +90,8 @@ export default authedProcedure
           }
         } catch (err) {
           console.error("Error checking parent comment:", err);
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Invalid parent comment ID",
-            cause: err,
-          });
+          // Continue without the replyToId if there's an error
+          input.replyToId = null;
         }
       }
 
@@ -287,8 +284,10 @@ export default authedProcedure
 
       // Add the replyToId and mentionedUsernames to the response
       const result = await serialize(CommentSerializer, comment, ctx.user);
-      if (input.replyToId !== undefined && input.replyToId !== null) {
-        result.replyToId = input.replyToId;
+
+      // Ensure replyToId is properly set in the response
+      if (comment.parentId) {
+        result.replyToId = comment.parentId;
       }
 
       // Add mentioned usernames to the result

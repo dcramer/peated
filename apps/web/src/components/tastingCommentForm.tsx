@@ -91,7 +91,7 @@ export default function TastingCommentForm({
     if (mentionMatch) {
       setMentionState({
         isSearching: true,
-        searchPosition: mentionMatch.index ?? 0,
+        searchPosition: mentionMatch.index!,
         searchQuery: mentionMatch[1],
       });
     } else {
@@ -205,13 +205,6 @@ export default function TastingCommentForm({
       // If this is a reply, add the replyToId
       if (isReply && replyToComment) {
         data.replyToId = replyToComment.id;
-
-        // Check if the comment exceeds the maximum length
-        if (data.comment.length > MAX_COMMENT_LENGTH) {
-          setError(`Comment cannot exceed ${MAX_COMMENT_LENGTH} characters`);
-          setSaving(false);
-          return;
-        }
       }
 
       const newComment = await commentCreateMutation.mutateAsync(data);
