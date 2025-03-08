@@ -2,11 +2,13 @@
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import type { User } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { PolymorphicProps } from "@peated/web/types";
 import type { ElementType } from "react";
 import button from "./button";
+import MentionHighlighter from "./mentionHighlighter";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
@@ -16,6 +18,9 @@ type Props = {
   text: string;
   canDelete?: boolean;
   onDelete?: () => void;
+  onReply?: () => void;
+  commentId: number;
+  mentionedUsernames?: string[];
 };
 
 const defaultElement = "li";
@@ -29,10 +34,12 @@ export default function CommentEntry<
   text,
   canDelete,
   onDelete,
+  onReply,
+  commentId,
+  mentionedUsernames = [],
   ...props
 }: PolymorphicProps<E, Props>) {
   const Component = as ?? defaultElement;
-
   const showMenu = canDelete;
 
   return (
@@ -73,7 +80,23 @@ export default function CommentEntry<
           </div>
         </div>
         <div className="mt-4 text-sm">
-          <p>{text}</p>
+          <p>
+            <MentionHighlighter
+              text={text}
+              mentionedUsernames={mentionedUsernames}
+            />
+          </p>
+        </div>
+        <div className="mt-2 flex items-center space-x-4">
+          {onReply && (
+            <button
+              onClick={onReply}
+              className="flex items-center text-xs text-gray-400 hover:text-white"
+            >
+              <ChatBubbleLeftIcon className="mr-1 h-4 w-4" />
+              Reply
+            </button>
+          )}
         </div>
       </div>
     </Component>

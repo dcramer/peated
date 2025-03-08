@@ -62,12 +62,30 @@ export default publicProcedure
       .offset(offset)
       .orderBy(asc(comments.createdAt));
 
+    const serializedComments = await serialize(
+      CommentSerializer,
+      results.slice(0, limit),
+      ctx.user,
+    );
+
+    // Process the comments to add replyToId information
+    // Since we don't have a parent_id column, we'll use a convention in the comment text
+    // to identify replies: [Reply to #123] at the beginning of the comment
+    const processedComments = serializedComments.map((comment) => {
+      const replyMatch = comment.comment.match(/^\[Reply to #(\d+)\]/);
+      if (replyMatch) {
+        // Extract the comment ID from the reply marker
+        const replyToId = parseInt(replyMatch[1], 10);
+        // Remove the reply marker from the comment text
+        comment.comment = comment.comment.replace(/^\[Reply to #\d+\]\s*/, "");
+        // Add the replyToId to the comment
+        comment.replyToId = replyToId;
+      }
+      return comment;
+    });
+
     return {
-      results: await serialize(
-        CommentSerializer,
-        results.slice(0, limit),
-        ctx.user,
-      ),
+      results: processedComments,
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,
         prevCursor: cursor > 1 ? cursor - 1 : null,
