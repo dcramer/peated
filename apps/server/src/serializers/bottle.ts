@@ -179,8 +179,11 @@ export const BottleSerializer = serializer({
       brand: attrs.brand,
       distillers: attrs.distillers,
       bottler: attrs.bottler,
+
       avgRating: item.avgRating,
       totalTastings: item.totalTastings,
+      numEditions: 0,
+
       suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,
       hasTasted: attrs.hasTasted,

@@ -47,7 +47,15 @@ export default function BottleResultRow({
             }
           >
             <span className="absolute inset-x-0 -top-px bottom-0" />
-            {bottle.fullName}
+            <div className="flex flex-col gap-x-2 sm:flex-row sm:items-center">
+              <span>{bottle.fullName}</span>
+              {bottle.numEditions > 0 && (
+                <span className="text-muted text-sm">
+                  {bottle.numEditions} edition
+                  {bottle.numEditions === 1 ? "" : "s"}
+                </span>
+              )}
+            </div>
           </Link>
           {bottle.isFavorite && (
             <StarIcon className="h-4 w-4" aria-hidden="true" />
