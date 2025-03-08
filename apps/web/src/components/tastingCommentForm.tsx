@@ -83,7 +83,7 @@ export default function TastingCommentForm({
     if (mentionMatch) {
       setMentionState({
         isSearching: true,
-        searchPosition: mentionMatch.index!,
+        searchPosition: mentionMatch.index ?? 0,
         searchQuery: mentionMatch[1],
       });
     } else {
