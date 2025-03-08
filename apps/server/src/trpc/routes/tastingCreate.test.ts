@@ -287,3 +287,63 @@ test("creates a new tasting with badge award", async ({
     }
   `);
 });
+
+test("creates a new tasting with edition", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const edition = await fixtures.BottleEdition({ bottleId: bottle.id });
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    edition: edition.id,
+    rating: 3.5,
+  });
+
+  expect(data.tasting.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.tasting.id));
+
+  expect(tasting.bottleId).toEqual(bottle.id);
+  expect(tasting.editionId).toEqual(edition.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
+  expect(tasting.rating).toEqual(3.5);
+});
+
+test("fails with invalid edition", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const otherBottle = await fixtures.Bottle();
+  const edition = await fixtures.BottleEdition({ bottleId: otherBottle.id });
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+
+  const err = await waitError(
+    caller.tastingCreate({
+      bottle: bottle.id,
+      edition: edition.id,
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify edition.]`);
+});
+
+test("fails with nonexistent edition", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+
+  const err = await waitError(
+    caller.tastingCreate({
+      bottle: bottle.id,
+      edition: 12345,
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify edition.]`);
+});
