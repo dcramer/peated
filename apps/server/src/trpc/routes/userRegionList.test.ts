@@ -10,20 +10,24 @@ test("lists regions", async ({ defaults, fixtures }) => {
   const entity1 = await fixtures.Entity({
     countryId: country1.id,
     regionId: null,
+    name: "Entity 1",
   });
   const entity2 = await fixtures.Entity({
     countryId: country1.id,
     regionId: region1.id,
+    name: "Entity 2",
   });
   const bottle = await fixtures.Bottle({
     brandId: entity1.id,
     distillerIds: [],
     bottlerId: null,
+    name: "Bottle 1",
   });
   const bottle2 = await fixtures.Bottle({
     brandId: entity2.id,
     distillerIds: [],
     bottlerId: null,
+    name: "Bottle 2",
   });
   await fixtures.Tasting({
     bottleId: bottle.id,
