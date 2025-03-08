@@ -4,8 +4,16 @@ import { eq } from "drizzle-orm";
 import mergeEntity from "./mergeEntity";
 
 test("merge A into B", async ({ fixtures }) => {
-  const entityA = await fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
-  const entityB = await fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
+  const entityA = await fixtures.Entity({
+    name: "Entity A",
+    totalTastings: 1,
+    totalBottles: 2,
+  });
+  const entityB = await fixtures.Entity({
+    name: "Entity B",
+    totalTastings: 3,
+    totalBottles: 1,
+  });
 
   await mergeEntity({
     fromEntityIds: [entityA.id],
@@ -32,8 +40,16 @@ test("merge A into B", async ({ fixtures }) => {
 });
 
 test("merge A from B", async ({ fixtures }) => {
-  const entityA = await fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
-  const entityB = await fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
+  const entityA = await fixtures.Entity({
+    name: "Entity A",
+    totalTastings: 1,
+    totalBottles: 2,
+  });
+  const entityB = await fixtures.Entity({
+    name: "Entity B",
+    totalTastings: 3,
+    totalBottles: 1,
+  });
 
   await mergeEntity({
     fromEntityIds: [entityB.id],
@@ -60,12 +76,20 @@ test("merge A from B", async ({ fixtures }) => {
 });
 
 test("merge duplicate bottle", async ({ fixtures }) => {
-  const entityA = await fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
+  const entityA = await fixtures.Entity({
+    name: "Entity A",
+    totalTastings: 1,
+    totalBottles: 2,
+  });
   const bottleA = await fixtures.Bottle({
     brandId: entityA.id,
     name: "Duplicate",
   });
-  const entityB = await fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
+  const entityB = await fixtures.Entity({
+    name: "Entity B",
+    totalTastings: 3,
+    totalBottles: 1,
+  });
   const bottleB = await fixtures.Bottle({
     brandId: entityB.id,
     name: "Duplicate",
@@ -91,12 +115,20 @@ test("merge duplicate bottle", async ({ fixtures }) => {
 });
 
 test("merge unique bottle", async ({ fixtures }) => {
-  const entityA = await fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
+  const entityA = await fixtures.Entity({
+    name: "Entity A",
+    totalTastings: 1,
+    totalBottles: 2,
+  });
   const bottleA = await fixtures.Bottle({
     brandId: entityA.id,
     name: "Unique",
   });
-  const entityB = await fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
+  const entityB = await fixtures.Entity({
+    name: "Entity B",
+    totalTastings: 3,
+    totalBottles: 1,
+  });
   const bottleB = await fixtures.Bottle({
     brandId: entityB.id,
     name: "More Unique",
