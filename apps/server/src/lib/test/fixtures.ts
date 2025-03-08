@@ -858,7 +858,7 @@ export const BottleEdition = async (
 ): Promise<dbSchema.BottleEdition> => {
   const [result] = await db.transaction(async (tx) => {
     const bottle = data.bottleId
-      ? await db.query.bottles.findFirst({
+      ? await tx.query.bottles.findFirst({
           where: eq(bottles.id, data.bottleId),
         })
       : await Bottle({}, tx);
