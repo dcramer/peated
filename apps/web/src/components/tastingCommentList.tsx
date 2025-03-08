@@ -7,11 +7,13 @@ import React, { useState } from "react";
 import CommentEntry from "./commentEntry";
 import TastingCommentForm from "./tastingCommentForm";
 
+// Regex for extracting mentions from text - allows alphanumeric, underscore, hyphen, and period
+const MENTION_EXTRACT_REGEX = /@([a-zA-Z0-9_\-.]+)/g;
+
 // Helper function to extract mentioned usernames from comment text
 // Used as a fallback if mentionedUsernames is not available from the API
 function extractMentionedUsernames(text: string): string[] {
-  const mentionRegex = /@(\w+)/g;
-  const matches = text.match(mentionRegex) || [];
+  const matches = text.match(MENTION_EXTRACT_REGEX) || [];
   return matches.map((match) => match.substring(1)); // Remove @ symbol
 }
 

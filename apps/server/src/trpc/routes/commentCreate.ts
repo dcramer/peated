@@ -22,6 +22,10 @@ const MAX_MENTIONS_LENGTH = 500;
 // Maximum number of mentions allowed in a single comment
 const MAX_MENTIONS = 20;
 
+// Regex for extracting mentions from text - allows alphanumeric, underscore, hyphen, and period
+// This should match the client-side regex pattern
+const MENTION_EXTRACT_REGEX = /@([a-zA-Z0-9_\-.]+)/g;
+
 // Define the extended input schema type
 type CommentCreateInput = z.infer<typeof CommentInputSchema> & {
   tasting: number;
@@ -30,8 +34,7 @@ type CommentCreateInput = z.infer<typeof CommentInputSchema> & {
 
 // Helper function to extract mentions from comment text
 function extractMentions(text: string): string[] {
-  const mentionRegex = /@(\w+)/g;
-  const matches = text.match(mentionRegex) || [];
+  const matches = text.match(MENTION_EXTRACT_REGEX) || [];
   return matches.map((match) => match.substring(1)); // Remove @ symbol
 }
 

@@ -18,6 +18,16 @@ const MAX_MENTIONS = 20;
 // Maximum length for comment text
 const MAX_COMMENT_LENGTH = 2000;
 
+// Regex for username validation - allows alphanumeric, underscore, hyphen, and period
+// This should match the server-side username validation
+const USERNAME_REGEX = /^[a-zA-Z0-9_\-.]+$/;
+
+// Regex for detecting mentions in progress (at the cursor position)
+const MENTION_IN_PROGRESS_REGEX = /@([a-zA-Z0-9_\-.]*)$/;
+
+// Regex for extracting complete mentions from text
+const MENTION_EXTRACT_REGEX = /@([a-zA-Z0-9_\-.]+)/g;
+
 // Type for the comment input data
 type CommentInput = z.infer<typeof CommentInputSchema> & {
   tasting: number;
@@ -86,7 +96,7 @@ export default function TastingCommentForm({
     // Check for @ mentions
     const cursorPosition = e.target.selectionStart || 0;
     const textBeforeCursor = value.substring(0, cursorPosition);
-    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+    const mentionMatch = textBeforeCursor.match(MENTION_IN_PROGRESS_REGEX);
 
     if (mentionMatch) {
       setMentionState({
@@ -164,8 +174,7 @@ export default function TastingCommentForm({
   // Extract mentioned usernames from the comment text
   // This should match the server-side extractMentions function
   const extractMentionedUsernames = (text: string): string[] => {
-    const mentionRegex = /@(\w+)/g;
-    const matches = text.match(mentionRegex) || [];
+    const matches = text.match(MENTION_EXTRACT_REGEX) || [];
     return matches.map((match) => match.substring(1)); // Remove @ symbol
   };
 
