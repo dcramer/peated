@@ -22,6 +22,12 @@ const MAX_MENTIONS_LENGTH = 500;
 // Maximum number of mentions allowed in a single comment
 const MAX_MENTIONS = 20;
 
+// Define the extended input schema type
+type CommentCreateInput = z.infer<typeof CommentInputSchema> & {
+  tasting: number;
+  mentionedUsernames?: string[];
+};
+
 // Helper function to extract mentions from comment text
 function extractMentions(text: string): string[] {
   const mentionRegex = /@(\w+)/g;
@@ -133,30 +139,25 @@ export default authedProcedure
           .where(inArray(users.username, mentionedUsernames));
       }
 
-      const data: Partial<NewComment> = {
+      // Create the comment data with proper typing
+      const data: Omit<NewComment, "id"> = {
         comment: input.comment,
         tastingId: tasting.id,
         createdById: ctx.user.id,
         parentId: input.replyToId ? Number(input.replyToId) : null,
+        createdAt: input.createdAt ? new Date(input.createdAt) : new Date(),
+        mentions:
+          mentionedUsers.length > 0
+            ? mentionedUsers.map((u) => u.username).join(",")
+            : null,
       };
 
-      // Store mentioned usernames in the mentions field
-      if (mentionedUsers.length > 0) {
-        const mentionsString = mentionedUsers.map((u) => u.username).join(",");
-
-        // Validate the length of the mentions field
-        if (mentionsString.length > MAX_MENTIONS_LENGTH) {
-          throw new TRPCError({
-            message: `Mentions exceed maximum allowed length of ${MAX_MENTIONS_LENGTH} characters.`,
-            code: "BAD_REQUEST",
-          });
-        }
-
-        data.mentions = mentionsString;
-      }
-
-      if (input.createdAt) {
-        data.createdAt = new Date(input.createdAt);
+      // Validate the length of the mentions field
+      if (data.mentions && data.mentions.length > MAX_MENTIONS_LENGTH) {
+        throw new TRPCError({
+          message: `Mentions exceed maximum allowed length of ${MAX_MENTIONS_LENGTH} characters.`,
+          code: "BAD_REQUEST",
+        });
       }
 
       const [comment, notifications] = await db.transaction(async (tx) => {
@@ -164,7 +165,7 @@ export default authedProcedure
         try {
           const result = await tx
             .insert(comments)
-            .values(data as NewComment)
+            .values(data)
             .onConflictDoNothing()
             .returning();
 

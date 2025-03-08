@@ -1,8 +1,10 @@
 "use client";
 
+import type { CommentInputSchema } from "@peated/server/schemas";
 import type { Comment, User } from "@peated/server/types";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useEffect, useRef, useState } from "react";
+import type { z } from "zod";
 import Button from "./button";
 import Fieldset from "./fieldset";
 import FormField from "./formField";
@@ -15,6 +17,12 @@ const MAX_MENTIONS = 20;
 
 // Maximum length for comment text
 const MAX_COMMENT_LENGTH = 2000;
+
+// Type for the comment input data
+type CommentInput = z.infer<typeof CommentInputSchema> & {
+  tasting: number;
+  mentionedUsernames?: string[];
+};
 
 export default function TastingCommentForm({
   tastingId,
@@ -185,20 +193,20 @@ export default function TastingCommentForm({
     setSaving(true);
 
     try {
-      // Prepare the comment data
-      const data: any = {
+      // Prepare the comment data with proper typing
+      const data: CommentInput = {
         comment: formData.comment,
         tasting: tastingId,
         createdAt: new Date().toISOString(),
-        mentionedUsernames, // Add mentioned usernames to the request
+        mentionedUsernames:
+          mentionedUsernames.length > 0 ? mentionedUsernames : undefined,
       };
 
-      // If this is a reply, add the replyToId and modify the comment text
+      // If this is a reply, add the replyToId
       if (isReply && replyToComment) {
-        // Add the replyToId to the data
         data.replyToId = replyToComment.id;
 
-        // Check if the modified comment exceeds the maximum length
+        // Check if the comment exceeds the maximum length
         if (data.comment.length > MAX_COMMENT_LENGTH) {
           setError(`Comment cannot exceed ${MAX_COMMENT_LENGTH} characters`);
           setSaving(false);
