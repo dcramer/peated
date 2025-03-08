@@ -1,10 +1,9 @@
 import { db } from "@peated/server/db";
-import { comments, tastings } from "@peated/server/db/schema";
+import { comments, notifications, tastings } from "@peated/server/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
-import { deleteNotification } from "../../lib/notifications";
 
 export default authedProcedure.input(z.number()).mutation(async function ({
   input,
@@ -29,17 +28,38 @@ export default authedProcedure.input(z.number()).mutation(async function ({
     });
   }
 
+  const replies = await db
+    .select()
+    .from(comments)
+    .where(eq(comments.parentId, comment.id));
+
   await db.transaction(async (tx) => {
+    const decrementAmount = 1 + replies.length;
+
     await tx
       .update(tastings)
-      .set({ comments: sql`${tastings.comments} - 1` })
+      .set({ comments: sql`${tastings.comments} - ${decrementAmount}` })
       .where(and(eq(tastings.id, comment.tastingId), gt(tastings.comments, 0)));
 
-    await deleteNotification(tx, {
-      type: "comment",
-      objectId: comment.id,
-      userId: comment.createdById,
-    });
+    await tx
+      .delete(notifications)
+      .where(
+        and(
+          eq(notifications.type, "comment"),
+          eq(notifications.objectId, comment.id),
+        ),
+      );
+
+    for (const reply of replies) {
+      await tx
+        .delete(notifications)
+        .where(
+          and(
+            eq(notifications.type, "comment"),
+            eq(notifications.objectId, reply.id),
+          ),
+        );
+    }
 
     await tx.delete(comments).where(eq(comments.id, comment.id));
   });
