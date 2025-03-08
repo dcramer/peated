@@ -85,6 +85,7 @@ export const BottleInputSchema = BottleSchema.omit({
   updatedAt: true,
   isFavorite: true,
   hasTasted: true,
+  numEditions: true,
 }).extend({
   brand: EntityChoice,
   distillers: z.array(EntityChoice).default([]).optional(),
