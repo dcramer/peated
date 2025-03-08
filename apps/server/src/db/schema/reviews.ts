@@ -32,17 +32,15 @@ export const reviews = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      nameUnique: uniqueIndex("review_unq_name").using(
-        "btree",
-        table.externalSiteId,
-        sql`LOWER(${table.name})`,
-        table.issue,
-      ),
-      bottleIdx: index("review_bottle_idx").on(table.bottleId),
-    };
-  },
+  (table) => [
+    uniqueIndex("review_unq_name").using(
+      "btree",
+      table.externalSiteId,
+      sql`LOWER(${table.name})`,
+      table.issue,
+    ),
+    index("review_bottle_idx").on(table.bottleId),
+  ],
 );
 
 export const reviewsRelations = relations(reviews, ({ one }) => ({

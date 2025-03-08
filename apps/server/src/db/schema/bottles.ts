@@ -115,21 +115,14 @@ export const bottles = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (table) => {
-    return {
-      searchVectorIndex: index("bottle_search_idx").using(
-        "gin",
-        table.searchVector,
-      ),
-      brandIdx: index("bottle_brand_idx").on(table.brandId),
-      bottlerIdx: index("bottle_bottler_idx").on(table.bottlerId),
-      createdById: index("bottle_created_by_idx").on(table.createdById),
-      categoryIdx: index("bottle_category_idx").on(table.category),
-      flavorProfileIdx: index("bottle_flavor_profile_idx").on(
-        table.flavorProfile,
-      ),
-    };
-  },
+  (table) => [
+    index("bottle_search_idx").using("gin", table.searchVector),
+    index("bottle_brand_idx").on(table.brandId),
+    index("bottle_bottler_idx").on(table.bottlerId),
+    index("bottle_created_by_idx").on(table.createdById),
+    index("bottle_category_idx").on(table.category),
+    index("bottle_flavor_profile_idx").on(table.flavorProfile),
+  ],
 );
 
 export type Bottle = typeof bottles.$inferSelect;
@@ -257,14 +250,7 @@ export const bottlesToDistillers = pgTable(
       .references(() => entities.id)
       .notNull(),
   },
-  (bottlesToDistillers) => {
-    return {
-      bottleDistillerId: primaryKey(
-        bottlesToDistillers.bottleId,
-        bottlesToDistillers.distillerId,
-      ),
-    };
-  },
+  (table) => [primaryKey({ columns: [table.bottleId, table.distillerId] })],
 );
 
 export const bottlesToDistillersRelations = relations(
@@ -293,11 +279,7 @@ export const bottleTags = pgTable(
     tag: varchar("tag", { length: 64 }).notNull(),
     count: integer("count").default(0).notNull(),
   },
-  (bottleTags) => {
-    return {
-      pk: primaryKey(bottleTags.bottleId, bottleTags.tag),
-    };
-  },
+  (table) => [primaryKey({ columns: [table.bottleId, table.tag] })],
 );
 
 export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
@@ -322,15 +304,13 @@ export const bottleAliases = pgTable(
     ignored: boolean("ignored").default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      nameIdx: uniqueIndex("bottle_alias_name_idx").using(
-        "btree",
-        sql`LOWER(${table.name})`,
-      ),
-      bottleIdx: index("bottle_alias_bottle_idx").on(table.bottleId),
-    };
-  },
+  (table) => [
+    uniqueIndex("bottle_alias_name_idx").using(
+      "btree",
+      sql`LOWER(${table.name})`,
+    ),
+    index("bottle_alias_bottle_idx").on(table.bottleId),
+  ],
 );
 
 export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
@@ -374,11 +354,7 @@ export const bottleFlavorProfiles = pgTable(
     flavorProfile: flavorProfileEnum("flavor_profile").notNull(),
     count: integer("count").default(0).notNull(),
   },
-  (table) => {
-    return {
-      pk: primaryKey(table.bottleId, table.flavorProfile),
-    };
-  },
+  (table) => [primaryKey({ columns: [table.bottleId, table.flavorProfile] })],
 );
 
 export const bottleFlavorProfilesRelations = relations(

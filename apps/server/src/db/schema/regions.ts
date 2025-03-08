@@ -30,21 +30,19 @@ export const regions = pgTable(
       .default(0)
       .notNull(),
   },
-  (table) => {
-    return {
-      nameUnique: uniqueIndex("region_name_unq").using(
-        "btree",
-        table.countryId,
-        sql`LOWER(${table.name})`,
-      ),
-      slugUnique: uniqueIndex("region_slug_unq").using(
-        "btree",
-        table.countryId,
-        sql`LOWER(${table.slug})`,
-      ),
-      countryId: index("region_country_idx").on(table.countryId),
-    };
-  },
+  (table) => [
+    uniqueIndex("region_name_unq").using(
+      "btree",
+      table.countryId,
+      sql`LOWER(${table.name})`,
+    ),
+    uniqueIndex("region_slug_unq").using(
+      "btree",
+      table.countryId,
+      sql`LOWER(${table.slug})`,
+    ),
+    index("region_country_idx").on(table.countryId),
+  ],
 );
 
 export const regionsRelations = relations(regions, ({ one, many }) => ({

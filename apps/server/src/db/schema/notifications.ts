@@ -34,19 +34,16 @@ export const notifications = pgTable(
     type: notificationTypeEnum("type").notNull(),
     // does not default as it should be set to object's createdAt timestamp
     createdAt: timestamp("created_at").notNull(),
-
     read: boolean("read").default(false).notNull(),
   },
-  (notifications) => {
-    return {
-      notificationUnique: uniqueIndex("notifications_unq").on(
-        notifications.userId,
-        notifications.objectId,
-        notifications.type,
-        notifications.createdAt,
-      ),
-    };
-  },
+  (table) => [
+    uniqueIndex("notifications_unq").on(
+      table.userId,
+      table.objectId,
+      table.type,
+      table.createdAt,
+    ),
+  ],
 );
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({

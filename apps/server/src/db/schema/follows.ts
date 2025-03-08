@@ -30,15 +30,10 @@ export const follows = pgTable(
     status: followStatusEnum("status").default("pending").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (follows) => {
-    return {
-      follows: uniqueIndex("follow_unq").on(
-        follows.fromUserId,
-        follows.toUserId,
-      ),
-      toUserIdx: index("follow_to_user_idx").on(follows.toUserId),
-    };
-  },
+  (table) => [
+    uniqueIndex("follow_unq").on(table.fromUserId, table.toUserId),
+    index("follow_to_user_idx").on(table.toUserId),
+  ],
 );
 
 export const followsRelations = relations(follows, ({ one, many }) => ({

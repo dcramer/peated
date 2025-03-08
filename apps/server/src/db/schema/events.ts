@@ -36,16 +36,14 @@ export const events = pgTable(
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      name: uniqueIndex("event_name_unq").using(
-        "btree",
-        table.dateStart,
-        sql`LOWER(${table.name})`,
-      ),
-      countryId: index("event_country_id").on(table.countryId),
-    };
-  },
+  (table) => [
+    uniqueIndex("event_name_unq").using(
+      "btree",
+      table.dateStart,
+      sql`LOWER(${table.name})`,
+    ),
+    index("event_country_id").on(table.countryId),
+  ],
 );
 
 export type Event = typeof events.$inferSelect;

@@ -55,18 +55,16 @@ export const tastings = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (tastings) => {
-    return {
-      tasting: uniqueIndex("tasting_unq").on(
-        tastings.bottleId,
-        tastings.createdById,
-        tastings.createdAt,
-      ),
-      bottleId: index("tasting_bottle_idx").on(tastings.bottleId),
-      flightId: index("tasting_flight_idx").on(tastings.flightId),
-      createdById: index("tasting_created_by_idx").on(tastings.createdById),
-    };
-  },
+  (table) => [
+    uniqueIndex("tasting_unq").on(
+      table.bottleId,
+      table.createdById,
+      table.createdAt,
+    ),
+    index("tasting_bottle_idx").on(table.bottleId),
+    index("tasting_flight_idx").on(table.flightId),
+    index("tasting_created_by_idx").on(table.createdById),
+  ],
 );
 
 export const tastingsRelations = relations(tastings, ({ one }) => ({
@@ -96,15 +94,10 @@ export const tastingBadgeAwards = pgTable(
     level: smallint("level").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      constraint: uniqueIndex("tasting_badge_award_key").on(
-        table.tastingId,
-        table.awardId,
-      ),
-      award: index("tasting_badge_award_award_id").on(table.awardId),
-    };
-  },
+  (table) => [
+    uniqueIndex("tasting_badge_award_key").on(table.tastingId, table.awardId),
+    index("tasting_badge_award_award_id").on(table.awardId),
+  ],
 );
 
 export const tastingBadgeAwardsRelations = relations(
