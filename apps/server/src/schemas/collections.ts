@@ -21,4 +21,5 @@ export const CollectionBottleSchema = z.object({
 
 export const CollectionBottleInputSchema = z.object({
   bottle: z.number(),
+  edition: z.number().nullish(),
 });

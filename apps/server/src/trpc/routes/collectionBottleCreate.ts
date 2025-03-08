@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleEditions,
   bottles,
   collectionBottles,
   collections,
@@ -8,7 +9,7 @@ import { getUserFromId } from "@peated/server/lib/api";
 import { getDefaultCollection } from "@peated/server/lib/db";
 import { CollectionBottleInputSchema } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 
@@ -67,12 +68,28 @@ export default authedProcedure
       });
     }
 
+    if (input.edition) {
+      const edition = await db.query.bottleEditions.findFirst({
+        where: and(
+          eq(bottleEditions.id, input.edition),
+          eq(bottleEditions.bottleId, bottle.id),
+        ),
+      });
+      if (!edition) {
+        throw new TRPCError({
+          message: "Cannot identify edition.",
+          code: "BAD_REQUEST",
+        });
+      }
+    }
+
     await db.transaction(async (tx) => {
       const [cb] = await tx
         .insert(collectionBottles)
         .values({
           collectionId: collection.id,
           bottleId: bottle.id,
+          editionId: input.edition || null,
         })
         .onConflictDoNothing()
         .returning();
