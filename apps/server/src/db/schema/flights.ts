@@ -4,14 +4,14 @@ import {
   bigserial,
   boolean,
   pgTable,
-  primaryKey,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottles } from "./bottles";
+import { bottleEditions, bottles } from "./bottles";
 import { users } from "./users";
 
 export const flights = pgTable(
@@ -51,8 +51,15 @@ export const flightBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
+    editionId: bigint("edition_id", { mode: "number" }).references(
+      () => bottleEditions.id,
+    ),
   },
-  (table) => [primaryKey({ columns: [table.flightId, table.bottleId] })],
+  (table) => [
+    unique()
+      .on(table.flightId, table.bottleId, table.editionId)
+      .nullsNotDistinct(),
+  ],
 );
 
 export const flightBottlesRelations = relations(flightBottles, ({ one }) => ({

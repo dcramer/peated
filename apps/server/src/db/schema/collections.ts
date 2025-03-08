@@ -5,11 +5,12 @@ import {
   index,
   pgTable,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottles } from "./bottles";
+import { bottleEditions, bottles } from "./bottles";
 import { users } from "./users";
 
 export const collections = pgTable(
@@ -52,11 +53,17 @@ export const collectionBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
+    editionId: bigint("edition_id", { mode: "number" }).references(
+      () => bottleEditions.id,
+    ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("collection_bottle_unq").on(table.collectionId, table.bottleId),
+    unique()
+      .on(table.collectionId, table.bottleId, table.editionId)
+      .nullsNotDistinct(),
     index("collection_bottle_bottle_idx").on(table.bottleId),
+    index("collection_bottle_edition_idx").on(table.editionId),
   ],
 );
 

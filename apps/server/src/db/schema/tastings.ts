@@ -10,13 +10,14 @@ import {
   smallint,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
 import { SERVING_STYLE_LIST } from "../../constants";
 import { badgeAwards } from "./badges";
-import { bottles } from "./bottles";
+import { bottleEditions, bottles } from "./bottles";
 import { flights } from "./flights";
 import { users } from "./users";
 
@@ -30,6 +31,9 @@ export const tastings = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
+    editionId: bigint("edition_id", { mode: "number" }).references(
+      () => bottleEditions.id,
+    ),
     tags: varchar("tags", { length: 64 })
       .array()
       .default(sql`array[]::varchar[]`)
@@ -56,12 +60,11 @@ export const tastings = pgTable(
       .notNull(),
   },
   (table) => [
-    uniqueIndex("tasting_unq").on(
-      table.bottleId,
-      table.createdById,
-      table.createdAt,
-    ),
+    unique("tasting_unq")
+      .on(table.bottleId, table.editionId, table.createdById, table.createdAt)
+      .nullsNotDistinct(),
     index("tasting_bottle_idx").on(table.bottleId),
+    index("tasting_edition_idx").on(table.editionId),
     index("tasting_flight_idx").on(table.flightId),
     index("tasting_created_by_idx").on(table.createdById),
   ],
