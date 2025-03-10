@@ -13,8 +13,15 @@ describe("priceList", () => {
   test("lists prices with default parameters", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const caller = createCaller({ user: admin });
-    const price1 = await fixtures.StorePrice({ name: "Price 1" });
-    const price2 = await fixtures.StorePrice({ name: "Price 2" });
+    const site = await fixtures.ExternalSiteOrExisting();
+    const price1 = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Price 1",
+    });
+    const price2 = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Price 2",
+    });
 
     const result = await caller.priceList({});
 
@@ -28,9 +35,13 @@ describe("priceList", () => {
   test("filters prices by site", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const caller = createCaller({ user: admin });
-    const site1 = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const site1 = await fixtures.ExternalSiteOrExisting({
+      type: "whiskyadvocate",
+    });
     const price1 = await fixtures.StorePrice({ externalSiteId: site1.id });
-    const site2 = await fixtures.ExternalSite({ type: "healthyspirits" });
+    const site2 = await fixtures.ExternalSiteOrExisting({
+      type: "healthyspirits",
+    });
     await fixtures.StorePrice({ externalSiteId: site2.id }); // Different site
 
     const result = await caller.priceList({ site: "whiskyadvocate" });
@@ -43,8 +54,12 @@ describe("priceList", () => {
     const admin = await fixtures.User({ admin: true });
     const caller = createCaller({ user: admin });
     const bottle = await fixtures.Bottle();
-    const price1 = await fixtures.StorePrice({ bottleId: null });
-    await fixtures.StorePrice({ bottleId: bottle.id }); // Known bottle
+    const site = await fixtures.ExternalSiteOrExisting();
+    const price1 = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+    });
+    await fixtures.StorePrice({ bottleId: bottle.id, externalSiteId: site.id }); // Known bottle
 
     const result = await caller.priceList({ onlyUnknown: true });
 
@@ -55,8 +70,15 @@ describe("priceList", () => {
   test("filters prices by query", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const caller = createCaller({ user: admin });
-    const price1 = await fixtures.StorePrice({ name: "Unique Whiskey" });
-    await fixtures.StorePrice({ name: "Common Bourbon" });
+    const site = await fixtures.ExternalSiteOrExisting();
+    const price1 = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Unique Whiskey",
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Common Bourbon",
+    });
 
     const result = await caller.priceList({ query: "Unique" });
 
@@ -97,14 +119,14 @@ describe("priceList", () => {
     const caller = createCaller({ user: admin });
     const recentPrice = await fixtures.StorePrice({
       externalSiteId: (
-        await fixtures.ExternalSite({
+        await fixtures.ExternalSiteOrExisting({
           type: "astorwines",
         })
       ).id,
     });
     const oldPrice = await fixtures.StorePrice({
       externalSiteId: (
-        await fixtures.ExternalSite({
+        await fixtures.ExternalSiteOrExisting({
           type: "totalwine",
         })
       ).id,
@@ -125,14 +147,14 @@ describe("priceList", () => {
     const caller = createCaller({ user: admin });
     const recentPrice = await fixtures.StorePrice({
       externalSiteId: (
-        await fixtures.ExternalSite({
+        await fixtures.ExternalSiteOrExisting({
           type: "astorwines",
         })
       ).id,
     });
     const oldPrice = await fixtures.StorePrice({
       externalSiteId: (
-        await fixtures.ExternalSite({
+        await fixtures.ExternalSiteOrExisting({
           type: "totalwine",
         })
       ).id,

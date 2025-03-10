@@ -1,8 +1,11 @@
 import { createCaller } from "../router";
 
 test("lists tags", async ({ fixtures }) => {
-  const bottle = await fixtures.Bottle();
+  const bottle = await fixtures.Bottle({
+    name: "A",
+  });
   const bottle2 = await fixtures.Bottle({
+    name: "B",
     brandId: bottle.brandId,
   });
   await fixtures.Tasting({

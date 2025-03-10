@@ -2,8 +2,9 @@ import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "../router";
 
 test("lists reviews", async ({ fixtures }) => {
-  await fixtures.Review();
-  await fixtures.Review();
+  const site = await fixtures.ExternalSite();
+  await fixtures.Review({ externalSiteId: site.id });
+  await fixtures.Review({ externalSiteId: site.id });
 
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),
@@ -14,9 +15,6 @@ test("lists reviews", async ({ fixtures }) => {
 });
 
 test("lists reviews without mod", async ({ defaults, fixtures }) => {
-  await fixtures.Review();
-  await fixtures.Review();
-
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(caller.reviewList());
   expect(err).toMatchInlineSnapshot(`[TRPCError: BAD_REQUEST]`);
@@ -41,9 +39,6 @@ test("lists reviews by site", async ({ fixtures }) => {
 });
 
 test("lists reviews by site without mod", async ({ defaults, fixtures }) => {
-  await fixtures.Review();
-  await fixtures.Review();
-
   const site = await fixtures.ExternalSite();
 
   const caller = createCaller({ user: defaults.user });

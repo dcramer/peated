@@ -54,7 +54,7 @@ const loadDefaultSites = async () => {
     (await db.query.externalSites.findFirst({
       where: eq(externalSites.type, "totalwine"),
     })) ||
-    (await Fixtures.ExternalSite({
+    (await Fixtures.ExternalSiteOrExisting({
       name: "Total Wine",
       type: "totalwine",
     }));
@@ -62,7 +62,7 @@ const loadDefaultSites = async () => {
     (await db.query.externalSites.findFirst({
       where: eq(externalSites.type, "woodencork"),
     })) ||
-    (await Fixtures.ExternalSite({
+    (await Fixtures.ExternalSiteOrExisting({
       name: "Wooden Cork",
       type: "woodencork",
     }));
@@ -71,15 +71,6 @@ const loadDefaultSites = async () => {
 };
 
 const loadDefaultEntities = async () => {
-  const distilleryList = [];
-  for (
-    let i = 1, distilleryName;
-    (distilleryName = SMWS_DISTILLERY_CODES[i]);
-    i++
-  ) {
-    distilleryList.push(distilleryName);
-  }
-
   // TODO: add countries
   const mocks: Pick<Entity, "name" | "type" | "shortName">[] = [
     {
@@ -87,7 +78,7 @@ const loadDefaultEntities = async () => {
       type: ["brand", "bottler"],
       shortName: "SMWS",
     },
-    ...distilleryList.map((name) => ({
+    ...Fixtures.distilleryNames.map((name) => ({
       name,
       type: ["brand", "distiller"] as EntityType[],
       shortName: null,
@@ -114,7 +105,7 @@ const loadDefaultEntities = async () => {
     });
     results.push(
       existingMatch?.entity ??
-        (await Fixtures.Entity({
+        (await Fixtures.EntityOrExisting({
           ...data,
           countryId: sample(majorCountries, 1)[0].id,
         })),
