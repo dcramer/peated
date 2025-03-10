@@ -4,6 +4,7 @@ export * from "./countries";
 export * from "./data";
 export * from "./db";
 export * from "./entities";
+export * from "./labels";
 export * from "./mocks";
 export * from "./prices";
 export * from "./regions";
