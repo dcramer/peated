@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
-import { collectionBottles } from "@peated/server/db/schema";
+import { collectionBottles, collections } from "@peated/server/db/schema";
+import { getDefaultCollection } from "@peated/server/lib/db";
 import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "@peated/server/trpc/router";
 import { eq } from "drizzle-orm";
@@ -63,21 +64,17 @@ test("multiple bottles without editions in default", async ({
     bottle: bottle2.id,
   });
 
+  // Get the actual default collection that was used
+  const defaultCollection = await getDefaultCollection(db, defaults.user.id);
+  if (!defaultCollection) {
+    throw new Error("Default collection not found");
+  }
+
   // Check both bottles are in the collection
   const bottleList = await db
     .select()
     .from(collectionBottles)
-    .where(
-      eq(
-        collectionBottles.collectionId,
-        (
-          await fixtures.Collection({
-            name: "default",
-            createdById: defaults.user.id,
-          })
-        ).id,
-      ),
-    );
+    .where(eq(collectionBottles.collectionId, defaultCollection.id));
 
   expect(bottleList.length).toBe(2);
   expect(bottleList.map((b) => b.bottleId).sort()).toEqual(
