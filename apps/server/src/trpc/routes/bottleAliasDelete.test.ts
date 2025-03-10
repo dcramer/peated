@@ -9,12 +9,15 @@ test("deletes alias", async ({ fixtures }) => {
   const bottle = await fixtures.Bottle();
   const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
 
+  const site = await fixtures.ExternalSiteOrExisting();
   const review = await fixtures.Review({
     bottleId: bottle.id,
     name: alias.name,
+    externalSiteId: site.id,
   });
   const storePrice = await fixtures.StorePrice({
     bottleId: bottle.id,
+    externalSiteId: site.id,
     name: alias.name,
   });
 
