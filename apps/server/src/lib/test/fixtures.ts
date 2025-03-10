@@ -243,7 +243,7 @@ export const EntityOrExisting = async (
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Entity> => {
   if (!data.name)
-    data.name = `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}}`;
+    data.name = `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}`;
 
   const existing = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.name, data.name as string),
@@ -259,7 +259,7 @@ export const Entity = async (
 ): Promise<dbSchema.Entity> => {
   const name =
     data.name ||
-    `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}}`;
+    `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}`;
 
   return await db.transaction(async (tx) => {
     const entityData: dbSchema.NewEntity = {
