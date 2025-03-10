@@ -129,18 +129,7 @@ export default function Sidebar() {
               </li>
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
-                  <SidebarLink
-                    href={config.GITHUB_REPO}
-                    icon={CodeBracketSquareIcon}
-                  >
-                    GitHub
-                  </SidebarLink>
-                  <SidebarLink
-                    href={config.DISCORD_LINK}
-                    icon={ChatBubbleLeftIcon}
-                  >
-                    Discord
-                  </SidebarLink>
+                  <FeedbackSidebarLink />
                   <SidebarLink
                     href="/about"
                     icon={InformationCircleIcon}
@@ -148,7 +137,6 @@ export default function Sidebar() {
                   >
                     About
                   </SidebarLink>
-                  <FeedbackSidebarLink />
                 </ul>
               </li>
             </ul>

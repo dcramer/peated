@@ -1,7 +1,6 @@
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
-import Spinner from "@peated/web/components/spinner";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { Suspense, type ReactNode } from "react";
@@ -70,6 +69,18 @@ export default async function Layout({
             <Suspense fallback={<PriceChangesSkeleton />}>
               <PriceChanges />
             </Suspense>
+
+            <Tabs fullWidth>
+              <TabItem active>Quick Links</TabItem>
+            </Tabs>
+            <div className="text-muted text-center text-sm">
+              <Link
+                href="/entities/4263/codes"
+                className="text-inherit hover:underline"
+              >
+                SMWS Distillery Codes
+              </Link>
+            </div>
           </div>
         </div>
       </div>
