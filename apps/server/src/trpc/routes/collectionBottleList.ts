@@ -64,7 +64,7 @@ export default publicProcedure
       .from(collectionBottles)
       .where(where ? and(...where) : undefined)
       .innerJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
-      .innerJoin(entities, eq(entities.id, bottles.brandId))
+      // .innerJoin(entities, eq(entities.id, bottles.brandId))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(asc(bottles.fullName));
