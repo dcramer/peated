@@ -59,7 +59,7 @@ function getDistilleryNames() {
   return distilleryNames;
 }
 
-const distilleryNames = getDistilleryNames();
+export const distilleryNames = getDistilleryNames();
 
 const bottleNames = [
   "12-year-old",
@@ -238,16 +238,28 @@ export const Region = async (
   return result;
 };
 
+export const EntityOrExisting = async (
+  { ...data }: Partial<Omit<dbSchema.NewEntity, "id">> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.Entity> => {
+  if (!data.name)
+    data.name = `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}}`;
+
+  const existing = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.name, data.name as string),
+  });
+  if (existing) return existing;
+
+  return await Entity(data, db);
+};
+
 export const Entity = async (
   { ...data }: Partial<Omit<dbSchema.NewEntity, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Entity> => {
-  const name = data.name || choose(distilleryNames);
-  // XXX(dcramer): not ideal
-  const existing = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.name, name),
-  });
-  if (existing) return existing;
+  const name =
+    data.name ||
+    `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}}`;
 
   return await db.transaction(async (tx) => {
     const entityData: dbSchema.NewEntity = {
@@ -442,7 +454,7 @@ export const Tasting = async (
   return await db.transaction(async (tx) => {
     const tags = [];
     for (let i = 0; i <= random(1, 5); i++) {
-      tags.push((await Tag({}, tx)).name);
+      tags.push((await TagOrExisting({}, tx)).name);
     }
     const [result] = await tx
       .insert(tastings)
@@ -600,17 +612,25 @@ export const Event = async (
   return result;
 };
 
-export const ExternalSite = async (
+export const ExternalSiteOrExisting = async (
   { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
   if (!data.type) data.type = choose(EXTERNAL_SITE_TYPE_LIST);
-  // XXX(dcramer): not ideal
   const existing = await db.query.externalSites.findFirst({
     where: (externalSites, { eq }) =>
       eq(externalSites.type, data.type as ExternalSiteType),
   });
   if (existing) return existing;
+
+  return await ExternalSite(data, db);
+};
+
+export const ExternalSite = async (
+  { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.ExternalSite> => {
+  if (!data.type) data.type = choose(EXTERNAL_SITE_TYPE_LIST);
 
   const [result] = await db
     .insert(externalSites)
@@ -766,28 +786,32 @@ export const Collection = async (
   return result;
 };
 
+export const TagOrExisting = async (
+  { ...data }: Partial<Omit<dbSchema.NewTag, "id">> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.Tag> => {
+  if (!data.name) data.name = faker.word.adjective().toLowerCase();
+
+  const existing = await db.query.tags.findFirst({
+    where: (tags, { eq }) => eq(tags.name, data.name as string),
+  });
+  if (existing) return existing;
+
+  return await Tag(data, db);
+};
+
 export const Tag = async (
   { ...data }: Partial<Omit<dbSchema.NewTag, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Tag> => {
-  const name = data.name || faker.word.adjective().toLowerCase();
-
-  // XXX(dcramer): not ideal
-  const existing = await db.query.tags.findFirst({
-    where: (tags, { eq }) => eq(tags.name, name),
-  });
-  if (existing) return existing;
+  if (!data.name) data.name = faker.word.adjective().toLowerCase();
 
   const [result] = await db
     .insert(dbSchema.tags)
     .values({
-      name,
       tagCategory: choose(TAG_CATEGORIES),
       flavorProfiles: sample(FLAVOR_PROFILES, random(1, 2)),
-      ...(data as Omit<
-        dbSchema.NewTag,
-        "name" | "tagCategory" | "flavorProfiles"
-      >),
+      ...(data as Omit<dbSchema.NewTag, "tagCategory" | "flavorProfiles">),
     })
     .returning();
   if (!result) throw new Error("Unable to create Tag fixture");
