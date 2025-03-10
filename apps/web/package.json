@@ -44,7 +44,6 @@
     "react-hook-form": "^7.52.0",
     "react-leaflet": "^4.2.1",
     "react-qr-code": "^2.0.14",
-    "react-scan": "^0.2.8",
     "recharts": "^2.12.7",
     "schema-dts": "^1.1.2",
     "superjson": "catalog:",

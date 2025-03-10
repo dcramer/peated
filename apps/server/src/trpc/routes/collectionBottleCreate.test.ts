@@ -38,6 +38,54 @@ test("new bottle in default", async ({ fixtures, defaults }) => {
   expect(bottleList.length).toBe(1);
 });
 
+test("multiple bottles without editions in default", async ({
+  fixtures,
+  defaults,
+}) => {
+  const bottle1 = await fixtures.Bottle();
+  const bottle2 = await fixtures.Bottle();
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+
+  // Add first bottle
+  await caller.collectionBottleCreate({
+    user: "me",
+    collection: "default",
+    bottle: bottle1.id,
+  });
+
+  // Add second bottle
+  await caller.collectionBottleCreate({
+    user: "me",
+    collection: "default",
+    bottle: bottle2.id,
+  });
+
+  // Check both bottles are in the collection
+  const bottleList = await db
+    .select()
+    .from(collectionBottles)
+    .where(
+      eq(
+        collectionBottles.collectionId,
+        (
+          await fixtures.Collection({
+            name: "default",
+            createdById: defaults.user.id,
+          })
+        ).id,
+      ),
+    );
+
+  expect(bottleList.length).toBe(2);
+  expect(bottleList.map((b) => b.bottleId).sort()).toEqual(
+    [bottle1.id, bottle2.id].sort(),
+  );
+  expect(bottleList.every((b) => b.editionId === null)).toBe(true);
+});
+
 test("new bottle with edition in default", async ({ fixtures, defaults }) => {
   const bottle = await fixtures.Bottle();
   const edition = await fixtures.BottleEdition({ bottleId: bottle.id });
