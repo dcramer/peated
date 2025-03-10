@@ -171,6 +171,9 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   158: "Yuza",
   159: "Komagatake",
   160: "Tsunuki",
+  161: "Mc'nean Distillery",
+  // 162:
+  163: "Isle of Harris Distillery",
 
   // Single Grain
   G1: "North British",
