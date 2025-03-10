@@ -44,7 +44,7 @@ export function normalizeCategory(name: string): Category | null {
 
 // TODO: this is still semi problematic
 export function normalizeEntityName(name: string): string {
-  name = name.replace(/ (distillery|distillerie)$/i, "");
+  // name = name.replace(/ (distillery|distillerie)$/i, "");
   return name;
 }
 
