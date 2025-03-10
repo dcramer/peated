@@ -119,6 +119,7 @@ describe("badge integration test", () => {
 
     for (const region of [regionKy, regionTn, regionTx, regionHi]) {
       const brand = await fixtures.Entity({
+        name: region.name,
         regionId: region.id,
         countryId: region.countryId,
       });
@@ -137,6 +138,7 @@ describe("badge integration test", () => {
     // now record one with a country without region, to make sure
     // somehow 'null' isnt bubbling up...
     const brand = await fixtures.Entity({
+      name: "Brand",
       regionId: null,
       countryId: countryUs.id,
     });
