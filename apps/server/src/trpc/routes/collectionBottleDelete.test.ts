@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { collectionBottles } from "@peated/server/db/schema";
+import { collectionBottles, collections } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "@peated/server/trpc/router";
 import { and, eq } from "drizzle-orm";
@@ -22,6 +22,7 @@ test("delete bottle from default", async ({ fixtures, defaults }) => {
   const bottle = await fixtures.Bottle();
   const collection = await fixtures.Collection({
     createdById: defaults.user.id,
+    totalBottles: 1,
   });
   await db.insert(collectionBottles).values({
     bottleId: bottle.id,
@@ -43,6 +44,13 @@ test("delete bottle from default", async ({ fixtures, defaults }) => {
     .where(eq(collectionBottles.bottleId, bottle.id));
 
   expect(bottleList.length).toBe(0);
+
+  // Verify totalBottles was decremented
+  const [updatedCollection] = await db
+    .select()
+    .from(collections)
+    .where(eq(collections.id, collection.id));
+  expect(updatedCollection.totalBottles).toBe(0);
 });
 
 test("delete bottle with edition", async ({ fixtures, defaults }) => {
@@ -50,6 +58,7 @@ test("delete bottle with edition", async ({ fixtures, defaults }) => {
   const edition = await fixtures.BottleEdition({ bottleId: bottle.id });
   const collection = await fixtures.Collection({
     createdById: defaults.user.id,
+    totalBottles: 1,
   });
   await db.insert(collectionBottles).values({
     bottleId: bottle.id,
@@ -78,6 +87,13 @@ test("delete bottle with edition", async ({ fixtures, defaults }) => {
     );
 
   expect(bottleList.length).toBe(0);
+
+  // Verify totalBottles was decremented
+  const [updatedCollection] = await db
+    .select()
+    .from(collections)
+    .where(eq(collections.id, collection.id));
+  expect(updatedCollection.totalBottles).toBe(0);
 });
 
 test("only deletes specific edition", async ({ fixtures, defaults }) => {
@@ -87,6 +103,7 @@ test("only deletes specific edition", async ({ fixtures, defaults }) => {
   const collection = await fixtures.Collection({
     name: "default",
     createdById: defaults.user.id,
+    totalBottles: 1,
   });
 
   // Add both editions to collection
@@ -119,4 +136,47 @@ test("only deletes specific edition", async ({ fixtures, defaults }) => {
 
   expect(bottleList.length).toBe(1);
   expect(bottleList[0].editionId).toBe(edition2.id);
+
+  // Verify totalBottles was decremented by 1 even though we still have one edition
+  const [updatedCollection] = await db
+    .select()
+    .from(collections)
+    .where(eq(collections.id, collection.id));
+  expect(updatedCollection.totalBottles).toBe(0);
+});
+
+test("deleting non-existent bottle from collection", async ({
+  fixtures,
+  defaults,
+}) => {
+  const bottle = await fixtures.Bottle();
+  const collection = await fixtures.Collection({
+    createdById: defaults.user.id,
+    totalBottles: 1,
+  });
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+
+  // Attempt to delete a bottle that isn't in the collection
+  await caller.collectionBottleDelete({
+    user: "me",
+    collection: collection.id,
+    bottle: bottle.id,
+  });
+
+  // Verify totalBottles hasn't changed
+  const [updatedCollection] = await db
+    .select()
+    .from(collections)
+    .where(eq(collections.id, collection.id));
+  expect(updatedCollection.totalBottles).toBe(1);
+
+  // Verify no bottles were deleted (though there weren't any to begin with)
+  const bottleList = await db
+    .select()
+    .from(collectionBottles)
+    .where(eq(collectionBottles.bottleId, bottle.id));
+  expect(bottleList.length).toBe(0);
 });

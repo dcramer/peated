@@ -1,10 +1,10 @@
 import { db } from "@peated/server/db";
-import { collectionBottles } from "@peated/server/db/schema";
+import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { getDefaultCollection } from "@peated/server/lib/db";
 import { CollectionBottleInputSchema } from "@peated/server/schemas";
 import { TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 
@@ -53,17 +53,28 @@ export default authedProcedure
       });
     }
 
-    await db
-      .delete(collectionBottles)
-      .where(
-        and(
-          eq(collectionBottles.bottleId, input.bottle),
-          eq(collectionBottles.collectionId, collection.id),
-          input.edition
-            ? eq(collectionBottles.editionId, input.edition)
-            : undefined,
-        ),
-      );
+    await db.transaction(async (tx) => {
+      const [cb] = await tx
+        .delete(collectionBottles)
+        .where(
+          and(
+            eq(collectionBottles.bottleId, input.bottle),
+            eq(collectionBottles.collectionId, collection.id),
+            input.edition
+              ? eq(collectionBottles.editionId, input.edition)
+              : undefined,
+          ),
+        )
+        .returning();
+      if (cb) {
+        await tx
+          .update(collections)
+          .set({
+            totalBottles: sql`${collections.totalBottles} - 1`,
+          })
+          .where(eq(collections.id, collection.id));
+      }
+    });
 
     return {};
   });
