@@ -48,9 +48,12 @@ export default async function Page({
     throw new Error("Unable to find example distiller for SMWS codes.");
   }
 
-  const distillersByName = Object.fromEntries(
-    distillerList.map((d) => [d.name.toLowerCase(), d]),
-  );
+  const distillersByName = Object.fromEntries([
+    ...distillerList.map((d) => [d.name.toLowerCase(), d]),
+    ...distillerList
+      .filter((d) => !!d.shortName)
+      .map((d) => [d.shortName!.toLowerCase(), d]),
+  ]);
 
   return (
     <>
