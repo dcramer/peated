@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import {
@@ -23,16 +24,16 @@ export default publicProcedure
   .mutation(async function ({ input: { username, email, password } }) {
     const [user] = await db.transaction(async (tx) => {
       try {
-        return await db
+        return await tx
           .insert(users)
           .values({
             username,
             email,
             passwordHash: generatePasswordHash(password),
+            verified: !!config.SKIP_EMAIL_VERIFICATION,
           })
           .returning();
       } catch (err: any) {
-        console.log(err?.code, err?.constraint);
         if (
           err?.code === "23505" &&
           (err?.constraint === "user_username_unq" ||
@@ -52,7 +53,9 @@ export default publicProcedure
       }
     });
 
-    await sendVerificationEmail({ user });
+    if (!user.verified) {
+      await sendVerificationEmail({ user });
+    }
 
     return {
       user: await serialize(UserSerializer, user, user),

@@ -24,6 +24,7 @@ test("valid credentials", async ({ fixtures }) => {
   expect(user.username).toEqual("foo");
   expect(user.email).toEqual("foo@example.com");
   expect(user.passwordHash).not.toBeNull();
+  expect(user.verified).toBe(false);
   expect(compareSync("example", user.passwordHash as string)).toBeTruthy();
 });
 

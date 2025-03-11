@@ -32,7 +32,7 @@ pnpm db migrate
 Create a local user to avoid setting up Google credentials:
 
 ```
-pnpm cli users create you@example.com password -a
+pnpm cli users create you@example.com password -a -v
 ```
 
 Load some mock data:

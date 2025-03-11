@@ -1,6 +1,6 @@
+import * as Sentry from "@sentry/node";
 import { hashSync } from "bcrypt";
 import { eq } from "drizzle-orm";
-
 import config from "../config";
 import type { AnyDatabase } from "../db";
 import { db } from "../db";
@@ -12,9 +12,12 @@ import { UserSerializer } from "../serializers/user";
 import { logError } from "./log";
 import { absoluteUrl } from "./urls";
 
+const { warn, info, fmt } = Sentry._experiment_log; // Temporary destructuring while this is experimental
+
 // I love to ESM.
 import type { JwtPayload } from "jsonwebtoken";
 import { default as jsonwebtoken } from "jsonwebtoken";
+import { sendVerificationEmail } from "./email";
 const { sign, verify } = jsonwebtoken;
 
 export function signPayload(payload: string | object): Promise<string> {
@@ -59,7 +62,7 @@ export async function getUserFromHeader(
 
   const { id } = (await verifyPayload(token)) as any;
   if (!id) {
-    console.warn(`Invalid Bearer token`);
+    warn(`Invalid Bearer token`);
     return null;
   }
   const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -69,7 +72,7 @@ export async function getUserFromHeader(
   }
 
   if (!user.active) {
-    console.debug(`Inactive user found for token`);
+    info(`Inactive user found for token`);
     return null;
   }
 
@@ -104,6 +107,7 @@ export async function createUser(
         const [user] = await tx
           .insert(users)
           .values({
+            verified: !!config.SKIP_EMAIL_VERIFICATION,
             ...data,
             username: currentUsername,
           })
@@ -118,7 +122,15 @@ export async function createUser(
       }
     }
   }
+
   if (!user) throw new Error("Unable to create user");
+
+  if (!user.verified) {
+    await sendVerificationEmail({ user });
+  } else {
+    warn(fmt`Skipping email verification for ${user.email}`);
+  }
+
   return user;
 }
 

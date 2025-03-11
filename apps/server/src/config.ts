@@ -16,6 +16,8 @@ export default {
   URL_PREFIX: process.env.URL_PREFIX || "http://localhost:3000",
   REDIS_URL: process.env.REDIS_URL || "redis://@localhost:6379",
 
+  SKIP_EMAIL_VERIFICATION: !!process.env.SKIP_EMAIL_VERIFICATION,
+
   SMTP_FROM: process.env.SMTP_FROM || "no-reply@peated.com",
   SMTP_REPLY_TO: process.env.SMTP_REPLY_TO || "no-reply@peated.com",
   SMTP_HOST: process.env.SMTP_HOST || "localhost",
