@@ -27,6 +27,7 @@ export const collections = pgTable(
       .notNull(),
   },
   (table) => [
+    // make this case insensitive on name
     uniqueIndex("collection_name_unq").on(table.name, table.createdById),
     index("collection_created_by_idx").on(table.createdById),
   ],

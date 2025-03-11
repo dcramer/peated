@@ -1,5 +1,5 @@
 import type { InferSelectModel, Table } from "drizzle-orm";
-import { eq, getTableColumns, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { type z } from "zod";
 import type { AnyDatabase } from "../db";
@@ -118,7 +118,11 @@ export const getDefaultCollection = async (db: AnyDatabase, userId: number) => {
         .returning()
     ).find(() => true) ||
     (await db.query.collections.findFirst({
-      where: (collections, { eq }) => eq(collections.createdById, userId),
+      where: (collections, { eq }) =>
+        and(
+          eq(collections.createdById, userId),
+          eq(collections.name, "Default"),
+        ),
     }))
   );
 };
