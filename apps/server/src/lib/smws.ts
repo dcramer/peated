@@ -172,7 +172,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   159: "Komagatake",
   160: "Tsunuki",
   161: "Mc'nean Distillery",
-  // 162:
+  162: "",
   163: "Isle of Harris Distillery",
 
   // Single Grain
