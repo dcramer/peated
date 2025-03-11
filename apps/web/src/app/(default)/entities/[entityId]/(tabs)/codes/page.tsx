@@ -7,7 +7,7 @@ import Link from "@peated/web/components/link";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-static";
+export const revalidate = 60;
 
 export async function generateMetadata({
   params: { entityId },
