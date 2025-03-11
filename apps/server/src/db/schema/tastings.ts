@@ -89,10 +89,14 @@ export const tastingBadgeAwards = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     tastingId: bigint("tasting_id", { mode: "number" })
-      .references(() => tastings.id)
+      .references(() => tastings.id, {
+        onDelete: "cascade",
+      })
       .notNull(),
     awardId: bigint("award_id", { mode: "number" })
-      .references(() => badgeAwards.id)
+      .references(() => badgeAwards.id, {
+        onDelete: "cascade",
+      })
       .notNull(),
     level: smallint("level").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
