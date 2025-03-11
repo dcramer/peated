@@ -28,7 +28,7 @@ Sentry.init({
     enableLogs: true,
   },
   // needed for proper trace propagation
-  tracePropagationTargets: ["localhost", "https://api.peated.com"],
+  tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
 });
 
 Sentry.setTag("service", "@peated/web");
