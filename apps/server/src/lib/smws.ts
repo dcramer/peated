@@ -254,7 +254,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   C9: "Robert Audebeau",
 
   // Gin
-  GN1: "Glasgow Distillery Company",
+  GN1: "Glasgow Distillery",
   GN2: "Strathearn Distillers",
   GN3: "The Borders Distillery",
   GN4: "Boatyard Distillery",
