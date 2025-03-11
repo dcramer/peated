@@ -108,7 +108,11 @@ export default async function Page({
                     return (
                       <tr key={code}>
                         <td className="border-b border-slate-800 p-3 text-sm">
-                          {code}
+                          <abbr
+                            title={`${entity.shortName || entity.name} ${code}`}
+                          >
+                            {code}
+                          </abbr>
                         </td>
                         <td className="border-b border-slate-800 p-3 text-sm">
                           {distiller ? (
