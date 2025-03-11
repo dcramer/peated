@@ -106,7 +106,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   93: "Glen Scotia",
   94: "Fettercairn",
   95: "Auchroisk",
-  96: "GlenDronach",
+  96: "Glendronach",
   97: "Littlemill",
   98: "Inverleven",
   99: "Glenugie",
