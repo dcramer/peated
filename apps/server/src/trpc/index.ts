@@ -64,10 +64,16 @@ const isMod = t.middleware(({ ctx, next }) => {
   });
 });
 
+const sentryMiddleware = t.middleware(
+  trpcMiddleware({
+    attachRpcInput: true,
+  }),
+);
+
 export const router = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const middleware = t.middleware;
-export const publicProcedure = t.procedure.use(trpcMiddleware());
+export const publicProcedure = t.procedure.use(sentryMiddleware);
 export const authedProcedure = publicProcedure.use(isAuthed);
 export const verifiedProcedure = publicProcedure.use(isVerified);
 export const adminProcedure = publicProcedure.use(isAdmin);
