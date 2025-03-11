@@ -85,7 +85,7 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   72: "Miltonduff",
   73: "Aultmore",
   74: "North Port",
-  75: "Glenury", // Glenury Royal
+  75: "Glenury Royal", // Glenury Royal
   76: "Mortlach",
   77: "Glen Ord",
   78: "Ben Nevis",
