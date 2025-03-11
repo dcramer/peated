@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
@@ -78,7 +78,7 @@ export const BottleSerializer = serializer({
       ? new Set(
           (
             await db
-              .selectDistinct({ id: collectionBottles.bottleId })
+              .selectDistinct({ bottleId: collectionBottles.bottleId })
               .from(collectionBottles)
               .innerJoin(
                 collections,
@@ -87,11 +87,11 @@ export const BottleSerializer = serializer({
               .where(
                 and(
                   inArray(collectionBottles.bottleId, itemIds),
-                  eq(collections.name, "Default"),
+                  sql`LOWER(${collections.name}) = 'default'`,
                   eq(collections.createdById, currentUser.id),
                 ),
               )
-          ).map((r) => r.id),
+          ).map((r) => r.bottleId),
         )
       : new Set();
 
@@ -103,7 +103,7 @@ export const BottleSerializer = serializer({
       ? new Set(
           (context?.flight
             ? await db
-                .selectDistinct({ id: tastings.bottleId })
+                .selectDistinct({ bottleId: tastings.bottleId })
                 .from(tastings)
                 .where(
                   and(
@@ -113,7 +113,7 @@ export const BottleSerializer = serializer({
                   ),
                 )
             : await db
-                .selectDistinct({ id: tastings.bottleId })
+                .selectDistinct({ bottleId: tastings.bottleId })
                 .from(tastings)
                 .where(
                   and(
@@ -121,7 +121,7 @@ export const BottleSerializer = serializer({
                     eq(tastings.createdById, currentUser.id),
                   ),
                 )
-          ).map((r) => r.id),
+          ).map((r) => r.bottleId),
         )
       : new Set();
 

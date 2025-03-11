@@ -9,13 +9,14 @@ import type {
 } from "@peated/server/db/schema";
 import {
   bottles,
+  collectionBottles,
   externalSites,
   tastings,
   users,
 } from "@peated/server/db/schema";
+import { getDefaultCollection } from "@peated/server/lib/db";
 import { createNotification } from "@peated/server/lib/notifications";
 import { choose, random, sample } from "@peated/server/lib/rand";
-import { SMWS_DISTILLERY_CODES } from "@peated/server/lib/smws";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { type Category } from "@peated/server/types";
@@ -330,6 +331,10 @@ subcommand
             .orderBy(sql`RANDOM()`)
             .limit(1)
         )[0].id,
+      });
+      await db.insert(collectionBottles).values({
+        collectionId: (await getDefaultCollection(db, tasting.createdById))!.id,
+        bottleId: tasting.bottleId,
       });
       console.log(`tasting ${tasting.id} created.`);
     }

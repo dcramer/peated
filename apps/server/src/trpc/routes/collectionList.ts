@@ -35,7 +35,7 @@ export default authedProcedure
 
     const offset = (cursor - 1) * limit;
 
-    const where = [];
+    const where = [sql`${collections.createdById} = ${user.id}`];
     if (input.bottle) {
       where.push(
         sql`EXISTS(SELECT 1 FROM ${collectionBottles} WHERE ${collectionBottles.bottleId} = ${input.bottle} AND ${collectionBottles.collectionId} = ${collections.id})`,

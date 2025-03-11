@@ -121,7 +121,7 @@ export const getDefaultCollection = async (db: AnyDatabase, userId: number) => {
       where: (collections, { eq }) =>
         and(
           eq(collections.createdById, userId),
-          eq(collections.name, "Default"),
+          sql`LOWER(${collections.name}) = 'default'`,
         ),
     }))
   );
