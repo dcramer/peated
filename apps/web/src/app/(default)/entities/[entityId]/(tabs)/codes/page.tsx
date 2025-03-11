@@ -49,7 +49,7 @@ export default async function Page({
   }
 
   const distillersByName = Object.fromEntries(
-    distillerList.map((d) => [d.name, d]),
+    distillerList.map((d) => [d.name.toLowerCase(), d]),
   );
 
   return (
@@ -85,7 +85,7 @@ export default async function Page({
           categoryDistillerList.push([
             `${catCode}${i}`,
             distillerName,
-            distillersByName[distillerName],
+            distillersByName[distillerName.toLowerCase()],
           ]);
         }
 
