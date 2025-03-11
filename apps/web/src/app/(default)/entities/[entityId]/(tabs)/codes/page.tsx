@@ -75,17 +75,24 @@ export default async function Page({
         const categoryDistillerList: [
           string,
           string,
-          (typeof distillerList)[number],
+          (typeof distillerList)[number] | null,
         ][] = [];
-        for (
-          let i = 1, distillerName;
-          (distillerName = SMWS_DISTILLERY_CODES[`${catCode}${i}`]);
-          i++
-        ) {
+
+        let distillerName: string;
+        let i = 0;
+        while (i < 1000) {
+          i++;
+          distillerName = SMWS_DISTILLERY_CODES[`${catCode}${i}`];
+          if (typeof distillerName === "undefined") {
+            break;
+          }
+
           categoryDistillerList.push([
             `${catCode}${i}`,
             distillerName,
-            distillersByName[distillerName.toLowerCase()],
+            distillerName
+              ? distillersByName[distillerName.toLowerCase()]
+              : null,
           ]);
         }
 
@@ -123,7 +130,7 @@ export default async function Page({
                               {distiller.name}
                             </Link>
                           ) : (
-                            distillerName
+                            distillerName || <em>Unknown</em>
                           )}
                         </td>
                         <td className="text-muted hidden border-b border-slate-800 p-3 text-center text-sm sm:table-cell">
