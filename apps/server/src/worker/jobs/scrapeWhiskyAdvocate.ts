@@ -6,7 +6,7 @@ import {
 import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
 import { trpcClient } from "@peated/server/lib/trpc/server";
 import { absoluteUrl } from "@peated/server/lib/urls";
-import * as Sentry from "@sentry/core";
+import * as Sentry from "@sentry/node";
 import { load as cheerio } from "cheerio";
 
 const { info, warn, fmt } = Sentry._experiment_log; // Temporary destructuring while this is experimental
