@@ -3,20 +3,6 @@ import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { CATEGORY_LIST } from "../constants";
 
-const ExtractedBottleDetailsSchema = z.object({
-  brand: z.string().nullish(),
-  distillery: z.array(z.string()).nullish(),
-  category: z.enum(CATEGORY_LIST).nullish(),
-  expression: z.string().nullish(),
-  series: z.string().nullish(),
-  stated_age: z.number().nullish(),
-  abv: z.number().nullish(),
-  release_year: z.number().nullish(),
-  vintage_year: z.number().nullish(),
-  cask_type: z.string().nullish(),
-  edition: z.string().nullish(),
-});
-
 const EXTRACTION_LABEL_PROMPT = `The fields to extract are:
 
 - **brand**: The brand or bottler of the whiskey.
@@ -80,6 +66,8 @@ The final output must be a **valid JSON object** with:
 - \`null\` for missing values.
 - An **array for distillery**, which may contain one or multiple entries, or be empty (\`[]\` for unknown blends).
 - **No additional commentary**—output only the JSON object.
+
+If you cannot extract the required attributes, return \`null\` for the entire object.
 
 ---
 
@@ -160,7 +148,14 @@ Output:
   "vintage_year": null,
   "cask_type": null,
   "edition": null,
-}`;
+}
+
+### **Unknown Brand**
+Input:
+> **"Single Malt 12-year-old"**
+
+Output:
+null`;
 
 const imageInstructions = `You are an advanced data extraction assistant with expertise in whiskey labeling conventions. Your task is to analyze the provided **image** of a whiskey bottle label and extract structured data in **JSON format**.
 
@@ -183,7 +178,25 @@ const textInstructions = `You are a data extraction assistant with expertise in 
 
 ${EXTRACTION_LABEL_PROMPT}`;
 
-export const extractFromImage = async (imageUrl: string) => {
+const ExtractedBottleDetailsSchema = z.object({
+  brand: z.string(),
+  expression: z.string(),
+  series: z.string().nullable(),
+  distillery: z.array(z.string()).nullable(),
+  category: z.enum(CATEGORY_LIST).nullable(),
+  stated_age: z.number().nullable(),
+  abv: z.number().nullable(),
+  release_year: z.number().nullable(),
+  vintage_year: z.number().nullable(),
+  cask_type: z.string().nullable(),
+  edition: z.string().nullable(),
+});
+
+const Response = z.object({
+  result: ExtractedBottleDetailsSchema.nullable(),
+});
+
+export const extractFromImage = async (imageUrlOrBase64: string) => {
   const client = new OpenAI();
 
   const response = await client.responses.create({
@@ -195,7 +208,7 @@ export const extractFromImage = async (imageUrl: string) => {
         content: [
           {
             type: "input_image",
-            image_url: imageUrl,
+            image_url: imageUrlOrBase64,
             detail: "auto",
           },
         ],
@@ -204,12 +217,16 @@ export const extractFromImage = async (imageUrl: string) => {
     text: {
       format: {
         type: "json_schema",
-        schema: zodToJsonSchema(ExtractedBottleDetailsSchema),
+        name: "ExtractedBottleDetails",
+        schema: zodToJsonSchema(Response),
       },
     },
   });
 
-  return JSON.parse(response.output_text);
+  console.log(response);
+
+  const { result } = JSON.parse(response.output_text);
+  return result;
 };
 
 export const extractFromText = async (label: string) => {
@@ -232,10 +249,12 @@ export const extractFromText = async (label: string) => {
     text: {
       format: {
         type: "json_schema",
-        schema: zodToJsonSchema(ExtractedBottleDetailsSchema),
+        name: "ExtractedBottleDetails",
+        schema: zodToJsonSchema(Response),
       },
     },
   });
 
-  return JSON.parse(response.output_text);
+  const { result } = JSON.parse(response.output_text);
+  return result;
 };

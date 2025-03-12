@@ -76,6 +76,7 @@ import flightUpdate from "./routes/flightUpdate";
 import friendCreate from "./routes/friendCreate";
 import friendDelete from "./routes/friendDelete";
 import friendList from "./routes/friendList";
+import labelExtract from "./routes/labelExtract";
 import notificationCount from "./routes/notificationCount";
 import notificationDelete from "./routes/notificationDelete";
 import notificationList from "./routes/notificationList";
@@ -196,6 +197,7 @@ export const appRouter = router({
   friendCreate,
   friendDelete,
   friendList,
+  labelExtract,
   notificationCount,
   notificationDelete,
   notificationList,
