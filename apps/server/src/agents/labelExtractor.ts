@@ -1,16 +1,23 @@
-import config from "@peated/server/config";
-import { CATEGORY_LIST } from "@peated/server/constants";
-import { getStructuredResponse } from "@peated/server/lib/openai";
-import { startSpan } from "@sentry/node";
+import OpenAI from "openai";
 import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
+import { CATEGORY_LIST } from "../constants";
 
-if (!config.OPENAI_API_KEY) {
-  console.warn("OPENAI_API_KEY is not configured.");
-}
-const SYSTEM_PROMPT = `
-You are a data extraction assistant with expertise in whiskey labeling conventions. Extract the whiskey details from the given label description and output them in **JSON** format with the specified fields.
+const ExtractedBottleDetailsSchema = z.object({
+  brand: z.string().nullish(),
+  distillery: z.array(z.string()).nullish(),
+  category: z.enum(CATEGORY_LIST).nullish(),
+  expression: z.string().nullish(),
+  series: z.string().nullish(),
+  stated_age: z.number().nullish(),
+  abv: z.number().nullish(),
+  release_year: z.number().nullish(),
+  vintage_year: z.number().nullish(),
+  cask_type: z.string().nullish(),
+  edition: z.string().nullish(),
+});
 
-The fields to extract are:
+const EXTRACTION_LABEL_PROMPT = `The fields to extract are:
 
 - **brand**: The brand or bottler of the whiskey.
 - **distillery**: An **array** of distilleries where the whiskey was produced (e.g., \`[ "Macallan", "Highland Park" ]\` for a blend of multiple distilleries, or \`[ "Lagavulin" ]\` for a single distillery release). If the whiskey is an **official bottling** from a single distillery, return \`[ distillery_name ]\`. If it’s a blend with unknown distilleries, return \`[]\` (empty array). If it is an independent bottling, return the distillery name(s) in the array.
@@ -19,7 +26,14 @@ The fields to extract are:
 - **category**: The category of the whiskey. One of \`blend\`, \`bourbon\`, \`rye\`, \`single_grain\`, \`single_malt\`, \`single_pot_still\`.
 - **stated_age**: Age of the whiskey in years (integer, \`null\` if no age statement).
 - **abv**: Alcohol by volume as a percentage (float, e.g., 43.0 for 43% ABV).
-- **release_year**: The year the whiskey was released (if given, otherwise \`null\`). This may also be called the "bottling year" or similar.
+- **release_year**: The year the whiskey was bottled or released.
+  - Extract if explicitly labeled as "Bottling Year," "Bottled in YYYY," "Release Year," or similar.
+  - If no explicit label, extract any standalone four-digit year (YYYY) if it appears near ABV, batch, or edition information.
+  - Ignore unrelated dates (e.g., distillery establishment year, government warnings).
+  - If multiple years are listed (e.g., "Distilled in 1998, Bottled in 2018"), use:
+    - vintage_year: 1998
+    - release_year: 2018
+  - If no valid year is found, set \`release_year\`: null.
 - **vintage_year**: The distillation or vintage year (if given, otherwise \`null\`).
 - **cask_type**: Primary cask type or finish (if mentioned, otherwise \`null\`).
 - **edition**: Batch, edition, or release identifier (if mentioned, otherwise \`null\`).
@@ -146,62 +160,82 @@ Output:
   "vintage_year": null,
   "cask_type": null,
   "edition": null,
-}
+}`;
+
+const imageInstructions = `You are an advanced data extraction assistant with expertise in whiskey labeling conventions. Your task is to analyze the provided **image** of a whiskey bottle label and extract structured data in **JSON format**.
+
+### **Instructions:**
+
+1. Carefully examine the image to identify key whiskey details such as brand, distillery, age statement, ABV, and edition.
+2. Normalize the extracted information based on standard whiskey labeling conventions.
+3. Return only a **valid JSON object** with extracted values, using null for missing information.
+
+${EXTRACTION_LABEL_PROMPT}
 `;
 
-const OpenAIBottleDetailsSchema = z.object({
-  brand: z.string().nullish(),
-  distillery: z.array(z.string()).nullish(),
-  category: z.enum(CATEGORY_LIST).nullish(),
-  expression: z.string().nullish(),
-  series: z.string().nullish(),
-  stated_age: z.number().nullish(),
-  abv: z.number().nullish(),
-  release_year: z.number().nullish(),
-  vintage_year: z.number().nullish(),
-  cask_type: z.string().nullish(),
-  edition: z.string().nullish(),
-});
+const textInstructions = `You are a data extraction assistant with expertise in whiskey labeling conventions. Extract the whiskey details from the given label description and output them in **JSON** format with the specified fields.
 
-export type ExtractedLabelDetails = z.infer<typeof OpenAIBottleDetailsSchema>;
+### **Instructions:**
 
-export async function getExtractedLabelDetails(
-  label: string,
-): Promise<ExtractedLabelDetails | null> {
-  return await startSpan(
-    {
-      op: "ai.pipeline",
-      name: "generateBottleDetails",
-    },
-    async (span) => {
-      return await getStructuredResponse(
-        "generateBottleDetails",
-        [
+1. Carefully analyze the text to identify key whiskey details such as brand, distillery, age statement, ABV, and edition.
+2. Normalize the extracted information based on standard whiskey labeling conventions.
+3. Return only a **valid JSON object** with extracted values, using null for missing information.
+
+${EXTRACTION_LABEL_PROMPT}`;
+
+export const extractFromImage = async (imageUrl: string) => {
+  const client = new OpenAI();
+
+  const response = await client.responses.create({
+    model: "gpt-4o-2024-08-06",
+    input: [
+      { role: "system", content: imageInstructions },
+      {
+        role: "user",
+        content: [
           {
-            role: "system",
-            content: SYSTEM_PROMPT,
-          },
-          {
-            role: "user",
-            content: label,
+            type: "input_image",
+            image_url: imageUrl,
+            detail: "auto",
           },
         ],
-        OpenAIBottleDetailsSchema,
-      );
+      },
+    ],
+    text: {
+      format: {
+        type: "json_schema",
+        schema: zodToJsonSchema(ExtractedBottleDetailsSchema),
+      },
     },
-  );
-}
+  });
 
-export default async function ({ label }: { label: string }) {
-  if (!config.OPENAI_API_KEY) {
-    return;
-  }
+  return JSON.parse(response.output_text);
+};
 
-  const result = await getExtractedLabelDetails(label);
+export const extractFromText = async (label: string) => {
+  const client = new OpenAI();
 
-  if (!result) {
-    throw new Error(`Failed to extract details for label: ${label}`);
-  }
+  const response = await client.responses.create({
+    model: "gpt-4o-2024-08-06",
+    input: [
+      { role: "system", content: textInstructions },
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: label,
+          },
+        ],
+      },
+    ],
+    text: {
+      format: {
+        type: "json_schema",
+        schema: zodToJsonSchema(ExtractedBottleDetailsSchema),
+      },
+    },
+  });
 
-  return result;
-}
+  return JSON.parse(response.output_text);
+};
