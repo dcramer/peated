@@ -7,10 +7,11 @@ import {
   type TRPCUntypedClient,
 } from "@trpc/react-query";
 import { type CreateQueryUtils } from "@trpc/react-query/shared";
+import { cache } from "react";
 import { getSession } from "../session.server";
 import { trpc } from "./client";
 
-export async function getTrpcClient(): Promise<CreateQueryUtils<AppRouter>> {
+export async function createTrpcClient(): Promise<CreateQueryUtils<AppRouter>> {
   const session = await getSession();
   const accessToken = session.accessToken;
 
@@ -28,6 +29,8 @@ export async function getTrpcClient(): Promise<CreateQueryUtils<AppRouter>> {
 
   return clientUtils;
 }
+
+export const getTrpcClient = cache(createTrpcClient);
 
 export async function getUnsafeTrpcClient(): Promise<
   TRPCUntypedClient<AppRouter>
