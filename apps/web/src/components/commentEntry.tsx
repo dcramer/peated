@@ -21,6 +21,7 @@ type Props = {
   onReply?: () => void;
   commentId: number;
   mentionedUsernames?: string[];
+  isDeleted?: boolean;
 };
 
 const defaultElement = "li";
@@ -37,10 +38,11 @@ export default function CommentEntry<
   onReply,
   commentId,
   mentionedUsernames = [],
+  isDeleted = false,
   ...props
 }: PolymorphicProps<E, Props>) {
   const Component = as ?? defaultElement;
-  const showMenu = canDelete;
+  const showMenu = canDelete && !isDeleted;
 
   return (
     <Component {...props}>
@@ -80,12 +82,16 @@ export default function CommentEntry<
           </div>
         </div>
         <div className="mt-4 text-sm">
-          <p>
-            <MentionHighlighter
-              text={text}
-              mentionedUsernames={mentionedUsernames}
-            />
-          </p>
+          {isDeleted ? (
+            <p className="italic text-gray-500">This comment was deleted</p>
+          ) : (
+            <p>
+              <MentionHighlighter
+                text={text}
+                mentionedUsernames={mentionedUsernames}
+              />
+            </p>
+          )}
         </div>
         <div className="mt-2 flex items-center space-x-4">
           {onReply && (

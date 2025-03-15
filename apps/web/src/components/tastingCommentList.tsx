@@ -3,7 +3,7 @@
 import type { Comment, User } from "@peated/server/types";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CommentEntry from "./commentEntry";
 import TastingCommentForm from "./tastingCommentForm";
 
@@ -27,13 +27,12 @@ export default function TastingCommentList({
     tasting: tastingId,
   });
 
-  const commentDeleteMutation = trpc.commentDelete.useMutation({
-    onSuccess: (_data, input) => {
-      setDeleted((a) => [...a, input]);
-    },
-  });
+  const commentDeleteMutation = trpc.commentDelete.useMutation();
 
-  const [deleted, setDeleted] = useState<number[]>([]);
+  // Track locally deleted comment IDs (comments that were deleted during this session)
+  const [locallyDeletedComments, setLocallyDeletedComments] = useState<
+    Record<number, boolean>
+  >({});
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [newComments, setNewComments] = useState<Comment[]>([]);
 
@@ -46,8 +45,6 @@ export default function TastingCommentList({
 
   // First pass: identify top-level comments and build a map of parent IDs to replies
   allComments.forEach((comment) => {
-    if (deleted.includes(comment.id)) return;
-
     if (comment.replyToId) {
       // This is a reply
       const replies = commentMap.get(comment.replyToId) || [];
@@ -73,6 +70,25 @@ export default function TastingCommentList({
     }
   };
 
+  // Function to handle comment deletion
+  const handleDeleteComment = (commentId: number) => {
+    // Mark the comment as locally deleted
+    setLocallyDeletedComments((prev) => ({
+      ...prev,
+      [commentId]: true,
+    }));
+
+    // Call the server to delete the comment
+    commentDeleteMutation.mutate(commentId);
+  };
+
+  // Function to check if a comment is deleted (either from server or locally)
+  const isCommentDeleted = (comment: Comment): boolean => {
+    return (
+      comment.deleted === true || locallyDeletedComments[comment.id] === true
+    );
+  };
+
   return (
     <>
       {/* Comment form for top-level comments */}
@@ -89,6 +105,7 @@ export default function TastingCommentList({
           {topLevelComments.map((comment) => {
             const isAuthor = user?.id === comment.createdBy.id;
             const replies = commentMap.get(comment.id) || [];
+            const isDeleted = isCommentDeleted(comment);
 
             // Sort replies by creation date
             replies.sort(
@@ -114,9 +131,10 @@ export default function TastingCommentList({
                   text={comment.comment}
                   commentId={comment.id}
                   mentionedUsernames={mentionedUsernames}
-                  canDelete={user?.admin || isAuthor}
-                  onDelete={() => commentDeleteMutation.mutate(comment.id)}
+                  canDelete={!isDeleted && (user?.admin || isAuthor)}
+                  onDelete={() => handleDeleteComment(comment.id)}
                   onReply={user ? () => handleReply(comment.id) : undefined}
+                  isDeleted={isDeleted}
                 />
 
                 {/* Replies */}
@@ -127,6 +145,7 @@ export default function TastingCommentList({
                       const replyMentionedUsernames = extractMentionedUsernames(
                         reply.comment,
                       );
+                      const isReplyDeleted = isCommentDeleted(reply);
 
                       return (
                         <CommentEntry
@@ -139,13 +158,14 @@ export default function TastingCommentList({
                           text={reply.comment}
                           commentId={reply.id}
                           mentionedUsernames={replyMentionedUsernames}
-                          canDelete={user?.admin || isReplyAuthor}
-                          onDelete={() =>
-                            commentDeleteMutation.mutate(reply.id)
+                          canDelete={
+                            !isReplyDeleted && (user?.admin || isReplyAuthor)
                           }
+                          onDelete={() => handleDeleteComment(reply.id)}
                           onReply={
                             user ? () => handleReply(comment.id) : undefined
                           }
+                          isDeleted={isReplyDeleted}
                         />
                       );
                     })}

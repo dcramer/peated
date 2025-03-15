@@ -9,6 +9,7 @@ export const CommentSchema = z.object({
   createdBy: UserSchema,
   replyToId: z.number().nullable().optional(),
   mentionedUsernames: z.array(z.string()).optional(),
+  deleted: z.boolean().optional(),
 });
 
 export const CommentInputSchema = z.object({
