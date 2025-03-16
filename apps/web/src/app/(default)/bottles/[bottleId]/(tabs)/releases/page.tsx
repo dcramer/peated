@@ -11,7 +11,7 @@ export async function generateMetadata({
 
   return {
     title: `Releases of ${bottle.fullName}`,
-    description: `Known releases of ${bottle.fullName}, including specific vintages and special editions.`,
+    description: `Known releases of ${bottle.fullName}, including specific vintages and special releases.`,
   };
 }
 
@@ -21,13 +21,13 @@ export default async function Page({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const editionList = await trpcClient.bottleEditionList.fetch({
+  const releaseList = await trpcClient.bottleReleaseList.fetch({
     bottle: Number(bottleId),
   });
 
   return (
     <div className="mt-6 px-3 lg:px-0">
-      <ReleaseTable bottleId={Number(bottleId)} editionList={editionList} />
+      <ReleaseTable bottleId={Number(bottleId)} releaseList={releaseList} />
     </div>
   );
 }

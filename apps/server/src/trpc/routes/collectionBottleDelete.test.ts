@@ -53,9 +53,9 @@ test("delete bottle from default", async ({ fixtures, defaults }) => {
   expect(updatedCollection.totalBottles).toBe(0);
 });
 
-test("delete bottle with edition", async ({ fixtures, defaults }) => {
+test("delete bottle with release", async ({ fixtures, defaults }) => {
   const bottle = await fixtures.Bottle();
-  const edition = await fixtures.BottleEdition({ bottleId: bottle.id });
+  const release = await fixtures.BottleRelease({ bottleId: bottle.id });
   const collection = await fixtures.Collection({
     createdById: defaults.user.id,
     totalBottles: 1,
@@ -63,7 +63,7 @@ test("delete bottle with edition", async ({ fixtures, defaults }) => {
   await db.insert(collectionBottles).values({
     bottleId: bottle.id,
     collectionId: collection.id,
-    editionId: edition.id,
+    releaseId: release.id,
   });
 
   const caller = createCaller({
@@ -73,7 +73,7 @@ test("delete bottle with edition", async ({ fixtures, defaults }) => {
     user: "me",
     collection: collection.id,
     bottle: bottle.id,
-    edition: edition.id,
+    release: release.id,
   });
 
   const bottleList = await db
@@ -82,7 +82,7 @@ test("delete bottle with edition", async ({ fixtures, defaults }) => {
     .where(
       and(
         eq(collectionBottles.bottleId, bottle.id),
-        eq(collectionBottles.editionId, edition.id),
+        eq(collectionBottles.releaseId, release.id),
       ),
     );
 
@@ -96,26 +96,26 @@ test("delete bottle with edition", async ({ fixtures, defaults }) => {
   expect(updatedCollection.totalBottles).toBe(0);
 });
 
-test("only deletes specific edition", async ({ fixtures, defaults }) => {
+test("only deletes specific release", async ({ fixtures, defaults }) => {
   const bottle = await fixtures.Bottle();
-  const edition1 = await fixtures.BottleEdition({ bottleId: bottle.id });
-  const edition2 = await fixtures.BottleEdition({ bottleId: bottle.id });
+  const release1 = await fixtures.BottleRelease({ bottleId: bottle.id });
+  const release2 = await fixtures.BottleRelease({ bottleId: bottle.id });
   const collection = await fixtures.Collection({
     name: "default",
     createdById: defaults.user.id,
     totalBottles: 1,
   });
 
-  // Add both editions to collection
+  // Add both releases to collection
   await db.insert(collectionBottles).values({
     bottleId: bottle.id,
     collectionId: collection.id,
-    editionId: edition1.id,
+    releaseId: release1.id,
   });
   await db.insert(collectionBottles).values({
     bottleId: bottle.id,
     collectionId: collection.id,
-    editionId: edition2.id,
+    releaseId: release2.id,
   });
 
   const caller = createCaller({
@@ -125,19 +125,19 @@ test("only deletes specific edition", async ({ fixtures, defaults }) => {
     user: "me",
     collection: "default",
     bottle: bottle.id,
-    edition: edition1.id,
+    release: release1.id,
   });
 
-  // Should only delete edition1, leaving edition2
+  // Should only delete release1, leaving release2
   const bottleList = await db
     .select()
     .from(collectionBottles)
     .where(eq(collectionBottles.bottleId, bottle.id));
 
   expect(bottleList.length).toBe(1);
-  expect(bottleList[0].editionId).toBe(edition2.id);
+  expect(bottleList[0].releaseId).toBe(release2.id);
 
-  // Verify totalBottles was decremented by 1 even though we still have one edition
+  // Verify totalBottles was decremented by 1 even though we still have one release
   const [updatedCollection] = await db
     .select()
     .from(collections)

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BottleReleaseSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
 import { UserSchema } from "./users";
 
@@ -17,9 +18,10 @@ export const CollectionInputSchema = z.object({
 export const CollectionBottleSchema = z.object({
   id: z.number(),
   bottle: BottleSchema,
+  release: BottleReleaseSchema.nullish(),
 });
 
 export const CollectionBottleInputSchema = z.object({
   bottle: z.number(),
-  edition: z.number().nullish(),
+  release: z.number().nullish(),
 });

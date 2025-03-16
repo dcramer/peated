@@ -1,9 +1,9 @@
 import { db } from "@peated/server/db";
-import { bottleEditions, bottles } from "@peated/server/db/schema";
+import { bottleReleases, bottles } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
-import { BottleEditionSerializer } from "@peated/server/serializers/bottleEdition";
+import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
 import { TRPCError } from "@trpc/server";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, type SQL, sql } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure } from "..";
 
@@ -32,26 +32,26 @@ export default publicProcedure
     }
 
     const where: (SQL<unknown> | undefined)[] = [
-      eq(bottleEditions.bottleId, bottle.id),
+      eq(bottleReleases.bottleId, bottle.id),
     ];
 
     if (query) {
       where.push(
-        sql`${bottleEditions.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        sql`${bottleReleases.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
       );
     }
 
     const results = await db
       .select()
-      .from(bottleEditions)
+      .from(bottleReleases)
       .where(where ? and(...where) : undefined)
-      .orderBy(bottleEditions.name)
+      .orderBy(bottleReleases.name)
       .limit(limit + 1)
       .offset(offset);
 
     return {
       results: await serialize(
-        BottleEditionSerializer,
+        BottleReleaseSerializer,
         results.slice(0, limit),
         ctx.user ?? undefined,
       ),

@@ -1,9 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CASK_FILLS, CASK_SIZES, CASK_TYPES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
-import { BottleEditionInputSchema } from "@peated/server/schemas";
+import { BottleReleaseInputSchema } from "@peated/server/schemas";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import BooleanField from "./booleanField";
@@ -16,7 +15,7 @@ import SelectField from "./selectField";
 import { type CreateFormOptions, type Option } from "./selectField/types";
 import TextField from "./textField";
 
-type FormSchemaType = z.infer<typeof BottleEditionInputSchema>;
+type FormSchemaType = z.infer<typeof BottleReleaseInputSchema>;
 
 const caskFillList = CASK_FILLS.map((id) => ({
   id,
@@ -33,7 +32,7 @@ const caskTypeList = CASK_TYPES.map(({ id }) => ({
   name: toTitleCase(id),
 }));
 
-export default function EditionField({
+export default function ReleaseField({
   createDialogHelpText,
   bottle,
   ...props
@@ -45,7 +44,7 @@ export default function EditionField({
   return (
     <SelectField<Option>
       onQuery={async (query) => {
-        const { results } = await trpcUtils.bottleEditionList.fetch({
+        const { results } = await trpcUtils.bottleReleaseList.fetch({
           query,
           bottle,
         });
@@ -81,12 +80,9 @@ function CreateForm({
     getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(BottleEditionInputSchema),
+    resolver: zodResolver(BottleReleaseInputSchema),
     defaultValues: data,
   });
-
-  const [countryValue, setCountryValue] = useState<Option | undefined>();
-  const [regionValue, setRegionValue] = useState<Option | undefined>();
 
   return (
     <LayoutModal
@@ -115,7 +111,7 @@ function CreateForm({
       >
         <Fieldset>
           <p>
-            Most values of the edition are optional, and we'll come up with a
+            Most values of the release are optional, and we'll come up with a
             canonical name based on what's present.
           </p>
 
@@ -126,7 +122,7 @@ function CreateForm({
             label="Series"
             type="text"
             placeholder="e.g. Supernova for Ardbeg Supernova"
-            helpText={BottleEditionInputSchema.shape.series.description}
+            helpText={BottleReleaseInputSchema.shape.series.description}
             autoComplete="off"
           />
 
@@ -136,8 +132,8 @@ function CreateForm({
             autoFocus
             label="Edition"
             type="text"
-            placeholder="e.g. Batch #1, Distillers Edition"
-            helpText={BottleEditionInputSchema.shape.edition.description}
+            placeholder="e.g. Batch #1, Distillers Release"
+            helpText={BottleReleaseInputSchema.shape.edition.description}
             autoComplete="off"
           />
 
@@ -149,7 +145,7 @@ function CreateForm({
             type="number"
             label="Stated Age"
             placeholder="e.g. 12"
-            helpText={BottleEditionInputSchema.shape.statedAge.description}
+            helpText={BottleReleaseInputSchema.shape.statedAge.description}
             suffixLabel="years"
           />
 
@@ -161,7 +157,7 @@ function CreateForm({
             type="number"
             label="ABV"
             placeholder="e.g. 40.5"
-            helpText={BottleEditionInputSchema.shape.abv.description}
+            helpText={BottleReleaseInputSchema.shape.abv.description}
             suffixLabel="%"
             step="0.1"
             min="0"
@@ -178,7 +174,7 @@ function CreateForm({
             placeholder="e.g. 1994"
             min="1800"
             max={new Date().getFullYear() + 1}
-            helpText={BottleEditionInputSchema.shape.releaseYear.description}
+            helpText={BottleReleaseInputSchema.shape.releaseYear.description}
           />
 
           <TextField
@@ -191,7 +187,7 @@ function CreateForm({
             placeholder="e.g. 2024"
             min="1800"
             max={new Date().getFullYear() + 1}
-            helpText={BottleEditionInputSchema.shape.vintageYear.description}
+            helpText={BottleReleaseInputSchema.shape.vintageYear.description}
           />
         </Fieldset>
 
@@ -200,14 +196,14 @@ function CreateForm({
           <BooleanField
             control={control}
             label="Single Cask"
-            helpText={BottleEditionInputSchema.shape.singleCask.description}
+            helpText={BottleReleaseInputSchema.shape.singleCask.description}
             name="singleCask"
           />
 
           <BooleanField
             control={control}
             label="Cask Strength"
-            helpText={BottleEditionInputSchema.shape.caskStrength.description}
+            helpText={BottleReleaseInputSchema.shape.caskStrength.description}
             name="caskStrength"
           />
 
@@ -220,7 +216,7 @@ function CreateForm({
                 error={errors.caskFill}
                 label="Cask Fill"
                 placeholder="e.g. 1st Fill"
-                helpText={BottleEditionInputSchema.shape.caskFill.description}
+                helpText={BottleReleaseInputSchema.shape.caskFill.description}
                 simple
                 options={caskFillList}
                 onChange={(value) => onChange(value?.id)}
@@ -240,7 +236,7 @@ function CreateForm({
                 error={errors.caskType}
                 label="Cask Type"
                 placeholder="e.g. Bourbon"
-                helpText={BottleEditionInputSchema.shape.caskType.description}
+                helpText={BottleReleaseInputSchema.shape.caskType.description}
                 simple
                 options={caskTypeList}
                 onChange={(value) => onChange(value?.id)}
@@ -260,7 +256,7 @@ function CreateForm({
                 error={errors.caskSize}
                 label="Cask Size"
                 placeholder="e.g. Hogshead"
-                helpText={BottleEditionInputSchema.shape.caskSize.description}
+                helpText={BottleReleaseInputSchema.shape.caskSize.description}
                 simple
                 options={caskSizeList}
                 onChange={(value) => onChange(value?.id)}

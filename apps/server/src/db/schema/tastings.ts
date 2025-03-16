@@ -17,7 +17,7 @@ import {
 
 import { SERVING_STYLE_LIST } from "../../constants";
 import { badgeAwards } from "./badges";
-import { bottleEditions, bottles } from "./bottles";
+import { bottleReleases, bottles } from "./bottles";
 import { flights } from "./flights";
 import { users } from "./users";
 
@@ -31,8 +31,8 @@ export const tastings = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    editionId: bigint("edition_id", { mode: "number" }).references(
-      () => bottleEditions.id,
+    releaseId: bigint("release_id", { mode: "number" }).references(
+      () => bottleReleases.id,
     ),
     tags: varchar("tags", { length: 64 })
       .array()
@@ -61,10 +61,10 @@ export const tastings = pgTable(
   },
   (table) => [
     unique("tasting_unq")
-      .on(table.bottleId, table.editionId, table.createdById, table.createdAt)
+      .on(table.bottleId, table.releaseId, table.createdById, table.createdAt)
       .nullsNotDistinct(),
     index("tasting_bottle_idx").on(table.bottleId),
-    index("tasting_edition_idx").on(table.editionId),
+    index("tasting_release_idx").on(table.releaseId),
     index("tasting_flight_idx").on(table.flightId),
     index("tasting_created_by_idx").on(table.createdById),
   ],

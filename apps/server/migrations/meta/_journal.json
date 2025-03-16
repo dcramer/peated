@@ -1093,6 +1093,13 @@
       "when": 1742144775492,
       "tag": "0155_lucky_lifeguard",
       "breakpoints": false
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1742157348326,
+      "tag": "0156_empty_black_tarantula",
+      "breakpoints": false
     }
   ]
 }

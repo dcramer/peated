@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { BadgeAwardSchema } from "./badges";
-import { BottleEditionSchema } from "./bottleEditions";
+import { BottleReleaseSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
 import { ServingStyleEnum, zDatetime } from "./common";
 import { UserSchema } from "./users";
@@ -10,8 +10,8 @@ export const TastingSchema = z.object({
   imageUrl: z.string().nullable().default(null).readonly(),
   notes: z.string().nullable().default(null),
   bottle: BottleSchema,
-  edition: BottleEditionSchema.describe(
-    "The edition of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
+  release: BottleReleaseSchema.describe(
+    "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
   ),
   rating: z.number().gte(0).lte(5).nullable().default(null),
   tags: z.array(z.string()).default([]),
@@ -37,11 +37,11 @@ export const TastingInputSchema = TastingSchema.omit({
   createdBy: true,
 }).extend({
   bottle: z.number(),
-  edition: z
+  release: z
     .number()
     .nullish()
     .describe(
-      "The edition of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
+      "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
     ),
   flight: z.string().nullish(),
   createdAt: zDatetime.nullish(),

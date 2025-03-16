@@ -26,7 +26,7 @@ export default async function Layout({
           Tastings ({bottle.totalTastings.toLocaleString()})
         </TabItem>
         <TabItem as={Link} href={`${baseUrl}/releases`} controlled>
-          Releases ({bottle.numEditions.toLocaleString()})
+          Releases ({bottle.numReleases.toLocaleString()})
         </TabItem>
         <TabItem as={Link} href={`${baseUrl}/prices`} controlled desktopOnly>
           Prices

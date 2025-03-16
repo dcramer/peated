@@ -12,21 +12,27 @@ import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AddTasting({
-  params: { bottleId },
+  params: { bottleId, releaseId },
 }: {
-  params: { bottleId: string };
+  params: { bottleId: string; releaseId?: string };
 }) {
   useAuthRequired();
 
   const router = useRouter();
 
   const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
+  const [release] = releaseId
+    ? trpc.bottleReleaseById.useSuspenseQuery(Number(releaseId))
+    : [null];
   const [suggestedTags] = trpc.bottleSuggestedTagList.useSuspenseQuery({
     bottle: Number(bottleId),
   });
 
   const qs = useSearchParams();
-  const flight = qs.get("flight") || null;
+  const flightId = qs.get("flight") || null;
+  const [flight] = flightId
+    ? trpc.flightById.useSuspenseQuery(flightId)
+    : [null];
 
   const tastingCreateMutation = trpc.tastingCreate.useMutation();
   const api = useApi();
@@ -40,32 +46,32 @@ export default function AddTasting({
   return (
     <TastingForm
       title="Record Tasting"
-      initialData={{ bottle }}
+      initialData={{ bottle, release }}
       suggestedTags={suggestedTags}
       onSubmit={async ({ image, ...data }) => {
         const { tasting, awards } = await tastingCreateMutation.mutateAsync({
           ...data,
+          flight: flight?.id || null,
           createdAt,
         });
 
-        if (image) {
-          const blob = await toBlob(image);
-          try {
-            // TODO: switch to fetch maybe?
-            await api.post(`/tastings/${tasting.id}/image`, {
-              data: {
-                image: blob,
-              },
-            });
-          } catch (err) {
-            logError(err);
-            flash(
-              "There was an error uploading your image, but the tasting was saved.",
-              "error",
-            );
-          }
-        }
         if (tasting) {
+          if (image) {
+            try {
+              await api.post(`/tastings/${tasting.id}/image`, {
+                data: {
+                  image: image ? await toBlob(image) : null,
+                },
+              });
+            } catch (err) {
+              logError(err);
+              flash(
+                "There was an error uploading your image, but the tasting was saved.",
+                "error",
+              );
+            }
+          }
+
           for (const award of awards) {
             // TODO: show "Youve discovered" flow for level 0 badges
             if (award.level != award.prevLevel && award.level) {
@@ -91,8 +97,8 @@ export default function AddTasting({
               );
             }
           }
-          if (flight) {
-            router.push(`/flights/${flight}`);
+          if (flightId) {
+            router.push(`/flights/${flightId}`);
           } else {
             router.push(`/tastings/${tasting.id}`);
           }

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { CASK_FILLS, CASK_SIZE_IDS, CASK_TYPE_IDS } from "../constants";
 
-export const BottleEditionSchema = z.object({
+export const BottleReleaseSchema = z.object({
   id: z.number().describe("Unique identifier for the bottle edition"),
   bottleId: z.number().describe("Reference to the parent bottle"),
 
@@ -102,7 +102,7 @@ export const BottleEditionSchema = z.object({
   updatedAt: z.string().describe("Timestamp when the edition was last updated"),
 });
 
-export const BottleEditionInputSchema = BottleEditionSchema.omit({
+export const BottleReleaseInputSchema = BottleReleaseSchema.omit({
   id: true,
   fullName: true,
   name: true,

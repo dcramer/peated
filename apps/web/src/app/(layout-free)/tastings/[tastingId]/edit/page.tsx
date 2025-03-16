@@ -7,7 +7,7 @@ import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { trpc } from "@peated/web/lib/trpc/client";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Page({
   params: { tastingId },
@@ -22,8 +22,6 @@ export default function Page({
   });
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const flight = searchParams.get("flight") || null;
 
   const tastingUpdateMutation = trpc.tastingUpdate.useMutation();
   const api = useApi();
@@ -57,11 +55,14 @@ export default function Page({
           }
         }
         if (tasting) {
-          if (flight) {
-            router.push(`/flights/${flight}`);
-          } else {
-            router.push(`/tastings/${tasting.id}`);
-          }
+          router.push(`/tastings/${tasting.id}`);
+
+          // TODO:
+          // if (tasting.flight) {
+          //   router.push(`/flights/${flightId}`);
+          // } else {
+          //   router.push(`/tastings/${tasting.id}`);
+          // }
         }
       }}
     />

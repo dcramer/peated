@@ -10,7 +10,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottleEditions, bottles } from "./bottles";
+import { bottleReleases, bottles } from "./bottles";
 import { users } from "./users";
 
 export const collections = pgTable(
@@ -56,17 +56,17 @@ export const collectionBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    editionId: bigint("edition_id", { mode: "number" }).references(
-      () => bottleEditions.id,
+    releaseId: bigint("release_id", { mode: "number" }).references(
+      () => bottleReleases.id,
     ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     unique()
-      .on(table.collectionId, table.bottleId, table.editionId)
+      .on(table.collectionId, table.bottleId, table.releaseId)
       .nullsNotDistinct(),
     index("collection_bottle_bottle_idx").on(table.bottleId),
-    index("collection_bottle_edition_idx").on(table.editionId),
+    index("collection_bottle_release_idx").on(table.releaseId),
   ],
 );
 

@@ -8,19 +8,19 @@ import type { RouterOutputs } from "@peated/web/lib/trpc/client";
 
 export default function ReleaseTable({
   bottleId,
-  editionList,
+  releaseList,
 }: {
   bottleId: number;
-  editionList: RouterOutputs["bottleEditionList"];
+  releaseList: RouterOutputs["bottleReleaseList"];
 }) {
-  if (!editionList.results.length) {
+  if (!releaseList.results.length) {
     return (
       <EmptyActivity>
         <div className="font-semibold">
           We're not aware of any named releases of this bottling.
         </div>
         <div className="mt-4">
-          <Button href={`/addEdition?bottle=${bottleId}`} color="primary">
+          <Button href={`/addRelease?bottle=${bottleId}`} color="primary">
             Add Release
           </Button>
         </div>
@@ -29,10 +29,10 @@ export default function ReleaseTable({
   }
   return (
     <Table
-      items={editionList.results}
-      rel={editionList.rel}
+      items={releaseList.results}
+      rel={releaseList.rel}
       defaultSort="date"
-      url={(item) => `/bottles/${bottleId}/editions/${item.id}`}
+      url={(item) => `/bottles/${bottleId}/releases/${item.id}`}
       columns={[
         { name: "name", sort: "name", sortDefaultOrder: "asc" },
         {

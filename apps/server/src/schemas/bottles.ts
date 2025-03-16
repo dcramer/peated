@@ -137,7 +137,7 @@ export const BottleSchema = z.object({
     .gte(0)
     .readonly()
     .describe("Total number of recorded tastings for this bottle"),
-  numEditions: z
+  numReleases: z
     .number()
     .gte(0)
     .readonly()
@@ -181,7 +181,7 @@ export const BottleInputSchema = BottleSchema.omit({
   updatedAt: true,
   isFavorite: true,
   hasTasted: true,
-  numEditions: true,
+  numReleases: true,
 }).extend({
   brand: EntityChoice,
   distillers: z.array(EntityChoice).default([]).optional(),

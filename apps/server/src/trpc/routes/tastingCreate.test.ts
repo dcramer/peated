@@ -288,17 +288,18 @@ test("creates a new tasting with badge award", async ({
   `);
 });
 
-test("creates a new tasting with edition", async ({ defaults, fixtures }) => {
+test("creates a new tasting with release", async ({ defaults, fixtures }) => {
   const bottle = await fixtures.Bottle();
-  const edition = await fixtures.BottleEdition({ bottleId: bottle.id });
+  const release = await fixtures.BottleRelease({
+    bottleId: bottle.id,
+  });
 
   const caller = createCaller({
     user: defaults.user,
   });
   const data = await caller.tastingCreate({
     bottle: bottle.id,
-    edition: edition.id,
-    rating: 3.5,
+    release: release.id,
   });
 
   expect(data.tasting.id).toBeDefined();
@@ -308,16 +309,13 @@ test("creates a new tasting with edition", async ({ defaults, fixtures }) => {
     .from(tastings)
     .where(eq(tastings.id, data.tasting.id));
 
-  expect(tasting.bottleId).toEqual(bottle.id);
-  expect(tasting.editionId).toEqual(edition.id);
-  expect(tasting.createdById).toEqual(defaults.user.id);
-  expect(tasting.rating).toEqual(3.5);
+  expect(tasting.releaseId).toEqual(release.id);
 });
 
-test("fails with invalid edition", async ({ defaults, fixtures }) => {
+test("fails with invalid release", async ({ defaults, fixtures }) => {
   const bottle = await fixtures.Bottle();
   const otherBottle = await fixtures.Bottle();
-  const edition = await fixtures.BottleEdition({ bottleId: otherBottle.id });
+  const release = await fixtures.BottleRelease({ bottleId: otherBottle.id });
 
   const caller = createCaller({
     user: defaults.user,
@@ -326,13 +324,13 @@ test("fails with invalid edition", async ({ defaults, fixtures }) => {
   const err = await waitError(
     caller.tastingCreate({
       bottle: bottle.id,
-      edition: edition.id,
+      release: release.id,
     }),
   );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify edition.]`);
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify release.]`);
 });
 
-test("fails with nonexistent edition", async ({ defaults, fixtures }) => {
+test("fails with nonexistent release", async ({ defaults, fixtures }) => {
   const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
@@ -342,10 +340,10 @@ test("fails with nonexistent edition", async ({ defaults, fixtures }) => {
   const err = await waitError(
     caller.tastingCreate({
       bottle: bottle.id,
-      edition: 12345,
+      release: 12345,
     }),
   );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify edition.]`);
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify release.]`);
 });
 
 test("creates a new tasting with serving style and color", async ({
@@ -475,7 +473,6 @@ test("creates a new tasting with friends", async ({ defaults, fixtures }) => {
   await fixtures.Follow({
     fromUserId: defaults.user.id,
     toUserId: friend.id,
-    status: "following",
   });
 
   const caller = createCaller({
@@ -504,15 +501,19 @@ test("prevents duplicate tastings", async ({ defaults, fixtures }) => {
 
   const createdAt = new Date().toISOString();
 
-  await caller.tastingCreate({
+  const data = await caller.tastingCreate({
     bottle: bottle.id,
     createdAt,
+    rating: 4.0,
   });
+
+  expect(data.tasting.id).toBeDefined();
 
   const err = await waitError(
     caller.tastingCreate({
       bottle: bottle.id,
       createdAt,
+      rating: 4.0,
     }),
   );
   expect(err).toMatchInlineSnapshot(`[TRPCError: Tasting already exists.]`);
@@ -559,12 +560,12 @@ test("updates entity stats correctly", async ({ defaults, fixtures }) => {
   expect(updatedBottle.avgRating).toBe(4.5);
 });
 
-test("creates a new tasting with both flight and edition", async ({
+test("creates a new tasting with both flight and release", async ({
   defaults,
   fixtures,
 }) => {
   const bottle = await fixtures.Bottle();
-  const edition = await fixtures.BottleEdition({ bottleId: bottle.id });
+  const release = await fixtures.BottleRelease({ bottleId: bottle.id });
   const flight = await fixtures.Flight({ bottles: [bottle.id] });
 
   const caller = createCaller({
@@ -572,7 +573,7 @@ test("creates a new tasting with both flight and edition", async ({
   });
   const data = await caller.tastingCreate({
     bottle: bottle.id,
-    edition: edition.id,
+    release: release.id,
     flight: flight.publicId,
     rating: 4.0,
   });
@@ -585,8 +586,71 @@ test("creates a new tasting with both flight and edition", async ({
     .where(eq(tastings.id, data.tasting.id));
 
   expect(tasting.bottleId).toEqual(bottle.id);
-  expect(tasting.editionId).toEqual(edition.id);
+  expect(tasting.releaseId).toEqual(release.id);
   expect(tasting.flightId).toEqual(flight.id);
   expect(tasting.createdById).toEqual(defaults.user.id);
   expect(tasting.rating).toEqual(4.0);
+});
+
+test("creates a new tasting with color", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    rating: 4.0,
+  });
+
+  expect(data.tasting.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.tasting.id));
+
+  expect(tasting.bottleId).toEqual(bottle.id);
+  expect(tasting.createdById).toEqual(defaults.user.id);
+  expect(tasting.rating).toEqual(4.0);
+});
+
+test("creates a new tasting with serving style", async ({
+  defaults,
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const data = await caller.tastingCreate({
+    bottle: bottle.id,
+    servingStyle: "neat",
+  });
+
+  expect(data.tasting.id).toBeDefined();
+
+  const [tasting] = await db
+    .select()
+    .from(tastings)
+    .where(eq(tastings.id, data.tasting.id));
+
+  expect(tasting.servingStyle).toEqual("neat");
+});
+
+test("fails with non-following friend", async ({ defaults, fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const friend = await fixtures.User();
+
+  const caller = createCaller({
+    user: defaults.user,
+  });
+  const err = await waitError(
+    caller.tastingCreate({
+      bottle: bottle.id,
+      friends: [friend.id],
+    }),
+  );
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Invalid friend.]`);
 });

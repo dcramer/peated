@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
 import {
-  bottleEditions,
+  bottleReleases,
   bottles,
   bottleTags,
   entities,
@@ -46,16 +46,16 @@ export default authedProcedure
       });
     }
 
-    if (input.edition) {
-      const edition = await db.query.bottleEditions.findFirst({
+    if (input.release) {
+      const release = await db.query.bottleReleases.findFirst({
         where: and(
-          eq(bottleEditions.id, input.edition),
-          eq(bottleEditions.bottleId, bottle.id),
+          eq(bottleReleases.id, input.release),
+          eq(bottleReleases.bottleId, bottle.id),
         ),
       });
-      if (!edition) {
+      if (!release) {
         throw new TRPCError({
-          message: "Cannot identify edition.",
+          message: "Cannot identify release.",
           code: "BAD_REQUEST",
         });
       }
@@ -85,7 +85,7 @@ export default authedProcedure
 
     const data: NewTasting = {
       bottleId: bottle.id,
-      editionId: input.edition || null,
+      releaseId: input.release || null,
       notes: input.notes || null,
       rating: input.rating || null,
       flightId: flight ? flight.id : null,

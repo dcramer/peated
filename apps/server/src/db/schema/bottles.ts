@@ -157,8 +157,8 @@ export type NewBottle = typeof bottles.$inferInsert;
  *    - ABV: 43%
  *    - Edition-specific details: Sherry oak casks
  */
-export const bottleEditions = pgTable(
-  "bottle_edition",
+export const bottleReleases = pgTable(
+  "bottle_release",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     bottleId: bigint("bottle_id", { mode: "number" })
@@ -169,8 +169,9 @@ export const bottleEditions = pgTable(
     fullName: varchar("full_name", { length: 255 }).notNull(),
     // canonical name, excluding brand
     name: varchar("name", { length: 255 }).notNull(),
+    searchVector: tsvector("search_vector"),
 
-    // Edition-specific fields
+    // Release-specific fields
     series: varchar("series", { length: 255 }),
     edition: varchar("edition", { length: 255 }),
     vintageYear: smallint("vintage_year"),
@@ -185,7 +186,7 @@ export const bottleEditions = pgTable(
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
 
-    // Edition-specific content
+    // Release-specific content
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
     imageUrl: text("image_url"),
@@ -195,7 +196,7 @@ export const bottleEditions = pgTable(
       .default(sql`array[]::varchar[]`)
       .notNull(),
 
-    // Edition-specific stats
+    // Release-specific stats
     avgRating: doublePrecision("avg_rating"),
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
@@ -208,9 +209,9 @@ export const bottleEditions = pgTable(
       .notNull(),
   },
   (table) => [
-    index("bottle_edition_bottle_idx").on(table.bottleId),
-    index("bottle_edition_created_by_idx").on(table.createdById),
-    uniqueIndex("bottle_edition_full_name_idx").on(table.fullName),
+    index("bottle_release_bottle_idx").on(table.bottleId),
+    index("bottle_release_created_by_idx").on(table.createdById),
+    uniqueIndex("bottle_release_full_name_idx").on(table.fullName),
   ],
 );
 
@@ -224,26 +225,26 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
     references: [entities.id],
   }),
   bottlesToDistillers: many(bottlesToDistillers),
-  editions: many(bottleEditions),
+  releases: many(bottleReleases),
   createdBy: one(users, {
     fields: [bottles.createdById],
     references: [users.id],
   }),
 }));
 
-export const bottleEditionsRelations = relations(bottleEditions, ({ one }) => ({
+export const bottleReleasesRelations = relations(bottleReleases, ({ one }) => ({
   bottle: one(bottles, {
-    fields: [bottleEditions.bottleId],
+    fields: [bottleReleases.bottleId],
     references: [bottles.id],
   }),
   createdBy: one(users, {
-    fields: [bottleEditions.createdById],
+    fields: [bottleReleases.createdById],
     references: [users.id],
   }),
 }));
 
-export type BottleEdition = typeof bottleEditions.$inferSelect;
-export type NewBottleEdition = typeof bottleEditions.$inferInsert;
+export type BottleRelease = typeof bottleReleases.$inferSelect;
+export type NewBottleRelease = typeof bottleReleases.$inferInsert;
 
 export const bottlesToDistillers = pgTable(
   "bottle_distiller",
@@ -304,7 +305,7 @@ export const bottleAliases = pgTable(
       () => bottles.id,
     ),
     editionId: bigint("edition_id", { mode: "number" }).references(
-      () => bottleEditions.id,
+      () => bottleReleases.id,
     ),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),

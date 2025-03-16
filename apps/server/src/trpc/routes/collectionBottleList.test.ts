@@ -53,7 +53,7 @@ test("can list own bottles with me parameter", async ({
   // Create some bottles and add them to the default collection
   const bottle1 = await fixtures.Bottle();
   const bottle2 = await fixtures.Bottle();
-  const edition = await fixtures.BottleEdition({ bottleId: bottle2.id });
+  const release = await fixtures.BottleRelease({ bottleId: bottle2.id });
 
   // Get the default collection
   const defaultCollection = await getDefaultCollection(db, defaults.user.id);
@@ -66,12 +66,12 @@ test("can list own bottles with me parameter", async ({
     {
       collectionId: defaultCollection.id,
       bottleId: bottle1.id,
-      editionId: null,
+      releaseId: null,
     },
     {
       collectionId: defaultCollection.id,
       bottleId: bottle2.id,
-      editionId: edition.id,
+      releaseId: release.id,
     },
   ]);
 
