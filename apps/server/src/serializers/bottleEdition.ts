@@ -9,6 +9,7 @@ import { type BottleEditionSchema } from "../schemas";
 
 type Attrs = {
   hasTasted: boolean;
+  isFavorite: boolean;
 };
 
 export const BottleEditionSerializer = serializer({
@@ -40,6 +41,7 @@ export const BottleEditionSerializer = serializer({
         item.id,
         {
           hasTasted: tastedSet.has(item.id),
+          isFavorite: false, // TODO
         },
       ]),
     );
@@ -55,6 +57,9 @@ export const BottleEditionSerializer = serializer({
 
       fullName: item.fullName,
       name: item.name,
+
+      series: item.series,
+      edition: item.edition,
 
       description: item.description,
       tastingNotes: item.tastingNotes,
@@ -80,6 +85,7 @@ export const BottleEditionSerializer = serializer({
 
       suggestedTags: item.suggestedTags,
       hasTasted: attrs.hasTasted,
+      isFavorite: attrs.isFavorite,
 
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),

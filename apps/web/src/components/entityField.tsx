@@ -3,7 +3,6 @@ import { EntityInputSchema } from "@peated/server/schemas";
 import { type EntityType } from "@peated/server/types";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
-import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import CountryField from "./countryField";

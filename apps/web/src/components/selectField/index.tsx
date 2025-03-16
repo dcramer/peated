@@ -25,6 +25,7 @@ type BaseProps = {
   error?: {
     message?: string;
   };
+  noSort?: boolean;
   noDialog?: boolean;
   placeholder?: string;
   children?: ReactNode;
@@ -97,6 +98,7 @@ export default function SelectField<T extends Option>({
   onRenderChip,
   onChange,
   noDialog = false,
+  noSort = false,
   error,
   disabled = false,
   readOnly = false,

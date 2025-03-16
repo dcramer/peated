@@ -30,6 +30,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import ColorField from "./colorField";
+import EditionField from "./editionField";
 import Form from "./form";
 import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
 import ServingStyleIcon from "./servingStyleIcon";
@@ -63,7 +64,7 @@ export default function TastingForm({
       image: HTMLCanvasElement | null | undefined;
     }
   >;
-  initialData: Partial<Tasting> & Pick<Tasting, "bottle">;
+  initialData: Partial<Tasting> & Pick<Tasting, "bottle" | "edition">;
   title: string;
   suggestedTags: Paginated<SuggestedTag>;
 }) {
@@ -76,6 +77,7 @@ export default function TastingForm({
     resolver: zodResolver(TastingInputSchema),
     defaultValues: {
       bottle: initialData.bottle.id,
+      edition: initialData.edition?.id,
       rating: initialData.rating,
       notes: initialData.notes,
       tags: initialData.tags,
@@ -91,6 +93,11 @@ export default function TastingForm({
   );
   const [friendsValue, setFriendsValue] = useState<Option[]>(
     initialData.friends ? initialData.friends.map(userToOption) : [],
+  );
+  const [editionValue, setEditionValue] = useState<Option | undefined>(
+    initialData.edition
+      ? { id: initialData.edition.id, name: initialData.edition.name }
+      : undefined,
   );
 
   const trpcUtils = trpc.useUtils();
@@ -141,6 +148,28 @@ export default function TastingForm({
         isSubmitting={isSubmitting}
       >
         <Fieldset>
+          <Controller
+            name="edition"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <EditionField
+                {...field}
+                error={errors.edition}
+                label="Bottle Edition"
+                helpText={TastingInputSchema.shape.edition.description}
+                placeholder="e.g. Ardbeg Supernova 2013"
+                bottle={initialData.bottle.id}
+                required
+                onChange={(value) => {
+                  onChange(value?.id || value);
+                  setEditionValue(value);
+                }}
+                canCreate
+                value={editionValue}
+              />
+            )}
+          />
+
           <Controller
             name="rating"
             control={control}
@@ -237,6 +266,7 @@ export default function TastingForm({
                 {...field}
                 error={errors.servingStyle}
                 label="Serving Style"
+                noSort
                 noDialog
                 targetOptions={servingStyleList.length}
                 options={servingStyleList}

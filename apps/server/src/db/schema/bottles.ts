@@ -164,10 +164,15 @@ export const bottleEditions = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id, { onDelete: "cascade" })
       .notNull(),
+
+    // canonical name, including brand
     fullName: varchar("full_name", { length: 255 }).notNull(),
+    // canonical name, excluding brand
     name: varchar("name", { length: 255 }).notNull(),
 
     // Edition-specific fields
+    series: varchar("series", { length: 255 }),
+    edition: varchar("edition", { length: 255 }),
     vintageYear: smallint("vintage_year"),
     releaseYear: smallint("release_year"),
     abv: doublePrecision("abv"),

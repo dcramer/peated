@@ -213,7 +213,7 @@ export default function BottleForm({
                 error={errors.brand}
                 label="Brand"
                 helpText="The brand, or main label of the bottle."
-                placeholder="e.g. Laphroiag"
+                placeholder="e.g. Laphroaig"
                 createDialogHelpText="The brand is the label the spirit is bottled under. Sometimes this is
                 the same as the distiller."
                 searchContext={{

@@ -1,6 +1,5 @@
-import BetaNotice from "@peated/web/components/betaNotice";
-import BottleTable from "@peated/web/components/bottleTable";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import ReleaseTable from "./releaseTable";
 
 export async function generateMetadata({
   params: { bottleId },
@@ -11,7 +10,8 @@ export async function generateMetadata({
   const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
 
   return {
-    title: `Whisky Similar to ${bottle.fullName}`,
+    title: `Releases of ${bottle.fullName}`,
+    description: `Known releases of ${bottle.fullName}, including specific vintages and special editions.`,
   };
 }
 
@@ -21,15 +21,13 @@ export default async function Page({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const bottleList = await trpcClient.similarBottleList.fetch({
+  const editionList = await trpcClient.bottleEditionList.fetch({
     bottle: Number(bottleId),
   });
 
   return (
     <div className="mt-6 px-3 lg:px-0">
-      <BetaNotice>This is a work in progress.</BetaNotice>
-
-      <BottleTable bottleList={bottleList.results} rel={bottleList.rel} />
+      <ReleaseTable bottleId={Number(bottleId)} editionList={editionList} />
     </div>
   );
 }
