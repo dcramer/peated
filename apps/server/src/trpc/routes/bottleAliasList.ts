@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { bottleAliases, bottles } from "@peated/server/db/schema";
-import { formatBottleName } from "@peated/server/lib/format";
 import { TRPCError } from "@trpc/server";
 import {
   and,

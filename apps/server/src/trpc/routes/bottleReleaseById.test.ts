@@ -19,8 +19,8 @@ describe("bottleReleaseById", function () {
     const result = await caller.bottleReleaseById(release.id);
 
     expect(result.id).toBe(release.id);
-    expect(result.bottle.id).toBe(bottle.id);
-    expect(result.bottle.name).toBe("Test Bottle");
+    expect(result.bottleId).toBe(bottle.id);
+    expect(result.name).toBe(release.name);
     expect(result.abv).toBe(40);
   });
 

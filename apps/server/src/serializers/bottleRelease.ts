@@ -59,7 +59,6 @@ export const BottleReleaseSerializer = serializer({
       name: item.name,
 
       edition: item.edition,
-      series: item.series,
 
       description: item.description,
       tastingNotes: item.tastingNotes,

@@ -1100,6 +1100,13 @@
       "when": 1742157348326,
       "tag": "0156_empty_black_tarantula",
       "breakpoints": false
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1742162826738,
+      "tag": "0157_ambiguous_karnak",
+      "breakpoints": false
     }
   ]
 }

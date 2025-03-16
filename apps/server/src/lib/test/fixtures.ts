@@ -38,7 +38,7 @@ import {
 } from "../../db/schema";
 import { createAccessToken, generatePasswordHash } from "../auth";
 import { mapRows } from "../db";
-import { formatBottleName } from "../format";
+import { formatExpressionName } from "../format";
 import { normalizeBottle } from "../normalize";
 import { choose, random, sample } from "../rand";
 import { buildBottleSearchVector, buildEntitySearchVector } from "../search";
@@ -344,23 +344,26 @@ export const Bottle = async (
           )
     ) as dbSchema.Entity;
 
-    const name = data.name ?? chooseBottleName();
+    const expression = data.expression ?? chooseBottleName();
 
-    const fullName = formatBottleName({
-      ...data,
-      name: `${brand.name} ${name}`,
-    });
-
-    const bottleData: dbSchema.NewBottle = {
+    const tBottleData = {
       category: choose([...CATEGORY_LIST, null, null]),
       statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
       createdAt: new Date(),
       updatedAt: new Date(),
+      expression,
+      series: choose([null, expression]),
       ...data,
-      name,
-      fullName,
       brandId: brand.id,
       createdById: data.createdById || (await User({}, tx)).id,
+    };
+
+    const name = formatExpressionName(tBottleData);
+
+    const bottleData: dbSchema.NewBottle = {
+      ...tBottleData,
+      name,
+      fullName: `${brand.shortName || brand.name} ${name}`,
     };
 
     const distillerList = distillerIds.length
@@ -895,15 +898,10 @@ export const BottleRelease = async (
     if (!bottleBrand) throw new Error("Unable to find bottle brand");
 
     const edition = data.edition ?? choose([null, faker.lorem.word()]);
-    const series = data.series ?? choose([null, faker.lorem.word()]);
 
-    const name = `${bottle.name}${edition ? ` ${edition}` : ""}${series ? ` ${series}` : ""}`;
+    const name = `${bottle.name}${edition ? ` ${edition}` : ""}`;
     const fullName =
-      data.fullName ||
-      formatBottleName({
-        ...data,
-        name: `${bottleBrand.name} ${name}`,
-      });
+      data.fullName || `${bottleBrand.shortName || bottleBrand.name} ${name}`;
 
     const releaseData: dbSchema.NewBottleRelease = {
       ...data,

@@ -11,7 +11,7 @@ import {
   upsertBottleAlias,
   upsertEntity,
 } from "@peated/server/lib/db";
-import { formatBottleName } from "@peated/server/lib/format";
+import { formatExpressionName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -51,9 +51,9 @@ export async function bottleCreate({
       (input.description && input.description !== null ? "user" : null);
   }
 
-  if (!bottleData.name) {
+  if (!bottleData.expression) {
     throw new TRPCError({
-      message: "Invalid bottle name.",
+      message: "Invalid bottle expression.",
       code: "BAD_REQUEST",
     });
   }
@@ -118,16 +118,15 @@ export async function bottleCreate({
         distillerIds.push(distUpsert.id);
       }
 
-    const fullName = formatBottleName({
-      ...bottleData,
-      name: `${brand.shortName || brand.name} ${bottleData.name}`,
-    });
+    const name = formatExpressionName(bottleData);
+    const fullName = `${brand.shortName || brand.name} ${name}`;
 
     const bottleInsertData: NewBottle = {
       ...bottleData,
       brandId: brand.id,
       bottlerId: bottler?.id || null,
       createdById: user.id,
+      name,
       fullName,
     };
 

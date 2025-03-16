@@ -31,7 +31,7 @@ test("requires mod", async ({ defaults }) => {
 
 test("no changes", async ({ fixtures }) => {
   const bottle = await fixtures.Bottle({
-    name: "Cool Bottle",
+    expression: "Cool Bottle",
     releaseYear: null,
     vintageYear: null,
     edition: null,
@@ -58,7 +58,7 @@ test("edits a new bottle with new name param", async ({ fixtures }) => {
   const brand = await fixtures.Entity();
   const bottle = await fixtures.Bottle({
     brandId: brand.id,
-    name: "Nice Oak",
+    expression: "Nice Oak",
     vintageYear: null,
     releaseYear: null,
     edition: null,
@@ -69,7 +69,7 @@ test("edits a new bottle with new name param", async ({ fixtures }) => {
   });
   const data = await caller.bottleUpdate({
     bottle: bottle.id,
-    name: "Delicious Wood",
+    expression: "Delicious Wood",
   });
 
   expect(data.id).toBeDefined();
@@ -109,7 +109,7 @@ test("manipulates name to conform with age", async ({ fixtures }) => {
   const bottle = await fixtures.Bottle({
     brandId: brand.id,
     statedAge: null,
-    name: "Nice Oak",
+    expression: "Nice Oak",
     vintageYear: null,
     releaseYear: null,
     edition: null,
@@ -120,7 +120,7 @@ test("manipulates name to conform with age", async ({ fixtures }) => {
   });
   await caller.bottleUpdate({
     bottle: bottle.id,
-    name: "Delicious 10",
+    expression: "Delicious 10",
     statedAge: 10,
   });
 
@@ -139,7 +139,7 @@ test("fills in statedAge", async ({ fixtures }) => {
   const bottle = await fixtures.Bottle({
     brandId: brand.id,
     statedAge: null,
-    name: "Delicious",
+    expression: "Delicious",
   });
 
   const caller = createCaller({
@@ -147,7 +147,7 @@ test("fills in statedAge", async ({ fixtures }) => {
   });
   await caller.bottleUpdate({
     bottle: bottle.id,
-    name: "Delicious 10-year-old",
+    expression: "Delicious 10-year-old",
   });
 
   const [bottle2] = await db
@@ -159,7 +159,10 @@ test("fills in statedAge", async ({ fixtures }) => {
 });
 
 test("removes statedAge", async ({ fixtures }) => {
-  const bottle = await fixtures.Bottle({ name: "Foo Bar", statedAge: 10 });
+  const bottle = await fixtures.Bottle({
+    expression: "Foo Bar",
+    statedAge: 10,
+  });
 
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),
@@ -180,7 +183,7 @@ test("removes statedAge", async ({ fixtures }) => {
 test("changes brand", async ({ fixtures }) => {
   const newBrand = await fixtures.Entity();
   const bottle = await fixtures.Bottle({
-    name: "Nice Oak",
+    expression: "Nice Oak",
     vintageYear: null,
     releaseYear: null,
     edition: null,
@@ -332,7 +335,7 @@ test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleUpdate({
     bottle: bottle.id,
-    name: "1.54",
+    expression: "1.54",
     brand: brand.id,
   });
 
@@ -371,7 +374,7 @@ test("saves cask information", async ({ defaults, fixtures }) => {
 
 test("saves vintage information", async ({ defaults, fixtures }) => {
   const bottle = await fixtures.Bottle({
-    name: "Delicious",
+    expression: "Delicious",
     statedAge: null,
     releaseYear: null,
   });

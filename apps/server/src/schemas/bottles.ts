@@ -14,25 +14,30 @@ export const BottleSchema = z.object({
   fullName: z
     .string()
     .readonly()
-    .describe("Complete name of the bottle including brand and series"),
+    .describe("Canonical name including the brand"),
+  name: z.string().readonly().describe("Canonical name excluding the brand."),
 
-  series: z
+  expression: z
     .string()
     .trim()
     .nullable()
     .default(null)
     .describe(
-      "Series name for the bottle (e.g., 'Supernova' for Ardbeg Supernova series)",
+      "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
     ),
-  // DEPRECATED: use series instead
-  name: z.string().trim().min(1, "Required"),
 
-  // DEPRECATED: moving to editions
-  edition: z.string().trim().nullable().default(null),
-
-  category: CategoryEnum.nullable()
+  series: z
+    .string()
+    .nullable()
     .default(null)
-    .describe("Category of the whisky (e.g., Single Malt, Blend)"),
+    .describe(
+      "Series name for this bottling (e.g. Supernova for Ardbeg Supernova)",
+    ),
+
+  category: CategoryEnum.nullable().default(null),
+
+  // <deprecated>: moving to editions
+  edition: z.string().trim().nullable().default(null),
   statedAge: z
     .number()
     .min(0)
@@ -82,6 +87,7 @@ export const BottleSchema = z.object({
   caskFill: CaskFillEnum.nullable()
     .default(null)
     .describe("Fill number of the cask (1st fill, refill, etc.)"),
+  // </deprecated>: moving to editions
 
   brand: EntitySchema.describe("The brand that produces this bottle"),
   distillers: z
@@ -174,6 +180,7 @@ const EntityChoice = z.union([
 export const BottleInputSchema = BottleSchema.omit({
   id: true,
   fullName: true,
+  name: true,
   suggestedTags: true,
   avgRating: true,
   totalTastings: true,

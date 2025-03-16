@@ -34,7 +34,7 @@ type TastingNotes = {
 };
 
 /**
- * Represents a unique bottle/expression from a brand.
+ * Represents a unique expression from a brand.
  * This is the parent table that contains the core information about a bottle.
  * Each bottle can have multiple editions (vintages, releases, etc.) which are stored in bottle_edition.
  *
@@ -44,26 +44,37 @@ type TastingNotes = {
  * Examples:
  * 1. Ardbeg Supernova
  *    - Brand: Ardbeg
- *    - Name: Supernova
+ *    - Series: Supernova
  *    - Multiple editions released in 2009, 2010, 2014, 2015, 2019
  *
  * 2. Octomore
- *    - Brand: Bruichladdich
- *    - Name: Octomore
+ *    - Brand: Octomore
+ *    - Series: 13
  *    - Multiple editions like 13.1, 13.2, 13.3, etc.
  *
  * 3. Macallan 18
  *    - Brand: Macallan
- *    - Name: 18-year-old
+ *    - Series: 18-year-old
  *    - Multiple editions by vintage year (1993, 1994, etc.)
  */
 export const bottles = pgTable(
   "bottle",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
+    // canonical name including brand
     fullName: varchar("full_name", { length: 255 }).notNull(),
+    // canonical name excluding brand
     name: varchar("name", { length: 255 }).notNull(),
-    edition: varchar("edition", { length: 255 }),
+
+    // expression is the name of the bottle without the brand, in our case it typically is the same as `name` here
+    expression: varchar("expression", { length: 255 }),
+
+    // statedAge is only present on the expression level if its always the same across any release
+    // and when it is present, it will be included in the canonical expression name
+    statedAge: smallint("stated_age"),
+
+    // a NULL series represents a "core bottling"
+    series: varchar("series", { length: 255 }),
 
     searchVector: tsvector("search_vector"),
 
@@ -77,7 +88,7 @@ export const bottles = pgTable(
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
     // @deprecated - being migrated to bottle_edition table
-    statedAge: smallint("stated_age"),
+    edition: varchar("edition", { length: 255 }),
     // @deprecated - being migrated to bottle_edition table
     abv: doublePrecision("abv"),
     // @deprecated - being migrated to bottle_edition table
@@ -145,7 +156,7 @@ export type NewBottle = typeof bottles.$inferInsert;
  *
  * 2. Octomore 13.1
  *    - Bottle: Octomore
- *    - Name: 13.1
+ *    - Expression: 13.1
  *    - Release Year: 2022
  *    - ABV: 59.2%
  *    - Edition-specific details: 137.3 ppm, 5 years old, ex-American oak
@@ -169,10 +180,10 @@ export const bottleReleases = pgTable(
     fullName: varchar("full_name", { length: 255 }).notNull(),
     // canonical name, excluding brand
     name: varchar("name", { length: 255 }).notNull(),
+
     searchVector: tsvector("search_vector"),
 
     // Release-specific fields
-    series: varchar("series", { length: 255 }),
     edition: varchar("edition", { length: 255 }),
     vintageYear: smallint("vintage_year"),
     releaseYear: smallint("release_year"),

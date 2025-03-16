@@ -10,9 +10,11 @@ export const TastingSchema = z.object({
   imageUrl: z.string().nullable().default(null).readonly(),
   notes: z.string().nullable().default(null),
   bottle: BottleSchema,
-  release: BottleReleaseSchema.describe(
-    "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
-  ),
+  release: BottleReleaseSchema.nullable()
+    .default(null)
+    .describe(
+      "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
+    ),
   rating: z.number().gte(0).lte(5).nullable().default(null),
   tags: z.array(z.string()).default([]),
   color: z.number().gte(0).lte(20).nullable().default(null),

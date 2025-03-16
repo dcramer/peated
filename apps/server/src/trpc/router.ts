@@ -27,6 +27,7 @@ import bottleMerge from "./routes/bottleMerge";
 import bottlePreview from "./routes/bottlePreview";
 import bottlePriceHistory from "./routes/bottlePriceHistory";
 import bottlePriceList from "./routes/bottlePriceList";
+import bottleReleaseById from "./routes/bottleReleaseById";
 import bottleReleaseList from "./routes/bottleReleaseList";
 import bottleSuggestedTagList from "./routes/bottleSuggestedTagList";
 import bottleTagList from "./routes/bottleTagList";

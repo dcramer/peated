@@ -5,16 +5,11 @@ export const BottleReleaseSchema = z.object({
   id: z.number().describe("Unique identifier for the bottle edition"),
   bottleId: z.number().describe("Reference to the parent bottle"),
 
-  fullName: z.string().describe("Canonical name including the brand"),
-  name: z.string().describe("Canonical name excluding the brand."),
-
-  series: z
+  fullName: z
     .string()
-    .nullable()
-    .default(null)
-    .describe(
-      "Series name for this bottling (e.g. Supernova for Ardbeg Supernova)",
-    ),
+    .readonly()
+    .describe("Canonical name including the brand"),
+  name: z.string().readonly().describe("Canonical name excluding the brand."),
 
   edition: z
     .string()

@@ -37,6 +37,7 @@ const EXTRACTION_LABEL_PROMPT = `The fields to extract are:
 2. **Age Statement Handling:**
    - If the label includes a stated age (e.g., \`"12 Years Old"\`), extract it as an integer (\`stated_age: 12\`).
    - If there is no age statement, return \`null\` (\`stated_age: null\` for NAS – No Age Statement).
+   - When including the age statement as part of the expression, it should always be in this format: \`"12-year-old"\`
 
 3. **ABV Extraction:**
    - Identify the ABV percentage and return it as a decimal (e.g., \`"abv": 46.3\` for \`"46.3% ABV"\`).
@@ -92,6 +93,27 @@ Output:
   "edition": null,
 }
 
+
+#### **Single Expression**
+Input:
+> **"Octomore 13.1"**
+
+Output:
+{
+  "brand": "Octomore",
+  "distillery": ["Octomore"],
+  "expression": "13.1",
+  "category": "single_malt",
+  "series": "13",
+  "stated_age": null,
+  "abv": null,
+  "release_year": null,
+  "vintage_year": null,
+  "cask_type": null,
+  "edition": null,
+}
+
+Note: In the above example, we know the series is "Octomore 13" because this is how Octomore labels its bottles.
 
 #### **Blended Whiskey (Multiple Distilleries)**
 Input:

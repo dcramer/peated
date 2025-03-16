@@ -34,7 +34,7 @@ export default async function createMissingBottles() {
             user: systemUser,
           });
           const result = await caller.bottleCreate({
-            name: review.name,
+            expression: review.name,
             brand: entity.id,
           });
           bottleId = result.id;

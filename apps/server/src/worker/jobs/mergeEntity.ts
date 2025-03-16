@@ -7,7 +7,6 @@ import {
   entityTombstones,
 } from "@peated/server/db/schema";
 import { upsertBottleAlias } from "@peated/server/lib/db";
-import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { ConflictError } from "@peated/server/trpc/errors";
 import { pushUniqueJob, runJob } from "@peated/server/worker/client";
@@ -45,10 +44,8 @@ export default async function mergeEntity({
     for (const bottle of bottleList) {
       // bottles are unique on alias, so we need to attempt to bind the alias,
       // and on conflict we're going to merge
-      const fullName = formatBottleName({
-        ...bottle,
-        name: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
-      });
+
+      const fullName = `${toEntity.shortName || toEntity.name} ${bottle.name}`;
       const alias = await upsertBottleAlias(tx, fullName, bottle.id);
       // alias.bottleId is always set, but I don't want to deal w/ TS
       if (alias.bottleId && alias.bottleId !== bottle.id) {

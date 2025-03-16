@@ -57,10 +57,10 @@ export async function bottleNormalize({
   if (rv.brand?.name.toLowerCase() === "the scotch malt whisky society") {
     rv.bottler = rv.brand;
 
-    if (input.name) {
-      const details = parseDetailsFromName(input.name);
+    if (input.expression) {
+      const details = parseDetailsFromName(input.expression);
       if (details) {
-        rv.name = details.name;
+        rv.expression = details.name;
 
         if (details.category) rv.category = details.category;
 
@@ -89,12 +89,16 @@ export async function bottleNormalize({
 
   // remove duplicate brand name prefix on bottle name
   // e.g. Hibiki 12-year-old => Hibiki
-  if (rv.brand) {
-    rv.name = stripPrefix(rv.name, `${rv.brand.name} `);
+  if (rv.brand && rv.expression) {
+    rv.expression = stripPrefix(rv.expression, `${rv.brand.name} `);
   }
 
-  if (rv.name) {
-    const normBottle = normalizeBottle({ ...rv, isFullName: false });
+  if (rv.expression) {
+    const normBottle = normalizeBottle({
+      ...rv,
+      name: rv.expression,
+      isFullName: false,
+    });
 
     Object.assign(rv, normBottle);
   }

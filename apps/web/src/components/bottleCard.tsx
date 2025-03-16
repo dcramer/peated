@@ -1,7 +1,7 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import {
-  formatBottleName,
   formatCategoryName,
+  formatExpressionName,
 } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import Link from "@peated/web/components/link";
@@ -96,10 +96,7 @@ export const PreviewBottleCard = ({
   const { brand } = data;
   return (
     <BottleScaffold
-      name={formatBottleName({
-        ...data,
-        name: `${brand ? `${brand.shortName || brand.name} ` : ""}${data.name}`,
-      })}
+      name={`${brand ? `${brand.shortName || brand.name} ` : ""}${formatExpressionName(data)}`}
       category={data.category ? formatCategoryName(data.category) : null}
       distillers={
         data.distillers?.length ? (

@@ -7,7 +7,7 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
-import { formatBottleName } from "@peated/server/lib/format";
+import { formatExpressionName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -227,7 +227,7 @@ export async function bottleUpdate({
       }
     }
 
-    if (bottleData.name || bottleData.brandId) {
+    if (bottleData.expression || bottleData.statedAge || bottleData.brandId) {
       if (!brand) {
         brand =
           (await tx.query.entities.findFirst({
@@ -235,11 +235,12 @@ export async function bottleUpdate({
           })) || null;
         if (!brand) throw new Error("Unexpected");
       }
-      bottleData.fullName = formatBottleName({
+
+      bottleData.name = formatExpressionName({
         ...bottle,
         ...bottleData,
-        name: `${brand.shortName || brand.name} ${bottleData.name ?? bottle.name}`,
       });
+      bottleData.fullName = `${brand.shortName || brand.name} ${bottleData.name}`;
     }
 
     // bottles ae unique on aliases, so if an alias exists that is bound to

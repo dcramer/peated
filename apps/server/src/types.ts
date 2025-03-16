@@ -128,7 +128,7 @@ type FreeformEntity =
   | z.infer<typeof EntitySchema>;
 
 export type BottlePreviewResult = {
-  name: string;
+  expression: string | null;
   category?: Category | null;
   brand: FreeformEntity;
   bottler?: FreeformEntity | null;
