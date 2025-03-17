@@ -1,5 +1,5 @@
 {
-  "id": "62ec2fb0-e62a-498c-b521-17cc17fa263f",
+  "id": "acb82de5-b8c8-4051-8592-c350cf451425",
   "prevId": "30a8b5ce-6d93-4185-83c7-72ea552bbe08",
   "version": "7",
   "dialect": "postgresql",
@@ -373,10 +373,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "bottle_alias_edition_id_bottle_edition_id_fk": {
-          "name": "bottle_alias_edition_id_bottle_edition_id_fk",
+        "bottle_alias_edition_id_bottle_release_id_fk": {
+          "name": "bottle_alias_edition_id_bottle_release_id_fk",
           "tableFrom": "bottle_alias",
-          "tableTo": "bottle_edition",
+          "tableTo": "bottle_release",
           "columnsFrom": [
             "edition_id"
           ],
@@ -393,8 +393,63 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.bottle_edition": {
-      "name": "bottle_edition",
+    "public.bottle_flavor_profile": {
+      "name": "bottle_flavor_profile",
+      "schema": "",
+      "columns": {
+        "bottle_id": {
+          "name": "bottle_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "flavor_profile": {
+          "name": "flavor_profile",
+          "type": "flavor_profile",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "count": {
+          "name": "count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "bottle_flavor_profile_bottle_id_bottle_id_fk": {
+          "name": "bottle_flavor_profile_bottle_id_bottle_id_fk",
+          "tableFrom": "bottle_flavor_profile",
+          "tableTo": "bottle",
+          "columnsFrom": [
+            "bottle_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "bottle_flavor_profile_bottle_id_flavor_profile_pk": {
+          "name": "bottle_flavor_profile_bottle_id_flavor_profile_pk",
+          "columns": [
+            "bottle_id",
+            "flavor_profile"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.bottle_release": {
+      "name": "bottle_release",
       "schema": "",
       "columns": {
         "id": {
@@ -421,9 +476,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "series": {
-          "name": "series",
-          "type": "varchar(255)",
+        "search_vector": {
+          "name": "search_vector",
+          "type": "tsvector",
           "primaryKey": false,
           "notNull": false
         },
@@ -554,8 +609,8 @@
         }
       },
       "indexes": {
-        "bottle_edition_bottle_idx": {
-          "name": "bottle_edition_bottle_idx",
+        "bottle_release_bottle_idx": {
+          "name": "bottle_release_bottle_idx",
           "columns": [
             {
               "expression": "bottle_id",
@@ -569,8 +624,8 @@
           "method": "btree",
           "with": {}
         },
-        "bottle_edition_created_by_idx": {
-          "name": "bottle_edition_created_by_idx",
+        "bottle_release_created_by_idx": {
+          "name": "bottle_release_created_by_idx",
           "columns": [
             {
               "expression": "created_by_id",
@@ -584,8 +639,8 @@
           "method": "btree",
           "with": {}
         },
-        "bottle_edition_full_name_idx": {
-          "name": "bottle_edition_full_name_idx",
+        "bottle_release_full_name_idx": {
+          "name": "bottle_release_full_name_idx",
           "columns": [
             {
               "expression": "full_name",
@@ -601,9 +656,9 @@
         }
       },
       "foreignKeys": {
-        "bottle_edition_bottle_id_bottle_id_fk": {
-          "name": "bottle_edition_bottle_id_bottle_id_fk",
-          "tableFrom": "bottle_edition",
+        "bottle_release_bottle_id_bottle_id_fk": {
+          "name": "bottle_release_bottle_id_bottle_id_fk",
+          "tableFrom": "bottle_release",
           "tableTo": "bottle",
           "columnsFrom": [
             "bottle_id"
@@ -614,9 +669,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "bottle_edition_created_by_id_user_id_fk": {
-          "name": "bottle_edition_created_by_id_user_id_fk",
-          "tableFrom": "bottle_edition",
+        "bottle_release_created_by_id_user_id_fk": {
+          "name": "bottle_release_created_by_id_user_id_fk",
+          "tableFrom": "bottle_release",
           "tableTo": "user",
           "columnsFrom": [
             "created_by_id"
@@ -629,61 +684,6 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.bottle_flavor_profile": {
-      "name": "bottle_flavor_profile",
-      "schema": "",
-      "columns": {
-        "bottle_id": {
-          "name": "bottle_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "flavor_profile": {
-          "name": "flavor_profile",
-          "type": "flavor_profile",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "count": {
-          "name": "count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "bottle_flavor_profile_bottle_id_bottle_id_fk": {
-          "name": "bottle_flavor_profile_bottle_id_bottle_id_fk",
-          "tableFrom": "bottle_flavor_profile",
-          "tableTo": "bottle",
-          "columnsFrom": [
-            "bottle_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "bottle_flavor_profile_bottle_id_flavor_profile_pk": {
-          "name": "bottle_flavor_profile_bottle_id_flavor_profile_pk",
-          "columns": [
-            "bottle_id",
-            "flavor_profile"
-          ]
-        }
-      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
@@ -790,8 +790,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "edition": {
-          "name": "edition",
+        "stated_age": {
+          "name": "stated_age",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "series": {
+          "name": "series",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
@@ -828,9 +834,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "stated_age": {
-          "name": "stated_age",
-          "type": "smallint",
+        "edition": {
+          "name": "edition",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
@@ -1265,8 +1271,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "edition_id": {
-          "name": "edition_id",
+        "release_id": {
+          "name": "release_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
@@ -1295,11 +1301,11 @@
           "method": "btree",
           "with": {}
         },
-        "collection_bottle_edition_idx": {
-          "name": "collection_bottle_edition_idx",
+        "collection_bottle_release_idx": {
+          "name": "collection_bottle_release_idx",
           "columns": [
             {
-              "expression": "edition_id",
+              "expression": "release_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1338,12 +1344,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "collection_bottle_edition_id_bottle_edition_id_fk": {
-          "name": "collection_bottle_edition_id_bottle_edition_id_fk",
+        "collection_bottle_release_id_bottle_release_id_fk": {
+          "name": "collection_bottle_release_id_bottle_release_id_fk",
           "tableFrom": "collection_bottle",
-          "tableTo": "bottle_edition",
+          "tableTo": "bottle_release",
           "columnsFrom": [
-            "edition_id"
+            "release_id"
           ],
           "columnsTo": [
             "id"
@@ -1354,13 +1360,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "collection_bottle_collection_id_bottle_id_edition_id_unique": {
-          "name": "collection_bottle_collection_id_bottle_id_edition_id_unique",
+        "collection_bottle_collection_id_bottle_id_release_id_unique": {
+          "name": "collection_bottle_collection_id_bottle_id_release_id_unique",
           "nullsNotDistinct": true,
           "columns": [
             "collection_id",
             "bottle_id",
-            "edition_id"
+            "release_id"
           ]
         }
       },
@@ -2328,8 +2334,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "edition_id": {
-          "name": "edition_id",
+        "release_id": {
+          "name": "release_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
@@ -2363,12 +2369,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "flight_bottle_edition_id_bottle_edition_id_fk": {
-          "name": "flight_bottle_edition_id_bottle_edition_id_fk",
+        "flight_bottle_release_id_bottle_release_id_fk": {
+          "name": "flight_bottle_release_id_bottle_release_id_fk",
           "tableFrom": "flight_bottle",
-          "tableTo": "bottle_edition",
+          "tableTo": "bottle_release",
           "columnsFrom": [
-            "edition_id"
+            "release_id"
           ],
           "columnsTo": [
             "id"
@@ -2379,13 +2385,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "flight_bottle_flight_id_bottle_id_edition_id_unique": {
-          "name": "flight_bottle_flight_id_bottle_id_edition_id_unique",
+        "flight_bottle_flight_id_bottle_id_release_id_unique": {
+          "name": "flight_bottle_flight_id_bottle_id_release_id_unique",
           "nullsNotDistinct": true,
           "columns": [
             "flight_id",
             "bottle_id",
-            "edition_id"
+            "release_id"
           ]
         }
       },
@@ -3518,8 +3524,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "edition_id": {
-          "name": "edition_id",
+        "release_id": {
+          "name": "release_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
@@ -3619,11 +3625,11 @@
           "method": "btree",
           "with": {}
         },
-        "tasting_edition_idx": {
-          "name": "tasting_edition_idx",
+        "tasting_release_idx": {
+          "name": "tasting_release_idx",
           "columns": [
             {
-              "expression": "edition_id",
+              "expression": "release_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -3679,12 +3685,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "tasting_edition_id_bottle_edition_id_fk": {
-          "name": "tasting_edition_id_bottle_edition_id_fk",
+        "tasting_release_id_bottle_release_id_fk": {
+          "name": "tasting_release_id_bottle_release_id_fk",
           "tableFrom": "tasting",
-          "tableTo": "bottle_edition",
+          "tableTo": "bottle_release",
           "columnsFrom": [
-            "edition_id"
+            "release_id"
           ],
           "columnsTo": [
             "id"
@@ -3726,7 +3732,7 @@
           "nullsNotDistinct": true,
           "columns": [
             "bottle_id",
-            "edition_id",
+            "release_id",
             "created_by_id",
             "created_at"
           ]

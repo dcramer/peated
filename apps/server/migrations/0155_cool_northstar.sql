@@ -23,6 +23,8 @@ DROP INDEX "bottle_edition_full_name_idx";
 DROP INDEX "collection_bottle_edition_idx";
 DROP INDEX "tasting_edition_idx";
 ALTER TABLE "bottle_release" ADD COLUMN "search_vector" "tsvector";
+ALTER TABLE "bottle_release" ADD COLUMN "edition" varchar(255);
+ALTER TABLE "bottle" ADD COLUMN "series" varchar(255);
 ALTER TABLE "bottle_alias" ADD CONSTRAINT "bottle_alias_edition_id_bottle_release_id_fk" FOREIGN KEY ("edition_id") REFERENCES "public"."bottle_release"("id") ON DELETE no action ON UPDATE no action;
 ALTER TABLE "bottle_release" ADD CONSTRAINT "bottle_release_bottle_id_bottle_id_fk" FOREIGN KEY ("bottle_id") REFERENCES "public"."bottle"("id") ON DELETE cascade ON UPDATE no action;
 ALTER TABLE "bottle_release" ADD CONSTRAINT "bottle_release_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
