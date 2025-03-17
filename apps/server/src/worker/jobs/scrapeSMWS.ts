@@ -95,7 +95,7 @@ export async function scrapeBottles(
 
         await cb(
           {
-            expression: name,
+            name,
             vintageYear,
             releaseYear,
             category: details.category,

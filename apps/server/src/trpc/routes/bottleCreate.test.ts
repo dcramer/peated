@@ -15,7 +15,7 @@ test("requires authentication", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(
     caller.bottleCreate({
-      expression: "Delicious Wood",
+      name: "Delicious Wood",
       brand: 1,
     }),
   );
@@ -29,7 +29,7 @@ test("creates a new bottle with minimal params", async ({
   const caller = createCaller({ user: defaults.user });
   const brand = await fixtures.Entity();
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: brand.id,
   });
 
@@ -39,8 +39,7 @@ test("creates a new bottle with minimal params", async ({
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.expression).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.expression);
+  expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toBeDefined();
   expect(bottle.statedAge).toBeNull();
   const distillers = await db
@@ -56,7 +55,7 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: brand.id,
     bottler: distiller.id,
     distillers: [distiller.id],
@@ -70,7 +69,6 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.expression).toEqual("Delicious Wood");
   expect(bottle.name).toEqual("Delicious Wood 12-year-old");
   expect(bottle.brandId).toEqual(brand.id);
   expect(bottle.statedAge).toEqual(12);
@@ -98,7 +96,7 @@ test("does not create a new bottle with invalid brandId", async ({
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(
     caller.bottleCreate({
-      expression: "Delicious Wood",
+      name: "Delicious Wood",
       brand: 5,
     }),
   );
@@ -114,7 +112,7 @@ test("creates a new bottle with existing brand name", async ({
 
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: {
       name: existingBrand.name,
     },
@@ -128,8 +126,7 @@ test("creates a new bottle with existing brand name", async ({
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .where(eq(bottles.id, data.id));
 
-  expect(bottle.expression).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.expression);
+  expect(bottle.name).toEqual("Delicious Wood");
   expect(bottle.brandId).toEqual(existingBrand.id);
 
   // it should not create a change entry for the brand
@@ -157,7 +154,7 @@ test("creates a new bottle with new brand name", async ({
     name: "Kentucky",
   });
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: {
       id: null,
       name: "Hard Knox",
@@ -174,8 +171,8 @@ test("creates a new bottle with new brand name", async ({
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .where(eq(bottles.id, data.id));
 
-  expect(bottle.expression).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.expression);
+  expect(bottle.name).toEqual("Delicious Wood");
+  expect(bottle.name).toEqual(bottle.name);
   expect(bottle.brandId).toBeDefined();
   expect(brand.name).toBe("Hard Knox");
   expect(brand.createdById).toBe(defaults.user.id);
@@ -202,7 +199,7 @@ test("does not create a new bottle with invalid distillerId", async ({
   const caller = createCaller({ user: defaults.user });
   const err = await waitError(
     caller.bottleCreate({
-      expression: "Delicious Wood",
+      name: "Delicious Wood",
       brand: {
         name: "Hard Knox",
       },
@@ -222,7 +219,7 @@ test("creates a new bottle with existing distiller name", async ({
   const existingDistiller = await fixtures.Entity();
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: {
       name: existingBrand.name,
     },
@@ -239,8 +236,7 @@ test("creates a new bottle with existing distiller name", async ({
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.expression).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.expression);
+  expect(bottle.name).toEqual("Delicious Wood");
 
   const distillers = await db
     .select({ distiller: entities })
@@ -276,7 +272,7 @@ test("creates a new bottle with new distiller name", async ({
 
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: brand.id,
     distillers: [
       {
@@ -291,8 +287,7 @@ test("creates a new bottle with new distiller name", async ({
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.expression).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.expression);
+  expect(bottle.name).toEqual("Delicious Wood");
 
   const distillers = await db
     .select({ distiller: entities })
@@ -327,7 +322,7 @@ test("creates a new bottle with new distiller name and brand name", async ({
 }) => {
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: {
       name: "Rip Van",
     },
@@ -344,8 +339,7 @@ test("creates a new bottle with new distiller name and brand name", async ({
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.expression).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.expression);
+  expect(bottle.name).toEqual("Delicious Wood");
 
   const distillers = await db
     .select({ distiller: entities })
@@ -386,7 +380,7 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
 }) => {
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: {
       name: "Hard Knox",
     },
@@ -403,8 +397,8 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.expression).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.expression);
+  expect(bottle.name).toEqual("Delicious Wood");
+  expect(bottle.name).toEqual(bottle.name);
 
   const distillers = await db
     .select({ distiller: entities })
@@ -445,7 +439,7 @@ test("updates statedAge bottle w/ age signal", async ({
   const caller = createCaller({ user: defaults.user });
 
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood 12-year-old",
+    name: "Delicious Wood 12-year-old",
     brand: brand.id,
     distillers: [distiller.id],
   });
@@ -462,7 +456,7 @@ test("removes duplicated brand name", async ({ defaults, fixtures }) => {
   const brand = await fixtures.Entity({ name: "Delicious Wood" });
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood Yum Yum",
+    name: "Delicious Wood Yum Yum",
     brand: brand.id,
   });
 
@@ -472,8 +466,7 @@ test("removes duplicated brand name", async ({ defaults, fixtures }) => {
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.expression).toEqual("Yum Yum");
-  expect(bottle.name).toEqual(bottle.expression);
+  expect(bottle.name).toEqual("Yum Yum");
   expect(bottle.fullName).toEqual("Delicious Wood Yum Yum");
 });
 
@@ -486,7 +479,7 @@ test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {
   });
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    expression: "1.54",
+    name: "1.54",
     brand: brand.id,
   });
 
@@ -505,7 +498,7 @@ test("saves cask information", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleCreate({
-    expression: "Old Whisky",
+    name: "Old Whisky",
     brand: brand.id,
     caskType: "bourbon",
     caskSize: "hogshead",
@@ -529,7 +522,7 @@ test("saves vintage information", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleCreate({
-    expression: "Old Whisky",
+    name: "Old Whisky",
     brand: brand.id,
     vintageYear: 2024,
   });
@@ -549,7 +542,7 @@ test("saves release year", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleCreate({
-    expression: "Old Whisky",
+    name: "Old Whisky",
     brand: brand.id,
     releaseYear: 2024,
   });
@@ -572,7 +565,7 @@ test("creating a new bottle with a new alias does not mess with unrelated aliase
 
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: {
       name: "Cool Cats",
     },
@@ -586,8 +579,7 @@ test("creating a new bottle with a new alias does not mess with unrelated aliase
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .where(eq(bottles.id, data.id));
 
-  expect(bottle.expression).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.expression);
+  expect(bottle.name).toEqual("Delicious Wood");
 
   const [newOtherAlias] = await db
     .select()
@@ -604,7 +596,7 @@ test("saves ABV information", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleCreate({
-    expression: "Old Whisky",
+    name: "Old Whisky",
     brand: brand.id,
     abv: 40.5,
   });
@@ -625,7 +617,7 @@ test("rejects invalid ABV values", async ({ defaults, fixtures }) => {
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const err = await waitError(
     caller.bottleCreate({
-      expression: "Old Whisky",
+      name: "Old Whisky",
       brand: brand.id,
       abv: 101, // Invalid: above 100
     }),

@@ -9,8 +9,8 @@ import {
 import { findEntity } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import {
+  formatBottleName,
   formatCategoryName,
-  formatExpressionName,
 } from "@peated/server/lib/format";
 import { normalizeBottle } from "@peated/server/lib/normalize";
 import { createCaller } from "@peated/server/trpc/router";
@@ -47,7 +47,10 @@ subcommand
           values.name = name;
           // XXX: this _could_ be wrong if the name did not have the brand in it
           // but that shouldn't happen
-          values.fullName = `${bottle.fullName.substring(0, bottle.fullName.length - bottle.name.length)}${name}`;
+          values.fullName = formatBottleName({
+            ...bottle,
+            name: `${bottle.fullName.substring(0, bottle.fullName.length - bottle.name.length)}${name}`,
+          });
         }
         if (bottle.singleCask !== normalizedData.singleCask)
           values.singleCask = normalizedData.singleCask;
@@ -162,7 +165,8 @@ subcommand
             throw new Error();
           }
 
-          const newName = review.name.slice(entity.name.length + 1) || null;
+          let newName = review.name.slice(entity.name.length + 1);
+          if (!newName) newName = formatCategoryName(bottle.category);
 
           console.log(
             `Updating ${bottle.fullName} to ${entity.name} ${newName} (from ${entity.name})`,
@@ -170,7 +174,7 @@ subcommand
 
           await caller.bottleUpdate({
             bottle: bottle.id,
-            expression: newName,
+            name: newName,
             brand: entity.id,
           });
         }
@@ -283,14 +287,16 @@ subcommand
       const query = await baseQuery.offset(offset).limit(step);
 
       for (const { brand, bottle } of query) {
-        const name = formatExpressionName(bottle);
-        const fullName = `${brand.shortName || brand.name} ${name}`;
-        if (bottle.fullName !== fullName || bottle.name !== name) {
+        const fullName = formatBottleName({
+          ...bottle,
+          name: `${brand.shortName || brand.name} ${bottle.name}`,
+        });
+        if (bottle.fullName !== fullName) {
           console.log(`Updating name for bottle ${bottle.id}: ${fullName}`);
           await db.transaction(async (tx) => {
             await tx
               .update(bottles)
-              .set({ fullName, name })
+              .set({ fullName })
               .where(eq(bottles.id, bottle.id));
             const alias = await upsertBottleAlias(tx, fullName, bottle.id);
             if (alias.bottleId !== bottle.id) {

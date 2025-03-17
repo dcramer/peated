@@ -38,7 +38,7 @@ import {
 } from "../../db/schema";
 import { createAccessToken, generatePasswordHash } from "../auth";
 import { mapRows } from "../db";
-import { formatExpressionName } from "../format";
+import { formatBottleName } from "../format";
 import { normalizeBottle } from "../normalize";
 import { choose, random, sample } from "../rand";
 import { buildBottleSearchVector, buildEntitySearchVector } from "../search";
@@ -344,26 +344,26 @@ export const Bottle = async (
           )
     ) as dbSchema.Entity;
 
-    const expression = data.expression ?? chooseBottleName();
+    const name = data.name ?? chooseBottleName();
 
     const tBottleData = {
       category: choose([...CATEGORY_LIST, null, null]),
       statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
       createdAt: new Date(),
       updatedAt: new Date(),
-      expression,
-      series: choose([null, expression]),
+      name,
+      series: choose([null, name]),
       ...data,
       brandId: brand.id,
       createdById: data.createdById || (await User({}, tx)).id,
     };
 
-    const name = formatExpressionName(tBottleData);
+    const formattedName = formatBottleName(tBottleData);
 
     const bottleData: dbSchema.NewBottle = {
       ...tBottleData,
-      name,
-      fullName: `${brand.shortName || brand.name} ${name}`,
+      name: formattedName,
+      fullName: `${brand.shortName || brand.name} ${formattedName}`,
     };
 
     const distillerList = distillerIds.length

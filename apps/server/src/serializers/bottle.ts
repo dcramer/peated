@@ -150,11 +150,10 @@ export const BottleSerializer = serializer({
     return {
       id: item.id,
 
-      // fullName is brand + name + edition
+      // fullName is brand + name
       fullName: item.fullName,
       name: item.name,
 
-      expression: item.expression,
       series: item.series,
       statedAge: item.statedAge,
 

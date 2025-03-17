@@ -652,5 +652,7 @@ test("fails with non-following friend", async ({ defaults, fixtures }) => {
       friends: [friend.id],
     }),
   );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: Invalid friend.]`);
+  expect(err).toMatchInlineSnapshot(
+    `[TRPCError: Friends must all be active relationships.]`,
+  );
 });

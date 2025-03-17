@@ -6,35 +6,35 @@ import type {
 } from "@peated/server/types";
 import { COLOR_SCALE } from "../constants";
 
-export function formatExpressionName({
-  expression,
+export function formatBottleName({
+  name,
   statedAge,
 }: {
-  expression?: string | null | undefined;
+  name?: string | null | undefined;
   statedAge?: number | null | undefined;
 } & Record<string, any>) {
   const bits = [];
-  if (expression) bits.push(expression);
+  if (name) bits.push(name);
   if (statedAge) bits.push(`${statedAge}-year-old`);
   if (!bits.length) return "Unnamed Release";
   return bits.join(" ");
 }
 
 export function formatReleaseName({
-  expression,
+  name, // bottle name / express name
   edition,
   statedAge,
   releaseYear,
   vintageYear,
 }: {
-  expression?: string | null | undefined;
+  name?: string | null | undefined;
   edition?: string | null | undefined;
   statedAge?: number | null | undefined;
   releaseYear?: number | null | undefined;
   vintageYear?: number | null | undefined;
 }) {
   const bits = [];
-  if (expression) bits.push(expression);
+  if (name) bits.push(name);
   if (edition) bits.push(edition);
   if (statedAge) bits.push(`${statedAge}-year-old`);
   if (releaseYear) bits.push(`${releaseYear} Release`);

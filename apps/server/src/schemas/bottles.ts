@@ -15,13 +15,10 @@ export const BottleSchema = z.object({
     .string()
     .readonly()
     .describe("Canonical name including the brand"),
-  name: z.string().readonly().describe("Canonical name excluding the brand."),
 
-  expression: z
+  name: z
     .string()
-    .trim()
-    .nullable()
-    .default(null)
+    .readonly()
     .describe(
       "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
     ),
@@ -180,7 +177,6 @@ const EntityChoice = z.union([
 export const BottleInputSchema = BottleSchema.omit({
   id: true,
   fullName: true,
-  name: true,
   suggestedTags: true,
   avgRating: true,
   totalTastings: true,
@@ -190,6 +186,12 @@ export const BottleInputSchema = BottleSchema.omit({
   hasTasted: true,
   numReleases: true,
 }).extend({
+  name: z
+    .string()
+    .min(1)
+    .describe(
+      "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
+    ),
   brand: EntityChoice,
   distillers: z.array(EntityChoice).default([]).optional(),
   bottler: EntityChoice.nullable().default(null).optional(),

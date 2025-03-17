@@ -66,9 +66,6 @@ export const bottles = pgTable(
     // canonical name excluding brand
     name: varchar("name", { length: 255 }).notNull(),
 
-    // expression is the name of the bottle without the brand, in our case it typically is the same as `name` here
-    expression: varchar("expression", { length: 255 }),
-
     // statedAge is only present on the expression level if its always the same across any release
     // and when it is present, it will be included in the canonical expression name
     statedAge: smallint("stated_age"),

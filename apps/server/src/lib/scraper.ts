@@ -15,7 +15,7 @@ import type { z } from "zod";
 import config from "../config";
 import type { BottleInputSchema, StorePriceInputSchema } from "../schemas";
 import BatchQueue from "./batchQueue";
-import { formatExpressionName } from "./format";
+import { formatBottleName } from "./format";
 
 const CACHE = ".cache";
 
@@ -164,7 +164,7 @@ export async function handleBottle(
   });
 
   if (process.env.ACCESS_TOKEN) {
-    console.log(`Submitting [${formatExpressionName(bottle)}]`);
+    console.log(`Submitting [${formatBottleName(bottle)}]`);
 
     let bottleResult;
     try {
@@ -202,7 +202,7 @@ export async function handleBottle(
       }
     }
   } else {
-    console.log(`Dry Run [${formatExpressionName(bottle)}]`);
+    console.log(`Dry Run [${formatBottleName(bottle)}]`);
   }
 }
 

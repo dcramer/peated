@@ -8,7 +8,7 @@ test("requires authentication", async () => {
   const caller = createCaller({ user: null });
   const err = await waitError(
     caller.bottleUpsert({
-      expression: "Delicious Wood",
+      name: "Delicious Wood",
       brand: 1,
     }),
   );
@@ -19,7 +19,7 @@ test("creates a new bottle", async ({ fixtures, defaults }) => {
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const brand = await fixtures.Entity();
   const data = await caller.bottleUpsert({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: brand.id,
   });
 
@@ -29,7 +29,7 @@ test("creates a new bottle", async ({ fixtures, defaults }) => {
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(bottle.expression).toEqual("Delicious Wood");
+  expect(bottle.name).toEqual("Delicious Wood");
 });
 
 test("updates existing bottle", async ({ fixtures, defaults }) => {
@@ -37,10 +37,10 @@ test("updates existing bottle", async ({ fixtures, defaults }) => {
   const brand = await fixtures.Entity();
   const bottle = await fixtures.Bottle({
     brandId: brand.id,
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
   });
   const data = await caller.bottleUpsert({
-    expression: "Delicious Wood",
+    name: "Delicious Wood",
     brand: brand.id,
     caskFill: "1st_fill",
   });
@@ -52,6 +52,6 @@ test("updates existing bottle", async ({ fixtures, defaults }) => {
     .select()
     .from(bottles)
     .where(eq(bottles.id, data.id));
-  expect(newBottle.expression).toEqual("Delicious Wood");
+  expect(newBottle.name).toEqual("Delicious Wood");
   expect(newBottle.caskFill).toEqual("1st_fill");
 });
