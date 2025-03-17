@@ -13,10 +13,7 @@ export function formatBottleName({
   name?: string | null | undefined;
   statedAge?: number | null | undefined;
 } & Record<string, any>) {
-  const bits = [];
-  if (name) bits.push(name);
-  if (statedAge) bits.push(`${statedAge}-year-old`);
-  if (!bits.length) return "Unnamed Release";
+  const bits = [[name]];
   return bits.join(" ");
 }
 

@@ -96,7 +96,10 @@ export const PreviewBottleCard = ({
   const { brand } = data;
   return (
     <BottleScaffold
-      name={`${brand ? `${brand.shortName || brand.name} ` : ""}${formatBottleName(data)}`}
+      name={formatBottleName({
+        ...data,
+        name: `${brand ? `${brand.shortName || brand.name} ` : ""}${data.name}`,
+      })}
       category={data.category ? formatCategoryName(data.category) : null}
       distillers={
         data.distillers?.length ? (

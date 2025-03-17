@@ -89,16 +89,12 @@ export async function bottleNormalize({
 
   // remove duplicate brand name prefix on bottle name
   // e.g. Hibiki 12-year-old => Hibiki
-  if (rv.brand && rv.name) {
+  if (rv.brand) {
     rv.name = stripPrefix(rv.name, `${rv.brand.name} `);
   }
 
   if (rv.name) {
-    const normBottle = normalizeBottle({
-      ...rv,
-      name: rv.name,
-      isFullName: false,
-    });
+    const normBottle = normalizeBottle({ ...rv, isFullName: false });
 
     Object.assign(rv, normBottle);
   }

@@ -118,15 +118,16 @@ export async function bottleCreate({
         distillerIds.push(distUpsert.id);
       }
 
-    const name = formatBottleName(bottleData);
-    const fullName = `${brand.shortName || brand.name} ${name}`;
+    const fullName = formatBottleName({
+      ...bottleData,
+      name: `${brand.shortName || brand.name} ${bottleData.name}`,
+    });
 
     const bottleInsertData: NewBottle = {
       ...bottleData,
       brandId: brand.id,
       bottlerId: bottler?.id || null,
       createdById: user.id,
-      name,
       fullName,
     };
 

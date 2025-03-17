@@ -55,7 +55,7 @@ test("creates a new bottle with all params", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    name: "Delicious Wood",
+    name: "Delicious Wood 12-year-old",
     brand: brand.id,
     bottler: distiller.id,
     distillers: [distiller.id],
@@ -172,7 +172,6 @@ test("creates a new bottle with new brand name", async ({
     .where(eq(bottles.id, data.id));
 
   expect(bottle.name).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.name);
   expect(bottle.brandId).toBeDefined();
   expect(brand.name).toBe("Hard Knox");
   expect(brand.createdById).toBe(defaults.user.id);
@@ -398,7 +397,6 @@ test("creates a new bottle with new distiller name which is duplicated as brand 
     .from(bottles)
     .where(eq(bottles.id, data.id));
   expect(bottle.name).toEqual("Delicious Wood");
-  expect(bottle.name).toEqual(bottle.name);
 
   const distillers = await db
     .select({ distiller: entities })

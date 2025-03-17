@@ -346,24 +346,22 @@ export const Bottle = async (
 
     const name = data.name ?? chooseBottleName();
 
-    const tBottleData = {
+    const fullName = formatBottleName({
+      ...data,
+      name: `${brand.shortName || brand.name} ${name}`,
+    });
+
+    const bottleData: dbSchema.NewBottle = {
       category: choose([...CATEGORY_LIST, null, null]),
       statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
       createdAt: new Date(),
       updatedAt: new Date(),
-      name,
       series: choose([null, name]),
       ...data,
+      name,
+      fullName,
       brandId: brand.id,
       createdById: data.createdById || (await User({}, tx)).id,
-    };
-
-    const formattedName = formatBottleName(tBottleData);
-
-    const bottleData: dbSchema.NewBottle = {
-      ...tBottleData,
-      name: formattedName,
-      fullName: `${brand.shortName || brand.name} ${formattedName}`,
     };
 
     const distillerList = distillerIds.length
@@ -899,9 +897,11 @@ export const BottleRelease = async (
 
     const edition = data.edition ?? choose([null, faker.lorem.word()]);
 
-    const name = `${bottle.name}${edition ? ` ${edition}` : ""}`;
-    const fullName =
-      data.fullName || `${bottleBrand.shortName || bottleBrand.name} ${name}`;
+    const name = data.name ?? `${bottle.name}${edition ? ` ${edition}` : ""}`;
+    const fullName = formatBottleName({
+      ...data,
+      name: `${bottleBrand.shortName || bottleBrand.name} ${name}`,
+    });
 
     const releaseData: dbSchema.NewBottleRelease = {
       ...data,

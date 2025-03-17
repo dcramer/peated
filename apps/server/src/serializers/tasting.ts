@@ -45,7 +45,7 @@ export const TastingSerializer = serializer({
       .from(tastings)
       .innerJoin(users, eq(tastings.createdById, users.id))
       .innerJoin(bottles, eq(tastings.bottleId, bottles.id))
-      .innerJoin(bottleReleases, eq(tastings.releaseId, bottleReleases.id))
+      .leftJoin(bottleReleases, eq(tastings.releaseId, bottleReleases.id))
       .where(inArray(tastings.id, itemIds));
 
     const userToastsList: number[] = currentUser
@@ -76,7 +76,7 @@ export const TastingSerializer = serializer({
       (
         await serialize(
           BottleReleaseSerializer,
-          results.map((r) => r.release),
+          results.map((r) => r.release).filter(notEmpty),
           currentUser,
         )
       ).map((data, index) => [results[index].id, data]),

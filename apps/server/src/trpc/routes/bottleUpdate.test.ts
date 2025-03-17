@@ -32,6 +32,7 @@ test("requires mod", async ({ defaults }) => {
 test("no changes", async ({ fixtures }) => {
   const bottle = await fixtures.Bottle({
     name: "Cool Bottle",
+    series: null,
     releaseYear: null,
     vintageYear: null,
     edition: null,

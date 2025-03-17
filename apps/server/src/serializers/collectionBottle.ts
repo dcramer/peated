@@ -6,6 +6,7 @@ import type {
   CollectionBottle,
   User,
 } from "../db/schema";
+import { notEmpty } from "../lib/filter";
 import { type CollectionBottleSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
 import { BottleReleaseSerializer } from "./bottleRelease";
@@ -30,7 +31,7 @@ export const CollectionBottleSerializer = serializer({
       ),
     );
 
-    const releaseList = itemList.map((i) => i.release);
+    const releaseList = itemList.map((i) => i.release).filter(notEmpty);
     const releasesById = Object.fromEntries(
       (await serialize(BottleReleaseSerializer, releaseList, currentUser)).map(
         (data, index) => [releaseList[index].id, data],

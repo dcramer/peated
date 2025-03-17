@@ -68,7 +68,7 @@ export default publicProcedure
       .from(collectionBottles)
       .where(where ? and(...where) : undefined)
       .innerJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
-      .innerJoin(
+      .leftJoin(
         bottleReleases,
         eq(bottleReleases.id, collectionBottles.releaseId),
       )

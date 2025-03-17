@@ -5,14 +5,17 @@ describe("bottleReleaseList", () => {
     const bottle = await fixtures.Bottle();
     const release1 = await fixtures.BottleRelease({
       bottleId: bottle.id,
+      edition: "A",
       name: "A",
     });
     const release2 = await fixtures.BottleRelease({
       bottleId: bottle.id,
+      edition: "B",
       name: "B",
     });
     await fixtures.BottleRelease({
       bottleId: bottle.id,
+      edition: "C",
       name: "C",
     });
 
@@ -44,10 +47,12 @@ describe("bottleReleaseList", () => {
     const bottle = await fixtures.Bottle();
     const release1 = await fixtures.BottleRelease({
       bottleId: bottle.id,
+      edition: "A",
       name: "A",
     });
     const release2 = await fixtures.BottleRelease({
-      bottleId: bottle.id,
+      bottleId: (await fixtures.Bottle()).id,
+      edition: "B",
       name: "B",
     });
 
@@ -57,9 +62,8 @@ describe("bottleReleaseList", () => {
       bottle: bottle.id,
     });
 
-    expect(results.length).toBe(2);
+    expect(results.length).toBe(1);
     expect(results[0].id).toBe(release1.id);
-    expect(results[1].id).toBe(release2.id);
     expect(rel.nextCursor).toBe(null);
     expect(rel.prevCursor).toBe(null);
   });
