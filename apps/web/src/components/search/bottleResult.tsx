@@ -51,7 +51,7 @@ export default function BottleResultRow({
               <span>{bottle.fullName}</span>
               {bottle.numReleases > 0 && (
                 <span className="text-muted text-sm">
-                  {bottle.numReleases} edition
+                  {bottle.numReleases} release
                   {bottle.numReleases === 1 ? "" : "s"}
                 </span>
               )}
