@@ -18,7 +18,7 @@ export const BottleSchema = z.object({
 
   name: z
     .string()
-    .readonly()
+    .trim()
     .describe(
       "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
     ),
@@ -188,6 +188,7 @@ export const BottleInputSchema = BottleSchema.omit({
 }).extend({
   name: z
     .string()
+    .trim()
     .min(1)
     .describe(
       "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
