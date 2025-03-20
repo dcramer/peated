@@ -225,7 +225,7 @@ export default function SelectDialog<T extends Option>({
           setOpen={setCreateOpen}
           render={createForm}
           onSubmit={(newOption) => {
-            selectOption(newOption);
+            selectOption(onResults ? onResults([newOption])[0] : newOption);
           }}
         />
       )}

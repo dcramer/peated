@@ -77,11 +77,12 @@ function CreateForm({
     control,
     register,
     handleSubmit,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(BottleReleaseInputSchema),
-    defaultValues: data,
+    defaultValues: {
+      edition: data.name ?? "",
+    },
   });
 
   return (
@@ -114,17 +115,6 @@ function CreateForm({
             Most values of the release are optional, and we'll come up with a
             canonical name based on what's present.
           </p>
-
-          <TextField
-            {...register("series")}
-            error={errors.series}
-            autoFocus
-            label="Series"
-            type="text"
-            placeholder="e.g. Supernova for Ardbeg Supernova"
-            helpText={BottleReleaseInputSchema.shape.series.description}
-            autoComplete="off"
-          />
 
           <TextField
             {...register("edition")}
