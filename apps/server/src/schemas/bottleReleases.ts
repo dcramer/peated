@@ -17,20 +17,27 @@ export const BottleReleaseSchema = z.object({
     .default(null)
     .describe("Specific edition identifier (e.g. Batch #1)"),
 
-  statedAge: z.number().nullable().describe("Official age statement in years"),
+  statedAge: z
+    .number()
+    .nullable()
+    .default(null)
+    .describe("Official age statement in years"),
   abv: z
     .number()
     .nullable()
+    .default(null)
     .describe("Alcohol By Volume percentage of the spirit."),
   caskStrength: z
     .boolean()
     .nullable()
+    .default(null)
     .describe(
       "Whether this spirit is bottled at Cask Strength (usually ranging from 55-65% abv). May be inferred from abv.",
     ),
   singleCask: z
     .boolean()
     .nullable()
+    .default(null)
     .describe("Whether the whisky comes from a single cask"),
 
   vintageYear: z
@@ -38,31 +45,36 @@ export const BottleReleaseSchema = z.object({
     .gte(1800)
     .lte(new Date().getFullYear() + 1)
     .nullable()
+    .default(null)
     .describe("Year this spirit was distilled and transferred to a cask."),
   releaseYear: z
     .number()
     .gte(1800)
     .lte(new Date().getFullYear() + 1)
-
     .nullable()
+    .default(null)
     .describe("Year this bottling was released."),
 
   caskType: z
     .enum(CASK_TYPE_IDS)
     .nullable()
+    .default(null)
     .describe("Type of cask used for maturation."),
   caskFill: z
     .enum(CASK_FILLS)
     .nullable()
+    .default(null)
     .describe("Fill number of the cask (1st fill, refill, etc.)"),
   caskSize: z
     .enum(CASK_SIZE_IDS)
     .nullable()
+    .default(null)
     .describe("Size of the cask used for maturation"),
 
   description: z
     .string()
     .nullable()
+    .default(null)
     .describe("Detailed description of the bottle edition"),
   tastingNotes: z
     .object({
@@ -70,19 +82,26 @@ export const BottleReleaseSchema = z.object({
       palate: z.string().describe("Taste characteristics of the whisky"),
       finish: z.string().describe("Aftertaste characteristics of the whisky"),
     })
-    .nullable(),
-  imageUrl: z.string().nullable().describe("URL to the bottle edition's image"),
+    .nullable()
+    .default(null),
+  imageUrl: z
+    .string()
+    .nullable()
+    .default(null)
+    .describe("URL to the bottle edition's image"),
 
   avgRating: z
     .number()
-    .nullable()
+    .readonly()
     .describe("Average user rating for this edition"),
   totalTastings: z
     .number()
+    .readonly()
     .describe("Total number of recorded tastings for this edition"),
 
   suggestedTags: z
     .array(z.string())
+    .readonly()
     .describe("System-generated tags based on the edition's characteristics"),
   isFavorite: z
     .boolean()
@@ -100,6 +119,7 @@ export const BottleReleaseSchema = z.object({
 export const BottleReleaseInputSchema = BottleReleaseSchema.omit({
   id: true,
   fullName: true,
+  bottleId: true,
   name: true,
   suggestedTags: true,
   avgRating: true,

@@ -50,9 +50,21 @@ export default function ReleaseField({
         });
         return results;
       }}
+      onResults={(results) => {
+        return results.map((result) => ({
+          name:
+            result.name ??
+            result.edition ??
+            result.vintageYear ??
+            result.releaseYear ??
+            result.abv ??
+            "Unnamed Release",
+          ...result,
+        }));
+      }}
       onRenderOption={(item) => (
         <div className="flex flex-col items-start">
-          <div>{item.displayName}</div>
+          <div>{item.name}</div>
         </div>
       )}
       createForm={(props) => {
@@ -66,7 +78,7 @@ export default function ReleaseField({
 }
 
 function CreateForm({
-  createDialogHelpText,
+  createDialogHelpText = "Most values of the release are optional, and we'll come up with a canonical name based on what's present.",
   data,
   onSubmit,
   onClose,
@@ -85,22 +97,26 @@ function CreateForm({
     },
   });
 
+  console.log(errors);
+
   return (
     <LayoutModal
       header={
         <FormHeader
-          title="Add Entity"
+          title="Add Release of Bottle"
           onSave={handleSubmit(onSubmit)}
           saveDisabled={isSubmitting}
           onClose={onClose}
         />
       }
     >
-      <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
-        <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
-          {createDialogHelpText}
+      {!!createDialogHelpText && (
+        <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
+          <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
+            {createDialogHelpText}
+          </div>
         </div>
-      </div>
+      )}
 
       <Form
         onSubmit={(e) => {
@@ -111,11 +127,6 @@ function CreateForm({
         isSubmitting={isSubmitting}
       >
         <Fieldset>
-          <p>
-            Most values of the release are optional, and we'll come up with a
-            canonical name based on what's present.
-          </p>
-
           <TextField
             {...register("edition")}
             error={errors.edition}
