@@ -112,8 +112,14 @@ export const BottleReleaseSchema = z.object({
     .boolean()
     .describe("Whether the current user has tasted this edition"),
 
-  createdAt: z.string().describe("Timestamp when the edition was created"),
-  updatedAt: z.string().describe("Timestamp when the edition was last updated"),
+  createdAt: z
+    .string()
+    .datetime()
+    .describe("Timestamp when the edition was created"),
+  updatedAt: z
+    .string()
+    .datetime()
+    .describe("Timestamp when the edition was last updated"),
 });
 
 export const BottleReleaseInputSchema = BottleReleaseSchema.omit({

@@ -312,7 +312,7 @@ export const bottleAliases = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
-    editionId: bigint("edition_id", { mode: "number" }).references(
+    releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
     name: varchar("name", { length: 255 }).notNull(),
@@ -327,7 +327,7 @@ export const bottleAliases = pgTable(
       sql`LOWER(${table.name})`,
     ),
     index("bottle_alias_bottle_idx").on(table.bottleId),
-    index("bottle_alias_edition_idx").on(table.editionId),
+    index("bottle_alias_release_idx").on(table.releaseId),
   ],
 );
 
@@ -335,6 +335,10 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
   bottle: one(bottles, {
     fields: [bottleAliases.bottleId],
     references: [bottles.id],
+  }),
+  release: one(bottleReleases, {
+    fields: [bottleAliases.releaseId],
+    references: [bottleReleases.id],
   }),
 }));
 

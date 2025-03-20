@@ -1,5 +1,5 @@
 {
-  "id": "acb82de5-b8c8-4051-8592-c350cf451425",
+  "id": "dca2d1b5-d016-4f5d-a78a-622e5fdccdf2",
   "prevId": "30a8b5ce-6d93-4185-83c7-72ea552bbe08",
   "version": "7",
   "dialect": "postgresql",
@@ -279,8 +279,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "edition_id": {
-          "name": "edition_id",
+        "release_id": {
+          "name": "release_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
@@ -343,11 +343,11 @@
           "method": "btree",
           "with": {}
         },
-        "bottle_alias_edition_idx": {
-          "name": "bottle_alias_edition_idx",
+        "bottle_alias_release_idx": {
+          "name": "bottle_alias_release_idx",
           "columns": [
             {
-              "expression": "edition_id",
+              "expression": "release_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -373,12 +373,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "bottle_alias_edition_id_bottle_release_id_fk": {
-          "name": "bottle_alias_edition_id_bottle_release_id_fk",
+        "bottle_alias_release_id_bottle_release_id_fk": {
+          "name": "bottle_alias_release_id_bottle_release_id_fk",
           "tableFrom": "bottle_alias",
           "tableTo": "bottle_release",
           "columnsFrom": [
-            "edition_id"
+            "release_id"
           ],
           "columnsTo": [
             "id"

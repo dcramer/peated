@@ -965,7 +965,7 @@ export const BottleRelease = async (
         data.description ?? choose([null, null, faker.lorem.paragraph()]),
       descriptionSrc:
         data.descriptionSrc ?? choose([null, null, "user", "generated"]),
-      createdById: data.createdById ?? (await User({}, db)).id,
+      createdById: data.createdById ?? (await User({}, tx)).id,
       createdAt: data.createdAt ?? new Date(),
       updatedAt: data.updatedAt ?? new Date(),
     };

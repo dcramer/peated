@@ -1,4 +1,5 @@
 ALTER TABLE "bottle_edition" RENAME TO "bottle_release";
+ALTER TABLE "bottle_alias" RENAME COLUMN "edition_id" TO "release_id";
 ALTER TABLE "collection_bottle" RENAME COLUMN "edition_id" TO "release_id";
 ALTER TABLE "flight_bottle" RENAME COLUMN "edition_id" TO "release_id";
 ALTER TABLE "tasting" RENAME COLUMN "edition_id" TO "release_id";
@@ -17,6 +18,7 @@ ALTER TABLE "flight_bottle" DROP CONSTRAINT "flight_bottle_edition_id_bottle_edi
 
 ALTER TABLE "tasting" DROP CONSTRAINT "tasting_edition_id_bottle_edition_id_fk";
 
+DROP INDEX "bottle_alias_edition_idx";
 DROP INDEX "bottle_edition_bottle_idx";
 DROP INDEX "bottle_edition_created_by_idx";
 DROP INDEX "bottle_edition_full_name_idx";
@@ -25,12 +27,13 @@ DROP INDEX "tasting_edition_idx";
 ALTER TABLE "bottle_release" ADD COLUMN "search_vector" "tsvector";
 ALTER TABLE "bottle_release" ADD COLUMN "edition" varchar(255);
 ALTER TABLE "bottle" ADD COLUMN "series" varchar(255);
-ALTER TABLE "bottle_alias" ADD CONSTRAINT "bottle_alias_edition_id_bottle_release_id_fk" FOREIGN KEY ("edition_id") REFERENCES "public"."bottle_release"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "bottle_alias" ADD CONSTRAINT "bottle_alias_release_id_bottle_release_id_fk" FOREIGN KEY ("release_id") REFERENCES "public"."bottle_release"("id") ON DELETE no action ON UPDATE no action;
 ALTER TABLE "bottle_release" ADD CONSTRAINT "bottle_release_bottle_id_bottle_id_fk" FOREIGN KEY ("bottle_id") REFERENCES "public"."bottle"("id") ON DELETE cascade ON UPDATE no action;
 ALTER TABLE "bottle_release" ADD CONSTRAINT "bottle_release_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
 ALTER TABLE "collection_bottle" ADD CONSTRAINT "collection_bottle_release_id_bottle_release_id_fk" FOREIGN KEY ("release_id") REFERENCES "public"."bottle_release"("id") ON DELETE no action ON UPDATE no action;
 ALTER TABLE "flight_bottle" ADD CONSTRAINT "flight_bottle_release_id_bottle_release_id_fk" FOREIGN KEY ("release_id") REFERENCES "public"."bottle_release"("id") ON DELETE no action ON UPDATE no action;
 ALTER TABLE "tasting" ADD CONSTRAINT "tasting_release_id_bottle_release_id_fk" FOREIGN KEY ("release_id") REFERENCES "public"."bottle_release"("id") ON DELETE no action ON UPDATE no action;
+CREATE INDEX "bottle_alias_release_idx" ON "bottle_alias" USING btree ("release_id");
 CREATE INDEX "bottle_release_bottle_idx" ON "bottle_release" USING btree ("bottle_id");
 CREATE INDEX "bottle_release_created_by_idx" ON "bottle_release" USING btree ("created_by_id");
 CREATE UNIQUE INDEX "bottle_release_full_name_idx" ON "bottle_release" USING btree ("full_name");

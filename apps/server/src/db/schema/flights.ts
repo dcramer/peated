@@ -71,6 +71,10 @@ export const flightBottlesRelations = relations(flightBottles, ({ one }) => ({
     fields: [flightBottles.bottleId],
     references: [bottles.id],
   }),
+  release: one(bottleReleases, {
+    fields: [flightBottles.releaseId],
+    references: [bottleReleases.id],
+  }),
 }));
 
 export type FlightBottle = typeof flightBottles.$inferSelect;
