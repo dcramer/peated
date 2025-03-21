@@ -93,6 +93,7 @@ export const BottleReleaseSchema = z.object({
   avgRating: z
     .number()
     .readonly()
+    .nullable()
     .describe("Average user rating for this edition"),
   totalTastings: z
     .number()

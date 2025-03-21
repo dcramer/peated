@@ -163,7 +163,6 @@ export default function TastingForm({
                 helpText={TastingInputSchema.shape.release.description}
                 placeholder="e.g. Ardbeg Supernova 2013"
                 bottle={initialData.bottle.id}
-                required
                 onChange={(value) => {
                   onChange(value?.id || value);
                   setReleaseValue(value);
