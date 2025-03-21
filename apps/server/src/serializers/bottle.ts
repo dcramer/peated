@@ -150,24 +150,22 @@ export const BottleSerializer = serializer({
     return {
       id: item.id,
 
-      // fullName is brand + name + edition
+      // fullName is brand + name
       fullName: item.fullName,
       name: item.name,
-      edition: item.edition,
+
+      series: item.series,
+      statedAge: item.statedAge,
 
       category: item.category,
       description: item.description,
       flavorProfile: item.flavorProfile,
       tastingNotes: item.tastingNotes,
 
-      statedAge: item.statedAge,
+      edition: item.edition,
       caskStrength: item.caskStrength,
       singleCask: item.singleCask,
       abv: item.abv,
-
-      imageUrl: item.imageUrl
-        ? absoluteUrl(config.API_SERVER, item.imageUrl)
-        : null,
 
       vintageYear: item.vintageYear,
       releaseYear: item.releaseYear,
@@ -180,9 +178,13 @@ export const BottleSerializer = serializer({
       distillers: attrs.distillers,
       bottler: attrs.bottler,
 
+      imageUrl: item.imageUrl
+        ? absoluteUrl(config.API_SERVER, item.imageUrl)
+        : null,
+
       avgRating: item.avgRating,
       totalTastings: item.totalTastings,
-      numEditions: 0,
+      numReleases: 0,
 
       suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,

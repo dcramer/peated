@@ -21,13 +21,14 @@ import bottleAliasUpsert from "./routes/bottleAliasUpsert";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
-import bottleEditionList from "./routes/bottleEditionList";
 import bottleGenerateDetails from "./routes/bottleGenerateDetails";
 import bottleList from "./routes/bottleList";
 import bottleMerge from "./routes/bottleMerge";
 import bottlePreview from "./routes/bottlePreview";
 import bottlePriceHistory from "./routes/bottlePriceHistory";
 import bottlePriceList from "./routes/bottlePriceList";
+import bottleReleaseById from "./routes/bottleReleaseById";
+import bottleReleaseList from "./routes/bottleReleaseList";
 import bottleSuggestedTagList from "./routes/bottleSuggestedTagList";
 import bottleTagList from "./routes/bottleTagList";
 import bottleUpdate from "./routes/bottleUpdate";
@@ -137,17 +138,18 @@ export const appRouter = router({
   bottleById,
   bottleCreate,
   bottleDelete,
-  bottleEditionList,
-  bottlePreview,
+  bottleGenerateDetails,
   bottleList,
   bottleAliasDelete,
   bottleAliasList,
   bottleAliasUpdate,
   bottleAliasUpsert,
-  bottleGenerateDetails,
   bottleMerge,
+  bottlePreview,
   bottlePriceHistory,
   bottlePriceList,
+  bottleReleaseById,
+  bottleReleaseList,
   bottleSuggestedTagList,
   bottleTagList,
   bottleUpdate,

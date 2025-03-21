@@ -3,8 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
+import type { TastingSchema } from "@peated/server/schemas";
 import { TastingInputSchema } from "@peated/server/schemas";
 import type {
+  Bottle,
   Paginated,
   ServingStyle,
   SuggestedTag,
@@ -31,6 +33,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import ColorField from "./colorField";
 import Form from "./form";
+import ReleaseField from "./releaseField";
 import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
 import ServingStyleIcon from "./servingStyleIcon";
 
@@ -63,7 +66,9 @@ export default function TastingForm({
       image: HTMLCanvasElement | null | undefined;
     }
   >;
-  initialData: Partial<Tasting> & Pick<Tasting, "bottle">;
+  initialData: Partial<z.infer<typeof TastingSchema>> & {
+    bottle: Bottle;
+  };
   title: string;
   suggestedTags: Paginated<SuggestedTag>;
 }) {
@@ -76,6 +81,7 @@ export default function TastingForm({
     resolver: zodResolver(TastingInputSchema),
     defaultValues: {
       bottle: initialData.bottle.id,
+      release: initialData.release?.id,
       rating: initialData.rating,
       notes: initialData.notes,
       tags: initialData.tags,
@@ -91,6 +97,11 @@ export default function TastingForm({
   );
   const [friendsValue, setFriendsValue] = useState<Option[]>(
     initialData.friends ? initialData.friends.map(userToOption) : [],
+  );
+  const [releaseValue, setReleaseValue] = useState<Option | undefined>(
+    initialData.release
+      ? { id: initialData.release.id, name: initialData.release.name }
+      : undefined,
   );
 
   const trpcUtils = trpc.useUtils();
@@ -141,6 +152,27 @@ export default function TastingForm({
         isSubmitting={isSubmitting}
       >
         <Fieldset>
+          <Controller
+            name="release"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <ReleaseField
+                {...field}
+                error={errors.release}
+                label="Bottle Release"
+                helpText={TastingInputSchema.shape.release.description}
+                placeholder="e.g. Ardbeg Supernova 2013"
+                bottle={initialData.bottle.id}
+                onChange={(value) => {
+                  onChange(value?.id || value);
+                  setReleaseValue(value);
+                }}
+                canCreate
+                value={releaseValue}
+              />
+            )}
+          />
+
           <Controller
             name="rating"
             control={control}
@@ -237,6 +269,7 @@ export default function TastingForm({
                 {...field}
                 error={errors.servingStyle}
                 label="Serving Style"
+                noSort
                 noDialog
                 targetOptions={servingStyleList.length}
                 options={servingStyleList}

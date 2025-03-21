@@ -105,8 +105,12 @@ describe("priceList", () => {
   test("excludes hidden prices", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const caller = createCaller({ user: admin });
-    await fixtures.StorePrice({ hidden: true });
-    const visiblePrice = await fixtures.StorePrice({ hidden: false });
+    const site = await fixtures.ExternalSiteOrExisting();
+    await fixtures.StorePrice({ hidden: true, externalSiteId: site.id });
+    const visiblePrice = await fixtures.StorePrice({
+      hidden: false,
+      externalSiteId: site.id,
+    });
 
     const result = await caller.priceList({});
 

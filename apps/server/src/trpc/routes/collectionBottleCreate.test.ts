@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { collectionBottles, collections } from "@peated/server/db/schema";
+import { collectionBottles } from "@peated/server/db/schema";
 import { getDefaultCollection } from "@peated/server/lib/db";
 import waitError from "@peated/server/lib/test/waitError";
 import { createCaller } from "@peated/server/trpc/router";
@@ -39,7 +39,7 @@ test("new bottle in default", async ({ fixtures, defaults }) => {
   expect(bottleList.length).toBe(1);
 });
 
-test("multiple bottles without editions in default", async ({
+test("multiple bottles without releases in default", async ({
   fixtures,
   defaults,
 }) => {
@@ -80,12 +80,12 @@ test("multiple bottles without editions in default", async ({
   expect(bottleList.map((b) => b.bottleId).sort()).toEqual(
     [bottle1.id, bottle2.id].sort(),
   );
-  expect(bottleList.every((b) => b.editionId === null)).toBe(true);
+  expect(bottleList.every((b) => b.releaseId === null)).toBe(true);
 });
 
-test("new bottle with edition in default", async ({ fixtures, defaults }) => {
+test("new bottle with release in default", async ({ fixtures, defaults }) => {
   const bottle = await fixtures.Bottle();
-  const edition = await fixtures.BottleEdition({ bottleId: bottle.id });
+  const release = await fixtures.BottleRelease({ bottleId: bottle.id });
 
   const caller = createCaller({
     user: defaults.user,
@@ -94,7 +94,7 @@ test("new bottle with edition in default", async ({ fixtures, defaults }) => {
     user: "me",
     collection: "default",
     bottle: bottle.id,
-    edition: edition.id,
+    release: release.id,
   });
 
   const bottleList = await db
@@ -103,13 +103,13 @@ test("new bottle with edition in default", async ({ fixtures, defaults }) => {
     .where(eq(collectionBottles.bottleId, bottle.id));
 
   expect(bottleList.length).toBe(1);
-  expect(bottleList[0].editionId).toBe(edition.id);
+  expect(bottleList[0].releaseId).toBe(release.id);
 });
 
-test("fails with invalid edition", async ({ fixtures, defaults }) => {
+test("fails with invalid release", async ({ fixtures, defaults }) => {
   const bottle = await fixtures.Bottle();
   const otherBottle = await fixtures.Bottle();
-  const edition = await fixtures.BottleEdition({ bottleId: otherBottle.id });
+  const release = await fixtures.BottleRelease({ bottleId: otherBottle.id });
 
   const caller = createCaller({
     user: defaults.user,
@@ -119,13 +119,13 @@ test("fails with invalid edition", async ({ fixtures, defaults }) => {
       user: "me",
       collection: "default",
       bottle: bottle.id,
-      edition: edition.id,
+      release: release.id,
     }),
   );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify edition.]`);
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify release.]`);
 });
 
-test("fails with nonexistent edition", async ({ fixtures, defaults }) => {
+test("fails with nonexistent release", async ({ fixtures, defaults }) => {
   const bottle = await fixtures.Bottle();
 
   const caller = createCaller({
@@ -136,8 +136,8 @@ test("fails with nonexistent edition", async ({ fixtures, defaults }) => {
       user: "me",
       collection: "default",
       bottle: bottle.id,
-      edition: 12345,
+      release: 12345,
     }),
   );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify edition.]`);
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Cannot identify release.]`);
 });

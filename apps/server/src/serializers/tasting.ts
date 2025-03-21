@@ -5,6 +5,7 @@ import config from "../config";
 import { db } from "../db";
 import type { Tasting, User } from "../db/schema";
 import {
+  bottleReleases,
   bottles,
   tastingBadgeAwards,
   tastings,
@@ -16,12 +17,14 @@ import { absoluteUrl } from "../lib/urls";
 import { type TastingSchema } from "../schemas";
 import { BadgeAwardSerializer } from "./badgeAward";
 import { BottleSerializer } from "./bottle";
+import { BottleReleaseSerializer } from "./bottleRelease";
 import { UserSerializer } from "./user";
 
 type TastingAttrs = {
   hasToasted: boolean;
   createdBy: ReturnType<(typeof UserSerializer)["item"]>;
   bottle: ReturnType<(typeof BottleSerializer)["item"]>;
+  release: ReturnType<(typeof BottleReleaseSerializer)["item"]> | null;
   friends: ReturnType<(typeof UserSerializer)["item"]>[];
   awards: ReturnType<(typeof BadgeAwardSerializer)["item"]>[];
 };
@@ -36,11 +39,13 @@ export const TastingSerializer = serializer({
       .select({
         id: tastings.id,
         bottle: bottles,
+        release: bottleReleases,
         createdBy: users,
       })
       .from(tastings)
       .innerJoin(users, eq(tastings.createdById, users.id))
       .innerJoin(bottles, eq(tastings.bottleId, bottles.id))
+      .leftJoin(bottleReleases, eq(tastings.releaseId, bottleReleases.id))
       .where(inArray(tastings.id, itemIds));
 
     const userToastsList: number[] = currentUser
@@ -62,6 +67,16 @@ export const TastingSerializer = serializer({
         await serialize(
           BottleSerializer,
           results.map((r) => r.bottle),
+          currentUser,
+        )
+      ).map((data, index) => [results[index].id, data]),
+    );
+
+    const releasesByRef = Object.fromEntries(
+      (
+        await serialize(
+          BottleReleaseSerializer,
+          results.map((r) => r.release).filter(notEmpty),
           currentUser,
         )
       ).map((data, index) => [results[index].id, data]),
@@ -135,6 +150,7 @@ export const TastingSerializer = serializer({
             hasToasted: userToastsList.includes(item.id),
             createdBy: usersByRef[item.id],
             bottle: bottlesByRef[item.id],
+            release: releasesByRef[item.id],
             friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
             awards: awardsByTasting[item.id] || [],
           },
@@ -168,6 +184,7 @@ export const TastingSerializer = serializer({
       awards: attrs.awards,
 
       bottle: attrs.bottle,
+      release: attrs.release,
       createdBy: attrs.createdBy,
       hasToasted: attrs.hasToasted,
     };

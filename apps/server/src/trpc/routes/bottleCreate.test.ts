@@ -190,11 +190,6 @@ test("creates a new bottle with new brand name", async ({
     );
 
   expect(changeList.length).toBe(1);
-
-  const [newBrand] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.id, brand.id));
 });
 
 test("does not create a new bottle with invalid distillerId", async ({
@@ -470,6 +465,7 @@ test("removes duplicated brand name", async ({ defaults, fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
   expect(bottle.name).toEqual("Yum Yum");
+  expect(bottle.fullName).toEqual("Delicious Wood Yum Yum");
 });
 
 test("applies SMWS from bottle normalize", async ({ defaults, fixtures }) => {
@@ -500,8 +496,8 @@ test("saves cask information", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleCreate({
-    brand: brand.id,
     name: "Old Whisky",
+    brand: brand.id,
     caskType: "bourbon",
     caskSize: "hogshead",
     caskFill: "1st_fill",
@@ -524,8 +520,8 @@ test("saves vintage information", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleCreate({
-    brand: brand.id,
     name: "Old Whisky",
+    brand: brand.id,
     vintageYear: 2024,
   });
 
@@ -544,8 +540,8 @@ test("saves release year", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleCreate({
-    brand: brand.id,
     name: "Old Whisky",
+    brand: brand.id,
     releaseYear: 2024,
   });
 
@@ -598,8 +594,8 @@ test("saves ABV information", async ({ defaults, fixtures }) => {
 
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const data = await caller.bottleCreate({
-    brand: brand.id,
     name: "Old Whisky",
+    brand: brand.id,
     abv: 40.5,
   });
 
@@ -619,8 +615,8 @@ test("rejects invalid ABV values", async ({ defaults, fixtures }) => {
   const caller = createCaller({ user: await fixtures.User({ mod: true }) });
   const err = await waitError(
     caller.bottleCreate({
-      brand: brand.id,
       name: "Old Whisky",
+      brand: brand.id,
       abv: 101, // Invalid: above 100
     }),
   );

@@ -32,6 +32,7 @@ test("requires mod", async ({ defaults }) => {
 test("no changes", async ({ fixtures }) => {
   const bottle = await fixtures.Bottle({
     name: "Cool Bottle",
+    series: null,
     releaseYear: null,
     vintageYear: null,
     edition: null,
@@ -70,6 +71,7 @@ test("edits a new bottle with new name param", async ({ fixtures }) => {
   const data = await caller.bottleUpdate({
     bottle: bottle.id,
     name: "Delicious Wood",
+    statedAge: null,
   });
 
   expect(data.id).toBeDefined();
@@ -159,7 +161,10 @@ test("fills in statedAge", async ({ fixtures }) => {
 });
 
 test("removes statedAge", async ({ fixtures }) => {
-  const bottle = await fixtures.Bottle({ name: "Foo Bar", statedAge: 10 });
+  const bottle = await fixtures.Bottle({
+    name: "Foo Bar",
+    statedAge: 10,
+  });
 
   const caller = createCaller({
     user: await fixtures.User({ mod: true }),

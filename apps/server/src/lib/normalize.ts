@@ -58,6 +58,7 @@ type NormalizedBottle = {
   singleCask?: boolean | null;
 };
 
+// name here could be the actual bottle name, or just the expression name...
 export function normalizeBottle({
   name,
   statedAge = null,

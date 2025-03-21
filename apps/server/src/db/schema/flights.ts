@@ -11,7 +11,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottleEditions, bottles } from "./bottles";
+import { bottleReleases, bottles } from "./bottles";
 import { users } from "./users";
 
 export const flights = pgTable(
@@ -51,13 +51,13 @@ export const flightBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    editionId: bigint("edition_id", { mode: "number" }).references(
-      () => bottleEditions.id,
+    releaseId: bigint("release_id", { mode: "number" }).references(
+      () => bottleReleases.id,
     ),
   },
   (table) => [
     unique()
-      .on(table.flightId, table.bottleId, table.editionId)
+      .on(table.flightId, table.bottleId, table.releaseId)
       .nullsNotDistinct(),
   ],
 );
@@ -70,6 +70,10 @@ export const flightBottlesRelations = relations(flightBottles, ({ one }) => ({
   bottle: one(bottles, {
     fields: [flightBottles.bottleId],
     references: [bottles.id],
+  }),
+  release: one(bottleReleases, {
+    fields: [flightBottles.releaseId],
+    references: [bottleReleases.id],
   }),
 }));
 

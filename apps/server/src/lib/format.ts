@@ -8,14 +8,34 @@ import { COLOR_SCALE } from "../constants";
 
 export function formatBottleName({
   name,
-  edition,
+  statedAge,
 }: {
-  // Name should include brand prefix
-  name: string;
-  edition?: string | null | undefined;
+  name?: string | null | undefined;
+  statedAge?: number | null | undefined;
 } & Record<string, any>) {
-  const bits = [name];
+  const bits = [[name]];
+  return bits.join(" ");
+}
+
+export function formatReleaseName({
+  name, // bottle name / express name
+  edition,
+  statedAge,
+  releaseYear,
+  vintageYear,
+}: {
+  name?: string | null | undefined;
+  edition?: string | null | undefined;
+  statedAge?: number | null | undefined;
+  releaseYear?: number | null | undefined;
+  vintageYear?: number | null | undefined;
+}) {
+  const bits = [];
+  if (name) bits.push(name);
   if (edition) bits.push(edition);
+  if (statedAge) bits.push(`${statedAge}-year-old`);
+  if (releaseYear) bits.push(`${releaseYear} Release`);
+  if (vintageYear) bits.push(`${vintageYear} Vintage`);
   return bits.join(" ");
 }
 

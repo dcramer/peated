@@ -123,6 +123,7 @@ test("merge unique bottle", async ({ fixtures }) => {
   const bottleA = await fixtures.Bottle({
     brandId: entityA.id,
     name: "Unique",
+    statedAge: null,
   });
   const entityB = await fixtures.Entity({
     name: "Entity B",
@@ -132,6 +133,7 @@ test("merge unique bottle", async ({ fixtures }) => {
   const bottleB = await fixtures.Bottle({
     brandId: entityB.id,
     name: "More Unique",
+    statedAge: null,
   });
 
   await mergeEntity({

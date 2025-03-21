@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "../modal";
 import type { CreateForm, Option } from "./types";
 
-type OnSubmit<T> = (newOption: T) => void;
+type OnSubmit<T> = (newOption: any) => void;
 
 // TODO(dcramer): hitting escape doesnt do what you want here (it does nothing)
 export default function CreateOptionDialog<T extends Option>({
@@ -14,14 +14,12 @@ export default function CreateOptionDialog<T extends Option>({
   setOpen,
   onSubmit,
   render,
-  title = "Add Option",
 }: {
   query?: string;
   open: boolean;
   setOpen: (value: boolean) => void;
   onSubmit: OnSubmit<T>;
   render: CreateForm<T>;
-  title?: string;
 }) {
   const [newOption, setNewOption] = useState<T>({
     id: null,
@@ -35,7 +33,7 @@ export default function CreateOptionDialog<T extends Option>({
   return (
     <Modal open={open} onClose={setOpen}>
       {render({
-        onSubmit: (newOption) => {
+        onSubmit: (newOption: any) => {
           onSubmit(newOption);
           setNewOption({
             id: null,

@@ -7,7 +7,7 @@ export type Option = {
 
 export type CreateFormOptions<T extends Option> = {
   data: T;
-  onSubmit: (newOption: T) => void;
+  onSubmit: (newOption: any) => void;
   onClose: () => void;
 };
 

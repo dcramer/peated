@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { bottles, collectionBottles, entities } from "@peated/server/db/schema";
+import {
+  bottleReleases,
+  bottles,
+  collectionBottles,
+} from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
 import { TRPCError } from "@trpc/server";
@@ -60,10 +64,14 @@ export default publicProcedure
     ];
 
     const results = await db
-      .select({ collectionBottles, bottles })
+      .select({ collectionBottles, bottle: bottles, release: bottleReleases })
       .from(collectionBottles)
       .where(where ? and(...where) : undefined)
       .innerJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
+      .leftJoin(
+        bottleReleases,
+        eq(bottleReleases.id, collectionBottles.releaseId),
+      )
       // .innerJoin(entities, eq(entities.id, bottles.brandId))
       .limit(limit + 1)
       .offset(offset)
@@ -72,10 +80,13 @@ export default publicProcedure
     return {
       results: await serialize(
         CollectionBottleSerializer,
-        results.slice(0, limit).map(({ collectionBottles, bottles }) => ({
-          ...collectionBottles,
-          bottle: bottles,
-        })),
+        results
+          .slice(0, limit)
+          .map(({ collectionBottles, bottle, release }) => ({
+            ...collectionBottles,
+            release,
+            bottle,
+          })),
         ctx.user,
       ),
       rel: {

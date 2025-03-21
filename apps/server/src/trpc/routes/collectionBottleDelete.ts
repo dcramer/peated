@@ -60,8 +60,8 @@ export default authedProcedure
           and(
             eq(collectionBottles.bottleId, input.bottle),
             eq(collectionBottles.collectionId, collection.id),
-            input.edition
-              ? eq(collectionBottles.editionId, input.edition)
+            input.release
+              ? eq(collectionBottles.releaseId, input.release)
               : undefined,
           ),
         )

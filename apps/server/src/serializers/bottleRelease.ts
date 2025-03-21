@@ -3,29 +3,30 @@ import { type z } from "zod";
 import { serializer } from ".";
 import config from "../config";
 import { db } from "../db";
-import { tastings, type BottleEdition, type User } from "../db/schema";
+import { tastings, type BottleRelease, type User } from "../db/schema";
 import { absoluteUrl } from "../lib/urls";
-import { type BottleEditionSchema } from "../schemas";
+import { type BottleReleaseSchema } from "../schemas";
 
 type Attrs = {
   hasTasted: boolean;
+  isFavorite: boolean;
 };
 
-export const BottleEditionSerializer = serializer({
+export const BottleReleaseSerializer = serializer({
   attrs: async (
-    itemList: BottleEdition[],
+    itemList: BottleRelease[],
     currentUser?: User,
   ): Promise<Record<number, Attrs>> => {
     const tastedSet = currentUser
       ? new Set(
           (
             await db
-              .selectDistinct({ id: tastings.editionId })
+              .selectDistinct({ id: tastings.releaseId })
               .from(tastings)
               .where(
                 and(
                   inArray(
-                    tastings.editionId,
+                    tastings.releaseId,
                     itemList.map((i) => i.id),
                   ),
                   eq(tastings.createdById, currentUser.id),
@@ -40,21 +41,24 @@ export const BottleEditionSerializer = serializer({
         item.id,
         {
           hasTasted: tastedSet.has(item.id),
+          isFavorite: false, // TODO
         },
       ]),
     );
   },
 
   item: (
-    item: BottleEdition,
+    item: BottleRelease,
     attrs: Attrs,
-  ): z.infer<typeof BottleEditionSchema> => {
+  ): z.infer<typeof BottleReleaseSchema> => {
     return {
       id: item.id,
       bottleId: item.bottleId,
 
       fullName: item.fullName,
       name: item.name,
+
+      edition: item.edition,
 
       description: item.description,
       tastingNotes: item.tastingNotes,
@@ -80,6 +84,7 @@ export const BottleEditionSerializer = serializer({
 
       suggestedTags: item.suggestedTags,
       hasTasted: attrs.hasTasted,
+      isFavorite: attrs.isFavorite,
 
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),

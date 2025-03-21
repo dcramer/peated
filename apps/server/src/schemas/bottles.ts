@@ -10,67 +10,166 @@ import {
 import { EntityInputSchema, EntitySchema } from "./entities";
 
 export const BottleSchema = z.object({
-  id: z.number().readonly(),
-  fullName: z.string().readonly(),
+  id: z.number().readonly().describe("Unique identifier for the bottle"),
+  fullName: z
+    .string()
+    .readonly()
+    .describe("Canonical name including the brand"),
 
-  name: z.string().trim().min(1, "Required"),
-  edition: z.string().trim().nullable().default(null),
+  name: z
+    .string()
+    .trim()
+    .describe(
+      "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
+    ),
+
+  series: z
+    .string()
+    .nullable()
+    .default(null)
+    .describe(
+      "Series name for this bottling (e.g. Supernova for Ardbeg Supernova)",
+    ),
 
   category: CategoryEnum.nullable().default(null),
-  statedAge: z.number().min(0).max(100).nullable().default(null),
-  caskStrength: z.boolean().nullable().default(null),
-  singleCask: z.boolean().nullable().default(null),
-  abv: z.number().min(0).max(100).nullable().default(null),
+
+  // <deprecated>: moving to editions
+  edition: z.string().trim().nullable().default(null),
+  statedAge: z
+    .number()
+    .min(0)
+    .max(100)
+    .nullable()
+    .default(null)
+    .describe("Official age statement in years"),
+  caskStrength: z
+    .boolean()
+    .nullable()
+    .default(null)
+    .describe("Whether the whisky is bottled at cask strength"),
+  singleCask: z
+    .boolean()
+    .nullable()
+    .default(null)
+    .describe("Whether the whisky comes from a single cask"),
+  abv: z
+    .number()
+    .min(0)
+    .max(100)
+    .nullable()
+    .default(null)
+    .describe("Alcohol by volume percentage"),
 
   vintageYear: z
     .number()
     .gte(1800)
     .lte(new Date().getFullYear())
     .nullable()
-    .default(null),
+    .default(null)
+    .describe("Year the whisky was distilled"),
   releaseYear: z
     .number()
     .gte(1800)
     .lte(new Date().getFullYear())
     .nullable()
-    .default(null),
+    .default(null)
+    .describe("Year the whisky was released"),
 
-  caskType: CaskTypeEnum.nullable().default(null),
-  caskSize: CaskSizeEnum.nullable().default(null),
-  caskFill: CaskFillEnum.nullable().default(null),
+  caskType: CaskTypeEnum.nullable()
+    .default(null)
+    .describe("Type of cask used for maturation"),
+  caskSize: CaskSizeEnum.nullable()
+    .default(null)
+    .describe("Size of the cask used for maturation"),
+  caskFill: CaskFillEnum.nullable()
+    .default(null)
+    .describe("Fill number of the cask (1st fill, refill, etc.)"),
+  // </deprecated>: moving to editions
 
-  brand: EntitySchema,
-  distillers: z.array(EntitySchema).default([]),
-  bottler: EntitySchema.nullable().default(null),
+  brand: EntitySchema.describe("The brand that produces this bottle"),
+  distillers: z
+    .array(EntitySchema)
+    .default([])
+    .describe("List of distilleries that produced this whisky"),
+  bottler: EntitySchema.nullable()
+    .default(null)
+    .describe("Independent bottler if different from the brand"),
 
-  description: z.string().nullable().default(null),
-  descriptionSrc: ContentSourceEnum.nullable().default(null).optional(),
-  imageUrl: z.string().url().nullable().default(null).readonly(),
-  flavorProfile: FlavorProfileEnum.nullable().default(null),
+  description: z
+    .string()
+    .nullable()
+    .default(null)
+    .describe("Detailed description of the bottle"),
+  descriptionSrc: ContentSourceEnum.nullable()
+    .default(null)
+    .optional()
+    .describe("Source of the bottle description"),
+  imageUrl: z
+    .string()
+    .url()
+    .nullable()
+    .default(null)
+    .readonly()
+    .describe("URL to the bottle's image"),
+  flavorProfile: FlavorProfileEnum.nullable()
+    .default(null)
+    .describe("Primary flavor characteristics of the whisky"),
   tastingNotes: z
     .object({
-      nose: z.string(),
-      palate: z.string(),
-      finish: z.string(),
+      nose: z.string().describe("Aroma characteristics of the whisky"),
+      palate: z.string().describe("Taste characteristics of the whisky"),
+      finish: z.string().describe("Aftertaste characteristics of the whisky"),
     })
     .nullish()
     .readonly(),
-  suggestedTags: z.array(z.string()).optional().readonly(),
+  suggestedTags: z
+    .array(z.string())
+    .optional()
+    .readonly()
+    .describe("System-generated tags based on the bottle's characteristics"),
 
-  avgRating: z.number().gte(0).lte(5).nullable().readonly(),
-  totalTastings: z.number().gte(0).readonly(),
-  numEditions: z.number().gte(0).readonly(),
+  avgRating: z
+    .number()
+    .gte(0)
+    .lte(5)
+    .nullable()
+    .readonly()
+    .describe("Average user rating for this bottle"),
+  totalTastings: z
+    .number()
+    .gte(0)
+    .readonly()
+    .describe("Total number of recorded tastings for this bottle"),
+  numReleases: z
+    .number()
+    .gte(0)
+    .readonly()
+    .describe("Number of different editions of this bottle"),
 
-  createdAt: z.string().datetime().readonly(),
-  updatedAt: z.string().datetime().readonly(),
+  createdAt: z
+    .string()
+    .datetime()
+    .readonly()
+    .describe("Timestamp when the bottle was created"),
+  updatedAt: z
+    .string()
+    .datetime()
+    .readonly()
+    .describe("Timestamp when the bottle was last updated"),
 
-  isFavorite: z.boolean().readonly(),
-  hasTasted: z.boolean().readonly(),
+  isFavorite: z
+    .boolean()
+    .readonly()
+    .describe("Whether the current user has marked this bottle as a favorite"),
+  hasTasted: z
+    .boolean()
+    .readonly()
+    .describe("Whether the current user has recorded a tasting this bottle"),
 });
 
 const EntityChoice = z.union([
   EntityInputSchema.extend({
-    id: z.number().nullish(),
+    id: z.number().nullish().describe("Optional ID for the entity"),
   }),
   z.number(),
 ]);
@@ -85,22 +184,38 @@ export const BottleInputSchema = BottleSchema.omit({
   updatedAt: true,
   isFavorite: true,
   hasTasted: true,
-  numEditions: true,
+  numReleases: true,
 }).extend({
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .describe(
+      "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
+    ),
   brand: EntityChoice,
   distillers: z.array(EntityChoice).default([]).optional(),
   bottler: EntityChoice.nullable().default(null).optional(),
-  image: z.null().optional(),
-  abv: z.number().min(0).max(100).nullable().default(null).optional(),
+  image: z.null().optional().describe("Optional image upload for the bottle"),
+  abv: z
+    .number()
+    .min(0)
+    .max(100)
+    .nullable()
+    .default(null)
+    .optional()
+    .describe("Alcohol by volume percentage"),
 });
 
 export const BottleMergeSchema = z.object({
   // TODO: rename to bottle
-  bottleId: z.number(),
-  direction: z.enum(["mergeInto", "mergeFrom"]),
+  bottleId: z.number().describe("ID of the bottle to merge"),
+  direction: z
+    .enum(["mergeInto", "mergeFrom"])
+    .describe("Direction of the merge operation"),
 });
 
 export const BottleAliasSchema = z.object({
-  bottle: z.number(),
-  name: z.string(),
+  bottle: z.number().describe("ID of the bottle this alias belongs to"),
+  name: z.string().describe("Alternative name for the bottle"),
 });
