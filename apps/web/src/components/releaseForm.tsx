@@ -2,20 +2,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CASK_FILLS, CASK_SIZES, CASK_TYPES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { BottleReleaseInputSchema } from "@peated/server/schemas";
-import { trpc } from "@peated/web/lib/trpc/client";
+import type { Bottle } from "@peated/server/types";
+import Fieldset from "@peated/web/components/fieldset";
+import Form from "@peated/web/components/form";
+import FormError from "@peated/web/components/formError";
+import FormHeader from "@peated/web/components/formHeader";
+import Header from "@peated/web/components/header";
+import Layout from "@peated/web/components/layout";
+import SelectField from "@peated/web/components/selectField";
+import TextField from "@peated/web/components/textField";
+import { isTRPCClientError } from "@peated/web/lib/trpc/client";
+import { useState } from "react";
+import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
+import { logError } from "../lib/log";
 import BooleanField from "./booleanField";
-import Fieldset from "./fieldset";
-import Form from "./form";
-import FormHeader from "./formHeader";
-import LayoutModal from "./layoutModal";
+import BottleCard from "./bottleCard";
 import Legend from "./legend";
-import SelectField from "./selectField";
-import { type CreateFormOptions, type Option } from "./selectField/types";
-import TextField from "./textField";
-
-type FormSchemaType = z.infer<typeof BottleReleaseInputSchema>;
 
 const caskFillList = CASK_FILLS.map((id) => ({
   id,
@@ -32,58 +36,18 @@ const caskTypeList = CASK_TYPES.map(({ id }) => ({
   name: toTitleCase(id),
 }));
 
-export default function ReleaseField({
-  createDialogHelpText,
-  bottle,
-  ...props
-}: React.ComponentProps<typeof SelectField> & {
-  createDialogHelpText?: string;
-  bottle: number;
-}) {
-  const trpcUtils = trpc.useUtils();
-  return (
-    <SelectField<Option>
-      onQuery={async (query) => {
-        const { results } = await trpcUtils.bottleReleaseList.fetch({
-          query,
-          bottle,
-        });
-        return results;
-      }}
-      onResults={(results) => {
-        return results.map((result) => ({
-          name:
-            result.name ??
-            result.edition ??
-            result.vintageYear ??
-            result.releaseYear ??
-            result.abv ??
-            "Unnamed Release",
-          ...result,
-        }));
-      }}
-      onRenderOption={(item) => (
-        <div className="flex flex-col items-start">
-          <div>{item.name}</div>
-        </div>
-      )}
-      createForm={(props) => {
-        return (
-          <CreateForm createDialogHelpText={createDialogHelpText} {...props} />
-        );
-      }}
-      {...props}
-    />
-  );
-}
+type FormSchemaType = z.infer<typeof BottleReleaseInputSchema>;
 
-function CreateForm({
-  createDialogHelpText = "Most values of the release are optional, and we'll come up with a canonical name based on what's present.",
-  data,
+export default function ReleaseForm({
+  bottle,
   onSubmit,
-  onClose,
-}: CreateFormOptions<Option> & {
-  createDialogHelpText?: string;
+  initialData = {},
+  title,
+}: {
+  bottle: Bottle;
+  onSubmit: SubmitHandler<FormSchemaType>;
+  initialData?: Partial<FormSchemaType>;
+  title: string;
 }) {
   const {
     control,
@@ -92,35 +56,48 @@ function CreateForm({
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(BottleReleaseInputSchema),
-    defaultValues: {
-      edition: data.name ?? "",
-    },
+    defaultValues: initialData,
   });
 
-  return (
-    <LayoutModal
-      header={
-        <FormHeader
-          title="Add Release of Bottle"
-          onSave={handleSubmit(onSubmit)}
-          saveDisabled={isSubmitting}
-          onClose={onClose}
-        />
+  const [error, setError] = useState<string | undefined>();
+
+  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
+    try {
+      await onSubmit(data);
+    } catch (err) {
+      if (isTRPCClientError(err)) {
+        setError(err.message);
+      } else {
+        logError(err);
+        setError("Internal error");
       }
+    }
+  };
+
+  return (
+    <Layout
+      header={
+        <Header>
+          <FormHeader
+            title={title}
+            saveDisabled={isSubmitting}
+            onSave={handleSubmit(onSubmitHandler)}
+          />
+        </Header>
+      }
+      footer={null}
     >
-      {!!createDialogHelpText && (
-        <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
-          <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
-            {createDialogHelpText}
-          </div>
-        </div>
-      )}
+      <div className="lg:mb-8 lg:p-0">
+        <BottleCard bottle={bottle} color="highlight" />
+      </div>
+
+      {error && <FormError values={[error]} />}
 
       <Form
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          handleSubmit(onSubmit)(e);
+          handleSubmit(onSubmitHandler)(e);
         }}
         isSubmitting={isSubmitting}
       >
@@ -267,6 +244,6 @@ function CreateForm({
           />
         </Fieldset>
       </Form>
-    </LayoutModal>
+    </Layout>
   );
 }
