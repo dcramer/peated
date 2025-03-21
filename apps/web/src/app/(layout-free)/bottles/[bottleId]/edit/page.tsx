@@ -33,15 +33,20 @@ export default function Page({
 
         if (image) {
           try {
+            const imageBlob = image ? await toBlob(image) : null;
+            if (!imageBlob || imageBlob.size === 0) {
+              throw new Error("Invalid image data");
+            }
+            
             await api.post(`/bottles/${bottle.id}/image`, {
               data: {
-                image: image ? await toBlob(image) : null,
+                image: imageBlob,
               },
             });
           } catch (err) {
             logError(err);
             flash(
-              "There was an error uploading your image, but the bottle was saved.",
+              "Failed to upload image: " + (err.message || "Unknown error"),
               "error",
             );
           }

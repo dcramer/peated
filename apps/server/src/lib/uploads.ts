@@ -15,24 +15,29 @@ export const compressAndResizeImage = (
   maxWidth?: number,
   maxHeight?: number,
 ) => {
-  const transformer = sharp()
-    .resize({
-      width: maxWidth,
-      height: maxHeight,
-      fit: sharp.fit.cover,
-      position: sharp.strategy.entropy,
-      withoutEnlargement: true,
-    })
-    .trim()
-    .unflatten()
-    .webp({ quality: 80 });
+  try {
+    const transformer = sharp()
+      .resize({
+        width: maxWidth,
+        height: maxHeight,
+        fit: sharp.fit.cover,
+        position: sharp.strategy.entropy,
+        withoutEnlargement: true,
+      })
+      .trim()
+      .unflatten()
+      .webp({ quality: 80 });
 
-  return {
-    stream: stream.pipe(transformer),
-    filename: `${
-      filename.substring(0, filename.lastIndexOf(".")) || filename
-    }.webp`,
-  };
+    return {
+      stream: stream.pipe(transformer),
+      filename: `${
+        filename.substring(0, filename.lastIndexOf(".")) || filename
+      }.webp`,
+    };
+  } catch (err) {
+    console.error("Error in image processing:", err);
+    throw new Error(`Image processing failed: ${err.message}`);
+  }
 };
 
 type ProcessCallback = (
