@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CASK_FILLS, CASK_SIZE_IDS, CASK_TYPE_IDS } from "../constants";
+import { CaskFillEnum, CaskSizeEnum, CaskTypeEnum } from "./common";
 
 export const BottleReleaseSchema = z.object({
   id: z.number().describe("Unique identifier for the bottle edition"),
@@ -55,21 +56,15 @@ export const BottleReleaseSchema = z.object({
     .default(null)
     .describe("Year this bottling was released."),
 
-  caskType: z
-    .enum(CASK_TYPE_IDS)
-    .nullable()
+  caskType: CaskTypeEnum.nullable()
     .default(null)
-    .describe("Type of cask used for maturation."),
-  caskFill: z
-    .enum(CASK_FILLS)
-    .nullable()
-    .default(null)
-    .describe("Fill number of the cask (1st fill, refill, etc.)"),
-  caskSize: z
-    .enum(CASK_SIZE_IDS)
-    .nullable()
+    .describe("Type of cask used for maturation"),
+  caskSize: CaskSizeEnum.nullable()
     .default(null)
     .describe("Size of the cask used for maturation"),
+  caskFill: CaskFillEnum.nullable()
+    .default(null)
+    .describe("Fill number of the cask (1st fill, refill, etc.)"),
 
   description: z
     .string()
