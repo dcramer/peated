@@ -105,11 +105,16 @@ export class ApiClient {
       }
       throw new ApiError("Request failed", resp, await resp.json());
     }
-    if (resp.headers.get("Content-Type") !== "application/json") {
-      const body = await resp.text();
-      if (body) return JSON.parse(body);
+    
+    const contentType = resp.headers.get("Content-Type") || "";
+    if (contentType.includes("application/json")) {
+      return await resp.json();
+    } else if (resp.status === 204 || resp.headers.get("Content-Length") === "0") {
+      return null;
+    } else {
+      console.error(`Unexpected content type: ${contentType}`);
+      throw new ApiError("Unexpected response format", resp, { error: "Server returned a non-JSON response" });
     }
-    return null;
   }
 
   get(path: string, options: any | undefined = undefined) {
