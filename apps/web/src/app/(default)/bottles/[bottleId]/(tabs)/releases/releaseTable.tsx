@@ -32,7 +32,7 @@ export default function ReleaseTable({
       items={releaseList.results}
       rel={releaseList.rel}
       defaultSort="date"
-      url={(item) => `/bottles/${bottleId}/releases/${item.id}`}
+      // url={(item) => `/bottles/${bottleId}/releases/${item.id}`}
       columns={[
         { name: "name", sort: "name", sortDefaultOrder: "asc" },
         {

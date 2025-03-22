@@ -34,7 +34,7 @@ export default function AddRelease({
         });
 
         if (returnTo) router.push(returnTo);
-        else router.replace(`/bottles/${bottleId}/releases/${newRelease.id}`);
+        else router.replace(`/bottles/${bottleId}/releases`);
       }}
       initialData={{
         edition: name,
