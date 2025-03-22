@@ -384,10 +384,10 @@ export const Bottle = async (
       distillerList,
     );
 
-    Object.assign(
-      bottleData,
-      normalizeBottle({ ...bottleData, isFullName: false }),
-    );
+    // Object.assign(
+    //   bottleData,
+    //   normalizeBottle({ ...bottleData, isFullName: false }),
+    // );
 
     const [bottle] = await tx
       .insert(bottles)
@@ -904,13 +904,10 @@ export const BottleRelease = async (
     });
 
     const releaseData: dbSchema.NewBottleRelease = {
-      ...data,
       bottleId: bottle.id,
       fullName,
       name,
-      statedAge:
-        data.statedAge ??
-        choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
+      statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
       abv:
         data.abv ??
         choose([null, null, 40, 43, 46, 48.6, 50, 55.8, 58.9, 63.5]),
@@ -967,9 +964,10 @@ export const BottleRelease = async (
         data.description ?? choose([null, null, faker.lorem.paragraph()]),
       descriptionSrc:
         data.descriptionSrc ?? choose([null, null, "user", "generated"]),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...data,
       createdById: data.createdById ?? (await User({}, tx)).id,
-      createdAt: data.createdAt ?? new Date(),
-      updatedAt: data.updatedAt ?? new Date(),
     };
 
     return await tx
