@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { db } from "../../db";
-import { bottleReleases } from "../../db/schema";
+import { bottleReleases, bottles } from "../../db/schema";
 import waitError from "../../lib/test/waitError";
 import { createCaller } from "../router";
 
@@ -71,6 +71,13 @@ describe("bottleReleaseCreate", () => {
     expect(release.name).toBe(
       "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
     );
+
+    // Verify numReleases was incremented
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle.numReleases).toBe(1);
   });
 
   it("creates a new release for a bottle with statedAge", async function ({
@@ -136,6 +143,13 @@ describe("bottleReleaseCreate", () => {
     expect(release.name).toBe(
       "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV", // No age in name since it's in bottle
     );
+
+    // Verify numReleases was incremented
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle.numReleases).toBe(1);
   });
 
   it("throws error if release statedAge differs from bottle statedAge", async function ({
@@ -160,6 +174,13 @@ describe("bottleReleaseCreate", () => {
     expect(err).toMatchInlineSnapshot(
       `[TRPCError: Release statedAge must match bottle's statedAge.]`,
     );
+
+    // Verify numReleases was not incremented
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle.numReleases).toBe(0);
   });
 
   it("throws error if bottle not found", async function ({ defaults }) {
@@ -186,6 +207,7 @@ describe("bottleReleaseCreate", () => {
       name: "10",
       statedAge: null,
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      numReleases: 1,
     });
 
     // Create initial release
@@ -210,6 +232,13 @@ describe("bottleReleaseCreate", () => {
     expect(err).toMatchInlineSnapshot(
       `[TRPCError: A release with these attributes already exists.]`,
     );
+
+    // Verify numReleases was not incremented
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle.numReleases).toBe(1);
   });
 
   it("handles null values in uniqueness check", async function ({
@@ -220,6 +249,7 @@ describe("bottleReleaseCreate", () => {
 
     const bottle = await fixtures.Bottle({
       statedAge: null,
+      numReleases: 1,
     });
 
     // Create initial release with null values
@@ -242,5 +272,12 @@ describe("bottleReleaseCreate", () => {
     expect(err).toMatchInlineSnapshot(
       `[TRPCError: A release with these attributes already exists.]`,
     );
+
+    // Verify numReleases was not incremented
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle.numReleases).toBe(1);
   });
 });

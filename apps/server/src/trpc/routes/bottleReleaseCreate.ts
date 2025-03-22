@@ -101,29 +101,47 @@ export default authedProcedure
       });
     }
 
-    // Create the release
-    const [release] = await db
-      .insert(bottleReleases)
-      .values({
-        bottleId: input.bottleId,
-        fullName,
-        name,
-        edition: input.edition,
-        vintageYear: input.vintageYear,
-        releaseYear: input.releaseYear,
-        abv: input.abv,
-        singleCask: input.singleCask,
-        caskStrength: input.caskStrength,
-        statedAge: bottle.statedAge || input.statedAge,
-        caskSize: input.caskSize,
-        caskType: input.caskType,
-        caskFill: input.caskFill,
-        description: input.description,
-        imageUrl: input.imageUrl,
-        tastingNotes: input.tastingNotes,
-        createdById: ctx.user.id,
-      })
-      .returning();
+    let release;
+    await db.transaction(async (tx) => {
+      // Create the release
+      [release] = await tx
+        .insert(bottleReleases)
+        .values({
+          bottleId: input.bottleId,
+          fullName,
+          name,
+          edition: input.edition,
+          vintageYear: input.vintageYear,
+          releaseYear: input.releaseYear,
+          abv: input.abv,
+          singleCask: input.singleCask,
+          caskStrength: input.caskStrength,
+          statedAge: bottle.statedAge || input.statedAge,
+          caskSize: input.caskSize,
+          caskType: input.caskType,
+          caskFill: input.caskFill,
+          description: input.description,
+          imageUrl: input.imageUrl,
+          tastingNotes: input.tastingNotes,
+          createdById: ctx.user.id,
+        })
+        .returning();
+
+      // Increment the numReleases counter on the bottle
+      await tx
+        .update(bottles)
+        .set({
+          numReleases: sql`${bottles.numReleases} + 1`,
+        })
+        .where(eq(bottles.id, input.bottleId));
+    });
+
+    if (!release) {
+      throw new TRPCError({
+        message: "Failed to create release.",
+        code: "INTERNAL_SERVER_ERROR",
+      });
+    }
 
     return await serialize(BottleReleaseSerializer, release, ctx.user);
   });

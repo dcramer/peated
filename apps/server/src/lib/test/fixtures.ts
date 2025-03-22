@@ -775,14 +775,17 @@ export const Collection = async (
   { ...data }: Partial<Omit<dbSchema.NewCollection, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Collection> => {
-  const [result] = await db
-    .insert(collections)
-    .values({
-      name: faker.commerce.product(),
-      createdAt: new Date(),
-      ...(data as Omit<dbSchema.NewCollection, "name">),
-    })
-    .returning();
+  const [result] = await db.transaction(async (tx) => {
+    return await tx
+      .insert(collections)
+      .values({
+        name: faker.commerce.product(),
+        createdAt: new Date(),
+        createdById: data.createdById || (await User({}, tx)).id,
+        ...(data as Omit<dbSchema.NewCollection, "name" | "createdById">),
+      })
+      .returning();
+  });
   if (!result) throw new Error("Unable to create Collection fixture");
   return result;
 };
