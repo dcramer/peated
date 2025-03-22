@@ -184,7 +184,7 @@ export const BottleSerializer = serializer({
 
       avgRating: item.avgRating,
       totalTastings: item.totalTastings,
-      numReleases: 0,
+      numReleases: item.numReleases,
 
       suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,

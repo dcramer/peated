@@ -13,4 +13,5 @@ export const ObjectTypeEnum = z.enum([
   "bottle",
   "entity",
   "tasting",
+  "bottle_release",
 ]);

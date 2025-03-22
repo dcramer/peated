@@ -116,6 +116,9 @@ export const bottles = pgTable(
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
       .notNull(),
+    numReleases: bigint("num_releases", { mode: "number" })
+      .default(0)
+      .notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -29,6 +29,7 @@ import bottlePriceHistory from "./routes/bottlePriceHistory";
 import bottlePriceList from "./routes/bottlePriceList";
 import bottleReleaseById from "./routes/bottleReleaseById";
 import bottleReleaseCreate from "./routes/bottleReleaseCreate";
+import bottleReleaseDelete from "./routes/bottleReleaseDelete";
 import bottleReleaseList from "./routes/bottleReleaseList";
 import bottleSuggestedTagList from "./routes/bottleSuggestedTagList";
 import bottleTagList from "./routes/bottleTagList";
@@ -151,6 +152,7 @@ export const appRouter = router({
   bottlePriceList,
   bottleReleaseById,
   bottleReleaseCreate,
+  bottleReleaseDelete,
   bottleReleaseList,
   bottleSuggestedTagList,
   bottleTagList,
