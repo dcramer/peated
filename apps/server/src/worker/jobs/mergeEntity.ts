@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleReleases,
   bottles,
   bottlesToDistillers,
   entities,
@@ -7,7 +8,7 @@ import {
   entityTombstones,
 } from "@peated/server/db/schema";
 import { upsertBottleAlias } from "@peated/server/lib/db";
-import { formatBottleName } from "@peated/server/lib/format";
+import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { ConflictError } from "@peated/server/trpc/errors";
 import { pushUniqueJob, runJob } from "@peated/server/worker/client";
@@ -70,12 +71,47 @@ export default async function mergeEntity({
           db: tx,
         });
       } else {
-        // there was no conflict so lets udate it
+        // there was no conflict so lets update it
         await tx
           .update(bottles)
           .set({ brandId: toEntity.id, fullName })
           .where(eq(bottles.id, bottle.id));
+
+        // Update associated releases
+        const releases = await tx
+          .select()
+          .from(bottleReleases)
+          .where(eq(bottleReleases.bottleId, bottle.id));
+
+        for (const release of releases) {
+          const newName = formatReleaseName({
+            name: bottle.name,
+            edition: release.edition,
+            abv: release.abv,
+            statedAge: bottle.statedAge ? null : release.statedAge,
+            releaseYear: release.releaseYear,
+            vintageYear: release.vintageYear,
+          });
+
+          const newFullName = formatReleaseName({
+            name: fullName,
+            edition: release.edition,
+            abv: release.abv,
+            statedAge: bottle.statedAge ? null : release.statedAge,
+            releaseYear: release.releaseYear,
+            vintageYear: release.vintageYear,
+          });
+
+          await tx
+            .update(bottleReleases)
+            .set({
+              name: newName,
+              fullName: newFullName,
+            })
+            .where(eq(bottleReleases.id, release.id));
+        }
       }
+      updatedBottleIds.push(bottle.id);
     }
 
     await tx

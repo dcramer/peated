@@ -2,12 +2,13 @@ import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,
+  bottleReleases,
   bottles,
   bottlesToDistillers,
   changes,
   entities,
 } from "@peated/server/db/schema";
-import { formatBottleName } from "@peated/server/lib/format";
+import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -240,6 +241,39 @@ export async function bottleUpdate({
         ...bottleData,
         name: `${brand.shortName || brand.name} ${bottleData.name ?? bottle.name}`,
       });
+
+      // Update all associated bottle releases with the new name
+      const releases = await tx.query.bottleReleases.findMany({
+        where: eq(bottleReleases.bottleId, bottle.id),
+      });
+
+      for (const release of releases) {
+        const newName = formatReleaseName({
+          name: bottleData.name ?? bottle.name,
+          edition: release.edition,
+          abv: release.abv,
+          statedAge: bottle.statedAge ? null : release.statedAge,
+          releaseYear: release.releaseYear,
+          vintageYear: release.vintageYear,
+        });
+
+        const newFullName = formatReleaseName({
+          name: bottleData.fullName,
+          edition: release.edition,
+          abv: release.abv,
+          statedAge: bottle.statedAge ? null : release.statedAge,
+          releaseYear: release.releaseYear,
+          vintageYear: release.vintageYear,
+        });
+
+        await tx
+          .update(bottleReleases)
+          .set({
+            name: newName,
+            fullName: newFullName,
+          })
+          .where(eq(bottleReleases.id, release.id));
+      }
     }
 
     // bottles ae unique on aliases, so if an alias exists that is bound to

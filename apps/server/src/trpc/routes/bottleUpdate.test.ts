@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleReleases,
   bottles,
   bottlesToDistillers,
   entities,
@@ -480,4 +481,114 @@ test("rejects invalid ABV values", async ({ defaults, fixtures }) => {
       }
     ]]
   `);
+});
+
+test("updates associated bottle releases when name changes", async ({
+  fixtures,
+}) => {
+  const brand = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({
+    brandId: brand.id,
+    name: "Original Name",
+    statedAge: null,
+  });
+
+  // Create a few releases with different attributes
+  const release1 = await fixtures.BottleRelease({
+    bottleId: bottle.id,
+    edition: "Batch 1",
+    abv: 43.0,
+    statedAge: 12,
+    releaseYear: 2020,
+    vintageYear: 2008,
+  });
+
+  const release2 = await fixtures.BottleRelease({
+    bottleId: bottle.id,
+    edition: "Limited Edition",
+    abv: 46.0,
+    statedAge: null,
+    releaseYear: 2021,
+    vintageYear: null,
+  });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  // Update the bottle name
+  await caller.bottleUpdate({
+    bottle: bottle.id,
+    name: "New Name",
+  });
+
+  // Verify the releases were updated
+  const [updatedRelease1] = await db
+    .select()
+    .from(bottleReleases)
+    .where(eq(bottleReleases.id, release1.id));
+
+  const [updatedRelease2] = await db
+    .select()
+    .from(bottleReleases)
+    .where(eq(bottleReleases.id, release2.id));
+
+  // Check first release
+  expect(updatedRelease1.name).toBe(
+    "New Name - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV",
+  );
+  expect(updatedRelease1.fullName).toBe(
+    `${brand.name} New Name - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV`,
+  );
+
+  // Check second release
+  expect(updatedRelease2.name).toBe(
+    "New Name - Limited Edition - 2021 Release - 46.0% ABV",
+  );
+  expect(updatedRelease2.fullName).toBe(
+    `${brand.name} New Name - Limited Edition - 2021 Release - 46.0% ABV`,
+  );
+});
+
+test("updates associated bottle releases when brand changes", async ({
+  fixtures,
+}) => {
+  const oldBrand = await fixtures.Entity();
+  const newBrand = await fixtures.Entity();
+  const bottle = await fixtures.Bottle({
+    brandId: oldBrand.id,
+    name: "Test Bottle",
+    statedAge: null,
+  });
+
+  // Create a release
+  const release = await fixtures.BottleRelease({
+    bottleId: bottle.id,
+    edition: "Special Edition",
+    abv: 45.0,
+    statedAge: null,
+    vintageYear: null,
+    releaseYear: null,
+  });
+
+  const caller = createCaller({
+    user: await fixtures.User({ mod: true }),
+  });
+
+  // Update the bottle brand
+  await caller.bottleUpdate({
+    bottle: bottle.id,
+    brand: newBrand.id,
+  });
+
+  // Verify the release was updated
+  const [updatedRelease] = await db
+    .select()
+    .from(bottleReleases)
+    .where(eq(bottleReleases.id, release.id));
+
+  expect(updatedRelease.name).toBe("Test Bottle - Special Edition - 45.0% ABV");
+  expect(updatedRelease.fullName).toBe(
+    `${newBrand.name} Test Bottle - Special Edition - 45.0% ABV`,
+  );
 });
