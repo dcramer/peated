@@ -1,6 +1,7 @@
 import { db as defaultDb, type AnyDatabase } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleReleases,
   bottleTags,
   bottleTombstones,
   bottles,
@@ -11,9 +12,10 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import { formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { inArray, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 
 // TODO: this should happen async
 export default async function mergeBottle({
@@ -28,6 +30,16 @@ export default async function mergeBottle({
   console.log(
     `Merging bottles ${fromBottleIds.join(", ")} into ${toBottleId}.`,
   );
+
+  // Get the target bottle to get its name for release updates
+  const [targetBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, toBottleId));
+
+  if (!targetBottle) {
+    throw new Error(`Target bottle ${toBottleId} not found`);
+  }
 
   // TODO: this doesnt handle duplicate bottles
   await db.transaction(async (tx) => {
@@ -73,6 +85,40 @@ export default async function mergeBottle({
         bottleId: toBottleId,
       })
       .where(inArray(bottleAliases.bottleId, fromBottleIds));
+
+    // Update bottle releases with new fullName
+    const releases = await tx.query.bottleReleases.findMany({
+      where: inArray(bottleReleases.bottleId, fromBottleIds),
+    });
+
+    for (const release of releases) {
+      const newName = formatReleaseName({
+        name: targetBottle.name,
+        edition: release.edition,
+        abv: release.abv,
+        statedAge: release.statedAge,
+        releaseYear: release.releaseYear,
+        vintageYear: release.vintageYear,
+      });
+
+      const newFullName = formatReleaseName({
+        name: targetBottle.fullName,
+        edition: release.edition,
+        abv: release.abv,
+        statedAge: release.statedAge,
+        releaseYear: release.releaseYear,
+        vintageYear: release.vintageYear,
+      });
+
+      await tx
+        .update(bottleReleases)
+        .set({
+          bottleId: toBottleId,
+          name: newName,
+          fullName: newFullName,
+        })
+        .where(eq(bottleReleases.id, release.id));
+    }
 
     for (const id of fromBottleIds) {
       await tx.insert(bottleTombstones).values({
