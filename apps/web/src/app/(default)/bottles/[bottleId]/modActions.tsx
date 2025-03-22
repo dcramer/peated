@@ -37,6 +37,9 @@ export default function ModActions({ bottle }: { bottle: Bottle }) {
         <MenuItem as={Link} href={`/bottles/${bottle.id}/aliases`}>
           View Aliases
         </MenuItem>
+        <MenuItem as={Link} href={`/bottles/${bottle.id}/addRelease`}>
+          Add Release
+        </MenuItem>
         <MenuItem as={Link} href={`/bottles/${bottle.id}/edit`}>
           Edit Bottle
         </MenuItem>
