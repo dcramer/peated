@@ -3,7 +3,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authedProcedure } from "..";
 import { db } from "../../db";
-import { bottleReleases, bottles } from "../../db/schema";
+import { bottleReleases, bottles, changes } from "../../db/schema";
 import { formatReleaseName } from "../../lib/format";
 import { BottleReleaseInputSchema } from "../../schemas/bottleReleases";
 import { serialize } from "../../serializers";
@@ -126,6 +126,18 @@ export default authedProcedure
           createdById: ctx.user.id,
         })
         .returning();
+
+      // Create change record
+      await tx.insert(changes).values({
+        objectType: "bottle_release",
+        objectId: release.id,
+        createdById: ctx.user.id,
+        displayName: release.fullName,
+        type: "add",
+        data: {
+          ...release,
+        },
+      });
 
       // Increment the numReleases counter on the bottle
       await tx

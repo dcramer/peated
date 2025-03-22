@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { db } from "../../db";
-import { bottleReleases, bottles } from "../../db/schema";
+import { bottleReleases, bottles, changes } from "../../db/schema";
 import waitError from "../../lib/test/waitError";
 import { createCaller } from "../router";
 
@@ -78,6 +78,22 @@ describe("bottleReleaseCreate", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.numReleases).toBe(1);
+
+    // Verify change record was created
+    const [change] = await db
+      .select()
+      .from(changes)
+      .where(
+        and(
+          eq(changes.objectType, "bottle_release"),
+          eq(changes.objectId, release.id),
+          eq(changes.createdById, defaults.user.id),
+        ),
+      );
+
+    expect(change).toBeDefined();
+    expect(change.type).toBe("add");
+    expect(change.displayName).toBe(release.fullName);
   });
 
   it("creates a new release for a bottle with statedAge", async function ({
@@ -150,6 +166,22 @@ describe("bottleReleaseCreate", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.numReleases).toBe(1);
+
+    // Verify change record was created
+    const [change] = await db
+      .select()
+      .from(changes)
+      .where(
+        and(
+          eq(changes.objectType, "bottle_release"),
+          eq(changes.objectId, release.id),
+          eq(changes.createdById, defaults.user.id),
+        ),
+      );
+
+    expect(change).toBeDefined();
+    expect(change.type).toBe("add");
+    expect(change.displayName).toBe(release.fullName);
   });
 
   it("throws error if release statedAge differs from bottle statedAge", async function ({
