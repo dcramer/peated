@@ -5,6 +5,7 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import Link from "@peated/web/components/link";
 import Table from "@peated/web/components/table";
 import type { RouterOutputs } from "@peated/web/lib/trpc/client";
+import ModActions from "./modActions";
 
 export default function ReleaseTable({
   bottleId,
@@ -73,6 +74,15 @@ export default function ReleaseTable({
           value: (item) => (item.avgRating ? item.avgRating.toFixed(2) : null),
           className: "sm:w-1/8 hidden sm:table-cell",
           sortDefaultOrder: "desc",
+        },
+        {
+          name: "actions",
+          title: "",
+          align: "right",
+          value: (item) => {
+            return <ModActions release={item} />;
+          },
+          className: "sm:w-1/8 hidden sm:table-cell",
         },
       ]}
     />

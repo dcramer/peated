@@ -160,8 +160,8 @@ export default function Table<
                     <td
                       key={col.name}
                       className={classNames(
-                        "group relative flex items-center gap-x-2 p-3",
-                        colN !== 0 ? "hidden sm:table-cell" : "",
+                        "group relative items-center gap-x-2 p-3",
+                        colN !== 0 ? "hidden sm:table-cell" : "table-cell",
                         colAlign === "left"
                           ? "text-left"
                           : colAlign === "center"
