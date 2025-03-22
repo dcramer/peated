@@ -20,12 +20,14 @@ export function formatBottleName({
 export function formatReleaseName({
   name, // bottle name / express name
   edition,
+  abv,
   statedAge,
   releaseYear,
   vintageYear,
 }: {
   name?: string | null | undefined;
   edition?: string | null | undefined;
+  abv?: number | null | undefined;
   statedAge?: number | null | undefined;
   releaseYear?: number | null | undefined;
   vintageYear?: number | null | undefined;
@@ -36,7 +38,8 @@ export function formatReleaseName({
   if (statedAge) bits.push(`${statedAge}-year-old`);
   if (releaseYear) bits.push(`${releaseYear} Release`);
   if (vintageYear) bits.push(`${vintageYear} Vintage`);
-  return bits.join(" ");
+  if (abv) bits.push(`${abv.toFixed(1)}% ABV`);
+  return bits.join(" - ");
 }
 
 export function formatCategoryName(

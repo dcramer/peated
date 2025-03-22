@@ -20,7 +20,7 @@ export default function ReleaseTable({
           We're not aware of any named releases of this bottling.
         </div>
         <div className="mt-4">
-          <Button href={`/addRelease?bottle=${bottleId}`} color="primary">
+          <Button href={`/bottles/${bottleId}/addRelease`} color="primary">
             Add Release
           </Button>
         </div>
@@ -36,19 +36,8 @@ export default function ReleaseTable({
       columns={[
         { name: "name", sort: "name", sortDefaultOrder: "asc" },
         {
-          name: "tastings",
-          value: (item) => item.totalTastings.toLocaleString(),
-          className: "sm:w-1/6",
-          sortDefaultOrder: "desc",
-        },
-        {
-          name: "rating",
-          value: (item) => (item.avgRating ? item.avgRating.toFixed(2) : null),
-          className: "sm:w-1/6",
-          sortDefaultOrder: "desc",
-        },
-        {
           name: "age",
+          sort: "statedAge",
           value: (item) =>
             item.statedAge ? (
               <Link
@@ -56,7 +45,33 @@ export default function ReleaseTable({
                 href={`/bottles/?age=${item.statedAge}`}
               >{`${item.statedAge} years`}</Link>
             ) : null,
-          className: "sm:w-1/6",
+          className: "sm:w-1/8",
+          sortDefaultOrder: "desc",
+        },
+        {
+          name: "vintageYear",
+          sort: "vintageYear",
+          title: "Vintage",
+          className: "sm:w-1/8",
+          sortDefaultOrder: "desc",
+        },
+        {
+          name: "releaseYear",
+          sort: "releaseYear",
+          title: "Release",
+          className: "sm:w-1/8",
+          sortDefaultOrder: "desc",
+        },
+        {
+          name: "tastings",
+          value: (item) => item.totalTastings.toLocaleString(),
+          className: "sm:w-1/8 hidden sm:table-cell",
+          sortDefaultOrder: "desc",
+        },
+        {
+          name: "rating",
+          value: (item) => (item.avgRating ? item.avgRating.toFixed(2) : null),
+          className: "sm:w-1/8 hidden sm:table-cell",
           sortDefaultOrder: "desc",
         },
       ]}

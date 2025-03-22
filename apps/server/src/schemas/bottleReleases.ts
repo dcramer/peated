@@ -138,6 +138,5 @@ export const BottleReleaseInputSchema = BottleReleaseSchema.omit({
     .max(100)
     .nullable()
     .default(null)
-    .optional()
     .describe("Alcohol by volume percentage"),
 });
