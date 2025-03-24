@@ -43,116 +43,126 @@ export default async function mergeBottle({
 
   // TODO: this doesnt handle duplicate bottles
   await db.transaction(async (tx) => {
-    await tx
-      .update(tastings)
-      .set({
-        bottleId: toBottleId,
-      })
-      .where(inArray(tastings.bottleId, fromBottleIds));
+    await Promise.all([
+      tx
+        .update(tastings)
+        .set({
+          bottleId: toBottleId,
+        })
+        .where(inArray(tastings.bottleId, fromBottleIds)),
 
-    await tx
-      .update(storePrices)
-      .set({
-        bottleId: toBottleId,
-      })
-      .where(inArray(storePrices.bottleId, fromBottleIds));
+      tx
+        .update(storePrices)
+        .set({
+          bottleId: toBottleId,
+        })
+        .where(inArray(storePrices.bottleId, fromBottleIds)),
 
-    await tx
-      .update(reviews)
-      .set({
-        bottleId: toBottleId,
-      })
-      .where(inArray(reviews.bottleId, fromBottleIds));
+      tx
+        .update(reviews)
+        .set({
+          bottleId: toBottleId,
+        })
+        .where(inArray(reviews.bottleId, fromBottleIds)),
 
-    await tx
-      .update(flightBottles)
-      .set({
-        bottleId: toBottleId,
-      })
-      .where(inArray(flightBottles.bottleId, fromBottleIds));
+      tx
+        .update(flightBottles)
+        .set({
+          bottleId: toBottleId,
+        })
+        .where(inArray(flightBottles.bottleId, fromBottleIds)),
 
-    await tx
-      .update(collectionBottles)
-      .set({
-        bottleId: toBottleId,
-      })
-      .where(inArray(collectionBottles.bottleId, fromBottleIds));
+      tx
+        .update(collectionBottles)
+        .set({
+          bottleId: toBottleId,
+        })
+        .where(inArray(collectionBottles.bottleId, fromBottleIds)),
 
-    // TODO: handle conflicts
-    await tx
-      .update(bottleAliases)
-      .set({
-        bottleId: toBottleId,
-      })
-      .where(inArray(bottleAliases.bottleId, fromBottleIds));
+      // TODO: handle conflicts
+      tx
+        .update(bottleAliases)
+        .set({
+          bottleId: toBottleId,
+        })
+        .where(inArray(bottleAliases.bottleId, fromBottleIds)),
+    ]);
 
     // Update bottle releases with new fullName
     const releases = await tx.query.bottleReleases.findMany({
       where: inArray(bottleReleases.bottleId, fromBottleIds),
     });
 
-    for (const release of releases) {
-      const newName = formatReleaseName({
-        name: targetBottle.name,
-        edition: release.edition,
-        abv: release.abv,
-        statedAge: release.statedAge,
-        releaseYear: release.releaseYear,
-        vintageYear: release.vintageYear,
-      });
+    await Promise.all(
+      releases.map(async (release) => {
+        const newName = formatReleaseName({
+          name: targetBottle.name,
+          edition: release.edition,
+          abv: release.abv,
+          statedAge: release.statedAge,
+          releaseYear: release.releaseYear,
+          vintageYear: release.vintageYear,
+        });
 
-      const newFullName = formatReleaseName({
-        name: targetBottle.fullName,
-        edition: release.edition,
-        abv: release.abv,
-        statedAge: release.statedAge,
-        releaseYear: release.releaseYear,
-        vintageYear: release.vintageYear,
-      });
+        const newFullName = formatReleaseName({
+          name: targetBottle.fullName,
+          edition: release.edition,
+          abv: release.abv,
+          statedAge: release.statedAge,
+          releaseYear: release.releaseYear,
+          vintageYear: release.vintageYear,
+        });
 
-      await tx
-        .update(bottleReleases)
-        .set({
-          bottleId: toBottleId,
-          name: newName,
-          fullName: newFullName,
-        })
-        .where(eq(bottleReleases.id, release.id));
-    }
+        return tx
+          .update(bottleReleases)
+          .set({
+            bottleId: toBottleId,
+            name: newName,
+            fullName: newFullName,
+          })
+          .where(eq(bottleReleases.id, release.id));
+      }),
+    );
 
-    for (const id of fromBottleIds) {
-      await tx.insert(bottleTombstones).values({
-        bottleId: id,
-        newBottleId: toBottleId,
-      });
-    }
+    await Promise.all(
+      fromBottleIds.map((id) =>
+        tx.insert(bottleTombstones).values({
+          bottleId: id,
+          newBottleId: toBottleId,
+        }),
+      ),
+    );
 
     const existingTags = await tx.query.bottleTags.findMany({
       where: inArray(bottleTags.bottleId, fromBottleIds),
     });
-    for (const row of existingTags) {
-      await tx
-        .insert(bottleTags)
-        .values({
-          bottleId: toBottleId,
-          tag: row.tag,
-          count: row.count,
-        })
-        .onConflictDoUpdate({
-          target: [bottleTags.bottleId, bottleTags.tag],
-          set: {
-            count: sql<number>`${bottleTags.count} + 1`,
-          },
-        });
-    }
+
+    await Promise.all(
+      existingTags.map((row) =>
+        tx
+          .insert(bottleTags)
+          .values({
+            bottleId: toBottleId,
+            tag: row.tag,
+            count: row.count,
+          })
+          .onConflictDoUpdate({
+            target: [bottleTags.bottleId, bottleTags.tag],
+            set: {
+              count: sql<number>`${bottleTags.count} + 1`,
+            },
+          }),
+      ),
+    );
 
     // wipe old bottles
-    await tx
-      .delete(bottleTags)
-      .where(inArray(bottleTags.bottleId, fromBottleIds));
-    await tx
-      .delete(bottlesToDistillers)
-      .where(inArray(bottlesToDistillers.bottleId, fromBottleIds));
+    await Promise.all([
+      tx.delete(bottleTags).where(inArray(bottleTags.bottleId, fromBottleIds)),
+      tx
+        .delete(bottlesToDistillers)
+        .where(inArray(bottlesToDistillers.bottleId, fromBottleIds)),
+    ]);
+
     await tx.delete(bottles).where(inArray(bottles.id, fromBottleIds));
   });
 

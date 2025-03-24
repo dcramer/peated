@@ -98,8 +98,14 @@ test("delete bottle with release", async ({ fixtures, defaults }) => {
 
 test("only deletes specific release", async ({ fixtures, defaults }) => {
   const bottle = await fixtures.Bottle();
-  const release1 = await fixtures.BottleRelease({ bottleId: bottle.id });
-  const release2 = await fixtures.BottleRelease({ bottleId: bottle.id });
+  const release1 = await fixtures.BottleRelease({
+    bottleId: bottle.id,
+    edition: "A",
+  });
+  const release2 = await fixtures.BottleRelease({
+    bottleId: bottle.id,
+    edition: "B",
+  });
   const collection = await fixtures.Collection({
     name: "default",
     createdById: defaults.user.id,

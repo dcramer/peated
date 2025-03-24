@@ -98,37 +98,44 @@ export default verifiedProcedure
       }
 
       // TODO: handle existing duplicate
-      await tx.insert(entityAliases).values({
-        entityId: entity.id,
-        name: entity.name,
-        createdAt: entity.createdAt,
-      });
+      const promises: Promise<any>[] = [
+        tx.insert(entityAliases).values({
+          entityId: entity.id,
+          name: entity.name,
+          createdAt: entity.createdAt,
+        }),
+        tx.insert(changes).values({
+          objectType: "entity",
+          objectId: entity.id,
+          displayName: entity.name,
+          type: "add",
+          createdAt: entity.createdAt,
+          createdById: user.id,
+          data: data,
+        }),
+      ];
 
       if (entity.shortName) {
-        await tx.insert(entityAliases).values({
-          entityId: entity.id,
-          name: entity.shortName,
-          createdAt: entity.createdAt,
-        });
+        promises.push(
+          tx.insert(entityAliases).values({
+            entityId: entity.id,
+            name: entity.shortName,
+            createdAt: entity.createdAt,
+          }),
+        );
       }
 
       if (entity.name.startsWith("The ")) {
-        await tx.insert(entityAliases).values({
-          entityId: entity.id,
-          name: entity.name.substring(4),
-          createdAt: entity.createdAt,
-        });
+        promises.push(
+          tx.insert(entityAliases).values({
+            entityId: entity.id,
+            name: entity.name.substring(4),
+            createdAt: entity.createdAt,
+          }),
+        );
       }
 
-      await tx.insert(changes).values({
-        objectType: "entity",
-        objectId: entity.id,
-        displayName: entity.name,
-        type: "add",
-        createdAt: entity.createdAt,
-        createdById: user.id,
-        data: data,
-      });
+      await Promise.all(promises);
 
       return entity;
     });

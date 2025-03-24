@@ -177,25 +177,32 @@ export async function bottleCreate({
 
     newAliases.push(alias.name);
 
+    // TODO: type, but who cares
+    const promises: Promise<any>[] = [
+      tx.insert(changes).values({
+        objectType: "bottle",
+        objectId: bottle.id,
+        createdAt: bottle.createdAt,
+        createdById: user.id,
+        displayName: bottle.fullName,
+        type: "add",
+        data: {
+          ...bottle,
+          distillerIds,
+        },
+      }),
+    ];
+
     for (const distillerId of distillerIds) {
-      await tx.insert(bottlesToDistillers).values({
-        bottleId: bottle.id,
-        distillerId,
-      });
+      promises.push(
+        tx.insert(bottlesToDistillers).values({
+          bottleId: bottle.id,
+          distillerId,
+        }),
+      );
     }
 
-    await tx.insert(changes).values({
-      objectType: "bottle",
-      objectId: bottle.id,
-      createdAt: bottle.createdAt,
-      createdById: user.id,
-      displayName: bottle.fullName,
-      type: "add",
-      data: {
-        ...bottle,
-        distillerIds,
-      },
-    });
+    await Promise.all(promises);
 
     return bottle;
   });

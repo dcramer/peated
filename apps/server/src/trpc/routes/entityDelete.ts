@@ -27,21 +27,24 @@ export default adminProcedure.input(z.number()).mutation(async function ({
   }
 
   await db.transaction(async (tx) => {
-    await tx.insert(changes).values({
-      objectType: "entity",
-      objectId: entity.id,
-      createdById: ctx.user.id,
-      displayName: entity.name,
-      type: "delete",
-      data: {
-        ...entity,
-      },
-    });
+    await Promise.all([
+      tx.insert(changes).values({
+        objectType: "entity",
+        objectId: entity.id,
+        createdById: ctx.user.id,
+        displayName: entity.name,
+        type: "delete",
+        data: {
+          ...entity,
+        },
+      }),
 
-    await tx.delete(entityAliases).where(eq(entityAliases.entityId, entity.id));
-    await tx.insert(entityTombstones).values({
-      entityId: entity.id,
-    });
+      tx.delete(entityAliases).where(eq(entityAliases.entityId, entity.id)),
+
+      tx.insert(entityTombstones).values({
+        entityId: entity.id,
+      }),
+    ]);
 
     await tx.delete(entities).where(eq(entities.id, entity.id));
   });

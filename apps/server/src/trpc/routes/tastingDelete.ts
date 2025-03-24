@@ -36,51 +36,53 @@ export default authedProcedure.input(z.number()).mutation(async function ({
   }
 
   await db.transaction(async (tx) => {
-    await tx
-      .delete(notifications)
-      .where(
-        and(
-          eq(notifications.type, "toast"),
-          inArray(
-            notifications.objectId,
-            sql`(SELECT ${toasts.id} FROM ${toasts} WHERE ${toasts.tastingId} = ${tasting.id})`,
-          ),
-        ),
-      );
-
-    await tx.delete(toasts).where(eq(toasts.tastingId, tasting.id));
-    await tx.delete(tastings).where(eq(tastings.id, tasting.id));
-    // TODO: this probably should undo the badges...
-    await tx
-      .delete(tastingBadgeAwards)
-      .where(eq(tastingBadgeAwards.tastingId, tasting.id));
-
-    // update aggregates after tasting row is removed
-    for (const tag of tasting.tags) {
-      await tx
-        .update(bottleTags)
-        .set({
-          count: sql`${bottleTags.count} - 1`,
-        })
+    await Promise.all([
+      tx
+        .delete(notifications)
         .where(
           and(
-            eq(bottleTags.bottleId, tasting.bottleId),
-            eq(bottleTags.tag, tag),
-            gt(bottleTags.count, 0),
+            eq(notifications.type, "toast"),
+            inArray(
+              notifications.objectId,
+              sql`(SELECT ${toasts.id} FROM ${toasts} WHERE ${toasts.tastingId} = ${tasting.id})`,
+            ),
           ),
-        );
-    }
+        ),
 
-    await tx
-      .update(bottles)
-      .set({
-        totalTastings: sql`${bottles.totalTastings} - 1`,
-        avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
-      })
-      .where(eq(bottles.id, tasting.bottleId));
+      tx.delete(toasts).where(eq(toasts.tastingId, tasting.id)),
 
+      tx
+        .delete(tastingBadgeAwards)
+        .where(eq(tastingBadgeAwards.tastingId, tasting.id)),
+
+      ...tasting.tags.map((tag) =>
+        tx
+          .update(bottleTags)
+          .set({
+            count: sql`${bottleTags.count} - 1`,
+          })
+          .where(
+            and(
+              eq(bottleTags.bottleId, tasting.bottleId),
+              eq(bottleTags.tag, tag),
+              gt(bottleTags.count, 0),
+            ),
+          ),
+      ),
+
+      tx
+        .update(bottles)
+        .set({
+          totalTastings: sql`${bottles.totalTastings} - 1`,
+          avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.id} != ${tasting.id})`,
+        })
+        .where(eq(bottles.id, tasting.bottleId)),
+    ]);
+
+    // TODO: delete the image from storage
     // TODO: update badge qualifiers
     // TODO: update entities.totalTastings
+    await tx.delete(tastings).where(eq(tastings.id, tasting.id));
   });
 
   return {};

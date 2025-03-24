@@ -145,37 +145,38 @@ export default authedProcedure
 
       const distillerIds = bottle.bottlesToDistillers.map((d) => d.distillerId);
 
-      await tx
-        .update(entities)
-        .set({ totalTastings: sql`${entities.totalTastings} + 1` })
-        .where(
-          inArray(
-            entities.id,
-            Array.from(
-              new Set(
-                [bottle.brandId, ...distillerIds, bottle.bottlerId].filter(
-                  notEmpty,
+      await Promise.all([
+        tx
+          .update(entities)
+          .set({ totalTastings: sql`${entities.totalTastings} + 1` })
+          .where(
+            inArray(
+              entities.id,
+              Array.from(
+                new Set(
+                  [bottle.brandId, ...distillerIds, bottle.bottlerId].filter(
+                    notEmpty,
+                  ),
                 ),
               ),
             ),
           ),
-        );
-
-      for (const tag of tasting.tags) {
-        await tx
-          .insert(bottleTags)
-          .values({
-            bottleId: bottle.id,
-            tag,
-            count: 1,
-          })
-          .onConflictDoUpdate({
-            target: [bottleTags.bottleId, bottleTags.tag],
-            set: {
-              count: sql<number>`${bottleTags.count} + 1`,
-            },
-          });
-      }
+        ...tasting.tags.map((tag) =>
+          tx
+            .insert(bottleTags)
+            .values({
+              bottleId: bottle.id,
+              tag,
+              count: 1,
+            })
+            .onConflictDoUpdate({
+              target: [bottleTags.bottleId, bottleTags.tag],
+              set: {
+                count: sql<number>`${bottleTags.count} + 1`,
+              },
+            }),
+        ),
+      ]);
 
       const awards = await awardAllBadgeXp(tx, {
         ...tasting,

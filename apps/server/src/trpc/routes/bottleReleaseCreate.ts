@@ -127,25 +127,27 @@ export default authedProcedure
         })
         .returning();
 
-      // Create change record
-      await tx.insert(changes).values({
-        objectType: "bottle_release",
-        objectId: release.id,
-        createdById: ctx.user.id,
-        displayName: release.fullName,
-        type: "add",
-        data: {
-          ...release,
-        },
-      });
+      await Promise.all([
+        // Create change record
+        tx.insert(changes).values({
+          objectType: "bottle_release",
+          objectId: release.id,
+          createdById: ctx.user.id,
+          displayName: release.fullName,
+          type: "add",
+          data: {
+            ...release,
+          },
+        }),
 
-      // Increment the numReleases counter on the bottle
-      await tx
-        .update(bottles)
-        .set({
-          numReleases: sql`${bottles.numReleases} + 1`,
-        })
-        .where(eq(bottles.id, input.bottleId));
+        // Increment the numReleases counter on the bottle
+        tx
+          .update(bottles)
+          .set({
+            numReleases: sql`${bottles.numReleases} + 1`,
+          })
+          .where(eq(bottles.id, input.bottleId)),
+      ]);
     });
 
     if (!release) {
