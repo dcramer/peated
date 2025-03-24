@@ -2,20 +2,36 @@ import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleReleases,
   bottles,
+  changes,
+  collectionBottles,
   entities,
+  flightBottles,
   reviews,
+  tastings,
 } from "@peated/server/db/schema";
 import { findEntity } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import {
   formatBottleName,
   formatCategoryName,
+  formatReleaseName,
 } from "@peated/server/lib/format";
 import { normalizeBottle } from "@peated/server/lib/normalize";
 import { createCaller } from "@peated/server/trpc/router";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 
 const subcommand = program.command("bottles");
 
@@ -312,3 +328,108 @@ subcommand
       offset += step;
     }
   });
+
+subcommand.command("migrate-releases").action(async (options) => {
+  const step = 1000;
+  const baseQuery = db
+    .select({
+      bottle: bottles,
+      brand: entities,
+    })
+    .from(bottles)
+    .innerJoin(entities, eq(bottles.brandId, entities.id))
+    .where(
+      or(
+        isNotNull(bottles.releaseYear),
+        isNotNull(bottles.vintageYear),
+        isNotNull(bottles.edition),
+      ),
+    )
+    .orderBy(asc(bottles.createdAt));
+
+  let hasResults = true;
+  let offset = 0;
+  while (hasResults) {
+    hasResults = false;
+    const query = await baseQuery.offset(offset).limit(step);
+
+    for (const { brand, bottle } of query) {
+      const name = formatReleaseName({
+        name: bottle.name,
+        releaseYear: bottle.releaseYear ?? undefined,
+        vintageYear: bottle.vintageYear ?? undefined,
+        edition: bottle.edition ?? undefined,
+      });
+      const fullName = formatReleaseName({
+        name: bottle.fullName,
+        releaseYear: bottle.releaseYear ?? undefined,
+        vintageYear: bottle.vintageYear ?? undefined,
+        edition: bottle.edition ?? undefined,
+      });
+
+      await db.transaction(async (tx) => {
+        const [release] = await tx
+          .insert(bottleReleases)
+          .values({
+            bottleId: bottle.id,
+            name,
+            fullName,
+            caskStrength: bottle.caskStrength,
+            caskFill: bottle.caskFill,
+            caskSize: bottle.caskSize,
+            statedAge: bottle.statedAge,
+            vintageYear: bottle.vintageYear,
+            releaseYear: bottle.releaseYear,
+            edition: bottle.edition,
+            createdAt: bottle.createdAt,
+            updatedAt: sql`NOW()`,
+            createdById: bottle.createdById,
+          })
+          .returning();
+
+        await Promise.all([
+          tx.insert(changes).values({
+            objectType: "bottle_release",
+            objectId: release.id,
+            createdById: bottle.createdById,
+            displayName: release.name,
+            data: {
+              ...release,
+            },
+          }),
+
+          tx
+            .update(tastings)
+            .set({
+              releaseId: release.id,
+            })
+            .where(eq(tastings.bottleId, bottle.id)),
+
+          tx
+            .update(collectionBottles)
+            .set({
+              releaseId: release.id,
+            })
+            .where(eq(collectionBottles.bottleId, bottle.id)),
+
+          tx
+            .update(flightBottles)
+            .set({
+              releaseId: release.id,
+            })
+            .where(eq(flightBottles.bottleId, bottle.id)),
+
+          tx
+            .update(bottleAliases)
+            .set({
+              releaseId: release.id,
+            })
+            .where(eq(bottleAliases.bottleId, bottle.id)),
+        ]);
+      });
+
+      hasResults = true;
+    }
+    offset += step;
+  }
+});
