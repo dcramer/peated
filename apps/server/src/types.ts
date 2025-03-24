@@ -6,6 +6,7 @@ import type {
   BadgeFormulaEnum,
   BadgeSchema,
   BadgeTrackerEnum,
+  BottleReleaseSchema,
   BottleSchema,
   CaskFillEnum,
   CaskSizeEnum,
@@ -65,6 +66,7 @@ export type Badge = z.infer<typeof BadgeSchema>;
 export type BadgeAward = z.infer<typeof BadgeAwardSchema>;
 export type BadgeCheck = z.infer<typeof BadgeCheckSchema>;
 export type Bottle = z.infer<typeof BottleSchema>;
+export type BottleRelease = z.infer<typeof BottleReleaseSchema>;
 export type Change = z.infer<typeof ChangeSchema>;
 export type Collection = z.infer<typeof CollectionSchema>;
 export type CollectionBottle = z.infer<typeof CollectionBottleSchema>;
