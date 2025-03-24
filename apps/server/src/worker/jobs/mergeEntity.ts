@@ -83,64 +83,70 @@ export default async function mergeEntity({
           .from(bottleReleases)
           .where(eq(bottleReleases.bottleId, bottle.id));
 
-        for (const release of releases) {
-          const newName = formatReleaseName({
-            name: bottle.name,
-            edition: release.edition,
-            abv: release.abv,
-            statedAge: bottle.statedAge ? null : release.statedAge,
-            releaseYear: release.releaseYear,
-            vintageYear: release.vintageYear,
-          });
+        await Promise.all(
+          releases.map(async (release) => {
+            const newName = formatReleaseName({
+              name: bottle.name,
+              edition: release.edition,
+              abv: release.abv,
+              statedAge: bottle.statedAge ? null : release.statedAge,
+              releaseYear: release.releaseYear,
+              vintageYear: release.vintageYear,
+            });
 
-          const newFullName = formatReleaseName({
-            name: fullName,
-            edition: release.edition,
-            abv: release.abv,
-            statedAge: bottle.statedAge ? null : release.statedAge,
-            releaseYear: release.releaseYear,
-            vintageYear: release.vintageYear,
-          });
+            const newFullName = formatReleaseName({
+              name: fullName,
+              edition: release.edition,
+              abv: release.abv,
+              statedAge: bottle.statedAge ? null : release.statedAge,
+              releaseYear: release.releaseYear,
+              vintageYear: release.vintageYear,
+            });
 
-          await tx
-            .update(bottleReleases)
-            .set({
-              name: newName,
-              fullName: newFullName,
-            })
-            .where(eq(bottleReleases.id, release.id));
-        }
+            return tx
+              .update(bottleReleases)
+              .set({
+                name: newName,
+                fullName: newFullName,
+              })
+              .where(eq(bottleReleases.id, release.id));
+          }),
+        );
       }
       updatedBottleIds.push(bottle.id);
     }
 
-    await tx
-      .update(bottles)
-      .set({
-        bottlerId: toEntity.id,
-      })
-      .where(inArray(bottles.bottlerId, fromEntityIds));
+    await Promise.all([
+      tx
+        .update(bottles)
+        .set({
+          bottlerId: toEntity.id,
+        })
+        .where(inArray(bottles.bottlerId, fromEntityIds)),
 
-    await tx
-      .update(entityAliases)
-      .set({
-        entityId: toEntity.id,
-      })
-      .where(inArray(entityAliases.entityId, fromEntityIds));
+      tx
+        .update(entityAliases)
+        .set({
+          entityId: toEntity.id,
+        })
+        .where(inArray(entityAliases.entityId, fromEntityIds)),
 
-    await tx
-      .update(bottlesToDistillers)
-      .set({
-        distillerId: toEntity.id,
-      })
-      .where(inArray(bottlesToDistillers.distillerId, fromEntityIds));
+      tx
+        .update(bottlesToDistillers)
+        .set({
+          distillerId: toEntity.id,
+        })
+        .where(inArray(bottlesToDistillers.distillerId, fromEntityIds)),
+    ]);
 
-    for (const id of fromEntityIds) {
-      await tx.insert(entityTombstones).values({
-        entityId: id,
-        newEntityId: toEntity.id,
-      });
-    }
+    await Promise.all(
+      fromEntityIds.map((id) =>
+        tx.insert(entityTombstones).values({
+          entityId: id,
+          newEntityId: toEntity.id,
+        }),
+      ),
+    );
 
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
   });

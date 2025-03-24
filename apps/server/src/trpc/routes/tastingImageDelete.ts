@@ -31,6 +31,7 @@ export default authedProcedure
       });
     }
 
+    // TODO: delete the image from storage
     await db
       .update(tastings)
       .set({

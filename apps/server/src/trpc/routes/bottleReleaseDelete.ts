@@ -30,48 +30,48 @@ export default adminProcedure.input(z.number()).mutation(async function ({
   }
 
   await db.transaction(async (tx) => {
-    // Log the deletion in changes table
-    await tx.insert(changes).values({
-      objectType: "bottle_release",
-      objectId: release.bottleId,
-      createdById: ctx.user.id,
-      displayName: release.fullName,
-      type: "delete",
-      data: release,
-    });
+    await Promise.all([
+      // Log the deletion in changes table
+      tx.insert(changes).values({
+        objectType: "bottle_release",
+        objectId: release.bottleId,
+        createdById: ctx.user.id,
+        displayName: release.fullName,
+        type: "delete",
+        data: release,
+      }),
 
-    // Update bottle aliases to remove release reference
-    await tx
-      .update(bottleAliases)
-      .set({ releaseId: null })
-      .where(eq(bottleAliases.releaseId, release.id));
+      // Update bottle aliases to remove release reference
+      tx
+        .update(bottleAliases)
+        .set({ releaseId: null })
+        .where(eq(bottleAliases.releaseId, release.id)),
 
-    // Update collection bottles to remove release reference
-    await tx
-      .update(collectionBottles)
-      .set({ releaseId: null })
-      .where(eq(collectionBottles.releaseId, release.id));
+      // Update collection bottles to remove release reference
+      tx
+        .update(collectionBottles)
+        .set({ releaseId: null })
+        .where(eq(collectionBottles.releaseId, release.id)),
 
-    // Update flight bottles to remove release reference
-    await tx
-      .update(flightBottles)
-      .set({ releaseId: null })
-      .where(eq(flightBottles.releaseId, release.id));
+      // Update flight bottles to remove release reference
+      tx
+        .update(flightBottles)
+        .set({ releaseId: null })
+        .where(eq(flightBottles.releaseId, release.id)),
 
-    // Update tastings to remove release reference
-    await tx
-      .update(tastings)
-      .set({ releaseId: null })
-      .where(eq(tastings.releaseId, release.id));
-
+      // Update tastings to remove release reference
+      tx
+        .update(tastings)
+        .set({ releaseId: null })
+        .where(eq(tastings.releaseId, release.id)),
+    ]);
     // Delete the release
     const affected = await tx
       .delete(bottleReleases)
       .where(eq(bottleReleases.id, release.id))
       .returning({ id: bottleReleases.id });
 
-    if (affected.length > 0) {
-      // Decrement the numReleases counter on the bottle
+    if (affected.length !== 0) {
       await tx
         .update(bottles)
         .set({
