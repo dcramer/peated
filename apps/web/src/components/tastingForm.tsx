@@ -152,26 +152,28 @@ export default function TastingForm({
         isSubmitting={isSubmitting}
       >
         <Fieldset>
-          <Controller
-            name="release"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <ReleaseField
-                {...field}
-                error={errors.release}
-                label="Bottle Release"
-                helpText={TastingInputSchema.shape.release.description}
-                placeholder="e.g. Ardbeg Supernova 2013"
-                bottle={initialData.bottle.id}
-                onChange={(value) => {
-                  onChange(value?.id || value);
-                  setReleaseValue(value);
-                }}
-                canCreate
-                value={releaseValue}
-              />
-            )}
-          />
+          {!!releaseValue && (
+            <Controller
+              name="release"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <ReleaseField
+                  {...field}
+                  error={errors.release}
+                  label="Bottle Release"
+                  helpText={TastingInputSchema.shape.release.description}
+                  placeholder="e.g. Ardbeg Supernova 2013"
+                  bottle={initialData.bottle.id}
+                  onChange={(value) => {
+                    onChange(value?.id || value);
+                    setReleaseValue(value);
+                  }}
+                  canCreate
+                  value={releaseValue}
+                />
+              )}
+            />
+          )}
 
           <Controller
             name="rating"
