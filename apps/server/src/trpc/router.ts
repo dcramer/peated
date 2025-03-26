@@ -31,6 +31,7 @@ import bottleReleaseById from "./routes/bottleReleaseById";
 import bottleReleaseCreate from "./routes/bottleReleaseCreate";
 import bottleReleaseDelete from "./routes/bottleReleaseDelete";
 import bottleReleaseList from "./routes/bottleReleaseList";
+import bottleReleaseUpdate from "./routes/bottleReleaseUpdate";
 import bottleSuggestedTagList from "./routes/bottleSuggestedTagList";
 import bottleTagList from "./routes/bottleTagList";
 import bottleUpdate from "./routes/bottleUpdate";
@@ -154,6 +155,7 @@ export const appRouter = router({
   bottleReleaseCreate,
   bottleReleaseDelete,
   bottleReleaseList,
+  bottleReleaseUpdate,
   bottleSuggestedTagList,
   bottleTagList,
   bottleUpdate,

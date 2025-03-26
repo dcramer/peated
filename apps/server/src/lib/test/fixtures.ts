@@ -352,11 +352,8 @@ export const Bottle = async (
     });
 
     const bottleData: dbSchema.NewBottle = {
-      category: choose([...CATEGORY_LIST, null, null]),
-      statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
       createdAt: new Date(),
       updatedAt: new Date(),
-      series: choose([null, name]),
       ...data,
       name,
       fullName,
@@ -910,63 +907,6 @@ export const BottleRelease = async (
       bottleId: bottle.id,
       fullName,
       name,
-      statedAge: choose([null, null, null, null, 3, 10, 12, 15, 18, 20, 25]),
-      abv:
-        data.abv ??
-        choose([null, null, 40, 43, 46, 48.6, 50, 55.8, 58.9, 63.5]),
-      singleCask: data.singleCask ?? choose([null, null, true, false]),
-      caskStrength: data.caskStrength ?? choose([null, null, true, false]),
-      vintageYear:
-        data.vintageYear ??
-        choose([
-          null,
-          null,
-          null,
-          ...Array.from({ length: 20 }, (_, i) => 1990 + i),
-        ]),
-      releaseYear:
-        data.releaseYear ??
-        choose([
-          null,
-          null,
-          null,
-          ...Array.from({ length: 20 }, (_, i) => 2000 + i),
-        ]),
-      caskSize:
-        data.caskSize ??
-        choose([
-          null,
-          null,
-          "quarter_cask",
-          "barrel",
-          "hogshead",
-          "barrique",
-          "puncheon",
-          "butt",
-          "port_pipe",
-          "madeira_drum",
-        ]),
-      caskType:
-        data.caskType ??
-        choose([
-          null,
-          null,
-          "bourbon",
-          "amontilado",
-          "fino",
-          "oloroso",
-          "pedro_ximenez",
-          "madeira",
-          "tawny_port",
-          "ruby_port",
-        ]),
-      caskFill:
-        data.caskFill ??
-        choose([null, null, "1st_fill", "2nd_fill", "refill", "other"]),
-      description:
-        data.description ?? choose([null, null, faker.lorem.paragraph()]),
-      descriptionSrc:
-        data.descriptionSrc ?? choose([null, null, "user", "generated"]),
       createdAt: new Date(),
       updatedAt: new Date(),
       ...data,
