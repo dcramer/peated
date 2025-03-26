@@ -1,3 +1,4 @@
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 import ReleaseTable from "./releaseTable";
 
@@ -21,9 +22,16 @@ export default async function Page({
   params: { bottleId: string };
 }) {
   const trpcClient = await getTrpcClient();
-  const releaseList = await trpcClient.bottleReleaseList.fetch({
-    bottle: Number(bottleId),
+
+  const queryParams = useApiQueryParams({
+    numericFields: ["cursor", "limit"],
+    overrides: {
+      bottle: Number(bottleId),
+      limit: 100,
+    },
   });
+
+  const releaseList = await trpcClient.bottleReleaseList.fetch(queryParams);
 
   return (
     <div className="mt-6 px-3 lg:px-0">
