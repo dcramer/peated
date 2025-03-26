@@ -12,7 +12,7 @@ export default function BottleField({
       onQuery={async (query) => {
         const { results } = await trpcUtils.bottleList.fetch({ query });
         return results.map((r) => ({
-          name: r.fullName,
+          name: r.edition ? `${r.fullName} (${r.edition})` : r.fullName,
           id: r.id,
         }));
       }}
