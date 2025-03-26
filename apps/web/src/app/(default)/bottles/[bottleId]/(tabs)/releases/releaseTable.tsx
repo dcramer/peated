@@ -64,16 +64,10 @@ export default function ReleaseTable({
           sortDefaultOrder: "desc",
         },
         {
-          name: "tastings",
-          value: (item) => item.totalTastings.toLocaleString(),
-          className: "sm:w-1/8 hidden sm:table-cell",
-          sortDefaultOrder: "desc",
-        },
-        {
-          name: "rating",
-          value: (item) => (item.avgRating ? item.avgRating.toFixed(2) : null),
-          className: "sm:w-1/8 hidden sm:table-cell",
-          sortDefaultOrder: "desc",
+          name: "abv",
+          sort: "abv",
+          title: "ABV",
+          className: "sm:w-1/8",
         },
         {
           name: "actions",
