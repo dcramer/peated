@@ -18,6 +18,7 @@ export default function BottleResultRow({
   directToTasting: boolean;
 }) {
   const metadata: ReactNode[] = [];
+  if (bottle.edition) metadata.push(<span>({bottle.edition})</span>);
   if (bottle.distillers.length)
     metadata.push(
       <span>
