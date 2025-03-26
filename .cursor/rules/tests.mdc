@@ -1,0 +1,60 @@
+---
+description: 
+globs: *.test.ts*
+alwaysApply: false
+---
+Follow these rules when you write tests:
+
+- Use Vitest, do not use Jest.
+- When you are testing for errors, use `waitError` to wait for the error to be thrown. For example:
+
+```
+import waitError from "@peated/server/lib/test/waitError";
+
+const err = await waitError(
+  caller.authPasswordResetConfirm({
+    token,
+    password: "testpassword",
+  }),
+);
+```
+
+- In addition to using `waitError`, utilize snapshots for the resulting error. For example, `expect(err).toMatchInlineSnapshot();`
+- Avoid snapshots for API responses where data is dynamic (such as it returning a `createdAt` date).
+- Prefer dependency injection over mocking when the called functions make it possible.
+
+
+## tRPC endpoints
+
+When calling tRPC endpoints that are not expected to error, await on the caller. Do not test the Promise directly. For example:
+
+```
+const caller = createCaller();
+
+const data = await caller.authRegister({
+  username: "foo",
+  email: "foo@example.com",
+  password: "example",
+});
+```
+
+Additionally when you add a new tRPC endpoint, ensure its also added to [router.ts](mdc:apps/server/src/trpc/router.ts)
+
+## Fixture data in tests
+
+Test fixtures should be referenced via the context (found in [fixtures.ts](mdc:apps/server/src/lib/test/fixtures.ts)):
+
+```
+  it("returns a bottle release", async function ({ fixtures }) {
+    const bottle = await fixtures.Bottle();
+  });
+```
+
+User context - such as for the trpc route caller - should use the `defaults` (as defauled in [setup-test-env.ts](mdc:apps/server/src/test/setup-test-env.ts)) when available. For example:
+
+```
+  it("returns a bottle release", async function ({ defaults }) {
+    const caller = createCaller({ user: defaults.user });
+  });
+```
+

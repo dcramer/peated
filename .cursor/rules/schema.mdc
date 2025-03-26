@@ -1,0 +1,27 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Whisky Schema Definitions
+
+A set of common definitions for fields we use:
+
+- **brand**: The brand or bottler of the whiskey.
+- **distillery**: An **array** of distilleries where the whiskey was produced (e.g., \`[ "Macallan", "Highland Park" ]\` for a blend of multiple distilleries, or \`[ "Lagavulin" ]\` for a single distillery release). If the whiskey is an **official bottling** from a single distillery, return \`[ distillery_name ]\`. If it’s a blend with unknown distilleries, return \`[]\` (empty array). If it is an independent bottling, return the distillery name(s) in the array.
+- **expression**: The specific name or expression of the whiskey.
+- **series**: The series or collection name (if applicable, otherwise \`null\`).
+- **category**: The category of the whiskey. One of \`blend\`, \`bourbon\`, \`rye\`, \`single_grain\`, \`single_malt\`, \`single_pot_still\`.
+- **stated_age**: Age of the whiskey in years (integer, \`null\` if no age statement).
+- **abv**: Alcohol by volume as a percentage (float, e.g., 43.0 for 43% ABV).
+- **release_year**: The year the whiskey was bottled or released.
+  - Extract if explicitly labeled as "Bottling Year," "Bottled in YYYY," "Release Year," or similar.
+  - If no explicit label, extract any standalone four-digit year (YYYY) if it appears near ABV, batch, or edition information.
+  - Ignore unrelated dates (e.g., distillery establishment year, government warnings).
+  - If multiple years are listed (e.g., "Distilled in 1998, Bottled in 2018"), use:
+    - vintage_year: 1998
+    - release_year: 2018
+  - If no valid year is found, set \`release_year\`: null.
+- **vintage_year**: The distillation or vintage year (if given, otherwise \`null\`).
+- **cask_type**: Primary cask type or finish (if mentioned, otherwise \`null\`).
+- **edition**: Batch, edition, or release identifier (if mentioned, otherwise \`null\`).
