@@ -32,10 +32,10 @@ export default function ReleaseTable({
     <Table
       items={releaseList.results}
       rel={releaseList.rel}
-      defaultSort="date"
+      defaultSort="releaseYear"
       // url={(item) => `/bottles/${bottleId}/releases/${item.id}`}
       columns={[
-        { name: "name", sort: "name", sortDefaultOrder: "asc" },
+        { name: "edition", sort: "edition", sortDefaultOrder: "asc" },
         {
           name: "age",
           sort: "statedAge",

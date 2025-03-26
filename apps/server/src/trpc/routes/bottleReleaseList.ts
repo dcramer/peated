@@ -10,6 +10,8 @@ import { publicProcedure } from "..";
 const SORT_OPTIONS = [
   "name",
   "-name",
+  "edition",
+  "-edition",
   "statedAge",
   "-statedAge",
   "vintageYear",
@@ -21,6 +23,8 @@ const SORT_OPTIONS = [
   "avgRating",
   "-avgRating",
 ] as const;
+
+const DEFAULT_SORT = "releaseYear";
 
 export default publicProcedure
   .input(
@@ -62,6 +66,12 @@ export default publicProcedure
 
     let orderBy: SQL<unknown>;
     switch (sort) {
+      case "edition":
+        orderBy = asc(bottleReleases.edition);
+        break;
+      case "-edition":
+        orderBy = desc(bottleReleases.edition);
+        break;
       case "name":
         orderBy = asc(bottleReleases.name);
         break;
