@@ -2,7 +2,9 @@
 
 import BottleLink from "@peated/web/components/bottleLink";
 import { Distillers } from "@peated/web/components/bottleMetadata";
+import { ClientOnly } from "@peated/web/components/clientOnly";
 import LayoutEmpty from "@peated/web/components/layoutEmpty";
+import QRCodeClient from "@peated/web/components/qrcode.client";
 import { trpc } from "@peated/web/lib/trpc/client";
 
 export default function Page({
@@ -19,7 +21,7 @@ export default function Page({
 
   return (
     <LayoutEmpty fullWidth>
-      <div className="mx-auto max-w-3xl">
+      <div className="w-full max-w-3xl flex-1 self-center">
         <div className="mb-8 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
           <div className="w-full flex-auto flex-col items-center space-y-1 sm:w-auto sm:items-start">
             <h1 className="mb-2 text-center text-4xl font-semibold sm:text-left">
@@ -60,7 +62,15 @@ export default function Page({
               </tbody>
             </table>
           </div>
-          <div className="hidden p-4 pl-12 lg:block lg:w-4/12"></div>
+          <div className="hidden p-4 pl-12 lg:block lg:w-4/12">
+            <ClientOnly>
+              {() => (
+                <QRCodeClient
+                  value={`${window.location.protocol}//${window.location.host}/flights/${flight.id}`}
+                />
+              )}
+            </ClientOnly>
+          </div>
         </div>
       </div>
     </LayoutEmpty>
