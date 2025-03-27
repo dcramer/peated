@@ -76,10 +76,12 @@ export const TastingSerializer = serializer({
       (
         await serialize(
           BottleReleaseSerializer,
-          results.map((r) => r.release),
+          results.map((r) => r.release).filter(notEmpty),
           currentUser,
         )
-      ).map((data, index) => [results[index].id, data]),
+      )
+        .filter((data, index) => results[index].release)
+        .map((data, index) => [results[index].id, data]),
     );
 
     // TODO: combine friends + createdBy
