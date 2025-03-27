@@ -71,7 +71,7 @@ export async function serialize<
     (i: T) =>
       i
         ? removeAttributes(
-            serializer.item(i, attrs[i.id] || {}, currentUser, context),
+            serializer.item(i, attrs[i?.id] || {}, currentUser, context),
             excludeFields,
           )
         : null,
