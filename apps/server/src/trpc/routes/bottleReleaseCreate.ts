@@ -1,3 +1,5 @@
+import { logError } from "@peated/server/lib/log";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -101,10 +103,9 @@ export default authedProcedure
       });
     }
 
-    let release;
-    await db.transaction(async (tx) => {
+    const release = await db.transaction(async (tx) => {
       // Create the release
-      [release] = await tx
+      const [release] = await tx
         .insert(bottleReleases)
         .values({
           bottleId: input.bottleId,
@@ -148,12 +149,24 @@ export default authedProcedure
           })
           .where(eq(bottles.id, input.bottleId)),
       ]);
+
+      return release;
     });
 
     if (!release) {
       throw new TRPCError({
         message: "Failed to create release.",
         code: "INTERNAL_SERVER_ERROR",
+      });
+    }
+
+    try {
+      await pushJob("OnBottleReleaseChange", { releaseId: release.id });
+    } catch (err) {
+      logError(err, {
+        release: {
+          id: release.id,
+        },
       });
     }
 

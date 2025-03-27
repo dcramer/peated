@@ -36,7 +36,7 @@ export default async function mergeEntity({
   }
 
   const updatedBottleIds: number[] = [];
-
+  const updatedReleaseIds: number[] = [];
   await db.transaction(async (tx) => {
     const bottleList = await tx
       .select()
@@ -112,6 +112,7 @@ export default async function mergeEntity({
               .where(eq(bottleReleases.id, release.id));
           }),
         );
+        updatedReleaseIds.push(...releases.map((r) => r.id));
       }
       updatedBottleIds.push(bottle.id);
     }
@@ -162,6 +163,22 @@ export default async function mergeEntity({
       logError(err, {
         bottle: {
           id: bottleId,
+        },
+      });
+    }
+  }
+
+  for (const releaseId of updatedReleaseIds) {
+    try {
+      await pushUniqueJob(
+        "IndexBottleReleaseSearchVectors",
+        { releaseId: releaseId },
+        { delay: 5000 },
+      );
+    } catch (err) {
+      logError(err, {
+        release: {
+          id: releaseId,
         },
       });
     }
