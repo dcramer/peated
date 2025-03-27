@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleReleases,
   bottleTags,
   bottles,
   notifications,
@@ -77,6 +78,16 @@ export default authedProcedure.input(z.number()).mutation(async function ({
           avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.id} != ${tasting.id})`,
         })
         .where(eq(bottles.id, tasting.bottleId)),
+
+      tasting.releaseId
+        ? tx
+            .update(bottleReleases)
+            .set({
+              totalTastings: sql`${bottleReleases.totalTastings} - 1`,
+              avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottleReleases.id} = ${tastings.releaseId})`,
+            })
+            .where(eq(bottleReleases.id, tasting.releaseId))
+        : undefined,
     ]);
 
     // TODO: delete the image from storage

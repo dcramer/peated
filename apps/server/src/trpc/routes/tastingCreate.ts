@@ -143,6 +143,16 @@ export default authedProcedure
         })
         .where(eq(bottles.id, bottle.id));
 
+      if (tasting.releaseId) {
+        await tx
+          .update(bottleReleases)
+          .set({
+            totalTastings: sql`${bottleReleases.totalTastings} + 1`,
+            avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottleReleases.id} = ${tastings.releaseId})`,
+          })
+          .where(eq(bottleReleases.id, tasting.releaseId));
+      }
+
       const distillerIds = bottle.bottlesToDistillers.map((d) => d.distillerId);
 
       await Promise.all([
