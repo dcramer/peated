@@ -164,9 +164,8 @@ export default function BottleCard({
         release ? (
           <div>
             {release.edition}{" "}
-            {release.releaseYear || release.vintageYear
-              ? `(${release.vintageYear} Vintage)`
-              : null}
+            {release.releaseYear ??
+              (release.vintageYear ? `(${release.vintageYear} Vintage)` : null)}
           </div>
         ) : null
       }
