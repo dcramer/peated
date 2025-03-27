@@ -54,7 +54,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
     ref,
   ) => {
     const defaultClassName =
-      "inline-flex spacing-2-x justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
+      "inline-flex gap-x-2 justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
 
     let textColor = "text-white";
     let colorClassName;

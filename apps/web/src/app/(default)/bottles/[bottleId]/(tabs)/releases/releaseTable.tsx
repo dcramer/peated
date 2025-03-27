@@ -80,6 +80,7 @@ export default function ReleaseTable({
                 <Button
                   href={`/bottles/${bottleId}/addTasting?release=${item.id}`}
                   size="small"
+                  title="Record a Tasting"
                 >
                   <PeatedGlyph className="h-3 w-3" />
                 </Button>

@@ -2,8 +2,6 @@
 
 import { MapIcon } from "@heroicons/react/20/solid";
 import {
-  ChatBubbleLeftIcon,
-  CodeBracketSquareIcon,
   GiftTopIcon,
   HomeIcon,
   InformationCircleIcon,
@@ -15,7 +13,6 @@ import BottlerIcon from "@peated/web/assets/bottler.svg";
 import BrandIcon from "@peated/web/assets/brand.svg";
 import DistillerIcon from "@peated/web/assets/distiller.svg";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
-import config from "@peated/web/config";
 import { usePathname } from "next/navigation";
 import Button from "./button";
 import FeedbackSidebarLink from "./feedbackSidebarLink";
@@ -36,7 +33,7 @@ export default function Sidebar() {
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
                 <Button href="/search?tasting" fullWidth color="highlight">
-                  Record Tasting
+                  Record a Tasting
                 </Button>
               </li>
               <li>

@@ -1,3 +1,4 @@
+import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import BottleHeader from "@peated/web/components/bottleHeader";
 import Button from "@peated/web/components/button";
 import CollectionAction from "@peated/web/components/collectionAction";
@@ -76,7 +77,7 @@ export default async function Layout({
             </Suspense>
 
             <Button href={`/bottles/${bottle.id}/addTasting`} color="primary">
-              Record a Tasting
+              <PeatedGlyph className="h-4 w-4" /> Record a Tasting
             </Button>
 
             <ShareButton
