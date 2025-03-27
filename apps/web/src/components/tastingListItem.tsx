@@ -78,7 +78,7 @@ export default function TastingListItem({
   onToast?: (tasting: Tasting) => void;
   noCommentAction?: boolean;
 }) {
-  const { bottle } = tasting;
+  const { bottle, release } = tasting;
   const { user } = useAuth();
 
   const pathname = usePathname();
@@ -121,7 +121,12 @@ export default function TastingListItem({
 
       {!noBottle && (
         <div className="px-3 sm:px-5">
-          <BottleCard color="inherit" noGutter bottle={bottle} />
+          <BottleCard
+            color="inherit"
+            noGutter
+            bottle={bottle}
+            release={release}
+          />
         </div>
       )}
 

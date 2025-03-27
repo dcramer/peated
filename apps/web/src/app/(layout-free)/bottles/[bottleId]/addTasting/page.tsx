@@ -12,13 +12,16 @@ import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AddTasting({
-  params: { bottleId, releaseId },
+  params: { bottleId },
 }: {
-  params: { bottleId: string; releaseId?: string };
+  params: { bottleId: string };
 }) {
   useAuthRequired();
 
   const router = useRouter();
+
+  const params = useSearchParams();
+  const releaseId = params.get("release");
 
   const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
   const [release] = releaseId
@@ -51,6 +54,7 @@ export default function AddTasting({
       onSubmit={async ({ image, ...data }) => {
         const { tasting, awards } = await tastingCreateMutation.mutateAsync({
           ...data,
+          release: release?.id || null,
           flight: flight?.id || null,
           createdAt,
         });

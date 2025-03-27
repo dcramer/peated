@@ -11,7 +11,6 @@ import type {
   ServingStyle,
   SuggestedTag,
   Tag,
-  Tasting,
   User,
 } from "@peated/server/types";
 import BottleCard from "@peated/web/components/bottleCard";
@@ -33,7 +32,6 @@ import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import ColorField from "./colorField";
 import Form from "./form";
-import ReleaseField from "./releaseField";
 import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
 import ServingStyleIcon from "./servingStyleIcon";
 
@@ -142,7 +140,11 @@ export default function TastingForm({
       footer={null}
     >
       <div className="lg:mb-8 lg:p-0">
-        <BottleCard bottle={initialData.bottle} color="highlight" />
+        <BottleCard
+          bottle={initialData.bottle}
+          release={initialData.release}
+          color="highlight"
+        />
       </div>
 
       {error && <FormError values={[error]} />}
@@ -152,29 +154,6 @@ export default function TastingForm({
         isSubmitting={isSubmitting}
       >
         <Fieldset>
-          {!!releaseValue && (
-            <Controller
-              name="release"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <ReleaseField
-                  {...field}
-                  error={errors.release}
-                  label="Bottle Release"
-                  helpText={TastingInputSchema.shape.release.description}
-                  placeholder="e.g. Ardbeg Supernova 2013"
-                  bottle={initialData.bottle.id}
-                  onChange={(value) => {
-                    onChange(value?.id || value);
-                    setReleaseValue(value);
-                  }}
-                  canCreate
-                  value={releaseValue}
-                />
-              )}
-            />
-          )}
-
           <Controller
             name="rating"
             control={control}

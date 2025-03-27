@@ -76,18 +76,18 @@ export default function ReleaseTable({
           align: "right",
           value: (item) => {
             return (
-              <>
+              <div className="flex flex-row justify-end gap-2">
                 <Button
-                  href={`/addTasting?bottle=${bottleId}&release=${item.id}`}
+                  href={`/bottles/${bottleId}/addTasting?release=${item.id}`}
                   size="small"
                 >
-                  <PeatedGlyph className="h-5 w-5" />
+                  <PeatedGlyph className="h-3 w-3" />
                 </Button>
-                <ModActions release={item} />;
-              </>
+                <ModActions release={item} />
+              </div>
             );
           },
-          className: "sm:w-1/8 hidden sm:table-cell",
+          className: "sm:w-1/8 hidden sm:table-cell flex",
         },
       ]}
     />

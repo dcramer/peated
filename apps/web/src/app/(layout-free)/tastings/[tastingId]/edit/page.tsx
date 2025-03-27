@@ -35,6 +35,7 @@ export default function Page({
       onSubmit={async ({ image, ...data }) => {
         await tastingUpdateMutation.mutateAsync({
           tasting: tasting.id,
+          release: tasting.release?.id || null,
           image: image === null ? null : undefined,
           ...data,
         });

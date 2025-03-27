@@ -8,13 +8,15 @@ import { COLOR_SCALE } from "../constants";
 
 export function formatBottleName({
   name,
+  edition,
   statedAge,
 }: {
   name?: string | null | undefined;
+  edition?: string | null | undefined;
   statedAge?: number | null | undefined;
 } & Record<string, any>) {
-  const bits = [[name]];
-  return bits.join(" ");
+  const bits = [name, edition].filter(Boolean);
+  return bits.join(" - ");
 }
 
 export function formatReleaseName({

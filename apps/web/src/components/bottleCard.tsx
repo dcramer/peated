@@ -3,7 +3,7 @@ import {
   formatBottleName,
   formatCategoryName,
 } from "@peated/server/lib/format";
-import type { Bottle } from "@peated/server/types";
+import type { Bottle, BottleRelease } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
 import classNames from "../lib/classNames";
@@ -29,6 +29,7 @@ type BottleFormData = {
 function BottleScaffold({
   name,
   category,
+  release,
   distillers,
   statedAge,
   color = "default",
@@ -37,6 +38,7 @@ function BottleScaffold({
 }: {
   name: any;
   category: any;
+  release?: any;
   distillers: any;
   statedAge: any;
   color?: "default" | "highlight" | "inherit";
@@ -65,6 +67,14 @@ function BottleScaffold({
       <div className="flex-1 overflow-hidden">
         <div className="flex w-full items-center space-x-1 font-bold">
           {name}
+        </div>
+        <div
+          className={classNames(
+            "text-sm",
+            color === "highlight" ? "" : "text-muted",
+          )}
+        >
+          {release}
         </div>
         <div
           className={classNames(
@@ -118,11 +128,13 @@ export const PreviewBottleCard = ({
 
 export default function BottleCard({
   bottle,
+  release,
   noGutter,
   color,
   onClick,
 }: {
   bottle: Bottle;
+  release?: BottleRelease | null;
   onClick?: (bottle: Bottle) => void;
 } & Pick<
   ComponentPropsWithoutRef<typeof BottleScaffold>,
@@ -132,19 +144,31 @@ export default function BottleCard({
     <BottleScaffold
       onClick={onClick ? () => onClick(bottle) : undefined}
       name={
-        <div className="space-x-1">
-          <h4 className="inline font-bold" title={bottle.fullName}>
-            <BottleLink bottle={bottle} className="hover:underline">
-              {bottle.fullName}
-            </BottleLink>
-          </h4>
-          {bottle.isFavorite && (
-            <StarIcon className="inline w-4" aria-hidden="true" />
-          )}
-          {bottle.hasTasted && (
-            <CheckBadgeIcon className="inline w-4" aria-hidden="true" />
-          )}
+        <div>
+          <div className="space-x-1">
+            <h4 className="inline font-bold" title={bottle.fullName}>
+              <BottleLink bottle={bottle} className="hover:underline">
+                {bottle.fullName}
+              </BottleLink>
+            </h4>
+            {bottle.isFavorite && (
+              <StarIcon className="inline w-4" aria-hidden="true" />
+            )}
+            {bottle.hasTasted && (
+              <CheckBadgeIcon className="inline w-4" aria-hidden="true" />
+            )}
+          </div>
         </div>
+      }
+      release={
+        release ? (
+          <div>
+            {release.edition}{" "}
+            {release.releaseYear || release.vintageYear
+              ? `(${release.vintageYear} Vintage)`
+              : null}
+          </div>
+        ) : null
       }
       category={
         <div>
