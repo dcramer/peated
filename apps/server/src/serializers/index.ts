@@ -1,6 +1,6 @@
 import type { User } from "../db/schema";
 
-type Item = Record<string, any>;
+type Item = Record<string, any> | null;
 
 export type Attrs = Record<number, Record<string, any>>;
 
@@ -22,7 +22,7 @@ export async function DefaultAttrs<T extends Item>(
   itemList: T[],
   currentUser?: User | null,
 ): Promise<Attrs> {
-  return Object.fromEntries(itemList.map((i) => [i.id, {}]));
+  return Object.fromEntries(itemList.map((i) => [i?.id, {}]));
 }
 
 export async function serialize<
@@ -66,12 +66,15 @@ export async function serialize<
     context,
   );
 
+  // we automatically serialize null values as null
   const results = (Array.isArray(itemList) ? itemList : [itemList]).map(
     (i: T) =>
-      removeAttributes(
-        serializer.item(i, attrs[i.id] || {}, currentUser, context),
-        excludeFields,
-      ),
+      i
+        ? removeAttributes(
+            serializer.item(i, attrs[i.id] || {}, currentUser, context),
+            excludeFields,
+          )
+        : null,
   ) as R[];
 
   return Array.isArray(itemList) ? results : results[0];
