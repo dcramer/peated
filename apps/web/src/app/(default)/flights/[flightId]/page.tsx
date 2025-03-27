@@ -39,14 +39,16 @@ export default async function Page({
     <>
       <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
         <div className="w-full flex-auto flex-col items-center space-y-1 sm:w-auto sm:items-start">
-          <div className="mb-2 flex items-center gap-4">
+          <div className="mb-2 flex flex-col items-center gap-4 sm:flex-row">
             <h1 className="truncate text-center text-3xl font-semibold leading-7 sm:text-left">
               {flight.name}
             </h1>
-            <Button href={`/flights/${flight.id}/overlay`} color="primary">
-              <ArrowsPointingOutIcon className="h-4 w-4" />
-            </Button>
-            <ModActions flight={flight} />
+            <div className="flex flex-row gap-2">
+              <Button href={`/flights/${flight.id}/overlay`} color="primary">
+                <ArrowsPointingOutIcon className="h-4 w-4" />
+              </Button>
+              <ModActions flight={flight} />
+            </div>
           </div>
           {flight.description && (
             <div className="text-muted truncate text-center sm:text-left">
