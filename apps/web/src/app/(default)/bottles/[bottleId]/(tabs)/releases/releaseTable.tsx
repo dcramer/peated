@@ -1,5 +1,6 @@
 "use client";
 
+import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Link from "@peated/web/components/link";
@@ -74,7 +75,17 @@ export default function ReleaseTable({
           title: "",
           align: "right",
           value: (item) => {
-            return <ModActions release={item} />;
+            return (
+              <>
+                <Button
+                  href={`/addTasting?bottle=${bottleId}&release=${item.id}`}
+                  size="small"
+                >
+                  <PeatedGlyph className="h-5 w-5" />
+                </Button>
+                <ModActions release={item} />;
+              </>
+            );
           },
           className: "sm:w-1/8 hidden sm:table-cell",
         },
