@@ -75,13 +75,7 @@ function BottleScaffold({
           )}
         >
           {release}
-        </div>
-        <div
-          className={classNames(
-            "text-sm",
-            color === "highlight" ? "" : "text-muted",
-          )}
-        >
+          {!!(release && distillers) && <div>&middot;</div>}
           {distillers}
         </div>
       </div>
