@@ -65,12 +65,10 @@ function BottleScaffold({
       onClick={onClick}
     >
       <div className="flex-1 overflow-hidden">
-        <div className="flex w-full items-center space-x-1 font-bold">
-          {name}
-        </div>
+        <div className="flex w-full items-center gap-x-1 font-bold">{name}</div>
         <div
           className={classNames(
-            "text-sm",
+            "flex flex-row gap-x-1 text-sm",
             color === "highlight" ? "" : "text-muted",
           )}
         >
