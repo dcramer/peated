@@ -72,16 +72,13 @@ export const TastingSerializer = serializer({
       ).map((data, index) => [results[index].id, data]),
     );
 
-    const releasesByRef = Object.fromEntries(
-      (
-        await serialize(
-          BottleReleaseSerializer,
-          results.map((r) => r.release).filter(notEmpty),
-          currentUser,
-        )
-      )
-        .filter((data, index) => results[index].release)
-        .map((data, index) => [results[index].id, data]),
+    const releaseList = Array.from(
+      new Set(results.map((r) => r.release).filter(notEmpty)),
+    );
+    const releasesById = Object.fromEntries(
+      (await serialize(BottleReleaseSerializer, releaseList, currentUser)).map(
+        (data, index) => [releaseList[index].id, data],
+      ),
     );
 
     // TODO: combine friends + createdBy
@@ -152,7 +149,9 @@ export const TastingSerializer = serializer({
             hasToasted: userToastsList.includes(item.id),
             createdBy: usersByRef[item.id],
             bottle: bottlesByRef[item.id],
-            release: releasesByRef[item.id],
+            release: item.releaseId
+              ? (releasesById[item.releaseId] ?? null)
+              : null,
             friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
             awards: awardsByTasting[item.id] || [],
           },
