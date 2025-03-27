@@ -1,3 +1,5 @@
+import { logError } from "@peated/server/lib/log";
+import { pushJob } from "@peated/server/worker/client";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -30,8 +32,7 @@ export async function bottleReleaseUpdate({
     });
   }
 
-  let updatedRelease;
-  await db.transaction(async (tx) => {
+  const updatedRelease = await db.transaction(async (tx) => {
     // Get the existing release with a lock
     const [release] = await tx
       .select()
@@ -156,7 +157,7 @@ export async function bottleReleaseUpdate({
     }
 
     // Update the release
-    [updatedRelease] = await tx
+    const [updatedRelease] = await tx
       .update(bottleReleases)
       .set({
         fullName,
@@ -178,6 +179,13 @@ export async function bottleReleaseUpdate({
       })
       .where(eq(bottleReleases.id, release.id))
       .returning();
+
+    if (!updatedRelease) {
+      throw new TRPCError({
+        message: "Failed to update release.",
+        code: "INTERNAL_SERVER_ERROR",
+      });
+    }
 
     // Create change record with both old and new values
     await tx.insert(changes).values({
@@ -204,12 +212,24 @@ export async function bottleReleaseUpdate({
         ),
       },
     });
+
+    return updatedRelease;
   });
 
   if (!updatedRelease) {
     throw new TRPCError({
       message: "Failed to update release.",
       code: "INTERNAL_SERVER_ERROR",
+    });
+  }
+
+  try {
+    await pushJob("OnBottleReleaseChange", { releaseId: updatedRelease.id });
+  } catch (err) {
+    logError(err, {
+      release: {
+        id: updatedRelease.id,
+      },
     });
   }
 

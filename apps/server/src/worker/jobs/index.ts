@@ -9,6 +9,7 @@ import geocodeCountryLocation from "./geocodeCountryLocation";
 import geocodeEntityLocation from "./geocodeEntityLocation";
 import geocodeRegionLocation from "./geocodeRegionLocation";
 import indexBottleAlias from "./indexBottleAlias";
+import indexBottleReleaseSearchVectors from "./indexBottleReleaseSearchVectors";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
 import indexEntitySearchVectors from "./indexEntitySearchVectors";
 import mergeBottle from "./mergeBottle";
@@ -16,6 +17,7 @@ import mergeEntity from "./mergeEntity";
 import notifyDiscordOnTasting from "./notifyDiscordOnTasting";
 import onBottleAliasChange from "./onBottleAliasChange";
 import onBottleChange from "./onBottleChange";
+import onBottleReleaseChange from "./onBottleReleaseChange";
 import onEntityChange from "./onEntityChange";
 import processNotification from "./processNotification";
 import scrapeAstorWines from "./scrapeAstorWines";
@@ -41,12 +43,17 @@ registry.add("GeocodeRegionLocation", geocodeRegionLocation);
 registry.add("GeocodeEntityLocation", geocodeEntityLocation);
 registry.add("IndexBottleAlias", indexBottleAlias);
 registry.add("IndexBottleSearchVectors", indexBottleSearchVectors);
+registry.add(
+  "IndexBottleReleaseSearchVectors",
+  indexBottleReleaseSearchVectors,
+);
 registry.add("IndexEntitySearchVectors", indexEntitySearchVectors);
 registry.add("MergeBottle", mergeBottle);
 registry.add("MergeEntity", mergeEntity);
 registry.add("NotifyDiscordOnTasting", notifyDiscordOnTasting);
 registry.add("OnBottleAliasChange", onBottleAliasChange);
 registry.add("OnBottleChange", onBottleChange);
+registry.add("OnBottleReleaseChange", onBottleReleaseChange);
 registry.add("OnEntityChange", onEntityChange);
 registry.add("ProcessNotification", processNotification);
 registry.add("ScrapeAstorWines", scrapeAstorWines);

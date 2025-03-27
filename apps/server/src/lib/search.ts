@@ -1,5 +1,10 @@
 import { TSVector } from "../db/columns";
-import type { NewBottle, NewBottleAlias, NewEntity } from "../db/schema";
+import type {
+  NewBottle,
+  NewBottleAlias,
+  NewBottleRelease,
+  NewEntity,
+} from "../db/schema";
 import { formatCategoryName } from "./format";
 
 export function buildEntitySearchVector(
@@ -28,23 +33,48 @@ export function buildBottleSearchVector(
     new TSVector(brand.name, "B"),
   ];
   if (brand.shortName)
-    values.push(
-      new TSVector(`${brand.name} ${bottle.name} ${bottle.edition || ""}`, "B"),
-    );
-  if (bottle.edition)
-    values.push(new TSVector(`${bottle.name} ${bottle.edition}`, "B"));
-  else values.push(new TSVector(bottle.name, "B"));
+    values.push(new TSVector(`${brand.shortName} ${bottle.name}`, "B"));
 
   if (bottle.category)
     values.push(new TSVector(formatCategoryName(bottle.category), "C"));
-  if (bottle.vintageYear)
-    values.push(new TSVector(`${bottle.vintageYear} Vintage`, "B"));
-  if (bottle.releaseYear)
-    values.push(new TSVector(`${bottle.releaseYear} Release`, "B"));
   if (bottler) values.push(new TSVector(bottler.name, "C"));
   aliasList
     ?.filter((a) => a.name !== bottle.fullName)
     .forEach((a) => values.push(new TSVector(a.name, "A")));
   distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));
+  return values;
+}
+
+export function buildBottleReleaseSearchVector(
+  bottle: NewBottle,
+  release: NewBottleRelease,
+  brand: NewEntity,
+): TSVector[] {
+  const values: TSVector[] = [
+    new TSVector(bottle.fullName, "A"),
+    new TSVector(brand.name, "B"),
+  ];
+  if (brand.shortName)
+    values.push(new TSVector(`${brand.shortName} ${bottle.name}`, "B"));
+
+  if (release.edition) {
+    values.push(
+      new TSVector(`${brand.name} ${bottle.name} ${release.edition}`, "A"),
+    );
+    if (brand.shortName)
+      values.push(
+        new TSVector(
+          `${brand.shortName} ${bottle.name} ${release.edition}`,
+          "A",
+        ),
+      );
+  }
+
+  if (bottle.category)
+    values.push(new TSVector(formatCategoryName(bottle.category), "C"));
+  if (release.vintageYear)
+    values.push(new TSVector(`${release.vintageYear} Vintage`, "B"));
+  if (release.releaseYear)
+    values.push(new TSVector(`${release.releaseYear} Release`, "B"));
   return values;
 }
