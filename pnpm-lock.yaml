@@ -28,11 +28,11 @@ catalogs:
       specifier: ^0.5.12
       version: 0.5.12
     '@tanstack/react-query':
-      specifier: ^5.48.0
-      version: 5.51.1
+      specifier: ^5.71.0
+      version: 5.71.0
     '@tanstack/react-query-next-experimental':
-      specifier: ^5.48.0
-      version: 5.48.0
+      specifier: ^5.71.0
+      version: 5.71.0
     '@trpc/client':
       specifier: 11.0.0-rc.461
       version: 11.0.0-rc.461
@@ -266,7 +266,7 @@ importers:
         version: 2.2.1
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.51.1(react@18.3.1)
+        version: 5.71.0(react@18.3.1)
       '@trpc/client':
         specifier: 'catalog:'
         version: 11.0.0-rc.461(@trpc/server@11.0.0-rc.461)
@@ -453,19 +453,19 @@ importers:
         version: 9.6.0-alpha.0(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.93.0)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.51.1(react@18.3.1)
+        version: 5.71.0(react@18.3.1)
       '@tanstack/react-query-next-experimental':
         specifier: 'catalog:'
-        version: 5.48.0(@tanstack/react-query@5.51.1(react@18.3.1))(next@14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 5.71.0(@tanstack/react-query@5.71.0(react@18.3.1))(next@14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@trpc/client':
         specifier: 'catalog:'
         version: 11.0.0-rc.461(@trpc/server@11.0.0-rc.461)
       '@trpc/next':
         specifier: 'catalog:'
-        version: 11.0.0-rc.461(@tanstack/react-query@5.51.1(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/react-query@11.0.0-rc.461(@tanstack/react-query@5.51.1(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.461)(next@14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 11.0.0-rc.461(@tanstack/react-query@5.71.0(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/react-query@11.0.0-rc.461(@tanstack/react-query@5.71.0(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.461)(next@14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/react-query':
         specifier: 'catalog:'
-        version: 11.0.0-rc.461(@tanstack/react-query@5.51.1(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 11.0.0-rc.461(@tanstack/react-query@5.71.0(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/server':
         specifier: 'catalog:'
         version: 11.0.0-rc.461
@@ -3767,20 +3767,20 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
 
-  '@tanstack/query-core@5.51.1':
-    resolution: {integrity: sha512-fJBMQMpo8/KSsWW5ratJR5+IFr7YNJ3K2kfP9l5XObYHsgfVy1w3FJUWU4FT2fj7+JMaEg33zOcNDBo0LMwHnw==}
+  '@tanstack/query-core@5.71.0':
+    resolution: {integrity: sha512-p4+T7CIEe1kMhii4booWiw42nuaiYI9La/bRCNzBaj1P3PDb0dEZYDhc/7oBifKJfHYN+mtS1ynW1qsmzQW7Og==}
 
-  '@tanstack/react-query-next-experimental@5.48.0':
-    resolution: {integrity: sha512-+t41XBiPMtwa+xEfsNuVCxPCQQh4vnZ4Xzd6NtDaqWMsWSeR6hN6mTtMvJb2KFzBs8gZghB8yebLRE4msYnF1A==}
+  '@tanstack/react-query-next-experimental@5.71.0':
+    resolution: {integrity: sha512-lsUAsW02ovJ+LmO66LWhnc9+1RTtonPuFOI00oNPjpkY4pH75roRAb8aQj1fGfnH04FN3sdFDu4fJCcCGzP/tw==}
     peerDependencies:
-      '@tanstack/react-query': ^5.48.0
+      '@tanstack/react-query': ^5.71.0
       next: ^13 || ^14 || ^15
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.51.1':
-    resolution: {integrity: sha512-s47HKFnQ4HOJAHoIiXcpna/roMMPZJPy6fJ6p4ZNVn8+/onlLBEDd1+xc8OnDuwgvecqkZD7Z2mnSRbcWefrKw==}
+  '@tanstack/react-query@5.71.0':
+    resolution: {integrity: sha512-Udhlz9xHwk0iB7eLDchIqvu666NZFxPZZF80KnL8sZy+5J0kMvnJkzQNYRJwF70g8Vc1nn0TSMkPJgvx6+Pn4g==}
     peerDependencies:
-      react: ^18.0.0
+      react: ^18 || ^19
 
   '@tanstack/react-virtual@3.8.1':
     resolution: {integrity: sha512-dP5a7giEM4BQWLJ7K07ToZv8rF51mzbrBMkf0scg1QNYuFx3utnPUBPUHdzaowZhIez1K2XS78amuzD+YGRA5Q==}
@@ -13327,17 +13327,17 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@22.13.1)(typescript@5.5.4))
 
-  '@tanstack/query-core@5.51.1': {}
+  '@tanstack/query-core@5.71.0': {}
 
-  '@tanstack/react-query-next-experimental@5.48.0(@tanstack/react-query@5.51.1(react@18.3.1))(next@14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)':
+  '@tanstack/react-query-next-experimental@5.71.0(@tanstack/react-query@5.71.0(react@18.3.1))(next@14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@tanstack/react-query': 5.51.1(react@18.3.1)
+      '@tanstack/react-query': 5.71.0(react@18.3.1)
       next: 14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
-  '@tanstack/react-query@5.51.1(react@18.3.1)':
+  '@tanstack/react-query@5.71.0(react@18.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.51.1
+      '@tanstack/query-core': 5.71.0
       react: 18.3.1
 
   '@tanstack/react-virtual@3.8.1(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
@@ -13354,7 +13354,7 @@ snapshots:
     dependencies:
       '@trpc/server': 11.0.0-rc.461
 
-  '@trpc/next@11.0.0-rc.461(@tanstack/react-query@5.51.1(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/react-query@11.0.0-rc.461(@tanstack/react-query@5.51.1(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.461)(next@14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
+  '@trpc/next@11.0.0-rc.461(@tanstack/react-query@5.71.0(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/react-query@11.0.0-rc.461(@tanstack/react-query@5.71.0(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.461)(next@14.2.4(@babel/core@7.24.9)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@trpc/client': 11.0.0-rc.461(@trpc/server@11.0.0-rc.461)
       '@trpc/server': 11.0.0-rc.461
@@ -13362,12 +13362,12 @@ snapshots:
       react: 18.3.1
       react-dom: 18.2.0(react@18.3.1)
     optionalDependencies:
-      '@tanstack/react-query': 5.51.1(react@18.3.1)
-      '@trpc/react-query': 11.0.0-rc.461(@tanstack/react-query@5.51.1(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+      '@tanstack/react-query': 5.71.0(react@18.3.1)
+      '@trpc/react-query': 11.0.0-rc.461(@tanstack/react-query@5.71.0(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
 
-  '@trpc/react-query@11.0.0-rc.461(@tanstack/react-query@5.51.1(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
+  '@trpc/react-query@11.0.0-rc.461(@tanstack/react-query@5.71.0(react@18.3.1))(@trpc/client@11.0.0-rc.461(@trpc/server@11.0.0-rc.461))(@trpc/server@11.0.0-rc.461)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@tanstack/react-query': 5.51.1(react@18.3.1)
+      '@tanstack/react-query': 5.71.0(react@18.3.1)
       '@trpc/client': 11.0.0-rc.461(@trpc/server@11.0.0-rc.461)
       '@trpc/server': 11.0.0-rc.461
       react: 18.3.1
@@ -15480,7 +15480,7 @@ snapshots:
       debug: 4.4.0
       enhanced-resolve: 5.17.0
       eslint: 8.57.0
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.10.0
@@ -15492,7 +15492,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -15513,7 +15513,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       hasown: 2.0.2
       is-core-module: 2.13.1
       is-glob: 4.0.3

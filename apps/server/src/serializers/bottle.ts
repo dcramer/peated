@@ -5,6 +5,7 @@ import config from "../config";
 import { db } from "../db";
 import type { Bottle, Flight, User } from "../db/schema";
 import {
+  bottleSeries,
   bottlesToDistillers,
   collectionBottles,
   collections,
@@ -14,6 +15,7 @@ import {
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type BottleSchema } from "../schemas";
+import { BottleSeriesSerializer } from "./bottleSeries";
 import { EntitySerializer } from "./entity";
 
 type Attrs = {
@@ -22,6 +24,7 @@ type Attrs = {
   brand: ReturnType<(typeof EntitySerializer)["item"]>;
   distillers: ReturnType<(typeof EntitySerializer)["item"]>[];
   bottler: ReturnType<(typeof EntitySerializer)["item"]> | null;
+  series: ReturnType<(typeof BottleSeriesSerializer)["item"]> | null;
 };
 
 type Context =
@@ -63,6 +66,19 @@ export const BottleSerializer = serializer({
           "description",
         ])
       ).map((data, index) => [entityList[index].id, data]),
+    );
+
+    const seriesIds = Array.from(
+      new Set(itemList.map((i) => i.seriesId).filter(notEmpty)),
+    );
+    const seriesList = await db
+      .select()
+      .from(bottleSeries)
+      .where(inArray(bottleSeries.id, seriesIds));
+    const seriesById = Object.fromEntries(
+      (await serialize(BottleSeriesSerializer, seriesList, currentUser)).map(
+        (data, index) => [seriesList[index].id, data],
+      ),
     );
 
     const distillersByBottleId: {
@@ -135,6 +151,7 @@ export const BottleSerializer = serializer({
             brand: entitiesById[item.brandId],
             distillers: distillersByBottleId[item.id] || [],
             bottler: item.bottlerId ? entitiesById[item.bottlerId] : null,
+            series: item.seriesId ? seriesById[item.seriesId] : null,
           },
         ];
       }),
@@ -154,7 +171,6 @@ export const BottleSerializer = serializer({
       fullName: item.fullName,
       name: item.name,
 
-      series: item.series,
       statedAge: item.statedAge,
 
       category: item.category,
@@ -177,6 +193,7 @@ export const BottleSerializer = serializer({
       brand: attrs.brand,
       distillers: attrs.distillers,
       bottler: attrs.bottler,
+      series: attrs.series,
 
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)

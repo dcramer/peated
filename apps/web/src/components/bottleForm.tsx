@@ -26,6 +26,7 @@ import ImageField from "@peated/web/components/imageField";
 import Layout from "@peated/web/components/layout";
 import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
+import SeriesField from "@peated/web/components/seriesField";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { logError } from "@peated/web/lib/log";
@@ -111,6 +112,7 @@ export default function BottleForm({
       distillers: initialData.distillers
         ? initialData.distillers.map((d) => d.id)
         : [],
+      series: initialData.series?.id,
     },
   });
 
@@ -145,6 +147,11 @@ export default function BottleForm({
   );
   const [bottlerValue, setBottlerValue] = useState<Option | undefined>(
     initialData.bottler ? entityToOption(initialData.bottler) : undefined,
+  );
+  const [seriesValue, setSeriesValue] = useState<Option | undefined>(
+    initialData.series
+      ? { id: initialData.series.id, name: initialData.series.name }
+      : undefined,
   );
 
   const [showCaskDetails, setShowCaskDetails] = useState(true);
@@ -239,14 +246,20 @@ export default function BottleForm({
             helpText={
               <div className="flex flex-col gap-y-2">
                 <p>
-                  The name of the bottle. We'll do our best to clean this up for
-                  you, but generally speaking there's a few things to think
+                  The name of the expression. We'll do our best to clean this up
+                  for you, but generally speaking there's a few things to think
                   about:
                 </p>
                 <ul className="ml-6 flex list-disc flex-col gap-y-1">
                   <li>
-                    The unique series name is the focus. For example,{" "}
-                    <strong>do include</strong> <em>2010 Spring Release</em>.
+                    The unique expression name is the focus. For example,{" "}
+                    <strong>do not</strong> include the series if applicable,
+                    like <em>A Midwinter NIght's Dram</em>.
+                  </li>
+                  <li>
+                    Edition names should not be included. For example,{" "}
+                    <strong>do not include</strong> <em>2010 Spring Release</em>
+                    .
                   </li>
                   <li>
                     Flavor text should be avoided whenever possible. For
@@ -258,13 +271,34 @@ export default function BottleForm({
                     data. For example, <em>10-year-old Single Malt</em>...
                   </li>
                   <li>
-                    However, if the series is clearly identifying,{" "}
+                    However, if the expression is clearly identifying,{" "}
                     <em>do not include</em> the stated age or the spirit type.
                   </li>
                 </ul>
               </div>
             }
             placeholder="e.g. 12-year-old"
+          />
+
+          <Controller
+            name="series"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SeriesField
+                {...field}
+                error={errors.series}
+                label="Series"
+                helpText="The series this bottle belongs to (if any)."
+                placeholder="e.g. A Midwinter Night's Dram"
+                brand={brandValue?.id ? Number(brandValue.id) : 0}
+                disabled={!brandValue}
+                onChange={(value) => {
+                  onChange(value?.id || value);
+                  setSeriesValue(value);
+                }}
+                value={seriesValue}
+              />
+            )}
           />
 
           <TextField

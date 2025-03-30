@@ -24,7 +24,7 @@ export default async ({ releaseId }: { releaseId: number }) => {
   const searchVector =
     buildBottleReleaseSearchVector(bottle, release, brand!) || null;
 
-  console.log(`Updating index for Bottle ${bottle.id}`);
+  console.log(`Updating searchVector for Bottle ${bottle.id}`);
 
   await db
     .update(bottleReleases)

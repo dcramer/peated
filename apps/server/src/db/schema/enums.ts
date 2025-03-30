@@ -11,6 +11,7 @@ export const categoryEnum = pgEnum("category", CATEGORY_LIST);
 export const objectTypeEnum = pgEnum("object_type", [
   "bottle",
   "bottle_release",
+  "bottle_series",
   "comment",
   "entity",
   "tasting",

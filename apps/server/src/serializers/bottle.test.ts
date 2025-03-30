@@ -3,6 +3,7 @@ import { serialize } from ".";
 import { db } from "../db";
 import {
   bottles,
+  bottleSeries,
   bottlesToDistillers,
   collectionBottles,
   collections,
@@ -66,6 +67,57 @@ describe("BottleSerializer", () => {
 
       // The bottle should not be marked as favorite for the viewer
       expect(result.isFavorite).toBe(false);
+    });
+  });
+
+  it("serializes a bottle with and without a series", async function ({
+    fixtures,
+  }) {
+    const brand = await fixtures.Entity({ name: "Ardbeg" });
+    const series = await fixtures.BottleSeries({
+      name: "Supernova",
+      description: "A limited edition series",
+      brandId: brand.id,
+    });
+
+    const bottleWithSeries = await fixtures.Bottle({
+      name: "Supernova",
+      brandId: brand.id,
+      seriesId: series.id,
+    });
+
+    const bottleWithoutSeries = await fixtures.Bottle({
+      name: "10 Year Old",
+      brandId: brand.id,
+    });
+
+    const results = await serialize(BottleSerializer, [
+      bottleWithSeries,
+      bottleWithoutSeries,
+    ]);
+
+    expect(results).toHaveLength(2);
+
+    // Check bottle with series
+    expect(results[0]).toMatchObject({
+      id: bottleWithSeries.id,
+      name: bottleWithSeries.name,
+      series: expect.objectContaining({
+        id: series.id,
+        name: series.name,
+        description: series.description,
+        brand: expect.objectContaining({
+          id: brand.id,
+          name: brand.name,
+        }),
+      }),
+    });
+
+    // Check bottle without series
+    expect(results[1]).toMatchObject({
+      id: bottleWithoutSeries.id,
+      name: bottleWithoutSeries.name,
+      series: null,
     });
   });
 });
