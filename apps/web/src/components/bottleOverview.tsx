@@ -67,7 +67,11 @@ export default function BottleOverview({
                 >
                   {bottle.brand.name}
                 </Link>
-              </DefinitionList.Details>{" "}
+              </DefinitionList.Details>
+              <DefinitionList.Term>Series</DefinitionList.Term>
+              <DefinitionList.Details>
+                {bottle.series ? bottle.series.name : <em>n/a</em>}
+              </DefinitionList.Details>
               <DefinitionList.Term>Distilled At</DefinitionList.Term>
               <DefinitionList.Details>
                 {bottle.distillers && bottle.distillers.length > 0 ? (
