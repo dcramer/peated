@@ -67,7 +67,10 @@ function CreateForm({
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(BottleSeriesInputSchema),
-    defaultValues: data,
+    defaultValues: {
+      brand: brandId,
+      ...data,
+    },
   });
 
   return (
