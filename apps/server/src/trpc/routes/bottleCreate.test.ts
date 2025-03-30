@@ -3,6 +3,7 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottles,
+  bottleSeries,
   bottlesToDistillers,
   changes,
   entities,
@@ -555,48 +556,18 @@ test("saves release year", async ({ defaults, fixtures }) => {
   expect(newBottle.releaseYear).toEqual(2024);
 });
 
-test("creating a new bottle with a new alias does not mess with unrelated aliases", async ({
-  fixtures,
+test("creates a bottle with an existing series", async ({
   defaults,
+  fixtures,
 }) => {
-  const otherAlias = await fixtures.BottleAlias({ name: "A", bottleId: null });
+  const brand = await fixtures.Entity();
+  const series = await fixtures.BottleSeries({ brandId: brand.id });
 
   const caller = createCaller({ user: defaults.user });
   const data = await caller.bottleCreate({
-    name: "Delicious Wood",
-    brand: {
-      name: "Cool Cats",
-    },
-  });
-
-  expect(data.id).toBeDefined();
-
-  const [{ bottle, brand }] = await db
-    .select({ bottle: bottles, brand: entities })
-    .from(bottles)
-    .innerJoin(entities, eq(entities.id, bottles.brandId))
-    .where(eq(bottles.id, data.id));
-
-  expect(bottle.name).toEqual("Delicious Wood");
-
-  const [newOtherAlias] = await db
-    .select()
-    .from(bottleAliases)
-    .where(
-      eq(sql`LOWER(${bottleAliases.name})`, otherAlias.name.toLowerCase()),
-    );
-  expect(newOtherAlias).toBeDefined();
-  expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
-});
-
-test("saves ABV information", async ({ defaults, fixtures }) => {
-  const brand = await fixtures.Entity();
-
-  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
-  const data = await caller.bottleCreate({
     name: "Old Whisky",
     brand: brand.id,
-    abv: 40.5,
+    series: series.id,
   });
 
   expect(data.id).toBeDefined();
@@ -606,33 +577,76 @@ test("saves ABV information", async ({ defaults, fixtures }) => {
     .from(bottles)
     .where(eq(bottles.id, data.id));
 
-  expect(newBottle.abv).toEqual(40.5);
+  expect(newBottle.seriesId).toEqual(series.id);
+
+  // Verify numReleases was updated
+  const [updatedSeries] = await db
+    .select()
+    .from(bottleSeries)
+    .where(eq(bottleSeries.id, series.id));
+
+  expect(updatedSeries.numReleases).toEqual(1);
 });
 
-test("rejects invalid ABV values", async ({ defaults, fixtures }) => {
+test("creates a bottle with a new series", async ({ defaults, fixtures }) => {
   const brand = await fixtures.Entity();
 
-  const caller = createCaller({ user: await fixtures.User({ mod: true }) });
+  const caller = createCaller({ user: defaults.user });
+  const data = await caller.bottleCreate({
+    name: "Old Whisky",
+    brand: brand.id,
+    series: {
+      name: "Limited Edition",
+      description: "Special release series",
+    },
+  });
+
+  expect(data.id).toBeDefined();
+
+  const [newBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, data.id));
+
+  expect(newBottle.seriesId).toBeDefined();
+
+  const [newSeries] = await db
+    .select()
+    .from(bottleSeries)
+    .where(eq(bottleSeries.id, newBottle.seriesId!));
+
+  expect(newSeries.name).toEqual("Limited Edition");
+  expect(newSeries.description).toEqual("Special release series");
+  expect(newSeries.brandId).toEqual(brand.id);
+  expect(newSeries.numReleases).toEqual(1);
+  expect(newSeries.createdById).toEqual(defaults.user.id);
+
+  // Verify change was recorded
+  const [change] = await db
+    .select()
+    .from(changes)
+    .where(
+      and(
+        eq(changes.objectType, "bottle_series"),
+        eq(changes.objectId, newSeries.id),
+      ),
+    );
+
+  expect(change).toBeDefined();
+  expect(change.type).toEqual("add");
+  expect(change.displayName).toEqual(`${brand.name} Limited Edition`);
+});
+
+test("rejects invalid series ID", async ({ defaults, fixtures }) => {
+  const brand = await fixtures.Entity();
+
+  const caller = createCaller({ user: defaults.user });
   const err = await waitError(
     caller.bottleCreate({
       name: "Old Whisky",
       brand: brand.id,
-      abv: 101, // Invalid: above 100
+      series: 999999,
     }),
   );
-  expect(err).toMatchInlineSnapshot(`
-    [TRPCError: [
-      {
-        "code": "too_big",
-        "maximum": 100,
-        "type": "number",
-        "inclusive": true,
-        "exact": false,
-        "message": "Number must be less than or equal to 100",
-        "path": [
-          "abv"
-        ]
-      }
-    ]]
-  `);
+  expect(err).toMatchInlineSnapshot(`[TRPCError: Series not found.]`);
 });

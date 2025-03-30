@@ -3,9 +3,11 @@ import type { Bottle, Entity, NewBottle } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottles,
+  bottleSeries,
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
+import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
   coerceToUpsert,
   upsertBottleAlias,
@@ -13,6 +15,7 @@ import {
 } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
+import type { BottleSeriesInputSchema } from "@peated/server/schemas";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
@@ -61,6 +64,8 @@ export async function bottleCreate({
   const newAliases: string[] = [];
   const newEntityIds: Set<number> = new Set();
 
+  let seriesCreated = false;
+
   const bottle: Bottle | undefined = await db.transaction(async (tx) => {
     const brandUpsert = await upsertEntity({
       db: tx,
@@ -97,6 +102,26 @@ export async function bottleCreate({
       bottler = bottlerUpsert.result;
     }
 
+    // Handle series creation if needed
+    let seriesId: number | null = null;
+    if (input.series) {
+      [seriesId, seriesCreated] = await processSeries({
+        series: input.series,
+        brand,
+        userId: user.id,
+        tx,
+      });
+
+      if (!seriesCreated && seriesId) {
+        await tx
+          .update(bottleSeries)
+          .set({
+            numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${seriesId}) + 1`,
+          })
+          .where(eq(bottleSeries.id, seriesId));
+      }
+    }
+
     const distillerIds: number[] = [];
     const distillerList: Entity[] = [];
     if (bottleData.distillers)
@@ -127,6 +152,7 @@ export async function bottleCreate({
       ...bottleData,
       brandId: brand.id,
       bottlerId: bottler?.id || null,
+      seriesId,
       createdById: user.id,
       fullName,
     };
@@ -218,7 +244,7 @@ export async function bottleCreate({
   }
 
   // Queue search vector indexing for series if present
-  if (bottle.seriesId) {
+  if (bottle.seriesId && seriesCreated) {
     try {
       await pushJob("IndexBottleSeriesSearchVectors", {
         seriesId: bottle.seriesId,
