@@ -1,15 +1,18 @@
+import type { AnyTransaction } from "@peated/server/db";
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottleReleases,
   bottles,
+  bottleSeries,
   bottlesToDistillers,
   changes,
   entities,
 } from "@peated/server/db/schema";
 import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
+import type { BottleSeriesInputSchema } from "@peated/server/schemas";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
@@ -23,6 +26,81 @@ import { coerceToUpsert, upsertBottleAlias, upsertEntity } from "../../lib/db";
 import { type Context } from "../context";
 import { ConflictError } from "../errors";
 import { bottleNormalize } from "./bottlePreview";
+
+// returns [seriesId, created]
+async function processSeries({
+  tx,
+  series,
+  brand,
+  userId,
+}: {
+  tx: AnyTransaction;
+  series:
+    | Omit<z.infer<typeof BottleSeriesInputSchema>, "brand">
+    | number
+    | null;
+  brand: Entity;
+  userId: number;
+}): Promise<[number | null, boolean]> {
+  if (!series) return [null, false];
+
+  // If series is a number, it's an existing series ID
+  if (typeof series === "number") {
+    const existingSeries = await tx.query.bottleSeries.findFirst({
+      where: eq(bottleSeries.id, series),
+    });
+    if (!existingSeries) {
+      throw new TRPCError({
+        message: "Series not found.",
+        code: "NOT_FOUND",
+      });
+    }
+    return [series, false];
+  }
+
+  // Handle series object input
+  const fullName = `${brand.name} ${series.name}`;
+
+  // Check for existing series
+  const [existingSeries] = await tx
+    .select()
+    .from(bottleSeries)
+    .where(eq(sql`LOWER(${bottleSeries.fullName})`, fullName.toLowerCase()))
+    .limit(1);
+
+  if (existingSeries) {
+    return [existingSeries.id, false];
+  }
+
+  // Create new series
+  const [newSeries] = await tx
+    .insert(bottleSeries)
+    .values({
+      name: series.name,
+      description: series.description,
+      fullName,
+      brandId: brand.id,
+      numReleases: 1,
+      createdById: userId,
+    })
+    .returning();
+
+  // Record the change
+  await tx.insert(changes).values({
+    objectId: newSeries.id,
+    objectType: "bottle_series",
+    type: "add",
+    displayName: newSeries.fullName,
+    data: {
+      name: newSeries.name,
+      fullName: newSeries.fullName,
+      brandId: newSeries.brandId,
+    },
+    createdById: userId,
+  });
+
+  return [newSeries.id, true];
+}
 
 const InputSchema = BottleInputSchema.partial().extend({
   bottle: z.number(),
@@ -111,6 +189,8 @@ export async function bottleUpdate({
   const newAliases: string[] = [];
   const newEntityIds: Set<number> = new Set();
 
+  let seriesCreated = false;
+
   const newBottle = await db.transaction(async (tx) => {
     let brand: Entity | null = null;
     if (bottleData.brand) {
@@ -135,6 +215,36 @@ export async function bottleUpdate({
         }
         brand = brandUpsert.result;
         if (brandUpsert.created) newEntityIds.add(brandUpsert.id);
+      }
+    }
+
+    // Handle series creation if needed
+    let seriesId: number | null = null;
+
+    if (input.series) {
+      // Get the brand to build fullName if not already set
+      if (!brand) {
+        brand =
+          (await tx.query.entities.findFirst({
+            where: eq(entities.id, bottle.brandId),
+          })) || null;
+        if (!brand) throw new Error("Unexpected");
+      }
+
+      [seriesId, seriesCreated] = await processSeries({
+        series: input.series,
+        brand,
+        userId: user.id,
+        tx,
+      });
+
+      if (!seriesCreated && seriesId) {
+        await tx
+          .update(bottleSeries)
+          .set({
+            numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${seriesId}) + 1`,
+          })
+          .where(eq(bottleSeries.id, seriesId));
       }
     }
 
@@ -304,6 +414,7 @@ export async function bottleUpdate({
             .update(bottles)
             .set({
               ...bottleData,
+              seriesId,
               updatedAt: sql`NOW()`,
             })
             .where(eq(bottles.id, bottle.id))
@@ -387,6 +498,14 @@ export async function bottleUpdate({
         },
       });
     }
+  }
+
+  // Queue search vector indexing for the new series
+  // TODO: only run this when series is created
+  if (bottle.seriesId && seriesCreated) {
+    await pushUniqueJob("IndexBottleSeriesSearchVectors", {
+      seriesId: bottle.seriesId,
+    });
   }
 
   for (const entityId of newEntityIds.values()) {

@@ -195,7 +195,7 @@ export const BottleInputSchema = BottleSchema.omit({
   series: z
     .union([
       z.number(),
-      BottleSeriesInputSchema.extend({
+      BottleSeriesInputSchema.omit({ brand: true }).extend({
         id: z.number().nullish().describe("Optional ID for the series"),
       }),
     ])

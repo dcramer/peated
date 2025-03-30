@@ -2,12 +2,15 @@ import { db } from "@peated/server/db";
 import {
   bottleReleases,
   bottles,
+  bottleSeries,
   bottlesToDistillers,
+  changes,
   entities,
 } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { expect, test } from "vitest";
 import { createCaller } from "../router";
 
 test("requires authentication", async () => {
@@ -590,4 +593,62 @@ test("updates associated bottle releases when brand changes", async ({
   expect(updatedRelease.fullName).toBe(
     `${newBrand.name} Test Bottle - Special Edition - 45.0% ABV`,
   );
+});
+
+test("creates a new series when updating a bottle", async function ({
+  fixtures,
+}) {
+  const brand = await fixtures.Entity({ name: "Ardbeg" });
+  const bottle = await fixtures.Bottle({ brandId: brand.id });
+
+  const user = await fixtures.User({ mod: true });
+
+  const caller = createCaller({
+    user,
+  });
+
+  const data = {
+    bottle: bottle.id,
+    name: "Supernova",
+    series: {
+      name: "Supernova",
+    },
+  };
+
+  await caller.bottleUpdate(data);
+
+  const [updatedBottle] = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottle.id));
+
+  expect(updatedBottle.seriesId).toBeDefined();
+
+  const [series] = await db
+    .select()
+    .from(bottleSeries)
+    .where(eq(bottleSeries.id, updatedBottle.seriesId!));
+
+  expect(series.name).toEqual(data.series.name);
+  expect(series.brandId).toEqual(bottle.brandId);
+  expect(series.numReleases).toEqual(1);
+
+  // Verify change record was created
+  const change = await db.query.changes.findFirst({
+    where: and(
+      eq(changes.objectId, series.id),
+      eq(changes.objectType, "bottle_series"),
+    ),
+  });
+  expect(change).toBeDefined();
+  expect(change!.objectId).toEqual(series.id);
+  expect(change!.objectType).toEqual("bottle_series");
+  expect(change!.type).toEqual("add");
+  expect(change!.createdById).toEqual(user.id);
+  expect(change!.displayName).toEqual(`${brand.name} ${data.series.name}`);
+  expect(change!.data).toEqual({
+    name: data.series.name,
+    fullName: `${brand.name} ${data.series.name}`,
+    brandId: brand.id,
+  });
 });
