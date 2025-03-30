@@ -70,7 +70,17 @@ export default function BottleOverview({
               </DefinitionList.Details>
               <DefinitionList.Term>Series</DefinitionList.Term>
               <DefinitionList.Details>
-                {bottle.series ? bottle.series.name : <em>n/a</em>}
+                {bottle.series ? (
+                  <Link
+                    key={bottle.series.id}
+                    href={`/bottles?series=${bottle.series.id}`}
+                    className="underline"
+                  >
+                    {bottle.series.name}
+                  </Link>
+                ) : (
+                  <em>n/a</em>
+                )}
               </DefinitionList.Details>
               <DefinitionList.Term>Distilled At</DefinitionList.Term>
               <DefinitionList.Details>

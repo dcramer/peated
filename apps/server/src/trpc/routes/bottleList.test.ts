@@ -106,3 +106,20 @@ test("lists bottles with query matching brand and name", async ({
   expect(results.length).toBe(1);
   expect(results[0].id).toBe(bottle1.id);
 });
+
+test("lists bottles with series", async ({ fixtures }) => {
+  const series = await fixtures.BottleSeries({ name: "Limited Edition" });
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood",
+    seriesId: series.id,
+  });
+  await fixtures.Bottle({ name: "Something Else" });
+
+  const caller = createCaller({ user: null });
+  const { results } = await caller.bottleList({
+    series: series.id,
+  });
+
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});

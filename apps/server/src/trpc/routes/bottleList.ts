@@ -43,6 +43,7 @@ const InputSchema = z
     distiller: z.number().nullish(),
     bottler: z.number().nullish(),
     entity: z.number().nullish(),
+    series: z.number().nullish(),
     tag: z.string().nullish(),
     flavorProfile: z.enum(FLAVOR_PROFILES).nullish(),
     flight: z.string().nullish(),
@@ -95,6 +96,9 @@ export async function bottleList({
         sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${input.entity} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
       ),
     );
+  }
+  if (input.series) {
+    where.push(eq(bottles.seriesId, input.series));
   }
   if (input.category) {
     where.push(eq(bottles.category, input.category));
