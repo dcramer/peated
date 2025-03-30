@@ -18,7 +18,7 @@ export default async ({ entityId }: { entityId: number }) => {
 
   const searchVector = buildEntitySearchVector(entity, aliasList) || null;
 
-  console.log(`Updating index for Entity ${entity.id}`);
+  console.log(`Updating searchVector for Entity ${entity.id}`);
 
   await db
     .update(entities)

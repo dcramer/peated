@@ -7,7 +7,6 @@ import { eq, inArray, or, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
 import {
-  CATEGORY_LIST,
   EXTERNAL_SITE_TYPE_LIST,
   FLAVOR_PROFILES,
   TAG_CATEGORIES,
@@ -19,6 +18,7 @@ import {
   badges,
   bottleAliases,
   bottles,
+  bottleSeries,
   bottlesToDistillers,
   bottleTags,
   changes,
@@ -39,9 +39,12 @@ import {
 import { createAccessToken, generatePasswordHash } from "../auth";
 import { mapRows } from "../db";
 import { formatBottleName } from "../format";
-import { normalizeBottle } from "../normalize";
 import { choose, random, sample } from "../rand";
-import { buildBottleSearchVector, buildEntitySearchVector } from "../search";
+import {
+  buildBottleSearchVector,
+  buildBottleSeriesSearchVector,
+  buildEntitySearchVector,
+} from "../search";
 import { SMWS_DISTILLERY_CODES } from "../smws";
 import { toTitleCase } from "../strings";
 
@@ -923,3 +926,54 @@ export const BottleRelease = async (
 
   return result;
 };
+
+export async function BottleSeries(
+  { ...data }: Partial<Omit<dbSchema.NewBottleSeries, "id">> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.BottleSeries> {
+  const result = await db.transaction(async (tx) => {
+    if (!data.brandId) {
+      const brand = await Entity({ type: ["distiller"] }, tx);
+      data.brandId = brand.id;
+    }
+
+    if (!data.createdById) {
+      const user = await User({}, tx);
+      data.createdById = user.id;
+    }
+
+    // Get the brand to build fullName
+    const brand = await tx.query.entities.findFirst({
+      where: (entities, { eq }) => eq(entities.id, data.brandId as number),
+    });
+    if (!brand) throw new Error("Unable to find brand");
+
+    const name = data.name ?? faker.commerce.productName();
+    const fullName = `${brand.shortName || brand.name} ${name}`;
+
+    const values = {
+      name,
+      fullName,
+      description: data.description ?? faker.lorem.sentence(),
+      brandId: data.brandId,
+      createdById: data.createdById,
+      createdAt: data.createdAt ?? new Date(),
+      updatedAt: data.updatedAt ?? new Date(),
+      numReleases: data.numReleases ?? 0,
+    };
+
+    const result = await tx
+      .insert(bottleSeries)
+      .values({
+        ...values,
+        searchVector: buildBottleSeriesSearchVector(values, brand),
+      })
+      .returning();
+
+    return result[0];
+  });
+
+  if (!result) throw new Error("Unable to create BottleSeries fixture");
+
+  return result;
+}

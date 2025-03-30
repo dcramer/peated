@@ -3,6 +3,7 @@ import type {
   NewBottle,
   NewBottleAlias,
   NewBottleRelease,
+  NewBottleSeries,
   NewEntity,
 } from "../db/schema";
 import { formatCategoryName } from "./format";
@@ -76,5 +77,18 @@ export function buildBottleReleaseSearchVector(
     values.push(new TSVector(`${release.vintageYear} Vintage`, "B"));
   if (release.releaseYear)
     values.push(new TSVector(`${release.releaseYear} Release`, "B"));
+  return values;
+}
+
+export function buildBottleSeriesSearchVector(
+  series: NewBottleSeries,
+  brand: NewEntity,
+): TSVector[] {
+  const values: TSVector[] = [
+    new TSVector(series.fullName, "A"),
+    new TSVector(brand.name, "C"),
+  ];
+  if (brand.shortName)
+    values.push(new TSVector(`${brand.shortName} ${series.name}`, "B"));
   return values;
 }

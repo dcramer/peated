@@ -34,6 +34,45 @@ type TastingNotes = {
 };
 
 /**
+ * Represents a series of bottles from a brand.
+ * A series groups related bottles together and contains shared characteristics.
+ * Examples: Macallan 18, Octomore 13, Ardbeg Supernova
+ */
+export const bottleSeries = pgTable(
+  "bottle_series",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    brandId: bigint("brand_id", { mode: "number" })
+      .references(() => entities.id)
+      .notNull(),
+    description: text("description"),
+    searchVector: tsvector("search_vector"),
+    numReleases: bigint("num_releases", { mode: "number" })
+      .default(0)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" })
+      .references(() => users.id)
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("bottle_series_full_name_key").using(
+      "btree",
+      sql`LOWER(${table.fullName})`,
+    ),
+    index("bottle_series_search_idx").using("gin", table.searchVector),
+    index("bottle_series_brand_idx").on(table.brandId),
+    index("bottle_series_created_by_idx").on(table.createdById),
+  ],
+);
+
+export type BottleSeries = typeof bottleSeries.$inferSelect;
+export type NewBottleSeries = typeof bottleSeries.$inferInsert;
+
+/**
  * Represents a unique expression from a brand.
  * This is the parent table that contains the core information about a bottle.
  * Each bottle can have multiple editions (vintages, releases, etc.) which are stored in bottle_edition.
@@ -71,7 +110,9 @@ export const bottles = pgTable(
     statedAge: smallint("stated_age"),
 
     // a NULL series represents a "core bottling"
-    series: varchar("series", { length: 255 }),
+    seriesId: bigint("series_id", { mode: "number" }).references(
+      () => bottleSeries.id,
+    ),
 
     searchVector: tsvector("search_vector"),
 
@@ -138,6 +179,44 @@ export const bottles = pgTable(
 
 export type Bottle = typeof bottles.$inferSelect;
 export type NewBottle = typeof bottles.$inferInsert;
+
+export const bottlesRelations = relations(bottles, ({ one, many }) => ({
+  brand: one(entities, {
+    fields: [bottles.brandId],
+    references: [entities.id],
+  }),
+  bottler: one(entities, {
+    fields: [bottles.bottlerId],
+    references: [entities.id],
+  }),
+  series: one(bottleSeries, {
+    fields: [bottles.seriesId],
+    references: [bottleSeries.id],
+  }),
+  bottlesToDistillers: many(bottlesToDistillers),
+  releases: many(bottleReleases),
+  createdBy: one(users, {
+    fields: [bottles.createdById],
+    references: [users.id],
+  }),
+}));
+
+export const bottleSeriesRelations = relations(
+  bottleSeries,
+  ({ one, many }) => ({
+    brand: one(entities, {
+      fields: [bottleSeries.brandId],
+      references: [entities.id],
+    }),
+    bottles: many(bottles, {
+      relationName: "series",
+    }),
+    createdBy: one(users, {
+      fields: [bottleSeries.createdById],
+      references: [users.id],
+    }),
+  }),
+);
 
 /**
  * Represents a specific edition/release/vintage of a bottle.
@@ -225,23 +304,6 @@ export const bottleReleases = pgTable(
     uniqueIndex("bottle_release_full_name_idx").on(table.fullName),
   ],
 );
-
-export const bottlesRelations = relations(bottles, ({ one, many }) => ({
-  brand: one(entities, {
-    fields: [bottles.brandId],
-    references: [entities.id],
-  }),
-  bottler: one(entities, {
-    fields: [bottles.bottlerId],
-    references: [entities.id],
-  }),
-  bottlesToDistillers: many(bottlesToDistillers),
-  releases: many(bottleReleases),
-  createdBy: one(users, {
-    fields: [bottles.createdById],
-    references: [users.id],
-  }),
-}));
 
 export const bottleReleasesRelations = relations(bottleReleases, ({ one }) => ({
   bottle: one(bottles, {

@@ -11,6 +11,7 @@ export type JobName =
   | "IndexBottleAlias"
   | "IndexBottleSearchVectors"
   | "IndexBottleReleaseSearchVectors"
+  | "IndexBottleSeriesSearchVectors"
   | "IndexEntitySearchVectors"
   | "MergeBottle"
   | "MergeEntity"

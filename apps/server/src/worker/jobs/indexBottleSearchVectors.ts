@@ -52,7 +52,7 @@ export default async ({ bottleId }: { bottleId: number }) => {
       distillerList,
     ) || null;
 
-  console.log(`Updating index for Bottle ${bottle.id}`);
+  console.log(`Updating searchVector for Bottle ${bottle.id}`);
 
   await db
     .update(bottles)

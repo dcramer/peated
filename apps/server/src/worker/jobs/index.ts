@@ -11,6 +11,7 @@ import geocodeRegionLocation from "./geocodeRegionLocation";
 import indexBottleAlias from "./indexBottleAlias";
 import indexBottleReleaseSearchVectors from "./indexBottleReleaseSearchVectors";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
+import indexBottleSeriesSearchVectors from "./indexBottleSeriesSearchVectors";
 import indexEntitySearchVectors from "./indexEntitySearchVectors";
 import mergeBottle from "./mergeBottle";
 import mergeEntity from "./mergeEntity";
@@ -47,6 +48,7 @@ registry.add(
   "IndexBottleReleaseSearchVectors",
   indexBottleReleaseSearchVectors,
 );
+registry.add("IndexBottleSeriesSearchVectors", indexBottleSeriesSearchVectors);
 registry.add("IndexEntitySearchVectors", indexEntitySearchVectors);
 registry.add("MergeBottle", mergeBottle);
 registry.add("MergeEntity", mergeEntity);

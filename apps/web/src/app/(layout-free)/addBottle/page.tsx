@@ -24,8 +24,9 @@ export default function AddBottle() {
   const distiller = searchParams.get("distiller") || null;
   const brand = searchParams.get("brand") || null;
   const bottler = searchParams.get("bottler") || null;
+  const series = searchParams.get("series") || null;
 
-  const needsToLoad = Boolean(distiller || brand || bottler);
+  const needsToLoad = Boolean(distiller || brand || bottler || series);
   const [loading, setLoading] = useState<boolean>(needsToLoad);
 
   const [initialData, setInitialData] = useState<Record<string, any>>({
@@ -33,7 +34,7 @@ export default function AddBottle() {
   });
 
   const queryOrder: string[] = [];
-  const initialQueries = trpc.useQueries((t) => {
+  let initialQueries = trpc.useQueries((t) => {
     const rv = [];
     if (distiller) {
       queryOrder.push("distiller");
@@ -47,8 +48,13 @@ export default function AddBottle() {
       queryOrder.push("bottler");
       rv.push(t.entityById(Number(bottler)));
     }
+
     return rv;
   });
+
+  const seriesQuery = series
+    ? trpc.bottleSeriesById.useQuery(Number(series))
+    : null;
 
   const getQueryResult = (name: string): Entity | undefined => {
     const index = queryOrder.indexOf(name);
@@ -57,19 +63,25 @@ export default function AddBottle() {
   };
 
   useEffect(() => {
-    if (loading && !initialQueries.find((q) => q.isLoading)) {
+    if (
+      loading &&
+      !initialQueries.find((q) => q.isLoading) &&
+      !seriesQuery?.isLoading
+    ) {
       const distiller = getQueryResult("distiller");
       const brand = getQueryResult("brand");
       const bottler = getQueryResult("bottler");
+      const series = seriesQuery?.data;
       setInitialData((initialData) => ({
         ...initialData,
         distillers: distiller ? [distiller] : [],
         brand,
         bottler,
+        series,
       }));
       setLoading(false);
     }
-  }, [initialQueries.find((q) => q.isLoading)]);
+  }, [initialQueries.find((q) => q.isLoading), seriesQuery?.isLoading]);
 
   const bottleCreateMutation = trpc.bottleCreate.useMutation();
   const api = useApi();

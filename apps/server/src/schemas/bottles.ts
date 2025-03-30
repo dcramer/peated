@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BottleSeriesInputSchema, BottleSeriesSchema } from "./bottleSeries";
 import {
   CaskFillEnum,
   CaskSizeEnum,
@@ -23,9 +24,7 @@ export const BottleSchema = z.object({
       "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
     ),
 
-  series: z
-    .string()
-    .nullable()
+  series: BottleSeriesSchema.nullable()
     .default(null)
     .describe(
       "Series name for this bottling (e.g. Supernova for Ardbeg Supernova)",
@@ -193,6 +192,16 @@ export const BottleInputSchema = BottleSchema.omit({
     .describe(
       "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
     ),
+  series: z
+    .union([
+      z.number(),
+      BottleSeriesInputSchema.extend({
+        id: z.number().nullish().describe("Optional ID for the series"),
+      }),
+    ])
+    .nullable()
+    .default(null)
+    .optional(),
   brand: EntityChoice,
   distillers: z.array(EntityChoice).default([]).optional(),
   bottler: EntityChoice.nullable().default(null).optional(),

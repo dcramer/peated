@@ -217,6 +217,24 @@ export async function bottleCreate({
     });
   }
 
+  // Queue search vector indexing for series if present
+  if (bottle.seriesId) {
+    try {
+      await pushJob("IndexBottleSeriesSearchVectors", {
+        seriesId: bottle.seriesId,
+      });
+    } catch (err) {
+      logError(err, {
+        bottle: {
+          id: bottle.id,
+        },
+        series: {
+          id: bottle.seriesId,
+        },
+      });
+    }
+  }
+
   for (const aliasName of newAliases) {
     try {
       await pushJob("OnBottleAliasChange", { name: aliasName });
