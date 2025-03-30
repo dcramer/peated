@@ -292,6 +292,7 @@ export default function BottleForm({
                 placeholder="e.g. A Midwinter Night's Dram"
                 brand={brandValue?.id ? Number(brandValue.id) : 0}
                 disabled={!brandValue}
+                canCreate
                 onChange={(value) => {
                   onChange(value?.id || value);
                   setSeriesValue(value);
