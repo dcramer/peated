@@ -9,15 +9,19 @@ import { UserSerializer } from "./user";
 
 export const CommentSerializer = serializer({
   attrs: async (itemList: Comment[], currentUser?: User) => {
+    if (itemList.length === 0) return {};
+
+    // Get all creator user IDs
+    const userIds = new Set<number>();
+    itemList.forEach((item) => {
+      userIds.add(item.createdById);
+    });
+
     const userList = await db
       .select()
       .from(users)
-      .where(
-        inArray(
-          users.id,
-          itemList.map((i) => i.createdById),
-        ),
-      );
+      .where(inArray(users.id, Array.from(userIds)));
+
     const usersById = Object.fromEntries(
       (await serialize(UserSerializer, userList, currentUser)).map(
         (data, index) => [userList[index].id, data],
@@ -41,11 +45,14 @@ export const CommentSerializer = serializer({
     attrs: Record<string, any>,
     currentUser?: User,
   ): z.infer<typeof CommentSchema> => {
+    // Create a basic comment object
     return {
       id: item.id,
       comment: item.comment,
       createdAt: item.createdAt.toISOString(),
       createdBy: attrs.createdBy,
+      replyToId: null, // This will be overridden in the commentCreate procedure if needed
+      mentions: [],
     };
   },
 });
