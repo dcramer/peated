@@ -21,6 +21,7 @@ test("bottle list", async ({ axiosMock }) => {
   expect(items[0]).toMatchInlineSnapshot(`
     [
       {
+        "abv": 58.9,
         "bottler": {
           "name": "The Scotch Malt Whisky Society",
         },
@@ -56,6 +57,7 @@ test("bottle list", async ({ axiosMock }) => {
   expect(items[1]).toMatchInlineSnapshot(`
     [
       {
+        "abv": 57.1,
         "bottler": {
           "name": "The Scotch Malt Whisky Society",
         },
