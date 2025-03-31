@@ -16,6 +16,7 @@ export default function BottleList() {
       "entity",
       "distiller",
       "bottler",
+      "series",
       "entity",
     ],
     overrides: {
