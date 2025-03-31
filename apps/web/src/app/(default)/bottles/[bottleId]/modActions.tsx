@@ -37,6 +37,19 @@ export default function ModActions({ bottle }: { bottle: Bottle }) {
         <MenuItem as={Link} href={`/bottles/${bottle.id}/aliases`}>
           View Aliases
         </MenuItem>
+        <MenuItem
+          as={Link}
+          href={`/addBottle?${new URLSearchParams({
+            series: bottle.series ? `${bottle.series.id}` : "",
+            brand: `${bottle.brand.id}`,
+            bottler: bottle.bottler ? `${bottle.bottler.id}` : "",
+            distiller: bottle.distillers.length
+              ? `${bottle.distillers[0].id}`
+              : "",
+          }).toString()}`}
+        >
+          Add Similar Release
+        </MenuItem>
         <MenuItem as={Link} href={`/bottles/${bottle.id}/edit`}>
           Edit Bottle
         </MenuItem>
