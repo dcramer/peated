@@ -1,0 +1,1 @@
+ALTER TABLE "bottle" ADD COLUMN "edition" varchar(255);

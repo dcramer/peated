@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "review_bottle_idx" ON "review" ("bottle_id");

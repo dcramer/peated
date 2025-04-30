@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "follow_to_user_idx" ON "follow" ("to_user_id");

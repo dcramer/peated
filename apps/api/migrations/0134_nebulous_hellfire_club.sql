@@ -1,0 +1,1 @@
+ALTER TABLE "bottle_alias" ADD COLUMN "ignored" boolean DEFAULT false;

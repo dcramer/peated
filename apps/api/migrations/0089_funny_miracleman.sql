@@ -1,0 +1,1 @@
+ALTER TABLE "badges" ALTER COLUMN "name" SET NOT NULL;

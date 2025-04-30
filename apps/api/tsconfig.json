@@ -1,0 +1,14 @@
+{
+  "extends": "@peated/tsconfig/base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "types": ["node", "vitest/globals", "./src/global.d.ts"],
+    "moduleResolution": "Node",
+    "composite": true,
+    "paths": {
+      "@peated/server/*": ["./src/*"]
+    }
+  },
+  "include": ["./src"],
+  "exclude": ["./src/test/setup-test-env.ts", "node_modules"]
+}

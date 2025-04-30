@@ -1,0 +1,1 @@
+ALTER TYPE "public"."object_type" ADD VALUE 'bottle_series' BEFORE 'comment';

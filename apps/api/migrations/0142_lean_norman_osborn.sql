@@ -1,0 +1,1 @@
+ALTER TYPE "badge_formula" ADD VALUE 'fibonacci';

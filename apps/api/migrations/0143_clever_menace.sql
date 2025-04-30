@@ -1,0 +1,1 @@
+ALTER TABLE "bottle" DROP COLUMN IF EXISTS "uniq_hash";
