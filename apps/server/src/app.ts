@@ -55,6 +55,13 @@ export default async function buildFastify(options = {}) {
       "Cache-Control":
         "private, no-cache, no-store, max-age=0, must-revalidate",
     });
+    
+    // Ensure API routes return JSON responses
+    if (request.url.startsWith('/api') || request.url.startsWith('/bottles/') || 
+        request.url.startsWith('/trpc') || request.url.includes('/image')) {
+      reply.type('application/json');
+    }
+    
     done();
   });
 
