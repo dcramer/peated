@@ -76,7 +76,12 @@ export default async function plugin<T extends FastifyInstance>(
         } satisfies FastifyZodOpenApiSchema,
       },
       async function (request, reply) {
-        const user = await authBasic(request.body.email, request.body.password);
+        let user;
+        if ("googleCode" in request.body) {
+          user = await authGoogle(request.body.googleCode);
+        } else {
+          user = await authBasic(request.body.email, request.body.password);
+        }
 
         if (!user.active) {
           throw new UnauthorizedError("Invalid credentials.");

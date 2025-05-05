@@ -41,11 +41,9 @@
     "@types/jsonwebtoken": "^9.0.8",
     "@types/mime-types": "^2.1.4",
     "@types/mjml": "^4.7.4",
-    "@types/node": "catalog:",
     "@types/nodemailer": "^6.4.17",
     "@types/pg": "catalog:",
     "@types/react": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
     "ai": "^4.1.58",
     "axios": "~1.6.8",
     "bcrypt": "^5.1.1",
@@ -84,9 +82,7 @@
   "devDependencies": {
     "axios-mock-adapter": "~1.22.0",
     "form-data-encoder": "^4.0.2",
-    "formdata-node": "^6.0.3",
-    "vite-tsconfig-paths": "catalog:",
-    "vitest": "catalog:"
+    "formdata-node": "^6.0.3"
   },
   "volta": {
     "extends": "../../package.json"

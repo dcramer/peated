@@ -1,4 +1,4 @@
-FROM node:22-slim as base
+FROM node:23-slim as base
 # set for base and all layer that inherit from it
 ENV NODE_ENV="production" \
     PNPM_HOME="/pnpm" \

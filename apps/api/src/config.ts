@@ -29,7 +29,7 @@ export default {
   VERSION: process.env.VERSION || "",
 
   SENTRY_DSN: process.env.SENTRY_DSN || "",
-  SENTRY_SERVICE: process.env.SENTRY_SERVICE || "@peated/server",
+  SENTRY_SERVICE: process.env.SENTRY_SERVICE || "@peated/api",
 
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,

@@ -21,9 +21,9 @@ import { setTimeout } from "node:timers/promises";
 import type { ZodOpenApiVersion } from "zod-openapi";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
+import type { User } from "./db/schema";
 import { injectAuth } from "./middleware/auth";
 import fastifySentry from "./sentryPlugin";
-import type { User } from "./types";
 import { gracefulShutdown } from "./worker/client";
 
 declare module "@fastify/request-context" {
@@ -68,13 +68,19 @@ export default async function buildFastify(options = {}) {
   });
 
   app.addHook("preHandler", (request, reply, done) => {
-    // default
+    // default cache headers
     reply.headers({
       "Cache-Control":
         "private, no-cache, no-store, max-age=0, must-revalidate",
     });
     done();
   });
+
+  app.addHook("onClose", async () => {
+    await gracefulShutdown();
+  });
+
+  app.addHook("onRequest", injectAuth);
 
   if (config.ENV === "development") {
     console.log("Adding 300ms delay to all requests");
@@ -86,6 +92,7 @@ export default async function buildFastify(options = {}) {
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
+  await app.register(fastifySentry);
   await app.register(fastifyHttpErrorsEnhanced);
   await app.register(fastifyZodOpenApiPlugin);
   await app.register(fastifySwagger, {
@@ -155,15 +162,6 @@ export default async function buildFastify(options = {}) {
     },
   });
 
-  await app.register(fastifySentry);
-
-  app.addHook("preHandler", injectAuth);
-  app.addHook("onClose", async () => {
-    await gracefulShutdown();
-  });
-
-  // app.addHook('onRequest', injectAuth);
-
   // app.setErrorHandler(function (error, request, reply) {
   //   const { validation, validationContext } = error;
 
@@ -195,10 +193,12 @@ export default async function buildFastify(options = {}) {
   //   }
   // });
 
-  app.register(fastifyAutoload, {
+  await app.register(fastifyAutoload, {
     dir: path.join(__dirname, "routes"),
     dirNameRoutePrefix: true,
     options: { prefix: "/v1/" },
+    forceESM: true,
+    // encapsulate: false,
   });
 
   return app;

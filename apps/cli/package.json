@@ -20,7 +20,6 @@
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
     "@types/bcrypt": "^5.0.2",
-    "@types/node": "catalog:",
     "@types/pg": "catalog:",
     "bcrypt": "^5.1.1",
     "commander": "^12.1.0",

@@ -6,7 +6,8 @@
     "moduleResolution": "Node",
     "composite": true,
     "paths": {
-      "@peated/server/*": ["./src/*"]
+      "@peated/api/*": ["./src/*"],
+      "@peated/server/*": ["../server/src/*"]
     }
   },
   "include": ["./src"],
