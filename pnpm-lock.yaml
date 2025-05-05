@@ -54,9 +54,6 @@ catalogs:
     '@types/react-dom':
       specifier: ^18.2.0
       version: 18.3.0
-    '@vitest/coverage-v8':
-      specifier: ~3
-      version: 3.0.6
     drizzle-kit:
       specifier: ^0.30.5
       version: 0.30.5
@@ -96,12 +93,6 @@ catalogs:
     typescript:
       specifier: ^5.5.4
       version: 5.5.4
-    vite-tsconfig-paths:
-      specifier: ^5.0.1
-      version: 5.0.1
-    vitest:
-      specifier: ~3
-      version: 3.0.6
     zod:
       specifier: ^3.23.8
       version: 3.23.8
@@ -138,6 +129,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^5.62.0
         version: 5.62.0(eslint@8.57.0)(typescript@5.8.3)
+      '@vitest/coverage-v8':
+        specifier: ~3
+        version: 3.0.6(vitest@3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1))
       eslint:
         specifier: 'catalog:'
         version: 8.57.0
@@ -156,6 +150,12 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: 'catalog:'
         version: 0.5.14(prettier-plugin-organize-imports@3.2.4(prettier@3.3.3)(typescript@5.8.3))(prettier@3.3.3)
+      vite-tsconfig-paths:
+        specifier: ^5.0.1
+        version: 5.0.1(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1))
+      vitest:
+        specifier: ~3
+        version: 3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1)
 
   apps/api:
     dependencies:
@@ -192,6 +192,12 @@ importers:
       '@googlemaps/google-maps-services-js':
         specifier: ^3.4.1
         version: 3.4.1
+      '@hono/zod-openapi':
+        specifier: ^0.19.6
+        version: 0.19.6(hono@4.7.8)(zod@3.24.4)
+      '@hono/zod-validator':
+        specifier: ^0.5.0
+        version: 0.5.0(hono@4.7.8)(zod@3.24.4)
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
@@ -240,9 +246,6 @@ importers:
       '@types/pg':
         specifier: 'catalog:'
         version: 8.11.6
-      '@vitest/coverage-v8':
-        specifier: 'catalog:'
-        version: 3.0.6(vitest@3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1))
       ai:
         specifier: ^4.3.13
         version: 4.3.13(react@18.3.1)(zod@3.24.4)
@@ -300,6 +303,9 @@ importers:
       google-auth-library:
         specifier: ^8.9.0
         version: 8.9.0
+      hono-openapi:
+        specifier: ^0.4.8
+        version: 0.4.8(@hono/zod-validator@0.5.0(hono@4.7.8)(zod@3.24.4))(hono@4.7.8)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.24.4))(zod@3.24.4)
       http-errors-enhanced:
         specifier: ^3.0.2
         version: 3.0.2
@@ -361,12 +367,6 @@ importers:
       formdata-node:
         specifier: ^6.0.3
         version: 6.0.3
-      vite-tsconfig-paths:
-        specifier: 'catalog:'
-        version: 5.0.1(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1))
-      vitest:
-        specifier: 'catalog:'
-        version: 3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1)
 
   apps/cli:
     dependencies:
@@ -508,9 +508,6 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 18.3.3
-      '@vitest/coverage-v8':
-        specifier: 'catalog:'
-        version: 3.0.6(vitest@3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1))
       ai:
         specifier: ^4.1.58
         version: 4.1.58(react@18.3.1)(zod@3.23.8)
@@ -623,12 +620,6 @@ importers:
       formdata-node:
         specifier: ^6.0.3
         version: 6.0.3
-      vite-tsconfig-paths:
-        specifier: 'catalog:'
-        version: 5.0.1(typescript@5.5.4)(vite@4.5.9(@types/node@22.15.3)(lightningcss@1.22.0)(terser@5.39.0))
-      vitest:
-        specifier: 'catalog:'
-        version: 3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1)
 
   apps/web:
     dependencies:
@@ -957,8 +948,17 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
+  '@apidevtools/json-schema-ref-parser@11.9.3':
+    resolution: {integrity: sha512-60vepv88RwcJtSHrD6MjIL6Ta3SOYbgfnkHb+ppAVK+o9mXprRtulx7VlRl3lN3bbvysAfCS7WMVfhUYemB0IQ==}
+    engines: {node: '>= 16'}
+
   '@asamuzakjp/css-color@3.1.7':
     resolution: {integrity: sha512-Ok5fYhtwdyJQmU1PpEv6Si7Y+A4cYb8yNM9oiIJC9TzXPMuN9fvdonKJqcnz9TbFqV6bQ8z0giRq0iaOpGZV2g==}
+
+  '@asteasolutions/zod-to-openapi@7.3.0':
+    resolution: {integrity: sha512-7tE/r1gXwMIvGnXVUdIqUhCU1RevEFC4Jk6Bussa0fk1ecbnnINkZzj1EOAJyE/M3AI25DnHT/zKQL1/FPFi8Q==}
+    peerDependencies:
+      zod: ^3.20.2
 
   '@babel/code-frame@7.24.7':
     resolution: {integrity: sha512-BcYH1CVJBO9tvyIZ2jVeXgSIMvGZ2FDRvDdOIVQyuklNKSsx+eppDEBq/g47Ayw+RqNFE+URvOShmf+f/qwAlA==}
@@ -2855,6 +2855,19 @@ packages:
     peerDependencies:
       react: '>= 16'
 
+  '@hono/zod-openapi@0.19.6':
+    resolution: {integrity: sha512-qD2I0i5Ksry8gf47rXR6tuUAfv5S/wRZPRUNn+y8vOkgArDtIs30Ha3KGHeuGhcMk773D197IlPUppSCbHt6iQ==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      hono: '>=4.3.6'
+      zod: 3.*
+
+  '@hono/zod-validator@0.5.0':
+    resolution: {integrity: sha512-ds5bW6DCgAnNHP33E3ieSbaZFd5dkV52ZjyaXtGoR06APFrCtzAsKZxTHwOrJNBdXsi0e5wNwo5L4nVEVnJUdg==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.19.1
+
   '@hookform/resolvers@3.6.0':
     resolution: {integrity: sha512-UBcpyOX3+RR+dNnqBd0lchXpoL8p4xC21XP8H6Meb8uve5Br1GCnmg0PcBoKKqPKgGu9GHQ/oygcmPrQhetwqw==}
     peerDependencies:
@@ -3044,6 +3057,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@jsdevtools/ono@7.1.3':
+    resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
 
   '@jsx-email/app-preview@1.2.6':
     resolution: {integrity: sha512-YpHkz96nQtwB12iTFgFKFSChAhPUzbCCDvX/VSs/sM/ehjzQ+qGqhACmWG+evvFwg3NYXHQ7JKXpVAjEW+PJkQ==}
@@ -5623,6 +5639,10 @@ packages:
     resolution: {integrity: sha512-neHB9xuzh/wk0dIHweyAXv2aPGZIVk3pLMe+/RNzINf17fe0OG96QroktYAUm7SM1PBnzTabaLboqqxDyMU+SQ==}
     engines: {node: '>=6'}
 
+  clone@2.1.2:
+    resolution: {integrity: sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==}
+    engines: {node: '>=0.8'}
+
   clsx@2.0.0:
     resolution: {integrity: sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==}
     engines: {node: '>=6'}
@@ -7093,6 +7113,55 @@ packages:
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
+  hono-openapi@0.4.8:
+    resolution: {integrity: sha512-LYr5xdtD49M7hEAduV1PftOMzuT8ZNvkyWfh1DThkLsIr4RkvDb12UxgIiFbwrJB6FLtFXLoOZL9x4IeDk2+VA==}
+    peerDependencies:
+      '@hono/arktype-validator': ^2.0.0
+      '@hono/effect-validator': ^1.2.0
+      '@hono/typebox-validator': ^0.2.0 || ^0.3.0
+      '@hono/valibot-validator': ^0.5.1
+      '@hono/zod-validator': ^0.4.1
+      '@sinclair/typebox': ^0.34.9
+      '@valibot/to-json-schema': ^1.0.0-beta.3
+      arktype: ^2.0.0
+      effect: ^3.11.3
+      hono: ^4.6.13
+      openapi-types: ^12.1.3
+      valibot: ^1.0.0-beta.9
+      zod: ^3.23.8
+      zod-openapi: ^4.0.0
+    peerDependenciesMeta:
+      '@hono/arktype-validator':
+        optional: true
+      '@hono/effect-validator':
+        optional: true
+      '@hono/typebox-validator':
+        optional: true
+      '@hono/valibot-validator':
+        optional: true
+      '@hono/zod-validator':
+        optional: true
+      '@sinclair/typebox':
+        optional: true
+      '@valibot/to-json-schema':
+        optional: true
+      arktype:
+        optional: true
+      effect:
+        optional: true
+      hono:
+        optional: true
+      valibot:
+        optional: true
+      zod:
+        optional: true
+      zod-openapi:
+        optional: true
+
+  hono@4.7.8:
+    resolution: {integrity: sha512-PCibtFdxa7/Ldud9yddl1G81GjYaeMYYTq4ywSaNsYbB1Lug4mwtOMJf2WXykL0pntYwmpRJeOI3NmoDgD+Jxw==}
+    engines: {node: '>=16.9.0'}
+
   html-encoding-sniffer@4.0.0:
     resolution: {integrity: sha512-Y22oTqIU4uuPgEemfz7NDJz6OeKf12Lsu+QC+s3BVpda64lTiMYCyGwg5ki4vFxkMwQdeZDl2adZoqUgdFuTgQ==}
     engines: {node: '>=18'}
@@ -7627,6 +7696,10 @@ packages:
 
   json-schema-traverse@1.0.0:
     resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
+
+  json-schema-walker@2.0.0:
+    resolution: {integrity: sha512-nXN2cMky0Iw7Af28w061hmxaPDaML5/bQD9nwm1lOoIKEGjHcRGxqWe4MfrkYThYAPjSUhmsp4bJNoLAyVn9Xw==}
+    engines: {node: '>=10'}
 
   json-schema@0.4.0:
     resolution: {integrity: sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==}
@@ -8430,6 +8503,9 @@ packages:
 
   openapi-types@12.1.3:
     resolution: {integrity: sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw==}
+
+  openapi3-ts@4.4.0:
+    resolution: {integrity: sha512-9asTNB9IkKEzWMcHmVZE7Ts3kC9G7AFHfs8i7caD8HbI76gEjdkId4z/AkP83xdZsH7PLAnnbl47qZkXuxpArw==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -10809,6 +10885,12 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
+  '@apidevtools/json-schema-ref-parser@11.9.3':
+    dependencies:
+      '@jsdevtools/ono': 7.1.3
+      '@types/json-schema': 7.0.15
+      js-yaml: 4.1.0
+
   '@asamuzakjp/css-color@3.1.7':
     dependencies:
       '@csstools/css-calc': 2.1.3(@csstools/css-parser-algorithms@3.0.4(@csstools/css-tokenizer@3.0.3))(@csstools/css-tokenizer@3.0.3)
@@ -10817,6 +10899,11 @@ snapshots:
       '@csstools/css-tokenizer': 3.0.3
       lru-cache: 10.4.3
     optional: true
+
+  '@asteasolutions/zod-to-openapi@7.3.0(zod@3.24.4)':
+    dependencies:
+      openapi3-ts: 4.4.0
+      zod: 3.24.4
 
   '@babel/code-frame@7.24.7':
     dependencies:
@@ -11058,16 +11145,16 @@ snapshots:
 
   '@babel/helper-environment-visitor@7.24.7':
     dependencies:
-      '@babel/types': 7.25.2
+      '@babel/types': 7.27.1
 
   '@babel/helper-function-name@7.24.7':
     dependencies:
       '@babel/template': 7.26.9
-      '@babel/types': 7.25.2
+      '@babel/types': 7.27.1
 
   '@babel/helper-hoist-variables@7.24.7':
     dependencies:
-      '@babel/types': 7.25.2
+      '@babel/types': 7.27.1
 
   '@babel/helper-member-expression-to-functions@7.24.8':
     dependencies:
@@ -11219,7 +11306,7 @@ snapshots:
   '@babel/helper-simple-access@7.24.7':
     dependencies:
       '@babel/traverse': 7.26.9
-      '@babel/types': 7.25.2
+      '@babel/types': 7.27.1
     transitivePeerDependencies:
       - supports-color
 
@@ -11240,7 +11327,7 @@ snapshots:
 
   '@babel/helper-split-export-declaration@7.24.7':
     dependencies:
-      '@babel/types': 7.25.2
+      '@babel/types': 7.27.1
 
   '@babel/helper-string-parser@7.25.9': {}
 
@@ -13054,6 +13141,18 @@ snapshots:
     dependencies:
       react: 18.3.1
 
+  '@hono/zod-openapi@0.19.6(hono@4.7.8)(zod@3.24.4)':
+    dependencies:
+      '@asteasolutions/zod-to-openapi': 7.3.0(zod@3.24.4)
+      '@hono/zod-validator': 0.5.0(hono@4.7.8)(zod@3.24.4)
+      hono: 4.7.8
+      zod: 3.24.4
+
+  '@hono/zod-validator@0.5.0(hono@4.7.8)(zod@3.24.4)':
+    dependencies:
+      hono: 4.7.8
+      zod: 3.24.4
+
   '@hookform/resolvers@3.6.0(react-hook-form@7.52.0(react@18.3.1))':
     dependencies:
       react-hook-form: 7.52.0(react@18.3.1)
@@ -13256,6 +13355,8 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
     optional: true
+
+  '@jsdevtools/ono@7.1.3': {}
 
   '@jsx-email/app-preview@1.2.6(@types/node@22.15.3)(@types/react-dom@18.3.0)(@types/react@18.3.3)(lightningcss@1.22.0)(react@18.3.1)(rollup@4.40.1)(terser@5.39.0)(ts-node@10.9.2(@types/node@22.15.3)(typescript@5.5.4))':
     dependencies:
@@ -15353,24 +15454,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@3.0.6(vitest@3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1))':
-    dependencies:
-      '@ampproject/remapping': 2.3.0
-      '@bcoe/v8-coverage': 1.0.2
-      debug: 4.4.0
-      istanbul-lib-coverage: 3.2.2
-      istanbul-lib-report: 3.0.1
-      istanbul-lib-source-maps: 5.0.6
-      istanbul-reports: 3.1.7
-      magic-string: 0.30.17
-      magicast: 0.3.5
-      std-env: 3.9.0
-      test-exclude: 7.0.1
-      tinyrainbow: 2.0.0
-      vitest: 3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1)
-    transitivePeerDependencies:
-      - supports-color
-
   '@vitest/coverage-v8@3.0.6(vitest@3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1))':
     dependencies:
       '@ampproject/remapping': 2.3.0
@@ -15395,14 +15478,6 @@ snapshots:
       '@vitest/utils': 3.0.6
       chai: 5.2.0
       tinyrainbow: 2.0.0
-
-  '@vitest/mocker@3.0.6(vite@6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1))':
-    dependencies:
-      '@vitest/spy': 3.0.6
-      estree-walker: 3.0.3
-      magic-string: 0.30.17
-    optionalDependencies:
-      vite: 6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1)
 
   '@vitest/mocker@3.0.6(vite@6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1))':
     dependencies:
@@ -16357,6 +16432,8 @@ snapshots:
       shallow-clone: 3.0.1
     optional: true
 
+  clone@2.1.2: {}
+
   clsx@2.0.0: {}
 
   clsx@2.1.1: {}
@@ -17203,7 +17280,7 @@ snapshots:
       '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@5.5.4)
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       eslint-plugin-jsx-a11y: 6.8.0(eslint@8.57.0)
       eslint-plugin-react: 7.37.5(eslint@8.57.0)
@@ -17222,12 +17299,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0):
+  eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
       debug: 4.4.0
       enhanced-resolve: 5.17.0
       eslint: 8.57.0
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.10.0
@@ -17239,14 +17316,14 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@5.8.3)
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint@8.57.0))(eslint@8.57.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -17260,7 +17337,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.8.3))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
       hasown: 2.0.2
       is-core-module: 2.13.1
       is-glob: 4.0.3
@@ -18174,6 +18251,18 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
+  hono-openapi@0.4.8(@hono/zod-validator@0.5.0(hono@4.7.8)(zod@3.24.4))(hono@4.7.8)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.24.4))(zod@3.24.4):
+    dependencies:
+      json-schema-walker: 2.0.0
+      openapi-types: 12.1.3
+    optionalDependencies:
+      '@hono/zod-validator': 0.5.0(hono@4.7.8)(zod@3.24.4)
+      hono: 4.7.8
+      zod: 3.24.4
+      zod-openapi: 4.2.4(zod@3.24.4)
+
+  hono@4.7.8: {}
+
   html-encoding-sniffer@4.0.0:
     dependencies:
       whatwg-encoding: 3.1.1
@@ -18855,6 +18944,11 @@ snapshots:
   json-schema-traverse@0.4.1: {}
 
   json-schema-traverse@1.0.0: {}
+
+  json-schema-walker@2.0.0:
+    dependencies:
+      '@apidevtools/json-schema-ref-parser': 11.9.3
+      clone: 2.1.2
 
   json-schema@0.4.0: {}
 
@@ -19846,6 +19940,10 @@ snapshots:
       - encoding
 
   openapi-types@12.1.3: {}
+
+  openapi3-ts@4.4.0:
+    dependencies:
+      yaml: 2.7.1
 
   optionator@0.9.4:
     dependencies:
@@ -21742,10 +21840,6 @@ snapshots:
       yn: 3.1.1
     optional: true
 
-  tsconfck@3.1.5(typescript@5.5.4):
-    optionalDependencies:
-      typescript: 5.5.4
-
   tsconfck@3.1.5(typescript@5.8.3):
     optionalDependencies:
       typescript: 5.8.3
@@ -22065,27 +22159,6 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite-node@3.0.6(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1):
-    dependencies:
-      cac: 6.7.14
-      debug: 4.4.0
-      es-module-lexer: 1.7.0
-      pathe: 2.0.3
-      vite: 6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1)
-    transitivePeerDependencies:
-      - '@types/node'
-      - jiti
-      - less
-      - lightningcss
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - tsx
-      - yaml
-
   vite-node@3.0.6(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1):
     dependencies:
       cac: 6.7.14
@@ -22127,17 +22200,6 @@ snapshots:
     transitivePeerDependencies:
       - rollup
 
-  vite-tsconfig-paths@5.0.1(typescript@5.5.4)(vite@4.5.9(@types/node@22.15.3)(lightningcss@1.22.0)(terser@5.39.0)):
-    dependencies:
-      debug: 4.4.0
-      globrex: 0.1.2
-      tsconfck: 3.1.5(typescript@5.5.4)
-    optionalDependencies:
-      vite: 4.5.9(@types/node@22.15.3)(lightningcss@1.22.0)(terser@5.39.0)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-
   vite-tsconfig-paths@5.0.1(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1)):
     dependencies:
       debug: 4.4.0
@@ -22171,23 +22233,6 @@ snapshots:
       lightningcss: 1.22.0
       terser: 5.39.0
 
-  vite@6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1):
-    dependencies:
-      esbuild: 0.25.3
-      fdir: 6.4.4(picomatch@4.0.2)
-      picomatch: 4.0.2
-      postcss: 8.5.3
-      rollup: 4.40.1
-      tinyglobby: 0.2.13
-    optionalDependencies:
-      '@types/node': 22.15.3
-      fsevents: 2.3.3
-      jiti: 1.21.7
-      lightningcss: 1.22.0
-      terser: 5.39.0
-      tsx: 4.16.2
-      yaml: 2.7.1
-
   vite@6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1):
     dependencies:
       esbuild: 0.25.3
@@ -22204,45 +22249,6 @@ snapshots:
       terser: 5.39.0
       tsx: 4.19.4
       yaml: 2.7.1
-
-  vitest@3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1):
-    dependencies:
-      '@vitest/expect': 3.0.6
-      '@vitest/mocker': 3.0.6(vite@6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1))
-      '@vitest/pretty-format': 3.1.2
-      '@vitest/runner': 3.0.6
-      '@vitest/snapshot': 3.0.6
-      '@vitest/spy': 3.0.6
-      '@vitest/utils': 3.0.6
-      chai: 5.2.0
-      debug: 4.4.0
-      expect-type: 1.2.1
-      magic-string: 0.30.17
-      pathe: 2.0.3
-      std-env: 3.9.0
-      tinybench: 2.9.0
-      tinyexec: 0.3.2
-      tinypool: 1.0.2
-      tinyrainbow: 2.0.0
-      vite: 6.3.4(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1)
-      vite-node: 3.0.6(@types/node@22.15.3)(jiti@1.21.7)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.16.2)(yaml@2.7.1)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@types/node': 22.15.3
-      jsdom: 25.0.1
-    transitivePeerDependencies:
-      - jiti
-      - less
-      - lightningcss
-      - msw
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - tsx
-      - yaml
 
   vitest@3.0.6(@types/node@22.15.3)(jiti@1.21.7)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1):
     dependencies:

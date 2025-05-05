@@ -1,4 +1,3 @@
-import { requestContext } from "@fastify/request-context";
 import config from "@peated/api/config";
 import { db } from "@peated/api/db";
 import { users } from "@peated/api/db/schema";
@@ -11,89 +10,78 @@ import { identities } from "@peated/server/db/schema";
 import { createUser } from "@peated/server/lib/auth";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
-import type { FastifyInstance, FastifyRegisterOptions } from "fastify";
-import type {
-  FastifyZodOpenApiSchema,
-  FastifyZodOpenApiTypeProvider,
-} from "fastify-zod-openapi";
 import { OAuth2Client } from "google-auth-library";
 import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 import { z } from "zod";
+import { ApiRoutes } from "../../../openapi/route";
 
-export default async function plugin<T extends FastifyInstance>(
-  fastify: T,
-  _opts: FastifyRegisterOptions<T>,
-) {
-  fastify
-    .withTypeProvider<FastifyZodOpenApiTypeProvider>()
-    .get(
-      "/",
-      {
-        schema: {
-          response: {
-            200: z.object({ user: UserSchema }),
-            401: unauthorizedSchema,
-          },
-        } satisfies FastifyZodOpenApiSchema,
+export default new ApiRoutes()
+  .get(
+    "/",
+    {
+      responses: {
+        200: z.object({ user: UserSchema }),
+        401: unauthorizedSchema,
       },
-      async function (request, reply) {
-        const currentUser = requestContext.get("user");
-        if (!currentUser) {
-          throw new UnauthorizedError();
-        }
+    },
+    async function (c) {
+      const currentUser = c.user;
+      if (!currentUser) {
+        throw new UnauthorizedError();
+      }
 
-        const [user] = await db
-          .select()
-          .from(users)
-          .where(eq(users.id, currentUser.id));
-        if (!user) {
-          logError(
-            `Authenticated user (${currentUser.id}) failed to retrieve details`,
-          );
-          throw new UnauthorizedError();
-        }
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, currentUser.id));
+      if (!user) {
+        logError(
+          `Authenticated user (${currentUser.id}) failed to retrieve details`,
+        );
+        throw new UnauthorizedError();
+      }
 
-        if (!user.active) {
-          throw new UnauthorizedError();
-        }
+      if (!user.active) {
+        throw new UnauthorizedError();
+      }
 
-        return { user: await serialize(UserSerializer, user, user) };
+      return { user: await serialize(UserSerializer, user, user) };
+    },
+  )
+  .post(
+    "/",
+    {
+      schema: {
+        body: z.union([
+          z.object({
+            email: z.string().email(),
+            password: z.string(),
+          }),
+          z.object({
+            googleCode: z.string(),
+          }),
+        ]),
       },
-    )
-    .post(
-      "/",
-      {
-        schema: {
-          body: z.union([
-            z.object({
-              email: z.string().email(),
-              password: z.string(),
-            }),
-            z.object({
-              googleCode: z.string(),
-            }),
-          ]),
-        } satisfies FastifyZodOpenApiSchema,
-      },
-      async function (request, reply) {
-        let user;
-        if ("googleCode" in request.body) {
-          user = await authGoogle(request.body.googleCode);
-        } else {
-          user = await authBasic(request.body.email, request.body.password);
-        }
+    },
+    async function (c) {
+      let user;
+      const googleCode = c.req.valid("googleCode");
+      if (googleCode) {
+        user = await authGoogle(googleCode);
+      } else {
+        user = await authBasic(request.body.email, request.body.password);
+      }
 
-        if (!user.active) {
-          throw new UnauthorizedError("Invalid credentials.");
-        }
+      if (!user.active) {
+        throw new UnauthorizedError("Invalid credentials.");
+      }
 
-        return {
-          user: await serialize(UserSerializer, user, user),
-          accessToken: await createAccessToken(user),
-        };
-      },
-    );
-}
+      return {
+        user: await serialize(UserSerializer, user, user),
+        accessToken: await createAccessToken(user),
+      };
+    },
+  );
 
 async function authBasic(email: string, password: string) {
   const [user] = await db
