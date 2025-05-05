@@ -1,7 +1,6 @@
 // make sure to import this _before_ all other code
 import "./sentry";
 
-import fastifyAutoload from "@fastify/autoload";
 import fastifyCors from "@fastify/cors";
 import fastifyHelmet from "@fastify/helmet";
 import fastifyMultipart from "@fastify/multipart";
@@ -16,13 +15,13 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";
-import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 import type { ZodOpenApiVersion } from "zod-openapi";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
 import type { User } from "./db/schema";
 import { injectAuth } from "./middleware/auth";
+import authRoute from "./routes/auth";
 import fastifySentry from "./sentryPlugin";
 import { gracefulShutdown } from "./worker/client";
 
@@ -193,13 +192,15 @@ export default async function buildFastify(options = {}) {
   //   }
   // });
 
-  await app.register(fastifyAutoload, {
-    dir: path.join(__dirname, "routes"),
-    dirNameRoutePrefix: true,
-    options: { prefix: "/v1/" },
-    forceESM: true,
-    // encapsulate: false,
-  });
+  await app.register(authRoute, { prefix: "/v1/auth" });
+
+  // await app.register(fastifyAutoload, {
+  //   dir: path.join(__dirname, "routes"),
+  //   dirNameRoutePrefix: true,
+  //   options: { prefix: "/v1/" },
+  //   forceESM: true,
+  //   // encapsulate: false,
+  // });
 
   return app;
 }

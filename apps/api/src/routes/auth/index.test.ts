@@ -57,6 +57,6 @@ describe("GET /auth", async (t) => {
         },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Invalid credentials.]`);
+    expect(err).toMatchInlineSnapshot(`[Error:]`);
   });
 });

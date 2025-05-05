@@ -11,7 +11,7 @@ import { identities } from "@peated/server/db/schema";
 import { createUser } from "@peated/server/lib/auth";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
-import type { FastifyInstance, FastifyRegisterOptions } from "fastify";
+import type { FastifyInstance } from "fastify";
 import type {
   FastifyZodOpenApiSchema,
   FastifyZodOpenApiTypeProvider,
@@ -20,14 +20,11 @@ import { OAuth2Client } from "google-auth-library";
 import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 import { z } from "zod";
 
-export default async function plugin<T extends FastifyInstance>(
-  fastify: T,
-  _opts: FastifyRegisterOptions<T>,
-) {
+export default async function routes<T extends FastifyInstance>(fastify: T) {
   fastify
     .withTypeProvider<FastifyZodOpenApiTypeProvider>()
     .get(
-      "/",
+      "/v1/auth/",
       {
         schema: {
           response: {
