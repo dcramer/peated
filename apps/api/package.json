@@ -43,7 +43,6 @@
     "@types/mjml": "^4.7.4",
     "@types/nodemailer": "^6.4.17",
     "@types/pg": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
     "ai": "^4.3.13",
     "axios": "~1.6.8",
     "bcrypt": "^5.1.1",
@@ -66,6 +65,7 @@
     "http-errors-enhanced": "^3.0.2",
     "ioredis": "^5.6.1",
     "jsonwebtoken": "^9.0.2",
+    "jsx-email": "catalog:",
     "mime-types": "^2.1.35",
     "nanoid": "^3.3.11",
     "nodemailer": "^6.10.1",
@@ -84,8 +84,7 @@
   "devDependencies": {
     "axios-mock-adapter": "~1.22.0",
     "form-data-encoder": "^4.0.2",
-    "formdata-node": "^6.0.3",
-    "vitest": "catalog:"
+    "formdata-node": "^6.0.3"
   },
   "volta": {
     "extends": "../../package.json"

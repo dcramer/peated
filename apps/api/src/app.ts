@@ -1,6 +1,7 @@
 // make sure to import this _before_ all other code
 import "./sentry";
 
+import fastifyAutoload from "@fastify/autoload";
 import fastifyCors from "@fastify/cors";
 import fastifyHelmet from "@fastify/helmet";
 import fastifyMultipart from "@fastify/multipart";
@@ -15,6 +16,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";
+import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 import type { ZodOpenApiVersion } from "zod-openapi";
 import config from "./config";
@@ -30,8 +32,6 @@ declare module "@fastify/request-context" {
     user: User | null;
   }
 }
-
-const __dirname = import.meta.dirname;
 
 const envToLogger: {
   [env: string]: any;
@@ -52,6 +52,8 @@ const envToLogger: {
     },
   },
 };
+
+const __dirname = import.meta.dirname;
 
 export default async function buildFastify(options = {}) {
   const app = fastify({
@@ -194,13 +196,13 @@ export default async function buildFastify(options = {}) {
 
   await app.register(authRoute, { prefix: "/v1/auth" });
 
-  // await app.register(fastifyAutoload, {
-  //   dir: path.join(__dirname, "routes"),
-  //   dirNameRoutePrefix: true,
-  //   options: { prefix: "/v1/" },
-  //   forceESM: true,
-  //   // encapsulate: false,
-  // });
+  await app.register(fastifyAutoload, {
+    dir: path.join(__dirname, "routes"),
+    dirNameRoutePrefix: true,
+    options: { prefix: "/v1/" },
+    forceESM: true,
+    // encapsulate: fase,
+  });
 
   return app;
 }

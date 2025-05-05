@@ -11,20 +11,18 @@ import { identities } from "@peated/server/db/schema";
 import { createUser } from "@peated/server/lib/auth";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
 import type {
+  FastifyPluginAsyncZodOpenApi,
   FastifyZodOpenApiSchema,
-  FastifyZodOpenApiTypeProvider,
 } from "fastify-zod-openapi";
 import { OAuth2Client } from "google-auth-library";
 import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 import { z } from "zod";
 
-export default async function routes<T extends FastifyInstance>(fastify: T) {
+const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
   fastify
-    .withTypeProvider<FastifyZodOpenApiTypeProvider>()
     .get(
-      "/v1/auth/",
+      "/",
       {
         schema: {
           response: {
@@ -90,7 +88,9 @@ export default async function routes<T extends FastifyInstance>(fastify: T) {
         };
       },
     );
-}
+};
+
+export default plugin;
 
 async function authBasic(email: string, password: string) {
   const [user] = await db

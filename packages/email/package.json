@@ -9,7 +9,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b",
     "create": "email create",
     "dev": "email preview --port=5000 ./src/templates --no-open",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"

@@ -1,9 +1,9 @@
 import cuid2 from "@paralleldrive/cuid2";
+import config from "@peated/api/config";
 import { Template as MagicLinkEmailTemplate } from "@peated/email/templates/magicLinkEmail";
 import { Template as NewCommentTemplate } from "@peated/email/templates/newCommentEmail";
 import { Template as PasswordResetEmailTemplate } from "@peated/email/templates/passwordResetEmail";
 import { Template as VerifyEmailTemplate } from "@peated/email/templates/verifyEmail";
-import config from "@peated/server/config";
 import { createHash } from "crypto";
 import { and, eq, inArray, ne } from "drizzle-orm";
 import { render } from "jsx-email";
