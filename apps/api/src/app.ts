@@ -6,13 +6,16 @@ import { secureHeaders } from "hono/secure-headers";
 import config from "./config";
 import type { User } from "./db/schema";
 import { injectAuth } from "./middleware/auth";
+import authRoutes from "./routes/auth";
 
-export type Variables = {
-  user: User | null;
-};
+declare module "hono" {
+  interface Variables {
+    user: User | null;
+  }
+}
 
 export default async function buildApp(options = {}) {
-  const app = new Hono<{ Variables: Variables }>()
+  const app = new Hono()
     .use(
       cors({
         credentials: true,
@@ -37,5 +40,9 @@ export default async function buildApp(options = {}) {
 
     .use(injectAuth);
 
+  app.route("/v1/auth", authRoutes);
+
   return app;
 }
+
+export const app = await buildApp();

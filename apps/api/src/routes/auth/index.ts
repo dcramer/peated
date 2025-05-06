@@ -1,5 +1,4 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import type { Variables } from "@peated/api/app";
 import config from "@peated/api/config";
 import { db } from "@peated/api/db";
 import { users } from "@peated/api/db/schema";
@@ -21,7 +20,7 @@ import { OAuth2Client } from "google-auth-library";
 import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 import { z } from "zod";
 
-export default new OpenAPIHono<{ Variables: Variables }>()
+export default new OpenAPIHono()
   .openapi(
     {
       method: "get",

@@ -1,37 +1,27 @@
-import { default as buildFastify } from "@peated/api/app.old";
-import waitError from "@peated/api/lib/test/waitError";
-import type { FastifyInstance } from "fastify";
+import { app } from "@peated/api/app";
 
-describe("GET /auth", async (t) => {
-  let app: FastifyInstance;
-
-  beforeEach(async () => {
-    app = await buildFastify();
-  });
-
-  afterEach(async () => {
-    app && (await app.close());
-  });
-
+describe("POST /auth", async (t) => {
   test("valid credentials", async ({ fixtures }) => {
     const user = await fixtures.User({
       email: "foo@example.com",
       password: "example",
     });
 
-    const res = await app.inject({
-      method: "GET",
-      url: "/auth",
-      body: {
+    const res = await app.request("/v1/auth", {
+      method: "POST",
+      body: JSON.stringify({
         email: "foo@example.com",
         password: "example",
-      },
+      }),
+      headers: new Headers({ "Content-Type": "application/json" }),
       // headers: {
       //   authorization: "Bearer " + (await createAccessToken(user)),
       // },
     });
 
-    const data = res.json();
+    expect(res.status).toBe(200);
+
+    const data: any = await res.json();
 
     expect(data.user.id).toEqual(user.id);
     expect(data.accessToken).toBeDefined();
@@ -47,16 +37,15 @@ describe("GET /auth", async (t) => {
     //   },
     // });
 
-    const err = await waitError(
-      app.inject({
-        method: "GET",
-        url: "/auth",
-        body: {
-          email: "foo@example.com",
-          password: "example",
-        },
+    const res = await app.request("/v1/auth", {
+      method: "POST",
+      body: JSON.stringify({
+        email: "foo@example.com",
+        password: "example",
       }),
-    );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Invalid credentials.]`);
+      headers: new Headers({ "Content-Type": "application/json" }),
+    });
+
+    expect(res.status).toBe(401);
   });
 });
