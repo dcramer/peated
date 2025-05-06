@@ -1,9 +1,9 @@
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import config from "@peated/api/config";
 import { db } from "@peated/api/db";
 import { users } from "@peated/api/db/schema";
 import { createAccessToken } from "@peated/api/lib/auth";
 import { logError } from "@peated/api/lib/log";
+import { ApiRoutes } from "@peated/api/openapi/route";
 import { UserSchema } from "@peated/api/schemas";
 import { serialize } from "@peated/api/serializers";
 import { UserSerializer } from "@peated/api/serializers/user";
@@ -12,103 +12,76 @@ import { createUser } from "@peated/server/lib/auth";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
-import { UnauthorizedError } from "http-errors-enhanced";
+import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 import { z } from "zod";
 
-const routeGet = createRoute({
-  method: "get",
-  path: "/",
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: z.object({ user: UserSchema }),
-        },
-      },
-      description: "Retrieve the user",
-    },
-    // 401: unauthorizedSchema,
-  },
-});
-
-const routePost = createRoute({
-  method: "post",
-  path: "/",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: z.union([
-            z.object({
-              email: z.string().email(),
-              password: z.string(),
-            }),
-            z.object({
-              googleCode: z.string(),
-            }),
-          ]),
-        },
+export default new ApiRoutes()
+  .get(
+    "/",
+    {
+      responses: {
+        200: z.object({ user: UserSchema }),
+        // 401: unauthorizedSchema,
       },
     },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: z.object({ user: UserSchema }),
-        },
-      },
-      description: "Retrieve the user",
+    async function (c) {
+      const currentUser = c.user;
+      if (!currentUser) {
+        throw new UnauthorizedError();
+      }
+
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, currentUser.id));
+      if (!user) {
+        logError(
+          `Authenticated user (${currentUser.id}) failed to retrieve details`,
+        );
+        throw new UnauthorizedError();
+      }
+
+      if (!user.active) {
+        throw new UnauthorizedError();
+      }
+
+      return { user: await serialize(UserSerializer, user, user) };
     },
-  },
-});
+  )
+  .post(
+    "/",
+    {
+      schema: {
+        body: z.union([
+          z.object({
+            email: z.string().email(),
+            password: z.string(),
+          }),
+          z.object({
+            googleCode: z.string(),
+          }),
+        ]),
+      },
+    },
+    async function (c) {
+      let user;
+      const data = c.req.valid("json");
+      if ("googleCode" in data) {
+        user = await authGoogle(data.googleCode);
+      } else {
+        user = await authBasic(data.email, data.password);
+      }
 
-const app = new OpenAPIHono()
-  .openapi(routeGet, async function (c) {
-    const currentUser = c.user;
-    if (!currentUser) {
-      throw new UnauthorizedError();
-    }
+      if (!user.active) {
+        throw new UnauthorizedError("Invalid credentials.");
+      }
 
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, currentUser.id));
-    if (!user) {
-      logError(
-        `Authenticated user (${currentUser.id}) failed to retrieve details`,
-      );
-      throw new UnauthorizedError();
-    }
-
-    if (!user.active) {
-      throw new UnauthorizedError();
-    }
-
-    return c.json({
-      user: await serialize(UserSerializer, user, user),
-    });
-  })
-  .openapi(routePost, async function (c) {
-    let user;
-    const data = c.req.valid("json");
-    if ("googleCode" in data) {
-      user = await authGoogle(data.googleCode);
-    } else {
-      user = await authBasic(data.email, data.password);
-    }
-
-    if (!user.active) {
-      throw new UnauthorizedError("Invalid credentials.");
-    }
-
-    return c.json({
-      user: await serialize(UserSerializer, user, user),
-      accessToken: await createAccessToken(user),
-    });
-  });
-
-export default app;
+      return {
+        user: await serialize(UserSerializer, user, user),
+        accessToken: await createAccessToken(user),
+      };
+    },
+  );
 
 async function authBasic(email: string, password: string) {
   const [user] = await db

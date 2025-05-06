@@ -1,13 +1,19 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import type { Handler } from "hono";
 import type { ZodType } from "zod";
+import type {
+  ReferenceObject,
+  SchemaObject,
+} from "zod-openapi/dist/openapi3-ts/dist/oas31";
 
 type Path = Parameters<typeof createRoute>[0]["path"];
 type Method = Parameters<typeof createRoute>[0]["method"];
 type Request = Omit<Parameters<typeof createRoute>[0]["request"], "body"> & {
   body?: ZodType;
 };
-type Responses = { [statusCode: string]: ZodType };
-type Handler = Parameters<InstanceType<typeof OpenAPIHono>["openapi"]>[1];
+type Schema = ZodType<unknown> | SchemaObject | ReferenceObject;
+
+type Responses = { [statusCode: string]: Schema };
 
 type PartialOpts = {
   schema?: Request;
@@ -27,7 +33,7 @@ export class ApiRoutes {
     return this.app.fetch(...args);
   }
 
-  private wrapRoute({
+  private route({
     path,
     method,
     schema = {},
@@ -74,18 +80,18 @@ export class ApiRoutes {
   }
 
   get(path: Path, opts: PartialOpts, handler: Handler) {
-    return this.wrapRoute({ path, method: "get", ...opts, handler });
+    return this.route({ path, method: "get", ...opts, handler });
   }
 
   post(path: Path, opts: PartialOpts, handler: Handler) {
-    return this.wrapRoute({ path, method: "post", ...opts, handler });
+    return this.route({ path, method: "post", ...opts, handler });
   }
 
   put(path: Path, opts: PartialOpts, handler: Handler) {
-    return this.wrapRoute({ path, method: "put", ...opts, handler });
+    return this.route({ path, method: "put", ...opts, handler });
   }
 
   delete(path: Path, opts: PartialOpts, handler: Handler) {
-    return this.wrapRoute({ path, method: "delete", ...opts, handler });
+    return this.route({ path, method: "delete", ...opts, handler });
   }
 }
