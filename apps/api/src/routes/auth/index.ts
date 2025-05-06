@@ -1,10 +1,16 @@
+import { OpenAPIHono } from "@hono/zod-openapi";
+import type { Variables } from "@peated/api/app";
 import config from "@peated/api/config";
 import { db } from "@peated/api/db";
 import { users } from "@peated/api/db/schema";
 import { createAccessToken } from "@peated/api/lib/auth";
 import { logError } from "@peated/api/lib/log";
-import { ApiRoutes } from "@peated/api/openapi/route";
-import { UserSchema } from "@peated/api/schemas";
+import {
+  AuthSchema,
+  BasicAuthSchema,
+  GoogleAuthSchema,
+  UserSchema,
+} from "@peated/api/schemas";
 import { serialize } from "@peated/api/serializers";
 import { UserSerializer } from "@peated/api/serializers/user";
 import { identities } from "@peated/server/db/schema";
@@ -15,17 +21,25 @@ import { OAuth2Client } from "google-auth-library";
 import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 import { z } from "zod";
 
-export default new ApiRoutes()
-  .get(
-    "/",
+export default new OpenAPIHono<{ Variables: Variables }>()
+  .openapi(
     {
+      method: "get",
+      path: "/",
       responses: {
-        200: z.object({ user: UserSchema }),
-        // 401: unauthorizedSchema,
+        200: {
+          content: {
+            "application/json": {
+              schema: z.object({ user: UserSchema }),
+            },
+          },
+          description: "User details",
+        },
+        401: unauthorizedSchema,
       },
     },
     async function (c) {
-      const currentUser = c.user;
+      const currentUser = c.get("user");
       if (!currentUser) {
         throw new UnauthorizedError();
       }
@@ -45,22 +59,32 @@ export default new ApiRoutes()
         throw new UnauthorizedError();
       }
 
-      return { user: await serialize(UserSerializer, user, user) };
+      return c.json({ user: await serialize(UserSerializer, user, user) });
     },
   )
-  .post(
-    "/",
+  .openapi(
     {
-      schema: {
-        body: z.union([
-          z.object({
-            email: z.string().email(),
-            password: z.string(),
-          }),
-          z.object({
-            googleCode: z.string(),
-          }),
-        ]),
+      method: "post",
+      path: "/",
+      request: {
+        body: {
+          content: {
+            "application/json": {
+              schema: z.union([BasicAuthSchema, GoogleAuthSchema]),
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          content: {
+            "application/json": {
+              schema: AuthSchema,
+            },
+          },
+          description: "Authenticated user details",
+        },
+        401: unauthorizedSchema,
       },
     },
     async function (c) {
@@ -76,10 +100,10 @@ export default new ApiRoutes()
         throw new UnauthorizedError("Invalid credentials.");
       }
 
-      return {
+      return c.json({
         user: await serialize(UserSerializer, user, user),
         accessToken: await createAccessToken(user),
-      };
+      });
     },
   );
 

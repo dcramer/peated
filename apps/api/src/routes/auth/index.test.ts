@@ -1,4 +1,4 @@
-import { default as buildFastify } from "@peated/api/app";
+import { default as buildFastify } from "@peated/api/app.old";
 import waitError from "@peated/api/lib/test/waitError";
 import type { FastifyInstance } from "fastify";
 

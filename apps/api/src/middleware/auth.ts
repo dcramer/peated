@@ -1,35 +1,39 @@
-import type { onRequestHookHandler } from "fastify";
+import { createMiddleware } from "hono/factory";
 import { ForbiddenError, UnauthorizedError } from "http-errors-enhanced";
 import type { User } from "../db/schema";
 import { getUserFromHeader } from "../lib/auth";
 
 // XXX: this happens globally at the app level
-export const injectAuth: onRequestHookHandler = async (req, res) => {
-  const user = await getUserFromHeader(req.headers["authorization"]);
-  req.requestContext.set("user", user);
-};
+export const injectAuth = createMiddleware(async (c, next) => {
+  const user = await getUserFromHeader(c.req.header("authorization"));
+  c.set("user", user);
+  await next();
+});
 
-export const requireAuth: onRequestHookHandler = async (req, res) => {
-  let user: User | null | undefined = req.requestContext.get("user");
+export const requireAuth = createMiddleware(async (c, next) => {
+  let user: User | null | undefined = c.get("user");
   if (user === undefined) {
-    user = await getUserFromHeader(req.headers["authorization"]);
-    req.requestContext.set("user", user);
+    user = await getUserFromHeader(c.req.header("authorization"));
+    c.set("user", user);
   }
 
   if (!user) {
-    const auth = req.headers["authorization"];
+    const auth = c.req.header("authorization");
     const token = auth?.replace("Bearer ", "");
 
     throw new UnauthorizedError(token ? "Invalid token." : undefined, {
       name: token ? "invalid_token" : "auth_required",
     });
   }
-};
-export const requireAdmin: onRequestHookHandler = async (req, res) => {
-  let user: User | null | undefined = req.requestContext.get("user");
+
+  await next();
+});
+
+export const requireAdmin = createMiddleware(async (c, next) => {
+  let user: User | null | undefined = c.get("user");
   if (user === undefined) {
-    user = await getUserFromHeader(req.headers["authorization"]);
-    req.requestContext.set("user", user);
+    user = await getUserFromHeader(c.req.header("authorization"));
+    c.set("user", user);
   }
 
   if (!user) {
@@ -46,17 +50,19 @@ export const requireAdmin: onRequestHookHandler = async (req, res) => {
       name: "no_permission",
     });
   }
-};
 
-export const requireMod: onRequestHookHandler = async (req, res) => {
-  let user: User | null | undefined = req.requestContext.get("user");
+  await next();
+});
+
+export const requireMod = createMiddleware(async (c, next) => {
+  let user: User | null | undefined = c.get("user");
   if (user === undefined) {
-    user = await getUserFromHeader(req.headers["authorization"]);
-    req.requestContext.set("user", user);
+    user = await getUserFromHeader(c.req.header("authorization"));
+    c.set("user", user);
   }
 
   if (!user) {
-    const auth = req.headers["authorization"];
+    const auth = c.req.header("authorization");
     const token = auth?.replace("Bearer ", "");
 
     throw new UnauthorizedError(token ? "Invalid token." : undefined, {
@@ -69,4 +75,6 @@ export const requireMod: onRequestHookHandler = async (req, res) => {
       name: "no_permission",
     });
   }
-};
+
+  await next();
+});

@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import buildFastify from "./app";
+import buildFastify from "./app.old";
 import config from "./config";
 
 const start = async () => {
