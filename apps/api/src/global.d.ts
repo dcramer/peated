@@ -1,9 +1,15 @@
-import type { OAuth2Namespace } from "@fastify/oauth2";
 import type MockAdapter from "axios-mock-adapter";
-import "fastify";
 import "vitest";
 import type { User } from "./db/schema";
 import type * as fixtures from "./lib/test/fixtures";
+
+declare module "hono" {
+  interface Env {
+    Variables: {
+      user: User | null;
+    };
+  }
+}
 
 declare namespace NodeJS {
   export interface ProcessEnv {
@@ -13,15 +19,6 @@ declare namespace NodeJS {
     DISABLE_HTTP_CACHE?: string;
     API_SERVER?: string;
     API_KEY?: string;
-  }
-}
-
-declare module "fastify" {
-  export interface FastifyInstance {
-    googleOAuth2: OAuth2Namespace;
-  }
-  export interface FastifyRequest {
-    user: User | null;
   }
 }
 

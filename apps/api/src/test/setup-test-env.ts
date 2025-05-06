@@ -104,7 +104,6 @@ const clearTables = async () => {
 const createDefaultUser = async () => {
   return await fixtures.User({
     email: "fizz.buzz@example.com",
-    displayName: "Fizzy Buzz",
     username: "fizz.buzz",
   });
 };

@@ -1,9 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import config from "@peated/api/config";
 import { db } from "@peated/api/db";
-import { users } from "@peated/api/db/schema";
-import { createAccessToken } from "@peated/api/lib/auth";
+import { identities, users } from "@peated/api/db/schema";
+import { createAccessToken, createUser } from "@peated/api/lib/auth";
 import { logError } from "@peated/api/lib/log";
+import { requireAuth } from "@peated/api/middleware/auth";
 import {
   AuthSchema,
   BasicAuthSchema,
@@ -12,13 +13,14 @@ import {
 } from "@peated/api/schemas";
 import { serialize } from "@peated/api/serializers";
 import { UserSerializer } from "@peated/api/serializers/user";
-import { identities } from "@peated/server/db/schema";
-import { createUser } from "@peated/server/lib/auth";
+import * as Sentry from "@sentry/node";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
 import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 import { z } from "zod";
+
+const { info } = Sentry._experiment_log; // Temporary destructuring while this is experimental
 
 export default new OpenAPIHono()
   .openapi(
@@ -36,6 +38,7 @@ export default new OpenAPIHono()
         },
         401: unauthorizedSchema,
       },
+      middleware: [requireAuth],
     },
     async function (c) {
       const currentUser = c.get("user");
@@ -112,17 +115,17 @@ async function authBasic(email: string, password: string) {
     .from(users)
     .where(eq(sql`LOWER(${users.email})`, email.toLowerCase()));
   if (!user) {
-    console.log("user not found");
+    info("user not found");
     throw new UnauthorizedError("Invalid credentials.");
   }
 
   if (!user.passwordHash) {
-    console.log("user has no password set");
+    info("user has no password set");
     throw new UnauthorizedError("Invalid credentials.");
   }
 
   if (!compareSync(password, user.passwordHash)) {
-    console.log("invalid password");
+    info("invalid password");
     throw new UnauthorizedError("Invalid credentials.");
   }
 

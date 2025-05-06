@@ -65,6 +65,7 @@ export async function getUserFromHeader(
     warn(`Invalid Bearer token`);
     return null;
   }
+
   const [user] = await db.select().from(users).where(eq(users.id, id));
   if (!user) {
     logError("User not found", { userId: id });

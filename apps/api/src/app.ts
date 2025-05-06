@@ -3,16 +3,11 @@ import { cache } from "hono/cache";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 
+import { isHttpError, serializeError } from "http-errors-enhanced";
 import config from "./config";
-import type { User } from "./db/schema";
+import { logError } from "./lib/log";
 import { injectAuth } from "./middleware/auth";
 import authRoutes from "./routes/auth";
-
-declare module "hono" {
-  interface Variables {
-    user: User | null;
-  }
-}
 
 export default async function buildApp(options = {}) {
   const app = new Hono()
@@ -37,6 +32,14 @@ export default async function buildApp(options = {}) {
         // contentSecurityPolicy: false,
       }),
     )
+
+    .onError((err, c) => {
+      if (isHttpError(err)) {
+        return c.json(serializeError(err), err.statusCode as any);
+      }
+      logError(err);
+      throw err;
+    })
 
     .use(injectAuth);
 
