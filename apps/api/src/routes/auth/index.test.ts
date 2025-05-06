@@ -1,8 +1,7 @@
 import { default as buildFastify } from "@peated/api/app";
-import waitError from "@peated/api/lib/test/waitError";
 import type { FastifyInstance } from "fastify";
 
-describe("GET /auth", async (t) => {
+describe("POST /auth", async (t) => {
   let app: FastifyInstance;
 
   beforeEach(async () => {
@@ -20,8 +19,8 @@ describe("GET /auth", async (t) => {
     });
 
     const res = await app.inject({
-      method: "GET",
-      url: "/auth",
+      method: "POST",
+      url: "/v1/auth",
       body: {
         email: "foo@example.com",
         password: "example",
@@ -31,6 +30,8 @@ describe("GET /auth", async (t) => {
       // },
     });
 
+    expect(res.statusCode).toBe(200);
+
     const data = res.json();
 
     expect(data.user.id).toEqual(user.id);
@@ -38,25 +39,14 @@ describe("GET /auth", async (t) => {
   });
 
   test("invalid credentials", async ({ fixtures }) => {
-    // const res = await app.inject({
-    //   method: "GET",
-    //   url: "/auth",
-    //   body: {
-    //     email: "foo@example.com",
-    //     password: "example",
-    //   },
-    // });
-
-    const err = await waitError(
-      app.inject({
-        method: "GET",
-        url: "/auth",
-        body: {
-          email: "foo@example.com",
-          password: "example",
-        },
-      }),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error:]`);
+    const res = await app.inject({
+      method: "POST",
+      url: "/v1/auth",
+      body: {
+        email: "foo@example.com",
+        password: "example",
+      },
+    });
+    expect(res.statusCode).toBe(401);
   });
 });

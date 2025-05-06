@@ -13,6 +13,7 @@ import {
   fastifyZodOpenApiPlugin,
   fastifyZodOpenApiTransform,
   fastifyZodOpenApiTransformObject,
+  RequestValidationError,
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";
@@ -196,13 +197,13 @@ export default async function buildFastify(options = {}) {
 
   await app.register(authRoute, { prefix: "/v1/auth" });
 
-  await app.register(fastifyAutoload, {
-    dir: path.join(__dirname, "routes"),
-    dirNameRoutePrefix: true,
-    options: { prefix: "/v1/" },
-    forceESM: true,
-    // encapsulate: fase,
-  });
+  // await app.register(fastifyAutoload, {
+  //   dir: path.join(__dirname, "routes"),
+  //   dirNameRoutePrefix: true,
+  //   options: { prefix: "/v1/" },
+  //   forceESM: true,
+  //   // encapsulate: fase,
+  // });
 
   return app;
 }

@@ -1,23 +1,19 @@
 import { requestContext } from "@fastify/request-context";
 import config from "@peated/api/config";
 import { db } from "@peated/api/db";
-import { users } from "@peated/api/db/schema";
-import { createAccessToken } from "@peated/api/lib/auth";
+import { identities, users } from "@peated/api/db/schema";
+import { createAccessToken, createUser } from "@peated/api/lib/auth";
 import { logError } from "@peated/api/lib/log";
 import { UserSchema } from "@peated/api/schemas";
 import { serialize } from "@peated/api/serializers";
 import { UserSerializer } from "@peated/api/serializers/user";
-import { identities } from "@peated/server/db/schema";
-import { createUser } from "@peated/server/lib/auth";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
-import type {
-  FastifyPluginAsyncZodOpenApi,
-  FastifyZodOpenApiSchema,
-} from "fastify-zod-openapi";
+import type { FastifyPluginAsyncZodOpenApi } from "fastify-zod-openapi";
 import { OAuth2Client } from "google-auth-library";
 import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 
 const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
   fastify
@@ -26,12 +22,12 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
       {
         schema: {
           response: {
-            200: z.object({ user: UserSchema }),
+            200: zodToJsonSchema(z.object({ user: UserSchema })),
             401: unauthorizedSchema,
           },
-        } satisfies FastifyZodOpenApiSchema,
+        },
       },
-      async function (request, reply) {
+      async function (_request, _reply) {
         const currentUser = requestContext.get("user");
         if (!currentUser) {
           throw new UnauthorizedError();
@@ -68,9 +64,13 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
               googleCode: z.string(),
             }),
           ]),
-        } satisfies FastifyZodOpenApiSchema,
+          200: zodToJsonSchema(
+            z.object({ user: UserSchema, accessToken: z.string() }),
+          ),
+          401: unauthorizedSchema,
+        },
       },
-      async function (request, reply) {
+      async function (request, _reply) {
         let user;
         if ("googleCode" in request.body) {
           user = await authGoogle(request.body.googleCode);
