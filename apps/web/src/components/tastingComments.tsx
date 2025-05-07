@@ -4,37 +4,25 @@ import { type Comment } from "@peated/server/types";
 import { Suspense, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import EmbeddedLogin from "./embeddedLogin";
-import TastingCommentForm from "./tastingCommentForm";
 import TastingCommentList from "./tastingCommentList";
 
 export default function TastingComments({ tastingId }: { tastingId: number }) {
   const { user } = useAuth();
-
   const [newComments, setNewComments] = useState<Comment[]>([]);
 
   return (
-    <>
-      {user ? (
-        <TastingCommentForm
-          tastingId={tastingId}
-          user={user}
-          onComment={(comment) => {
-            setNewComments((comments) => [...comments, comment]);
-          }}
-        />
-      ) : (
-        <EmbeddedLogin />
-      )}
+    <div className="mt-4">
+      {!user && <EmbeddedLogin />}
 
-      <ul className="my-4 space-y-4 px-3 sm:px-2">
-        <Suspense>
-          <TastingCommentList
-            user={user}
-            tastingId={tastingId}
-            newValues={newComments}
-          />
-        </Suspense>
-      </ul>
-    </>
+      <Suspense
+        fallback={<div className="p-4 text-center">Loading comments...</div>}
+      >
+        <TastingCommentList
+          user={user}
+          tastingId={tastingId}
+          newValues={newComments}
+        />
+      </Suspense>
+    </div>
   );
 }
