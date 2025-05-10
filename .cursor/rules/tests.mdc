@@ -1,14 +1,26 @@
 ---
-description: 
+description: Rules to apply when running or writing tests
 globs: *.test.ts*
 alwaysApply: false
 ---
+## Running tests
+
+Tests can be run with `pnpm test` inside of the specific package (reminder: we're in a pnpm monorepo).
+
+```shell
+pnpm --filter=./apps/api test --run -- src/routes/auth/ 
+```
+
+Pass the `--run` arg otherwise it enables watch mode, which you likely don't want.
+
+## Writing tests
+
 Follow these rules when you write tests:
 
 - Use Vitest, do not use Jest.
 - When you are testing for errors, use `waitError` to wait for the error to be thrown. For example:
 
-```
+```ts
 import waitError from "@peated/server/lib/test/waitError";
 
 const err = await waitError(
@@ -23,12 +35,11 @@ const err = await waitError(
 - Avoid snapshots for API responses where data is dynamic (such as it returning a `createdAt` date).
 - Prefer dependency injection over mocking when the called functions make it possible.
 
-
 ## tRPC endpoints
 
 When calling tRPC endpoints that are not expected to error, await on the caller. Do not test the Promise directly. For example:
 
-```
+```ts
 const caller = createCaller();
 
 const data = await caller.authRegister({
@@ -44,7 +55,7 @@ Additionally when you add a new tRPC endpoint, ensure its also added to [router.
 
 Test fixtures should be referenced via the context (found in [fixtures.ts](mdc:apps/server/src/lib/test/fixtures.ts)):
 
-```
+```ts
   it("returns a bottle release", async function ({ fixtures }) {
     const bottle = await fixtures.Bottle();
   });
@@ -52,9 +63,8 @@ Test fixtures should be referenced via the context (found in [fixtures.ts](mdc:a
 
 User context - such as for the trpc route caller - should use the `defaults` (as defauled in [setup-test-env.ts](mdc:apps/server/src/test/setup-test-env.ts)) when available. For example:
 
-```
+```ts
   it("returns a bottle release", async function ({ defaults }) {
     const caller = createCaller({ user: defaults.user });
   });
 ```
-

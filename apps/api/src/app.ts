@@ -13,7 +13,6 @@ import {
   fastifyZodOpenApiPlugin,
   fastifyZodOpenApiTransform,
   fastifyZodOpenApiTransformObject,
-  RequestValidationError,
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";

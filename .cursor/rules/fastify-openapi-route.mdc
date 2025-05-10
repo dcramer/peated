@@ -1,0 +1,122 @@
+---
+description: Instructions when working on OpenAPI routes in Fastify.
+globs:
+alwaysApply: false
+---
+## Technology
+
+We use the `fastify` framework, with the `fastify-zod-openapi` plugin for OpenAPI support. All code is written in TypeScript.
+
+## Route Modules
+
+Routes are located in `apps/api/src/routes` and are named based on their URL path. For example:
+
+- a route at `/v1/auth` would be in `apps/api/src/routes/auth/index.ts`.
+- a route at `/v1/bottles/:bottleId` would be in `apps/api/src/routes/bottles/[bottleId]/index.ts`.
+
+When importing these modules, we name then accordingly:
+
+- `authRoute` for `apps/api/src/routes/auth/index.ts`
+- `bottleByIdRoute` for `apps/api/src/routes/bottles/[bottleId]/index.ts`
+
+Routes are registered in `apps/api/src/app.ts`, by adding a new `app.register`. Routes are always registered as the last thing on the Fastify instance. They are grouped together and sorted alphabetically by route prefix. For example:
+
+```ts
+import authRoute from "./routes/auth";
+import bottleByIdRoute from "./routes/bottles/[bottleId]";
+
+// ... app configuration calls
+
+await app.register(authRoute, { prefix: "/v1/auth" });
+await app.register(bottleByIdRoute, { prefix: "/v1/bottles/:bottleId" });
+```
+
+All unique paths should also be unique modules. For example:
+
+- GET /v1/auth should be in `[..]/auth/index.ts`.
+- POST /v1/auth should be in `[..]/auth/index.ts`.
+- POST /v1/auth/register should be in `[..]/auth/register/index.ts`.
+
+Tests should live side-by-side with the routes:
+
+- If the route is at `[...]/auth/index.ts` the tests should be in `[...]/auth/index.test.ts`
+
+Additional helpers, which should be any sufficiently large amount of functionality for the route (helper functions that may get defined), should live within the directory itself. For example, lets say you needed a helper function for the lost password endpoint (`sendResetPasswordEmail`). If that doesnt already exist elsewhere, you might put it in `[theCurrentRouteFolder]/email.ts`.
+
+## Route Structure
+
+Routes are created as a Fastify plugin, using the `FastifyPluginAsyncZodOpenApi` type.
+
+```ts
+import type {
+  FastifyPluginAsyncZodOpenApi,
+  FastifyZodOpenApiSchema,
+} from "fastify-zod-openapi";
+import { z } from "zod";
+
+const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
+  fastify
+    .get(
+      "/",
+      {
+        schema: {
+          response: {
+            200: z.object({ ok: z.boolean() }),
+          },
+        } satisfies FastifyZodOpenApiSchema,
+      },
+      async function (_request, _reply) {
+        return { ok: true };
+      },
+    )
+    .post(
+      "/",
+      {
+        schema: {
+          body: z.object({
+            echo: z.string(),
+          }),
+          200: z.object({ echo: z.string() }),
+        },
+      },
+      async function (request, _reply) {
+        return request.body.echo;
+      },
+    );
+};
+
+export default plugin;
+```
+
+When returning errors from routes, such as an HTTP 401 Unauthorized response, you should use exceptions for control flow via the `http-errors-enhanced` package.
+
+```ts
+import { UnauthorizedError } from "http-errors-enhanced";
+
+throw new UnauthorizedError("Invalid credentials.");
+```
+
+This will be caught by the error handler and converted to the appropriate HTTP response.
+
+You'll also need to define these in the Fastify route responses:
+
+```typescript
+import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
+
+const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
+  fastify
+    .get(
+      "/",
+      {
+        schema: {
+          response: {
+            200: z.object({ ok: z.boolean() }),
+            401: unauthorizedSchema,
+          },
+        } satisfies FastifyZodOpenApiSchema,
+      },
+      async function (_request, _reply) {
+        throw new UnauthorizedError("You are not authorized.");
+      },
+    )
+```

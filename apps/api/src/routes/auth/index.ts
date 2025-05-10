@@ -9,7 +9,10 @@ import { serialize } from "@peated/api/serializers";
 import { UserSerializer } from "@peated/api/serializers/user";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
-import type { FastifyPluginAsyncZodOpenApi } from "fastify-zod-openapi";
+import type {
+  FastifyPluginAsyncZodOpenApi,
+  FastifyZodOpenApiSchema,
+} from "fastify-zod-openapi";
 import { OAuth2Client } from "google-auth-library";
 import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 import { z } from "zod";
@@ -25,7 +28,7 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
             200: zodToJsonSchema(z.object({ user: UserSchema })),
             401: unauthorizedSchema,
           },
-        },
+        } satisfies FastifyZodOpenApiSchema,
       },
       async function (_request, _reply) {
         const currentUser = requestContext.get("user");
@@ -64,11 +67,13 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
               googleCode: z.string(),
             }),
           ]),
-          200: zodToJsonSchema(
-            z.object({ user: UserSchema, accessToken: z.string() }),
-          ),
-          401: unauthorizedSchema,
-        },
+          response: {
+            200: zodToJsonSchema(
+              z.object({ user: UserSchema, accessToken: z.string() }),
+            ),
+            401: unauthorizedSchema,
+          },
+        } satisfies FastifyZodOpenApiSchema,
       },
       async function (request, _reply) {
         let user;
