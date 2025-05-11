@@ -1,0 +1,182 @@
+---
+description: Instructions when working on OpenAPI routes in Fastify.
+globs: 
+alwaysApply: false
+---
+## Technology
+
+We use the `hono` framework, with the `@hono/zod-openapi` extension for OpenAPI support. All code is written in TypeScript.
+
+## Conventions
+
+Routes are located in `apps/api/src/routes` and are named based on their URL path. For example:
+
+- a route at `/v1/auth` would be in `apps/api/src/routes/auth.ts`.
+- a route at `/v1/bottles/:bottleId` would be in `apps/api/src/routes/bottleDetails.ts`.
+- a route at `/v1/bottles/:bottleId/tastings` would be in `apps/api/src/routes/bottleTastings.ts`
+
+When importing these modules, we name then accordingly:
+
+- `authRoute` for `apps/api/src/routes/auth.ts`
+- `bottleDetailsRoute` for `apps/api/src/routes/bottleDetails.ts`
+
+Routes are registered in `apps/api/src/app.ts`, by adding a new `app.route`. Routes are always registered as the last thing on the Hono instance. They are grouped together and sorted alphabetically by route prefix. For example:
+
+```ts
+import authRoute from "./routes/auth";
+import bottleDetailRoute from "./routes/bottleDetails";
+
+// ... app configuration calls
+
+app.route("/v1/auth", authRoutes);
+app.route("/v1/bottles/:bottleId", bottleDetailRoutes);
+```
+
+All unique paths should also be unique modules. For example:
+
+- GET /v1/auth should be in `[..]/auth.ts`.
+- POST /v1/auth should be in `[..]/auth.ts`.
+- POST /v1/auth/register should be in `[..]/authRegister.ts`.
+
+Tests should live side-by-side with the routes:
+
+- If the route is at `[...]/auth.ts` the tests should be in `[...]/auth.test.ts`
+
+## Route Definition
+
+Routes are created as a `OpenAPIHono` instance, using the `@hono/zod-openapi` extension:
+
+```ts
+import { OpenAPIHono } from "@hono/zod-openapi";
+
+export default new OpenAPIHono()
+  .openapi(
+    {
+      method: "get",
+      path: "/",
+      responses: {
+        200: {
+          content: {
+            "application/json": {
+              schema: z.object({ ok: z.boolean() }),
+            },
+          },
+          description: "A description of the endpoint",
+        },
+      },
+    },
+    async function (c) {
+      return c.json({ ok: true });
+    },
+  )
+  .openapi(
+    {
+      method: "post",
+      path: "/",
+      responses: {
+        200: {
+          content: {
+            "application/json": {
+              schema: z.object({ echo: z.string() }),
+            },
+          },
+          description: "A description of the endpoint",
+        },
+      },
+    },
+    async function (c) {
+      const { echo } = c.req.valid("json");
+
+      return c.json({ echo });
+    },
+  );
+```
+
+### Error Responses
+
+When returning errors from routes, such as an HTTP 401 Unauthorized response, you should use exceptions for control flow via the `http-errors-enhanced` package.
+
+```ts
+import { UnauthorizedError } from "http-errors-enhanced";
+
+throw new UnauthorizedError("Invalid credentials.");
+```
+
+This will be caught by the error handler and converted to the appropriate HTTP response.
+
+You'll also need to define these in the OpenAPI route responses:
+
+```typescript
+import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
+import { requireAuth } from "@peated/api/middleware/auth";
+import { OpenAPIHono } from "@hono/zod-openapi";
+
+export default new OpenAPIHono()
+  .openapi(
+    {
+      method: "get",
+      path: "/",
+      responses: {
+        401: unauthorizedSchema,
+      },
+    },
+    async function (c) {
+      throw new UnauthorizedError();
+    },
+  )
+```
+
+### Authentication
+
+Authentication can be added to an endpoint view a few middlewares. These are all found in `apps/api/src/middleware`. Commonly you will use something like `requireAuth` or `requireAdmin`. These are defined in the `openapi` call:
+
+You also must define the appropriate responses if you're requiring authorization, such as the `401` response. Utilize the `UnauthorizedError` for these responses.
+
+Both the standard response schema, and the error class can be found in `http-errors-enhanced`.
+
+```ts
+import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
+import { requireAuth } from "@peated/api/middleware/auth";
+import { OpenAPIHono } from "@hono/zod-openapi";
+
+export default new OpenAPIHono()
+  .openapi(
+    {
+      method: "get",
+      path: "/",
+      responses: {
+        200: {
+          content: {
+            "application/json": {
+              schema: z.object({ ok: z.boolean() }),
+            },
+          },
+          description: "A description of the endpoint",
+        },
+        401: unauthorizedSchema,
+      },
+      // if the endpoint requires authentication, force it via
+      // the middleware
+      middleware: [requireAuth],
+    },
+    async function (c) {
+      // you can fetch the authenticated user via `c.get("uesr")` 
+      const currentUser = c.get("user");
+      if (!currentUser) {
+        throw new UnauthorizedError();
+      }
+
+      return c.json({ ok: true });
+    },
+  )
+```
+
+### Versioning
+
+We're currently building `v1` of the API, meaning we will register all routes with the `/v1` prefix.
+
+This should _only_ be defined in the `app.register` call with the `prefix` option.
+
+
+
+
