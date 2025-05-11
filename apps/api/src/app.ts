@@ -1,7 +1,6 @@
 // make sure to import this _before_ all other code
 import "./sentry";
 
-import fastifyAutoload from "@fastify/autoload";
 import fastifyCors from "@fastify/cors";
 import fastifyHelmet from "@fastify/helmet";
 import fastifyMultipart from "@fastify/multipart";
@@ -16,22 +15,27 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";
-import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 import type { ZodOpenApiVersion } from "zod-openapi";
 import config from "./config";
 import { MAX_FILESIZE } from "./constants";
 import type { User } from "./db/schema";
 import { injectAuth } from "./middleware/auth";
-import authRoute from "./routes/auth";
 import fastifySentry from "./sentryPlugin";
 import { gracefulShutdown } from "./worker/client";
+
+import authRoute from "./routes/auth";
+import authRegisterRoute from "./routes/authRegister";
+import rootRoute from "./routes/root";
 
 declare module "@fastify/request-context" {
   interface RequestContextData {
     user: User | null;
   }
 }
+
+const ROBOTS = `User-agent: *
+Disallow: /`;
 
 const envToLogger: {
   [env: string]: any;
@@ -194,7 +198,34 @@ export default async function buildFastify(options = {}) {
   //   }
   // });
 
-  await app.register(authRoute, { prefix: "/v1/auth" });
+  app.route({
+    method: "GET",
+    url: "/_health",
+    handler: (_, res) => {
+      res.status(200).send();
+    },
+  });
+
+  app.route({
+    method: "GET",
+    url: "/robots.txt",
+    handler: (_, res) => {
+      res.status(200).type("text/plain").send(ROBOTS);
+    },
+  });
+
+  // unversioned routes
+  await app.register(rootRoute);
+  // await app.register(updateBadgeImage);
+  // await app.register(updateBottleImage);
+  // await app.register(updateTastingImage);
+  // await app.register(updateUserAvatar);
+  // await app.register(uploads);
+
+  // API v1 routes
+  await app.register(rootRoute, { prefix: "/v1" });
+  await app.register(authRoute, { prefix: "/v1" });
+  await app.register(authRegisterRoute, { prefix: "/v1" });
 
   // await app.register(fastifyAutoload, {
   //   dir: path.join(__dirname, "routes"),

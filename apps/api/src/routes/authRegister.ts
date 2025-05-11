@@ -15,10 +15,10 @@ import type {
 } from "fastify-zod-openapi";
 import { ConflictError, conflictSchema } from "http-errors-enhanced";
 import { z } from "zod";
-
+import zodToJsonSchema from "zod-to-json-schema";
 const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
   fastify.post(
-    "/",
+    "/auth/register",
     {
       schema: {
         tags: ["auth"],
@@ -29,7 +29,7 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
           password: z.string(),
         }),
         response: {
-          200: AuthSchema,
+          200: zodToJsonSchema(AuthSchema),
           409: conflictSchema,
         },
       } satisfies FastifyZodOpenApiSchema,

@@ -1,6 +1,6 @@
 ---
 description: Instructions when working on OpenAPI routes in Fastify.
-globs:
+globs: 
 alwaysApply: false
 ---
 ## Technology
@@ -11,37 +11,36 @@ We use the `fastify` framework, with the `fastify-zod-openapi` plugin for OpenAP
 
 Routes are located in `apps/api/src/routes` and are named based on their URL path. For example:
 
-- a route at `/v1/auth` would be in `apps/api/src/routes/auth/index.ts`.
-- a route at `/v1/bottles/:bottleId` would be in `apps/api/src/routes/bottles/[bottleId]/index.ts`.
+- a route at `/v1/auth` would be in `apps/api/src/routes/auth.ts`.
+- a route at `/v1/bottles/:bottleId` would be in `apps/api/src/routes/bottleDetails.ts`.
+- a route at `/v1/bottles/:bottleId/tastings` would be in `apps/api/src/routes/bottleTastings.ts`
 
 When importing these modules, we name then accordingly:
 
-- `authRoute` for `apps/api/src/routes/auth/index.ts`
-- `bottleByIdRoute` for `apps/api/src/routes/bottles/[bottleId]/index.ts`
+- `authRoute` for `apps/api/src/routes/auth.ts`
+- `bottleDetailsRoute` for `apps/api/src/routes/bottleDetails.ts`
 
 Routes are registered in `apps/api/src/app.ts`, by adding a new `app.register`. Routes are always registered as the last thing on the Fastify instance. They are grouped together and sorted alphabetically by route prefix. For example:
 
 ```ts
 import authRoute from "./routes/auth";
-import bottleByIdRoute from "./routes/bottles/[bottleId]";
+import bottleDetailsRoute from "./routes/bottleDetails";
 
 // ... app configuration calls
 
-await app.register(authRoute, { prefix: "/v1/auth" });
-await app.register(bottleByIdRoute, { prefix: "/v1/bottles/:bottleId" });
+await app.register(authRoute, { prefix: "/v1" });
+await app.register(bottleDetailsRoute, { prefix: "/v1" });
 ```
 
 All unique paths should also be unique modules. For example:
 
-- GET /v1/auth should be in `[..]/auth/index.ts`.
-- POST /v1/auth should be in `[..]/auth/index.ts`.
-- POST /v1/auth/register should be in `[..]/auth/register/index.ts`.
+- GET /v1/auth should be in `[..]/auth.ts`.
+- POST /v1/auth should be in `[..]/auth.ts`.
+- POST /v1/auth/register should be in `[..]/authRegister.ts`.
 
 Tests should live side-by-side with the routes:
 
-- If the route is at `[...]/auth/index.ts` the tests should be in `[...]/auth/index.test.ts`
-
-Additional helpers, which should be any sufficiently large amount of functionality for the route (helper functions that may get defined), should live within the directory itself. For example, lets say you needed a helper function for the lost password endpoint (`sendResetPasswordEmail`). If that doesnt already exist elsewhere, you might put it in `[theCurrentRouteFolder]/email.ts`.
+- If the route is at `[...]/auth.ts` the tests should be in `[...]/auth.test.ts`
 
 ## Route Structure
 
@@ -57,7 +56,8 @@ import { z } from "zod";
 const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
   fastify
     .get(
-      "/",
+      // the /v1 prefix should not be included
+      "/echo",
       {
         schema: {
           response: {
@@ -70,7 +70,7 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
       },
     )
     .post(
-      "/",
+      "/echo",
       {
         schema: {
           body: z.object({
@@ -87,6 +87,8 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
 
 export default plugin;
 ```
+
+### Error Responses
 
 When returning errors from routes, such as an HTTP 401 Unauthorized response, you should use exceptions for control flow via the `http-errors-enhanced` package.
 
@@ -120,3 +122,13 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
       },
     )
 ```
+
+### Versioning
+
+We're currently building `v1` of the API, meaning we will register all routes with the `/v1` prefix.
+
+This should _only_ be defined in the `app.register` call with the `prefix` option.
+
+
+
+

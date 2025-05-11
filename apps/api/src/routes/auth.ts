@@ -21,7 +21,7 @@ import zodToJsonSchema from "zod-to-json-schema";
 const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
   fastify
     .get(
-      "/",
+      "/auth",
       {
         schema: {
           response: {
@@ -55,7 +55,7 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
       },
     )
     .post(
-      "/",
+      "/auth",
       {
         schema: {
           body: z.union([
