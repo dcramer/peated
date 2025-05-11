@@ -1,0 +1,14 @@
+---
+description: Guidelines to migrate an old trpc route from apps/server to a new hono route in apps/api
+globs: 
+alwaysApply: false
+---
+Use these guidelines when you are migrating code from the legacy trpc-based implementation at `apps/server/`, into the new Hono, openapi-based implementation at `apps/api/`.
+
+The trpc routes are located in `apps/server/src/trpc/routes/`.
+
+Each route should be cleanly mapped to the new `apps/api/src/routes/` format, keeping the directory flat, and migrating both the route and tests. Always ensure that the route is registered when you are finished, and verify the type-safety as well as tests.
+
+If you're using code from `@peated/server` in the migration, ensure the code is ported over to the new `@peated/api` codebase. That is, duplicate the code if its not already present.
+
+NEVER make changes to the `tsconfig` files or any build system configuration.

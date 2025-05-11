@@ -1,5 +1,5 @@
 ---
-description: Instructions when working on OpenAPI routes in Fastify.
+description: Instructions when working on OpenAPI routes in Hono.
 globs: 
 alwaysApply: false
 ---
@@ -12,6 +12,7 @@ We use the `hono` framework, with the `@hono/zod-openapi` extension for OpenAPI 
 Routes are located in `apps/api/src/routes` and are named based on their URL path. For example:
 
 - a route at `/v1/auth` would be in `apps/api/src/routes/auth.ts`.
+- a route at `/v1/auth/register` would be in `apps/api/src/routes/authRegister.ts`.
 - a route at `/v1/bottles/:bottleId` would be in `apps/api/src/routes/bottleDetails.ts`.
 - a route at `/v1/bottles/:bottleId/tastings` would be in `apps/api/src/routes/bottleTastings.ts`
 
@@ -19,6 +20,8 @@ When importing these modules, we name then accordingly:
 
 - `authRoute` for `apps/api/src/routes/auth.ts`
 - `bottleDetailsRoute` for `apps/api/src/routes/bottleDetails.ts`
+
+Most importantly, paths are always in unique modules. Every `url` in a single route definition should be identical, and subpaths should be in their own separate module and route definition.
 
 Routes are registered in `apps/api/src/app.ts`, by adding a new `app.route`. Routes are always registered as the last thing on the Hono instance. They are grouped together and sorted alphabetically by route prefix. For example:
 
@@ -175,7 +178,7 @@ export default new OpenAPIHono()
 
 We're currently building `v1` of the API, meaning we will register all routes with the `/v1` prefix.
 
-This should _only_ be defined in the `app.register` call with the `prefix` option.
+This should _only_ be defined in the `app.route` call with the `prefix` option.
 
 
 

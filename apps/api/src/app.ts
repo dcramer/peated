@@ -8,6 +8,7 @@ import config from "./config";
 import { logError } from "./lib/log";
 import { injectAuth } from "./middleware/auth";
 import authRoutes from "./routes/auth";
+import authRegisterRoutes from "./routes/authRegister";
 
 export default async function buildApp(options = {}) {
   const app = new Hono()
@@ -44,6 +45,7 @@ export default async function buildApp(options = {}) {
     .use(injectAuth);
 
   app.route("/v1/auth", authRoutes);
+  app.route("/v1/auth/register", authRegisterRoutes);
 
   return app;
 }
