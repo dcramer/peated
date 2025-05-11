@@ -7,6 +7,7 @@ import { serialize } from "@peated/api/serializers";
 import { CountrySerializer } from "@peated/api/serializers/country";
 import { and, asc, desc, ilike, inArray, ne, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
+import { CursorSchema } from "../schemas";
 
 const SORT_OPTIONS = ["name", "bottles", "-name", "-bottles"] as const;
 
@@ -42,10 +43,7 @@ const CountryListQuerySchema = z.object({
 
 const CountryListResponseSchema = z.object({
   results: z.array(CountrySchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
+  rel: CursorSchema,
 });
 
 export default new OpenAPIHono().openapi(

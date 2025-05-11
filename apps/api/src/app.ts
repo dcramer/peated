@@ -12,6 +12,7 @@ import authRoutes from "./routes/auth";
 import authRegisterRoutes from "./routes/authRegister";
 import countriesRoutes from "./routes/countries";
 import metaRoutes from "./routes/meta";
+import regionsRoutes from "./routes/regions";
 
 export default async function buildApp(options = {}) {
   const app = new Hono()
@@ -51,6 +52,7 @@ export default async function buildApp(options = {}) {
   app.route("/v1/auth", authRoutes);
   app.route("/v1/auth/register", authRegisterRoutes);
   app.route("/v1/countries", countriesRoutes);
+  app.route("/v1/regions", regionsRoutes);
   app.route("/v1/admin/queue-info", adminQueueInfoRoutes);
 
   return app;

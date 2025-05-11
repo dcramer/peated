@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const CursorSchema = z.object({
+  nextCursor: z.number().nullable(),
+  prevCursor: z.number().nullable(),
+});
+
 export const PointSchema = z.tuple([z.number(), z.number()]);
 
 export const FollowStatusEnum = z.enum(["pending", "following", "none"]);
