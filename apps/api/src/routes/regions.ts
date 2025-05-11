@@ -7,7 +7,13 @@ import { RegionSerializer } from "@peated/api/serializers/region";
 import { and, asc, desc, eq, ilike, ne, sql, type SQL } from "drizzle-orm";
 import { BadRequestError, badRequestSchema } from "http-errors-enhanced";
 import { z } from "zod";
-import { CursorSchema, RegionSchema } from "../schemas";
+import {
+  BooleanQueryParam,
+  CursorQueryParam,
+  CursorSchema,
+  LimitQueryParam,
+  RegionSchema,
+} from "../schemas";
 
 const DEFAULT_SORT = "name";
 const SORT_OPTIONS = ["name", "bottles", "-name", "-bottles"] as const;
@@ -21,17 +27,10 @@ export default new OpenAPIHono().openapi(
         // TODO: coerce to number if possible? this is awful
         country: z.string().openapi("country ID or slug"),
         query: z.string().default(""),
-        cursor: z.string().default("1").pipe(z.coerce.number().gte(1)),
-        limit: z
-          .string()
-          .default("100")
-          .pipe(z.coerce.number().gte(1).lte(100)),
+        cursor: CursorQueryParam(),
+        limit: LimitQueryParam(),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
-        hasBottles: z
-          .string()
-          .default("0")
-          .transform((v) => v === "1" || v.toLowerCase() === "true")
-          .pipe(z.coerce.boolean()),
+        hasBottles: BooleanQueryParam(false),
       }),
     },
     responses: {

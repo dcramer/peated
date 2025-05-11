@@ -7,7 +7,12 @@ import { serialize } from "@peated/api/serializers";
 import { CountrySerializer } from "@peated/api/serializers/country";
 import { and, asc, desc, ilike, inArray, ne, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
-import { CursorSchema } from "../schemas";
+import {
+  BooleanQueryParam,
+  CursorQueryParam,
+  CursorSchema,
+  LimitQueryParam,
+} from "../schemas";
 
 const SORT_OPTIONS = ["name", "bottles", "-name", "-bottles"] as const;
 
@@ -18,22 +23,11 @@ export default new OpenAPIHono().openapi(
     request: {
       query: z.object({
         query: z.string().default(""),
-        cursor: z.string().default("1").pipe(z.coerce.number().gte(1)),
-        limit: z
-          .string()
-          .default("100")
-          .pipe(z.coerce.number().gte(1).lte(100)),
+        cursor: CursorQueryParam(),
+        limit: LimitQueryParam(100),
         sort: z.enum(SORT_OPTIONS).default("name"),
-        onlyMajor: z
-          .string()
-          .default("false")
-          .transform((v) => v === "1" || v.toLowerCase() === "true")
-          .pipe(z.coerce.boolean()),
-        hasBottles: z
-          .string()
-          .default("false")
-          .transform((v) => v === "1" || v.toLowerCase() === "true")
-          .pipe(z.coerce.boolean()),
+        onlyMajor: BooleanQueryParam(false),
+        hasBottles: BooleanQueryParam(false),
       }),
     },
     responses: {
