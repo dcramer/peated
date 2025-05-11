@@ -97,6 +97,8 @@ export default new OpenAPIHono()
   );
 ```
 
+Note: Imports from the `apps/api` package should always use the `@peated/api` import path, rather than use relative imports. The only exception to this rule is when you're importing code which is in the same directory and is not a shared utility.
+
 ### Error Responses
 
 When returning errors from routes, such as an HTTP 401 Unauthorized response, you should use exceptions for control flow via the `http-errors-enhanced` package.

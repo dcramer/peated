@@ -10,6 +10,7 @@ import { injectAuth } from "./middleware/auth";
 import adminQueueInfoRoutes from "./routes/adminQueueInfo";
 import authRoutes from "./routes/auth";
 import authRegisterRoutes from "./routes/authRegister";
+import countriesRoutes from "./routes/countries";
 import metaRoutes from "./routes/meta";
 
 export default async function buildApp(options = {}) {
@@ -49,6 +50,7 @@ export default async function buildApp(options = {}) {
   app.route("/v1", metaRoutes);
   app.route("/v1/auth", authRoutes);
   app.route("/v1/auth/register", authRegisterRoutes);
+  app.route("/v1/countries", countriesRoutes);
   app.route("/v1/admin/queue-info", adminQueueInfoRoutes);
 
   return app;

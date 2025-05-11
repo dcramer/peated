@@ -1,7 +1,7 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { requireAdmin } from "@peated/api/middleware/auth";
 import { getQueue } from "@peated/api/worker/client";
-import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
+import { forbiddenSchema } from "http-errors-enhanced";
 import { z } from "zod";
 
 export default new OpenAPIHono().openapi(
@@ -24,7 +24,7 @@ export default new OpenAPIHono().openapi(
         },
         description: "Get queue statistics",
       },
-      401: unauthorizedSchema,
+      403: forbiddenSchema,
     },
     middleware: [requireAdmin],
   },

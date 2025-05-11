@@ -3,7 +3,7 @@ import { createAccessToken } from "@peated/api/lib/auth";
 
 describe("GET /admin/queue-info", () => {
   test("requires admin access", async ({ fixtures }) => {
-    const user = await fixtures.User();
+    const user = await fixtures.User({ admin: false });
 
     const res = await app.request("/v1/admin/queue-info", {
       method: "GET",
@@ -13,7 +13,7 @@ describe("GET /admin/queue-info", () => {
       }),
     });
 
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(403);
   });
 
   test("returns queue stats", async ({ fixtures }) => {
