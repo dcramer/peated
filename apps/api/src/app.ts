@@ -3,7 +3,12 @@ import { cache } from "hono/cache";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 
-import { isHttpError, serializeError } from "http-errors-enhanced";
+import type { internalServerErrorSchema } from "http-errors-enhanced";
+import {
+  isHttpError,
+  messagesByCodes,
+  serializeError,
+} from "http-errors-enhanced";
 import config from "./config";
 import { logError } from "./lib/log";
 import { injectAuth } from "./middleware/auth";
@@ -13,6 +18,16 @@ import authRegisterRoutes from "./routes/authRegister";
 import countriesRoutes from "./routes/countries";
 import metaRoutes from "./routes/meta";
 import regionsRoutes from "./routes/regions";
+
+const processRoot = process.cwd();
+
+type ErrorResponse = {
+  statusCode: number;
+  error: string;
+  message: string;
+  code?: string;
+  stack?: string[];
+};
 
 export default async function buildApp(options = {}) {
   const app = new Hono()
@@ -40,10 +55,37 @@ export default async function buildApp(options = {}) {
 
     .onError((err, c) => {
       if (isHttpError(err)) {
-        return c.json(serializeError(err), err.statusCode as any);
+        return c.json<ErrorResponse>(
+          {
+            message: err.message,
+            error: messagesByCodes[err.statusCode],
+            statusCode: err.statusCode,
+            code: err.code,
+            stack:
+              process.env.NODE_ENV === "development" && err.stack
+                ? err.stack
+                    .split("\n")
+                    .slice(1)
+                    .map((s) =>
+                      s
+                        .trim()
+                        .replace(/^at /, "")
+                        .replace(processRoot, "$ROOT"),
+                    )
+                : undefined,
+          },
+          err.statusCode as any,
+        );
       }
       logError(err);
-      throw err;
+      return c.json<ErrorResponse>(
+        {
+          message: "Internal server error.",
+          error: messagesByCodes[500],
+          statusCode: 500,
+        },
+        500,
+      );
     })
 
     .use(injectAuth);

@@ -15,7 +15,7 @@ export default new OpenAPIHono().openapi(
             }),
           },
         },
-        description: "Get the current API version",
+        description: "Information about the version of the API",
       },
     },
   },

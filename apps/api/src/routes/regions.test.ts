@@ -12,6 +12,9 @@ describe("GET /regions", () => {
       name: "Region B",
     });
 
+    expect(region1.countryId).toBe(country.id);
+    expect(region2.countryId).toBe(country.id);
+
     const res = await app.request(`/v1/regions?country=${country.id}`, {
       method: "GET",
       headers: new Headers({
@@ -148,7 +151,6 @@ describe("GET /regions", () => {
       },
     );
 
-    console.log(await res.text());
     expect(res.status).toBe(200);
 
     const data: any = await res.json();
@@ -168,7 +170,7 @@ describe("GET /regions", () => {
     await fixtures.Region({ countryId: country.id, totalBottles: 0 });
 
     const res = await app.request(
-      `/v1/regions?country=${country.id}&hasBottles=true`,
+      `/v1/regions?country=${country.id}&hasBottles=1`,
       {
         method: "GET",
         headers: new Headers({
@@ -194,6 +196,6 @@ describe("GET /regions", () => {
 
     expect(res.status).toBe(400);
     const data: any = await res.json();
-    expect(data.message).toMatchInlineSnapshot("Invalid country");
+    expect(data.message).toMatchInlineSnapshot(`"Invalid country."`);
   });
 });

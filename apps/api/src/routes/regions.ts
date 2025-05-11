@@ -18,12 +18,20 @@ export default new OpenAPIHono().openapi(
     path: "/",
     request: {
       query: z.object({
-        country: z.union([z.number(), z.string()]),
+        // TODO: coerce to number if possible? this is awful
+        country: z.string().openapi("country ID or slug"),
         query: z.string().default(""),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
+        cursor: z.string().default("1").pipe(z.coerce.number().gte(1)),
+        limit: z
+          .string()
+          .default("100")
+          .pipe(z.coerce.number().gte(1).lte(100)),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
-        hasBottles: z.boolean().default(false),
+        hasBottles: z
+          .string()
+          .default("0")
+          .transform((v) => v === "1" || v.toLowerCase() === "true")
+          .pipe(z.coerce.boolean()),
       }),
     },
     responses: {
@@ -48,11 +56,11 @@ export default new OpenAPIHono().openapi(
     const where: (SQL<unknown> | undefined)[] = [];
     const offset = (cursor - 1) * limit;
 
-    if (query) {
+    if (query !== "") {
       where.push(ilike(regions.name, `%${query}%`));
     }
 
-    if (typeof country === "number" || Number.isFinite(+country)) {
+    if (Number.isFinite(+country)) {
       where.push(eq(regions.countryId, Number(country)));
     } else if (country) {
       const [result] = await db
@@ -61,7 +69,7 @@ export default new OpenAPIHono().openapi(
         .where(eq(sql`LOWER(${countries.slug})`, country.toLowerCase()))
         .limit(1);
       if (!result) {
-        throw new BadRequestError("Invalid country");
+        throw new BadRequestError("Invalid country.");
       }
       where.push(eq(regions.countryId, result.id));
     }
@@ -85,7 +93,7 @@ export default new OpenAPIHono().openapi(
         orderBy = desc(regions.totalBottles);
         break;
       default:
-        throw new Error(`Invalid sort: ${sort}`);
+        throw new Error(`Invalid sort: ${sort}.`);
     }
 
     const results = await db

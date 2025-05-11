@@ -11,53 +11,39 @@ import { CursorSchema } from "../schemas";
 
 const SORT_OPTIONS = ["name", "bottles", "-name", "-bottles"] as const;
 
-const CountryListQuerySchema = z.object({
-  query: z
-    .string()
-    .default("")
-    .openapi({ param: { style: "form" } }),
-  cursor: z
-    .number()
-    .gte(1)
-    .default(1)
-    .openapi({ param: { style: "form" } }),
-  limit: z
-    .number()
-    .gte(1)
-    .lte(100)
-    .default(100)
-    .openapi({ param: { style: "form" } }),
-  sort: z
-    .enum(SORT_OPTIONS)
-    .default("name")
-    .openapi({ param: { style: "form" } }),
-  onlyMajor: z
-    .boolean()
-    .default(false)
-    .openapi({ param: { style: "form" } }),
-  hasBottles: z
-    .boolean()
-    .default(false)
-    .openapi({ param: { style: "form" } }),
-});
-
-const CountryListResponseSchema = z.object({
-  results: z.array(CountrySchema),
-  rel: CursorSchema,
-});
-
 export default new OpenAPIHono().openapi(
   {
     method: "get",
     path: "/",
     request: {
-      query: CountryListQuerySchema,
+      query: z.object({
+        query: z.string().default(""),
+        cursor: z.string().default("1").pipe(z.coerce.number().gte(1)),
+        limit: z
+          .string()
+          .default("100")
+          .pipe(z.coerce.number().gte(1).lte(100)),
+        sort: z.enum(SORT_OPTIONS).default("name"),
+        onlyMajor: z
+          .string()
+          .default("false")
+          .transform((v) => v === "1" || v.toLowerCase() === "true")
+          .pipe(z.coerce.boolean()),
+        hasBottles: z
+          .string()
+          .default("false")
+          .transform((v) => v === "1" || v.toLowerCase() === "true")
+          .pipe(z.coerce.boolean()),
+      }),
     },
     responses: {
       200: {
         content: {
           "application/json": {
-            schema: CountryListResponseSchema,
+            schema: z.object({
+              results: z.array(CountrySchema),
+              rel: CursorSchema,
+            }),
           },
         },
         description:
@@ -72,7 +58,7 @@ export default new OpenAPIHono().openapi(
       c.req.valid("query");
     const where: SQL<unknown>[] = [];
     const offset = (cursor - 1) * limit;
-    if (query) {
+    if (query !== "") {
       where.push(ilike(countries.name, `%${query}%`));
     }
     if (hasBottles) {
