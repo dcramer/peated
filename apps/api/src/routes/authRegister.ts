@@ -4,7 +4,7 @@ import { db } from "@peated/api/db";
 import { users } from "@peated/api/db/schema";
 import { createAccessToken, generatePasswordHash } from "@peated/api/lib/auth";
 import { sendVerificationEmail } from "@peated/api/lib/email";
-import { AuthSchema, UserSchema } from "@peated/api/schemas";
+import { AuthSchema } from "@peated/api/schemas";
 import { serialize } from "@peated/api/serializers";
 import { UserSerializer } from "@peated/api/serializers/user";
 import { eq, sql } from "drizzle-orm";

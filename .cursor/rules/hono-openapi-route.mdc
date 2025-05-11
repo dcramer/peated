@@ -16,12 +16,14 @@ Routes are located in `apps/api/src/routes` and are named based on their URL pat
 - a route at `/v1/bottles/:bottleId` would be in `apps/api/src/routes/bottleDetails.ts`.
 - a route at `/v1/bottles/:bottleId/tastings` would be in `apps/api/src/routes/bottleTastings.ts`
 
-When importing these modules, we name then accordingly:
+When importing these modules, ALWAYS we name then accordingly:
 
 - `authRoute` for `apps/api/src/routes/auth.ts`
 - `bottleDetailsRoute` for `apps/api/src/routes/bottleDetails.ts`
 
-Most importantly, paths are always in unique modules. Every `url` in a single route definition should be identical, and subpaths should be in their own separate module and route definition.
+Most importantly, paths are ALWAYS in unique modules. Every `url` in a single route definition should be identical, and subpaths should be in their own separate module and route definition. For example: /auth and /auth/register should be two separate route modules on disk.
+
+Generally speaking, you will almost ALWAYS prefix the route module name with the subpath. For example, a route at `/v1/admin/queueInfo` would be named `adminQueueInfo.ts`.
 
 Routes are registered in `apps/api/src/app.ts`, by adding a new `app.route`. Routes are always registered as the last thing on the Hono instance. They are grouped together and sorted alphabetically by route prefix. For example:
 
@@ -180,6 +182,51 @@ We're currently building `v1` of the API, meaning we will register all routes wi
 
 This should _only_ be defined in the `app.route` call with the `prefix` option.
 
+## Tests
 
+Tests should be defined in `[routeName].test.ts`. They should use standard patterns that you can see in other similar route tests.
 
+The description passed to `describe` should ALWAYS be `METHOD /path`, representing the specific HTTP route.
+
+```ts
+import { app } from "@peated/api/app";
+
+describe("GET /auth", () => {
+  test("active sessions", async ({ fixtures }) => {
+    const user = await fixtures.User();
+
+    const res = await app.request("/v1/auth", {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        authorization: "Bearer " + (await createAccessToken(user)),
+      }),
+    });
+
+    expect(res.status).toBe(200);
+
+    const data: any = await res.json();
+
+    expect(data.user.id).toEqual(user.id);
+  });
+});
+```
+
+You can run tests with the following command from the package root:
+
+```shell
+pnpm --filter ./apps/api test --run [routeName]
+```
+
+For example, to run ALL route tests:
+
+```shell
+pnpm --filter ./apps/api test --run routes
+```
+
+Or to just run the `authRegister` route tests:
+
+```shell
+pnpm --filter ./apps/api test --run authRegister
+```
 

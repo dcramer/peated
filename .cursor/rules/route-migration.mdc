@@ -5,10 +5,20 @@ alwaysApply: false
 ---
 Use these guidelines when you are migrating code from the legacy trpc-based implementation at `apps/server/`, into the new Hono, openapi-based implementation at `apps/api/`.
 
+Always include the [hono-openapi-route.mdc](mdc:.cursor/rules/hono-openapi-route.mdc) and follow them extremely carefully.
+
 The trpc routes are located in `apps/server/src/trpc/routes/`.
 
-Each route should be cleanly mapped to the new `apps/api/src/routes/` format, keeping the directory flat, and migrating both the route and tests. Always ensure that the route is registered when you are finished, and verify the type-safety as well as tests.
+Each route should be cleanly mapped to the new `apps/api/src/routes/` format, keeping the directory flat, and migrating both the route and tests. Always ensure that the route is registered when you are finished.
+
+You should ALWAYS look at the existing tests for the route and ensure every single test still exists, but look for opportunities to improve test coverage. The existing tests will always be in the same directory as the route definition, using the `.test.ts` extension (vs just `.ts`).
 
 If you're using code from `@peated/server` in the migration, ensure the code is ported over to the new `@peated/api` codebase. That is, duplicate the code if its not already present.
 
 NEVER make changes to the `tsconfig` files or any build system configuration.
+
+Run the tests after you migrate a route to ensure its still correct. Use the following from the workspace root:
+
+```shell
+pnpm --filter ./apps/api test --run [newRouteName]
+```

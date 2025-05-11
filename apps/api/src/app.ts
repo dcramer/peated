@@ -7,8 +7,10 @@ import { isHttpError, serializeError } from "http-errors-enhanced";
 import config from "./config";
 import { logError } from "./lib/log";
 import { injectAuth } from "./middleware/auth";
+import adminQueueInfoRoutes from "./routes/adminQueueInfo";
 import authRoutes from "./routes/auth";
 import authRegisterRoutes from "./routes/authRegister";
+import metaRoutes from "./routes/meta";
 
 export default async function buildApp(options = {}) {
   const app = new Hono()
@@ -44,8 +46,10 @@ export default async function buildApp(options = {}) {
 
     .use(injectAuth);
 
+  app.route("/v1", metaRoutes);
   app.route("/v1/auth", authRoutes);
   app.route("/v1/auth/register", authRegisterRoutes);
+  app.route("/v1/admin/queue-info", adminQueueInfoRoutes);
 
   return app;
 }
