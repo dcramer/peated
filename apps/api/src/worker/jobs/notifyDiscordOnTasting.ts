@@ -1,8 +1,8 @@
-import config from "@peated/server/config";
-import { db } from "@peated/server/db";
-import { formatColor } from "@peated/server/lib/format";
-import { logError } from "@peated/server/lib/log";
-import { absoluteUrl } from "@peated/server/lib/urls";
+import config from "@peated/api/config";
+import { db } from "@peated/api/db";
+import { formatColor } from "@peated/api/lib/format";
+import { logError } from "@peated/api/lib/log";
+import { absoluteUrl } from "@peated/api/lib/urls";
 
 if (!config.DISCORD_WEBHOOK) {
   console.error("DISCORD_WEBHOOK is not configured");

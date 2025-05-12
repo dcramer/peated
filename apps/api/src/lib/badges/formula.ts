@@ -1,4 +1,4 @@
-import type { BadgeFormula } from "@peated/server/types";
+import type { BadgeFormula } from "@peated/api/types";
 
 export function getFormula(
   type: BadgeFormula,

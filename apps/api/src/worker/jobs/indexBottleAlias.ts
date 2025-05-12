@@ -1,7 +1,7 @@
 import { openai } from "@ai-sdk/openai";
-import { db } from "@peated/server/db";
-import { bottleAliases } from "@peated/server/db/schema";
-import { formatCategoryName } from "@peated/server/lib/format";
+import { db } from "@peated/api/db";
+import { bottleAliases } from "@peated/api/db/schema";
+import { formatCategoryName } from "@peated/api/lib/format";
 import { embed } from "ai";
 import { eq, sql } from "drizzle-orm";
 

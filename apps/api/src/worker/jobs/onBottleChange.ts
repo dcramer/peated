@@ -1,4 +1,4 @@
-import { pushUniqueJob, runJob } from "@peated/server/worker/client";
+import { pushUniqueJob, runJob } from "@peated/api/worker/client";
 
 export default async ({ bottleId }: { bottleId: number }) => {
   await runJob("GenerateBottleDetails", { bottleId });

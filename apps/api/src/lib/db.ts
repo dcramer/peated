@@ -16,14 +16,19 @@ export type UpsertOutcome<T> =
     }
   | undefined;
 
-export function coerceToUpsert({
-  country,
-  region,
-  ...data
-}:
-  | z.infer<typeof EntityInputSchema>
-  | z.infer<typeof EntitySchema>): EntityInput {
-  const rv: EntityInput = { ...data };
+export function coerceToUpsert(
+  data:
+    | z.infer<typeof EntityInputSchema>
+    | z.infer<typeof EntitySchema>
+    | number,
+): EntityInput {
+  if (typeof data === "number") {
+    return data;
+  }
+
+  const { country, region, ...rest } = data;
+
+  const rv: Record<string, unknown> = { ...rest };
   if (country instanceof Object) {
     rv.countryId = country.id;
   } else if (country) {
@@ -34,7 +39,7 @@ export function coerceToUpsert({
   } else if (region) {
     rv.regionId = region;
   }
-  return rv;
+  return rv as EntityInput;
 }
 
 export const upsertEntity = async ({

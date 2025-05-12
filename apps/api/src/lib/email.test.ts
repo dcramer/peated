@@ -1,4 +1,4 @@
-import config from "@peated/server/config";
+import config from "@peated/api/config";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";

@@ -1,9 +1,5 @@
-import { toTitleCase } from "@peated/server/lib/strings";
-import type {
-  Category,
-  FlavorProfile,
-  ServingStyle,
-} from "@peated/server/types";
+import { toTitleCase } from "@peated/api/lib/strings";
+import type { Category, FlavorProfile, ServingStyle } from "@peated/api/types";
 import { COLOR_SCALE } from "../constants";
 
 export function formatBottleName({

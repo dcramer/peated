@@ -1,4 +1,4 @@
-import type { BadgeTracker } from "@peated/server/types";
+import type { BadgeTracker } from "@peated/api/types";
 import type { Tracker } from "./base";
 import { BottleTracker } from "./bottle";
 import { CountryTracker } from "./country";

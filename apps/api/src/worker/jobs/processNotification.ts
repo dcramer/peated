@@ -1,5 +1,5 @@
-import { db } from "@peated/server/db";
-import { notifyComment } from "@peated/server/lib/email";
+import { db } from "@peated/api/db";
+import { notifyComment } from "@peated/api/lib/email";
 
 export default async function processNotification({
   notificationId,

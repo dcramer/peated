@@ -1,5 +1,5 @@
-import config from "@peated/server/config";
-import { logError } from "@peated/server/lib/log";
+import config from "@peated/api/config";
+import { logError } from "@peated/api/lib/log";
 import { startSpan } from "@sentry/node";
 import OpenAI from "openai";
 import { type ZodSchema, type z } from "zod";

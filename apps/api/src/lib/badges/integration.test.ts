@@ -1,10 +1,7 @@
 import { db } from "../../db";
 
 import { faker } from "@faker-js/faker";
-import {
-  badgeAwards,
-  badgeAwardTrackedObjects,
-} from "@peated/server/db/schema";
+import { badgeAwards, badgeAwardTrackedObjects } from "@peated/api/db/schema";
 import { asc } from "drizzle-orm";
 import { awardAllBadgeXp } from ".";
 import { createTastingForBadge } from "./testHelpers";

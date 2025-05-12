@@ -1,4 +1,4 @@
-import type { ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteType } from "@peated/api/types";
 import { type JobName } from "./types";
 
 export function getJobForSite(site: ExternalSiteType): JobName {

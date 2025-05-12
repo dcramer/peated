@@ -1,6 +1,6 @@
-import { db } from "@peated/server/db";
-import { bottleSeries, entities } from "@peated/server/db/schema";
-import { buildBottleSeriesSearchVector } from "@peated/server/lib/search";
+import { db } from "@peated/api/db";
+import { bottleSeries, entities } from "@peated/api/db/schema";
+import { buildBottleSeriesSearchVector } from "@peated/api/lib/search";
 import { eq } from "drizzle-orm";
 
 export default async ({ seriesId }: { seriesId: number }) => {

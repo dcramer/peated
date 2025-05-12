@@ -1,11 +1,8 @@
-import { logError } from "@peated/server/lib/log";
-import {
-  normalizeBottle,
-  normalizeCategory,
-} from "@peated/server/lib/normalize";
-import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
-import { trpcClient } from "@peated/server/lib/trpc/server";
-import { absoluteUrl } from "@peated/server/lib/urls";
+import { logError } from "@peated/api/lib/log";
+import { normalizeBottle, normalizeCategory } from "@peated/api/lib/normalize";
+import { getUrl, type BottleReview } from "@peated/api/lib/scraper";
+import { trpcClient } from "@peated/api/lib/trpc/server";
+import { absoluteUrl } from "@peated/api/lib/urls";
 import * as Sentry from "@sentry/node";
 import { load as cheerio } from "cheerio";
 

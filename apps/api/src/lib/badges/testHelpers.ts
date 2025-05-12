@@ -1,5 +1,5 @@
-import type { Entity, NewBottle } from "@peated/server/db/schema";
-import type * as Fixtures from "@peated/server/lib/test/fixtures";
+import type { Entity, NewBottle } from "@peated/api/db/schema";
+import type * as Fixtures from "@peated/api/lib/test/fixtures";
 
 export async function createTastingForBadge(
   fixtures: typeof Fixtures,

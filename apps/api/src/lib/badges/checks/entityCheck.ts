@@ -1,5 +1,5 @@
-import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
-import { EntityTypeEnum } from "@peated/server/schemas/common";
+import { bottles, bottlesToDistillers } from "@peated/api/db/schema";
+import { EntityTypeEnum } from "@peated/api/schemas/common";
 import type { SQL } from "drizzle-orm";
 import { eq, or, sql } from "drizzle-orm";
 import { z } from "zod";

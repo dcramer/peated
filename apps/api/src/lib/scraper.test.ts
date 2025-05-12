@@ -1,9 +1,9 @@
-import { trpcClient } from "@peated/server/lib/trpc/server";
+import { trpcClient } from "@peated/api/lib/trpc/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import scrapePrices, { type ScrapePricesCallback } from "./scraper";
 import waitError from "./test/waitError";
 
-vi.mock("@peated/server/lib/trpc/server", () => ({
+vi.mock("@peated/api/lib/trpc/server", () => ({
   trpcClient: {
     priceCreateBatch: {
       mutate: vi.fn(),

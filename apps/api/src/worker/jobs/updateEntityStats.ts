@@ -1,11 +1,11 @@
-import { db } from "@peated/server/db";
+import { db } from "@peated/api/db";
 import {
   bottles,
   bottlesToDistillers,
   entities,
   tastings,
-} from "@peated/server/db/schema";
-import { pushUniqueJob } from "@peated/server/worker/client";
+} from "@peated/api/db/schema";
+import { pushUniqueJob } from "@peated/api/worker/client";
 import { eq, sql } from "drizzle-orm";
 
 export default async ({ entityId }: { entityId: number }) => {

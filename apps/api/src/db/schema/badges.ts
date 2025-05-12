@@ -1,4 +1,4 @@
-import type { BadgeCheck } from "@peated/server/types";
+import type { BadgeCheck } from "@peated/api/types";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,

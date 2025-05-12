@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
-import * as dbSchema from "@peated/server/db/schema";
-import { generatePublicId } from "@peated/server/lib/publicId";
-import { type ExternalSiteType } from "@peated/server/types";
+import * as dbSchema from "@peated/api/db/schema";
+import { generatePublicId } from "@peated/api/lib/publicId";
+import { type ExternalSiteType } from "@peated/api/types";
 import slugify from "@sindresorhus/slugify";
 import { eq, inArray, or, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";

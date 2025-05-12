@@ -1,4 +1,4 @@
-import { db as defaultDb, type AnyDatabase } from "@peated/server/db";
+import { db as defaultDb, type AnyDatabase } from "@peated/api/db";
 import {
   bottleAliases,
   bottleReleases,
@@ -11,10 +11,10 @@ import {
   reviews,
   storePrices,
   tastings,
-} from "@peated/server/db/schema";
-import { formatReleaseName } from "@peated/server/lib/format";
-import { logError } from "@peated/server/lib/log";
-import { pushUniqueJob } from "@peated/server/worker/client";
+} from "@peated/api/db/schema";
+import { formatReleaseName } from "@peated/api/lib/format";
+import { logError } from "@peated/api/lib/log";
+import { pushUniqueJob } from "@peated/api/worker/client";
 import { eq, inArray, sql } from "drizzle-orm";
 
 // TODO: this should happen async

@@ -1,10 +1,10 @@
-import { db } from "@peated/server/db";
+import { db } from "@peated/api/db";
 import {
   bottleReleases,
   bottles,
   bottleTombstones,
   entities,
-} from "@peated/server/db/schema";
+} from "@peated/api/db/schema";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import mergeBottle from "./mergeBottle";

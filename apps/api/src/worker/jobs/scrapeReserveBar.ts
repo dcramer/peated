@@ -1,8 +1,8 @@
-import { ALLOWED_VOLUMES } from "@peated/server/constants";
-import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
-import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
-import { absoluteUrl } from "@peated/server/lib/urls";
+import { ALLOWED_VOLUMES } from "@peated/api/constants";
+import { normalizeBottle, normalizeVolume } from "@peated/api/lib/normalize";
+import type { ScrapePricesCallback } from "@peated/api/lib/scraper";
+import scrapePrices, { getUrl, parsePrice } from "@peated/api/lib/scraper";
+import { absoluteUrl } from "@peated/api/lib/urls";
 import { load as cheerio } from "cheerio";
 
 const cookieValue =

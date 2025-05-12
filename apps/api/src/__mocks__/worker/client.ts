@@ -1,5 +1,5 @@
-import * as jobs from "@peated/server/worker/client";
-import { type JobName } from "@peated/server/worker/types";
+import * as jobs from "@peated/api/worker/client";
+import { type JobName } from "@peated/api/worker/types";
 import { vi } from "vitest";
 
 export const pushJob: typeof jobs.pushJob = vi.fn(

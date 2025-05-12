@@ -1,5 +1,5 @@
-import config from "@peated/server/config";
-import { makeTRPCClient } from "@peated/server/trpc/client";
+import config from "@peated/api/config";
+import { makeTRPCClient } from "@peated/api/trpc/client";
 
 export const trpcClient = makeTRPCClient(
   config.API_SERVER,

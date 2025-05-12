@@ -1,5 +1,5 @@
-import { BOT_USER_AGENT } from "@peated/server/constants";
-import { OSMSchema } from "@peated/server/lib/osm";
+import { BOT_USER_AGENT } from "@peated/api/constants";
+import { OSMSchema } from "@peated/api/lib/osm";
 import axios from "axios";
 import { eq } from "drizzle-orm";
 import { db } from "../../db";

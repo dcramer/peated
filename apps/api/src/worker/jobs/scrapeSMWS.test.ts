@@ -1,4 +1,4 @@
-import { loadFixture } from "@peated/server/lib/test/fixtures";
+import { loadFixture } from "@peated/api/lib/test/fixtures";
 import { scrapeBottles } from "./scrapeSMWS";
 
 process.env.DISABLE_HTTP_CACHE = "1";

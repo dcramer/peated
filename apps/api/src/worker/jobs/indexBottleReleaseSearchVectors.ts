@@ -1,6 +1,6 @@
-import { db } from "@peated/server/db";
-import { bottleReleases, entities } from "@peated/server/db/schema";
-import { buildBottleReleaseSearchVector } from "@peated/server/lib/search";
+import { db } from "@peated/api/db";
+import { bottleReleases, entities } from "@peated/api/db/schema";
+import { buildBottleReleaseSearchVector } from "@peated/api/lib/search";
 import { eq } from "drizzle-orm";
 
 export default async ({ releaseId }: { releaseId: number }) => {

@@ -1,4 +1,4 @@
-import { bottles } from "@peated/server/db/schema";
+import { bottles } from "@peated/api/db/schema";
 import { inArray } from "drizzle-orm";
 import { z } from "zod";
 import type { TastingWithRelations } from "../types";

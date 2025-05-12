@@ -1,4 +1,4 @@
-import { badgeAwards, tastingBadgeAwards } from "@peated/server/db/schema";
+import { badgeAwards, tastingBadgeAwards } from "@peated/api/db/schema";
 import { awardAllBadgeXp, rescanBadge } from ".";
 import { db } from "../../db";
 import { createTastingForBadge } from "./testHelpers";

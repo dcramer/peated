@@ -1,14 +1,14 @@
-import { normalizeBottle } from "@peated/server/lib/normalize";
-import { chunked, getUrl, handleBottle } from "@peated/server/lib/scraper";
+import { normalizeBottle } from "@peated/api/lib/normalize";
+import { chunked, getUrl, handleBottle } from "@peated/api/lib/scraper";
 import {
   parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
-} from "@peated/server/lib/smws";
+} from "@peated/api/lib/smws";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,
-} from "@peated/server/schemas";
+} from "@peated/api/schemas";
 import { type z } from "zod";
 
 function parseAbv(value: string | number | null | undefined): number | null {

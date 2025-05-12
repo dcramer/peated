@@ -1,4 +1,4 @@
-import { type CountrySchema } from "@peated/server/schemas";
+import { type CountrySchema } from "@peated/api/schemas";
 import { type z } from "zod";
 import { serializer } from ".";
 import { type Country, type User } from "../db/schema";

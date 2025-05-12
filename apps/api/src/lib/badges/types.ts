@@ -3,7 +3,7 @@ import type {
   BottlesToDistillers,
   Entity,
   Tasting,
-} from "@peated/server/db/schema";
+} from "@peated/api/db/schema";
 
 export type TastingWithRelations = Tasting & {
   bottle: Bottle & {

@@ -1,11 +1,7 @@
-import { db } from "@peated/server/db";
-import {
-  bottles,
-  bottlesToDistillers,
-  tastings,
-} from "@peated/server/db/schema";
-import { notEmpty, uniq } from "@peated/server/lib/filter";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { db } from "@peated/api/db";
+import { bottles, bottlesToDistillers, tastings } from "@peated/api/db/schema";
+import { notEmpty, uniq } from "@peated/api/lib/filter";
+import { pushUniqueJob } from "@peated/api/worker/client";
 import { eq, sql } from "drizzle-orm";
 
 export default async ({ bottleId }: { bottleId: number }) => {

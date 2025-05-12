@@ -1,8 +1,4 @@
-import {
-  bottles,
-  bottlesToDistillers,
-  entities,
-} from "@peated/server/db/schema";
+import { bottles, bottlesToDistillers, entities } from "@peated/api/db/schema";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
 import type { TastingWithRelations } from "../types";

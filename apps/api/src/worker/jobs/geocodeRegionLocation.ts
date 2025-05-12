@@ -1,8 +1,8 @@
-import { BOT_USER_AGENT } from "@peated/server/constants";
-import { db } from "@peated/server/db";
-import type { Country } from "@peated/server/db/schema";
-import { regions } from "@peated/server/db/schema";
-import { OSMSchema } from "@peated/server/lib/osm";
+import { BOT_USER_AGENT } from "@peated/api/constants";
+import { db } from "@peated/api/db";
+import type { Country } from "@peated/api/db/schema";
+import { regions } from "@peated/api/db/schema";
+import { OSMSchema } from "@peated/api/lib/osm";
 import axios from "axios";
 import { eq } from "drizzle-orm";
 

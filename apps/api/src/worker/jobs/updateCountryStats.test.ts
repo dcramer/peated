@@ -1,5 +1,5 @@
-import { db } from "@peated/server/db";
-import { countries } from "@peated/server/db/schema";
+import { db } from "@peated/api/db";
+import { countries } from "@peated/api/db/schema";
 import { eq } from "drizzle-orm";
 import updateCountryStats from "./updateCountryStats";
 

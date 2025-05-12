@@ -1,14 +1,11 @@
-import config from "@peated/server/config";
-import {
-  BOT_USER_AGENT,
-  DEFAULT_CREATED_BY_ID,
-} from "@peated/server/constants";
-import { db } from "@peated/server/db";
-import type { Entity } from "@peated/server/db/schema";
-import { changes, entities } from "@peated/server/db/schema";
-import { arraysEqual } from "@peated/server/lib/equals";
-import { getStructuredResponse } from "@peated/server/lib/openai";
-import { EntityTypeEnum } from "@peated/server/schemas";
+import config from "@peated/api/config";
+import { BOT_USER_AGENT, DEFAULT_CREATED_BY_ID } from "@peated/api/constants";
+import { db } from "@peated/api/db";
+import type { Entity } from "@peated/api/db/schema";
+import { changes, entities } from "@peated/api/db/schema";
+import { arraysEqual } from "@peated/api/lib/equals";
+import { getStructuredResponse } from "@peated/api/lib/openai";
+import { EntityTypeEnum } from "@peated/api/schemas";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";

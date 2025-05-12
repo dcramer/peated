@@ -1,7 +1,7 @@
-import { db } from "@peated/server/db";
-import { reviews } from "@peated/server/db/schema";
-import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
-import { createCaller } from "@peated/server/trpc/router";
+import { db } from "@peated/api/db";
+import { reviews } from "@peated/api/db/schema";
+import { findBottleId, findEntity } from "@peated/api/lib/bottleFinder";
+import { createCaller } from "@peated/api/trpc/router";
 import { and, eq, isNull } from "drizzle-orm";
 
 export default async function createMissingBottles() {

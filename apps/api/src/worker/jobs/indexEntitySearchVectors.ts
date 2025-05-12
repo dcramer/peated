@@ -1,6 +1,6 @@
-import { db } from "@peated/server/db";
-import { entities, entityAliases } from "@peated/server/db/schema";
-import { buildEntitySearchVector } from "@peated/server/lib/search";
+import { db } from "@peated/api/db";
+import { entities, entityAliases } from "@peated/api/db/schema";
+import { buildEntitySearchVector } from "@peated/api/lib/search";
 import { eq } from "drizzle-orm";
 
 export default async ({ entityId }: { entityId: number }) => {

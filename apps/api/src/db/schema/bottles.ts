@@ -20,7 +20,7 @@ import {
   CASK_FILLS,
   CASK_SIZE_IDS,
   CASK_TYPE_IDS,
-} from "@peated/server/constants";
+} from "@peated/api/constants";
 import { tsvector } from "../columns";
 import { vector } from "../columns/vector";
 import { entities } from "./entities";

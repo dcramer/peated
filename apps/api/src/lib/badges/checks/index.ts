@@ -1,4 +1,4 @@
-import type { BadgeCheckType } from "@peated/server/types";
+import type { BadgeCheckType } from "@peated/api/types";
 import { AgeCheck } from "./ageCheck";
 import type { Check } from "./base";
 import { BottleCheck } from "./bottleCheck";

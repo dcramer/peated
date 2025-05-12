@@ -1,4 +1,4 @@
-import { type TagSchema } from "@peated/server/schemas";
+import { type TagSchema } from "@peated/api/schemas";
 import { type z } from "zod";
 import { serializer } from ".";
 import { type Tag, type User } from "../db/schema";

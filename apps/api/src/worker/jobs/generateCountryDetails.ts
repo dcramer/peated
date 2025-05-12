@@ -1,8 +1,8 @@
-import config from "@peated/server/config";
-import { db } from "@peated/server/db";
-import { countries } from "@peated/server/db/schema";
-import { getStructuredResponse } from "@peated/server/lib/openai";
-import { type Country } from "@peated/server/types";
+import config from "@peated/api/config";
+import { db } from "@peated/api/db";
+import { countries } from "@peated/api/db/schema";
+import { getStructuredResponse } from "@peated/api/lib/openai";
+import { type Country } from "@peated/api/types";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";

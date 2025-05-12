@@ -1,13 +1,13 @@
 import {
   defaultHeaders,
   SCRAPER_PRICE_BATCH_SIZE,
-} from "@peated/server/constants";
-import { ApiClient } from "@peated/server/lib/apiClient";
-import { logError } from "@peated/server/lib/log";
-import { trpcClient } from "@peated/server/lib/trpc/server";
-import { isTRPCClientError } from "@peated/server/trpc/client";
-import type { Currency, ExternalSiteType } from "@peated/server/types";
-import { type Category } from "@peated/server/types";
+} from "@peated/api/constants";
+import { ApiClient } from "@peated/api/lib/apiClient";
+import { logError } from "@peated/api/lib/log";
+import { trpcClient } from "@peated/api/lib/trpc/server";
+import { isTRPCClientError } from "@peated/api/trpc/client";
+import type { Currency, ExternalSiteType } from "@peated/api/types";
+import { type Category } from "@peated/api/types";
 import axios from "axios";
 import { existsSync, mkdirSync, statSync } from "fs";
 import { open } from "fs/promises";

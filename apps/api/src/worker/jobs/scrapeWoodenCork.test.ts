@@ -1,4 +1,4 @@
-import { loadFixture } from "@peated/server/lib/test/fixtures";
+import { loadFixture } from "@peated/api/lib/test/fixtures";
 import { scrapeProducts } from "./scrapeWoodenCork";
 
 test("simple", async ({ axiosMock }) => {

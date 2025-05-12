@@ -1,5 +1,5 @@
 import cuid2 from "@paralleldrive/cuid2";
-import { logError } from "@peated/server/lib/log";
+import { logError } from "@peated/api/lib/log";
 import * as Sentry from "@sentry/node";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 

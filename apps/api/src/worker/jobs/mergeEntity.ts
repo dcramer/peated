@@ -1,4 +1,4 @@
-import { db } from "@peated/server/db";
+import { db } from "@peated/api/db";
 import {
   bottleReleases,
   bottles,
@@ -6,12 +6,12 @@ import {
   entities,
   entityAliases,
   entityTombstones,
-} from "@peated/server/db/schema";
-import { upsertBottleAlias } from "@peated/server/lib/db";
-import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
-import { logError } from "@peated/server/lib/log";
-import { ConflictError } from "@peated/server/trpc/errors";
-import { pushUniqueJob, runJob } from "@peated/server/worker/client";
+} from "@peated/api/db/schema";
+import { upsertBottleAlias } from "@peated/api/lib/db";
+import { formatBottleName, formatReleaseName } from "@peated/api/lib/format";
+import { logError } from "@peated/api/lib/log";
+import { ConflictError } from "@peated/api/trpc/errors";
+import { pushUniqueJob, runJob } from "@peated/api/worker/client";
 import { eq, inArray } from "drizzle-orm";
 
 // TODO: this should happen async

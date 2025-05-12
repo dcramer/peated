@@ -3,23 +3,28 @@ description: Guidelines to migrate an old trpc route from apps/server to a new h
 globs: 
 alwaysApply: false
 ---
-Use these guidelines when you are migrating code from the legacy trpc-based implementation at `apps/server/`, into the new Hono, openapi-based implementation at `apps/api/`.
+**When migrating routes, be careful to plan and follow existing rules.**
 
-Always include the [hono-openapi-route.mdc](mdc:.cursor/rules/hono-openapi-route.mdc) and follow them extremely carefully.
+Use these guidelines when you are migrating code from the legacy tRPC-based implementation at `apps/server/`, into the new Hono, openapi-based implementation at `apps/api/`.
 
-The trpc routes are located in `apps/server/src/trpc/routes/`.
+The legacy tRPC routes are located in `apps/server/src/trpc/routes/`.
 
-Each route should be cleanly mapped to the new `apps/api/src/routes/` format, keeping the directory flat, and migrating both the route and tests. Always ensure that the route is registered when you are finished.
+The new OpenAPI routes are located in `apps/api/src/routes/`.
 
-You should consider if the original trpc route name makes sense when migrating. For example, in OpenAPI and REST we do not have endpoints like `bottleById`, instead we have `bottleDetail`, which accepts an `id` (or maybe a `slug`) in the URL parameter.
+- ALWAYS follow the rules defined in [hono-openapi-route.mdc](mdc:.cursor/rules/hono-openapi-route.mdc) extremely carefully.
+- Each route should be cleanly mapped to the new `apps/api/src/routes/` format, keeping the directory flat.
+- Migrate both the route and tests. Always ensure that the route is registered when you are finished.
+- Update the route name to follow the guidelines of OpenAPI. (e.g. `bottleById` would become `bottleDetails`).
+- If a route exists for multiple inputs (e.g. `countryById` and `countryBySlug`), it should be migrated to a single union-type parameter on the OpenAPI endpoint.
+- If you're using code from `@peated/server` in the migration, ensure the code is ported over to the new `@peated/api` codebase. That is, duplicate the code if its not already present.
+- NEVER make changes to the `tsconfig` files or any build system configuration.
 
-You should ALWAYS look at the existing tests for the route and ensure every single test still exists, but look for opportunities to improve test coverage. The existing tests will always be in the same directory as the route definition, using the `.test.ts` extension (vs just `.ts`).
+## Tests
 
-If you're using code from `@peated/server` in the migration, ensure the code is ported over to the new `@peated/api` codebase. That is, duplicate the code if its not already present.
-
-NEVER make changes to the `tsconfig` files or any build system configuration.
-
-ALWAYS run tests after you migrate a route to ensure its still correct. Use the following from the workspace root:
+- ALWAYS look at existing tests for the route, and ensure every single test still exists.
+- Look for opportunities to improve test coverage if there are obvious concerns missing.
+- The existing tests will always be in the same directory as the route definition, using the `.test.ts` extension (vs just `.ts`).
+- ALWAYS run tests after you migrate a route to ensure its still correct. Use the following from the workspace root:
 
 ```shell
 pnpm --filter ./apps/api test --run [newRouteName]

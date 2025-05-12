@@ -1,6 +1,6 @@
-import type { Entity } from "@peated/server/db/schema";
-import { bottleSeries, changes } from "@peated/server/db/schema";
-import type { BottleSeriesInputSchema } from "@peated/server/schemas";
+import type { Entity } from "@peated/api/db/schema";
+import { bottleSeries, changes } from "@peated/api/db/schema";
+import type { BottleSeriesInputSchema } from "@peated/api/schemas";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";

@@ -1,5 +1,5 @@
-import { countries, type Region, type User } from "@peated/server/db/schema";
-import { type RegionSchema } from "@peated/server/schemas";
+import { countries, type Region, type User } from "@peated/api/db/schema";
+import { type RegionSchema } from "@peated/api/schemas";
 import { inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";

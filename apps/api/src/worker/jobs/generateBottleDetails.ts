@@ -1,17 +1,17 @@
-import config from "@peated/server/config";
+import config from "@peated/api/config";
 import {
   CATEGORY_LIST,
   DEFAULT_CREATED_BY_ID,
   FLAVOR_PROFILES,
-} from "@peated/server/constants";
-import { db } from "@peated/server/db";
-import type { Bottle } from "@peated/server/db/schema";
-import { bottles, changes } from "@peated/server/db/schema";
-import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
-import { notesForProfile } from "@peated/server/lib/format";
-import { logError } from "@peated/server/lib/log";
-import { getStructuredResponse } from "@peated/server/lib/openai";
-import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
+} from "@peated/api/constants";
+import { db } from "@peated/api/db";
+import type { Bottle } from "@peated/api/db/schema";
+import { bottles, changes } from "@peated/api/db/schema";
+import { arraysEqual, objectsShallowEqual } from "@peated/api/lib/equals";
+import { notesForProfile } from "@peated/api/lib/format";
+import { logError } from "@peated/api/lib/log";
+import { getStructuredResponse } from "@peated/api/lib/openai";
+import { CategoryEnum, FlavorProfileEnum } from "@peated/api/schemas";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";

@@ -1,5 +1,5 @@
-import { db } from "@peated/server/db";
-import { tags } from "@peated/server/db/schema";
+import { db } from "@peated/api/db";
+import { tags } from "@peated/api/db/schema";
 import { TRPCError } from "@trpc/server";
 import { inArray } from "drizzle-orm";
 

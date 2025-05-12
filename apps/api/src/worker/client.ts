@@ -1,5 +1,5 @@
 import { context, propagation } from "@opentelemetry/api";
-import { scheduledJob, scheduler } from "@peated/server/lib/cron";
+import { scheduledJob, scheduler } from "@peated/api/lib/cron";
 import * as Sentry from "@sentry/node";
 import type { JobsOptions } from "bullmq";
 import { Worker } from "bullmq";

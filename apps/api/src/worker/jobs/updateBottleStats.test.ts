@@ -1,5 +1,5 @@
-import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
+import { db } from "@peated/api/db";
+import { bottles } from "@peated/api/db/schema";
 import { eq } from "drizzle-orm";
 import updateBottleStats from "./updateBottleStats";
 

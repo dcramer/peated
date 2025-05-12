@@ -1,10 +1,10 @@
-import { db } from "@peated/server/db";
+import { db } from "@peated/api/db";
 import {
   bottles,
   bottlesToDistillers,
   countries,
   entities,
-} from "@peated/server/db/schema";
+} from "@peated/api/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 export default async ({ countryId }: { countryId: number }) => {

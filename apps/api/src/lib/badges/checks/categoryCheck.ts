@@ -1,5 +1,5 @@
-import { bottles } from "@peated/server/db/schema";
-import { CategoryEnum } from "@peated/server/schemas/common";
+import { bottles } from "@peated/api/db/schema";
+import { CategoryEnum } from "@peated/api/schemas/common";
 import { inArray } from "drizzle-orm";
 import { z } from "zod";
 import type { TastingWithRelations } from "../types";

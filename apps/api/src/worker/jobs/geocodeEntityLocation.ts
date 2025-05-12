@@ -1,14 +1,14 @@
 import { Client } from "@googlemaps/google-maps-services-js";
-import config from "@peated/server/config";
-import { DEFAULT_CREATED_BY_ID } from "@peated/server/constants";
-import { db } from "@peated/server/db";
+import config from "@peated/api/config";
+import { DEFAULT_CREATED_BY_ID } from "@peated/api/constants";
+import { db } from "@peated/api/db";
 import {
   changes,
   entities,
   type Country,
   type Entity,
   type Region,
-} from "@peated/server/db/schema";
+} from "@peated/api/db/schema";
 import { eq } from "drizzle-orm";
 
 async function locateAddress(

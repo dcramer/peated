@@ -1,11 +1,11 @@
-import { CATEGORY_LIST } from "@peated/server/constants";
+import { CATEGORY_LIST } from "@peated/api/constants";
 import type {
   CaskFill,
   CaskSize,
   CaskType,
   Category,
   FlavorProfile,
-} from "@peated/server/types";
+} from "@peated/api/types";
 
 // This needs moved into the database and needs to be editable by the community/mods
 // https://www.whiskysaga.com/smws-codes

@@ -1,14 +1,14 @@
-import { normalizeBottle } from "@peated/server/lib/normalize";
-import { getUrl, handleBottle } from "@peated/server/lib/scraper";
+import { normalizeBottle } from "@peated/api/lib/normalize";
+import { getUrl, handleBottle } from "@peated/api/lib/scraper";
 import {
   parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
-} from "@peated/server/lib/smws";
+} from "@peated/api/lib/smws";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,
-} from "@peated/server/schemas";
+} from "@peated/api/schemas";
 
 import { load as cheerio } from "cheerio";
 import { type z } from "zod";

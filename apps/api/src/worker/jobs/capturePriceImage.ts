@@ -1,7 +1,7 @@
-import { defaultHeaders } from "@peated/server/constants";
-import { db } from "@peated/server/db";
-import { bottles, storePrices } from "@peated/server/db/schema";
-import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
+import { defaultHeaders } from "@peated/api/constants";
+import { db } from "@peated/api/db";
+import { bottles, storePrices } from "@peated/api/db/schema";
+import { compressAndResizeImage, storeFile } from "@peated/api/lib/uploads";
 import * as Sentry from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { Readable } from "stream";

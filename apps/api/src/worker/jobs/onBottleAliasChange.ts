@@ -1,6 +1,6 @@
-import { db } from "@peated/server/db";
-import { reviews, storePrices } from "@peated/server/db/schema";
-import { runJob } from "@peated/server/worker/client";
+import { db } from "@peated/api/db";
+import { reviews, storePrices } from "@peated/api/db/schema";
+import { runJob } from "@peated/api/worker/client";
 import { eq, sql } from "drizzle-orm";
 
 export default async ({ name }: { name: string }) => {
