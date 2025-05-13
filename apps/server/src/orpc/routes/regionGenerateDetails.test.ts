@@ -8,7 +8,7 @@ vi.mock("@peated/server/worker/jobs/generateRegionDetails", () => ({
   getGeneratedRegionDetails: vi.fn(),
 }));
 
-describe("POST /regions/generate-details", () => {
+describe("POST /ai/region-lookup", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.mocked(

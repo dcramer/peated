@@ -23,7 +23,7 @@ const OutputSchema = z.object({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/bottles/generate-details" })
+  .route({ method: "POST", path: "/ai/bottle-lookup" })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({ input }) {

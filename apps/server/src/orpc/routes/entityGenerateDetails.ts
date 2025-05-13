@@ -12,13 +12,13 @@ const InputSchema = EntityInputSchema.partial();
 const OutputSchema = z.object({
   description: z.string().nullish(),
   yearEstablished: z.number().nullish(),
-  type: z.array(z.string().nullish()),
+  type: z.array(z.string().nullish()).nullish(),
   website: z.string().nullish(),
 });
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/entities/generate-details" })
+  .route({ method: "POST", path: "/ai/entity-lookup" })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({ input }) {
@@ -38,10 +38,11 @@ export default procedure
       country: country || null,
       region: region || null,
     });
+
     return {
       description: result?.description,
       yearEstablished: result?.yearEstablished,
-      type: result?.type,
+      type: result?.type || null,
       website: result?.website,
     };
   });

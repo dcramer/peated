@@ -8,7 +8,7 @@ const InputSchema = CountryInputSchema.partial();
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/countries/generate-details" })
+  .route({ method: "POST", path: "/ai/country-lookup" })
   .input(InputSchema)
   .output(z.any())
   .handler(async function ({ input, context }) {
