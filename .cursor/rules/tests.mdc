@@ -8,7 +8,7 @@ alwaysApply: false
 Tests can be run with `pnpm test` inside of the specific package (reminder: we're in a pnpm monorepo).
 
 ```shell
-pnpm --filter=./apps/api test --run -- src/routes/auth/ 
+pnpm --filter=./apps/api test --run -- src/routes/auth/
 ```
 
 Pass the `--run` arg otherwise it enables watch mode, which you likely don't want.
@@ -27,13 +27,27 @@ const err = await waitError(
   caller.authPasswordResetConfirm({
     token,
     password: "testpassword",
-  }),
+  })
 );
 ```
 
 - In addition to using `waitError`, utilize snapshots for the resulting error. For example, `expect(err).toMatchInlineSnapshot();`
+- Use snapshots whenever you're testing for any kind of error message.
 - Avoid snapshots for API responses where data is dynamic (such as it returning a `createdAt` date).
 - Prefer dependency injection over mocking when the called functions make it possible.
+
+## OpenAPI endpoints
+
+When calling OpenAPI endpoints in Fastify, use the `toRespondWith` expect helper:
+
+```ts
+const res = await app.inject({
+  method: "GET",
+  url: "/v1/auth/me",
+});
+
+expect(res).toRespondWith(200);
+```
 
 ## tRPC endpoints
 
@@ -49,22 +63,21 @@ const data = await caller.authRegister({
 });
 ```
 
-Additionally when you add a new tRPC endpoint, ensure its also added to [router.ts](mdc:apps/server/src/trpc/router.ts)
+Additionally when you add a new tRPC endpoint, ensure its also added to @router.ts
 
-## Fixture data in tests
+## Fa in tests
 
-Test fixtures should be referenced via the context (found in [fixtures.ts](mdc:apps/server/src/lib/test/fixtures.ts)):
+Test fixtures should be referenced via the context (found in @fixtures.ts):
 
-```ts
-  it("returns a bottle release", async function ({ fixtures }) {
-    const bottle = await fixtures.Bottle();
-  });
+turns a bottle release", async function ({ fixtures }) {
+  const bottle = await fixtures.Bottle();
+});
 ```
 
-User context - such as for the trpc route caller - should use the `defaults` (as defauled in [setup-test-env.ts](mdc:apps/server/src/test/setup-test-env.ts)) when available. For example:
+User context - such as for the trpc route caller - should use the `defaults` (as defauled in @setup-test-env.ts) whexample:
 
 ```ts
-  it("returns a bottle release", async function ({ defaults }) {
-    const caller = createCaller({ user: defaults.user });
-  });
+it("returns a bottle release", async function ({ defaults }) {
+  const caller = createCaller({ user: defaults.user });
+});
 ```

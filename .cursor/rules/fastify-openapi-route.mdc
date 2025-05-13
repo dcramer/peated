@@ -52,37 +52,37 @@ import type {
   FastifyZodOpenApiSchema,
 } from "fastify-zod-openapi";
 import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 
 const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
   fastify
-    .get(
+    .route({
+      method: "GET",
       // the /v1 prefix should not be included
-      "/echo",
-      {
-        schema: {
-          response: {
-            200: z.object({ ok: z.boolean() }),
-          },
-        } satisfies FastifyZodOpenApiSchema,
-      },
-      async function (_request, _reply) {
+      url: "/echo",
+      schema: {
+        response: {
+          // response types must be json schemas, not raw zod objects
+          200: zodToJsonSchema(z.object({ ok: z.boolean() })),
+        },
+      } satisfies FastifyZodOpenApiSchema,
+      handler: async function (_request, _reply) {
         return { ok: true };
       },
-    )
-    .post(
-      "/echo",
-      {
-        schema: {
-          body: z.object({
-            echo: z.string(),
-          }),
-          200: z.object({ echo: z.string() }),
-        },
+    })
+    .route({
+      method: "POST",
+      url: "/echo",
+      schema: {
+        body: z.object({
+          echo: z.string(),
+        }),
+        200: z.object({ echo: z.string() }),
       },
-      async function (request, _reply) {
+      handler: async function (request, _reply) {
         return request.body.echo;
       },
-    );
+    });
 };
 
 export default plugin;
@@ -107,20 +107,19 @@ import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
 
 const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
   fastify
-    .get(
-      "/",
-      {
-        schema: {
-          response: {
-            200: z.object({ ok: z.boolean() }),
-            401: unauthorizedSchema,
-          },
-        } satisfies FastifyZodOpenApiSchema,
-      },
-      async function (_request, _reply) {
+    .route({
+      method: "GET",
+      url: "/",
+      schema: {
+        response: {
+          200: z.object({ ok: z.boolean() }),
+          401: unauthorizedSchema,
+        },
+      } satisfies FastifyZodOpenApiSchema,
+      handler: async function (_request, _reply) {
         throw new UnauthorizedError("You are not authorized.");
       },
-    )
+    });
 ```
 
 ### Versioning
@@ -128,7 +127,3 @@ const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
 We're currently building `v1` of the API, meaning we will register all routes with the `/v1` prefix.
 
 This should _only_ be defined in the `app.register` call with the `prefix` option.
-
-
-
-

@@ -1,9 +1,7 @@
-import { requestContext } from "@fastify/request-context";
 import config from "@peated/api/config";
 import { db } from "@peated/api/db";
 import { identities, users } from "@peated/api/db/schema";
 import { createAccessToken, createUser } from "@peated/api/lib/auth";
-import { logError } from "@peated/api/lib/log";
 import { UserSchema } from "@peated/api/schemas";
 import { serialize } from "@peated/api/serializers";
 import { UserSerializer } from "@peated/api/serializers/user";
@@ -14,85 +12,57 @@ import type {
   FastifyZodOpenApiSchema,
 } from "fastify-zod-openapi";
 import { OAuth2Client } from "google-auth-library";
-import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
+import {
+  badRequestSchema,
+  conflictSchema,
+  UnauthorizedError,
+  unauthorizedSchema,
+} from "http-errors-enhanced";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
 const plugin: FastifyPluginAsyncZodOpenApi = async (fastify, _opts) => {
-  fastify
-    .get(
-      "/auth",
-      {
-        schema: {
-          response: {
-            200: zodToJsonSchema(z.object({ user: UserSchema })),
-            401: unauthorizedSchema,
-          },
-        } satisfies FastifyZodOpenApiSchema,
+  fastify.route({
+    method: "POST",
+    url: "/auth/login",
+    schema: {
+      tags: ["auth"],
+      body: z.union([
+        z.object({
+          email: z.string().email(),
+          password: z.string(),
+        }),
+        z.object({
+          googleCode: z.string(),
+        }),
+      ]),
+      response: {
+        200: zodToJsonSchema(
+          z.object({ user: UserSchema, accessToken: z.string() }),
+        ),
+        400: badRequestSchema,
+        401: unauthorizedSchema,
+        409: conflictSchema,
       },
-      async function (_request, _reply) {
-        const currentUser = requestContext.get("user");
-        if (!currentUser) {
-          throw new UnauthorizedError();
-        }
+    } satisfies FastifyZodOpenApiSchema,
+    handler: async function (request, _reply) {
+      let user;
+      if ("googleCode" in request.body) {
+        user = await authGoogle(request.body.googleCode);
+      } else {
+        user = await authBasic(request.body.email, request.body.password);
+      }
 
-        const [user] = await db
-          .select()
-          .from(users)
-          .where(eq(users.id, currentUser.id));
-        if (!user) {
-          logError(
-            `Authenticated user (${currentUser.id}) failed to retrieve details`,
-          );
-          throw new UnauthorizedError();
-        }
+      if (!user.active) {
+        throw new UnauthorizedError("Invalid credentials.");
+      }
 
-        if (!user.active) {
-          throw new UnauthorizedError();
-        }
-
-        return { user: await serialize(UserSerializer, user, user) };
-      },
-    )
-    .post(
-      "/auth",
-      {
-        schema: {
-          body: z.union([
-            z.object({
-              email: z.string().email(),
-              password: z.string(),
-            }),
-            z.object({
-              googleCode: z.string(),
-            }),
-          ]),
-          response: {
-            200: zodToJsonSchema(
-              z.object({ user: UserSchema, accessToken: z.string() }),
-            ),
-            401: unauthorizedSchema,
-          },
-        } satisfies FastifyZodOpenApiSchema,
-      },
-      async function (request, _reply) {
-        let user;
-        if ("googleCode" in request.body) {
-          user = await authGoogle(request.body.googleCode);
-        } else {
-          user = await authBasic(request.body.email, request.body.password);
-        }
-
-        if (!user.active) {
-          throw new UnauthorizedError("Invalid credentials.");
-        }
-
-        return {
-          user: await serialize(UserSerializer, user, user),
-          accessToken: await createAccessToken(user),
-        };
-      },
-    );
+      return {
+        user: await serialize(UserSerializer, user, user),
+        accessToken: await createAccessToken(user),
+      };
+    },
+  });
 };
 
 export default plugin;

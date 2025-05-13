@@ -1,20 +1,9 @@
-import { default as buildFastify } from "@peated/api/app";
+import app from "@peated/api/app";
 import { db } from "@peated/api/db";
 import { users } from "@peated/api/db/schema";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
 
 describe("POST /auth/register", () => {
-  let app: FastifyInstance;
-
-  beforeEach(async () => {
-    app = await buildFastify();
-  });
-
-  afterEach(async () => {
-    app && (await app.close());
-  });
-
   test("registers a new user", async ({ fixtures }) => {
     const res = await app.inject({
       method: "POST",
@@ -26,7 +15,7 @@ describe("POST /auth/register", () => {
       },
     });
 
-    expect(res.statusCode).toBe(200);
+    expect(res).toRespondWith(200);
 
     const data = res.json();
     expect(data.user.username).toBe("testuser");
@@ -59,9 +48,15 @@ describe("POST /auth/register", () => {
       },
     });
 
-    expect(res.statusCode).toBe(409);
-    const data = res.json();
-    expect(data.field).toBe("username");
+    expect(res).toRespondWith(409);
+    expect(res.json()).toMatchInlineSnapshot(`
+      {
+        "code": "Conflict",
+        "error": "Conflict",
+        "message": "User already exists.",
+        "statusCode": 409,
+      }
+    `);
   });
 
   test("fails with existing email", async ({ fixtures }) => {
@@ -80,9 +75,15 @@ describe("POST /auth/register", () => {
       },
     });
 
-    expect(res.statusCode).toBe(409);
-    const data = res.json();
-    expect(data.field).toBe("email");
+    expect(res).toRespondWith(409);
+    expect(res.json()).toMatchInlineSnapshot(`
+      {
+        "code": "Conflict",
+        "error": "Conflict",
+        "message": "User already exists.",
+        "statusCode": 409,
+      }
+    `);
   });
 
   test("validates email format", async () => {
@@ -96,7 +97,15 @@ describe("POST /auth/register", () => {
       },
     });
 
-    expect(res.statusCode).toBe(400);
+    expect(res).toRespondWith(400);
+    expect(res.json()).toMatchInlineSnapshot(`
+      {
+        "code": "Bad Request",
+        "error": "Bad Request",
+        "message": "body/email Invalid email",
+        "statusCode": 400,
+      }
+    `);
   });
 
   test("requires all fields", async () => {
@@ -109,6 +118,14 @@ describe("POST /auth/register", () => {
       },
     });
 
-    expect(res.statusCode).toBe(400);
+    expect(res).toRespondWith(400);
+    expect(res.json()).toMatchInlineSnapshot(`
+      {
+        "code": "Bad Request",
+        "error": "Bad Request",
+        "message": "body/email Required, body/password Required",
+        "statusCode": 400,
+      }
+    `);
   });
 });

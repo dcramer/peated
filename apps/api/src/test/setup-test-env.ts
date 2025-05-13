@@ -8,7 +8,8 @@ import MockAdapter from "axios-mock-adapter";
 import { and, eq, sql } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { Client } from "pg";
-import { beforeAll, beforeEach, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, vi } from "vitest";
+import app from "../app";
 import { db, pool } from "../db";
 import { migrate } from "../db/migrate";
 import "../lib/test/expects";
@@ -165,4 +166,8 @@ beforeEach(async (ctx) => {
     authHeaders: await fixtures.AuthenticatedHeaders({ user }),
   };
   ctx.fixtures = fixtures;
+});
+
+afterAll(async () => {
+  await app.close();
 });

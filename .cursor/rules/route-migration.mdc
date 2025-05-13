@@ -1,0 +1,39 @@
+---
+description: Guidelines to migrate an old trpc route from apps/server to a new hono route in apps/api
+globs: 
+alwaysApply: false
+---
+**When migrating routes, be careful to plan and follow existing rules.**
+
+Use these guidelines when you are migrating code from the legacy tRPC-based implementation at `apps/server/`, into the new Fastify, OpenAPI-based implementation at `apps/api/`.
+
+The legacy tRPC routes are located in `apps/server/src/trpc/routes/`.
+
+The new OpenAPI routes are located in `apps/api/src/routes/`.
+
+- ALWAYS follow the rules defined in [fastify-openapi-route.mdc](mdc:.cursor/rules/fastify-openapi-route.mdc) extremely carefully.
+- Each route should be cleanly mapped to the new `apps/api/src/routes/` format, keeping the directory flat.
+- Migrate both the route and tests. Always ensure that the route is registered when you are finished.
+- Update the route name to follow the guidelines of OpenAPI. (e.g. `bottleById` would become `bottleDetails`).
+- If a route exists for multiple inputs (e.g. `countryById` and `countryBySlug`), it should be migrated to a single union-type parameter on the OpenAPI endpoint.
+- If you're using code from `@peated/server` in the migration, ensure the code is ported over to the new `@peated/api` codebase. That is, duplicate the code if its not already present.
+- NEVER make changes to the `tsconfig` files or any build system configuration.
+
+## Tests
+
+- ALWAYS look at existing tests for the route, and ensure every single test still exists.
+- Look for opportunities to improve test coverage if there are obvious concerns missing.
+- The existing tests will always be in the same directory as the route definition, using the `.test.ts` extension (vs just `.ts`).
+- ALWAYS run tests after you migrate a route to ensure its still correct. Use the following from the workspace root:
+
+```shell
+pnpm --filter ./apps/api test --run [newRouteName]
+```
+
+## Final Pass
+
+Make one final pass after you migrate a route and ensure:
+
+- You migrated the tests in their entirety.
+- There are no unused imports in the new files.
+

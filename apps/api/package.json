@@ -33,6 +33,7 @@
     "@peated/email": "workspace:*",
     "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",
+    "@scalar/fastify-api-reference": "^1.28.33",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
     "@sindresorhus/slugify": "^2.2.1",
