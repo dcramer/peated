@@ -4,7 +4,11 @@ import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { externalSites, storePrices } from "@peated/server/db/schema";
-import { CursorSchema, ExternalSiteTypeEnum } from "@peated/server/schemas";
+import {
+  CursorSchema,
+  ExternalSiteTypeEnum,
+  StorePriceSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
 import { z } from "zod";
@@ -32,7 +36,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(StorePriceSchema),
       rel: CursorSchema,
     }),
   )

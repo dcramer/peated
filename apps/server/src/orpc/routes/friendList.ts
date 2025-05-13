@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
+import { CursorSchema, FriendSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FriendSerializer } from "@peated/server/serializers/friend";
 import {
@@ -14,16 +15,19 @@ import {
   type SQL,
 } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { procedure } from "..";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "GET", path: "/friends" })
   .input(
     z
       .object({
         query: z.string().default(""),
         filter: z.enum(["pending", "active"]).optional(),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
+        cursor: z.coerce.number().gte(1).default(1),
+        limit: z.coerce.number().gte(1).lte(100).default(100),
       })
       .default({
         query: "",
@@ -31,11 +35,20 @@ export default authedProcedure
         limit: 100,
       }),
   )
-  .query(async function ({ input: { query, cursor, limit, ...input }, ctx }) {
+  .output(
+    z.object({
+      results: z.array(FriendSchema),
+      rel: CursorSchema,
+    }),
+  )
+  .handler(async function ({
+    input: { query, cursor, limit, ...input },
+    context,
+  }) {
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [
-      eq(follows.fromUserId, ctx.user.id),
+      eq(follows.fromUserId, context.user.id),
       not(eq(follows.status, "none")),
     ];
     if (input.filter === "pending") {
@@ -66,7 +79,7 @@ export default authedProcedure
       results: await serialize(
         FriendSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

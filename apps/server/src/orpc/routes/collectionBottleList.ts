@@ -5,7 +5,7 @@ import {
   bottles,
   collectionBottles,
 } from "@peated/server/db/schema";
-import { CursorSchema } from "@peated/server/schemas";
+import { CollectionBottleSchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
 import type { SQL } from "drizzle-orm";
@@ -30,7 +30,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(CollectionBottleSchema),
       rel: CursorSchema,
     }),
   )

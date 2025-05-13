@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { collectionBottles, collections } from "@peated/server/db/schema";
-import { CursorSchema } from "@peated/server/schemas";
+import { CollectionSchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionSerializer } from "@peated/server/serializers/collection";
 import { and, asc, sql } from "drizzle-orm";
@@ -23,7 +23,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(CollectionSchema),
       rel: CursorSchema,
     }),
   )

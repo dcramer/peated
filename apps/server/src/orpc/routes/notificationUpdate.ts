@@ -1,36 +1,38 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { NotificationInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { NotificationSerializer } from "@peated/server/serializers/notification";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { procedure } from "..";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "PUT", path: "/notifications/:id" })
   .input(
     NotificationInputSchema.partial().extend({
-      notification: z.number(),
+      id: z.coerce.number(),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
+  .output(z.any())
+  .handler(async function ({ input, context }) {
     const [notification] = await db
       .select()
       .from(notifications)
-      .where(eq(notifications.id, input.notification));
+      .where(eq(notifications.id, input.id));
 
     if (!notification) {
-      throw new TRPCError({
-        message: "Notifcation not found.",
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
+        message: "Notification not found.",
       });
     }
 
-    if (notification.userId !== ctx.user.id) {
-      throw new TRPCError({
+    if (notification.userId !== context.user.id) {
+      throw new ORPCError("FORBIDDEN", {
         message: "Cannot edit another user's notification.",
-        code: "FORBIDDEN",
       });
     }
 
@@ -45,5 +47,9 @@ export default authedProcedure
       .where(eq(notifications.id, notification.id))
       .returning();
 
-    return await serialize(NotificationSerializer, newNotification, ctx.user);
+    return await serialize(
+      NotificationSerializer,
+      newNotification,
+      context.user,
+    );
   });

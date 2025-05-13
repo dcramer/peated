@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleSeries } from "@peated/server/db/schema";
+import { BottleSeriesSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
 import type { SQL } from "drizzle-orm";
@@ -19,7 +20,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(BottleSeriesSchema),
       total: z.number(),
     }),
   )

@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { comments } from "@peated/server/db/schema";
-import { CursorSchema } from "@peated/server/schemas";
+import { CommentSchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CommentSerializer } from "@peated/server/serializers/comment";
 import { and, asc, eq } from "drizzle-orm";
@@ -20,7 +20,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(CommentSchema),
       rel: CursorSchema,
     }),
   )

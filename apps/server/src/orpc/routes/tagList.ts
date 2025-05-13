@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { tags } from "@peated/server/db/schema";
+import { TagSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TagSerializer } from "@peated/server/serializers/tag";
 import { and, asc, ilike, type SQL } from "drizzle-orm";
@@ -24,7 +25,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(TagSchema),
       rel: z.object({
         nextCursor: z.number().nullable(),
         prevCursor: z.number().nullable(),

@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
-import { CursorSchema } from "@peated/server/schemas";
+import { CursorSchema, UserSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import type { SQL } from "drizzle-orm";
@@ -30,7 +30,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(UserSchema),
       rel: CursorSchema,
     }),
   )

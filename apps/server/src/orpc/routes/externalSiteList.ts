@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { CursorSchema } from "@peated/server/schemas";
+import { CursorSchema, ExternalSiteSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteSerializer } from "@peated/server/serializers/externalSite";
 import { procedure } from "..";
@@ -21,7 +21,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(ExternalSiteSchema),
       rel: CursorSchema,
     }),
   )

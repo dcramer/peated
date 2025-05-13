@@ -7,7 +7,7 @@ import {
   tastings,
   users,
 } from "@peated/server/db/schema";
-import { CursorSchema } from "@peated/server/schemas";
+import { CursorSchema, TastingSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import type { SQL } from "drizzle-orm";
@@ -35,7 +35,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(TastingSchema),
       rel: CursorSchema,
     }),
   )

@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottles, externalSites, storePrices } from "@peated/server/db/schema";
+import { ExternalSiteSchema, StorePriceSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
 import {
@@ -25,7 +26,11 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(
+        StorePriceSchema.extend({
+          site: ExternalSiteSchema,
+        }),
+      ),
     }),
   )
   .handler(async function ({ input, context }) {

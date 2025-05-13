@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { badgeAwards } from "@peated/server/db/schema";
+import { BadgeAwardSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
@@ -19,7 +20,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(z.any()),
+      results: z.array(BadgeAwardSchema),
       rel: z.object({
         nextCursor: z.number().nullable(),
         prevCursor: z.number().nullable(),
