@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { publicProcedure } from "..";
 import { extractFromImage, extractFromText } from "../../agents/labelExtractor";
-import { publicProcedure } from "../../trpc";
 
 export default publicProcedure
   .input(

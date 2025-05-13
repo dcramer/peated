@@ -26,6 +26,10 @@
     "@google-cloud/storage": "^6.12.0",
     "@googlemaps/google-maps-services-js": "^3.4.0",
     "@opentelemetry/api": "^1.9.0",
+    "@orpc/client": "^1.2.0",
+    "@orpc/contract": "^1.2.0",
+    "@orpc/openapi": "^1.2.0",
+    "@orpc/server": "^1.2.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@peated/design": "workspace:*",
     "@peated/email": "workspace:*",
@@ -63,6 +67,7 @@
     "fastify": "^4.29.0",
     "fastify-plugin": "^4.5.1",
     "google-auth-library": "^8.9.0",
+    "hono": "^4.7.9",
     "ioredis": "^5.5.0",
     "jsonwebtoken": "^9.0.2",
     "jsx-email": "catalog:",
@@ -79,7 +84,7 @@
     "typescript": "catalog:",
     "wkx": "^0.5.0",
     "zod": "catalog:",
-    "zod-to-json-schema": "^3.24.1"
+    "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
     "axios-mock-adapter": "~1.22.0",

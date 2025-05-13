@@ -1,4 +1,4 @@
-import { type AppRouter } from "@peated/server/trpc/router";
+import { type AppRouter } from "@peated/server/orpc/router";
 import { createTRPCProxyClient, TRPCClientError } from "@trpc/client";
 import { getLinks } from "./links";
 

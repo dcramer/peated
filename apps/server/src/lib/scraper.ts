@@ -5,7 +5,7 @@ import {
 import { ApiClient } from "@peated/server/lib/apiClient";
 import { logError } from "@peated/server/lib/log";
 import { trpcClient } from "@peated/server/lib/trpc/server";
-import { isTRPCClientError } from "@peated/server/trpc/client";
+import { isTRPCClientError } from "@peated/server/orpc/client";
 import type { Currency, ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";

@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { generatePasswordHash } from "@peated/server/lib/auth";
-import type { Context } from "@peated/server/trpc/context";
+import type { Context } from "@peated/server/orpc/context";
 
 export async function createTestContext(): Promise<Context> {
   const [user] = await db

@@ -1,54 +1,51 @@
+import { oc } from "@orpc/contract";
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { createAccessToken } from "@peated/server/lib/auth";
+import { AuthSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { TRPCError } from "@trpc/server";
 import { compareSync } from "bcrypt";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+const authBasic = procedure
   .input(
     z.object({
       email: z.string(),
       password: z.string(),
     }),
   )
-  .mutation(async function ({ input: { email, password } }) {
+  .output(AuthSchema)
+  .handler(async function ({ input }) {
+    const { email, password }: { email: string; password: string } = input;
     const [user] = await db
       .select()
       .from(users)
       .where(eq(sql`LOWER(${users.email})`, email.toLowerCase()));
     if (!user) {
-      console.log("user not found");
-      throw new TRPCError({
+      throw new ORPCError("UNAUTHORIZED", {
         message: "Invalid credentials.",
-        code: "UNAUTHORIZED",
       });
     }
 
     if (!user.passwordHash) {
-      console.log("user has no password set");
-      throw new TRPCError({
+      throw new ORPCError("UNAUTHORIZED", {
         message: "Invalid credentials.",
-        code: "UNAUTHORIZED",
       });
     }
 
     if (!compareSync(password, user.passwordHash)) {
-      console.log("invalid password");
-      throw new TRPCError({
+      throw new ORPCError("UNAUTHORIZED", {
         message: "Invalid credentials.",
-        code: "UNAUTHORIZED",
       });
     }
 
     if (!user.active) {
-      throw new TRPCError({
+      throw new ORPCError("UNAUTHORIZED", {
         message: "Invalid credentials.",
-        code: "UNAUTHORIZED",
       });
     }
 
@@ -57,3 +54,7 @@ export default publicProcedure
       accessToken: await createAccessToken(user),
     };
   });
+
+export const router = {
+  authBasic,
+};

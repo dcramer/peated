@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { collectionBottles } from "@peated/server/db/schema";
 import { getDefaultCollection } from "@peated/server/lib/db";
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "@peated/server/trpc/router";
+import { createCaller } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
 test("requires auth", async () => {
