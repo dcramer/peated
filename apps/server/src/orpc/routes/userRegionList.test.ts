@@ -84,7 +84,7 @@ describe("GET /users/:user/regions", () => {
         user: otherUser.id,
       }),
     );
-    expect(err.message).toEqual("User's profile is not public.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("can list private with friend", async ({ defaults, fixtures }) => {

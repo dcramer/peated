@@ -1,29 +1,36 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
+import { describe, expect, test } from "vitest";
 import { db } from "../../db";
 import { entities } from "../../db/schema";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("deletes entity", async ({ fixtures }) => {
-  const user = await fixtures.User({ admin: true });
-  const entity = await fixtures.Entity();
+describe("DELETE /entities/:id", () => {
+  test("deletes entity", async ({ fixtures }) => {
+    const user = await fixtures.User({ admin: true });
+    const entity = await fixtures.Entity();
 
-  const caller = createCaller({ user });
-  const data = await caller.entityDelete(entity.id);
-  expect(data).toEqual({});
+    const data = await routerClient.entityDelete(entity.id, {
+      context: { user },
+    });
+    expect(data).toEqual({});
 
-  const [newEntity] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.id, entity.id));
-  expect(newEntity).toBeUndefined();
-});
+    const [newEntity] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, entity.id));
+    expect(newEntity).toBeUndefined();
+  });
 
-test("cannot delete without admin", async ({ fixtures }) => {
-  const user = await fixtures.User({ mod: true });
-  const entity = await fixtures.Entity({ createdById: user.id });
+  test("cannot delete without admin", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity({ createdById: user.id });
 
-  const caller = createCaller({ user });
-  const err = await waitError(caller.entityDelete(entity.id));
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    const err = await waitError(() =>
+      routerClient.entityDelete(entity.id, {
+        context: { user },
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
 });

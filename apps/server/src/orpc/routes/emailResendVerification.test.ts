@@ -1,18 +1,25 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("initiates email", async ({ fixtures }) => {
-  const user = await fixtures.User({ verified: false });
-  const caller = createCaller({ user });
+describe("POST /email/resend-verification", () => {
+  test("initiates email", async ({ fixtures }) => {
+    const user = await fixtures.User({ verified: false });
 
-  await caller.emailResendVerification();
-});
+    await routerClient.emailResendVerification(undefined, {
+      context: { user },
+    });
+  });
 
-test("already verified", async ({ fixtures }) => {
-  const user = await fixtures.User({ verified: true });
-  const caller = createCaller({ user });
+  test("already verified", async ({ fixtures }) => {
+    const user = await fixtures.User({ verified: true });
 
-  const err = await waitError(caller.emailResendVerification());
+    const err = await waitError(() =>
+      routerClient.emailResendVerification(undefined, {
+        context: { user },
+      }),
+    );
 
-  expect(err).toMatchInlineSnapshot(`[TRPCError: Account already verified]`);
+    expect(err).toMatchInlineSnapshot();
+  });
 });

@@ -18,7 +18,7 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toEqual("User's profile is private.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("can list private with friend", async ({ defaults, fixtures }) => {

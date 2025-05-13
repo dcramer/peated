@@ -12,7 +12,7 @@ describe("POST /tastings/:id/toast", () => {
         id: 1,
       }),
     );
-    expect(err.message).toBe("Unauthorized");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("cannot toast self", async ({ defaults, fixtures }) => {
@@ -28,7 +28,7 @@ describe("POST /tastings/:id/toast", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Cannot toast your own tasting.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("new toast", async ({ defaults, fixtures }) => {

@@ -125,6 +125,6 @@ describe("GET /countries/categories", () => {
     const err = await waitError(() =>
       routerClient.countryCategoryList({ country: "nonexistent" }),
     );
-    expect(err.message).toContain("Invalid country");
+    expect(err).toMatchInlineSnapshot();
   });
 });

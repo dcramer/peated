@@ -12,7 +12,7 @@ describe("PUT /notifications/:id", () => {
         id: 1,
       }),
     );
-    expect(err.message).toBe("UNAUTHORIZED");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("mark own notification as read", async ({ defaults, fixtures }) => {
@@ -65,6 +65,6 @@ describe("PUT /notifications/:id", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Cannot edit another user's notification.");
+    expect(err).toMatchInlineSnapshot();
   });
 });

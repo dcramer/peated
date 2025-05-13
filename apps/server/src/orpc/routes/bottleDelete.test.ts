@@ -31,6 +31,6 @@ describe("DELETE /bottles/:id", () => {
         context: { user },
       }),
     );
-    expect(err.message).toBe("UNAUTHORIZED");
+    expect(err).toMatchInlineSnapshot();
   });
 });

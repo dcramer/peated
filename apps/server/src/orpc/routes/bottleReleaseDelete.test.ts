@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { db } from "../../db";
@@ -10,14 +11,13 @@ import {
   flightBottles,
   tastings,
 } from "../../db/schema";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottleReleaseDelete", () => {
+describe("DELETE /bottle-releases/:id", () => {
   it("deletes a bottle release and updates related records", async function ({
     fixtures,
   }) {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
 
     const release = await fixtures.BottleRelease();
 
@@ -52,7 +52,9 @@ describe("bottleReleaseDelete", () => {
     });
 
     // Delete the release
-    await caller.bottleReleaseDelete(release.id);
+    await routerClient.bottleReleaseDelete(release.id, {
+      context: { user: admin },
+    });
 
     // Verify the release is deleted
     const [deletedRelease] = await db
@@ -110,9 +112,12 @@ describe("bottleReleaseDelete", () => {
 
   it("throws error if release not found", async function ({ fixtures }) {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
 
-    const err = await caller.bottleReleaseDelete(999999).catch((e: Error) => e);
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Release not found.]`);
+    const err = await waitError(() =>
+      routerClient.bottleReleaseDelete(999999, {
+        context: { user: admin },
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 });

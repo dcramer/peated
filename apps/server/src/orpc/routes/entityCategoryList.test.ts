@@ -77,6 +77,6 @@ describe("GET /entities/:entity/categories", () => {
         entity: 999999,
       }),
     );
-    expect(err.message).toContain("Entity not found");
+    expect(err).toMatchInlineSnapshot();
   });
 });

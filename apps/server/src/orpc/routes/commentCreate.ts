@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type {
   Comment,
@@ -7,22 +8,25 @@ import type {
 import { comments, tastings } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
 import { createNotification } from "@peated/server/lib/notifications";
-import { CommentInputSchema } from "@peated/server/schemas";
+import { CommentInputSchema, CommentSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CommentSerializer } from "@peated/server/serializers/comment";
 import { pushJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { procedure } from "..";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "POST", path: "/comments" })
   .input(
     CommentInputSchema.extend({
-      tasting: z.number(),
+      tasting: z.coerce.number(),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
+  .output(CommentSchema)
+  .handler(async function ({ input, context }) {
     const tasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) => eq(tastings.id, input.tasting),
       with: {
@@ -32,16 +36,15 @@ export default authedProcedure
     });
 
     if (!tasting) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Tasting not found.",
-        code: "NOT_FOUND",
       });
     }
 
     const data: NewComment = {
       comment: input.comment,
       tastingId: tasting.id,
-      createdById: ctx.user.id,
+      createdById: context.user.id,
     };
     if (input.createdAt) {
       data.createdAt = new Date(input.createdAt);
@@ -57,8 +60,7 @@ export default authedProcedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "comment_unq") {
-          throw new TRPCError({
-            code: "CONFLICT",
+          throw new ORPCError("CONFLICT", {
             message: "Comment already exists.",
             cause: err,
           });
@@ -87,8 +89,7 @@ export default authedProcedure
     });
 
     if (!comment) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Unable to create comment.",
       });
     }
@@ -105,5 +106,5 @@ export default authedProcedure
       }
     }
 
-    return await serialize(CommentSerializer, comment, ctx.user);
+    return await serialize(CommentSerializer, comment, context.user);
   });

@@ -8,7 +8,7 @@ import { routerClient } from "../router";
 describe("DELETE /tastings/:id", () => {
   test("requires authentication", async () => {
     const err = await waitError(() => routerClient.tastingDelete(1));
-    expect(err.message).toBe("UNAUTHORIZED");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("delete own tasting", async ({ defaults, fixtures }) => {
@@ -47,6 +47,6 @@ describe("DELETE /tastings/:id", () => {
         context: { user: defaults.user },
       }),
     );
-    expect(err.message).toBe("Cannot delete another user's tasting.");
+    expect(err).toMatchInlineSnapshot();
   });
 });

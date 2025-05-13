@@ -10,7 +10,7 @@ describe("POST /tastings", () => {
     const err = await waitError(() =>
       routerClient.tastingCreate({ bottle: 1 }),
     );
-    expect(err.message).toBe("UNAUTHORIZED");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("creates a new tasting with minimal params", async ({
@@ -211,7 +211,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Cannot identify flight.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("creates a new tasting with flight", async ({ defaults, fixtures }) => {
@@ -324,7 +324,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Cannot identify release.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("fails with nonexistent release", async ({ defaults, fixtures }) => {
@@ -339,7 +339,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Cannot identify release.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("creates a new tasting with serving style and color", async ({
@@ -454,7 +454,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Friends must all be active relationships.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("creates a new tasting with friends", async ({ defaults, fixtures }) => {
@@ -508,7 +508,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Tasting already exists.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("updates entity stats correctly", async ({ defaults, fixtures }) => {
@@ -644,6 +644,6 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Friends must all be active relationships.");
+    expect(err).toMatchInlineSnapshot();
   });
 });

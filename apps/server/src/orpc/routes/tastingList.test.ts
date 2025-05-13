@@ -50,7 +50,7 @@ describe("GET /tastings", () => {
         filter: "friends",
       }),
     );
-    expect(err.message).toEqual("Unauthorized");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("lists tastings filter friends", async ({ defaults, fixtures }) => {

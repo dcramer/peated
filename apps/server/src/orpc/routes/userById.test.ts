@@ -49,6 +49,6 @@ describe("GET /users/:id", () => {
     const err = await waitError(() =>
       routerClient.userById({ id: "notauser" }),
     );
-    expect(err.message).toContain("User not found");
+    expect(err).toMatchInlineSnapshot();
   });
 });

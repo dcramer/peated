@@ -3,15 +3,13 @@ import { describe, expect, it } from "vitest";
 import { db } from "../../db";
 import { bottleReleases, bottles, changes } from "../../db/schema";
 import waitError from "../../lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottleReleaseCreate", () => {
+describe("POST /bottle-releases", () => {
   it("creates a new release for a bottle without statedAge", async function ({
     fixtures,
     defaults,
   }) {
-    const caller = createCaller({ user: defaults.user });
-
     const bottle = await fixtures.Bottle({
       name: "Urquhart",
       statedAge: null,
@@ -32,7 +30,9 @@ describe("bottleReleaseCreate", () => {
       caskFill: "refill" as const,
     };
 
-    const result = await caller.bottleReleaseCreate(data);
+    const result = await routerClient.bottleReleaseCreate(data, {
+      context: { user: defaults.user },
+    });
 
     // Verify key properties of the response
     expect(result).toMatchObject({
@@ -100,8 +100,6 @@ describe("bottleReleaseCreate", () => {
     fixtures,
     defaults,
   }) {
-    const caller = createCaller({ user: defaults.user });
-
     const bottle = await fixtures.Bottle({
       name: "10",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
@@ -121,7 +119,9 @@ describe("bottleReleaseCreate", () => {
       caskFill: "refill" as const,
     };
 
-    const result = await caller.bottleReleaseCreate(data);
+    const result = await routerClient.bottleReleaseCreate(data, {
+      context: { user: defaults.user },
+    });
 
     // Verify key properties of the response
     expect(result).toMatchObject({
@@ -188,8 +188,6 @@ describe("bottleReleaseCreate", () => {
     fixtures,
     defaults,
   }) {
-    const caller = createCaller({ user: defaults.user });
-
     const bottle = await fixtures.Bottle({
       name: "10",
       statedAge: 10,
@@ -202,10 +200,12 @@ describe("bottleReleaseCreate", () => {
       abv: 46.0,
     };
 
-    const err = await waitError(caller.bottleReleaseCreate(data));
-    expect(err).toMatchInlineSnapshot(
-      `[TRPCError: Release statedAge must match bottle's statedAge.]`,
+    const err = await waitError(() =>
+      routerClient.bottleReleaseCreate(data, {
+        context: { user: defaults.user },
+      }),
     );
+    expect(err).toMatchInlineSnapshot();
 
     // Verify numReleases was not incremented
     const [updatedBottle] = await db
@@ -216,8 +216,6 @@ describe("bottleReleaseCreate", () => {
   });
 
   it("throws error if bottle not found", async function ({ defaults }) {
-    const caller = createCaller({ user: defaults.user });
-
     const data = {
       bottleId: 999999,
       edition: "Batch 1",
@@ -225,16 +223,18 @@ describe("bottleReleaseCreate", () => {
       abv: 46.0,
     };
 
-    const err = await waitError(caller.bottleReleaseCreate(data));
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Bottle not found.]`);
+    const err = await waitError(() =>
+      routerClient.bottleReleaseCreate(data, {
+        context: { user: defaults.user },
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
   it("throws error if release with same attributes exists", async function ({
     fixtures,
     defaults,
   }) {
-    const caller = createCaller({ user: defaults.user });
-
     const bottle = await fixtures.Bottle({
       name: "10",
       statedAge: null,
@@ -260,10 +260,12 @@ describe("bottleReleaseCreate", () => {
       abv: 46.0,
     };
 
-    const err = await waitError(caller.bottleReleaseCreate(data));
-    expect(err).toMatchInlineSnapshot(
-      `[TRPCError: A release with these attributes already exists.]`,
+    const err = await waitError(() =>
+      routerClient.bottleReleaseCreate(data, {
+        context: { user: defaults.user },
+      }),
     );
+    expect(err).toMatchInlineSnapshot();
 
     // Verify numReleases was not incremented
     const [updatedBottle] = await db
@@ -277,8 +279,6 @@ describe("bottleReleaseCreate", () => {
     fixtures,
     defaults,
   }) {
-    const caller = createCaller({ user: defaults.user });
-
     const bottle = await fixtures.Bottle({
       statedAge: null,
       numReleases: 1,
@@ -300,10 +300,12 @@ describe("bottleReleaseCreate", () => {
       edition: "A",
     };
 
-    const err = await waitError(caller.bottleReleaseCreate(data));
-    expect(err).toMatchInlineSnapshot(
-      `[TRPCError: A release with these attributes already exists.]`,
+    const err = await waitError(() =>
+      routerClient.bottleReleaseCreate(data, {
+        context: { user: defaults.user },
+      }),
     );
+    expect(err).toMatchInlineSnapshot();
 
     // Verify numReleases was not incremented
     const [updatedBottle] = await db

@@ -49,7 +49,7 @@ describe("GET /users/:user/tags", () => {
         user: otherUser.id,
       }),
     );
-    expect(err.message).toMatchInlineSnapshot();
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("can list private with friend", async ({ defaults, fixtures }) => {

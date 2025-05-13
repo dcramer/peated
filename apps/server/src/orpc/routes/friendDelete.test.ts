@@ -8,7 +8,7 @@ import { routerClient } from "../router";
 describe("DELETE /friends/:id", () => {
   test("requires authentication", async () => {
     const err = await waitError(() => routerClient.friendDelete(1));
-    expect(err.message).toBe("UNAUTHORIZED");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("cannot unfriend self", async ({ defaults }) => {
@@ -17,7 +17,7 @@ describe("DELETE /friends/:id", () => {
         context: { user: defaults.user },
       }),
     );
-    expect(err.message).toBe("Cannot unfriend yourself.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("can unfriend new link", async ({ defaults, fixtures }) => {

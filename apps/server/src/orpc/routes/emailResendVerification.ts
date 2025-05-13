@@ -1,16 +1,22 @@
+import { ORPCError } from "@orpc/server";
 import { sendVerificationEmail } from "@peated/server/lib/email";
-import { TRPCError } from "@trpc/server";
-import { authedProcedure } from "..";
+import { z } from "zod";
+import { procedure } from "..";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure.mutation(async function ({ ctx: { user } }) {
-  if (user.verified) {
-    throw new TRPCError({
-      code: "CONFLICT",
-      message: "Account already verified",
-    });
-  }
+export default procedure
+  .use(requireAuth)
+  .route({ method: "POST", path: "/email/resend-verification" })
+  .input(z.void())
+  .output(z.object({}))
+  .handler(async function ({ context: { user } }) {
+    if (user.verified) {
+      throw new ORPCError("CONFLICT", {
+        message: "Account already verified",
+      });
+    }
 
-  await sendVerificationEmail({ user });
+    await sendVerificationEmail({ user });
 
-  return {};
-});
+    return {};
+  });

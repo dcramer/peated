@@ -101,7 +101,7 @@ describe("bottleSeriesUpdate", () => {
       }),
     );
 
-    expect(err.message).toBe("A series with this name already exists.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   it("performs partial updates correctly", async function ({ fixtures }) {

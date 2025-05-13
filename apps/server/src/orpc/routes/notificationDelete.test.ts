@@ -12,7 +12,7 @@ describe("DELETE /notifications/:id", () => {
         id: 1,
       }),
     );
-    expect(err.message).toBe("UNAUTHORIZED");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("invalid notification", async ({ defaults }) => {
@@ -24,7 +24,7 @@ describe("DELETE /notifications/:id", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Notification not found.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("delete own notification", async ({ defaults, fixtures }) => {
@@ -73,6 +73,6 @@ describe("DELETE /notifications/:id", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Cannot delete another user's notification.");
+    expect(err).toMatchInlineSnapshot();
   });
 });

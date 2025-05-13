@@ -1,24 +1,31 @@
+import { ORPCError } from "@orpc/server";
 import { logError } from "@peated/server/lib/log";
 import { pushJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { procedure } from "..";
 import { db } from "../../db";
 import { bottleReleases, bottles, changes } from "../../db/schema";
 import { formatReleaseName } from "../../lib/format";
-import { BottleReleaseInputSchema } from "../../schemas/bottleReleases";
+import {
+  BottleReleaseInputSchema,
+  BottleReleaseSchema,
+} from "../../schemas/bottleReleases";
 import { serialize } from "../../serializers";
 import { BottleReleaseSerializer } from "../../serializers/bottleRelease";
 import { ConflictError } from "../errors";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "POST", path: "/bottle-releases" })
   .input(
     BottleReleaseInputSchema.extend({
-      bottleId: z.number(),
+      bottleId: z.coerce.number(),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
+  .output(BottleReleaseSchema)
+  .handler(async function ({ input, context }) {
     // Verify the bottle exists
     const [bottle] = await db
       .select()
@@ -26,9 +33,8 @@ export default authedProcedure
       .where(eq(bottles.id, input.bottleId));
 
     if (!bottle) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Bottle not found.",
-        code: "NOT_FOUND",
       });
     }
 
@@ -38,9 +44,8 @@ export default authedProcedure
       input.statedAge &&
       bottle.statedAge !== input.statedAge
     ) {
-      throw new TRPCError({
+      throw new ORPCError("BAD_REQUEST", {
         message: "Release statedAge must match bottle's statedAge.",
-        code: "BAD_REQUEST",
       });
     }
 
@@ -97,9 +102,8 @@ export default authedProcedure
     }
 
     if (name === bottle.name || fullName === bottle.fullName) {
-      throw new TRPCError({
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Release name cannot be the same as the bottle name.",
-        code: "INTERNAL_SERVER_ERROR",
       });
     }
 
@@ -124,7 +128,7 @@ export default authedProcedure
           description: input.description,
           imageUrl: input.imageUrl,
           tastingNotes: input.tastingNotes,
-          createdById: ctx.user.id,
+          createdById: context.user.id,
         })
         .returning();
 
@@ -133,7 +137,7 @@ export default authedProcedure
         tx.insert(changes).values({
           objectType: "bottle_release",
           objectId: release.id,
-          createdById: ctx.user.id,
+          createdById: context.user.id,
           displayName: release.fullName,
           type: "add",
           data: {
@@ -154,9 +158,8 @@ export default authedProcedure
     });
 
     if (!release) {
-      throw new TRPCError({
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Failed to create release.",
-        code: "INTERNAL_SERVER_ERROR",
       });
     }
 
@@ -170,5 +173,5 @@ export default authedProcedure
       });
     }
 
-    return await serialize(BottleReleaseSerializer, release, ctx.user);
+    return await serialize(BottleReleaseSerializer, release, context.user);
   });

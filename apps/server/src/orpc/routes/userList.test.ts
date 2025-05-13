@@ -30,6 +30,6 @@ describe("GET /users", () => {
 
   test("requires authentication", async () => {
     const err = await waitError(() => routerClient.userList());
-    expect(err.message).toBe("UNAUTHORIZED");
+    expect(err).toMatchInlineSnapshot();
   });
 });

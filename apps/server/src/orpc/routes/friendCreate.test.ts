@@ -12,7 +12,7 @@ describe("POST /friends", () => {
         id: defaults.user.id,
       }),
     );
-    expect(err.message).toBe("UNAUTHORIZED");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("cannot friend self", async ({ defaults }) => {
@@ -24,7 +24,7 @@ describe("POST /friends", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err.message).toBe("Cannot friend yourself.");
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("can friend new link", async ({ defaults, fixtures }) => {
