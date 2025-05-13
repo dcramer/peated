@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import {
@@ -5,31 +6,31 @@ import {
   generatePasswordHash,
   verifyPayload,
 } from "@peated/server/lib/auth";
-import { PasswordResetSchema } from "@peated/server/schemas";
+import { AuthSchema, PasswordResetSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { TRPCError } from "@trpc/server";
 import { createHash } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
 const TOKEN_CUTOFF = 600; // 10 minutes
 
-export default publicProcedure
+export default procedure
+  .route({ method: "POST", path: "/auth/password-reset/confirm" })
   .input(
     z.object({
       token: z.string(),
       password: z.string().trim().min(8, "At least 8 characters."),
     }),
   )
-  .mutation(async function ({ input }) {
+  .output(AuthSchema)
+  .handler(async function ({ input }) {
     let payload;
     try {
       payload = await verifyPayload(input.token);
     } catch (err) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
+      throw new ORPCError("BAD_REQUEST", {
         message: "Invalid verification token.",
       });
     }
@@ -39,8 +40,7 @@ export default publicProcedure
       new Date(token.createdAt).getTime() <
       new Date().getTime() - TOKEN_CUTOFF * 1000
     ) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
+      throw new ORPCError("BAD_REQUEST", {
         message: "Invalid verification token.",
       });
     }
@@ -55,8 +55,7 @@ export default publicProcedure
         ),
       );
     if (!user) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
+      throw new ORPCError("BAD_REQUEST", {
         message: "Invalid verification token.",
       });
     }
@@ -67,8 +66,7 @@ export default publicProcedure
         .update(user.passwordHash || "")
         .digest("hex")
     ) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
+      throw new ORPCError("BAD_REQUEST", {
         message: "Invalid verification token.",
       });
     }

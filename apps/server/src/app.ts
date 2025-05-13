@@ -1,4 +1,7 @@
+import { OpenAPIGenerator } from "@orpc/openapi";
+import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { RPCHandler } from "@orpc/server/fetch";
+import { ZodSmartCoercionPlugin, ZodToJsonSchemaConverter } from "@orpc/zod";
 import { setUser } from "@sentry/core";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
@@ -9,7 +12,14 @@ import config from "./config";
 import { getUserFromHeader } from "./lib/auth";
 import { router } from "./orpc/router";
 
-const handler = new RPCHandler(router);
+const openapiHandler = new OpenAPIHandler(router, {
+  plugins: [new ZodSmartCoercionPlugin()],
+});
+const openAPIGenerator = new OpenAPIGenerator({
+  schemaConverters: [new ZodToJsonSchemaConverter()],
+});
+
+const rpcHandler = new RPCHandler(router);
 
 export const app = new Hono()
   .use(
@@ -19,7 +29,6 @@ export const app = new Hono()
       maxAge: 600,
     }),
   )
-
   .use(
     cache({
       cacheName: "default",
@@ -42,7 +51,75 @@ export const app = new Hono()
 
     await next();
   })
+  .get("/_health", (c) => {
+    return c.json({ ok: true });
+  })
+  .get("/robots.txt", (c) => {
+    return c.text("User-agent: *\nDisallow: /");
+  })
+  .get("/", async (c) => {
+    return c.html(`
+      <!doctype html>
+      <html>
+        <head>
+          <title>My Client</title>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" type="image/svg+xml" href="https://orpc.unnoq.com/icon.svg" />
+        </head>
+        <body>
+          <div id="app"></div>
+  
+          <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+          <script>
+            Scalar.createApiReference('#app', {
+              url: '/spec.json',
+              authentication: {
+                securitySchemes: {
+                  bearerAuth: {
+                    token: 'default-token',
+                  },
+                },
+              },
+            })
+          </script>
+        </body>
+      </html>
+    `);
+  })
+  .get("/spec.json", async (c) => {
+    return c.json(
+      openAPIGenerator.generate(router, {
+        info: {
+          title: "Peated API",
+          version: "1.0.0",
+          description: "The Peated API",
+        },
+      }),
+    );
+  })
+  .use("/v1*", async (c, next) => {
+    const user = await getUserFromHeader(c.req.header("authorization"));
 
+    user
+      ? setUser({
+          id: `${user.id}`,
+          username: user.username,
+          email: user.email,
+        })
+      : setUser(null);
+
+    const { matched, response } = await openapiHandler.handle(c.req.raw, {
+      prefix: "/v1",
+      context: { user }, // Provide initial context if needed
+    });
+
+    if (matched) {
+      return c.newResponse(response.body, response);
+    }
+
+    await next();
+  })
   .use("/rpc/*", async (c, next) => {
     const user = await getUserFromHeader(c.req.header("authorization"));
 
@@ -54,7 +131,7 @@ export const app = new Hono()
         })
       : setUser(null);
 
-    const { matched, response } = await handler.handle(c.req.raw, {
+    const { matched, response } = await rpcHandler.handle(c.req.raw, {
       prefix: "/rpc",
       context: { user }, // Provide initial context if needed
     });

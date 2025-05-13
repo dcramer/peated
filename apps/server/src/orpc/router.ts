@@ -1,8 +1,8 @@
-import auth from "./routes/auth";
-import authBasic from "./routes/authBasic";
-import authGoogle from "./routes/authGoogle";
+import { createRouterClient } from "@orpc/server";
+import authLogin from "./routes/authLogin";
 import authMagicLinkConfirm from "./routes/authMagicLinkConfirm";
 import authMagicLinkSend from "./routes/authMagicLinkSend";
+import authMe from "./routes/authMe";
 import authPasswordReset from "./routes/authPasswordReset";
 import authPasswordResetConfirm from "./routes/authPasswordResetConfirm";
 import authRegister from "./routes/authRegister";
@@ -127,16 +127,15 @@ import userUpdate from "./routes/userUpdate";
 import version from "./routes/version";
 
 export const router = {
-  auth,
-  // authBasic,
-  // authGoogle,
-  // authMagicLinkConfirm,
-  // authMagicLinkSend,
-  // authPasswordReset,
-  // authPasswordResetConfirm,
-  // authRegister,
-  // badgeById,
-  // badgeCreate,
+  authMe,
+  authLogin,
+  authRegister,
+  authMagicLinkSend,
+  authMagicLinkConfirm,
+  authPasswordReset,
+  authPasswordResetConfirm,
+  badgeById,
+  badgeCreate,
   // badgeList,
   // badgeUpdate,
   // badgeUserList,
@@ -257,3 +256,7 @@ export const router = {
 };
 
 export type Router = typeof router;
+
+export const routerClient = createRouterClient(router, {
+  context: { user: null },
+});

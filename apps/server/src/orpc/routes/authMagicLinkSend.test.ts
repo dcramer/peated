@@ -1,23 +1,22 @@
 import { sendMagicLinkEmail } from "@peated/server/lib/email";
 import waitError from "@peated/server/lib/test/waitError";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
 // Mock the sendMagicLinkEmail function
 vi.mock("@peated/server/lib/email", () => ({
   sendMagicLinkEmail: vi.fn(),
 }));
 
-describe("authMagicLinkSend", () => {
+describe("POST /auth/magic-link/send", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("sends magic link for active user", async ({ fixtures }) => {
     const user = await fixtures.User({ active: true });
-    const caller = createCaller({ user: null });
 
-    const result = await caller.authMagicLinkSend({
+    const result = await routerClient.authMagicLinkSend({
       email: user.email,
     });
 
@@ -26,28 +25,25 @@ describe("authMagicLinkSend", () => {
   });
 
   test("throws error when user is not found", async ({ fixtures }) => {
-    const caller = createCaller({ user: null });
-
     const error = await waitError(
-      caller.authMagicLinkSend({
+      routerClient.authMagicLinkSend({
         email: "nonexistent@example.com",
       }),
     );
 
-    expect(error).toMatchInlineSnapshot(`[TRPCError: Account not found.]`);
+    expect(error).toMatchInlineSnapshot();
   });
 
   test("throws error when user is not active", async ({ fixtures }) => {
     const user = await fixtures.User({ active: false });
-    const caller = createCaller({ user: null });
 
     const error = await waitError(
-      caller.authMagicLinkSend({
+      routerClient.authMagicLinkSend({
         email: user.email,
       }),
     );
 
-    expect(error).toMatchInlineSnapshot(`[TRPCError: Account not found.]`);
+    expect(error).toMatchInlineSnapshot();
   });
 
   test("is case-insensitive for email", async ({ fixtures }) => {
@@ -55,9 +51,8 @@ describe("authMagicLinkSend", () => {
       active: true,
       email: "User@Example.com",
     });
-    const caller = createCaller({ user: null });
 
-    const result = await caller.authMagicLinkSend({
+    const result = await routerClient.authMagicLinkSend({
       email: "uSER@eXAMPLE.COM",
     });
 

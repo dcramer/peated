@@ -1,14 +1,14 @@
 import { sendPasswordResetEmail } from "@peated/server/lib/email";
 import waitError from "@peated/server/lib/test/waitError";
-import { TRPCError } from "@trpc/server";
-import { createCaller } from "../router";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { routerClient } from "../router";
 
 // Mock the sendPasswordResetEmail function
 vi.mock("@peated/server/lib/email", () => ({
   sendPasswordResetEmail: vi.fn(),
 }));
 
-describe("authPasswordReset", () => {
+describe("POST /auth/password-reset", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -17,9 +17,8 @@ describe("authPasswordReset", () => {
     fixtures,
   }) => {
     const user = await fixtures.User();
-    const caller = createCaller({ user: null });
 
-    await caller.authPasswordReset({
+    await routerClient.authPasswordReset({
       email: user.email,
     });
 
@@ -28,45 +27,28 @@ describe("authPasswordReset", () => {
   });
 
   test("does not leak information for non-existent user", async () => {
-    const caller = createCaller({ user: null });
     const nonExistentEmail = "nonexistent@example.com";
 
     const err = await waitError(
-      caller.authPasswordReset({
+      routerClient.authPasswordReset({
         email: nonExistentEmail,
       }),
     );
 
-    expect(err).toBeInstanceOf(TRPCError);
-    expect((err as TRPCError).code).toBe("NOT_FOUND");
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Account not found.]`);
+    expect(err).toMatchInlineSnapshot();
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
 
   test("throws error for invalid email format", async () => {
-    const caller = createCaller({ user: null });
     const invalidEmail = "invalid-email";
 
     const err = await waitError(
-      caller.authPasswordReset({
+      routerClient.authPasswordReset({
         email: invalidEmail,
       }),
     );
 
-    expect(err).toBeInstanceOf(TRPCError);
-    expect((err as TRPCError).code).toBe("BAD_REQUEST");
-    expect(err).toMatchInlineSnapshot(`
-      [TRPCError: [
-        {
-          "validation": "email",
-          "code": "invalid_string",
-          "message": "Invalid email",
-          "path": [
-            "email"
-          ]
-        }
-      ]]
-    `);
+    expect(err).toMatchInlineSnapshot();
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
 });

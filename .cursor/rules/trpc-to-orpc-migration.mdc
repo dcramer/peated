@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+I need you to help me migrate the remaining tPRC endpoints.
+
+They are all in the `apps/server/src/orpc/routes` directory intermingled with the orpc routes. You can detect if its a trpc route as it will still have import statements referencing the tRPC procedures (such as `publicProcedure`). If its an `oRPC` route it will have import statements referencing the `procedure` function.
+
+Reference the [orpc-route.mdc](mdc:.cursor/rules/orpc-route.mdc) rules to migrate each route. Follow them carefully, especially around the code patterns used to handle errors and call tests.
+
+Plan each route carefully. Migrate the tests as well. Make sure all tests contain the same behavior as they did previously.

@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
@@ -6,14 +7,15 @@ import {
   generatePasswordHash,
 } from "@peated/server/lib/auth";
 import { sendVerificationEmail } from "@peated/server/lib/email";
+import { AuthSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
-import { ConflictError } from "../errors";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "POST", path: "/auth/register" })
   .input(
     z.object({
       username: z.string().toLowerCase(),
@@ -21,7 +23,8 @@ export default publicProcedure
       password: z.string(),
     }),
   )
-  .mutation(async function ({ input: { username, email, password } }) {
+  .output(AuthSchema)
+  .handler(async function ({ input: { username, email, password } }) {
     const [user] = await db.transaction(async (tx) => {
       try {
         return await tx
@@ -47,7 +50,9 @@ export default publicProcedure
                 ? eq(sql`LOWER(${users.username})`, username.toLowerCase())
                 : eq(sql`LOWER(${users.email})`, email.toLowerCase()),
             );
-          throw new ConflictError(existingUser, err);
+          throw new ORPCError("CONFLICT", {
+            message: `Conflicting object already exists (ID=${existingUser.id}).`,
+          });
         }
         throw err;
       }

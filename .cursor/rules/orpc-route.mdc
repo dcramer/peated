@@ -1,0 +1,217 @@
+---
+description: Instructions when working on OpenAPI routes in Hono.
+globs: 
+alwaysApply: false
+---
+## Technology
+
+We use the `orpc` framework, which provides our OpenAPI support. All code is written in TypeScript.
+
+## Conventions
+
+Routes are located in `apps/server/src/orpc/routes` and are named based on their URL path.
+
+- They are ALWAYS in the root `routes` folder and flattened. We do not use or group routes into subfolders.
+- They should contain every HTTP METHOD at the same path (GET, POST, etc.)
+- Their path will include only their relative route location from the version (e.g. `/auth` vs `/v1/auth`). It will never include the `/v1` prefix.
+- They use plural nouns in filenames (e.g. `bottleDetails` vs `bottleDetail`).
+- Each unique path should be its own module. (e.g. `auth.ts` only contains `/auth`, NEVER `/auth/register`, which would be in `authRegister.ts`).
+- The filename should be prefixed with the route subpath leading up to it (e.g. `adminQueueInfo.ts` for `/v1/admin/queueInfo`)
+
+Here are some examples of file paths:
+
+- a route at `/v1/auth` would be in `apps/server/src/orpc/routes/auth.ts`.
+- a route at `/v1/auth/register` would be in `apps/server/src/orpc/routes/authRegister.ts`.
+- a route at `/v1/bottles/:bottleId` would be in `apps/server/src/orpc/routes/bottleDetails.ts`.
+- a route at `/v1/bottles/:bottleId/tastings` would be in `apps/server/src/orpc/routes/bottleTastings.ts`
+
+When importing these modules, ALWAYS name then accordingly with a `Route` suffix. For example:
+
+```ts
+import authRegister from "@peated/server/orpc/routes/authRegister";
+```
+
+Routes are registered in `apps/server/src/orpc/router.ts`, by adding a new `app.route`. They sorted alphabetically by name.
+
+All unique paths should also be unique modules. For example:
+
+- GET /v1/auth should be in `[..]/auth.ts`.
+- POST /v1/auth should be in `[..]/auth.ts`.
+- POST /v1/auth/register should be in `[..]/authRegister.ts`.
+
+Tests should live side-by-side with the routes:
+
+- If the route is at `[...]/auth.ts` the tests should be in `[...]/auth.test.ts`
+
+## Route Definition
+
+Routes are created as an oRPC procedure, using the `@orcp/server` package:
+
+```ts
+import { os } from "@orpc/server";
+import { procedure } from "..";
+
+export default procedure
+  .route({ method: "GET", path: "/ping" })
+  .handler(async function ({ context }) {
+    return { ping: "pong" }
+  });
+```
+
+Note: Imports from the `apps/api` package should always use the `@peated/api` import path, rather than use relative imports. The only exception to this rule is when you're importing code which is in the same directory and is not a shared utility.
+
+### Error Responses
+
+When returning errors from routes, such as an HTTP 401 Unauthorized response, you should use the `OrpcError` class as control flow.
+
+```ts
+import { ORPCError } from "@orpc/server";
+
+throw new ORPCError("UNAUTHORIZED", {message: "Invalid Credentials."});
+```
+
+This will be caught by the error handler and converted to the appropriate HTTP response.
+
+### Authentication
+
+Authentication can be added to an endpoint view a few middlewares. These are all found in `apps/server/src/orpc/middleware`. Commonly you will use something like `requireAuth` or `requireAdmin`. These are defined in the `procedure` call:
+
+```ts
+import { os } from "@orpc/server";
+import { requireAuth } from "@peated/server/orpc/middleware";
+import { procedure } from "..";
+
+export default procedure
+  .route({ method: "GET", path: "/auth/me" })
+  .use(requireAuth)
+  .handler(async function ({ context }) {
+    return { whoami: context.user.email }
+  });
+```
+
+### Response Serialization
+
+Responses should be defined using `.output()` on the procedure, and then serialized using one of our `Serializer` classes. These are found in `apps/server/src/serializers`.
+
+For example:
+
+```ts
+import { os } from "@orpc/server";
+import { requireAuth } from "@peated/server/orpc/middleware";
+import { UserSchema } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { UserSerializer } from "@peated/server/serializers/user";
+import { eq } from "drizzle-orm";
+import { z } from "zod";
+import { procedure } from "..";
+
+export default procedure
+  .route({ method: "GET", path: "/auth/me" })
+  .use(requireAuth)
+  .output(z.object({ user: UserSchema }))
+  .handler(async function ({ context }) {
+    // serialize(SerializerClass, objectOrArrayOfObjects, currentUserOrNull);
+    return {
+      user: serialize(UserSerializer, context.user, context.user),
+    };
+  });
+```
+
+## Tests
+
+Tests should be defined in `[routeName].test.ts`. They should use standard patterns that you can see in other similar route tests.
+
+The description passed to `describe` should ALWAYS be `METHOD /path`, representing the specific HTTP route.
+
+```ts
+import { routerClient } from "../router";
+
+describe("POST /auth/login", () => {
+  test("valid credentials", async ({ fixtures }) => {
+    const user = await fixtures.User({
+      email: "foo@example.com",
+      password: "example",
+    });
+
+    const data = await routerClient.authLogin({
+      email: "foo@example.com",
+      password: "example",
+    });
+
+    expect(data.user.id).toEqual(user.id);
+    expect(data.accessToken).toBeDefined();
+  });
+});
+
+```
+
+If you need to test against an authenticated user, you can create it via `fixtures`, and pass it in via `context`:
+
+```ts
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "../router";
+
+describe("GET /auth/me", () => {
+  test("returns user details for authenticated user", async ({ fixtures }) => {
+    const user = await fixtures.User();
+    const data = await routerClient.authMe.call({}, { user });
+
+    expect(data.user.id).toEqual(user.id);
+    expect(data.user.email).toEqual(user.email);
+  });
+});
+```
+
+You should always assert that the relevant database objects have been created as part of the test, vs only asserting on the response.
+
+- DO check the database object has been updated correctly.
+- DO NOT assert on outputs that are unrelated to the inputs.
+
+### Testing Errors
+
+When asserting against errors:
+
+- Use `waitError` to grab the error object.
+- Use `toMatchInlineSnapshot` on the value. This makes it easy for us to make changes later.
+
+```ts
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "../router";
+
+describe("POST /auth/login", () => {
+  test("invalid credentials", async ({ fixtures }) => {
+    await fixtures.User({
+      email: "foo@example.com",
+      password: "example",
+    });
+
+    const err = await waitError(
+      routerClient.authLogin({
+        email: "foo@example.com",
+        password: "example2",
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
+});
+```
+
+### Running Tests
+
+You can run tests with the following command from the package root:
+
+```shell
+pnpm --filter ./apps/api test --run [routeName]
+```
+
+For example, to run ALL route tests:
+
+```shell
+pnpm --filter ./apps/api test --run routes
+```
+
+Or to just run the `authRegister` route tests:
+
+```shell
+pnpm --filter ./apps/api test --run authRegister
+```

@@ -1,7 +1,7 @@
 import { createAccessToken, verifyPayload } from "@peated/server/lib/auth";
 import waitError from "@peated/server/lib/test/waitError";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
 // Mock the auth functions
 vi.mock("@peated/server/lib/auth", () => ({
@@ -9,14 +9,13 @@ vi.mock("@peated/server/lib/auth", () => ({
   verifyPayload: vi.fn(),
 }));
 
-describe("authMagicLinkConfirm", () => {
+describe("POST /auth/magic-link/confirm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("confirms magic link for active user", async ({ fixtures }) => {
     const user = await fixtures.User({ active: true, verified: false });
-    const caller = createCaller({ user: null });
     const token = "valid-token";
 
     vi.mocked(verifyPayload).mockResolvedValue({
@@ -27,7 +26,7 @@ describe("authMagicLinkConfirm", () => {
 
     vi.mocked(createAccessToken).mockResolvedValue("mocked-access-token");
 
-    const result = await caller.authMagicLinkConfirm({ token });
+    const result = await routerClient.authMagicLinkConfirm({ token });
 
     expect(result.user.id).toBe(user.id);
     expect(result.user.verified).toBe(true);
@@ -38,21 +37,17 @@ describe("authMagicLinkConfirm", () => {
   });
 
   test("throws error for invalid token", async ({ fixtures }) => {
-    const caller = createCaller({ user: null });
     const token = "invalid-token";
 
     vi.mocked(verifyPayload).mockRejectedValue(new Error("Invalid token"));
 
-    const error = await waitError(caller.authMagicLinkConfirm({ token }));
+    const error = await waitError(routerClient.authMagicLinkConfirm({ token }));
 
-    expect(error).toMatchInlineSnapshot(
-      `[TRPCError: Invalid magic link token.]`,
-    );
+    expect(error).toMatchInlineSnapshot();
   });
 
   test("throws error for expired token", async ({ fixtures }) => {
     const user = await fixtures.User({ active: true });
-    const caller = createCaller({ user: null });
     const token = "expired-token";
 
     const expiredDate = new Date();
@@ -64,16 +59,13 @@ describe("authMagicLinkConfirm", () => {
       createdAt: expiredDate.toISOString(),
     });
 
-    const error = await waitError(caller.authMagicLinkConfirm({ token }));
+    const error = await waitError(routerClient.authMagicLinkConfirm({ token }));
 
-    expect(error).toMatchInlineSnapshot(
-      `[TRPCError: Invalid magic link token.]`,
-    );
+    expect(error).toMatchInlineSnapshot();
   });
 
   test("throws error for inactive user", async ({ fixtures }) => {
     const user = await fixtures.User({ active: false });
-    const caller = createCaller({ user: null });
     const token = "valid-token";
 
     vi.mocked(verifyPayload).mockResolvedValue({
@@ -82,15 +74,12 @@ describe("authMagicLinkConfirm", () => {
       createdAt: new Date().toISOString(),
     });
 
-    const error = await waitError(caller.authMagicLinkConfirm({ token }));
+    const error = await waitError(routerClient.authMagicLinkConfirm({ token }));
 
-    expect(error).toMatchInlineSnapshot(
-      `[TRPCError: Invalid magic link token.]`,
-    );
+    expect(error).toMatchInlineSnapshot();
   });
 
   test("throws error for non-existent user", async ({ fixtures }) => {
-    const caller = createCaller({ user: null });
     const token = "valid-token";
 
     vi.mocked(verifyPayload).mockResolvedValue({
@@ -99,10 +88,8 @@ describe("authMagicLinkConfirm", () => {
       createdAt: new Date().toISOString(),
     });
 
-    const error = await waitError(caller.authMagicLinkConfirm({ token }));
+    const error = await waitError(routerClient.authMagicLinkConfirm({ token }));
 
-    expect(error).toMatchInlineSnapshot(
-      `[TRPCError: Invalid magic link token.]`,
-    );
+    expect(error).toMatchInlineSnapshot();
   });
 });

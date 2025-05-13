@@ -1,18 +1,20 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { sendMagicLinkEmail } from "@peated/server/lib/email";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "POST", path: "/auth/magic-link/send" })
   .input(
     z.object({
       email: z.string().email(),
     }),
   )
-  .mutation(async function ({ input: { email } }) {
+  .output(z.object({}))
+  .handler(async function ({ input: { email } }) {
     const [user] = await db
       .select()
       .from(users)
@@ -20,17 +22,15 @@ export default publicProcedure
 
     if (!user) {
       console.log("user not found");
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Account not found.",
-        code: "NOT_FOUND",
       });
     }
 
     if (!user.active) {
       console.log("user not active");
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Account not found.",
-        code: "NOT_FOUND",
       });
     }
 

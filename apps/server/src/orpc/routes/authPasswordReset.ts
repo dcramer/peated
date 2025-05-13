@@ -1,34 +1,34 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { sendPasswordResetEmail } from "@peated/server/lib/email";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "POST", path: "/auth/password-reset" })
   .input(
     z.object({
       email: z.string().email(),
     }),
   )
-  .mutation(async function ({ input }) {
+  .output(z.object({}))
+  .handler(async function ({ input }) {
     const [user] = await db
       .select()
       .from(users)
       .where(eq(sql`LOWER(${users.email})`, input.email.toLowerCase()));
     if (!user) {
       console.log("user not found");
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Account not found.",
-        code: "NOT_FOUND",
       });
     }
 
     if (!user.active) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Account not found.",
-        code: "NOT_FOUND",
       });
     }
 

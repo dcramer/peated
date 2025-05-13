@@ -11,6 +11,7 @@ import { z } from "zod";
 import { procedure } from "..";
 
 export default procedure
+  .route({ method: "GET", path: "/auth/me" })
   .use(requireAuth)
   .output(z.object({ user: UserSchema }))
   .handler(async function ({ context }) {
