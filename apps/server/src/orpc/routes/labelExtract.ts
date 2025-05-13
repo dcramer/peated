@@ -1,23 +1,34 @@
-import { TRPCError } from "@trpc/server";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 import { extractFromImage, extractFromText } from "../../agents/labelExtractor";
 
-export default publicProcedure
-  .input(
-    z
-      .object({
-        imageUrl: z.string().optional(),
-        label: z.string().optional(),
-      })
-      .refine(
-        (data) => data.imageUrl !== undefined || data.label !== undefined,
-        {
-          message: "Either imageUrl or label must be provided",
-        },
-      ),
-  )
-  .mutation(async ({ input }) => {
+const InputSchema = z
+  .object({
+    imageUrl: z.string().optional(),
+    label: z.string().optional(),
+  })
+  .refine((data) => data.imageUrl !== undefined || data.label !== undefined, {
+    message: "Either imageUrl or label must be provided",
+  });
+
+// TODO: Define proper output schema based on what extractFromImage/extractFromText return
+const OutputSchema = z.object({
+  brand: z.string().optional(),
+  expression: z.string().optional(),
+  category: z.string().optional(),
+  statedAge: z.number().optional(),
+  abv: z.number().optional(),
+  caskType: z.string().optional(),
+  series: z.string().optional(),
+  edition: z.string().optional(),
+});
+
+export default procedure
+  .route({ method: "POST", path: "/labels/extract" })
+  .input(InputSchema)
+  .output(OutputSchema)
+  .handler(async function ({ input }) {
     try {
       if (input.imageUrl) {
         return await extractFromImage(input.imageUrl);
@@ -25,16 +36,13 @@ export default publicProcedure
       if (input.label) {
         return await extractFromText(input.label);
       }
-      throw new TRPCError({
-        code: "BAD_REQUEST",
+      throw new ORPCError("BAD_REQUEST", {
         message: "Either imageUrl or label must be provided",
       });
     } catch (error) {
       console.error(error);
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Failed to extract label information",
-        cause: error,
       });
     }
   });

@@ -1,7 +1,7 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { bottleAliases, bottles } from "@peated/server/db/schema";
-import { TRPCError } from "@trpc/server";
 import {
   and,
   asc,
@@ -12,17 +12,33 @@ import {
   type SQL,
 } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+const OutputSchema = z.object({
+  results: z.array(
+    z.object({
+      name: z.string(),
+      createdAt: z.string(),
+      bottleId: z.number().nullable(),
+      isCanonical: z.boolean().optional(),
+    }),
+  ),
+  rel: z.object({
+    nextCursor: z.number().nullable(),
+    prevCursor: z.number().nullable(),
+  }),
+});
+
+export default procedure
+  .route({ method: "GET", path: "/bottle-aliases" })
   .input(
     z
       .object({
-        bottle: z.number().optional(),
+        bottle: z.coerce.number().optional(),
         query: z.string().default(""),
-        onlyUnknown: z.boolean().optional(),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
+        onlyUnknown: z.coerce.boolean().optional(),
+        cursor: z.coerce.number().gte(1).default(1),
+        limit: z.coerce.number().gte(1).lte(100).default(100),
       })
       .default({
         query: "",
@@ -30,7 +46,8 @@ export default publicProcedure
         limit: 100,
       }),
   )
-  .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
+  .output(OutputSchema)
+  .handler(async function ({ input: { cursor, query, limit, ...input } }) {
     const where: (SQL<unknown> | undefined)[] = [
       eq(bottleAliases.ignored, false),
     ];
@@ -43,9 +60,8 @@ export default publicProcedure
         .where(eq(bottles.id, input.bottle));
 
       if (!bottle) {
-        throw new TRPCError({
+        throw new ORPCError("NOT_FOUND", {
           message: "Bottle not found.",
-          code: "NOT_FOUND",
         });
       }
       where.push(eq(bottleAliases.bottleId, bottle.id));

@@ -1,33 +1,46 @@
 import type { SQL } from "drizzle-orm";
 import { and, asc, eq, ilike, isNull } from "drizzle-orm";
 
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { externalSites, reviews } from "@peated/server/db/schema";
-import { ExternalSiteTypeEnum } from "@peated/server/schemas";
+import { ExternalSiteTypeEnum, ReviewSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
-  .input(
-    z
-      .object({
-        site: ExternalSiteTypeEnum.optional(),
-        bottle: z.number().optional(),
-        query: z.string().default(""),
-        onlyUnknown: z.boolean().optional(),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
-      })
-      .default({
-        query: "",
-        cursor: 1,
-        limit: 100,
-      }),
-  )
-  .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
+const InputSchema = z
+  .object({
+    site: ExternalSiteTypeEnum.optional(),
+    bottle: z.coerce.number().optional(),
+    query: z.string().default(""),
+    onlyUnknown: z.coerce.boolean().optional(),
+    cursor: z.coerce.number().gte(1).default(1),
+    limit: z.coerce.number().gte(1).lte(100).default(100),
+  })
+  .default({
+    query: "",
+    cursor: 1,
+    limit: 100,
+  });
+
+const OutputSchema = z.object({
+  results: z.array(ReviewSchema),
+  rel: z.object({
+    nextCursor: z.number().nullable(),
+    prevCursor: z.number().nullable(),
+  }),
+});
+
+export default procedure
+  .route({ method: "GET", path: "/reviews" })
+  .input(InputSchema)
+  .output(OutputSchema)
+  .handler(async function ({
+    input: { cursor, query, limit, ...input },
+    context,
+  }) {
     const where: (SQL<unknown> | undefined)[] = [eq(reviews.hidden, false)];
 
     if (input.site) {
@@ -36,8 +49,7 @@ export default publicProcedure
       });
 
       if (!site) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
+        throw new ORPCError("NOT_FOUND", {
           message: "Site not found",
         });
       }
@@ -50,10 +62,12 @@ export default publicProcedure
 
     if (input.bottle) {
       where.push(eq(reviews.bottleId, input.bottle));
-    } else if (!ctx.user?.admin && !ctx.user?.mod) {
-      console.error(`User requested reviewList without mod: ${ctx.user?.id}`);
-      throw new TRPCError({
-        code: "BAD_REQUEST",
+    } else if (!context.user?.admin && !context.user?.mod) {
+      console.error(
+        `User requested reviewList without mod: ${context.user?.id}`,
+      );
+      throw new ORPCError("BAD_REQUEST", {
+        message: "Must be a moderator to list all reviews.",
       });
     }
 
@@ -74,7 +88,7 @@ export default publicProcedure
       results: await serialize(
         ReviewSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
         [...(input.site ? ["site"] : []), ...(input.bottle ? ["bottle"] : [])],
       ),
       rel: {

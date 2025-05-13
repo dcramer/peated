@@ -7,15 +7,14 @@ import {
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
 // Mock the worker client
 vi.mock("@peated/server/worker/client");
 
-describe("bottleAliasUpsert", () => {
+describe("POST /bottle-aliases", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
@@ -23,12 +22,14 @@ describe("bottleAliasUpsert", () => {
   test("creates a new bottle alias", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const user = await fixtures.User({ mod: true });
-    const caller = createCaller({ user });
 
-    const result = await caller.bottleAliasUpsert({
-      bottle: bottle.id,
-      name: "New Alias",
-    });
+    const result = await routerClient.bottleAliasUpsert(
+      {
+        bottle: bottle.id,
+        name: "New Alias",
+      },
+      { context: { user } },
+    );
 
     expect(result).toEqual({});
 
@@ -47,12 +48,14 @@ describe("bottleAliasUpsert", () => {
       bottleId: null,
     });
     const user = await fixtures.User({ mod: true });
-    const caller = createCaller({ user });
 
-    await caller.bottleAliasUpsert({
-      bottle: bottle.id,
-      name: "Test Alias",
-    });
+    await routerClient.bottleAliasUpsert(
+      {
+        bottle: bottle.id,
+        name: "Test Alias",
+      },
+      { context: { user } },
+    );
 
     const updatedStorePrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, storePrice.id),
@@ -68,12 +71,14 @@ describe("bottleAliasUpsert", () => {
       bottleId: null,
     });
     const user = await fixtures.User({ mod: true });
-    const caller = createCaller({ user });
 
-    await caller.bottleAliasUpsert({
-      bottle: bottle.id,
-      name: "Test Alias",
-    });
+    await routerClient.bottleAliasUpsert(
+      {
+        bottle: bottle.id,
+        name: "Test Alias",
+      },
+      { context: { user } },
+    );
 
     const updatedReview = await db.query.reviews.findFirst({
       where: eq(reviews.id, review.id),
@@ -92,12 +97,14 @@ describe("bottleAliasUpsert", () => {
       imageUrl: "https://example.com/image.jpg",
     });
     const user = await fixtures.User({ mod: true });
-    const caller = createCaller({ user });
 
-    await caller.bottleAliasUpsert({
-      bottle: bottle.id,
-      name: "Test Alias",
-    });
+    await routerClient.bottleAliasUpsert(
+      {
+        bottle: bottle.id,
+        name: "Test Alias",
+      },
+      { context: { user } },
+    );
 
     const updatedBottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, bottle.id),
@@ -108,31 +115,35 @@ describe("bottleAliasUpsert", () => {
 
   test("throws NOT_FOUND for non-existent bottle", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
-    const caller = createCaller({ user });
 
     const err = await waitError(
-      caller.bottleAliasUpsert({
-        bottle: 9999,
-        name: "Test Alias",
-      }),
+      routerClient.bottleAliasUpsert(
+        {
+          bottle: 9999,
+          name: "Test Alias",
+        },
+        { context: { user } },
+      ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Bottle not found.]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("requires mod permission", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const user = await fixtures.User({ mod: false });
-    const caller = createCaller({ user });
 
     const err = await waitError(
-      caller.bottleAliasUpsert({
-        bottle: bottle.id,
-        name: "Test Alias",
-      }),
+      routerClient.bottleAliasUpsert(
+        {
+          bottle: bottle.id,
+          name: "Test Alias",
+        },
+        { context: { user } },
+      ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("throws error for duplicate alias on different bottle", async ({
@@ -145,17 +156,17 @@ describe("bottleAliasUpsert", () => {
       name: "Duplicate Alias",
     });
     const user = await fixtures.User({ mod: true });
-    const caller = createCaller({ user });
 
     const err = await waitError(
-      caller.bottleAliasUpsert({
-        bottle: bottle2.id,
-        name: "Duplicate Alias",
-      }),
+      routerClient.bottleAliasUpsert(
+        {
+          bottle: bottle2.id,
+          name: "Duplicate Alias",
+        },
+        { context: { user } },
+      ),
     );
 
-    expect(err).toMatchInlineSnapshot(
-      `[TRPCError: Duplicate alias found (1). Not implemented.]`,
-    );
+    expect(err).toMatchInlineSnapshot();
   });
 });

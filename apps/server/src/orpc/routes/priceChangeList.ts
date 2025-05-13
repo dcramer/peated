@@ -3,26 +3,37 @@ import { and, eq, ilike, isNotNull, sql } from "drizzle-orm";
 
 import { db } from "@peated/server/db";
 import { storePriceHistories, storePrices } from "@peated/server/db/schema";
+import { BottlePriceChangeSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottlePriceChangeSerializer } from "@peated/server/serializers/storePrice";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
-  .input(
-    z
-      .object({
-        query: z.string().default(""),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
-      })
-      .default({
-        query: "",
-        cursor: 1,
-        limit: 100,
-      }),
-  )
-  .query(async function ({ input: { query, cursor, limit, ...input }, ctx }) {
+const InputSchema = z
+  .object({
+    query: z.string().default(""),
+    cursor: z.coerce.number().gte(1).default(1),
+    limit: z.coerce.number().gte(1).lte(100).default(100),
+  })
+  .default({
+    query: "",
+    cursor: 1,
+    limit: 100,
+  });
+
+const OutputSchema = z.object({
+  results: z.array(BottlePriceChangeSchema),
+  rel: z.object({
+    nextCursor: z.number().nullable(),
+    prevCursor: z.number().nullable(),
+  }),
+});
+
+export default procedure
+  .route({ method: "GET", path: "/price-changes" })
+  .input(InputSchema)
+  .output(OutputSchema)
+  .handler(async function ({ input: { query, cursor, limit }, context }) {
     const offset = (cursor - 1) * limit;
 
     const minChange = 500; // $5
@@ -67,7 +78,7 @@ export default publicProcedure
       results: await serialize(
         BottlePriceChangeSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

@@ -1,26 +1,36 @@
 import { MAJOR_COUNTRIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
+import { CountrySchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
 import { and, asc, desc, ilike, inArray, ne, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
 const DEFAULT_SORT = "name";
 
 const SORT_OPTIONS = ["name", "bottles", "-name", "-bottles"] as const;
 
-export default publicProcedure
+const OutputSchema = z.object({
+  results: z.array(CountrySchema),
+  rel: z.object({
+    nextCursor: z.number().nullable(),
+    prevCursor: z.number().nullable(),
+  }),
+});
+
+export default procedure
+  .route({ method: "GET", path: "/countries" })
   .input(
     z
       .object({
         query: z.string().default(""),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
+        cursor: z.coerce.number().gte(1).default(1),
+        limit: z.coerce.number().gte(1).lte(100).default(100),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
-        onlyMajor: z.boolean().default(false),
-        hasBottles: z.boolean().default(false),
+        onlyMajor: z.coerce.boolean().default(false),
+        hasBottles: z.coerce.boolean().default(false),
       })
       .default({
         query: "",
@@ -29,9 +39,11 @@ export default publicProcedure
         sort: DEFAULT_SORT,
       }),
   )
-  .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
-    ctx.maxAge = 86400;
-
+  .output(OutputSchema)
+  .handler(async function ({
+    input: { cursor, query, limit, ...input },
+    context,
+  }) {
     const where: (SQL<unknown> | undefined)[] = [];
 
     const offset = (cursor - 1) * limit;
@@ -82,7 +94,7 @@ export default publicProcedure
       results: await serialize(
         CountrySerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

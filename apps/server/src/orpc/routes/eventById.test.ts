@@ -1,18 +1,26 @@
 import { db } from "@peated/server/db";
 import { entityTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("get event by id", async ({ fixtures }) => {
-  const event = await fixtures.Event();
+describe("GET /events/:id", () => {
+  test("returns event details", async ({ fixtures }) => {
+    const event = await fixtures.Event();
 
-  const caller = createCaller({ user: null });
-  const data = await caller.eventById(event.id);
-  expect(data.id).toEqual(event.id);
-});
+    const data = await routerClient.eventById({
+      id: event.id,
+    });
 
-test("errors on invalid event", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(caller.eventById(1));
-  expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+    expect(data.id).toEqual(event.id);
+    expect(data.name).toEqual(event.name);
+  });
+
+  test("returns 404 for invalid event", async () => {
+    const err = await waitError(
+      routerClient.eventById({
+        id: 12345,
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
 });

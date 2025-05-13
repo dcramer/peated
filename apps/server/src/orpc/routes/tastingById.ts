@@ -1,26 +1,32 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
+import { TastingSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure.input(z.number()).query(async function ({
-  input,
-  ctx,
-}) {
-  const [tasting] = await db
-    .select()
-    .from(tastings)
-    .where(eq(tastings.id, input));
+export default procedure
+  .route({ method: "GET", path: "/tastings/:id" })
+  .input(
+    z.object({
+      id: z.number(),
+    }),
+  )
+  .output(TastingSchema)
+  .handler(async function ({ input, context }) {
+    const [tasting] = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.id, input.id));
 
-  if (!tasting) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-    });
-  }
+    if (!tasting) {
+      throw new ORPCError("NOT_FOUND", {
+        message: "Tasting not found.",
+      });
+    }
 
-  return await serialize(TastingSerializer, tasting, ctx.user);
-});
+    return await serialize(TastingSerializer, tasting, context.user);
+  });

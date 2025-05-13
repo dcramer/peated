@@ -1,8 +1,8 @@
-import { TRPCError } from "@trpc/server";
-import { createCaller } from "../router";
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "../router";
 
-describe("regionList", () => {
-  test("lists regions for a country by id", async ({ fixtures, expect }) => {
+describe("GET /regions", () => {
+  test("lists regions for a country by id", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region1 = await fixtures.Region({
       countryId: country.id,
@@ -13,8 +13,7 @@ describe("regionList", () => {
       name: "Region B",
     });
 
-    const caller = createCaller({ user: null });
-    const { results, rel } = await caller.regionList({
+    const { results, rel } = await routerClient.regionList({
       country: country.id,
     });
 
@@ -25,12 +24,11 @@ describe("regionList", () => {
     expect(rel.prevCursor).toBeNull();
   });
 
-  test("lists regions for a country by slug", async ({ fixtures, expect }) => {
+  test("lists regions for a country by slug", async ({ fixtures }) => {
     const country = await fixtures.Country({ slug: "test-country" });
     const region = await fixtures.Region({ countryId: country.id });
 
-    const caller = createCaller({ user: null });
-    const { results } = await caller.regionList({
+    const { results } = await routerClient.regionList({
       country: "test-country",
     });
 
@@ -38,7 +36,7 @@ describe("regionList", () => {
     expect(results[0].id).toBe(region.id);
   });
 
-  test("filters regions by query", async ({ fixtures, expect }) => {
+  test("filters regions by query", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region1 = await fixtures.Region({
       countryId: country.id,
@@ -46,8 +44,7 @@ describe("regionList", () => {
     });
     await fixtures.Region({ countryId: country.id, name: "Beta Region" });
 
-    const caller = createCaller({ user: null });
-    const { results } = await caller.regionList({
+    const { results } = await routerClient.regionList({
       country: country.id,
       query: "Alpha",
     });
@@ -56,7 +53,7 @@ describe("regionList", () => {
     expect(results[0].id).toBe(region1.id);
   });
 
-  test("sorts regions by name ascending", async ({ fixtures, expect }) => {
+  test("sorts regions by name ascending", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region1 = await fixtures.Region({
       countryId: country.id,
@@ -67,8 +64,7 @@ describe("regionList", () => {
       name: "Beta",
     });
 
-    const caller = createCaller({ user: null });
-    const { results } = await caller.regionList({
+    const { results } = await routerClient.regionList({
       country: country.id,
       sort: "name",
     });
@@ -78,7 +74,7 @@ describe("regionList", () => {
     expect(results[1].id).toBe(region2.id);
   });
 
-  test("sorts regions by name descending", async ({ fixtures, expect }) => {
+  test("sorts regions by name descending", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region1 = await fixtures.Region({
       countryId: country.id,
@@ -89,8 +85,7 @@ describe("regionList", () => {
       name: "Beta",
     });
 
-    const caller = createCaller({ user: null });
-    const { results } = await caller.regionList({
+    const { results } = await routerClient.regionList({
       country: country.id,
       sort: "-name",
     });
@@ -100,7 +95,7 @@ describe("regionList", () => {
     expect(results[1].id).toBe(region1.id);
   });
 
-  test("paginates results", async ({ fixtures, expect }) => {
+  test("paginates results", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const regions = await Promise.all(
       Array.from({ length: 3 }, (_, i) =>
@@ -108,8 +103,7 @@ describe("regionList", () => {
       ),
     );
 
-    const caller = createCaller({ user: null });
-    const { results, rel } = await caller.regionList({
+    const { results, rel } = await routerClient.regionList({
       country: country.id,
       limit: 2,
       cursor: 1,
@@ -122,7 +116,7 @@ describe("regionList", () => {
     expect(rel.prevCursor).toBeNull();
   });
 
-  test("filters regions with bottles", async ({ fixtures, expect }) => {
+  test("filters regions with bottles", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region1 = await fixtures.Region({
       countryId: country.id,
@@ -130,8 +124,7 @@ describe("regionList", () => {
     });
     await fixtures.Region({ countryId: country.id, totalBottles: 0 });
 
-    const caller = createCaller({ user: null });
-    const { results } = await caller.regionList({
+    const { results } = await routerClient.regionList({
       country: country.id,
       hasBottles: true,
     });
@@ -140,13 +133,12 @@ describe("regionList", () => {
     expect(results[0].id).toBe(region1.id);
   });
 
-  test("throws error for invalid country slug", async ({
-    fixtures,
-    expect,
-  }) => {
-    const caller = createCaller({ user: null });
-    await expect(
-      caller.regionList({ country: "nonexistent-country" }),
-    ).rejects.toThrow(TRPCError);
+  test("errors on invalid country slug", async ({ fixtures }) => {
+    const err = await waitError(
+      routerClient.regionList({
+        country: "nonexistent-country",
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 });

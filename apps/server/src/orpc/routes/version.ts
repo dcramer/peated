@@ -1,8 +1,12 @@
 import config from "@peated/server/config";
-import { publicProcedure } from "..";
+import { z } from "zod";
+import { procedure } from "..";
 
-export default publicProcedure.query(async function () {
-  return {
-    version: config.VERSION,
-  };
-});
+export default procedure
+  .route({ method: "GET", path: "/version" })
+  .output(z.object({ version: z.string() }))
+  .handler(async function () {
+    return {
+      version: config.VERSION,
+    };
+  });

@@ -1,37 +1,33 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("tagByName", () => {
+describe("GET /tags/:name", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
 
   test("retrieves a tag by name", async ({ fixtures }) => {
     const tag = await fixtures.Tag({ name: "TestTag" });
-    const caller = createCaller({ user: null });
-
-    const result = await caller.tagByName("TestTag");
+    const result = await routerClient.tagByName({ name: "TestTag" });
 
     expect(result).toBeDefined();
     expect(result.name).toBe("TestTag");
   });
 
   test("throws NOT_FOUND for non-existent tag", async ({ fixtures }) => {
-    const caller = createCaller({ user: null });
+    const err = await waitError(
+      routerClient.tagByName({ name: "NonExistentTag" }),
+    );
 
-    const err = await waitError(caller.tagByName("NonExistentTag"));
-
-    expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("is case-sensitive", async ({ fixtures }) => {
     await fixtures.Tag({ name: "TestTag" });
-    const caller = createCaller({ user: null });
+    const err = await waitError(routerClient.tagByName({ name: "testtag" }));
 
-    const err = await waitError(caller.tagByName("testtag"));
-
-    expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("returns serialized tag data", async ({ fixtures }) => {
@@ -40,9 +36,8 @@ describe("tagByName", () => {
       tagCategory: "fruity",
       flavorProfiles: ["young_spritely"],
     });
-    const caller = createCaller({ user: null });
 
-    const result = await caller.tagByName("TestTag");
+    const result = await routerClient.tagByName({ name: "TestTag" });
 
     expect(result.name).toBe("TestTag");
     expect(result.tagCategory).toBe("fruity");
@@ -52,9 +47,11 @@ describe("tagByName", () => {
   test("works with authenticated user", async ({ fixtures }) => {
     const tag = await fixtures.Tag({ name: "TestTag" });
     const user = await fixtures.User();
-    const caller = createCaller({ user });
 
-    const result = await caller.tagByName("TestTag");
+    const result = await routerClient.tagByName(
+      { name: "TestTag" },
+      { context: { user } },
+    );
 
     expect(result).toBeDefined();
   });
@@ -62,9 +59,8 @@ describe("tagByName", () => {
   test("handles special characters in tag names", async ({ fixtures }) => {
     const tagName = "Test & Special Characters!";
     await fixtures.Tag({ name: tagName });
-    const caller = createCaller({ user: null });
 
-    const result = await caller.tagByName(tagName);
+    const result = await routerClient.tagByName({ name: tagName });
 
     expect(result).toBeDefined();
     expect(result.name).toBe(tagName);

@@ -1,19 +1,17 @@
 import { db } from "@peated/server/db";
 import { badgeAwards } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("badgeUserList", () => {
+describe("GET /badges/:badge/users", () => {
   test("requires authentication", async () => {
-    const caller = createCaller({ user: null });
     const err = await waitError(
-      caller.badgeUserList({
+      routerClient.badgeUserList({
         badge: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("lists users for a badge", async ({ fixtures, expect }) => {
@@ -33,8 +31,7 @@ describe("badgeUserList", () => {
       level: 2,
     });
 
-    const caller = createCaller({ user: user1 });
-    const { results, rel } = await caller.badgeUserList({
+    const { results, rel } = await routerClient.badgeUserList({
       badge: badge.id,
     });
 
@@ -63,8 +60,7 @@ describe("badgeUserList", () => {
       });
     }
 
-    const caller = createCaller({ user: users[0] });
-    const { results, rel } = await caller.badgeUserList({
+    const { results, rel } = await routerClient.badgeUserList({
       badge: badge.id,
       limit: 2,
       cursor: 1,
@@ -94,8 +90,7 @@ describe("badgeUserList", () => {
       level: 2,
     });
 
-    const caller = createCaller({ user: publicUser });
-    const { results } = await caller.badgeUserList({
+    const { results } = await routerClient.badgeUserList({
       badge: badge.id,
     });
 
@@ -120,8 +115,7 @@ describe("badgeUserList", () => {
       level: 0,
     });
 
-    const caller = createCaller({ user: user1 });
-    const { results } = await caller.badgeUserList({
+    const { results } = await routerClient.badgeUserList({
       badge: badge.id,
     });
 
@@ -146,8 +140,7 @@ describe("badgeUserList", () => {
       level: 2,
     });
 
-    const caller = createCaller({ user: user1 });
-    const { results } = await caller.badgeUserList({
+    const { results } = await routerClient.badgeUserList({
       badge: badge.id,
     });
 
@@ -160,14 +153,11 @@ describe("badgeUserList", () => {
     fixtures,
     expect,
   }) => {
-    const user = await fixtures.User();
-    const caller = createCaller({ user });
-
     const err = await waitError(
-      caller.badgeUserList({
+      routerClient.badgeUserList({
         badge: 9999, // Non-existent badge ID
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+    expect(err).toMatchInlineSnapshot();
   });
 });

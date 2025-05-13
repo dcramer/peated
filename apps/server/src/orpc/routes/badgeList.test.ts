@@ -1,12 +1,11 @@
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("lists badges", async ({ fixtures }) => {
-  await fixtures.Badge();
-  await fixtures.Badge();
+describe("GET /badges", () => {
+  test("lists badges", async ({ fixtures }) => {
+    await fixtures.Badge();
+    await fixtures.Badge();
 
-  const caller = createCaller({
-    user: null,
+    const { results } = await routerClient.badgeList();
+    expect(results.length).toBe(2);
   });
-  const { results } = await caller.badgeList();
-  expect(results.length).toBe(2);
 });

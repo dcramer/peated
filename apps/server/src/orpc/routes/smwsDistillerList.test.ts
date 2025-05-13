@@ -1,4 +1,4 @@
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
 test("lists distillers", async ({ fixtures }) => {
   const nikka = await fixtures.Entity({
@@ -13,10 +13,11 @@ test("lists distillers", async ({ fixtures }) => {
     name: "Macallan",
   });
 
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
-  });
-  const { results } = await caller.smwsDistillerList();
+  const user = await fixtures.User({ mod: true });
+  const { results } = await routerClient.smwsDistillerList(
+    {},
+    { context: { user } },
+  );
 
   expect(results.length).toBe(2);
 });

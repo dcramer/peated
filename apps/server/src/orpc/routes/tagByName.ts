@@ -1,21 +1,23 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tags } from "@peated/server/db/schema";
+import { TagSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TagSerializer } from "@peated/server/serializers/tag";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure.input(z.string()).query(async function ({
-  input,
-  ctx,
-}) {
-  const [tag] = await db.select().from(tags).where(eq(tags.name, input));
-  if (!tag) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-    });
-  }
-  return await serialize(TagSerializer, tag, ctx.user);
-});
+export default procedure
+  .route({ method: "GET", path: "/tags/:name" })
+  .input(z.object({ name: z.string() }))
+  .output(TagSchema)
+  .handler(async function ({ input, context }) {
+    const [tag] = await db.select().from(tags).where(eq(tags.name, input.name));
+    if (!tag) {
+      throw new ORPCError("NOT_FOUND", {
+        message: "Tag not found",
+      });
+    }
+    return await serialize(TagSerializer, tag, context.user);
+  });

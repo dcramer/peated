@@ -1,28 +1,30 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { badges } from "@peated/server/db/schema";
 import { checkBadgeConfig } from "@peated/server/lib/badges";
 import { logError } from "@peated/server/lib/log";
-import { BadgeInputSchema } from "@peated/server/schemas";
+import { requireAdmin } from "@peated/server/orpc/middleware";
+import { BadgeInputSchema, BadgeSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BadgeSerializer } from "@peated/server/serializers/badge";
 import type { Badge, BadgeCheck } from "@peated/server/types";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { adminProcedure } from "..";
+import { procedure } from "..";
 
-export default adminProcedure
+export default procedure
+  .route({ method: "PUT", path: "/badges/:id" })
+  .use(requireAdmin)
   .input(
     BadgeInputSchema.partial().extend({
       id: z.number(),
     }),
   )
-  .mutation(async function ({ input: { id, ...input }, ctx }) {
+  .output(BadgeSchema)
+  .handler(async function ({ input: { id, ...input }, context }) {
     const [badge] = await db.select().from(badges).where(eq(badges.id, id));
     if (!badge) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-      });
+      throw new ORPCError("NOT_FOUND");
     }
 
     const data: { [name: string]: any } = {};
@@ -40,9 +42,8 @@ export default adminProcedure
           config = await checkBadgeConfig(check.type as any, check.config);
         } catch (err) {
           logError(err);
-          throw new TRPCError({
+          throw new ORPCError("BAD_REQUEST", {
             message: "Failed to validate badge config.",
-            code: "BAD_REQUEST",
           });
         }
         checks.push({
@@ -54,7 +55,7 @@ export default adminProcedure
     }
 
     if (Object.values(data).length === 0) {
-      return await serialize(BadgeSerializer, badge, ctx.user);
+      return await serialize(BadgeSerializer, badge, context.user);
     }
 
     const [newBadge] = await db
@@ -63,5 +64,5 @@ export default adminProcedure
       .where(eq(badges.id, badge.id))
       .returning();
 
-    return await serialize(BadgeSerializer, newBadge, ctx.user);
+    return await serialize(BadgeSerializer, newBadge, context.user);
   });

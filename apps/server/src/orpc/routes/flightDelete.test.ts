@@ -1,29 +1,41 @@
+import { db } from "@peated/server/db";
+import { flights } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
-import { db } from "../../db";
-import { flights } from "../../db/schema";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("deletes flight", async ({ fixtures }) => {
-  const user = await fixtures.User({ admin: true });
-  const flight = await fixtures.Flight();
+describe("DELETE /flights/:id", () => {
+  test("deletes flight", async ({ fixtures }) => {
+    const user = await fixtures.User({ admin: true });
+    const flight = await fixtures.Flight();
 
-  const caller = createCaller({ user });
-  const data = await caller.flightDelete(flight.publicId);
-  expect(data).toEqual({});
+    const data = await routerClient.flightDelete(
+      {
+        id: flight.publicId,
+      },
+      { context: { user } },
+    );
+    expect(data).toEqual({});
 
-  const [newFlight] = await db
-    .select()
-    .from(flights)
-    .where(eq(flights.id, flight.id));
-  expect(newFlight).toBeUndefined();
-});
+    const [newFlight] = await db
+      .select()
+      .from(flights)
+      .where(eq(flights.id, flight.id));
+    expect(newFlight).toBeUndefined();
+  });
 
-test("cannot delete without admin", async ({ fixtures }) => {
-  const user = await fixtures.User({ mod: true });
-  const flight = await fixtures.Flight({ createdById: user.id });
+  test("cannot delete without admin", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const flight = await fixtures.Flight({ createdById: user.id });
 
-  const caller = createCaller({ user });
-  const err = await waitError(caller.flightDelete(flight.publicId));
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    const err = await waitError(
+      routerClient.flightDelete(
+        {
+          id: flight.publicId,
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
 });

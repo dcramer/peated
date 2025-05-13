@@ -1,30 +1,34 @@
 import { db } from "@peated/server/db";
+import { flights } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
-import { flights } from "../../db/schema";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("requires authentication", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(
-    caller.flightCreate({
-      name: "Delicious Wood",
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-test("creates a new flight", async ({ defaults }) => {
-  const caller = createCaller({ user: defaults.user });
-  const data = await caller.flightCreate({
-    name: "Macallan",
+describe("POST /flights", () => {
+  test("requires authentication", async () => {
+    const err = await waitError(
+      routerClient.flightCreate({
+        name: "Delicious Wood",
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  expect(data.id).toBeDefined();
+  test("creates a new flight", async ({ fixtures }) => {
+    const user = await fixtures.User();
+    const data = await routerClient.flightCreate(
+      {
+        name: "Macallan",
+      },
+      { context: { user } },
+    );
 
-  const [flight] = await db
-    .select()
-    .from(flights)
-    .where(eq(flights.publicId, data.id));
-  expect(flight.name).toEqual("Macallan");
+    expect(data.id).toBeDefined();
+
+    const [flight] = await db
+      .select()
+      .from(flights)
+      .where(eq(flights.publicId, data.id));
+    expect(flight.name).toEqual("Macallan");
+  });
 });

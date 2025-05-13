@@ -1,14 +1,15 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { BadgeAward, User } from "@peated/server/db/schema";
 import { badgeAwards, badges, users } from "@peated/server/db/schema";
 import { notEmpty } from "@peated/server/lib/filter";
+import { requireAuth } from "@peated/server/orpc/middleware";
+import { UserSchema } from "@peated/server/schemas";
 import { serialize, serializer } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { TRPCError } from "@trpc/server";
 import { and, desc, eq, ne } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
-import { type Context } from "../context";
+import { procedure } from "..";
 
 export const Serializer = serializer({
   attrs: async (
@@ -50,64 +51,75 @@ export const Serializer = serializer({
 });
 
 const InputSchema = z.object({
-  badge: z.number(),
-  cursor: z.number().gte(1).default(1),
-  limit: z.number().gte(1).lte(100).default(25),
+  badge: z.coerce.number(),
+  cursor: z.coerce.number().gte(1).default(1),
+  limit: z.coerce.number().gte(1).lte(100).default(25),
 });
 
-export async function badgeUserList({
-  input: { cursor, limit, ...input },
-  ctx,
-}: {
-  input: z.infer<typeof InputSchema>;
-  ctx: Context;
-}) {
-  const [badge] = await db
-    .select()
-    .from(badges)
-    .where(eq(badges.id, input.badge));
-  if (!badge) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-    });
-  }
+const OutputSchema = z.object({
+  results: z.array(
+    z.object({
+      id: z.number(),
+      xp: z.number(),
+      level: z.number(),
+      user: UserSchema,
+      createdAt: z.string(),
+    }),
+  ),
+  rel: z.object({
+    nextCursor: z.number().nullable(),
+    prevCursor: z.number().nullable(),
+  }),
+});
 
-  const offset = (cursor - 1) * limit;
+export default procedure
+  .route({ method: "GET", path: "/badges/:badge/users" })
+  .use(requireAuth)
+  .input(InputSchema)
+  .output(OutputSchema)
+  .handler(async function ({ input: { cursor, limit, ...input }, context }) {
+    const [badge] = await db
+      .select()
+      .from(badges)
+      .where(eq(badges.id, input.badge));
+    if (!badge) {
+      throw new ORPCError("NOT_FOUND");
+    }
 
-  const results = await db
-    .select({
-      badgeAward: badgeAwards,
-      user: users,
-    })
-    .from(users)
-    .innerJoin(badgeAwards, eq(badgeAwards.userId, users.id))
-    .where(
-      and(
-        eq(users.private, false),
-        eq(badgeAwards.badgeId, badge.id),
-        ne(badgeAwards.level, 0),
+    const offset = (cursor - 1) * limit;
+
+    const results = await db
+      .select({
+        badgeAward: badgeAwards,
+        user: users,
+      })
+      .from(users)
+      .innerJoin(badgeAwards, eq(badgeAwards.userId, users.id))
+      .where(
+        and(
+          eq(users.private, false),
+          eq(badgeAwards.badgeId, badge.id),
+          ne(badgeAwards.level, 0),
+        ),
+      )
+      .limit(limit + 1)
+      .offset(offset)
+      .orderBy(desc(badgeAwards.xp));
+
+    return {
+      results: await serialize(
+        Serializer,
+        results
+          .map((i) => ({
+            ...i.badgeAward,
+            user: i.user,
+          }))
+          .slice(0, limit),
+        context.user,
       ),
-    )
-    .limit(limit + 1)
-    .offset(offset)
-    .orderBy(desc(badgeAwards.xp));
-
-  return {
-    results: await serialize(
-      Serializer,
-      results
-        .map((i) => ({
-          ...i.badgeAward,
-          user: i.user,
-        }))
-        .slice(0, limit),
-      ctx.user,
-    ),
-    rel: {
-      nextCursor: results.length > limit ? cursor + 1 : null,
-      prevCursor: cursor > 1 ? cursor - 1 : null,
-    },
-  };
-}
-
-export default authedProcedure.input(InputSchema).query(badgeUserList);
+      rel: {
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
+      },
+    };
+  });

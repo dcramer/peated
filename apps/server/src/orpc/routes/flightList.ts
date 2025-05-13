@@ -1,25 +1,35 @@
 import { db } from "@peated/server/db";
 import { flights } from "@peated/server/db/schema";
+import { FlightSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FlightSerializer } from "@peated/server/serializers/flight";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, or } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
 const DEFAULT_SORT = "name";
 
 const SORT_OPTIONS = ["name", "-name"] as const;
 
-export default publicProcedure
+const OutputSchema = z.object({
+  results: z.array(FlightSchema),
+  rel: z.object({
+    nextCursor: z.number().nullable(),
+    prevCursor: z.number().nullable(),
+  }),
+});
+
+export default procedure
+  .route({ method: "GET", path: "/flights" })
   .input(
     z
       .object({
         query: z.string().default(""),
         filter: z.enum(["public", "private", "none"]).optional(),
         sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
+        cursor: z.coerce.number().gte(1).default(1),
+        limit: z.coerce.number().gte(1).lte(100).default(100),
       })
       .default({
         query: "",
@@ -28,7 +38,11 @@ export default publicProcedure
         limit: 100,
       }),
   )
-  .query(async function ({ input: { query, cursor, limit, ...input }, ctx }) {
+  .output(OutputSchema)
+  .handler(async function ({
+    input: { query, cursor, limit, ...input },
+    context,
+  }) {
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
@@ -36,12 +50,15 @@ export default publicProcedure
       where.push(ilike(flights.name, `%${query}%`));
     }
 
-    if (ctx.user?.mod && input.filter === "none") {
+    if (context.user?.mod && input.filter === "none") {
       // do nothing
     } else {
-      if (ctx.user) {
+      if (context.user) {
         where.push(
-          or(eq(flights.public, true), eq(flights.createdById, ctx.user.id)),
+          or(
+            eq(flights.public, true),
+            eq(flights.createdById, context.user.id),
+          ),
         );
       } else {
         where.push(eq(flights.public, true));
@@ -78,7 +95,7 @@ export default publicProcedure
       results: await serialize(
         FlightSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

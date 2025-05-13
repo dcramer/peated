@@ -33,16 +33,16 @@ describe("POST /badges", () => {
       .where(eq(badges.id, data.id));
     expect(badge.name).toEqual("Single Malts");
     expect(badge.checks).toMatchInlineSnapshot(`
-      [
-        {
-          "config": {
-            "category": [
-              "single_malt",
-            ],
-          },
-          "type": "category",
+    [
+      {
+        "config": {
+          "category": [
+            "single_malt",
+          ],
         },
-      ]
-    `);
+        "type": "category",
+      },
+    ]
+  `);
   });
 });

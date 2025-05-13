@@ -1,16 +1,22 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("get country by slug", async ({ fixtures }) => {
-  const country = await fixtures.Country();
+describe("GET /countries/:slug", () => {
+  test("get country by slug", async ({ fixtures }) => {
+    const country = await fixtures.Country();
 
-  const caller = createCaller({ user: null });
-  const data = await caller.countryBySlug(country.slug);
-  expect(data.id).toEqual(country.id);
-});
+    const data = await routerClient.countryBySlug({
+      slug: country.slug,
+    });
+    expect(data.id).toEqual(country.id);
+  });
 
-test("errors on invalid badge", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(caller.countryBySlug("nochance"));
-  expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+  test("errors on invalid country", async () => {
+    const err = await waitError(
+      routerClient.countryBySlug({
+        slug: "nochance",
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
 });

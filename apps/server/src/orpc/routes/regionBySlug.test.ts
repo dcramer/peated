@@ -1,74 +1,59 @@
-import { TRPCError } from "@trpc/server";
-import { createCaller } from "../router";
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "../router";
 
-describe("regionBySlug", () => {
-  test("retrieves a region by slug and country id", async ({
-    fixtures,
-    expect,
-  }) => {
+describe("GET /regions/:slug", () => {
+  test("retrieves a region by slug and country id", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region = await fixtures.Region({ countryId: country.id });
 
-    const caller = createCaller({ user: null });
-    const result = await caller.regionBySlug({
+    const data = await routerClient.regionBySlug({
       country: country.id,
       slug: region.slug,
     });
 
-    expect(result.id).toBe(region.id);
-    expect(result.name).toBe(region.name);
-    expect(result.slug).toBe(region.slug);
+    expect(data.id).toBe(region.id);
+    expect(data.name).toBe(region.name);
+    expect(data.slug).toBe(region.slug);
   });
 
-  test("retrieves a region by slug and country slug", async ({
-    fixtures,
-    expect,
-  }) => {
+  test("retrieves a region by slug and country slug", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region = await fixtures.Region({ countryId: country.id });
 
-    const caller = createCaller({ user: null });
-    const result = await caller.regionBySlug({
+    const data = await routerClient.regionBySlug({
       country: country.slug,
       slug: region.slug,
     });
 
-    expect(result.id).toBe(region.id);
-    expect(result.name).toBe(region.name);
-    expect(result.slug).toBe(region.slug);
+    expect(data.id).toBe(region.id);
+    expect(data.name).toBe(region.name);
+    expect(data.slug).toBe(region.slug);
   });
 
-  test("throws BAD_REQUEST for invalid country slug", async ({
-    fixtures,
-    expect,
-  }) => {
-    const caller = createCaller({ user: null });
-    await expect(
-      caller.regionBySlug({
+  test("errors on invalid country slug", async ({ fixtures }) => {
+    const err = await waitError(
+      routerClient.regionBySlug({
         country: "nonexistent-country",
         slug: "some-region",
       }),
-    ).rejects.toThrow(TRPCError);
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  test("throws NOT_FOUND for non-existent region", async ({
-    fixtures,
-    expect,
-  }) => {
+  test("errors on non-existent region", async ({ fixtures }) => {
     const country = await fixtures.Country();
 
-    const caller = createCaller({ user: null });
-    await expect(
-      caller.regionBySlug({
+    const err = await waitError(
+      routerClient.regionBySlug({
         country: country.id,
         slug: "nonexistent-region",
       }),
-    ).rejects.toThrow(TRPCError);
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("is case-insensitive for country and region slugs", async ({
     fixtures,
-    expect,
   }) => {
     const country = await fixtures.Country({ slug: "United-States" });
     const region = await fixtures.Region({
@@ -76,29 +61,27 @@ describe("regionBySlug", () => {
       slug: "California",
     });
 
-    const caller = createCaller({ user: null });
-    const result = await caller.regionBySlug({
+    const data = await routerClient.regionBySlug({
       country: "united-states",
       slug: "california",
     });
 
-    expect(result.id).toBe(region.id);
-    expect(result.name).toBe(region.name);
-    expect(result.slug).toBe(region.slug);
+    expect(data.id).toBe(region.id);
+    expect(data.name).toBe(region.name);
+    expect(data.slug).toBe(region.slug);
   });
 
-  test("returns serialized region data", async ({ fixtures, expect }) => {
+  test("returns serialized region data", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region = await fixtures.Region({ countryId: country.id });
 
-    const caller = createCaller({ user: null });
-    const result = await caller.regionBySlug({
+    const data = await routerClient.regionBySlug({
       country: country.id,
       slug: region.slug,
     });
 
-    expect(result.id).toBe(region.id);
-    expect(result.name).toBe(region.name);
-    expect(result.slug).toBe(region.slug);
+    expect(data.id).toBe(region.id);
+    expect(data.name).toBe(region.name);
+    expect(data.slug).toBe(region.slug);
   });
 });

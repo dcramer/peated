@@ -1,20 +1,24 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { NewFlight } from "@peated/server/db/schema";
 import { flightBottles, flights } from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
-import { FlightInputSchema } from "@peated/server/schemas";
+import { requireAuth } from "@peated/server/orpc/middleware";
+import { FlightInputSchema, FlightSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FlightSerializer } from "@peated/server/serializers/flight";
-import { TRPCError } from "@trpc/server";
-import { authedProcedure } from "..";
+import { procedure } from "..";
 
-export default authedProcedure
+export default procedure
+  .route({ method: "POST", path: "/flights" })
+  .use(requireAuth)
   .input(FlightInputSchema)
-  .mutation(async function ({ input, ctx }) {
+  .output(FlightSchema)
+  .handler(async function ({ input, context }) {
     const data: NewFlight = {
       ...input,
       publicId: generatePublicId(),
-      createdById: ctx.user.id,
+      createdById: context.user.id,
     };
 
     const flight = await db.transaction(async (tx) => {
@@ -33,11 +37,10 @@ export default authedProcedure
     });
 
     if (!flight) {
-      throw new TRPCError({
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Failed to create flight.",
-        code: "INTERNAL_SERVER_ERROR",
       });
     }
 
-    return await serialize(FlightSerializer, flight, ctx.user);
+    return await serialize(FlightSerializer, flight, context.user);
   });

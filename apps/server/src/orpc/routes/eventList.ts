@@ -1,35 +1,46 @@
 import { db } from "@peated/server/db";
 import { events } from "@peated/server/db/schema";
+import { EventSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EventSerializer } from "@peated/server/serializers/event";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, gte, ilike, isNull, lte, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
 const DEFAULT_SORT = "date";
 
-export default publicProcedure
-  .input(
-    z
-      .object({
-        query: z.string().default(""),
-        sort: z.enum(["name", "date", "-date", "-name"]).default(DEFAULT_SORT),
-        cursor: z.number().gte(1).default(1),
-        onlyUpcoming: z.boolean().default(true),
-        limit: z.number().gte(1).lte(100).default(100),
-      })
-      .default({
-        query: "",
-        sort: DEFAULT_SORT,
-        onlyUpcoming: true,
-        cursor: 1,
-        limit: 100,
-      }),
-  )
-  .query(async function ({
+const InputSchema = z
+  .object({
+    query: z.string().default(""),
+    sort: z.enum(["name", "date", "-date", "-name"]).default(DEFAULT_SORT),
+    cursor: z.coerce.number().gte(1).default(1),
+    onlyUpcoming: z.coerce.boolean().default(true),
+    limit: z.coerce.number().gte(1).lte(100).default(100),
+  })
+  .default({
+    query: "",
+    sort: DEFAULT_SORT,
+    onlyUpcoming: true,
+    cursor: 1,
+    limit: 100,
+  });
+
+const OutputSchema = z.object({
+  results: z.array(EventSchema),
+  rel: z.object({
+    nextCursor: z.number().nullable(),
+    prevCursor: z.number().nullable(),
+  }),
+});
+
+export default procedure
+  .route({ method: "GET", path: "/events" })
+  .input(InputSchema)
+  .output(OutputSchema)
+  .handler(async function ({
     input: { cursor, sort, limit, query, ...input },
-    ctx,
+    context,
   }) {
     const offset = (cursor - 1) * limit;
 
@@ -76,7 +87,7 @@ export default publicProcedure
       results: await serialize(
         EventSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,
