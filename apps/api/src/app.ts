@@ -8,7 +8,8 @@ import config from "./config";
 import { logError } from "./lib/log";
 import { injectAuth } from "./middleware/auth";
 import adminQueueInfoRoutes from "./routes/adminQueueInfo";
-import authRoutes from "./routes/auth";
+import authLoginRoutes from "./routes/authLogin";
+import authMeRoutes from "./routes/authMe";
 import authRegisterRoutes from "./routes/authRegister";
 import countriesRoutes from "./routes/countries";
 import metaRoutes from "./routes/meta";
@@ -82,7 +83,8 @@ export const app = new Hono()
   .use(injectAuth)
 
   .route("/v1", metaRoutes)
-  .route("/v1/auth", authRoutes)
+  .route("/v1/auth/me", authMeRoutes)
+  .route("/v1/auth/login", authLoginRoutes)
   .route("/v1/auth/register", authRegisterRoutes)
   .route("/v1/countries", countriesRoutes)
   .route("/v1/regions", regionsRoutes)

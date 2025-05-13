@@ -1,7 +1,8 @@
+import { app } from "@peated/api/app";
 import { db } from "@peated/api/db";
 import { reviews } from "@peated/api/db/schema";
 import { findBottleId, findEntity } from "@peated/api/lib/bottleFinder";
-import { createCaller } from "@peated/api/trpc/router";
+import { honoRequest } from "@peated/api/lib/internalApiClient";
 import { and, eq, isNull } from "drizzle-orm";
 
 export default async function createMissingBottles() {
@@ -30,14 +31,14 @@ export default async function createMissingBottles() {
 
         const entity = await findEntity(review.name);
         if (entity) {
-          const caller = createCaller({
+          const data = await honoRequest({
+            path: "/v1/bottle/create",
+            method: "POST",
+            json: { name: review.name, brand: entity.id },
             user: systemUser,
           });
-          const result = await caller.bottleCreate({
-            name: review.name,
-            brand: entity.id,
-          });
-          bottleId = result.id;
+
+          bottleId = data.bottle.id;
         }
       } else {
         console.log(`Identified bottle for review [${review.id}]`);

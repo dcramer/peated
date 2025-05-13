@@ -7,10 +7,10 @@ import {
   entityAliases,
   entityTombstones,
 } from "@peated/api/db/schema";
+import { ConflictError } from "@peated/api/errors";
 import { upsertBottleAlias } from "@peated/api/lib/db";
 import { formatBottleName, formatReleaseName } from "@peated/api/lib/format";
 import { logError } from "@peated/api/lib/log";
-import { ConflictError } from "@peated/api/trpc/errors";
 import { pushUniqueJob, runJob } from "@peated/api/worker/client";
 import { eq, inArray } from "drizzle-orm";
 

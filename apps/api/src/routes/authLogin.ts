@@ -1,9 +1,9 @@
-import { OpenAPIHono } from "@hono/zod-openapi";
 import config from "@peated/api/config";
 import { db } from "@peated/api/db";
 import { identities, users } from "@peated/api/db/schema";
 import { createAccessToken, createUser } from "@peated/api/lib/auth";
 import { logError } from "@peated/api/lib/log";
+import { defineRoute } from "@peated/api/lib/openapiRoute";
 import { requireAuth } from "@peated/api/middleware/auth";
 import {
   AuthSchema,
@@ -17,97 +17,43 @@ import * as Sentry from "@sentry/node";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
-import { UnauthorizedError, unauthorizedSchema } from "http-errors-enhanced";
+import { UnauthorizedError } from "http-errors-enhanced";
 import { z } from "zod";
 
 const { info } = Sentry._experiment_log; // Temporary destructuring while this is experimental
 
-export default new OpenAPIHono()
-  .openapi(
-    {
-      method: "get",
-      path: "/",
-      responses: {
-        200: {
-          content: {
-            "application/json": {
-              schema: z.object({ user: UserSchema }),
-            },
-          },
-          description: "User details",
-        },
-        401: unauthorizedSchema,
-      },
-      middleware: [requireAuth],
+export default defineRoute({
+  method: "post",
+  path: "/",
+  request: {
+    body: z.union([BasicAuthSchema, GoogleAuthSchema]),
+  },
+  responses: {
+    200: {
+      schema: AuthSchema,
+      description: "Authenticated user details",
     },
-    async function (c) {
-      const currentUser = c.get("user");
-      if (!currentUser) {
-        throw new UnauthorizedError();
-      }
+    // 401 is provided by default
+  },
+  handler: async (c, { body }) => {
+    let user;
+    const data = body;
+    if ("googleCode" in data) {
+      user = await authGoogle(data.googleCode);
+    } else {
+      user = await authBasic(data.email, data.password);
+    }
 
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, currentUser.id));
-      if (!user) {
-        logError(
-          `Authenticated user (${currentUser.id}) failed to retrieve details`,
-        );
-        throw new UnauthorizedError();
-      }
+    if (!user.active) {
+      throw new UnauthorizedError("Invalid credentials.");
+    }
 
-      if (!user.active) {
-        throw new UnauthorizedError();
-      }
-
-      return c.json({ user: await serialize(UserSerializer, user, user) });
-    },
-  )
-  .openapi(
-    {
-      method: "post",
-      path: "/",
-      request: {
-        body: {
-          content: {
-            "application/json": {
-              schema: z.union([BasicAuthSchema, GoogleAuthSchema]),
-            },
-          },
-        },
-      },
-      responses: {
-        200: {
-          content: {
-            "application/json": {
-              schema: AuthSchema,
-            },
-          },
-          description: "Authenticated user details",
-        },
-        401: unauthorizedSchema,
-      },
-    },
-    async function (c) {
-      let user;
-      const data = c.req.valid("json");
-      if ("googleCode" in data) {
-        user = await authGoogle(data.googleCode);
-      } else {
-        user = await authBasic(data.email, data.password);
-      }
-
-      if (!user.active) {
-        throw new UnauthorizedError("Invalid credentials.");
-      }
-
-      return c.json({
-        user: await serialize(UserSerializer, user, user),
-        accessToken: await createAccessToken(user),
-      });
-    },
-  );
+    return c.json({
+      user: await serialize(UserSerializer, user, user),
+      accessToken: await createAccessToken(user),
+    });
+  },
+});
 
 async function authBasic(email: string, password: string) {
   const [user] = await db

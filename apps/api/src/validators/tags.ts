@@ -1,7 +1,7 @@
 import { db } from "@peated/api/db";
 import { tags } from "@peated/api/db/schema";
-import { TRPCError } from "@trpc/server";
 import { inArray } from "drizzle-orm";
+import { BadRequestError } from "http-errors-enhanced";
 
 export async function validateTags(value: string[]): Promise<string[]> {
   if (value.length === 0) return [];
@@ -12,9 +12,6 @@ export async function validateTags(value: string[]): Promise<string[]> {
     .where(inArray(tags.name, tagList));
   // TODO: validate each entry
   if (tagList.length !== results.length)
-    throw new TRPCError({
-      message: "One or more tag values are invalid.",
-      code: "BAD_REQUEST",
-    });
+    throw new BadRequestError("One or more tag values are invalid.");
   return tagList;
 }

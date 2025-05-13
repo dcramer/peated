@@ -1,8 +1,8 @@
 import type { Entity } from "@peated/api/db/schema";
 import { bottleSeries, changes } from "@peated/api/db/schema";
 import type { BottleSeriesInputSchema } from "@peated/api/schemas";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
+import { NotFoundError } from "http-errors-enhanced";
 import type { z } from "zod";
 import type { AnyTransaction } from "../db";
 
@@ -29,10 +29,7 @@ export async function processSeries({
       where: eq(bottleSeries.id, series),
     });
     if (!existingSeries) {
-      throw new TRPCError({
-        message: "Series not found.",
-        code: "NOT_FOUND",
-      });
+      throw new NotFoundError("Series not found.");
     }
     return [series, false];
   }
