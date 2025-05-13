@@ -6,6 +6,11 @@ alwaysApply: false
 ## Technology
 
 We use the `orpc` framework, which provides our OpenAPI support. All code is written in TypeScript.
+The `zod` library is used for schemas.
+
+Imports from the `apps/api` package should always use the `@peated/api` import path, rather
+than use relative imports. The only exception to this rule is when you're importing code which is
+in the same directory and is not a shared utility.
 
 ## Conventions
 
@@ -63,9 +68,13 @@ export default procedure
   });
 ```
 
-Note: Imports from the `apps/api` package should always use the `@peated/api` import path, rather
-than use relative imports. The only exception to this rule is when you're importing code which is
-in the same directory and is not a shared utility.
+Methods chained on the procedure should be ordered as followed:
+
+1. `use` - any middleware clauses
+2. `route` - the openapi route definition
+3. `input` - the input accepted
+4. `output` - the output schema
+5. `handler` - the handler should always be last
 
 ### Query Parameters
 
