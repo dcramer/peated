@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
 import {
@@ -13,20 +14,33 @@ import {
 import { awardAllBadgeXp } from "@peated/server/lib/badges";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
-import { TastingInputSchema } from "@peated/server/schemas";
+import {
+  BadgeAwardSchema,
+  TastingInputSchema,
+  TastingSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BadgeSerializer } from "@peated/server/serializers/badge";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { pushJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { authedProcedure } from "..";
+import { z } from "zod";
+import { procedure } from "..";
+import { requireAuth } from "../middleware";
 import { validateTags } from "../validators/tags";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "POST", path: "/tastings" })
   .input(TastingInputSchema)
-  .mutation(async function ({ input, ctx }) {
+  .output(
+    z.object({
+      tasting: TastingSchema,
+      awards: z.array(BadgeAwardSchema),
+    }),
+  )
+  .handler(async function ({ input, context }) {
     const bottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, input.bottle),
       with: {
@@ -40,9 +54,8 @@ export default authedProcedure
       },
     });
     if (!bottle) {
-      throw new TRPCError({
+      throw new ORPCError("BAD_REQUEST", {
         message: "Cannot identify bottle.",
-        code: "BAD_REQUEST",
       });
     }
 
@@ -54,9 +67,8 @@ export default authedProcedure
         ),
       });
       if (!release) {
-        throw new TRPCError({
+        throw new ORPCError("BAD_REQUEST", {
           message: "Cannot identify release.",
-          code: "BAD_REQUEST",
         });
       }
     }
@@ -75,9 +87,8 @@ export default authedProcedure
         )
         .limit(1);
       if (flightResults.length !== 1) {
-        throw new TRPCError({
+        throw new ORPCError("BAD_REQUEST", {
           message: "Cannot identify flight.",
-          code: "BAD_REQUEST",
         });
       }
       flight = flightResults[0].flight;
@@ -92,7 +103,7 @@ export default authedProcedure
       servingStyle: input.servingStyle || null,
       color: input.color || null,
       tags: input.tags ? await validateTags(input.tags) : [],
-      createdById: ctx.user.id,
+      createdById: context.user.id,
     };
     if (input.createdAt) {
       data.createdAt = new Date(input.createdAt);
@@ -105,15 +116,14 @@ export default authedProcedure
         .from(follows)
         .where(
           and(
-            eq(follows.fromUserId, ctx.user.id),
+            eq(follows.fromUserId, context.user.id),
             eq(follows.status, "following"),
             inArray(follows.toUserId, friendUserIds),
           ),
         );
       if (matches.length != friendUserIds.length) {
-        throw new TRPCError({
+        throw new ORPCError("BAD_REQUEST", {
           message: "Friends must all be active relationships.",
-          code: "BAD_REQUEST",
         });
       }
       data.friends = input.friends;
@@ -125,9 +135,8 @@ export default authedProcedure
         [tasting] = await tx.insert(tastings).values(data).returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "tasting_unq") {
-          throw new TRPCError({
+          throw new ORPCError("CONFLICT", {
             message: "Tasting already exists.",
-            code: "CONFLICT",
             cause: err,
           });
         }
@@ -195,7 +204,7 @@ export default authedProcedure
 
       for (const award of awards) {
         Object.assign(award, {
-          badge: await serialize(BadgeSerializer, award.badge, ctx.user),
+          badge: await serialize(BadgeSerializer, award.badge, context.user),
         });
       }
 
@@ -203,13 +212,12 @@ export default authedProcedure
     });
 
     if (!tasting) {
-      throw new TRPCError({
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Unable to create tasting.",
-        code: "INTERNAL_SERVER_ERROR",
       });
     }
 
-    if (!ctx.user.private) {
+    if (!context.user.private) {
       try {
         await pushJob("NotifyDiscordOnTasting", { tastingId: tasting.id });
       } catch (err) {
@@ -222,8 +230,7 @@ export default authedProcedure
     }
 
     return {
-      tasting: await serialize(TastingSerializer, tasting, ctx.user),
-      // TODO:
-      awards: await serialize(BadgeAwardSerializer, awards || [], ctx.user),
+      tasting: await serialize(TastingSerializer, tasting, context.user),
+      awards: await serialize(BadgeAwardSerializer, awards || [], context.user),
     };
   });

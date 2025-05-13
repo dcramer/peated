@@ -1,7 +1,10 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
-import { NotificationInputSchema } from "@peated/server/schemas";
+import {
+  NotificationInputSchema,
+  NotificationSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { NotificationSerializer } from "@peated/server/serializers/notification";
 import { eq } from "drizzle-orm";
@@ -17,7 +20,7 @@ export default procedure
       id: z.coerce.number(),
     }),
   )
-  .output(z.any())
+  .output(NotificationSchema)
   .handler(async function ({ input, context }) {
     const [notification] = await db
       .select()

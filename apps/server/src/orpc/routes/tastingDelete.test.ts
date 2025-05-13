@@ -2,47 +2,51 @@ import { db } from "@peated/server/db";
 import { bottleTags, tastings } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("requires authentication", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(caller.tastingDelete(1));
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-test("delete own tasting", async ({ defaults, fixtures }) => {
-  const tasting = await fixtures.Tasting({
-    createdById: defaults.user.id,
-    tags: ["spiced", "caramel"],
+describe("DELETE /tastings/:id", () => {
+  test("requires authentication", async () => {
+    const err = await waitError(() => routerClient.tastingDelete(1));
+    expect(err.message).toBe("UNAUTHORIZED");
   });
 
-  const caller = createCaller({ user: defaults.user });
-  await caller.tastingDelete(tasting.id);
+  test("delete own tasting", async ({ defaults, fixtures }) => {
+    const tasting = await fixtures.Tasting({
+      createdById: defaults.user.id,
+      tags: ["spiced", "caramel"],
+    });
 
-  const [newTasting] = await db
-    .select()
-    .from(tastings)
-    .where(eq(tastings.id, tasting.id));
-  expect(newTasting).toBeUndefined();
+    await routerClient.tastingDelete(tasting.id, {
+      context: { user: defaults.user },
+    });
 
-  const tags = await db
-    .select()
-    .from(bottleTags)
-    .where(eq(bottleTags.bottleId, tasting.bottleId));
+    const [newTasting] = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.id, tasting.id));
+    expect(newTasting).toBeUndefined();
 
-  expect(tags.length).toBe(2);
-  for (const tag of tags) {
-    expect(tag.count).toBe(0);
-  }
-});
+    const tags = await db
+      .select()
+      .from(bottleTags)
+      .where(eq(bottleTags.bottleId, tasting.bottleId));
 
-test("cannot delete others tasting", async ({ defaults, fixtures }) => {
-  const user = await fixtures.User();
-  const tasting = await fixtures.Tasting({ createdById: user.id });
+    expect(tags.length).toBe(2);
+    for (const tag of tags) {
+      expect(tag.count).toBe(0);
+    }
+  });
 
-  const caller = createCaller({ user: defaults.user });
-  const err = await waitError(caller.tastingDelete(tasting.id));
-  expect(err).toMatchInlineSnapshot(
-    `[TRPCError: Cannot delete another user's tasting.]`,
-  );
+  test("cannot delete others tasting", async ({ defaults, fixtures }) => {
+    const user = await fixtures.User();
+    const tasting = await fixtures.Tasting({ createdById: user.id });
+
+    const err = await waitError(() =>
+      routerClient.tastingDelete(tasting.id, {
+        context: { user: defaults.user },
+      }),
+    );
+    expect(err.message).toBe("Cannot delete another user's tasting.");
+  });
 });

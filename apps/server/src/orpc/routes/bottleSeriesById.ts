@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleSeries } from "@peated/server/db/schema";
+import { BottleSeriesSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
 import { eq } from "drizzle-orm";
@@ -14,7 +15,7 @@ export default procedure
       id: z.coerce.number(),
     }),
   )
-  .output(z.any())
+  .output(BottleSeriesSchema)
   .handler(async function ({ input, context }) {
     const series = await db.query.bottleSeries.findFirst({
       where: eq(bottleSeries.id, input.id),

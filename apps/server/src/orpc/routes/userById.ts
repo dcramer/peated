@@ -7,6 +7,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
+import { UserSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { eq, sql } from "drizzle-orm";
@@ -20,7 +21,7 @@ export default procedure
       id: z.union([z.coerce.number(), z.literal("me"), z.string()]),
     }),
   )
-  .output(z.any())
+  .output(UserSchema)
   .handler(async function ({ input, context }) {
     const user = await getUserFromId(db, input.id, context.user);
 

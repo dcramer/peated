@@ -1,7 +1,10 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleSeries, changes, entities } from "@peated/server/db/schema";
-import { BottleSeriesInputSchema } from "@peated/server/schemas";
+import {
+  BottleSeriesInputSchema,
+  BottleSeriesSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
 import { pushJob } from "@peated/server/worker/client";
@@ -15,7 +18,7 @@ export default procedure
   .route({ method: "POST", path: "/bottle-series" })
   .use(requireAuth)
   .input(BottleSeriesInputSchema)
-  .output(z.any())
+  .output(BottleSeriesSchema)
   .handler(async function ({ input, context }) {
     const user = context.user;
 

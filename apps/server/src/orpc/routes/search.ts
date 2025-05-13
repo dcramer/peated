@@ -1,4 +1,5 @@
 import { call } from "@orpc/server";
+import { BottleSchema, EntitySchema, UserSchema } from "@peated/server/schemas";
 import type { Bottle, Entity, User } from "@peated/server/types";
 import { z } from "zod";
 import { procedure } from "..";
@@ -71,10 +72,20 @@ export default procedure
     z.object({
       query: z.string(),
       results: z.array(
-        z.object({
-          type: z.enum(["bottle", "entity", "user"]),
-          ref: z.any(),
-        }),
+        z.union([
+          z.object({
+            type: z.literal("bottle"),
+            ref: BottleSchema,
+          }),
+          z.object({
+            type: z.literal("entity"),
+            ref: EntitySchema,
+          }),
+          z.object({
+            type: z.literal("user"),
+            ref: UserSchema,
+          }),
+        ]),
       ),
     }),
   )

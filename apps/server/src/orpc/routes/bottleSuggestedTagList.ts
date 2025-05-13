@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleTags, bottles, tags } from "@peated/server/db/schema";
 import { shuffle } from "@peated/server/lib/rand";
+import { TagSchema } from "@peated/server/schemas";
 import { desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { procedure } from "..";
@@ -17,7 +18,7 @@ export default procedure
     z.object({
       results: z.array(
         z.object({
-          tag: z.any(),
+          tag: TagSchema,
           count: z.number(),
         }),
       ),
