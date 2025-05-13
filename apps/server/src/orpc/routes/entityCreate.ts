@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { NewEntity } from "@peated/server/db/schema";
 import {
@@ -10,22 +11,25 @@ import {
 import { logError } from "@peated/server/lib/log";
 import { normalizeEntityName } from "@peated/server/lib/normalize";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
-import { EntityInputSchema } from "@peated/server/schemas";
+import { EntityInputSchema, EntitySchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import { verifiedProcedure } from "..";
+import { procedure } from "..";
+import { requireVerified } from "../middleware";
 
-export default verifiedProcedure
+export default procedure
+  .use(requireVerified)
+  .route({ method: "POST", path: "/entities" })
   .input(EntityInputSchema)
-  .mutation(async function ({ input, ctx }) {
+  .output(EntitySchema)
+  .handler(async function ({ input, context }) {
     const data: NewEntity = {
       ...input,
       name: normalizeEntityName(input.name),
       type: input.type || [],
-      createdById: ctx.user.id,
+      createdById: context.user.id,
     };
 
     if (input.country) {
@@ -35,9 +39,8 @@ export default verifiedProcedure
         .where(eq(countries.id, input.country))
         .limit(1);
       if (!country) {
-        throw new TRPCError({
+        throw new ORPCError("NOT_FOUND", {
           message: "Country not found.",
-          code: "NOT_FOUND",
         });
       }
       data.countryId = country.id;
@@ -49,9 +52,8 @@ export default verifiedProcedure
           .where(eq(regions.id, input.region))
           .limit(1);
         if (!region || region.countryId !== data.countryId) {
-          throw new TRPCError({
+          throw new ORPCError("NOT_FOUND", {
             message: "Region not found.",
-            code: "NOT_FOUND",
           });
         }
         data.regionId = region.id;
@@ -64,7 +66,7 @@ export default verifiedProcedure
         (input.description && input.description !== null ? "user" : null);
     }
 
-    const user = ctx.user;
+    const user = context.user;
     const entity = await db.transaction(async (tx) => {
       const [entity] = await tx
         .insert(entities)
@@ -141,9 +143,8 @@ export default verifiedProcedure
     });
 
     if (!entity) {
-      throw new TRPCError({
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Failed to create entity.",
-        code: "INTERNAL_SERVER_ERROR",
       });
     }
 
@@ -157,5 +158,5 @@ export default verifiedProcedure
       });
     }
 
-    return await serialize(EntitySerializer, entity, ctx.user);
+    return await serialize(EntitySerializer, entity, context.user);
   });

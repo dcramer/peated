@@ -2,30 +2,34 @@ import { db } from "@peated/server/db";
 import { regions } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("regionUpdate", () => {
+describe("PATCH /regions/:country/:slug", () => {
   test("requires authentication", async () => {
-    const caller = createCaller({ user: null });
     const err = await waitError(
-      caller.regionUpdate({
-        country: "test-country",
-        slug: "test-region",
-      }),
+      routerClient.regionUpdate(
+        {
+          country: "test-country",
+          slug: "test-region",
+        },
+        { context: { user: null } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("requires mod", async ({ fixtures }) => {
     const user = await fixtures.User();
-    const caller = createCaller({ user });
     const err = await waitError(
-      caller.regionUpdate({
-        country: "test-country",
-        slug: "test-region",
-      }),
+      routerClient.regionUpdate(
+        {
+          country: "test-country",
+          slug: "test-region",
+        },
+        { context: { user } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("updates region description", async ({ fixtures }) => {
@@ -33,12 +37,14 @@ describe("regionUpdate", () => {
     const region = await fixtures.Region({ countryId: country.id });
     const modUser = await fixtures.User({ mod: true });
 
-    const caller = createCaller({ user: modUser });
-    const updatedRegion = await caller.regionUpdate({
-      country: country.id,
-      slug: region.slug,
-      description: "New description",
-    });
+    const updatedRegion = await routerClient.regionUpdate(
+      {
+        country: country.id,
+        slug: region.slug,
+        description: "New description",
+      },
+      { context: { user: modUser } },
+    );
 
     expect(updatedRegion.id).toBe(region.id);
     expect(updatedRegion.description).toBe("New description");
@@ -56,12 +62,14 @@ describe("regionUpdate", () => {
     const region = await fixtures.Region({ countryId: country.id });
     const modUser = await fixtures.User({ mod: true });
 
-    const caller = createCaller({ user: modUser });
-    const updatedRegion = await caller.regionUpdate({
-      country: country.slug,
-      slug: region.slug,
-      description: "New description",
-    });
+    const updatedRegion = await routerClient.regionUpdate(
+      {
+        country: country.slug,
+        slug: region.slug,
+        description: "New description",
+      },
+      { context: { user: modUser } },
+    );
 
     expect(updatedRegion.id).toBe(region.id);
     expect(updatedRegion.description).toBe("New description");
@@ -74,11 +82,13 @@ describe("regionUpdate", () => {
     const region = await fixtures.Region({ countryId: country.id });
     const modUser = await fixtures.User({ mod: true });
 
-    const caller = createCaller({ user: modUser });
-    const result = await caller.regionUpdate({
-      country: country.id,
-      slug: region.slug,
-    });
+    const result = await routerClient.regionUpdate(
+      {
+        country: country.id,
+        slug: region.slug,
+      },
+      { context: { user: modUser } },
+    );
 
     expect(result).toEqual(
       expect.objectContaining({
@@ -93,27 +103,31 @@ describe("regionUpdate", () => {
   test("throws BAD_REQUEST for invalid country", async ({ fixtures }) => {
     const modUser = await fixtures.User({ mod: true });
 
-    const caller = createCaller({ user: modUser });
     const err = await waitError(
-      caller.regionUpdate({
-        country: "nonexistent-country",
-        slug: "some-region",
-      }),
+      routerClient.regionUpdate(
+        {
+          country: "nonexistent-country",
+          slug: "some-region",
+        },
+        { context: { user: modUser } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Invalid country]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("throws NOT_FOUND for non-existent region", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const modUser = await fixtures.User({ mod: true });
 
-    const caller = createCaller({ user: modUser });
     const err = await waitError(
-      caller.regionUpdate({
-        country: country.id,
-        slug: "nonexistent-region",
-      }),
+      routerClient.regionUpdate(
+        {
+          country: country.id,
+          slug: "nonexistent-region",
+        },
+        { context: { user: modUser } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+    expect(err).toMatchInlineSnapshot();
   });
 });

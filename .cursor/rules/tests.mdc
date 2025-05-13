@@ -1,5 +1,5 @@
 ---
-description: 
+description:
 globs: *.test.ts*
 alwaysApply: false
 ---
@@ -23,23 +23,6 @@ const err = await waitError(
 - Avoid snapshots for API responses where data is dynamic (such as it returning a `createdAt` date).
 - Prefer dependency injection over mocking when the called functions make it possible.
 
-
-## tRPC endpoints
-
-When calling tRPC endpoints that are not expected to error, await on the caller. Do not test the Promise directly. For example:
-
-```
-const caller = createCaller();
-
-const data = await caller.authRegister({
-  username: "foo",
-  email: "foo@example.com",
-  password: "example",
-});
-```
-
-Additionally when you add a new tRPC endpoint, ensure its also added to [router.ts](mdc:apps/server/src/trpc/router.ts)
-
 ## Fixture data in tests
 
 Test fixtures should be referenced via the context (found in [fixtures.ts](mdc:apps/server/src/lib/test/fixtures.ts)):
@@ -50,11 +33,11 @@ Test fixtures should be referenced via the context (found in [fixtures.ts](mdc:a
   });
 ```
 
-User context - such as for the trpc route caller - should use the `defaults` (as defauled in [setup-test-env.ts](mdc:apps/server/src/test/setup-test-env.ts)) when available. For example:
+User context - such as for an oRPC route caller - should use the `defaults` (as defauled in [setup-test-env.ts](mdc:apps/server/src/test/setup-test-env.ts)) when available. For example:
 
 ```
   it("returns a bottle release", async function ({ defaults }) {
-    const caller = createCaller({ user: defaults.user });
+    const defaultUser = defaults.user;
   });
 ```
 

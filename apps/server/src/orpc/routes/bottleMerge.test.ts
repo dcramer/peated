@@ -1,62 +1,69 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("requires authentication", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(
-    caller.bottleMerge({
-      root: 1,
-      other: 2,
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-test("requires mod", async ({ fixtures }) => {
-  const caller = createCaller({
-    user: await fixtures.User({ mod: false, admin: false }),
-  });
-  const err = await waitError(
-    caller.bottleMerge({
-      root: 1,
-      other: 2,
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-// TODO: test call to pushJob
-test("merge A into B", async ({ fixtures }) => {
-  const bottleA = await fixtures.Bottle({ totalTastings: 1 });
-  await fixtures.Tasting({ bottleId: bottleA.id });
-  const bottleB = await fixtures.Bottle();
-
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
-  });
-  const data = await caller.bottleMerge({
-    root: bottleA.id,
-    other: bottleB.id,
-    direction: "mergeInto",
+describe("POST /bottles/:bottle/merge", () => {
+  test("requires authentication", async () => {
+    const err = await waitError(
+      routerClient.bottleMerge(
+        {
+          bottle: 1,
+          other: 2,
+        },
+        { context: { user: null } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  expect(data.id).toEqual(bottleB.id);
-});
-
-// TODO: test call to pushJob
-test("merge A from B", async ({ fixtures }) => {
-  const bottleA = await fixtures.Bottle({ totalTastings: 1 });
-  await fixtures.Tasting({ bottleId: bottleA.id });
-  const bottleB = await fixtures.Bottle();
-
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
-  });
-  const data = await caller.bottleMerge({
-    root: bottleA.id,
-    other: bottleB.id,
-    direction: "mergeFrom",
+  test("requires mod", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: false, admin: false });
+    const err = await waitError(
+      routerClient.bottleMerge(
+        {
+          bottle: 1,
+          other: 2,
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  expect(data.id).toEqual(bottleA.id);
+  // TODO: test call to pushJob
+  test("merge A into B", async ({ fixtures }) => {
+    const bottleA = await fixtures.Bottle({ totalTastings: 1 });
+    await fixtures.Tasting({ bottleId: bottleA.id });
+    const bottleB = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.bottleMerge(
+      {
+        bottle: bottleA.id,
+        other: bottleB.id,
+        direction: "mergeInto",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toEqual(bottleB.id);
+  });
+
+  // TODO: test call to pushJob
+  test("merge A from B", async ({ fixtures }) => {
+    const bottleA = await fixtures.Bottle({ totalTastings: 1 });
+    await fixtures.Tasting({ bottleId: bottleA.id });
+    const bottleB = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.bottleMerge(
+      {
+        bottle: bottleA.id,
+        other: bottleB.id,
+        direction: "mergeFrom",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toEqual(bottleA.id);
+  });
 });

@@ -1,31 +1,36 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("requires admin", async ({ fixtures }) => {
-  const event = await fixtures.Event();
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
-  });
-  const err = await waitError(
-    caller.eventUpdate({
-      id: event.id,
-      name: "Foobar",
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
+describe("PATCH /events/:id", () => {
+  test("requires admin", async ({ fixtures }) => {
+    const event = await fixtures.Event();
+    const modUser = await fixtures.User({ mod: true });
 
-test("updates event", async ({ fixtures }) => {
-  const event = await fixtures.Event();
-
-  const caller = createCaller({
-    user: await fixtures.User({ admin: true }),
-  });
-  const newEvent = await caller.eventUpdate({
-    id: event.id,
-    name: "Foobar",
+    const err = await waitError(
+      routerClient.eventUpdate(
+        {
+          id: event.id,
+          name: "Foobar",
+        },
+        { context: { user: modUser } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  expect(newEvent).toBeDefined();
-  expect(newEvent.name).toEqual("Foobar");
+  test("updates event", async ({ fixtures }) => {
+    const event = await fixtures.Event();
+    const adminUser = await fixtures.User({ admin: true });
+
+    const newEvent = await routerClient.eventUpdate(
+      {
+        id: event.id,
+        name: "Foobar",
+      },
+      { context: { user: adminUser } },
+    );
+
+    expect(newEvent).toBeDefined();
+    expect(newEvent.name).toEqual("Foobar");
+  });
 });

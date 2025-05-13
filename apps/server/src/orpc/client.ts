@@ -1,25 +1,25 @@
-import { type AppRouter } from "@peated/server/orpc/router";
-import { createTRPCProxyClient, TRPCClientError } from "@trpc/client";
-import { getLinks } from "./links";
+import { createORPCClient, isDefinedError } from "@orpc/client";
+import { RPCLink } from "@orpc/client/fetch";
+import type { ORPCError, RouterClient } from "@orpc/server";
+import { type Router } from "@peated/server/orpc/router";
 
-export function makeTRPCClient(
+export function makeORPCClient(
   apiServer: string,
   accessToken?: string | null | undefined,
-) {
-  return createTRPCProxyClient<AppRouter>({
-    links: getLinks({
-      apiServer,
-      accessToken,
-      batch: false,
-      userAgent: "@peated (trpc/proxy)",
-    }),
+): RouterClient<Router> {
+  const link = new RPCLink({
+    url: `${apiServer}/trpc`,
+    async headers() {
+      return {
+        authorization: accessToken ? `Bearer ${accessToken}` : "",
+        "user-agent": "@peated (trpc/proxy)",
+      };
+    },
   });
+
+  return createORPCClient(link);
 }
 
-export function isTRPCClientError(
-  cause: unknown,
-): cause is TRPCClientError<AppRouter> {
-  return (
-    cause instanceof TRPCClientError || Object.hasOwn(cause as any, "data")
-  );
+export function isORPCClientError(cause: unknown): cause is ORPCError {
+  return isDefinedError(cause);
 }

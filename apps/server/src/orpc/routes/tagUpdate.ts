@@ -1,25 +1,29 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tags } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
-import { TagInputSchema } from "@peated/server/schemas";
+import { TagInputSchema, TagSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TagSerializer } from "@peated/server/serializers/tag";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { modProcedure } from "..";
+import { procedure } from "..";
+import { requireMod } from "../middleware";
 
-export default modProcedure
+export default procedure
+  .use(requireMod)
+  .route({ method: "PATCH", path: "/tags/:name" })
   .input(
     TagInputSchema.partial().extend({
       name: z.string(),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
+  .output(TagSchema)
+  .handler(async function ({ input, context }) {
     const [tag] = await db.select().from(tags).where(eq(tags.name, input.name));
     if (!tag) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
+        message: "Tag not found",
       });
     }
 
@@ -46,7 +50,7 @@ export default modProcedure
     }
 
     if (Object.values(data).length === 0) {
-      return await serialize(TagSerializer, tag, ctx.user);
+      return await serialize(TagSerializer, tag, context.user);
     }
 
     const [newTag] = await db
@@ -56,11 +60,10 @@ export default modProcedure
       .returning();
 
     if (!newTag) {
-      throw new TRPCError({
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Failed to update tag.",
-        code: "INTERNAL_SERVER_ERROR",
       });
     }
 
-    return await serialize(TagSerializer, newTag, ctx.user);
+    return await serialize(TagSerializer, newTag, context.user);
   });

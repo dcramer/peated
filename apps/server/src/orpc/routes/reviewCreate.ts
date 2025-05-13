@@ -1,3 +1,4 @@
+import { call, ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -7,25 +8,31 @@ import {
 import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
 import { mapRows, upsertBottleAlias } from "@peated/server/lib/db";
 import { normalizeBottle } from "@peated/server/lib/normalize";
-import { BottleInputSchema, ReviewInputSchema } from "@peated/server/schemas";
+import {
+  BottleInputSchema,
+  ReviewInputSchema,
+  ReviewSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
-import { adminProcedure } from "..";
-import { bottleCreate } from "./bottleCreate";
+import { procedure } from "..";
+import { requireAdmin } from "../middleware";
+import bottleCreate from "./bottleCreate";
 
-export default adminProcedure
+export default procedure
+  .use(requireAdmin)
+  .route({ method: "POST", path: "/reviews" })
   .input(ReviewInputSchema)
-  .mutation(async function ({ input, ctx }) {
+  .output(ReviewSchema)
+  .handler(async function ({ input, context }) {
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
 
     if (!site) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Site not found",
-        code: "NOT_FOUND",
       });
     }
 
@@ -35,15 +42,16 @@ export default adminProcedure
     if (!bottleId) {
       const entity = await findEntity(name);
       if (entity) {
-        const result = await bottleCreate({
-          input: BottleInputSchema.parse({
+        const result = await call(
+          bottleCreate,
+          BottleInputSchema.parse({
             name,
             edition: null,
             brand: entity.id,
             category: input.category,
           }),
-          ctx,
-        });
+          { context },
+        );
         bottleId = result.id;
       }
     }
@@ -81,5 +89,5 @@ export default adminProcedure
       .set({ lastRunAt: sql`NOW()` })
       .where(eq(externalSites.id, site.id));
 
-    return await serialize(ReviewSerializer, review, ctx.user);
+    return await serialize(ReviewSerializer, review, context.user);
   });

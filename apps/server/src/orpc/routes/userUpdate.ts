@@ -1,35 +1,37 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { generatePasswordHash } from "@peated/server/lib/auth";
-import { UserInputSchema } from "@peated/server/schemas";
+import { UserInputSchema, UserSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { procedure } from "..";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "PATCH", path: "/users/:user" })
   .input(
     UserInputSchema.partial().extend({
-      user: z.union([z.literal("me"), z.number(), z.string()]),
+      user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
-    const user = await getUserFromId(db, input.user, ctx.user);
+  .output(UserSchema)
+  .handler(async function ({ input, context }) {
+    const user = await getUserFromId(db, input.user, context.user);
 
     if (!user) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "User not found.",
-        code: "NOT_FOUND",
       });
     }
 
-    if (user.id !== ctx.user.id && !ctx.user.admin) {
-      throw new TRPCError({
+    if (user.id !== context.user.id && !context.user.admin) {
+      throw new ORPCError("FORBIDDEN", {
         message: "Cannot edit another user.",
-        code: "FORBIDDEN",
       });
     }
 
@@ -38,9 +40,8 @@ export default authedProcedure
     if (input.username !== undefined && input.username !== user.username) {
       data.username = input.username;
       if (data.username === "me") {
-        throw new TRPCError({
+        throw new ORPCError("BAD_REQUEST", {
           message: "Invalid username.",
-          code: "BAD_REQUEST",
         });
       }
     }
@@ -50,18 +51,18 @@ export default authedProcedure
     }
 
     if (input.admin !== undefined && input.admin !== user.admin) {
-      if (!ctx.user.admin) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
+      if (!context.user.admin) {
+        throw new ORPCError("FORBIDDEN", {
+          message: "Admin privileges required to modify admin status.",
         });
       }
       data.admin = input.admin;
     }
 
     if (input.mod !== undefined && input.mod !== user.mod) {
-      if (!ctx.user.admin) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
+      if (!context.user.admin) {
+        throw new ORPCError("FORBIDDEN", {
+          message: "Admin privileges required to modify mod status.",
         });
       }
       data.mod = input.mod;
@@ -73,7 +74,7 @@ export default authedProcedure
     }
 
     if (!Object.values(data).length) {
-      return await serialize(UserSerializer, user, ctx.user);
+      return await serialize(UserSerializer, user, context.user);
     }
 
     try {
@@ -83,18 +84,16 @@ export default authedProcedure
         .where(eq(users.id, user.id))
         .returning();
       if (!newUser) {
-        throw new TRPCError({
+        throw new ORPCError("INTERNAL_SERVER_ERROR", {
           message: "Unable to update user.",
-          code: "INTERNAL_SERVER_ERROR",
         });
       }
 
-      return await serialize(UserSerializer, newUser, ctx.user);
+      return await serialize(UserSerializer, newUser, context.user);
     } catch (err: any) {
       if (err?.code === "23505" && err?.constraint === "user_username_unq") {
-        throw new TRPCError({
+        throw new ORPCError("CONFLICT", {
           message: "Username in use.",
-          code: "CONFLICT",
           cause: err,
         });
       }

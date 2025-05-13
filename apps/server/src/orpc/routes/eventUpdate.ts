@@ -1,29 +1,31 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Event } from "@peated/server/db/schema";
 import { countries, events } from "@peated/server/db/schema";
-import { EventInputSchema } from "@peated/server/schemas";
+import { EventInputSchema, EventSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EventSerializer } from "@peated/server/serializers/event";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { adminProcedure } from "..";
+import { procedure } from "..";
+import { requireAdmin } from "../middleware";
 
-export default adminProcedure
+export default procedure
+  .use(requireAdmin)
+  .route({ method: "PATCH", path: "/events/:id" })
   .input(
     EventInputSchema.partial().extend({
       id: z.number(),
     }),
   )
-  .mutation(async function ({
+  .output(EventSchema)
+  .handler(async function ({
     input: { id, country: countryId, ...input },
-    ctx,
+    context,
   }) {
     const [event] = await db.select().from(events).where(eq(events.id, id));
     if (!event) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-      });
+      throw new ORPCError("NOT_FOUND");
     }
 
     const data: { [name: string]: any } = {};
@@ -38,7 +40,7 @@ export default adminProcedure
     }
 
     if (Object.values(data).length === 0) {
-      return await serialize(EventSerializer, event, ctx.user);
+      return await serialize(EventSerializer, event, context.user);
     }
 
     const newEvent = await db.transaction(async (tx) => {
@@ -51,9 +53,8 @@ export default adminProcedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "event_name_unq") {
-          throw new TRPCError({
+          throw new ORPCError("CONFLICT", {
             message: "Event already exists.",
-            code: "CONFLICT",
             cause: err,
           });
         }
@@ -66,11 +67,10 @@ export default adminProcedure
     });
 
     if (!newEvent) {
-      throw new TRPCError({
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Failed to update event.",
-        code: "INTERNAL_SERVER_ERROR",
       });
     }
 
-    return await serialize(EventSerializer, newEvent, ctx.user);
+    return await serialize(EventSerializer, newEvent, context.user);
   });

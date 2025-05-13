@@ -1,6 +1,6 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tags } from "@peated/server/db/schema";
-import { TRPCError } from "@trpc/server";
 import { inArray } from "drizzle-orm";
 
 export async function validateTags(value: string[]): Promise<string[]> {
@@ -12,9 +12,8 @@ export async function validateTags(value: string[]): Promise<string[]> {
     .where(inArray(tags.name, tagList));
   // TODO: validate each entry
   if (tagList.length !== results.length)
-    throw new TRPCError({
+    throw new ORPCError("BAD_REQUEST", {
       message: "One or more tag values are invalid.",
-      code: "BAD_REQUEST",
     });
   return tagList;
 }

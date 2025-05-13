@@ -1,119 +1,145 @@
 import { db } from "@peated/server/db";
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("requires admin", async ({ fixtures }) => {
-  const site = await fixtures.ExternalSite();
+describe("POST /reviews", () => {
+  test("requires admin", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSite();
+    const user = await fixtures.User({ mod: true });
 
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
+    const err = await waitError(() =>
+      routerClient.reviewCreate(
+        {
+          site: site.type,
+          name: "Bottle Name",
+          issue: "Default",
+          rating: 89,
+          url: "https://example.com",
+          category: "single_malt",
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: FORBIDDEN: Admin privileges required]
+    `);
   });
 
-  const err = await waitError(
-    caller.reviewCreate({
-      site: site.type,
-      name: "Bottle Name",
-      issue: "Default",
-      rating: 89,
-      url: "https://example.com",
-      category: "single_malt",
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
+  test("new review with new bottle no entity", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSite();
+    const adminUser = await fixtures.User({ admin: true });
 
-test("new review with new bottle no entity", async ({ fixtures }) => {
-  const site = await fixtures.ExternalSite();
+    const data = await routerClient.reviewCreate(
+      {
+        site: site.type,
+        name: "Bottle Name",
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com",
+        category: "single_malt",
+      },
+      { context: { user: adminUser } },
+    );
 
-  const caller = createCaller({
-    user: await fixtures.User({ admin: true }),
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    expect(review).toBeDefined();
+    expect(review?.bottleId).toBeNull();
+    expect(review?.name).toEqual("Bottle Name");
+    expect(review?.issue).toEqual("Default");
+    expect(review?.rating).toEqual(89);
+    expect(review?.url).toEqual("https://example.com");
   });
 
-  const data = await caller.reviewCreate({
-    site: site.type,
-    name: "Bottle Name",
-    issue: "Default",
-    rating: 89,
-    url: "https://example.com",
-    category: "single_malt",
+  test("new review with new bottle matching entity", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSite();
+    const brand = await fixtures.Entity();
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviewCreate(
+      {
+        site: site.type,
+        name: `${brand.name} Bottle Name`,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com",
+        category: "single_malt",
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    expect(review).toBeDefined();
+    expect(review?.bottleId).toBeTruthy();
+    expect(review?.name).toEqual(`${brand.name} Bottle Name`);
+    expect(review?.issue).toEqual("Default");
+    expect(review?.rating).toEqual(89);
+    expect(review?.url).toEqual("https://example.com");
+
+    const bottle = await db.query.bottles.findFirst({
+      where: (table, { eq }) => eq(table.id, review!.bottleId as number),
+    });
+    expect(bottle).toBeDefined();
+    expect(bottle?.fullName).toEqual(`${brand.name} Bottle Name`);
+    expect(bottle?.name).toEqual("Bottle Name");
+    expect(bottle?.category).toEqual("single_malt");
+    expect(bottle?.brandId).toEqual(brand.id);
   });
 
-  const review = await db.query.reviews.findFirst({
-    where: (table, { eq }) => eq(table.id, data.id),
-  });
-  expect(review).toBeDefined();
-  expect(review?.bottleId).toBeNull();
-  expect(review?.name).toEqual("Bottle Name");
-  expect(review?.issue).toEqual("Default");
-  expect(review?.rating).toEqual(89);
-  expect(review?.url).toEqual("https://example.com");
-});
+  test("new review with existing bottle", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSite();
+    const bottle = await fixtures.Bottle({
+      name: "Delicious",
+      vintageYear: null,
+      releaseYear: null,
+    });
+    const adminUser = await fixtures.User({ admin: true });
 
-test("new review with new bottle matching entity", async ({ fixtures }) => {
-  const site = await fixtures.ExternalSite();
-  const brand = await fixtures.Entity();
+    const data = await routerClient.reviewCreate(
+      {
+        site: site.type,
+        name: bottle.fullName,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
 
-  const caller = createCaller({
-    user: await fixtures.User({ admin: true }),
-  });
-
-  const data = await caller.reviewCreate({
-    site: site.type,
-    name: `${brand.name} Bottle Name`,
-    issue: "Default",
-    rating: 89,
-    url: "https://example.com",
-    category: "single_malt",
-  });
-
-  const review = await db.query.reviews.findFirst({
-    where: (table, { eq }) => eq(table.id, data.id),
-  });
-  expect(review).toBeDefined();
-  expect(review?.bottleId).toBeTruthy();
-  expect(review?.name).toEqual(`${brand.name} Bottle Name`);
-  expect(review?.issue).toEqual("Default");
-  expect(review?.rating).toEqual(89);
-  expect(review?.url).toEqual("https://example.com");
-
-  const bottle = await db.query.bottles.findFirst({
-    where: (table, { eq }) => eq(table.id, review!.bottleId as number),
-  });
-  expect(bottle).toBeDefined();
-  expect(bottle?.fullName).toEqual(`${brand.name} Bottle Name`);
-  expect(bottle?.name).toEqual("Bottle Name");
-  expect(bottle?.category).toEqual("single_malt");
-  expect(bottle?.brandId).toEqual(brand.id);
-});
-
-test("new review with existing bottle", async ({ fixtures }) => {
-  const site = await fixtures.ExternalSite();
-  const bottle = await fixtures.Bottle({
-    name: "Delicious",
-    vintageYear: null,
-    releaseYear: null,
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    expect(review).toBeDefined();
+    expect(review?.bottleId).toEqual(bottle.id);
+    expect(review?.name).toEqual(bottle.fullName);
+    expect(review?.issue).toEqual("Default");
+    expect(review?.rating).toEqual(89);
+    expect(review?.url).toEqual("https://example.com");
   });
 
-  const caller = createCaller({
-    user: await fixtures.User({ admin: true }),
-  });
+  test("returns error for non-existent site", async ({ fixtures }) => {
+    const adminUser = await fixtures.User({ admin: true });
 
-  const data = await caller.reviewCreate({
-    site: site.type,
-    name: bottle.fullName,
-    issue: "Default",
-    rating: 89,
-    url: "https://example.com",
-    category: bottle.category,
+    const err = await waitError(() =>
+      routerClient.reviewCreate(
+        {
+          site: "non-existent-site" as any, // force invalid type here
+          name: "Bottle Name",
+          issue: "Default",
+          rating: 89,
+          url: "https://example.com",
+          category: "single_malt",
+        },
+        { context: { user: adminUser } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: NOT_FOUND: Site not found]
+    `);
   });
-
-  const review = await db.query.reviews.findFirst({
-    where: (table, { eq }) => eq(table.id, data.id),
-  });
-  expect(review).toBeDefined();
-  expect(review?.bottleId).toEqual(bottle.id);
-  expect(review?.name).toEqual(bottle.fullName);
-  expect(review?.issue).toEqual("Default");
-  expect(review?.rating).toEqual(89);
-  expect(review?.url).toEqual("https://example.com");
 });

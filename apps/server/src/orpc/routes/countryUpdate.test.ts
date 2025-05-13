@@ -3,110 +3,118 @@ import { countries } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("authentication and authorization", () => {
-  test("requires authentication", async () => {
-    const caller = createCaller({ user: null });
-    const err = await waitError(
-      caller.countryUpdate({
-        slug: "test-country",
-      }),
-    );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+describe("PATCH /countries/:slug", () => {
+  describe("authentication and authorization", () => {
+    test("requires authentication", async () => {
+      const err = await waitError(
+        routerClient.countryUpdate({
+          slug: "test-country",
+        }),
+      );
+      expect(err).toMatchInlineSnapshot(`[ORPCError: UNAUTHORIZED]`);
+    });
+
+    test("requires mod", async ({ defaults }) => {
+      const err = await waitError(
+        routerClient.countryUpdate(
+          {
+            slug: "test-country",
+          },
+          { context: { user: defaults.user } },
+        ),
+      );
+      expect(err).toMatchInlineSnapshot();
+    });
   });
 
-  test("requires mod", async ({ defaults }) => {
-    const caller = createCaller({ user: defaults.user });
-    const err = await waitError(
-      caller.countryUpdate({
-        slug: "test-country",
-      }),
-    );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-  });
-});
+  describe("country updates", () => {
+    test("no changes", async ({ fixtures }) => {
+      const country = await fixtures.Country();
+      const modUser = await fixtures.User({ mod: true });
 
-describe("country updates", () => {
-  test("no changes", async ({ fixtures }) => {
-    const country = await fixtures.Country();
+      const data = await routerClient.countryUpdate(
+        {
+          slug: country.slug,
+        },
+        { context: { user: modUser } },
+      );
 
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
-    const data = await caller.countryUpdate({
-      slug: country.slug,
-    });
+      expect(data.id).toBeDefined();
 
-    expect(data.id).toBeDefined();
+      const [newCountry] = await db
+        .select()
+        .from(countries)
+        .where(eq(countries.id, data.id));
 
-    const [newCountry] = await db
-      .select()
-      .from(countries)
-      .where(eq(countries.id, data.id));
-
-    expect(country).toEqual(newCountry);
-  });
-
-  test("can change description", async ({ fixtures }) => {
-    const country = await fixtures.Country();
-
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
-    const data = await caller.countryUpdate({
-      slug: country.slug,
-      description: "New description",
+      expect(country).toEqual(newCountry);
     });
 
-    expect(data.id).toBeDefined();
+    test("can change description", async ({ fixtures }) => {
+      const country = await fixtures.Country();
+      const modUser = await fixtures.User({ mod: true });
 
-    const [newCountry] = await db
-      .select()
-      .from(countries)
-      .where(eq(countries.id, data.id));
+      const data = await routerClient.countryUpdate(
+        {
+          slug: country.slug,
+          description: "New description",
+        },
+        { context: { user: modUser } },
+      );
 
-    expect(omit(country, "description", "descriptionSrc", "updatedAt")).toEqual(
-      omit(newCountry, "description", "descriptionSrc", "updatedAt"),
-    );
-    expect(newCountry.description).toBe("New description");
-    expect(newCountry.descriptionSrc).toBe("user");
-  });
+      expect(data.id).toBeDefined();
 
-  test("can change summary", async ({ fixtures }) => {
-    const country = await fixtures.Country();
+      const [newCountry] = await db
+        .select()
+        .from(countries)
+        .where(eq(countries.id, data.id));
 
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
+      expect(
+        omit(country, "description", "descriptionSrc", "updatedAt"),
+      ).toEqual(omit(newCountry, "description", "descriptionSrc", "updatedAt"));
+      expect(newCountry.description).toBe("New description");
+      expect(newCountry.descriptionSrc).toBe("user");
     });
-    const data = await caller.countryUpdate({
-      slug: country.slug,
-      summary: "New summary",
+
+    test("can change summary", async ({ fixtures }) => {
+      const country = await fixtures.Country();
+      const modUser = await fixtures.User({ mod: true });
+
+      const data = await routerClient.countryUpdate(
+        {
+          slug: country.slug,
+          summary: "New summary",
+        },
+        { context: { user: modUser } },
+      );
+
+      expect(data.id).toBeDefined();
+
+      const [newCountry] = await db
+        .select()
+        .from(countries)
+        .where(eq(countries.id, data.id));
+
+      expect(omit(country, "summary", "updatedAt")).toEqual(
+        omit(newCountry, "summary", "updatedAt"),
+      );
+      expect(newCountry.summary).toBe("New summary");
     });
 
-    expect(data.id).toBeDefined();
+    test("throws error for invalid country slug", async ({ fixtures }) => {
+      const modUser = await fixtures.User({ mod: true });
 
-    const [newCountry] = await db
-      .select()
-      .from(countries)
-      .where(eq(countries.id, data.id));
-
-    expect(omit(country, "summary", "updatedAt")).toEqual(
-      omit(newCountry, "summary", "updatedAt"),
-    );
-    expect(newCountry.summary).toBe("New summary");
-  });
-
-  test("throws error for invalid country slug", async ({ fixtures }) => {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
+      const err = await waitError(
+        routerClient.countryUpdate(
+          {
+            slug: "nonexistent-country",
+            description: "New description",
+          },
+          { context: { user: modUser } },
+        ),
+      );
+      expect(err).toMatchInlineSnapshot();
     });
-    const err = await waitError(
-      caller.countryUpdate({
-        slug: "nonexistent-country",
-        description: "New description",
-      }),
-    );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
   });
 });

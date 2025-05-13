@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import { routerClient } from "../router";
 
-describe("DELETE /collection-bottles", () => {
+describe("DELETE /users/:user/collections/:collection/bottles", () => {
   test("requires auth", async () => {
     const err = await waitError(() =>
       routerClient.collectionBottleDelete({

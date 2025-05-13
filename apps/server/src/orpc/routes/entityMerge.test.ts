@@ -1,58 +1,78 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("requires authentication", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(
-    caller.entityMerge({
-      root: 1,
-      other: 2,
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-test("requires mod", async ({ defaults }) => {
-  const caller = createCaller({ user: defaults.user });
-  const err = await waitError(
-    caller.entityMerge({
-      root: 1,
-      other: 2,
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-// TODO: test call to pushJob
-test("merge A into B", async ({ fixtures }) => {
-  const entityA = await fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
-  const entityB = await fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
-
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
-  });
-  const data = await caller.entityMerge({
-    root: entityA.id,
-    other: entityB.id,
-    direction: "mergeInto",
+describe("POST /entities/:entity/merge", () => {
+  test("requires authentication", async () => {
+    const err = await waitError(
+      routerClient.entityMerge(
+        {
+          entity: 1,
+          other: 2,
+        },
+        { context: { user: null } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  expect(data.id).toEqual(entityB.id);
-});
-
-// TODO: test call to pushJob
-test("merge A from B", async ({ fixtures }) => {
-  const entityA = await fixtures.Entity({ totalTastings: 1, totalBottles: 2 });
-  const entityB = await fixtures.Entity({ totalTastings: 3, totalBottles: 1 });
-
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
-  });
-  const data = await caller.entityMerge({
-    root: entityA.id,
-    other: entityB.id,
-    direction: "mergeFrom",
+  test("requires mod", async ({ defaults }) => {
+    const err = await waitError(
+      routerClient.entityMerge(
+        {
+          entity: 1,
+          other: 2,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  expect(data.id).toEqual(entityA.id);
+  // TODO: test call to pushJob
+  test("merge A into B", async ({ fixtures }) => {
+    const entityA = await fixtures.Entity({
+      totalTastings: 1,
+      totalBottles: 2,
+    });
+    const entityB = await fixtures.Entity({
+      totalTastings: 3,
+      totalBottles: 1,
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.entityMerge(
+      {
+        entity: entityA.id,
+        other: entityB.id,
+        direction: "mergeInto",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toEqual(entityB.id);
+  });
+
+  // TODO: test call to pushJob
+  test("merge A from B", async ({ fixtures }) => {
+    const entityA = await fixtures.Entity({
+      totalTastings: 1,
+      totalBottles: 2,
+    });
+    const entityB = await fixtures.Entity({
+      totalTastings: 3,
+      totalBottles: 1,
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.entityMerge(
+      {
+        entity: entityA.id,
+        other: entityB.id,
+        direction: "mergeFrom",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toEqual(entityA.id);
+  });
 });

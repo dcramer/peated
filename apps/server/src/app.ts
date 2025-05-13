@@ -1,13 +1,17 @@
+import { Storage } from "@google-cloud/storage";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodSmartCoercionPlugin, ZodToJsonSchemaConverter } from "@orpc/zod";
 import { setUser } from "@sentry/core";
+import { open } from "fs/promises";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
+import { contentType } from "mime-types";
 import { setTimeout } from "node:timers/promises";
+import { format } from "path";
 import config from "./config";
 import { getUserFromHeader } from "./lib/auth";
 import { router } from "./orpc/router";
@@ -20,6 +24,9 @@ const openAPIGenerator = new OpenAPIGenerator({
 });
 
 const rpcHandler = new RPCHandler(router);
+
+// File upload handler constants
+const ONE_DAY = 60 * 60 * 24;
 
 export const app = new Hono()
   .use(
@@ -57,6 +64,49 @@ export const app = new Hono()
   .get("/robots.txt", (c) => {
     return c.text("User-agent: *\nDisallow: /");
   })
+  // File upload handler
+  .get("/uploads/:filename", async (c) => {
+    const filename = c.req.param("filename");
+
+    let stream;
+    if (process.env.USE_GCS_STORAGE) {
+      const bucketName = process.env.GCS_BUCKET_NAME as string;
+      const bucketPath = process.env.GCS_BUCKET_PATH
+        ? `${process.env.GCS_BUCKET_PATH}/`
+        : "";
+
+      const cloudStorage = new Storage({
+        credentials: config.GCP_CREDENTIALS,
+      });
+      const file = cloudStorage
+        .bucket(bucketName)
+        .file(`${bucketPath}${filename}`);
+
+      stream = file.createReadStream();
+    } else {
+      const filepath = format({
+        dir: config.UPLOAD_PATH,
+        base: filename,
+      });
+
+      try {
+        const fd = await open(filepath, "r");
+        stream = fd.createReadStream();
+      } catch (err) {
+        return c.notFound();
+      }
+    }
+
+    // Set appropriate headers
+    c.header("Cache-Control", `public, max-age=${ONE_DAY}`);
+    c.header(
+      "Content-Type",
+      contentType(filename) || "application/octet-stream",
+    );
+
+    // Return the stream
+    return c.body(stream);
+  })
   .get("/", async (c) => {
     return c.html(`
       <!doctype html>
@@ -69,7 +119,7 @@ export const app = new Hono()
         </head>
         <body>
           <div id="app"></div>
-  
+
           <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
           <script>
             Scalar.createApiReference('#app', {

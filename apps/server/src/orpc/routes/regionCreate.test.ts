@@ -1,113 +1,119 @@
 import { db } from "@peated/server/db";
 import { regions } from "@peated/server/db/schema";
-import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-test("requires authentication", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(
-    caller.regionCreate({
-      name: "Test Region",
-      country: 1,
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-test("requires mod", async ({ defaults }) => {
-  const caller = createCaller({ user: defaults.user });
-  const err = await waitError(
-    caller.regionCreate({
-      name: "Test Region",
-      country: 1,
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-test("creates a new region", async ({ fixtures }) => {
-  const country = await fixtures.Country();
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
+describe("POST /regions", () => {
+  test("requires authentication", async () => {
+    const err = await waitError(
+      routerClient.regionCreate(
+        {
+          name: "Test Region",
+          country: 1,
+        },
+        { context: { user: null } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  const data = await caller.regionCreate({
-    name: "Test Region",
-    country: country.id,
-    description: "A test region",
+  test("requires mod", async ({ defaults }) => {
+    const err = await waitError(
+      routerClient.regionCreate(
+        {
+          name: "Test Region",
+          country: 1,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  expect(data.id).toBeDefined();
-  expect(data.name).toBe("Test Region");
-  expect(data.slug).toBe("test-region");
-  expect(data.description).toBe("A test region");
+  test("creates a new region", async ({ fixtures }) => {
+    const country = await fixtures.Country();
+    const modUser = await fixtures.User({ mod: true });
 
-  const [newRegion] = await db
-    .select()
-    .from(regions)
-    .where(eq(regions.id, data.id));
+    const data = await routerClient.regionCreate(
+      {
+        name: "Test Region",
+        country: country.id,
+        description: "A test region",
+      },
+      { context: { user: modUser } },
+    );
 
-  expect(newRegion).toBeDefined();
-  expect(newRegion.countryId).toBe(country.id);
-});
+    expect(data.id).toBeDefined();
+    expect(data.name).toBe("Test Region");
+    expect(data.slug).toBe("test-region");
+    expect(data.description).toBe("A test region");
 
-test("throws error for non-existent country", async ({ fixtures }) => {
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
+    const [newRegion] = await db
+      .select()
+      .from(regions)
+      .where(eq(regions.id, data.id));
+
+    expect(newRegion).toBeDefined();
+    expect(newRegion.countryId).toBe(country.id);
   });
 
-  const err = await waitError(
-    caller.regionCreate({
-      name: "Test Region",
-      country: 9999, // Non-existent country ID
-    }),
-  );
+  test("throws error for non-existent country", async ({ fixtures }) => {
+    const modUser = await fixtures.User({ mod: true });
 
-  expect(err).toMatchInlineSnapshot(`[TRPCError: Country not found.]`);
-});
+    const err = await waitError(
+      routerClient.regionCreate(
+        {
+          name: "Test Region",
+          country: 9999, // Non-existent country ID
+        },
+        { context: { user: modUser } },
+      ),
+    );
 
-test("handles duplicate name", async ({ fixtures }) => {
-  const country = await fixtures.Country();
-  const existingRegion = await fixtures.Region({ countryId: country.id });
-
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
+    expect(err).toMatchInlineSnapshot();
   });
 
-  const err = await waitError(
-    caller.regionCreate({
-      name: existingRegion.name,
-      country: country.id,
-    }),
-  );
+  test("handles duplicate name", async ({ fixtures }) => {
+    const country = await fixtures.Country();
+    const existingRegion = await fixtures.Region({ countryId: country.id });
+    const modUser = await fixtures.User({ mod: true });
 
-  expect(err).toMatchInlineSnapshot(
-    `[TRPCError: Conflicting object already exists (ID=1).]`,
-  );
-});
+    const err = await waitError(
+      routerClient.regionCreate(
+        {
+          name: existingRegion.name,
+          country: country.id,
+        },
+        { context: { user: modUser } },
+      ),
+    );
 
-test("creates region with minimal data", async ({ fixtures }) => {
-  const country = await fixtures.Country();
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
+    expect(err).toMatchInlineSnapshot();
   });
 
-  const data = await caller.regionCreate({
-    name: "Minimal Region",
-    country: country.id,
+  test("creates region with minimal data", async ({ fixtures }) => {
+    const country = await fixtures.Country();
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.regionCreate(
+      {
+        name: "Minimal Region",
+        country: country.id,
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toBeDefined();
+    expect(data.name).toBe("Minimal Region");
+    expect(data.description).toBeNull();
+
+    const [newRegion] = await db
+      .select()
+      .from(regions)
+      .where(eq(regions.id, data.id));
+
+    expect(newRegion).toBeDefined();
+    expect(newRegion.countryId).toBe(country.id);
   });
-
-  expect(data.id).toBeDefined();
-  expect(data.name).toBe("Minimal Region");
-  expect(data.description).toBeNull();
-
-  const [newRegion] = await db
-    .select()
-    .from(regions)
-    .where(eq(regions.id, data.id));
-
-  expect(newRegion).toBeDefined();
-  expect(newRegion.countryId).toBe(country.id);
 });

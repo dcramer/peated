@@ -23,7 +23,7 @@ describe("GET /admin/queue/info", () => {
   });
 
   test("requires authentication", async () => {
-    const err = await waitError(() => routerClient.adminQueueInfo({}));
+    const err = await waitError(() => routerClient.adminQueueInfo());
     expect(err).toMatchInlineSnapshot(`
       [ORPCError: UNAUTHORIZED: Authentication required]
     `);
@@ -33,7 +33,7 @@ describe("GET /admin/queue/info", () => {
     const user = await fixtures.User({ mod: true });
 
     const err = await waitError(() =>
-      routerClient.adminQueueInfo({}, { context: { user } }),
+      routerClient.adminQueueInfo(undefined, { context: { user } }),
     );
     expect(err).toMatchInlineSnapshot(`
       [ORPCError: FORBIDDEN: Admin privileges required]
@@ -43,7 +43,9 @@ describe("GET /admin/queue/info", () => {
   test("returns queue stats", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
 
-    const result = await routerClient.adminQueueInfo({}, { context: { user } });
+    const result = await routerClient.adminQueueInfo(undefined, {
+      context: { user },
+    });
 
     expect(result).toEqual({
       stats: {

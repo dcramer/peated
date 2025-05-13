@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
 import { bottleAliases, storePrices } from "@peated/server/db/schema";
+import {
+  CursorSchema,
+  ExternalSiteSchema,
+  StorePriceSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
 import {
@@ -13,16 +18,34 @@ import {
   type SQL,
 } from "drizzle-orm";
 import { z } from "zod";
-import { modProcedure } from "..";
+import { procedure } from "..";
+import { requireMod } from "../middleware";
 
-export default modProcedure
+const OutputSchema = z.object({
+  results: z.array(
+    z.object({
+      name: z.string(),
+      createdAt: z.string(),
+      bottleId: z.number().nullable(),
+      bestMatch: z.null(),
+      exampleListing: StorePriceSchema.extend({
+        site: ExternalSiteSchema,
+      }),
+    }),
+  ),
+  rel: CursorSchema,
+});
+
+export default procedure
+  .use(requireMod)
+  .route({ method: "GET", path: "/bottles/unmatched" })
   .input(
     z
       .object({
-        bottle: z.number().optional(),
+        bottle: z.coerce.number().optional(),
         query: z.string().default(""),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
+        cursor: z.coerce.number().gte(1).default(1),
+        limit: z.coerce.number().gte(1).lte(100).default(100),
       })
       .default({
         query: "",
@@ -30,7 +53,10 @@ export default modProcedure
         limit: 100,
       }),
   )
-  .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
+  .output(OutputSchema)
+  .handler(async function ({ input, context }) {
+    const { cursor, query, limit, ...rest } = input;
+
     const where: (SQL<unknown> | undefined)[] = [
       eq(bottleAliases.ignored, false),
       isNull(bottleAliases.bottleId),
@@ -65,7 +91,11 @@ export default modProcedure
 
     const examplesByName = Object.fromEntries(
       (
-        await serialize(StorePriceWithSiteSerializer, exampleListings, ctx.user)
+        await serialize(
+          StorePriceWithSiteSerializer,
+          exampleListings,
+          context.user,
+        )
       ).map((data, index) => [exampleListings[index].name, data]),
     );
 

@@ -1,53 +1,43 @@
-import { BottleInputSchema } from "@peated/server/schemas";
+import { call, ORPCError } from "@orpc/server";
+import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
-import { TRPCError } from "@trpc/server";
-import type { z } from "zod";
-import { modProcedure } from "..";
-import { type Context } from "../context";
+import { procedure } from "..";
 import { ConflictError } from "../errors";
-import { bottleCreate } from "./bottleCreate";
+import { requireMod } from "../middleware";
+import bottleCreate from "./bottleCreate";
 import { bottleNormalize } from "./bottlePreview";
-import { bottleUpdate } from "./bottleUpdate";
+import bottleUpdate from "./bottleUpdate";
 
-export async function bottleUpsert({
-  input,
-  ctx,
-}: {
-  input: z.infer<typeof BottleInputSchema>;
-  ctx: Context;
-}) {
-  const user = ctx.user;
-  if (!user) {
-    throw new TRPCError({
-      message: "Unauthorzed!",
-      code: "UNAUTHORIZED",
-    });
-  }
+export default procedure
+  .use(requireMod)
+  .route({ method: "POST", path: "/bottles/upsert" })
+  .input(BottleInputSchema)
+  .output(BottleSchema)
+  .handler(async function ({ input, context }) {
+    const user = context.user;
 
-  const bottleData: BottlePreviewResult & Record<string, any> =
-    await bottleNormalize({ input, ctx });
+    const bottleData: BottlePreviewResult & Record<string, any> =
+      await bottleNormalize({ input, context });
 
-  if (!bottleData.name) {
-    throw new TRPCError({
-      message: "Invalid bottle name.",
-      code: "BAD_REQUEST",
-    });
-  }
-
-  try {
-    return await bottleCreate({ input, ctx });
-  } catch (err) {
-    if (err instanceof ConflictError) {
-      return await bottleUpdate({
-        input: {
-          ...input,
-          bottle: err.existingRow.id,
-        },
-        ctx,
+    if (!bottleData.name) {
+      throw new ORPCError("BAD_REQUEST", {
+        message: "Invalid bottle name.",
       });
     }
-    throw err;
-  }
-}
 
-export default modProcedure.input(BottleInputSchema).mutation(bottleUpsert);
+    try {
+      return await call(bottleCreate, input, { context });
+    } catch (err) {
+      if (err instanceof ConflictError) {
+        return await call(
+          bottleUpdate,
+          {
+            ...input,
+            bottle: err.existingRow.id,
+          },
+          { context },
+        );
+      }
+      throw err;
+    }
+  });

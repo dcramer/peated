@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
@@ -12,31 +13,33 @@ import {
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
 import { normalizeEntityName } from "@peated/server/lib/normalize";
-import { EntityInputSchema } from "@peated/server/schemas";
+import { EntityInputSchema, EntitySchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
-import { modProcedure } from "..";
+import { procedure } from "..";
+import { requireMod } from "../middleware";
 
-export default modProcedure
+export default procedure
+  .use(requireMod)
+  .route({ method: "PATCH", path: "/entities/:entity" })
   .input(
     EntityInputSchema.partial().extend({
       entity: z.number(),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
+  .output(EntitySchema)
+  .handler(async function ({ input, context }) {
     const [entity] = await db
       .select()
       .from(entities)
       .where(eq(entities.id, input.entity));
 
     if (!entity) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Entity not found.",
-        code: "NOT_FOUND",
       });
     }
 
@@ -57,9 +60,8 @@ export default modProcedure
           .where(eq(countries.id, input.country))
           .limit(1);
         if (!country) {
-          throw new TRPCError({
+          throw new ORPCError("NOT_FOUND", {
             message: "Country not found.",
-            code: "NOT_FOUND",
           });
         }
         if (country.id !== entity.countryId) {
@@ -84,9 +86,8 @@ export default modProcedure
         !region ||
         region.countryId !== (data.countryId ?? entity.countryId)
       ) {
-        throw new TRPCError({
+        throw new ORPCError("NOT_FOUND", {
           message: "Region not found.",
-          code: "NOT_FOUND",
         });
       }
       if (region.id !== entity.regionId) {
@@ -134,10 +135,10 @@ export default modProcedure
       data.website = input.website;
     }
     if (Object.values(data).length === 0) {
-      return await serialize(EntitySerializer, entity, ctx.user);
+      return await serialize(EntitySerializer, entity, context.user);
     }
 
-    const user = ctx.user;
+    const user = context.user;
     const newEntity = await db.transaction(async (tx) => {
       let newEntity: Entity | undefined;
 
@@ -152,9 +153,8 @@ export default modProcedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "entity_name_unq") {
-          throw new TRPCError({
+          throw new ORPCError("CONFLICT", {
             message: "Entity with name already exists.",
-            code: "CONFLICT",
             cause: err,
           });
         }
@@ -270,9 +270,8 @@ export default modProcedure
     });
 
     if (!newEntity) {
-      throw new TRPCError({
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Failed to update entity.",
-        code: "INTERNAL_SERVER_ERROR",
       });
     }
 
@@ -290,5 +289,5 @@ export default modProcedure
       });
     }
 
-    return await serialize(EntitySerializer, newEntity, ctx.user);
+    return await serialize(EntitySerializer, newEntity, context.user);
   });

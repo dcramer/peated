@@ -1,5 +1,5 @@
 import { ORPCError, os } from "@orpc/server";
-import type { Context } from "./context";
+import type { Context } from "../context";
 
 export const requireAuth = os
   .$context<Context>()

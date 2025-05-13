@@ -1,56 +1,51 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
+import { StorePriceSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { modProcedure } from "..";
-import { type Context } from "../context";
+import { procedure } from "..";
+import { requireMod } from "../middleware";
 
 const InputSchema = z.object({
   price: z.number(),
   hidden: z.boolean().optional(),
 });
 
-export async function priceUpdate({
-  input,
-  ctx,
-}: {
-  input: z.infer<typeof InputSchema>;
-  ctx: Context;
-}) {
-  const { price: priceId, ...data } = input;
+export default procedure
+  .use(requireMod)
+  .route({ method: "PUT", path: "/prices/:price" })
+  .input(InputSchema)
+  .output(StorePriceSchema)
+  .handler(async function ({ input, context }) {
+    const { price: priceId, ...data } = input;
 
-  const [price] = await db
-    .select()
-    .from(storePrices)
-    .where(eq(storePrices.id, priceId));
+    const [price] = await db
+      .select()
+      .from(storePrices)
+      .where(eq(storePrices.id, priceId));
 
-  if (!price) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-    });
-  }
+    if (!price) {
+      throw new ORPCError("NOT_FOUND");
+    }
 
-  if (Object.values(data).length === 0) {
-    return await serialize(StorePriceSerializer, price, ctx.user);
-  }
+    if (Object.values(data).length === 0) {
+      return await serialize(StorePriceSerializer, price, context.user);
+    }
 
-  const [newPrice] = await db
-    .update(storePrices)
-    .set(data)
-    .where(eq(storePrices.id, priceId))
-    .returning();
+    const [newPrice] = await db
+      .update(storePrices)
+      .set(data)
+      .where(eq(storePrices.id, priceId))
+      .returning();
 
-  if (!newPrice) {
-    throw new TRPCError({
-      message: "Failed to update price.",
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  }
+    if (!newPrice) {
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+        message: "Failed to update price.",
+      });
+    }
 
-  return await serialize(StorePriceSerializer, newPrice, ctx.user);
-}
-
-export default modProcedure.input(InputSchema).mutation(priceUpdate);
+    return await serialize(StorePriceSerializer, newPrice, context.user);
+  });

@@ -4,8 +4,8 @@ import {
 } from "@peated/server/constants";
 import { ApiClient } from "@peated/server/lib/apiClient";
 import { logError } from "@peated/server/lib/log";
-import { trpcClient } from "@peated/server/lib/trpc/server";
-import { isTRPCClientError } from "@peated/server/orpc/client";
+import { orpcClient } from "@peated/server/lib/orpc-client/server";
+import { isORPCClientError } from "@peated/server/orpc/client";
 import type { Currency, ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
@@ -168,9 +168,9 @@ export async function handleBottle(
 
     let bottleResult;
     try {
-      bottleResult = await trpcClient.bottleUpsert.mutate(bottle);
+      bottleResult = await orpcClient.bottleUpsert(bottle);
     } catch (err) {
-      if (!isTRPCClientError(err) || (err as any).data?.httpStatus !== 409) {
+      if (!isORPCClientError(err) || (err as any).data?.httpStatus !== 409) {
         logError(err, { bottle });
         return;
       }
@@ -191,12 +191,12 @@ export async function handleBottle(
 
     if (price) {
       try {
-        await trpcClient.priceCreateBatch.mutate({
+        await orpcClient.priceCreateBatch({
           site: "smws",
           prices: [price],
         });
       } catch (err) {
-        if (!isTRPCClientError(err) || (err as any).data?.httpStatus !== 409) {
+        if (!isORPCClientError(err) || (err as any).data?.httpStatus !== 409) {
           logError(err, { bottle, price });
         }
       }
@@ -219,7 +219,7 @@ export default async function scrapePrices(
     SCRAPER_PRICE_BATCH_SIZE,
     async (prices) => {
       console.log("Pushing new price data to API");
-      await trpcClient.priceCreateBatch.mutate({
+      await orpcClient.priceCreateBatch({
         site,
         prices,
       });

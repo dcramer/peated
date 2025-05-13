@@ -1,7 +1,7 @@
+import { ORPCError } from "@orpc/server";
 import type { Entity } from "@peated/server/db/schema";
 import { bottleSeries, changes } from "@peated/server/db/schema";
 import type { BottleSeriesInputSchema } from "@peated/server/schemas";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import type { AnyTransaction } from "../db";
@@ -29,9 +29,8 @@ export async function processSeries({
       where: eq(bottleSeries.id, series),
     });
     if (!existingSeries) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Series not found.",
-        code: "NOT_FOUND",
       });
     }
     return [series, false];

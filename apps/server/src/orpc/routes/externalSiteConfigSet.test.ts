@@ -2,63 +2,107 @@ import { db } from "@peated/server/db";
 import { externalSiteConfig } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("requires admin", async ({ fixtures }) => {
-  const site = await fixtures.ExternalSite();
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
+describe("PUT /external-sites/:site/config/:key", () => {
+  test("requires authentication", async () => {
+    const err = await waitError(() =>
+      routerClient.externalSiteConfigSet({
+        site: "test" as any,
+        key: "test",
+        value: "test",
+      }),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: UNAUTHORIZED: Authentication required]
+    `);
   });
-  const err = await waitError(
-    caller.externalSiteConfigSet({
-      site: site.type,
+
+  test("requires admin", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSite();
+    const user = await fixtures.User({ mod: true });
+
+    const err = await waitError(() =>
+      routerClient.externalSiteConfigSet(
+        {
+          site: site.type,
+          key: "test",
+          value: "test",
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: FORBIDDEN: Admin privileges required]
+    `);
+  });
+
+  test("returns error for non-existent site", async ({ fixtures }) => {
+    const user = await fixtures.User({ admin: true });
+
+    const err = await waitError(() =>
+      routerClient.externalSiteConfigSet(
+        {
+          site: "non-existent-site" as any,
+          key: "test",
+          value: "test",
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: NOT_FOUND: Site not found]
+    `);
+  });
+
+  test("set new value", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSite();
+    const user = await fixtures.User({ admin: true });
+
+    await routerClient.externalSiteConfigSet(
+      {
+        site: site.type,
+        key: "test",
+        value: "bar",
+      },
+      { context: { user } },
+    );
+
+    const results = await db
+      .select()
+      .from(externalSiteConfig)
+      .where(eq(externalSiteConfig.externalSiteId, site.id));
+    expect(results.length).toEqual(1);
+    expect(results[0].key).toEqual("test");
+    expect(results[0].value).toEqual("bar");
+  });
+
+  test("update existing value", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSite();
+    await db.insert(externalSiteConfig).values({
+      externalSiteId: site.id,
       key: "test",
-      value: "test",
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
+      value: { foo: "bar" },
+    });
 
-test("set new value", async ({ fixtures }) => {
-  const site = await fixtures.ExternalSite();
-  const caller = createCaller({
-    user: await fixtures.User({ admin: true }),
-  });
-  await caller.externalSiteConfigSet({
-    site: site.type,
-    key: "test",
-    value: "bar",
-  });
-  const results = await db
-    .select()
-    .from(externalSiteConfig)
-    .where(eq(externalSiteConfig.externalSiteId, site.id));
-  expect(results.length).toEqual(1);
-  expect(results[0].key).toEqual("test");
-  expect(results[0].value).toEqual("bar");
-});
+    const user = await fixtures.User({ admin: true });
 
-test("set existing value", async ({ fixtures }) => {
-  const site = await fixtures.ExternalSite();
-  await db.insert(externalSiteConfig).values({
-    externalSiteId: site.id,
-    key: "test",
-    value: { foo: "bar" },
-  });
+    await routerClient.externalSiteConfigSet(
+      {
+        site: site.type,
+        key: "test",
+        value: "bar",
+      },
+      { context: { user } },
+    );
 
-  const caller = createCaller({
-    user: await fixtures.User({ admin: true }),
+    const results = await db
+      .select()
+      .from(externalSiteConfig)
+      .where(eq(externalSiteConfig.externalSiteId, site.id));
+    expect(results.length).toEqual(1);
+    expect(results[0].key).toEqual("test");
+    expect(results[0].value).toEqual("bar");
   });
-  await caller.externalSiteConfigSet({
-    site: site.type,
-    key: "test",
-    value: "bar",
-  });
-  const results = await db
-    .select()
-    .from(externalSiteConfig)
-    .where(eq(externalSiteConfig.externalSiteId, site.id));
-  expect(results.length).toEqual(1);
-  expect(results[0].key).toEqual("test");
-  expect(results[0].value).toEqual("bar");
 });

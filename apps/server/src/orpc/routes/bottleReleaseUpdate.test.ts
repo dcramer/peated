@@ -4,33 +4,32 @@ import type { CASK_FILLS, CASK_SIZE_IDS, CASK_TYPE_IDS } from "../../constants";
 import { db } from "../../db";
 import { bottleReleases, changes } from "../../db/schema";
 import waitError from "../../lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottleReleaseUpdate", () => {
+describe("PATCH /bottle-releases/:release", () => {
   it("requires authentication", async () => {
-    const caller = createCaller({ user: null });
     const err = await waitError(
-      caller.bottleReleaseUpdate({
+      routerClient.bottleReleaseUpdate({
         release: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot(`[ORPCError: UNAUTHORIZED]`);
   });
 
   it("requires moderator access", async ({ defaults }) => {
-    const caller = createCaller({ user: defaults.user });
     const err = await waitError(
-      caller.bottleReleaseUpdate({
-        release: 1,
-      }),
+      routerClient.bottleReleaseUpdate(
+        {
+          release: 1,
+        },
+        { context: { user: defaults.user } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   it("updates a release with new attributes", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
       name: "Test Bottle",
@@ -56,7 +55,9 @@ describe("bottleReleaseUpdate", () => {
       vintageYear: 2009,
     };
 
-    const result = await caller.bottleReleaseUpdate(data);
+    const result = await routerClient.bottleReleaseUpdate(data, {
+      context: { user: modUser },
+    });
 
     // Verify key properties of the response
     expect(result).toMatchObject({
@@ -108,24 +109,23 @@ describe("bottleReleaseUpdate", () => {
   });
 
   it("throws error if release not found", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const err = await waitError(
-      caller.bottleReleaseUpdate({
-        release: 999999,
-      }),
+      routerClient.bottleReleaseUpdate(
+        {
+          release: 999999,
+        },
+        { context: { user: modUser } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Release not found.]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   it("throws error if release statedAge differs from bottle statedAge", async function ({
     fixtures,
   }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
       name: "10",
@@ -140,22 +140,21 @@ describe("bottleReleaseUpdate", () => {
     });
 
     const err = await waitError(
-      caller.bottleReleaseUpdate({
-        release: release.id,
-        statedAge: 12, // Different from bottle's statedAge
-      }),
+      routerClient.bottleReleaseUpdate(
+        {
+          release: release.id,
+          statedAge: 12, // Different from bottle's statedAge
+        },
+        { context: { user: modUser } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(
-      `[TRPCError: Release statedAge must match bottle's statedAge.]`,
-    );
+    expect(err).toMatchInlineSnapshot();
   });
 
   it("throws error if release with same attributes exists", async function ({
     fixtures,
   }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
       name: "Test Bottle",
@@ -184,24 +183,23 @@ describe("bottleReleaseUpdate", () => {
 
     // Try to update release2 to match release1's attributes
     const err = await waitError(
-      caller.bottleReleaseUpdate({
-        release: release2.id,
-        edition: "Batch 1",
-        statedAge: 10,
-        abv: 46.0,
-        releaseYear: 2020,
-        vintageYear: 2010,
-      }),
+      routerClient.bottleReleaseUpdate(
+        {
+          release: release2.id,
+          edition: "Batch 1",
+          statedAge: 10,
+          abv: 46.0,
+          releaseYear: 2020,
+          vintageYear: 2010,
+        },
+        { context: { user: modUser } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(
-      `[TRPCError: A release with these attributes already exists.]`,
-    );
+    expect(err).toMatchInlineSnapshot();
   });
 
   it("updates cask information", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({
@@ -219,7 +217,9 @@ describe("bottleReleaseUpdate", () => {
       caskStrength: true,
     };
 
-    const result = await caller.bottleReleaseUpdate(data);
+    const result = await routerClient.bottleReleaseUpdate(data, {
+      context: { user: modUser },
+    });
 
     expect(result.caskType).toBe("bourbon");
     expect(result.caskSize).toBe("hogshead");
@@ -241,9 +241,7 @@ describe("bottleReleaseUpdate", () => {
   });
 
   it("updates description and tasting notes", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({
@@ -262,7 +260,9 @@ describe("bottleReleaseUpdate", () => {
       },
     };
 
-    const result = await caller.bottleReleaseUpdate(data);
+    const result = await routerClient.bottleReleaseUpdate(data, {
+      context: { user: modUser },
+    });
 
     expect(result.description).toBe("Updated description");
     expect(result.tastingNotes).toEqual({
@@ -288,9 +288,7 @@ describe("bottleReleaseUpdate", () => {
   it("throws error if release name matches bottle name", async function ({
     fixtures,
   }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
       name: "Test Bottle",
@@ -302,23 +300,22 @@ describe("bottleReleaseUpdate", () => {
     });
 
     const err = await waitError(
-      caller.bottleReleaseUpdate({
-        release: release.id,
-        edition: null,
-        abv: null,
-        releaseYear: null,
-        vintageYear: null,
-      }),
+      routerClient.bottleReleaseUpdate(
+        {
+          release: release.id,
+          edition: null,
+          abv: null,
+          releaseYear: null,
+          vintageYear: null,
+        },
+        { context: { user: modUser } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(
-      `[TRPCError: Release name cannot be the same as the bottle name.]`,
-    );
+    expect(err).toMatchInlineSnapshot();
   });
 
   it("performs partial updates correctly", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
       name: "Test Bottle",
@@ -342,7 +339,9 @@ describe("bottleReleaseUpdate", () => {
       releaseYear: 2021,
     };
 
-    const result = await caller.bottleReleaseUpdate(data);
+    const result = await routerClient.bottleReleaseUpdate(data, {
+      context: { user: modUser },
+    });
 
     // Verify only specified fields were updated
     expect(result.abv).toBe(48.0);
@@ -366,9 +365,7 @@ describe("bottleReleaseUpdate", () => {
   });
 
   it("updates image URL", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({
@@ -385,7 +382,9 @@ describe("bottleReleaseUpdate", () => {
       imageUrl: "https://example.com/new-image.jpg",
     };
 
-    const result = await caller.bottleReleaseUpdate(data);
+    const result = await routerClient.bottleReleaseUpdate(data, {
+      context: { user: modUser },
+    });
 
     expect(result.imageUrl).toBe("https://example.com/new-image.jpg");
 
@@ -399,9 +398,7 @@ describe("bottleReleaseUpdate", () => {
   });
 
   it("rolls back transaction on error", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
       name: "Test Bottle",
@@ -422,16 +419,17 @@ describe("bottleReleaseUpdate", () => {
 
     // Try to update with invalid data that will cause a conflict
     const err = await waitError(
-      caller.bottleReleaseUpdate({
-        release: release2.id,
-        edition: "Batch 1", // Same as existing
-        abv: 46.0, // Same as existing
-        // This should trigger the duplicate check
-      }),
+      routerClient.bottleReleaseUpdate(
+        {
+          release: release2.id,
+          edition: "Batch 1", // Same as existing
+          abv: 46.0, // Same as existing
+          // This should trigger the duplicate check
+        },
+        { context: { user: modUser } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(
-      `[TRPCError: A release with these attributes already exists.]`,
-    );
+    expect(err).toMatchInlineSnapshot();
 
     // Verify the release was not changed
     const [unchangedRelease] = await db

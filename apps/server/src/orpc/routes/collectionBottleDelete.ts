@@ -11,7 +11,10 @@ import { requireAuth } from "../middleware";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/collection-bottles" })
+  .route({
+    method: "DELETE",
+    path: "/users/:user/collections/:collection/bottles",
+  })
   .input(
     CollectionBottleInputSchema.extend({
       collection: z.union([z.coerce.number(), z.literal("default")]),

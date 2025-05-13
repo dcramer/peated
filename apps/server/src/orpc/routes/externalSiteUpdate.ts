@@ -1,30 +1,35 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { ExternalSite } from "@peated/server/db/schema";
 import { externalSites } from "@peated/server/db/schema";
 import {
   ExternalSiteInputSchema,
+  ExternalSiteSchema,
   ExternalSiteTypeEnum,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteSerializer } from "@peated/server/serializers/externalSite";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import { adminProcedure } from "..";
+import { procedure } from "..";
+import { requireAdmin } from "../middleware";
 
-export default adminProcedure
+export default procedure
+  .use(requireAdmin)
+  .route({ method: "PATCH", path: "/external-sites/:site" })
   .input(
     ExternalSiteInputSchema.partial().extend({
       site: ExternalSiteTypeEnum,
     }),
   )
-  .mutation(async function ({ input, ctx }) {
+  .output(ExternalSiteSchema)
+  .handler(async function ({ input, context }) {
     const [site] = await db
       .select()
       .from(externalSites)
       .where(eq(externalSites.type, input.site));
     if (!site) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
+        message: "Site not found",
       });
     }
 
@@ -40,7 +45,7 @@ export default adminProcedure
       data.runEvery = input.runEvery;
     }
     if (Object.values(data).length === 0) {
-      return await serialize(ExternalSiteSerializer, site, ctx.user);
+      return await serialize(ExternalSiteSerializer, site, context.user);
     }
     const newSite = await db.transaction(async (tx) => {
       let newSite: ExternalSite | undefined;
@@ -52,9 +57,8 @@ export default adminProcedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "external_site_type") {
-          throw new TRPCError({
+          throw new ORPCError("CONFLICT", {
             message: "Site with type already exists.",
-            code: "CONFLICT",
             cause: err,
           });
         }
@@ -67,11 +71,10 @@ export default adminProcedure
     });
 
     if (!newSite) {
-      throw new TRPCError({
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: "Failed to update site.",
-        code: "INTERNAL_SERVER_ERROR",
       });
     }
 
-    return await serialize(ExternalSiteSerializer, newSite, ctx.user);
+    return await serialize(ExternalSiteSerializer, newSite, context.user);
   });

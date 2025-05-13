@@ -1,38 +1,41 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
+import { EntitySchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { modProcedure } from "..";
+import { procedure } from "..";
+import { requireMod } from "../middleware";
 
-export default modProcedure
+export default procedure
+  .use(requireMod)
+  .route({ method: "POST", path: "/entities/:entity/merge" })
   .input(
     z.object({
-      root: z.number(),
+      entity: z.coerce.number(),
       other: z.number(),
       direction: z.enum(["mergeInto", "mergeFrom"]).default("mergeInto"),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
-    if (input.root === input.other) {
-      throw new TRPCError({
+  .output(EntitySchema)
+  .handler(async function ({ input, context }) {
+    if (input.entity === input.other) {
+      throw new ORPCError("BAD_REQUEST", {
         message: "Cannot merge an entity into itself.",
-        code: "BAD_REQUEST",
       });
     }
 
     const [rootEntity] = await db
       .select()
       .from(entities)
-      .where(eq(entities.id, input.root));
+      .where(eq(entities.id, input.entity));
 
     if (!rootEntity) {
-      throw new TRPCError({
-        message: "root not found.",
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
+        message: "entity not found.",
       });
     }
 
@@ -42,9 +45,8 @@ export default modProcedure
       .where(eq(entities.id, input.other));
 
     if (!otherEntity) {
-      throw new TRPCError({
-        message: "other not found.",
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
+        message: "other entity not found.",
       });
     }
 
@@ -58,5 +60,5 @@ export default modProcedure
       fromEntityIds: [fromEntity.id],
     });
 
-    return await serialize(EntitySerializer, toEntity, ctx.user);
+    return await serialize(EntitySerializer, toEntity, context.user);
   });

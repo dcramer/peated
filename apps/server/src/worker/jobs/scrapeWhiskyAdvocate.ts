@@ -3,8 +3,8 @@ import {
   normalizeBottle,
   normalizeCategory,
 } from "@peated/server/lib/normalize";
+import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
-import { trpcClient } from "@peated/server/lib/trpc/server";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import * as Sentry from "@sentry/node";
 import { load as cheerio } from "cheerio";
@@ -23,7 +23,7 @@ export default async function scrapeWhiskeyAdvocate() {
   info(fmt`[Whisky Advocate] Found ${String(issueList.length)} issues`);
 
   const processedIssues = process.env.ACCESS_TOKEN
-    ? await trpcClient.externalSiteConfigGet.query({
+    ? await orpcClient.externalSiteConfigGet({
         site: "whiskyadvocate",
         key: "processedIssues",
         default: [],
@@ -49,7 +49,7 @@ export default async function scrapeWhiskeyAdvocate() {
           info(fmt`[Whisky Advocate] Submitting [${item.name}]`);
 
           try {
-            await trpcClient.reviewCreate.mutate({
+            await orpcClient.reviewCreate({
               site: "whiskyadvocate",
               ...item,
             });
@@ -66,7 +66,7 @@ export default async function scrapeWhiskeyAdvocate() {
     info(fmt`[Whisky Advocate] Done processing issue [${issueName}]`);
 
     if (process.env.ACCESS_TOKEN) {
-      await trpcClient.externalSiteConfigSet.mutate({
+      await orpcClient.externalSiteConfigSet({
         site: "whiskyadvocate",
         key: "processedIssues",
         value: processedIssues,
@@ -102,7 +102,7 @@ export async function scrapeReviews(
   const $ = cheerio(data);
 
   for (const el of $("#directoryResults .postsItem")) {
-    // <h5>Claxton’s Mannochmore 7 year old Oloroso Hogshead, 50% </h5>
+    // <h5>Claxton's Mannochmore 7 year old Oloroso Hogshead, 50% </h5>
     const rawName = $(".postsItemContent > h5", el).first().text().trim();
     if (!rawName) {
       warn(fmt`[Whisky Advocate] Unable to identify bottle name`);

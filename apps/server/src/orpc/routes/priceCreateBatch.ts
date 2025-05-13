@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
@@ -15,27 +16,29 @@ import {
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { pushJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { adminProcedure } from "..";
+import { procedure } from "..";
+import { requireAdmin } from "../middleware";
 
-export default adminProcedure
+export default procedure
+  .use(requireAdmin)
+  .route({ method: "POST", path: "/external-sites/:site/prices" })
   .input(
     z.object({
       site: ExternalSiteTypeEnum,
       prices: z.array(StorePriceInputSchema),
     }),
   )
-  .mutation(async function ({ input }) {
+  .output(z.object({}))
+  .handler(async function ({ input }) {
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
 
     if (!site) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Site not found",
-        code: "NOT_FOUND",
       });
     }
 
@@ -104,4 +107,6 @@ export default adminProcedure
         }),
       );
     });
+
+    return {};
   });

@@ -1,38 +1,41 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
+import { BottleSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { pushJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { modProcedure } from "..";
+import { procedure } from "..";
+import { requireMod } from "../middleware";
 
-export default modProcedure
+export default procedure
+  .use(requireMod)
+  .route({ method: "POST", path: "/bottles/:bottle/merge" })
   .input(
     z.object({
-      root: z.number(),
+      bottle: z.coerce.number(),
       other: z.number(),
       direction: z.enum(["mergeInto", "mergeFrom"]).default("mergeInto"),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
-    if (input.root === input.other) {
-      throw new TRPCError({
+  .output(BottleSchema)
+  .handler(async function ({ input, context }) {
+    if (input.bottle === input.other) {
+      throw new ORPCError("BAD_REQUEST", {
         message: "Cannot merge a bottle into itself.",
-        code: "BAD_REQUEST",
       });
     }
 
     const [rootBottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, input.root));
+      .where(eq(bottles.id, input.bottle));
 
     if (!rootBottle) {
-      throw new TRPCError({
-        message: "root not found.",
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
+        message: "bottle not found.",
       });
     }
 
@@ -42,9 +45,8 @@ export default modProcedure
       .where(eq(bottles.id, input.other));
 
     if (!otherBottle) {
-      throw new TRPCError({
-        message: "other not found.",
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
+        message: "other bottle not found.",
       });
     }
 
@@ -58,5 +60,5 @@ export default modProcedure
       fromBottleIds: [fromBottle.id],
     });
 
-    return await serialize(BottleSerializer, toBottle, ctx.user);
+    return await serialize(BottleSerializer, toBottle, context.user);
   });

@@ -1,30 +1,97 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("requires mod", async ({ fixtures }) => {
-  const tag = await fixtures.Tag();
-  const caller = createCaller({
-    user: await fixtures.User(),
-  });
-  const err = await waitError(
-    caller.tagUpdate({
-      name: tag.name,
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-test("updates tag", async ({ fixtures }) => {
-  const tag = await fixtures.Tag({ tagCategory: "peaty" });
-
-  const caller = createCaller({
-    user: await fixtures.User({ admin: true }),
-  });
-  const newTag = await caller.tagUpdate({
-    name: tag.name,
-    tagCategory: "fruity",
+describe("PATCH /tags/:name", () => {
+  test("requires authentication", async ({ fixtures }) => {
+    const tag = await fixtures.Tag();
+    const err = await waitError(() =>
+      routerClient.tagUpdate({
+        name: tag.name,
+      }),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: UNAUTHORIZED: Authentication required]
+    `);
   });
 
-  expect(newTag).toBeDefined();
-  expect(newTag.tagCategory).toEqual("fruity");
+  test("requires mod privileges", async ({ fixtures }) => {
+    const tag = await fixtures.Tag();
+    const user = await fixtures.User();
+
+    const err = await waitError(() =>
+      routerClient.tagUpdate(
+        {
+          name: tag.name,
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: FORBIDDEN: Moderator privileges required]
+    `);
+  });
+
+  test("returns 404 for non-existent tag", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+
+    const err = await waitError(() =>
+      routerClient.tagUpdate(
+        {
+          name: "non-existent-tag",
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: NOT_FOUND: Tag not found]
+    `);
+  });
+
+  test("updates tag category", async ({ fixtures }) => {
+    const tag = await fixtures.Tag({ tagCategory: "peaty" });
+    const user = await fixtures.User({ admin: true });
+
+    const newTag = await routerClient.tagUpdate(
+      {
+        name: tag.name,
+        tagCategory: "fruity",
+      },
+      { context: { user } },
+    );
+
+    expect(newTag).toBeDefined();
+    expect(newTag.tagCategory).toEqual("fruity");
+  });
+
+  test("updates tag synonyms", async ({ fixtures }) => {
+    const tag = await fixtures.Tag({ synonyms: ["old-synonym"] });
+    const user = await fixtures.User({ admin: true });
+
+    const newTag = await routerClient.tagUpdate(
+      {
+        name: tag.name,
+        synonyms: ["new-synonym"],
+      },
+      { context: { user } },
+    );
+
+    expect(newTag).toBeDefined();
+    expect(newTag.synonyms).toEqual(["new-synonym"]);
+  });
+
+  test("no-op when no changes", async ({ fixtures }) => {
+    const tag = await fixtures.Tag({ tagCategory: "peaty" });
+    const user = await fixtures.User({ admin: true });
+
+    const newTag = await routerClient.tagUpdate(
+      {
+        name: tag.name,
+      },
+      { context: { user } },
+    );
+
+    expect(newTag).toBeDefined();
+    expect(newTag.tagCategory).toEqual("peaty");
+  });
 });

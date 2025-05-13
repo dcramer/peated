@@ -1,5 +1,5 @@
 import { createRouterClient } from "@orpc/server";
-import admninQueueInfo from "./routes/adminQueueInfo";
+import adminQueueInfo from "./routes/adminQueueInfo";
 import authLogin from "./routes/authLogin";
 import authMagicLinkConfirm from "./routes/authMagicLinkConfirm";
 import authMagicLinkSend from "./routes/authMagicLinkSend";
@@ -9,6 +9,7 @@ import authPasswordResetConfirm from "./routes/authPasswordResetConfirm";
 import authRegister from "./routes/authRegister";
 import badgeById from "./routes/badgeById";
 import badgeCreate from "./routes/badgeCreate";
+import badgeImageUpdate from "./routes/badgeImageUpdate";
 import badgeList from "./routes/badgeList";
 import badgeUpdate from "./routes/badgeUpdate";
 import badgeUserList from "./routes/badgeUserList";
@@ -20,6 +21,7 @@ import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
 import bottleGenerateDetails from "./routes/bottleGenerateDetails";
+import bottleImageUpdate from "./routes/bottleImageUpdate";
 import bottleList from "./routes/bottleList";
 import bottleMerge from "./routes/bottleMerge";
 import bottlePreview from "./routes/bottlePreview";
@@ -101,6 +103,7 @@ import regionUpdate from "./routes/regionUpdate";
 import reviewCreate from "./routes/reviewCreate";
 import reviewList from "./routes/reviewList";
 import reviewUpdate from "./routes/reviewUpdate";
+import root from "./routes/root";
 import search from "./routes/search";
 import similarBottleList from "./routes/similarBottleList";
 import smwsDistillerList from "./routes/smwsDistillerList";
@@ -113,10 +116,12 @@ import tastingById from "./routes/tastingById";
 import tastingCreate from "./routes/tastingCreate";
 import tastingDelete from "./routes/tastingDelete";
 import tastingImageDelete from "./routes/tastingImageDelete";
+import tastingImageUpdate from "./routes/tastingImageUpdate";
 import tastingList from "./routes/tastingList";
 import tastingUpdate from "./routes/tastingUpdate";
 import toastCreate from "./routes/toastCreate";
 import unmatchedBottleList from "./routes/unmatchedBottleList";
+import userAvatarUpdate from "./routes/userAvatarUpdate";
 import userBadgeList from "./routes/userBadgeList";
 import userById from "./routes/userById";
 import userFlavorList from "./routes/userFlavorList";
@@ -139,6 +144,7 @@ export const router = {
   badgeList,
   badgeUpdate,
   badgeUserList,
+  badgeImageUpdate,
   bottleAliasDelete,
   bottleAliasList,
   bottleAliasUpdate,
@@ -253,6 +259,10 @@ export const router = {
   userTagList,
   userUpdate,
   version,
+  bottleImageUpdate,
+  tastingImageUpdate,
+  userAvatarUpdate,
+  root,
 };
 
 export type Router = typeof router;

@@ -1,8 +1,11 @@
-import { TRPCError } from "@trpc/server";
+import { ORPCError } from "@orpc/server";
 
 type ConflictMatch = { id: any } & Record<string, any>;
 
-export class ConflictError extends TRPCError {
+export class ConflictError extends ORPCError<
+  "CONFLICT",
+  { existingRow: ConflictMatch }
+> {
   public existingRow: ConflictMatch;
 
   constructor(
@@ -10,10 +13,10 @@ export class ConflictError extends TRPCError {
     err: Error | undefined = undefined,
     message: string | undefined = undefined,
   ) {
-    super({
+    super("CONFLICT", {
       message: message ?? `Conflicting object already exists (ID=${row.id}).`,
-      code: "CONFLICT",
       cause: err,
+      data: { existingRow: row },
     });
     this.existingRow = row;
   }

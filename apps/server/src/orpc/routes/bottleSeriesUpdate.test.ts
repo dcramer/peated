@@ -1,35 +1,34 @@
 import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { db } from "../../db";
-import { bottleSeries, changes } from "../../db/schema";
+import { changes } from "../../db/schema";
 import waitError from "../../lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottleSeriesUpdate", () => {
+describe("PATCH /bottle-series/:series", () => {
   it("requires authentication", async () => {
-    const caller = createCaller({ user: null });
     const err = await waitError(
-      caller.bottleSeriesUpdate({
+      routerClient.bottleSeriesUpdate({
         series: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot(`[ORPCError: UNAUTHORIZED]`);
   });
 
   it("requires moderator access", async ({ defaults }) => {
-    const caller = createCaller({ user: defaults.user });
     const err = await waitError(
-      caller.bottleSeriesUpdate({
-        series: 1,
-      }),
+      routerClient.bottleSeriesUpdate(
+        {
+          series: 1,
+        },
+        { context: { user: defaults.user } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   it("updates a series with new attributes", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const user = await fixtures.User({ mod: true });
 
     const brand = await fixtures.Entity({ name: "Ardbeg" });
     const series = await fixtures.BottleSeries({
@@ -44,7 +43,9 @@ describe("bottleSeriesUpdate", () => {
       description: "The updated series description",
     };
 
-    const result = await caller.bottleSeriesUpdate(data);
+    const result = await routerClient.bottleSeriesUpdate(data, {
+      context: { user },
+    });
 
     expect(result).toMatchObject({
       id: series.id,
@@ -80,9 +81,7 @@ describe("bottleSeriesUpdate", () => {
   it("prevents duplicate series names within the same brand", async function ({
     fixtures,
   }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const user = await fixtures.User({ mod: true });
 
     const brand = await fixtures.Entity({ name: "Ardbeg" });
     const series1 = await fixtures.BottleSeries({
@@ -95,19 +94,20 @@ describe("bottleSeriesUpdate", () => {
     });
 
     const err = await waitError(
-      caller.bottleSeriesUpdate({
-        series: series2.id,
-        name: series1.name,
-      }),
+      routerClient.bottleSeriesUpdate(
+        {
+          series: series2.id,
+          name: series1.name,
+        },
+        { context: { user } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot();
   });
 
   it("performs partial updates correctly", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ mod: true }),
-    });
+    const user = await fixtures.User({ mod: true });
 
     const brand = await fixtures.Entity({ name: "Ardbeg" });
     const series = await fixtures.BottleSeries({
@@ -117,10 +117,13 @@ describe("bottleSeriesUpdate", () => {
     });
 
     // Update only the name
-    const result = await caller.bottleSeriesUpdate({
-      series: series.id,
-      name: "Updated Series",
-    });
+    const result = await routerClient.bottleSeriesUpdate(
+      {
+        series: series.id,
+        name: "Updated Series",
+      },
+      { context: { user } },
+    );
 
     expect(result).toMatchObject({
       id: series.id,
