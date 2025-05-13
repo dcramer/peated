@@ -1,7 +1,7 @@
 import { MAJOR_COUNTRIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
-import { CountrySchema } from "@peated/server/schemas";
+import { CountrySchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
 import { and, asc, desc, ilike, inArray, ne, sql, type SQL } from "drizzle-orm";
@@ -96,9 +96,6 @@ export default procedure
         results.slice(0, limit),
         context.user,
       ),
-      rel: {
-        nextCursor: results.length > limit ? cursor + 1 : null,
-        prevCursor: cursor > 1 ? cursor - 1 : null,
-      },
+      rel: CursorSchema,
     };
   });

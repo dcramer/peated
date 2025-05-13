@@ -1,7 +1,7 @@
 ---
-description: 
-globs: 
-alwaysApply: true
+description: Guidelines for working with the database schema, as well as terminology and normalization techniques
+globs:
+alwaysApply: false
 ---
 # Whisky Schema Definitions
 
@@ -25,3 +25,43 @@ A set of common definitions for fields we use:
 - **vintage_year**: The distillation or vintage year (if given, otherwise \`null\`).
 - **cask_type**: Primary cask type or finish (if mentioned, otherwise \`null\`).
 - **edition**: Batch, edition, or release identifier (if mentioned, otherwise \`null\`).
+
+### Normalization Guidelines
+
+1. **Brand vs Distillery:**
+
+   - If the whiskey is an official distillery bottling, **brand** is the distillery name, and **distillery** is an array containing the same name (e.g., \`"brand": "Macallan",\` \`"distillery": [ "Macallan" ]\`).
+   - If the whiskey is a **blend** from multiple distilleries, **distillery** should list all known contributing distilleries (e.g., \`[ "Macallan", "Highland Park" ]\`).
+   - If the distilleries are **unknown**, set \`distillery: []\` (empty array).
+   - If the whiskey is an **independent bottling**, set **brand** to the bottler name (e.g., \`"Gordon & MacPhail"\` ) and **distillery** to the actual producer(s) (e.g., \`[ "Caol Ila" ]\` for a Gordon & MacPhail Caol Ila release).
+
+2. **Age Statement Handling:**
+
+   - If the label includes a stated age (e.g., \`"12 Years Old"\`), extract it as an integer (\`stated_age: 12\`).
+   - If there is no age statement, return \`null\` (\`stated_age: null\` for NAS – No Age Statement).
+   - When including the age statement as part of the expression, it should always be in this format: \`"12-year-old"\`
+
+3. **ABV Extraction:**
+
+   - Identify the ABV percentage and return it as a decimal (e.g., \`"abv": 46.3\` for \`"46.3% ABV"\`).
+
+4. **Series and Edition Identification:**
+
+   - If the whiskey is part of a named series (e.g., \`"Committee Release",\` \`"Limited Edition"\`), extract that into \`series\`.
+   - If the label specifies an edition (e.g., \`"Batch 3",\` \`"2021 Release"\`), extract it into \`edition\`.
+
+5. **Cask Type Extraction:**
+
+   - If a maturation or finishing cask is mentioned (e.g., \`"Sherry Cask",\` \`"Bourbon Barrel"\`), include that in \`cask_type\`.
+
+6. **Multiple Distilleries (Blends):**
+
+   - If the label indicates that the whiskey is a **blend** of multiple distilleries, list all known names in \`distillery: [ "Distillery1", "Distillery2" ]\`.
+   - If the distilleries are unspecified, leave \`distillery: []\` (empty array) instead of guessing.
+   - If it's a **single malt**, ensure that **distillery** is an array with one value.
+
+7. **Edge Case Handling:**
+
+   - If a typo or near match is detected (e.g., "Ardbeg Supanova" instead of "Ardbeg Supernova"), correct it.
+   - If a year is present but unclear (e.g., "2019" without context), use judgment but do **not fabricate details**.
+   - If multiple dates are listed (e.g., "Distilled in 1998, Bottled in 2018"), use **vintage_year: 1998**, **release_year: 2018**.

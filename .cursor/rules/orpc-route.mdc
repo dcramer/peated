@@ -1,6 +1,6 @@
 ---
 description: Instructions when working on OpenAPI routes in Hono.
-globs: 
+globs:
 alwaysApply: false
 ---
 ## Technology
@@ -11,12 +11,16 @@ We use the `orpc` framework, which provides our OpenAPI support. All code is wri
 
 Routes are located in `apps/server/src/orpc/routes` and are named based on their URL path.
 
-- They are ALWAYS in the root `routes` folder and flattened. We do not use or group routes into subfolders.
+- They are ALWAYS in the root `routes` folder and flattened. We do not use or group routes into
+  subfolders.
 - They should contain every HTTP METHOD at the same path (GET, POST, etc.)
-- Their path will include only their relative route location from the version (e.g. `/auth` vs `/v1/auth`). It will never include the `/v1` prefix.
+- Their path will include only their relative route location from the version
+  (e.g. `/auth` vs `/v1/auth`). It will never include the `/v1` prefix.
 - They use plural nouns in filenames (e.g. `bottleDetails` vs `bottleDetail`).
-- Each unique path should be its own module. (e.g. `auth.ts` only contains `/auth`, NEVER `/auth/register`, which would be in `authRegister.ts`).
-- The filename should be prefixed with the route subpath leading up to it (e.g. `adminQueueInfo.ts` for `/v1/admin/queueInfo`)
+- Each unique path should be its own module. For example, `auth.ts` only contains `/auth`,
+  NEVER `/auth/register`, which would be in `authRegister.ts`.
+- The filename should be prefixed with the route subpath leading up to it. For example, `adminQueueInfo.ts`
+  for `/v1/admin/queueInfo`.
 
 Here are some examples of file paths:
 
@@ -31,7 +35,8 @@ When importing these modules, ALWAYS name then accordingly with a `Route` suffix
 import authRegister from "@peated/server/orpc/routes/authRegister";
 ```
 
-Routes are registered in `apps/server/src/orpc/router.ts`, by adding a new `app.route`. They sorted alphabetically by name.
+Routes are registered in `apps/server/src/orpc/router.ts`, by adding a new `app.route`. They are
+sorted alphabetically by name.
 
 All unique paths should also be unique modules. For example:
 
@@ -54,27 +59,67 @@ import { procedure } from "..";
 export default procedure
   .route({ method: "GET", path: "/ping" })
   .handler(async function ({ context }) {
-    return { ping: "pong" }
+    return { ping: "pong" };
   });
 ```
 
-Note: Imports from the `apps/api` package should always use the `@peated/api` import path, rather than use relative imports. The only exception to this rule is when you're importing code which is in the same directory and is not a shared utility.
+Note: Imports from the `apps/api` package should always use the `@peated/api` import path, rather
+than use relative imports. The only exception to this rule is when you're importing code which is
+in the same directory and is not a shared utility.
+
+### Query Parameters
+
+Input parameters that may come from the query string must treat all inputs as strings. Query string
+parameters are input parameters from any procedure definition which is `method: "GET"`.
+
+We still want typed parameters, so we use the `coerce` behavior in Zod for this.
+
+Numbers and Booleans are straight forward:
+
+```ts
+{
+  cursor: z.coerce.number().gte(1).default(1),
+  hasBottles: z.coerce.boolean().default(false),
+}
+```
+
+Union types are a bit more complicated. We often use a union type when we want to allow a numeric ID
+in addition to something like a `slug`. To work around this we accept both values in the input:
+
+```ts
+{
+  country: z.union([z.string(), z.number()]),
+}
+```
+
+You then need to test the string to determine if its a number:
+
+```ts
+if (Number.isFinite(+input.country)) {
+}
+```
+
+This will not on its own satisfy the type-checker, so you'll need to assign it to a variable or otherwise
+type-cast it with `Number()` or `String()`.
 
 ### Error Responses
 
-When returning errors from routes, such as an HTTP 401 Unauthorized response, you should use the `OrpcError` class as control flow.
+When returning errors from routes, such as an HTTP 401 Unauthorized response, you should use the
+`OrpcError` class as control flow.
 
 ```ts
 import { ORPCError } from "@orpc/server";
 
-throw new ORPCError("UNAUTHORIZED", {message: "Invalid Credentials."});
+throw new ORPCError("UNAUTHORIZED", { message: "Invalid Credentials." });
 ```
 
 This will be caught by the error handler and converted to the appropriate HTTP response.
 
 ### Authentication
 
-Authentication can be added to an endpoint view a few middlewares. These are all found in `apps/server/src/orpc/middleware`. Commonly you will use something like `requireAuth` or `requireAdmin`. These are defined in the `procedure` call:
+Authentication can be added to an endpoint view a few middlewares. These are all found in
+`apps/server/src/orpc/middleware`. Commonly you will use something like `requireAuth` or
+`requireAdmin`. These are defined in the `procedure` call:
 
 ```ts
 import { os } from "@orpc/server";
@@ -85,13 +130,14 @@ export default procedure
   .route({ method: "GET", path: "/auth/me" })
   .use(requireAuth)
   .handler(async function ({ context }) {
-    return { whoami: context.user.email }
+    return { whoami: context.user.email };
   });
 ```
 
 ### Response Serialization
 
-Responses should be defined using `.output()` on the procedure, and then serialized using one of our `Serializer` classes. These are found in `apps/server/src/serializers`.
+Responses should be defined using `.output()` on the procedure, and then serialized using one of
+our `Serializer` classes. These are found in `apps/server/src/serializers`.
 
 For example:
 
@@ -117,11 +163,42 @@ export default procedure
   });
 ```
 
+All schemas are Zod schemas, and should exist for every core object type. These live in `apps/server/src/schemas`.
+
+For `list`-type responses, we return a standard format that uses the `results` key (as an array of the items), and
+the `rel` key which contains our `CursorSchema`.
+
+```ts
+import { CursorSchema } from "@peated/server/schemas";
+
+// ...
+
+return {
+  results: await serialize(
+    CountrySerializer,
+    results.slice(0, limit),
+    context.user
+  ),
+  rel: CursorSchema,
+};
+```
+
+For responses which return an object, we prefix them with the object-type to make nesting of other attributes easier
+and to create more uniformity in the types of responses:
+
+```ts
+return {
+  user: await serializer(UserSerializer, user, context.user);
+}
+```
+
 ## Tests
 
-Tests should be defined in `[routeName].test.ts`. They should use standard patterns that you can see in other similar route tests.
+Tests should be defined in `[routeName].test.ts`. They should use standard patterns that you
+can see in other similar route tests.
 
-The description passed to `describe` should ALWAYS be `METHOD /path`, representing the specific HTTP route.
+The description passed to `describe` should ALWAYS be `METHOD /path`, representing the
+specific HTTP route.
 
 ```ts
 import { routerClient } from "../router";
@@ -142,10 +219,10 @@ describe("POST /auth/login", () => {
     expect(data.accessToken).toBeDefined();
   });
 });
-
 ```
 
-If you need to test against an authenticated user, you can create it via `fixtures`, and pass it in via `context`:
+If you need to test against an authenticated user, you can create it via `fixtures`, and pass
+it in via `context`:
 
 ```ts
 import waitError from "@peated/server/lib/test/waitError";
@@ -162,7 +239,8 @@ describe("GET /auth/me", () => {
 });
 ```
 
-You should always assert that the relevant database objects have been created as part of the test, vs only asserting on the response.
+You should always assert that the relevant database objects have been created as part of the
+test, vs only asserting on the response.
 
 - DO check the database object has been updated correctly.
 - DO NOT assert on outputs that are unrelated to the inputs.
@@ -189,7 +267,7 @@ describe("POST /auth/login", () => {
       routerClient.authLogin({
         email: "foo@example.com",
         password: "example2",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot();
   });
