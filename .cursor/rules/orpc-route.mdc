@@ -124,6 +124,11 @@ throw new ORPCError("UNAUTHORIZED", { message: "Invalid Credentials." });
 
 This will be caught by the error handler and converted to the appropriate HTTP response.
 
+Errors should always use the following rules:
+
+- the value of the error should be mapped to an HTTP Status Code (`NOT_FOUND`, `UNAUTHORIZED`, etc)
+- the message should be generally provided, and be a sentence (that is, ending with puncutation, proper capitalization, etc).
+
 ### Authentication
 
 Authentication can be added to an endpoint view a few middlewares. These are all found in
