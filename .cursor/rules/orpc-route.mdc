@@ -76,6 +76,31 @@ Methods chained on the procedure should be ordered as followed:
 4. `output` - the output schema (a `zod` schema)
 5. `handler` - the handler should always be last
 
+## Paths
+
+We follow the standard REST pattern of `/collectionName/:identifierName`, with subcollections where it
+makes sense.
+
+- Collections should be plural: /bottles
+- Items should be attached to their collections: /bottles/:id
+
+### HTTP Verbs
+
+Use the following patterns for the verb in routes:
+
+- GET: read a resource
+- POST: create a new resource
+- PUT: upsert a resource (create or update, without a primary key)
+- PATCH: update a resource (fields are always optional on updates)
+- DELETE: delete a resource
+
+Additionally for UPSERT type behavior:
+
+- If the operation is on a singular primary key, use the dedicated resource details with PUT.
+- If the operation is on multiple objects, or its on a composite key, use the collection endpoint with PUT.
+
+When mutation operations are exposed on collections they must always support batch inputs.
+
 ### Query and Path Parameters
 
 Input parameters that may come from the path or query string must treat all inputs as strings. Query string

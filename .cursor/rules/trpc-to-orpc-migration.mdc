@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: false
 ---
 I need you to help me migrate the remaining tPRC endpoints.
@@ -10,3 +10,5 @@ They are all in the `apps/server/src/orpc/routes` directory intermingled with th
 Reference the [orpc-route.mdc](mdc:.cursor/rules/orpc-route.mdc) rules to migrate each route. Follow them carefully, especially around the code patterns used to handle errors and call tests.
 
 Plan each route carefully. Migrate the tests as well. Make sure all tests contain the same behavior as they did previously.
+
+You should NEVER partially migrate a file. Always do it completely to ensure all original functionality (or tests) remain.
