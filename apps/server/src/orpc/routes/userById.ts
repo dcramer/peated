@@ -1,31 +1,37 @@
-import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
-import { z } from "zod";
-import { publicProcedure } from "..";
-import { db } from "../../db";
+import { ORPCError } from "@orpc/server";
+import { db } from "@peated/server/db";
 import {
   changes,
   collectionBottles,
   collections,
   tastings,
-} from "../../db/schema";
-import { getUserFromId } from "../../lib/api";
-import { serialize } from "../../serializers";
-import { UserSerializer } from "../../serializers/user";
+} from "@peated/server/db/schema";
+import { getUserFromId } from "@peated/server/lib/api";
+import { serialize } from "@peated/server/serializers";
+import { UserSerializer } from "@peated/server/serializers/user";
+import { eq, sql } from "drizzle-orm";
+import { z } from "zod";
+import { procedure } from "..";
 
-export default publicProcedure
-  .input(z.union([z.number(), z.literal("me"), z.string()]))
-  .query(async function ({ input, ctx }) {
-    const user = await getUserFromId(db, input, ctx.user);
+export default procedure
+  .route({ method: "GET", path: "/users/:id" })
+  .input(
+    z.object({
+      id: z.union([z.coerce.number(), z.literal("me"), z.string()]),
+    }),
+  )
+  .output(z.any())
+  .handler(async function ({ input, context }) {
+    const user = await getUserFromId(db, input.id, context.user);
 
     if (!user) {
-      if (input === "me") {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
+      if (input.id === "me") {
+        throw new ORPCError("UNAUTHORIZED", {
+          message: "User not authenticated",
         });
       }
-      throw new TRPCError({
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
+        message: "User not found",
       });
     }
 
@@ -59,7 +65,7 @@ export default publicProcedure
       .limit(1);
 
     return {
-      ...(await serialize(UserSerializer, user, ctx.user)),
+      ...(await serialize(UserSerializer, user, context.user)),
       stats: {
         tastings: totalTastings,
         bottles: totalBottles,

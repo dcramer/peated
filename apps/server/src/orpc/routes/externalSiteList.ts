@@ -4,27 +4,29 @@ import { z } from "zod";
 
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
+import { CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteSerializer } from "@peated/server/serializers/externalSite";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/external-sites" })
   .input(
-    z
-      .object({
-        query: z.string().default(""),
-        sort: z.enum(["name", "-name"]).default("name"),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
-      })
-      .default({
-        query: "",
-        sort: "name",
-        cursor: 1,
-        limit: 100,
-      }),
+    z.object({
+      query: z.coerce.string().default(""),
+      sort: z.enum(["name", "-name"]).default("name"),
+      cursor: z.coerce.number().gte(1).default(1),
+      limit: z.coerce.number().gte(1).lte(100).default(100),
+    }),
   )
-  .query(async function ({ input: { cursor, sort, limit, query }, ctx }) {
+  .output(
+    z.object({
+      results: z.array(z.any()),
+      rel: CursorSchema,
+    }),
+  )
+  .handler(async function ({ input, context }) {
+    const { cursor, sort, limit, query } = input;
     const offset = (cursor - 1) * limit;
 
     const where: SQL<unknown>[] = [];
@@ -54,7 +56,7 @@ export default publicProcedure
       results: await serialize(
         ExternalSiteSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

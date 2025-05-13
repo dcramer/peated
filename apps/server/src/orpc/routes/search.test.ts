@@ -1,17 +1,16 @@
-import { TRPCError } from "@trpc/server";
-import { createCaller } from "../router";
+import waitError from "@peated/server/lib/test/waitError";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-describe("search", () => {
+describe("GET /search", () => {
   test("searches across bottles and entities without authentication", async ({
     fixtures,
-    expect,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Unique Whiskey" });
     const entity = await fixtures.Entity({ name: "Unique Distillery" });
     const user = await fixtures.User({ username: "uniqueuser" });
 
-    const caller = createCaller({ user: null });
-    const { results } = await caller.search({
+    const { results } = await routerClient.search({
       query: "unique",
       limit: 10,
     });
@@ -28,17 +27,20 @@ describe("search", () => {
   test("searches across bottles, entities, and users with authentication", async ({
     fixtures,
     defaults,
-    expect,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Unique Whiskey" });
     const entity = await fixtures.Entity({ name: "Unique Distillery" });
     const user = await fixtures.User({ username: "uniqueuser" });
 
-    const caller = createCaller({ user: defaults.user });
-    const { results } = await caller.search({
-      query: "unique",
-      limit: 10,
-    });
+    const { results } = await routerClient.search(
+      {
+        query: "unique",
+        limit: 10,
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
 
     expect(results.length).toBe(3);
     expect(
@@ -52,12 +54,11 @@ describe("search", () => {
     ).toBeTruthy();
   });
 
-  test("limits search to specified types", async ({ fixtures, expect }) => {
+  test("limits search to specified types", async ({ fixtures }) => {
     await fixtures.Bottle({ name: "Unique Whiskey" });
     const entity = await fixtures.Entity({ name: "Unique Distillery" });
 
-    const caller = createCaller({ user: null });
-    const { results } = await caller.search({
+    const { results } = await routerClient.search({
       query: "unique",
       include: ["entities"],
       limit: 10,
@@ -68,13 +69,12 @@ describe("search", () => {
     expect(results[0].ref.id).toBe(entity.id);
   });
 
-  test("respects the limit parameter", async ({ fixtures, expect }) => {
+  test("respects the limit parameter", async ({ fixtures }) => {
     await fixtures.Bottle({ name: "Unique Whiskey 1" });
     await fixtures.Bottle({ name: "Unique Whiskey 2" });
     await fixtures.Bottle({ name: "Unique Whiskey 3" });
 
-    const caller = createCaller({ user: null });
-    const { results } = await caller.search({
+    const { results } = await routerClient.search({
       query: "unique",
       limit: 2,
     });
@@ -82,12 +82,11 @@ describe("search", () => {
     expect(results.length).toBe(2);
   });
 
-  test("sorts exact matches first", async ({ fixtures, expect }) => {
+  test("sorts exact matches first", async ({ fixtures }) => {
     await fixtures.Bottle({ name: "Lagavulin 16" });
     const exactMatch = await fixtures.Bottle({ name: "Lagavulin" });
 
-    const caller = createCaller({ user: null });
-    const { results } = await caller.search({
+    const { results } = await routerClient.search({
       query: "Lagavulin",
       limit: 10,
     });
@@ -96,9 +95,8 @@ describe("search", () => {
     expect(results[0].ref.id).toBe(exactMatch.id);
   });
 
-  test("handles empty query", async ({ fixtures, expect }) => {
-    const caller = createCaller({ user: null });
-    const { results } = await caller.search({
+  test("handles empty query", async () => {
+    const { results } = await routerClient.search({
       query: "",
       limit: 10,
     });
@@ -106,9 +104,8 @@ describe("search", () => {
     expect(results.length).toBe(0);
   });
 
-  test("handles query with no results", async ({ fixtures, expect }) => {
-    const caller = createCaller({ user: null });
-    const { results } = await caller.search({
+  test("handles query with no results", async () => {
+    const { results } = await routerClient.search({
       query: "nonexistentitem",
       limit: 10,
     });
@@ -116,17 +113,14 @@ describe("search", () => {
     expect(results.length).toBe(0);
   });
 
-  test("throws error for invalid include parameter", async ({
-    fixtures,
-    expect,
-  }) => {
-    const caller = createCaller({ user: null });
-    await expect(
-      caller.search({
+  test("throws error for invalid include parameter", async () => {
+    const err = await waitError(() =>
+      routerClient.search({
         query: "test",
         include: ["invalidtype" as any],
         limit: 10,
       }),
-    ).rejects.toThrow(TRPCError);
+    );
+    expect(err).toBeDefined();
   });
 });

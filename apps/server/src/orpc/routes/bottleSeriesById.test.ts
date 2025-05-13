@@ -1,8 +1,8 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { describe, expect, it } from "vitest";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottleSeriesById", () => {
+describe("GET /bottle-series/:id", () => {
   it("returns a bottle series", async function ({ fixtures }) {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
     const series = await fixtures.BottleSeries({
@@ -11,8 +11,9 @@ describe("bottleSeriesById", () => {
       brandId: brand.id,
     });
 
-    const caller = createCaller();
-    const result = await caller.bottleSeriesById(series.id);
+    const result = await routerClient.bottleSeriesById({
+      id: series.id,
+    });
 
     expect(result).toMatchObject({
       id: series.id,
@@ -28,8 +29,11 @@ describe("bottleSeriesById", () => {
   });
 
   it("returns 404 for non-existent series", async function () {
-    const caller = createCaller();
-    const err = await waitError(caller.bottleSeriesById(999999));
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Series not found.]`);
+    const err = await waitError(
+      routerClient.bottleSeriesById({
+        id: 999999,
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 });

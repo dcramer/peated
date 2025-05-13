@@ -1,21 +1,22 @@
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("lists entity aliases", async ({ fixtures }) => {
-  const entity = await fixtures.Entity({ name: "Foo" });
-  await fixtures.EntityAlias({
-    entityId: entity.id,
-    name: "Foo Bar",
-  });
+describe("GET /entities/:entity/aliases", () => {
+  test("lists entity aliases", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({ name: "Foo" });
+    await fixtures.EntityAlias({
+      entityId: entity.id,
+      name: "Foo Bar",
+    });
 
-  const caller = createCaller({
-    user: null,
+    const { results } = await routerClient.entityAliasList({
+      entity: entity.id,
+    });
+
+    expect(results.length).toEqual(2);
+    expect(results[0].name).toEqual("Foo");
+    expect(results[0].isCanonical).toEqual(true);
+    expect(results[1].name).toEqual("Foo Bar");
+    expect(results[1].isCanonical).toEqual(false);
   });
-  const { results } = await caller.entityAliasList({
-    entity: entity.id,
-  });
-  expect(results.length).toEqual(2);
-  expect(results[0].name).toEqual("Foo");
-  expect(results[0].isCanonical).toEqual(true);
-  expect(results[1].name).toEqual("Foo Bar");
-  expect(results[1].isCanonical).toEqual(false);
 });

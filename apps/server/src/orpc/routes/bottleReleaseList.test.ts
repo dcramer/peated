@@ -1,6 +1,7 @@
-import { createCaller } from "../router";
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "../router";
 
-describe("bottleReleaseList", () => {
+describe("GET /bottles/:bottle/releases", () => {
   it("lists releases for a bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const release1 = await fixtures.BottleRelease({
@@ -19,9 +20,7 @@ describe("bottleReleaseList", () => {
       name: "C",
     });
 
-    const caller = createCaller();
-
-    const { results, rel } = await caller.bottleReleaseList({
+    const { results, rel } = await routerClient.bottleReleaseList({
       bottle: bottle.id,
       limit: 2,
     });
@@ -34,13 +33,12 @@ describe("bottleReleaseList", () => {
   });
 
   it("errors on invalid bottle", async () => {
-    const caller = createCaller();
-
-    await expect(
-      caller.bottleReleaseList({
+    const err = await waitError(
+      routerClient.bottleReleaseList({
         bottle: 1,
       }),
-    ).rejects.toThrow("Bottle not found.");
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
   it("filters by bottle", async ({ fixtures }) => {
@@ -56,9 +54,7 @@ describe("bottleReleaseList", () => {
       name: "B",
     });
 
-    const caller = createCaller();
-
-    const { results, rel } = await caller.bottleReleaseList({
+    const { results, rel } = await routerClient.bottleReleaseList({
       bottle: bottle.id,
     });
 
@@ -80,9 +76,7 @@ describe("bottleReleaseList", () => {
       name: "B",
     });
 
-    const caller = createCaller();
-
-    const { results, rel } = await caller.bottleReleaseList({
+    const { results, rel } = await routerClient.bottleReleaseList({
       bottle: bottle.id,
     });
 

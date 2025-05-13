@@ -4,7 +4,11 @@ import { and, asc, eq, ilike, isNull } from "drizzle-orm";
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { externalSites, reviews } from "@peated/server/db/schema";
-import { ExternalSiteTypeEnum, ReviewSchema } from "@peated/server/schemas";
+import {
+  CursorSchema,
+  ExternalSiteTypeEnum,
+  ReviewSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import { z } from "zod";
@@ -27,10 +31,7 @@ const InputSchema = z
 
 const OutputSchema = z.object({
   results: z.array(ReviewSchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
+  rel: CursorSchema,
 });
 
 export default procedure

@@ -1,27 +1,39 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottles, tastings } from "@peated/server/db/schema";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/bottles/:bottle/tags" })
   .input(
     z.object({
-      bottle: z.number(),
-      limit: z.number().gte(1).lte(100).default(25),
+      bottle: z.coerce.number(),
+      limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
   )
-  .query(async function ({ input: { limit, ...input } }) {
+  .output(
+    z.object({
+      results: z.array(
+        z.object({
+          tag: z.string(),
+          count: z.number(),
+        }),
+      ),
+      totalCount: z.number(),
+    }),
+  )
+  .handler(async function ({ input }) {
+    const { limit, ...rest } = input;
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, input.bottle));
+      .where(eq(bottles.id, rest.bottle));
 
     if (!bottle) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Bottle not found.",
-        code: "NOT_FOUND",
       });
     }
 

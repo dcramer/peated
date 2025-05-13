@@ -1,9 +1,10 @@
+import { call } from "@orpc/server";
 import type { Bottle, Entity, User } from "@peated/server/types";
 import { z } from "zod";
-import { publicProcedure } from "..";
-import { bottleList } from "./bottleList";
-import { entityList } from "./entityList";
-import { userList } from "./userList";
+import { procedure } from "..";
+import bottleList from "./bottleList";
+import entityList from "./entityList";
+import userList from "./userList";
 
 export type BottleResult = {
   type: "bottle";
@@ -57,68 +58,92 @@ function sortResults(query: string, unsortedResults: Result[]) {
   return results;
 }
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/search" })
   .input(
     z.object({
-      query: z.string(),
+      query: z.coerce.string(),
       include: z.array(z.enum(INCLUDE_LIST)).default([...INCLUDE_LIST]),
-      limit: z.number().lte(100),
+      limit: z.coerce.number().lte(100),
     }),
   )
-  .query(async function ({ input: { query, include, limit }, ctx }) {
+  .output(
+    z.object({
+      query: z.string(),
+      results: z.array(
+        z.object({
+          type: z.enum(["bottle", "entity", "user"]),
+          ref: z.any(),
+        }),
+      ),
+    }),
+  )
+  .handler(async function ({ input, context }) {
+    const { query, include, limit } = input;
     const promises = [];
 
-    if (include.includes("bottles"))
+    if (include.includes("bottles")) {
       promises.push(
-        bottleList({
-          input: {
+        call(
+          bottleList,
+          {
             query,
             cursor: 1,
             limit,
             sort: "rank",
           },
-          ctx,
-        })
-          .then((data) =>
-            data.results.map<Result>((b) => ({ type: "bottle", ref: b })),
+          { context },
+        )
+          .then((data: any) =>
+            data.results.map((b: any) => ({ type: "bottle", ref: b })),
           )
           .catch(() => []),
       );
+    }
 
-    if (include.includes("users"))
+    if (include.includes("users")) {
       promises.push(
-        userList({
-          input: {
+        call(
+          userList,
+          {
             query,
             cursor: 1,
             sort: "name",
             limit,
           },
-          ctx,
-        })
-          .then((data) =>
-            data.results.map<Result>((b) => ({ type: "user", ref: b })),
+          { context },
+        )
+          .then((data: any) =>
+            data.results.map((b: any) => ({ type: "user", ref: b })),
           )
           .catch(() => []),
       );
+    }
 
-    if (include.includes("entities"))
+    if (include.includes("entities")) {
       promises.push(
-        entityList({
-          input: { query, cursor: 1, limit, sort: "rank" },
-          ctx,
-        })
-          .then((data) =>
-            data.results.map<Result>((b) => ({ type: "entity", ref: b })),
+        call(
+          entityList,
+          {
+            query,
+            cursor: 1,
+            limit,
+            sort: "rank",
+          },
+          { context },
+        )
+          .then((data: any) =>
+            data.results.map((b: any) => ({ type: "entity", ref: b })),
           )
           .catch(() => []),
       );
+    }
 
     const results = await Promise.all(promises);
 
     const sortedResults = sortResults(
       query,
-      results.reduce((prev, cur) => [...prev, ...cur], []),
+      results.reduce((prev: any[], cur: any[]) => [...prev, ...cur], []),
     );
 
     return {

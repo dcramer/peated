@@ -1,11 +1,9 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { describe, expect, it } from "vitest";
-import waitError from "../../lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottleReleaseById", function () {
+describe("GET /bottle-releases/:id", function () {
   it("returns a bottle release", async function ({ fixtures }) {
-    const caller = createCaller();
-
     const bottle = await fixtures.Bottle({
       name: "Test Bottle",
       category: "single_malt",
@@ -16,7 +14,9 @@ describe("bottleReleaseById", function () {
       abv: 40,
     });
 
-    const result = await caller.bottleReleaseById(release.id);
+    const result = await routerClient.bottleReleaseById({
+      id: release.id,
+    });
 
     expect(result.id).toBe(release.id);
     expect(result.bottleId).toBe(bottle.id);
@@ -25,9 +25,11 @@ describe("bottleReleaseById", function () {
   });
 
   it("errors on invalid release", async function () {
-    const caller = createCaller();
-
-    const err = await waitError(caller.bottleReleaseById(1234));
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Release not found.]`);
+    const err = await waitError(
+      routerClient.bottleReleaseById({
+        id: 1234,
+      }),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 });

@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottleSeriesList", () => {
+describe("GET /bottle-series", () => {
   it("lists series for a brand", async function ({ fixtures, defaults }) {
-    const caller = createCaller({ user: defaults.user });
-
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const series1 = await fixtures.BottleSeries({
@@ -27,7 +25,7 @@ describe("bottleSeriesList", () => {
       brandId: otherBrand.id,
     });
 
-    const { results } = await caller.bottleSeriesList({
+    const { results } = await routerClient.bottleSeriesList({
       brand: brand.id,
     });
 
@@ -57,8 +55,6 @@ describe("bottleSeriesList", () => {
   });
 
   it("filters series by query", async function ({ fixtures, defaults }) {
-    const caller = createCaller({ user: defaults.user });
-
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const series1 = await fixtures.BottleSeries({
@@ -71,7 +67,7 @@ describe("bottleSeriesList", () => {
       brandId: brand.id,
     });
 
-    const { results } = await caller.bottleSeriesList({
+    const { results } = await routerClient.bottleSeriesList({
       brand: brand.id,
       query: "supernova",
     });
@@ -92,9 +88,7 @@ describe("bottleSeriesList", () => {
     fixtures,
     defaults,
   }) {
-    const caller = createCaller({ user: defaults.user });
-
-    const { results } = await caller.bottleSeriesList({
+    const { results } = await routerClient.bottleSeriesList({
       brand: 12345,
     });
 

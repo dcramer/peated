@@ -1,26 +1,30 @@
-import { TRPCError } from "@trpc/server";
+import { ORPCError } from "@orpc/server";
+import { db } from "@peated/server/db";
+import { bottleSeries } from "@peated/server/db/schema";
+import { serialize } from "@peated/server/serializers";
+import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
-import { db } from "../../db";
-import { bottleSeries } from "../../db/schema";
-import { serialize } from "../../serializers";
-import { BottleSeriesSerializer } from "../../serializers/bottleSeries";
+import { procedure } from "..";
 
-export default publicProcedure.input(z.number()).query(async function ({
-  input,
-  ctx,
-}) {
-  const series = await db.query.bottleSeries.findFirst({
-    where: eq(bottleSeries.id, input),
-  });
-
-  if (!series) {
-    throw new TRPCError({
-      message: "Series not found.",
-      code: "NOT_FOUND",
+export default procedure
+  .route({ method: "GET", path: "/bottle-series/:id" })
+  .input(
+    z.object({
+      id: z.coerce.number(),
+    }),
+  )
+  .output(z.any())
+  .handler(async function ({ input, context }) {
+    const series = await db.query.bottleSeries.findFirst({
+      where: eq(bottleSeries.id, input.id),
     });
-  }
 
-  return await serialize(BottleSeriesSerializer, series, ctx.user);
-});
+    if (!series) {
+      throw new ORPCError("NOT_FOUND", {
+        message: "Series not found.",
+      });
+    }
+
+    return await serialize(BottleSeriesSerializer, series, context.user);
+  });

@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { regions } from "@peated/server/db/schema/regions";
-import { RegionSchema } from "@peated/server/schemas";
+import { CursorSchema, RegionSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { RegionSerializer } from "@peated/server/serializers/region";
 import { and, asc, desc, eq, ilike, ne, sql, type SQL } from "drizzle-orm";
@@ -24,10 +24,7 @@ const InputSchema = z.object({
 
 const OutputSchema = z.object({
   results: z.array(RegionSchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
+  rel: CursorSchema,
 });
 
 export default procedure

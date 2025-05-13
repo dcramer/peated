@@ -14,10 +14,7 @@ const SORT_OPTIONS = ["name", "bottles", "-name", "-bottles"] as const;
 
 const OutputSchema = z.object({
   results: z.array(CountrySchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
+  rel: CursorSchema,
 });
 
 export default procedure
@@ -96,6 +93,9 @@ export default procedure
         results.slice(0, limit),
         context.user,
       ),
-      rel: CursorSchema,
+      rel: {
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
+      },
     };
   });

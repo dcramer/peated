@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { bottleAliases, bottles } from "@peated/server/db/schema";
+import { CursorSchema } from "@peated/server/schemas";
 import {
   and,
   asc,
@@ -23,10 +24,7 @@ const OutputSchema = z.object({
       isCanonical: z.boolean().optional(),
     }),
   ),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
+  rel: CursorSchema,
 });
 
 export default procedure

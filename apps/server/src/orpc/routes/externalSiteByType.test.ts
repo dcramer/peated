@@ -1,9 +1,13 @@
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("get site by type", async ({ fixtures }) => {
-  const site = await fixtures.ExternalSite();
+describe("GET /external-sites/:type", () => {
+  test("get site by type", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSite();
 
-  const caller = createCaller({ user: null });
-  const data = await caller.externalSiteByType(site.type);
-  expect(data.id).toEqual(site.id);
+    const data = await routerClient.externalSiteByType({
+      type: site.type,
+    });
+    expect(data.id).toEqual(site.id);
+  });
 });

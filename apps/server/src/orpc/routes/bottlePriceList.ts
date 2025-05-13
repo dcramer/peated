@@ -1,8 +1,8 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottles, externalSites, storePrices } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
-import { TRPCError } from "@trpc/server";
 import {
   and,
   asc,
@@ -13,25 +13,30 @@ import {
   sql,
 } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/bottles/:bottle/prices" })
   .input(
     z.object({
-      bottle: z.number(),
-      onlyValid: z.boolean().optional(),
+      bottle: z.coerce.number(),
+      onlyValid: z.coerce.boolean().optional(),
     }),
   )
-  .query(async function ({ input, ctx }) {
+  .output(
+    z.object({
+      results: z.array(z.any()),
+    }),
+  )
+  .handler(async function ({ input, context }) {
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Bottle not found.",
-        code: "NOT_FOUND",
       });
     }
 
@@ -61,6 +66,10 @@ export default publicProcedure
       );
 
     return {
-      results: await serialize(StorePriceWithSiteSerializer, results, ctx.user),
+      results: await serialize(
+        StorePriceWithSiteSerializer,
+        results,
+        context.user,
+      ),
     };
   });

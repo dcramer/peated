@@ -1,25 +1,23 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleSeries, changes, entities } from "@peated/server/db/schema";
 import { BottleSeriesInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
 import { pushJob } from "@peated/server/worker/client";
-import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 import { ConflictError } from "../errors";
+import { requireAuth } from "../middleware";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "POST", path: "/bottle-series" })
+  .use(requireAuth)
   .input(BottleSeriesInputSchema)
-  .mutation(async ({ input, ctx }) => {
-    const user = ctx.user;
-
-    if (!user) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-      });
-    }
+  .output(z.any())
+  .handler(async function ({ input, context }) {
+    const user = context.user;
 
     const series = await db.transaction(async (tx) => {
       // Get the brand to ensure it exists and to build fullName
@@ -30,9 +28,8 @@ export default publicProcedure
         .limit(1);
 
       if (!brand) {
-        throw new TRPCError({
+        throw new ORPCError("NOT_FOUND", {
           message: "Brand not found.",
-          code: "NOT_FOUND",
         });
       }
 

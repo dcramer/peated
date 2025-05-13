@@ -1,31 +1,35 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { comments } from "@peated/server/db/schema";
+import { CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CommentSerializer } from "@peated/server/serializers/comment";
-import { TRPCError } from "@trpc/server";
 import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/comments" })
   .input(
-    z
-      .object({
-        user: z.union([z.literal("me"), z.number()]).optional(),
-        tasting: z.number().optional(),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
-      })
-      .default({
-        cursor: 1,
-        limit: 100,
-      }),
+    z.object({
+      user: z.union([z.literal("me"), z.coerce.number()]).optional(),
+      tasting: z.coerce.number().optional(),
+      cursor: z.coerce.number().gte(1).default(1),
+      limit: z.coerce.number().gte(1).lte(100).default(100),
+    }),
   )
-  .query(async function ({ input: { cursor, limit, ...input }, ctx }) {
+  .output(
+    z.object({
+      results: z.array(z.any()),
+      rel: CursorSchema,
+    }),
+  )
+  .handler(async function ({ input, context }) {
+    const { cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
 
     // have to specify at least one so folks dont scrape all comments
-    if (!ctx.user?.admin && !input.tasting && !input.user) {
+    if (!context.user?.admin && !rest.tasting && !rest.user) {
       return {
         results: [],
         rel: {
@@ -37,21 +41,19 @@ export default publicProcedure
 
     const where = [];
 
-    if (input.user) {
-      if (input.user === "me") {
-        if (!ctx.user) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-          });
+    if (rest.user) {
+      if (rest.user === "me") {
+        if (!context.user) {
+          throw new ORPCError("UNAUTHORIZED");
         }
-        where.push(eq(comments.createdById, ctx.user.id));
+        where.push(eq(comments.createdById, context.user.id));
       } else {
-        where.push(eq(comments.createdById, input.user));
+        where.push(eq(comments.createdById, rest.user));
       }
     }
 
-    if (input.tasting) {
-      where.push(eq(comments.tastingId, input.tasting));
+    if (rest.tasting) {
+      where.push(eq(comments.tastingId, rest.tasting));
     }
 
     const results = await db
@@ -66,7 +68,7 @@ export default publicProcedure
       results: await serialize(
         CommentSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

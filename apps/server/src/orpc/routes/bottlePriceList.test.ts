@@ -1,6 +1,6 @@
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottlePriceList", () => {
+describe("GET /bottles/:bottle/prices", () => {
   test("includes prices older than a week by default", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const recentPrice = await fixtures.StorePrice({
@@ -21,8 +21,7 @@ describe("bottlePriceList", () => {
       updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
     });
 
-    const caller = createCaller({ user: null });
-    const result = await caller.bottlePriceList({
+    const result = await routerClient.bottlePriceList({
       bottle: bottle.id,
     });
 
@@ -53,8 +52,7 @@ describe("bottlePriceList", () => {
       updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
     });
 
-    const caller = createCaller({ user: null });
-    const result = await caller.bottlePriceList({
+    const result = await routerClient.bottlePriceList({
       bottle: bottle.id,
       onlyValid: true,
     });

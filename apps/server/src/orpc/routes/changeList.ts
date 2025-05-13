@@ -1,46 +1,48 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { changes } from "@peated/server/db/schema";
+import { CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ChangeSerializer } from "@peated/server/serializers/change";
-import { TRPCError } from "@trpc/server";
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/changes" })
   .input(
-    z
-      .object({
-        user: z.union([z.literal("me"), z.number()]).optional(),
-        type: z.enum(["bottle", "entity"]).optional(),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
-      })
-      .default({
-        cursor: 1,
-        limit: 100,
-      }),
+    z.object({
+      user: z.union([z.literal("me"), z.coerce.number()]).optional(),
+      type: z.enum(["bottle", "entity"]).optional(),
+      cursor: z.coerce.number().gte(1).default(1),
+      limit: z.coerce.number().gte(1).lte(100).default(100),
+    }),
   )
-  .query(async function ({ input: { cursor, limit, ...input }, ctx }) {
+  .output(
+    z.object({
+      results: z.array(z.any()),
+      rel: CursorSchema,
+    }),
+  )
+  .handler(async function ({ input, context }) {
+    const { cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
 
-    if (input.type) {
-      where.push(eq(changes.objectType, input.type));
+    if (rest.type) {
+      where.push(eq(changes.objectType, rest.type));
     }
-    if (input.user) {
-      if (input.user === "me") {
-        if (!ctx.user) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-          });
+    if (rest.user) {
+      if (rest.user === "me") {
+        if (!context.user) {
+          throw new ORPCError("UNAUTHORIZED");
         }
 
-        where.push(eq(changes.createdById, ctx.user.id));
+        where.push(eq(changes.createdById, context.user.id));
       } else {
-        where.push(eq(changes.createdById, input.user));
+        where.push(eq(changes.createdById, rest.user));
       }
     }
 
@@ -56,7 +58,7 @@ export default publicProcedure
       results: await serialize(
         ChangeSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

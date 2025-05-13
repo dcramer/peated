@@ -1,11 +1,12 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles } from "@peated/server/db/schema";
+import { CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
-import { TRPCError } from "@trpc/server";
 import { and, asc, desc, eq, type SQL, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
 const SORT_OPTIONS = [
   "name",
@@ -26,31 +27,35 @@ const SORT_OPTIONS = [
 
 const DEFAULT_SORT = "releaseYear";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/bottles/:bottle/releases" })
   .input(
     z.object({
-      bottle: z.number(),
-      query: z.string().default(""),
-      cursor: z.number().gte(1).default(1),
-      limit: z.number().gte(1).lte(100).default(25),
+      bottle: z.coerce.number(),
+      query: z.coerce.string().default(""),
+      cursor: z.coerce.number().gte(1).default(1),
+      limit: z.coerce.number().gte(1).lte(100).default(25),
       sort: z.enum(SORT_OPTIONS).default("name"),
     }),
   )
-  .query(async function ({
-    input: { query, cursor, limit, sort, ...input },
-    ctx,
-  }) {
+  .output(
+    z.object({
+      results: z.array(z.any()),
+      rel: CursorSchema,
+    }),
+  )
+  .handler(async function ({ input, context }) {
+    const { query, cursor, limit, sort, ...rest } = input;
     const offset = (cursor - 1) * limit;
 
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, input.bottle));
+      .where(eq(bottles.id, rest.bottle));
 
     if (!bottle) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Bottle not found.",
-        code: "NOT_FOUND",
       });
     }
 
@@ -124,7 +129,7 @@ export default publicProcedure
       results: await serialize(
         BottleReleaseSerializer,
         results.slice(0, limit),
-        ctx.user ?? undefined,
+        context.user ?? undefined,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

@@ -1,30 +1,41 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottles,
   bottlesToDistillers,
   entities,
 } from "@peated/server/db/schema";
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/entities/:entity/categories" })
   .input(
     z.object({
-      entity: z.number(),
+      entity: z.coerce.number(),
     }),
   )
-  .query(async function ({ input, ctx }) {
+  .output(
+    z.object({
+      results: z.array(
+        z.object({
+          count: z.number(),
+          category: z.string().nullable(),
+        }),
+      ),
+      totalCount: z.number(),
+    }),
+  )
+  .handler(async function ({ input }) {
     const [entity] = await db
       .select()
       .from(entities)
       .where(eq(entities.id, input.entity));
 
     if (!entity) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Entity not found.",
-        code: "NOT_FOUND",
       });
     }
 

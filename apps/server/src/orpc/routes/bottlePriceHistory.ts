@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottles,
@@ -5,28 +6,39 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { CurrencyEnum } from "@peated/server/schemas";
-import { TRPCError } from "@trpc/server";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/bottles/:bottle/price-history" })
   .input(
     z.object({
-      bottle: z.number(),
+      bottle: z.coerce.number(),
       currency: CurrencyEnum.default("usd"),
     }),
   )
-  .query(async function ({ input, ctx }) {
+  .output(
+    z.object({
+      results: z.array(
+        z.object({
+          date: z.string(),
+          avgPrice: z.number(),
+          minPrice: z.number(),
+          maxPrice: z.number(),
+        }),
+      ),
+    }),
+  )
+  .handler(async function ({ input, context }) {
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Bottle not found.",
-        code: "NOT_FOUND",
       });
     }
 

@@ -1,42 +1,54 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("get user by id", async ({ defaults, fixtures }) => {
-  const user = await fixtures.User();
+describe("GET /users/:id", () => {
+  test("get user by id", async ({ defaults, fixtures }) => {
+    const user = await fixtures.User();
 
-  const caller = createCaller({ user: defaults.user });
-  const data = await caller.userById(user.id);
-  expect(data.id).toEqual(user.id);
-  expect(data.friendStatus).toBe("none");
-});
-
-test("get user:me", async ({ defaults }) => {
-  const caller = createCaller({ user: defaults.user });
-  const data = await caller.userById("me");
-  expect(data.id).toBe(defaults.user.id);
-});
-
-test("get user by username", async ({ defaults }) => {
-  const caller = createCaller({ user: defaults.user });
-  const data = await caller.userById(defaults.user.username);
-  expect(data.id).toBe(defaults.user.id);
-});
-
-test("get user w/ friendStatus", async ({ defaults, fixtures }) => {
-  const user = await fixtures.User();
-  await fixtures.Follow({
-    fromUserId: defaults.user.id,
-    toUserId: user.id,
+    const data = await routerClient.userById(
+      { id: user.id },
+      { context: { user: defaults.user } },
+    );
+    expect(data.id).toEqual(user.id);
+    expect(data.friendStatus).toBe("none");
   });
 
-  const caller = createCaller({ user: defaults.user });
-  const data = await caller.userById(user.id);
-  expect(data.id).toBe(user.id);
-  expect(data.friendStatus).toBe("friends");
-});
+  test("get user:me", async ({ defaults }) => {
+    const data = await routerClient.userById(
+      { id: "me" },
+      { context: { user: defaults.user } },
+    );
+    expect(data.id).toBe(defaults.user.id);
+  });
 
-test("errors on invalid username", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(caller.userById("notauser"));
-  expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+  test("get user by username", async ({ defaults }) => {
+    const data = await routerClient.userById(
+      { id: defaults.user.username },
+      { context: { user: defaults.user } },
+    );
+    expect(data.id).toBe(defaults.user.id);
+  });
+
+  test("get user w/ friendStatus", async ({ defaults, fixtures }) => {
+    const user = await fixtures.User();
+    await fixtures.Follow({
+      fromUserId: defaults.user.id,
+      toUserId: user.id,
+    });
+
+    const data = await routerClient.userById(
+      { id: user.id },
+      { context: { user: defaults.user } },
+    );
+    expect(data.id).toBe(user.id);
+    expect(data.friendStatus).toBe("friends");
+  });
+
+  test("errors on invalid username", async () => {
+    const err = await waitError(() =>
+      routerClient.userById({ id: "notauser" }),
+    );
+    expect(err.message).toContain("User not found");
+  });
 });

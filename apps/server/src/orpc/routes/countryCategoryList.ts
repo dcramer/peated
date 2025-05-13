@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottles,
@@ -5,18 +6,29 @@ import {
   countries,
   entities,
 } from "@peated/server/db/schema";
-import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/countries/categories" })
   .input(
     z.object({
-      country: z.union([z.string(), z.number()]),
+      country: z.union([z.string(), z.coerce.number()]),
     }),
   )
-  .query(async function ({ input, ctx }) {
+  .output(
+    z.object({
+      results: z.array(
+        z.object({
+          count: z.number(),
+          category: z.string().nullable(),
+        }),
+      ),
+      totalCount: z.number(),
+    }),
+  )
+  .handler(async function ({ input }) {
     let countryId: number;
 
     if (typeof input.country === "number") {
@@ -28,9 +40,8 @@ export default publicProcedure
         .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
         .limit(1);
       if (!result) {
-        throw new TRPCError({
+        throw new ORPCError("BAD_REQUEST", {
           message: "Invalid country",
-          code: "BAD_REQUEST",
         });
       }
       countryId = result.id;

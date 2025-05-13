@@ -1,27 +1,37 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleTags, bottles, tags } from "@peated/server/db/schema";
 import { shuffle } from "@peated/server/lib/rand";
-import { TRPCError } from "@trpc/server";
 import { desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/bottles/:bottle/suggested-tags" })
   .input(
     z.object({
-      bottle: z.number(),
+      bottle: z.coerce.number(),
     }),
   )
-  .query(async function ({ input }) {
+  .output(
+    z.object({
+      results: z.array(
+        z.object({
+          tag: z.any(),
+          count: z.number(),
+        }),
+      ),
+    }),
+  )
+  .handler(async function ({ input }) {
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Bottle not found.",
-        code: "NOT_FOUND",
       });
     }
 

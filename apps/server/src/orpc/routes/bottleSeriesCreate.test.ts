@@ -1,15 +1,12 @@
-import type { TRPCError } from "@trpc/server";
+import { db } from "@peated/server/db";
+import { bottleSeries, changes } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
-import { db } from "../../db";
-import { bottleSeries, changes } from "../../db/schema";
-import waitError from "../../lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottleSeriesCreate", () => {
+describe("POST /bottle-series", () => {
   it("creates a new series", async function ({ fixtures, defaults }) {
-    const caller = createCaller({ user: defaults.user });
-
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const data = {
@@ -18,7 +15,9 @@ describe("bottleSeriesCreate", () => {
       brand: brand.id,
     };
 
-    const result = await caller.bottleSeriesCreate(data);
+    const result = await routerClient.bottleSeriesCreate(data, {
+      context: { user: defaults.user },
+    });
 
     // Verify key properties of the response
     expect(result).toMatchObject({
@@ -65,8 +64,6 @@ describe("bottleSeriesCreate", () => {
   });
 
   it("requires authentication", async function ({ fixtures }) {
-    const caller = createCaller({ user: null });
-
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const data = {
@@ -75,26 +72,24 @@ describe("bottleSeriesCreate", () => {
       brand: brand.id,
     };
 
-    const error = await waitError<TRPCError>(async () =>
-      caller.bottleSeriesCreate(data),
-    );
+    const error = await waitError(() => routerClient.bottleSeriesCreate(data));
 
-    expect(error.code).toBe("UNAUTHORIZED");
+    expect(error.message).toContain("UNAUTHORIZED");
   });
 
   it("validates brand exists", async function ({ fixtures, defaults }) {
-    const caller = createCaller({ user: defaults.user });
-
     const data = {
       name: "Supernova",
       description: "A series of heavily peated whiskies",
       brand: 12345,
     };
 
-    const error = await waitError<TRPCError>(async () =>
-      caller.bottleSeriesCreate(data),
+    const error = await waitError(() =>
+      routerClient.bottleSeriesCreate(data, {
+        context: { user: defaults.user },
+      }),
     );
 
-    expect(error.code).toBe("NOT_FOUND");
+    expect(error.message).toContain("NOT_FOUND");
   });
 });

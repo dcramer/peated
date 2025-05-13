@@ -1,11 +1,18 @@
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("lists changes", async ({ defaults, fixtures }) => {
-  await fixtures.Entity({ name: "Entity 1" });
-  await fixtures.Entity({ name: "Entity 2" });
+describe("GET /changes", () => {
+  test("lists changes", async ({ defaults, fixtures }) => {
+    await fixtures.Entity({ name: "Entity 1" });
+    await fixtures.Entity({ name: "Entity 2" });
 
-  const caller = createCaller({ user: defaults.user });
-  const { results } = await caller.changeList();
+    const { results } = await routerClient.changeList(
+      {},
+      {
+        context: { user: defaults.user },
+      },
+    );
 
-  expect(results.length).toBe(2);
+    expect(results.length).toBe(2);
+  });
 });

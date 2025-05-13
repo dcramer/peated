@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { badges } from "@peated/server/db/schema";
-import { BadgeSchema } from "@peated/server/schemas";
+import { BadgeSchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BadgeSerializer } from "@peated/server/serializers/badge";
 import type { SQL } from "drizzle-orm";
@@ -10,10 +10,7 @@ import { procedure } from "..";
 
 const OutputSchema = z.object({
   results: z.array(BadgeSchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
+  rel: CursorSchema,
 });
 
 export default procedure
