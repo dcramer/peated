@@ -16,8 +16,8 @@ import { z } from "zod";
 import { procedure } from "..";
 
 export default procedure
-  .route({ method: "POST", path: "/bottle-aliases" })
   .use(requireMod)
+  .route({ method: "PUT", path: "/bottle-aliases" })
   .input(BottleAliasSchema)
   .output(z.object({}))
   .handler(async function ({ input }) {

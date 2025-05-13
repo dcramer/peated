@@ -4,7 +4,7 @@ import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { routerClient } from "../router";
 
-describe("POST /bottles/upsert", () => {
+describe("PUT /bottles", () => {
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.bottleUpsert({

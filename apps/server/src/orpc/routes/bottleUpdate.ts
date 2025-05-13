@@ -25,7 +25,7 @@ import { procedure } from "..";
 import { coerceToUpsert, upsertBottleAlias, upsertEntity } from "../../lib/db";
 import { ConflictError } from "../errors";
 import { requireMod } from "../middleware";
-import { bottleNormalize } from "./bottlePreview";
+import { bottleNormalize } from "./bottleValidation";
 
 const InputSchema = BottleInputSchema.partial().extend({
   bottle: z.number(),
@@ -33,7 +33,7 @@ const InputSchema = BottleInputSchema.partial().extend({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PUT", path: "/bottles/:bottle" })
+  .route({ method: "PATCH", path: "/bottles/:bottle" })
   .input(InputSchema)
   .output(BottleSchema)
   .handler(async function ({

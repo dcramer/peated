@@ -2,7 +2,7 @@ import waitError from "@peated/server/lib/test/waitError";
 import { describe, expect, test } from "vitest";
 import { routerClient } from "../router";
 
-describe("POST /bottles/preview", () => {
+describe("POST /bottles/validations", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
       routerClient.bottlePreview({

@@ -1,5 +1,6 @@
 import { createRouterClient } from "@orpc/server";
 import adminQueueInfo from "./routes/adminQueueInfo";
+import aiLabelExtract from "./routes/aiLabelExtract";
 import authLogin from "./routes/authLogin";
 import authMagicLinkConfirm from "./routes/authMagicLinkConfirm";
 import authMagicLinkSend from "./routes/authMagicLinkSend";
@@ -24,7 +25,6 @@ import bottleGenerateDetails from "./routes/bottleGenerateDetails";
 import bottleImageUpdate from "./routes/bottleImageUpdate";
 import bottleList from "./routes/bottleList";
 import bottleMerge from "./routes/bottleMerge";
-import bottlePreview from "./routes/bottlePreview";
 import bottlePriceHistory from "./routes/bottlePriceHistory";
 import bottlePriceList from "./routes/bottlePriceList";
 import bottleReleaseById from "./routes/bottleReleaseById";
@@ -37,10 +37,13 @@ import bottleSeriesCreate from "./routes/bottleSeriesCreate";
 import bottleSeriesDelete from "./routes/bottleSeriesDelete";
 import bottleSeriesList from "./routes/bottleSeriesList";
 import bottleSeriesUpdate from "./routes/bottleSeriesUpdate";
+import bottleSimilarList from "./routes/bottleSimilarList";
 import bottleSuggestedTagList from "./routes/bottleSuggestedTagList";
 import bottleTagList from "./routes/bottleTagList";
+import bottleUnmatchedList from "./routes/bottleUnmatchedList";
 import bottleUpdate from "./routes/bottleUpdate";
 import bottleUpsert from "./routes/bottleUpsert";
+import bottleValidation from "./routes/bottleValidation";
 import changeList from "./routes/changeList";
 import collectionBottleCreate from "./routes/collectionBottleCreate";
 import collectionBottleDelete from "./routes/collectionBottleDelete";
@@ -85,7 +88,6 @@ import flightUpdate from "./routes/flightUpdate";
 import friendCreate from "./routes/friendCreate";
 import friendDelete from "./routes/friendDelete";
 import friendList from "./routes/friendList";
-import labelExtract from "./routes/labelExtract";
 import notificationCount from "./routes/notificationCount";
 import notificationDelete from "./routes/notificationDelete";
 import notificationList from "./routes/notificationList";
@@ -105,7 +107,6 @@ import reviewList from "./routes/reviewList";
 import reviewUpdate from "./routes/reviewUpdate";
 import root from "./routes/root";
 import search from "./routes/search";
-import similarBottleList from "./routes/similarBottleList";
 import smwsDistillerList from "./routes/smwsDistillerList";
 import stats from "./routes/stats";
 import tagByName from "./routes/tagByName";
@@ -120,7 +121,6 @@ import tastingImageUpdate from "./routes/tastingImageUpdate";
 import tastingList from "./routes/tastingList";
 import tastingUpdate from "./routes/tastingUpdate";
 import toastCreate from "./routes/toastCreate";
-import unmatchedBottleList from "./routes/unmatchedBottleList";
 import userAvatarUpdate from "./routes/userAvatarUpdate";
 import userBadgeList from "./routes/userBadgeList";
 import userById from "./routes/userById";
@@ -155,7 +155,7 @@ export const router = {
   bottleGenerateDetails,
   bottleList,
   bottleMerge,
-  bottlePreview,
+  bottleValidation,
   bottlePriceHistory,
   bottlePriceList,
   bottleReleaseById,
@@ -216,7 +216,7 @@ export const router = {
   friendCreate,
   friendDelete,
   friendList,
-  labelExtract,
+  aiLabelExtract,
   notificationCount,
   notificationDelete,
   notificationList,
@@ -236,7 +236,7 @@ export const router = {
   reviewList,
   reviewUpdate,
   search,
-  similarBottleList,
+  bottleSimilarList,
   smwsDistillerList,
   stats,
   tagByName,
@@ -250,7 +250,7 @@ export const router = {
   tastingList,
   tastingUpdate,
   toastCreate,
-  unmatchedBottleList,
+  bottleUnmatchedList,
   userBadgeList,
   userById,
   userFlavorList,

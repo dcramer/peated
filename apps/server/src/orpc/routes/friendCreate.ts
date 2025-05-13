@@ -10,7 +10,7 @@ import { requireAuth } from "../middleware";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/friends" })
+  .route({ method: "PUT", path: "/friends/:id" })
   .input(
     z.object({
       id: z.coerce.number(),

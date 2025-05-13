@@ -2,7 +2,6 @@ import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleAliases } from "@peated/server/db/schema";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { procedure } from "..";
@@ -18,7 +17,7 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "PUT", path: "/bottle-aliases/:name" })
+  .route({ method: "PATCH", path: "/bottle-aliases/:name" })
   .use(requireMod)
   .input(InputSchema)
   .output(OutputSchema)

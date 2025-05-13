@@ -11,8 +11,8 @@ import type { BadgeCheck } from "@peated/server/types";
 import { procedure } from "..";
 
 export default procedure
-  .route({ method: "POST", path: "/badges" })
   .use(requireAdmin)
+  .route({ method: "POST", path: "/badges" })
   .input(BadgeInputSchema)
   .output(BadgeSchema)
   .handler(async function ({ input, context }) {

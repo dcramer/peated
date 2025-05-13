@@ -25,7 +25,7 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "POST", path: "/labels/extract" })
+  .route({ method: "POST", path: "/ai/extract-labels" })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({ input }) {

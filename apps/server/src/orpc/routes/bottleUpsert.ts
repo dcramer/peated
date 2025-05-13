@@ -5,12 +5,12 @@ import { procedure } from "..";
 import { ConflictError } from "../errors";
 import { requireMod } from "../middleware";
 import bottleCreate from "./bottleCreate";
-import { bottleNormalize } from "./bottlePreview";
 import bottleUpdate from "./bottleUpdate";
+import { bottleNormalize } from "./bottleValidation";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/bottles/upsert" })
+  .route({ method: "PUT", path: "/bottles" })
   .input(BottleInputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context }) {

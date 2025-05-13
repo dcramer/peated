@@ -16,7 +16,7 @@ const InputSchema = z.object({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PUT", path: "/reviews/:review" })
+  .route({ method: "PATCH", path: "/reviews/:review" })
   .input(InputSchema)
   .output(ReviewSchema)
   .handler(async ({ input, context }) => {

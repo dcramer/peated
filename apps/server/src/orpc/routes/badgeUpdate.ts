@@ -13,8 +13,8 @@ import { z } from "zod";
 import { procedure } from "..";
 
 export default procedure
-  .route({ method: "PUT", path: "/badges/:id" })
   .use(requireAdmin)
+  .route({ method: "PATCH", path: "/badges/:id" })
   .input(
     BadgeInputSchema.partial().extend({
       id: z.number(),

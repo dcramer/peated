@@ -12,7 +12,7 @@ import { requireMod } from "../middleware";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/bottles/:bottle/merge" })
+  .route({ method: "POST", path: "/bottles/:bottle/merge-targets" })
   .input(
     z.object({
       bottle: z.coerce.number(),

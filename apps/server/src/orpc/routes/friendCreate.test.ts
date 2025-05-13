@@ -5,7 +5,7 @@ import { describe, expect, test } from "vitest";
 import { follows, notifications } from "../../db/schema";
 import { routerClient } from "../router";
 
-describe("POST /friends", () => {
+describe("PUT /friends/:id", () => {
   test("requires authentication", async ({ defaults }) => {
     const err = await waitError(() =>
       routerClient.friendCreate({

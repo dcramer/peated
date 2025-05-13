@@ -14,7 +14,7 @@ import { requireAuth } from "../middleware";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "PUT", path: "/notifications/:id" })
+  .route({ method: "PATCH", path: "/notifications/:id" })
   .input(
     NotificationInputSchema.partial().extend({
       id: z.coerce.number(),

@@ -11,8 +11,8 @@ import { z } from "zod";
 import { procedure } from "..";
 
 export default procedure
-  .route({ method: "GET", path: "/auth/me" })
   .use(requireAuth)
+  .route({ method: "GET", path: "/auth/me" })
   .output(z.object({ user: UserSchema }))
   .handler(async function ({ context }) {
     // this would be a good place to add refreshTokens (swap to POST for that)

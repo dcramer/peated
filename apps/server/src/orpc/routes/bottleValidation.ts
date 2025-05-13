@@ -128,7 +128,7 @@ const BottlePreviewResultSchema = z.object({
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/bottles/preview" })
+  .route({ method: "POST", path: "/bottles/validations" })
   .input(BottleInputSchema)
   .output(BottlePreviewResultSchema)
   .handler(async function ({ input, context }) {

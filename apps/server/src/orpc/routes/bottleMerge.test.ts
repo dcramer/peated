@@ -1,7 +1,7 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "../router";
 
-describe("POST /bottles/:bottle/merge", () => {
+describe("POST /bottles/:bottle/merge-targets", () => {
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.bottleMerge(
