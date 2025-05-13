@@ -71,9 +71,9 @@ export default procedure
 Methods chained on the procedure should be ordered as followed:
 
 1. `use` - any middleware clauses
-2. `route` - the openapi route definition
-3. `input` - the input accepted
-4. `output` - the output schema
+2. `route` - the openapi route definition (the `openapi` definition)
+3. `input` - the input schema (a `zod` schema)
+4. `output` - the output schema (a `zod` schema)
 5. `handler` - the handler should always be last
 
 ### Query and Path Parameters
