@@ -1,41 +1,50 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottleReleases,
   bottles,
   collectionBottles,
 } from "@peated/server/db/schema";
+import { CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
-import { TRPCError } from "@trpc/server";
 import type { SQL } from "drizzle-orm";
 import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 import { getUserFromId, profileVisible } from "../../lib/api";
 import { getDefaultCollection } from "../../lib/db";
 
-export default publicProcedure
+export default procedure
+  .route({
+    method: "GET",
+    path: "/users/:user/collections/:collection/bottles",
+  })
   .input(
     z.object({
-      collection: z.union([z.literal("default"), z.number()]),
-      user: z.union([z.literal("me"), z.string(), z.number()]),
-      cursor: z.number().gte(1).default(1),
-      limit: z.number().gte(1).lte(100).default(25),
+      collection: z.union([z.literal("default"), z.coerce.number()]),
+      user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
+      cursor: z.coerce.number().gte(1).default(1),
+      limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
   )
-  .query(async function ({ input: { cursor, limit, ...input }, ctx }) {
-    const user = await getUserFromId(db, input.user, ctx.user);
+  .output(
+    z.object({
+      results: z.array(z.any()),
+      rel: CursorSchema,
+    }),
+  )
+  .handler(async function ({ input: { cursor, limit, ...input }, context }) {
+    const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "User not found.",
-        code: "NOT_FOUND",
       });
     }
 
-    if (!(await profileVisible(db, user, ctx.user))) {
-      throw new TRPCError({
+    if (!(await profileVisible(db, user, context.user))) {
+      throw new ORPCError("BAD_REQUEST", {
         message: "User's profile is private.",
-        code: "BAD_REQUEST",
       });
     }
 
@@ -51,9 +60,8 @@ export default publicProcedure
           });
 
     if (!collection) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Collection not found.",
-        code: "NOT_FOUND",
       });
     }
 
@@ -87,7 +95,7 @@ export default publicProcedure
             release,
             bottle,
           })),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

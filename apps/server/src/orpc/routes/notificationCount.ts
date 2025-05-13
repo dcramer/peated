@@ -3,9 +3,12 @@ import { notifications } from "@peated/server/db/schema";
 import type { SQL } from "drizzle-orm";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { procedure } from "..";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "GET", path: "/notifications/count" })
   .input(
     z
       .object({
@@ -13,9 +16,10 @@ export default authedProcedure
       })
       .default({}),
   )
-  .query(async function ({ input, ctx }) {
+  .output(z.object({ count: z.number() }))
+  .handler(async function ({ input, context }) {
     const where: (SQL<unknown> | undefined)[] = [
-      eq(notifications.userId, ctx.user.id),
+      eq(notifications.userId, context.user.id),
     ];
     if (input.filter === "unread") {
       where.push(eq(notifications.read, false));

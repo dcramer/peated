@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottles,
@@ -6,31 +7,49 @@ import {
   regions,
   tastings,
 } from "@peated/server/db/schema";
-import { TRPCError } from "@trpc/server";
 import { inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 import { getUserFromId, profileVisible } from "../../lib/api";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/users/:user/regions" })
   .input(
     z.object({
-      user: z.union([z.literal("me"), z.string(), z.number()]),
+      user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
     }),
   )
-  .query(async function ({ input, ctx }) {
-    const user = await getUserFromId(db, input.user, ctx.user);
+  .output(
+    z.object({
+      results: z.array(
+        z.object({
+          country: z.object({
+            name: z.string(),
+            slug: z.string(),
+          }),
+          region: z
+            .object({
+              name: z.string(),
+              slug: z.string(),
+            })
+            .nullable(),
+          count: z.number(),
+        }),
+      ),
+      totalCount: z.number(),
+    }),
+  )
+  .handler(async function ({ input, context }) {
+    const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "User not found.",
-        code: "NOT_FOUND",
       });
     }
 
-    if (!(await profileVisible(db, user, ctx.user))) {
-      throw new TRPCError({
+    if (!(await profileVisible(db, user, context.user))) {
+      throw new ORPCError("BAD_REQUEST", {
         message: "User's profile is not public.",
-        code: "BAD_REQUEST",
       });
     }
 

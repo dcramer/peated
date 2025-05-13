@@ -1,29 +1,35 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("lists users needs a query", async ({ defaults, fixtures }) => {
-  await fixtures.User();
+describe("GET /users", () => {
+  test("lists users needs a query", async ({ defaults, fixtures }) => {
+    await fixtures.User();
 
-  const caller = createCaller({ user: defaults.user });
-  const { results } = await caller.userList();
+    const { results } = await routerClient.userList(
+      {},
+      { context: { user: defaults.user } },
+    );
 
-  expect(results.length).toBe(0);
-});
-
-test("lists users needs a query", async ({ defaults, fixtures }) => {
-  const user2 = await fixtures.User({ username: "david.george" });
-
-  const caller = createCaller({ user: defaults.user });
-  const { results } = await caller.userList({
-    query: "david",
+    expect(results.length).toBe(0);
   });
 
-  expect(results.length).toBe(1);
-  expect(results[0].id).toBe(user2.id);
-});
+  test("lists users with query", async ({ defaults, fixtures }) => {
+    const user2 = await fixtures.User({ username: "david.george" });
 
-test("requires authentication", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(caller.userList());
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    const { results } = await routerClient.userList(
+      {
+        query: "david",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.length).toBe(1);
+    expect(results[0].id).toBe(user2.id);
+  });
+
+  test("requires authentication", async () => {
+    const err = await waitError(() => routerClient.userList());
+    expect(err.message).toBe("UNAUTHORIZED");
+  });
 });

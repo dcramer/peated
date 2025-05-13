@@ -1,18 +1,16 @@
 import { db } from "@peated/server/db";
 import { externalSites, storePrices } from "@peated/server/db/schema";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("priceList", () => {
+describe("GET /prices", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
 
   test("lists prices with default parameters", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
     const site = await fixtures.ExternalSiteOrExisting();
     const price1 = await fixtures.StorePrice({
       externalSiteId: site.id,
@@ -23,7 +21,10 @@ describe("priceList", () => {
       name: "Price 2",
     });
 
-    const result = await caller.priceList({});
+    const result = await routerClient.priceList(
+      {},
+      { context: { user: admin } },
+    );
 
     expect(result.results.length).toBe(2);
     expect(result.results[0].id).toBe(price1.id);
@@ -34,7 +35,6 @@ describe("priceList", () => {
 
   test("filters prices by site", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
     const site1 = await fixtures.ExternalSiteOrExisting({
       type: "whiskyadvocate",
     });
@@ -44,7 +44,10 @@ describe("priceList", () => {
     });
     await fixtures.StorePrice({ externalSiteId: site2.id }); // Different site
 
-    const result = await caller.priceList({ site: "whiskyadvocate" });
+    const result = await routerClient.priceList(
+      { site: "whiskyadvocate" },
+      { context: { user: admin } },
+    );
 
     expect(result.results.length).toBe(1);
     expect(result.results[0].id).toBe(price1.id);
@@ -52,7 +55,6 @@ describe("priceList", () => {
 
   test("filters unknown prices", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
     const bottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSiteOrExisting();
     const price1 = await fixtures.StorePrice({
@@ -61,7 +63,10 @@ describe("priceList", () => {
     });
     await fixtures.StorePrice({ bottleId: bottle.id, externalSiteId: site.id }); // Known bottle
 
-    const result = await caller.priceList({ onlyUnknown: true });
+    const result = await routerClient.priceList(
+      { onlyUnknown: true },
+      { context: { user: admin } },
+    );
 
     expect(result.results.length).toBe(1);
     expect(result.results[0].id).toBe(price1.id);
@@ -69,7 +74,6 @@ describe("priceList", () => {
 
   test("filters prices by query", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
     const site = await fixtures.ExternalSiteOrExisting();
     const price1 = await fixtures.StorePrice({
       externalSiteId: site.id,
@@ -80,7 +84,10 @@ describe("priceList", () => {
       name: "Common Bourbon",
     });
 
-    const result = await caller.priceList({ query: "Unique" });
+    const result = await routerClient.priceList(
+      { query: "Unique" },
+      { context: { user: admin } },
+    );
 
     expect(result.results.length).toBe(1);
     expect(result.results[0].id).toBe(price1.id);
@@ -88,23 +95,25 @@ describe("priceList", () => {
 
   test("throws NOT_FOUND for non-existent site", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
 
     await expect(
-      caller.priceList({ site: "nonexistent" as any }),
-    ).rejects.toThrow(TRPCError);
+      routerClient.priceList(
+        { site: "nonexistent" as any },
+        { context: { user: admin } },
+      ),
+    ).rejects.toThrow("Site not found");
   });
 
   test("requires admin permission", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: false });
-    const caller = createCaller({ user });
 
-    await expect(caller.priceList({})).rejects.toThrow(TRPCError);
+    await expect(
+      routerClient.priceList({}, { context: { user } }),
+    ).rejects.toThrow();
   });
 
   test("excludes hidden prices", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
     const site = await fixtures.ExternalSiteOrExisting();
     await fixtures.StorePrice({ hidden: true, externalSiteId: site.id });
     const visiblePrice = await fixtures.StorePrice({
@@ -112,7 +121,10 @@ describe("priceList", () => {
       externalSiteId: site.id,
     });
 
-    const result = await caller.priceList({});
+    const result = await routerClient.priceList(
+      {},
+      { context: { user: admin } },
+    );
 
     expect(result.results.length).toBe(1);
     expect(result.results[0].id).toBe(visiblePrice.id);
@@ -120,7 +132,6 @@ describe("priceList", () => {
 
   test("includes prices older than a week by default", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
     const recentPrice = await fixtures.StorePrice({
       externalSiteId: (
         await fixtures.ExternalSiteOrExisting({
@@ -137,7 +148,10 @@ describe("priceList", () => {
       updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
     });
 
-    const result = await caller.priceList({});
+    const result = await routerClient.priceList(
+      {},
+      { context: { user: admin } },
+    );
 
     expect(result.results.length).toBe(2);
     expect(result.results.map((p) => p.id)).toContain(recentPrice.id);
@@ -148,7 +162,6 @@ describe("priceList", () => {
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
-    const caller = createCaller({ user: admin });
     const recentPrice = await fixtures.StorePrice({
       externalSiteId: (
         await fixtures.ExternalSiteOrExisting({
@@ -165,7 +178,10 @@ describe("priceList", () => {
       updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
     });
 
-    const result = await caller.priceList({ onlyValid: true });
+    const result = await routerClient.priceList(
+      { onlyValid: true },
+      { context: { user: admin } },
+    );
 
     expect(result.results.length).toBe(1);
     expect(result.results[0].id).toBe(recentPrice.id);

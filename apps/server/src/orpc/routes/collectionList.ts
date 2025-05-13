@@ -1,35 +1,43 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { collectionBottles, collections } from "@peated/server/db/schema";
+import { CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionSerializer } from "@peated/server/serializers/collection";
-import { TRPCError } from "@trpc/server";
 import { and, asc, sql } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { procedure } from "..";
 import { getUserFromId, profileVisible } from "../../lib/api";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "GET", path: "/users/:user/collections" })
   .input(
     z.object({
-      user: z.union([z.literal("me"), z.string(), z.number()]),
-      bottle: z.number().optional(),
-      cursor: z.number().gte(1).default(1),
-      limit: z.number().gte(1).lte(100).default(25),
+      user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
+      bottle: z.coerce.number().optional(),
+      cursor: z.coerce.number().gte(1).default(1),
+      limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
   )
-  .query(async function ({ input: { cursor, limit, ...input }, ctx }) {
-    const user = await getUserFromId(db, input.user, ctx.user);
+  .output(
+    z.object({
+      results: z.array(z.any()),
+      rel: CursorSchema,
+    }),
+  )
+  .handler(async function ({ input: { cursor, limit, ...input }, context }) {
+    const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "User not found.",
-        code: "NOT_FOUND",
       });
     }
 
-    if (!(await profileVisible(db, user, ctx.user))) {
-      throw new TRPCError({
+    if (!(await profileVisible(db, user, context.user))) {
+      throw new ORPCError("BAD_REQUEST", {
         message: "User's profile is private.",
-        code: "BAD_REQUEST",
       });
     }
 
@@ -54,7 +62,7 @@ export default authedProcedure
       results: await serialize(
         CollectionSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

@@ -1,34 +1,42 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { badgeAwards } from "@peated/server/db/schema";
 import { serialize } from "@peated/server/serializers";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
-import { TRPCError } from "@trpc/server";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 import { getUserFromId, profileVisible } from "../../lib/api";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/users/:user/badges" })
   .input(
     z.object({
-      user: z.union([z.literal("me"), z.string(), z.number()]),
-      cursor: z.number().gte(1).default(1),
-      limit: z.number().gte(1).lte(100).default(25),
+      user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
+      cursor: z.coerce.number().gte(1).default(1),
+      limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
   )
-  .query(async function ({ input: { cursor, limit, ...input }, ctx }) {
-    const user = await getUserFromId(db, input.user, ctx.user);
+  .output(
+    z.object({
+      results: z.array(z.any()),
+      rel: z.object({
+        nextCursor: z.number().nullable(),
+        prevCursor: z.number().nullable(),
+      }),
+    }),
+  )
+  .handler(async function ({ input: { cursor, limit, ...input }, context }) {
+    const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "User not found.",
-        code: "NOT_FOUND",
       });
     }
 
-    if (!(await profileVisible(db, user, ctx.user))) {
-      throw new TRPCError({
+    if (!(await profileVisible(db, user, context.user))) {
+      throw new ORPCError("BAD_REQUEST", {
         message: "User's profile is not public.",
-        code: "BAD_REQUEST",
       });
     }
 
@@ -49,7 +57,7 @@ export default publicProcedure
       results: await serialize(
         BadgeAwardSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

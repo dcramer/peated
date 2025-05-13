@@ -1,16 +1,19 @@
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { externalSites, storePrices } from "@peated/server/db/schema";
-import { ExternalSiteTypeEnum } from "@peated/server/schemas";
+import { CursorSchema, ExternalSiteTypeEnum } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { adminProcedure } from "..";
+import { procedure } from "..";
+import { requireAdmin } from "../middleware";
 
-export default adminProcedure
+export default procedure
+  .use(requireAdmin)
+  .route({ method: "GET", path: "/prices" })
   .input(
     z
       .object({
@@ -18,8 +21,8 @@ export default adminProcedure
         query: z.string().default(""),
         onlyUnknown: z.boolean().optional(),
         onlyValid: z.boolean().optional(),
-        cursor: z.number().gte(1).default(1),
-        limit: z.number().gte(1).lte(100).default(100),
+        cursor: z.coerce.number().gte(1).default(1),
+        limit: z.coerce.number().gte(1).lte(100).default(100),
       })
       .default({
         query: "",
@@ -27,7 +30,16 @@ export default adminProcedure
         limit: 100,
       }),
   )
-  .query(async function ({ input: { cursor, query, limit, ...input }, ctx }) {
+  .output(
+    z.object({
+      results: z.array(z.any()),
+      rel: CursorSchema,
+    }),
+  )
+  .handler(async function ({
+    input: { cursor, query, limit, ...input },
+    context,
+  }) {
     const where: (SQL<unknown> | undefined)[] = [eq(storePrices.hidden, false)];
 
     if (input.site) {
@@ -36,8 +48,7 @@ export default adminProcedure
       });
 
       if (!site) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
+        throw new ORPCError("NOT_FOUND", {
           message: "Site not found",
         });
       }
@@ -73,7 +84,7 @@ export default adminProcedure
       results: await serialize(
         StorePriceSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

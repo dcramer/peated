@@ -1,8 +1,9 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
+import { CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { TRPCError } from "@trpc/server";
 import type { SQL } from "drizzle-orm";
 import {
   and,
@@ -17,17 +18,24 @@ import {
 } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
-import { publicProcedure } from "..";
+import { procedure } from "..";
 
-export default publicProcedure
+export default procedure
+  .route({ method: "GET", path: "/bottles/:bottle/similar" })
   .input(
     z.object({
-      bottle: z.number(),
-      limit: z.number().gte(1).lte(100).default(25),
+      bottle: z.coerce.number(),
+      limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
   )
-  .query(async function ({ input: { limit, ...input }, ctx }) {
-    ctx.maxAge = 300;
+  .output(
+    z.object({
+      results: z.array(z.any()),
+      rel: CursorSchema,
+    }),
+  )
+  .handler(async function ({ input: { limit, ...input }, context }) {
+    // maxAge caching for 5 minutes would be handled by oRPC server settings
 
     const [bottle] = await db
       .select()
@@ -35,9 +43,8 @@ export default publicProcedure
       .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Bottle not found.",
-        code: "NOT_FOUND",
       });
     }
 
@@ -94,7 +101,7 @@ export default publicProcedure
       results: await serialize(
         BottleSerializer,
         results.slice(0, limit),
-        ctx.user,
+        context.user,
         ["description", "tastingNotes"],
       ),
       rel: {
