@@ -1,49 +1,57 @@
 import { db } from "@peated/server/db";
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("requires authentication", async () => {
-  const caller = createCaller({ user: null });
-  const err = await waitError(
-    caller.tastingImageDelete({
-      tasting: 1,
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-test("cannot delete another user's image", async ({ fixtures }) => {
-  const user = await fixtures.User();
-  const otherUser = await fixtures.User();
-  const tasting = await fixtures.Tasting({ createdById: otherUser.id });
-
-  const caller = createCaller({ user });
-  const err = await waitError(
-    caller.tastingImageDelete({
-      tasting: tasting.id,
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(
-    `[TRPCError: Cannot delete another user's tasting image.]`,
-  );
-});
-
-test("deletes existing image", async ({ defaults, fixtures }) => {
-  const tasting = await fixtures.Tasting({
-    createdById: defaults.user.id,
-    imageUrl: "http://example.com/image.png",
+describe("DELETE /tastings/:id/image", () => {
+  test("requires authentication", async () => {
+    const err = await waitError(() =>
+      routerClient.tastingImageDelete({
+        tasting: 1,
+      }),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: UNAUTHORIZED: Authentication required]
+    `);
   });
 
-  const caller = createCaller({ user: defaults.user });
-  const data = await caller.tastingImageDelete({
-    tasting: tasting.id,
+  test("cannot delete another user's image", async ({ fixtures }) => {
+    const user = await fixtures.User();
+    const otherUser = await fixtures.User();
+    const tasting = await fixtures.Tasting({ createdById: otherUser.id });
+
+    const err = await waitError(() =>
+      routerClient.tastingImageDelete(
+        {
+          tasting: tasting.id,
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: FORBIDDEN: Cannot delete another user's tasting image.]
+    `);
   });
 
-  expect(data.imageUrl).toBe(null);
+  test("deletes existing image", async ({ defaults, fixtures }) => {
+    const tasting = await fixtures.Tasting({
+      createdById: defaults.user.id,
+      imageUrl: "http://example.com/image.png",
+    });
 
-  const newTasting = await db.query.tastings.findFirst({
-    where: (tastings, { eq }) => eq(tastings.id, tasting.id),
+    const data = await routerClient.tastingImageDelete(
+      {
+        tasting: tasting.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.imageUrl).toBe(null);
+
+    const newTasting = await db.query.tastings.findFirst({
+      where: (tastings, { eq }) => eq(tastings.id, tasting.id),
+    });
+
+    expect(newTasting?.imageUrl).toBe(null);
   });
-
-  expect(newTasting?.imageUrl).toBe(null);
 });

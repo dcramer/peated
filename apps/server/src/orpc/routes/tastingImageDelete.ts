@@ -1,33 +1,39 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { procedure } from "..";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "DELETE", path: "/tastings/:id/image" })
   .input(
     z.object({
-      tasting: z.number(),
+      tasting: z.coerce.number(),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
+  .output(
+    z.object({
+      imageUrl: z.null(),
+    }),
+  )
+  .handler(async function ({ input, context }) {
     const [tasting] = await db
       .select()
       .from(tastings)
       .where(eq(tastings.id, input.tasting))
       .limit(1);
     if (!tasting) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Tasting not found.",
-        code: "NOT_FOUND",
       });
     }
 
-    if (tasting.createdById !== ctx.user.id && !ctx.user.admin) {
-      throw new TRPCError({
+    if (tasting.createdById !== context.user.id && !context.user.admin) {
+      throw new ORPCError("FORBIDDEN", {
         message: "Cannot delete another user's tasting image.",
-        code: "FORBIDDEN",
       });
     }
 

@@ -1,4 +1,5 @@
 import { createRouterClient } from "@orpc/server";
+import admninQueueInfo from "./routes/adminQueueInfo";
 import authLogin from "./routes/authLogin";
 import authMagicLinkConfirm from "./routes/authMagicLinkConfirm";
 import authMagicLinkSend from "./routes/authMagicLinkSend";
@@ -91,7 +92,6 @@ import priceChangeList from "./routes/priceChangeList";
 import priceCreateBatch from "./routes/priceCreateBatch";
 import priceList from "./routes/priceList";
 import priceUpdate from "./routes/priceUpdate";
-import queueInfo from "./routes/queueInfo";
 import regionBySlug from "./routes/regionBySlug";
 import regionCreate from "./routes/regionCreate";
 import regionDelete from "./routes/regionDelete";
@@ -219,7 +219,7 @@ export const router = {
   priceCreateBatch,
   priceList,
   priceUpdate,
-  queueInfo,
+  adminQueueInfo,
   regionBySlug,
   regionCreate,
   regionDelete,

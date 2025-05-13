@@ -1,10 +1,11 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { RegionInputSchema } from "@peated/server/schemas";
 import { getGeneratedRegionDetails } from "@peated/server/worker/jobs/generateRegionDetails";
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { modProcedure } from "..";
-import { type Context } from "../context";
+import { procedure } from "..";
+import type { Context } from "../context";
+import { requireMod } from "../middleware";
 
 const InputSchema = RegionInputSchema.partial().extend({
   country: z.number(),
@@ -12,10 +13,10 @@ const InputSchema = RegionInputSchema.partial().extend({
 
 export async function regionGenerateDetails({
   input,
-  ctx,
+  context,
 }: {
   input: z.infer<typeof InputSchema>;
-  ctx: Context;
+  context: Context;
 }) {
   const country = input.country
     ? await db.query.countries.findFirst({
@@ -24,9 +25,8 @@ export async function regionGenerateDetails({
     : null;
 
   if (!country) {
-    throw new TRPCError({
+    throw new ORPCError("BAD_REQUEST", {
       message: "Cannot find country",
-      code: "BAD_REQUEST",
     });
   }
 
@@ -37,4 +37,19 @@ export async function regionGenerateDetails({
   return result;
 }
 
-export default modProcedure.input(InputSchema).mutation(regionGenerateDetails);
+const OutputSchema = z.object({
+  description: z.string().nullish(),
+});
+
+export default procedure
+  .use(requireMod)
+  .route({ method: "POST", path: "/regions/generate-details" })
+  .input(InputSchema)
+  .output(OutputSchema)
+  .handler(async function ({ input, context }) {
+    const result = await regionGenerateDetails({ input, context });
+
+    return {
+      description: result?.description,
+    };
+  });

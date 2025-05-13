@@ -2,30 +2,33 @@ import { db } from "@peated/server/db";
 import { regions } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-describe("regionDelete", () => {
+describe("DELETE /regions", () => {
   test("requires authentication", async () => {
-    const caller = createCaller({ user: null });
-    const err = await waitError(
-      caller.regionDelete({
+    const err = await waitError(() =>
+      routerClient.regionDelete({
         country: "test-country",
         slug: "test-region",
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("requires admin", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
-    const caller = createCaller({ user });
-    const err = await waitError(
-      caller.regionDelete({
-        country: "test-country",
-        slug: "test-region",
-      }),
+
+    const err = await waitError(() =>
+      routerClient.regionDelete(
+        {
+          country: "test-country",
+          slug: "test-region",
+        },
+        { context: { user } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("deletes region by country id and slug", async ({ fixtures }) => {
@@ -33,11 +36,13 @@ describe("regionDelete", () => {
     const region = await fixtures.Region({ countryId: country.id });
     const adminUser = await fixtures.User({ admin: true });
 
-    const caller = createCaller({ user: adminUser });
-    await caller.regionDelete({
-      country: country.id,
-      slug: region.slug,
-    });
+    await routerClient.regionDelete(
+      {
+        country: country.id,
+        slug: region.slug,
+      },
+      { context: { user: adminUser } },
+    );
 
     const deletedRegion = await db
       .select()
@@ -53,11 +58,13 @@ describe("regionDelete", () => {
     const region = await fixtures.Region({ countryId: country.id });
     const adminUser = await fixtures.User({ admin: true });
 
-    const caller = createCaller({ user: adminUser });
-    await caller.regionDelete({
-      country: country.slug,
-      slug: region.slug,
-    });
+    await routerClient.regionDelete(
+      {
+        country: country.slug,
+        slug: region.slug,
+      },
+      { context: { user: adminUser } },
+    );
 
     const deletedRegion = await db
       .select()
@@ -69,28 +76,32 @@ describe("regionDelete", () => {
   test("throws BAD_REQUEST for invalid country", async ({ fixtures }) => {
     const adminUser = await fixtures.User({ admin: true });
 
-    const caller = createCaller({ user: adminUser });
-    const err = await waitError(
-      caller.regionDelete({
-        country: "nonexistent-country",
-        slug: "some-region",
-      }),
+    const err = await waitError(() =>
+      routerClient.regionDelete(
+        {
+          country: "nonexistent-country",
+          slug: "some-region",
+        },
+        { context: { user: adminUser } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Invalid country]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("throws NOT_FOUND for non-existent region", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const adminUser = await fixtures.User({ admin: true });
 
-    const caller = createCaller({ user: adminUser });
-    const err = await waitError(
-      caller.regionDelete({
-        country: country.id,
-        slug: "nonexistent-region",
-      }),
+    const err = await waitError(() =>
+      routerClient.regionDelete(
+        {
+          country: country.id,
+          slug: "nonexistent-region",
+        },
+        { context: { user: adminUser } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[TRPCError: NOT_FOUND]`);
+    expect(err).toMatchInlineSnapshot();
   });
 
   test("is case-insensitive for country and region slugs", async ({
@@ -103,11 +114,13 @@ describe("regionDelete", () => {
     });
     const adminUser = await fixtures.User({ admin: true });
 
-    const caller = createCaller({ user: adminUser });
-    await caller.regionDelete({
-      country: "united-states",
-      slug: "california",
-    });
+    await routerClient.regionDelete(
+      {
+        country: "united-states",
+        slug: "california",
+      },
+      { context: { user: adminUser } },
+    );
 
     const deletedRegion = await db
       .select()

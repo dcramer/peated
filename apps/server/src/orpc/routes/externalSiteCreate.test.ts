@@ -1,29 +1,36 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("requires admin", async ({ fixtures }) => {
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
-  });
-  const err = await waitError(
-    caller.externalSiteCreate({
-      name: "Whisky Advocate",
-      type: "whiskyadvocate",
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
+describe("POST /external-sites", () => {
+  test("requires admin", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
 
-test("triggers job", async ({ fixtures }) => {
-  const caller = createCaller({
-    user: await fixtures.User({ admin: true }),
-  });
-  const newSite = await caller.externalSiteCreate({
-    name: "Whisky Advocate",
-    type: "whiskyadvocate",
+    const err = await waitError(() =>
+      routerClient.externalSiteCreate(
+        {
+          name: "Whisky Advocate",
+          type: "whiskyadvocate",
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
   });
 
-  expect(newSite.name).toEqual("Whisky Advocate");
-  expect(newSite.type).toEqual("whiskyadvocate");
-  expect(newSite.runEvery).toBeNull();
+  test("triggers job", async ({ fixtures }) => {
+    const user = await fixtures.User({ admin: true });
+
+    const newSite = await routerClient.externalSiteCreate(
+      {
+        name: "Whisky Advocate",
+        type: "whiskyadvocate",
+      },
+      { context: { user } },
+    );
+
+    expect(newSite.name).toEqual("Whisky Advocate");
+    expect(newSite.type).toEqual("whiskyadvocate");
+    expect(newSite.runEvery).toBeNull();
+  });
 });

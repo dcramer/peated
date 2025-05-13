@@ -1,28 +1,35 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { createCaller } from "../router";
+import { describe, expect, test } from "vitest";
+import { routerClient } from "../router";
 
-test("requires mod", async ({ fixtures }) => {
-  const caller = createCaller({
-    user: await fixtures.User(),
-  });
-  const err = await waitError(
-    caller.tagCreate({
-      name: "Peated",
-      tagCategory: "peaty",
-    }),
-  );
-  expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
-});
-
-test("triggers job", async ({ fixtures }) => {
-  const caller = createCaller({
-    user: await fixtures.User({ mod: true }),
-  });
-  const tag = await caller.tagCreate({
-    name: "Peated",
-    tagCategory: "peaty",
+describe("POST /tags", () => {
+  test("requires mod", async ({ fixtures }) => {
+    const user = await fixtures.User();
+    const err = await waitError(() =>
+      routerClient.tagCreate(
+        {
+          name: "Peated",
+          tagCategory: "peaty",
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: FORBIDDEN: Moderator privileges required]
+    `);
   });
 
-  expect(tag.name).toEqual("peated");
-  expect(tag.tagCategory).toEqual("peaty");
+  test("creates tag", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const tag = await routerClient.tagCreate(
+      {
+        name: "Peated",
+        tagCategory: "peaty",
+      },
+      { context: { user } },
+    );
+
+    expect(tag.name).toEqual("peated");
+    expect(tag.tagCategory).toEqual("peaty");
+  });
 });

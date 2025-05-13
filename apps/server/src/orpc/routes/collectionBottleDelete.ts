@@ -1,55 +1,55 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { getDefaultCollection } from "@peated/server/lib/db";
 import { CollectionBottleInputSchema } from "@peated/server/schemas";
-import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { authedProcedure } from "..";
+import { procedure } from "..";
+import { requireAuth } from "../middleware";
 
-export default authedProcedure
+export default procedure
+  .use(requireAuth)
+  .route({ method: "DELETE", path: "/collection-bottles" })
   .input(
     CollectionBottleInputSchema.extend({
-      collection: z.union([z.number(), z.literal("default")]),
-      user: z.union([z.literal("me"), z.number(), z.string()]),
+      collection: z.union([z.coerce.number(), z.literal("default")]),
+      user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
     }),
   )
-  .mutation(async function ({ input, ctx }) {
-    const user = await getUserFromId(db, input.user, ctx.user);
+  .output(z.object({}))
+  .handler(async function ({ input, context }) {
+    const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "User not found.",
-        code: "NOT_FOUND",
       });
     }
 
-    if (user.id !== ctx.user.id) {
-      throw new TRPCError({
+    if (user.id !== context.user.id) {
+      throw new ORPCError("FORBIDDEN", {
         message: "Cannot modify another user's collection.",
-        code: "FORBIDDEN",
       });
     }
 
     const collection =
       input.collection === "default"
-        ? await getDefaultCollection(db, ctx.user.id)
+        ? await getDefaultCollection(db, context.user.id)
         : await db.query.collections.findFirst({
             where: (collections, { eq }) =>
               eq(collections.id, input.collection as number),
           });
 
     if (!collection) {
-      throw new TRPCError({
+      throw new ORPCError("NOT_FOUND", {
         message: "Collection not found.",
-        code: "NOT_FOUND",
       });
     }
 
-    if (ctx.user.id !== collection.createdById) {
-      throw new TRPCError({
+    if (context.user.id !== collection.createdById) {
+      throw new ORPCError("FORBIDDEN", {
         message: "Cannot modify another user's collection.",
-        code: "FORBIDDEN",
       });
     }
 

@@ -1,30 +1,40 @@
 import { and, eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { db } from "../../db";
 import { bottles, bottleSeries, changes } from "../../db/schema";
 import waitError from "../../lib/test/waitError";
-import { createCaller } from "../router";
+import { routerClient } from "../router";
 
-describe("bottleSeriesDelete", () => {
-  it("requires authentication", async () => {
-    const caller = createCaller({ user: null });
-    const err = await waitError(caller.bottleSeriesDelete(1));
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+describe("DELETE /bottle-series/:id", () => {
+  test("requires authentication", async () => {
+    const err = await waitError(() =>
+      routerClient.bottleSeriesDelete({
+        id: 1,
+      }),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: UNAUTHORIZED: Authentication required]
+    `);
   });
 
-  it("requires moderator access", async ({ defaults }) => {
-    const caller = createCaller({ user: defaults.user });
-    const err = await waitError(caller.bottleSeriesDelete(1));
-    expect(err).toMatchInlineSnapshot(`[TRPCError: UNAUTHORIZED]`);
+  test("requires moderator access", async ({ defaults }) => {
+    const err = await waitError(() =>
+      routerClient.bottleSeriesDelete(
+        {
+          id: 1,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: FORBIDDEN: Moderator privileges required]
+    `);
   });
 
-  it("deletes a series and updates related bottles", async function ({
+  test("deletes a series and updates related bottles", async function ({
     fixtures,
   }) {
-    const caller = createCaller({
-      user: await fixtures.User({ admin: true }),
-    });
-
+    const user = await fixtures.User({ admin: true });
     const brand = await fixtures.Entity({ name: "Ardbeg" });
     const series = await fixtures.BottleSeries({
       name: "Test Series",
@@ -43,7 +53,12 @@ describe("bottleSeriesDelete", () => {
       seriesId: series.id,
     });
 
-    await caller.bottleSeriesDelete(series.id);
+    await routerClient.bottleSeriesDelete(
+      {
+        id: series.id,
+      },
+      { context: { user } },
+    );
 
     // Verify series is deleted
     const [deletedSeries] = await db
@@ -81,12 +96,19 @@ describe("bottleSeriesDelete", () => {
     });
   });
 
-  it("returns 404 for non-existent series", async function ({ fixtures }) {
-    const caller = createCaller({
-      user: await fixtures.User({ admin: true }),
-    });
+  test("returns 404 for non-existent series", async function ({ fixtures }) {
+    const user = await fixtures.User({ admin: true });
 
-    const err = await waitError(caller.bottleSeriesDelete(12345));
-    expect(err).toMatchInlineSnapshot(`[TRPCError: Series not found.]`);
+    const err = await waitError(() =>
+      routerClient.bottleSeriesDelete(
+        {
+          id: 12345,
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`
+      [ORPCError: NOT_FOUND: Series not found.]
+    `);
   });
 });

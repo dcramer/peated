@@ -1,12 +1,15 @@
+import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { externalSiteConfig, externalSites } from "@peated/server/db/schema";
 import { ExternalSiteTypeEnum } from "@peated/server/schemas";
-import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { adminProcedure } from "..";
+import { procedure } from "..";
+import { requireAdmin } from "../middleware";
 
-export default adminProcedure
+export default procedure
+  .use(requireAdmin)
+  .route({ method: "GET", path: "/external-sites/:site/config/:key" })
   .input(
     z.object({
       site: ExternalSiteTypeEnum,
@@ -14,14 +17,15 @@ export default adminProcedure
       default: z.any().default(null),
     }),
   )
-  .query(async function ({ input }) {
+  .output(z.any())
+  .handler(async function ({ input }) {
     const [site] = await db
       .select()
       .from(externalSites)
       .where(eq(externalSites.type, input.site));
     if (!site) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
+        message: "Site not found",
       });
     }
 

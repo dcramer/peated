@@ -1,24 +1,27 @@
-import { normalizeBottle } from "@peated/server/lib/normalize";
+import { call, ORPCError } from "@orpc/server";
+import {
+  normalizeBottle,
+  type NormalizedBottle,
+} from "@peated/server/lib/normalize";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { stripPrefix } from "@peated/server/lib/strings";
 import { BottleInputSchema, EntityInputSchema } from "@peated/server/schemas";
 import { type BottlePreviewResult } from "@peated/server/types";
-import { TRPCError } from "@trpc/server";
-import { type z } from "zod";
-import { authedProcedure } from "..";
-import { type Context } from "../context";
-import { entityById } from "./entityById";
+import { z } from "zod";
+import { procedure } from "..";
+import type { Context } from "../context";
+import { requireAuth } from "../middleware";
+import entityById from "./entityById";
 
 async function getEntity(
   input: number | z.input<typeof EntityInputSchema>,
-  ctx: Context,
+  context: Context,
 ) {
   if (typeof input === "number") {
     try {
-      return await entityById({ input, ctx });
+      return await call(entityById, { id: input }, { context });
     } catch (err) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
+      throw new ORPCError("NOT_FOUND", {
         message: `Entity not found [id: ${input}]`,
         cause: err,
       });
@@ -29,20 +32,19 @@ async function getEntity(
 
 export async function bottleNormalize({
   input,
-  ctx,
+  context,
 }: {
   input: z.infer<typeof BottleInputSchema>;
-  ctx: Context;
-}) {
-  const user = ctx.user;
+  context: Context;
+}): Promise<BottlePreviewResult & NormalizedBottle> {
+  const user = context.user;
   if (!user) {
-    throw new TRPCError({
-      message: "Unauthorzed!",
-      code: "UNAUTHORIZED",
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Authentication required",
     });
   }
 
-  const brand = await getEntity(input.brand, ctx);
+  const brand = await getEntity(input.brand, context);
 
   const rv: BottlePreviewResult = {
     ...input,
@@ -69,7 +71,7 @@ export async function bottleNormalize({
             {
               name: details.distiller,
             },
-            ctx,
+            context,
           );
           if (distiller) rv.distillers = [distiller];
         }
@@ -78,12 +80,12 @@ export async function bottleNormalize({
   }
 
   if (!rv.bottler && input.bottler) {
-    rv.bottler = await getEntity(input.bottler, ctx);
+    rv.bottler = await getEntity(input.bottler, context);
   }
 
   if (!rv.distillers && input.distillers) {
     rv.distillers = await Promise.all(
-      input.distillers.map((d) => getEntity(d, ctx)),
+      input.distillers.map((d) => getEntity(d, context)),
     );
   }
 
@@ -93,13 +95,55 @@ export async function bottleNormalize({
     rv.name = stripPrefix(rv.name, `${rv.brand.name} `);
   }
 
-  if (rv.name) {
-    const normBottle = normalizeBottle({ ...rv, isFullName: false });
+  let normalized: NormalizedBottle = {
+    name: rv.name,
+    statedAge: rv.statedAge ?? null,
+    vintageYear: null,
+    releaseYear: null,
+    caskStrength: null,
+    singleCask: null,
+  };
 
-    Object.assign(rv, normBottle);
+  if (rv.name) {
+    normalized = normalizeBottle({
+      ...rv,
+      isFullName: false,
+    });
   }
 
-  return rv;
+  return {
+    ...rv,
+    ...normalized,
+  };
 }
 
-export default authedProcedure.input(BottleInputSchema).query(bottleNormalize);
+const BottlePreviewResultSchema = z.object({
+  name: z.string(),
+  statedAge: z.number().nullable(),
+  vintageYear: z.number().nullable(),
+  releaseYear: z.number().nullable(),
+  caskStrength: z.boolean().nullish(),
+  singleCask: z.boolean().nullish(),
+});
+
+export default procedure
+  .use(requireAuth)
+  .route({ method: "POST", path: "/bottles/preview" })
+  .input(BottleInputSchema)
+  .output(BottlePreviewResultSchema)
+  .handler(async function ({ input, context }) {
+    const normalized = await bottleNormalize({
+      input,
+      context,
+    });
+
+    // Extract only the properties specified in the output schema
+    return {
+      name: normalized.name,
+      statedAge: normalized.statedAge,
+      vintageYear: normalized.vintageYear,
+      releaseYear: normalized.releaseYear,
+      caskStrength: normalized.caskStrength,
+      singleCask: normalized.singleCask,
+    };
+  });
