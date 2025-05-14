@@ -1,6 +1,11 @@
 import { createRouterClient } from "@orpc/server";
+
 import adminQueueInfo from "./routes/adminQueueInfo";
+import aiBottleLookup from "./routes/aiBottleLookup";
+import aiCountryLookup from "./routes/aiCountryLookup";
+import aiEntityLookup from "./routes/aiEntityLookup";
 import aiLabelExtract from "./routes/aiLabelExtract";
+import aiRegionLookup from "./routes/aiRegionLookup";
 import authLogin from "./routes/authLogin";
 import authMagicLinkConfirm from "./routes/authMagicLinkConfirm";
 import authMagicLinkSend from "./routes/authMagicLinkSend";
@@ -21,7 +26,6 @@ import bottleAliasUpsert from "./routes/bottleAliasUpsert";
 import bottleById from "./routes/bottleById";
 import bottleCreate from "./routes/bottleCreate";
 import bottleDelete from "./routes/bottleDelete";
-import bottleGenerateDetails from "./routes/bottleGenerateDetails";
 import bottleImageUpdate from "./routes/bottleImageUpdate";
 import bottleList from "./routes/bottleList";
 import bottleMerge from "./routes/bottleMerge";
@@ -54,7 +58,6 @@ import commentDelete from "./routes/commentDelete";
 import commentList from "./routes/commentList";
 import countryBySlug from "./routes/countryBySlug";
 import countryCategoryList from "./routes/countryCategoryList";
-import countryGenerateDetails from "./routes/countryGenerateDetails";
 import countryList from "./routes/countryList";
 import countryUpdate from "./routes/countryUpdate";
 import emailResendVerification from "./routes/emailResendVerification";
@@ -65,7 +68,6 @@ import entityById from "./routes/entityById";
 import entityCategoryList from "./routes/entityCategoryList";
 import entityCreate from "./routes/entityCreate";
 import entityDelete from "./routes/entityDelete";
-import entityGenerateDetails from "./routes/entityGenerateDetails";
 import entityList from "./routes/entityList";
 import entityMerge from "./routes/entityMerge";
 import entityUpdate from "./routes/entityUpdate";
@@ -99,7 +101,6 @@ import priceUpdate from "./routes/priceUpdate";
 import regionBySlug from "./routes/regionBySlug";
 import regionCreate from "./routes/regionCreate";
 import regionDelete from "./routes/regionDelete";
-import regionGenerateDetails from "./routes/regionGenerateDetails";
 import regionList from "./routes/regionList";
 import regionUpdate from "./routes/regionUpdate";
 import reviewCreate from "./routes/reviewCreate";
@@ -152,7 +153,7 @@ export const router = {
   bottleById,
   bottleCreate,
   bottleDelete,
-  bottleGenerateDetails,
+  aiBottleLookup,
   bottleList,
   bottleMerge,
   bottleValidation,
@@ -168,6 +169,7 @@ export const router = {
   bottleSeriesDelete,
   bottleSeriesList,
   bottleSeriesUpdate,
+  bottleSimilarList,
   bottleSuggestedTagList,
   bottleTagList,
   bottleUpdate,
@@ -182,7 +184,7 @@ export const router = {
   commentList,
   countryBySlug,
   countryCategoryList,
-  countryGenerateDetails,
+  aiCountryLookup,
   countryList,
   countryUpdate,
   emailResendVerification,
@@ -193,7 +195,7 @@ export const router = {
   entityCategoryList,
   entityCreate,
   entityDelete,
-  entityGenerateDetails,
+  aiEntityLookup,
   entityList,
   entityMerge,
   entityUpdate,
@@ -229,14 +231,13 @@ export const router = {
   regionBySlug,
   regionCreate,
   regionDelete,
-  regionGenerateDetails,
+  aiRegionLookup,
   regionList,
   regionUpdate,
   reviewCreate,
   reviewList,
   reviewUpdate,
   search,
-  bottleSimilarList,
   smwsDistillerList,
   stats,
   tagByName,
