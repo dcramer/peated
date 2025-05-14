@@ -270,12 +270,6 @@ importers:
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.71.0(react@18.3.1)
-      '@trpc/client':
-        specifier: 'catalog:'
-        version: 11.0.0-rc.461(@trpc/server@11.0.0-rc.461)
-      '@trpc/server':
-        specifier: 'catalog:'
-        version: 11.0.0-rc.461
       '@types/bcrypt':
         specifier: ^5.0.2
         version: 5.0.2

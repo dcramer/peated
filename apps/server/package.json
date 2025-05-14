@@ -35,8 +35,6 @@
     "@sentry/node": "catalog:",
     "@sindresorhus/slugify": "^2.2.1",
     "@tanstack/react-query": "catalog:",
-    "@trpc/client": "catalog:",
-    "@trpc/server": "catalog:",
     "@types/bcrypt": "^5.0.2",
     "@types/error-cause": "^1.0.4",
     "@types/jsonwebtoken": "^9.0.8",
