@@ -1,6 +1,6 @@
 import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
-import { routerClient } from "../router";
 
 describe("GET /search", () => {
   test("searches across bottles and entities without authentication", async ({
@@ -8,10 +8,11 @@ describe("GET /search", () => {
   }) => {
     const bottle = await fixtures.Bottle({ name: "Unique Whiskey" });
     const entity = await fixtures.Entity({ name: "Unique Distillery" });
-    const user = await fixtures.User({ username: "uniqueuser" });
+    await fixtures.User({ username: "uniqueuser" });
 
     const { results } = await routerClient.search({
       query: "unique",
+      include: ["bottles", "entities"],
       limit: 10,
     });
 
@@ -95,22 +96,22 @@ describe("GET /search", () => {
     expect(results[0].ref.id).toBe(exactMatch.id);
   });
 
-  test("handles empty query", async () => {
+  test("returns empty results with no query", async () => {
     const { results } = await routerClient.search({
       query: "",
       limit: 10,
     });
 
-    expect(results.length).toBe(0);
+    expect(results).toHaveLength(0);
   });
 
-  test("handles query with no results", async () => {
+  test("returns empty results with no matches", async () => {
     const { results } = await routerClient.search({
       query: "nonexistentitem",
       limit: 10,
     });
 
-    expect(results.length).toBe(0);
+    expect(results).toHaveLength(0);
   });
 
   test("throws error for invalid include parameter", async () => {
@@ -122,5 +123,6 @@ describe("GET /search", () => {
       }),
     );
     expect(err).toBeDefined();
+    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 });

@@ -5,7 +5,9 @@ import waitError from "./test/waitError";
 
 vi.mock("@peated/server/lib/orpc-client/server", () => ({
   orpcClient: {
-    priceCreateBatch: vi.fn(),
+    prices: {
+      createBatch: vi.fn(),
+    },
   },
 }));
 
@@ -55,7 +57,7 @@ describe("scrapePrices", () => {
     await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
 
     expect(mockScrapeProducts).toHaveBeenCalledTimes(3);
-    expect(orpcClient.priceCreateBatch).toHaveBeenCalledWith({
+    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
       site: mockSite,
       prices: [
         {
@@ -112,7 +114,7 @@ describe("scrapePrices", () => {
     await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
 
     expect(mockScrapeProducts).toHaveBeenCalledTimes(2);
-    expect(orpcClient.priceCreateBatch).toHaveBeenCalledWith({
+    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
       site: mockSite,
       prices: [
         {

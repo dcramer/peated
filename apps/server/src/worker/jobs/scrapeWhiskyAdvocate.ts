@@ -23,7 +23,7 @@ export default async function scrapeWhiskeyAdvocate() {
   info(fmt`[Whisky Advocate] Found ${String(issueList.length)} issues`);
 
   const processedIssues = process.env.ACCESS_TOKEN
-    ? await orpcClient.externalSiteConfigGet({
+    ? await orpcClient.externalSites.config.get({
         site: "whiskyadvocate",
         key: "processedIssues",
         default: [],
@@ -49,7 +49,7 @@ export default async function scrapeWhiskeyAdvocate() {
           info(fmt`[Whisky Advocate] Submitting [${item.name}]`);
 
           try {
-            await orpcClient.reviewCreate({
+            await orpcClient.reviews.create({
               site: "whiskyadvocate",
               ...item,
             });
@@ -66,7 +66,7 @@ export default async function scrapeWhiskeyAdvocate() {
     info(fmt`[Whisky Advocate] Done processing issue [${issueName}]`);
 
     if (process.env.ACCESS_TOKEN) {
-      await orpcClient.externalSiteConfigSet({
+      await orpcClient.externalSites.config.set({
         site: "whiskyadvocate",
         key: "processedIssues",
         value: processedIssues,

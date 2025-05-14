@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import { bottles, entities, tastings } from "@peated/server/db/schema";
+import { procedure } from "@peated/server/orpc";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
-import { procedure } from "..";
 
 export default procedure
   .route({ method: "GET", path: "/stats" })

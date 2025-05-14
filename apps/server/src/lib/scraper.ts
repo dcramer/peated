@@ -168,7 +168,7 @@ export async function handleBottle(
 
     let bottleResult;
     try {
-      bottleResult = await orpcClient.bottleUpsert(bottle);
+      bottleResult = await orpcClient.bottles.upsert(bottle);
     } catch (err) {
       if (!isORPCClientError(err) || (err as any).data?.httpStatus !== 409) {
         logError(err, { bottle });
@@ -191,7 +191,7 @@ export async function handleBottle(
 
     if (price) {
       try {
-        await orpcClient.priceCreateBatch({
+        await orpcClient.prices.createBatch({
           site: "smws",
           prices: [price],
         });
@@ -219,7 +219,7 @@ export default async function scrapePrices(
     SCRAPER_PRICE_BATCH_SIZE,
     async (prices) => {
       console.log("Pushing new price data to API");
-      await orpcClient.priceCreateBatch({
+      await orpcClient.prices.createBatch({
         site,
         prices,
       });

@@ -1,5 +1,5 @@
 import config from "@peated/server/config";
-import { routerClient } from "../router";
+import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /version", () => {
   test("returns version", async () => {

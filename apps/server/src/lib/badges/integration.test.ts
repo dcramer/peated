@@ -1,4 +1,4 @@
-import { db } from "../../db";
+import { db } from "@peated/server/db";
 
 import { faker } from "@faker-js/faker";
 import {

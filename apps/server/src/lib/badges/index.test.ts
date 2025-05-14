@@ -1,6 +1,6 @@
+import { db } from "@peated/server/db";
 import { badgeAwards, tastingBadgeAwards } from "@peated/server/db/schema";
 import { awardAllBadgeXp, rescanBadge } from ".";
-import { db } from "../../db";
 import { createTastingForBadge } from "./testHelpers";
 
 describe("rescanBadge", () => {

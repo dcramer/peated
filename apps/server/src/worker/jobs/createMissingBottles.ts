@@ -30,7 +30,7 @@ export default async function createMissingBottles() {
 
         const entity = await findEntity(review.name);
         if (entity) {
-          const result = await routerClient.bottleCreate(
+          const result = await routerClient.bottles.create(
             {
               name: review.name,
               brand: entity.id,

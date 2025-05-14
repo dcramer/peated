@@ -105,7 +105,8 @@ export const app = new Hono()
     );
 
     // Return the stream
-    return c.body(stream);
+    // TODO: fix this
+    return c.body(stream as any);
   })
   .get("/", async (c) => {
     return c.html(`
@@ -145,6 +146,7 @@ export const app = new Hono()
           version: "1.0.0",
           description: "The Peated API",
         },
+        servers: [{ url: "/v1" } /** Should use absolute URLs in production */],
       }),
     );
   })

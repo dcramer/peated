@@ -1,11 +1,8 @@
-import { call } from "@orpc/server";
+import { procedure } from "@peated/server/orpc";
+import { routerClient } from "@peated/server/orpc/router";
 import { BottleSchema, EntitySchema, UserSchema } from "@peated/server/schemas";
 import type { Bottle, Entity, User } from "@peated/server/types";
 import { z } from "zod";
-import { procedure } from "..";
-import bottleList from "./bottleList";
-import entityList from "./entityList";
-import userList from "./userList";
 
 export type BottleResult = {
   type: "bottle";
@@ -95,16 +92,16 @@ export default procedure
 
     if (include.includes("bottles")) {
       promises.push(
-        call(
-          bottleList,
-          {
-            query,
-            cursor: 1,
-            limit,
-            sort: "rank",
-          },
-          { context },
-        )
+        routerClient.bottles
+          .list(
+            {
+              query,
+              cursor: 1,
+              limit,
+              sort: "rank",
+            },
+            { context },
+          )
           .then((data: any) =>
             data.results.map((b: any) => ({ type: "bottle", ref: b })),
           )
@@ -114,16 +111,16 @@ export default procedure
 
     if (include.includes("users")) {
       promises.push(
-        call(
-          userList,
-          {
-            query,
-            cursor: 1,
-            sort: "name",
-            limit,
-          },
-          { context },
-        )
+        routerClient.users
+          .list(
+            {
+              query,
+              cursor: 1,
+              sort: "name",
+              limit,
+            },
+            { context },
+          )
           .then((data: any) =>
             data.results.map((b: any) => ({ type: "user", ref: b })),
           )
@@ -133,16 +130,16 @@ export default procedure
 
     if (include.includes("entities")) {
       promises.push(
-        call(
-          entityList,
-          {
-            query,
-            cursor: 1,
-            limit,
-            sort: "rank",
-          },
-          { context },
-        )
+        routerClient.entities
+          .list(
+            {
+              query,
+              cursor: 1,
+              limit,
+              sort: "rank",
+            },
+            { context },
+          )
           .then((data: any) =>
             data.results.map((b: any) => ({ type: "entity", ref: b })),
           )

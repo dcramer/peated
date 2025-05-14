@@ -1,6 +1,6 @@
 import config from "@peated/server/config";
+import { procedure } from "@peated/server/orpc";
 import { z } from "zod";
-import { procedure } from "..";
 
 export default procedure
   .route({ method: "GET", path: "/" })

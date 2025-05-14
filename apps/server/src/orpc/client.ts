@@ -20,6 +20,7 @@ export function makeORPCClient(
   return createORPCClient(link);
 }
 
-export function isORPCClientError(cause: unknown): cause is ORPCError {
+// TODO:
+export function isORPCClientError(cause: unknown) {
   return isDefinedError(cause);
 }

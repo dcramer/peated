@@ -5,9 +5,28 @@ alwaysApply: false
 ---
 # oRPC Route Implementation Conventions
 
-This document defines the conventions for implementing, naming, and testing routes using the `@orpc/server` framework. It is designed to align with OpenAPI principles while maintaining consistency and ergonomic developer experience.
+This document defines conventions for implementing and testing API endpoints using the `@orpc/server` framework. It focuses on producing consistent and composable oRPC procedures that align with OpenAPI principles. The guidelines cover how procedures should be structured, named, composed, and validated within a TypeScript codebase.
 
-## File Structure and Naming
+## File Structure, Imports, and Routing
+
+### Import Rules
+
+Use absolute imports for all modules that are not in the same folder. For example, import middleware, serializers, schemas, or utilities using paths like `@peated/server/orpc`, which maps to `apps/server/src/orpc`.
+
+Avoid relative imports such as `../../../middleware` unless the module is a direct sibling or nearby file. This ensures consistent and readable imports across the codebase.
+
+Example:
+
+```ts
+import { requireAuth } from "@peated/server/orpc/middleware";
+import { serialize } from "@peated/server/serializers";
+```
+
+### Router Structure
+
+All routes are composed using router objects. Each folder should export an `index.ts` that defines a router object, even if it only wraps a single route.
+
+This standardization allows parent routers to compose children consistently, and supports future expansion without breaking the interface.
 
 * Each route corresponds to a semantic file name, not a dynamic parameter.
 * Each folder in the path represents a URL segment; dynamic segments (`:id`, `:user`, etc.) are **not** reflected in folder names.
@@ -16,8 +35,7 @@ This document defines the conventions for implementing, naming, and testing rout
   * `list.ts` for collection routes (e.g. `GET /bottles`)
   * `details.ts` for detail routes (e.g. `GET /bottles/:id`)
   * Descriptive names like `login.ts`, `me.ts`, `tastings.ts` for functional or nested routes.
-* Each folder with multiple routes includes a `router.ts` to export the routes with semantic keys.
-* If a folder contains only a single route file, a `router.ts` file is not required.
+* Each folder with multiple routes includes an `index.ts` file to export the routes with semantic keys.
 
 ### Example
 
@@ -29,17 +47,19 @@ routes/
     └── collections/
         ├── details.ts           # /users/:user/collections/:collection
         ├── bottles.ts           # /users/:user/collections/:collection/bottles
-        └── router.ts            # combines child routes
+        └── index.ts             # combines child routes
 ```
 
-### Root Router Composition
+### Root and Lazy Router Composition
 
-A root `router.ts` should be defined at the top-level `routes/` directory to compose all sub-routers:
+A root `index.ts` file should be defined at the top-level `routes/` directory to compose child routers. You may import routers eagerly or use lazy-loading for modularity and startup performance:
+
+#### Eager Composition:
 
 ```ts
-import auth from "./auth/router";
-import bottles from "./bottles/router";
-import users from "./users/router";
+import auth from "./auth";
+import bottles from "./bottles";
+import users from "./users";
 
 export default {
   auth,
@@ -48,10 +68,10 @@ export default {
 };
 ```
 
-Child `router.ts` files should import semantic route modules from their folder and return an object:
+#### Child Router Example
 
 ```ts
-// routes/users/collections/router.ts
+// routes/users/collections/index.ts
 import details from "./details";
 import bottles from "./bottles";
 
@@ -61,21 +81,21 @@ export default {
 };
 ```
 
-## Route Definition Order
+## Defining Routes
 
-Route procedures are defined using method chaining. The correct order is:
+Each oRPC route is defined using a chained procedure call with a consistent structure. The route declaration must follow the order below:
 
-1. `use` – middleware
-2. `route` – HTTP method and path
-3. `input` – Zod schema for input
-4. `output` – Zod schema for output
-5. `handler` – the request handler (must come last)
+1. `use` - middleware
+2. `route` - HTTP method and path
+3. `input` - Zod schema for input
+4. `output` - Zod schema for output
+5. `handler` - the request handler (must come last)
 
 ### Example
 
 ```ts
 import { os } from "@orpc/server";
-import { procedure } from "..";
+import { procedure } from "@peated/server/orpc";
 
 export default procedure
   .route({ method: "GET", path: "/ping" })
@@ -84,7 +104,7 @@ export default procedure
   });
 ```
 
-## HTTP Verb Semantics
+## HTTP Method Semantics
 
 * **GET**: Read a resource
 * **POST**: Create a new resource
@@ -99,7 +119,11 @@ For upserts:
 
 Mutations on collections must support batch input.
 
-## Query and Path Parameters
+## Query and Path Parameter Handling
+
+Use `.coerce` for all values passed via query or path, as these arrive as strings. Always define a default where appropriate. If multiple query patterns are possible (e.g., `slug` or `id`), use a union type and disambiguate at runtime.
+
+You may also define enums from constant arrays (e.g. `SORT_OPTIONS`, `FLAVOR_PROFILES`) for filtering or sorting.
 
 All query/path parameters must be treated as strings and coerced using Zod.
 
@@ -122,7 +146,18 @@ if (Number.isFinite(+input.country)) {
 }
 ```
 
-## Error Responses
+## Error Handling and ORPCError Usage
+
+If an endpoint interacts with the database and may throw constraint or type errors (e.g., duplicate keys, bad filters), wrap the logic in try/catch and rethrow using `ORPCError`. When mapping database constraint violations, include a useful message with any relevant record information.
+
+```ts
+if (err.code === "23505" && err.constraint === "user_email_unq") {
+  const [existing] = await db.select().from(users).where(...);
+  throw new ORPCError("CONFLICT", {
+    message: `User already exists (ID=${existing.id}).`,
+  });
+}
+```
 
 Use `ORPCError` for returning errors:
 
@@ -134,7 +169,7 @@ throw new ORPCError("UNAUTHORIZED", { message: "Invalid Credentials." });
 * Use OpenAPI-style error codes (`NOT_FOUND`, `UNAUTHORIZED`, etc).
 * Always include a complete, properly punctuated message.
 
-## Authentication
+## Authentication Middleware
 
 Middleware like `requireAuth` or `requireAdmin` is defined using `.use()`:
 
@@ -142,35 +177,23 @@ Middleware like `requireAuth` or `requireAdmin` is defined using `.use()`:
 import { requireAuth } from "@peated/server/orpc/middleware";
 
 export default procedure
-  .route({ method: "GET", path: "/auth/me" })
+  .route({ method: "GET", path: "/auth/me", tags: ['Auth'] })
   .use(requireAuth)
   .handler(async function ({ context }) {
     return { whoami: context.user.email };
   });
 ```
 
-## Response Serialization
+## Testing Routes
 
-Use `.output()` and a `Serializer` to define and format responses:
+Each route should have a corresponding test file named `[routeName].test.ts`. Follow these conventions:
 
-```ts
-.output(z.object({ user: UserSchema }))
-.handler(async function ({ context }) {
-  return {
-    user: serialize(UserSerializer, context.user, context.user),
-  };
-});
-```
+* The `describe` block should use the format `METHOD /path`
+* Test valid input, error paths, and edge cases
+* Use `fixtures` to create any necessary users or data
+* Pass the authenticated user in `context` where applicable
 
-* All response schemas must be defined in `apps/server/src/schemas` using Zod.
-* Use the `serialize()` helper and serializer classes for object outputs.
-* List responses use `{ results, rel }` format, where `rel` includes `CursorSchema`.
-
-## Tests
-
-Test files must match `[routeName].test.ts` and include a `describe()` call with the format: `METHOD /path`.
-
-### Example
+Example:
 
 ```ts
 describe("POST /auth/login", () => {
@@ -186,26 +209,101 @@ describe("POST /auth/login", () => {
     });
 
     expect(data.user.id).toEqual(user.id);
+    expect(data.accessToken).toBeDefined();
   });
 });
 ```
 
 ### Testing Errors
 
-Use `waitError()` and `toMatchInlineSnapshot()`:
+Use `waitError` and inline snapshots to verify structured errors:
 
 ```ts
-const err = await waitError(routerClient.authLogin({ ... }));
+const err = await waitError(
+  routerClient.authLogin({ email: "wrong", password: "bad" })
+);
 expect(err).toMatchInlineSnapshot();
 ```
 
-## Running Tests
+### Assertions
 
-```bash
-pnpm --filter ./apps/api test --run [routeName]
+* Assert both the response structure and any DB side-effects
+* Prefer checking persisted state rather than echo values
+* Avoid testing unrelated fields in the response
+
+## Response Structure and Serialization
+
+## OpenAPI Metadata
+
+Routes can include metadata inside `.route()` to enrich the OpenAPI spec. These fields improve generated API docs and client usability.
+
+```ts
+.route({
+  method: "POST",
+  path: "/auth/login",
+  summary: "Authenticate a user",
+  description: "Returns a user session token and profile",
+  tags: ["Auth"]
+})
 ```
 
-Examples:
+### Cursor-Based Pagination
 
-* All routes: `pnpm --filter ./apps/api test --run routes`
-* One route: `pnpm --filter ./apps/api test --run authRegister`
+Paginated responses must follow a consistent structure using cursor-based pagination. The returned object should contain two keys:
+
+* `results`: an array of serialized resources.
+* `rel`: an object containing `nextCursor` and `prevCursor` values.
+
+This allows clients to efficiently navigate forward and backward through results.
+
+The `CursorSchema` should be used for typing the `rel` key.
+
+```ts
+.output(
+  z.object({
+    results: z.array(ResourceSchema),
+    rel: CursorSchema,
+  })
+)
+```
+
+During implementation:
+
+* Always query one extra record (`limit + 1`) to determine if a next page exists.
+* Slice the result to `limit` before serializing.
+* Calculate cursors based on the current offset or cursor position.
+
+Example:
+
+```ts
+return {
+  results: await serialize(
+    ResourceSerializer,
+    records.slice(0, limit),
+    context.user,
+  ),
+  rel: {
+    nextCursor: records.length > limit ? cursor + 1 : null,
+    prevCursor: cursor > 1 ? cursor - 1 : null,
+  },
+};
+```
+
+### Single Resource Responses
+
+For single object responses, return a named key for the resource, matching the object type. This improves clarity and structure for clients.
+
+Example:
+
+```ts
+.output(z.object({ user: UserSchema }))
+.handler(async function ({ context }) {
+  return {
+    user: serialize(UserSerializer, context.user, context.user),
+  };
+});
+```
+
+* Always prefix returned resources with a semantic key (`user`, `bottle`, `flight`, etc.)
+* Use serializers to control which fields are exposed to the user
+* All schemas must be defined in `apps/server/src/schemas` using Zod

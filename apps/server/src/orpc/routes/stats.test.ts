@@ -1,4 +1,4 @@
-import { routerClient } from "../router";
+import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /stats", () => {
   test("returns stats", async ({ fixtures }) => {

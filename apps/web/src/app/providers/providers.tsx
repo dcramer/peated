@@ -1,5 +1,6 @@
 "use client";
 
+import { type SessionData } from "@peated/server/lib/session.server";
 import FlashMessages from "@peated/web/components/flash";
 import { default as config } from "@peated/web/config";
 import { ApiProvider } from "@peated/web/hooks/useApi";
@@ -11,7 +12,6 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { useInterval } from "usehooks-ts";
-import { type SessionData } from "../../lib/session.server";
 
 export default function Providers({
   children,
