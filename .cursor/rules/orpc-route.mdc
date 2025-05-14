@@ -1,6 +1,6 @@
 ---
 description: Instructions when working on OpenAPI routes in Hono.
-globs:
+globs: 
 alwaysApply: false
 ---
 ## Technology
@@ -16,38 +16,40 @@ in the same directory and is not a shared utility.
 
 Routes are located in `apps/server/src/orpc/routes` and are named based on their URL path.
 
-- They are ALWAYS in the root `routes` folder and flattened. We do not use or group routes into
-  subfolders.
-- They should contain every HTTP METHOD at the same path (GET, POST, etc.)
-- Their path will include only their relative route location from the version
-  (e.g. `/auth` vs `/v1/auth`). It will never include the `/v1` prefix.
-- They use plural nouns in filenames (e.g. `bottleDetails` vs `bottleDetail`).
-- Each unique path should be its own module. For example, `auth.ts` only contains `/auth`,
-  NEVER `/auth/register`, which would be in `authRegister.ts`.
-- The filename should be prefixed with the route subpath leading up to it. For example, `adminQueueInfo.ts`
-  for `/v1/admin/queueInfo`.
+Include only thet relative route location from the version
+(e.g. `/auth` vs `/v1/auth`). It will never include the `/v1` prefix.
 
 Here are some examples of file paths:
 
-- a route at `/v1/auth` would be in `apps/server/src/orpc/routes/auth.ts`.
-- a route at `/v1/auth/register` would be in `apps/server/src/orpc/routes/authRegister.ts`.
-- a route at `/v1/bottles/:bottleId` would be in `apps/server/src/orpc/routes/bottleDetails.ts`.
-- a route at `/v1/bottles/:bottleId/tastings` would be in `apps/server/src/orpc/routes/bottleTastings.ts`
+| Path                    | File Path                 |
+| ----------------------- | ------------------------- |
+| `/auth/me`              | `auth/me.ts`              |
+| `/auth/register`        | `auth/register.ts`        |
+| `/bottles`              | `bottles/index.ts`        |
+| `/bottles/:id`          | `bottles/$id.ts`          |
+| `/bottles/:id/tastings` | `bottles/$id/tastings.ts` |
+| `/bottle-aliases`       | `bottle-aliases/index.ts` |
 
-When importing these modules, ALWAYS name then accordingly with a `Route` suffix. For example:
+You will also need to define an `router.ts` in each path to create an oRPC router:
 
 ```ts
-import authRegister from "@peated/server/orpc/routes/authRegister";
+// auth/router.ts
+import me from "./me";
+import register from "./register";
+
+export { me, register };
 ```
 
-Routes are registered in `apps/server/src/orpc/router.ts`, by adding a new `app.route`. They are
-sorted alphabetically by name.
+This router then gets registered in the root router at `apps/server/src/orpc/router.ts`:
 
-All unique paths should also be unique modules. For example:
+```ts
+// we use the Router suffix to avoid complexity here
+import authRouter from "./routes/auth/router";
 
-- GET /v1/auth should be in `[..]/auth.ts`.
-- POST /v1/auth should be in `[..]/auth.ts`.
-- POST /v1/auth/register should be in `[..]/authRegister.ts`.
+export default {
+    auth: authRouter,
+};
+```
 
 Tests should live side-by-side with the routes:
 
