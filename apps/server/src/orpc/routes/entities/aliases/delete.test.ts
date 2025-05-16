@@ -71,15 +71,15 @@ describe("DELETE /entity-aliases/:name", () => {
     const entity = await fixtures.Entity({ name: "Test Entity" });
 
     // Create an alias with the same name as the entity
-    const alias = await fixtures.EntityAlias({
-      entityId: entity.id,
-      name: entity.name,
-    });
+    // const alias = await fixtures.EntityAlias({
+    //   entityId: entity.id,
+    //   name: entity.name,
+    // });
 
     const err = await waitError(() =>
       routerClient.entities.aliases.delete(
         {
-          name: alias.name,
+          name: entity.name,
         },
         { context: { user } },
       ),

@@ -153,7 +153,7 @@ subcommand
           console.warn(
             `Removing bottle due to unknown entity: ${bottle.fullName}`,
           );
-          await routerClient.bottleDelete(bottle.id, {
+          await routerClient.bottles.delete(bottle.id, {
             context: { user: systemUser },
           });
         } else {
@@ -171,7 +171,7 @@ subcommand
             `Updating ${bottle.fullName} to ${entity.name} ${newName} (from ${entity.name})`,
           );
 
-          await routerClient.bottleUpdate(
+          await routerClient.bottles.update(
             {
               bottle: bottle.id,
               name: newName,

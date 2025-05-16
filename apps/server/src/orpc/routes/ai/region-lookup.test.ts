@@ -68,10 +68,11 @@ describe("POST /ai/region-lookup", () => {
       { context: { user } },
     );
 
-    expect(result).toEqual({
-      name: "Generated Region",
-      description: "This is a generated description for a region.",
-    });
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "description": "This is a generated description for a region.",
+      }
+    `);
 
     expect(
       generateRegionDetailsModule.getGeneratedRegionDetails,

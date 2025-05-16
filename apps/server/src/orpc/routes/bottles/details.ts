@@ -62,7 +62,7 @@ export default procedure
 
     const [{ count: totalPeople }] = await db
       .select({
-        count: sql<number>`COUNT(DISTINCT ${tastings.createdById})`,
+        count: sql<string>`COUNT(DISTINCT ${tastings.createdById})`,
       })
       .from(tastings)
       .where(eq(tastings.bottleId, bottle.id));
@@ -72,7 +72,7 @@ export default procedure
       createdBy: createdBy
         ? await serialize(UserSerializer, createdBy, context.user)
         : null,
-      people: totalPeople,
+      people: Number(totalPeople),
       lastPrice: lastPrice
         ? await serialize(StorePriceSerializer, lastPrice, context.user)
         : null,

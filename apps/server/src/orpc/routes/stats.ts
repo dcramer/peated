@@ -16,25 +16,25 @@ export default procedure
   .handler(async function () {
     const [{ totalTastings }] = await db
       .select({
-        totalTastings: sql<number>`COUNT(${tastings.id})`,
+        totalTastings: sql<string>`COUNT(${tastings.id})`,
       })
       .from(tastings);
 
     const [{ totalBottles }] = await db
       .select({
-        totalBottles: sql<number>`COUNT(${bottles.id})`,
+        totalBottles: sql<string>`COUNT(${bottles.id})`,
       })
       .from(bottles);
 
     const [{ totalEntities }] = await db
       .select({
-        totalEntities: sql<number>`COUNT(${entities.id})`,
+        totalEntities: sql<string>`COUNT(${entities.id})`,
       })
       .from(entities);
 
     return {
-      totalTastings,
-      totalBottles,
-      totalEntities,
+      totalTastings: Number(totalTastings),
+      totalBottles: Number(totalBottles),
+      totalEntities: Number(totalEntities),
     };
   });

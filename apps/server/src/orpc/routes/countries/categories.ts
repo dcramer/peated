@@ -67,7 +67,7 @@ export default procedure
     ).rows;
 
     const [{ totalBottles }] = await db
-      .select({ totalBottles: sql<number>`COUNT(*)` })
+      .select({ totalBottles: sql<string>`COUNT(*)` })
       .from(bottles)
       .innerJoin(
         bottlesToDistillers,

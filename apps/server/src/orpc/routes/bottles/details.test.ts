@@ -9,7 +9,7 @@ describe("GET /bottles/:id", () => {
     await fixtures.Bottle({ name: "Something Else" });
 
     const data = await routerClient.bottles.details(bottle1.id);
-    expect(data.id).toEqual(bottle1.id);
+    expect(data.bottle.id).toEqual(bottle1.id);
   });
 
   test("errors on invalid bottle", async () => {
@@ -26,6 +26,6 @@ describe("GET /bottles/:id", () => {
     await fixtures.Bottle({ name: "Something Else" });
 
     const data = await routerClient.bottles.details(999);
-    expect(data.id).toEqual(bottle1.id);
+    expect(data.bottle.id).toEqual(bottle1.id);
   });
 });

@@ -48,7 +48,7 @@ export default procedure
         .limit(limit)
         .offset(offset),
       db
-        .select({ count: sql<number>`count(*)` })
+        .select({ count: sql<string>`count(*)` })
         .from(bottleSeries)
         .where(where ? and(...where) : undefined),
     ]);

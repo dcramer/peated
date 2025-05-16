@@ -26,7 +26,7 @@ export default procedure
     }
 
     const [{ count }] = await db
-      .select({ count: sql<number>`count(*)` })
+      .select({ count: sql<string>`count(*)` })
       .from(notifications)
       .where(where ? and(...where) : undefined);
 

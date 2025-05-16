@@ -191,7 +191,7 @@ export default procedure
             .onConflictDoUpdate({
               target: [bottleTags.bottleId, bottleTags.tag],
               set: {
-                count: sql<number>`${bottleTags.count} + 1`,
+                count: sql<string>`${bottleTags.count} + 1`,
               },
             }),
         ),
