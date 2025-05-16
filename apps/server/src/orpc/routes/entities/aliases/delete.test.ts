@@ -84,8 +84,6 @@ describe("DELETE /entity-aliases/:name", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: BAD_REQUEST: Cannot delete canonical name]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Cannot delete canonical name.]`);
   });
 });

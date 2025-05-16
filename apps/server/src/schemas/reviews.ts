@@ -8,7 +8,7 @@ export const ReviewSchema = z.object({
   name: z.string(),
   rating: z.number(),
   url: z.string(),
-  site: ExternalSiteSchema,
+  site: ExternalSiteSchema.optional(),
   bottle: BottleSchema.nullish().default(null),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
