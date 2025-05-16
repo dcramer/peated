@@ -19,8 +19,7 @@ import { UserSerializer } from "@peated/server/serializers/user";
 import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const OutputSchema = z.object({
-  bottle: BottleSchema,
+const OutputSchema = BottleSchema.extend({
   createdBy: UserSchema.nullable(),
   people: z.number(),
   lastPrice: StorePriceSchema.nullable(),
@@ -68,7 +67,7 @@ export default procedure
       .where(eq(tastings.bottleId, bottle.id));
 
     return {
-      bottle: await serialize(BottleSerializer, bottle, context.user),
+      ...(await serialize(BottleSerializer, bottle, context.user)),
       createdBy: createdBy
         ? await serialize(UserSerializer, createdBy, context.user)
         : null,
