@@ -77,13 +77,19 @@ export default procedure
   .use(requireAuth)
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input: { cursor, limit, ...input }, context }) {
+  .handler(async function ({
+    input: { cursor, limit, ...input },
+    context,
+    errors,
+  }) {
     const [badge] = await db
       .select()
       .from(badges)
       .where(eq(badges.id, input.badge));
     if (!badge) {
-      throw new ORPCError("NOT_FOUND");
+      throw errors.NOT_FOUND({
+        message: "Badge not found.",
+      });
     }
 
     const offset = (cursor - 1) * limit;

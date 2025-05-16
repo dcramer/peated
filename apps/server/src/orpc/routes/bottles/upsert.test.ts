@@ -12,7 +12,7 @@ describe("PUT /bottles", () => {
         brand: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[ORPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("creates a new bottle", async ({ fixtures }) => {

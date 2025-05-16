@@ -22,7 +22,7 @@ describe("POST /bottles", () => {
         { context: { user: null } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("creates a new bottle with minimal params", async ({
@@ -113,7 +113,7 @@ describe("POST /bottles", () => {
       ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 5]]`);
   });
 
   test("creates a new bottle with existing brand name", async ({
@@ -223,9 +223,7 @@ describe("POST /bottles", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(
-      `[ORPCError: Entity not found [id: 500000]]`,
-    );
+    expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 500000]]`);
   });
 
   test("creates a new bottle with existing distiller name", async ({
@@ -690,6 +688,6 @@ describe("POST /bottles", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[ORPCError: Series not found.]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Series not found.]`);
   });
 });

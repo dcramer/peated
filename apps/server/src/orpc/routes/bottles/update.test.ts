@@ -20,7 +20,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[ORPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires mod", async ({ defaults }) => {
@@ -32,7 +32,7 @@ describe("PUT /bottles/:bottle", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("no changes", async ({ fixtures }) => {
@@ -499,7 +499,7 @@ describe("PUT /bottles/:bottle", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 
   test("updates associated bottle releases when name changes", async ({

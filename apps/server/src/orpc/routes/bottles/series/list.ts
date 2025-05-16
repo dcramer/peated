@@ -24,7 +24,7 @@ export default procedure
       total: z.number(),
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { query, brand, cursor, limit } = input;
     const offset = (cursor - 1) * limit;
 

@@ -126,7 +126,7 @@ describe("POST /bottle-aliases", () => {
       ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
   test("requires mod permission", async ({ fixtures }) => {
@@ -143,7 +143,7 @@ describe("POST /bottle-aliases", () => {
       ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("throws error for duplicate alias on different bottle", async ({
@@ -167,6 +167,8 @@ describe("POST /bottle-aliases", () => {
       ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Duplicate alias found (1). Not implemented.]`,
+    );
   });
 });

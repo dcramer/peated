@@ -16,7 +16,7 @@ export default procedure
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const alias = await db.query.entityAliases.findFirst({
       where: eq(sql`LOWER(${entityAliases.name})`, input.name.toLowerCase()),
       with: {
@@ -25,8 +25,8 @@ export default procedure
     });
 
     if (!alias) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Entity Alias not found.",
+      throw errors.NOT_FOUND({
+        message: "Alias not found.",
       });
     }
 
@@ -34,8 +34,8 @@ export default procedure
       alias.entity &&
       alias.name.toLowerCase() === alias.entity.name.toLowerCase()
     )
-      throw new ORPCError("BAD_REQUEST", {
-        message: "Cannot delete canonical name",
+      throw errors.BAD_REQUEST({
+        message: "Cannot delete canonical name.",
       });
 
     // we dont actually delete aliases, just unassociate them

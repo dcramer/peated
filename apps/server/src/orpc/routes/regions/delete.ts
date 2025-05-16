@@ -16,7 +16,7 @@ export default procedure
   .route({ method: "DELETE", path: "/regions" })
   .input(InputSchema)
   .output(z.object({}))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     let countryId: number;
     if (typeof input.country === "number") {
       countryId = input.country;
@@ -27,8 +27,8 @@ export default procedure
         .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
         .limit(1);
       if (!result) {
-        throw new ORPCError("BAD_REQUEST", {
-          message: "Invalid country",
+        throw errors.BAD_REQUEST({
+          message: "Invalid country.",
         });
       }
       countryId = result.id;
@@ -45,8 +45,8 @@ export default procedure
       );
 
     if (!region) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Region not found",
+      throw errors.NOT_FOUND({
+        message: "Region not found.",
       });
     }
 

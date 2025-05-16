@@ -43,6 +43,7 @@ export default procedure
   .handler(async function ({
     input: { cursor, query, limit, ...input },
     context,
+    errors,
   }) {
     const where: (SQL<unknown> | undefined)[] = [eq(storePrices.hidden, false)];
 
@@ -52,8 +53,8 @@ export default procedure
       });
 
       if (!site) {
-        throw new ORPCError("NOT_FOUND", {
-          message: "Site not found",
+        throw errors.NOT_FOUND({
+          message: "Site not found.",
         });
       }
       where.push(eq(storePrices.externalSiteId, site.id));

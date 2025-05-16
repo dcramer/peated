@@ -5,9 +5,7 @@ import { describe, expect, test } from "vitest";
 describe("GET /bottles/unmatched", () => {
   test("requires authentication", async () => {
     const err = await waitError(() => routerClient.bottles.unmatched());
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires mod privileges", async ({ fixtures }) => {
@@ -16,9 +14,7 @@ describe("GET /bottles/unmatched", () => {
     const err = await waitError(() =>
       routerClient.bottles.unmatched({}, { context: { user } }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Moderator privileges required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("returns empty list when no aliases exist", async ({ fixtures }) => {

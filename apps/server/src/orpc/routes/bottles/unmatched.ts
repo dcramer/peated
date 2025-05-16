@@ -54,7 +54,7 @@ export default procedure
       }),
   )
   .output(OutputSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { cursor, query, limit, ...rest } = input;
 
     const where: (SQL<unknown> | undefined)[] = [

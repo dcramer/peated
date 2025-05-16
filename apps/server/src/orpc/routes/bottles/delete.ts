@@ -22,14 +22,14 @@ export default procedure
   .route({ method: "DELETE", path: "/bottles/:id" })
   .input(z.coerce.number())
   .output(z.object({}))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, input))
       .limit(1);
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }

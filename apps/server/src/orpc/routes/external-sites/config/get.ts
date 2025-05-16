@@ -18,14 +18,14 @@ export default procedure
     }),
   )
   .output(z.any())
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     const [site] = await db
       .select()
       .from(externalSites)
       .where(eq(externalSites.type, input.site));
     if (!site) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Site not found",
+      throw errors.NOT_FOUND({
+        message: "Site not found.",
       });
     }
 

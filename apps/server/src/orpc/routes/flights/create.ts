@@ -14,7 +14,7 @@ export default procedure
   .use(requireAuth)
   .input(FlightInputSchema)
   .output(FlightSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const data: NewFlight = {
       ...input,
       publicId: generatePublicId(),
@@ -37,7 +37,7 @@ export default procedure
     });
 
     if (!flight) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to create flight.",
       });
     }

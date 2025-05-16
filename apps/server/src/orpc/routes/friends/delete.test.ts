@@ -8,7 +8,7 @@ import { describe, expect, test } from "vitest";
 describe("DELETE /friends/:id", () => {
   test("requires authentication", async () => {
     const err = await waitError(() => routerClient.friends.delete(1));
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("cannot unfriend self", async ({ defaults }) => {
@@ -17,7 +17,7 @@ describe("DELETE /friends/:id", () => {
         context: { user: defaults.user },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Cannot unfriend yourself.]`);
   });
 
   test("can unfriend new link", async ({ defaults, fixtures }) => {

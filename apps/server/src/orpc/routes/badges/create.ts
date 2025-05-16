@@ -15,7 +15,7 @@ export default procedure
   .route({ method: "POST", path: "/badges" })
   .input(BadgeInputSchema)
   .output(BadgeSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const checks: BadgeCheck[] = [];
     for (const check of input.checks) {
       let config;
@@ -23,7 +23,7 @@ export default procedure
         config = await checkBadgeConfig(check.type as any, check.config);
       } catch (err) {
         logError(err);
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Failed to validate badge config.",
         });
       }
@@ -43,7 +43,7 @@ export default procedure
     });
 
     if (!badge) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to create badge.",
       });
     }

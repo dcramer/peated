@@ -16,13 +16,13 @@ export default procedure
     }),
   )
   .output(FlightSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [flight] = await db
       .select()
       .from(flights)
       .where(eq(flights.publicId, input.id));
     if (!flight) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Flight not found.",
       });
     }

@@ -15,7 +15,7 @@ describe("POST /regions", () => {
         { context: { user: null } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires mod", async ({ defaults }) => {
@@ -28,7 +28,7 @@ describe("POST /regions", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("creates a new region", async ({ fixtures }) => {
@@ -71,7 +71,7 @@ describe("POST /regions", () => {
       ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Country not found.]`);
   });
 
   test("handles duplicate name", async ({ fixtures }) => {
@@ -89,7 +89,9 @@ describe("POST /regions", () => {
       ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Conflicting object already exists (ID=1).]`,
+    );
   });
 
   test("creates region with minimal data", async ({ fixtures }) => {

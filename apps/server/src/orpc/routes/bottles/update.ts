@@ -40,18 +40,8 @@ export default procedure
   .route({ method: "PATCH", path: "/bottles/:bottle" })
   .input(InputSchema)
   .output(BottleSchema)
-  .handler(async function ({
-    input,
-    context,
-  }: {
-    input: z.infer<typeof InputSchema>;
-    context: Context;
-  }) {
+  .handler(async function ({ input, context, errors }) {
     const user = context.user;
-
-    if (!user) {
-      throw new ORPCError("FORBIDDEN");
-    }
 
     const bottle = await db.query.bottles.findFirst({
       where: (bottles, { eq }) => eq(bottles.id, input.bottle),
@@ -66,7 +56,7 @@ export default procedure
       },
     });
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }
@@ -137,7 +127,7 @@ export default procedure
             type: "brand",
           });
           if (!brandUpsert)
-            throw new ORPCError("INTERNAL_SERVER_ERROR", {
+            throw errors.INTERNAL_SERVER_ERROR({
               message: `Unable to find entity: ${bottleData.brand}.`,
             });
           if (brandUpsert.id !== bottle.brandId) {
@@ -191,7 +181,7 @@ export default procedure
             type: "bottler",
           });
           if (!bottlerUpsert) {
-            throw new ORPCError("INTERNAL_SERVER_ERROR", {
+            throw errors.INTERNAL_SERVER_ERROR({
               message: `Unable to find entity: ${bottleData.bottler}.`,
             });
           }
@@ -229,7 +219,7 @@ export default procedure
               type: "distiller",
             });
             if (!distUpsert) {
-              throw new ORPCError("INTERNAL_SERVER_ERROR", {
+              throw errors.INTERNAL_SERVER_ERROR({
                 message: `Unable to find entity: ${distData}.`,
               });
             }
@@ -392,7 +382,7 @@ export default procedure
     });
 
     if (!newBottle) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update bottle.",
       });
     }

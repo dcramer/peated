@@ -50,7 +50,7 @@ describe("GET /tastings", () => {
         filter: "friends",
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("lists tastings filter friends", async ({ defaults, fixtures }) => {

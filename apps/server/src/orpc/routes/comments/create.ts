@@ -26,7 +26,7 @@ export default procedure
     }),
   )
   .output(CommentSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const tasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) => eq(tastings.id, input.tasting),
       with: {
@@ -36,7 +36,7 @@ export default procedure
     });
 
     if (!tasting) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Tasting not found.",
       });
     }
@@ -60,7 +60,7 @@ export default procedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "comment_unq") {
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: "Comment already exists.",
             cause: err,
           });
@@ -89,7 +89,7 @@ export default procedure
     });
 
     if (!comment) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to create comment.",
       });
     }

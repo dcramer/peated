@@ -34,18 +34,18 @@ export default procedure
       rel: CursorSchema,
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { cursor, limit } = input;
 
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "User not found.",
       });
     }
 
     if (!(await profileVisible(db, user, context.user))) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "User's profile is private.",
       });
     }
@@ -62,7 +62,7 @@ export default procedure
           });
 
     if (!collection) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Collection not found.",
       });
     }

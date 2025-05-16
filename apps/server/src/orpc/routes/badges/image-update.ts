@@ -26,7 +26,7 @@ export default procedure
       imageUrl: z.string(),
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { badgeId, file } = input;
 
     const [badge] = await db
@@ -36,8 +36,8 @@ export default procedure
       .limit(1);
 
     if (!badge) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Badge not found",
+      throw errors.NOT_FOUND({
+        message: "Badge not found.",
       });
     }
 

@@ -35,7 +35,7 @@ export default procedure
       query: z.coerce.string().default(""),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
-      sort: z.enum(SORT_OPTIONS).default("name"),
+      sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
     }),
   )
   .output(
@@ -44,7 +44,7 @@ export default procedure
       rel: CursorSchema,
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { query, cursor, limit, sort, ...rest } = input;
     const offset = (cursor - 1) * limit;
 
@@ -54,7 +54,7 @@ export default procedure
       .where(eq(bottles.id, rest.bottle));
 
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }

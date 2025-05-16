@@ -20,7 +20,9 @@ test("cannot update another user's bottle", async ({ fixtures }) => {
       },
     ),
   );
-  expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+  expect(err).toMatchInlineSnapshot(
+    `[Error: You don't have permission to update this bottle.]`,
+  );
 });
 
 test("bottle image does resize down", async ({ fixtures, defaults }) => {

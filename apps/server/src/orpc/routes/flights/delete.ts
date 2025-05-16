@@ -15,14 +15,14 @@ export default procedure
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     const [flight] = await db
       .select()
       .from(flights)
       .where(eq(flights.publicId, input.id))
       .limit(1);
     if (!flight) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Flight not found.",
       });
     }

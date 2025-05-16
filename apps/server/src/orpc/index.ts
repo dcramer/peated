@@ -57,6 +57,11 @@ export const base = os
       statusCode: 409,
       error: "Conflict",
     },
+    PAYLOAD_TOO_LARGE: {
+      message: "Payload too large.",
+      statusCode: 413,
+      error: "Payload Too Large",
+    },
     UNPROCESSABLE_ENTITY: {
       message: "Unprocessable entity.",
       statusCode: 422,

@@ -26,7 +26,7 @@ export default procedure
     }),
   )
   .output(OutputSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     let [entity] = await db
       .select()
       .from(entities)
@@ -41,7 +41,7 @@ export default procedure
         .innerJoin(entities, eq(entityTombstones.newEntityId, entities.id))
         .where(eq(entityTombstones.entityId, input.id));
       if (!entity) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Entity not found.",
         });
       }

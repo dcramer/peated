@@ -31,14 +31,14 @@ export default procedure
     }),
   )
   .output(EntitySchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [entity] = await db
       .select()
       .from(entities)
       .where(eq(entities.id, input.entity));
 
     if (!entity) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Entity not found.",
       });
     }
@@ -60,7 +60,7 @@ export default procedure
           .where(eq(countries.id, input.country))
           .limit(1);
         if (!country) {
-          throw new ORPCError("NOT_FOUND", {
+          throw errors.NOT_FOUND({
             message: "Country not found.",
           });
         }
@@ -86,7 +86,7 @@ export default procedure
         !region ||
         region.countryId !== (data.countryId ?? entity.countryId)
       ) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Region not found.",
         });
       }
@@ -153,7 +153,7 @@ export default procedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "entity_name_unq") {
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: "Entity with name already exists.",
             cause: err,
           });
@@ -270,7 +270,7 @@ export default procedure
     });
 
     if (!newEntity) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update entity.",
       });
     }

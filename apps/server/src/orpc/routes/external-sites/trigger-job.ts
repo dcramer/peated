@@ -18,7 +18,7 @@ export default procedure
     }),
   )
   .output(z.object({ success: z.boolean() }))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [site] = await db
       .select()
       .from(externalSites)
@@ -26,8 +26,8 @@ export default procedure
       .limit(1);
 
     if (!site) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "External site not found",
+      throw errors.NOT_FOUND({
+        message: "Site not found.",
       });
     }
 

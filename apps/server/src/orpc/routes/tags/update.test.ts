@@ -10,9 +10,7 @@ describe("PATCH /tags/:name", () => {
         name: tag.name,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires mod privileges", async ({ fixtures }) => {
@@ -27,9 +25,7 @@ describe("PATCH /tags/:name", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Moderator privileges required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("returns 404 for non-existent tag", async ({ fixtures }) => {
@@ -43,9 +39,7 @@ describe("PATCH /tags/:name", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: NOT_FOUND: Tag not found]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Tag not found.]`);
   });
 
   test("updates tag category", async ({ fixtures }) => {

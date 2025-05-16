@@ -21,9 +21,9 @@ export default procedure
     }),
   )
   .output(BottleSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     if (input.bottle === input.other) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Cannot merge a bottle into itself.",
       });
     }
@@ -34,8 +34,8 @@ export default procedure
       .where(eq(bottles.id, input.bottle));
 
     if (!rootBottle) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "bottle not found.",
+      throw errors.NOT_FOUND({
+        message: "Bottle not found.",
       });
     }
 
@@ -45,8 +45,8 @@ export default procedure
       .where(eq(bottles.id, input.other));
 
     if (!otherBottle) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "other bottle not found.",
+      throw errors.NOT_FOUND({
+        message: "Other bottle not found.",
       });
     }
 

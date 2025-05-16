@@ -26,7 +26,7 @@ export default procedure
       imageUrl: z.string(),
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { tastingId, file } = input;
 
     const [tasting] = await db
@@ -36,14 +36,14 @@ export default procedure
       .limit(1);
 
     if (!tasting) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Tasting not found",
+      throw errors.NOT_FOUND({
+        message: "Tasting not found.",
       });
     }
 
     if (tasting.createdById !== context.user.id && !context.user.admin) {
-      throw new ORPCError("FORBIDDEN", {
-        message: "You don't have permission to update this tasting",
+      throw errors.FORBIDDEN({
+        message: "You don't have permission to update this tasting.",
       });
     }
 
@@ -66,21 +66,14 @@ export default procedure
     } catch (err) {
       // Check for file size limits
       if (file.size > MAX_FILESIZE) {
-        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}`;
-        throw new ORPCError("PAYLOAD_TOO_LARGE", {
+        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`;
+        throw errors.PAYLOAD_TOO_LARGE({
           message: errMessage,
           cause: err,
         });
       }
       throw err;
     }
-
-    await db
-      .update(tastings)
-      .set({
-        imageUrl,
-      })
-      .where(eq(tastings.id, tasting.id));
 
     return {
       imageUrl: absoluteUrl(config.API_SERVER, imageUrl),

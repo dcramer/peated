@@ -41,6 +41,7 @@ export default procedure
   .handler(async function ({
     input: { cursor, sort, limit, query, ...input },
     context,
+    errors,
   }) {
     const offset = (cursor - 1) * limit;
 

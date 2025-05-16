@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
@@ -31,14 +30,14 @@ export default procedure
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
 
     if (!site) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Site not found",
+      throw errors.NOT_FOUND({
+        message: "Site not found.",
       });
     }
 

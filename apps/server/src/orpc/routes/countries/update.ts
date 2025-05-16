@@ -18,14 +18,16 @@ export default procedure
   .route({ method: "PATCH", path: "/countries/:slug" })
   .input(InputSchema)
   .output(CountrySchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [country] = await db
       .select()
       .from(countries)
       .where(eq(sql`LOWER(${countries.slug})`, input.slug.toLowerCase()));
 
     if (!country) {
-      throw new ORPCError("NOT_FOUND");
+      throw errors.NOT_FOUND({
+        message: "Country not found.",
+      });
     }
 
     const data: { [name: string]: any } = {};
@@ -55,7 +57,7 @@ export default procedure
       .returning();
 
     if (!newCountry) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update country.",
       });
     }

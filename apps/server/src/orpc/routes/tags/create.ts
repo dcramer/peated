@@ -12,7 +12,7 @@ export default procedure
   .route({ method: "POST", path: "/tags" })
   .input(TagInputSchema)
   .output(TagSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const tag = await db.transaction(async (tx) => {
       try {
         const [tag] = await tx
@@ -27,7 +27,7 @@ export default procedure
         return tag;
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "tag_pkey") {
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: "Tag with name already exists.",
             cause: err,
           });
@@ -37,7 +37,7 @@ export default procedure
     });
 
     if (!tag) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to create tag.",
       });
     }

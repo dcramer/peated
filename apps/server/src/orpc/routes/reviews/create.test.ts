@@ -21,9 +21,7 @@ describe("POST /reviews", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Admin privileges required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("new review with new bottle no entity", async ({ fixtures }) => {
@@ -138,8 +136,6 @@ describe("POST /reviews", () => {
         { context: { user: adminUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: NOT_FOUND: Site not found]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 });

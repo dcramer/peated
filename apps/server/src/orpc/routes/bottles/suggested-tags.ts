@@ -24,14 +24,14 @@ export default procedure
       ),
     }),
   )
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }

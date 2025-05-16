@@ -21,9 +21,9 @@ export default procedure
       status: z.enum(["pending", "friends"]),
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     if (context.user.id === input.id) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Cannot friend yourself.",
       });
     }
@@ -31,7 +31,7 @@ export default procedure
     const [user] = await db.select().from(users).where(eq(users.id, input.id));
 
     if (!user) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "User not found.",
       });
     }
@@ -121,7 +121,7 @@ export default procedure
     });
 
     if (!myFollow) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to create friend relationship.",
       });
     }

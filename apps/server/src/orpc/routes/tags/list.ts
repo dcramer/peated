@@ -35,6 +35,7 @@ export default procedure
   .handler(async function ({
     input: { cursor, query, limit, ...input },
     context,
+    errors,
   }) {
     const where: (SQL<unknown> | undefined)[] = [];
 

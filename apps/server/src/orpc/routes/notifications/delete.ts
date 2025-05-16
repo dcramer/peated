@@ -15,20 +15,20 @@ export default procedure
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [notification] = await db
       .select()
       .from(notifications)
       .where(eq(notifications.id, input.id));
 
     if (!notification) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Notification not found.",
       });
     }
 
     if (notification.userId !== context.user.id && !context.user.admin) {
-      throw new ORPCError("FORBIDDEN", {
+      throw errors.FORBIDDEN({
         message: "Cannot delete another user's notification.",
       });
     }

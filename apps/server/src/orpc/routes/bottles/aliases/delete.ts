@@ -12,7 +12,7 @@ export default procedure
   .use(requireMod)
   .input(z.string())
   .output(z.object({}))
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, context, errors }) {
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(sql`LOWER(${bottleAliases.name})`, input.toLowerCase()),
       with: {
@@ -21,7 +21,7 @@ export default procedure
     });
 
     if (!alias) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Bottle Alias not found.",
       });
     }
@@ -29,7 +29,7 @@ export default procedure
     if (alias.bottle) {
       const { bottle } = alias;
       if (alias.name.toLowerCase() === bottle.fullName.toLowerCase())
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Cannot delete canonical name",
         });
     }

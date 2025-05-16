@@ -15,7 +15,7 @@ describe("PATCH /events/:id", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("updates event", async ({ fixtures }) => {

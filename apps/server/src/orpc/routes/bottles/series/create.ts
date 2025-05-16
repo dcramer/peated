@@ -18,7 +18,7 @@ export default procedure
   .use(requireAuth)
   .input(BottleSeriesInputSchema)
   .output(BottleSeriesSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const user = context.user;
 
     const series = await db.transaction(async (tx) => {
@@ -30,7 +30,7 @@ export default procedure
         .limit(1);
 
       if (!brand) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Brand not found.",
         });
       }

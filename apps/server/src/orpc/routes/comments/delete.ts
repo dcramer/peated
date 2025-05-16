@@ -12,20 +12,20 @@ export default procedure
   .route({ method: "DELETE", path: "/comments/:id" })
   .input(z.coerce.number())
   .output(z.object({}))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [comment] = await db
       .select()
       .from(comments)
       .where(eq(comments.id, input))
       .limit(1);
     if (!comment) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Comment not found.",
       });
     }
 
     if (comment.createdById !== context.user.id && !context.user.admin) {
-      throw new ORPCError("FORBIDDEN", {
+      throw errors.FORBIDDEN({
         message: "Cannot delete another user's comment.",
       });
     }

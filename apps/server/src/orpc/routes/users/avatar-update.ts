@@ -26,7 +26,7 @@ export default procedure
       pictureUrl: z.string(),
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { userId, file } = input;
 
     const targetUserId = userId === "me" ? context.user.id : userId;
@@ -38,14 +38,14 @@ export default procedure
       .limit(1);
 
     if (!user) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "User not found",
+      throw errors.NOT_FOUND({
+        message: "User not found.",
       });
     }
 
     if (user.id !== context.user.id && !context.user.admin) {
-      throw new ORPCError("FORBIDDEN", {
-        message: "You don't have permission to update this user",
+      throw errors.FORBIDDEN({
+        message: "You don't have permission to update this user.",
       });
     }
 
@@ -67,8 +67,8 @@ export default procedure
     } catch (err) {
       // Check for file size limits
       if (file.size > MAX_FILESIZE) {
-        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}`;
-        throw new ORPCError("PAYLOAD_TOO_LARGE", {
+        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`;
+        throw errors.PAYLOAD_TOO_LARGE({
           message: errMessage,
           cause: err,
         });

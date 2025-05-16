@@ -205,7 +205,9 @@ describe("POST /bottle-releases", () => {
         context: { user: defaults.user },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Release statedAge must match bottle's statedAge.]`,
+    );
 
     // Verify numReleases was not incremented
     const [updatedBottle] = await db
@@ -228,7 +230,7 @@ describe("POST /bottle-releases", () => {
         context: { user: defaults.user },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
   it("throws error if release with same attributes exists", async function ({
@@ -265,7 +267,9 @@ describe("POST /bottle-releases", () => {
         context: { user: defaults.user },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: A release with these attributes already exists.]`,
+    );
 
     // Verify numReleases was not incremented
     const [updatedBottle] = await db
@@ -305,7 +309,9 @@ describe("POST /bottle-releases", () => {
         context: { user: defaults.user },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: A release with these attributes already exists.]`,
+    );
 
     // Verify numReleases was not incremented
     const [updatedBottle] = await db

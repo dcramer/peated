@@ -10,17 +10,17 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z.object({
-  price: z.number(),
+  priceId: z.coerce.number(),
   hidden: z.boolean().optional(),
 });
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/prices/:price" })
+  .route({ method: "PATCH", path: "/prices/:priceId" })
   .input(InputSchema)
   .output(StorePriceSchema)
-  .handler(async function ({ input, context }) {
-    const { price: priceId, ...data } = input;
+  .handler(async function ({ input, context, errors }) {
+    const { priceId, ...data } = input;
 
     const [price] = await db
       .select()
@@ -28,7 +28,9 @@ export default procedure
       .where(eq(storePrices.id, priceId));
 
     if (!price) {
-      throw new ORPCError("NOT_FOUND");
+      throw errors.NOT_FOUND({
+        message: "Price not found.",
+      });
     }
 
     if (Object.values(data).length === 0) {
@@ -42,7 +44,7 @@ export default procedure
       .returning();
 
     if (!newPrice) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update price.",
       });
     }

@@ -15,14 +15,14 @@ export default procedure
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [series] = await db
       .select()
       .from(bottleSeries)
       .where(eq(bottleSeries.id, input.id))
       .limit(1);
     if (!series) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Series not found.",
       });
     }

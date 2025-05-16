@@ -40,6 +40,7 @@ export default procedure
   .handler(async function ({
     input: { cursor, query, limit, ...input },
     context,
+    errors,
   }) {
     const where: (SQL<unknown> | undefined)[] = [];
 
@@ -76,7 +77,10 @@ export default procedure
         orderBy = desc(countries.totalBottles);
         break;
       default:
-        throw new Error(`Invalid sort: ${input.sort}`);
+        // TODO: should be a schema validation error
+        throw errors.BAD_REQUEST({
+          message: `Invalid sort: ${input.sort}`,
+        });
     }
 
     const results = await db

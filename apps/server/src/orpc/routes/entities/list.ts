@@ -73,6 +73,7 @@ export default procedure
   .handler(async function ({
     input: { query, cursor, limit, ...input },
     context,
+    errors,
   }) {
     const offset = (cursor - 1) * limit;
 
@@ -111,8 +112,8 @@ export default procedure
           .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
           .limit(1);
         if (!result) {
-          throw new ORPCError("BAD_REQUEST", {
-            message: "Invalid country",
+          throw errors.BAD_REQUEST({
+            message: "Invalid country.",
           });
         }
         countryId = result.id;
@@ -120,8 +121,8 @@ export default procedure
       }
 
       if (!countryId) {
-        throw new ORPCError("BAD_REQUEST", {
-          message: "Invalid country",
+        throw errors.BAD_REQUEST({
+          message: "Invalid country.",
         });
       }
 
@@ -139,8 +140,8 @@ export default procedure
           )
           .limit(1);
         if (!result) {
-          throw new ORPCError("BAD_REQUEST", {
-            message: "Invalid region",
+          throw errors.BAD_REQUEST({
+            message: "Invalid region.",
           });
         }
         where.push(eq(entities.regionId, result.id));
@@ -148,8 +149,8 @@ export default procedure
     } else if (input.region && Number.isFinite(+input.region)) {
       where.push(eq(entities.regionId, Number(input.region)));
     } else if (input.region) {
-      throw new ORPCError("BAD_REQUEST", {
-        message: "Region requires country",
+      throw errors.BAD_REQUEST({
+        message: "Region requires country.",
       });
     }
 

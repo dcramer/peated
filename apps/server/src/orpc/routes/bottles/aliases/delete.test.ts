@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 
 describe("DELETE /bottle-aliases/:name", () => {
   test("deletes alias", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
     const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
 
@@ -21,7 +22,9 @@ describe("DELETE /bottle-aliases/:name", () => {
       name: alias.name,
     });
 
-    const data = await routerClient.bottles.aliases.delete(alias.name);
+    const data = await routerClient.bottles.aliases.delete(alias.name, {
+      context: { user },
+    });
     expect(data).toEqual({});
 
     const [newAlias] = await db
@@ -52,6 +55,6 @@ describe("DELETE /bottle-aliases/:name", () => {
     const err = await waitError(
       routerClient.bottles.aliases.delete(alias.name, { context: { user } }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 });

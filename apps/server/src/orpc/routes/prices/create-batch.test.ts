@@ -10,9 +10,7 @@ describe("POST /external-sites/:site/prices", () => {
     const err = await waitError(() =>
       routerClient.prices.createBatch({ site: "healthyspirits", prices: [] }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires admin", async ({ fixtures }) => {
@@ -24,9 +22,7 @@ describe("POST /external-sites/:site/prices", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Admin privileges required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("returns error for non-existent site", async ({ fixtures }) => {
@@ -38,9 +34,7 @@ describe("POST /external-sites/:site/prices", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: NOT_FOUND: Site not found]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 
   test("processes new price", async ({ fixtures }) => {

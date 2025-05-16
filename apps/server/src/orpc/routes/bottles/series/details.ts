@@ -16,13 +16,13 @@ export default procedure
     }),
   )
   .output(BottleSeriesSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const series = await db.query.bottleSeries.findFirst({
       where: eq(bottleSeries.id, input.id),
     });
 
     if (!series) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Series not found.",
       });
     }

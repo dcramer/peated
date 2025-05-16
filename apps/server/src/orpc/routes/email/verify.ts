@@ -11,12 +11,12 @@ export default procedure
   .route({ method: "POST", path: "/email/verify" })
   .input(z.object({ token: z.string() }))
   .output(z.object({}))
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     let payload;
     try {
       payload = await verifyPayload(input.token);
     } catch (err) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid verification token.",
       });
     }

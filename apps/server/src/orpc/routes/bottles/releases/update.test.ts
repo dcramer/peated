@@ -17,7 +17,7 @@ describe("PATCH /bottle-releases/:release", () => {
         release: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[ORPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   it("requires moderator access", async ({ defaults }) => {
@@ -29,7 +29,7 @@ describe("PATCH /bottle-releases/:release", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   it("updates a release with new attributes", async function ({ fixtures }) {
@@ -123,7 +123,7 @@ describe("PATCH /bottle-releases/:release", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
   });
 
   it("throws error if release statedAge differs from bottle statedAge", async function ({
@@ -152,7 +152,9 @@ describe("PATCH /bottle-releases/:release", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Release statedAge must match bottle's statedAge.]`,
+    );
   });
 
   it("throws error if release with same attributes exists", async function ({
@@ -199,7 +201,9 @@ describe("PATCH /bottle-releases/:release", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: A release with these attributes already exists.]`,
+    );
   });
 
   it("updates cask information", async function ({ fixtures }) {
@@ -315,7 +319,9 @@ describe("PATCH /bottle-releases/:release", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Release name cannot be the same as the bottle name.]`,
+    );
   });
 
   it("performs partial updates correctly", async function ({ fixtures }) {
@@ -433,7 +439,9 @@ describe("PATCH /bottle-releases/:release", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: A release with these attributes already exists.]`,
+    );
 
     // Verify the release was not changed
     const [unchangedRelease] = await db

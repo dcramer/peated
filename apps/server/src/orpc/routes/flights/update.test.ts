@@ -12,7 +12,7 @@ describe("PATCH /flights/:id", () => {
         id: "1",
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires mod", async ({ fixtures }) => {
@@ -27,7 +27,9 @@ describe("PATCH /flights/:id", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Cannot update another user's flight.]`,
+    );
   });
 
   test("no changes", async ({ fixtures }) => {

@@ -45,7 +45,10 @@ export default procedure
       }),
   )
   .output(OutputSchema)
-  .handler(async function ({ input: { cursor, query, limit, ...input } }) {
+  .handler(async function ({
+    input: { cursor, query, limit, ...input },
+    errors,
+  }) {
     const where: (SQL<unknown> | undefined)[] = [
       eq(bottleAliases.ignored, false),
     ];
@@ -58,7 +61,7 @@ export default procedure
         .where(eq(bottles.id, input.bottle));
 
       if (!bottle) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Bottle not found.",
         });
       }

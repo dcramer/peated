@@ -15,7 +15,7 @@ describe("POST /external-sites/:site/trigger", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("triggers job", async ({ fixtures }) => {

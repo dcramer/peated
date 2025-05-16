@@ -8,7 +8,7 @@ import { and, eq, gt } from "drizzle-orm";
 describe("PUT /tastings/:tasting", () => {
   test("requires auth", async () => {
     const err = await waitError(routerClient.tastings.update({ tasting: 1 }));
-    expect(err).toMatchInlineSnapshot(`[ORPCError: UNAUTHORIZED]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("cannot update another users tasting", async ({
@@ -22,7 +22,7 @@ describe("PUT /tastings/:tasting", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Tasting not found.]`);
   });
 
   test("no changes", async ({ defaults, fixtures }) => {

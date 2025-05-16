@@ -14,7 +14,7 @@ describe("GET /users/:user/collections", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: User's profile is private.]`);
   });
 
   test("can list private with friend", async ({ defaults, fixtures }) => {

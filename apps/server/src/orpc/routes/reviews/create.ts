@@ -1,4 +1,4 @@
-import { call, ORPCError } from "@orpc/server";
+import { call } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -25,14 +25,14 @@ export default procedure
   .route({ method: "POST", path: "/reviews" })
   .input(ReviewInputSchema)
   .output(ReviewSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
 
     if (!site) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Site not found",
+      throw errors.NOT_FOUND({
+        message: "Site not found.",
       });
     }
 

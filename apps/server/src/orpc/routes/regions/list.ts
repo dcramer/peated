@@ -34,6 +34,7 @@ export default procedure
   .handler(async function ({
     input: { cursor, query, limit, ...input },
     context,
+    errors,
   }) {
     const where: (SQL<unknown> | undefined)[] = [];
 
@@ -58,8 +59,8 @@ export default procedure
         )
         .limit(1);
       if (!result) {
-        throw new ORPCError("BAD_REQUEST", {
-          message: "Invalid country",
+        throw errors.BAD_REQUEST({
+          message: "Invalid country.",
         });
       }
       where.push(eq(regions.countryId, result.id));
@@ -84,7 +85,7 @@ export default procedure
         orderBy = desc(regions.totalBottles);
         break;
       default:
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: `Invalid sort: ${input.sort}`,
         });
     }

@@ -14,9 +14,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
         value: "test",
       }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires admin", async ({ fixtures }) => {
@@ -33,9 +31,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Admin privileges required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("returns error for non-existent site", async ({ fixtures }) => {
@@ -51,9 +47,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: NOT_FOUND: Site not found]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 
   test("set new value", async ({ fixtures }) => {

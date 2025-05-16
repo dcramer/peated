@@ -18,20 +18,20 @@ export default procedure
   .use(requireAuth)
   .input(InputSchema)
   .output(FlightSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [flight] = await db
       .select()
       .from(flights)
       .where(eq(flights.publicId, input.id));
 
     if (!flight) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Flight not found.",
       });
     }
 
     if (flight.createdById !== context.user.id && !context.user.mod) {
-      throw new ORPCError("FORBIDDEN", {
+      throw errors.FORBIDDEN({
         message: "Cannot update another user's flight.",
       });
     }
@@ -90,7 +90,7 @@ export default procedure
     });
 
     if (!newFlight) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update flight.",
       });
     }

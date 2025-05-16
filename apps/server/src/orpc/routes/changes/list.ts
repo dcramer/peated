@@ -25,7 +25,7 @@ export default procedure
       rel: CursorSchema,
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
 
@@ -37,7 +37,7 @@ export default procedure
     if (rest.user) {
       if (rest.user === "me") {
         if (!context.user) {
-          throw new ORPCError("UNAUTHORIZED");
+          throw errors.UNAUTHORIZED();
         }
 
         where.push(eq(changes.createdById, context.user.id));

@@ -20,7 +20,9 @@ test("cannot update another user's tasting", async ({ fixtures }) => {
       },
     ),
   );
-  expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+  expect(err).toMatchInlineSnapshot(
+    `[Error: You don't have permission to update this tasting.]`,
+  );
 });
 
 test("tasting image does resize down", async ({ fixtures, defaults }) => {

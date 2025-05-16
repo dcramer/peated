@@ -33,9 +33,7 @@ describe("DELETE /entity-aliases/:name", () => {
         name: "test-alias",
       }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires mod privileges", async ({ fixtures }) => {
@@ -51,9 +49,7 @@ describe("DELETE /entity-aliases/:name", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Moderator privileges required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("returns 404 for non-existent alias", async ({ fixtures }) => {
@@ -67,9 +63,7 @@ describe("DELETE /entity-aliases/:name", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: NOT_FOUND: Entity Alias not found.]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Alias not found.]`);
   });
 
   test("prevents deleting canonical name", async ({ fixtures }) => {

@@ -25,7 +25,7 @@ export default procedure
   .route({ method: "PATCH", path: "/bottle-releases/:release" })
   .input(InputSchema)
   .output(BottleReleaseSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const user = context.user;
 
     const updatedRelease = await db.transaction(async (tx) => {
@@ -37,7 +37,7 @@ export default procedure
         .for("update");
 
       if (!release) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Release not found.",
         });
       }
@@ -60,7 +60,7 @@ export default procedure
         input.statedAge &&
         bottle.statedAge !== input.statedAge
       ) {
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Release statedAge must match bottle's statedAge.",
         });
       }
@@ -143,7 +143,7 @@ export default procedure
         name.toLowerCase() === bottle.name.toLowerCase() ||
         fullName.toLowerCase() === bottle.fullName.toLowerCase()
       ) {
-        throw new ORPCError("INTERNAL_SERVER_ERROR", {
+        throw errors.INTERNAL_SERVER_ERROR({
           message: "Release name cannot be the same as the bottle name.",
         });
       }
@@ -173,7 +173,7 @@ export default procedure
         .returning();
 
       if (!updatedRelease) {
-        throw new ORPCError("INTERNAL_SERVER_ERROR", {
+        throw errors.INTERNAL_SERVER_ERROR({
           message: "Failed to update release.",
         });
       }
@@ -208,7 +208,7 @@ export default procedure
     });
 
     if (!updatedRelease) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update release.",
       });
     }

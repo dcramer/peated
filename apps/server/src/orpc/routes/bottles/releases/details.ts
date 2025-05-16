@@ -16,7 +16,7 @@ export default procedure
     }),
   )
   .output(BottleReleaseSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const release = await db.query.bottleReleases.findFirst({
       where: eq(bottleReleases.id, input.id),
       with: {
@@ -26,7 +26,7 @@ export default procedure
     });
 
     if (!release) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Release not found.",
       });
     }

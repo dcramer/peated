@@ -16,13 +16,13 @@ export default procedure
     }),
   )
   .output(EventSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [event] = await db
       .select()
       .from(events)
       .where(eq(events.id, input.id));
     if (!event) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Event not found.",
       });
     }

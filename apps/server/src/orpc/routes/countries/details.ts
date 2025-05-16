@@ -16,14 +16,14 @@ export default procedure
     }),
   )
   .output(CountrySchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [country] = await db
       .select()
       .from(countries)
       .where(eq(sql`LOWER(${countries.slug})`, input.slug.toLowerCase()));
 
     if (!country) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Country not found.",
       });
     }

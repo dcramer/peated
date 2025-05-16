@@ -9,10 +9,10 @@ export default procedure
   .route({ method: "POST", path: "/email/resend-verification" })
   .input(z.void())
   .output(z.object({}))
-  .handler(async function ({ context: { user } }) {
+  .handler(async function ({ context: { user }, errors }) {
     if (user.verified) {
-      throw new ORPCError("CONFLICT", {
-        message: "Account already verified",
+      throw errors.CONFLICT({
+        message: "Account already verified.",
       });
     }
 

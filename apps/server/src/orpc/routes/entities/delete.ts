@@ -16,14 +16,14 @@ export default procedure
   .route({ method: "DELETE", path: "/entities/:id" })
   .input(z.coerce.number())
   .output(z.object({}))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [entity] = await db
       .select()
       .from(entities)
       .where(eq(entities.id, input))
       .limit(1);
     if (!entity) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Entity not found.",
       });
     }

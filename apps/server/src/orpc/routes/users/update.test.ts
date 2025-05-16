@@ -13,9 +13,7 @@ describe("PATCH /users/:user", () => {
         user: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("cannot update another user", async ({ fixtures }) => {
@@ -30,9 +28,7 @@ describe("PATCH /users/:user", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Cannot edit another user.]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Cannot edit another user.]`);
   });
 
   test("can change username", async ({ defaults, fixtures }) => {
@@ -103,9 +99,9 @@ describe("PATCH /users/:user", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Admin privileges required to modify mod status.]
-    `);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Admin privileges required to modify mod status.]`,
+    );
   });
 
   test("cannot change admin as user", async ({ defaults }) => {
@@ -118,9 +114,9 @@ describe("PATCH /users/:user", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Admin privileges required to modify admin status.]
-    `);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Admin privileges required to modify admin status.]`,
+    );
   });
 
   test("can change password", async ({ defaults, fixtures }) => {
@@ -152,8 +148,6 @@ describe("PATCH /users/:user", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: BAD_REQUEST: Invalid username.]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Invalid username.]`);
   });
 });

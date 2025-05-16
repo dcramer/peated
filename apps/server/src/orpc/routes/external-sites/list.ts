@@ -25,7 +25,7 @@ export default procedure
       rel: CursorSchema,
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { cursor, sort, limit, query } = input;
     const offset = (cursor - 1) * limit;
 

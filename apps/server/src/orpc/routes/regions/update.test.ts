@@ -15,7 +15,7 @@ describe("PATCH /regions/:country/:slug", () => {
         { context: { user: null } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires mod", async ({ fixtures }) => {
@@ -29,7 +29,7 @@ describe("PATCH /regions/:country/:slug", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("updates region description", async ({ fixtures }) => {
@@ -112,7 +112,7 @@ describe("PATCH /regions/:country/:slug", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
   });
 
   test("throws NOT_FOUND for non-existent region", async ({ fixtures }) => {
@@ -128,6 +128,6 @@ describe("PATCH /regions/:country/:slug", () => {
         { context: { user: modUser } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Region not found.]`);
   });
 });

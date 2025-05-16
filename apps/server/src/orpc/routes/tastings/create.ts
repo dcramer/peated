@@ -40,7 +40,7 @@ export default procedure
       awards: z.array(BadgeAwardSchema),
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const bottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, input.bottle),
       with: {
@@ -54,7 +54,7 @@ export default procedure
       },
     });
     if (!bottle) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Cannot identify bottle.",
       });
     }
@@ -67,7 +67,7 @@ export default procedure
         ),
       });
       if (!release) {
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Cannot identify release.",
         });
       }
@@ -87,7 +87,7 @@ export default procedure
         )
         .limit(1);
       if (flightResults.length !== 1) {
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Cannot identify flight.",
         });
       }
@@ -122,7 +122,7 @@ export default procedure
           ),
         );
       if (matches.length != friendUserIds.length) {
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Friends must all be active relationships.",
         });
       }
@@ -135,7 +135,7 @@ export default procedure
         [tasting] = await tx.insert(tastings).values(data).returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "tasting_unq") {
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: "Tasting already exists.",
             cause: err,
           });
@@ -212,7 +212,7 @@ export default procedure
     });
 
     if (!tasting) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to create tasting.",
       });
     }

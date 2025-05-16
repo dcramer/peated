@@ -11,7 +11,7 @@ describe("POST /flights", () => {
         name: "Delicious Wood",
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("creates a new flight", async ({ fixtures }) => {

@@ -86,7 +86,7 @@ export default procedure
       ),
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { query, include, limit } = input;
     const promises = [];
 

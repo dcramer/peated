@@ -19,7 +19,9 @@ test("cannot update another user's avatar", async ({ fixtures }) => {
       },
     ),
   );
-  expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+  expect(err).toMatchInlineSnapshot(
+    `[Error: You don't have permission to update this user.]`,
+  );
 });
 
 test("can use 'me' as user ID", async ({ fixtures, defaults }) => {

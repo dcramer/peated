@@ -118,6 +118,6 @@ describe("DELETE /bottle-releases/:id", () => {
         context: { user: admin },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
   });
 });

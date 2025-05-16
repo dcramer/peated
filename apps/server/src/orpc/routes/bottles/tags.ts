@@ -24,7 +24,7 @@ export default procedure
       totalCount: z.number(),
     }),
   )
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     const { limit, ...rest } = input;
     const [bottle] = await db
       .select()
@@ -32,7 +32,7 @@ export default procedure
       .where(eq(bottles.id, rest.bottle));
 
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }

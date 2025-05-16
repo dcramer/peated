@@ -14,14 +14,12 @@ export default procedure
   .route({ method: "PUT", path: "/bottles" })
   .input(BottleInputSchema)
   .output(BottleSchema)
-  .handler(async function ({ input, context }) {
-    const user = context.user;
-
+  .handler(async function ({ input, context, errors }) {
     const bottleData: BottlePreviewResult & Record<string, any> =
       await bottleNormalize({ input, context });
 
     if (!bottleData.name) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid bottle name.",
       });
     }

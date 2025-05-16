@@ -22,10 +22,13 @@ export default procedure
   .handler(async function ({
     input: { id, country: countryId, ...input },
     context,
+    errors,
   }) {
     const [event] = await db.select().from(events).where(eq(events.id, id));
     if (!event) {
-      throw new ORPCError("NOT_FOUND");
+      throw errors.NOT_FOUND({
+        message: "Event not found.",
+      });
     }
 
     const data: { [name: string]: any } = {};
@@ -53,7 +56,7 @@ export default procedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "event_name_unq") {
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: "Event already exists.",
             cause: err,
           });
@@ -67,7 +70,7 @@ export default procedure
     });
 
     if (!newEvent) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update event.",
       });
     }

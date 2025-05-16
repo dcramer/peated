@@ -17,7 +17,7 @@ export default procedure
     }),
   )
   .output(RegionSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     let countryId: number;
     if (Number.isFinite(+input.country)) {
       countryId = Number(input.country);
@@ -33,8 +33,8 @@ export default procedure
         )
         .limit(1);
       if (!result) {
-        throw new ORPCError("BAD_REQUEST", {
-          message: "Invalid country",
+        throw errors.BAD_REQUEST({
+          message: "Invalid country.",
         });
       }
       countryId = result.id;
@@ -51,7 +51,7 @@ export default procedure
       );
 
     if (!region) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Region not found.",
       });
     }

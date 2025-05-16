@@ -27,16 +27,16 @@ export default procedure
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "User not found.",
       });
     }
 
     if (user.id !== context.user.id) {
-      throw new ORPCError("FORBIDDEN", {
+      throw errors.FORBIDDEN({
         message: "Cannot modify another user's collection.",
       });
     }
@@ -50,13 +50,13 @@ export default procedure
           });
 
     if (!collection) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Collection not found.",
       });
     }
 
     if (context.user.id !== collection.createdById) {
-      throw new ORPCError("FORBIDDEN", {
+      throw errors.FORBIDDEN({
         message: "Cannot modify another user's collection.",
       });
     }
@@ -66,7 +66,7 @@ export default procedure
       .from(bottles)
       .where(eq(bottles.id, input.bottle));
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Cannot find bottle.",
       });
     }
@@ -79,7 +79,7 @@ export default procedure
         ),
       });
       if (!release) {
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Cannot identify release.",
         });
       }

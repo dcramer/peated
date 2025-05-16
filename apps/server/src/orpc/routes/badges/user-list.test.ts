@@ -11,7 +11,7 @@ describe("GET /badges/:badge/users", () => {
         badge: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("lists users for a badge", async ({ fixtures, expect }) => {
@@ -158,6 +158,6 @@ describe("GET /badges/:badge/users", () => {
         badge: 9999, // Non-existent badge ID
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 });

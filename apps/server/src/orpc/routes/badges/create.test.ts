@@ -14,7 +14,7 @@ describe("POST /badges", () => {
         checks: [{ type: "category", config: { category: ["single_malt"] } }],
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("creates badge", async ({ fixtures }) => {

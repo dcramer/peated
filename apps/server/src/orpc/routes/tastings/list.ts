@@ -39,7 +39,11 @@ export default procedure
       rel: CursorSchema,
     }),
   )
-  .handler(async function ({ input: { cursor, limit, ...input }, context }) {
+  .handler(async function ({
+    input: { cursor, limit, ...input },
+    context,
+    errors,
+  }) {
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
@@ -65,9 +69,7 @@ export default procedure
     if (input.user) {
       if (input.user === "me") {
         if (!context.user) {
-          throw new ORPCError("UNAUTHORIZED", {
-            message: "Unauthorized",
-          });
+          throw errors.UNAUTHORIZED();
         }
 
         where.push(eq(tastings.createdById, context.user.id));
@@ -80,9 +82,7 @@ export default procedure
     const limitPrivate = input.filter !== "friends";
     if (input.filter === "friends") {
       if (!context.user) {
-        throw new ORPCError("UNAUTHORIZED", {
-          message: "Unauthorized",
-        });
+        throw errors.UNAUTHORIZED();
       }
       where.push(
         sql`${tastings.createdById} IN (SELECT ${follows.toUserId} FROM ${follows} WHERE ${follows.fromUserId} = ${context.user.id} AND ${follows.status} = 'following')`,

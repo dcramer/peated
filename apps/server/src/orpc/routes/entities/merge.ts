@@ -21,9 +21,9 @@ export default procedure
     }),
   )
   .output(EntitySchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     if (input.entity === input.other) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Cannot merge an entity into itself.",
       });
     }
@@ -34,8 +34,8 @@ export default procedure
       .where(eq(entities.id, input.entity));
 
     if (!rootEntity) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "entity not found.",
+      throw errors.NOT_FOUND({
+        message: "Entity not found.",
       });
     }
 
@@ -45,8 +45,8 @@ export default procedure
       .where(eq(entities.id, input.other));
 
     if (!otherEntity) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "other entity not found.",
+      throw errors.NOT_FOUND({
+        message: "Other entity not found.",
       });
     }
 

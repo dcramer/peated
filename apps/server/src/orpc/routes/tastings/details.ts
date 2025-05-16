@@ -16,14 +16,14 @@ export default procedure
     }),
   )
   .output(TastingSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [tasting] = await db
       .select()
       .from(tastings)
       .where(eq(tastings.id, input.id));
 
     if (!tasting) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Tasting not found.",
       });
     }

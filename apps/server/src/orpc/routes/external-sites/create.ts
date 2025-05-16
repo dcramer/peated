@@ -15,14 +15,14 @@ export default procedure
   .route({ method: "POST", path: "/external-sites" })
   .input(ExternalSiteInputSchema)
   .output(ExternalSiteSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const site = await db.transaction(async (tx) => {
       try {
         const [site] = await tx.insert(externalSites).values(input).returning();
         return site;
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "external_site_type") {
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: "Site with type already exists.",
             cause: err,
           });
@@ -32,7 +32,7 @@ export default procedure
     });
 
     if (!site) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to create site.",
       });
     }

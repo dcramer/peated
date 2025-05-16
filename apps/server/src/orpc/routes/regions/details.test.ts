@@ -37,7 +37,7 @@ describe("GET /regions/:slug", () => {
         slug: "some-region",
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid country]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
   });
 
   test("errors on non-existent region", async ({ fixtures }) => {

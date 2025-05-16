@@ -20,6 +20,6 @@ describe("POST /email/resend-verification", () => {
       }),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Account already verified.]`);
   });
 });

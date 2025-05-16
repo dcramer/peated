@@ -25,7 +25,7 @@ export default procedure
     }),
   )
   .output(BottleReleaseSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     // Verify the bottle exists
     const [bottle] = await db
       .select()
@@ -33,7 +33,7 @@ export default procedure
       .where(eq(bottles.id, input.bottleId));
 
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }
@@ -44,7 +44,7 @@ export default procedure
       input.statedAge &&
       bottle.statedAge !== input.statedAge
     ) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Release statedAge must match bottle's statedAge.",
       });
     }
@@ -102,7 +102,7 @@ export default procedure
     }
 
     if (name === bottle.name || fullName === bottle.fullName) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Release name cannot be the same as the bottle name.",
       });
     }
@@ -158,7 +158,7 @@ export default procedure
     });
 
     if (!release) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to create release.",
       });
     }

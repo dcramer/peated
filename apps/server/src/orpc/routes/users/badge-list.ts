@@ -27,16 +27,20 @@ export default procedure
       }),
     }),
   )
-  .handler(async function ({ input: { cursor, limit, ...input }, context }) {
+  .handler(async function ({
+    input: { cursor, limit, ...input },
+    context,
+    errors,
+  }) {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "User not found.",
       });
     }
 
     if (!(await profileVisible(db, user, context.user))) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "User's profile is not public.",
       });
     }

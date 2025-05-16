@@ -23,14 +23,14 @@ export default procedure
       ),
     }),
   )
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     const [entity] = await db
       .select()
       .from(entities)
       .where(eq(entities.id, input.entity));
 
     if (!entity) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Entity not found.",
       });
     }

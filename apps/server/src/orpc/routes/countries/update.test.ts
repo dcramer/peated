@@ -13,7 +13,7 @@ describe("PATCH /countries/:slug", () => {
           slug: "test-country",
         }),
       );
-      expect(err).toMatchInlineSnapshot(`[ORPCError: UNAUTHORIZED]`);
+      expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
     });
 
     test("requires mod", async ({ defaults }) => {
@@ -25,7 +25,7 @@ describe("PATCH /countries/:slug", () => {
           { context: { user: defaults.user } },
         ),
       );
-      expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+      expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
     });
   });
 
@@ -114,7 +114,7 @@ describe("PATCH /countries/:slug", () => {
           { context: { user: modUser } },
         ),
       );
-      expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+      expect(err).toMatchInlineSnapshot(`[Error: Country not found.]`);
     });
   });
 });

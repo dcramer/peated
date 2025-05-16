@@ -28,7 +28,7 @@ export default procedure
       totalCount: z.number(),
     }),
   )
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     let countryId: number;
 
     if (typeof input.country === "number") {
@@ -40,8 +40,8 @@ export default procedure
         .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
         .limit(1);
       if (!result) {
-        throw new ORPCError("BAD_REQUEST", {
-          message: "Invalid country",
+        throw errors.BAD_REQUEST({
+          message: "Invalid country.",
         });
       }
       countryId = result.id;

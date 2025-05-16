@@ -16,19 +16,19 @@ export default procedure
   )
   .output(z.object({}))
   .use(requireAuth)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const tasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) => eq(tastings.id, input.id),
     });
 
     if (!tasting) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Tasting not found.",
       });
     }
 
     if (context.user.id === tasting.createdById) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Cannot toast your own tasting.",
       });
     }

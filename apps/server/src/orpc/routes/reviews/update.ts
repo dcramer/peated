@@ -16,10 +16,10 @@ const InputSchema = z.object({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/reviews/:review" })
+  .route({ method: "PATCH", path: "/reviews/:reviewId" })
   .input(InputSchema)
   .output(ReviewSchema)
-  .handler(async ({ input, context }) => {
+  .handler(async function ({ input, context, errors }) {
     const { review: reviewId, ...data } = input;
 
     const [review] = await db
@@ -28,7 +28,9 @@ export default procedure
       .where(eq(reviews.id, reviewId));
 
     if (!review) {
-      throw new ORPCError("NOT_FOUND");
+      throw errors.NOT_FOUND({
+        message: "Review not found.",
+      });
     }
 
     if (Object.values(data).length === 0) {
@@ -42,7 +44,7 @@ export default procedure
       .returning();
 
     if (!newReview) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update review.",
       });
     }

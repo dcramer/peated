@@ -29,7 +29,7 @@ export default procedure
   .route({ method: "GET", path: "/bottles/:id" })
   .input(z.coerce.number())
   .output(OutputSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     let [bottle] = await db.select().from(bottles).where(eq(bottles.id, input));
 
     if (!bottle) {
@@ -42,7 +42,7 @@ export default procedure
         .innerJoin(bottles, eq(bottleTombstones.newBottleId, bottles.id))
         .where(eq(bottleTombstones.bottleId, input));
       if (!bottle) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Bottle not found.",
         });
       }

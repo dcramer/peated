@@ -31,6 +31,6 @@ describe("DELETE /entities/:id", () => {
         context: { user },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 });

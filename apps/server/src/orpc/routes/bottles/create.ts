@@ -33,7 +33,7 @@ export default procedure
   .route({ method: "POST", path: "/bottles" })
   .input(BottleInputSchema)
   .output(BottleSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const user = context.user;
 
     const bottleData: BottlePreviewResult & Record<string, any> =
@@ -47,7 +47,7 @@ export default procedure
     }
 
     if (!bottleData.name) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid bottle name.",
       });
     }
@@ -66,7 +66,7 @@ export default procedure
       });
 
       if (!brandUpsert) {
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Could not identify brand.",
         });
       }
@@ -83,7 +83,7 @@ export default procedure
           userId: user.id,
         });
         if (!bottlerUpsert) {
-          throw new ORPCError("BAD_REQUEST", {
+          throw errors.BAD_REQUEST({
             message: "Could not identify bottler.",
           });
         }
@@ -122,7 +122,7 @@ export default procedure
             type: "distiller",
           });
           if (!distUpsert) {
-            throw new ORPCError("BAD_REQUEST", {
+            throw errors.BAD_REQUEST({
               message: "Could not identify distiller.",
             });
           }

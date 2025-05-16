@@ -15,14 +15,14 @@ export default procedure
   .route({ method: "POST", path: "/regions" })
   .input(RegionInputSchema)
   .output(RegionSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [country] = await db
       .select({ id: countries.id })
       .from(countries)
       .where(eq(countries.id, input.country))
       .limit(1);
     if (!country) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Country not found.",
       });
     }
@@ -74,7 +74,7 @@ export default procedure
     });
 
     if (!newRegion) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update region.",
       });
     }

@@ -28,7 +28,7 @@ export default procedure
   .route({ method: "PATCH", path: "/tastings/:tasting" })
   .input(InputSchema)
   .output(TastingSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const user = context.user;
 
     const tasting = await db.query.tastings.findFirst({
@@ -42,7 +42,7 @@ export default procedure
       },
     });
     if (!tasting) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Tasting not found.",
       });
     }
@@ -79,7 +79,7 @@ export default procedure
             )
         : [];
       if (matches.length != friendUserIds.length) {
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Friends must all be active relationships.",
         });
       }
@@ -115,7 +115,7 @@ export default procedure
           : tasting;
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "tasting_unq") {
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: "Tasting already exists.",
             cause: err,
           });
@@ -171,7 +171,7 @@ export default procedure
     });
 
     if (!newTasting) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to update tasting.",
       });
     }

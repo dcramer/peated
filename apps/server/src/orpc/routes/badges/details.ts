@@ -12,10 +12,12 @@ export default procedure
   .route({ method: "GET", path: "/badges/:id" })
   .input(z.number())
   .output(BadgeSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [badge] = await db.select().from(badges).where(eq(badges.id, input));
     if (!badge) {
-      throw new ORPCError("NOT_FOUND");
+      throw errors.NOT_FOUND({
+        message: "Badge not found.",
+      });
     }
     return await serialize(BadgeSerializer, badge, context.user);
   });

@@ -10,9 +10,7 @@ describe("DELETE /tastings/:id/image", () => {
         tasting: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("cannot delete another user's image", async ({ fixtures }) => {
@@ -28,9 +26,9 @@ describe("DELETE /tastings/:id/image", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Cannot delete another user's tasting image.]
-    `);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Cannot delete another user's tasting image.]`,
+    );
   });
 
   test("deletes existing image", async ({ defaults, fixtures }) => {

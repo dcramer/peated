@@ -12,7 +12,7 @@ describe("PUT /friends/:id", () => {
         id: defaults.user.id,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("cannot friend self", async ({ defaults }) => {
@@ -24,7 +24,7 @@ describe("PUT /friends/:id", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Cannot friend yourself.]`);
   });
 
   test("can friend new link", async ({ defaults, fixtures }) => {

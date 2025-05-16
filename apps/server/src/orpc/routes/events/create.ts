@@ -13,14 +13,14 @@ export default procedure
   .route({ method: "POST", path: "/events" })
   .input(EventInputSchema)
   .output(EventSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const event = await db.transaction(async (tx) => {
       try {
         const [event] = await tx.insert(events).values(input).returning();
         return event;
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "event_name") {
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: "Event already exists.",
             cause: err,
           });
@@ -30,7 +30,7 @@ export default procedure
     });
 
     if (!event) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to create event.",
       });
     }

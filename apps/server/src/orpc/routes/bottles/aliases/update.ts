@@ -21,7 +21,7 @@ export default procedure
   .use(requireMod)
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, context, errors }) {
     const { name, ...data } = input;
 
     const [alias] = await db
@@ -30,7 +30,9 @@ export default procedure
       .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()));
 
     if (!alias) {
-      throw new ORPCError("NOT_FOUND");
+      throw errors.NOT_FOUND({
+        message: "Alias not found.",
+      });
     }
 
     if (Object.values(data).length === 0) {
@@ -47,7 +49,7 @@ export default procedure
       .returning();
 
     if (!newAlias) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update alias.",
       });
     }

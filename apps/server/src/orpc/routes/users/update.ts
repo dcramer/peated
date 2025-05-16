@@ -20,17 +20,17 @@ export default procedure
     }),
   )
   .output(UserSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);
 
     if (!user) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "User not found.",
       });
     }
 
     if (user.id !== context.user.id && !context.user.admin) {
-      throw new ORPCError("FORBIDDEN", {
+      throw errors.FORBIDDEN({
         message: "Cannot edit another user.",
       });
     }
@@ -40,7 +40,7 @@ export default procedure
     if (input.username !== undefined && input.username !== user.username) {
       data.username = input.username;
       if (data.username === "me") {
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.BAD_REQUEST({
           message: "Invalid username.",
         });
       }
@@ -52,7 +52,7 @@ export default procedure
 
     if (input.admin !== undefined && input.admin !== user.admin) {
       if (!context.user.admin) {
-        throw new ORPCError("FORBIDDEN", {
+        throw errors.FORBIDDEN({
           message: "Admin privileges required to modify admin status.",
         });
       }
@@ -61,7 +61,7 @@ export default procedure
 
     if (input.mod !== undefined && input.mod !== user.mod) {
       if (!context.user.admin) {
-        throw new ORPCError("FORBIDDEN", {
+        throw errors.FORBIDDEN({
           message: "Admin privileges required to modify mod status.",
         });
       }
@@ -84,7 +84,7 @@ export default procedure
         .where(eq(users.id, user.id))
         .returning();
       if (!newUser) {
-        throw new ORPCError("INTERNAL_SERVER_ERROR", {
+        throw errors.INTERNAL_SERVER_ERROR({
           message: "Unable to update user.",
         });
       }
@@ -92,7 +92,7 @@ export default procedure
       return await serialize(UserSerializer, newUser, context.user);
     } catch (err: any) {
       if (err?.code === "23505" && err?.constraint === "user_username_unq") {
-        throw new ORPCError("CONFLICT", {
+        throw errors.CONFLICT({
           message: "Username in use.",
           cause: err,
         });

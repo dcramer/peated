@@ -1,7 +1,3 @@
-import type { SQL } from "drizzle-orm";
-import { and, asc, eq, ilike, isNull } from "drizzle-orm";
-
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { externalSites, reviews } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -12,6 +8,8 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
+import type { SQL } from "drizzle-orm";
+import { and, asc, eq, ilike, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z
@@ -41,6 +39,7 @@ export default procedure
   .handler(async function ({
     input: { cursor, query, limit, ...input },
     context,
+    errors,
   }) {
     const where: (SQL<unknown> | undefined)[] = [eq(reviews.hidden, false)];
 
@@ -50,8 +49,8 @@ export default procedure
       });
 
       if (!site) {
-        throw new ORPCError("NOT_FOUND", {
-          message: "Site not found",
+        throw errors.NOT_FOUND({
+          message: "Site not found.",
         });
       }
       where.push(eq(reviews.externalSiteId, site.id));
@@ -67,7 +66,7 @@ export default procedure
       console.error(
         `User requested reviewList without mod: ${context.user?.id}`,
       );
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Must be a moderator to list all reviews.",
       });
     }

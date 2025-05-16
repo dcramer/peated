@@ -1,4 +1,5 @@
 import { call, ORPCError } from "@orpc/server";
+import type { User } from "@peated/server/db/schema";
 import {
   normalizeBottle,
   type NormalizedBottle,
@@ -35,15 +36,8 @@ export async function bottleNormalize({
   context,
 }: {
   input: z.infer<typeof BottleInputSchema>;
-  context: Context;
+  context: Context & { user: User };
 }): Promise<BottlePreviewResult & NormalizedBottle> {
-  const user = context.user;
-  if (!user) {
-    throw new ORPCError("UNAUTHORIZED", {
-      message: "Authentication required",
-    });
-  }
-
   const brand = await getEntity(input.brand, context);
 
   const rv: BottlePreviewResult = {

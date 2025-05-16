@@ -19,14 +19,14 @@ export default procedure
     }),
   )
   .output(ExternalSiteSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [site] = await db
       .select()
       .from(externalSites)
       .where(eq(externalSites.type, input.type));
     if (!site) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "External site not found",
+      throw errors.NOT_FOUND({
+        message: "Site not found.",
       });
     }
     return await serialize(ExternalSiteSerializer, site, context.user);

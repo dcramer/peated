@@ -24,7 +24,7 @@ export default procedure
   .route({ method: "POST", path: "/entities" })
   .input(EntityInputSchema)
   .output(EntitySchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const data: NewEntity = {
       ...input,
       name: normalizeEntityName(input.name),
@@ -39,7 +39,7 @@ export default procedure
         .where(eq(countries.id, input.country))
         .limit(1);
       if (!country) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Country not found.",
         });
       }
@@ -52,7 +52,7 @@ export default procedure
           .where(eq(regions.id, input.region))
           .limit(1);
         if (!region || region.countryId !== data.countryId) {
-          throw new ORPCError("NOT_FOUND", {
+          throw errors.NOT_FOUND({
             message: "Region not found.",
           });
         }
@@ -143,7 +143,7 @@ export default procedure
     });
 
     if (!entity) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to create entity.",
       });
     }

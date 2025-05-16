@@ -20,14 +20,14 @@ export default procedure
   .route({ method: "PUT", path: "/bottle-aliases" })
   .input(BottleAliasSchema)
   .output(z.object({}))
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, context, errors }) {
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }
@@ -66,7 +66,7 @@ export default procedure
           .where(and(eq(bottleAliases.name, existingAlias.name)))
           .returning();
       } else {
-        throw new ORPCError("BAD_REQUEST", {
+        throw errors.CONFLICT({
           message: `Duplicate alias found (${existingAlias.bottleId}). Not implemented.`,
         });
       }
@@ -107,7 +107,7 @@ export default procedure
     });
 
     if (!newAlias) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to save alias.",
       });
     }

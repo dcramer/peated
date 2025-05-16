@@ -19,20 +19,20 @@ export default procedure
   .route({ method: "DELETE", path: "/tastings/:id" })
   .input(z.coerce.number())
   .output(z.object({}))
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [tasting] = await db
       .select()
       .from(tastings)
       .where(eq(tastings.id, input))
       .limit(1);
     if (!tasting) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Tasting not found.",
       });
     }
 
     if (tasting.createdById !== context.user.id && !context.user.admin) {
-      throw new ORPCError("FORBIDDEN", {
+      throw errors.FORBIDDEN({
         message: "Cannot delete another user's tasting.",
       });
     }

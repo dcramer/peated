@@ -21,10 +21,12 @@ export default procedure
     }),
   )
   .output(BadgeSchema)
-  .handler(async function ({ input: { id, ...input }, context }) {
+  .handler(async function ({ input: { id, ...input }, context, errors }) {
     const [badge] = await db.select().from(badges).where(eq(badges.id, id));
     if (!badge) {
-      throw new ORPCError("NOT_FOUND");
+      throw errors.NOT_FOUND({
+        message: "Badge not found.",
+      });
     }
 
     const data: { [name: string]: any } = {};
@@ -42,7 +44,7 @@ export default procedure
           config = await checkBadgeConfig(check.type as any, check.config);
         } catch (err) {
           logError(err);
-          throw new ORPCError("BAD_REQUEST", {
+          throw errors.BAD_REQUEST({
             message: "Failed to validate badge config.",
           });
         }

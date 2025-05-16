@@ -22,14 +22,14 @@ export default procedure
     }),
   )
   .output(ExternalSiteSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [site] = await db
       .select()
       .from(externalSites)
       .where(eq(externalSites.type, input.site));
     if (!site) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Site not found",
+      throw errors.NOT_FOUND({
+        message: "Site not found.",
       });
     }
 
@@ -57,7 +57,7 @@ export default procedure
           .returning();
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint === "external_site_type") {
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: "Site with type already exists.",
             cause: err,
           });
@@ -71,7 +71,7 @@ export default procedure
     });
 
     if (!newSite) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update site.",
       });
     }

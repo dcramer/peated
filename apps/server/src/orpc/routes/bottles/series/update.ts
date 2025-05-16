@@ -23,7 +23,7 @@ export default procedure
   .route({ method: "PATCH", path: "/bottle-series/:series" })
   .input(InputSchema)
   .output(BottleSeriesSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const user = context.user;
 
     const updatedSeries = await db.transaction(async (tx) => {
@@ -35,7 +35,7 @@ export default procedure
         .for("update");
 
       if (!series) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Series not found.",
         });
       }
@@ -48,7 +48,7 @@ export default procedure
         .limit(1);
 
       if (!brand) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Brand not found.",
         });
       }

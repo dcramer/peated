@@ -8,7 +8,7 @@ import { describe, expect, test } from "vitest";
 describe("DELETE /tastings/:id", () => {
   test("requires authentication", async () => {
     const err = await waitError(() => routerClient.tastings.delete(1));
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("delete own tasting", async ({ defaults, fixtures }) => {
@@ -47,6 +47,8 @@ describe("DELETE /tastings/:id", () => {
         context: { user: defaults.user },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Cannot delete another user's tasting.]`,
+    );
   });
 });

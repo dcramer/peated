@@ -12,9 +12,7 @@ describe("DELETE /bottle-series/:id", () => {
         id: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires moderator access", async ({ defaults }) => {
@@ -26,9 +24,7 @@ describe("DELETE /bottle-series/:id", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Moderator privileges required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("deletes a series and updates related bottles", async function ({
@@ -107,8 +103,6 @@ describe("DELETE /bottle-series/:id", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: NOT_FOUND: Series not found.]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Series not found.]`);
   });
 });

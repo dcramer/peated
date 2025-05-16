@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   changes,
@@ -22,16 +21,14 @@ export default procedure
     }),
   )
   .output(UserSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.id, context.user);
 
     if (!user) {
       if (input.id === "me") {
-        throw new ORPCError("UNAUTHORIZED", {
-          message: "User not authenticated",
-        });
+        throw errors.UNAUTHORIZED();
       }
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "User not found",
       });
     }

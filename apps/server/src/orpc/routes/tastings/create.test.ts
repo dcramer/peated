@@ -10,7 +10,7 @@ describe("POST /tastings", () => {
     const err = await waitError(() =>
       routerClient.tastings.create({ bottle: 1 }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("creates a new tasting with minimal params", async ({
@@ -211,7 +211,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify flight.]`);
   });
 
   test("creates a new tasting with flight", async ({ defaults, fixtures }) => {
@@ -324,7 +324,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
   });
 
   test("fails with nonexistent release", async ({ defaults, fixtures }) => {
@@ -339,7 +339,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
   });
 
   test("creates a new tasting with serving style and color", async ({
@@ -454,7 +454,9 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Friends must all be active relationships.]`,
+    );
   });
 
   test("creates a new tasting with friends", async ({ defaults, fixtures }) => {
@@ -508,7 +510,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot();
+    expect(err).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
   });
 
   test("updates entity stats correctly", async ({ defaults, fixtures }) => {
@@ -644,6 +646,8 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Friends must all be active relationships.]`,
+    );
   });
 });

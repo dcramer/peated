@@ -21,20 +21,20 @@ export default procedure
     }),
   )
   .output(NotificationSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [notification] = await db
       .select()
       .from(notifications)
       .where(eq(notifications.id, input.id));
 
     if (!notification) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Notification not found.",
       });
     }
 
     if (notification.userId !== context.user.id) {
-      throw new ORPCError("FORBIDDEN", {
+      throw errors.FORBIDDEN({
         message: "Cannot edit another user's notification.",
       });
     }

@@ -19,7 +19,7 @@ test("requires admin", async ({ fixtures }) => {
       },
     ),
   );
-  expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+  expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
 });
 
 test("badge image does resize down", async ({ fixtures }) => {

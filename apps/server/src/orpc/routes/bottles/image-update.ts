@@ -26,7 +26,7 @@ export default procedure
       imageUrl: z.string(),
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const { bottleId, file } = input;
 
     const [bottle] = await db
@@ -36,14 +36,14 @@ export default procedure
       .limit(1);
 
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Bottle not found",
+      throw errors.NOT_FOUND({
+        message: "Bottle not found.",
       });
     }
 
     if (bottle.createdById !== context.user.id && !context.user.admin) {
-      throw new ORPCError("FORBIDDEN", {
-        message: "You don't have permission to update this bottle",
+      throw errors.FORBIDDEN({
+        message: "You don't have permission to update this bottle.",
       });
     }
 

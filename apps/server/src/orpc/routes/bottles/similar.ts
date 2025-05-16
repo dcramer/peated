@@ -35,7 +35,7 @@ export default procedure
       rel: CursorSchema,
     }),
   )
-  .handler(async function ({ input: { limit, ...input }, context }) {
+  .handler(async function ({ input: { limit, ...input }, context, errors }) {
     // maxAge caching for 5 minutes would be handled by oRPC server settings
 
     const [bottle] = await db
@@ -44,7 +44,7 @@ export default procedure
       .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }

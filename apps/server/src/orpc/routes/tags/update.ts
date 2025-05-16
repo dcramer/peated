@@ -19,11 +19,11 @@ export default procedure
     }),
   )
   .output(TagSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const [tag] = await db.select().from(tags).where(eq(tags.name, input.name));
     if (!tag) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Tag not found",
+      throw errors.NOT_FOUND({
+        message: "Tag not found.",
       });
     }
 
@@ -60,7 +60,7 @@ export default procedure
       .returning();
 
     if (!newTag) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update tag.",
       });
     }

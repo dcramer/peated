@@ -53,7 +53,7 @@ describe("POST /ai/region-lookup", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Cannot find country]`);
   });
 
   test("generates region details", async ({ fixtures }) => {

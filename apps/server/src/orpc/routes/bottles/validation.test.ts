@@ -10,9 +10,7 @@ describe("POST /bottles/validations", () => {
         brand: { name: "Test Brand" },
       }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("returns normalized data", async ({ fixtures }) => {

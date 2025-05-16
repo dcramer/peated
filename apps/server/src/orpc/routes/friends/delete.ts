@@ -17,9 +17,9 @@ export default procedure
       status: z.enum(["none", "pending", "following", "friends"]).optional(),
     }),
   )
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     if (context.user.id === input) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Cannot unfriend yourself.",
       });
     }
@@ -27,7 +27,7 @@ export default procedure
     const [user] = await db.select().from(users).where(eq(users.id, input));
 
     if (!user) {
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "User not found.",
       });
     }
