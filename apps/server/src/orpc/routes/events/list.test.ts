@@ -16,9 +16,11 @@ describe("GET /events", () => {
       dateStart: "2020-01-01",
       dateEnd: "2020-01-02",
     });
+
+    const futureData = new Date(new Date().getTime() + 1000 * 60 * 60 * 24);
     const futureEvent = await fixtures.Event({
-      dateStart: "2030-01-01",
-      dateEnd: "2030-01-02",
+      dateStart: futureData.toISOString(),
+      dateEnd: futureData.toISOString(),
     });
 
     const { results } = await routerClient.events.list({
@@ -39,6 +41,7 @@ describe("GET /events", () => {
 
     const { results } = await routerClient.events.list({
       sort: "date",
+      onlyUpcoming: false,
     });
 
     expect(results.length).toBe(2);

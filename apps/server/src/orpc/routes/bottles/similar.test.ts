@@ -3,8 +3,8 @@ import { describe, expect, test } from "vitest";
 
 describe("GET /bottles/:bottle/similar", () => {
   test("lists similar bottles", async ({ fixtures }) => {
-    const brand = await fixtures.Entity();
-    const distiller = await fixtures.Entity();
+    const brand = await fixtures.Entity({ name: "Brand" });
+    const distiller = await fixtures.Entity({ name: "Distiller" });
 
     const bottle1 = await fixtures.Bottle({
       brandId: brand.id,
@@ -19,6 +19,7 @@ describe("GET /bottles/:bottle/similar", () => {
       brandId: brand.id,
       distillerIds: [distiller.id],
       name: "Main Bottle",
+      edition: "Other Vintage",
       statedAge: 10,
       category: "bourbon",
     });
@@ -34,7 +35,7 @@ describe("GET /bottles/:bottle/similar", () => {
 
     // Should NOT find - different brand
     await fixtures.Bottle({
-      brandId: (await fixtures.Entity()).id,
+      brandId: (await fixtures.Entity({ name: "Other Brand" })).id,
       distillerIds: [distiller.id],
       name: "Main Bottle",
       statedAge: 12,

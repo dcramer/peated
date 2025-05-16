@@ -3,7 +3,6 @@ import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
-import { ConflictError } from "../errors";
 
 import create from "./create";
 import update from "./update";
@@ -27,12 +26,12 @@ export default procedure
     try {
       return await call(create, input, { context });
     } catch (err) {
-      if (err instanceof ConflictError) {
+      if (err instanceof ORPCError && err.status === 409) {
         return await call(
           update,
           {
             ...input,
-            bottle: err.existingRow.id,
+            bottle: err.data.bottle,
           },
           { context },
         );

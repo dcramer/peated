@@ -159,7 +159,12 @@ export default procedure
           .select()
           .from(bottles)
           .where(eq(bottles.id, alias.bottleId));
-        throw new ConflictError(existingBottle);
+        throw errors.CONFLICT({
+          message: "Bottle already exists.",
+          data: {
+            bottle: existingBottle.id,
+          },
+        });
       }
 
       const [bottle] = await tx

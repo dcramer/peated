@@ -139,7 +139,8 @@ describe("scrapePrices", () => {
       scrapePrices(mockSite, mockUrlFn, mockScrapeProducts),
     );
 
-    expect(error).toBeInstanceOf(Error);
-    expect(error.message).toBe("Failed to scrape any products.");
+    expect(error).toMatchInlineSnapshot(
+      `[Error: Failed to scrape any products.]`,
+    );
   });
 });

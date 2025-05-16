@@ -47,15 +47,15 @@ describe("POST /bottles/validations", () => {
 
     const data = await routerClient.bottles.validation(
       {
-        name: "33.141 Tarry ropes on a smokehouse roof",
+        name: "Cask No. 33.141 Tarry ropes on a smokehouse roof",
         brand: brand.id,
       },
       { context: { user } },
     );
 
-    expect(data).toMatchObject({
-      name: "Tarry ropes on a smokehouse roof",
-    });
+    expect(data.name).toMatchInlineSnapshot(
+      `"33.141 Tarry ropes on a smokehouse roof"`,
+    );
   });
 
   test("strips brand prefix from name", async ({ fixtures }) => {

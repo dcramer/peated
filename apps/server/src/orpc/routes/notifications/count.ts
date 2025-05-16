@@ -30,5 +30,5 @@ export default procedure
       .from(notifications)
       .where(where ? and(...where) : undefined);
 
-    return { count: count };
+    return { count: Number(count) };
   });

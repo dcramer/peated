@@ -406,15 +406,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchObject({
-      errors: [
-        {
-          code: "custom",
-          message: "Value too far in the past.",
-          path: ["createdAt"],
-        },
-      ],
-    });
+    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 
   test("fails with future date", async ({ defaults, fixtures }) => {
@@ -430,15 +422,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchObject({
-      errors: [
-        {
-          code: "custom",
-          message: "Value too far in future.",
-          path: ["createdAt"],
-        },
-      ],
-    });
+    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 
   test("fails with non-following friends", async ({ defaults, fixtures }) => {

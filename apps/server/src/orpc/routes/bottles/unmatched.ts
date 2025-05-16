@@ -30,7 +30,7 @@ const OutputSchema = z.object({
       bestMatch: z.null(),
       exampleListing: StorePriceSchema.extend({
         site: ExternalSiteSchema,
-      }),
+      }).nullable(),
     }),
   ),
   rel: CursorSchema,

@@ -76,7 +76,7 @@ describe("POST /bottle-series", () => {
       routerClient.bottles.series.create(data),
     );
 
-    expect(error.message).toContain("UNAUTHORIZED");
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   it("validates brand exists", async function ({ fixtures, defaults }) {
@@ -92,6 +92,6 @@ describe("POST /bottle-series", () => {
       }),
     );
 
-    expect(error.message).toContain("NOT_FOUND");
+    expect(error).toMatchInlineSnapshot(`[Error: Brand not found.]`);
   });
 });

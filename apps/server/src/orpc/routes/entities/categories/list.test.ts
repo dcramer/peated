@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 
 describe("GET /entities/:entity/categories", () => {
   test("lists categories for an entity", async ({ fixtures }) => {
-    const entity = await fixtures.Entity();
+    const entity = await fixtures.Entity({ totalBottles: 3 });
 
     // Create bottles with different categories
     await fixtures.Bottle({

@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottleSeries } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BottleSeriesSchema } from "@peated/server/schemas";
+import { BottleSeriesSchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
 import type { SQL } from "drizzle-orm";
@@ -22,6 +22,7 @@ export default procedure
     z.object({
       results: z.array(BottleSeriesSchema),
       total: z.number(),
+      rel: CursorSchema,
     }),
   )
   .handler(async function ({ input, context, errors }) {
@@ -54,6 +55,10 @@ export default procedure
 
     return {
       results: await serialize(BottleSeriesSerializer, results, context.user),
-      total: total[0].count,
+      total: Number(total[0].count),
+      rel: {
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
+      },
     };
   });
