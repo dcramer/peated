@@ -26,14 +26,14 @@ export default procedure
     ]),
   )
   .output(AuthSchema)
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     const user =
       "code" in input
         ? await authGoogle(input.code)
         : await authBasic(input.email, input.password);
 
     if (!user.active) {
-      throw new ORPCError("UNAUTHORIZED", {
+      throw errors.UNAUTHORIZED({
         message: "Invalid credentials.",
       });
     }

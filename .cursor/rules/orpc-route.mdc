@@ -1,6 +1,6 @@
 ---
 description: Instructions when working on OpenAPI routes in Hono.
-globs: 
+globs:
 alwaysApply: false
 ---
 # oRPC Route Implementation Conventions

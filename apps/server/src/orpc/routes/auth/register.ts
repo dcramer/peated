@@ -24,7 +24,7 @@ export default procedure
     }),
   )
   .output(AuthSchema)
-  .handler(async function ({ input: { username, email, password } }) {
+  .handler(async function ({ input: { username, email, password }, errors }) {
     const [user] = await db.transaction(async (tx) => {
       try {
         return await tx
@@ -50,7 +50,7 @@ export default procedure
                 ? eq(sql`LOWER(${users.username})`, username.toLowerCase())
                 : eq(sql`LOWER(${users.email})`, email.toLowerCase()),
             );
-          throw new ORPCError("CONFLICT", {
+          throw errors.CONFLICT({
             message: `Conflicting object already exists (ID=${existingUser.id}).`,
           });
         }

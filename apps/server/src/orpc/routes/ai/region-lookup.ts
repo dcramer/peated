@@ -19,7 +19,7 @@ export default procedure
   .route({ method: "POST", path: "/ai/region-lookup" })
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const country = input.country
       ? await db.query.countries.findFirst({
           where: (table, { eq }) => eq(table.id, input.country),
@@ -27,7 +27,7 @@ export default procedure
       : null;
 
     if (!country) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Cannot find country",
       });
     }

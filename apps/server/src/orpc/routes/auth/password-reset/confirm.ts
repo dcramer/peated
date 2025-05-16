@@ -25,7 +25,7 @@ export default procedure
     }),
   )
   .output(AuthSchema)
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     let payload;
     try {
       payload = await verifyPayload(input.token);
@@ -40,7 +40,7 @@ export default procedure
       new Date(token.createdAt).getTime() <
       new Date().getTime() - TOKEN_CUTOFF * 1000
     ) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid verification token.",
       });
     }
@@ -55,7 +55,7 @@ export default procedure
         ),
       );
     if (!user) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid verification token.",
       });
     }
@@ -66,7 +66,7 @@ export default procedure
         .update(user.passwordHash || "")
         .digest("hex")
     ) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid verification token.",
       });
     }

@@ -11,6 +11,6 @@ describe("GET /auth/me", () => {
 
   test("throws UNAUTHORIZED for unauthenticated request", async () => {
     const err = await waitError(routerClient.auth.me({}));
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 });

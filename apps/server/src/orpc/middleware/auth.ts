@@ -1,11 +1,11 @@
-import { ORPCError, os } from "@orpc/server";
+import { base } from "..";
 import type { Context } from "../context";
 
-export const requireAuth = os
+export const requireAuth = base
   .$context<Context>()
-  .middleware(({ context, next }) => {
+  .middleware(({ context, next, errors }) => {
     if (!context.user) {
-      throw new ORPCError("UNAUTHORIZED");
+      throw errors.UNAUTHORIZED();
     }
     return next({
       context: {
@@ -15,11 +15,11 @@ export const requireAuth = os
     });
   });
 
-export const requireVerified = os
+export const requireVerified = base
   .$context<Context>()
-  .middleware(({ context, next }) => {
+  .middleware(({ context, next, errors }) => {
     if (!context.user?.verified) {
-      throw new ORPCError("UNAUTHORIZED");
+      throw errors.UNAUTHORIZED();
     }
     return next({
       context: {
@@ -29,11 +29,11 @@ export const requireVerified = os
     });
   });
 
-export const requireAdmin = os
+export const requireAdmin = base
   .$context<Context>()
-  .middleware(({ context, next }) => {
+  .middleware(({ context, next, errors }) => {
     if (!context.user?.admin) {
-      throw new ORPCError("UNAUTHORIZED");
+      throw errors.UNAUTHORIZED();
     }
 
     return next({
@@ -44,11 +44,11 @@ export const requireAdmin = os
     });
   });
 
-export const requireMod = os
+export const requireMod = base
   .$context<Context>()
-  .middleware(({ context, next }) => {
+  .middleware(({ context, next, errors }) => {
     if (!context.user?.admin && !context.user?.mod) {
-      throw new ORPCError("UNAUTHORIZED");
+      throw errors.UNAUTHORIZED();
     }
     return next({
       context: {

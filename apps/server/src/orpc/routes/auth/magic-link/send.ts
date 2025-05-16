@@ -14,7 +14,7 @@ export default procedure
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input: { email } }) {
+  .handler(async function ({ input: { email }, errors }) {
     const [user] = await db
       .select()
       .from(users)
@@ -22,14 +22,14 @@ export default procedure
 
     if (!user) {
       console.log("user not found");
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Account not found.",
       });
     }
 
     if (!user.active) {
       console.log("user not active");
-      throw new ORPCError("NOT_FOUND", {
+      throw errors.NOT_FOUND({
         message: "Account not found.",
       });
     }

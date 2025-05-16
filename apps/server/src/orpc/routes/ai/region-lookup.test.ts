@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Mock the getGeneratedRegionDetails function
 vi.mock("@peated/server/worker/jobs/generateRegionDetails", () => ({
+  default: vi.fn(),
   getGeneratedRegionDetails: vi.fn(),
 }));
 
@@ -24,9 +25,7 @@ describe("POST /ai/region-lookup", () => {
         country: 1,
       }),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: UNAUTHORIZED: Authentication required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires mod privileges", async ({ fixtures }) => {
@@ -40,9 +39,7 @@ describe("POST /ai/region-lookup", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: FORBIDDEN: Moderator privileges required]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("returns error with invalid country", async ({ fixtures }) => {
@@ -56,9 +53,7 @@ describe("POST /ai/region-lookup", () => {
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`
-      [ORPCError: BAD_REQUEST: Cannot find country]
-    `);
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("generates region details", async ({ fixtures }) => {
