@@ -140,7 +140,7 @@ export const app = new Hono()
   })
   .get("/spec.json", async (c) => {
     return c.json(
-      openAPIGenerator.generate(router, {
+      await openAPIGenerator.generate(router, {
         info: {
           title: "Peated API",
           version: "1.0.0",

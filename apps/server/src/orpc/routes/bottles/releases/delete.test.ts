@@ -52,9 +52,12 @@ describe("DELETE /bottle-releases/:id", () => {
     });
 
     // Delete the release
-    await routerClient.bottles.releases.delete(release.id, {
-      context: { user: admin },
-    });
+    await routerClient.bottles.releases.delete(
+      { id: release.id },
+      {
+        context: { user: admin },
+      },
+    );
 
     // Verify the release is deleted
     const [deletedRelease] = await db
@@ -114,9 +117,12 @@ describe("DELETE /bottle-releases/:id", () => {
     const admin = await fixtures.User({ admin: true });
 
     const err = await waitError(() =>
-      routerClient.bottles.releases.delete(999999, {
-        context: { user: admin },
-      }),
+      routerClient.bottles.releases.delete(
+        { id: 999999 },
+        {
+          context: { user: admin },
+        },
+      ),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
   });

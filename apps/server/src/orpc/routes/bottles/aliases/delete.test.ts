@@ -22,9 +22,12 @@ describe("DELETE /bottle-aliases/:name", () => {
       name: alias.name,
     });
 
-    const data = await routerClient.bottles.aliases.delete(alias.name, {
-      context: { user },
-    });
+    const data = await routerClient.bottles.aliases.delete(
+      { name: alias.name },
+      {
+        context: { user },
+      },
+    );
     expect(data).toEqual({});
 
     const [newAlias] = await db
@@ -53,7 +56,12 @@ describe("DELETE /bottle-aliases/:name", () => {
     const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
 
     const err = await waitError(
-      routerClient.bottles.aliases.delete(alias.name, { context: { user } }),
+      routerClient.bottles.aliases.delete(
+        { name: alias.name },
+        {
+          context: { user },
+        },
+      ),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

@@ -10,11 +10,11 @@ import { z } from "zod";
 export default procedure
   .route({ method: "DELETE", path: "/bottle-aliases/:name" })
   .use(requireMod)
-  .input(z.string())
+  .input(z.object({ name: z.string() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const alias = await db.query.bottleAliases.findFirst({
-      where: eq(sql`LOWER(${bottleAliases.name})`, input.toLowerCase()),
+      where: eq(sql`LOWER(${bottleAliases.name})`, input.name.toLowerCase()),
       with: {
         bottle: true,
       },

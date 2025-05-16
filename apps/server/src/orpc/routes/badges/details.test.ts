@@ -5,12 +5,12 @@ describe("GET /badges/:id", () => {
   test("get badge by id", async ({ fixtures }) => {
     const badge = await fixtures.Badge();
 
-    const data = await routerClient.badges.details(badge.id);
+    const data = await routerClient.badges.details({ id: badge.id });
     expect(data.id).toEqual(badge.id);
   });
 
   test("errors on invalid badge", async () => {
-    const err = await waitError(routerClient.badges.details(1));
+    const err = await waitError(routerClient.badges.details({ id: 1 }));
     expect(err).toMatchInlineSnapshot(`[Error: Badge not found.]`);
   });
 });

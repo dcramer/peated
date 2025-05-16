@@ -8,12 +8,12 @@ describe("GET /bottles/:id", () => {
     const bottle1 = await fixtures.Bottle({ name: "Delicious Wood" });
     await fixtures.Bottle({ name: "Something Else" });
 
-    const data = await routerClient.bottles.details(bottle1.id);
+    const data = await routerClient.bottles.details({ id: bottle1.id });
     expect(data.id).toEqual(bottle1.id);
   });
 
   test("errors on invalid bottle", async () => {
-    const err = await waitError(routerClient.bottles.details(1));
+    const err = await waitError(routerClient.bottles.details({ id: 1 }));
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
@@ -25,7 +25,7 @@ describe("GET /bottles/:id", () => {
     });
     await fixtures.Bottle({ name: "Something Else" });
 
-    const data = await routerClient.bottles.details(999);
+    const data = await routerClient.bottles.details({ id: 999 });
     expect(data.id).toEqual(bottle1.id);
   });
 });

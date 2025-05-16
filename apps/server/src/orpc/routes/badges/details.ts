@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { badges } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -10,10 +9,13 @@ import { z } from "zod";
 
 export default procedure
   .route({ method: "GET", path: "/badges/:id" })
-  .input(z.number())
+  .input(z.object({ id: z.coerce.number() }))
   .output(BadgeSchema)
   .handler(async function ({ input, context, errors }) {
-    const [badge] = await db.select().from(badges).where(eq(badges.id, input));
+    const [badge] = await db
+      .select()
+      .from(badges)
+      .where(eq(badges.id, input.id));
     if (!badge) {
       throw errors.NOT_FOUND({
         message: "Badge not found.",

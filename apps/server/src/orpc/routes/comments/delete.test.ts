@@ -16,9 +16,12 @@ describe("DELETE /comments/:id", () => {
       createdById: defaults.user.id,
     });
 
-    await routerClient.comments.delete(comment.id, {
-      context: { user: defaults.user },
-    });
+    await routerClient.comments.delete(
+      { id: comment.id },
+      {
+        context: { user: defaults.user },
+      },
+    );
 
     const [newComment] = await db
       .select()

@@ -10,13 +10,13 @@ import { z } from "zod";
 export default procedure
   .use(requireAuth)
   .route({ method: "DELETE", path: "/comments/:id" })
-  .input(z.coerce.number())
+  .input(z.object({ id: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const [comment] = await db
       .select()
       .from(comments)
-      .where(eq(comments.id, input))
+      .where(eq(comments.id, input.id))
       .limit(1);
     if (!comment) {
       throw errors.NOT_FOUND({

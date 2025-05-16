@@ -17,13 +17,13 @@ import { z } from "zod";
 export default procedure
   .use(requireAdmin)
   .route({ method: "DELETE", path: "/bottle-releases/:id" })
-  .input(z.coerce.number())
+  .input(z.object({ id: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const [release] = await db
       .select()
       .from(bottleReleases)
-      .where(eq(bottleReleases.id, input))
+      .where(eq(bottleReleases.id, input.id))
       .limit(1);
     if (!release) {
       throw errors.NOT_FOUND({
