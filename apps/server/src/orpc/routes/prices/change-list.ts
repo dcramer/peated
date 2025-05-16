@@ -4,7 +4,7 @@ import { and, eq, ilike, isNotNull, sql } from "drizzle-orm";
 import { db } from "@peated/server/db";
 import { storePriceHistories, storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BottlePriceChangeSchema } from "@peated/server/schemas";
+import { BottlePriceChangeSchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottlePriceChangeSerializer } from "@peated/server/serializers/storePrice";
 import { z } from "zod";
@@ -23,10 +23,7 @@ const InputSchema = z
 
 const OutputSchema = z.object({
   results: z.array(BottlePriceChangeSchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
+  rel: CursorSchema,
 });
 
 export default procedure
@@ -50,11 +47,11 @@ export default procedure
 
     const results = await db
       .select({
-        id: sql<number>`${storePrices.bottleId}`,
-        price: sql<number>`AVG(${storePrices.price})`,
-        previousPrice: sql<number>`AVG(${storePriceHistories.price})`,
+        id: sql<string>`${storePrices.bottleId}`,
+        price: sql<string>`AVG(${storePrices.price})`,
+        previousPrice: sql<string>`AVG(${storePriceHistories.price})`,
         // force the type to fix nullable in default
-        bottleId: sql<number>`${storePrices.bottleId}`,
+        bottleId: sql<string>`${storePrices.bottleId}`,
         // assume this never changes
         currency: storePrices.currency,
       })

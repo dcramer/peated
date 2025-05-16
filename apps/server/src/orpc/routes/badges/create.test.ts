@@ -6,24 +6,32 @@ import { eq } from "drizzle-orm";
 
 describe("POST /badges", () => {
   test("requires admin", async ({ defaults }) => {
+    const user = defaults.user;
     const err = await waitError(
-      routerClient.badges.create({
-        name: "Single Malts",
-        tracker: "bottle",
-        formula: "default",
-        checks: [{ type: "category", config: { category: ["single_malt"] } }],
-      }),
+      routerClient.badges.create(
+        {
+          name: "Single Malts",
+          tracker: "bottle",
+          formula: "default",
+          checks: [{ type: "category", config: { category: ["single_malt"] } }],
+        },
+        { context: { user } },
+      ),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("creates badge", async ({ fixtures }) => {
-    const data = await routerClient.badges.create({
-      name: "Single Malts",
-      tracker: "bottle",
-      formula: "default",
-      checks: [{ type: "category", config: { category: ["single_malt"] } }],
-    });
+    const user = await fixtures.User({ admin: true });
+    const data = await routerClient.badges.create(
+      {
+        name: "Single Malts",
+        tracker: "bottle",
+        formula: "default",
+        checks: [{ type: "category", config: { category: ["single_malt"] } }],
+      },
+      { context: { user } },
+    );
 
     expect(data.id).toBeDefined();
 

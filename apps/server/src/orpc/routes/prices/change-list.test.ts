@@ -22,7 +22,7 @@ describe("GET /price-changes", () => {
     expect(results[0].id).toEqual(bottle.id);
     expect(results[0].price).toEqual(10000);
     expect(results[0].previousPrice).toEqual(5000);
-    expect(results[0].bottle.id).toEqual(bottle.id);
+    expect(results[0].bottle!.id).toEqual(bottle.id);
   });
 
   test("filters by query", async ({ fixtures }) => {
@@ -58,10 +58,11 @@ describe("GET /price-changes", () => {
     });
 
     expect(results.length).toBe(1);
-    expect(results[0].bottle.name).toEqual("Test Bottle 1");
+    expect(results[0].bottle!.name).toEqual("Test Bottle 1");
   });
 
   test("paginates results", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
     const bottles = await Promise.all(
       Array.from({ length: 3 }).map((_, i) =>
         fixtures.Bottle({ name: `Bottle ${i}` }),
@@ -71,6 +72,7 @@ describe("GET /price-changes", () => {
     await Promise.all(
       bottles.map(async (bottle) => {
         const price = await fixtures.StorePrice({
+          externalSiteId: site.id,
           bottleId: bottle.id,
           price: 10000,
           updatedAt: new Date(),

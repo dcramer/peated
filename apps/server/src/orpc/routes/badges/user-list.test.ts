@@ -14,7 +14,7 @@ describe("GET /badges/:badge/users", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("lists users for a badge", async ({ fixtures, expect }) => {
+  test("lists users for a badge", async ({ defaults, fixtures, expect }) => {
     const badge = await fixtures.Badge();
     const user1 = await fixtures.User();
     const user2 = await fixtures.User();
@@ -31,9 +31,12 @@ describe("GET /badges/:badge/users", () => {
       level: 2,
     });
 
-    const { results, rel } = await routerClient.badges.userList({
-      badge: badge.id,
-    });
+    const { results, rel } = await routerClient.badges.userList(
+      {
+        badge: badge.id,
+      },
+      { context: { user: defaults.user } },
+    );
 
     expect(results.length).toBe(2);
     expect(results[0].user.id).toBe(user2.id);
@@ -46,7 +49,7 @@ describe("GET /badges/:badge/users", () => {
     expect(rel.prevCursor).toBeNull();
   });
 
-  test("paginates results", async ({ fixtures, expect }) => {
+  test("paginates results", async ({ defaults, fixtures, expect }) => {
     const badge = await fixtures.Badge();
     const users = await Promise.all(
       Array.from({ length: 3 }, () => fixtures.User()),
@@ -60,11 +63,14 @@ describe("GET /badges/:badge/users", () => {
       });
     }
 
-    const { results, rel } = await routerClient.badges.userList({
-      badge: badge.id,
-      limit: 2,
-      cursor: 1,
-    });
+    const { results, rel } = await routerClient.badges.userList(
+      {
+        badge: badge.id,
+        limit: 2,
+        cursor: 1,
+      },
+      { context: { user: defaults.user } },
+    );
 
     expect(results.length).toBe(2);
     expect(results[0].user.id).toBe(users[2].id);
@@ -73,7 +79,7 @@ describe("GET /badges/:badge/users", () => {
     expect(rel.prevCursor).toBeNull();
   });
 
-  test("excludes private users", async ({ fixtures, expect }) => {
+  test("excludes private users", async ({ defaults, fixtures, expect }) => {
     const badge = await fixtures.Badge();
     const publicUser = await fixtures.User();
     const privateUser = await fixtures.User({ private: true });
@@ -90,15 +96,22 @@ describe("GET /badges/:badge/users", () => {
       level: 2,
     });
 
-    const { results } = await routerClient.badges.userList({
-      badge: badge.id,
-    });
+    const { results } = await routerClient.badges.userList(
+      {
+        badge: badge.id,
+      },
+      { context: { user: defaults.user } },
+    );
 
     expect(results.length).toBe(1);
     expect(results[0].user.id).toBe(publicUser.id);
   });
 
-  test("excludes users with level 0", async ({ fixtures, expect }) => {
+  test("excludes users with level 0", async ({
+    defaults,
+    fixtures,
+    expect,
+  }) => {
     const badge = await fixtures.Badge();
     const user1 = await fixtures.User();
     const user2 = await fixtures.User();
@@ -115,15 +128,22 @@ describe("GET /badges/:badge/users", () => {
       level: 0,
     });
 
-    const { results } = await routerClient.badges.userList({
-      badge: badge.id,
-    });
+    const { results } = await routerClient.badges.userList(
+      {
+        badge: badge.id,
+      },
+      { context: { user: defaults.user } },
+    );
 
     expect(results.length).toBe(1);
     expect(results[0].user.id).toBe(user1.id);
   });
 
-  test("sorts results by xp descending", async ({ fixtures, expect }) => {
+  test("sorts results by xp descending", async ({
+    defaults,
+    fixtures,
+    expect,
+  }) => {
     const badge = await fixtures.Badge();
     const user1 = await fixtures.User();
     const user2 = await fixtures.User();
@@ -140,9 +160,12 @@ describe("GET /badges/:badge/users", () => {
       level: 2,
     });
 
-    const { results } = await routerClient.badges.userList({
-      badge: badge.id,
-    });
+    const { results } = await routerClient.badges.userList(
+      {
+        badge: badge.id,
+      },
+      { context: { user: defaults.user } },
+    );
 
     expect(results.length).toBe(2);
     expect(results[0].user.id).toBe(user2.id);
@@ -150,14 +173,17 @@ describe("GET /badges/:badge/users", () => {
   });
 
   test("throws NOT_FOUND for non-existent badge", async ({
-    fixtures,
+    defaults,
     expect,
   }) => {
     const err = await waitError(
-      routerClient.badges.userList({
-        badge: 9999, // Non-existent badge ID
-      }),
+      routerClient.badges.userList(
+        {
+          badge: 9999, // Non-existent badge ID
+        },
+        { context: { user: defaults.user } },
+      ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Badge not found.]`);
   });
 });

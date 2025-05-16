@@ -8,7 +8,7 @@ describe("GET /flights", () => {
     const data = await routerClient.flights.list({});
 
     expect(data.results).toHaveLength(1);
-    expect(data.results[0].id).toEqual(flight.id);
+    expect(data.results[0].id).toEqual(flight.publicId);
     expect(data.rel.nextCursor).toBeNull();
     expect(data.rel.prevCursor).toBeNull();
   });
@@ -23,7 +23,7 @@ describe("GET /flights", () => {
     const data = await routerClient.flights.list({}, { context: { user } });
 
     expect(data.results).toHaveLength(1);
-    expect(data.results[0].id).toEqual(flight.id);
+    expect(data.results[0].id).toEqual(flight.publicId);
   });
 
   test("returns all flights for mod with none filter", async ({ fixtures }) => {
@@ -38,7 +38,7 @@ describe("GET /flights", () => {
 
     expect(data.results).toHaveLength(2);
     expect(data.results.map((f) => f.id).sort()).toEqual(
-      [publicFlight.id, privateFlight.id].sort(),
+      [publicFlight.publicId, privateFlight.publicId].sort(),
     );
   });
 
@@ -55,6 +55,6 @@ describe("GET /flights", () => {
     const data = await routerClient.flights.list({ query: "Test" });
 
     expect(data.results).toHaveLength(1);
-    expect(data.results[0].id).toEqual(flight1.id);
+    expect(data.results[0].id).toEqual(flight1.publicId);
   });
 });

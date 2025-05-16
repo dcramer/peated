@@ -33,5 +33,5 @@ export const BottlePriceChangeSchema = z.object({
   price: z.number(),
   previousPrice: z.number(),
   currency: CurrencyEnum,
-  bottle: BottleSchema,
+  bottle: BottleSchema.nullable(),
 });

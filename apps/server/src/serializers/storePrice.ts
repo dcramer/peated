@@ -101,11 +101,11 @@ export const StorePriceWithSiteSerializer = serializer({
 
 export type BottlePriceChange = {
   // bottle ID
-  id: number;
-  price: number;
-  previousPrice: number;
+  id: string | number;
+  price: string | number;
+  previousPrice: string | number;
   currency: Currency;
-  bottleId: number;
+  bottleId: string | number;
 };
 
 export const BottlePriceChangeSerializer = serializer({
@@ -114,7 +114,7 @@ export const BottlePriceChangeSerializer = serializer({
       where: (bottles, { inArray }) =>
         inArray(
           bottles.id,
-          itemList.map((b) => b.id),
+          itemList.map((b) => Number(b.id)),
         ),
     });
     const bottlesById = Object.fromEntries(
@@ -126,9 +126,9 @@ export const BottlePriceChangeSerializer = serializer({
     return Object.fromEntries(
       itemList.map((item) => {
         return [
-          item.id,
+          Number(item.id),
           {
-            bottle: bottlesById[item.id],
+            bottle: bottlesById[Number(item.id)],
           },
         ];
       }),
@@ -141,11 +141,11 @@ export const BottlePriceChangeSerializer = serializer({
     currentUser?: User,
   ): z.infer<typeof BottlePriceChangeSchema> => {
     return {
-      id: item.id,
-      price: item.price,
+      id: Number(item.id),
+      price: Number(item.price),
       currency: item.currency,
-      previousPrice: item.previousPrice,
-      bottle: attrs.bottle,
+      previousPrice: Number(item.previousPrice),
+      bottle: attrs.bottle ?? null,
     };
   },
 });

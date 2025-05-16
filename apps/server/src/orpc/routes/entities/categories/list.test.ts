@@ -8,14 +8,17 @@ describe("GET /entities/:entity/categories", () => {
 
     // Create bottles with different categories
     await fixtures.Bottle({
+      name: "Bourbon 1",
       brandId: entity.id,
       category: "bourbon",
     });
     await fixtures.Bottle({
+      name: "Bourbon 2",
       brandId: entity.id,
       category: "bourbon",
     });
     await fixtures.Bottle({
+      name: "Single Malt 1",
       brandId: entity.id,
       category: "single_malt",
     });

@@ -1,3 +1,4 @@
+import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
@@ -66,10 +67,11 @@ describe("GET /bottles/:bottle/similar", () => {
   });
 
   test("throws error for non-existent bottle", async () => {
-    await expect(
+    const err = await waitError(
       routerClient.bottles.similar({
         bottle: 999999,
       }),
-    ).rejects.toThrow("Bottle not found.");
+    );
+    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 });
