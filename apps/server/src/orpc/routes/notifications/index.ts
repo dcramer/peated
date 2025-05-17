@@ -1,11 +1,12 @@
+import { base } from "../..";
 import count from "./count";
 import delete_ from "./delete";
 import list from "./list";
 import update from "./update";
 
-export default {
+export default base.tag("notifications").router({
   count,
   delete: delete_,
   list,
   update,
-};
+});

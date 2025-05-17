@@ -1,16 +1,13 @@
 "use client";
 
-import { isTRPCClientError } from "@peated/server/trpc/client";
-
+import { isDefinedError } from "@orpc/client";
 import {
   ApiError,
   ApiUnauthorized,
   ApiUnavailable,
 } from "@peated/server/lib/apiClient";
-import { type AppRouter } from "@peated/server/trpc/router";
 import Button from "@peated/web/components/button";
 import config from "@peated/web/config";
-import { type TRPCClientError } from "@trpc/client";
 import { type ComponentProps, type ReactNode } from "react";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 
@@ -41,7 +38,7 @@ export default function ErrorPage({
 }: {
   title?: ReactNode | string;
   subtitle?: ReactNode | string;
-  error?: Error | ApiError | TRPCClientError<AppRouter>;
+  error?: Error | ApiError | unknown;
   onTryAgain?: () => void;
 }) {
   const isOnline = useOnlineStatus();
@@ -61,24 +58,21 @@ export default function ErrorPage({
         "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
     } else if (
       (error instanceof ApiError && error.statusCode === 404) ||
-      (isTRPCClientError(error) && error.data?.httpStatus === 404) ||
+      (isDefinedError(error) && error.data?.statusCode === 404) ||
       error.message === "NOT_FOUND"
     ) {
       title = title ?? "Not Found";
       subtitle = subtitle ?? "We couldn't find the page you were looking for.";
     } else if (
       (error instanceof ApiError && error.statusCode === 401) ||
-      (isTRPCClientError(error) && error.data?.httpStatus === 401) ||
+      (isDefinedError(error) && error.data?.httpStatus === 401) ||
       error.message === "UNAUTHORIZED"
     ) {
       title = title ?? "Identify Yourself";
       subtitle =
         subtitle ??
         "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
-    } else if (
-      isTRPCClientError(error) &&
-      error.message === "Failed to fetch"
-    ) {
+    } else if (isDefinedError(error) && error.message === "Failed to fetch") {
       title = (title ?? isOnline) ? "Server Unreachable" : "Connection Offline";
       subtitle =
         (subtitle ?? isOnline)

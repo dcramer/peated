@@ -16,14 +16,12 @@ import friends from "./friends";
 import misc from "./misc";
 import notifications from "./notifications";
 import prices from "./prices";
-import regions from "./regions";
 import reviews from "./reviews";
 import root from "./root";
 import search from "./search";
 import stats from "./stats";
 import tags from "./tags";
 import tastings from "./tastings";
-import toasts from "./toasts";
 import users from "./users";
 import version from "./version";
 
@@ -46,14 +44,12 @@ export interface Router {
   misc: typeof misc;
   notifications: typeof notifications;
   prices: typeof prices;
-  regions: typeof regions;
   reviews: typeof reviews;
   root: typeof root;
   search: typeof search;
   stats: typeof stats;
   tags: typeof tags;
   tastings: typeof tastings;
-  toasts: typeof toasts;
   users: typeof users;
   version: typeof version;
 }
@@ -77,14 +73,12 @@ export default {
   misc,
   notifications,
   prices,
-  regions,
   reviews,
   root,
   search,
   stats,
   tags,
   tastings,
-  toasts,
   users,
   version,
 };

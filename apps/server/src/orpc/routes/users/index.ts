@@ -1,3 +1,4 @@
+import { base } from "../..";
 import avatarUpdate from "./avatar-update";
 import badgeList from "./badge-list";
 import details from "./details";
@@ -7,7 +8,7 @@ import regionList from "./region-list";
 import tagList from "./tag-list";
 import update from "./update";
 
-export default {
+export default base.tag("users").router({
   details,
   list,
   update,
@@ -16,4 +17,4 @@ export default {
   flavorList,
   regionList,
   tagList,
-};
+});

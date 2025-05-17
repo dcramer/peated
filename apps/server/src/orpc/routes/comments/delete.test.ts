@@ -5,9 +5,11 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /comments/:id", () => {
+describe("DELETE /tastings/:tasting/comments/:id", () => {
   test("requires authentication", async () => {
-    const err = await waitError(() => routerClient.comments.delete(1));
+    const err = await waitError(() =>
+      routerClient.comments.delete({ id: 1, tasting: 1 }),
+    );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
@@ -17,7 +19,7 @@ describe("DELETE /comments/:id", () => {
     });
 
     await routerClient.comments.delete(
-      { id: comment.id },
+      { id: comment.id, tasting: comment.tastingId },
       {
         context: { user: defaults.user },
       },
@@ -37,9 +39,12 @@ describe("DELETE /comments/:id", () => {
     });
 
     const err = await waitError(() =>
-      routerClient.comments.delete(comment.id, {
-        context: { user: defaults.user },
-      }),
+      routerClient.comments.delete(
+        { id: comment.id },
+        {
+          context: { user: defaults.user },
+        },
+      ),
     );
     expect(err).toMatchInlineSnapshot(
       `[Error: Cannot delete another user's comment.]`,

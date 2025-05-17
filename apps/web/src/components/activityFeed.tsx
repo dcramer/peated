@@ -1,11 +1,13 @@
 "use client";
 
+import type { Outputs } from "@peated/server/orpc/router";
 import Glyph from "@peated/web/assets/glyph.svg";
 import Alert from "@peated/web/components/alert";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Spinner from "@peated/web/components/spinner";
 import TastingList from "@peated/web/components/tastingList";
-import { trpc, type RouterOutputs } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
 import { useEventListener } from "usehooks-ts";
 
@@ -13,22 +15,23 @@ export default function ActivityFeed({
   tastingList,
   filter = "global",
 }: {
-  tastingList: RouterOutputs["tastingList"];
+  tastingList: Outputs["tastingList"];
   filter: "global" | "friends" | "local";
 }) {
+  const orpc = useORPC();
   const [
     { pages },
     { error, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage },
-  ] = trpc.tastingList.useSuspenseInfiniteQuery(
-    { filter, limit: 10 },
-    {
-      staleTime: Infinity,
-      initialData: { pages: [tastingList], pageParams: [null] },
-      // initialPageParam: 1,
+  ] = useSuspenseInfiniteQuery({
+    ...orpc.tastings.list.infiniteOptions({
+      input: { filter, limit: 10 },
       getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,
       getPreviousPageParam: (firstPage) => firstPage.rel?.prevCursor,
-    },
-  );
+    }),
+    staleTime: Infinity,
+    initialData: { pages: [tastingList], pageParams: [null] },
+    // initialPageParam: 1,
+  });
 
   const onScroll = () => {
     if (!hasNextPage) return;

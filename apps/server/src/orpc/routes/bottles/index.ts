@@ -1,3 +1,4 @@
+import { base } from "../..";
 import aliases from "./aliases";
 import create from "./create";
 import delete_ from "./delete";
@@ -16,7 +17,7 @@ import update from "./update";
 import upsert from "./upsert";
 import validation from "./validation";
 
-export default {
+export default base.tag("bottles").router({
   details,
   list,
   create,
@@ -34,4 +35,4 @@ export default {
   releases,
   series,
   prices,
-};
+});

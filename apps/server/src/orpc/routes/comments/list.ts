@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { comments } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -9,7 +8,16 @@ import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/comments" })
+  .route({
+    method: "GET",
+    path: "/comments",
+  })
+  .route({
+    method: "GET",
+    path: "/tastings/:tasting/comments",
+    tags: ["tastings"],
+  })
+  .route({ method: "GET", path: "/users/:user/comments", tags: ["users"] })
   .input(
     z.object({
       user: z.union([z.literal("me"), z.coerce.number()]).optional(),

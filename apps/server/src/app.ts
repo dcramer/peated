@@ -14,7 +14,7 @@ import { setTimeout } from "node:timers/promises";
 import { format } from "path";
 import config from "./config";
 import { getUserFromHeader } from "./lib/auth";
-import { router } from "./orpc/router";
+import router from "./orpc/router";
 
 const openapiHandler = new OpenAPIHandler(router, {
   plugins: [new ZodSmartCoercionPlugin()],

@@ -411,7 +411,7 @@ importers:
         version: 6.0.3
       vite-tsconfig-paths:
         specifier: 'catalog:'
-        version: 5.0.1(typescript@5.5.4)(vite@4.5.9(@types/node@22.13.1)(lightningcss@1.22.0)(terser@5.38.2))
+        version: 5.0.1(typescript@5.5.4)(vite@5.4.14(@types/node@22.13.1)(lightningcss@1.22.0)(terser@5.38.2))
       vitest:
         specifier: 'catalog:'
         version: 3.0.6(@types/node@22.13.1)(jsdom@25.0.1)(lightningcss@1.22.0)(terser@5.38.2)
@@ -430,6 +430,15 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.6.0
         version: 3.6.0(react-hook-form@7.52.0(react@18.3.1))
+      '@orpc/client':
+        specifier: ^1.2.0
+        version: 1.2.0
+      '@orpc/react-query':
+        specifier: ^1.2.0
+        version: 1.2.0(@orpc/client@1.2.0)(@tanstack/react-query@5.71.0(react@18.3.1))(react@18.3.1)
+      '@orpc/server':
+        specifier: ^1.2.0
+        version: 1.2.0
       '@peated/design':
         specifier: workspace:*
         version: link:../../packages/design
@@ -2712,6 +2721,13 @@ packages:
 
   '@orpc/openapi@1.2.0':
     resolution: {integrity: sha512-yZ5RWyBSltHuSrh17wdjA69OcbQwjeBrKecTRe1ORJmaIMHFSW/aDij/nBYzWHspJPcD911j3vsD6CjVvz8k9Q==}
+
+  '@orpc/react-query@1.2.0':
+    resolution: {integrity: sha512-GudwI8kHpjL5lgZ41epzmTD3HBWVuRve3upltZU2eAx9GKHLN61WKIGNC6yaIpBY7WN8hRaFh4SoDzOo8Yvssw==}
+    peerDependencies:
+      '@orpc/client': 1.2.0
+      '@tanstack/react-query': '>=5.55.0'
+      react: '>=18.3.0'
 
   '@orpc/server@1.2.0':
     resolution: {integrity: sha512-EQARc4PEcS3ndkL+Es87M1BZru5x7q49q7Ivcd6tWFpA9Hn6n08WgiJDqDRDMoEeEJlzG5AzI+eXxvF1hR9Cdg==}
@@ -11984,6 +12000,13 @@ snapshots:
       - crossws
       - ws
 
+  '@orpc/react-query@1.2.0(@orpc/client@1.2.0)(@tanstack/react-query@5.71.0(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@orpc/client': 1.2.0
+      '@orpc/shared': 1.2.0
+      '@tanstack/react-query': 5.71.0(react@18.3.1)
+      react: 18.3.1
+
   '@orpc/server@1.2.0':
     dependencies:
       '@orpc/client': 1.2.0
@@ -19622,13 +19645,13 @@ snapshots:
     transitivePeerDependencies:
       - rollup
 
-  vite-tsconfig-paths@5.0.1(typescript@5.5.4)(vite@4.5.9(@types/node@22.13.1)(lightningcss@1.22.0)(terser@5.38.2)):
+  vite-tsconfig-paths@5.0.1(typescript@5.5.4)(vite@5.4.14(@types/node@22.13.1)(lightningcss@1.22.0)(terser@5.38.2)):
     dependencies:
       debug: 4.4.0
       globrex: 0.1.2
       tsconfck: 3.1.5(typescript@5.5.4)
     optionalDependencies:
-      vite: 4.5.9(@types/node@22.13.1)(lightningcss@1.22.0)(terser@5.38.2)
+      vite: 5.4.14(@types/node@22.13.1)(lightningcss@1.22.0)(terser@5.38.2)
     transitivePeerDependencies:
       - supports-color
       - typescript

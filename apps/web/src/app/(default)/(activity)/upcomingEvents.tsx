@@ -2,7 +2,8 @@
 
 import DateRange from "@peated/web/components/dateRange";
 import Link from "@peated/web/components/link";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export function UpcomingEventsSkeleton() {
   const Row = () => (
@@ -29,11 +30,12 @@ export function UpcomingEventsSkeleton() {
 }
 
 export default function UpcomingEvents() {
-  const [eventList] = trpc.eventList.useSuspenseQuery({
-    sort: "date",
-    onlyUpcoming: true,
-    limit: 3,
-  });
+  const orpc = useORPC();
+  const { data: eventList } = useSuspenseQuery(
+    orpc.events.list.queryOptions({
+      input: { limit: 3, onlyUpcoming: true, sort: "date" },
+    }),
+  );
 
   return eventList.results.length ? (
     <table className="mb-8 min-w-full">

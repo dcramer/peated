@@ -1,3 +1,4 @@
+import { base } from "../..";
 import aliases from "./aliases";
 import categories from "./categories";
 import create from "./create";
@@ -7,7 +8,7 @@ import list from "./list";
 import merge from "./merge";
 import update from "./update";
 
-export default {
+export default base.tag("entities").router({
   details,
   list,
   create,
@@ -16,4 +17,4 @@ export default {
   merge,
   aliases,
   categories,
-};
+});

@@ -8,7 +8,9 @@ import BottleLink from "@peated/web/components/bottleLink";
 import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
 import classNames from "@peated/web/lib/classNames";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import { trpc } from "@peated/web/lib/trpc/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 function PriceDelta({
   price,
@@ -35,9 +37,10 @@ export function PriceChangesSkeleton() {
 }
 
 export default function PriceChanges() {
-  const [data] = trpc.priceChangeList.useSuspenseQuery({
-    limit: 25,
-  });
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.prices.changeList.queryOptions({ input: { limit: 25 } }),
+  );
 
   return (
     <div className="mb-8">
@@ -51,6 +54,7 @@ export default function PriceChanges() {
           <tbody>
             {data.results.map((price) => {
               const { bottle } = price;
+              if (!bottle) return null;
               return (
                 <tr key={price.id} className="border-b border-slate-800">
                   <td className="max-w-0 py-2 pl-4 pr-3 text-sm sm:pl-3">

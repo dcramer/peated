@@ -9,8 +9,23 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/comments/:id" })
-  .input(z.object({ id: z.coerce.number() }))
+  .route({
+    method: "DELETE",
+    path: "/tastings/:tasting/comments/:id",
+    tags: ["tastings"],
+  })
+  .route({
+    method: "DELETE",
+    path: "/users/:user/comments/:id",
+    tags: ["users"],
+  })
+  .input(
+    z.object({
+      id: z.coerce.number(),
+      user: z.coerce.number().optional(),
+      tasting: z.coerce.number().optional(),
+    }),
+  )
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const [comment] = await db

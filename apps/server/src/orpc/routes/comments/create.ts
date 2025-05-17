@@ -19,7 +19,11 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/comments" })
+  .route({
+    method: "POST",
+    path: "/tastings/:tasting/comments",
+    tags: ["tastings"],
+  })
   .input(
     CommentInputSchema.extend({
       tasting: z.coerce.number(),
@@ -28,7 +32,7 @@ export default procedure
   .output(CommentSchema)
   .handler(async function ({ input, context, errors }) {
     const tasting = await db.query.tastings.findFirst({
-      where: (tastings, { eq }) => eq(tastings.id, input.tasting),
+      where: (tastings, { eq }) => eq(tastings.id, Number(input.tasting)),
       with: {
         createdBy: true,
         bottle: true,

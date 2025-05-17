@@ -8,7 +8,7 @@ import { describe, expect, test } from "vitest";
 describe("POST /tastings/:id/toast", () => {
   test("requires auth", async () => {
     const err = await waitError(() =>
-      routerClient.toasts.create({
+      routerClient.tastings.toasts.create({
         id: 1,
       }),
     );
@@ -21,7 +21,7 @@ describe("POST /tastings/:id/toast", () => {
     });
 
     const err = await waitError(() =>
-      routerClient.toasts.create(
+      routerClient.tastings.toasts.create(
         {
           id: tasting.id,
         },
@@ -36,7 +36,7 @@ describe("POST /tastings/:id/toast", () => {
   test("new toast", async ({ defaults, fixtures }) => {
     const tasting = await fixtures.Tasting();
 
-    await routerClient.toasts.create(
+    await routerClient.tastings.toasts.create(
       {
         id: tasting.id,
       },
@@ -65,7 +65,7 @@ describe("POST /tastings/:id/toast", () => {
       createdById: defaults.user.id,
     });
 
-    await routerClient.toasts.create(
+    await routerClient.tastings.toasts.create(
       {
         id: tasting.id,
       },

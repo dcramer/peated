@@ -5,10 +5,10 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("POST /comments", () => {
+describe("POST /tastings/:tasting/comments", () => {
   test("requires auth", async () => {
     const err = await waitError(() =>
-      routerClient.comments.create({
+      routerClient.tastings.comments.create({
         tasting: 1,
         comment: "Hello world!",
         createdAt: new Date().toISOString(),
