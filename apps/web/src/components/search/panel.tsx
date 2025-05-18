@@ -1,6 +1,7 @@
 "use client";
 
 import useAuth from "@peated/web/hooks/useAuth";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -40,7 +41,8 @@ export default function SearchPanel({
   const [state, setState] = useState<"loading" | "ready">("loading");
   const [results, setResults] = useState<Result[]>([]);
 
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
+
   const isUserQuery = query.indexOf("@") !== -1 && user;
 
   const unsafe_onQuery = useCallback(async (query: string) => {
@@ -54,7 +56,7 @@ export default function SearchPanel({
       include.push("users");
     if (!directToTasting) include.push("entities");
 
-    const { results } = await trpcUtils.search.fetch({
+    const { results } = await orpc.search.call({
       query,
       limit: maxResults,
       include,
