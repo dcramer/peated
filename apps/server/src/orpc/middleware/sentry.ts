@@ -8,14 +8,15 @@ import type { Context } from "../context";
  */
 export const sentryCapture = os
   .$context<Context>()
-  .middleware(({ context, next }) => {
-    return Sentry.withScope((scope) => {
+  .middleware(async ({ context, next }) => {
+    return await Sentry.withScope(async (scope) => {
       try {
-        return next({
+        return await next({
           context,
         });
       } catch (error) {
         Sentry.captureException(error);
+        console.error(error);
 
         // Re-throw the error so it can be handled by the error handler
         throw error;

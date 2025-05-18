@@ -18,12 +18,6 @@ export function getLink({
         "user-agent": userAgent,
       };
     },
-    url: () => {
-      if (typeof window === "undefined") {
-        throw new Error("RPCLink is not allowed on the server side.");
-      }
-
-      return `${apiServer}/rpc`;
-    },
+    url: `${apiServer}/rpc`,
   });
 }
