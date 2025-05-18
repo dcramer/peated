@@ -1,8 +1,7 @@
-import { base } from "../..";
+import { base } from "@peated/server/orpc";
 import categories from "./categories";
 import details from "./details";
 import list from "./list";
-import regions from "./regions";
 import update from "./update";
 
 export default base.tag("countries").router({
@@ -10,5 +9,4 @@ export default base.tag("countries").router({
   list,
   categories,
   update,
-  regions,
 });

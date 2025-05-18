@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -8,30 +7,25 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/tastings/:id/image" })
-  .input(
-    z.object({
-      tasting: z.coerce.number(),
-    }),
-  )
-  .output(
-    z.object({
-      imageUrl: z.null(),
-    }),
-  )
+  .route({ method: "DELETE", path: "/tastings/:tasting/image" })
+  .input(z.object({ tasting: z.coerce.number() }))
+  .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
-    const [tasting] = await db
+    const { tasting: tastingId } = input;
+
+    const [targetTasting] = await db
       .select()
       .from(tastings)
-      .where(eq(tastings.id, input.tasting))
+      .where(eq(tastings.id, tastingId))
       .limit(1);
-    if (!tasting) {
+
+    if (!targetTasting) {
       throw errors.NOT_FOUND({
         message: "Tasting not found.",
       });
     }
 
-    if (tasting.createdById !== context.user.id && !context.user.admin) {
+    if (targetTasting.createdById !== context.user.id && !context.user.admin) {
       throw errors.FORBIDDEN({
         message: "Cannot delete another user's tasting image.",
       });
@@ -43,9 +37,7 @@ export default procedure
       .set({
         imageUrl: null,
       })
-      .where(eq(tastings.id, tasting.id));
+      .where(eq(tastings.id, targetTasting.id));
 
-    return {
-      imageUrl: null,
-    };
+    return {};
   });

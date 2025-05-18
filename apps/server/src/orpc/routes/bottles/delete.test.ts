@@ -5,13 +5,13 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /bottles/:id", () => {
+describe("DELETE /bottles/:bottle", () => {
   test("deletes bottle", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle();
 
     const data = await routerClient.bottles.delete(
-      { id: bottle.id },
+      { bottle: bottle.id },
       {
         context: { user },
       },
@@ -25,17 +25,12 @@ describe("DELETE /bottles/:id", () => {
     expect(newBottle).toBeUndefined();
   });
 
-  test("cannot delete without admin", async ({ fixtures }) => {
-    const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({ createdById: user.id });
+  test("requires admin", async ({ fixtures }) => {
+    const user = await fixtures.User();
+    const bottle = await fixtures.Bottle();
 
-    const err = await waitError(() =>
-      routerClient.bottles.delete(
-        { id: bottle.id },
-        {
-          context: { user },
-        },
-      ),
+    const err = await waitError(
+      routerClient.bottles.delete({ bottle: bottle.id }, { context: { user } }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

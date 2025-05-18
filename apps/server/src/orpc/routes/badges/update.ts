@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { badges } from "@peated/server/db/schema";
 import { checkBadgeConfig } from "@peated/server/lib/badges";
@@ -14,15 +13,18 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "PATCH", path: "/badges/:id" })
+  .route({ method: "PATCH", path: "/badges/:badge" })
   .input(
     BadgeInputSchema.partial().extend({
-      id: z.number(),
+      badge: z.coerce.number(),
     }),
   )
   .output(BadgeSchema)
-  .handler(async function ({ input: { id, ...input }, context, errors }) {
-    const [badge] = await db.select().from(badges).where(eq(badges.id, id));
+  .handler(async function ({ input, context, errors }) {
+    const [badge] = await db
+      .select()
+      .from(badges)
+      .where(eq(badges.id, input.badge));
     if (!badge) {
       throw errors.NOT_FOUND({
         message: "Badge not found.",

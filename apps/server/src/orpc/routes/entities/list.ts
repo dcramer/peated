@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { ENTITY_TYPE_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {

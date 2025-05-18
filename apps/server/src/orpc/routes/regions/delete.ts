@@ -7,13 +7,13 @@ import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z.object({
-  country: z.union([z.string(), z.number()]),
-  slug: z.string(),
+  country: z.coerce.string(),
+  region: z.coerce.string(),
 });
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "DELETE", path: "/regions" })
+  .route({ method: "DELETE", path: "/countries/:country/regions/:region" })
   .input(InputSchema)
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
@@ -40,7 +40,7 @@ export default procedure
       .where(
         and(
           eq(regions.countryId, countryId),
-          eq(sql`LOWER(${regions.slug})`, input.slug.toLowerCase()),
+          eq(sql`LOWER(${regions.slug})`, input.region.toLowerCase()),
         ),
       );
 
@@ -52,12 +52,7 @@ export default procedure
 
     await db
       .delete(regions)
-      .where(
-        and(
-          eq(regions.countryId, countryId),
-          eq(sql`LOWER(${regions.slug})`, region.slug.toLowerCase()),
-        ),
-      );
+      .where(and(eq(regions.countryId, countryId), eq(regions.id, region.id)));
 
     return {};
   });

@@ -5,17 +5,22 @@ import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /friends/:id", () => {
+describe("DELETE /friends/:friend", () => {
   test("requires authentication", async () => {
-    const err = await waitError(() => routerClient.friends.delete(1));
+    const err = await waitError(() =>
+      routerClient.friends.delete({ friend: 1 }),
+    );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("cannot unfriend self", async ({ defaults }) => {
     const err = await waitError(() =>
-      routerClient.friends.delete(defaults.user.id, {
-        context: { user: defaults.user },
-      }),
+      routerClient.friends.delete(
+        { friend: defaults.user.id },
+        {
+          context: { user: defaults.user },
+        },
+      ),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot unfriend yourself.]`);
   });
@@ -23,9 +28,12 @@ describe("DELETE /friends/:id", () => {
   test("can unfriend new link", async ({ defaults, fixtures }) => {
     const otherUser = await fixtures.User();
 
-    const data = await routerClient.friends.delete(otherUser.id, {
-      context: { user: defaults.user },
-    });
+    const data = await routerClient.friends.delete(
+      { friend: otherUser.id },
+      {
+        context: { user: defaults.user },
+      },
+    );
     expect(data.status).toBe("none");
 
     const [follow] = await db
@@ -48,9 +56,12 @@ describe("DELETE /friends/:id", () => {
       toUserId: otherUser.id,
     });
 
-    const data = await routerClient.friends.delete(otherUser.id, {
-      context: { user: defaults.user },
-    });
+    const data = await routerClient.friends.delete(
+      { friend: otherUser.id },
+      {
+        context: { user: defaults.user },
+      },
+    );
     expect(data.status).toBe("none");
 
     const [follow] = await db

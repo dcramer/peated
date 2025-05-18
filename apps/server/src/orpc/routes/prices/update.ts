@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -10,17 +9,17 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z.object({
-  priceId: z.coerce.number(),
+  price: z.coerce.number(),
   hidden: z.boolean().optional(),
 });
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/prices/:priceId" })
+  .route({ method: "PATCH", path: "/prices/:price" })
   .input(InputSchema)
   .output(StorePriceSchema)
   .handler(async function ({ input, context, errors }) {
-    const { priceId, ...data } = input;
+    const { price: priceId, ...data } = input;
 
     const [price] = await db
       .select()

@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -14,18 +13,20 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "PATCH", path: "/notifications/:id" })
+  .route({ method: "PATCH", path: "/notifications/:notification" })
   .input(
     NotificationInputSchema.partial().extend({
-      id: z.coerce.number(),
+      notification: z.coerce.number(),
     }),
   )
   .output(NotificationSchema)
   .handler(async function ({ input, context, errors }) {
+    const { notification: notificationId, read } = input;
+
     const [notification] = await db
       .select()
       .from(notifications)
-      .where(eq(notifications.id, input.id));
+      .where(eq(notifications.id, notificationId));
 
     if (!notification) {
       throw errors.NOT_FOUND({
@@ -40,8 +41,8 @@ export default procedure
     }
 
     const data: { [name: string]: any } = {};
-    if (input.read !== undefined) {
-      data.read = input.read;
+    if (read !== undefined) {
+      data.read = read;
     }
 
     const [newNotification] = await db

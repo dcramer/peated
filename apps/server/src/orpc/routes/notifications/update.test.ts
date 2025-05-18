@@ -5,11 +5,11 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("PUT /notifications/:id", () => {
+describe("PUT /notifications/:notification", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
       routerClient.notifications.update({
-        id: 1,
+        notification: 1,
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -29,7 +29,7 @@ describe("PUT /notifications/:id", () => {
 
     const data = await routerClient.notifications.update(
       {
-        id: notification.id,
+        notification: notification.id,
         read: true,
       },
       { context: { user: defaults.user } },
@@ -59,7 +59,7 @@ describe("PUT /notifications/:id", () => {
     const err = await waitError(() =>
       routerClient.notifications.update(
         {
-          id: notification.id,
+          notification: notification.id,
           read: true,
         },
         { context: { user: defaults.user } },

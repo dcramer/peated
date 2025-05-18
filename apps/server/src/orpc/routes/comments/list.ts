@@ -12,12 +12,12 @@ export default procedure
     method: "GET",
     path: "/comments",
   })
-  .route({
-    method: "GET",
-    path: "/tastings/:tasting/comments",
-    tags: ["tastings"],
-  })
-  .route({ method: "GET", path: "/users/:user/comments", tags: ["users"] })
+  // .route({
+  //   method: "GET",
+  //   path: "/tastings/:tasting/comments",
+  //   tags: ["tastings"],
+  // })
+  // .route({ method: "GET", path: "/users/:user/comments", tags: ["users"] })
   .input(
     z.object({
       user: z.union([z.literal("me"), z.coerce.number()]).optional(),

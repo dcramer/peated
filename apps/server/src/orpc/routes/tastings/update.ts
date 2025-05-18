@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Tasting } from "@peated/server/db/schema";
 import {
@@ -19,7 +18,7 @@ import { z } from "zod";
 
 const InputSchema = TastingInputSchema.partial()
   .extend({
-    tasting: z.number(),
+    tasting: z.coerce.number(),
   })
   .omit({ bottle: true, flight: true });
 

@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { events } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -6,7 +5,6 @@ import { requireAdmin } from "@peated/server/orpc/middleware";
 import { EventInputSchema, EventSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EventSerializer } from "@peated/server/serializers/event";
-import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)

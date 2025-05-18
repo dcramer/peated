@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { NewFlight } from "@peated/server/db/schema";
 import { flightBottles, flights } from "@peated/server/db/schema";

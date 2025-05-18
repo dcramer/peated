@@ -1,7 +1,7 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
-describe("GET /regions", () => {
+describe("GET /countries/:country/regions", () => {
   test("lists regions for a country by id", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region1 = await fixtures.Region({
@@ -14,7 +14,7 @@ describe("GET /regions", () => {
     });
 
     const { results, rel } = await routerClient.regions.list({
-      country: country.id,
+      country: country.slug,
     });
 
     expect(results.length).toBe(2);
@@ -45,7 +45,7 @@ describe("GET /regions", () => {
     await fixtures.Region({ countryId: country.id, name: "Beta Region" });
 
     const { results } = await routerClient.regions.list({
-      country: country.id,
+      country: country.slug,
       query: "Alpha",
     });
 
@@ -65,7 +65,7 @@ describe("GET /regions", () => {
     });
 
     const { results } = await routerClient.regions.list({
-      country: country.id,
+      country: country.slug,
       sort: "name",
     });
 
@@ -86,7 +86,7 @@ describe("GET /regions", () => {
     });
 
     const { results } = await routerClient.regions.list({
-      country: country.id,
+      country: country.slug,
       sort: "-name",
     });
 
@@ -104,7 +104,7 @@ describe("GET /regions", () => {
     );
 
     const { results, rel } = await routerClient.regions.list({
-      country: country.id,
+      country: country.slug,
       limit: 2,
       cursor: 1,
     });
@@ -125,7 +125,7 @@ describe("GET /regions", () => {
     await fixtures.Region({ countryId: country.id, totalBottles: 0 });
 
     const { results } = await routerClient.regions.list({
-      country: country.id,
+      country: country.slug,
       hasBottles: true,
     });
 

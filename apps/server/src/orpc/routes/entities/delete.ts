@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   changes,
@@ -13,14 +12,14 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "DELETE", path: "/entities/:id" })
-  .input(z.coerce.number())
+  .route({ method: "DELETE", path: "/entities/:entity" })
+  .input(z.object({ entity: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const [entity] = await db
       .select()
       .from(entities)
-      .where(eq(entities.id, input))
+      .where(eq(entities.id, input.entity))
       .limit(1);
     if (!entity) {
       throw errors.NOT_FOUND({

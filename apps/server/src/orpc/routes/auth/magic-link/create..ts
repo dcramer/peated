@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { sendMagicLinkEmail } from "@peated/server/lib/email";
@@ -7,7 +6,7 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "POST", path: "/auth/magic-link/send" })
+  .route({ method: "POST", path: "/auth/magic-link" })
   .input(
     z.object({
       email: z.string().email(),

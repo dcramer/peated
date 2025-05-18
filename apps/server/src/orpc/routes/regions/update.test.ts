@@ -4,13 +4,13 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
-describe("PATCH /regions/:country/:slug", () => {
+describe("PATCH /countries/:country/regions/:region", () => {
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.regions.update(
         {
           country: "test-country",
-          slug: "test-region",
+          region: "test-region",
         },
         { context: { user: null } },
       ),
@@ -24,7 +24,7 @@ describe("PATCH /regions/:country/:slug", () => {
       routerClient.regions.update(
         {
           country: "test-country",
-          slug: "test-region",
+          region: "test-region",
         },
         { context: { user } },
       ),
@@ -39,8 +39,8 @@ describe("PATCH /regions/:country/:slug", () => {
 
     const updatedRegion = await routerClient.regions.update(
       {
-        country: country.id,
-        slug: region.slug,
+        country: country.slug,
+        region: region.slug,
         description: "New description",
       },
       { context: { user: modUser } },
@@ -65,7 +65,7 @@ describe("PATCH /regions/:country/:slug", () => {
     const updatedRegion = await routerClient.regions.update(
       {
         country: country.slug,
-        slug: region.slug,
+        region: region.slug,
         description: "New description",
       },
       { context: { user: modUser } },
@@ -84,8 +84,8 @@ describe("PATCH /regions/:country/:slug", () => {
 
     const result = await routerClient.regions.update(
       {
-        country: country.id,
-        slug: region.slug,
+        country: country.slug,
+        region: region.slug,
       },
       { context: { user: modUser } },
     );
@@ -107,7 +107,7 @@ describe("PATCH /regions/:country/:slug", () => {
       routerClient.regions.update(
         {
           country: "nonexistent-country",
-          slug: "some-region",
+          region: "some-region",
         },
         { context: { user: modUser } },
       ),
@@ -122,8 +122,8 @@ describe("PATCH /regions/:country/:slug", () => {
     const err = await waitError(
       routerClient.regions.update(
         {
-          country: country.id,
-          slug: "nonexistent-region",
+          country: country.slug,
+          region: "nonexistent-region",
         },
         { context: { user: modUser } },
       ),

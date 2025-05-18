@@ -5,14 +5,14 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("PATCH /prices/:priceId", () => {
+describe("PATCH /prices/:price", () => {
   test("requires mod role", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: false });
     const price = await fixtures.StorePrice();
 
     const err = await waitError(
       routerClient.prices.update(
-        { priceId: price.id, hidden: true },
+        { price: price.id, hidden: true },
         { context: { user } },
       ),
     );
@@ -24,7 +24,7 @@ describe("PATCH /prices/:priceId", () => {
     const price = await fixtures.StorePrice({ hidden: false });
 
     const newPriceData = await routerClient.prices.update(
-      { priceId: price.id, hidden: true },
+      { price: price.id, hidden: true },
       { context: { user } },
     );
 
@@ -40,7 +40,7 @@ describe("PATCH /prices/:priceId", () => {
 
     const err = await waitError(
       routerClient.prices.update(
-        { priceId: 999999, hidden: true },
+        { price: 999999, hidden: true },
         { context: { user } },
       ),
     );
@@ -55,7 +55,7 @@ describe("PATCH /prices/:priceId", () => {
     });
 
     const newPriceData = await routerClient.prices.update(
-      { priceId: price.id }, // no actual update data
+      { price: price.id }, // no actual update data
       { context: { user } },
     );
 

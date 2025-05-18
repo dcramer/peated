@@ -5,11 +5,11 @@ import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("PUT /friends/:id", () => {
+describe("PUT /friends/:friend", () => {
   test("requires authentication", async ({ defaults }) => {
     const err = await waitError(() =>
       routerClient.friends.create({
-        id: defaults.user.id,
+        friend: defaults.user.id,
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -19,7 +19,7 @@ describe("PUT /friends/:id", () => {
     const err = await waitError(() =>
       routerClient.friends.create(
         {
-          id: defaults.user.id,
+          friend: defaults.user.id,
         },
         { context: { user: defaults.user } },
       ),
@@ -32,7 +32,7 @@ describe("PUT /friends/:id", () => {
 
     const data = await routerClient.friends.create(
       {
-        id: otherUser.id,
+        friend: otherUser.id,
       },
       { context: { user: defaults.user } },
     );
@@ -77,7 +77,7 @@ describe("PUT /friends/:id", () => {
 
     const data = await routerClient.friends.create(
       {
-        id: otherUser.id,
+        friend: otherUser.id,
       },
       { context: { user: defaults.user } },
     );
@@ -107,7 +107,7 @@ describe("PUT /friends/:id", () => {
 
     const data = await routerClient.friends.create(
       {
-        id: otherUser.id,
+        friend: otherUser.id,
       },
       { context: { user: defaults.user } },
     );

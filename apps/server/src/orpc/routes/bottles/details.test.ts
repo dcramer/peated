@@ -3,17 +3,18 @@ import { bottleTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
-describe("GET /bottles/:id", () => {
-  test("gets bottle", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({ name: "Delicious Wood" });
-    await fixtures.Bottle({ name: "Something Else" });
+describe("GET /bottles/:bottle", () => {
+  test("get bottle by id", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
 
-    const data = await routerClient.bottles.details({ id: bottle1.id });
-    expect(data.id).toEqual(bottle1.id);
+    const data = await routerClient.bottles.details({
+      bottle: bottle.id,
+    });
+    expect(data.id).toEqual(bottle.id);
   });
 
   test("errors on invalid bottle", async () => {
-    const err = await waitError(routerClient.bottles.details({ id: 1 }));
+    const err = await waitError(routerClient.bottles.details({ bottle: 1 }));
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
@@ -25,7 +26,7 @@ describe("GET /bottles/:id", () => {
     });
     await fixtures.Bottle({ name: "Something Else" });
 
-    const data = await routerClient.bottles.details({ id: 999 });
+    const data = await routerClient.bottles.details({ bottle: 999 });
     expect(data.id).toEqual(bottle1.id);
   });
 });

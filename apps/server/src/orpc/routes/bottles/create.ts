@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Bottle, Entity, NewBottle } from "@peated/server/db/schema";
 import {

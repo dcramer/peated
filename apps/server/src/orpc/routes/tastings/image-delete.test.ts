@@ -3,7 +3,7 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /tastings/:id/image", () => {
+describe("DELETE /tastings/:tasting/image", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
       routerClient.tastings.imageDelete({
@@ -43,8 +43,6 @@ describe("DELETE /tastings/:id/image", () => {
       },
       { context: { user: defaults.user } },
     );
-
-    expect(data.imageUrl).toBe(null);
 
     const newTasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) => eq(tastings.id, tasting.id),

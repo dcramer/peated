@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Flight } from "@peated/server/db/schema";
@@ -150,7 +149,7 @@ export default procedure
         break;
       case "brand":
         if (!rest.entity) {
-          throw new ORPCError("BAD_REQUEST", {
+          throw errors.BAD_REQUEST({
             message: "Cannot sort by brand without entity filter.",
           });
         }

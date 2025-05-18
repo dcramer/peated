@@ -1,8 +1,8 @@
 "use server";
 
+import { isDefinedError } from "@orpc/client";
 import { makeTRPCClient } from "@peated/server/trpc/client";
 import config from "@peated/web/config";
-import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
 import type { SessionData } from "./session.server";
@@ -66,8 +66,8 @@ export async function authenticate(
   if (email && !password) {
     try {
       await trpcClient.authMagicLinkSend.mutate({ email });
-    } catch (err) {
-      if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
+    } catch (err: any) {
+      if (isDefinedError(err) && err.data?.code === "UNAUTHORIZED") {
         return {
           magicLink: false,
           error: "Invalid credentials",

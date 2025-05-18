@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -8,18 +7,16 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/notifications/:id" })
-  .input(
-    z.object({
-      id: z.coerce.number(),
-    }),
-  )
+  .route({ method: "DELETE", path: "/notifications/:notification" })
+  .input(z.object({ notification: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
+    const { notification: notificationId } = input;
+
     const [notification] = await db
       .select()
       .from(notifications)
-      .where(eq(notifications.id, input.id));
+      .where(eq(notifications.id, notificationId));
 
     if (!notification) {
       throw errors.NOT_FOUND({

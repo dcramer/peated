@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -14,10 +13,10 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/tastings/:tastingId/image" })
+  .route({ method: "POST", path: "/tastings/:tasting/image" })
   .input(
     z.object({
-      tastingId: z.coerce.number(),
+      tasting: z.coerce.number(),
       file: z.instanceof(Blob),
     }),
   )
@@ -27,21 +26,21 @@ export default procedure
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    const { tastingId, file } = input;
+    const { tasting: tastingId, file } = input;
 
-    const [tasting] = await db
+    const [targetTasting] = await db
       .select()
       .from(tastings)
       .where(eq(tastings.id, tastingId))
       .limit(1);
 
-    if (!tasting) {
+    if (!targetTasting) {
       throw errors.NOT_FOUND({
         message: "Tasting not found.",
       });
     }
 
-    if (tasting.createdById !== context.user.id && !context.user.admin) {
+    if (targetTasting.createdById !== context.user.id && !context.user.admin) {
       throw errors.FORBIDDEN({
         message: "You don't have permission to update this tasting.",
       });

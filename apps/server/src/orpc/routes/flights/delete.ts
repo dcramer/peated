@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { flights } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -7,19 +6,21 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "DELETE", path: "/flights/:id" })
+  .route({ method: "DELETE", path: "/flights/:flight" })
   .use(requireAdmin)
   .input(
     z.object({
-      id: z.string(),
+      flight: z.string(),
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input, errors }) {
+  .handler(async function ({ input, context, errors }) {
+    const { flight: flightId } = input;
+
     const [flight] = await db
       .select()
       .from(flights)
-      .where(eq(flights.publicId, input.id))
+      .where(eq(flights.publicId, flightId))
       .limit(1);
     if (!flight) {
       throw errors.NOT_FOUND({

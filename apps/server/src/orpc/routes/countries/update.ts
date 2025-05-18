@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -10,19 +9,19 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = CountryInputSchema.partial().extend({
-  slug: z.string(),
+  country: z.string(),
 });
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/countries/:slug" })
+  .route({ method: "PATCH", path: "/countries/:country" })
   .input(InputSchema)
   .output(CountrySchema)
   .handler(async function ({ input, context, errors }) {
     const [country] = await db
       .select()
       .from(countries)
-      .where(eq(sql`LOWER(${countries.slug})`, input.slug.toLowerCase()));
+      .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()));
 
     if (!country) {
       throw errors.NOT_FOUND({

@@ -4,13 +4,13 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
-describe("POST /regions", () => {
+describe("POST /countries/:country/regions", () => {
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.regions.create(
         {
           name: "Test Region",
-          country: 1,
+          country: "test-country",
         },
         { context: { user: null } },
       ),
@@ -23,7 +23,7 @@ describe("POST /regions", () => {
       routerClient.regions.create(
         {
           name: "Test Region",
-          country: 1,
+          country: "test-country",
         },
         { context: { user: defaults.user } },
       ),
@@ -38,7 +38,7 @@ describe("POST /regions", () => {
     const data = await routerClient.regions.create(
       {
         name: "Test Region",
-        country: country.id,
+        country: country.slug,
         description: "A test region",
       },
       { context: { user: modUser } },
@@ -65,7 +65,7 @@ describe("POST /regions", () => {
       routerClient.regions.create(
         {
           name: "Test Region",
-          country: 9999, // Non-existent country ID
+          country: "nonexistent-country",
         },
         { context: { user: modUser } },
       ),
@@ -83,7 +83,7 @@ describe("POST /regions", () => {
       routerClient.regions.create(
         {
           name: existingRegion.name,
-          country: country.id,
+          country: country.slug,
         },
         { context: { user: modUser } },
       ),
@@ -101,7 +101,7 @@ describe("POST /regions", () => {
     const data = await routerClient.regions.create(
       {
         name: "Minimal Region",
-        country: country.id,
+        country: country.slug,
       },
       { context: { user: modUser } },
     );

@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tastings, toasts } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
@@ -8,26 +7,26 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "POST", path: "/tastings/:id/toast" })
-  .input(
-    z.object({
-      id: z.coerce.number(),
-    }),
-  )
+  .route({ method: "POST", path: "/tastings/:tasting/toast" })
+  .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))
   .use(requireAuth)
   .handler(async function ({ input, context, errors }) {
-    const tasting = await db.query.tastings.findFirst({
-      where: (tastings, { eq }) => eq(tastings.id, input.id),
-    });
+    const { tasting: tastingId } = input;
 
-    if (!tasting) {
+    const [targetTasting] = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.id, tastingId))
+      .limit(1);
+
+    if (!targetTasting) {
       throw errors.NOT_FOUND({
         message: "Tasting not found.",
       });
     }
 
-    if (context.user.id === tasting.createdById) {
+    if (context.user.id === targetTasting.createdById) {
       throw errors.BAD_REQUEST({
         message: "Cannot toast your own tasting.",
       });
@@ -39,7 +38,7 @@ export default procedure
         .insert(toasts)
         .values({
           createdById: user.id,
-          tastingId: tasting.id,
+          tastingId: targetTasting.id,
         })
         .onConflictDoNothing()
         .returning();
@@ -48,14 +47,14 @@ export default procedure
         await tx
           .update(tastings)
           .set({ toasts: sql`${tastings.toasts} + 1` })
-          .where(eq(tastings.id, tasting.id));
+          .where(eq(tastings.id, targetTasting.id));
 
         createNotification(tx, {
           fromUserId: toast.createdById,
           type: "toast",
           objectId: toast.id,
           createdAt: toast.createdAt,
-          userId: tasting.createdById,
+          userId: targetTasting.createdById,
         });
       }
     });

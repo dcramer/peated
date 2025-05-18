@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { countries, regions } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -10,13 +9,13 @@ import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = RegionInputSchema.partial().extend({
-  country: z.union([z.string(), z.number()]),
-  slug: z.string(),
+  region: z.string(),
+  country: z.string(),
 });
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/regions/:country/:slug" })
+  .route({ method: "PATCH", path: "/countries/:country/regions/:region" })
   .input(InputSchema)
   .output(RegionSchema)
   .handler(async function ({ input, context, errors }) {
@@ -43,7 +42,7 @@ export default procedure
       .where(
         and(
           eq(regions.countryId, countryId),
-          eq(sql`LOWER(${regions.slug})`, input.slug.toLowerCase()),
+          eq(sql`LOWER(${regions.slug})`, input.region.toLowerCase()),
         ),
       );
 

@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
@@ -19,7 +18,6 @@ import {
 import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
-import type { Context } from "@peated/server/orpc/context";
 import { ConflictError } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
 import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
@@ -32,7 +30,7 @@ import { z } from "zod";
 import { bottleNormalize } from "./validation";
 
 const InputSchema = BottleInputSchema.partial().extend({
-  bottle: z.number(),
+  bottle: z.coerce.number(),
 });
 
 export default procedure

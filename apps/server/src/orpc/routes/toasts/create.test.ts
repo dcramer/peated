@@ -5,11 +5,11 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("POST /tastings/:id/toast", () => {
+describe("POST /tastings/:tasting/toast", () => {
   test("requires auth", async () => {
     const err = await waitError(() =>
-      routerClient.tastings.toasts.create({
-        id: 1,
+      routerClient.toasts.create({
+        tasting: 1,
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -21,9 +21,9 @@ describe("POST /tastings/:id/toast", () => {
     });
 
     const err = await waitError(() =>
-      routerClient.tastings.toasts.create(
+      routerClient.toasts.create(
         {
-          id: tasting.id,
+          tasting: tasting.id,
         },
         { context: { user: defaults.user } },
       ),
@@ -36,9 +36,9 @@ describe("POST /tastings/:id/toast", () => {
   test("new toast", async ({ defaults, fixtures }) => {
     const tasting = await fixtures.Tasting();
 
-    await routerClient.tastings.toasts.create(
+    await routerClient.toasts.create(
       {
-        id: tasting.id,
+        tasting: tasting.id,
       },
       { context: { user: defaults.user } },
     );
@@ -65,9 +65,9 @@ describe("POST /tastings/:id/toast", () => {
       createdById: defaults.user.id,
     });
 
-    await routerClient.tastings.toasts.create(
+    await routerClient.toasts.create(
       {
-        id: tasting.id,
+        tasting: tasting.id,
       },
       { context: { user: defaults.user } },
     );

@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -14,10 +13,10 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/badges/:badgeId/image" })
+  .route({ method: "POST", path: "/badges/:badge/image" })
   .input(
     z.object({
-      badgeId: z.coerce.number(),
+      badge: z.coerce.number(),
       file: z.instanceof(Blob),
     }),
   )
@@ -27,15 +26,15 @@ export default procedure
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    const { badgeId, file } = input;
+    const { badge: badgeId, file } = input;
 
-    const [badge] = await db
+    const [targetBadge] = await db
       .select()
       .from(badges)
       .where(eq(badges.id, badgeId))
       .limit(1);
 
-    if (!badge) {
+    if (!targetBadge) {
       throw errors.NOT_FOUND({
         message: "Badge not found.",
       });
@@ -60,8 +59,8 @@ export default procedure
     } catch (err) {
       // Check for file size limits
       if (file.size > MAX_FILESIZE) {
-        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}`;
-        throw new ORPCError("PAYLOAD_TOO_LARGE", {
+        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`;
+        throw errors.PAYLOAD_TOO_LARGE({
           message: errMessage,
           cause: err,
         });
@@ -74,7 +73,7 @@ export default procedure
       .set({
         imageUrl,
       })
-      .where(eq(badges.id, badge.id));
+      .where(eq(badges.id, targetBadge.id));
 
     return {
       imageUrl: absoluteUrl(config.API_SERVER, imageUrl),

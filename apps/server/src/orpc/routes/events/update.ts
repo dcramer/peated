@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Event } from "@peated/server/db/schema";
 import { countries, events } from "@peated/server/db/schema";
@@ -7,28 +6,37 @@ import { requireAdmin } from "@peated/server/orpc/middleware";
 import { EventInputSchema, EventSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EventSerializer } from "@peated/server/serializers/event";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "PATCH", path: "/events/:id" })
-  .input(
-    EventInputSchema.partial().extend({
-      id: z.number(),
-    }),
-  )
+  .route({ method: "PATCH", path: "/events/:event" })
+  .input(EventInputSchema.partial().extend({ event: z.coerce.number() }))
   .output(EventSchema)
-  .handler(async function ({
-    input: { id, country: countryId, ...input },
-    context,
-    errors,
-  }) {
-    const [event] = await db.select().from(events).where(eq(events.id, id));
+  .handler(async function ({ input, context, errors }) {
+    const { event: eventId } = input;
+
+    const [event] = await db
+      .select()
+      .from(events)
+      .where(eq(events.id, eventId));
     if (!event) {
       throw errors.NOT_FOUND({
         message: "Event not found.",
       });
+    }
+
+    if (input.country) {
+      const [country] = await db
+        .select()
+        .from(countries)
+        .where(eq(countries.id, input.country));
+      if (!country) {
+        throw errors.NOT_FOUND({
+          message: "Country not found.",
+        });
+      }
     }
 
     const data: { [name: string]: any } = {};
@@ -37,10 +45,6 @@ export default procedure
         data[k] = v;
       }
     });
-
-    if (countryId) {
-      data.countryId = countryId;
-    }
 
     if (Object.values(data).length === 0) {
       return await serialize(EventSerializer, event, context.user);

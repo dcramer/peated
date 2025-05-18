@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { createAccessToken, verifyPayload } from "@peated/server/lib/auth";
@@ -45,7 +44,7 @@ export default procedure
       new Date(parsedPayload.createdAt).getTime() <
       new Date().getTime() - TOKEN_CUTOFF * 1000
     ) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid magic link token.",
       });
     }
@@ -60,13 +59,13 @@ export default procedure
         ),
       );
     if (!user) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid magic link token.",
       });
     }
 
     if (!user.active) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid magic link token.",
       });
     }

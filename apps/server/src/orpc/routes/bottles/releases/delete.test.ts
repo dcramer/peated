@@ -13,7 +13,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
-describe("DELETE /bottle-releases/:id", () => {
+describe("DELETE /bottle-releases/:release", () => {
   it("deletes a bottle release and updates related records", async function ({
     fixtures,
   }) {
@@ -53,7 +53,7 @@ describe("DELETE /bottle-releases/:id", () => {
 
     // Delete the release
     await routerClient.bottles.releases.delete(
-      { id: release.id },
+      { release: release.id },
       {
         context: { user: admin },
       },
@@ -118,7 +118,7 @@ describe("DELETE /bottle-releases/:id", () => {
 
     const err = await waitError(() =>
       routerClient.bottles.releases.delete(
-        { id: 999999 },
+        { release: 999999 },
         {
           context: { user: admin },
         },

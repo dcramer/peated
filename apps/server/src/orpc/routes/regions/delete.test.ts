@@ -5,12 +5,12 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /regions", () => {
+describe("DELETE /countries/:country/regions/:region", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
       routerClient.regions.delete({
         country: "test-country",
-        slug: "test-region",
+        region: "test-region",
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -23,7 +23,7 @@ describe("DELETE /regions", () => {
       routerClient.regions.delete(
         {
           country: "test-country",
-          slug: "test-region",
+          region: "test-region",
         },
         { context: { user } },
       ),
@@ -38,8 +38,8 @@ describe("DELETE /regions", () => {
 
     await routerClient.regions.delete(
       {
-        country: country.id,
-        slug: region.slug,
+        country: country.slug,
+        region: region.slug,
       },
       { context: { user: adminUser } },
     );
@@ -61,7 +61,7 @@ describe("DELETE /regions", () => {
     await routerClient.regions.delete(
       {
         country: country.slug,
-        slug: region.slug,
+        region: region.slug,
       },
       { context: { user: adminUser } },
     );
@@ -80,7 +80,7 @@ describe("DELETE /regions", () => {
       routerClient.regions.delete(
         {
           country: "nonexistent-country",
-          slug: "some-region",
+          region: "some-region",
         },
         { context: { user: adminUser } },
       ),
@@ -95,8 +95,8 @@ describe("DELETE /regions", () => {
     const err = await waitError(() =>
       routerClient.regions.delete(
         {
-          country: country.id,
-          slug: "nonexistent-region",
+          country: country.slug,
+          region: "nonexistent-region",
         },
         { context: { user: adminUser } },
       ),
@@ -117,7 +117,7 @@ describe("DELETE /regions", () => {
     await routerClient.regions.delete(
       {
         country: "united-states",
-        slug: "california",
+        region: "california",
       },
       { context: { user: adminUser } },
     );

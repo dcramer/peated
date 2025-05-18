@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import {
   extractFromImage,
   extractFromText,
@@ -31,7 +30,7 @@ export default procedure
   .route({ method: "POST", path: "/ai/extract-labels" })
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
     try {
       if (input.imageUrl) {
         return await extractFromImage(input.imageUrl);
@@ -39,12 +38,12 @@ export default procedure
       if (input.label) {
         return await extractFromText(input.label);
       }
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Either imageUrl or label must be provided",
       });
     } catch (error) {
       console.error(error);
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to extract label information",
       });
     }

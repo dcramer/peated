@@ -9,11 +9,11 @@ import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/regions/:slug" })
+  .route({ method: "GET", path: "/countries/:country/regions/:region" })
   .input(
     z.object({
-      slug: z.string(),
-      country: z.union([z.number(), z.string()]),
+      region: z.string(),
+      country: z.string(),
     }),
   )
   .output(RegionSchema)
@@ -25,12 +25,7 @@ export default procedure
       const [result] = await db
         .select({ id: countries.id })
         .from(countries)
-        .where(
-          eq(
-            sql`LOWER(${countries.slug})`,
-            String(input.country).toLowerCase(),
-          ),
-        )
+        .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
         .limit(1);
       if (!result) {
         throw errors.BAD_REQUEST({
@@ -46,7 +41,7 @@ export default procedure
       .where(
         and(
           eq(regions.countryId, countryId),
-          eq(sql`LOWER(${regions.slug})`, input.slug.toLowerCase()),
+          eq(sql`LOWER(${regions.slug})`, input.region.toLowerCase()),
         ),
       );
 

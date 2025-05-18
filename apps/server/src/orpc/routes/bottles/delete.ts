@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -19,14 +18,16 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "DELETE", path: "/bottles/:id" })
-  .input(z.object({ id: z.coerce.number() }))
+  .route({ method: "DELETE", path: "/bottles/:bottle" })
+  .input(z.object({ bottle: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
+    const { bottle: bottleId } = input;
+
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, input.id))
+      .where(eq(bottles.id, bottleId))
       .limit(1);
     if (!bottle) {
       throw errors.NOT_FOUND({

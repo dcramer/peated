@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { BadgeAward, User } from "@peated/server/db/schema";
 import { badgeAwards, badges, users } from "@peated/server/db/schema";

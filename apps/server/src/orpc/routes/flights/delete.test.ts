@@ -4,14 +4,14 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
-describe("DELETE /flights/:id", () => {
+describe("DELETE /flights/:flight", () => {
   test("deletes flight", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const flight = await fixtures.Flight();
 
     const data = await routerClient.flights.delete(
       {
-        id: flight.publicId,
+        flight: flight.publicId,
       },
       { context: { user } },
     );
@@ -31,7 +31,7 @@ describe("DELETE /flights/:id", () => {
     const err = await waitError(
       routerClient.flights.delete(
         {
-          id: flight.publicId,
+          flight: flight.publicId,
         },
         { context: { user } },
       ),

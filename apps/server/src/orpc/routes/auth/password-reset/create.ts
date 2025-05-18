@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { sendPasswordResetEmail } from "@peated/server/lib/email";

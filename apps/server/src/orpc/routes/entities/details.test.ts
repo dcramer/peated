@@ -3,12 +3,12 @@ import { entityTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
-describe("GET /entities/:id", () => {
+describe("GET /entities/:entity", () => {
   test("get entity by id", async ({ fixtures }) => {
     const brand = await fixtures.Entity();
 
     const data = await routerClient.entities.details({
-      id: brand.id,
+      entity: brand.id,
     });
     expect(data.id).toEqual(brand.id);
   });
@@ -16,7 +16,7 @@ describe("GET /entities/:id", () => {
   test("errors on invalid entity", async () => {
     const err = await waitError(
       routerClient.entities.details({
-        id: 1,
+        entity: 1,
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found.]`);
@@ -31,7 +31,7 @@ describe("GET /entities/:id", () => {
     await fixtures.Bottle();
 
     const data = await routerClient.entities.details({
-      id: 999,
+      entity: 999,
     });
     expect(data.id).toEqual(entity1.id);
   });

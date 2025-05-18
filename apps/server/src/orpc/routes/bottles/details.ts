@@ -25,14 +25,16 @@ const OutputSchema = BottleSchema.extend({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/bottles/:id" })
-  .input(z.object({ id: z.coerce.number() }))
+  .route({ method: "GET", path: "/bottles/:bottle" })
+  .input(z.object({ bottle: z.coerce.number() }))
   .output(OutputSchema)
   .handler(async function ({ input, context, errors }) {
+    const { bottle: bottleId } = input;
+
     let [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, input.id));
+      .where(eq(bottles.id, bottleId));
 
     if (!bottle) {
       // check for a tombstone
@@ -42,7 +44,7 @@ export default procedure
         })
         .from(bottleTombstones)
         .innerJoin(bottles, eq(bottleTombstones.newBottleId, bottles.id))
-        .where(eq(bottleTombstones.bottleId, input.id));
+        .where(eq(bottleTombstones.bottleId, bottleId));
       if (!bottle) {
         throw errors.NOT_FOUND({
           message: "Bottle not found.",

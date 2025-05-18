@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
@@ -10,10 +9,11 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "PUT", path: "/friends/:id" })
+  // TODO: better path
+  .route({ method: "PUT", path: "/friends/:friend" })
   .input(
     z.object({
-      id: z.coerce.number(),
+      friend: z.coerce.number(),
     }),
   )
   .output(
@@ -22,13 +22,15 @@ export default procedure
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    if (context.user.id === input.id) {
+    const { friend: friendId } = input;
+
+    if (context.user.id === friendId) {
       throw errors.BAD_REQUEST({
         message: "Cannot friend yourself.",
       });
     }
 
-    const [user] = await db.select().from(users).where(eq(users.id, input.id));
+    const [user] = await db.select().from(users).where(eq(users.id, friendId));
 
     if (!user) {
       throw errors.NOT_FOUND({

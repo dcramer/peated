@@ -1,10 +1,12 @@
 "use client";
 
 import { trpc } from "@peated/web/lib/trpc/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import type { ComponentProps } from "react";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { logError } from "../lib/log";
+import { useORPC } from "../lib/orpc/context";
 import DistributionChart, {
   DistributionChartError,
   DistributionChartLegend,
@@ -12,9 +14,14 @@ import DistributionChart, {
 } from "./distributionChart";
 
 function BottleTagDistributionElement({ bottleId }: { bottleId: number }) {
-  const [data] = trpc.bottleTagList.useSuspenseQuery({
-    bottle: bottleId,
-  });
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.bottles.tags.queryOptions({
+      input: {
+        bottle: bottleId,
+      },
+    }),
+  );
 
   const { results, totalCount } = data;
 

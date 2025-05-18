@@ -1,7 +1,3 @@
-import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
-
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { externalSites, storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -13,6 +9,8 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
+import type { SQL } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure

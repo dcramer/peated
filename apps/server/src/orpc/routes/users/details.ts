@@ -4,6 +4,7 @@ import {
   collectionBottles,
   collections,
   tastings,
+  users,
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
@@ -14,18 +15,18 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/users/:id" })
+  .route({ method: "GET", path: "/users/:user" })
   .input(
     z.object({
-      id: z.union([z.coerce.number(), z.literal("me"), z.string()]),
+      user: z.union([z.coerce.number(), z.literal("me"), z.string()]),
     }),
   )
   .output(UserSchema)
   .handler(async function ({ input, context, errors }) {
-    const user = await getUserFromId(db, input.id, context.user);
+    const user = await getUserFromId(db, input.user, context.user);
 
     if (!user) {
-      if (input.id === "me") {
+      if (input.user === "me") {
         throw errors.UNAUTHORIZED();
       }
       throw errors.NOT_FOUND({

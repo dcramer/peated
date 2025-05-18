@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { entities, entityTombstones } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -19,18 +18,16 @@ const OutputSchema = EntitySchema.extend({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/entities/:id" })
-  .input(
-    z.object({
-      id: z.number(),
-    }),
-  )
+  .route({ method: "GET", path: "/entities/:entity" })
+  .input(z.object({ entity: z.coerce.number() }))
   .output(OutputSchema)
   .handler(async function ({ input, context, errors }) {
+    const { entity: entityId } = input;
+
     let [entity] = await db
       .select()
       .from(entities)
-      .where(eq(entities.id, input.id));
+      .where(eq(entities.id, entityId));
     if (!entity) {
       // check for a tombstone
       [entity] = await db
@@ -39,7 +36,7 @@ export default procedure
         })
         .from(entityTombstones)
         .innerJoin(entities, eq(entityTombstones.newEntityId, entities.id))
-        .where(eq(entityTombstones.entityId, input.id));
+        .where(eq(entityTombstones.entityId, entityId));
       if (!entity) {
         throw errors.NOT_FOUND({
           message: "Entity not found.",

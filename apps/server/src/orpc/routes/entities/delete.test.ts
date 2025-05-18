@@ -5,14 +5,15 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /entities/:id", () => {
+describe("DELETE /entities/:entity", () => {
   test("deletes entity", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const entity = await fixtures.Entity();
 
-    const data = await routerClient.entities.delete(entity.id, {
-      context: { user },
-    });
+    const data = await routerClient.entities.delete(
+      { entity: entity.id },
+      { context: { user } },
+    );
     expect(data).toEqual({});
 
     const [newEntity] = await db
@@ -27,9 +28,10 @@ describe("DELETE /entities/:id", () => {
     const entity = await fixtures.Entity({ createdById: user.id });
 
     const err = await waitError(() =>
-      routerClient.entities.delete(entity.id, {
-        context: { user },
-      }),
+      routerClient.entities.delete(
+        { entity: entity.id },
+        { context: { user } },
+      ),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

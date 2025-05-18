@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleSeries, changes, entities } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -15,7 +14,7 @@ import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = BottleSeriesInputSchema.partial().extend({
-  series: z.number(),
+  series: z.coerce.number(),
 });
 
 export default procedure

@@ -15,23 +15,36 @@ export default function ActivityFeed({
   tastingList,
   filter = "global",
 }: {
-  tastingList: Outputs["tastingList"];
+  tastingList: Outputs["tastings"]["list"];
   filter: "global" | "friends" | "local";
 }) {
   const orpc = useORPC();
-  const [
-    { pages },
-    { error, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage },
-  ] = useSuspenseInfiniteQuery({
-    ...orpc.tastings.list.infiniteOptions({
-      input: { filter, limit: 10 },
+  const {
+    data: { pages },
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+  } = useSuspenseInfiniteQuery(
+    orpc.tastings.list.infiniteOptions({
+      input: (pageParam: number | undefined) => ({
+        filter,
+        limit: 10,
+        cursor: pageParam,
+      }),
+      initialPageParam: undefined,
+      staleTime: Infinity,
+      initialData: () => {
+        return {
+          pages: [tastingList],
+          pageParams: [undefined],
+        };
+      },
       getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,
       getPreviousPageParam: (firstPage) => firstPage.rel?.prevCursor,
     }),
-    staleTime: Infinity,
-    initialData: { pages: [tastingList], pageParams: [null] },
-    // initialPageParam: 1,
-  });
+  );
 
   const onScroll = () => {
     if (!hasNextPage) return;

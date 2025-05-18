@@ -5,7 +5,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("PATCH /reviews/:reviewId", () => {
+describe("PATCH /reviews/:review", () => {
   test("requires mod role", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: false });
     const review = await fixtures.Review();

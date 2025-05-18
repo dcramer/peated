@@ -1,14 +1,14 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
-describe("GET /regions/:slug", () => {
+describe("GET /countries/:country/regions/:region", () => {
   test("retrieves a region by slug and country id", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region = await fixtures.Region({ countryId: country.id });
 
     const data = await routerClient.regions.details({
-      country: country.id,
-      slug: region.slug,
+      country: country.slug,
+      region: region.slug,
     });
 
     expect(data.id).toBe(region.id);
@@ -22,7 +22,7 @@ describe("GET /regions/:slug", () => {
 
     const data = await routerClient.regions.details({
       country: country.slug,
-      slug: region.slug,
+      region: region.slug,
     });
 
     expect(data.id).toBe(region.id);
@@ -34,7 +34,7 @@ describe("GET /regions/:slug", () => {
     const err = await waitError(
       routerClient.regions.details({
         country: "nonexistent-country",
-        slug: "some-region",
+        region: "some-region",
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
@@ -45,8 +45,8 @@ describe("GET /regions/:slug", () => {
 
     const err = await waitError(
       routerClient.regions.details({
-        country: country.id,
-        slug: "nonexistent-region",
+        country: country.slug,
+        region: "nonexistent-region",
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Region not found.]`);
@@ -63,7 +63,7 @@ describe("GET /regions/:slug", () => {
 
     const data = await routerClient.regions.details({
       country: "united-states",
-      slug: "california",
+      region: "california",
     });
 
     expect(data.id).toBe(region.id);
@@ -76,8 +76,8 @@ describe("GET /regions/:slug", () => {
     const region = await fixtures.Region({ countryId: country.id });
 
     const data = await routerClient.regions.details({
-      country: country.id,
-      slug: region.slug,
+      country: country.slug,
+      region: region.slug,
     });
 
     expect(data.id).toBe(region.id);

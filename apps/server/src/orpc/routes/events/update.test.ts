@@ -1,7 +1,7 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
-describe("PATCH /events/:id", () => {
+describe("PATCH /events/:event", () => {
   test("requires admin", async ({ fixtures }) => {
     const event = await fixtures.Event();
     const modUser = await fixtures.User({ mod: true });
@@ -9,7 +9,7 @@ describe("PATCH /events/:id", () => {
     const err = await waitError(
       routerClient.events.update(
         {
-          id: event.id,
+          event: event.id,
           name: "Foobar",
         },
         { context: { user: modUser } },
@@ -24,7 +24,7 @@ describe("PATCH /events/:id", () => {
 
     const newEvent = await routerClient.events.update(
       {
-        id: event.id,
+        event: event.id,
         name: "Foobar",
       },
       { context: { user: adminUser } },

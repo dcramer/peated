@@ -1,5 +1,6 @@
 import { TrophyIcon } from "@heroicons/react/24/outline";
-import { trpc } from "../lib/trpc/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useORPC } from "../lib/orpc/context";
 import Heading from "./heading";
 
 function RatingIcon({ rating }: { rating: number }) {
@@ -10,11 +11,16 @@ function RatingIcon({ rating }: { rating: number }) {
 }
 
 export default function BottleReviews({ bottleId }: { bottleId: number }) {
-  const [data] = trpc.reviewList.useSuspenseQuery({
-    bottle: bottleId,
-  });
-
-  const { results } = data;
+  const orpc = useORPC();
+  const {
+    data: { results },
+  } = useSuspenseQuery(
+    orpc.reviews.list.queryOptions({
+      input: {
+        bottle: bottleId,
+      },
+    }),
+  );
 
   if (!results.length) return null;
 
@@ -23,6 +29,7 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
       <Heading as="h3">The Critics</Heading>
       <ul className="-mx-2 -mt-2 mb-4 grid grid-cols-2 sm:w-2/3 md:w-1/2">
         {results.map((r) => {
+          if (!r.site) return null;
           return (
             <li
               key={r.id}

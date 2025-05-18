@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { flightBottles, flights } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -10,19 +9,21 @@ import { and, eq, notInArray } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = FlightInputSchema.partial().extend({
-  id: z.string(),
+  flight: z.string(),
 });
 
 export default procedure
-  .route({ method: "PATCH", path: "/flights/:id" })
+  .route({ method: "PATCH", path: "/flights/:flight" })
   .use(requireAuth)
   .input(InputSchema)
   .output(FlightSchema)
   .handler(async function ({ input, context, errors }) {
+    const { flight: flightId, ...data } = input;
+
     const [flight] = await db
       .select()
       .from(flights)
-      .where(eq(flights.publicId, input.id));
+      .where(eq(flights.publicId, flightId));
 
     if (!flight) {
       throw errors.NOT_FOUND({
@@ -34,21 +35,6 @@ export default procedure
       throw errors.FORBIDDEN({
         message: "Cannot update another user's flight.",
       });
-    }
-
-    const data: { [name: string]: any } = {};
-
-    if (input.name && input.name !== flight.name) {
-      data.name = input.name;
-    }
-    if (
-      input.description !== undefined &&
-      input.description !== flight.description
-    ) {
-      data.description = input.description;
-    }
-    if (input.public !== undefined && input.public !== flight.public) {
-      data.public = input.public;
     }
 
     if (Object.values(data).length === 0 && !input.bottles) {

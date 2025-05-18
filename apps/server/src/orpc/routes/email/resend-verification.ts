@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { sendVerificationEmail } from "@peated/server/lib/email";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";

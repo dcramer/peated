@@ -1,14 +1,12 @@
-import { db } from "@peated/server/db";
-import { entityTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
-describe("GET /events/:id", () => {
+describe("GET /events/:event", () => {
   test("returns event details", async ({ fixtures }) => {
     const event = await fixtures.Event();
 
     const data = await routerClient.events.details({
-      id: event.id,
+      event: event.id,
     });
 
     expect(data.id).toEqual(event.id);
@@ -18,7 +16,7 @@ describe("GET /events/:id", () => {
   test("returns 404 for invalid event", async () => {
     const err = await waitError(
       routerClient.events.details({
-        id: 12345,
+        event: 12345,
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Event not found.]`);

@@ -5,11 +5,11 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
-describe("PATCH /flights/:id", () => {
+describe("PATCH /flights/:flight", () => {
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.flights.update({
-        id: "1",
+        flight: "1",
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -22,7 +22,7 @@ describe("PATCH /flights/:id", () => {
     const err = await waitError(
       routerClient.flights.update(
         {
-          id: flight.publicId,
+          flight: flight.publicId,
         },
         { context: { user } },
       ),
@@ -38,7 +38,7 @@ describe("PATCH /flights/:id", () => {
 
     const data = await routerClient.flights.update(
       {
-        id: flight.publicId,
+        flight: flight.publicId,
       },
       { context: { user } },
     );
@@ -59,7 +59,7 @@ describe("PATCH /flights/:id", () => {
 
     const data = await routerClient.flights.update(
       {
-        id: flight.publicId,
+        flight: flight.publicId,
         name: "Delicious Wood",
       },
       { context: { user } },
@@ -85,7 +85,7 @@ describe("PATCH /flights/:id", () => {
 
     const data = await routerClient.flights.update(
       {
-        id: flight.publicId,
+        flight: flight.publicId,
         bottles: [bottle1.id, bottle3.id],
       },
       { context: { user } },

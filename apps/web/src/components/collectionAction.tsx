@@ -2,31 +2,38 @@
 
 import { StarIcon as StarIconFilled } from "@heroicons/react/20/solid";
 import { StarIcon } from "@heroicons/react/24/outline";
+import { isDefinedError } from "@orpc/client";
 import type { Bottle } from "@peated/server/types";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import useAuth from "../hooks/useAuth";
+import { useORPC } from "../lib/orpc/context";
 import Button from "./button";
 
 function CollectionActionAuthenticated({ bottle }: { bottle: Bottle }) {
-  const favoriteBottleMutation = trpc.collectionBottleCreate.useMutation();
-  const unfavoriteBottleMutation = trpc.collectionBottleDelete.useMutation();
+  const orpc = useORPC();
+  const favoriteBottleMutation = useMutation(
+    orpc.collections.bottles.create.mutationOptions(),
+  );
+  const unfavoriteBottleMutation = useMutation(
+    orpc.collections.bottles.delete.mutationOptions(),
+  );
 
   let isCollected = false;
   let isLoading = false;
   try {
-    const [result, collectedQuery] = trpc.collectionList.useSuspenseQuery(
-      {
-        bottle: bottle.id,
-        user: "me",
-      },
-      {
+    const result = useSuspenseQuery(
+      orpc.collections.list.queryOptions({
+        input: {
+          bottle: bottle.id,
+          user: "me",
+        },
         select: (data) => data.results.length > 0,
-      },
+      }),
     );
-    isCollected = result;
-    isLoading = collectedQuery.isLoading;
-  } catch (err) {
-    if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
+    isCollected = result.data;
+    isLoading = result.isLoading;
+  } catch (err: any) {
+    if (isDefinedError(err) && err.data?.code === "UNAUTHORIZED") {
       return <CollectionActionUnauthenticated />;
     }
     throw err;

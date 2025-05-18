@@ -1,4 +1,4 @@
-import { base } from "../..";
+import { base } from "@peated/server/orpc";
 import avatarUpdate from "./avatar-update";
 import badgeList from "./badge-list";
 import details from "./details";

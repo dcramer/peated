@@ -5,11 +5,11 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /notifications/:id", () => {
+describe("DELETE /notifications/:notification", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
       routerClient.notifications.delete({
-        id: 1,
+        notification: 1,
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -19,7 +19,7 @@ describe("DELETE /notifications/:id", () => {
     const err = await waitError(() =>
       routerClient.notifications.delete(
         {
-          id: 1,
+          notification: 1,
         },
         { context: { user: defaults.user } },
       ),
@@ -41,7 +41,7 @@ describe("DELETE /notifications/:id", () => {
 
     await routerClient.notifications.delete(
       {
-        id: notification.id,
+        notification: notification.id,
       },
       { context: { user: defaults.user } },
     );
@@ -68,7 +68,7 @@ describe("DELETE /notifications/:id", () => {
     const err = await waitError(() =>
       routerClient.notifications.delete(
         {
-          id: notification.id,
+          notification: notification.id,
         },
         { context: { user: defaults.user } },
       ),

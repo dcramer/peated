@@ -1,4 +1,3 @@
-import { ORPCError, os } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";

@@ -1,4 +1,4 @@
-import { base } from "../..";
+import { base } from "@peated/server/orpc";
 import aliases from "./aliases";
 import categories from "./categories";
 import create from "./create";

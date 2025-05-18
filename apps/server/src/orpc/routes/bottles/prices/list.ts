@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottles, externalSites, storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";

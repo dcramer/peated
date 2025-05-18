@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { badges } from "@peated/server/db/schema";
 import { checkBadgeConfig } from "@peated/server/lib/badges";

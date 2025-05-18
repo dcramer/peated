@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleTags, bottles, tags } from "@peated/server/db/schema";
 import { shuffle } from "@peated/server/lib/rand";

@@ -14,7 +14,7 @@ const DEFAULT_SORT = "name";
 const SORT_OPTIONS = ["name", "bottles", "-name", "-bottles"] as const;
 
 const InputSchema = z.object({
-  country: z.union([z.coerce.number(), z.string()]),
+  country: z.string(),
   query: z.string().default(""),
   cursor: z.coerce.number().gte(1).default(1),
   limit: z.coerce.number().gte(1).lte(100).default(100),
@@ -28,7 +28,7 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/regions" })
+  .route({ method: "GET", path: "/countries/:country/regions" })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({
@@ -51,12 +51,7 @@ export default procedure
       const [result] = await db
         .select({ id: countries.id })
         .from(countries)
-        .where(
-          eq(
-            sql`LOWER(${countries.slug})`,
-            String(input.country).toLowerCase(),
-          ),
-        )
+        .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
         .limit(1);
       if (!result) {
         throw errors.BAD_REQUEST({

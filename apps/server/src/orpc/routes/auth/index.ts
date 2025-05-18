@@ -1,4 +1,4 @@
-import { base } from "../..";
+import { base } from "@peated/server/orpc";
 import login from "./login";
 import magicLink from "./magic-link";
 import me from "./me";

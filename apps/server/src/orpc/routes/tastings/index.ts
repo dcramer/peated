@@ -1,4 +1,4 @@
-import { base } from "../..";
+import { base } from "@peated/server/orpc";
 import comments from "../comments";
 import create from "./create";
 import delete_ from "./delete";
@@ -6,7 +6,6 @@ import details from "./details";
 import imageDelete from "./image-delete";
 import imageUpdate from "./image-update";
 import list from "./list";
-import toasts from "./toasts";
 import update from "./update";
 
 export default base.tag("tastings").router({
@@ -18,5 +17,4 @@ export default base.tag("tastings").router({
   delete: delete_,
   imageUpdate,
   imageDelete,
-  toasts,
 });

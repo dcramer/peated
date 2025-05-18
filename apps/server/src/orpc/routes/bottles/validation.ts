@@ -20,7 +20,7 @@ async function getEntity(
 ) {
   if (typeof input === "number") {
     try {
-      return await call(details, { id: input }, { context });
+      return await call(details, { entity: input }, { context });
     } catch (err) {
       throw new ORPCError("NOT_FOUND", {
         message: `Entity not found [id: ${input}]`,

@@ -1,4 +1,4 @@
-import { base } from "../..";
+import { base } from "@peated/server/orpc";
 import create from "./create";
 import delete_ from "./delete";
 import details from "./details";

@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { flights } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -9,18 +8,18 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/flights/:id" })
-  .input(
-    z.object({
-      id: z.coerce.string(),
-    }),
-  )
+  // we use the publicId as the route param here as an easy solution
+  // to make the flight private (through obscuring the id)
+  .route({ method: "GET", path: "/flights/:flight" })
+  .input(z.object({ flight: z.string() }))
   .output(FlightSchema)
   .handler(async function ({ input, context, errors }) {
+    const { flight: flightId } = input;
+
     const [flight] = await db
       .select()
       .from(flights)
-      .where(eq(flights.publicId, input.id));
+      .where(eq(flights.publicId, flightId));
     if (!flight) {
       throw errors.NOT_FOUND({
         message: "Flight not found.",

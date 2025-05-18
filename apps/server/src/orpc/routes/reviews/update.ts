@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { reviews } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -16,25 +15,30 @@ const InputSchema = z.object({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/reviews/:reviewId" })
-  .input(InputSchema)
+  .route({ method: "PATCH", path: "/reviews/:review" })
+  .input(
+    InputSchema.partial().extend({
+      review: z.coerce.number(),
+    }),
+  )
   .output(ReviewSchema)
   .handler(async function ({ input, context, errors }) {
     const { review: reviewId, ...data } = input;
 
-    const [review] = await db
+    const [targetReview] = await db
       .select()
       .from(reviews)
-      .where(eq(reviews.id, reviewId));
+      .where(eq(reviews.id, reviewId))
+      .limit(1);
 
-    if (!review) {
+    if (!targetReview) {
       throw errors.NOT_FOUND({
         message: "Review not found.",
       });
     }
 
     if (Object.values(data).length === 0) {
-      return await serialize(ReviewSerializer, review, context.user);
+      return await serialize(ReviewSerializer, targetReview, context.user);
     }
 
     const [newReview] = await db

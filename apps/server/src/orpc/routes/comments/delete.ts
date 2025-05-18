@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { comments, tastings } from "@peated/server/db/schema";
 import { deleteNotification } from "@peated/server/lib/notifications";
@@ -9,19 +8,20 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({
-    method: "DELETE",
-    path: "/tastings/:tasting/comments/:id",
-    tags: ["tastings"],
-  })
-  .route({
-    method: "DELETE",
-    path: "/users/:user/comments/:id",
-    tags: ["users"],
-  })
+  .route({ method: "DELETE", path: "/comments/:comment" })
+  // .route({
+  //   method: "DELETE",
+  //   path: "/tastings/:tasting/comments/:id",
+  //   tags: ["tastings"],
+  // })
+  // .route({
+  //   method: "DELETE",
+  //   path: "/users/:user/comments/:id",
+  //   tags: ["users"],
+  // })
   .input(
     z.object({
-      id: z.coerce.number(),
+      comment: z.coerce.number(),
       user: z.coerce.number().optional(),
       tasting: z.coerce.number().optional(),
     }),
@@ -31,7 +31,7 @@ export default procedure
     const [comment] = await db
       .select()
       .from(comments)
-      .where(eq(comments.id, input.id))
+      .where(eq(comments.id, input.comment))
       .limit(1);
     if (!comment) {
       throw errors.NOT_FOUND({

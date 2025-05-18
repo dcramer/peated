@@ -5,11 +5,11 @@ import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /bottle-series/:id", () => {
+describe("DELETE /bottle-series/:series", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
       routerClient.bottles.series.delete({
-        id: 1,
+        series: 1,
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -19,7 +19,7 @@ describe("DELETE /bottle-series/:id", () => {
     const err = await waitError(() =>
       routerClient.bottles.series.delete(
         {
-          id: 1,
+          series: 1,
         },
         { context: { user: defaults.user } },
       ),
@@ -51,7 +51,7 @@ describe("DELETE /bottle-series/:id", () => {
 
     await routerClient.bottles.series.delete(
       {
-        id: series.id,
+        series: series.id,
       },
       { context: { user } },
     );
@@ -98,7 +98,7 @@ describe("DELETE /bottle-series/:id", () => {
     const err = await waitError(() =>
       routerClient.bottles.series.delete(
         {
-          id: 12345,
+          series: 12345,
         },
         { context: { user } },
       ),

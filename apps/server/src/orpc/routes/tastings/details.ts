@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -9,10 +8,10 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/tastings/:id" })
+  .route({ method: "GET", path: "/tastings/:tasting" })
   .input(
     z.object({
-      id: z.number(),
+      tasting: z.coerce.number(),
     }),
   )
   .output(TastingSchema)
@@ -20,7 +19,7 @@ export default procedure
     const [tasting] = await db
       .select()
       .from(tastings)
-      .where(eq(tastings.id, input.id));
+      .where(eq(tastings.id, input.tasting));
 
     if (!tasting) {
       throw errors.NOT_FOUND({

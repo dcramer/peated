@@ -1,4 +1,4 @@
-import { base } from "../..";
+import { base } from "@peated/server/orpc";
 import changeList from "./change-list";
 import createBatch from "./create-batch";
 import list from "./list";

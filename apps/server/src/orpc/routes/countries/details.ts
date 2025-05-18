@@ -9,10 +9,10 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/countries/:slug" })
+  .route({ method: "GET", path: "/countries/:country" })
   .input(
     z.object({
-      slug: z.string(),
+      country: z.string(),
     }),
   )
   .output(CountrySchema)
@@ -20,7 +20,7 @@ export default procedure
     const [country] = await db
       .select()
       .from(countries)
-      .where(eq(sql`LOWER(${countries.slug})`, input.slug.toLowerCase()));
+      .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()));
 
     if (!country) {
       throw errors.NOT_FOUND({

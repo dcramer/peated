@@ -2,12 +2,12 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
-describe("GET /users/:id", () => {
+describe("GET /users/:user", () => {
   test("get user by id", async ({ defaults, fixtures }) => {
     const user = await fixtures.User();
 
     const data = await routerClient.users.details(
-      { id: user.id },
+      { user: user.id },
       { context: { user: defaults.user } },
     );
     expect(data.id).toEqual(user.id);
@@ -16,7 +16,7 @@ describe("GET /users/:id", () => {
 
   test("get user:me", async ({ defaults }) => {
     const data = await routerClient.users.details(
-      { id: "me" },
+      { user: "me" },
       { context: { user: defaults.user } },
     );
     expect(data.id).toBe(defaults.user.id);
@@ -24,7 +24,7 @@ describe("GET /users/:id", () => {
 
   test("get user by username", async ({ defaults }) => {
     const data = await routerClient.users.details(
-      { id: defaults.user.username },
+      { user: defaults.user.username },
       { context: { user: defaults.user } },
     );
     expect(data.id).toBe(defaults.user.id);
@@ -38,7 +38,7 @@ describe("GET /users/:id", () => {
     });
 
     const data = await routerClient.users.details(
-      { id: user.id },
+      { user: user.id },
       { context: { user: defaults.user } },
     );
     expect(data.id).toBe(user.id);
@@ -47,7 +47,7 @@ describe("GET /users/:id", () => {
 
   test("errors on invalid username", async () => {
     const err = await waitError(() =>
-      routerClient.users.details({ id: "notauser" }),
+      routerClient.users.details({ user: "notauser" }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: User not found]`);
   });

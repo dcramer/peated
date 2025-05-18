@@ -1,12 +1,12 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
-describe("GET /flights/:id", () => {
+describe("GET /flights/:flight", () => {
   test("get flight by id", async ({ fixtures }) => {
     const flight = await fixtures.Flight();
 
     const data = await routerClient.flights.details({
-      id: flight.publicId,
+      flight: flight.publicId,
     });
     expect(data.id).toEqual(flight.publicId);
   });
@@ -14,7 +14,7 @@ describe("GET /flights/:id", () => {
   test("errors on invalid flight", async () => {
     const err = await waitError(
       routerClient.flights.details({
-        id: "123",
+        flight: "123",
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Flight not found.]`);

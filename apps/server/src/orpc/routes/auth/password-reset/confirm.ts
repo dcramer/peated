@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import {
@@ -30,7 +29,7 @@ export default procedure
     try {
       payload = await verifyPayload(input.token);
     } catch (err) {
-      throw new ORPCError("BAD_REQUEST", {
+      throw errors.BAD_REQUEST({
         message: "Invalid verification token.",
       });
     }

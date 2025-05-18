@@ -8,14 +8,14 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/badges/:id" })
-  .input(z.object({ id: z.coerce.number() }))
+  .route({ method: "GET", path: "/badges/:badge" })
+  .input(z.object({ badge: z.coerce.number() }))
   .output(BadgeSchema)
   .handler(async function ({ input, context, errors }) {
     const [badge] = await db
       .select()
       .from(badges)
-      .where(eq(badges.id, input.id));
+      .where(eq(badges.id, input.badge));
     if (!badge) {
       throw errors.NOT_FOUND({
         message: "Badge not found.",

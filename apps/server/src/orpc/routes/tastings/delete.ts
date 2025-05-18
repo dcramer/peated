@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottleReleases,
@@ -16,14 +15,14 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/tastings/:id" })
-  .input(z.coerce.number())
+  .route({ method: "DELETE", path: "/tastings/:tasting" })
+  .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const [tasting] = await db
       .select()
       .from(tastings)
-      .where(eq(tastings.id, input))
+      .where(eq(tastings.id, input.tasting))
       .limit(1);
     if (!tasting) {
       throw errors.NOT_FOUND({

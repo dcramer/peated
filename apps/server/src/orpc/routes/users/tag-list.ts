@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";

@@ -5,12 +5,12 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
-describe("PATCH /countries/:slug", () => {
+describe("PATCH /countries/:country", () => {
   describe("authentication and authorization", () => {
     test("requires authentication", async () => {
       const err = await waitError(
         routerClient.countries.update({
-          slug: "test-country",
+          country: "test-country",
         }),
       );
       expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -20,7 +20,7 @@ describe("PATCH /countries/:slug", () => {
       const err = await waitError(
         routerClient.countries.update(
           {
-            slug: "test-country",
+            country: "test-country",
           },
           { context: { user: defaults.user } },
         ),
@@ -36,7 +36,7 @@ describe("PATCH /countries/:slug", () => {
 
       const data = await routerClient.countries.update(
         {
-          slug: country.slug,
+          country: country.slug,
         },
         { context: { user: modUser } },
       );
@@ -57,7 +57,7 @@ describe("PATCH /countries/:slug", () => {
 
       const data = await routerClient.countries.update(
         {
-          slug: country.slug,
+          country: country.slug,
           description: "New description",
         },
         { context: { user: modUser } },
@@ -83,7 +83,7 @@ describe("PATCH /countries/:slug", () => {
 
       const data = await routerClient.countries.update(
         {
-          slug: country.slug,
+          country: country.slug,
           summary: "New summary",
         },
         { context: { user: modUser } },
@@ -108,7 +108,7 @@ describe("PATCH /countries/:slug", () => {
       const err = await waitError(
         routerClient.countries.update(
           {
-            slug: "nonexistent-country",
+            country: "nonexistent-country",
             description: "New description",
           },
           { context: { user: modUser } },

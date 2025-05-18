@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottles, bottleSeries, changes } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -8,18 +7,14 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "DELETE", path: "/bottle-series/:id" })
-  .input(
-    z.object({
-      id: z.coerce.number(),
-    }),
-  )
+  .route({ method: "DELETE", path: "/bottle-series/:series" })
+  .input(z.object({ series: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const [series] = await db
       .select()
       .from(bottleSeries)
-      .where(eq(bottleSeries.id, input.id))
+      .where(eq(bottleSeries.id, input.series))
       .limit(1);
     if (!series) {
       throw errors.NOT_FOUND({

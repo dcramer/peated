@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
 import { formatReleaseName } from "@peated/server/lib/format";
@@ -17,7 +16,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = BottleReleaseInputSchema.partial().extend({
-  release: z.number(),
+  release: z.coerce.number(),
 });
 
 export default procedure
@@ -49,7 +48,7 @@ export default procedure
         .where(eq(bottles.id, release.bottleId));
 
       if (!bottle) {
-        throw new ORPCError("NOT_FOUND", {
+        throw errors.NOT_FOUND({
           message: "Bottle not found.",
         });
       }

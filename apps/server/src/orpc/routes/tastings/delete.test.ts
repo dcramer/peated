@@ -5,9 +5,11 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /tastings/:id", () => {
+describe("DELETE /tastings/:tasting", () => {
   test("requires authentication", async () => {
-    const err = await waitError(() => routerClient.tastings.delete(1));
+    const err = await waitError(() =>
+      routerClient.tastings.delete({ tasting: 1 }),
+    );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
@@ -17,9 +19,12 @@ describe("DELETE /tastings/:id", () => {
       tags: ["spiced", "caramel"],
     });
 
-    await routerClient.tastings.delete(tasting.id, {
-      context: { user: defaults.user },
-    });
+    await routerClient.tastings.delete(
+      { tasting: tasting.id },
+      {
+        context: { user: defaults.user },
+      },
+    );
 
     const [newTasting] = await db
       .select()
@@ -43,9 +48,12 @@ describe("DELETE /tastings/:id", () => {
     const tasting = await fixtures.Tasting({ createdById: user.id });
 
     const err = await waitError(() =>
-      routerClient.tastings.delete(tasting.id, {
-        context: { user: defaults.user },
-      }),
+      routerClient.tastings.delete(
+        { tasting: tasting.id },
+        {
+          context: { user: defaults.user },
+        },
+      ),
     );
     expect(err).toMatchInlineSnapshot(
       `[Error: Cannot delete another user's tasting.]`,

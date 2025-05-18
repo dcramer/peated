@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleSeries } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -9,17 +8,14 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/bottle-series/:id", tags: ["bottles"] })
-  .input(
-    z.object({
-      id: z.coerce.number(),
-    }),
-  )
+  .route({ method: "GET", path: "/bottle-series/:series" })
+  .input(z.object({ series: z.coerce.number() }))
   .output(BottleSeriesSchema)
   .handler(async function ({ input, context, errors }) {
-    const series = await db.query.bottleSeries.findFirst({
-      where: eq(bottleSeries.id, input.id),
-    });
+    const [series] = await db
+      .select()
+      .from(bottleSeries)
+      .where(eq(bottleSeries.id, input.series));
 
     if (!series) {
       throw errors.NOT_FOUND({

@@ -8,7 +8,7 @@ vi.mock("@peated/server/lib/email", () => ({
   sendMagicLinkEmail: vi.fn(),
 }));
 
-describe("POST /auth/magic-link/send", () => {
+describe("POST /auth/magic-link", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -16,7 +16,7 @@ describe("POST /auth/magic-link/send", () => {
   test("sends magic link for active user", async ({ fixtures }) => {
     const user = await fixtures.User({ active: true });
 
-    const result = await routerClient.auth.magicLink.send({
+    const result = await routerClient.auth.magicLink.create({
       email: user.email,
     });
 
@@ -26,7 +26,7 @@ describe("POST /auth/magic-link/send", () => {
 
   test("throws error when user is not found", async ({ fixtures }) => {
     const error = await waitError(
-      routerClient.auth.magicLink.send({
+      routerClient.auth.magicLink.create({
         email: "nonexistent@example.com",
       }),
     );
@@ -38,7 +38,7 @@ describe("POST /auth/magic-link/send", () => {
     const user = await fixtures.User({ active: false });
 
     const error = await waitError(
-      routerClient.auth.magicLink.send({
+      routerClient.auth.magicLink.create({
         email: user.email,
       }),
     );
@@ -52,7 +52,7 @@ describe("POST /auth/magic-link/send", () => {
       email: "User@Example.com",
     });
 
-    const result = await routerClient.auth.magicLink.send({
+    const result = await routerClient.auth.magicLink.create({
       email: "uSER@eXAMPLE.COM",
     });
 

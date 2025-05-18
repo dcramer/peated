@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { ExternalSite } from "@peated/server/db/schema";
 import { externalSites } from "@peated/server/db/schema";

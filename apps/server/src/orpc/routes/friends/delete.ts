@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
 import { deleteNotification } from "@peated/server/lib/notifications";
@@ -10,21 +9,24 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/friends/:id" })
-  .input(z.coerce.number())
+  // TODO: better path
+  .route({ method: "DELETE", path: "/friends/:friend" })
+  .input(z.object({ friend: z.coerce.number() }))
   .output(
     z.object({
       status: z.enum(["none", "pending", "following", "friends"]).optional(),
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    if (context.user.id === input) {
-      throw errors.NOT_FOUND({
+    const { friend: friendId } = input;
+
+    if (context.user.id === friendId) {
+      throw errors.BAD_REQUEST({
         message: "Cannot unfriend yourself.",
       });
     }
 
-    const [user] = await db.select().from(users).where(eq(users.id, input));
+    const [user] = await db.select().from(users).where(eq(users.id, friendId));
 
     if (!user) {
       throw errors.NOT_FOUND({

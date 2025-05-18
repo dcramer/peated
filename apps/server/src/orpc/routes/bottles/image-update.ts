@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -14,10 +13,10 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/bottles/:bottleId/image" })
+  .route({ method: "POST", path: "/bottles/:bottle/image" })
   .input(
     z.object({
-      bottleId: z.coerce.number(),
+      bottle: z.coerce.number(),
       file: z.instanceof(Blob),
     }),
   )
@@ -27,21 +26,21 @@ export default procedure
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    const { bottleId, file } = input;
+    const { bottle: bottleId, file } = input;
 
-    const [bottle] = await db
+    const [targetBottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, bottleId))
       .limit(1);
 
-    if (!bottle) {
+    if (!targetBottle) {
       throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }
 
-    if (bottle.createdById !== context.user.id && !context.user.admin) {
+    if (targetBottle.createdById !== context.user.id && !context.user.admin) {
       throw errors.FORBIDDEN({
         message: "You don't have permission to update this bottle.",
       });
@@ -67,8 +66,8 @@ export default procedure
     } catch (err) {
       // Check for file size limits
       if (file.size > MAX_FILESIZE) {
-        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}`;
-        throw new ORPCError("PAYLOAD_TOO_LARGE", {
+        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`;
+        throw errors.PAYLOAD_TOO_LARGE({
           message: errMessage,
           cause: err,
         });
@@ -81,7 +80,7 @@ export default procedure
       .set({
         imageUrl,
       })
-      .where(eq(bottles.id, bottle.id));
+      .where(eq(bottles.id, targetBottle.id));
 
     return {
       imageUrl: absoluteUrl(config.API_SERVER, imageUrl),

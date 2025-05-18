@@ -9,17 +9,18 @@ import { serialize } from "@peated/server/serializers";
 import { RegionSerializer } from "@peated/server/serializers/region";
 import slugify from "@sindresorhus/slugify";
 import { and, eq, ne, sql } from "drizzle-orm";
+import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/regions" })
-  .input(RegionInputSchema)
+  .route({ method: "POST", path: "/countries/:country/regions" })
+  .input(RegionInputSchema.extend({ country: z.string() }))
   .output(RegionSchema)
   .handler(async function ({ input, context, errors }) {
     const [country] = await db
       .select({ id: countries.id })
       .from(countries)
-      .where(eq(countries.id, input.country))
+      .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
       .limit(1);
     if (!country) {
       throw errors.NOT_FOUND({
@@ -30,7 +31,7 @@ export default procedure
     const data: NewRegion = {
       ...input,
       slug: slugify(input.name),
-      countryId: input.country,
+      countryId: country.id,
     };
 
     if (data.description && data.description !== "") {
