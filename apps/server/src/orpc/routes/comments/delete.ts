@@ -22,8 +22,8 @@ export default procedure
   .input(
     z.object({
       comment: z.coerce.number(),
-      user: z.coerce.number().optional(),
-      tasting: z.coerce.number().optional(),
+      // user: z.coerce.number().optional(),
+      // tasting: z.coerce.number().optional(),
     }),
   )
   .output(z.object({}))

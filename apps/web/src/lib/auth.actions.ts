@@ -1,7 +1,7 @@
 "use server";
 
 import { isDefinedError } from "@orpc/client";
-import { makeTRPCClient } from "@peated/server/trpc/client";
+import { makeORPCClient } from "@peated/server/orpc/client";
 import config from "@peated/web/config";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
@@ -61,7 +61,7 @@ export async function authenticate(
     (formData.get("redirectTo") || "/") as string,
   );
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
 
   if (email && !password) {
     try {
@@ -86,10 +86,10 @@ export async function authenticate(
   let data;
   try {
     data = code
-      ? await trpcClient.authGoogle.mutate({
+      ? await orpcClient.auth.login({
           code,
         })
-      : await trpcClient.authBasic.mutate({
+      : await orpcClient.auth.login({
           email,
           password,
         });
@@ -101,8 +101,8 @@ export async function authenticate(
 
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
     // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
-  } catch (err) {
-    if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
+  } catch (err: any) {
+    if (isDefinedError(err) && err.data?.code === "UNAUTHORIZED") {
       return {
         magicLink: false,
         error: "Invalid credentials",

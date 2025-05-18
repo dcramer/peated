@@ -23,7 +23,7 @@ export function getLink({
         throw new Error("RPCLink is not allowed on the server side.");
       }
 
-      return apiServer;
+      return `${apiServer}/rpc`;
     },
   });
 }

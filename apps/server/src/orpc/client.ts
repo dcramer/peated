@@ -8,11 +8,11 @@ export function makeORPCClient(
   accessToken?: string | null | undefined,
 ): RouterClient<Router> {
   const link = new RPCLink({
-    url: `${apiServer}/trpc`,
+    url: `${apiServer}/rpc`,
     async headers() {
       return {
         authorization: accessToken ? `Bearer ${accessToken}` : "",
-        "user-agent": "@peated (trpc/proxy)",
+        "user-agent": "@peated (orpc/proxy)",
       };
     },
   });

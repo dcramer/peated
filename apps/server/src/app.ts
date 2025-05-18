@@ -150,7 +150,7 @@ export const app = new Hono()
       }),
     );
   })
-  .use("/v1*", async (c, next) => {
+  .use("/v1/*", async (c, next) => {
     const user = await getUserFromHeader(c.req.header("authorization"));
 
     user

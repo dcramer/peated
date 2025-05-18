@@ -5,8 +5,8 @@ import { type Router } from "@peated/server/orpc/router";
 import { QueryClientProvider } from "@tanstack/react-query";
 import type { ComponentProps } from "react";
 import { useState } from "react";
-import { getLink } from "./client";
 import { ORPCContext } from "./context";
+import { getLink } from "./link";
 import { getQueryClient } from "./query";
 
 export default function ORPCProvider({
