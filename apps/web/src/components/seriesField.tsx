@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BottleSeriesInputSchema } from "@peated/server/schemas";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import Fieldset from "./fieldset";
@@ -21,11 +21,11 @@ export default function SeriesField({
   createDialogHelpText?: string;
   brand: number;
 }) {
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
   return (
     <SelectField<Option>
       onQuery={async (query) => {
-        const { results } = await trpcUtils.bottleSeriesList.fetch({
+        const { results } = await orpc.bottles.series.list.call({
           query,
           brand,
         });

@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { tags } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -9,11 +8,11 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/tags/:name" })
-  .input(z.object({ name: z.string() }))
+  .route({ method: "GET", path: "/tags/:tag" })
+  .input(z.object({ tag: z.string() }))
   .output(TagSchema)
   .handler(async function ({ input, context, errors }) {
-    const [tag] = await db.select().from(tags).where(eq(tags.name, input.name));
+    const [tag] = await db.select().from(tags).where(eq(tags.name, input.tag));
     if (!tag) {
       throw errors.NOT_FOUND({
         message: "Tag not found.",

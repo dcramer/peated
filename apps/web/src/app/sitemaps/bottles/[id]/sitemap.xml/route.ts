@@ -1,5 +1,5 @@
+import { client } from "@peated/web/lib/orpc/client";
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 export const dynamic = "force-dynamic";
 
@@ -12,22 +12,16 @@ export async function GET(
   { params: { id } }: { params: { id: string } },
 ) {
   const startCursor = (Number(id) - 1) * (PAGE_LIMIT / 100) + 1;
-  const trpcClient = await getTrpcClient();
 
   let cursor: number | null = startCursor;
   let count = 0;
   const pages: Sitemap = [];
   while (cursor && count < PAGE_LIMIT) {
-    const { results, rel } = await trpcClient.bottleList.fetch(
-      {
-        cursor,
-        limit: 100,
-        sort: "created",
-      },
-      {
-        gcTime: 0,
-      },
-    );
+    const { results, rel } = await client.bottles.list({
+      cursor,
+      limit: 100,
+      sort: "created",
+    });
 
     pages.push(
       ...results.map((bottle) => ({

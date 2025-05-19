@@ -1,24 +1,17 @@
+import { client } from "@peated/web/lib/orpc/client";
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 export const dynamic = "force-dynamic";
 
 export const revalidate = 86400;
 
 export async function GET() {
-  const trpcClient = await getTrpcClient();
-
   let cursor: number | null = 1;
   const pages: Sitemap = [{ url: "/locations" }];
   while (cursor) {
-    const { results, rel } = await trpcClient.countryList.fetch(
-      {
-        cursor,
-      },
-      {
-        gcTime: 0,
-      },
-    );
+    const { results, rel } = await client.countries.list({
+      cursor,
+    });
 
     pages.push(
       ...results.map((country) => ({

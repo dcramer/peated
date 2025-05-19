@@ -30,25 +30,26 @@ export default function Page({
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const flightUpdateMutation = useMutation({
-    ...orpc.flights.update.mutationOptions(),
-    onSuccess: (data) => {
-      if (!data) return;
-      // TODO: this might be wrong
-      queryClient.setQueryData(
-        orpc.flights.details.key({
-          input: { flight: data.id },
-        }),
-        (oldData: any) =>
-          oldData
-            ? {
-                ...oldData,
-                ...data,
-              }
-            : oldData,
-      );
-    },
-  });
+  const flightUpdateMutation = useMutation(
+    orpc.flights.update.mutationOptions({
+      onSuccess: (data) => {
+        if (!data) return;
+        // TODO: this might be wrong
+        queryClient.setQueryData(
+          orpc.flights.details.key({
+            input: { flight: data.id },
+          }),
+          (oldData: any) =>
+            oldData
+              ? {
+                  ...oldData,
+                  ...data,
+                }
+              : oldData,
+        );
+      },
+    }),
+  );
 
   return (
     <FlightForm

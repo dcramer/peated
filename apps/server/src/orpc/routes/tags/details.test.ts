@@ -2,14 +2,14 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("GET /tags/:name", () => {
+describe("GET /tags/:tag", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
 
   test("retrieves a tag by name", async ({ fixtures }) => {
     const tag = await fixtures.Tag({ name: "TestTag" });
-    const result = await routerClient.tags.details({ name: "TestTag" });
+    const result = await routerClient.tags.details({ tag: "TestTag" });
 
     expect(result).toBeDefined();
     expect(result.name).toBe("TestTag");
@@ -25,7 +25,7 @@ describe("GET /tags/:name", () => {
 
   test("is case-sensitive", async ({ fixtures }) => {
     await fixtures.Tag({ name: "TestTag" });
-    const err = await waitError(routerClient.tags.details({ name: "testtag" }));
+    const err = await waitError(routerClient.tags.details({ tag: "testtag" }));
 
     expect(err).toMatchInlineSnapshot(`[Error: Tag not found.]`);
   });
@@ -37,7 +37,7 @@ describe("GET /tags/:name", () => {
       flavorProfiles: ["young_spritely"],
     });
 
-    const result = await routerClient.tags.details({ name: "TestTag" });
+    const result = await routerClient.tags.details({ tag: "TestTag" });
 
     expect(result.name).toBe("TestTag");
     expect(result.tagCategory).toBe("fruity");
@@ -49,7 +49,7 @@ describe("GET /tags/:name", () => {
     const user = await fixtures.User();
 
     const result = await routerClient.tags.details(
-      { name: "TestTag" },
+      { tag: "TestTag" },
       { context: { user } },
     );
 
@@ -60,7 +60,7 @@ describe("GET /tags/:name", () => {
     const tagName = "Test & Special Characters!";
     await fixtures.Tag({ name: tagName });
 
-    const result = await routerClient.tags.details({ name: tagName });
+    const result = await routerClient.tags.details({ tag: tagName });
 
     expect(result).toBeDefined();
     expect(result.name).toBe(tagName);

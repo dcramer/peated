@@ -2,7 +2,8 @@
 
 import { type ExternalSiteType } from "@peated/server/types";
 import SiteForm from "@peated/web/components/admin/siteForm";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -10,10 +11,19 @@ export default function Page({
 }: {
   params: { siteId: ExternalSiteType };
 }) {
-  const [site] = trpc.externalSiteByType.useSuspenseQuery(siteId);
+  const orpc = useORPC();
+  const { data: site } = useSuspenseQuery(
+    orpc.externalSites.details.queryOptions({
+      input: {
+        site: siteId as any,
+      },
+    }),
+  );
 
   const router = useRouter();
-  const siteUpdateMutation = trpc.externalSiteUpdate.useMutation();
+  const siteUpdateMutation = useMutation(
+    orpc.externalSites.update.mutationOptions(),
+  );
 
   return (
     <SiteForm

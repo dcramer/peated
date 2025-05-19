@@ -10,23 +10,23 @@ import { z } from "zod";
 export default procedure
   .use(requireAuth)
   // TODO: better path
-  .route({ method: "DELETE", path: "/friends/:friend" })
-  .input(z.object({ friend: z.coerce.number() }))
+  .route({ method: "DELETE", path: "/friends/:user" })
+  .input(z.object({ user: z.coerce.number() }))
   .output(
     z.object({
       status: z.enum(["none", "pending", "following", "friends"]).optional(),
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    const { friend: friendId } = input;
+    const { user: userId } = input;
 
-    if (context.user.id === friendId) {
+    if (context.user.id === userId) {
       throw errors.BAD_REQUEST({
         message: "Cannot unfriend yourself.",
       });
     }
 
-    const [user] = await db.select().from(users).where(eq(users.id, friendId));
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
 
     if (!user) {
       throw errors.NOT_FOUND({

@@ -1,5 +1,6 @@
 import type { Notification } from "@peated/server/types";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import NotificationEntry from "./entry";
 
@@ -11,8 +12,13 @@ export default function NotificationList({
   const [archiveList, setArchiveList] = useState<number[]>([]);
   const [readList, setReadList] = useState<number[]>([]);
 
-  const deleteNotification = trpc.notificationDelete.useMutation();
-  const updateNotification = trpc.notificationUpdate.useMutation();
+  const orpc = useORPC();
+  const deleteNotification = useMutation(
+    orpc.notifications.delete.mutationOptions(),
+  );
+  const updateNotification = useMutation(
+    orpc.notifications.update.mutationOptions(),
+  );
 
   const activeValues = values.filter((n) => !archiveList.includes(n.id));
 
@@ -35,7 +41,9 @@ export default function NotificationList({
                 setReadList((results) => [...results, n.id]);
               }}
               onArchive={() => {
-                deleteNotification.mutate(n.id);
+                deleteNotification.mutate({
+                  notification: n.id,
+                });
                 setArchiveList((results) => [...results, n.id]);
               }}
             />

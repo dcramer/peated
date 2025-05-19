@@ -4,7 +4,6 @@ import {
   collectionBottles,
   collections,
   tastings,
-  users,
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
@@ -21,7 +20,16 @@ export default procedure
       user: z.union([z.coerce.number(), z.literal("me"), z.string()]),
     }),
   )
-  .output(UserSchema)
+  .output(
+    UserSchema.extend({
+      stats: z.object({
+        tastings: z.number(),
+        bottles: z.number(),
+        collected: z.number(),
+        contributions: z.number(),
+      }),
+    }),
+  )
   .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);
 
@@ -66,10 +74,10 @@ export default procedure
     return {
       ...(await serialize(UserSerializer, user, context.user)),
       stats: {
-        tastings: totalTastings,
-        bottles: totalBottles,
-        collected: collectedBottles,
-        contributions: totalContributions,
+        tastings: Number(totalTastings),
+        bottles: Number(totalBottles),
+        collected: Number(collectedBottles),
+        contributions: Number(totalContributions),
       },
     };
   });

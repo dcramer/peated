@@ -7,7 +7,7 @@ describe("PATCH /tags/:name", () => {
     const tag = await fixtures.Tag();
     const err = await waitError(() =>
       routerClient.tags.update({
-        name: tag.name,
+        tag: tag.name,
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -20,7 +20,7 @@ describe("PATCH /tags/:name", () => {
     const err = await waitError(() =>
       routerClient.tags.update(
         {
-          name: tag.name,
+          tag: tag.name,
         },
         { context: { user } },
       ),
@@ -34,7 +34,7 @@ describe("PATCH /tags/:name", () => {
     const err = await waitError(() =>
       routerClient.tags.update(
         {
-          name: "non-existent-tag",
+          tag: "non-existent-tag",
         },
         { context: { user } },
       ),
@@ -48,7 +48,7 @@ describe("PATCH /tags/:name", () => {
 
     const newTag = await routerClient.tags.update(
       {
-        name: tag.name,
+        tag: tag.name,
         tagCategory: "fruity",
       },
       { context: { user } },
@@ -64,7 +64,7 @@ describe("PATCH /tags/:name", () => {
 
     const newTag = await routerClient.tags.update(
       {
-        name: tag.name,
+        tag: tag.name,
         synonyms: ["new-synonym"],
       },
       { context: { user } },
@@ -80,7 +80,7 @@ describe("PATCH /tags/:name", () => {
 
     const newTag = await routerClient.tags.update(
       {
-        name: tag.name,
+        tag: tag.name,
       },
       { context: { user } },
     );

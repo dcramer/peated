@@ -3,12 +3,18 @@
 import BadgeImage from "@peated/web/components/badgeImage";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export function UserBadgeList({ userId }: { userId: number }) {
-  const [awardList] = trpc.userBadgeList.useSuspenseQuery({
-    user: userId,
-  });
+  const orpc = useORPC();
+  const { data: awardList } = useSuspenseQuery(
+    orpc.users.badgeList.queryOptions({
+      input: {
+        user: userId,
+      },
+    }),
+  );
 
   if (!awardList.results) return null;
 

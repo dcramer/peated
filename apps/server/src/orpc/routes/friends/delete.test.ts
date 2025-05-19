@@ -5,18 +5,16 @@ import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /friends/:friend", () => {
+describe("DELETE /friends/:user", () => {
   test("requires authentication", async () => {
-    const err = await waitError(() =>
-      routerClient.friends.delete({ friend: 1 }),
-    );
+    const err = await waitError(() => routerClient.friends.delete({ user: 1 }));
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("cannot unfriend self", async ({ defaults }) => {
     const err = await waitError(() =>
       routerClient.friends.delete(
-        { friend: defaults.user.id },
+        { user: defaults.user.id },
         {
           context: { user: defaults.user },
         },
@@ -29,7 +27,7 @@ describe("DELETE /friends/:friend", () => {
     const otherUser = await fixtures.User();
 
     const data = await routerClient.friends.delete(
-      { friend: otherUser.id },
+      { user: otherUser.id },
       {
         context: { user: defaults.user },
       },
@@ -57,7 +55,7 @@ describe("DELETE /friends/:friend", () => {
     });
 
     const data = await routerClient.friends.delete(
-      { friend: otherUser.id },
+      { user: otherUser.id },
       {
         context: { user: defaults.user },
       },

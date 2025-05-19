@@ -3,7 +3,8 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import FriendListItem from "./friendListItem";
 
 export const fetchCache = "default-no-store";
@@ -11,7 +12,12 @@ export const fetchCache = "default-no-store";
 export default function Page() {
   useAuthRequired();
 
-  const [friendList] = trpc.friendList.useSuspenseQuery();
+  const orpc = useORPC();
+  const { data: friendList } = useSuspenseQuery(
+    orpc.friends.list.queryOptions({
+      input: {},
+    }),
+  );
 
   const { results, rel } = friendList;
 

@@ -5,7 +5,8 @@ import { useFlashMessages } from "@peated/web/components/flash";
 import useApi from "@peated/web/hooks/useApi";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -13,10 +14,17 @@ export default function Page({
 }: {
   params: { badgeId: string };
 }) {
-  const [badge] = trpc.badgeById.useSuspenseQuery(parseInt(badgeId, 10));
+  const orpc = useORPC();
+  const { data: badge } = useSuspenseQuery(
+    orpc.badges.details.queryOptions({
+      input: {
+        badge: parseInt(badgeId, 10),
+      },
+    }),
+  );
 
   const router = useRouter();
-  const badgeUpdateMutation = trpc.badgeUpdate.useMutation();
+  const badgeUpdateMutation = useMutation(orpc.badges.update.mutationOptions());
   const api = useApi();
   const { flash } = useFlashMessages();
 
@@ -25,7 +33,7 @@ export default function Page({
       onSubmit={async ({ image, ...data }) => {
         const newBadge = await badgeUpdateMutation.mutateAsync({
           ...data,
-          id: badge.id,
+          badge: badge.id,
         });
 
         if (image) {

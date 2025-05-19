@@ -1,6 +1,7 @@
 "use client";
 
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export function StatsSkeleton() {
   return (
@@ -24,7 +25,8 @@ function SkeletonStat({ name }: { name: string }) {
 }
 
 export default function Stats() {
-  const [data] = trpc.stats.useSuspenseQuery();
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(orpc.stats.queryOptions());
 
   if (!data) {
     return <div>{"Oops, maybe you're offline?"}</div>;

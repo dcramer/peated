@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isDefinedError } from "@orpc/client";
 import { EventInputSchema } from "@peated/server/schemas";
 import { type Event } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
@@ -10,7 +11,6 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
@@ -63,8 +63,8 @@ export default function EventForm({
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit(data);
-    } catch (err) {
-      if (isTRPCClientError(err)) {
+    } catch (err: any) {
+      if (isDefinedError(err)) {
         setError(err.message);
       } else {
         logError(err);

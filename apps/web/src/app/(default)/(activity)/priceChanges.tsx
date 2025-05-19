@@ -9,7 +9,6 @@ import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
 import classNames from "@peated/web/lib/classNames";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { trpc } from "@peated/web/lib/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 function PriceDelta({

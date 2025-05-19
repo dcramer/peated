@@ -1,6 +1,5 @@
 "use client";
 
-import { trpc } from "@peated/web/lib/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import type { ComponentProps } from "react";
 import { Suspense } from "react";

@@ -30,25 +30,26 @@ export default function Page({
 
   const queryClient = useQueryClient();
 
-  const countryUpdateMutation = useMutation({
-    ...orpc.countries.update.mutationOptions(),
-    onSuccess: (data) => {
-      if (!data) return;
-      // TODO: this might be wrong
-      queryClient.setQueryData(
-        orpc.countries.details.key({
-          input: { country: data.slug },
-        }),
-        (oldData: any) =>
-          oldData
-            ? {
-                ...oldData,
-                ...data,
-              }
-            : oldData,
-      );
-    },
-  });
+  const countryUpdateMutation = useMutation(
+    orpc.countries.update.mutationOptions({
+      onSuccess: (data) => {
+        if (!data) return;
+        // TODO: this might be wrong
+        queryClient.setQueryData(
+          orpc.countries.details.key({
+            input: { country: data.slug },
+          }),
+          (oldData: any) =>
+            oldData
+              ? {
+                  ...oldData,
+                  ...data,
+                }
+              : oldData,
+        );
+      },
+    }),
+  );
 
   return (
     <CountryForm

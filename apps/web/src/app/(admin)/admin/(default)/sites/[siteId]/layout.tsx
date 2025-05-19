@@ -8,25 +8,17 @@ import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import TimeSince from "@peated/web/components/timeSince";
 import { formatDuration } from "@peated/web/lib/format";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import { type z } from "zod";
 
-type UpdateSiteFn = (data: z.infer<typeof ExternalSiteSchema>) => void;
-
-function TriggerJobButton({
-  siteId,
-  updateSite,
-}: {
-  siteId: ExternalSiteType;
-  updateSite: UpdateSiteFn;
-}) {
+function TriggerJobButton({ siteId }: { siteId: ExternalSiteType }) {
   const [isLoading, setLoading] = useState(false);
-  const triggerJobMutation = trpc.externalSiteTriggerJob.useMutation({
-    onSuccess: (data) => {
-      updateSite(data);
-    },
-  });
+  const orpc = useORPC();
+  const triggerJobMutation = useMutation(
+    orpc.externalSites.triggerJob.mutationOptions(),
+  );
 
   return (
     <Button
@@ -34,7 +26,9 @@ function TriggerJobButton({
       loading={isLoading}
       onClick={async () => {
         setLoading(true);
-        await triggerJobMutation.mutateAsync(siteId);
+        await triggerJobMutation.mutateAsync({
+          site: siteId,
+        });
         setLoading(false);
       }}
     >
@@ -50,8 +44,13 @@ export default function Layout({
   params: { siteId: string };
   children: ReactNode;
 }) {
-  const [initialSite] = trpc.externalSiteByType.useSuspenseQuery(
-    siteId as ExternalSiteType,
+  const orpc = useORPC();
+  const { data: initialSite } = useSuspenseQuery(
+    orpc.externalSites.details.queryOptions({
+      input: {
+        site: siteId as ExternalSiteType,
+      },
+    }),
   );
 
   const [site, setSite] = useState(initialSite);
@@ -120,10 +119,7 @@ export default function Layout({
         <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
           <div className="flex gap-x-2">
             <Button href={`/admin/sites/${site.type}/edit`}>Edit Site</Button>
-            <TriggerJobButton
-              siteId={site.type}
-              updateSite={(d) => setSite(d)}
-            />
+            <TriggerJobButton siteId={site.type} />
           </div>
         </div>
       </div>

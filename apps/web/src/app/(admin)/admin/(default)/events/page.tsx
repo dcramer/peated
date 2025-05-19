@@ -6,7 +6,8 @@ import DateRange from "@peated/web/components/dateRange";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page() {
   const queryParams = useApiQueryParams({
@@ -17,7 +18,12 @@ export default function Page() {
     numericFields: ["cursor", "limit"],
   });
 
-  const [eventList] = trpc.eventList.useSuspenseQuery(queryParams);
+  const orpc = useORPC();
+  const { data: eventList } = useSuspenseQuery(
+    orpc.events.list.queryOptions({
+      input: queryParams,
+    }),
+  );
 
   return (
     <div>

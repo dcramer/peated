@@ -12,15 +12,15 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/tags/:name" })
+  .route({ method: "PATCH", path: "/tags/:tag" })
   .input(
     TagInputSchema.partial().extend({
-      name: z.string(),
+      tag: z.string(),
     }),
   )
   .output(TagSchema)
   .handler(async function ({ input, context, errors }) {
-    const [tag] = await db.select().from(tags).where(eq(tags.name, input.name));
+    const [tag] = await db.select().from(tags).where(eq(tags.name, input.tag));
     if (!tag) {
       throw errors.NOT_FOUND({
         message: "Tag not found.",

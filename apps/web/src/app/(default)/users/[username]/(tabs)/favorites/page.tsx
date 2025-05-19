@@ -1,14 +1,15 @@
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 
 export async function generateMetadata({
   params: { username },
 }: {
   params: { username: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.fetch(username);
+  const user = await client.users.details({
+    user: username,
+  });
 
   return {
     title: `Favorites by @${user.username}`,
@@ -26,8 +27,7 @@ export default async function UserFavorites({
 }: {
   params: { username: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const favoriteList = await trpcClient.collectionBottleList.fetch({
+  const favoriteList = await client.collections.bottles.list({
     user: username,
     collection: "default",
   });

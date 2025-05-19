@@ -25,7 +25,7 @@ import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import TextAreaField from "@peated/web/components/textAreaField";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -102,13 +102,13 @@ export default function TastingForm({
       : undefined,
   );
 
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit({ ...data, image });
-    } catch (err) {
-      if (isTRPCClientError(err)) {
+    } catch (err: any) {
+      if (err.name === "BAD_REQUEST" || err.name === "CONFLICT") {
         setError(err.message);
       } else {
         logError(err);
@@ -284,7 +284,7 @@ export default function TastingForm({
               <SelectField
                 {...field}
                 onQuery={async (query) => {
-                  const { results } = await trpcUtils.friendList.fetch({
+                  const { results } = await orpc.friends.list.call({
                     query,
                     filter: "active",
                   });

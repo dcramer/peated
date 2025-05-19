@@ -10,10 +10,10 @@ import { z } from "zod";
 export default procedure
   .use(requireAuth)
   // TODO: better path
-  .route({ method: "PUT", path: "/friends/:friend" })
+  .route({ method: "PUT", path: "/friends/:user" })
   .input(
     z.object({
-      friend: z.coerce.number(),
+      user: z.coerce.number(),
     }),
   )
   .output(
@@ -22,15 +22,15 @@ export default procedure
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    const { friend: friendId } = input;
+    const { user: userId } = input;
 
-    if (context.user.id === friendId) {
+    if (context.user.id === userId) {
       throw errors.BAD_REQUEST({
         message: "Cannot friend yourself.",
       });
     }
 
-    const [user] = await db.select().from(users).where(eq(users.id, friendId));
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
 
     if (!user) {
       throw errors.NOT_FOUND({

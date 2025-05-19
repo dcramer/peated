@@ -6,7 +6,8 @@ import Link from "@peated/web/components/link";
 import ListItem from "@peated/web/components/listItem";
 import UserAvatar from "@peated/web/components/userAvatar";
 import classNames from "@peated/web/lib/classNames";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
 function actionLabel(status: FriendStatus) {
@@ -24,16 +25,21 @@ function actionLabel(status: FriendStatus) {
 export default function FriendListItem({ friend }: { friend: Friend }) {
   const [friendStatus, setFriendStatus] = useState<FriendStatus>(friend.status);
 
-  const friendCreateMutation = trpc.friendCreate.useMutation({
-    onSuccess: ({ status }) => {
-      setFriendStatus(status);
-    },
-  });
-  const friendDeleteMutation = trpc.friendDelete.useMutation({
-    onSuccess: ({ status }) => {
-      setFriendStatus(status);
-    },
-  });
+  const orpc = useORPC();
+  const friendCreateMutation = useMutation(
+    orpc.friends.create.mutationOptions({
+      onSuccess: ({ status }) => {
+        setFriendStatus(status);
+      },
+    }),
+  );
+  const friendDeleteMutation = useMutation(
+    orpc.friends.delete.mutationOptions({
+      onSuccess: ({ status }) => {
+        setFriendStatus(status);
+      },
+    }),
+  );
 
   if (friendStatus === "none") return null;
 
@@ -69,9 +75,13 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
                 onClick={() => {
                   if (isPending) return;
                   if (friendStatus === "friends") {
-                    friendDeleteMutation.mutate(user.id);
+                    friendDeleteMutation.mutate({
+                      user: user.id,
+                    });
                   } else {
-                    friendCreateMutation.mutate(user.id);
+                    friendCreateMutation.mutate({
+                      user: user.id,
+                    });
                   }
                 }}
               >

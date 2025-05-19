@@ -33,28 +33,29 @@ export default function Page({
 
   const queryClient = useQueryClient();
 
-  const regionUpdateMutation = useMutation({
-    ...orpc.regions.update.mutationOptions(),
-    onSuccess: (data) => {
-      if (!data) return;
-      // TODO: this might be wrong
-      queryClient.setQueryData(
-        orpc.regions.details.key({
-          input: {
-            country: countrySlug,
-            region: data.slug,
-          },
-        }),
-        (oldData: any) =>
-          oldData
-            ? {
-                ...oldData,
-                ...data,
-              }
-            : oldData,
-      );
-    },
-  });
+  const regionUpdateMutation = useMutation(
+    orpc.regions.update.mutationOptions({
+      onSuccess: (data) => {
+        if (!data) return;
+        // TODO: this might be wrong
+        queryClient.setQueryData(
+          orpc.regions.details.key({
+            input: {
+              country: countrySlug,
+              region: data.slug,
+            },
+          }),
+          (oldData: any) =>
+            oldData
+              ? {
+                  ...oldData,
+                  ...data,
+                }
+              : oldData,
+        );
+      },
+    }),
+  );
 
   return (
     <RegionForm

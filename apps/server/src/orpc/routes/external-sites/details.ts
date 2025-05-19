@@ -11,10 +11,10 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/external-sites/:type" })
+  .route({ method: "GET", path: "/external-sites/:site" })
   .input(
     z.object({
-      type: ExternalSiteTypeEnum,
+      site: ExternalSiteTypeEnum,
     }),
   )
   .output(ExternalSiteSchema)
@@ -22,7 +22,7 @@ export default procedure
     const [site] = await db
       .select()
       .from(externalSites)
-      .where(eq(externalSites.type, input.type));
+      .where(eq(externalSites.type, input.site));
     if (!site) {
       throw errors.NOT_FOUND({
         message: "Site not found.",
