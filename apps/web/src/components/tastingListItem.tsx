@@ -91,9 +91,7 @@ export default function TastingListItem({
   const tastingDeleteMutation = useMutation(
     orpc.tastings.delete.mutationOptions(),
   );
-  const toastCreateMutation = useMutation(
-    orpc.tastings.toasts.create.mutationOptions(),
-  );
+  const toastCreateMutation = useMutation(orpc.toasts.create.mutationOptions());
 
   const [imageOpen, setImageOpen] = useState(false);
 
@@ -245,7 +243,7 @@ export default function TastingListItem({
               ? () => {
                   setHasToasted(true);
                   toastCreateMutation.mutate(
-                    { tastingId: tasting.id },
+                    { tasting: tasting.id },
                     {
                       onError: () => {
                         setHasToasted(false);
@@ -298,7 +296,7 @@ export default function TastingListItem({
                     as="button"
                     onClick={async () => {
                       await tastingDeleteMutation.mutateAsync({
-                        tastingId: tasting.id,
+                        tasting: tasting.id,
                       });
                       if (onDelete) onDelete(tasting);
                       else {

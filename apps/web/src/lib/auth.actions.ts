@@ -1,6 +1,6 @@
 "use server";
 
-import { isDefinedError } from "@orpc/client";
+import { isDefinedError, safe } from "@orpc/client";
 import { makeORPCClient } from "@peated/server/orpc/client";
 import config from "@peated/web/config";
 import { redirect } from "next/navigation";
@@ -64,17 +64,16 @@ export async function authenticate(
   const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
 
   if (email && !password) {
-    try {
-      await trpcClient.authMagicLinkSend.mutate({ email });
-    } catch (err: any) {
-      if (isDefinedError(err) && err.data?.code === "UNAUTHORIZED") {
-        return {
-          magicLink: false,
-          error: "Invalid credentials",
-        };
-      }
-
-      throw err;
+    const { error, isDefined } = await safe(
+      orpcClient.auth.magicLink.create({ email }),
+    );
+    if (isDefined && error.name === "UNAUTHORIZED") {
+      return {
+        magicLink: false,
+        error: "Invalid credentials",
+      };
+    } else if (error) {
+      throw error;
     }
 
     return {
@@ -95,7 +94,7 @@ export async function authenticate(
         });
 
     session.user = data.user;
-    session.accessToken = data.accessToken;
+    session.accessToken = data.accessToken ?? null;
 
     await session.save();
 
@@ -141,25 +140,24 @@ export async function register(formData: FormData) {
   const password = (formData.get("password") || "") as string;
   const username = formData.get("username") as string;
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
 
-  let data;
-  try {
-    data = await trpcClient.authRegister.mutate({
+  const { error, data, isDefined } = await safe(
+    orpcClient.auth.register({
       email,
       password,
       username,
-    });
-  } catch (err) {
-    if (isTRPCClientError(err) && err.data?.code === "CONFLICT") {
-      return "An account already exists matching that username or email address.";
-    }
+    }),
+  );
 
-    throw err;
+  if (isDefined && error.name === "CONFLICT") {
+    return "An account already exists matching that username or email address.";
+  } else if (error) {
+    throw error;
   }
 
   session.user = data.user;
-  session.accessToken = data.accessToken;
+  session.accessToken = data.accessToken ?? null;
   session.ts = new Date().getTime();
 
   await session.save();
@@ -186,15 +184,15 @@ export async function resendVerificationForm(
 
   const session = await getSession();
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
-  try {
-    await trpcClient.emailResendVerification.mutate();
-  } catch (err) {
-    if (isTRPCClientError(err) && err.data?.code === "CONFLICT") {
-      return { ok: true, alreadyVerified: true };
-    }
+  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
+  const { isDefined, error } = await safe(
+    orpcClient.email.resendVerification(),
+  );
 
-    throw err;
+  if (isDefined && error.name === "CONFLICT") {
+    return { ok: true, alreadyVerified: true };
+  } else if (error) {
+    throw error;
   }
 
   return { ok: true };
@@ -277,8 +275,6 @@ export async function updateSession(): Promise<SessionData> {
     ...session,
   };
 }
-
-const SESSION_REFRESH = 60;
 
 export async function ensureSessionSynced(): Promise<SessionData> {
   "use server";

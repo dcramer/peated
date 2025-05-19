@@ -17,17 +17,13 @@ function NotificationCountAuthentciated() {
     staleTime: 60 * 1000,
   });
 
-  if (!user) return null;
+  if (!user || !unreadNotificationCount) return null;
 
-  if (unreadNotificationCount > 0) {
-    return (
-      <span className="bg-highlight absolute right-0 top-0 inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-semibold text-black">
-        {unreadNotificationCount.toLocaleString()}
-      </span>
-    );
-  }
-
-  return null;
+  return (
+    <span className="bg-highlight absolute right-0 top-0 inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-semibold text-black">
+      {unreadNotificationCount.toLocaleString()}
+    </span>
+  );
 }
 
 export default function NotificationCount() {

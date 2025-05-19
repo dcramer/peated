@@ -26,7 +26,7 @@ export default function BottlePanel({
 } & Omit<ComponentPropsWithoutRef<typeof SidePanel>, "children">) {
   const orpc = useORPC();
   const { data } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { id: bottle.id } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: bottle.id } }),
   );
 
   return (

@@ -2,6 +2,7 @@
 
 import { createORPCClient } from "@orpc/client";
 import config from "@peated/web/config";
+import { cache } from "react";
 import { getSession } from "../session.server";
 import { getLink } from "./link";
 
@@ -18,5 +19,7 @@ async function createServerClient() {
     }),
   );
 }
+
+export const getOrpcClient = cache(createServerClient);
 
 globalThis.$client = createServerClient();
