@@ -8,6 +8,8 @@ import { getSafeRedirect } from "./auth";
 import type { SessionData } from "./session.server";
 import { getSession } from "./session.server";
 
+const SESSION_REFRESH = 60 * 60; // 1 hour
+
 export async function logoutForm(
   prevState: void | undefined,
   formData: FormData,
@@ -67,13 +69,16 @@ export async function authenticate(
     const { error, isDefined } = await safe(
       orpcClient.auth.magicLink.create({ email }),
     );
-    if (isDefined && error.name === "UNAUTHORIZED") {
+    if (isDefined) {
       return {
         magicLink: false,
-        error: "Invalid credentials",
+        error: error.message,
       };
     } else if (error) {
-      throw error;
+      return {
+        magicLink: false,
+        error: "Internal server error.",
+      };
     }
 
     return {
@@ -82,34 +87,36 @@ export async function authenticate(
     };
   }
 
-  let data;
-  try {
-    data = code
-      ? await orpcClient.auth.login({
+  const { error, isDefined, data } = await safe(
+    code
+      ? orpcClient.auth.login({
           code,
         })
-      : await orpcClient.auth.login({
+      : orpcClient.auth.login({
           email,
           password,
-        });
+        }),
+  );
 
-    session.user = data.user;
-    session.accessToken = data.accessToken ?? null;
-
-    await session.save();
-
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
-    // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
-  } catch (err: any) {
-    if (isDefinedError(err) && err.data?.code === "UNAUTHORIZED") {
-      return {
-        magicLink: false,
-        error: "Invalid credentials",
-      };
-    }
-
-    throw err;
+  if (isDefined) {
+    return {
+      magicLink: false,
+      error: error.message,
+    };
+  } else if (error) {
+    return {
+      magicLink: false,
+      error: "Internal server error.",
+    };
   }
+
+  session.user = data.user;
+  session.accessToken = data.accessToken ?? null;
+
+  await session.save();
+
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
+  // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
 
   if (!data.user.verified) {
     redirect("/verify");
@@ -142,7 +149,7 @@ export async function register(formData: FormData) {
 
   const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
 
-  const { error, data, isDefined } = await safe(
+  const { error, isDefined, data } = await safe(
     orpcClient.auth.register({
       email,
       password,
@@ -150,10 +157,10 @@ export async function register(formData: FormData) {
     }),
   );
 
-  if (isDefined && error.name === "CONFLICT") {
-    return "An account already exists matching that username or email address.";
+  if (isDefined) {
+    return { ok: false, error: error.message };
   } else if (error) {
-    throw error;
+    return { ok: false, error: "Internal server error." };
   }
 
   session.user = data.user;
@@ -170,6 +177,7 @@ export async function register(formData: FormData) {
 
 type GenericResult = {
   ok: boolean;
+  error?: string;
 };
 
 export async function resendVerificationForm(
@@ -192,7 +200,7 @@ export async function resendVerificationForm(
   if (isDefined && error.name === "CONFLICT") {
     return { ok: true, alreadyVerified: true };
   } else if (error) {
-    throw error;
+    return { ok: false, error: "Internal server error." };
   }
 
   return { ok: true };
@@ -207,16 +215,16 @@ export async function passwordResetForm(
   const email = (formData.get("email") || "") as string;
 
   const session = await getSession();
+  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
-  try {
-    await trpcClient.authPasswordReset.mutate({ email });
-  } catch (err) {
-    if (isTRPCClientError(err)) {
-      return { ok: false, error: err.message };
-    }
+  const { error, isDefined } = await safe(
+    orpcClient.auth.passwordReset.create({ email }),
+  );
 
-    throw err;
+  if (isDefined) {
+    return { ok: false, error: error.message };
+  } else if (error) {
+    return { ok: false, error: "Internal server error." };
   }
 
   return { ok: true };
@@ -232,25 +240,20 @@ export async function passwordResetConfirmForm(
   const password = (formData.get("password") || "") as string;
 
   const session = await getSession();
+  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  const { error, isDefined, data } = await safe(
+    orpcClient.auth.passwordReset.confirm({ token, password }),
+  );
 
-  let data;
-  try {
-    data = await trpcClient.authPasswordResetConfirm.mutate({
-      token,
-      password,
-    });
-  } catch (err) {
-    if (isTRPCClientError(err)) {
-      return { ok: false, error: err.message };
-    }
-
-    throw err;
+  if (isDefined) {
+    return { ok: false, error: error.message };
+  } else if (error) {
+    return { ok: false, error: "Internal server error." };
   }
 
   session.user = data.user;
-  session.accessToken = data.accessToken;
+  session.accessToken = data.accessToken ?? null;
   session.ts = new Date().getTime();
 
   await session.save();
@@ -262,9 +265,9 @@ export async function updateSession(): Promise<SessionData> {
   "use server";
 
   const session = await getSession();
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
 
-  const user = await trpcClient.userById.query("me");
+  const user = await orpcClient.users.details({ user: "me" });
   session.user = user;
   session.ts = new Date().getTime();
   // should rotate access token too

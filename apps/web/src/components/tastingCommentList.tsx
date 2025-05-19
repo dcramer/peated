@@ -1,7 +1,8 @@
 "use client";
 
 import type { Comment, User } from "@peated/server/types";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import CommentEntry from "./commentEntry";
@@ -15,15 +16,16 @@ export default function TastingCommentList({
   tastingId: number;
   newValues?: Comment[];
 }) {
-  const [data] = trpc.commentList.useSuspenseQuery({
-    tasting: tastingId,
-  });
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.comments.list.queryOptions({
+      input: { tasting: tastingId },
+    }),
+  );
 
-  const commentDeleteMutation = trpc.commentDelete.useMutation({
-    onSuccess: (_data, input) => {
-      setDeleted((a) => [...a, input]);
-    },
-  });
+  const commentDeleteMutation = useMutation(
+    orpc.comments.delete.mutationOptions(),
+  );
 
   const [deleted, setDeleted] = useState<number[]>([]);
 
@@ -46,7 +48,10 @@ export default function TastingCommentList({
             createdBy={c.createdBy}
             text={c.comment}
             canDelete={user?.admin || isAuthor}
-            onDelete={() => commentDeleteMutation.mutate(c.id)}
+            onDelete={() => {
+              commentDeleteMutation.mutate({ comment: c.id });
+              setDeleted((a) => [...a, c.id]);
+            }}
           />
         );
       })}
