@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isDefinedError } from "@orpc/client";
 import { CASK_FILLS, CASK_SIZES, CASK_TYPES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { BottleReleaseInputSchema } from "@peated/server/schemas";
@@ -11,7 +12,6 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
-import { isTRPCClientError } from "@peated/web/lib/trpc/client";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -64,8 +64,8 @@ export default function ReleaseForm({
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit(data);
-    } catch (err) {
-      if (isTRPCClientError(err)) {
+    } catch (err: any) {
+      if (isDefinedError(err)) {
         setError(err.message);
       } else {
         logError(err);

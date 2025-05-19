@@ -1,7 +1,7 @@
 import Button from "@peated/web/components/button";
 import EntityHeader from "@peated/web/components/entityHeader";
 import ShareButton from "@peated/web/components/shareButton";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
@@ -15,8 +15,9 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const entityId = Number(params.entityId);
-  const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.fetch(entityId);
+  const entity = await client.entities.details({
+    entity: entityId,
+  });
 
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (entity.id !== entityId) {

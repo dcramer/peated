@@ -3,11 +3,13 @@
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const DEFAULT_SORT = "-tastings";
 
 export default function BottleList() {
+  const orpc = useORPC();
   const queryParams = useApiQueryParams({
     numericFields: [
       "cursor",
@@ -24,7 +26,11 @@ export default function BottleList() {
     },
   });
 
-  const [bottleList] = trpc.bottleList.useSuspenseQuery(queryParams);
+  const { data: bottleList } = useSuspenseQuery(
+    orpc.bottles.list.queryOptions({
+      input: queryParams,
+    }),
+  );
 
   return (
     <>

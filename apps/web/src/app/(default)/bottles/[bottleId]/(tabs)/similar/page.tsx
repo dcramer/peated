@@ -1,14 +1,15 @@
 import BetaNotice from "@peated/web/components/betaNotice";
 import BottleTable from "@peated/web/components/bottleTable";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 
 export async function generateMetadata({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
+  const bottle = await client.bottles.details({
+    bottle: Number(bottleId),
+  });
 
   return {
     title: `Whisky Similar to ${bottle.fullName}`,
@@ -20,8 +21,7 @@ export default async function Page({
 }: {
   params: { bottleId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const bottleList = await trpcClient.similarBottleList.fetch({
+  const bottleList = await client.bottles.similar({
     bottle: Number(bottleId),
   });
 

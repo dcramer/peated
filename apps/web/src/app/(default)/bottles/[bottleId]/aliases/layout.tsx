@@ -1,5 +1,5 @@
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -7,8 +7,9 @@ export async function generateMetadata({
 }: {
   params: { bottleId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
+  const bottle = await client.bottles.details({
+    bottle: Number(bottleId),
+  });
 
   return {
     title: `Other Names for ${bottle.fullName}`,

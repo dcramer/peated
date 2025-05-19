@@ -9,7 +9,8 @@ import useApi from "@peated/web/hooks/useApi";
 import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { skipToken, useMutation, useQueries } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -17,6 +18,7 @@ export default function AddBottle() {
   useVerifiedRequired();
 
   const router = useRouter();
+  const orpc = useORPC();
   const searchParams = useSearchParams();
   const name = toTitleCase(searchParams.get("name") || "");
   const returnTo = searchParams.get("returnTo");
@@ -33,57 +35,53 @@ export default function AddBottle() {
     name,
   });
 
-  const queryOrder: string[] = [];
-  let initialQueries = trpc.useQueries((t) => {
-    const rv = [];
-    if (distiller) {
-      queryOrder.push("distiller");
-      rv.push(t.entityById(Number(distiller)));
-    }
-    if (brand) {
-      queryOrder.push("brand");
-      rv.push(t.entityById(Number(brand)));
-    }
-    if (bottler) {
-      queryOrder.push("bottler");
-      rv.push(t.entityById(Number(bottler)));
-    }
-
-    return rv;
+  const queries = useQueries({
+    queries: [
+      {
+        ...orpc.entities.details.queryOptions({
+          input: { entity: Number(distiller) },
+        }),
+        enabled: !!distiller,
+      },
+      {
+        ...orpc.entities.details.queryOptions({
+          input: { entity: Number(brand) },
+        }),
+        enabled: !!brand,
+      },
+      {
+        ...orpc.entities.details.queryOptions({
+          input: { entity: Number(bottler) },
+        }),
+        enabled: !!bottler,
+      },
+      {
+        ...orpc.bottles.series.details.queryOptions({
+          input: { series: Number(series) },
+        }),
+        enabled: !!series,
+      },
+    ],
   });
 
-  const seriesQuery = series
-    ? trpc.bottleSeriesById.useQuery(Number(series))
-    : null;
-
-  const getQueryResult = (name: string): Entity | undefined => {
-    const index = queryOrder.indexOf(name);
-    if (index === -1) return undefined;
-    return initialQueries[index].data;
-  };
+  const [distillerQuery, brandQuery, bottlerQuery, seriesQuery] = queries;
 
   useEffect(() => {
-    if (
-      loading &&
-      !initialQueries.find((q) => q.isLoading) &&
-      !seriesQuery?.isLoading
-    ) {
-      const distiller = getQueryResult("distiller");
-      const brand = getQueryResult("brand");
-      const bottler = getQueryResult("bottler");
-      const series = seriesQuery?.data;
+    if (loading && !queries.some((q) => q.isLoading)) {
       setInitialData((initialData) => ({
         ...initialData,
-        distillers: distiller ? [distiller] : [],
-        brand,
-        bottler,
-        series,
+        distillers: distillerQuery.data ? [distillerQuery.data] : [],
+        brand: brandQuery.data,
+        bottler: bottlerQuery.data,
+        series: seriesQuery.data,
       }));
       setLoading(false);
     }
-  }, [initialQueries.find((q) => q.isLoading), seriesQuery?.isLoading]);
+  }, [queries.map((q) => q.isLoading)]);
 
-  const bottleCreateMutation = trpc.bottleCreate.useMutation();
+  const bottleCreateMutation = useMutation(
+    orpc.bottles.create.mutationOptions(),
+  );
   const api = useApi();
   const { flash } = useFlashMessages();
 

@@ -6,7 +6,7 @@ import FlavorProfile from "@peated/web/components/flavorProfile";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import { summarize } from "@peated/web/lib/markdown";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import type { Product, WithContext } from "schema-dts";
@@ -20,8 +20,9 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const bottleId = Number(params.bottleId);
-  const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.fetch(bottleId);
+  const bottle = await client.bottles.details({
+    bottle: bottleId,
+  });
 
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (bottle.id !== bottleId) {
