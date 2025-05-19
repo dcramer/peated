@@ -1,4 +1,4 @@
-import { createORPCClient, isDefinedError } from "@orpc/client";
+import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { RouterClient } from "@orpc/server";
 import { type Router } from "@peated/server/orpc/router";
@@ -19,5 +19,3 @@ export function makeORPCClient(
 
   return createORPCClient(link);
 }
-
-export const isORPCClientError = isDefinedError;

@@ -5,10 +5,10 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("DELETE /tastings/:tasting/comments/:comment", () => {
+describe("DELETE comments/:comment", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
-      routerClient.comments.delete({ comment: 1, tasting: 1 }),
+      routerClient.comments.delete({ comment: 1 }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -19,7 +19,7 @@ describe("DELETE /tastings/:tasting/comments/:comment", () => {
     });
 
     await routerClient.comments.delete(
-      { comment: comment.id, tasting: comment.tastingId },
+      { comment: comment.id },
       {
         context: { user: defaults.user },
       },
