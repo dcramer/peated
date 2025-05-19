@@ -2,6 +2,7 @@
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isDefinedError } from "@orpc/client";
 import { UserInputSchema } from "@peated/server/schemas";
 import { type User } from "@peated/server/types";
 import BooleanField from "@peated/web/components/booleanField";
@@ -20,7 +21,8 @@ import useAuth from "@peated/web/hooks/useAuth";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { updateSession } from "@peated/web/lib/auth.actions";
 import { toBlob } from "@peated/web/lib/blobs";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -34,20 +36,23 @@ export default function Page() {
 
   const { setUser } = useAuth();
   const api = useApi();
+  const orpc = useORPC();
 
   const router = useRouter();
 
-  let user: User;
-  try {
-    [user] = trpc.userById.useSuspenseQuery("me");
-  } catch (err) {
-    if (isTRPCClientError(err) && err.data?.code === "NOT_FOUND") {
-      redirect("/login");
-    }
-    throw err;
-  }
+  const { data: user } = useSuspenseQuery(
+    orpc.users.details.queryOptions({
+      input: { user: "me" },
+      onError: (error: any) => {
+        if (isDefinedError(error) && error.name === "NOT_FOUND") {
+          redirect("/login");
+        }
+        throw error;
+      },
+    }),
+  );
 
-  const userUpdateMutation = trpc.userUpdate.useMutation();
+  const userUpdateMutation = useMutation(orpc.users.update.mutationOptions());
 
   const [picture, setPicture] = useState<HTMLCanvasElement | null | undefined>(
     undefined,

@@ -17,7 +17,7 @@ describe("POST /bottle-releases", () => {
     });
 
     const data = {
-      bottleId: bottle.id,
+      bottle: bottle.id,
       edition: "Batch 1",
       statedAge: 10,
       abv: 46.1,
@@ -36,7 +36,7 @@ describe("POST /bottle-releases", () => {
 
     // Verify key properties of the response
     expect(result).toMatchObject({
-      bottleId: bottle.id,
+      bottle: bottle.id,
       statedAge: 10,
       abv: 46.1,
       releaseYear: 2023,
@@ -107,7 +107,7 @@ describe("POST /bottle-releases", () => {
     });
 
     const data = {
-      bottleId: bottle.id,
+      bottle: bottle.id,
       edition: "Batch 1",
       abv: 46.0,
       releaseYear: 2023,
@@ -125,7 +125,7 @@ describe("POST /bottle-releases", () => {
 
     // Verify key properties of the response
     expect(result).toMatchObject({
-      bottleId: bottle.id,
+      bottle: bottle.id,
       statedAge: 10,
       abv: 46.0,
       releaseYear: 2023,
@@ -194,7 +194,7 @@ describe("POST /bottle-releases", () => {
     });
 
     const data = {
-      bottleId: bottle.id,
+      bottle: bottle.id,
       edition: "Batch 1",
       statedAge: 12, // Different from bottle's statedAge
       abv: 46.0,
@@ -219,7 +219,7 @@ describe("POST /bottle-releases", () => {
 
   it("throws error if bottle not found", async function ({ defaults }) {
     const data = {
-      bottleId: 999999,
+      bottle: 999999,
       edition: "Batch 1",
       statedAge: 10,
       abv: 46.0,
@@ -256,7 +256,7 @@ describe("POST /bottle-releases", () => {
 
     // Try to create duplicate release
     const data = {
-      bottleId: bottle.id,
+      bottle: bottle.id,
       edition: "Batch 1",
       statedAge: 10,
       abv: 46.0,
@@ -300,7 +300,7 @@ describe("POST /bottle-releases", () => {
 
     // Try to create duplicate release with null values
     const data = {
-      bottleId: bottle.id,
+      bottle: bottle.id,
       edition: "A",
     };
 

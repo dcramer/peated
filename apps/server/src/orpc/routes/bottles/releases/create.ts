@@ -20,7 +20,7 @@ export default procedure
   .route({ method: "POST", path: "/bottle-releases" })
   .input(
     BottleReleaseInputSchema.extend({
-      bottleId: z.coerce.number(),
+      bottle: z.coerce.number(),
     }),
   )
   .output(BottleReleaseSchema)
@@ -29,7 +29,7 @@ export default procedure
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, input.bottleId));
+      .where(eq(bottles.id, input.bottle));
 
     if (!bottle) {
       throw errors.NOT_FOUND({
@@ -70,7 +70,7 @@ export default procedure
     // TODO: should use SELECT FOR UPDATE to avoid race condition
     const existingRelease = await db.query.bottleReleases.findFirst({
       where: and(
-        eq(bottleReleases.bottleId, input.bottleId),
+        eq(bottleReleases.bottleId, input.bottle),
         input.edition
           ? eq(
               sql`LOWER(${bottleReleases.edition})`,
@@ -111,7 +111,7 @@ export default procedure
       const [release] = await tx
         .insert(bottleReleases)
         .values({
-          bottleId: input.bottleId,
+          bottleId: input.bottle,
           fullName,
           name,
           edition: input.edition,
@@ -150,7 +150,7 @@ export default procedure
           .set({
             numReleases: sql`${bottles.numReleases} + 1`,
           })
-          .where(eq(bottles.id, input.bottleId)),
+          .where(eq(bottles.id, input.bottle)),
       ]);
 
       return release;

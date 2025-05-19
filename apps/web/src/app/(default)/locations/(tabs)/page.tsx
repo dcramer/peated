@@ -1,6 +1,6 @@
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
 import Link from "@peated/web/components/link";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -8,8 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const trpcClient = await getTrpcClient();
-  const countryList = await trpcClient.countryList.fetch({
+  const countryList = await client.countries.list({
     onlyMajor: true,
     sort: "-bottles",
   });

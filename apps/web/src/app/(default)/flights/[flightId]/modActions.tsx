@@ -7,21 +7,25 @@ import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function ModActions({ flight }: { flight: Flight }) {
   const { user } = useAuth();
+  const orpc = useORPC();
 
   const router = useRouter();
 
-  const deleteFlightMutation = trpc.flightDelete.useMutation();
+  const deleteFlightMutation = useMutation(
+    orpc.flights.delete.mutationOptions(),
+  );
 
   if (!user?.mod && user?.id !== flight.createdBy?.id) return null;
 
   const deleteFlight = async () => {
     // TODO: show confirmation message
-    await deleteFlightMutation.mutateAsync(flight.id);
+    await deleteFlightMutation.mutateAsync({ flight: flight.id });
     router.push("/");
   };
 

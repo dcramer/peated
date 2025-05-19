@@ -3,7 +3,8 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import ReleaseForm from "@peated/web/components/releaseForm";
 import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AddRelease({
@@ -18,9 +19,14 @@ export default function AddRelease({
   const name = toTitleCase(searchParams.get("name") || "");
   const returnTo = searchParams.get("returnTo");
 
-  const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
+  const orpc = useORPC();
+  const { data: bottle } = useSuspenseQuery(
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+  );
 
-  const bottleReleaseCreateMutation = trpc.bottleReleaseCreate.useMutation();
+  const bottleReleaseCreateMutation = useMutation(
+    orpc.bottles.releases.create.mutationOptions(),
+  );
 
   if (!bottle) return null;
 
@@ -29,7 +35,7 @@ export default function AddRelease({
       bottle={bottle}
       onSubmit={async ({ image, ...data }) => {
         const newRelease = await bottleReleaseCreateMutation.mutateAsync({
-          bottleId: Number(bottleId),
+          bottle: Number(bottleId),
           ...data,
         });
 

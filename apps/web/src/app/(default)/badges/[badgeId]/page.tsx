@@ -2,7 +2,7 @@ import BadgeImage from "@peated/web/components/badgeImage";
 import BetaNotice from "@peated/web/components/betaNotice";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 import { Suspense } from "react";
 import Leaderboard from "./leaderboard";
 
@@ -11,8 +11,9 @@ export async function generateMetadata({
 }: {
   params: { badgeId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const badge = await trpcClient.badgeById.fetch(parseInt(badgeId, 10));
+  const badge = await client.badges.details({
+    badge: parseInt(badgeId, 10),
+  });
 
   return {
     title: `${badge.name} - Badge Details`,
@@ -28,10 +29,9 @@ export default async function Page({
     return redirectToAuth({ pathname: `/badges/${badgeId}` });
   }
 
-  const trpcClient = await getTrpcClient();
-  const [badge] = await Promise.all([
-    trpcClient.badgeById.fetch(parseInt(badgeId, 10)),
-  ]);
+  const badge = await client.badges.details({
+    badge: parseInt(badgeId, 10),
+  });
 
   return (
     <>
