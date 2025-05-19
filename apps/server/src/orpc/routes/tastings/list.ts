@@ -23,7 +23,7 @@ export default procedure
         bottle: z.coerce.number().optional(),
         entity: z.coerce.number().optional(),
         user: z
-          .union([z.coerce.number(), z.literal("me"), z.string])
+          .union([z.coerce.number(), z.literal("me"), z.string()])
           .optional(),
         filter: z.enum(["global", "friends", "local"]).default("global"),
         cursor: z.coerce.number().gte(1).default(1),
