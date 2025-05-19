@@ -21,7 +21,7 @@ describe("POST /users/:user/avatar", () => {
       ),
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: You don't have permission to update this user.]`,
+      `[Error: Cannot update another user's avatar.]`,
     );
   });
 

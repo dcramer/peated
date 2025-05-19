@@ -18,7 +18,7 @@ export default procedure
   .input(InputSchema)
   .output(FlightSchema)
   .handler(async function ({ input, context, errors }) {
-    const { flight: flightId, ...data } = input;
+    const { flight: flightId, bottles: bottleIds, ...data } = input;
 
     const [flight] = await db
       .select()
@@ -37,7 +37,7 @@ export default procedure
       });
     }
 
-    if (Object.values(data).length === 0 && !input.bottles) {
+    if (Object.values(data).length === 0 && !bottleIds) {
       return await serialize(FlightSerializer, flight, context.user);
     }
 
@@ -51,17 +51,17 @@ export default procedure
         : [flight];
       if (!newFlight) return;
 
-      if (input.bottles) {
+      if (bottleIds) {
         await tx
           .delete(flightBottles)
           .where(
             and(
               eq(flightBottles.flightId, flight.id),
-              notInArray(flightBottles.bottleId, input.bottles),
+              notInArray(flightBottles.bottleId, bottleIds),
             ),
           );
 
-        for (const bottle of input.bottles) {
+        for (const bottle of bottleIds) {
           await tx
             .insert(flightBottles)
             .values({
