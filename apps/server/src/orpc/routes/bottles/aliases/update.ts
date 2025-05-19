@@ -6,7 +6,7 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z.object({
-  name: z.string(),
+  alias: z.string(),
   ignored: z.boolean().optional(),
 });
 
@@ -16,17 +16,17 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "PATCH", path: "/bottle-aliases/:name" })
+  .route({ method: "PATCH", path: "/bottle-aliases/:alias" })
   .use(requireMod)
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({ input, context, errors }) {
-    const { name, ...data } = input;
+    const { alias: aliasName, ...data } = input;
 
     const [alias] = await db
       .select()
       .from(bottleAliases)
-      .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()));
+      .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()));
 
     if (!alias) {
       throw errors.NOT_FOUND({
@@ -44,7 +44,7 @@ export default procedure
     const [newAlias] = await db
       .update(bottleAliases)
       .set(data)
-      .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
+      .where(eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()))
       .returning();
 
     if (!newAlias) {

@@ -1,18 +1,22 @@
 "use client";
 
 import { MAJOR_COUNTRIES } from "@peated/server/constants";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import SelectField from "./selectField";
 
 export default function CountryField(
   props: React.ComponentProps<typeof SelectField>,
 ) {
-  const [{ results: suggestedOptions }] = trpc.countryList.useSuspenseQuery({
-    onlyMajor: true,
-    sort: "-bottles",
-  });
-
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.countries.list.queryOptions({
+      input: {
+        onlyMajor: true,
+        sort: "-bottles",
+      },
+    }),
+  );
 
   MAJOR_COUNTRIES.map(([name, slug]) => ({
     id: slug,
@@ -22,7 +26,7 @@ export default function CountryField(
   return (
     <SelectField
       onQuery={async (query) => {
-        const { results } = await trpcUtils.countryList.fetch({
+        const { results } = await orpc.countries.list.call({
           query,
           sort: "-bottles",
         });
@@ -31,7 +35,7 @@ export default function CountryField(
           name: r.name,
         }));
       }}
-      suggestedOptions={suggestedOptions}
+      suggestedOptions={data.results}
       {...props}
     />
   );

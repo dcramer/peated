@@ -7,13 +7,13 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "DELETE", path: "/bottle-aliases/:name" })
+  .route({ method: "DELETE", path: "/bottle-aliases/:alias" })
   .use(requireMod)
-  .input(z.object({ name: z.string() }))
+  .input(z.object({ alias: z.string() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const alias = await db.query.bottleAliases.findFirst({
-      where: eq(sql`LOWER(${bottleAliases.name})`, input.name.toLowerCase()),
+      where: eq(sql`LOWER(${bottleAliases.name})`, input.alias.toLowerCase()),
       with: {
         bottle: true,
       },

@@ -12,7 +12,7 @@ describe("PUT /bottle-aliases/:name", () => {
     const err = await waitError(
       routerClient.bottles.aliases.update(
         {
-          name: alias.name,
+          alias: alias.name,
         },
         { context: { user } },
       ),
@@ -26,7 +26,7 @@ describe("PUT /bottle-aliases/:name", () => {
 
     await routerClient.bottles.aliases.update(
       {
-        name: alias.name,
+        alias: alias.name,
         ignored: true,
       },
       { context: { user } },

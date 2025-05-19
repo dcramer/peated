@@ -5,7 +5,8 @@ import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
 export default function EntityAliases({
   params: { entityId },
@@ -13,10 +14,16 @@ export default function EntityAliases({
   params: { entityId: string };
 }) {
   const { user } = useAuth();
-  const [aliasList] = trpc.entityAliasList.useSuspenseQuery({
-    entity: Number(entityId),
-  });
-  const deleteAliasMutation = trpc.entityAliasDelete.useMutation();
+  const orpc = useORPC();
+  const { data: aliasList } = useSuspenseQuery(
+    orpc.entities.aliases.list.queryOptions({
+      input: { entity: Number(entityId) },
+    }),
+  );
+
+  const deleteAliasMutation = useMutation(
+    orpc.entities.aliases.delete.mutationOptions(),
+  );
 
   return (
     <Table
@@ -46,7 +53,9 @@ export default function EntityAliases({
           value: (item) =>
             !item.isCanonical && (
               <ConfirmationButton
-                onContinue={() => deleteAliasMutation.mutate(item.name)}
+                onContinue={() =>
+                  deleteAliasMutation.mutate({ alias: item.name })
+                }
               >
                 Delete
               </ConfirmationButton>

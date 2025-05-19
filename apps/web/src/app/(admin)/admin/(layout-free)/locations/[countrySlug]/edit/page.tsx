@@ -2,7 +2,12 @@
 
 import CountryForm from "@peated/web/components/admin/countryForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Page({
@@ -12,23 +17,36 @@ export default function Page({
 }) {
   useModRequired();
 
-  const [country] = trpc.countryBySlug.useSuspenseQuery(countrySlug);
+  const orpc = useORPC();
+  const { data: country } = useSuspenseQuery(
+    orpc.countries.details.queryOptions({
+      input: { country: countrySlug },
+    }),
+  );
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo");
 
-  const trpcUtils = trpc.useUtils();
+  const queryClient = useQueryClient();
 
-  const countryUpdateMutation = trpc.countryUpdate.useMutation({
+  const countryUpdateMutation = useMutation({
+    ...orpc.countries.update.mutationOptions(),
     onSuccess: (data) => {
       if (!data) return;
-      const previous = trpcUtils.countryBySlug.getData(data.slug);
-      if (previous) {
-        trpcUtils.countryBySlug.setData(data.slug, {
-          ...previous,
-          ...data,
-        });
-      }
+      // TODO: this might be wrong
+      queryClient.setQueryData(
+        orpc.countries.details.key({
+          input: { country: data.slug },
+        }),
+        (oldData: any) =>
+          oldData
+            ? {
+                ...oldData,
+                ...data,
+              }
+            : oldData,
+      );
     },
   });
 
@@ -38,7 +56,7 @@ export default function Page({
         await countryUpdateMutation.mutateAsync(
           {
             ...data,
-            slug: country.slug,
+            country: country.slug,
           },
           {
             onSuccess: (result) => {

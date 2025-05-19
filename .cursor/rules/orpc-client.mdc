@@ -197,6 +197,21 @@ Use `safe()` for all oRPC calls. It returns `{ data, error, isDefined }`.
 * `error.name` can be used to distinguish known error cases (`"CONFLICT"`, `"NOT_FOUND"`, etc.). These are available in `@peated/server/orpc` and generally map to standard HTTP status names.
 * Throw `error` only when it's unhandled or indicates a true failure.
 
+```ts
+import { safe } from "@orpc/client";
+
+const { error, data, isDefined } = await safe(
+  orpcClient.auth.register({ email, password, username })
+);
+
+if (isDefined && error?.name === "CONFLICT") {
+  // error.message is safe to show to a user if the error 'isDefined'
+  return {error: error.message};
+} else if (error) {
+  throw error;
+}
+```
+
 ## Inferring Inputs and Outputs
 
 You can use the `Inputs` and `Outputs` type to reference a route handlers concerns:

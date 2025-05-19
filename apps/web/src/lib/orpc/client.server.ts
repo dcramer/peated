@@ -6,7 +6,7 @@ import { cache } from "react";
 import { getSession } from "../session.server";
 import { getLink } from "./link";
 
-async function createServerClient() {
+export async function createServerClient() {
   const session = await getSession();
   const accessToken = session.accessToken;
 

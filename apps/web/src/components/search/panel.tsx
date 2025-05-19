@@ -2,7 +2,6 @@
 
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { trpc } from "@peated/web/lib/trpc/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
@@ -45,27 +44,30 @@ export default function SearchPanel({
 
   const isUserQuery = query.indexOf("@") !== -1 && user;
 
-  const unsafe_onQuery = useCallback(async (query: string) => {
-    setState("loading");
+  const unsafe_onQuery = useCallback(
+    async (query: string) => {
+      setState("loading");
 
-    const isUserQuery = query.indexOf("@") !== -1 && user;
+      const isUserQuery = query.indexOf("@") !== -1 && user;
 
-    const include: ("bottles" | "entities" | "users")[] = [];
-    if (directToTasting || !isUserQuery) include.push("bottles");
-    if (!directToTasting && user && (isUserQuery || query))
-      include.push("users");
-    if (!directToTasting) include.push("entities");
+      const include: ("bottles" | "entities" | "users")[] = [];
+      if (directToTasting || !isUserQuery) include.push("bottles");
+      if (!directToTasting && user && (isUserQuery || query))
+        include.push("users");
+      if (!directToTasting) include.push("entities");
 
-    const { results } = await orpc.search.call({
-      query,
-      limit: maxResults,
-      include,
-    });
+      const { results } = await orpc.search.call({
+        query,
+        limit: maxResults,
+        include,
+      });
 
-    setResults(results);
-    setState("ready");
-    setInitialState("ready");
-  }, []);
+      setResults(results);
+      setState("ready");
+      setInitialState("ready");
+    },
+    [directToTasting, user],
+  );
 
   // TODO: handle errors
   const onQuery = useDebounceCallback(unsafe_onQuery);
@@ -75,7 +77,7 @@ export default function SearchPanel({
     setQuery(curValue);
     if (onQueryChange) onQueryChange(curValue);
     onQuery(curValue);
-  }, [initialValue, value]);
+  }, [initialValue, value, onQuery, onQueryChange]);
 
   return (
     <Layout

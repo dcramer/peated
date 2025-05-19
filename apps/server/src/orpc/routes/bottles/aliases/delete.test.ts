@@ -23,7 +23,7 @@ describe("DELETE /bottle-aliases/:name", () => {
     });
 
     const data = await routerClient.bottles.aliases.delete(
-      { name: alias.name },
+      { alias: alias.name },
       {
         context: { user },
       },
@@ -57,7 +57,7 @@ describe("DELETE /bottle-aliases/:name", () => {
 
     const err = await waitError(
       routerClient.bottles.aliases.delete(
-        { name: alias.name },
+        { alias: alias.name },
         {
           context: { user },
         },

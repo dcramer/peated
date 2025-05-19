@@ -1,6 +1,6 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 
 export const fetchCache = "default-no-store";
 
@@ -9,8 +9,7 @@ export async function generateMetadata({
 }: {
   params: { username: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.fetch(username);
+  const user = await client.users.details({ user: username });
 
   return {
     title: `@${user.username}`,
@@ -23,20 +22,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function UserTastings({
+export default async function UserProfilePage({
   params: { username },
 }: {
   params: { username: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.fetch(username);
-  const tastingList = await trpcClient.tastingList.fetch({
-    user: user.id,
-  });
+  const tastings = await client.tastings.list({ user: username, limit: 10 });
 
-  return tastingList.results.length ? (
-    <TastingList values={tastingList.results} />
-  ) : (
-    <EmptyActivity>Looks like this ones a bit short on tastings.</EmptyActivity>
-  );
+  if (!tastings.results.length) {
+    return <EmptyActivity />;
+  }
+
+  return <TastingList values={tastings.results} />;
 }

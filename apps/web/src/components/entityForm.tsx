@@ -1,5 +1,6 @@
 import { BoltIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isDefinedError } from "@orpc/client";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { type Entity } from "@peated/server/types";
@@ -12,13 +13,14 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import SelectField, { type Option } from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
+import useAuth from "@peated/web/hooks/useAuth";
+import { logError } from "@peated/web/lib/log";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import useAuth from "../hooks/useAuth";
-import { logError } from "../lib/log";
 import Button from "./button";
 import Legend from "./legend";
 import RegionField from "./regionField";
@@ -79,13 +81,16 @@ export default function EntityForm({
       : undefined,
   );
 
-  const generateDataMutation = trpc.entityGenerateDetails.useMutation();
+  const orpc = useORPC();
+  const generateDataMutation = useMutation(
+    orpc.ai.entityLookup.mutationOptions(),
+  );
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit(data);
-    } catch (err) {
-      if (isTRPCClientError(err)) {
+    } catch (err: any) {
+      if (isDefinedError(err)) {
         setError(err.message);
       } else {
         logError(err);

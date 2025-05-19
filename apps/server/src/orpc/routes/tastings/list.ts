@@ -6,6 +6,7 @@ import {
   tastings,
   users,
 } from "@peated/server/db/schema";
+import { getUserFromId } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
 import { CursorSchema, TastingSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -21,7 +22,9 @@ export default procedure
       .object({
         bottle: z.coerce.number().optional(),
         entity: z.coerce.number().optional(),
-        user: z.union([z.coerce.number(), z.literal("me")]).optional(),
+        user: z
+          .union([z.coerce.number(), z.literal("me"), z.string])
+          .optional(),
         filter: z.enum(["global", "friends", "local"]).default("global"),
         cursor: z.coerce.number().gte(1).default(1),
         limit: z.coerce.number().gte(1).lte(100).default(25),
@@ -66,16 +69,19 @@ export default procedure
     }
 
     if (input.user) {
-      if (input.user === "me") {
-        if (!context.user) {
-          throw errors.UNAUTHORIZED();
-        }
+      const selectedUser = await getUserFromId(db, input.user, context.user);
 
-        where.push(eq(tastings.createdById, context.user.id));
-      } else {
-        // TODO: support username
-        where.push(eq(tastings.createdById, input.user));
+      if (!selectedUser) {
+        if (input.user === "me") {
+          throw errors.UNAUTHORIZED();
+        } else {
+          throw errors.NOT_FOUND({
+            message: "User not found.",
+          });
+        }
       }
+
+      where.push(eq(tastings.createdById, selectedUser.id));
     }
 
     const limitPrivate = input.filter !== "friends";
