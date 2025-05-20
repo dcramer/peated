@@ -54,7 +54,7 @@ export default function EntityAliases({
             !item.isCanonical && (
               <ConfirmationButton
                 onContinue={() =>
-                  deleteAliasMutation.mutate({ alias: item.name })
+                  deleteAliasMutation.mutate({ name: item.name })
                 }
               >
                 Delete
