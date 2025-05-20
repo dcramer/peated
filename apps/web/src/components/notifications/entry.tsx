@@ -1,9 +1,9 @@
 "use client";
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import classNames from "@peated/server/lib/classNames";
 import type { Notification } from "@peated/server/types";
 import Link from "@peated/web/components/link";
+import classNames from "@peated/web/lib/classNames";
 import type { FriendRequestNotification } from "@peated/web/types";
 import { useRouter } from "next/navigation";
 import UserAvatar from "../userAvatar";

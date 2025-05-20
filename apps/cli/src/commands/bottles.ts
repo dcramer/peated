@@ -153,9 +153,12 @@ subcommand
           console.warn(
             `Removing bottle due to unknown entity: ${bottle.fullName}`,
           );
-          await routerClient.bottles.delete(bottle.id, {
-            context: { user: systemUser },
-          });
+          await routerClient.bottles.delete(
+            { bottle: bottle.id },
+            {
+              context: { user: systemUser },
+            },
+          );
         } else {
           // probably mismatched bottle
           if (bottle.brandId === entity.id) continue;

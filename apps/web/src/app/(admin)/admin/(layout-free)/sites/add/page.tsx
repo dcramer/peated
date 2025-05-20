@@ -15,9 +15,7 @@ export default function Page() {
   return (
     <SiteForm
       onSubmit={async (data) => {
-        const site = await siteCreateMutation.mutateAsync({
-          ...data,
-        });
+        const site = await siteCreateMutation.mutateAsync(data);
         router.push(`/admin/sites/${site.type}`);
       }}
     />
